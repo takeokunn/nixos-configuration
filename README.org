@@ -1,0 +1,7 @@
+#+STARTUP: content
+#+STARTUP: fold
+* nixos-configuration
+#+begin_src shell
+  nix build .#darwinConfigurations.OPL2212-2.system --extra-experimental-features 'nix-command flakes'
+  sudo ./result/sw/bin/darwin-rebuild switch --flake ".#OPL2212-2"
+#+end_src
