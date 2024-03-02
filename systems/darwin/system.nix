@@ -1,4 +1,4 @@
-{ nixpkgs, ... }: {
+{ pkgs, ... }: {
   services.nix-daemon.enable = true;
   nix.settings.experimental-features = "nix-command flakes";
   users.users.obara.home = "/Users/obara";
@@ -23,15 +23,11 @@
     };
   };
 
-  # launchd.agents = {
-  #   ollama = {
-  #     enable = false;
-  #     config = {
-  #       Label = "dev.takeokunn.ollama";
-  #       ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
-  #       RunAtLoad = true;
-  #       KeepAlive = true;
-  #     };
-  #   };
-  # };
+  launchd.user.agents.ollama = {
+    serviceConfig = {
+      ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
+      KeepAlive = true;
+      RunAtLoad = true;
+    };
+  };
 }

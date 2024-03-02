@@ -20,13 +20,13 @@
     php83Packages.composer
     ruby
     roswell
-    # terraform
+    terraform
     vlang
     zig
 
     # for language specific
     gopls
-    # gotools
+    gotools
     hadolint
     rustup
     rye
@@ -51,7 +51,7 @@
     jsonnet-language-server
     nil
     nodePackages_latest.bash-language-server
-    # nodePackages_latest.intelephense
+    nodePackages_latest.intelephense
     nodePackages_latest.typescript-language-server
     nodePackages_latest.vim-language-server
     rubyPackages.solargraph
@@ -161,7 +161,7 @@
     tcpdump
 
     # for editor
-    emacs
+    emacs-git
     editorconfig-core-c
     micro
     nano
@@ -199,10 +199,10 @@
     noto-fonts-monochrome-emoji
 
     # for application
-    # discord
+    discord
     gimp
-    # raycast
-    # slack
-    # iterm2
+    raycast
+    slack
+    iterm2
   ];
 }
