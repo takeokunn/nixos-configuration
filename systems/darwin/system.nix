@@ -1,6 +1,8 @@
 { pkgs, ... }: {
-  services.nix-daemon.enable = true;
+  nix.gc.automatic = true;
   nix.settings.experimental-features = "nix-command flakes";
+
+  services.nix-daemon.enable = true;
   users.users.obara.home = "/Users/obara";
 
   system = {
