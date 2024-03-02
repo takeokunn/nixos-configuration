@@ -9,12 +9,11 @@ in {
     inherit system lib;
     modules = [
       ./system.nix
-      # home-manager.darwinModules.home-manager
-      # {
-      #   home-manager.useGlobalPkgs = true;
-      #   home-manager.useUserPackages = true;
-      #   home-manager.users.obara = import ./home.nix { inherit pkgs lib; };
-      # }
+      home-manager.darwinModules.home-manager
+      {
+        home-manager.useUserPackages = true;
+        home-manager.users.obara = import ./home.nix { inherit pkgs lib; };
+      }
     ];
   };
 }

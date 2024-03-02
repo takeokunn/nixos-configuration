@@ -1,6 +1,8 @@
 { pkgs, lib, ... }:
 
 {
+  users.defaultUserShell = pkgs.fish;
+
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [
     (import (builtins.fetchTarball {
@@ -47,7 +49,6 @@
     php83
     php83Extensions.redis
     php83Packages.composer
-    python3
     ruby
     roswell
     # terraform
@@ -200,7 +201,7 @@
     (tree-sitter.withPlugins (p: builtins.attrValues p))
 
     # for shell
-    fish
+    # fish
 
     # for DB
     redis
