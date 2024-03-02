@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
     # for lanaguage
@@ -129,7 +128,6 @@
     hugo
     iftop
     imagemagick
-    mu
     ncurses
     neofetch
     offlineimap
@@ -197,6 +195,10 @@
     noto-fonts-emoji-blob-bin
     noto-fonts-lgc-plus
     noto-fonts-monochrome-emoji
+
+    # for emacs
+    mu
+    emacsPackages.mu4e
 
     # for application
     discord
