@@ -1,36 +1,5 @@
-{ pkgs, lib, ... }:
-
+{ pkgs, ... }:
 {
-  users.defaultUserShell = pkgs.fish;
-
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url =
-        "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
-      sha256 = "sha256:08cljf69nixcamkinmgbbk1ajl9lg8s3gm2jmq9qqisz0ydjjrch";
-    }))
-    (final: prev: {
-      gnupg = prev.gnupg.overrideAttrs (old: {
-        src = prev.fetchurl {
-          url = "mirror://gnupg/gnupg/gnupg-2.4.4.tar.bz2";
-          hash = "sha256-Z+vgFsqQ+naIzmejh+vYLGJh6ViX23sj3yT/M1voW8Y=";
-        };
-      });
-      gotools = prev.gotools.overrideAttrs (old: {
-        postPatch = ''
-          # The gopls folder contains a Go submodule which causes a build failure
-          # and lives in its own package named gopls.
-          rm -r gopls
-          # getgo is an experimental go installer which adds generic named server and client binaries to $out/bin
-          rm -r cmd/getgo
-          # remove bundle
-          rm -r cmd/bundle
-        '';
-      });
-    })
-  ];
-
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
     # for lanaguage
@@ -201,7 +170,7 @@
     (tree-sitter.withPlugins (p: builtins.attrValues p))
 
     # for shell
-    # fish
+    fish
 
     # for DB
     redis
@@ -236,16 +205,4 @@
     # slack
     # iterm2
   ];
-
-  # launchd.agents = {
-  #   ollama = {
-  #     enable = false;
-  #     config = {
-  #       Label = "dev.takeokunn.ollama";
-  #       ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
-  #       RunAtLoad = true;
-  #       KeepAlive = true;
-  #     };
-  #   };
-  # };
 }
