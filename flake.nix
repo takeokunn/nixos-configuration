@@ -2,8 +2,11 @@
   description = "takeokunn's nix system";
 
   inputs = {
-    nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    private-nixpkgs = {
+      url = "github:takeokunn/nix-channel";
+      flake = false;
     };
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
@@ -13,15 +16,14 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-    };
+
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay }:
-  {
-    darwinConfigurations = (import ./systems/darwin {
-      inherit self nixpkgs nix-darwin home-manager emacs-overlay;
-    });
-  };
+  outputs = inputs@{ self, nixpkgs, emacs-overlay, private-nixpkgs, nix-darwin
+    , home-manager }: {
+      darwinConfigurations = (import ./systems/darwin {
+        inherit self nixpkgs private-nixpkgs nix-darwin home-manager
+          emacs-overlay;
+      });
+    };
 }

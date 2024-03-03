@@ -1,37 +1,29 @@
-{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay, ... }:
+{ self, nixpkgs, private-nixpkgs, nix-darwin, home-manager, emacs-overlay, ...
+}:
 let
   system = "aarch64-darwin";
+  username = "obara";
+  configuration = { pkgs, ... }: {
+    users.users.${username}.home = "/Users/${username}";
+  };
   lib = nixpkgs.lib;
-  overlay = import emacs-overlay;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = [
-      overlay
-      (final: prev: {
-        gotools = prev.gotools.overrideAttrs (old: {
-          postPatch = ''
-            # The gopls folder contains a Go submodule which causes a build failure
-            # and lives in its own package named gopls.
-            rm -r gopls
-            # getgo is an experimental go installer which adds generic named server and client binaries to $out/bin
-            rm -r cmd/getgo
-            # remove bundle
-            rm -r cmd/bundle
-          '';
-        });
-      })
-    ];
+    overlays = import ./overlay.nix { inherit emacs-overlay; };
   };
+  private-pkgs = import private-nixpkgs { inherit system; };
 in {
   OPL2212-2 = nix-darwin.lib.darwinSystem {
     inherit system lib;
     modules = [
+      configuration
       ./system.nix
       home-manager.darwinModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users.obara = import ./home.nix { inherit pkgs; };
+        home-manager.users."${username}" =
+          import ./home.nix { inherit pkgs private-pkgs; };
       }
     ];
   };

@@ -1,9 +1,9 @@
-{ pkgs, ... }: {
+{ pkgs, private-pkgs, ... }: {
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
     # for lanaguage
     clojure
-    # deno
+    deno
     erlang
     fsharp
     gauche
@@ -106,8 +106,7 @@
     pv
     ripgrep
     rlwrap
-    tmux
-    # personal.tmux-sixel
+    private-pkgs.tmux-sixel
     tree
     wget
     yq
@@ -132,8 +131,8 @@
     neofetch
     offlineimap
     openssl
-    # personal.mitamae
-    # personal.isucrud
+    private-pkgs.mitamae
+    private-pkgs.isucrud
     pwgen
     silicon
     sqldef
@@ -148,7 +147,7 @@
     (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
     # for cloud
-    # personal.ecspresso
+    private-pkgs.ecspresso
     awscli
     ssm-session-manager-plugin
 
