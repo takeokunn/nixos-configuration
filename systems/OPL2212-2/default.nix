@@ -12,7 +12,7 @@ in {
     inherit system lib;
     modules = [
       configuration
-      ./system.nix
+      ../../nix-darwin
       home-manager.darwinModules.home-manager
       {
         home-manager.useUserPackages = true;
