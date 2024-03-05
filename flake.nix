@@ -16,7 +16,6 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
   };
 
   outputs = inputs@{ self, nixpkgs, emacs-overlay, private-nixpkgs, nix-darwin

@@ -1,6 +1,8 @@
 #+STARTUP: content
 #+STARTUP: fold
 * nixos-configuration
+** for OPL2212-2
 #+begin_src shell
+  nix flake update --flake ~/.ghq/github.com/takeokunn/nixos-configuration
   nix run nix-darwin -- switch --flake ~/.ghq/github.com/takeokunn/nixos-configuration#OPL2212-2
 #+end_src
