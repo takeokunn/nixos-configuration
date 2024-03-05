@@ -47,4 +47,27 @@
       RunAtLoad = true;
     };
   };
+
+  homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      upgrade = true;
+      cleanup = "uninstall";
+    };
+    casks = [
+      "aquaskk"
+      "docker"
+      "google-chrome"
+      "keycastr"
+      "raycast"
+      "sequel-ace"
+      "sublime-text"
+      "wireshark"
+    ];
+    masApps = {
+      Xcode = 497799835;
+      LINE = 539883307;
+    };
+  };
 }
