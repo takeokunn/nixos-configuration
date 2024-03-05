@@ -70,4 +70,9 @@
       LINE = 539883307;
     };
   };
+
+  networking.dns =
+    [ "8.8.8.8" "8.8.4.4" "2001:4860:4860::8888" "2001:4860:4860::8844" ];
+
+  security.pam.enableSudoTouchIdAuth = true;
 }
