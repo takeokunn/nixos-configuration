@@ -7,12 +7,6 @@ let
     users.users.${username}.home = "/Users/${username}";
   };
   lib = nixpkgs.lib;
-  pkgs = import nixpkgs {
-    inherit system;
-    config.allowUnfree = true;
-    overlays = import ./overlay.nix { inherit emacs-overlay; };
-  };
-  private-pkgs = import private-nixpkgs { inherit system; };
 in {
   OPL2212-2 = nix-darwin.lib.darwinSystem {
     inherit system lib;
@@ -22,8 +16,9 @@ in {
       home-manager.darwinModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users."${username}" =
-          import ./home.nix { inherit pkgs private-pkgs; };
+        home-manager.users."${username}" = import ../../home-manager {
+          inherit system nixpkgs private-nixpkgs emacs-overlay;
+        };
       }
     ];
   };

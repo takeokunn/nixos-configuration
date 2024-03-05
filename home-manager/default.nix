@@ -1,4 +1,12 @@
-{ pkgs, private-pkgs, ... }: {
+{ system, nixpkgs, private-nixpkgs, emacs-overlay, ... }:
+let
+  pkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+    overlays = import ./overlay.nix { inherit emacs-overlay; };
+  };
+  private-pkgs = import private-nixpkgs { inherit system; };
+in {
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
     # for lanaguage
@@ -168,6 +176,7 @@
 
     # for shell
     fish
+    zx
 
     # for DB
     redis
@@ -184,16 +193,6 @@
 
     # for ai
     ollama
-
-    # for font
-    hackgen-font
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-cjk-serif
-    noto-fonts-color-emoji
-    noto-fonts-emoji-blob-bin
-    noto-fonts-lgc-plus
-    noto-fonts-monochrome-emoji
 
     # for emacs
     mu
