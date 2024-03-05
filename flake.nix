@@ -21,7 +21,7 @@
 
   outputs = inputs@{ self, nixpkgs, emacs-overlay, private-nixpkgs, nix-darwin
     , home-manager }: {
-      darwinConfigurations = (import ./systems/darwin {
+      darwinConfigurations = (import ./systems/OPL2212-2 {
         inherit self nixpkgs private-nixpkgs nix-darwin home-manager
           emacs-overlay;
       });
