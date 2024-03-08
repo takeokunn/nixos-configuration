@@ -1,5 +1,10 @@
-{ pkgs, private-pkgs }:
-with pkgs; [
+{ pkgs }:
+let
+  ecspresso = pkgs.callPackage ./pkgs/ecspresso { };
+  isucrud = pkgs.callPackage ./pkgs/isucrud { };
+  mitamae = pkgs.callPackage ./pkgs/mitamae { };
+  tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
+in with pkgs; [
   # for lanaguage
   clojure
   deno
@@ -105,7 +110,7 @@ with pkgs; [
   pv
   ripgrep
   rlwrap
-  private-pkgs.tmux-sixel
+  tmux-sixel
   tree
   wget
   yq
@@ -130,8 +135,8 @@ with pkgs; [
   neofetch
   offlineimap
   openssl
-  private-pkgs.mitamae
-  private-pkgs.isucrud
+  mitamae
+  isucrud
   pwgen
   silicon
   sqldef
@@ -146,8 +151,8 @@ with pkgs; [
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
   # for cloud
-  private-pkgs.ecspresso
   awscli
+  ecspresso
   ssm-session-manager-plugin
 
   # for network
