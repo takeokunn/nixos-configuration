@@ -61,7 +61,8 @@ in with pkgs; [
   yaml-language-server
 
   # for gnupg
-  pinentry
+  pinentry_mac
+  pinentry-emacs
   gnupg
 
   # for build tools
