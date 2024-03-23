@@ -147,7 +147,6 @@ in with pkgs; [
   unixtools.watch
 
   # for pass
-  bitwarden-cli
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
   # for cloud
@@ -196,8 +195,6 @@ in with pkgs; [
 
   # for application
   discord
-  gimp
   raycast
   slack
-  iterm2
 ]
