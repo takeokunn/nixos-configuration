@@ -129,7 +129,6 @@ in with pkgs; [
   extract_url
   ffmpeg
   graphviz
-  hugo
   iftop
   imagemagick
   ncurses
