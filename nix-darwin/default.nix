@@ -57,6 +57,7 @@
     };
     casks = [
       "aquaskk"
+      "drawio"
       "docker"
       "google-chrome"
       "keycastr"
