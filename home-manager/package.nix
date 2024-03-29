@@ -50,6 +50,7 @@ in with pkgs; [
   nix-prefetch-github
 
   # for language server
+  phpactor
   haskell-language-server
   jsonnet-language-server
   nil
