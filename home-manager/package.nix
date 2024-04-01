@@ -20,6 +20,7 @@ in with pkgs; [
   perl
   php83
   php83Extensions.redis
+  php83Extensions.imagick
   php83Packages.composer
   ruby
   roswell
