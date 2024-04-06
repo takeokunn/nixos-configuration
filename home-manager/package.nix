@@ -43,7 +43,7 @@ in with pkgs; [
   yarn
 
   # for nix
-  nixfmt
+  nixfmt-classic
   nixpkgs-fmt
   niv
   nix-prefetch
@@ -56,7 +56,7 @@ in with pkgs; [
   jsonnet-language-server
   nil
   nodePackages_latest.bash-language-server
-  nodePackages_latest.intelephense
+  # nodePackages_latest.intelephense
   nodePackages_latest.typescript-language-server
   nodePackages_latest.vim-language-server
   rubyPackages.solargraph
