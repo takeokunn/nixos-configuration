@@ -18,5 +18,6 @@
     darwinConfigurations = (import ./systems/OPL2212-2 {
       inherit self nixpkgs nix-darwin home-manager emacs-overlay;
     });
+    # nixosConfigurations = (import ./systems/)
   };
 }
