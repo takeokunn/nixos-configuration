@@ -65,6 +65,9 @@
       "sequel-ace"
       "sublime-text"
       "wireshark"
+      "discord"
+      "raycast"
+      "slack"
     ];
     masApps = {
       Xcode = 497799835;

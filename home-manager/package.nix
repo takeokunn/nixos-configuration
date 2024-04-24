@@ -6,18 +6,9 @@ let
   tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
 in with pkgs; [
   # for lanaguage
-  clojure
-  deno
-  erlang
-  fsharp
-  gauche
-  ghc
   go
   go-jsonnet
-  guile
-  lua
   nodejs_21
-  perl
   php83
   php83Extensions.redis
   php83Extensions.imagick
@@ -25,15 +16,11 @@ in with pkgs; [
   ruby
   roswell
   terraform
-  vlang
-  zig
 
   # for language specific
   gopls
   gotools
   hadolint
-  rustup
-  rye
   shellcheck
   terraform-ls
   tflint
@@ -67,35 +54,6 @@ in with pkgs; [
   pinentry-emacs
   gnupg
 
-  # for build tools
-  autoconf
-  automake
-  binutils
-  bison
-  boost
-  cmake
-  coreutils
-  foreman
-  glib
-  gnutls
-  icu
-  libcxx
-  libcxxrt
-  libgccjit
-  libiconv
-  libllvm
-  libmng
-  libpng
-  librsvg
-  libsixel
-  libxml2
-  libzip
-  meson
-  pkg-config
-  sqldef
-  stunnel
-  texinfo
-
   # for essential tools
   bat
   csvq
@@ -119,7 +77,6 @@ in with pkgs; [
   yq
 
   # for basic tools
-  SDL2
   act
   actionlint
   android-tools
@@ -157,15 +114,12 @@ in with pkgs; [
   ssm-session-manager-plugin
 
   # for network
-  bettercap
-  gping
   speedtest-cli
   tcpdump
 
   # for editor
   emacs-git
   editorconfig-core-c
-  micro
   nano
   neovim
   tree-sitter
@@ -194,9 +148,4 @@ in with pkgs; [
   # for emacs
   mu
   emacsPackages.mu4e
-
-  # for application
-  discord
-  raycast
-  slack
 ]
