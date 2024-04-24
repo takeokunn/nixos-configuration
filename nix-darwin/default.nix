@@ -1,6 +1,14 @@
 { pkgs, ... }: {
   nix = {
-    gc.automatic = true;
+    gc = {
+      automatic = true;
+      user = "obara";
+      interval = {
+        Hour = 9;
+        Minute = 0;
+      };
+      options = "--delete-older-than 7d";
+    };
     settings.experimental-features = "nix-command flakes";
   };
   services.nix-daemon.enable = true;
@@ -40,14 +48,6 @@
     };
   };
 
-  # launchd.user.agents.ollama = {
-  #   serviceConfig = {
-  #     ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
-  #     KeepAlive = true;
-  #     RunAtLoad = true;
-  #   };
-  # };
-
   homebrew = {
     enable = true;
     onActivation = {
@@ -81,4 +81,12 @@
   };
 
   security.pam.enableSudoTouchIdAuth = true;
+
+  # launchd.user.agents.ollama = {
+  #   serviceConfig = {
+  #     ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
+  #     KeepAlive = true;
+  #     RunAtLoad = true;
+  #   };
+  # };
 }
