@@ -8,7 +8,7 @@ in with pkgs; [
   # for lanaguage
   go
   go-jsonnet
-  nodejs_21
+  nodejs_20
   php83
   php83Extensions.redis
   php83Extensions.imagick
