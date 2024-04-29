@@ -82,6 +82,7 @@ in with pkgs; [
   android-tools
   cacert
   cmigemo
+  devbox
   direnv
   du-dust
   exiftool
