@@ -6,3 +6,8 @@
   nix flake update --flake ~/.ghq/github.com/takeokunn/nixos-configuration
   nix run nix-darwin -- switch --flake ~/.ghq/github.com/takeokunn/nixos-configuration#OPL2212-2
 #+end_src
+** for X13Gen2
+#+begin_src shell
+  nix flake update --flake ~/.ghq/github.com/takeokunn/nixos-configuration
+  sudo nixos-rebuild switch --flake ~/.ghq/github.com/takeokunn/nixos-configuration#X13Gen2
+#+end_src
