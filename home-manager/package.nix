@@ -7,28 +7,16 @@ let
   tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
 in with pkgs; [
   # for lanaguage
-  go
-  go-jsonnet
-  nodejs_20
+  nodejs
   php83
-  php83Extensions.redis
-  php83Extensions.imagick
-  php83Packages.composer
-  ruby
-  roswell
-  terraform
+  typescript
 
   # for language specific
   gopls
   gotools
   hadolint
+  roswell
   shellcheck
-  terraform-ls
-  tflint
-  tfsec
-  tfupdate
-  typescript
-  yarn
 
   # for nix
   nixfmt-classic
@@ -39,15 +27,15 @@ in with pkgs; [
   nix-prefetch-github
 
   # for language server
-  phpactor
   haskell-language-server
   jsonnet-language-server
   nil
   nodePackages_latest.bash-language-server
-  # nodePackages_latest.intelephense
   nodePackages_latest.typescript-language-server
   nodePackages_latest.vim-language-server
+  phpactor
   rubyPackages.solargraph
+  terraform-ls
   yaml-language-server
 
   # for gnupg
@@ -112,7 +100,6 @@ in with pkgs; [
 
   # for cloud
   awscli
-  ecspresso
   ssm-session-manager-plugin
 
   # for network
