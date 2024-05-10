@@ -1,6 +1,5 @@
 { pkgs }:
 let
-  awscli = pkgs.callPackage ./pkgs/awscli { };
   ecspresso = pkgs.callPackage ./pkgs/ecspresso { };
   isucrud = pkgs.callPackage ./pkgs/isucrud { };
   mitamae = pkgs.callPackage ./pkgs/mitamae { };
