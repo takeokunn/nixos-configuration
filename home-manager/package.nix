@@ -38,6 +38,11 @@ in with pkgs; [
   # for essential tools
   bat
   csvq
+  devbox
+  direnv
+  du-dust
+  exiftool
+  extract_url
   eza
   fd
   fzf
@@ -47,27 +52,20 @@ in with pkgs; [
   htop
   jq
   nkf
+  openssl
   peco
   pv
   ripgrep
-  tig
   rlwrap
-  tmux # or tmux-sixel
-  tree
-  wget
-  yq
-
-  # for essential tools
-  devbox
-  direnv
-  du-dust
-  exiftool
-  extract_url
-  openssl
   terminal-notifier
+  tig
+  tmux # or tmux-sixel
   tokei
+  tree
   unixtools.procps
   unixtools.watch
+  wget
+  yq
 
   # for util tools
   actionlint
