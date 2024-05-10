@@ -4,33 +4,26 @@ let
   ecspresso = pkgs.callPackage ./pkgs/ecspresso { };
   isucrud = pkgs.callPackage ./pkgs/isucrud { };
   mitamae = pkgs.callPackage ./pkgs/mitamae { };
-  tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
+  # tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
 in with pkgs; [
   # for lanaguage
   nodejs
   php83
-  typescript
 
   # for language specific
   gopls
   gotools
   hadolint
+  nixfmt-classic
   roswell
   shellcheck
-
-  # for nix
-  nixfmt-classic
-  nixpkgs-fmt
-  niv
-  nix-prefetch
-  nix-prefetch-git
-  nix-prefetch-github
 
   # for language server
   haskell-language-server
   jsonnet-language-server
   nil
   nodePackages_latest.bash-language-server
+  typescript
   nodePackages_latest.typescript-language-server
   nodePackages_latest.vim-language-server
   phpactor
@@ -52,61 +45,53 @@ in with pkgs; [
   gh
   ghq
   git
-  gitflow
   htop
   jq
   nkf
   peco
   pv
   ripgrep
+  tig
   rlwrap
-  tmux-sixel
+  tmux # or tmux-sixel
   tree
   wget
   yq
 
-  # for basic tools
-  act
-  actionlint
-  android-tools
-  cacert
-  cmigemo
+  # for essential tools
   devbox
   direnv
   du-dust
   exiftool
   extract_url
-  ffmpeg
-  graphviz
-  iftop
-  imagemagick
-  ncurses
-  neofetch
-  offlineimap
   openssl
-  mitamae
-  isucrud
-  pwgen
-  silicon
-  sqldef
   terminal-notifier
-  tig
   tokei
   unixtools.procps
   unixtools.watch
 
-  # for pass
-  (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
-
-  # for cloud
+  # for util tools
+  actionlint
+  android-tools
   awscli
-  ssm-session-manager-plugin
-
-  # for network
+  ffmpeg
+  graphviz
+  iftop
+  imagemagick
+  isucrud
+  mitamae
+  ncurses
+  neofetch
+  offlineimap
   speedtest-cli
   tcpdump
 
+  # for pass
+  pwgen
+  (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
+
   # for editor
+  cmigemo
   emacs-git
   editorconfig-core-c
   nano
@@ -122,6 +107,7 @@ in with pkgs; [
   redis
   mysql
   sqlite
+  sqldef
   tbls
 
   # for jokes
@@ -129,6 +115,7 @@ in with pkgs; [
   cmatrix
   gibo
   sl
+  silicon
   genact
 
   # for ai
