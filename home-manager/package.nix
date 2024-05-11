@@ -64,10 +64,9 @@ in with pkgs; [
   yq
 
   # for util tools
-  actionlint
-  android-tools
   awscli
   ffmpeg
+  gibo
   graphviz
   iftop
   imagemagick
@@ -101,12 +100,10 @@ in with pkgs; [
   mysql
   sqlite
   sqldef
-  tbls
 
   # for jokes
   asciiquarium
   cmatrix
-  gibo
   sl
   silicon
   genact
