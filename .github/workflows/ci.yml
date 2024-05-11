@@ -28,7 +28,7 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: Run secretlint
-        run: npx secretlint "./*"
+        run: npm run lint
   dependabot:
     runs-on: ubuntu-latest
     needs: [actionlint, secretlint]
