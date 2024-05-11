@@ -5,10 +5,6 @@ let
   mitamae = pkgs.callPackage ./pkgs/mitamae { };
   # tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
 in with pkgs; [
-  # for lanaguage
-  nodejs
-  php83
-
   # for language specific
   gopls
   gotools
