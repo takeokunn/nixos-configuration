@@ -1,9 +1,9 @@
 { pkgs }:
 let
-  ecspresso = pkgs.callPackage ./pkgs/ecspresso { };
-  isucrud = pkgs.callPackage ./pkgs/isucrud { };
-  mitamae = pkgs.callPackage ./pkgs/mitamae { };
-  # tmux-sixel = pkgs.callPackage ./pkgs/tmux-sixel { };
+  ecspresso = pkgs.callPackage ./nixpkgs/ecspresso { };
+  isucrud = pkgs.callPackage ./nixpkgs/isucrud { };
+  # mitamae = pkgs.callPackage ./pkgs/mitamae { };
+  tmux-sixel = pkgs.callPackage ./nixpkgs/tmux-sixel { };
 in with pkgs; [
   # for language specific
   gopls
@@ -27,7 +27,8 @@ in with pkgs; [
   yaml-language-server
 
   # for gnupg
-  pinentry_mac
+  # pinentry_mac
+  # pinentry-curses
   pinentry-emacs
   gnupg
 
@@ -53,9 +54,9 @@ in with pkgs; [
   pv
   ripgrep
   rlwrap
-  terminal-notifier
+  # terminal-notifier
   tig
-  tmux # or tmux-sixel
+  tmux-sixel
   tokei
   tree
   unixtools.procps
@@ -71,7 +72,7 @@ in with pkgs; [
   iftop
   imagemagick
   isucrud
-  mitamae
+  # mitamae
   ncurses
   neofetch
   offlineimap
@@ -84,7 +85,7 @@ in with pkgs; [
 
   # for editor
   cmigemo
-  emacs-git
+  emacs
   editorconfig-core-c
   nano
   neovim

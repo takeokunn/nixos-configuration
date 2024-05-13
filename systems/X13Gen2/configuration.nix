@@ -5,11 +5,6 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -51,9 +46,9 @@
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "jp";
-    xkbVariant = "";
-    xkbOptions = "ctrl:swapcaps";
+    xkb.layout = "jp";
+    xkb.variant = "";
+    xkb.options = "ctrl:swapcaps";
   };
 
   # Configure console keymap
@@ -87,10 +82,11 @@
     isNormalUser = true;
     description = "take";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      firefox
-      #  thunderbird
-    ];
+    packages = with pkgs;
+      [
+        firefox
+        #  thunderbird
+      ];
   };
 
   # Allow unfree packages
@@ -98,18 +94,18 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    emacs29
-    git
-    ghq
-    gnumake
-    gnupg
-    pinentry-curses
-    tmux
-    fish
-    peco
-  ];
+  # environment.systemPackages = with pkgs; [
+  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #   emacs29
+  #   git
+  #   ghq
+  #   gnumake
+  #   gnupg
+  #   pinentry-curses
+  #   tmux
+  #   fish
+  #   peco
+  # ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
