@@ -1,9 +1,9 @@
 { pkgs }:
 let
-  ecspresso = pkgs.callPackage ./nixpkgs/ecspresso { };
-  isucrud = pkgs.callPackage ./nixpkgs/isucrud { };
-  # mitamae = pkgs.callPackage ./pkgs/mitamae { };
-  tmux-sixel = pkgs.callPackage ./nixpkgs/tmux-sixel { };
+  # ecspresso = pkgs.callPackage ../nixpkgs/ecspresso { };
+  # isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
+  # mitamae = pkgs.callPackage ../pkgs/mitamae { };
+  tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
 in with pkgs; [
   # for language specific
   gopls
@@ -27,8 +27,6 @@ in with pkgs; [
   yaml-language-server
 
   # for gnupg
-  # pinentry_mac
-  # pinentry-curses
   pinentry-emacs
   gnupg
 
@@ -54,7 +52,6 @@ in with pkgs; [
   pv
   ripgrep
   rlwrap
-  # terminal-notifier
   tig
   tmux-sixel
   tokei
@@ -66,12 +63,13 @@ in with pkgs; [
 
   # for util tools
   awscli
+  # ecspresso
   ffmpeg
   gibo
   graphviz
   iftop
   imagemagick
-  isucrud
+  # isucrud
   # mitamae
   ncurses
   neofetch
@@ -85,7 +83,6 @@ in with pkgs; [
 
   # for editor
   cmigemo
-  emacs
   editorconfig-core-c
   nano
   neovim
