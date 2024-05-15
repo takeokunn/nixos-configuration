@@ -44,6 +44,7 @@ in with pkgs; [
   gh
   ghq
   git
+  gitflow
   htop
   jq
   nkf
