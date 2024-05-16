@@ -13,14 +13,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nix-on-droid = {
+      url = "github:nix-community/nix-on-droid/release-23.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay, nixos-hardware }: {
-    darwinConfigurations = (import ./systems/OPL2212-2 {
-      inherit self nixpkgs nix-darwin home-manager emacs-overlay;
-    });
-    nixosConfigurations = (import ./systems/X13Gen2 {
-      inherit self nixpkgs home-manager emacs-overlay nixos-hardware;
-    });
-  };
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay
+    , nixos-hardware, nix-on-droid }: {
+      darwinConfigurations = (import ./systems/OPL2212-2 {
+        inherit self nixpkgs nix-darwin home-manager emacs-overlay;
+      });
+      nixosConfigurations = (import ./systems/X13Gen2 {
+        inherit self nixpkgs home-manager emacs-overlay nixos-hardware;
+      });
+    };
 }
