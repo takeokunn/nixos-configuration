@@ -1,4 +1,4 @@
-{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay, ... }:
+{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay }:
 let
   system = "aarch64-darwin";
   username = "obara";

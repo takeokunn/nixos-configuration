@@ -1,4 +1,4 @@
-{ system, nixpkgs, emacs-overlay, ... }:
+{ system, nixpkgs, emacs-overlay }:
 let
   lib = nixpkgs.lib;
   pkgs = import nixpkgs {

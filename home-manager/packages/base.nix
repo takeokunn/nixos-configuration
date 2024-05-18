@@ -21,6 +21,7 @@ in with pkgs; [
   typescript
   nodePackages_latest.typescript-language-server
   nodePackages_latest.vim-language-server
+  php83
   phpactor
   rubyPackages.solargraph
   terraform-ls
