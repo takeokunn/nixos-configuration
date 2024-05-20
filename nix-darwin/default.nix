@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-let ollama = pkgs.callPackage ../home-manager/nixpkgs/ollama { };
-in {
+{ pkgs, ... }: {
   nix = {
     gc = {
       automatic = true;
@@ -86,7 +84,7 @@ in {
 
   launchd.user.agents.ollama = {
     serviceConfig = {
-      ProgramArguments = [ "${ollama}/bin/ollama" "serve" ];
+      ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
       KeepAlive = true;
       RunAtLoad = true;
     };
