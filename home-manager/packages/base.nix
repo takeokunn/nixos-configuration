@@ -4,6 +4,7 @@ let
   # isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
   # mitamae = pkgs.callPackage ../pkgs/mitamae { };
   tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
+  ollama = pkgs.callPackage ../nixpkgs/ollama { };
 in with pkgs; [
   # for language specific
   gopls
