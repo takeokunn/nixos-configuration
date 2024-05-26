@@ -13,6 +13,6 @@ let
 in {
   home.stateVersion = "23.11";
   home.packages = basicPkgs
-                  ++ lib.optionals pkgs.stdenv.isDarwin lib.mkMerge [utilsPkgs darwinPkgs]
-                  ++ lib.optionals pkgs.stdenv.isLinux lib.mkMerge [ utilsPkgs nixosPkgs]
+    ++ lib.optionals pkgs.stdenv.isDarwin lib.mkMerge [ utilsPkgs darwinPkgs ]
+    ++ lib.optionals pkgs.stdenv.isLinux lib.mkMerge [ utilsPkgs nixosPkgs ];
 }
