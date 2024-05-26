@@ -33,6 +33,7 @@ in with pkgs; [
 
   # for essential tools
   bat
+  bottom
   csvq
   devbox
   direnv
@@ -46,7 +47,6 @@ in with pkgs; [
   ghq
   git
   gitflow
-  htop
   jq
   nkf
   openssl
@@ -62,7 +62,6 @@ in with pkgs; [
   unixtools.watch
   wget
   yq
-
   # for util tools
   awscli
   # ecspresso
