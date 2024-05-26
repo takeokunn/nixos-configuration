@@ -27,8 +27,7 @@
       nixosConfigurations = (import ./systems/X13Gen2 {
         inherit self nixpkgs home-manager emacs-overlay nixos-hardware;
       });
-      nixOnDroidConfigurations = (import ./systems/OPPO-A79 {
-        inherit self nixpkgs home-manager nix-on-droid;
-      });
+      nixOnDroidConfigurations =
+        (import ./systems/OPPO-A79 { inherit self nixpkgs nix-on-droid; });
     };
 }
