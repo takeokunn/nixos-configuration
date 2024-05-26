@@ -6,11 +6,13 @@ let
     config.allowUnfree = true;
     overlays = import ./overlay.nix { inherit emacs-overlay; };
   };
-  basePkgs = import ./packages/base.nix { inherit pkgs; };
-  darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
-  nixosPkgs = import ./packages/nixos.nix { inherit pkgs; };
+  basicPkgs = import ./packages/basic.nix { inherit pkgs; };
+  utilsPkgs = import ./packages/utils.nix { inherit pkgs; };
+  darwinPkgs = import ./packages/darwin { inherit pkgs; };
+  nixosPkgs = import ./packages/nixos { inherit pkgs; };
 in {
   home.stateVersion = "23.11";
-  home.packages = basePkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
-    ++ lib.optionals pkgs.stdenv.isLinux nixosPkgs;
+  home.packages = basicPkgs
+                  ++ lib.optionals pkgs.stdenv.isDarwin lib.mkMerge [utilsPkgs darwinPkgs]
+                  ++ lib.optionals pkgs.stdenv.isLinux lib.mkMerge [ utilsPkgs nixosPkgs]
 }
