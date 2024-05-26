@@ -45,8 +45,4 @@ in with pkgs; [
 
   # for ai
   ollama
-
-  # for emacs
-  mu
-  emacsPackages.mu4e
 ]

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: {
+{ config, lib, pkgs, emacs-overlay, ... }: {
   environment.etcBackupExtension = ".bak";
 
   system.stateVersion = "23.11";
@@ -11,7 +11,6 @@
 
   home-manager = {
     config = ./home.nix;
-    backupFileExtension = "hm-bak";
-    useGlobalPkgs = true;
+    extraSpecialArgs = { inherit emacs-overlay; };
   };
 }
