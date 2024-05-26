@@ -12,7 +12,7 @@ let
   nixosPkgs = import ./packages/nixos { inherit pkgs; };
 in {
   home.stateVersion = "23.11";
-  home.packages = basicPkgs
-    ++ lib.optionals pkgs.stdenv.isDarwin lib.mkMerge [ utilsPkgs darwinPkgs ]
-    ++ lib.optionals pkgs.stdenv.isLinux lib.mkMerge [ utilsPkgs nixosPkgs ];
+  home.packages = basicPkgs ++ utilsPkgs
+    ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
+    ++ lib.optionals pkgs.stdenv.isLinux nixosPkgs;
 }

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: {
+{
   environment.etcBackupExtension = ".bak";
 
   system.stateVersion = "23.11";
