@@ -8,6 +8,8 @@
 
   time.timeZone = "Asia/Tokyo";
 
+  environment.packages = with pkgs; [ vim git hostname ];
+
   # home-manager = {
   #   config = ../../home-manager;
   #   backupFileExtension = "hm-bak";
