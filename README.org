@@ -14,5 +14,5 @@
 ** for OPPO-A79
 #+begin_src shell
   nix flake update --flake ~/ghq/github.com/takeokunn/nixos-configuration
-  nix run "~/ghq/github.com/takeokunn/nixos-configuration#OPL2212-2#OPPO-A79"
+  nix run ~/ghq/github.com/takeokunn/nixos-configuration#OPL2212-2#OPPO-A79
 #+end_src
