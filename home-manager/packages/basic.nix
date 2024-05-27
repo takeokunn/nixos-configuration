@@ -1,5 +1,9 @@
 { pkgs }:
-let tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
+let
+  tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
+  ecspresso = pkgs.callPackage ../nixpkgs/ecspresso { };
+  isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
+  mitamae = pkgs.callPackage ../pkgs/mitamae { };
 in with pkgs; [
   # for language specific
   gopls
@@ -59,13 +63,51 @@ in with pkgs; [
   wget
   yq
 
+  # for util tools
+  awscli
+  ecspresso
+  ffmpeg
+  gibo
+  graphviz
+  iftop
+  imagemagick
+  isucrud
+  mitamae
+  ncurses
+  neofetch
+  offlineimap
+  speedtest-cli
+  tcpdump
+
   # for pass
   pwgen
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
   # for editor
+  cmigemo
+  editorconfig-core-c
+  nano
+  tree-sitter
+  (tree-sitter.withPlugins (p: builtins.attrValues p))
   neovim
 
   # for shell
   fish
+  zx
+
+  # for DB
+  redis
+  mysql
+  sqlite
+  sqldef
+
+  # for jokes
+  asciiquarium
+  cmatrix
+  sl
+  silicon
+  genact
+
+  # for ai
+  ollama
 ]

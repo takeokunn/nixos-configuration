@@ -6,7 +6,7 @@ in {
   X13Gen2 = nixpkgs.lib.nixosSystem {
     inherit system;
     modules = [
-      ./configuration.nix
+      ../../nixos
       ./hardware-configuration.nix
       home-manager.nixosModules.home-manager
       {
