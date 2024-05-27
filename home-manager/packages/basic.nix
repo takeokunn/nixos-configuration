@@ -3,7 +3,7 @@ let
   tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
   ecspresso = pkgs.callPackage ../nixpkgs/ecspresso { };
   isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
-  mitamae = pkgs.callPackage ../pkgs/mitamae { };
+  mitamae = pkgs.callPackage ../nixpkgs/mitamae { };
 in with pkgs; [
   # for language specific
   gopls
