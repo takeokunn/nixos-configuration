@@ -23,6 +23,7 @@ in with pkgs; [
   nodePackages_latest.vim-language-server
   php83
   phpactor
+  nodePackages_latest.intelephense
   rubyPackages.solargraph
   terraform-ls
   yaml-language-server
