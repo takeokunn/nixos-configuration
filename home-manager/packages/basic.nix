@@ -14,6 +14,7 @@ in with pkgs; [
   shellcheck
 
   # for language server
+  ccls
   haskell-language-server
   jsonnet-language-server
   nil
