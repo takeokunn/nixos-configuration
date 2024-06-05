@@ -68,7 +68,6 @@
       "discord"
       "raycast"
       "slack"
-      "postman"
     ];
     masApps = {
       Xcode = 497799835;
