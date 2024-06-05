@@ -5,6 +5,10 @@ let
   isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
   mitamae = pkgs.callPackage ../nixpkgs/mitamae { };
 in with pkgs; [
+  # for language
+  php83
+  nodejs
+
   # for language specific
   gopls
   gotools
@@ -22,7 +26,6 @@ in with pkgs; [
   typescript
   nodePackages_latest.typescript-language-server
   nodePackages_latest.vim-language-server
-  php83
   phpactor
   nodePackages_latest.intelephense
   rubyPackages.solargraph
@@ -71,6 +74,7 @@ in with pkgs; [
   ffmpeg
   gibo
   graphviz
+  hub
   iftop
   imagemagick
   isucrud
@@ -78,6 +82,7 @@ in with pkgs; [
   ncurses
   neofetch
   offlineimap
+  rain
   speedtest-cli
   tcpdump
 
