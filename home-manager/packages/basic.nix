@@ -82,7 +82,6 @@ in with pkgs; [
   ncurses
   neofetch
   offlineimap
-  rain
   speedtest-cli
   tcpdump
 
