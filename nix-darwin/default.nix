@@ -64,7 +64,6 @@
       "raycast"
       "sequel-ace"
       "sublime-text"
-      "wireshark"
       "discord"
       "raycast"
       "slack"

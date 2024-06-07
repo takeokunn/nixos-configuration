@@ -92,7 +92,6 @@ in with pkgs; [
   # for editor
   cmigemo
   editorconfig-core-c
-  nano
   tree-sitter
   (tree-sitter.withPlugins (p: builtins.attrValues p))
   neovim
@@ -116,4 +115,7 @@ in with pkgs; [
 
   # for ai
   ollama
+
+  # for tmp
+  heroku
 ]
