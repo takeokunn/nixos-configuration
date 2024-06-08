@@ -13,7 +13,7 @@
 *** for OPL2212-2
 #+begin_src shell
   nix flake update ~/ghq/github.com/takeokunn/nixos-configuration
-  nix run nix-darwin -- switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#OPL2212-2  --show-trace
+  nix run nix-darwin -- switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#OPL2212-2 --show-trace
 #+end_src
 *** for X13Gen2
 #+begin_src shell

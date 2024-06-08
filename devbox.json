@@ -1,6 +1,10 @@
 {
   "$schema":  "https://raw.githubusercontent.com/jetify-com/devbox/0.10.6/.schema/devbox.schema.json",
-  "packages": ["nodejs@latest"],
+  "packages": [
+      "nodejs@latest",
+      "nil@latest",
+      "nixfmt-classic@latest"
+  ],
   "shell": {
     "init_hook": [
       "echo 'Welcome to devbox!' > /dev/null"
