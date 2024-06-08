@@ -7,7 +7,7 @@
         Hour = 9;
         Minute = 0;
       };
-      options = "--delete-older-than 7d";
+      options = "--delete-older-than 3d";
     };
     settings.experimental-features = "nix-command flakes";
   };

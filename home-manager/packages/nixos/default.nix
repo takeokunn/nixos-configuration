@@ -1,9 +1,8 @@
 { pkgs }:
 with pkgs; [
-  pinentry-curses
-
   # for emacs
   emacs-git
   mu
+  pinentry-emacs
   emacsPackages.mu4e
 ]

@@ -4,7 +4,8 @@ with pkgs; [
   terminal-notifier
 
   # for emacs
-  emacs-git
   mu
+  emacs-git
+  pinentry-emacs
   emacsPackages.mu4e
 ]

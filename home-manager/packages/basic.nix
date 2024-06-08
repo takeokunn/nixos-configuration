@@ -1,91 +1,50 @@
 { pkgs }:
-let
-  tmux-sixel = pkgs.callPackage ../nixpkgs/tmux-sixel { };
-  ecspresso = pkgs.callPackage ../nixpkgs/ecspresso { };
-  isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
-  mitamae = pkgs.callPackage ../nixpkgs/mitamae { };
-in with pkgs; [
-  # for language
-  php83
-  nodejs
-
-  # for language specific
-  gopls
-  gotools
-  hadolint
-  nixfmt-classic
-  roswell
-  shellcheck
-
-  # for language server
-  ccls
-  haskell-language-server
-  jsonnet-language-server
-  nil
-  nodePackages_latest.bash-language-server
-  typescript
-  nodePackages_latest.typescript-language-server
-  nodePackages_latest.vim-language-server
-  phpactor
-  nodePackages_latest.intelephense
-  rubyPackages.solargraph
-  terraform-ls
-  yaml-language-server
-
-  # for gnupg
-  pinentry-emacs
-  gnupg
-
+with pkgs; [
   # for essential tools
   bat
-  bottom
-  csvq
   devbox
   direnv
   du-dust
-  exiftool
   extract_url
   eza
   fd
-  fzf
-  gh
-  ghq
-  git
-  gitflow
-  jq
+  gnupg
   nkf
   openssl
   peco
   pv
   ripgrep
   rlwrap
-  tig
-  tmux-sixel
+  tmux
   tokei
   tree
   unixtools.procps
   unixtools.watch
   wget
+
+  # for query
+  csvq
+  jq
   yq
+
+  # for git
+  ghq
+  git
+  tig
 
   # for util tools
   awscli
-  ecspresso
+  exiftool
   ffmpeg
-  gibo
-  graphviz
-  hub
-  iftop
-  imagemagick
-  isucrud
-  mitamae
-  ncurses
-  neofetch
   offlineimap
+  silicon
+
+  # for network tools
+  bottom
   speedtest-cli
   tcpdump
 
-  # for pass
+  # for password tools
   pwgen
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
@@ -98,24 +57,16 @@ in with pkgs; [
 
   # for shell
   fish
-  zx
 
   # for DB
-  redis
   mysql
-  sqlite
-  sqldef
 
   # for jokes
   asciiquarium
   cmatrix
-  sl
-  silicon
   genact
+  sl
 
   # for ai
   ollama
-
-  # for tmp
-  heroku
 ]
