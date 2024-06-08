@@ -16,7 +16,6 @@ with pkgs; [
   ripgrep
   rlwrap
   tmux
-  tokei
   tree
   unixtools.procps
   unixtools.watch
@@ -34,22 +33,17 @@ with pkgs; [
 
   # for util tools
   awscli
-  exiftool
-  ffmpeg
   offlineimap
-  silicon
 
   # for network tools
   bottom
   speedtest-cli
-  tcpdump
 
   # for password tools
   pwgen
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
   # for editor
-  cmigemo
   editorconfig-core-c
   tree-sitter
   (tree-sitter.withPlugins (p: builtins.attrValues p))
