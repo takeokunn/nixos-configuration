@@ -1,7 +1,8 @@
 { pkgs }:
 with pkgs; [
-  # for essential tools
+  # for terminal tools
   bat
+  bottom
   devbox
   direnv
   du-dust
@@ -10,6 +11,7 @@ with pkgs; [
   fd
   gnupg
   nkf
+  offlineimap
   openssl
   peco
   pv
@@ -31,12 +33,10 @@ with pkgs; [
   git
   tig
 
-  # for util tools
+  # for cloud tools
   awscli
-  offlineimap
 
   # for network tools
-  bottom
   speedtest-cli
 
   # for password tools
