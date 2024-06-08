@@ -64,6 +64,7 @@ with pkgs; [
   # for jokes
   asciiquarium
   cmatrix
+  fastfetch
   genact
   sl
 
