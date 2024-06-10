@@ -25,6 +25,7 @@
       noto-fonts-monochrome-emoji
       hackgen-font
       hackgen-nf-font
+      nerdfonts
     ];
   };
 

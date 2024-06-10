@@ -119,8 +119,11 @@
   fonts = {
     fontDir.enable = true;
     packages = with pkgs; [
+      dejavu_fonts
       freefont_ttf
       gyre-fonts
+      hackgen-font
+      hackgen-nf-font
       liberation_ttf
       migu
       nerdfonts
@@ -128,9 +131,12 @@
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       noto-fonts-color-emoji
+      noto-fonts-emoji
+      noto-fonts-emoji-blob-bin
+      noto-fonts-lgc-plus
+      noto-fonts-monochrome-emoji
       twemoji-color-font
       unifont
-      dejavu_fonts
     ];
   };
 }
