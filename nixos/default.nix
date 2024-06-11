@@ -84,7 +84,7 @@
 
   nix = {
     gc.automatic = true;
-    gc.options = "--delete-older-than 5d";
+    gc.options = "--delete-older-than 3d";
   };
   nixpkgs = { config.allowUnfree = true; };
 
@@ -110,7 +110,7 @@
   };
 
   system = {
-    stateVersion = "23.11";
+    stateVersion = "24.11";
 
     # MEMO: 有効にしたい
     autoUpgrade.enable = false;

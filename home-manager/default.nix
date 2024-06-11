@@ -10,7 +10,7 @@ let
   darwinPkgs = import ./packages/darwin { inherit pkgs; };
   nixosPkgs = import ./packages/nixos { inherit pkgs; };
 in {
-  home.stateVersion = "23.11";
+  home.stateVersion = "24.11";
   home.packages = basicPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
     ++ lib.optionals pkgs.stdenv.isLinux nixosPkgs;
 }

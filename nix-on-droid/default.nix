@@ -3,7 +3,7 @@
 
   time.timeZone = "Asia/Tokyo";
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.11";
 
   nix.extraOptions = ''
     experimental-features = nix-command flakes
