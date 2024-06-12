@@ -1,6 +1,8 @@
-{ config, lib, pkgs, system, nixpkgs, emacs-overlay, ... }: {
+{ config, lib, pkgs }:
+let basicPkgs = import ../home-manager/packages/basic.nix { inherit pkgs; };
+in {
   home = {
     stateVersion = "24.11";
-    packages = import ../home-manager { inherit system nixpkgs emacs-overlay; };
+    packages = basicPkgs;
   };
 }
