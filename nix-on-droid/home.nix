@@ -1,8 +1,6 @@
-{ config, lib, pkgs }:
-let basicPkgs = import ../home-manager/packages/basic.nix { inherit pkgs; };
-in {
+{ config, lib, pkgs }: {
   home = {
     stateVersion = "24.11";
-    packages = basicPkgs;
+    packages = [ pkgs.hello ];
   };
 }
