@@ -50,8 +50,8 @@
       }
     },
     "nixfmt-classic@latest": {
-      "last_modified": "2024-06-04T00:03:09Z",
-      "resolved": "github:NixOS/nixpkgs/3b01abcc24846ae49957b30f4345bab4b3f1d14b#nixfmt-classic",
+      "last_modified": "2024-06-07T15:28:25Z",
+      "resolved": "github:NixOS/nixpkgs/d226935fd75012939397c83f6c385e4d6d832288#nixfmt-classic",
       "source": "devbox-search",
       "version": "0.6.0",
       "systems": {
@@ -99,12 +99,12 @@
               "default": true
             },
             {
-              "name": "out",
-              "path": "/nix/store/h21a39za77xcdyyvjb6rqcii6v3b2c3d-nixfmt-0.6.0"
-            },
-            {
               "name": "doc",
               "path": "/nix/store/5g0vpqjbapz6bwsp8s12nr1v1m72rq8r-nixfmt-0.6.0-doc"
+            },
+            {
+              "name": "out",
+              "path": "/nix/store/h21a39za77xcdyyvjb6rqcii6v3b2c3d-nixfmt-0.6.0"
             }
           ],
           "store_path": "/nix/store/p348jq73lnig5kkhayvsknz0svdnl54f-nixfmt-0.6.0-bin"
