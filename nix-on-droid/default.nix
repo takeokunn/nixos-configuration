@@ -1,4 +1,4 @@
-{ config, lib, pkgs, system, nixpkgs, emacs-overlay, ... }: {
+{ config, lib, pkgs }: {
   environment.etcBackupExtension = ".bak";
 
   time.timeZone = "Asia/Tokyo";
@@ -9,8 +9,5 @@
     experimental-features = nix-command flakes
   '';
 
-  home-manager = {
-    config = ./home.nix;
-    extraSpecialArgs = { inherit system nixpkgs emacs-overlay; };
-  };
+  home-manager.config = ./home.nix;
 }
