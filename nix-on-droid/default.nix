@@ -1,5 +1,6 @@
 { config, lib, pkgs }: {
-  environment.packages = import ../home-manager/packages/basic.nix pkgs;
+  # environment.packages = import ../home-manager/packages/basic.nix pkgs;
+  environment.packages = [ pkgs.hello ];
   environment.etcBackupExtension = ".bak";
 
   time.timeZone = "Asia/Tokyo";
