@@ -82,7 +82,7 @@
 
   nix = {
     gc.automatic = true;
-    gc.options = "--delete-older-than 5d";
+    gc.options = "--delete-older-than 3d";
   };
   nixpkgs = { config.allowUnfree = true; };
 
@@ -99,7 +99,7 @@
   };
 
   system = {
-    stateVersion = "23.11";
+    stateVersion = "24.11";
 
     # MEMO: 有効にしたい
     autoUpgrade.enable = false;
@@ -108,8 +108,11 @@
   fonts = {
     fontDir.enable = true;
     packages = with pkgs; [
+      dejavu_fonts
       freefont_ttf
       gyre-fonts
+      hackgen-font
+      hackgen-nf-font
       liberation_ttf
       migu
       nerdfonts
@@ -117,9 +120,12 @@
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       noto-fonts-color-emoji
+      noto-fonts-emoji
+      noto-fonts-emoji-blob-bin
+      noto-fonts-lgc-plus
+      noto-fonts-monochrome-emoji
       twemoji-color-font
       unifont
-      dejavu_fonts
     ];
   };
 }
