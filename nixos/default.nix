@@ -9,7 +9,6 @@
     hostName = "nixos";
     networkmanager.enable = true;
     enableIPv6 = true;
-    wireless.enable = true;
   };
 
   time = { timeZone = "Asia/Tokyo"; };
@@ -34,7 +33,7 @@
       enable = true;
       displayManager = {
         gdm.enable = true;
-        gnome.enable = true;
+        # gnome.enable = true;
       };
 
       xkb = {
@@ -54,7 +53,6 @@
       alsa.support32Bit = true;
       pulse.enable = true;
       jack.enable = true;
-      media-session.enable = true;
     };
   };
 
@@ -91,22 +89,13 @@
   programs = {
     fish.enable = true;
 
-    gnupg = {
-      enable = true;
-      agent = { enable = true; };
-    };
+    gnupg = { agent = { enable = true; }; };
 
-    google-chrome = {
+    sway = {
       enable = true;
-      commandLineArgs =
-        [ "--enable-features=UseOzonePlatfor" "--ozone-platform=x11" ];
+      xwayland.enable = true;
     };
-
-    # sway = {
-    #   enable = true;
-    #   xwayland.enable = true;
-    # };
-    # waybar.enable = true;
+    waybar.enable = true;
   };
 
   system = {
