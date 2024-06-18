@@ -14,8 +14,7 @@
   services.nix-daemon.enable = true;
 
   fonts = {
-    fontDir.enable = true;
-    fonts = with pkgs; [
+    packages = with pkgs; [
       noto-fonts
       noto-fonts-lgc-plus
       noto-fonts-cjk-sans
