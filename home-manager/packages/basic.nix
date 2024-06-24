@@ -10,6 +10,7 @@ with pkgs; [
   eza
   fd
   gnupg
+  lnav
   nkf
   offlineimap
   openssl
