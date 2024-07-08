@@ -80,11 +80,11 @@
 
   security.pam.enableSudoTouchIdAuth = true;
 
-  # launchd.user.agents.ollama = {
-  #   serviceConfig = {
-  #     ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
-  #     KeepAlive = true;
-  #     RunAtLoad = true;
-  #   };
-  # };
+  launchd.user.agents.ollama = {
+    serviceConfig = {
+      ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
+      KeepAlive = true;
+      RunAtLoad = true;
+    };
+  };
 }
