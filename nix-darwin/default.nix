@@ -57,16 +57,15 @@
     };
     casks = [
       "aquaskk"
+      "discord"
       "drawio"
-      "docker"
       "google-chrome"
       "keycastr"
+      "orbstack"
       "raycast"
       "sequel-ace"
-      "sublime-text"
-      "discord"
-      "raycast"
       "slack"
+      "sublime-text"
     ];
     masApps = {
       Xcode = 497799835;
