@@ -34,12 +34,6 @@ with pkgs; [
   git
   tig
 
-  # for cloud tools
-  awscli
-
-  # for network tools
-  speedtest-cli
-
   # for password tools
   pwgen
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
@@ -52,17 +46,4 @@ with pkgs; [
 
   # for shell
   fish
-
-  # for DB
-  mysql
-
-  # for jokes
-  asciiquarium
-  cmatrix
-  fastfetch
-  genact
-  sl
-
-  # for ai
-  ollama
 ]
