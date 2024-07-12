@@ -7,10 +7,12 @@ let
     overlays = import ./overlay.nix { inherit emacs-overlay; };
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
   darwinPkgs = import ./packages/darwin { inherit pkgs; };
   nixosPkgs = import ./packages/nixos { inherit pkgs; };
 in {
   home.stateVersion = "24.11";
-  home.packages = basicPkgs ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
+  home.packages = basicPkgs ++ advancedPkgs
+    ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
     ++ lib.optionals pkgs.stdenv.isLinux nixosPkgs;
 }

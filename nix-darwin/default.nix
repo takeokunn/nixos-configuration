@@ -14,8 +14,7 @@
   services.nix-daemon.enable = true;
 
   fonts = {
-    fontDir.enable = true;
-    fonts = with pkgs; [
+    packages = with pkgs; [
       noto-fonts
       noto-fonts-lgc-plus
       noto-fonts-cjk-sans
@@ -58,16 +57,15 @@
     };
     casks = [
       "aquaskk"
+      "discord"
       "drawio"
-      "docker"
       "google-chrome"
       "keycastr"
+      "orbstack"
       "raycast"
       "sequel-ace"
-      "sublime-text"
-      "discord"
-      "raycast"
       "slack"
+      "sublime-text"
     ];
     masApps = {
       Xcode = 497799835;

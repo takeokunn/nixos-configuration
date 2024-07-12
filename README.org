@@ -7,7 +7,7 @@
 |-----------+---------+----------------+--------|
 | OPL2212-2 | mac     | aarch64-darwin | ○      |
 | X13Gen2   | nixos   | x86_64-linux   | ×      |
-| OPPO-A79  | android | -              | ×      |
+| OPPO-A79  | android | -              | ○      |
 
 ** Usage
 *** for OPL2212-2
@@ -18,7 +18,7 @@
 *** for X13Gen2
 #+begin_src shell
   nix flake update --flake ~/ghq/github.com/takeokunn/nixos-configuration
-  sudo nixos-rebuild switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#X13Gen2  --show-trace
+  sudo nixos-rebuild switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#X13Gen2 --show-trace
 #+end_src
 *** for OPPO-A79
 #+begin_src shell
