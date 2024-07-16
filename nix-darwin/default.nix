@@ -11,7 +11,13 @@
     };
     settings.experimental-features = "nix-command flakes";
   };
-  services.nix-daemon.enable = true;
+  services = {
+    nix-daemon.enable = true;
+    offlineimap = {
+      enable = true;
+      startInterval = 600;
+    };
+  };
 
   fonts = {
     packages = with pkgs; [
@@ -75,7 +81,16 @@
 
   networking = {
     knownNetworkServices = [ "Wi-Fi" "Ethernet Adaptor" ];
-    dns = [ "8.8.8.8" "8.8.4.4" "2001:4860:4860::8888" "2001:4860:4860::8844" ];
+    dns = [
+      "1.1.1.1"
+      "1.0.0.1"
+      "8.8.8.8"
+      "8.8.4.4"
+      "2606:4700:4700::1111"
+      "2606:4700:4700::1001"
+      "2001:4860:4860::8888"
+      "2001:4860:4860::8844"
+    ];
   };
 
   security.pam.enableSudoTouchIdAuth = true;
@@ -85,6 +100,13 @@
       ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
       KeepAlive = true;
       RunAtLoad = true;
+    };
+  };
+
+  programs = {
+    gnupg = {
+      agent.enable = true;
+      agent.enableSSHSupport = true;
     };
   };
 }
