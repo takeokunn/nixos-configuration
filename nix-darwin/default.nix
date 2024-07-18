@@ -13,10 +13,14 @@
   };
   services = {
     nix-daemon.enable = true;
+
     offlineimap = {
       enable = true;
       startInterval = 600;
     };
+
+    yabai.enable = false;
+    skhd.enable = false;
   };
 
   fonts = {
