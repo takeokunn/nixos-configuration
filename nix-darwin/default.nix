@@ -2,7 +2,6 @@
   nix = {
     gc = {
       automatic = true;
-      user = "obara";
       interval = {
         Hour = 9;
         Minute = 0;
