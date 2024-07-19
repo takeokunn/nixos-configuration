@@ -9,6 +9,7 @@
       options = "--delete-older-than 3d";
     };
     settings.experimental-features = "nix-command flakes";
+    optimise.automatic = true;
   };
   services = {
     nix-daemon.enable = true;
@@ -83,16 +84,17 @@
   };
 
   networking = {
-    knownNetworkServices = [ "Wi-Fi" "Ethernet Adaptor" ];
+    knownNetworkServices =
+      [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
     dns = [
-      "1.1.1.1"
-      "1.0.0.1"
       "8.8.8.8"
       "8.8.4.4"
-      "2606:4700:4700::1111"
-      "2606:4700:4700::1001"
+      "1.1.1.1"
+      "1.0.0.1"
       "2001:4860:4860::8888"
       "2001:4860:4860::8844"
+      "2606:4700:4700::1111"
+      "2606:4700:4700::1001"
     ];
   };
 
