@@ -1,11 +1,4 @@
-{ pkgs, ... }:
-let minimum = import ../home-manager/minimum.nix { inherit pkgs; };
-in {
-  environment = {
-    packages = minimum;
-    etcBackupExtension = ".bak";
-  };
-
+{
   time.timeZone = "Asia/Tokyo";
 
   system.stateVersion = "24.05";
@@ -13,4 +6,11 @@ in {
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
+
+  home-manager = {
+    backupFileExtension = "hm-bak";
+    useGlobalPkgs = true;
+
+    config = import ../home-manager/minimum.nix;
+  };
 }
