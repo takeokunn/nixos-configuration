@@ -7,6 +7,5 @@ let
   programs = import ./programs { inherit pkgs; };
 in {
   imports = programs;
-
   home.packages = basicPkgs;
 }

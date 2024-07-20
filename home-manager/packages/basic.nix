@@ -16,7 +16,6 @@ with pkgs; [
   pv
   ripgrep
   rlwrap
-  tmux
   tree
   unixtools.procps
   unixtools.watch
