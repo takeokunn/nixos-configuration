@@ -88,8 +88,7 @@
 
   programs = {
     fish.enable = true;
-
-    gnupg = { agent = { enable = true; }; };
+    gnupg.agent.enable = true;
 
     sway = {
       enable = true;
@@ -100,9 +99,6 @@
 
   system = {
     stateVersion = "24.11";
-
-    # MEMO: 有効にしたい
-    autoUpgrade.enable = false;
   };
 
   fonts = {
