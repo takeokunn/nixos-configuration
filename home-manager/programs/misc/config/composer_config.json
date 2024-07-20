@@ -1,0 +1,6 @@
+{
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 600
+    }
+}

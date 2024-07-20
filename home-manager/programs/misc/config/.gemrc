@@ -1,0 +1,6 @@
+update_sources: true
+backtrace: true
+install: --no-document --verbose
+update: --no-document --verbose
+gemsrc_use_ghq: true
+jobs: 4

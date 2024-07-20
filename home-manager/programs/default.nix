@@ -15,6 +15,7 @@ let
   ripgrep = import ./ripgrep;
   readline = import ./readline;
   gnupg = import ./gnupg;
+  misc = import ./misc;
 in [
   git
   bottom
@@ -31,4 +32,5 @@ in [
   ripgrep
   readline
   gnupg
+  misc
 ]

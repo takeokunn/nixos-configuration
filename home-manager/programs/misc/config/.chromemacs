@@ -1,0 +1,6 @@
+# Insert your preferred key mappings here.
+
+map <c-e> scrollPageUp
+map <c-g><c-w> removeTab
+map <c-g><c-b> goBack
+map <c-g><c-f> goForward
