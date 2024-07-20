@@ -31,7 +31,6 @@ with pkgs; [
 
   # for git
   ghq
-  git
   tig
 
   # for password tools
