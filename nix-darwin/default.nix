@@ -108,10 +108,8 @@
     };
   };
 
-  programs = {
-    gnupg = {
-      agent.enable = true;
-      agent.enableSSHSupport = true;
-    };
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
   };
 }

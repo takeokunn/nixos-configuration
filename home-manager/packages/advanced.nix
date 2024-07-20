@@ -6,10 +6,6 @@ with pkgs; [
   # for network tools
   speedtest-cli
 
-  # for password tools
-  pwgen
-  (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
-
   # for DB
   mysql
 

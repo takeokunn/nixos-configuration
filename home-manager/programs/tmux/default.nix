@@ -7,5 +7,5 @@
     };
   };
 
-  home.packages = [ pkgs.tmux ];
+  home.packages = with pkgs; [ tmux extract_url ];
 }
