@@ -8,6 +8,5 @@ let
 in {
   imports = programs;
 
-  home.stateVersion = "24.11";
   home.packages = basicPkgs;
 }
