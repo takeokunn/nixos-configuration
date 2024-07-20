@@ -2,7 +2,6 @@
 with pkgs; [
   # for terminal tools
   bat
-  bottom
   devbox
   direnv
   du-dust
@@ -14,7 +13,6 @@ with pkgs; [
   nkf
   offlineimap
   openssl
-  peco
   pv
   ripgrep
   rlwrap
@@ -22,7 +20,6 @@ with pkgs; [
   tree
   unixtools.procps
   unixtools.watch
-  wget
 
   # for query
   csvq
@@ -38,7 +35,6 @@ with pkgs; [
   (pass.withExtensions (extensions: with extensions; [ pass-otp ]))
 
   # for editor
-  editorconfig-core-c
   tree-sitter
   (tree-sitter.withPlugins (p: builtins.attrValues p))
   neovim

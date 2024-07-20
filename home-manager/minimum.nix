@@ -4,7 +4,7 @@ let
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
   # programs
-  programs = import ./programs;
+  programs = import ./programs { inherit pkgs; };
 in {
   imports = programs;
 

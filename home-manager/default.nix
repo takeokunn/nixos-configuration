@@ -14,7 +14,7 @@ let
   nixosPkgs = import ./packages/nixos { inherit pkgs; };
 
   # programs
-  programs = import ./programs;
+  programs = import ./programs { inherit pkgs; };
 in {
   imports = programs;
 

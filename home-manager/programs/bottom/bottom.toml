@@ -1,0 +1,44 @@
+[[row]]
+  [[row.child]]
+  ratio=2
+  type="cpu"
+  [[row.child]]
+  type="mem"
+[[row]]
+  [[row.child]]
+  type="net"
+  ratio=2
+  [[row.child]]
+  type="disk"
+  ratio=2
+  [[row.child]]
+  type="temp"
+[[row]]
+  ratio=3
+  [[row.child]]
+  type="proc"
+  default=true
+
+[flags]
+basic = false
+group_processes = true
+case_sensitive = false
+rate = 700
+dot_marker = false
+hide_table_gap = true
+
+[disk_filter]
+is_list_ignored = true
+list = ["/dev/loop\\d+"]
+regex = true
+
+[colors]
+avg_cpu_color="Red"
+border_color="White"
+graph_color="Gray"
+highlighted_border_color="LightMagenta"
+selected_bg_color="Magenta"
+selected_text_color="Black"
+table_header_color="Blue"
+text_color="White"
+widget_title_color="Cyan"

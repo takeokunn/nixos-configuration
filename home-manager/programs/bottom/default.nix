@@ -1,13 +1,5 @@
 {
-  programs.bottom = {
-    enable = true;
-    settings = {
-      flags = {
-        avg_cpu = true;
-        temperature_type = "c";
-      };
+  home.file.".config/bottom/bottom.toml".source = ./bottom.toml;
 
-      colors = { low_battery_color = "red"; };
-    };
-  };
+  programs.bottom.enable = true;
 }
