@@ -1,38 +1,40 @@
 { pkgs }:
 let
-  git = import ./git;
-  bottom = import ./bottom;
-  vim = import ./vim;
-  peco = import ./peco { inherit pkgs; };
-  wget = import ./wget { inherit pkgs; };
-  tig = import ./tig { inherit pkgs; };
-  editorconfig = import ./editorconfig { inherit pkgs; };
-  tmux = import ./tmux { inherit pkgs; };
-  direnv = import ./direnv;
-  eza = import ./eza;
-  password-store = import ./password-store { inherit pkgs; };
   bat = import ./bat;
-  ripgrep = import ./ripgrep;
-  readline = import ./readline;
+  bottom = import ./bottom;
+  direnv = import ./direnv;
+  editorconfig = import ./editorconfig { inherit pkgs; };
+  eza = import ./eza;
+  fish = import ./fish { inherit pkgs; };
+  git = import ./git;
   gnupg = import ./gnupg;
-  misc = import ./misc;
   man = import ./man;
+  misc = import ./misc;
+  password-store = import ./password-store { inherit pkgs; };
+  peco = import ./peco { inherit pkgs; };
+  readline = import ./readline;
+  ripgrep = import ./ripgrep;
+  tig = import ./tig { inherit pkgs; };
+  tmux = import ./tmux { inherit pkgs; };
+  vim = import ./vim;
+  wget = import ./wget { inherit pkgs; };
 in [
-  git
-  bottom
-  vim
-  peco
-  wget
-  tig
-  editorconfig
-  tmux
-  direnv
-  eza
-  password-store
   bat
-  ripgrep
-  readline
+  bottom
+  direnv
+  editorconfig
+  eza
+  fish
+  git
   gnupg
-  misc
   man
+  misc
+  password-store
+  peco
+  readline
+  ripgrep
+  tig
+  tmux
+  vim
+  wget
 ]
