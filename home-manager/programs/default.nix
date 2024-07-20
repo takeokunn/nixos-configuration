@@ -16,6 +16,7 @@ let
   readline = import ./readline;
   gnupg = import ./gnupg;
   misc = import ./misc;
+  man = import ./man;
 in [
   git
   bottom
@@ -33,4 +34,5 @@ in [
   readline
   gnupg
   misc
+  man
 ]
