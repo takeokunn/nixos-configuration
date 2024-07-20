@@ -11,6 +11,6 @@
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
 
-    config = import ../home-manager/minimum.nix;
+    # config = import ../home-manager/minimum.nix;
   };
 }
