@@ -1,6 +1,6 @@
 {
-  home.file.".config/git/message" = {
-    source = ./message;
+  home.file = {
+    ".config/git/message".source = ./message;
   };
 
   programs.git = {
