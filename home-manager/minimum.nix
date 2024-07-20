@@ -3,10 +3,10 @@ let
   # packages
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
-  # # programs
-  # programs = import ./programs;
+  # programs
+  programs = import ./programs;
 in {
-  # imports = programs;
+  imports = programs;
 
   home.packages = basicPkgs;
 }

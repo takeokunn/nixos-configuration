@@ -1,4 +1,4 @@
 let
   git = import ./git;
-in
-[git]
+  bottom = import ./bottom;
+in [ git bottom ]
