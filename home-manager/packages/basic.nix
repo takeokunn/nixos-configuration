@@ -24,11 +24,6 @@ with pkgs; [
   # for password tools
   pwgen
 
-  # for editor
-  tree-sitter
-  (tree-sitter.withPlugins (p: builtins.attrValues p))
-  neovim
-
   # for shell
   fish
 ]
