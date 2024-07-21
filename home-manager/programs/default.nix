@@ -1,6 +1,6 @@
 { pkgs }:
 let
-  bat = import ./bat;
+  bat = import ./bat { inherit pkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
   editorconfig = import ./editorconfig { inherit pkgs; };

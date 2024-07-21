@@ -1,6 +1,3 @@
-# [vi mode]
-# set editing-mode vi
-
 # [prompt]
 set show-mode-in-prompt on
 set vi-ins-mode-string \1\e[6 q\2
