@@ -7,13 +7,6 @@ if test (uname) = "Darwin"
     set -gx EDITOR "emacs -nw"
     set -gx HOMEBREW_EDITOR "emacs -nw"
 
-    # path
-    fish_add_path /usr/local/sbin
-    fish_add_path /usr/local/bin
-    fish_add_path /opt/homebrew/bin
-    fish_add_path /opt/homebrew/sbin
-    fish_add_path $HOME/.local/bin
-
     # alias
     alias cdd 'cd ~/Desktop'
     alias make 'make -j8'

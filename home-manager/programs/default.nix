@@ -8,7 +8,6 @@ let
   fish = import ./fish { inherit pkgs; };
   git = import ./git;
   gnupg = import ./gnupg;
-  man = import ./man;
   misc = import ./misc;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
@@ -27,7 +26,6 @@ in [
   fish
   git
   gnupg
-  man
   misc
   password-store
   peco

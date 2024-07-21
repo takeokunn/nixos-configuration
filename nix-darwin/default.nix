@@ -18,9 +18,6 @@
       enable = true;
       startInterval = 600;
     };
-
-    yabai.enable = false;
-    skhd.enable = false;
   };
 
   fonts = {
@@ -106,10 +103,5 @@
       KeepAlive = true;
       RunAtLoad = true;
     };
-  };
-
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
   };
 }

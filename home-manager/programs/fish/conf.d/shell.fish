@@ -1,6 +1,3 @@
-set -xg LC_ALL ja_JP.UTF-8
-set -xg LANG ja_JP.UTF-8
-
 if type -q eza
     alias ls 'eza'
 end
@@ -25,10 +22,6 @@ end
 
 if type -q gh
     eval (gh completion -s fish| source)
-end
-
-if type -q gpg
-    set -x GPG_TTY (tty)
 end
 
 if test -d /etc/profiles/per-user/(whoami)/bin

@@ -23,7 +23,4 @@ with pkgs; [
 
   # for password tools
   pwgen
-
-  # for shell
-  fish
 ]
