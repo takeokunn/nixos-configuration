@@ -2,8 +2,8 @@
   "lockfile_version": "1",
   "packages": {
     "nil@latest": {
-      "last_modified": "2024-07-14T11:03:58Z",
-      "resolved": "github:NixOS/nixpkgs/aa247c0c90ecf4ae7a032c54fdc21b91ca274062#nil",
+      "last_modified": "2024-07-17T09:45:27Z",
+      "resolved": "github:NixOS/nixpkgs/5e73714b16ca222dcb2fc3ea2618fd7ba698da65#nil",
       "source": "devbox-search",
       "version": "2023-08-09",
       "systems": {
@@ -11,41 +11,41 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/99y57hnym4376mw8jq28gwwsd6k5s60i-nil-2023-08-09",
+              "path": "/nix/store/yj3dk2cfzx3n94ikhi3h2agmb546ilrv-nil-2023-08-09",
               "default": true
             }
           ],
-          "store_path": "/nix/store/99y57hnym4376mw8jq28gwwsd6k5s60i-nil-2023-08-09"
+          "store_path": "/nix/store/yj3dk2cfzx3n94ikhi3h2agmb546ilrv-nil-2023-08-09"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/cizzfl3pgrnlkjl2j90ylghcci3cfrxy-nil-2023-08-09",
+              "path": "/nix/store/jbabzddydlfq866zqfhrxmkia53j4gzl-nil-2023-08-09",
               "default": true
             }
           ],
-          "store_path": "/nix/store/cizzfl3pgrnlkjl2j90ylghcci3cfrxy-nil-2023-08-09"
+          "store_path": "/nix/store/jbabzddydlfq866zqfhrxmkia53j4gzl-nil-2023-08-09"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/0cbjaqp11w4rz6jvkfgbr42lzc0fas7l-nil-2023-08-09",
+              "path": "/nix/store/sah0hk22r2fbp0zph04mb5zpwwhm7gw6-nil-2023-08-09",
               "default": true
             }
           ],
-          "store_path": "/nix/store/0cbjaqp11w4rz6jvkfgbr42lzc0fas7l-nil-2023-08-09"
+          "store_path": "/nix/store/sah0hk22r2fbp0zph04mb5zpwwhm7gw6-nil-2023-08-09"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/gn6zkizwnlnj068hn1fs29hkqbka59m4-nil-2023-08-09",
+              "path": "/nix/store/k6f3dnmwlg8njz1j4gb8212invcx9kbm-nil-2023-08-09",
               "default": true
             }
           ],
-          "store_path": "/nix/store/gn6zkizwnlnj068hn1fs29hkqbka59m4-nil-2023-08-09"
+          "store_path": "/nix/store/k6f3dnmwlg8njz1j4gb8212invcx9kbm-nil-2023-08-09"
         }
       }
     },
