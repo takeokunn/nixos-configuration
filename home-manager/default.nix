@@ -10,7 +10,7 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
-  darwinPkgs = import ./packages/darwin { inherit pkgs; };
+  darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
   # programs
   programs = import ./programs { inherit pkgs; };
