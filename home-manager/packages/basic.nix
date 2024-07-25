@@ -2,6 +2,7 @@
 with pkgs; [
   # for terminal tools
   devbox
+  devenv
   du-dust
   lnav
   nkf
