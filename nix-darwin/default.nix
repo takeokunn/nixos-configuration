@@ -8,13 +8,12 @@
       };
       options = "--delete-older-than 3d";
     };
-    settings = {
-      experimental-features = "nix-command flakes";
-      trusted-substituters = [ "https://devenv.cachix.org" ];
-      trusted-public-keys =
-        [ "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=" ];
-    };
     optimise.automatic = true;
+    settings.experimental-features = "nix-command flakes";
+    extraOptions = ''
+      extra-substituters = https://devenv.cachix.org
+      extra-trusted-public-keys = devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=
+    '';
   };
   services = {
     nix-daemon.enable = true;
