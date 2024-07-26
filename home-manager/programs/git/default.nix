@@ -3,6 +3,7 @@
 
   programs.git = {
     enable = true;
+    lfs.enable = true;
 
     aliases = {
       st = "status";

@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ pkgs, ... }: {
   boot = {
     hardwareScan = true;
     loader.systemd-boot.enable = true;
