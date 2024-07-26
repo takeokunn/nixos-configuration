@@ -11,7 +11,7 @@
     enableIPv6 = true;
   };
 
-  time = { timeZone = "Asia/Tokyo"; };
+  time.timeZone = "Asia/Tokyo";
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -31,10 +31,8 @@
   services = {
     xserver = {
       enable = true;
-      displayManager = {
-        gdm.enable = true;
-        # gnome.enable = true;
-      };
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
 
       xkb = {
         layout = "jp";
@@ -43,27 +41,11 @@
       };
 
     };
-
-    tlp.enable = true;
-    printing.enable = true;
-
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-      jack.enable = true;
-    };
   };
 
-  console = { keyMap = "jp106"; };
+  console.keyMap = "jp106";
 
-  sound = { enable = true; };
-
-  hardware = {
-    opengl.enable = true;
-    bluetooth.enable = true;
-  };
+  hardware.bluetooth.enable = true;
 
   security = {
     rtkit.enable = true;
@@ -86,20 +68,7 @@
   };
   nixpkgs = { config.allowUnfree = true; };
 
-  programs = {
-    fish.enable = true;
-    gnupg.agent.enable = true;
-
-    sway = {
-      enable = true;
-      xwayland.enable = true;
-    };
-    waybar.enable = true;
-  };
-
-  system = {
-    stateVersion = "24.11";
-  };
+  system.stateVersion = "24.11";
 
   fonts = {
     fontDir.enable = true;

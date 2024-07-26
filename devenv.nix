@@ -1,4 +1,6 @@
 { pkgs, config, inputs, ... }: {
+  cachix.enable = false;
+
   packages = with pkgs; [ nixfmt-classic ];
 
   languages.javascript = {
