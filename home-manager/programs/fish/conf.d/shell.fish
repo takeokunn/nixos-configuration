@@ -1,5 +1,6 @@
 if type -q eza
     alias ls 'eza'
+    alias ll 'eza -la'
 end
 
 if type -q bat
