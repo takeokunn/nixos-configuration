@@ -16,6 +16,7 @@ let
   tig = import ./tig { inherit pkgs; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim;
+  wezterm = import ./wezterm;
   wget = import ./wget { inherit pkgs; };
 in [
   bat
@@ -34,5 +35,6 @@ in [
   tig
   tmux
   vim
+  wezterm
   wget
 ]
