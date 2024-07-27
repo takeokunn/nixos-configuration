@@ -1,1 +1,1 @@
-{ pkgs }: with pkgs; [ pinentry_mac terminal-notifier ]
+{ pkgs }: with pkgs; [ pinentry_mac terminal-notifier keycastr ]

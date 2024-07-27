@@ -31,6 +31,5 @@ with pkgs; [
   # for misc
   discord
   drawio
-  keycastr
   slack
 ]
