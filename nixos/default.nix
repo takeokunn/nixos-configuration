@@ -58,7 +58,7 @@
       extraGroups = [ "networkmanager" "wheel" ];
       shell = pkgs.fish;
       useDefaultShell = true;
-      packages = with pkgs; [ firefox google-chrome fcitx5-skk ];
+      packages = with pkgs; [ firefox google-chrome fcitx5-skk git ];
     };
   };
 
