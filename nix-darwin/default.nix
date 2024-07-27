@@ -68,14 +68,10 @@
     };
     casks = [
       "aquaskk"
-      "discord"
-      "drawio"
-      "google-chrome"
-      "keycastr"
       "orbstack"
       "raycast"
       "sequel-ace"
-      "slack"
+      "google-chrome"
       "sublime-text"
     ];
     masApps = {

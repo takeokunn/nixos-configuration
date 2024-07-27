@@ -27,4 +27,10 @@ with pkgs; [
   pinentry-emacs
   mu
   emacsPackages.mu4e
+
+  # for misc
+  discord
+  drawio
+  keycastr
+  slack
 ]
