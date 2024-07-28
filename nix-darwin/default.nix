@@ -1,4 +1,6 @@
 { pkgs, ... }: {
+  environment.shells = with pkgs; [ fish ];
+
   nix = {
     gc = {
       automatic = true;
@@ -9,12 +11,17 @@
       options = "--delete-older-than 3d";
     };
     optimise.automatic = true;
-    settings.experimental-features = "nix-command flakes";
+    settings = {
+      experimental-features = "nix-command flakes";
+      max-jobs = 8;
+    };
+
     extraOptions = ''
       extra-substituters = https://devenv.cachix.org
       extra-trusted-public-keys = devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=
     '';
   };
+
   services = {
     nix-daemon.enable = true;
 
@@ -66,18 +73,9 @@
       upgrade = true;
       cleanup = "uninstall";
     };
-    casks = [
-      "aquaskk"
-      "orbstack"
-      "raycast"
-      "sequel-ace"
-      "google-chrome"
-      "sublime-text"
-    ];
-    masApps = {
-      Xcode = 497799835;
-      LINE = 539883307;
-    };
+    casks =
+      [ "aquaskk" "orbstack" "sequel-ace" "google-chrome" "sublime-text" ];
+    masApps.LINE = 539883307;
   };
 
   networking = {
@@ -97,7 +95,7 @@
 
   security.pam.enableSudoTouchIdAuth = true;
 
-  launchd.user.agents.ollama = {
+  launchd.agents.ollama = {
     serviceConfig = {
       ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
       KeepAlive = true;
