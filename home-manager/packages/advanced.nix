@@ -1,8 +1,5 @@
 { pkgs }:
 with pkgs; [
-  # for cloud tools
-  awscli
-
   # for network tools
   speedtest-cli
 

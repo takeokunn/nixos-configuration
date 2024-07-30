@@ -1,5 +1,6 @@
 { pkgs }:
 let
+  awscli = import ./awscli;
   bat = import ./bat { inherit pkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
@@ -19,6 +20,7 @@ let
   wezterm = import ./wezterm;
   wget = import ./wget { inherit pkgs; };
 in [
+  awscli
   bat
   bottom
   direnv
