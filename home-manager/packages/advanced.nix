@@ -19,7 +19,6 @@ with pkgs; [
   # for editor
   tree-sitter
   (tree-sitter.withPlugins (p: builtins.attrValues p))
-  neovim
   emacs-git
   pinentry-emacs
   mu
