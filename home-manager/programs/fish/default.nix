@@ -38,7 +38,7 @@
     '';
 
     shellAliases = {
-      cd = "cd ~/Desktop";
+      cdd = "cd ~/Desktop";
       make = "make -j8";
     };
 
