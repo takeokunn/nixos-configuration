@@ -12,13 +12,13 @@
 ** Usage
 *** for OPL2212-2
 #+begin_src shell
-  nix run nix-darwin -- switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#OPL2212-2 --show-trace
+  nix run nix-darwin -- switch --flake .#OPL2212-2 --show-trace
 #+end_src
 *** for X13Gen2
 #+begin_src shell
-  sudo nixos-rebuild switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#X13Gen2 --show-trace
+  sudo nixos-rebuild switch --flake .#X13Gen2 --show-trace
 #+end_src
 *** for OPPO-A79
 #+begin_src shell
-  nix-on-droid switch --flake ~/ghq/github.com/takeokunn/nixos-configuration#OPPO-A79 --show-trace
+  nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
