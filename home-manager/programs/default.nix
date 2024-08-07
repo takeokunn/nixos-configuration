@@ -1,6 +1,5 @@
 { pkgs }:
 let
-  awscli = import ./awscli;
   bat = import ./bat { inherit pkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
@@ -10,6 +9,7 @@ let
   git = import ./git;
   gnupg = import ./gnupg;
   misc = import ./misc;
+  neovim = import ./neovim;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
@@ -19,6 +19,7 @@ let
   vim = import ./vim;
   wezterm = import ./wezterm;
   wget = import ./wget { inherit pkgs; };
+  awscli = import ./awscli;
 in [
   awscli
   bat
@@ -30,6 +31,7 @@ in [
   git
   gnupg
   misc
+  neovim
   password-store
   peco
   readline
