@@ -6,12 +6,6 @@
       recursive = true;
     };
 
-    # conf.d
-    ".config/fish/conf.d/" = {
-      source = ./conf.d;
-      recursive = true;
-    };
-
     # functions
     ".config/fish/functions/" = {
       source = ./functions;
@@ -42,6 +36,11 @@
             source ~/.config/fish/private.fish
         end
     '';
+
+    shellAliases = {
+      cd = "cd ~/Desktop";
+      make = "make -j8";
+    };
 
     plugins = [
       {

@@ -1,9 +1,11 @@
 { pkgs }:
 let
+  awscli = import ./awscli;
   bat = import ./bat { inherit pkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
   editorconfig = import ./editorconfig { inherit pkgs; };
+  emacs = import ./emacs { inherit pkgs; };
   eza = import ./eza;
   fish = import ./fish { inherit pkgs; };
   git = import ./git;
@@ -14,18 +16,19 @@ let
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
   ripgrep = import ./ripgrep;
+  roswell = import ./roswell { inherit pkgs; };
   tig = import ./tig { inherit pkgs; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim;
   wezterm = import ./wezterm;
   wget = import ./wget { inherit pkgs; };
-  awscli = import ./awscli;
 in [
   awscli
   bat
   bottom
   direnv
   editorconfig
+  emacs
   eza
   fish
   git
@@ -36,6 +39,7 @@ in [
   peco
   readline
   ripgrep
+  roswell
   tig
   tmux
   vim
