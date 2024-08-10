@@ -75,7 +75,7 @@
 
       rebase = {
         autoStash = true;
-        abbreviateCommands = true;
+        abbreviateCommands = false;
         autosquash = true;
       };
     };
