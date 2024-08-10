@@ -29,6 +29,28 @@
       enable = true;
       startInterval = 600;
     };
+
+    yabai = {
+      enable = false;
+      config = {
+        debug_output = "on";
+        external_bar = "all:30:0";
+      };
+    };
+
+    skhd = {
+      enable = false;
+      skhdConfig = ''
+        # focus window
+        shift + alt - x : yabai -m window --focus recent || yabai -m display --focus recent
+        alt - h : yabai -m window --focus west || yabai -m window --focus stack.prev || yabai -m display --focus west
+        alt - j : yabai -m window --focus south || yabai -m display --focus south
+        alt - k : yabai -m window --focus north || yabai -m display --focus north
+        alt - l : yabai -m window --focus east || yabai -m window --focus stack.next || yabai -m display --focus east
+        alt - z : yabai -m window --focus stack.prev
+        alt - c : yabai -m window --focus stack.next
+      '';
+    };
   };
 
   fonts = {

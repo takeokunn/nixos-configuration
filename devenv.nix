@@ -1,4 +1,4 @@
-{ pkgs, config, inputs, ... }: {
+{ pkgs, ... }: {
   cachix.enable = false;
 
   packages = with pkgs; [ nixfmt-classic ];

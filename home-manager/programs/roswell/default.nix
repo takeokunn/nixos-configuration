@@ -1,1 +1,1 @@
-{ pkgs }: { home.packages = [ pkgs.roswell ]; }
+{ pkgs }: { home.packages = with pkgs; [ roswell ]; }

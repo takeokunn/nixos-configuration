@@ -2,7 +2,7 @@
   time.timeZone = "Asia/Tokyo";
 
   system.stateVersion = "24.05";
-  environment.packages = [ pkgs.git ];
+  environment.packages = with pkgs; [ git ];
 
   nix.extraOptions = ''
     experimental-features = nix-command flakes
