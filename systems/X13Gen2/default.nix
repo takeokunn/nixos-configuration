@@ -5,15 +5,6 @@ let
 in {
   X13Gen2 = nixpkgs.lib.nixosSystem {
     inherit system;
-    modules = [
-      ../../nixos
-      ./hardware-configuration.nix
-      home-manager.nixosModules.home-manager
-      {
-        home-manager.useUserPackages = true;
-        home-manager.users."${username}" =
-          import ../../home-manager { inherit system nixpkgs emacs-overlay; };
-      }
-    ];
+    modules = [ ../../nixos ./hardware-configuration.nix ];
   };
 }
