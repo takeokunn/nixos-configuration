@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, username, ... }: {
   environment.shells = with pkgs; [ fish ];
 
   nix = {
@@ -115,7 +115,12 @@
     ];
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security = {
+    sudo.extraConfig = ''
+      ${username} ALL=NOPASSWD: ALL
+    '';
+    pam.enableSudoTouchIdAuth = true;
+  };
 
   launchd.agents.ollama = {
     serviceConfig = {

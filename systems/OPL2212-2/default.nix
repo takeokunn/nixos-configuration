@@ -9,6 +9,7 @@ let
 in {
   OPL2212-2 = nix-darwin.lib.darwinSystem {
     inherit system lib;
+    specialArgs = { username = username; };
     modules = [
       configuration
       ../../nix-darwin
