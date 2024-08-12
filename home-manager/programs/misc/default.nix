@@ -4,5 +4,6 @@
     ".config/cargo/config".source = ./config/cargo_config;
     ".gemrc".source = ./config/.gemrc;
     ".composer/config.json".source = ./config/composer_config.json;
+    ".sourcekit-lsp/config.json".source = ./config/sourcekit-lsp.config.json;
   };
 }
