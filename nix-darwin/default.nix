@@ -85,6 +85,10 @@
         launchanim = false;
         orientation = "bottom";
       };
+      trackpad = {
+        Clicking = true;
+        Dragging = true;
+      };
     };
   };
 
