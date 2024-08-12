@@ -5,7 +5,7 @@
     gc = {
       automatic = true;
       interval = {
-        Hour = 9;
+        Hour = 11;
         Minute = 0;
       };
       options = "--delete-older-than 3d";
@@ -175,7 +175,10 @@
     };
     casks =
       [ "aquaskk" "orbstack" "sequel-ace" "google-chrome" "sublime-text" ];
-    masApps.LINE = 539883307;
+    masApps = {
+      LINE = 539883307;
+      Xcode = 497799835;
+    };
   };
 
   networking = {
