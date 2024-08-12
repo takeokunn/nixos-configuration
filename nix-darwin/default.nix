@@ -173,8 +173,15 @@
       upgrade = true;
       cleanup = "uninstall";
     };
-    casks =
-      [ "aquaskk" "orbstack" "sequel-ace" "google-chrome" "sublime-text" ];
+    taps = [ "dracula/install" ];
+    casks = [
+      "aquaskk"
+      "orbstack"
+      "sequel-ace"
+      "google-chrome"
+      "sublime-text"
+      "dracula-xcode"
+    ];
     masApps = {
       LINE = 539883307;
       Xcode = 497799835;
