@@ -16,8 +16,8 @@ let
   # ripgrep = import ./ripgrep;
   # tig = import ./tig { inherit pkgs; };
   # tmux = import ./tmux { inherit pkgs; };
-  vim = import ./vim;
-  # wget = import ./wget { inherit pkgs; };
+  # vim = import ./vim;
+  wget = import ./wget { inherit pkgs; };
 in [
   # bat
   # bottom
@@ -35,6 +35,6 @@ in [
   # ripgrep
   # tig
   # tmux
-  vim
-  # wget
+  # vim
+  wget
 ]
