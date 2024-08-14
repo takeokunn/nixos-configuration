@@ -11,8 +11,7 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    config =
-      import ../../home-manager { inherit nixpkgs system emacs-overlay; };
+    config = import ../home-manager { inherit system nixpkgs emacs-overlay; };
   };
 
 }
