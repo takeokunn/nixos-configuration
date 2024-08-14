@@ -1,6 +1,4 @@
-{ config, lib, nixpkgs, pkgs, system, emacs-overlay, ... }:
-let pkgs = import nixpkgs { inherit system; };
-in {
+{ config, lib, nixpkgs, pkgs, system, emacs-overlay, ... }: {
   time.timeZone = "Asia/Tokyo";
 
   system.stateVersion = "24.05";
