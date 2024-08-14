@@ -35,6 +35,8 @@
         gpgsign = true;
       };
 
+      tag = { gpgsign = true; };
+
       user = {
         name = "takeokunn";
         email = "bararararatty@gmail.com";
