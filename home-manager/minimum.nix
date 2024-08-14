@@ -8,9 +8,9 @@ let
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
   # programs
-  programs = import ./programs/minimum.nix { inherit pkgs; };
+  basicPrograms = import ./programs/basic.nix { inherit pkgs; };
 in {
-  imports = programs;
+  imports = basicPrograms;
   home.stateVersion = "24.05";
   home.packages = basicPkgs;
 }

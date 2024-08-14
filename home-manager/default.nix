@@ -13,9 +13,10 @@ let
   darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
   # programs
-  programs = import ./programs { inherit pkgs; };
+  basicPrograms = import ./programs/basic.nix { inherit pkgs; };
+  advancedPrograms = import ./programs/advanced.nix { inherit pkgs; };
 in {
-  imports = programs;
+  imports = basicPrograms ++ advancedPrograms;
 
   home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs

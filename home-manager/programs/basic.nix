@@ -1,6 +1,5 @@
 { pkgs }:
 let
-  awscli = import ./awscli;
   bat = import ./bat { inherit pkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
@@ -14,13 +13,11 @@ let
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
   ripgrep = import ./ripgrep;
-  roswell = import ./roswell { inherit pkgs; };
   tig = import ./tig { inherit pkgs; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim;
   wget = import ./wget { inherit pkgs; };
 in [
-  awscli
   bat
   bottom
   direnv
@@ -34,7 +31,6 @@ in [
   peco
   readline
   ripgrep
-  roswell
   tig
   tmux
   vim
