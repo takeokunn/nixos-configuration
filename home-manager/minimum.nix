@@ -1,10 +1,9 @@
-{ system, nixpkgs, emacs-overlay }:
+{ system, nixpkgs }:
 let
   # packages
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = import ./overlay { inherit emacs-overlay; };
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
