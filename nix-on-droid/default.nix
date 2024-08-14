@@ -8,11 +8,11 @@
     experimental-features = nix-command flakes
   '';
 
-  home-manager = {
-    backupFileExtension = "hm-bak";
-    useGlobalPkgs = true;
-    config = import ../home-manager/minimum.nix {
-      inherit system nixpkgs emacs-overlay;
-    };
-  };
+  # home-manager = {
+  #   backupFileExtension = "hm-bak";
+  #   useGlobalPkgs = true;
+  #   config = import ../home-manager/minimum.nix {
+  #     inherit system nixpkgs emacs-overlay;
+  #   };
+  # };
 }
