@@ -19,12 +19,10 @@ let
   vim = import ./vim;
   wget = import ./wget { inherit pkgs; };
 in [
-  awscli
   bat
   bottom
   direnv
   editorconfig
-  emacs
   eza
   fish
   git
@@ -35,10 +33,8 @@ in [
   peco
   readline
   ripgrep
-  roswell
   tig
   tmux
   vim
-  wezterm
   wget
 ]
