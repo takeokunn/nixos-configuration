@@ -1,7 +1,5 @@
 { system, nixpkgs, emacs-overlay }:
 let
-  lib = nixpkgs.lib;
-
   # packages
   pkgs = import nixpkgs {
     inherit system;
@@ -11,7 +9,7 @@ let
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
   # programs
-  programs = import ./programs { inherit pkgs; };
+  programs = import ./programs/minimum.nix { inherit pkgs; };
 in {
   imports = programs;
   home.stateVersion = "24.11";
