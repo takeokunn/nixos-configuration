@@ -7,6 +7,8 @@
     experimental-features = nix-command flakes
   '';
 
+  user.shell = "${pkgs.fish}/bin/fish";
+
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
