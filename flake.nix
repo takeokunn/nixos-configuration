@@ -20,7 +20,6 @@
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/master";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
   };
 
@@ -33,7 +32,7 @@
         inherit self nixpkgs home-manager emacs-overlay nixos-hardware;
       });
       nixOnDroidConfigurations = (import ./systems/OPPO-A79 {
-        inherit self nixpkgs home-manager emacs-overlay nix-on-droid;
+        inherit self nixpkgs emacs-overlay nix-on-droid;
       });
     };
 }
