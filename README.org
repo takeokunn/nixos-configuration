@@ -7,7 +7,7 @@
 |-----------+---------+----------------+--------|
 | OPL2212-2 | mac     | aarch64-darwin | ○      |
 | X13Gen2   | nixos   | x86_64-linux   | ×      |
-| OPPO-A79  | android | -              | ×      |
+| OPPO-A79  | android | aarch64-linux  | ○      |
 
 ** Usage
 *** for OPL2212-2
