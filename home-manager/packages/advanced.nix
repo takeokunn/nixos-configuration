@@ -6,13 +6,6 @@ with pkgs; [
   # for DB
   mysql
 
-  # for jokes
-  asciiquarium
-  cmatrix
-  fastfetch
-  genact
-  sl
-
   # for ai
   ollama
 

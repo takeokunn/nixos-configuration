@@ -24,4 +24,11 @@ with pkgs; [
 
   # for password tools
   pwgen
+
+  # for jokes
+  asciiquarium
+  cmatrix
+  fastfetch
+  genact
+  sl
 ]
