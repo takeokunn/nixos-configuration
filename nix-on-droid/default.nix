@@ -15,5 +15,4 @@
       inherit system nixpkgs emacs-overlay;
     };
   };
-
 }
