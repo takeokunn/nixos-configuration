@@ -1,4 +1,6 @@
-{ config, lib, nixpkgs, pkgs, emacs-overlay, ... }: {
+{ config, lib, nixpkgs, pkgs, system, emacs-overlay, ... }:
+let pkgs = import nixpkgs { inherit system; };
+in {
   time.timeZone = "Asia/Tokyo";
 
   system.stateVersion = "24.05";
@@ -11,12 +13,8 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-
-    config = { config, lib, pkgs, ... }: {
-      home.stateVersion = "24.05";
-
-      # insert home-manager config
-    };
+    config =
+      import ../../home-manager { inherit nixpkgs system emacs-overlay; };
   };
 
 }
