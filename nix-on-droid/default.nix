@@ -1,4 +1,4 @@
-{ config, lib, nixpkgs, pkgs, system, ... }: {
+{ nixpkgs, pkgs, system, ... }: {
   environment.packages = with pkgs; [ git ];
 
   time.timeZone = "Asia/Tokyo";
