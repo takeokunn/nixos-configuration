@@ -131,7 +131,6 @@
       },
       "original": {
         "owner": "nix-community",
-        "ref": "master",
         "repo": "nix-on-droid",
         "type": "github"
       }
@@ -147,7 +146,6 @@
       },
       "original": {
         "owner": "NixOS",
-        "ref": "master",
         "repo": "nixos-hardware",
         "type": "github"
       }
