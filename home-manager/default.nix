@@ -17,7 +17,7 @@ let
 in {
   imports = programs;
 
-  home.stateVersion = "24.11";
+  home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs
     ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
 }
