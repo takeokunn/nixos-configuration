@@ -41,16 +41,13 @@
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
 
-      xkb = {
-        layout = "jp";
-        variant = "";
-        options = "ctrl:swapcaps";
-      };
-
+      # xkb = {
+      #   layout = "jp";
+      #   variant = "";
+      #   options = "ctrl:swapcaps";
+      # };
     };
   };
-
-  console.keyMap = "jp106";
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -133,5 +130,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }
