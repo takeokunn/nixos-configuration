@@ -23,7 +23,7 @@
   time.timeZone = "Asia/Tokyo";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "ja_JP.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "ja_JP.UTF-8";
@@ -43,10 +43,10 @@
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
 
-      xkb = {
-        layout = "jp";
-        model = "pc106";
-      };
+      # xkb = {
+      #   layout = "jp";
+      #   model = "pc106";
+      # };
     };
   };
 
