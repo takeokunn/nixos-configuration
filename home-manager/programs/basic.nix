@@ -17,7 +17,6 @@ let
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim;
   wget = import ./wget { inherit pkgs; };
-  sway = import ./sway;
 in [
   bat
   bottom
@@ -36,5 +35,4 @@ in [
   tmux
   vim
   wget
-  sway
 ]
