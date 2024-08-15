@@ -43,13 +43,11 @@
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
 
-      # xkb = {
-      #   layout = "jp";
-      #   variant = "";
-      #   options = "ctrl:swapcaps";
-      # };
+      xkb.layout = "jp106";
     };
   };
+
+  console.useXkbConfig = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
