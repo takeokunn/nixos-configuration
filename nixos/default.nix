@@ -42,15 +42,10 @@
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
-  console.keyMap = "jp106";
-
   # Configure keymap in X11
   services.xserver = {
-    xkb = {
-      layout = "jp";
-      variant = "";
-      options = "ctrl:swapcaps";
-    };
+    layout = "jp106";
+    xkbOptions = "ctrl:swapcaps";
   };
 
   # Enable CUPS to print documents.
