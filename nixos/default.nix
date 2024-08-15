@@ -43,7 +43,7 @@
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
 
-      layout = "jp106";
+      xkb.layout = "jp";
     };
   };
 
