@@ -43,8 +43,10 @@
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
 
-      xkb.layout = "jp";
-      xkb.model = "pc104";
+      xkb = {
+        layout = "jp";
+        model = "pc106";
+      };
     };
   };
 
