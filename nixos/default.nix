@@ -23,7 +23,7 @@
   time.timeZone = "Asia/Tokyo";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.defaultLocale = "ja_JP.UTF-8";
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "ja_JP.UTF-8";
@@ -48,11 +48,6 @@
         model = "pc106";
       };
     };
-  };
-
-  console = {
-    useXkbConfig = true;
-    keyMap = "jp106";
   };
 
   # Enable CUPS to print documents.
