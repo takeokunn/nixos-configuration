@@ -44,6 +44,7 @@
       desktopManager.gnome.enable = true;
 
       xkb.layout = "jp";
+      xkb.model = "pc104";
     };
   };
 
