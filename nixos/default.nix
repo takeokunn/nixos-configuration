@@ -41,13 +41,14 @@
     xserver = {
       enable = true;
       displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
-
-      # xkb = {
-      #   layout = "jp";
-      #   model = "pc106";
-      # };
+      # desktopManager.gnome.enable = true;
+      xkb.layout = "jp";
     };
+  };
+
+  programs.sway = {
+    enable = true;
+    xwayland.enable = true;
   };
 
   # Enable CUPS to print documents.
