@@ -1,4 +1,3 @@
 input * {
-    xkb_layout "cz"
-    xkb_variant "coder"
+    xkb_layout "jp"
 }
