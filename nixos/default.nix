@@ -50,7 +50,10 @@
     };
   };
 
-  console.keyMap = "jp106";
+  console = {
+    useXkbConfig = true;
+    keyMap = "jp106";
+  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
