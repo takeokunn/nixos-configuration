@@ -42,12 +42,11 @@
       enable = true;
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
-
-      xkb.layout = "jp106";
+    };
+    xkb = {
+      layout = "jp106";
     };
   };
-
-  console.useXkbConfig = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -68,21 +67,21 @@
     #media-session.enable = true;
   };
 
-   services.xremap = {
-   userName = "take";
-   serviceMode = "system";
-   config = {
-     modmap = [
-       {
-         # CapsLockをCtrlに置換
-         name = "CapsLock is dead";
-         remap = {
-           CapsLock = "Ctrl_L";
-         };
-       }
-     ];
-   };
- };
+  services.xremap = {
+    userName = "take";
+    serviceMode = "system";
+    config = {
+      modmap = [
+        {
+          # CapsLockをCtrlに置換
+          name = "CapsLock is dead";
+          remap = {
+            CapsLock = "Ctrl_L";
+          };
+        }
+      ];
+    };
+  };
 
 
   # Enable touchpad support (enabled default in most desktopManager).
