@@ -35,18 +35,22 @@
     LC_TIME = "ja_JP.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  services = {
+    xserver = {
+      enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+      xkb = {
+        layout = "jp";
+        variant = "";
+        options = "ctrl:swapcaps";
+      };
 
-  # Configure keymap in X11
-  services.xserver = {
-    layout = "jp106";
-    xkbOptions = "ctrl:swapcaps";
+    };
   };
+
+  console.keyMap = "jp106";
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
