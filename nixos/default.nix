@@ -2,7 +2,9 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }: {
+{ config, pkgs, xremap, ... }: {
+  imports = [ xremap.nixosModules.default ];
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -67,6 +69,23 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
+
+   services.xremap = {
+   userName = "take";
+   serviceMode = "system";
+   config = {
+     modmap = [
+       {
+         # CapsLockをCtrlに置換
+         name = "CapsLock is dead";
+         remap = {
+           CapsLock = "Ctrl_L";
+         };
+       }
+     ];
+   };
+ };
+
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
