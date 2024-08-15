@@ -1,0 +1,4 @@
+input * {
+    xkb_layout "cz"
+    xkb_variant "coder"
+}
