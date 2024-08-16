@@ -4,5 +4,6 @@
     extraGroups = [ "networkmanager" "wheel" "video" "audio" ];
     shell = pkgs.fish;
     useDefaultShell = true;
+    packages = with pkgs; [ alsa-utils ];
   };
 }
