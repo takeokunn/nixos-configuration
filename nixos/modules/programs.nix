@@ -1,4 +1,4 @@
-{
+{ pkgs }: {
   fish.enable = true;
   firefox.enable = true;
 
@@ -11,6 +11,7 @@
     enable = true;
     xwayland.enable = true;
     wrapperFeatures.gtk = true;
+    extraPackages = with pkgs; [ swaylock swayidle foot rofi ];
   };
 
   light.enable = true;

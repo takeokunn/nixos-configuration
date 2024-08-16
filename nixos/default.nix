@@ -6,7 +6,7 @@ let
   i18n = import ./modules/i18n.nix { inherit pkgs; };
   networking = import ./modules/networking.nix;
   nix = import ./modules/nix.nix;
-  programs = import ./modules/programs.nix;
+  programs = import ./modules/programs.nix { inherit pkgs; };
   security = import ./modules/security.nix { inherit username; };
   services = import ./modules/services.nix { inherit username; };
   systemd = import ./modules/systemd.nix;
