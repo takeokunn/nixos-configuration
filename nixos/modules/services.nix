@@ -30,4 +30,23 @@
       }];
     };
   };
+
+  ntp.enable = true;
+
+  ollama = {
+    enable = true;
+    models = "gemma2:27b";
+  };
+
+  tlp = {
+    enable = true;
+    settings = {
+      AHCI_RUNTIME_PM_ON_AC = "auto";
+      AHCI_RUNTIME_PM_ON_BAT = "auto";
+      RUNTIME_PM_ON_AC = "auto";
+      RUNTIME_PM_ON_BAT = "auto";
+    };
+  };
+
+  offlineimap.enable = true;
 }

@@ -2,6 +2,16 @@
   fish.enable = true;
   firefox.enable = true;
 
+  chromium = {
+    enable = true;
+    extensions = [
+      "gppongmhjkpfnbhagpmjfkannfbllamg" # Wappalyzer
+      "kfdibhbheajeacnkkakomaliggbgndcf" # Chromemacs
+      "gighmmpiobklfepjocnamgkkbiglidom" # Adblock
+      "hkgfoiooedgoejojocmhlaklaeopbecg" # Picture-in-Picture
+    ];
+  };
+
   gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
