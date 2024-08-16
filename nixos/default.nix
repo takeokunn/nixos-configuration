@@ -15,6 +15,7 @@ let
 in {
   imports = [ xremap.nixosModules.default ];
   system.stateVersion = "24.05";
+  sound.enable = true;
 
   boot = boot;
   fonts = fonts;
