@@ -3,7 +3,7 @@ let
   boot = import ./modules/boot.nix;
   fonts = import ./modules/fonts.nix { inherit pkgs; };
   hardware = import ./modules/hardware.nix;
-  i18n = import ./modules/i18n.nix;
+  i18n = import ./modules/i18n.nix { inherit pkgs; };
   networking = import ./modules/networking.nix;
   nix = import ./modules/nix.nix;
   programs = import ./modules/programs.nix;
