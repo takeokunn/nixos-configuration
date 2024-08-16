@@ -13,8 +13,7 @@
   };
 
   inputMethod = {
-    enable = true;
-    type = "fcitx5";
+    enable = "fcitx5";
     fcitx5.addons = with pkgs; [ fcitx-skk ];
   };
 }
