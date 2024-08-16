@@ -1,9 +1,4 @@
 {
-  pulseaudio = {
-    enable = true;
-    support32Bit = true;
-  };
-
+  pulseaudio.enable = false;
   bluetooth.enable = true;
-  graphics.enable = true;
 }

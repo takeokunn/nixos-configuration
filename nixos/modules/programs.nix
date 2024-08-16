@@ -15,4 +15,6 @@
 
   light.enable = true;
   waybar.enable = true;
+
+  noisetorch.enable = true;
 }
