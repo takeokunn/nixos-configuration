@@ -1,4 +1,4 @@
-{ config, pkgs, xremap, username }:
+{ config, pkgs, xremap, username, ... }:
 let
   boot = import ./modules/boot.nix;
   fonts = import ./modules/fonts.nix { inherit pkgs; };
