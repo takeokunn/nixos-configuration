@@ -11,7 +11,6 @@
     enable = true;
     xwayland.enable = true;
     wrapperFeatures.gtk = true;
-    extraPackages = with pkgs; [ swaylock swayidle foot rofi ];
   };
 
   light.enable = true;
