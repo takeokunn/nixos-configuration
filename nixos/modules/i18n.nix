@@ -1,4 +1,4 @@
-{
+{ pkgs }: {
   defaultLocale = "en_US.UTF-8";
   extraLocaleSettings = {
     LC_ADDRESS = "ja_JP.UTF-8";
@@ -10,5 +10,11 @@
     LC_PAPER = "ja_JP.UTF-8";
     LC_TELEPHONE = "ja_JP.UTF-8";
     LC_TIME = "ja_JP.UTF-8";
+  };
+
+  inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [ fcitx-skk ];
   };
 }

@@ -1,5 +1,5 @@
 { pkgs }: {
-  home.packages = [ pkgs.editorconfig-core-c ];
+  home.packages = with pkgs; [ editorconfig-core-c ];
   editorconfig = {
     enable = true;
     settings = {
