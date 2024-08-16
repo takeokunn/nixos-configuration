@@ -10,6 +10,15 @@
     user = username;
   };
 
+  pipewire = {
+    enable = true;
+    alsa = {
+      enable = true;
+      support32Bit = true;
+    };
+    pulse.enable = true;
+  };
+
   xremap = {
     userName = username;
     serviceMode = "system";

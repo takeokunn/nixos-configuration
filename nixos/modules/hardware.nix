@@ -1,8 +1,4 @@
 {
-  alsa.enablePersistence = true;
-  pulseaudio = {
-    enable = true;
-    support32Bit = true;
-  };
+  pulseaudio.enable = false;
   bluetooth.enable = true;
 }
