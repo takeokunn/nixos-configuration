@@ -5,7 +5,7 @@ let
 in {
   X13Gen2 = nixpkgs.lib.nixosSystem {
     inherit system;
-    specialArgs = { inherit xremap username system; };
+    specialArgs = { inherit xremap username; };
     modules = [
       ../../nixos
       ./hardware-configuration.nix
