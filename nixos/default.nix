@@ -1,29 +1,31 @@
 { config, pkgs, xremap, username, system, ... }:
 let
   boot = import ./modules/boot.nix;
-  networking = import ./modules/networking.nix;
-  time = import ./modules/time.nix;
-  i18n = import ./modules/i18n.nix;
+  fonts = import ./modules/fonts.nix { inherit pkgs; };
   hardware = import ./modules/hardware.nix;
+  i18n = import ./modules/i18n.nix;
+  networking = import ./modules/networking.nix;
+  nix = import ./modules/nix.nix;
   programs = import ./modules/programs.nix;
+  security = import ./modules/security.nix;
   services = import ./modules/services.nix { inherit username; };
   systemd = import ./modules/systemd.nix;
-  security = import ./modules/security.nix;
+  time = import ./modules/time.nix;
   users = import ./modules/users.nix { inherit pkgs username; };
-  fonts = import ./modules/fonts.nix { inherit pkgs; };
 in {
   imports = [ xremap.nixosModules.default ];
   system.stateVersion = "24.05";
 
   boot = boot;
-  networking = networking;
-  time = time;
-  i18n = i18n;
+  fonts = fonts;
   hardware = hardware;
+  i18n = i18n;
+  networking = networking;
+  nix = nix;
   programs = programs;
+  security = security;
   services = services;
   systemd = systemd;
-  security = security;
+  time = time;
   users = users;
-  fonts = fonts;
 }
