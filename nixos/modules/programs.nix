@@ -1,4 +1,5 @@
 {
+  fish.enable = true;
   firefox.enable = true;
 
   gnupg.agent = {
@@ -9,7 +10,9 @@
   sway = {
     enable = true;
     xwayland.enable = true;
+    wrapperFeatures.gtk = true;
   };
 
-  fish.enable = true;
+  light.enable = true;
+  waybar.enable = true;
 }
