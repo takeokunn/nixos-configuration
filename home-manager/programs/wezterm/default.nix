@@ -19,8 +19,8 @@
         },
         color_scheme = "Dracula (Official)",
 
-        -- font = wezterm.font("HackGen"),
-        font_size = 16.0,
+        font = wezterm.font("HackGen"),
+        font_size = 14.0,
         adjust_window_size_when_changing_font_size = false
       }
     '';
