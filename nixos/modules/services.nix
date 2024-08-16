@@ -2,12 +2,12 @@
   xserver = {
     enable = true;
     xkb.layout = "jp";
+    displayManager.gdm.enable = true;
+  };
 
-    displayManager = {
-      gdm.enable = true;
-      autoLogin.enable = true;
-      autoLogin.user = username;
-    };
+  displayManager.autoLogin = {
+    enable = true;
+    user = username;
   };
 
   pipewire = {
