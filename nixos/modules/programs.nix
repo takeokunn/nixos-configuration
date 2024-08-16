@@ -10,4 +10,6 @@
     enable = true;
     xwayland.enable = true;
   };
+
+  fish.enable = true;
 }

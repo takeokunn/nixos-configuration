@@ -1,6 +1,8 @@
-{ username }: {
+{ pkgs, username }: {
   users.${username} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "audio" ];
+    shell = pkgs.fish;
+    useDefaultShell = true;
   };
 }

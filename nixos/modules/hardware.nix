@@ -1,1 +1,4 @@
-{ pulseaudio.enable = false; }
+{
+  pulseaudio.enable = false;
+  bluetooth.enable = true;
+}

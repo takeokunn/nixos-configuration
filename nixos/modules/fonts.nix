@@ -1,4 +1,5 @@
 { pkgs }: {
+  fontDir.enable = true;
   packages = with pkgs; [
     noto-fonts
     noto-fonts-lgc-plus

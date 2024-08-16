@@ -9,8 +9,8 @@ let
   services = import ./modules/services.nix { inherit username; };
   systemd = import ./modules/systemd.nix;
   security = import ./modules/security.nix;
-  users = import ./modules/users.nix;
-  fonts = import ./modules/fonts.nix;
+  users = import ./modules/users.nix { inherit pkgs username; };
+  fonts = import ./modules/fonts.nix { inherit pkgs; };
 in {
   imports = [ xremap.nixosModules.default ];
   system.stateVersion = "24.05";
