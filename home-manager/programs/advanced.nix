@@ -7,4 +7,11 @@ let
   # rofi = import ./rofi;
   # sway = import ./sway;
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
-in [ awscli emacs git roswell rofi sway wezterm ]
+in [
+  awscli
+  emacs
+  git
+  roswell
+  # rofi sway
+  wezterm
+]
