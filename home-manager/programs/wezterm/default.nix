@@ -21,7 +21,8 @@
 
         font = wezterm.font("HackGen"),
         font_size = 16.0,
-        adjust_window_size_when_changing_font_size = false
+        adjust_window_size_when_changing_font_size = false,
+        harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
       }
     '';
   };

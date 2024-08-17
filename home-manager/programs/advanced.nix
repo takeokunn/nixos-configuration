@@ -4,5 +4,7 @@ let
   emacs = import ./emacs { inherit pkgs; };
   git = import ./git;
   roswell = import ./roswell { inherit pkgs; };
+  rofi = import ./rofi;
+  sway = import ./sway;
   wezterm = import ./wezterm;
-in [ awscli emacs git roswell wezterm ]
+in [ awscli emacs git roswell rofi sway wezterm ]
