@@ -1,4 +1,4 @@
-{ system, nixpkgs, emacs-overlay }:
+{ system, nixpkgs, emacs-overlay, wezterm-flake }:
 let
   lib = nixpkgs.lib;
 
@@ -14,7 +14,8 @@ let
 
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
-  advancedPrograms = import ./programs/advanced.nix { inherit pkgs; };
+  advancedPrograms =
+    import ./programs/advanced.nix { inherit pkgs wezterm-flake; };
 in {
   imports = basicPrograms ++ advancedPrograms;
 

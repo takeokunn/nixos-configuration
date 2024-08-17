@@ -1,4 +1,4 @@
-{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay }:
+{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay, wezterm-flake }:
 let
   system = "aarch64-darwin";
   username = "obara";
@@ -16,8 +16,9 @@ in {
       home-manager.darwinModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users."${username}" =
-          import ../../home-manager { inherit system nixpkgs emacs-overlay; };
+        home-manager.users."${username}" = import ../../home-manager {
+          inherit system nixpkgs emacs-overlay wezterm-flake;
+        };
       }
     ];
   };

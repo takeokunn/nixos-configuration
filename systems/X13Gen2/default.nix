@@ -1,4 +1,5 @@
-{ self, nixpkgs, home-manager, emacs-overlay, nixos-hardware, xremap }:
+{ self, nixpkgs, home-manager, emacs-overlay, nixos-hardware, xremap
+, wezterm-flake }:
 let
   username = "take";
   system = "x86_64-linux";
@@ -12,8 +13,9 @@ in {
       home-manager.nixosModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users."${username}" =
-          import ../../home-manager { inherit system nixpkgs emacs-overlay; };
+        home-manager.users."${username}" = import ../../home-manager {
+          inherit system nixpkgs emacs-overlay wezterm-flake;
+        };
       }
     ];
   };

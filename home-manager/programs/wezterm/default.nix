@@ -1,9 +1,9 @@
-{
+{ pkgs, wezterm-flake }: {
   home.file.".config/wezterm/dracula.toml".source = ./dracula.toml;
 
   programs.wezterm = {
     enable = true;
-
+    package = wezterm-flake.packages.${pkgs.system}.default;
     extraConfig = ''
       local wezterm = require("wezterm")
 
