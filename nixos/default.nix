@@ -13,19 +13,9 @@ let
   time = import ./modules/time.nix;
   users = import ./modules/users.nix { inherit pkgs username; };
 in {
-  imports = [ xremap.nixosModules.default ];
-  system.stateVersion = "24.05";
+  inherit boot fonts hardware i18n networking nix programs security services
+    systemd time users;
 
-  boot = boot;
-  fonts = fonts;
-  hardware = hardware;
-  i18n = i18n;
-  networking = networking;
-  nix = nix;
-  programs = programs;
-  security = security;
-  services = services;
-  systemd = systemd;
-  time = time;
-  users = users;
+  system.stateVersion = "24.05";
+  imports = [ xremap.nixosModules.default ];
 }
