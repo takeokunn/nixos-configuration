@@ -1,5 +1,5 @@
 { nixpkgs, pkgs, system, ... }: {
-  environment.packages = with pkgs; [ git emacs rustup llvm ];
+  environment.packages = with pkgs; [ git emacs ];
 
   time.timeZone = "Asia/Tokyo";
 
