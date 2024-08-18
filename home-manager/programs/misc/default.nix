@@ -5,6 +5,5 @@
     ".gemrc".source = ./config/.gemrc;
     ".composer/config.json".source = ./config/composer_config.json;
     ".sourcekit-lsp/config.json".source = ./config/sourcekit-lsp.config.json;
-    ".config/xremap/config.yml".source = ./config/xremap_config.yml;
   };
 }
