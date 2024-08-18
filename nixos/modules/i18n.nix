@@ -17,8 +17,8 @@
     enable = true;
     type = "fcitx5";
     fcitx5 = {
-      waylandFrontend = true;
-      addons = with pkgs; [ fcitx5-skk fcitx5-mozc fcitx5-nord fcitx5-gtk ];
+      waylandFrontend = false;
+      addons = with pkgs; [ fcitx5-skk fcitx5-mozc ];
     };
   };
 }
