@@ -4,14 +4,25 @@ let
   emacs = import ./emacs { inherit pkgs; };
   git = import ./git;
   roswell = import ./roswell { inherit pkgs; };
-  # rofi = import ./rofi;
-  # sway = import ./sway;
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
+
+  # for window manager
+  rofi = import ./rofi;
+  sway = import ./sway;
+  swaylock = import ./swaylock;
+  mako = import ./mako;
+  waybar = import ./waybar;
 in [
   awscli
   emacs
   git
   roswell
-  # rofi sway
   wezterm
+
+  # for window manager
+  rofi
+  sway
+  swaylock
+  mako
+  waybar
 ]

@@ -2,6 +2,7 @@
   hostName = "nixos";
   networkmanager.enable = true;
   enableIPv6 = true;
+  firewall.enable = true;
   nameservers = [
     "8.8.8.8"
     "8.8.4.4"

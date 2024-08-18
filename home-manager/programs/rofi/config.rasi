@@ -10,13 +10,13 @@ configuration {
   display-filebrowser: " Filebrowser";
   timeout {
       action: "kb-cancel";
-      delay:  60;
+      delay: 60;
   }
   filebrowser {
       directory: "$HOME";
       directories-first: true;
-      sorting-method:    "name";
+      sorting-method: "name";
   }
 }
 
-@theme "nord"
+@theme "dracula"

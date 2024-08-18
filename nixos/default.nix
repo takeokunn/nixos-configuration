@@ -12,9 +12,10 @@ let
   systemd = import ./modules/systemd.nix;
   time = import ./modules/time.nix;
   users = import ./modules/users.nix { inherit pkgs username; };
+  virtualisation = import ./modules/virtualisation.nix;
 in {
   inherit boot fonts hardware i18n networking nix programs security services
-    systemd time users;
+    systemd time users virtualisation;
 
   system.stateVersion = "24.05";
   imports = [ xremap.nixosModules.default ];

@@ -1,17 +1,16 @@
 { lib, buildGoModule, fetchFromGitHub }:
-
 buildGoModule rec {
   pname = "ecspresso";
-  version = "2.3.2";
+  version = "2.4.0";
 
   src = fetchFromGitHub {
     owner = "kayac";
     repo = "ecspresso";
     rev = "refs/tags/v${version}";
-    hash = "sha256-jqO0kT5DuPeIbHw3AfmbT95mzlS7ovGi2kjJYc4zRyA=";
+    hash = "sha256-jqO0kT5DuPeIbHw3AfmbT95mzlS7ovGi2kjJYc4zRyA==";
   };
 
-  vendorHash = "sha256-pfiMKzvGKbfjGfklQjIlaLN1ZRTsln94DKHatDZv+eI=";
+  vendorHash = "sha256-UX4tKoy0W+uYugRILq9TElz0i1b5hTsh4gDivVVVsZ4=";
 
   ldflags = [ "-s" "-w" "-X=main.Version=v${version}" ];
 
