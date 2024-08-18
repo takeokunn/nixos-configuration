@@ -1,2 +1,2 @@
-include ~/.config/sway/config.d/*
+include /home/take/.config/sway/config.d/*
 include /etc/sway/config.d/*

@@ -1,6 +1,1 @@
-{
-  docker = {
-    enable = true;
-    storageDriver = "btrfs";
-  };
-}
+{ docker.enable = true; }
