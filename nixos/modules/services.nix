@@ -49,4 +49,6 @@
   };
 
   offlineimap.enable = true;
+
+  mako.enable = true;
 }

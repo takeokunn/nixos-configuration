@@ -1,6 +1,7 @@
 { pkgs }: {
   fish.enable = true;
   firefox.enable = true;
+  noisetorch.enable = true;
 
   chromium = {
     enable = true;
@@ -22,9 +23,7 @@
     xwayland.enable = true;
     wrapperFeatures.gtk = true;
   };
-
-  light.enable = true;
+  swaylock.enable = true;
   waybar.enable = true;
-
-  noisetorch.enable = true;
+  rofi.enable = true;
 }

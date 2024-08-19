@@ -31,9 +31,6 @@ outer.top = 0
 outer.right = 0
 
 [mode.main.binding]
-# See: https://nikitabobko.github.io/AeroSpace/goodness#open-a-new-window-with-applescript
-alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
-
 alt-h = 'focus left'
 alt-j = ['focus down', 'focus-monitor down']
 alt-k = ['focus up', 'focus-monitor up']
@@ -47,9 +44,6 @@ alt-shift-l = 'move right'
 # Consider using 'join-with' command as a 'split' replacement if you want to enable normalizations
 alt-shift-v = 'split horizontal'
 alt-shift-b = 'split vertical'
-
-alt-w = 'layout tiles h_accordion' # 'layout tabbed' in i3
-
 alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
 
 # `focus parent`/`focus child` are not yet supported, and it's not clear whether they
