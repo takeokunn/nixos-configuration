@@ -6,32 +6,111 @@
     font-size: 11pt;
     min-height: 0;
 }
+
 window#waybar {
     opacity: 0.9;
     background: @background-darker;
     color: @foreground;
     border-bottom: 2px solid @background;
 }
+
 #workspaces button {
     padding: 0 10px;
     background: @background;
     color: @foreground;
 }
+
 #workspaces button:hover {
     box-shadow: inherit;
     text-shadow: inherit;
     background-image: linear-gradient(0deg, @selection, @background-darker);
 }
+
 #workspaces button.active {
     background-image: linear-gradient(0deg, @purple, @selection);
 }
+
 #workspaces button.urgent {
     background-image: linear-gradient(0deg, @red, @background-darker);
 }
+
 #taskbar button.active {
     background-image: linear-gradient(0deg, @selection, @background-darker);
 }
+
 #clock {
     padding: 0 4px;
     background: @background;
+}
+
+#custom-right-arrow-dark,
+#custom-left-arrow-dark {
+    color: @background-darker;
+}
+#custom-right-arrow-light,
+#custom-left-arrow-light {
+    color: @background;
+    background: @background-darker;
+}
+
+#workspaces,
+#clock.1,
+#clock.2,
+#clock.3,
+#pulseaudio,
+#memory,
+#cpu,
+#battery,
+#disk,
+#tray {
+    background: @background-darker;
+}
+
+#workspaces button {
+    padding: 0 2px;
+    color: @foreground;
+}
+
+#workspaces button.focused {
+    color: @cyan;
+}
+
+#workspaces button:hover {
+    box-shadow: inherit;
+    text-shadow: inherit;
+}
+
+#workspaces button:hover {
+    background: @background-darker;
+    border: @background-darker;
+    padding: 0 3px;
+}
+
+#pulseaudio {
+    color: @cyan;
+}
+
+#memory {
+    color: @cyan;
+}
+
+#cpu {
+    color: @comment;
+}
+
+#battery {
+    color: @yellow;
+}
+
+#disk {
+    color: @yellow;
+}
+
+#clock,
+#pulseaudio,
+#memory,
+#cpu,
+#battery,
+#disk {
+    padding: 0 10px;
 }
