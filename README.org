@@ -3,11 +3,11 @@
 * nixos-configuration
 ** Target
 
-| name      | os      | system         | stable |
-|-----------+---------+----------------+--------|
-| OPL2212-2 | mac     | aarch64-darwin | ○      |
-| X13Gen2   | nixos   | x86_64-linux   | ○      |
-| OPPO-A79  | android | aarch64-linux  | ○      |
+| machine          | name      | os      | system         | stable |
+|------------------+-----------+---------+----------------+--------|
+| M1 Mac Pro       | OPL2212-2 | OSX     | aarch64-darwin | ○      |
+| Thinkpad X13Gen2 | X13Gen2   | NixOS   | x86_64-linux   | ○      |
+| Android OPPO-A79 | OPPO-A79  | Android | aarch64-linux  | ○      |
 
 ** Usage
 *** for OPL2212-2
