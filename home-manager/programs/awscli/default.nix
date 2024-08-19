@@ -1,5 +1,5 @@
 {
-  programs.awscli.enable = false;
+  programs.awscli.enable = true;
 
   programs.fish = {
     interactiveShellInit = ''

@@ -5,7 +5,7 @@
     upgrade = true;
     cleanup = "uninstall";
   };
-  taps = [ "dracula/install" ];
+  taps = [ "dracula/install" "nikitabobko/tap" ];
   casks = [
     "aquaskk"
     "orbstack"
@@ -13,6 +13,7 @@
     "google-chrome"
     "sublime-text"
     "dracula-xcode"
+    "aerospace"
   ];
   masApps = {
     LINE = 539883307;
