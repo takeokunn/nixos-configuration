@@ -23,7 +23,5 @@
     xwayland.enable = true;
     wrapperFeatures.gtk = true;
   };
-  swaylock.enable = true;
   waybar.enable = true;
-  rofi.enable = true;
 }
