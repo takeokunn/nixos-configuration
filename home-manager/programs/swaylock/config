@@ -32,7 +32,7 @@ bs-hl-color=8BE9FD
 grace=2
 grace-no-mouse
 grace-no-touch
-datestr=%a, %B %e
-timestr=%I:%M %p
+datestr=%Y/%m/%d
+timestr=%H:%m
 fade-in=0.4
 ignore-empty-password
