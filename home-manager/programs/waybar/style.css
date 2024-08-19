@@ -86,26 +86,6 @@ window#waybar {
     padding: 0 3px;
 }
 
-#pulseaudio {
-    color: @cyan;
-}
-
-#memory {
-    color: @cyan;
-}
-
-#cpu {
-    color: @comment;
-}
-
-#battery {
-    color: @yellow;
-}
-
-#disk {
-    color: @yellow;
-}
-
 #clock,
 #pulseaudio,
 #memory,
