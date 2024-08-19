@@ -12,13 +12,4 @@
     LC_TELEPHONE = "ja_JP.UTF-8";
     LC_TIME = "ja_JP.UTF-8";
   };
-
-  inputMethod = {
-    enable = true;
-    type = "fcitx5";
-    fcitx5 = {
-      waylandFrontend = false;
-      addons = with pkgs; [ fcitx5-skk fcitx5-mozc ];
-    };
-  };
 }
