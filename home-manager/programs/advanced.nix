@@ -7,6 +7,7 @@ let
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
   # for window manager
+  aerospace = import ./aerospace;
   rofi = import ./rofi;
   sway = import ./sway;
   swaylock = import ./swaylock;
@@ -20,6 +21,7 @@ in [
   wezterm
 
   # for window manager
+  aerospace
   rofi
   sway
   swaylock
