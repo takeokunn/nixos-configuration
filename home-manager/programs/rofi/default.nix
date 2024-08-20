@@ -2,6 +2,13 @@
   programs.rofi = {
     enable = pkgs.stdenv.isLinux;
     font = "Cica 16";
+    plugins = with pkgs; [ rofi-calc rofi-power-menu ];
+
+    pass = {
+      enable = pkgs.stdenv.isLinux;
+      stores = [ "$HOME/ghq/github.com/takeokunn/private/password-store" ];
+    };
+
     extraConfig = {
       modi = "window,run,drun";
       show-icons = true;
