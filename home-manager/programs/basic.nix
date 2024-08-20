@@ -9,7 +9,6 @@ let
   gnupg = import ./gnupg;
   misc = import ./misc;
   mu = import ./mu;
-  neovim = import ./neovim;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
@@ -28,7 +27,6 @@ in [
   gnupg
   misc
   mu
-  neovim
   password-store
   peco
   readline

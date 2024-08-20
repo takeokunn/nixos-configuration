@@ -396,6 +396,26 @@
         "type": "github"
       }
     },
+    "neovim-skkeleton-flake": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1724160010,
+        "narHash": "sha256-518CcABCIgJPEsKoIPB38nxdMvPCuF1vbSoDg52fpcQ=",
+        "owner": "takeokunn",
+        "repo": "skkeleton",
+        "rev": "2b4b0c54d65507bc38e978bdf09a144f4f62d4d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "takeokunn",
+        "repo": "skkeleton",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -650,6 +670,7 @@
       "inputs": {
         "emacs-overlay": "emacs-overlay",
         "home-manager": "home-manager",
+        "neovim-skkeleton-flake": "neovim-skkeleton-flake",
         "nix-darwin": "nix-darwin",
         "nix-on-droid": "nix-on-droid",
         "nixos-hardware": "nixos-hardware",

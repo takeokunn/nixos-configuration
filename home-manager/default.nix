@@ -1,4 +1,4 @@
-{ system, nixpkgs, emacs-overlay, wezterm-flake }:
+{ system, nixpkgs, emacs-overlay, wezterm-flake, neovim-skkeleton-flake }:
 let
   lib = nixpkgs.lib;
 
@@ -9,7 +9,8 @@ let
     overlays = import ./overlay { inherit emacs-overlay; };
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
-  advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
+  advancedPkgs =
+    import ./packages/advanced.nix { inherit pkgs neovim-skkeleton-flake; };
   darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
   # programs
