@@ -8,11 +8,11 @@ let
 
   # for window manager
   aerospace = import ./aerospace;
-  rofi = import ./rofi { inherit lib pkgs; };
+  rofi = import ./rofi { inherit pkgs; };
   sway = import ./sway;
   swaylock = import ./swaylock { inherit lib pkgs; };
   mako = import ./mako;
-  waybar = import ./waybar { inherit lib pkgs; };
+  waybar = import ./waybar { inherit pkgs; };
 in [
   awscli
   emacs

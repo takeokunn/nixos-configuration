@@ -1,4 +1,4 @@
-{ lib, pkgs }: {
+{ pkgs }: {
   programs.rofi = {
     enable = pkgs.stdenv.isLinux;
     font = "Cica 16";

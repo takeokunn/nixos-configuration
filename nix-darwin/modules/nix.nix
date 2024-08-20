@@ -1,12 +1,4 @@
 {
-  gc = {
-    automatic = true;
-    interval = {
-      Hour = 11;
-      Minute = 0;
-    };
-    options = "--delete-older-than 3d";
-  };
   optimise.automatic = true;
   settings = {
     experimental-features = "nix-command flakes";

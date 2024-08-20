@@ -1,4 +1,4 @@
-{ lib, pkgs }: {
+{ pkgs }: {
   home.file = {
     ".config/waybar/colors.css".source = ./colors.css;
     ".config/waybar/style.css".source = ./style.css;

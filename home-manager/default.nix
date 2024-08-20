@@ -16,8 +16,11 @@ let
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
   advancedPrograms =
     import ./programs/advanced.nix { inherit lib pkgs wezterm-flake; };
+
+  # services
+  services = import ./services;
 in {
-  imports = basicPrograms ++ advancedPrograms;
+  imports = basicPrograms ++ advancedPrograms ++ services;
 
   home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs

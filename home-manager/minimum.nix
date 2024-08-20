@@ -9,8 +9,11 @@ let
 
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
+
+  # services
+  services = import ./services;
 in {
-  imports = basicPrograms;
+  imports = basicPrograms ++ services;
   home.stateVersion = "24.05";
   home.packages = basicPkgs;
 }
