@@ -5,11 +5,8 @@
   };
 
   home.packages = with pkgs; [
-    tree-sitter
-    (tree-sitter.withPlugins (p: builtins.attrValues p))
     emacs-lsp-booster
     pinentry-emacs
-    mu
     emacsPackages.mu4e
   ];
 

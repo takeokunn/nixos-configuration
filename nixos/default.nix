@@ -1,12 +1,12 @@
-{ config, pkgs, xremap, username, ... }:
+{ pkgs, xremap, username, ... }:
 let
   boot = import ./modules/boot.nix;
   fonts = import ./modules/fonts.nix { inherit pkgs; };
   hardware = import ./modules/hardware.nix;
-  i18n = import ./modules/i18n.nix { inherit pkgs; };
+  i18n = import ./modules/i18n.nix;
   networking = import ./modules/networking.nix;
   nix = import ./modules/nix.nix;
-  programs = import ./modules/programs.nix { inherit pkgs; };
+  programs = import ./modules/programs.nix;
   security = import ./modules/security.nix { inherit username; };
   services = import ./modules/services.nix { inherit username; };
   systemd = import ./modules/systemd.nix;

@@ -8,6 +8,7 @@ let
   fish = import ./fish { inherit pkgs; };
   gnupg = import ./gnupg;
   misc = import ./misc;
+  mu = import ./mu;
   neovim = import ./neovim;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
@@ -26,6 +27,7 @@ in [
   fish
   gnupg
   misc
+  mu
   neovim
   password-store
   peco

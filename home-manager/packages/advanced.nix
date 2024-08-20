@@ -1,5 +1,9 @@
 { pkgs }:
 with pkgs; [
+  # for editor
+  tree-sitter
+  (tree-sitter.withPlugins (p: builtins.attrValues p))
+
   # for network tools
   speedtest-cli
 

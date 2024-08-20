@@ -1,4 +1,4 @@
-{ pkgs }: {
+{
   fish.enable = true;
   firefox.enable = true;
   noisetorch.enable = true;
