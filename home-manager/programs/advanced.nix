@@ -11,7 +11,6 @@ let
   rofi = import ./rofi { inherit pkgs; };
   sway = import ./sway;
   swaylock = import ./swaylock { inherit lib pkgs; };
-  mako = import ./mako;
   waybar = import ./waybar { inherit pkgs; };
 in [
   awscli
@@ -25,6 +24,5 @@ in [
   rofi
   sway
   swaylock
-  mako
   waybar
 ]
