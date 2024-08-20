@@ -29,9 +29,19 @@ jobs:
         run: npm ci
       - name: Run secretlint
         run: npm run lint
+  nix-flake:
+    name: Secretlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: prepare nix
+        uses: cachix/install-nix-action@v27
+      - name: flake check
+        run: nix flake check
   dependabot:
     runs-on: ubuntu-latest
-    needs: [actionlint, secretlint]
+    needs: [actionlint, secretlint, nix-flake]
     if: github.actor == 'dependabot[bot]'
     permissions:
       contents: write

@@ -1,7 +1,7 @@
 { pkgs, ... }: {
   cachix.enable = false;
 
-  packages = with pkgs; [ nixfmt-classic ];
+  packages = with pkgs; [ nixfmt-classic actionlint shellcheck ];
 
   languages.javascript = {
     enable = true;
