@@ -15,7 +15,7 @@ let
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
   advancedPrograms =
-    import ./programs/advanced.nix { inherit pkgs wezterm-flake; };
+    import ./programs/advanced.nix { inherit lib pkgs wezterm-flake; };
 in {
   imports = basicPrograms ++ advancedPrograms;
 

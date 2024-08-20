@@ -1,4 +1,4 @@
-{ pkgs, wezterm-flake }:
+{ lib, pkgs, wezterm-flake }:
 let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs; };
@@ -8,11 +8,11 @@ let
 
   # for window manager
   aerospace = import ./aerospace;
-  rofi = import ./rofi;
+  rofi = import ./rofi { inherit lib pkgs; };
   sway = import ./sway;
-  swaylock = import ./swaylock;
+  swaylock = import ./swaylock { inherit lib pkgs; };
   mako = import ./mako;
-  waybar = import ./waybar;
+  waybar = import ./waybar { inherit lib pkgs; };
 in [
   awscli
   emacs

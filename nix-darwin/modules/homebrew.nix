@@ -7,13 +7,13 @@
   };
   taps = [ "dracula/install" "nikitabobko/tap" ];
   casks = [
+    "aerospace"
     "aquaskk"
+    "dracula-xcode"
+    "google-chrome"
     "orbstack"
     "sequel-ace"
-    "google-chrome"
     "sublime-text"
-    "dracula-xcode"
-    "aerospace"
   ];
   masApps = {
     LINE = 539883307;

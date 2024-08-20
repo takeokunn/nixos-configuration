@@ -10,6 +10,7 @@
       "kfdibhbheajeacnkkakomaliggbgndcf" # Chromemacs
       "gighmmpiobklfepjocnamgkkbiglidom" # Adblock
       "hkgfoiooedgoejojocmhlaklaeopbecg" # Picture-in-Picture
+      "gfapcejdoghpoidkfodoiiffaaibpaem" # Dracula Chrome Theme
     ];
   };
 
