@@ -30,7 +30,7 @@ jobs:
       - name: Run secretlint
         run: npm run lint
   nix-flake:
-    name: Secretlint
+    name: Nix Flake Check
     runs-on: ubuntu-latest
     steps:
       - name: checkout
