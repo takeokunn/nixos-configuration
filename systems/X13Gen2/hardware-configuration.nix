@@ -1,9 +1,11 @@
 { config, lib, pkgs, modulesPath, ... }: {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
+  services.xserver.videoDrivers = [ "amdgpu" ];
+
   boot = {
     initrd = {
-      availableKernelModules = [ "nvme" "xhci_pci" "usb_storage" "sd_mod" ];
+      availableKernelModules = [ "nvme" "xhci_pci" "usb_storage" "sd_mod" "amdgpu" ];
       kernelModules = [ ];
     };
     kernelModules = [ "kvm-amd" ];
