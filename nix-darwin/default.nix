@@ -3,7 +3,7 @@ let
   nix = import ./modules/nix.nix;
   fonts = import ./modules/fonts.nix { inherit pkgs; };
   services = import ./modules/services.nix;
-  system = import ./modules/system.nix;
+  system = import ./modules/system.nix { inherit pkgs; };
   homebrew = import ./modules/homebrew.nix;
   networking = import ./modules/networking.nix;
   security = import ./modules/security.nix { inherit username; };

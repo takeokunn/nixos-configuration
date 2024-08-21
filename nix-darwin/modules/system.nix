@@ -1,4 +1,4 @@
-{
+{ pkgs }: {
   stateVersion = 4;
   defaults = {
     SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;
@@ -20,4 +20,9 @@
       Dragging = true;
     };
   };
+
+  activationScripts.extraActivation.text = ''
+    chsh -s ${pkgs.fish}/bin/fish
+    softwareupdate --all --install
+  '';
 }
