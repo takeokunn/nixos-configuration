@@ -8,8 +8,4 @@ let
   networking = import ./modules/networking.nix;
   security = import ./modules/security.nix { inherit username; };
   launchd = import ./modules/launchd.nix { inherit pkgs; };
-in {
-  inherit nix services fonts system homebrew networking security launchd;
-
-  environment.shells = with pkgs; [ fish ];
-}
+in { inherit nix services fonts system homebrew networking security launchd; }
