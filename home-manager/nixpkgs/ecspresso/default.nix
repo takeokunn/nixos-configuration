@@ -7,10 +7,10 @@ buildGoModule rec {
     owner = "kayac";
     repo = "ecspresso";
     rev = "refs/tags/v${version}";
-    hash = "sha256-jqO0kT5DuPeIbHw3AfmbT95mzlS7ovGi2kjJYc4zRyA==";
+    hash = "sha256-UX4tKoy0W+uYugRILq9TElz0i1b5hTsh4gDivVVVsZ4=";
   };
 
-  vendorHash = "sha256-UX4tKoy0W+uYugRILq9TElz0i1b5hTsh4gDivVVVsZ4=";
+  vendorHash = "sha256-TdQPbIgsA9yiQsX71kmocLIVCzd47PLUepA0mdfOjA4=";
 
   ldflags = [ "-s" "-w" "-X=main.Version=v${version}" ];
 
