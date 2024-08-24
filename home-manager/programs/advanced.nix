@@ -3,6 +3,7 @@ let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs; };
   git = import ./git;
+  nix-index = import ./nix-index;
   roswell = import ./roswell { inherit pkgs; };
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
@@ -16,6 +17,7 @@ in [
   awscli
   emacs
   git
+  nix-index
   roswell
   wezterm
 
