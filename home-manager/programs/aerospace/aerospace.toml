@@ -1,21 +1,12 @@
 # Reference: https://github.com/i3/i3/blob/next/etc/config
 
-# i3 doesn't have "normalizations" feature that why we disable them here.
-# But the feature is very helpful.
-# Normalizations eliminate all sorts of weird tree configurations that don't make sense.
-# Give normalizations a chance and enable them back.
 enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = false
 
-# Mouse follows focus when focused monitor changes
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-# Run Sketchybar together with AeroSpace
-# sketchbar has a built-in detection of already running process,
-# so it won't be run twice on AeroSpace restart
 after-startup-command = ['exec-and-forget sketchybar']
 
-# Notify Sketchybar about workspace change
 exec-on-workspace-change = [
   '/bin/bash',
   '-c',
@@ -41,14 +32,9 @@ alt-shift-j = 'move down'
 alt-shift-k = 'move up'
 alt-shift-l = 'move right'
 
-# Consider using 'join-with' command as a 'split' replacement if you want to enable normalizations
 alt-shift-v = 'split horizontal'
 alt-shift-b = 'split vertical'
-alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
-
-# `focus parent`/`focus child` are not yet supported, and it's not clear whether they
-# should be supported at all https://github.com/nikitabobko/AeroSpace/issues/5
-# alt-a = 'focus parent'
+alt-shift-space = 'layout floating tiling'
 
 alt-1 = 'workspace 1'
 alt-2 = 'workspace 2'
