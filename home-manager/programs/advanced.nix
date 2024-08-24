@@ -1,5 +1,9 @@
 { lib, pkgs, wezterm-flake }:
 let
+  # ecspresso = pkgs.callPackage ../nixpkgs/ecspresso { };
+  # mitamae = pkgs.callPackage ../nixpkgs/mitamae { };
+  isucrud = pkgs.callPackage ../nixpkgs/isucrud { };
+
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs; };
   git = import ./git;
@@ -14,6 +18,10 @@ let
   swaylock = import ./swaylock { inherit lib pkgs; };
   waybar = import ./waybar { inherit pkgs; };
 in [
+  # ecspresso
+  # mitamae
+  isucrud
+
   awscli
   emacs
   git
