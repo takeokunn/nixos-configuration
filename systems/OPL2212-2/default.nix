@@ -1,5 +1,5 @@
 { self, nixpkgs, nix-darwin, home-manager, emacs-overlay, wezterm-flake
-, neovim-skkeleton-flake }:
+, neovim-nightly-overlay }:
 let
   system = "aarch64-darwin";
   username = "obara";
@@ -19,7 +19,7 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users."${username}" = import ../../home-manager {
           inherit system nixpkgs emacs-overlay wezterm-flake
-            neovim-skkeleton-flake;
+            neovim-nightly-overlay;
         };
       }
     ];

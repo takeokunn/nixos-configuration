@@ -1,9 +1,10 @@
-{ lib, pkgs, wezterm-flake }:
+{ lib, pkgs, wezterm-flake, neovim-nightly-overlay }:
 let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs; };
   git = import ./git;
   nix-index = import ./nix-index;
+  neovim = import ./neovim { inherit pkgs neovim-nightly-overlay; };
   roswell = import ./roswell { inherit pkgs; };
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
@@ -18,6 +19,7 @@ in [
   emacs
   git
   nix-index
+  neovim
   roswell
   wezterm
 

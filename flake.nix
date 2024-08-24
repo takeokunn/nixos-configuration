@@ -30,22 +30,22 @@
       url = "github:wez/wezterm?dir=nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    neovim-skkeleton-flake = {
-      url = "github:takeokunn/skkeleton";
+    neovim-nightly-overlay = {
+      url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, emacs-overlay
     , nixos-hardware, xremap, nix-on-droid, wezterm-flake
-    , neovim-skkeleton-flake }: {
+    , neovim-nightly-overlay }: {
       darwinConfigurations = (import ./systems/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager emacs-overlay wezterm-flake
-          neovim-skkeleton-flake;
+          neovim-nightly-overlay;
       });
       nixosConfigurations = (import ./systems/X13Gen2 {
         inherit self nixpkgs home-manager emacs-overlay nixos-hardware xremap
-          wezterm-flake neovim-skkeleton-flake;
+          wezterm-flake neovim-nightly-overlay;
       });
       nixOnDroidConfigurations = (import ./systems/OPPO-A79 {
         inherit self nixpkgs home-manager nix-on-droid;
