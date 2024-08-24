@@ -1,4 +1,6 @@
 {
-  timeZone = "Asia/Tokyo";
-  hardwareClockInLocalTime = true;
+  time = {
+    timeZone = "Asia/Tokyo";
+    hardwareClockInLocalTime = true;
+  };
 }

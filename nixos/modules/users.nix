@@ -1,5 +1,5 @@
 { pkgs, username }: {
-  users.${username} = {
+  users.users.${username} = {
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" "video" "audio" "docker" ];
     shell = pkgs.fish;

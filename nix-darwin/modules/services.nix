@@ -1,8 +1,10 @@
 {
-  nix-daemon.enable = true;
+  services = {
+    nix-daemon.enable = true;
 
-  offlineimap = {
-    enable = true;
-    startInterval = 600;
+    offlineimap = {
+      enable = true;
+      startInterval = 600;
+    };
   };
 }

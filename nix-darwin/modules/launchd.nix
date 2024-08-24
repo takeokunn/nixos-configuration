@@ -1,5 +1,5 @@
 { pkgs }: {
-  agents.ollama = {
+  launchd.agents.ollama = {
     serviceConfig = {
       ProgramArguments = [ "${pkgs.ollama}/bin/ollama" "serve" ];
       KeepAlive = true;
