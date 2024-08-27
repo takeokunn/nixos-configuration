@@ -12,7 +12,6 @@
     emacs-flake = {
       url = "github:takeokunn/emacs-flake";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
       inputs.emacs-overlay.follows = "emacs-overlay";
     };
     home-manager = {
