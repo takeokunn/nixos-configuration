@@ -40,6 +40,29 @@
         "type": "github"
       }
     },
+    "emacs-flake": {
+      "inputs": {
+        "emacs-overlay": [
+          "emacs-overlay"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1724770630,
+        "narHash": "sha256-YsJHMGAV/C5x53J8Zg/wnqpYbQzUovmpxGDWpKfWuOk=",
+        "owner": "takeokunn",
+        "repo": "emacs-flake",
+        "rev": "4b5fdea1cc7cd424a01615e3a12fc1f105c794c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "takeokunn",
+        "repo": "emacs-flake",
+        "type": "github"
+      }
+    },
     "emacs-overlay": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -832,8 +855,24 @@
         "type": "gitlab"
       }
     },
+    "org-babel": {
+      "locked": {
+        "lastModified": 1720009466,
+        "narHash": "sha256-/8exp1bCK9aJczbITjiwhKonFd1FejRL6k93iXVNWf0=",
+        "owner": "emacs-twist",
+        "repo": "org-babel",
+        "rev": "8684ef7fcdcd65f29129596c05fede1eb63c21b3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "org-babel",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
+        "emacs-flake": "emacs-flake",
         "emacs-overlay": "emacs-overlay",
         "home-manager": "home-manager",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
@@ -841,6 +880,7 @@
         "nix-on-droid": "nix-on-droid",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
+        "org-babel": "org-babel",
         "wezterm-flake": "wezterm-flake",
         "xremap": "xremap"
       }
