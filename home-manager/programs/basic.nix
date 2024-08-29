@@ -15,7 +15,7 @@ let
   ripgrep = import ./ripgrep;
   tig = import ./tig { inherit pkgs; };
   tmux = import ./tmux { inherit pkgs; };
-  vim = import ./vim;
+  vim = import ./vim { inherit pkgs; };
   wget = import ./wget { inherit pkgs; };
 in [
   bat

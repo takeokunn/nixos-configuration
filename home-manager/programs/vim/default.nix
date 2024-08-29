@@ -1,6 +1,7 @@
-{
+{ pkgs }: {
   programs.vim = {
     enable = true;
+    packageConfigurable = pkgs.vim;
     extraConfig = ''
       set encoding=utf-8
       set fileencodings=utf-8,euc-jp,cp932
