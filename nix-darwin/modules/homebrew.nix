@@ -12,7 +12,9 @@
       "aquaskk"
       "dracula-xcode"
       "google-chrome"
+      "keycastr"
       "orbstack"
+      "raycast"
       "sequel-ace"
       "sublime-text"
     ];
