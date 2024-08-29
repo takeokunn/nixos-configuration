@@ -1,6 +1,6 @@
 { pkgs }: {
   programs.emacs = {
-    enable = pkgs.stdenv.isDarwin;
+    enable = true;
     package = pkgs.emacs-git;
   };
 

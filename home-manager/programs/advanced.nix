@@ -1,8 +1,7 @@
-{ lib, pkgs, wezterm-flake, emacs-flake, neovim-nightly-overlay }:
+{ lib, pkgs, wezterm-flake, neovim-nightly-overlay }:
 let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs; };
-  emacs-flake = import ./emacs-flake { inherit lib pkgs emacs-flake; };
   git = import ./git;
   nix-index = import ./nix-index;
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay; };
@@ -18,7 +17,6 @@ let
 in [
   awscli
   emacs
-  emacs-flake
   git
   nix-index
   neovim
