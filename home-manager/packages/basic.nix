@@ -24,6 +24,7 @@ with pkgs; [
   ghq
 
   # for password tools
+  sops
   pwgen
 
   # for jokes
