@@ -1,5 +1,5 @@
 keys:
-  - &admin_alice 0B10DAA7BA0236D7382287660F79C0AB03FD7A1C
+  - &admin_alice age1enafxzz43lqh95fvj40mjfn4sa4k7l3xytd0ux4wjuglftjxdcdsfa0wpw
   # - &admin_bob 0B10DAA7BA0236D7382287660F79C0AB03FD7A1C
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
