@@ -1,6 +1,7 @@
 { config }: {
   sops.defaultSopsFile = ../../secrets/network.yaml;
   sops.secrets."home-wifi" = {};
+  sops.age.sshKeyPaths = [ "/home/take/.ssh/id_ed25519" ];
 
   networking = {
     hostName = "nixos";
