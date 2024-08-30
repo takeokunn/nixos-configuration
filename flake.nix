@@ -45,7 +45,7 @@
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, emacs-overlay
     , nixos-hardware, xremap, nix-on-droid, wezterm-flake
-    , neovim-nightly-overlay, sops-nix }: {
+    , neovim-nightly-overlay, sops-nix, ... }: {
       darwinConfigurations = (import ./systems/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager emacs-overlay wezterm-flake
           neovim-nightly-overlay;
