@@ -1,5 +1,5 @@
 { config }: {
-  sops.defaultSopsFile = ../../.sops.yaml;
+  sops.defaultSopsFile = ../../secrets/network.yaml;
   sops.secrets."home-wifi" = {};
 
   networking = {

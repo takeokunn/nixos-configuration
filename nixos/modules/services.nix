@@ -6,6 +6,7 @@
       acceleration = "rocm";
     };
     offlineimap.enable = true;
+    openssh.enable = true;
 
     xserver = {
       enable = true;
