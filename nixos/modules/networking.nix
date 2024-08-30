@@ -1,4 +1,7 @@
 { config }: {
+  sops.defaultSopsFile = ../../.sops.yaml;
+  sops.secrets."home-wifi" = {};
+
   networking = {
     hostName = "nixos";
     networkmanager = {
