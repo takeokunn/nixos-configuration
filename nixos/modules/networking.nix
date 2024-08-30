@@ -22,23 +22,7 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            psk = config.sops.secrets.home-wifi.path;
-          };
-        };
-
-        pixivn_free5 = {
-          connection = {
-            id = "pixivn_free5";
-            type = "wifi";
-          };
-          wifi = {
-            mode = "infrastructure";
-            ssid = "pixivn_free5";
-          };
-          wifi-security = {
-            auth-alg = "open";
-            key-mgmt = "wpa-psk";
-            psk = config.sops.secrets.home-wifi.path;
+            psk = "uengspy3bwdkb";
           };
         };
       };
