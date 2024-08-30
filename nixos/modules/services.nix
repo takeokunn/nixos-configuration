@@ -1,7 +1,10 @@
 { username }: {
   services = {
     ntp.enable = true;
-    ollama.enable = true;
+    ollama = {
+      enable = true;
+      acceleration = "rocm";
+    };
     offlineimap.enable = true;
 
     xserver = {

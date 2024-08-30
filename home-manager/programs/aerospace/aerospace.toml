@@ -1,3 +1,5 @@
+start-at-login = true
+
 enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = false
 
@@ -52,13 +54,13 @@ alt-shift-4 = ['move-node-to-workspace 4', 'workspace 4']
 alt-shift-5 = ['move-node-to-workspace 5', 'workspace 5']
 alt-shift-6 = ['move-node-to-workspace 6', 'workspace 6']
 alt-shift-7 = ['move-node-to-workspace 7', 'workspace 7']
-alt-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
+alt-shift-8 = ['move-node-To-workspace 8', 'workspace 8']
 alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
 alt-shift-0 = ['move-node-to-workspace 10', 'workspace 10']
 
-alt-shift-c = 'reload-config'
-
 alt-r = 'mode resize'
+alt-shift-f = 'fullscreen'
+alt-shift-c = 'reload-config'
 
 [mode.resize.binding]
 h = 'resize width -50'
