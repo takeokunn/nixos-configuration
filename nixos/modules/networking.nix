@@ -1,7 +1,9 @@
 {
   networking = {
     hostName = "nixos";
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+    };
     enableIPv6 = true;
     firewall.enable = true;
     nameservers = [

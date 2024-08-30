@@ -34,18 +34,22 @@
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, emacs-overlay
     , nixos-hardware, xremap, nix-on-droid, wezterm-flake
-    , neovim-nightly-overlay }: {
+    , neovim-nightly-overlay, sops-nix }: {
       darwinConfigurations = (import ./systems/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager emacs-overlay wezterm-flake
           neovim-nightly-overlay;
       });
       nixosConfigurations = (import ./systems/X13Gen2 {
         inherit self nixpkgs home-manager emacs-overlay nixos-hardware xremap
-          wezterm-flake neovim-nightly-overlay;
+          wezterm-flake neovim-nightly-overlay sops-nix;
       });
       nixOnDroidConfigurations = (import ./systems/OPPO-A79 {
         inherit self nixpkgs home-manager nix-on-droid;

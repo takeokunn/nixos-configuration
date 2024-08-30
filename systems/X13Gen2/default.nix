@@ -1,5 +1,5 @@
 { self, nixpkgs, home-manager, emacs-overlay, nixos-hardware, xremap
-, wezterm-flake, neovim-nightly-overlay }:
+, wezterm-flake, neovim-nightly-overlay, sops-nix }:
 let
   username = "take";
   system = "x86_64-linux";
@@ -10,6 +10,7 @@ in {
     modules = [
       ../../nixos
       ./hardware-configuration.nix
+      sops-nix.nixosModules.sops
       home-manager.nixosModules.home-manager
       {
         home-manager.useUserPackages = true;
