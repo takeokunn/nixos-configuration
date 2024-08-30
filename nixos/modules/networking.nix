@@ -1,6 +1,6 @@
 { config }: {
   sops.defaultSopsFile = ../../secrets/network.yaml;
-  sops.secrets."home-wifi" = {};
+  sops.secrets."home-wifi" = { };
   sops.age.sshKeyPaths = [ "/home/take/.ssh/id_ed25519" ];
 
   networking = {
@@ -20,8 +20,7 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            # psk = config.sops.secrets.home-wifi.path;
-            psk = "uengspy3bwkdb";
+            psk = config.sops.secrets.home-wifi.path;
           };
         };
 
