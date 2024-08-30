@@ -1,5 +1,7 @@
 { pkgs }:
 with pkgs; [
+  sheldon
+
   # for terminal tools
   devbox
   devenv
