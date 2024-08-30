@@ -1,8 +1,6 @@
 { pkgs }:
 with pkgs; [
- sheldon
-
- # for terminal tools
+  # for terminal tools
   devbox
   devenv
   du-dust
