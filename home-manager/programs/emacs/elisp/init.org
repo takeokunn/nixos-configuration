@@ -27,7 +27,7 @@
 #+end_src
 ** env
 #+begin_src emacs-lisp :tangle yes
-  (defconst my/enable-profile t
+  (defconst my/enable-profile nil
     "If true, enable profile")
 #+end_src
 * Macro Utilities
@@ -2856,9 +2856,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     ;; advice
     ;; close neotree when tab bar action
-    (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
-    (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
-    (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
 
     ;; function
     (defun my/tab-bar-rename-tab ()
@@ -2992,9 +2992,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'neotree-mode-hook #'(lambda () (display-line-numbers-mode -1)))
 
     ;; keybind
-    (define-key neotree-mode-map (kbd "C-j") (neotree-make-executor
-                                              :file-fn #'neo-open-file
-                                              :dir-fn  #'neo-open-dir)))
+    ;; (define-key neotree-mode-map (kbd "C-j") (neotree-make-executor
+    ;;                                           :file-fn #'neo-open-file
+    ;;                                           :dir-fn  #'neo-open-dir))
+    )
 #+END_SRC
 *** nyan-mode
 #+begin_src emacs-lisp :tangle yes
@@ -3028,6 +3029,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(global-undo-tree-mode) "undo-tree" nil t)
 
   (add-hook 'window-setup-hook #'global-undo-tree-mode)
+
+  (with-eval-after-load 'undo-tree
+    (setopt undo-tree-auto-save-history nil))
 #+end_src
 ** View Mode
 *** view-mode
