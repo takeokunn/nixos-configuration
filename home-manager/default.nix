@@ -13,15 +13,18 @@ let
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
   darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
+  # emacs
+  emacsPkgs = import ./packages/emacs.nix { inherit pkgs; };
+
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
   advancedPrograms = import ./programs/advanced.nix {
-    inherit lib pkgs wezterm-flake neovim-nightly-overlay org-babel;
+    inherit lib pkgs wezterm-flake neovim-nightly-overlay emacsPkgs org-babel;
   };
 
   # services
   basicServices = import ./services/basic.nix;
-  advancedServices = import ./services/advanced.nix { inherit pkgs; };
+  advancedServices = import ./services/advanced.nix { inherit pkgs emacsPkgs; };
 in {
   imports = basicPrograms ++ advancedPrograms ++ basicServices
     ++ advancedServices;
