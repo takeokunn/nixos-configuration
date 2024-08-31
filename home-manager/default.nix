@@ -1,4 +1,5 @@
-{ system, nixpkgs, emacs-overlay, wezterm-flake, neovim-nightly-overlay }:
+{ system, nixpkgs, org-babel, emacs-overlay, wezterm-flake
+, neovim-nightly-overlay }:
 let
   lib = nixpkgs.lib;
 
@@ -15,7 +16,7 @@ let
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
   advancedPrograms = import ./programs/advanced.nix {
-    inherit lib pkgs wezterm-flake neovim-nightly-overlay;
+    inherit lib pkgs wezterm-flake neovim-nightly-overlay org-babel;
   };
 
   # services

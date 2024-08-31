@@ -1,4 +1,6 @@
-{ pkgs }: {
+{ pkgs, org-babel }:
+let tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
+in {
   programs.emacs = {
     enable = true;
     package = pkgs.emacsWithPackagesFromUsePackage {
@@ -11,19 +13,20 @@
   };
 
   home.file = {
-    ".emacs.d/init.el".source = ./elisp/init.el;
-    ".emacs.d/early-init.el".source = ./elisp/early-init.el;
+    ".emacs.d/init.el".text = tangle (builtins.readFile ./elisp/init.org);
+    ".emacs.d/early-init.el".text =
+      tangle (builtins.readFile ./elisp/early-init.org);
   };
 
   home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs ];
 
   programs.fish = {
-    shellAliases = { emacs = "emacs -nw"; };
+    # shellAliases = { emacs = "emacs -nw"; };
 
     interactiveShellInit = ''
       # set -gx LSP_USE_PLISTS true
-      set -gx EDITOR "emacs -nw"
-      set -gx HOMEBREW_EDITOR "emacs -nw"
+      # set -gx EDITOR "emacs -nw"
+      # set -gx HOMEBREW_EDITOR "emacs -nw"
     '';
   };
 }

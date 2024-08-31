@@ -814,6 +814,21 @@
         "type": "gitlab"
       }
     },
+    "org-babel": {
+      "locked": {
+        "lastModified": 1724939881,
+        "narHash": "sha256-p6GB2AyyFb77s6gZct7rnVqoZ1Ahu+0rcTtI/oxh25I=",
+        "owner": "emacs-twist",
+        "repo": "org-babel",
+        "rev": "ec71fec7ec0f363a3868c7ecc7bdf1cfdaecd9c8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "org-babel",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "emacs-overlay": "emacs-overlay",
@@ -824,6 +839,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "nixpkgs-stable": "nixpkgs-stable",
+        "org-babel": "org-babel",
         "sops-nix": "sops-nix",
         "wezterm-flake": "wezterm-flake",
         "xremap": "xremap"
