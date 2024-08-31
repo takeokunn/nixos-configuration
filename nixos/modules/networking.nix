@@ -22,10 +22,10 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            psk = config.sops.secrets.home-wifi.path;
+            psk = "uengspy3bwdkb";
           };
         };
-     };
+      };
     };
     enableIPv6 = true;
     firewall.enable = true;
