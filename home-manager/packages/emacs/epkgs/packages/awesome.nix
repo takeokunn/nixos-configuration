@@ -148,6 +148,8 @@ in with epkgs; [
   migemo
   wgrep
   consult
+  consult-compile-multi
+  compile-multi-embark
   affe
   compile-multi
   vertico
@@ -203,6 +205,7 @@ in with epkgs; [
   crux
   dogears
   embark
+  embark-consult
   htmlize
   minimap
   puni

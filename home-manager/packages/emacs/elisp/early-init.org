@@ -72,3 +72,7 @@
 #+begin_src emacs-lisp :tangle yes
   (setq vc-follow-symlinks t)
 #+end_src
+** error抑制
+#+begin_src emacs-lisp :tangle yes
+  (setq byte-compile-warnings '(cl-functions))
+#+end_src

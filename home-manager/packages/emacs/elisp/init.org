@@ -1479,7 +1479,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
 
-  (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
+  ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp :tangle yes
@@ -3182,17 +3182,17 @@
          (funcall #',split-type)
          (call-interactively #',fn)))
 
-    ;; (defun my/sudo-find-file (file)
-    ;;   "Open FILE as root."
-    ;;   (interactive "FOpen file as root: ")
-    ;;   (when (file-writable-p file)
-    ;;     (user-error "File is user writeable, aborting sudo"))
-    ;;   (find-file (if (file-remote-p file)
-    ;;                  (concat "/" (file-remote-p file 'method) ":"
-    ;;                          (file-remote-p file 'user) "@" (file-remote-p file 'host)
-    ;;                          "|sudo:root@"
-    ;;                          (file-remote-p file 'host) ":" (file-remote-p file 'localname))
-    ;;                (concat "/sudo:root@localhost:" file))))
+    (defun my/sudo-find-file (file)
+      "Open FILE as root."
+      (interactive "FOpen file as root: ")
+      (when (file-writable-p file)
+        (user-error "File is user writeable, aborting sudo"))
+      (find-file (if (file-remote-p file)
+                     (concat "/" (file-remote-p file 'method) ":"
+                             (file-remote-p file 'user) "@" (file-remote-p file 'host)
+                             "|sudo:root@"
+                             (file-remote-p file 'host) ":" (file-remote-p file 'localname))
+                   (concat "/sudo:root@localhost:" file))))
 
     ;; config
     (setq embark-mixed-indicator-delay 0.1)
@@ -3214,10 +3214,16 @@
     (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
 
     ;; sudo
-    ;; (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
+    (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
     ;; consult
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
+#+end_src
+*** embark-consult
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(embark-consult-outline-candidates
+                       embark-consult-imenu-candidates
+                       embark-consult-imenu-or-outline-candidates) "embark-consult" nil t)
 #+end_src
 *** compile-multi
 #+begin_src emacs-lisp :tangle yes
@@ -3227,11 +3233,8 @@
 
   (keymap-global-set "C-x m" #'compile-multi)
 
-  ;; (with-eval-after-load 'consult
-  ;;   (consult-compile-multi-mode))
-
-  ;; (with-eval-after-load 'embark
-  ;;   (compile-multi-embark-mode))
+  ;; (add-hook emacs-startup-hook #'consult-compile-multi-mode)
+  ;; (add-hook emacs-startup-hook #'compile-multi-embark-mode)
 #+end_src
 *** vertico
 #+begin_src emacs-lisp :tangle yes
@@ -3255,9 +3258,10 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode) "marginalia" nil t)
 
-  (add-hook 'window-setup-hook #'marginalia-mode)
+  ;; (add-hook 'emacs-startup-hook #'marginalia-mode)
 
   (with-eval-after-load 'minibuffer
+    ;; hooks
     (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
 #+end_src
 *** orderless
