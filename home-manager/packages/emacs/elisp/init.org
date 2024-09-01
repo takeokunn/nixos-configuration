@@ -27,7 +27,7 @@
 #+end_src
 ** env
 #+begin_src emacs-lisp :tangle yes
-  (defconst my/enable-profile t
+  (defconst my/enable-profile nil
     "If true, enable profile")
 #+end_src
 * Macro Utilities

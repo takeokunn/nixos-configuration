@@ -7,9 +7,9 @@ in {
   };
 
   home.file = {
-    ".emacs.d/init.el".text =
+    ".config/emacs/init.el".text =
       tangle (builtins.readFile ../../packages/emacs/elisp/init.org);
-    ".emacs.d/early-init.el".text =
+    ".config/emacs/early-init.el".text =
       tangle (builtins.readFile ../../packages/emacs/elisp/early-init.org);
   };
 
