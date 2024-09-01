@@ -1464,6 +1464,207 @@
 
   (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
 #+end_src
+* Theme
+** Color
+*** ansi-color
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(ansi-color-for-comint-mode-on) "ansi-color" nil t)
+
+  (with-eval-after-load 'shell-mode
+    ;; hooks
+    (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
+
+  (with-eval-after-load 'compile
+    ;; hooks
+    (add-hook 'compilation-filter-hook
+              #'(lambda ()
+                  (ansi-color-apply-on-region (point-min) (point-max)))))
+#+end_src
+*** highlight-indent-guides
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(highlight-indent-guides-mode) "highlight-indent-guides" nil t)
+
+  (with-eval-after-load 'yaml-mode
+    ;; hooks
+    (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
+
+  (with-eval-after-load 'highlight-indent-guides
+    ;; config
+    (setq highlight-indent-guides-responsive 'stack)
+    (setq highlight-indent-guides-method 'bitmap))
+#+end_src
+*** hl-todo
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(hl-todo-mode) "hl-todo" nil t)
+
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'hl-todo-mode))
+
+  (with-eval-after-load 'hl-todo
+    (setq hl-todo-keyword-faces
+            '(("HOLD" . "#d0bf8f")
+              ("TODO" . "#cc9393")
+              ("NOW" . "#dca3a3")
+              ("SOMEDAY" . "#dc8cc3")
+              ("WAIT" . "#7cb8bb")
+              ("DONE" . "#afd8af")
+              ("FIXME" . "#cc9393"))))
+#+end_src
+*** xterm-color
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(xterm-color-filter) "xterm-color" nil t)
+
+  (add-hook 'window-setup-hook
+            #'(lambda () (setenv "TERM" "xterm-256color")))
+
+  (with-eval-after-load 'xterm-color
+    ;; config
+    (setq xterm-color-preserve-properties t))
+#+end_src
+** Theme
+*** nerd-icons-dired
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(nerd-icons-dired-mode) "nerd-icons-dired" nil t)
+
+  (with-eval-after-load 'dired-mode
+    (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
+#+end_src
+*** nerd-icons-completion
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
+
+  ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
+#+end_src
+*** dashboard
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
+
+  (with-eval-after-load 'dashboard
+    (setq dashboard-startup-banner 'logo)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner 4)
+    (setq dashboard-items '((recents . 10))))
+#+end_src
+*** dimmer
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dimmer-configure-which-key
+                       dimmer-configure-org
+                       dimmer-mode)
+                     "dimmer" nil t)
+
+  (add-hook 'window-setup-hook #'dimmer-mode)
+  (add-hook 'window-setup-hook #'dimmer-configure-which-key)
+  ;; (add-hook 'window-setup-hook #'dimmer-configure-org)
+#+end_src
+*** doom-themes
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(doom-themes-enable-org-fontification) "doom-themes-ext-org" nil t)
+
+  ;; (add-hook 'emacs-startup-hook #'doom-themes-enable-org-fontification)
+  (add-hook 'emacs-startup-hook
+            #'(lambda ()
+                (when (require 'doom-themes)
+                  (load-theme 'doom-dracula t))))
+
+  (with-eval-after-load 'doom-themes
+    ;; config
+    (setq doom-themes-padded-modeline t)
+    (setq doom-themes-enable-bold t)
+    (setq doom-themes-enable-italic t))
+#+END_SRC
+*** doom-modeline
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
+
+  (add-hook 'emacs-startup-hook #'doom-modeline-mode)
+  (add-hook 'emacs-startup-hook #'(lambda () (line-number-mode 0)))
+  (add-hook 'emacs-startup-hook #'(lambda () (column-number-mode 0)))
+
+  (with-eval-after-load 'doom-modeline
+    ;; config
+    (setq doom-modeline-buffer-file-name-style 'truncate-with-project)
+    (setq doom-modeline-icon `,(display-graphic-p))
+    (setq doom-modeline-major-mode-icon `,(display-graphic-p))
+    (setq doom-modeline-minor-modes nil))
+#+END_SRC
+*** hl-line
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-hl-line-mode) "hl-line-mode" nil t)
+
+  (add-hook 'window-setup-hook
+            #'(lambda ()
+                (when (not window-system)
+                  (global-hl-line-mode))))
+
+  (with-eval-after-load 'hl-line
+    (set-face-attribute 'hl-line nil :inherit nil)
+    (set-face-background 'hl-line "#444642"))
+#+END_SRC
+*** idle-highlight-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
+
+  (with-eval-after-load 'idle-highlight-mode
+    (setq idle-highlight-idle-time 0.1))
+
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hook #'idle-highlight-mode))
+#+end_src
+*** neotree
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(neotree-hide neotree-dir neotree-make-executor neo-open-file neo-open-dir) "neotree" nil t)
+
+  (defun my/neotree-toggle ()
+    (interactive)
+    (let ((default-directory (or (locate-dominating-file default-directory ".neotree")
+                                 (locate-dominating-file default-directory ".git"))))
+      (if (and (fboundp 'neo-global--window-exists-p)
+               (neo-global--window-exists-p))
+          (neotree-hide)
+        (neotree-dir default-directory))))
+
+  (keymap-global-set "C-q" #'my/neotree-toggle)
+
+  (with-eval-after-load 'neotree
+    ;; config
+    (setq neo-theme 'ascii)
+    (setq neo-show-hidden-files t)
+
+    ;; hook
+    (add-hook 'neotree-mode-hook #'(lambda () (display-line-numbers-mode -1)))
+
+    ;; keybind
+    ;; (define-key neotree-mode-map (kbd "C-j") (neotree-make-executor
+    ;;                                           :file-fn #'neo-open-file
+    ;;                                           :dir-fn  #'neo-open-dir))
+    )
+#+END_SRC
+*** nyan-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(nyan-mode) "nyan-mode" nil t)
+
+  (add-hook 'emacs-startup-hook #'nyan-mode)
+
+  (with-eval-after-load 'nyan-mode
+    (setq nyan-cat-face-number 5)
+    (setq nyan-animate-nyancat t))
+#+END_SRC
+*** volatile-highlights
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
+
+  (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
+#+end_src
+*** idle-highlight-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
+
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hook #'idle-highlight-mode))
+
+  (with-eval-after-load 'idle-highlight-mode
+    (setq idle-highlight-idle-time 0.1))
+#+end_src
 * Awesome Package
 ** Buffer
 *** auto-save-buffers-enhanced
@@ -1599,62 +1800,6 @@
     (define-key md4rd-mode-map (kbd "u") 'md4rd-upvote)
     (define-key md4rd-mode-map (kbd "d") 'md4rd-downvote)
     (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
-#+end_src
-** Color
-*** ansi-color
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(ansi-color-for-comint-mode-on) "ansi-color" nil t)
-
-  (with-eval-after-load 'shell-mode
-    ;; hooks
-    (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
-
-  (with-eval-after-load 'compile
-    ;; hooks
-    (add-hook 'compilation-filter-hook
-              #'(lambda ()
-                  (ansi-color-apply-on-region (point-min) (point-max)))))
-#+end_src
-*** highlight-indent-guides
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(highlight-indent-guides-mode) "highlight-indent-guides" nil t)
-
-  (with-eval-after-load 'yaml-mode
-    ;; hooks
-    (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
-
-  (with-eval-after-load 'highlight-indent-guides
-    ;; config
-    (setq highlight-indent-guides-responsive 'stack)
-    (setq highlight-indent-guides-method 'bitmap))
-#+end_src
-*** hl-todo
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(hl-todo-mode) "hl-todo" nil t)
-
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'hl-todo-mode))
-
-  (with-eval-after-load 'hl-todo
-    (setq hl-todo-keyword-faces
-            '(("HOLD" . "#d0bf8f")
-              ("TODO" . "#cc9393")
-              ("NOW" . "#dca3a3")
-              ("SOMEDAY" . "#dc8cc3")
-              ("WAIT" . "#7cb8bb")
-              ("DONE" . "#afd8af")
-              ("FIXME" . "#cc9393"))))
-#+end_src
-*** xterm-color
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(xterm-color-filter) "xterm-color" nil t)
-
-  (add-hook 'window-setup-hook
-            #'(lambda () (setenv "TERM" "xterm-256color")))
-
-  (with-eval-after-load 'xterm-color
-    ;; config
-    (setq xterm-color-preserve-properties t))
 #+end_src
 ** Command
 *** amx
@@ -2956,150 +3101,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'autoinsert
     (setq auto-insert-directory "~/.emacs.d/auto-insert"))
-#+end_src
-** Theme
-*** nerd-icons-dired
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(nerd-icons-dired-mode) "nerd-icons-dired" nil t)
-
-  (with-eval-after-load 'dired-mode
-    (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
-#+end_src
-*** nerd-icons-completion
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
-
-  ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
-#+end_src
-*** dashboard
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
-
-  (with-eval-after-load 'dashboard
-    (setq dashboard-startup-banner 'logo)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-startup-banner 4)
-    (setq dashboard-items '((recents . 10))))
-#+end_src
-*** dimmer
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dimmer-configure-which-key
-                       dimmer-configure-org
-                       dimmer-mode)
-                     "dimmer" nil t)
-
-  (add-hook 'window-setup-hook #'dimmer-mode)
-  (add-hook 'window-setup-hook #'dimmer-configure-which-key)
-  ;; (add-hook 'window-setup-hook #'dimmer-configure-org)
-#+end_src
-*** doom-themes
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(doom-themes-enable-org-fontification) "doom-themes-ext-org" nil t)
-
-  ;; (add-hook 'emacs-startup-hook #'doom-themes-enable-org-fontification)
-  (add-hook 'emacs-startup-hook
-            #'(lambda ()
-                (when (require 'doom-themes)
-                  (load-theme 'doom-dracula t))))
-
-  (with-eval-after-load 'doom-themes
-    ;; config
-    (setq doom-themes-padded-modeline t)
-    (setq doom-themes-enable-bold t)
-    (setq doom-themes-enable-italic t))
-#+END_SRC
-*** doom-modeline
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
-
-  (add-hook 'emacs-startup-hook #'doom-modeline-mode)
-  (add-hook 'emacs-startup-hook #'(lambda () (line-number-mode 0)))
-  (add-hook 'emacs-startup-hook #'(lambda () (column-number-mode 0)))
-
-  (with-eval-after-load 'doom-modeline
-    ;; config
-    (setq doom-modeline-buffer-file-name-style 'truncate-with-project)
-    (setq doom-modeline-icon `,(display-graphic-p))
-    (setq doom-modeline-major-mode-icon `,(display-graphic-p))
-    (setq doom-modeline-minor-modes nil))
-#+END_SRC
-*** hl-line
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-hl-line-mode) "hl-line-mode" nil t)
-
-  (add-hook 'window-setup-hook
-            #'(lambda ()
-                (when (not window-system)
-                  (global-hl-line-mode))))
-
-  (with-eval-after-load 'hl-line
-    (set-face-attribute 'hl-line nil :inherit nil)
-    (set-face-background 'hl-line "#444642"))
-#+END_SRC
-*** idle-highlight-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
-
-  (with-eval-after-load 'idle-highlight-mode
-    (setq idle-highlight-idle-time 0.1))
-
-  (with-eval-after-load 'prog-mode
-    (add-hook 'prog-mode-hook #'idle-highlight-mode))
-#+end_src
-*** neotree
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(neotree-hide neotree-dir neotree-make-executor neo-open-file neo-open-dir) "neotree" nil t)
-
-  (defun my/neotree-toggle ()
-    (interactive)
-    (let ((default-directory (or (locate-dominating-file default-directory ".neotree")
-                                 (locate-dominating-file default-directory ".git"))))
-      (if (and (fboundp 'neo-global--window-exists-p)
-               (neo-global--window-exists-p))
-          (neotree-hide)
-        (neotree-dir default-directory))))
-
-  (keymap-global-set "C-q" #'my/neotree-toggle)
-
-  (with-eval-after-load 'neotree
-    ;; config
-    (setq neo-theme 'ascii)
-    (setq neo-show-hidden-files t)
-
-    ;; hook
-    (add-hook 'neotree-mode-hook #'(lambda () (display-line-numbers-mode -1)))
-
-    ;; keybind
-    ;; (define-key neotree-mode-map (kbd "C-j") (neotree-make-executor
-    ;;                                           :file-fn #'neo-open-file
-    ;;                                           :dir-fn  #'neo-open-dir))
-    )
-#+END_SRC
-*** nyan-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(nyan-mode) "nyan-mode" nil t)
-
-  (add-hook 'emacs-startup-hook #'nyan-mode)
-
-  (with-eval-after-load 'nyan-mode
-    (setq nyan-cat-face-number 5)
-    (setq nyan-animate-nyancat t))
-#+END_SRC
-*** volatile-highlights
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
-
-  (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
-#+end_src
-*** idle-highlight-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
-
-  (with-eval-after-load 'prog-mode
-    (add-hook 'prog-mode-hook #'idle-highlight-mode))
-
-  (with-eval-after-load 'idle-highlight-mode
-    (setq idle-highlight-idle-time 0.1))
 #+end_src
 ** Undo
 *** undo-tree
