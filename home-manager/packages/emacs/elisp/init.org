@@ -158,7 +158,7 @@
   ;; prefer-coding-system take effect equally to follows
   (add-hook 'window-setup-hook
             #'(lambda ()
-  	      (setq locale-coding-system 'utf-8-unix)
+                (setq locale-coding-system 'utf-8-unix)
                 (set-buffer-file-coding-system 'utf-8-unix)
                 (set-file-name-coding-system 'utf-8-unix)
                 (set-terminal-coding-system 'utf-8-unix)
@@ -192,6 +192,60 @@
   (keymap-global-set "C-x C-b" #'switch-to-buffer)
 
   (keymap-global-set "C-x C-k" nil)
+
+  (keymap-global-set "C-M-@" 'er/expand-region)
+
+  (keymap-global-set "C-c f" #'paredit-forward-slurp-sexp)
+  (keymap-global-set "M-s" #'paredit-splice-sexp)
+
+  (keymap-global-set "C-:" #'avy-goto-word-1)
+  (keymap-global-set "M-z" 'avy-zap-up-to-char-dwim)
+
+  (keymap-global-set "M-d" #'my/delete-forward-block)
+
+  (keymap-global-set "C->" #'mc/mark-next-like-this)
+  (keymap-global-set "C-<" #'mc/mark-previous-like-this)
+  (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
+
+  (keymap-global-set "C-x j" #'open-junk-file)
+
+  (keymap-global-set "C-x g" #'my/magit-status)
+  (keymap-global-set "C-x G" #'magit-blame)
+
+  (keymap-global-set "C-h f" #'helpful-callable)
+  (keymap-global-set "C-h v" #'helpful-variable)
+  (keymap-global-set "C-h k" #'helpful-key)
+  (keymap-global-set "C-c C-d" #'helpful-at-point)
+  (keymap-global-set "C-h F" #'helpful-function)
+  (keymap-global-set "C-h C" #'helpful-command)
+
+  (keymap-global-set "C-x C-j" #'skk-mode)
+
+  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
+  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
+  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
+
+  (keymap-global-set "C-x C-w" #'mu4e)
+
+  (keymap-global-set "C-c t" #'origami-recursively-toggle-node)
+  (keymap-global-set "C-c C-t" #'origami-recursively-toggle-node)
+
+  (keymap-global-set "C-c c" #'org-capture)
+  (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
+  (keymap-global-set "C-c l" #'org-store-link)
+  (keymap-global-set "C-c a" #'org-agenda)
+  (keymap-global-set "C-c n g" #'org-roam-graph)
+  (keymap-global-set "C-c n l" #'org-roam-buffer-toggle)
+  (keymap-global-set "C-c n f" #'org-roam-node-find)
+  (keymap-global-set "C-c n i" #'org-roam-node-insert)
+  (keymap-global-set "C-c n c" #'org-roam-capture)
+  (keymap-global-set "C-c n d" #'org-roam-dailies-map)
+  (keymap-global-set "C-c n j" #'org-roam-dailies-goto-today)
+  (keymap-global-set "C-c n e" #'consult-org-roam-file-find)
+  (keymap-global-set "C-c n b" #'consult-org-roam-backlinks)
+  (keymap-global-set "C-c n B" #'consult-org-roam-backlinks-recursive)
+  (keymap-global-set "C-c n l" #'consult-org-roam-forward-links)
+  (keymap-global-set "C-c n r" #'consult-org-roam-search)
 
   (when window-system
     (keymap-global-set "C-x C-c" nil))
@@ -1425,7 +1479,8 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
 
-  (add-hook 'window-setup-hook #'editorconfig-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'editorconfig-mode))
 #+END_SRC
 *** persistent-scratch
 #+begin_src emacs-lisp :tangle yes
@@ -1434,24 +1489,28 @@
   (add-hook 'window-setup-hook #'persistent-scratch-setup-default)
 
   (with-eval-after-load 'persistent-scratch
-    (setq persistent-scratch-autosave-interval 100))
+    ;; config
+    (setopt persistent-scratch-autosave-interval 100))
 #+end_src
 *** popwin
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(popwin-mode) "popwin" nil t)
 
-  (add-hook 'window-setup-hook #'popwin-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'popwin-mode))
 #+end_src
 *** whitespace
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
 
-  (when window-system
-    (add-hook 'window-setup-hook #'global-whitespace-mode))
+  (with-eval-after-load 'simple
+    (when window-system
+      (add-hook 'fundamental-mode-hook #'global-whitespace-mode)))
 
   (with-eval-after-load 'whitespace
-    (setq whitespace-style '(face tabs tab-mark spaces space-mark))
-    (setq whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
+    ;; config
+    (setopt whitespace-style '(face tabs tab-mark spaces space-mark))
+    (setopt whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
                                           (tab-mark ?\t [?\xBB ?\t] [?\\ ?\t]))))
 #+END_SRC
 ** Check
@@ -1547,9 +1606,11 @@
   (autoload-if-found '(ansi-color-for-comint-mode-on) "ansi-color" nil t)
 
   (with-eval-after-load 'shell-mode
+    ;; hooks
     (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
 
   (with-eval-after-load 'compile
+    ;; hooks
     (add-hook 'compilation-filter-hook
               #'(lambda ()
                   (ansi-color-apply-on-region (point-min) (point-max)))))
@@ -1559,20 +1620,23 @@
   (autoload-if-found '(highlight-indent-guides-mode) "highlight-indent-guides" nil t)
 
   (with-eval-after-load 'yaml-mode
+    ;; hooks
     (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
   (with-eval-after-load 'highlight-indent-guides
-    (setq highlight-indent-guides-responsive 'stack)
-    (setq highlight-indent-guides-method 'bitmap))
+    ;; config
+    (setopt highlight-indent-guides-responsive 'stack)
+    (setopt highlight-indent-guides-method 'bitmap))
 #+end_src
 *** hl-todo
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-hl-todo-mode) "hl-todo" nil t)
+  (autoload-if-found '(hl-todo-mode) "hl-todo" nil t)
 
-  (add-hook 'window-setup-hook #'global-hl-todo-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'hl-todo-mode))
 
   (with-eval-after-load 'hl-todo
-    (setq hl-todo-keyword-faces
+    (setopt hl-todo-keyword-faces
             '(("HOLD" . "#d0bf8f")
               ("TODO" . "#cc9393")
               ("NOW" . "#dca3a3")
@@ -1589,6 +1653,7 @@
             #'(lambda () (setenv "TERM" "xterm-256color")))
 
   (with-eval-after-load 'xterm-color
+    ;; config
     (setq xterm-color-preserve-properties t))
 #+end_src
 ** Command
@@ -1599,7 +1664,8 @@
   (add-hook 'window-setup-hook #'amx-mode)
 
   (with-eval-after-load 'amx
-    (setq amx-history-length 100))
+    ;; config
+    (setopt amx-history-length 100))
 #+END_SRC
 ** Completion
 *** corfu
@@ -1609,13 +1675,15 @@
   (add-hook 'window-setup-hook #'global-corfu-mode)
 
   (with-eval-after-load 'corfu
-    (setq corfu-auto t)
-    (setq corfu-auto-delay 0.2)
-    (setq corfu-cycle t)
-    (setq corfu-on-exact-match nil))
+    ;; config
+    (setopt corfu-auto t)
+    (setopt corfu-auto-delay 0.2)
+    (setopt corfu-cycle t)
+    (setopt corfu-on-exact-match nil))
 
   (with-eval-after-load 'indent
-    (setq tab-always-indent 'complete))
+    ;; config
+    (setopt tab-always-indent 'complete))
 #+end_src
 *** cape
 #+begin_src emacs-lisp :tangle yes
@@ -1638,7 +1706,8 @@
   (add-hook 'window-setup-hook #'prescient-persist-mode)
 
   (with-eval-after-load 'prescient
-    (setq prescient-aggressive-file-save t))
+    ;; config
+    (setopt prescient-aggressive-file-save t))
 #+end_src
 *** kind-icon
 #+begin_src emacs-lisp :tangle yes
@@ -1652,52 +1721,26 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-goto-word-1) "avy" nil t)
 
-  (keymap-global-set "C-:" #'avy-goto-word-1)
-
   (with-eval-after-load 'avy
-    (setq avy-all-windows nil)
-    (setq avy-background t))
+    ;; config
+    (setopt avy-all-windows nil)
+    (setopt avy-background t))
 #+end_src
 *** avy-zap
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-zap-up-to-char-dwim) "avy-zap" nil t)
-
-  (keymap-global-set "M-z" 'avy-zap-up-to-char-dwim)
 #+end_src
 *** expand-region
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(er/expand-region) "expand-region" nil t)
 
-  (add-hook 'window-setup-hook #'transient-mark-mode)
-
-  (keymap-global-set "C-M-@" 'er/expand-region)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'transient-mark-mode))
 #+end_src
 *** multiple-cursors
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mc/mark-next-like-this mc/mark-previous-like-this mc/mark-all-like-this) "multiple-cursors" nil t)
-
-  (keymap-global-set "C->" #'mc/mark-next-like-this)
-  (keymap-global-set "C-<" #'mc/mark-previous-like-this)
-  (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
 #+END_SRC
-*** subword
-#+begin_src emacs-lisp :tangle yes
-  (keymap-global-set "M-d" #'my/delete-forward-block)
-
-  (defun my/delete-forward-block ()
-    (interactive)
-    (if (eobp)
-        (message "End of buffer")
-      (let* ((syntax-move-point
-              (save-excursion
-                (skip-syntax-forward (string (char-syntax (char-after))))
-                (point)))
-             (subword-move-point
-              (save-excursion
-                (subword-forward)
-                (point))))
-        (kill-region (point) (min syntax-move-point subword-move-point)))))
-#+end_src
 ** Dictionary
 *** define-word
 #+begin_src emacs-lisp :tangle yes
@@ -1708,7 +1751,7 @@
       (call-interactively #'define-word)))
 
   (with-eval-after-load 'define-word
-    (setq define-word-displayfn-alist
+    (setopt define-word-displayfn-alist
             '((wordnik . takeokunn/define-word--display-in-buffer)
               (openthesaurus . takeokunn/define-word--display-in-buffer)
               (webster . takeokunn/define-word--display-in-buffer)
@@ -1719,11 +1762,11 @@
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'dired
     ;; config
-    (setq dired-dwim-target nil)
-    (setq dired-hide-details-hide-symlink-targets nil)
-    (setq dired-listing-switches "-alh")
-    (setq dired-recursive-copies 'always)
-    (setq dired-use-ls-dired nil)
+    (setopt dired-dwim-target nil)
+    (setopt dired-hide-details-hide-symlink-targets nil)
+    (setopt dired-listing-switches "-alh")
+    (setopt dired-recursive-copies 'always)
+    (setopt dired-use-ls-dired nil)
 
     ;; hook
     (add-hook 'dired-mode-hook #'(lambda () (display-line-numbers-mode -1))))
@@ -1733,6 +1776,7 @@
   (autoload-if-found '(dired-collapse-mode) "dired-collapse" nil t)
 
   (with-eval-after-load 'dired
+    ;; hooks
     (add-hook 'dired-mode #'dired-collapse-mode))
 #+end_src
 *** dired-filter
@@ -1740,16 +1784,17 @@
   (autoload-if-found '(dired-filter-mode) "dired-filter" nil t)
 
   (with-eval-after-load 'dired
+    ;; hooks
     (add-hook 'dired-mode #'dired-filter-mode))
 #+end_src
-*** dired-narrow
+*** TODO dired-narrow
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
 
   ;; (with-eval-after-load 'dired
   ;;   (add-hook 'dired-mode-hook #'dired-narrow-mode))
 #+end_src
-*** dired-open
+*** TODO dired-open
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-open-file) "dired-open" nil t)
 
@@ -1765,6 +1810,7 @@
   (autoload-if-found '(dired-quick-sort-setup) "dired-quick-sort" nil t)
 
   (with-eval-after-load 'dired
+    ;; hooks
     (add-hook 'dired-mode-hook #'dired-quick-sort-setup))
 #+end_src
 *** dired-subtree
@@ -1775,7 +1821,9 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(diredfl-global-mode) "diredfl" nil t)
 
-  (add-hook 'dired-mode-hook #'diredfl-global-mode)
+  (with-eval-after-load 'dired
+    ;; hooks
+    (add-hook 'dired-mode-hook #'diredfl-global-mode))
 #+end_src
 ** EWW
 *** basic
@@ -1790,20 +1838,20 @@
                             url "")))
       (rename-buffer (format "eww: %s" buffer-name) t)))
 
-  ;; config
   (with-eval-after-load 'eww
+    ;; config
     (setq eww-header-line-format nil)
     (setq eww-search-prefix "http://www.google.co.jp/search?q="))
 
-  ;; keybind
   (with-eval-after-load 'eww
+    ;; keybind
     (define-key eww-mode-map (kbd "C") #'eww-set-character-encoding)
     (define-key eww-mode-map (kbd "C-j") #'eww-follow-link)
     (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading)
     (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading))
 
-  ;; hooks
   (with-eval-after-load 'eww
+    ;; hooks
     (add-hook 'eww-after-render #'my/eww-rename-buffer))
 #+end_src
 *** eww-lnum
@@ -1811,6 +1859,7 @@
   (autoload-if-found '(eww-lnum-follow eww-lnum-universal) "eww-lnum" nil t)
 
   (with-eval-after-load 'eww
+    ;; keybinds
     (define-key eww-mode-map "f" #'eww-lnum-follow)
     (define-key eww-mode-map "F" #'eww-lnum-universal))
 #+end_src
@@ -1822,20 +1871,20 @@
   (add-hook 'window-setup-hook #'recentf-mode)
 
   (with-eval-after-load 'recentf
-    (setq recentf-max-menu-items 10000)
-    (setq recentf-max-saved-items 10000)
+    ;; config
     (setq recentf-auto-cleanup 'never)
-    (setq recentf-save-file  "~/.emacs.d/.recentf")
-    (setq recentf-exclude '(".recentf" "\\.gpg\\")))
+    (setopt recentf-max-menu-items 10000)
+    (setopt recentf-max-saved-items 10000)
+    (setopt recentf-save-file  "~/.emacs.d/.recentf")
+    (setopt recentf-exclude '(".recentf" "\\.gpg\\")))
 #+END_SRC
 *** open-junk-file
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
 
-  (keymap-global-set "C-x j" #'open-junk-file)
-
   (with-eval-after-load 'open-junk-file
-    (setq open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
+    ;; config
+    (setopt open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
 #+END_SRC
 *** vlf
 #+begin_src emacs-lisp :tangle yes
@@ -1846,6 +1895,7 @@
   ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
 
   (with-eval-after-load 'dired
+    ;; hooks
     (define-key dired-mode-map (kbd "V") #'dired-vlf))
 #+end_src
 ** Font
@@ -1862,7 +1912,7 @@
 
   (with-eval-after-load 'gcmh
     ;; config
-    (setq gcmh-verbose t)
+    (setopt gcmh-verbose t)
 
     ;; hooks
     (defvar my/gcmh-status nil)
@@ -1894,40 +1944,40 @@
     (let ((default-directory (locate-dominating-file default-directory ".git")))
       (magit-status)))
 
-  (keymap-global-set "C-x g" #'my/magit-status)
-  (keymap-global-set "C-x G" #'magit-blame)
-
   (with-eval-after-load 'magit
-    (setq magit-refresh-status-buffer nil))
+    ;; config
+    (setopt magit-refresh-status-buffer nil))
 
   (with-eval-after-load 'magit-status
     ;; config
-    (setq magit-status-sections-hook
-          '(magit-insert-status-headers
-            ;; magit-insert-merge-log
-            ;; magit-insert-rebase-sequence
-            ;; magit-insert-am-sequence
-            ;; magit-insert-sequencer-sequence
-            ;; magit-insert-bisect-output
-            ;; magit-insert-bisect-rest
-            ;; magit-insert-bisect-log
-            magit-insert-untracked-files
-            magit-insert-unstaged-changes
-            magit-insert-staged-changes
-            ;; magit-insert-stashes
-            magit-insert-unpushed-to-pushremote
-            magit-insert-unpushed-to-upstream-or-recent
-            magit-insert-unpulled-from-pushremote
-            magit-insert-unpulled-from-upstream))
+    (setopt magit-status-sections-hook
+            '(magit-insert-status-headers
+              ;; magit-insert-merge-log
+              ;; magit-insert-rebase-sequence
+              ;; magit-insert-am-sequence
+              ;; magit-insert-sequencer-sequence
+              ;; magit-insert-bisect-output
+              ;; magit-insert-bisect-rest
+              ;; magit-insert-bisect-log
+              magit-insert-untracked-files
+              magit-insert-unstaged-changes
+              magit-insert-staged-changes
+              ;; magit-insert-stashes
+              magit-insert-unpushed-to-pushremote
+              magit-insert-unpushed-to-upstream-or-recent
+              magit-insert-unpulled-from-pushremote
+              magit-insert-unpulled-from-upstream))
 
 
-    ;; keybind
+    ;; keybinds
     (define-key magit-status-mode-map (kbd "C-j") #'magit-visit-thing))
 
   (with-eval-after-load 'magit-log
+    ;; keybinds
     (define-key magit-log-mode-map (kbd "C-j") #'magit-visit-thing))
 
   (with-eval-after-load 'git-commit
+    ;; keybinds
     (define-key git-commit-mode-map (kbd "C-h") #'delete-backward-char))
 #+END_SRC
 *** magit-file-icons
@@ -1961,7 +2011,9 @@
 
   (with-eval-after-load 'git-gutter
     ;; (add-hook 'prog-mode-hook #'git-gutter-mode)
-    (setq git-gutter:update-hooks '(after-save-hook after-revert-hook)))
+
+    ;; config
+    (setopt git-gutter:update-hooks '(after-save-hook after-revert-hook)))
 #+end_src
 *** git-gutter-fringe
 #+begin_src emacs-lisp :tangle yes
@@ -1970,11 +2022,12 @@
                        git-gutter-fr:clear) "git-gutter-fringe" nil t)
 
   (with-eval-after-load 'git-gutter
-    (setq git-gutter-fr:side 'right-fringe)
-    (setq git-gutter:window-width -1)
-    (setq git-gutter:init-function #'git-gutter-fr:init)
-    (setq git-gutter:view-diff-function #'git-gutter-fr:view-diff-infos)
-    (setq git-gutter:clear-function #'git-gutter-fr:clear))
+    ;; config
+    (setopt git-gutter-fr:side 'right-fringe)
+    (setopt git-gutter:window-width -1)
+    (setopt git-gutter:init-function #'git-gutter-fr:init)
+    (setopt git-gutter:view-diff-function #'git-gutter-fr:view-diff-infos)
+    (setopt git-gutter:clear-function #'git-gutter-fr:clear))
 #+end_src
 *** git-timemachine
 #+begin_src emacs-lisp :tangle yes
@@ -1993,10 +2046,11 @@
   (autoload-if-found '(git-auto-commit-mode) "git-auto-commit-mode" nil t)
 
   (with-eval-after-load 'git-auto-commit-mode
-    (setq gac-automatically-push-p t)
-    (setq gac-silent-message-p t)
-    (setq gac-debounce-interval (* 60 60 3))
-    (setq gac-default-message "Update"))
+    ;; config
+    (setopt gac-automatically-push-p t)
+    (setopt gac-silent-message-p t)
+    (setopt gac-debounce-interval (* 60 60 3))
+    (setopt gac-default-message "Update"))
 #+end_src
 ** Googling
 *** google-this
@@ -2015,11 +2069,13 @@
   (add-hook 'window-setup-hook #'epa-file-enable)
 
   (with-eval-after-load 'epa-file
+    ;; config
     (setq epa-file-encrypt-to '("bararararatty@gmail.com"))
-    (setq epa-file-select-keys 'silent)
-    (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-    (setq epg-pinentry-mode 'loopback)
+    (setopt epa-file-select-keys 'silent)
+    (setopt epa-file-cache-passphrase-for-symmetric-encryption t)
+    (setopt epg-pinentry-mode 'loopback)
 
+    ;; fset
     (fset 'epg-wait-for-status 'ignore))
 #+end_src
 *** pinentry
@@ -2037,20 +2093,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        helpful-key
                        helpful-variable
                        helpful-at-point) "helpful" nil t)
-  ;; keybinds
-  (keymap-global-set "C-h f" #'helpful-callable)
-  (keymap-global-set "C-h v" #'helpful-variable)
-  (keymap-global-set "C-h k" #'helpful-key)
-  (keymap-global-set "C-c C-d" #'helpful-at-point)
-  (keymap-global-set "C-h F" #'helpful-function)
-  (keymap-global-set "C-h C" #'helpful-command)
 #+end_src
 ** IME
 *** ddskk
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
-
-  (keymap-global-set "C-x C-j" #'skk-mode)
 
   (defun my/skk-C-j-key (arg)
     (interactive "P")
@@ -2091,6 +2138,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(ddskk-posframe-mode) "ddskk-posframe" nil t)
 
   (with-eval-after-load 'skk
+    ;; hooks
     (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
 #+end_src
 ** Joke
@@ -2120,10 +2168,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(lorem-ipsum-insert-sentences
                        lorem-ipsum-insert-paragraphs
                        lorem-ipsum-insert-list) "lorem-ipsum" nil t)
-
-  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
-  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
-  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
 #+end_src
 ** Keyboard
 *** key-chord
@@ -2131,10 +2175,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(key-chord-mode key-chord-define-global) "key-chord" nil t)
 
   (add-hook 'window-setup-hook #'key-chord-mode)
-
-  ;; for global
-  ;; (key-chord-define-global "fj" #'view-mode)
-  ;; (key-chord-define-global "jf" #'view-mode)
+  (add-hook 'window-setup-hook #'(lambda ()
+  				 (key-chord-define-global "fj" #'view-mode)
+  				 (key-chord-define-global "jf" #'view-mode)))
 #+end_src
 *** key-combo
 #+begin_src emacs-lisp :tangle yes
@@ -2156,6 +2199,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   ;; for typescript-tsx-mode
   (with-eval-after-load 'typescript-tsx-mode
+    ;; hooks
     (add-hook 'typescript-tsx-mode
               #'(lambda ()
                   (key-combo-mode)
@@ -2222,49 +2266,54 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'lsp-configure-hook #'lsp-diagnostics-mode)
 
     ;; config
-    (setq lsp-idle-delay 0.8)
-    (setq lsp-enable-links nil)
-    (setq lsp-log-io nil)
-    (setq lsp-file-watch-threshold 20000))
+    (setopt lsp-idle-delay 0.8)
+    (setopt lsp-enable-links nil)
+    (setopt lsp-log-io nil)
+    (setopt lsp-file-watch-threshold 20000))
 
   (with-eval-after-load 'lsp-rename
     (advice-add 'lsp-rename :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
     (advice-add 'lsp-rename :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
 
   (with-eval-after-load 'lsp-diagnostics
-    (setq lsp-diagnostics-flycheck-default-level 'info))
+    ;; config
+    (setopt lsp-diagnostics-flycheck-default-level 'info))
 
   (with-eval-after-load 'lsp-completion
-    (setq lsp-completion-no-cache t)
-    (setq lsp-prefer-capf t))
+    ;; config
+    (setopt lsp-completion-no-cache t)
+    (setopt lsp-prefer-capf t))
 
   (with-eval-after-load 'lsp-php
     ;; for intelephense
-    (setq lsp-intelephense-telemetry-enabled t)
-    (setq lsp-intelephense-files-exclude ["**/.git/**" "**/.svn/**" "**/.hg/**" "**/CVS/**" "**/.DS_Store/**"
+    (setopt lsp-intelephense-telemetry-enabled t)
+    (setopt lsp-intelephense-files-exclude ["**/.git/**" "**/.svn/**" "**/.hg/**" "**/CVS/**" "**/.DS_Store/**"
                                             "**/node_modules/**" "**/bower_components/**" "**/vendor/**/{Test,test,Tests,tests}/**"
                                             "**/.direnv/**"]))
 
   (with-eval-after-load 'lsp-javascript
     ;; for typescript-language-server
-    (setq lsp-clients-typescript-log-verbosity "info")
-    (setq lsp-typescript-references-code-lens-enabled t)
-    (setq lsp-typescript-implementations-code-lens-enabled t)
-    (setq lsp-javascript-display-return-type-hints t)
-    (setq lsp-javascript-display-parameter-type-hints t)
-    (setq lsp-javascript-display-parameter-name-hints-when-argument-matches-name t)
-    (setq lsp-javascript-display-property-declaration-type-hints t)
-    (setq lsp-javascript-display-variable-type-hints t))
+    (setopt lsp-clients-typescript-log-verbosity "info")
+    (setopt lsp-typescript-references-code-lens-enabled t)
+    (setopt lsp-typescript-implementations-code-lens-enabled t)
+    (setopt lsp-javascript-display-return-type-hints t)
+    (setopt lsp-javascript-display-parameter-type-hints t)
+    (setopt lsp-javascript-display-parameter-name-hints-when-argument-matches-name t)
+    (setopt lsp-javascript-display-property-declaration-type-hints t)
+    (setopt lsp-javascript-display-variable-type-hints t))
 
   (with-eval-after-load 'lsp-completion
-    (setq lsp-completion-provider :none))
+    ;; config
+    (setopt lsp-completion-provider :none))
 
   (with-eval-after-load 'lsp-ruby
-    (setq lsp-solargraph-autoformat t)
-    (setq lsp-solargraph-multi-root nil))
+    ;; config
+    (setopt lsp-solargraph-autoformat t)
+    (setopt lsp-solargraph-multi-root nil))
 
   (with-eval-after-load 'lsp-nil
-    (setq lsp-nix-nil-max-mem 100000))
+    ;; config
+    (setopt lsp-nix-nil-max-mem 100000))
 #+END_SRC
 *** TODO emacs-ccls
 #+begin_src emacs-lisp :tangle yes
@@ -2274,7 +2323,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** lsp-php-key
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lsp-php
-    (setq lsp-intelephense-licence-key "00OXTX8OROOJH9P"))
+    (setopt lsp-intelephense-licence-key "00OXTX8OROOJH9P"))
 #+end_src
 *** consult-lsp
 #+begin_src emacs-lisp :tangle yes
@@ -2288,11 +2337,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(lsp-treemacs-sync-mode) "lsp-treemacs" nil t)
 
   (with-eval-after-load 'lsp-mode
+    ;; hooks
     (add-hook 'lsp-mode-hook #'lsp-treemacs-sync-mode))
 
   (with-eval-after-load 'lsp-treemacs
-    (setq lsp-treemacs-error-list-severity 1)
-    (setq lsp-treemacs-error-list-current-project-only t))
+    ;; config
+    (setopt lsp-treemacs-error-list-severity 1)
+    (setopt lsp-treemacs-error-list-current-project-only t))
 #+end_src
 *** lsp-docker
 #+begin_src emacs-lisp :tangle yes
@@ -2313,7 +2364,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; keybind
     (define-key dap-mode-map (kbd "C-c d") #'dap-breakpoint-toggle)
 
-    ;; hook
+    ;; hooks
     (add-hook 'dap-mode-hook #'dap-ui-mode)
     (add-hook 'dap-mode-hook #'dap-ui-controls-mode)
     (add-hook 'dap-mode-hook #'tooltip-mode)
@@ -2321,6 +2372,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'dap-stopped-hook #'(lambda (arg) (call-interactively #'dap-hydra))))
 
   (with-eval-after-load 'php-mode
+    ;; hooks
     (add-hook 'php-mode-hook #'dap-php-setup))
 
   (with-eval-after-load 'dap-php
@@ -2339,9 +2391,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (add-hook 'js2-mode-hook #'dap-node-setup))
 
   (with-eval-after-load 'go-mode
+    ;; hooks
     (add-hook 'go-mode-hook #'dap-go-setup))
 
   (with-eval-after-load 'ruby-mode
+    ;; hooks
     (add-hook 'ruby-mode-hook #'dap-ruby-setup))
 #+END_SRC
 *** lsp-ui
@@ -2350,39 +2404,45 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   ;; hook
   (with-eval-after-load 'lsp-mode
+    ;; hooks
     (add-hook 'lsp-mode-hook #'lsp-ui-mode))
 
   ;; lsp-ui-doc
   (with-eval-after-load 'lsp-ui-doc
-    (setq lsp-ui-doc-enable t)
-    (setq lsp-ui-doc-show-with-cursor t)
-    (setq lsp-ui-doc-use-webkit t)
-    (setq lsp-ui-doc-include-signature t)
-    (setq lsp-ui-doc-delay 1)
-    (setq lsp-ui-doc-max-height 30))
+    ;; config
+    (setopt lsp-ui-doc-enable t)
+    (setopt lsp-ui-doc-show-with-cursor t)
+    (setopt lsp-ui-doc-use-webkit t)
+    (setopt lsp-ui-doc-include-signature t)
+    (setopt lsp-ui-doc-delay 1)
+    (setopt lsp-ui-doc-max-height 30))
 
   ;; lsp-ui-peek
   (autoload-if-found '(lsp-ui-peek-find-references lsp-ui-peek-find-definitions lsp-ui-peek-find-implementation) "lsp-ui-peek" nil t)
   (with-eval-after-load 'lsp-ui-peek
-    (setq lsp-ui-peek-enable nil)
-    (setq lsp-ui-peek-peek-height 30)
-    (setq lsp-ui-peek-list-width 60)
-    (setq lsp-ui-peek-fontify 'on-demand))
+    ;; config
+    (setopt lsp-ui-peek-enable nil)
+    (setopt lsp-ui-peek-peek-height 30)
+    (setopt lsp-ui-peek-list-width 60)
+    (setopt lsp-ui-peek-fontify 'on-demand))
 
   ;; lsp-ui-imenu
   (autoload-if-found '(lsp-ui-imenu) "lsp-ui-imenu" nil t)
   (with-eval-after-load 'lsp-ui-imenu
-    (setq lsp-ui-imenu-enable nil)
-    (setq lsp-ui-imenu-kind-position 'top))
+    ;; config
+    (setopt lsp-ui-imenu-enable nil)
+    (setopt lsp-ui-imenu-kind-position 'top))
 
   ;; lsp-ui-sideline
   (autoload-if-found '(lsp-ui-sideline-mode) "lsp-ui-sideline" nil t)
   (with-eval-after-load 'lsp-ui-sideline
-    (setq lsp-ui-sideline-enable nil)
-    (setq lsp-ui-sideline-show-hover t))
+    ;; config
+    (setopt lsp-ui-sideline-enable nil)
+    (setopt lsp-ui-sideline-show-hover t))
 
   ;; keybind
   (with-eval-after-load 'lsp-mode
+    ;; hooks
     (define-key lsp-mode-map (kbd "C-c C-r") #'lsp-ui-peek-find-references)
     (define-key lsp-mode-map (kbd "C-c C-j") #'lsp-ui-peek-find-definitions)
     (define-key lsp-mode-map (kbd "C-c C-i") #'lsp-ui-peek-find-implementation)
@@ -2401,13 +2461,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'lsp-scheme
     (setq lsp-scheme-implementation "guile"))
 #+end_src
-*** lsp-haskell
+*** TODO lsp-haskell
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp) "lsp-haskell" nil t)
-
-  (with-eval-after-load 'haskell-mode
-    (add-hook 'haskell-mode-hook #'lsp)
-    (add-hook 'haskell-literate-mode-hook #'lsp))
 #+end_src
 *** TODO lsp-pyright
 #+begin_src emacs-lisp :tangle yes
@@ -2448,26 +2504,24 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mu4e) "mu4e" nil t)
 
-  (keymap-global-set "C-x C-w" #'mu4e)
-
   (with-eval-after-load 'mu4e
     ;; config
-    (setq mail-user-agent 'mu4e-user-agent))
+    (setopt mail-user-agent 'mu4e-user-agent))
 
   (with-eval-after-load 'mu4e-update
     ;; config
-    (setq mu4e-get-mail-command "offlineimap")
-    (setq mu4e-update-interval (* 5 60))
-    (setq mu4e-index-cleanup nil)
-    (setq mu4e-index-lazy-check t))
+    (setopt mu4e-get-mail-command "offlineimap")
+    (setopt mu4e-update-interval (* 5 60))
+    (setopt mu4e-index-cleanup nil)
+    (setopt mu4e-index-lazy-check t))
 
   (with-eval-after-load 'mu4e-view
     ;; config
-    (setq mu4e-split-view 'horizontal))
+    (setopt mu4e-split-view 'horizontal))
 
   (with-eval-after-load 'mu4e-folders
     ;; config
-    (setq mu4e-maildir-shortcuts '((:maildir "/INBOX" :key ?i)
+    (setopt mu4e-maildir-shortcuts '((:maildir "/INBOX" :key ?i)
                                      (:maildir "/Redmine" :key ?r)
                                      (:maildir "/GitHub" :key ?g)
                                      (:maildir "/Emacs" :key ?e)
@@ -2519,21 +2573,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
 
   (add-hook 'window-setup-hook #'global-origami-mode)
-
-  (keymap-global-set "C-c t" #'origami-recursively-toggle-node)
-  (keymap-global-set "C-c C-t" #'origami-recursively-toggle-node)
 #+end_src
 ** Process
 *** proced
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(proced) "proced" nil t)
 
-  (add-hook 'proced-mode-hook #'proced-toggle-auto-update)
-
   (with-eval-after-load 'proced
-    (setq proced-auto-update-interval 10)
-    (setq proced-tree-flag t)
-    (setq proced-format 'long))
+    ;; hooks
+    (add-hook 'proced-mode-hook #'proced-toggle-auto-update)
+
+    ;; config
+    (setopt proced-auto-update-interval 10)
+    (setopt proced-tree-flag t)
+    (setopt proced-format 'long))
 #+end_src
 *** proced-narrow
 #+begin_src emacs-lisp :tangle yes
@@ -2554,13 +2607,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (keymap-global-set "M-p" #'projectile-command-map)
     (keymap-global-set "C-c p" #'projectile-command-map)
 
-    ;; hook
+    ;; hooks
     (add-hook 'projectile-mode-hook #'my/update-projectile-known-projects)
 
     ;; config
-    (setq projectile-switch-project-action 'projectile-dired)
-    (setq projectile-enable-caching t)
-    (setq projectile-use-git-grep t)
+    (setopt projectile-switch-project-action 'projectile-dired)
+    (setopt projectile-enable-caching t)
+    (setopt projectile-use-git-grep t)
 
     ;; function
     (defun my/update-projectile-known-projects ()
@@ -2601,10 +2654,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(emr-show-refactor-menu) "emr" nil t)
 
   (with-eval-after-load 'prog-mode
+    ;; keybinds
     (define-key prog-mode-map (kbd "M-RET") #'emr-show-refactor-menu))
 #+END_SRC
 ** Search
-*** migemo
+*** TODO migemo
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(migemo-init) "migemo" nil t)
 
@@ -2624,6 +2678,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(wgrep-setup) "wgrep" nil t)
 
   (with-eval-after-load 'grep
+    ;; hooks
     (add-hook 'grep-setup-hook 'wgrep-setup))
 #+end_src
 *** consult
@@ -2714,17 +2769,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add #'register-preview :override #'consult-register-window))
 
   (with-eval-after-load 'xref
-    (setq xref-show-xrefs-function #'consult-xref)
-    (setq xref-show-definitions-function #'consult-xref))
+    (setopt xref-show-xrefs-function #'consult-xref)
+    (setopt xref-show-definitions-function #'consult-xref))
 #+end_src
 *** affe
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(affe-grep) "affe" nil t)
 
   (with-eval-after-load 'affe
-    (setq affe-highlight-function 'orderless-highlight-matches)
-    (setq affe-find-command "fd --color=never --full-path")
-    (setq affe-regexp-function 'orderless-pattern-compiler))
+    ;; config
+    (setopt affe-highlight-function 'orderless-highlight-matches)
+    (setopt affe-find-command "fd --color=never --full-path")
+    (setopt affe-regexp-function 'orderless-pattern-compiler))
 #+end_src
 *** compile-multi
 #+begin_src emacs-lisp :tangle yes
@@ -2758,7 +2814,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq vertico-count 8)
     (setq vertico-cycle t))
 #+end_src
-*** marginalia
+*** TODO marginalia
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode) "marginalia" nil t)
 
@@ -2773,7 +2829,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'minibuffer
     ;; config
-    (setq completion-styles '(orderless basic))
+    (setopt xcompletion-styles '(orderless basic))
+
     ;; (setq completion-category-overrides '((file (styles basic partial-completion))))
     (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
                                                       "Completion of multiple components, in any order.")))
@@ -2786,7 +2843,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'window-setup-hook #'exec-path-from-shell-initialize)
 
   (with-eval-after-load 'exec-path-from-shell
-    (setq exec-path-from-shell-variables '("PATH"
+    (setopt exec-path-from-shell-variables '("PATH"
                                              "GEM_HOME"
                                              "GOROOT"
                                              "GOPATH"
@@ -2860,19 +2917,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "M-[" #'tab-previous)
   (keymap-global-set "M-]" #'tab-next)
 
-  ;; rename tab-bar with projectile
-  (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
 
   (with-eval-after-load 'tab-bar
+    ;; rename tab-bar with projectile
+    (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
+
     ;; config
-    (setq tab-bar-close-button-show nil)
-    (setq tab-bar-close-last-tab-choice nil)
-    (setq tab-bar-close-tab-select 'left)
-    (setq tab-bar-history-mode nil)
-    (setq tab-bar-new-tab-choice "*scratch*")
-    (setq tab-bar-new-button-show nil)
-    (setq tab-bar-tab-name-truncated-max 12)
-    (setq tab-bar-separator " | ")
+    (setopt tab-bar-close-button-show nil)
+    (setopt tab-bar-close-last-tab-choice nil)
+    (setopt tab-bar-close-tab-select 'left)
+    (setopt tab-bar-history-mode nil)
+    (setopt tab-bar-new-tab-choice "*scratch*")
+    (setopt tab-bar-new-button-show nil)
+    (setopt tab-bar-tab-name-truncated-max 12)
+    (setopt tab-bar-separator " | ")
 
     ;; advice
     ;; close neotree when tab bar action
@@ -2894,7 +2952,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(auto-insert-mode) "autoinsert" nil t)
 
-  (add-hook 'window-setup-hook #'auto-insert-mode)
+  ;; (add-hook 'window-setup-hook #'auto-insert-mode)
 
   (with-eval-after-load 'autoinsert
     (setq auto-insert-directory "~/.emacs.d/auto-insert"))
@@ -2918,10 +2976,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
 
   (with-eval-after-load 'dashboard
-    (setq dashboard-startup-banner 'logo)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-startup-banner 4)
-    (setq dashboard-items '((recents . 10))))
+    (setopt dashboard-startup-banner 'logo)
+    (setopt dashboard-set-file-icons t)
+    (setopt dashboard-startup-banner 4)
+    (setopt dashboard-items '((recents . 10))))
 #+end_src
 *** dimmer
 #+begin_src emacs-lisp :tangle yes
@@ -2946,9 +3004,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'doom-themes
     ;; config
-    (setq doom-themes-padded-modeline t)
-    (setq doom-themes-enable-bold t)
-    (setq doom-themes-enable-italic t))
+    (setopt doom-themes-padded-modeline t)
+    (setopt doom-themes-enable-bold t)
+    (setopt doom-themes-enable-italic t))
 #+END_SRC
 *** doom-modeline
 #+begin_src emacs-lisp :tangle yes
@@ -3447,32 +3505,37 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        paredit-define-keys)
                      "paredit" nil t)
 
-  (keymap-global-set "C-c f" #'paredit-forward-slurp-sexp)
-  (keymap-global-set "M-s" #'paredit-splice-sexp)
-
   (with-eval-after-load 'paredit
+    ;; hooks
     (add-hook 'paredit-mode-hook #'paredit-define-keys))
 
   (with-eval-after-load 'lisp-mode
+    ;; hooks
     (add-hook 'lisp-mode-hook #'enable-paredit-mode)
     (add-hook 'lisp-data-mode-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'emacs-lisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'clojure-mode
+    ;; hooks
     (add-hook 'clojure-mode-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'lisp-interaction-mode
+    ;; hooks
     (add-hook 'lisp-interacton-mode-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'scheme
+    ;; hooks
     (add-hook 'scheme-mode-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'simple
+    ;; hooks
     (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode))
 
   (with-eval-after-load 'ielm
+    ;; hooks
     (add-hook 'inferior-emacs-lisp-mode-hook #'enable-paredit-mode))
 #+END_SRC
 *** rainbow-delimiter
@@ -3480,21 +3543,26 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(rainbow-delimiters-mode-enable) "rainbow-delimiters" nil t)
 
   (with-eval-after-load 'lisp-mode
+    ;; hooks
     (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode-enable))
 
   (with-eval-after-load 'emacs-lisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode-enable))
 
   (with-eval-after-load 'clojure-mode
+    ;; hooks
     (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode-enable))
 
   (with-eval-after-load 'scheme
+    ;; hooks
     (add-hook 'scheme-mode-hook #'rainbow-delimiters-mode-enable))
 #+END_SRC
 ** Common Lisp
 *** slime
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lisp-mode
+    ;; hooks
     (add-hook 'lisp-mode-hook
               #'(lambda ()
                   (require 'slime)
@@ -3512,9 +3580,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                           (-distinct (read (f-read-text "~/.slime-history.eld"))))))))))
 
   (with-eval-after-load 'slime
-    (setq slime-net-coding-system 'utf-8-unix))
+    ;; config
+    (setopt slime-net-coding-system 'utf-8-unix))
 
   (with-eval-after-load 'slime-repl
+    ;; keybinds
     (define-key slime-repl-mode-map (kbd "C-c C-r") #'my/slime-history))
 #+END_SRC
 *** hyperspec
@@ -3522,6 +3592,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(hyperspec-lookup) "hyperspec" nil t)
 
   (with-eval-after-load 'lisp-mode
+    ;; keybinds
     (define-key lisp-mode-map (kbd "C-c h") #'hyperspec-lookup))
 #+end_src
 ** Emacs Lisp
@@ -3530,6 +3601,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(eros-mode) "eros" nil t)
 
   (with-eval-after-load 'emacs-lisp
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'eros-mode))
 #+end_src
 *** eldoc
@@ -3537,10 +3609,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(turn-on-eldoc-mode) "eldoc" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode))
 
   (with-eval-after-load 'ielm
+    ;; hooks
     (add-hook 'ielm-mode-hook #'turn-on-eldoc-mode))
 #+end_src
 *** trinary
@@ -3560,6 +3634,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(macrostep-expand macrostep-mode) "macrostep" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; keybinds
     (define-key emacs-lisp-mode-map (kbd "C-c e") #'macrostep-expand))
 #+end_src
 *** elisp-slime-nav
@@ -3567,9 +3642,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(elisp-slime-nav-mode) "elisp-slime-nav" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'elisp-slime-nav-mode))
 
   (with-eval-after-load 'ielm
+    ;; hooks
     (add-hook 'ielm-mode-hook #'elisp-slime-nav-mode))
 #+END_SRC
 *** nameless
@@ -3577,9 +3654,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(nameless-mode) "nameless" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'nameless-mode))
 
   (with-eval-after-load 'ielm
+    ;; hooks
     (add-hook 'ielm-mode-hook #'nameless-mode))
 #+END_SRC
 *** elisp-refs
@@ -3595,6 +3674,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(highlight-quoted-mode) "highlight-quoted" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'highlight-quoted-mode))
 #+end_src
 *** highlight-defined
@@ -3602,6 +3682,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(highlight-defined-mode) "highlight-defined" nil t)
 
   (with-eval-after-load 'elisp-mode
+    ;; hooks
     (add-hook 'emacs-lisp-mode-hook #'highlight-defined-mode))
 #+end_src
 *** my/ielm-history
@@ -3638,13 +3719,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;; (add-hook 'before-save-hook #'cider-format-buffer t t)
 
   (with-eval-after-load 'cider-common
+    ;; config
     (setopt cider-special-mode-truncate-lines nil))
 
   (with-eval-after-load 'cider-mode
+    ;; config
     (setopt cider-font-lock-reader-conditionals nil)
     (setopt cider-font-lock-dynamically '(macro core function var)))
 
   (with-eval-after-load 'cider-repl
+    ;; config
     (setopt cider-repl-buffer-size-limit 1000000)
     (setopt cider-repl-wrap-history t)
     (setopt cider-repl-history-size 10000)
@@ -3652,14 +3736,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt cider-repl-display-in-current-window t))
 
   (with-eval-after-load 'nrepl-client
+    ;; config
     (setopt nrepl-use-ssh-fallback-for-remote-hosts t)
     (setopt nrepl-hide-special-buffers t))
 
   (with-eval-after-load 'cider-eval
+    ;; config
     (setopt cider-show-error-buffer nil)
     (setopt cider-auto-select-error-buffer nil))
 
   (with-eval-after-load 'clojure-mode
+    ;; keybinds
     (define-key clojure-mode-map (kbd "C-c h") #'cider-doc))
 #+END_SRC
 *** kibit-helper
@@ -3711,6 +3798,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        nodejs-repl-switch-to-repl) "nodejs-repl" nil t)
 
   (with-eval-after-load 'js2-mode
+    ;; keyinds
     (define-key js2-mode-map (kbd "C-x C-e") #'nodejs-repl-send-last-expression)
     (define-key js2-mode-map (kbd "C-c C-j") #'nodejs-repl-send-line)
     (define-key js2-mode-map (kbd "C-c C-r") #'nodejs-repl-send-region)
@@ -3723,12 +3811,15 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(js2-refactor-mode) "js2-refactor" nil t)
 
   (with-eval-after-load 'js2-refactor
+    ;; config
     (setopt js2r-use-strict t))
 
   (with-eval-after-load 'js2-mode
+    ;; hooks
     (add-hook 'js2-mode-hook #'js2-refactor-mode))
 
   (with-eval-after-load 'typescript-mode
+    ;; hooks
     (add-hook 'typescript-mode-hook #'js2-refactor-mode))
 #+END_SRC
 *** jest
@@ -3742,17 +3833,19 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        jest-minor-mode) "jest" nil t)
 
   (with-eval-after-load 'typescript-mode
-    ;; hook
+    ;; hooks
     (add-hook 'typescript-mode-hook #'jest-minor-mode)
 
     ;; config
     (setopt jest-executable "npx jest"))
 
-  (with-eval-after-load 'projectile
-    (projectile-register-project-type 'npx '("package.json" "yarn.lock")
-                                      :project-file "package.json"
-                                      :test "npx jest"
-                                      :test-suffix ".spec"))
+  (with-eval-after-load 'typescript-mode
+    (add-hook 'typescript-mode-hook
+              #'(lambda ()
+                  (projectile-register-project-type 'npx '("package.json" "yarn.lock")
+                                                    :project-file "package.json"
+                                                    :test "npx jest"
+                                                    :test-suffix ".spec"))))
 #+end_src
 ** Ruby
 *** robe
@@ -3767,7 +3860,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt rubocop-keymap-prefix "C-c C-x")
 
-    ;; hook
+    ;; hooks
     (add-hook 'ruby-mode-hook #'rubocop-mode))
 #+end_src
 *** ruby-refactor
@@ -3775,6 +3868,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(ruby-refactor-mode-launch) "ruby-refactor" nil t)
 
   (with-eval-after-load 'ruby-mode
+    ;; hooks
     (add-hook 'ruby-mode-hook #'ruby-refactor-mode-launch))
 #+END_SRC
 *** inf-ruby
@@ -3792,6 +3886,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (mapcar #'list (-distinct (s-lines (f-read-text "~/.irb_history"))))))))
 
   (with-eval-after-load 'ruby-mode
+    ;; hooks
     (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
 #+END_SRC
 *** yard-mode
@@ -3799,6 +3894,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(yard-mode) "yard-mode" nil t)
 
   (with-eval-after-load 'ruby-mode
+    ;; hooks
     (add-hook 'ruby-mode-hook #'yard-mode))
 #+end_src
 ** SQL
@@ -3807,6 +3903,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(sqlind-setup sqlind-minor-mode) "sql-indent" nil t)
 
   (with-eval-after-load 'sql
+    ;; hooks
     (add-hook 'sql-mode-hook #'sqlind-setup)
     (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 #+END_SRC
@@ -3824,6 +3921,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(psysh psysh-doc) "psysh" nil t)
 
   (with-eval-after-load 'php-mode
+    ;; keybinds
     (define-key php-mode-map (kbd "C-c h") #'psysh-doc))
 #+end_src
 *** laravel-tinker-repl
@@ -3847,12 +3945,15 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (require 'flycheck-phpstan))
 
   (with-eval-after-load 'php-mode
+    ;; hooks
     (add-hook 'php-mode-hook #'my/flycheck-phpstan-setup))
 
   (with-eval-after-load 'php-ts-mode
+    ;; hooks
     (add-hook 'php-ts-mode-hook #'my/flycheck-phpstan-setup))
 
   (with-eval-after-load 'phpstan
+    ;; config
     (setopt phpstan-memory-limit "4G"))
 #+end_src
 *** phpunit
@@ -3874,6 +3975,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(markdown-preview-open-browser markdown-preview-mode) "markdown-preview-mode" nil t)
 
   (with-eval-after-load 'markdown-preview-mode
+    ;; config
     (setopt markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
 #+end_src
 ** Fish
@@ -3887,6 +3989,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(hindent-mode) "hindent" nil t)
 
   (with-eval-after-load 'haskell-mode
+    ;; hooks
     (add-hook 'haskell-mode-hook #'hindent-mode))
 #+end_src
 ** Web
@@ -3895,28 +3998,35 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(emmet-mode) "emmet-mode" nil t)
 
   (with-eval-after-load 'html-mode
+    ;; hooks
     (add-hook 'html-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'web-mode
+    ;; hooks
     (add-hook 'web-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'css-mode
+    ;; hooks
     (add-hook 'css-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'nxml-mode
+    ;; hooks
     (add-hook 'nxml-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'web-php-blade-mode
+    ;; hooks
     (add-hook 'web-php-blade-mode #'emmet-mode))
 
   (with-eval-after-load 'typescript-mode
+    ;; hooks
     (add-hook 'typescript-tsx-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'vue-mode
+    ;; hooks
     (add-hook 'vue-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'emmet-mode
-    ;; keybind
+    ;; keybinds
     (define-key emmet-mode-keymap (kbd "C-j") nil)
     (define-key emmet-mode-keymap (kbd "M-j") #'emmet-expand-line)
 
@@ -3930,6 +4040,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(jq-interactively) "jq-mode" nil t)
 
   (with-eval-after-load 'json-mode
+    ;; keybinds
     (define-key json-mode-map (kbd "C-c C-j") #'jq-interactively))
 #+end_src
 *** json-reformat
@@ -4015,11 +4126,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; startup
     (setopt org-startup-folded 'show3levels)
     (setopt org-startup-truncated nil)
-    (setopt org-src-window-setup 'current-window)
-
-    ;; archive
-    (advice-add 'org-archive-subtree :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
-    (advice-add 'org-archive-subtree :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode)))
 
     (defvar my/org-agenda-files `(,(concat org-directory "/agenda")
                                   ,(concat org-directory "/archive/2023")
@@ -4027,8 +4133,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     (setopt org-agenda-files my/org-agenda-files)
     (setopt org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
-                                         (format-time-string "%Y" (current-time))
-                                         (format-time-string "%Y-%m-%d" (current-time))))
+                                           (format-time-string "%Y" (current-time))
+                                           (format-time-string "%Y-%m-%d" (current-time))))
 
     ;; log
     (setopt org-log-into-drawer t)
@@ -4037,14 +4143,25 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (defun my/update-org-agenda-files ()
       (interactive)
       (setopt org-agenda-files my/org-agenda-files)))
+
+  (with-eval-after-load 'org-src
+    ;; config
+    (setopt org-src-window-setup 'current-window))
+
+  (with-eval-after-load 'org-archive
+    ;; archive
+    (advice-add 'org-archive-subtree :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
+    (advice-add 'org-archive-subtree :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
 #+END_SRC
 *** org-clock
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'org-clock
-    ;; hooks
-    (add-hook 'org-mode-hook #'org-clock-load)
-    (add-hook 'kill-emacs-hook #'org-clock-save)
+  (add-hook 'kill-emacs-hook #'org-clock-save)
 
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'org-clock-load))
+
+  (with-eval-after-load 'org-clock
     ;; config
     (setopt org-clock-out-remove-zero-time-clocks t)
     (setopt org-clock-clocked-in-display 'mode-line))
@@ -4057,9 +4174,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** org-keys
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-keys
+    ;; config
     (setopt org-use-extra-keys t)
     (setopt org-use-speed-commands t)
 
+    ;; keybind
     (add-to-list 'org-speed-commands '("d" org-todo "DONE"))
     ;; (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading))
     )
@@ -4067,13 +4186,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** org-capture
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-capture) "org-capture" nil t)
-  (keymap-global-set "C-c c" #'org-capture)
-
-  (add-hook 'window-setup-hook #'(lambda ()
-                                   (advice-add 'org-capture :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
-                                   (advice-add 'org-capture :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode)))))
 
   (with-eval-after-load 'org-capture
+    ;; advice
+    (advice-add 'org-capture :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
+    (advice-add 'org-capture :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode)))
+
+    ;; config
     (setopt org-capture-use-agenda-date t)
     (setopt org-capture-bookmark nil)
     (setopt org-capture-templates `(("t" "Todo" entry (file ,(expand-file-name "todo.org" org-directory))
@@ -4086,13 +4205,15 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** org-duration
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-duration
-   (setopt org-duration-format (quote h:mm)))
+    ;; config
+    (setopt org-duration-format (quote h:mm)))
 #+end_src
 *** org-id
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-id-store-link) "org-id" nil t)
 
   (with-eval-after-load 'org-id
+    ;; config
     (setopt org-id-locations-file (expand-file-name ".org-id-locations" org-directory))
     (setopt org-id-extra-files (append org-agenda-text-search-extra-files)))
 #+end_src
@@ -4100,9 +4221,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-encrypt-entry org-decrypt-entry org-crypt-use-before-save-magic) "org-crypt" nil t)
 
-  (add-hook 'window-setup-hook #'org-crypt-use-before-save-magic)
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'org-crypt-use-before-save-magic))
 
   (with-eval-after-load 'org-crypt
+    ;; config
     (setopt org-crypt-key nil)
     (setopt org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
@@ -4110,7 +4234,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orgtbl-mode org-table-begin org-table-end) "org-table" nil t)
 
-  (with-eval-after-load 'org
+  (with-eval-after-load 'org-table
     (defun my/org-table-align-markdown ()
       "Replace \"+\" sign with \"|\" in org-table."
       (when (member major-mode '(markdown-mode))
@@ -4120,11 +4244,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
             (goto-char (point-min))
             (while (search-forward "-+-" nil t)
               (replace-match "-|-"))))))
+
     (advice-add 'org-table-align :before #'my/org-table-align-markdown))
 #+end_src
 *** org-journal
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-journal
+    ;; config
     (setopt org-journal-dir (expand-file-name "journal" org-directory))
     (setopt org-journal-start-on-weekday 7)
     (setopt org-journal-prefix-key "C-c j"))
@@ -4151,8 +4277,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-projectile-project-todo-completing-read)
                      "org-projectile" nil t)
 
-  (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
-
   (with-eval-after-load 'org
     (setopt org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
 #+end_src
@@ -4172,6 +4296,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** org-faces
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-faces
+    ;; config
     (setopt org-link '(t (:foreground "#ebe087" :underline t))))
 #+end_src
 *** org-superstar
@@ -4179,9 +4304,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(org-superstar-mode) "org-superstar")
 
   (with-eval-after-load 'org
+    ;; hooks
     (add-hook 'org-mode-hook #'org-superstar-mode))
 
   (with-eval-after-load 'org-superstar
+    ;; config
     (setopt org-superstar-headline-bullets-list '("◉" "○" "✸" "✿"))
     (setopt org-superstar-leading-bullet " "))
 #+end_src
@@ -4191,7 +4318,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(toc-org-mode) "toc-org" nil t)
 
   (with-eval-after-load 'org
-    ;; hook
+    ;; hooks
     (add-hook 'org-mode-hook #'toc-org-mode))
 #+end_src
 ** Presentation
@@ -4200,6 +4327,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(org-tree-slide-mode org-tree-slide-skip-done-toggle) "org-tree-slide" nil t)
 
   (with-eval-after-load 'org-tree-slide
+    ;; config
     (setopt org-tree-slide-skip-outline-level 4))
 #+end_src
 ** Org Link
@@ -4207,9 +4335,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-store-link) "ol" nil t)
 
-  (keymap-global-set "C-c l" #'org-store-link)
-
   (with-eval-after-load 'ol
+    ;; config
     (setopt org-link-file-path-type 'relative))
 #+end_src
 *** TODO org-link-beautify
@@ -4246,9 +4373,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-agenda) "org-agenda" nil t)
 
-  (keymap-global-set "C-c a" #'org-agenda)
-
   (with-eval-after-load 'org-agenda
+    ;; config
     (setopt org-agenda-span 'day)
     (setopt org-agenda-start-on-weekday 1)
     (setopt org-agenda-todo-ignore-with-date t))
@@ -4257,9 +4383,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-super-agenda-mode) "org-super-agenda" nil t)
 
-  (add-hook 'window-setup-hook #'org-super-agenda-mode)
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'org-super-agenda-mode))
 
   (with-eval-after-load 'org-super-agenda
+    ;; config
     (setopt org-super-agenda-groups '((:log t)
                                       (:auto-group t)
                                       (:name "Today List..." :scheduled today)
@@ -4285,6 +4413,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(org-redmine-get-issue) "org-redmine" nil t)
 
   (with-eval-after-load 'org-redmine
+    ;; config
     (setopt org-redmine-template-header "[#%i%] %s%")
     (setopt org-redmine-template-property '(("project_name" . "%p_n%"))))
 #+end_src
@@ -4296,7 +4425,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (add-to-list 'org-structure-template-alist '("A" . "ai"))
 
-    ;; hook
+    ;; hooks
     (add-hook 'org-mode-hook #'org-ai-mode))
 
   (with-eval-after-load 'org-ai
@@ -4308,34 +4437,36 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-do-load-languages) "org" nil t)
 
-  (add-hook 'window-setup-hook
-            #'(lambda ()
-                (org-babel-do-load-languages 'org-babel-load-languages
-                                             '((awk . t)
-                                               (C . t)
-                                               (R . t)
-                                               (clojure . t)
-                                               (emacs-lisp . t)
-                                               (haskell . t)
-                                               (java . t)
-                                               (js . t)
-                                               (lisp . t)
-                                               (makefile . t)
-                                               (perl . t)
-                                               (plantuml . t)
-                                               (python . t)
-                                               (ruby . t)
-                                               (scheme . t)
-                                               (shell . t)
-                                               (sql . t)
-                                               (shell . t)))))
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook
+              #'(lambda ()
+                  (org-babel-do-load-languages 'org-babel-load-languages
+                                               '((awk . t)
+                                                 (C . t)
+                                                 (R . t)
+                                                 (clojure . t)
+                                                 (emacs-lisp . t)
+                                                 (haskell . t)
+                                                 (java . t)
+                                                 (js . t)
+                                                 (lisp . t)
+                                                 (makefile . t)
+                                                 (perl . t)
+                                                 (plantuml . t)
+                                                 (python . t)
+                                                 (ruby . t)
+                                                 (scheme . t)
+                                                 (shell . t)
+                                                 (sql . t)
+                                                 (shell . t))))))
 
   (with-eval-after-load 'ob-core
+    ;; config
     (setopt org-confirm-babel-evaluate nil)
-
     (add-to-list 'org-babel-default-header-args '(:results . "output")))
 
   (with-eval-after-load 'ob-eval
+    ;; advice
     (advice-add #'org-babel-eval-error-notify
                 :around #'(lambda (old-func &rest args)
                             (when (not (string= (nth 1 args)
@@ -4486,6 +4617,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** ox-html
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ox-html
+    ;; config
     (setopt org-html-head-include-default-style nil)
     (setopt org-html-head-include-scripts nil)
     (setopt org-html-doctype "html5")
@@ -4525,6 +4657,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-hugo-debug-info) "ox-hugo" nil t)
 
   (with-eval-after-load 'ox-hugo
+    ;; config
     (setopt org-hugo-auto-set-lastmod t))
 #+end_src
 ** Org Roam
@@ -4532,24 +4665,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-graph) "org-roam" nil t)
 
-  (keymap-global-set "C-c n g" #'org-roam-graph)
-
   (with-eval-after-load 'org-roam
+    ;; config
     (setopt org-roam-directory `,(concat (s-trim-right (shell-command-to-string "ghq root"))
                                          "/github.com/takeokunn/blog")))
 #+end_src
 *** org-roam-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-buffer-toggle) "org-roam-mode" nil t)
-
-  (keymap-global-set "C-c n l" #'org-roam-buffer-toggle)
 #+end_src
 *** org-roam-node
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-node-find org-roam-node-insert) "org-roam-node" nil t)
-
-  (keymap-global-set "C-c n f" #'org-roam-node-find)
-  (keymap-global-set "C-c n i" #'org-roam-node-insert)
 
   (with-eval-after-load 'org-roam-node
     (setopt org-roam-completion-everywhere nil))
@@ -4558,19 +4685,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-db-autosync-enable) "org-roam-db" nil t)
 
-  (add-hook 'window-setup-hook #'org-roam-db-autosync-enable)
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'org-roam-db-autosync-enable))
 
   (with-eval-after-load 'org-roam-db
-    (setq org-roam-database-connector 'sqlite)
-    (setq org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
+    ;; config
+    (setopt org-roam-database-connector 'sqlite)
+    (setopt org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
 #+end_src
 *** org-roam-capture
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-capture) "org-roam-capture" nil t)
 
-  (keymap-global-set "C-c n c" #'org-roam-capture)
-
   (with-eval-after-load 'org-roam-capture
+    ;; config
     (setopt org-roam-capture-templates '(("f" "Fleeting(一時メモ)" plain "%?"
                                           :target (file+head "org/fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
@@ -4606,9 +4734,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-roam-dailies-capture-date
                        org-roam-dailies-find-directory) "org-roam-dailies" nil t)
 
-  (keymap-global-set "C-c n d" #'org-roam-dailies-map)
-  (keymap-global-set "C-c n j" #'org-roam-dailies-goto-today)
-
   (with-eval-after-load 'org-roam-dailies
     ;; config
     (setopt org-roam-dailies-directory "org/daily/")
@@ -4628,9 +4753,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-export--org-html--reference) "org-roam-export" nil t)
 
-  (add-hook 'window-setup-hook
-            #'(lambda ()
-                (advice-add 'org-html--reference :override #'org-roam-export--org-html--reference)))
+  (with-eval-after-load 'ox-html
+    (advice-add 'org-html--reference :override #'org-roam-export--org-html--reference))
 #+end_src
 *** org-roam-graph
 #+begin_src emacs-lisp :tangle yes
@@ -4659,16 +4783,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-org-roam-mode) "consult-org-roam" nil t)
 
-  (add-hook 'window-setup-hook #'consult-org-roam-mode)
-
-  ;; keybinds
-  (keymap-global-set "C-c n e" #'consult-org-roam-file-find)
-  (keymap-global-set "C-c n b" #'consult-org-roam-backlinks)
-  (keymap-global-set "C-c n B" #'consult-org-roam-backlinks-recursive)
-  (keymap-global-set "C-c n l" #'consult-org-roam-forward-links)
-  (keymap-global-set "C-c n r" #'consult-org-roam-search)
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'consult-org-roam-mode))
 
   (with-eval-after-load 'consult-org-roam
+    ;; config
     (setopt consult-org-roam-grep-func #'consult-ripgrep)
     (setopt consult-org-roam-buffer-narrow-key ?r)
     (setopt consult-org-roam-buffer-after-buffers t))
@@ -4678,9 +4798,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(org-roam-ui-mode) "org-roam-ui" nil t)
 
   (with-eval-after-load 'org-roam-mode
+    ;; hooks
     (add-hook 'org-roam-mode-hook #'org-roam-ui-mode))
 
   (with-eval-after-load 'org-roam-ui
+    ;; config
     (setopt org-roam-ui-sync-theme t)
     (setopt org-roam-ui-follow t)
     (setopt org-roam-ui-update-on-save t)
@@ -4691,16 +4813,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(org-roam-timestamps-mode) "org-roam-timestamps" nil t)
 
   (with-eval-after-load 'org-roam-mode
+    ;; hooks
     (add-hook 'org-roam-mode #'org-roam-timestamps-mode))
 
   (with-eval-after-load 'org-roam-timestamps
+    ;; config
     (setopt org-roam-timestamps-remember-timestamps nil))
 #+end_src
 *** org-roam-search-node-insert
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '() "org-roam-search-node-insert" nil t)
 #+end_src
-*** org-roam-ql
+*** TODO org-roam-ql
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(org-roam-ql-nodes
   ;;                      org-roam-ql-search
@@ -4774,6 +4898,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(make-llm-ollama) "llm-ollama" nil t)
 
   (with-eval-after-load 'llm
+    ;; config
     (setopt llm-warn-on-nonfree nil))
 #+end_src
 ** ellama
@@ -5000,6 +5125,22 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
      (format-time-string "%Y-%m-%d %a" (current-time))))
 
   (defalias 'today 'my/today)
+#+end_src
+** my/subword
+#+begin_src emacs-lisp :tangle yes
+  (defun my/delete-forward-block ()
+    (interactive)
+    (if (eobp)
+        (message "End of buffer")
+      (let* ((syntax-move-point
+              (save-excursion
+                (skip-syntax-forward (string (char-syntax (char-after))))
+                (point)))
+             (subword-move-point
+              (save-excursion
+                (subword-forward)
+                (point))))
+        (kill-region (point) (min syntax-move-point subword-move-point)))))
 #+end_src
 * Footer
 ** Magic File Name を有効にする
