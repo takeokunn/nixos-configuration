@@ -1496,6 +1496,9 @@
   (autoload-if-found '(dimmer-mode) "dimmer" nil t)
 
   (add-hook 'window-setup-hook #'dimmer-mode)
+
+  (with-eval-after-load 'dimmer
+    (setq dimmer-fraction 0.1))
 #+end_src
 ** Doom
 *** doom-themes
@@ -1598,11 +1601,9 @@
 ** topsy
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(topsy-mode) "topsy" nil t)
-  ;; (with-eval-after-load 'prog-mode
-  ;;   (add-hook 'prog-mode-hook #'topsy-mode))
 
-  ;; (with-eval-after-load 'lsp-ui-mode
-  ;;   (add-hook 'lsp-ui-mode-hook #'(lambda () (topsy-mode -1))))
+  (with-eval-after-load 'yaml-mode
+    (add-hook 'yaml-mode-hook #'topsy-mode))
 #+end_src
 ** idle-highlight-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1707,6 +1708,9 @@
 *** TODO flycheck-cfn
 #+begin_src emacs-lisp
   ;; (autoload-if-found '(flycheck-cfn-setup) "flycheck-cfn" nil t)
+#+end_src
+*** TODO flycheck-phpstan
+#+begin_src emacs-lisp
 #+end_src
 ** Completion
 *** corfu
@@ -3238,19 +3242,13 @@
 #+end_src
 *** vertico
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(vertico-mode) "vertico" nil t)
-  (autoload-if-found '(vertico-directory-tidy
-                       vertico-directory-enter
-                       vertico-directory-delete-char
-                       vertico-directory-delete-word) "vertico-directory" nil t)
+  (autoload-if-found '(vertico-mode) "vertico-autoloads" nil t)
   (autoload-if-found '(vertico-flat-mode) "vertico-flat" nil t)
 
   (add-hook 'window-setup-hook #'vertico-mode)
 
-  (with-eval-after-load 'rfn-eshadow
-    (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
-
   (with-eval-after-load 'vertico
+    ;; config
     (setq vertico-count 8)
     (setq vertico-cycle t))
 #+end_src
@@ -3924,18 +3922,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** phpstan
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(phpstan-analyze-file phpstan-analyze-this-file) "phpstan" nil t)
-
-  (defun my/flycheck-phpstan-setup ()
-    "Setup Flycheck with PHPStan."
-    (require 'flycheck-phpstan))
-
-  (with-eval-after-load 'php-mode
-    ;; hooks
-    (add-hook 'php-mode-hook #'my/flycheck-phpstan-setup))
-
-  (with-eval-after-load 'php-ts-mode
-    ;; hooks
-    (add-hook 'php-ts-mode-hook #'my/flycheck-phpstan-setup))
 
   (with-eval-after-load 'phpstan
     ;; config

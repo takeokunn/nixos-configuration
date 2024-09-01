@@ -23,6 +23,8 @@ in with epkgs; [
   flycheck
   flycheck-elsa
   flycheck-projectile
+  flycheck-cfn
+  flycheck-phpstan
 
   # Client
   md4rd
