@@ -3,7 +3,7 @@
 
   programs.wezterm = {
     enable = true;
-    # package = wezterm-flake.packages.${pkgs.system}.default;
+    package = wezterm-flake.packages.${pkgs.system}.default;
     extraConfig = ''
       local wezterm = require("wezterm")
 
