@@ -11,6 +11,7 @@ in {
       tangle (builtins.readFile ../../packages/emacs/elisp/init.org);
     ".config/emacs/early-init.el".text =
       tangle (builtins.readFile ../../packages/emacs/elisp/early-init.org);
+    ".config/emacs/yasnippet.org".source = ../../packages/emacs/yasnippet.org;
   };
 
   home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs ];

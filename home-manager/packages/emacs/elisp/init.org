@@ -18,17 +18,11 @@
 - [[./early-init][early-init.org]]
 - [[./yasnippets][yasnippets.org]]
 - [[./elfeed][elfeed.org]]
-* Initialize
-** Header
+* Header
 #+begin_src emacs-lisp :tangle yes
   ;; init.el --- My init.el -*- lexical-binding: t -*-
   ;; Configurations for Emacs
   ;;                                         Takeo Obara  <bararararatty@gmail.com>
-#+end_src
-** env
-#+begin_src emacs-lisp :tangle yes
-  (defconst my/enable-profile nil
-    "If true, enable profile")
 #+end_src
 * Macro Utilities
 ** when-darwin
@@ -52,6 +46,9 @@
 #+end_src
 ** profile
 #+begin_src emacs-lisp :tangle yes
+  (defconst my/enable-profile nil
+    "If true, enable profile")
+
   (when my/enable-profile
     (require 'profiler)
     (profiler-start 'cpu))
@@ -59,6 +56,7 @@
 ** Magic File Name を一時的に無効にする
 #+begin_src emacs-lisp :tangle yes
   (defconst my/saved-file-name-handler-alist file-name-handler-alist)
+
   (setq file-name-handler-alist nil)
 #+end_src
 ** 起動時間計測
@@ -92,11 +90,11 @@
 #+end_src
 ** autoload-if-found
 #+begin_src emacs-lisp :tangle yes
-  (defmacro autoload-if-found (functions file &optional docstring interactive type)
+  (defun autoload-if-found (functions file &optional docstring interactive type)
     "Set autoload iff FILE has found."
     (when (locate-library file)
-      `(dolist (f ,functions)
-         (autoload f ,file ,docstring ,interactive ,type))))
+      (dolist (f functions)
+        (autoload f file docstring interactive type))))
 #+end_src
 * Basic
 ** 末尾のスペースを可視化する
@@ -113,15 +111,17 @@
   (with-eval-after-load 'minibuffer
     (add-hook 'minibuffer-inactive-mode-hook #'my/disable-show-trailing-whitespace))
 
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'my/disable-show-trailing-whitespace))
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hook #'my/disable-show-trailing-whitespace))
+
+  (with-eval-after-load 'text-mode
+    (add-hook 'text-mode-hook #'my/disable-show-trailing-whitespace))
 #+END_SRC
 ** 行番号を表示する
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-display-line-numbers-mode) "display-line-numbers" nil t)
 
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'global-display-line-numbers-mode))
+  (add-hook 'window-setup-hook #'global-display-line-numbers-mode)
 
   (with-eval-after-load 'display-line-numbers
     (setq display-line-numbers-grow-only t))
@@ -135,16 +135,16 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(show-paren-mode) "display-line-numbers" nil t)
 
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'show-paren-mode))
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hook #'show-paren-mode))
 
   (with-eval-after-load 'paren
     (setq show-paren-style 'mixed))
 #+END_SRC
 ** カッコが自動的に作られるようにする
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'electric-pair-mode))
+  (add-hook 'emacs-startup-hook #'electric-pair-mode)
+
 #+END_SRC
 ** coding system
 #+begin_src emacs-lisp :tangle yes
@@ -166,8 +166,7 @@
 #+end_src
 ** global-auto-revert-mode
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'global-auto-revert-mode))
+  (add-hook 'emacs-startup-hook #'global-auto-revert-mode)
 #+end_src
 ** yes/no to y/n
 #+begin_src emacs-lisp :tangle yes
@@ -257,6 +256,8 @@
     (define-key minibuffer-mode-map (kbd "M-h") #'backward-kill-word)
     (define-key minibuffer-mode-map (kbd "C-j") #'exit-minibuffer)
     (define-key minibuffer-mode-map (kbd "M-RET") #'exit-minibuffer))
+
+  (setq enable-recursive-minibuffers t)
 #+end_src
 ** savehistを有効にする
 #+begin_src emacs-lisp :tangle yes
@@ -277,16 +278,16 @@
    (setq interprogram-cut-function #'my/paste-to-osx)
    (setq interprogram-paste-function #'my/copy-from-osx))
 #+end_src
-** pluginをnative compする
+** native comp
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'comp-run
+    ;; config
     (setq native-comp-async-jobs-number 8)
     (setq native-comp-speed 3)
     (setq native-comp-always-compile t))
-#+end_src
-** native compのwarningを抑える
-#+begin_src emacs-lisp :tangle yes
+
   (with-eval-after-load 'warnings
+    ;; config
     (setq warning-suppress-types '((comp))))
 #+end_src
 ** 同一bufferの名前を変える
@@ -308,237 +309,18 @@
   (with-eval-after-load 'time
     (setq display-time-24hr-format t))
 #+end_src
-** warning
+** warning level
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'warnings
     (setq warning-minimum-level :error))
-#+end_src
-** fontset
-#+begin_src emacs-lisp :tangle yes
-  (defconst my/enable-warning-log nil)
-
-  (defun set-fontset-font:around (set-fontset-font name target font-spec &optional frame add)
-    "Warn if specified font is not installed."
-    (if (stringp font-spec)
-        (setq font-spec (font-spec :family font-spec)))
-    (if (and (fontp font-spec)
-             (null (find-font font-spec))
-             my/enable-warning-log)
-        (warn "set-fontset-font: font %s is not found." (font-get font-spec :family))
-      (ignore-errors
-        (funcall set-fontset-font name target font-spec frame add))))
-
-  ;; reset all settings in default fontset
-  (add-hook 'window-setup-hook
-            #'(lambda ()
-                (advice-add 'set-fontset-font :around #'set-fontset-font:around)
-
-                (when (functionp 'set-fontset-font)
-                  (if (find-font (font-spec :family "Noto Sans"))
-                      (set-fontset-font t '(0 . #x3fffff) "Noto Sans"))
-
-                  ;; multiple platform
-                  (set-fontset-font t 'latin "Noto Sans")
-                  (set-fontset-font t 'greek "Noto Sans")
-                  (set-fontset-font t 'phonetic "Noto Sans")
-                  (set-fontset-font t 'coptic "Noto Sans Coptic")
-                  (set-fontset-font t 'coptic "Noto Sans Symbols2" nil 'append)
-                  (set-fontset-font t 'cyrillic "Noto Sans")
-                  (set-fontset-font t 'armenian "Noto Sans Armenian")
-                  (set-fontset-font t 'hebrew "Noto Sans Hebrew")
-                  (set-fontset-font t 'arabic "Noto Sans Arabic")
-                  (set-fontset-font t 'syriac "Noto Sans Syriac")
-                  (set-fontset-font t 'thaana "Noto Sans Thaana")
-                  (set-fontset-font t 'nko "Noto Sans N'Ko")
-                  (set-fontset-font t 'samaritan "Noto Sans Samaritan")
-                  (set-fontset-font t 'mandaic "Noto Sans Mandaic")
-                  (set-fontset-font t 'devanagari "Noto Sans Devanagari")
-                  (set-fontset-font t 'bengali "Noto Sans Bengali")
-                  (set-fontset-font t 'gurmukhi "Noto Sans Gurmukhi")
-                  (set-fontset-font t 'gujarati "Noto Sans Gujanrati")
-                  (set-fontset-font t 'oriya "Noto Sans Oriya")
-                  (set-fontset-font t 'tamil "Noto Sans Tamil")
-                  (set-fontset-font t 'tamil "Noto Sans Tamil Supplement" nil 'append)
-                  (set-fontset-font t 'telugu "Noto Sans Telugu")
-                  (set-fontset-font t 'kannada "Noto Sans Kannada")
-                  (set-fontset-font t 'malayalam "Noto Sans Malayalam")
-                  (set-fontset-font t 'sinhala "Noto Sans Sinhala")
-                  (set-fontset-font t 'thai "Noto Sans Thai")
-                  (set-fontset-font t 'lao "Noto Sans Lao")
-                  (set-fontset-font t 'tibetan "Noto Sans Tibetan")
-                  (set-fontset-font t 'burmese "Noto Sans Myanmar")
-                  (set-fontset-font t 'georgian "Noto Sans Georgian")
-                  (set-fontset-font t 'hangul "Noto Sans CJK KR")
-                  (set-fontset-font t 'ethiopic "Noto Sans Ethiopic")
-                  (set-fontset-font t 'cherokee "Noto Sans Cherokee")
-                  (set-fontset-font t 'canadian-aboriginal "Noto Sans Canadian Aboriginal")
-                  (set-fontset-font t 'ogham "Noto Sans Ogham")
-                  (set-fontset-font t 'runic "Noto Sans Runic")
-                  (set-fontset-font t 'tagalog "Noto Sans Tagalog")
-                  (set-fontset-font t 'hanunoo "Noto Sans Hanunoo")
-                  (set-fontset-font t 'buhid "Noto Sans Buhid")
-                  (set-fontset-font t 'tagbanwa "Noto Sans Tagbanwa")
-                  (set-fontset-font t 'khmer "Noto Sans Khmer")
-                  (set-fontset-font t 'mongolian "Noto Sans Mongolian")
-                  (set-fontset-font t 'limbu "Noto Sans Limbu")
-                  (set-fontset-font t 'tai-le "Noto Sans Tai Le")
-                  (set-fontset-font t 'tai-lue "Noto Sans NewTaiLue")
-                  (set-fontset-font t 'buginese "Noto Sans Buginese")
-                  (set-fontset-font t 'tai-tham "Noto Sans Tai Tham")
-                  (set-fontset-font t 'balinese "Noto Sans Balinese")
-                  (set-fontset-font t 'sundanese "Noto Sans Sundanese")
-                  (set-fontset-font t 'vedic "Noto Sans Devanagari")
-                  (set-fontset-font t 'symbol "Noto Sans CJK JP")
-                  (set-fontset-font t 'symbol "Noto Sans Symbols2" nil 'append)
-                  (set-fontset-font t 'symbol "Noto Sans" nil 'append)
-                  (set-fontset-font t 'symbol "Noto Sans Math" nil 'append)
-                  (set-fontset-font t 'symbol "Noto Emoji" nil 'append)
-                  (set-fontset-font t 'symbol "Noto Sans Symbols" nil 'append)
-                  (set-fontset-font t 'braille "Noto Sans Symbols2")
-                  (set-fontset-font t 'batak "Noto Sans Batak")
-                  (set-fontset-font t 'lepcha "Noto Sans Lepcha")
-                  (set-fontset-font t 'ol-chiki "Noto Sans Ol Chiki")
-                  (set-fontset-font t 'glagolitic "Noto Sans Glagolitic")
-                  (set-fontset-font t 'tifinagh "Noto Sans Tifinagh")
-                  (set-fontset-font t 'han "Noto Sans CJK JP")
-                  (set-fontset-font t 'ideographic-description "Noto Sans CJK JP")
-                  (set-fontset-font t 'cjk-misc "Noto Sans CJK JP")
-                  (set-fontset-font t 'kana "Noto Sans CJK JP")
-                  (set-fontset-font t 'bopomofo "Noto Sans CJK TC")
-                  (set-fontset-font t 'kanbun "Noto Sans CJK JP")
-                  (set-fontset-font t 'yi "Noto Sans Yi")
-                  (set-fontset-font t 'lisu "Noto Sans Lisu")
-                  (set-fontset-font t 'vai "Noto Sans Vai")
-                  (set-fontset-font t 'bamum "Noto Sans Bamum")
-                  (set-fontset-font t 'syloti-nagri "Noto Sans Syloti Nagri")
-                  (set-fontset-font t 'north-indic-number "Noto Sans Devanagari")
-                  (set-fontset-font t 'phags-pa "Noto Sans Phags Pa")
-                  (set-fontset-font t 'saurashtra "Noto Sans Saurashtra")
-                  (set-fontset-font t 'kayah-li "Noto Sans Kayah Li")
-                  (set-fontset-font t 'rejang "Noto Sans Rejang")
-                  (set-fontset-font t 'javanese "Noto Sans Javanese")
-                  (set-fontset-font t 'cham "Noto Sans Cham")
-                  (set-fontset-font t 'tai-viet "Noto Sans Tai Viet")
-                  (set-fontset-font t 'meetei-mayek "Noto Sans Meetei Mayek")
-                  (set-fontset-font t 'vertical-form "Noto Sans CJK JP")
-                  (set-fontset-font t '(#xfe50 . #xfe6b) "Noto Sans CJK JP") ; symbol
-                  (set-fontset-font t '(#xfff9 . #xfffb) "Noto Sans Symbols2") ; nil
-                  (set-fontset-font t 'linear-b "Noto Sans Linear B")
-                  (set-fontset-font t 'aegean-number "Noto Sans Linear B")
-                  (set-fontset-font t 'ancient-greek-number "Noto Sans Symbols2")
-                  (set-fontset-font t 'ancient-symbol "Noto Sans Symbols2")
-                  (set-fontset-font t 'phaistos-disc "Noto Sans Symbols2")
-                  (set-fontset-font t 'lycian "Noto Sans Lycian")
-                  (set-fontset-font t 'carian "Noto Sans Carian")
-                  (set-fontset-font t 'old-italic "Noto Sans Old Italic")
-                  (set-fontset-font t 'gothic "Noto Sans Gothic")
-                  (set-fontset-font t 'old-permic "Noto Sans Old Permic")
-                  (set-fontset-font t 'ugaritic "Noto Sans Ugaritic")
-                  (set-fontset-font t 'old-persian "Noto Sans OldPersian")
-                  (set-fontset-font t 'deseret "Noto Sans Deseret")
-                  (set-fontset-font t 'shavian "Noto Sans Shavian")
-                  (set-fontset-font t 'osmanya "Noto Sans Osmanya")
-                  (set-fontset-font t 'osage "Noto Sans Osage")
-                  (set-fontset-font t 'elbasan "Noto Sans Elbasan")
-                  (set-fontset-font t 'caucasian-albanian "Noto Sans CaucAlban")
-                  (set-fontset-font t 'linear-a "Noto Sans Linear A")
-                  (set-fontset-font t 'cypriot-syllabary "Noto Sans Cypriot")
-                  (set-fontset-font t 'aramaic "Noto Sans ImpAramaic")
-                  (set-fontset-font t 'palmyrene "Noto Sans Palmyrene")
-                  (set-fontset-font t 'nabataean "Noto Sans Nabataean")
-                  (set-fontset-font t 'hatran "Noto Sans Hatran")
-                  (set-fontset-font t 'phoenician "Noto Sans Phoenician")
-                  (set-fontset-font t 'lydian "Noto Sans Lydian")
-                  (set-fontset-font t 'meroitic "Noto Sans Meroitic")
-                  (set-fontset-font t 'kharoshthi "Noto Sans Kharoshthi")
-                  (set-fontset-font t 'old-south-arabian "Noto Sans OldSouArab")
-                  (set-fontset-font t 'old-north-arabian "Noto Sans OldNorArab")
-                  (set-fontset-font t 'manichaean "Noto Sans Manichaean")
-                  (set-fontset-font t 'avestan "Noto Sans Avestan")
-                  (set-fontset-font t 'inscriptional-parthian "Noto Sans Inscriptional Parthian")
-                  (set-fontset-font t 'inscriptional-pahlavi "Noto Sans Inscriptional Pahlavi")
-                  (set-fontset-font t 'psalter-pahlavi "Noto Sans PsaPahlavi")
-                  (set-fontset-font t 'old-turkic "Noto Sans Old Turkic")
-                  (set-fontset-font t 'old-hungarian "Noto Sans OldHung")
-                  (set-fontset-font t 'hanifi-rohingya "Noto Sans HanifiRohg")
-                  (set-fontset-font t 'rumi-number "Noto Sans Symbols2")
-                  (set-fontset-font t 'old-sogdian "Noto Sans OldSogdian")
-                  (set-fontset-font t 'sogdian "Noto Sans Sogdian")
-                  (set-fontset-font t 'elymaic "Noto Sans Elymaic")
-                  (set-fontset-font t 'brahmi "Noto Sans Brahmi")
-                  (set-fontset-font t 'kaithi "Noto Sans Kaithi")
-                  (set-fontset-font t 'sora-sompeng "Noto Sans SoraSomp")
-                  (set-fontset-font t 'chakma "Noto Sans Chakma")
-                  (set-fontset-font t 'mahajani "Noto Sans Mahajani")
-                  (set-fontset-font t 'sharada "Noto Sans Sharada")
-                  (set-fontset-font t 'sinhala-archaic-number "Noto Sans Sinhala")
-                  (set-fontset-font t 'khojki "Noto Sans Khojki")
-                  (set-fontset-font t 'multani "Noto Sans Multani")
-                  (set-fontset-font t 'khudawadi "Noto Sans Khudawadi")
-                  (set-fontset-font t 'grantha "Noto Sans Grantha")
-                  (set-fontset-font t 'newa "Noto Sans Newa")
-                  (set-fontset-font t 'tirhuta "Noto Sans Tirhuta")
-                  (set-fontset-font t 'siddham "Noto Sans Siddham")
-                  (set-fontset-font t 'modi "Noto Sans Modi")
-                  (set-fontset-font t 'takri "Noto Sans Takri")
-                  (set-fontset-font t 'ahom "Noto Serif Ahom")
-                  (set-fontset-font t 'dogra "Noto Serif Dogra")
-                  (set-fontset-font t 'warang-citi "Noto Sans WarangCiti")
-                  (set-fontset-font t 'zanabazar-square "Noto Sans Zanabazar")
-                  (set-fontset-font t 'soyombo "Noto Sans Soyombo")
-                  (set-fontset-font t 'pau-cin-hau "Noto Sans PauCinHau")
-                  (set-fontset-font t 'bhaiksuki "Noto Sans Bhaiksuki")
-                  (set-fontset-font t 'marchen "Noto Sans Marchen")
-                  (set-fontset-font t 'masaram-gondi "Noto Sans Masaram Gondi")
-                  (set-fontset-font t 'gunjala-gondi "Noto Sans Gunjala Gondi")
-                  (set-fontset-font t 'cuneiform "Noto Sans Cuneiform")
-                  (set-fontset-font t 'cuneiform-numbers-and-punctuation "Noto Sans Cuneiform")
-                  (set-fontset-font t 'egyptian "Noto Sans EgyptHiero")
-                  (set-fontset-font t 'anatolian "Noto Sans AnatoHiero")
-                  (set-fontset-font t 'mro "Noto Sans Mro")
-                  (set-fontset-font t 'bassa-vah "Noto Sans Bassa Vah")
-                  (set-fontset-font t 'pahawh-hmong "Noto Sans Pahawh Hmong")
-                  (set-fontset-font t 'miao "Noto Sans Miao")
-                  (set-fontset-font t 'tangut "Noto Serif Tangut")
-                  (set-fontset-font t 'tangut-components "Noto Serif Tangut")
-                  (set-fontset-font t '(#x16fe0 . #x16fe0) "Noto Serif Tangut")
-                  (set-fontset-font t 'duployan-shorthand "Noto Sans Duployan")
-                  (set-fontset-font t 'byzantine-musical-symbol "Noto Music")
-                  (set-fontset-font t 'musical-symbol "Noto Music")
-                  (set-fontset-font t 'ancient-greek-musical-notation "Noto Music")
-                  (set-fontset-font t 'mayan-numeral "Noto Sans Mayan Numerals")
-                  (set-fontset-font t 'tai-xuan-jing-symbol "Noto Sans Symbols2")
-                  (set-fontset-font t 'counting-rod-numeral "Noto Sans Symbols2")
-                  (set-fontset-font t 'mathematical "Noto Sans Math")
-                  (set-fontset-font t 'wancho "Noto Sans Wancho")
-                  (set-fontset-font t 'mende-kikakui "Noto Sans Mende Kikakui")
-                  (set-fontset-font t 'adlam "Noto Sans Adlam")
-                  (set-fontset-font t 'indic-siyaq-number "Noto Sans Indic Siyaq Numbers")
-                  (set-fontset-font t '(#x1ee00 . #x1eeff) "Noto Sans Math") ; arabic
-                  (set-fontset-font t 'mahjong-tile "Noto Sans Symbols2")
-                  (set-fontset-font t 'domino-tile "Noto Sans Symbols2")
-                  (set-fontset-font t 'playing-cards "Noto Sans Symbols2")
-
-                  ;; non Noto fonts
-                  (set-fontset-font t 'kana "UniHentaiKana" nil 'append)
-                  (set-fontset-font t 'latin "Iosevka" nil 'append)
-                  (set-fontset-font t 'symbol "Iosevka" nil 'append)
-
-                  ;; Nerd Font (defined thru -#xfd46)
-                  (set-fontset-font t '( #xe000 .  #xf136) "Inconsolata Nerd Font"))))
 #+end_src
 ** キーコマンド入力中に入力過程をミニバッファに反映する
 #+begin_src emacs-lisp :tangle yes
   (setq echo-keystrokes 0.1)
 #+end_src
-** recursive minibuffers
-#+begin_src emacs-lisp :tangle yes
-  (setq enable-recursive-minibuffers t)
-#+end_src
 ** save-place-mode
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'save-place-mode))
+  (add-hook 'emacs-startup-hook #'save-place-mode)
 #+end_src
 ** enable-local-variables
 #+begin_src emacs-lisp :tangle yes
@@ -547,18 +329,13 @@
 ** password
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'password-cache
+    ;; config
     (setq password-cache t)
     (setq password-cache-expiry 3600))
 #+end_src
-** tab-width
-#+begin_src emacs-lisp :tangle yes
-  (setq tab-width 4)
-#+end_src
 ** 検索で大文字小文字を区別しない
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'minibuffer
-    (setq read-file-name-completion-ignore-case t))
-
+  (setq read-file-name-completion-ignore-case t)
   (setq read-buffer-completion-ignore-case t)
   (setq completion-ignore-case t)
 #+end_src
@@ -576,9 +353,10 @@
   (setq truncate-lines t)
   (setq truncate-partial-width-windows t)
 #+end_src
-** indent
+** indent/tab
 #+begin_src emacs-lisp :tangle yes
   (setq indent-tabs-mode nil)
+  (setq tab-width 4)
 #+END_SRC
 * Language
 ** apache-mode
@@ -1465,6 +1243,225 @@
   (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
 #+end_src
 * Theme
+** Font
+*** fontset
+#+begin_src emacs-lisp :tangle yes
+  (defconst my/enable-warning-log nil)
+
+  (defun set-fontset-font:around (set-fontset-font name target font-spec &optional frame add)
+    "Warn if specified font is not installed."
+    (if (stringp font-spec)
+        (setq font-spec (font-spec :family font-spec)))
+    (if (and (fontp font-spec)
+             (null (find-font font-spec))
+             my/enable-warning-log)
+        (warn "set-fontset-font: font %s is not found." (font-get font-spec :family))
+      (ignore-errors
+        (funcall set-fontset-font name target font-spec frame add))))
+
+  ;; reset all settings in default fontset
+  (add-hook 'window-setup-hook
+            #'(lambda ()
+                (advice-add 'set-fontset-font :around #'set-fontset-font:around)
+
+                (when (functionp 'set-fontset-font)
+                  (if (find-font (font-spec :family "Noto Sans"))
+                      (set-fontset-font t '(0 . #x3fffff) "Noto Sans"))
+
+                  ;; multiple platform
+                  (set-fontset-font t 'latin "Noto Sans")
+                  (set-fontset-font t 'greek "Noto Sans")
+                  (set-fontset-font t 'phonetic "Noto Sans")
+                  (set-fontset-font t 'coptic "Noto Sans Coptic")
+                  (set-fontset-font t 'coptic "Noto Sans Symbols2" nil 'append)
+                  (set-fontset-font t 'cyrillic "Noto Sans")
+                  (set-fontset-font t 'armenian "Noto Sans Armenian")
+                  (set-fontset-font t 'hebrew "Noto Sans Hebrew")
+                  (set-fontset-font t 'arabic "Noto Sans Arabic")
+                  (set-fontset-font t 'syriac "Noto Sans Syriac")
+                  (set-fontset-font t 'thaana "Noto Sans Thaana")
+                  (set-fontset-font t 'nko "Noto Sans N'Ko")
+                  (set-fontset-font t 'samaritan "Noto Sans Samaritan")
+                  (set-fontset-font t 'mandaic "Noto Sans Mandaic")
+                  (set-fontset-font t 'devanagari "Noto Sans Devanagari")
+                  (set-fontset-font t 'bengali "Noto Sans Bengali")
+                  (set-fontset-font t 'gurmukhi "Noto Sans Gurmukhi")
+                  (set-fontset-font t 'gujarati "Noto Sans Gujanrati")
+                  (set-fontset-font t 'oriya "Noto Sans Oriya")
+                  (set-fontset-font t 'tamil "Noto Sans Tamil")
+                  (set-fontset-font t 'tamil "Noto Sans Tamil Supplement" nil 'append)
+                  (set-fontset-font t 'telugu "Noto Sans Telugu")
+                  (set-fontset-font t 'kannada "Noto Sans Kannada")
+                  (set-fontset-font t 'malayalam "Noto Sans Malayalam")
+                  (set-fontset-font t 'sinhala "Noto Sans Sinhala")
+                  (set-fontset-font t 'thai "Noto Sans Thai")
+                  (set-fontset-font t 'lao "Noto Sans Lao")
+                  (set-fontset-font t 'tibetan "Noto Sans Tibetan")
+                  (set-fontset-font t 'burmese "Noto Sans Myanmar")
+                  (set-fontset-font t 'georgian "Noto Sans Georgian")
+                  (set-fontset-font t 'hangul "Noto Sans CJK KR")
+                  (set-fontset-font t 'ethiopic "Noto Sans Ethiopic")
+                  (set-fontset-font t 'cherokee "Noto Sans Cherokee")
+                  (set-fontset-font t 'canadian-aboriginal "Noto Sans Canadian Aboriginal")
+                  (set-fontset-font t 'ogham "Noto Sans Ogham")
+                  (set-fontset-font t 'runic "Noto Sans Runic")
+                  (set-fontset-font t 'tagalog "Noto Sans Tagalog")
+                  (set-fontset-font t 'hanunoo "Noto Sans Hanunoo")
+                  (set-fontset-font t 'buhid "Noto Sans Buhid")
+                  (set-fontset-font t 'tagbanwa "Noto Sans Tagbanwa")
+                  (set-fontset-font t 'khmer "Noto Sans Khmer")
+                  (set-fontset-font t 'mongolian "Noto Sans Mongolian")
+                  (set-fontset-font t 'limbu "Noto Sans Limbu")
+                  (set-fontset-font t 'tai-le "Noto Sans Tai Le")
+                  (set-fontset-font t 'tai-lue "Noto Sans NewTaiLue")
+                  (set-fontset-font t 'buginese "Noto Sans Buginese")
+                  (set-fontset-font t 'tai-tham "Noto Sans Tai Tham")
+                  (set-fontset-font t 'balinese "Noto Sans Balinese")
+                  (set-fontset-font t 'sundanese "Noto Sans Sundanese")
+                  (set-fontset-font t 'vedic "Noto Sans Devanagari")
+                  (set-fontset-font t 'symbol "Noto Sans CJK JP")
+                  (set-fontset-font t 'symbol "Noto Sans Symbols2" nil 'append)
+                  (set-fontset-font t 'symbol "Noto Sans" nil 'append)
+                  (set-fontset-font t 'symbol "Noto Sans Math" nil 'append)
+                  (set-fontset-font t 'symbol "Noto Emoji" nil 'append)
+                  (set-fontset-font t 'symbol "Noto Sans Symbols" nil 'append)
+                  (set-fontset-font t 'braille "Noto Sans Symbols2")
+                  (set-fontset-font t 'batak "Noto Sans Batak")
+                  (set-fontset-font t 'lepcha "Noto Sans Lepcha")
+                  (set-fontset-font t 'ol-chiki "Noto Sans Ol Chiki")
+                  (set-fontset-font t 'glagolitic "Noto Sans Glagolitic")
+                  (set-fontset-font t 'tifinagh "Noto Sans Tifinagh")
+                  (set-fontset-font t 'han "Noto Sans CJK JP")
+                  (set-fontset-font t 'ideographic-description "Noto Sans CJK JP")
+                  (set-fontset-font t 'cjk-misc "Noto Sans CJK JP")
+                  (set-fontset-font t 'kana "Noto Sans CJK JP")
+                  (set-fontset-font t 'bopomofo "Noto Sans CJK TC")
+                  (set-fontset-font t 'kanbun "Noto Sans CJK JP")
+                  (set-fontset-font t 'yi "Noto Sans Yi")
+                  (set-fontset-font t 'lisu "Noto Sans Lisu")
+                  (set-fontset-font t 'vai "Noto Sans Vai")
+                  (set-fontset-font t 'bamum "Noto Sans Bamum")
+                  (set-fontset-font t 'syloti-nagri "Noto Sans Syloti Nagri")
+                  (set-fontset-font t 'north-indic-number "Noto Sans Devanagari")
+                  (set-fontset-font t 'phags-pa "Noto Sans Phags Pa")
+                  (set-fontset-font t 'saurashtra "Noto Sans Saurashtra")
+                  (set-fontset-font t 'kayah-li "Noto Sans Kayah Li")
+                  (set-fontset-font t 'rejang "Noto Sans Rejang")
+                  (set-fontset-font t 'javanese "Noto Sans Javanese")
+                  (set-fontset-font t 'cham "Noto Sans Cham")
+                  (set-fontset-font t 'tai-viet "Noto Sans Tai Viet")
+                  (set-fontset-font t 'meetei-mayek "Noto Sans Meetei Mayek")
+                  (set-fontset-font t 'vertical-form "Noto Sans CJK JP")
+                  (set-fontset-font t '(#xfe50 . #xfe6b) "Noto Sans CJK JP") ; symbol
+                  (set-fontset-font t '(#xfff9 . #xfffb) "Noto Sans Symbols2") ; nil
+                  (set-fontset-font t 'linear-b "Noto Sans Linear B")
+                  (set-fontset-font t 'aegean-number "Noto Sans Linear B")
+                  (set-fontset-font t 'ancient-greek-number "Noto Sans Symbols2")
+                  (set-fontset-font t 'ancient-symbol "Noto Sans Symbols2")
+                  (set-fontset-font t 'phaistos-disc "Noto Sans Symbols2")
+                  (set-fontset-font t 'lycian "Noto Sans Lycian")
+                  (set-fontset-font t 'carian "Noto Sans Carian")
+                  (set-fontset-font t 'old-italic "Noto Sans Old Italic")
+                  (set-fontset-font t 'gothic "Noto Sans Gothic")
+                  (set-fontset-font t 'old-permic "Noto Sans Old Permic")
+                  (set-fontset-font t 'ugaritic "Noto Sans Ugaritic")
+                  (set-fontset-font t 'old-persian "Noto Sans OldPersian")
+                  (set-fontset-font t 'deseret "Noto Sans Deseret")
+                  (set-fontset-font t 'shavian "Noto Sans Shavian")
+                  (set-fontset-font t 'osmanya "Noto Sans Osmanya")
+                  (set-fontset-font t 'osage "Noto Sans Osage")
+                  (set-fontset-font t 'elbasan "Noto Sans Elbasan")
+                  (set-fontset-font t 'caucasian-albanian "Noto Sans CaucAlban")
+                  (set-fontset-font t 'linear-a "Noto Sans Linear A")
+                  (set-fontset-font t 'cypriot-syllabary "Noto Sans Cypriot")
+                  (set-fontset-font t 'aramaic "Noto Sans ImpAramaic")
+                  (set-fontset-font t 'palmyrene "Noto Sans Palmyrene")
+                  (set-fontset-font t 'nabataean "Noto Sans Nabataean")
+                  (set-fontset-font t 'hatran "Noto Sans Hatran")
+                  (set-fontset-font t 'phoenician "Noto Sans Phoenician")
+                  (set-fontset-font t 'lydian "Noto Sans Lydian")
+                  (set-fontset-font t 'meroitic "Noto Sans Meroitic")
+                  (set-fontset-font t 'kharoshthi "Noto Sans Kharoshthi")
+                  (set-fontset-font t 'old-south-arabian "Noto Sans OldSouArab")
+                  (set-fontset-font t 'old-north-arabian "Noto Sans OldNorArab")
+                  (set-fontset-font t 'manichaean "Noto Sans Manichaean")
+                  (set-fontset-font t 'avestan "Noto Sans Avestan")
+                  (set-fontset-font t 'inscriptional-parthian "Noto Sans Inscriptional Parthian")
+                  (set-fontset-font t 'inscriptional-pahlavi "Noto Sans Inscriptional Pahlavi")
+                  (set-fontset-font t 'psalter-pahlavi "Noto Sans PsaPahlavi")
+                  (set-fontset-font t 'old-turkic "Noto Sans Old Turkic")
+                  (set-fontset-font t 'old-hungarian "Noto Sans OldHung")
+                  (set-fontset-font t 'hanifi-rohingya "Noto Sans HanifiRohg")
+                  (set-fontset-font t 'rumi-number "Noto Sans Symbols2")
+                  (set-fontset-font t 'old-sogdian "Noto Sans OldSogdian")
+                  (set-fontset-font t 'sogdian "Noto Sans Sogdian")
+                  (set-fontset-font t 'elymaic "Noto Sans Elymaic")
+                  (set-fontset-font t 'brahmi "Noto Sans Brahmi")
+                  (set-fontset-font t 'kaithi "Noto Sans Kaithi")
+                  (set-fontset-font t 'sora-sompeng "Noto Sans SoraSomp")
+                  (set-fontset-font t 'chakma "Noto Sans Chakma")
+                  (set-fontset-font t 'mahajani "Noto Sans Mahajani")
+                  (set-fontset-font t 'sharada "Noto Sans Sharada")
+                  (set-fontset-font t 'sinhala-archaic-number "Noto Sans Sinhala")
+                  (set-fontset-font t 'khojki "Noto Sans Khojki")
+                  (set-fontset-font t 'multani "Noto Sans Multani")
+                  (set-fontset-font t 'khudawadi "Noto Sans Khudawadi")
+                  (set-fontset-font t 'grantha "Noto Sans Grantha")
+                  (set-fontset-font t 'newa "Noto Sans Newa")
+                  (set-fontset-font t 'tirhuta "Noto Sans Tirhuta")
+                  (set-fontset-font t 'siddham "Noto Sans Siddham")
+                  (set-fontset-font t 'modi "Noto Sans Modi")
+                  (set-fontset-font t 'takri "Noto Sans Takri")
+                  (set-fontset-font t 'ahom "Noto Serif Ahom")
+                  (set-fontset-font t 'dogra "Noto Serif Dogra")
+                  (set-fontset-font t 'warang-citi "Noto Sans WarangCiti")
+                  (set-fontset-font t 'zanabazar-square "Noto Sans Zanabazar")
+                  (set-fontset-font t 'soyombo "Noto Sans Soyombo")
+                  (set-fontset-font t 'pau-cin-hau "Noto Sans PauCinHau")
+                  (set-fontset-font t 'bhaiksuki "Noto Sans Bhaiksuki")
+                  (set-fontset-font t 'marchen "Noto Sans Marchen")
+                  (set-fontset-font t 'masaram-gondi "Noto Sans Masaram Gondi")
+                  (set-fontset-font t 'gunjala-gondi "Noto Sans Gunjala Gondi")
+                  (set-fontset-font t 'cuneiform "Noto Sans Cuneiform")
+                  (set-fontset-font t 'cuneiform-numbers-and-punctuation "Noto Sans Cuneiform")
+                  (set-fontset-font t 'egyptian "Noto Sans EgyptHiero")
+                  (set-fontset-font t 'anatolian "Noto Sans AnatoHiero")
+                  (set-fontset-font t 'mro "Noto Sans Mro")
+                  (set-fontset-font t 'bassa-vah "Noto Sans Bassa Vah")
+                  (set-fontset-font t 'pahawh-hmong "Noto Sans Pahawh Hmong")
+                  (set-fontset-font t 'miao "Noto Sans Miao")
+                  (set-fontset-font t 'tangut "Noto Serif Tangut")
+                  (set-fontset-font t 'tangut-components "Noto Serif Tangut")
+                  (set-fontset-font t '(#x16fe0 . #x16fe0) "Noto Serif Tangut")
+                  (set-fontset-font t 'duployan-shorthand "Noto Sans Duployan")
+                  (set-fontset-font t 'byzantine-musical-symbol "Noto Music")
+                  (set-fontset-font t 'musical-symbol "Noto Music")
+                  (set-fontset-font t 'ancient-greek-musical-notation "Noto Music")
+                  (set-fontset-font t 'mayan-numeral "Noto Sans Mayan Numerals")
+                  (set-fontset-font t 'tai-xuan-jing-symbol "Noto Sans Symbols2")
+                  (set-fontset-font t 'counting-rod-numeral "Noto Sans Symbols2")
+                  (set-fontset-font t 'mathematical "Noto Sans Math")
+                  (set-fontset-font t 'wancho "Noto Sans Wancho")
+                  (set-fontset-font t 'mende-kikakui "Noto Sans Mende Kikakui")
+                  (set-fontset-font t 'adlam "Noto Sans Adlam")
+                  (set-fontset-font t 'indic-siyaq-number "Noto Sans Indic Siyaq Numbers")
+                  (set-fontset-font t '(#x1ee00 . #x1eeff) "Noto Sans Math") ; arabic
+                  (set-fontset-font t 'mahjong-tile "Noto Sans Symbols2")
+                  (set-fontset-font t 'domino-tile "Noto Sans Symbols2")
+                  (set-fontset-font t 'playing-cards "Noto Sans Symbols2")
+
+                  ;; non Noto fonts
+                  (set-fontset-font t 'kana "UniHentaiKana" nil 'append)
+                  (set-fontset-font t 'latin "Iosevka" nil 'append)
+                  (set-fontset-font t 'symbol "Iosevka" nil 'append)
+
+                  ;; Nerd Font (defined thru -#xfd46)
+                  (set-fontset-font t '( #xe000 .  #xf136) "Inconsolata Nerd Font"))))
+#+end_src
+*** font-lock-studio
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(font-lock-studio) "font-lock-studio" nil t)
+#+END_SRC
 ** Color
 *** ansi-color
 #+begin_src emacs-lisp :tangle yes
@@ -1495,12 +1492,12 @@
 #+end_src
 *** hl-todo
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(hl-todo-mode) "hl-todo" nil t)
+  (autoload-if-found '(global-hl-todo-mode) "hl-todo" nil t)
 
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'hl-todo-mode))
+  (add-hook 'emacs-startup-hook #'global-hl-todo-mode)
 
   (with-eval-after-load 'hl-todo
+    ;; config
     (setq hl-todo-keyword-faces
             '(("HOLD" . "#d0bf8f")
               ("TODO" . "#cc9393")
@@ -1521,20 +1518,21 @@
     ;; config
     (setq xterm-color-preserve-properties t))
 #+end_src
-** nerd-icons-dired
+** Icon
+*** nerd-icons-dired
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-dired-mode) "nerd-icons-dired" nil t)
 
   (with-eval-after-load 'dired-mode
     (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
 #+end_src
-** nerd-icons-completion
+*** nerd-icons-completion
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
 
   ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
 #+end_src
-** dashboard
+** Dashboard
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
 
@@ -1544,22 +1542,15 @@
     (setq dashboard-startup-banner 4)
     (setq dashboard-items '((recents . 10))))
 #+end_src
-** dimmer
+** Dimmer
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dimmer-configure-which-key
-                       dimmer-configure-org
-                       dimmer-mode)
-                     "dimmer" nil t)
+  (autoload-if-found '(dimmer-mode) "dimmer" nil t)
 
   (add-hook 'window-setup-hook #'dimmer-mode)
-  (add-hook 'window-setup-hook #'dimmer-configure-which-key)
-  ;; (add-hook 'window-setup-hook #'dimmer-configure-org)
 #+end_src
-** doom-themes
+** Doom
+*** doom-themes
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(doom-themes-enable-org-fontification) "doom-themes-ext-org" nil t)
-
-  ;; (add-hook 'emacs-startup-hook #'doom-themes-enable-org-fontification)
   (add-hook 'emacs-startup-hook
             #'(lambda ()
                 (when (require 'doom-themes)
@@ -1571,7 +1562,7 @@
     (setq doom-themes-enable-bold t)
     (setq doom-themes-enable-italic t))
 #+END_SRC
-** doom-modeline
+*** doom-modeline
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
 
@@ -1645,6 +1636,7 @@
   (add-hook 'emacs-startup-hook #'nyan-mode)
 
   (with-eval-after-load 'nyan-mode
+    ;; config
     (setq nyan-cat-face-number 5)
     (setq nyan-animate-nyancat t))
 #+END_SRC
@@ -1653,6 +1645,15 @@
   (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
 
   (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
+#+end_src
+** topsy
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(topsy-mode) "topsy" nil t)
+  ;; (with-eval-after-load 'prog-mode
+  ;;   (add-hook 'prog-mode-hook #'topsy-mode))
+
+  ;; (with-eval-after-load 'lsp-ui-mode
+  ;;   (add-hook 'lsp-ui-mode-hook #'(lambda () (topsy-mode -1))))
 #+end_src
 ** idle-highlight-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1664,55 +1665,54 @@
   (with-eval-after-load 'idle-highlight-mode
     (setq idle-highlight-idle-time 0.1))
 #+end_src
-* Awesome Package
-** Buffer
-*** auto-save-buffers-enhanced
+* IME
+** ddskk
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
+  (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
 
-  ;; (add-hook 'window-setup-hook #'auto-save-buffers-enhanced)
+  (defun my/skk-C-j-key (arg)
+    (interactive "P")
+    (cond
+     ((and (null (skk-in-minibuffer-p))
+           (null skk-henkan-mode))
+      (skk-emulate-original-map arg))
+     (t
+      (skk-kakutei arg))))
 
-  (with-eval-after-load 'auto-save-buffers-enhanced
-    (setq auto-save-buffers-enhanced-interval 10))
-#+end_src
-*** editorconfig
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
-
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'editorconfig-mode))
-#+END_SRC
-*** persistent-scratch
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(persistent-scratch-setup-default) "persistent-scratch" nil t)
-
-  (add-hook 'window-setup-hook #'persistent-scratch-setup-default)
-
-  (with-eval-after-load 'persistent-scratch
+  (with-eval-after-load 'skk
     ;; config
-    (setq persistent-scratch-autosave-interval 100))
-#+end_src
-*** popwin
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(popwin-mode) "popwin" nil t)
+    (setq skk-preload t)
+    (setq default-input-method "japanese-skk"))
 
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'popwin-mode))
-#+end_src
-*** whitespace
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
+  (with-eval-after-load 'skk-vars
+    ;; use skkserv
+    (when-darwin
+     (setq skk-server-host "localhost")
+     (setq skk-server-portnum 1178))
 
-  (with-eval-after-load 'simple
-    (when window-system
-      (add-hook 'fundamental-mode-hook #'global-whitespace-mode)))
+    ;; guix
+    (setq skk-byte-compile-init-file t)
+    (setq skk-isearch-mode-enable 'always)
+    (setq skk-egg-like-newline t)
+    (setq skk-show-annotation nil)
+    (setq skk-auto-insert-paren t)
 
-  (with-eval-after-load 'whitespace
-    ;; config
-    (setq whitespace-style '(face tabs tab-mark spaces space-mark))
-    (setq whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
-                                          (tab-mark ?\t [?\xBB ?\t] [?\\ ?\t]))))
+    ;; azik
+    (setq skk-use-azik t)
+    (setq skk-azik-keyboard-type 'jp106)
+
+    ;; ref: https://github.com/skk-dev/ddskk/blob/master/etc/dot.skk#L752-L768
+    (add-to-list 'skk-rom-kana-rule-list '(skk-kakutei-key nil my/skk-C-j-key)))
 #+END_SRC
+** ddskk-posframe
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(ddskk-posframe-mode) "ddskk-posframe" nil t)
+
+  (with-eval-after-load 'skk
+    ;; hooks
+    (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
+#+end_src
+* Coding
 ** Check
 *** flycheck
 #+begin_src emacs-lisp :tangle yes
@@ -1757,60 +1757,6 @@
 #+begin_src emacs-lisp
   ;; (autoload-if-found '(flycheck-cfn-setup) "flycheck-cfn" nil t)
 #+end_src
-** Client
-*** md4rd
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(md4rd
-                       md4rd-login
-                       md4rd-visit
-                       md4rd-widget-expand-all
-                       md4rd-widget-collapse-all
-                       md4rd-reply
-                       md4rd-upvote
-                       md4rd-downvote
-                       md4rd-widget-toggle-line
-                       md4rd-refresh-login
-                       md4rd-indent-all-the-lines) "md4rd" nil t)
-
-  (with-eval-after-load 'md4rd
-    (add-hook 'md4rd-mode-hook #'md4rd-indent-all-the-lines)
-    (run-with-timer 0 3540 #'md4rd-refresh-login)
-
-    ;; config
-    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
-    ;; (setq md4rd--oauth-access-token "your-access-token-here")
-    ;; (setq md4rd--oauth-refresh-token "your-refresh-token-here")
-
-    ;; keymap
-    (define-key md4rd-mode-map (kbd "u") 'tree-mode-goto-parent)
-    (define-key md4rd-mode-map (kbd "o") 'md4rd-open)
-    (define-key md4rd-mode-map (kbd "v") 'md4rd-visit)
-    (define-key md4rd-mode-map (kbd "e") 'tree-mode-toggle-expand)
-    (define-key md4rd-mode-map (kbd "E") 'md4rd-widget-expand-all)
-    (define-key md4rd-mode-map (kbd "C") 'md4rd-widget-collapse-all)
-    (define-key md4rd-mode-map (kbd "n") 'widget-forward)
-    (define-key md4rd-mode-map (kbd "j") 'widget-forward)
-    (define-key md4rd-mode-map (kbd "h") 'backward-button)
-    (define-key md4rd-mode-map (kbd "p") 'widget-backward)
-    (define-key md4rd-mode-map (kbd "k") 'widget-backward)
-    (define-key md4rd-mode-map (kbd "l") 'forward-button)
-    (define-key md4rd-mode-map (kbd "q") 'kill-current-buffer)
-    (define-key md4rd-mode-map (kbd "r") 'md4rd-reply)
-    (define-key md4rd-mode-map (kbd "u") 'md4rd-upvote)
-    (define-key md4rd-mode-map (kbd "d") 'md4rd-downvote)
-    (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
-#+end_src
-** Command
-*** amx
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(amx-mode) "amx" nil t)
-
-  (add-hook 'window-setup-hook #'amx-mode)
-
-  (with-eval-after-load 'amx
-    ;; config
-    (setq amx-history-length 100))
-#+END_SRC
 ** Completion
 *** corfu
 #+begin_src emacs-lisp :tangle yes
@@ -1859,221 +1805,6 @@
 
   (with-eval-after-load 'corfu
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-#+end_src
-** Cursor
-*** avy
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(avy-goto-word-1) "avy" nil t)
-
-  (with-eval-after-load 'avy
-    ;; config
-    (setq avy-all-windows nil)
-    (setq avy-background t))
-#+end_src
-*** avy-zap
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(avy-zap-up-to-char-dwim) "avy-zap" nil t)
-#+end_src
-*** expand-region
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(er/expand-region) "expand-region" nil t)
-
-  (with-eval-after-load 'simple
-    (add-hook 'fundamental-mode-hook #'transient-mark-mode))
-#+end_src
-*** multiple-cursors
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(mc/mark-next-like-this mc/mark-previous-like-this mc/mark-all-like-this) "multiple-cursors" nil t)
-#+END_SRC
-** Dictionary
-*** define-word
-#+begin_src emacs-lisp :tangle yes
-  (defun my/define-word ()
-    (interactive)
-    (if (use-region-p)
-        (call-interactively #'define-word-at-point)
-      (call-interactively #'define-word)))
-
-  (with-eval-after-load 'define-word
-    (setq define-word-displayfn-alist
-            '((wordnik . takeokunn/define-word--display-in-buffer)
-              (openthesaurus . takeokunn/define-word--display-in-buffer)
-              (webster . takeokunn/define-word--display-in-buffer)
-              (weblio . takeokunn/define-word--display-in-buffer))))
-#+end_src
-** Dired
-*** basic
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'dired
-    ;; config
-    (setq dired-dwim-target nil)
-    (setq dired-hide-details-hide-symlink-targets nil)
-    (setq dired-listing-switches "-alh")
-    (setq dired-recursive-copies 'always)
-    (setq dired-use-ls-dired nil)
-
-    ;; hook
-    (add-hook 'dired-mode-hook #'(lambda () (display-line-numbers-mode -1))))
-#+end_src
-*** dired-collapse
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-collapse-mode) "dired-collapse" nil t)
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (add-hook 'dired-mode #'dired-collapse-mode))
-#+end_src
-*** dired-filter
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-filter-mode) "dired-filter" nil t)
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (add-hook 'dired-mode #'dired-filter-mode))
-#+end_src
-*** TODO dired-narrow
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
-
-  ;; (with-eval-after-load 'dired
-  ;;   (add-hook 'dired-mode-hook #'dired-narrow-mode))
-#+end_src
-*** TODO dired-open
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-open-file) "dired-open" nil t)
-
-  ;; (with-eval-after-load 'dired
-  ;;   (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
-#+end_src
-*** dired-ranger
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '() "dired-ranger" nil t)
-#+end_src
-*** dired-quick-sort
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-quick-sort-setup) "dired-quick-sort" nil t)
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (add-hook 'dired-mode-hook #'dired-quick-sort-setup))
-#+end_src
-*** dired-subtree
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-subtree-apply-filter) "dired-subtree" nil t)
-#+end_src
-*** diredfl
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(diredfl-global-mode) "diredfl" nil t)
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (add-hook 'dired-mode-hook #'diredfl-global-mode))
-#+end_src
-** EWW
-*** basic
-#+begin_src emacs-lisp :tangle yes
-  (defun my/eww-rename-buffer ()
-    "Rename the name of current EWW buffer."
-    (let* ((title (plist-get eww-data :title))
-           (url (file-name-base (eww-current-url)))
-           (buffer-name (or (if (and title (> (length title) 0))
-                                title
-                              nil)
-                            url "")))
-      (rename-buffer (format "eww: %s" buffer-name) t)))
-
-  (with-eval-after-load 'eww
-    ;; config
-    (setq eww-header-line-format nil)
-    (setq eww-search-prefix "http://www.google.co.jp/search?q="))
-
-  (with-eval-after-load 'eww
-    ;; keybind
-    (define-key eww-mode-map (kbd "C") #'eww-set-character-encoding)
-    (define-key eww-mode-map (kbd "C-j") #'eww-follow-link)
-    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading)
-    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading))
-
-  (with-eval-after-load 'eww
-    ;; hooks
-    (add-hook 'eww-after-render #'my/eww-rename-buffer))
-#+end_src
-*** eww-lnum
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(eww-lnum-follow eww-lnum-universal) "eww-lnum" nil t)
-
-  (with-eval-after-load 'eww
-    ;; keybinds
-    (define-key eww-mode-map "f" #'eww-lnum-follow)
-    (define-key eww-mode-map "F" #'eww-lnum-universal))
-#+end_src
-** File
-*** recentf
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(recentf-mode) "recentf" nil t)
-
-  (add-hook 'window-setup-hook #'recentf-mode)
-
-  (with-eval-after-load 'recentf
-    ;; config
-    (setq recentf-auto-cleanup 'never)
-    (setq recentf-max-menu-items 10000)
-    (setq recentf-max-saved-items 10000)
-    (setq recentf-save-file  "~/.emacs.d/.recentf")
-    (setq recentf-exclude '(".recentf" "\\.gpg\\")))
-#+END_SRC
-*** open-junk-file
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
-
-  (with-eval-after-load 'open-junk-file
-    ;; config
-    (setq open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
-#+END_SRC
-*** vlf
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
-
-  ;; (vlf-disable-for-function tags-verify-table "etags")
-  ;; (vlf-disable-for-function tag-find-file-of-tag-noselect "etags")
-  ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (define-key dired-mode-map (kbd "V") #'dired-vlf))
-#+end_src
-** Font
-*** font-lock-studio
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(font-lock-studio) "font-lock-studio" nil t)
-#+END_SRC
-** GC
-*** gcmh
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(gcmh-mode) "gcmh" nil t)
-
-  (add-hook 'window-setup-hook #'gcmh-mode)
-
-  (with-eval-after-load 'gcmh
-    ;; config
-    (setq gcmh-verbose t)
-
-    ;; hooks
-    (defvar my/gcmh-status nil)
-    (advice-add #'garbage-collect
-                :before
-                (defun my/gcmh-log-start (&rest _)
-                  (when gcmh-verbose
-                    (setq my/gcmh-status "Running GC..."))))
-
-    (advice-add #'gcmh-message
-                :override
-                (defun my/gcmh-message (format-string &rest args)
-                  (setq my/gcmh-status
-                        (apply #'format-message format-string args))
-                  (run-with-timer 2 nil
-                                  (lambda ()
-                                    (setq my/gcmh-status nil))))))
 #+end_src
 ** Git
 *** magit
@@ -2196,123 +1927,6 @@
     (setq gac-debounce-interval (* 60 60 3))
     (setq gac-default-message "Update"))
 #+end_src
-** Googling
-*** google-this
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(google-this) "google-this" nil t)
-#+END_SRC
-*** google-translate
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
-#+end_src
-** GPG
-*** epa-file
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(epa-file-enable) "epa-file" nil t)
-
-  (add-hook 'window-setup-hook #'epa-file-enable)
-
-  (with-eval-after-load 'epa-file
-    ;; config
-    (setq epa-file-encrypt-to '("bararararatty@gmail.com"))
-    (setq epa-file-select-keys 'silent)
-    (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-    (setq epg-pinentry-mode 'loopback)
-
-    ;; fset
-    (fset 'epg-wait-for-status 'ignore))
-#+end_src
-*** pinentry
-https://github.com/ch11ng/exwm/wiki#gpg-pinentry
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(pinentry-start) "pinentry" nil t)
-#+end_src
-** Help
-*** helpful
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(helpful-callable
-                       helpful-function
-                       helpful-macro
-                       helpful-command
-                       helpful-key
-                       helpful-variable
-                       helpful-at-point) "helpful" nil t)
-#+end_src
-** IME
-*** ddskk
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
-
-  (defun my/skk-C-j-key (arg)
-    (interactive "P")
-    (cond
-     ((and (null (skk-in-minibuffer-p))
-           (null skk-henkan-mode))
-      (skk-emulate-original-map arg))
-     (t
-      (skk-kakutei arg))))
-
-  (with-eval-after-load 'skk
-    ;; config
-    (setq skk-preload t)
-    (setq default-input-method "japanese-skk"))
-
-  (with-eval-after-load 'skk-vars
-    ;; use skkserv
-    (when-darwin
-     (setq skk-server-host "localhost")
-     (setq skk-server-portnum 1178))
-
-    ;; guix
-    (setq skk-byte-compile-init-file t)
-    (setq skk-isearch-mode-enable 'always)
-    (setq skk-egg-like-newline t)
-    (setq skk-show-annotation nil)
-    (setq skk-auto-insert-paren t)
-
-    ;; azik
-    (setq skk-use-azik t)
-    (setq skk-azik-keyboard-type 'jp106)
-
-    ;; ref: https://github.com/skk-dev/ddskk/blob/master/etc/dot.skk#L752-L768
-    (add-to-list 'skk-rom-kana-rule-list '(skk-kakutei-key nil my/skk-C-j-key)))
-#+END_SRC
-*** ddskk-posframe
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(ddskk-posframe-mode) "ddskk-posframe" nil t)
-
-  (with-eval-after-load 'skk
-    ;; hooks
-    (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
-#+end_src
-** Joke
-*** hacker-typer
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(hacker-typer) "hacker-typer" nil t)
-#+end_src
-*** power-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(power-mode) "power-mode" nil t)
-#+end_src
-*** sudden-death
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(sudden-death) "sudden-death" nil t)
-#+end_src
-*** redacted
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(redacted-mode) "redacted" nil t)
-
-  (defun my/redacted-mode ()
-    (interactive)
-    (read-only-mode (if redacted-mode -1 1))
-    (redacted-mode (if redacted-mode -1 1)))
-#+end_src
-*** lorem ipsum
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(lorem-ipsum-insert-sentences
-                       lorem-ipsum-insert-paragraphs
-                       lorem-ipsum-insert-list) "lorem-ipsum" nil t)
-#+end_src
 ** Keyboard
 *** key-chord
 #+begin_src emacs-lisp :tangle yes
@@ -2364,6 +1978,52 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** god-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(god-mode) "god-mode" nil t)
+#+end_src
+** Refactor
+*** emr
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(emr-show-refactor-menu) "emr" nil t)
+
+  (with-eval-after-load 'prog-mode
+    ;; keybinds
+    (define-key prog-mode-map (kbd "M-RET") #'emr-show-refactor-menu))
+#+END_SRC
+** Snippet
+*** yasnippet
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(yas-global-mode) "yasnippet" nil t)
+
+  (add-hook 'window-setup-hook #'yas-global-mode)
+#+end_src
+*** consult-yasnippet
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(consult-yasnippet) "consult-yasnippet" nil t)
+
+  (keymap-global-set "C-c y" #'consult-yasnippet)
+  (keymap-global-set "C-c C-y" #'consult-yasnippet)
+#+end_src
+** Narrowing
+*** fancy-narrow
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(fancy-narrow-mode) "fancy-narrow" nil t)
+
+  ;; (with-eval-after-load 'org
+  ;;   (add-hook 'org-mode-hook #'fancy-narrow-mode))
+
+  ;; (with-eval-after-load 'elisp-mode
+  ;;   (add-hook 'emacs-lisp-mode-hook #'fancy-narrow-mode))
+
+  ;; (with-eval-after-load 'lisp-mode
+  ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-mode))
+
+  ;; (with-eval-after-load 'clojure-mode
+  ;;   (add-hook 'clojure-mode-hook #'fancy-narrow-mode))
+#+end_src
+*** origami
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
+
+  (add-hook 'window-setup-hook #'global-origami-mode)
 #+end_src
 ** LSP
 *** eglot
@@ -2643,6 +2303,398 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;     (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
   ;;     (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references)))
 #+end_src
+** Syntax
+*** syntax-subword
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-syntax-subword-mode) "syntax-subword" nil t)
+
+  (add-hook 'window-setup-hook #'global-syntax-subword-mode)
+#+end_src
+** Undo
+*** undo-tree
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-undo-tree-mode) "undo-tree" nil t)
+
+  (add-hook 'window-setup-hook #'global-undo-tree-mode)
+
+  (with-eval-after-load 'undo-tree
+    (setq undo-tree-auto-save-history nil))
+#+end_src
+** Template
+*** auto-insert
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(auto-insert-mode) "autoinsert" nil t)
+
+  ;; (add-hook 'window-setup-hook #'auto-insert-mode)
+
+  (with-eval-after-load 'autoinsert
+    (setq auto-insert-directory "~/.emacs.d/auto-insert"))
+#+end_src
+** View Mode
+*** view-mode
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'files
+    (add-hook 'find-file-hooks #'view-mode))
+
+  (with-eval-after-load 'view
+    ;; hooks
+    (add-hook 'view-mode-hook #'my/enable-view-mode-automatically)
+
+    ;; keybind
+    (define-key view-mode-map (kbd "f") #'forward-char)
+    (define-key view-mode-map (kbd "b") #'backward-char)
+    (define-key view-mode-map (kbd "n") #'my/org-view-next-heading)
+    (define-key view-mode-map (kbd "p") #'my/org-view-previous-heading)
+    (define-key view-mode-map (kbd "@") #'set-mark-command)
+    (define-key view-mode-map (kbd "C-c '") #'my/org-edit-special)
+    (define-key view-mode-map (kbd "C-c C-C") #'my/org-ctrl-c-ctrl-c)
+    (define-key view-mode-map (kbd "e") nil)
+    (define-key view-mode-map (kbd "C-j") nil)
+    (define-key view-mode-map (kbd "C-i") #'my/view-tab)
+    (define-key view-mode-map (kbd "S-C-i") #'my/view-shifttab)
+
+    ;; functions
+    (defun my/org-view-next-heading ()
+      (interactive)
+      (if (and (derived-mode-p 'org-mode)
+               (org-at-heading-p))
+          (org-next-visible-heading 1)
+        (next-line)))
+
+    (defun my/org-view-previous-heading ()
+      (interactive)
+      (if (and (derived-mode-p 'org-mode)
+               (org-at-heading-p))
+          (org-previous-visible-heading 1)
+        (previous-line)))
+
+    (defun my/view-tab ()
+      (interactive)
+      (when (and (derived-mode-p 'org-mode)
+                 (or (org-at-heading-p)
+                     (org-at-property-drawer-p)))
+        (let ((view-mode nil))
+          (org-cycle))))
+
+    (defun my/view-shifttab ()
+      (interactive)
+      (when (derived-mode-p 'org-mode)
+        (let ((view-mode nil))
+          (org-shifttab))))
+
+    (defun my/org-edit-special ()
+      (interactive)
+      (when (derived-mode-p 'org-mode)
+        (view-mode -1)
+        (org-edit-special)))
+
+    (defun my/org-ctrl-c-ctrl-c ()
+      (interactive)
+      (when (derived-mode-p 'org-mode)
+        (view-mode -1)
+        (org-ctrl-c-ctrl-c)))
+
+    (defvar my/view-mode-timer nil)
+    (defun my/enable-view-mode-automatically ()
+      (if view-mode
+          (when my/view-mode-timer
+            (cancel-timer my/view-mode-timer))
+        (setq my/view-mode-timer (run-with-idle-timer (* 60 10) nil #'view-mode))))
+
+    ;; advices
+    (advice-add 'view--disable :before #'(lambda (&rest _) (view-lock-mode -1))))
+#+end_src
+*** view-lock-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(view-lock-timer-start view-lock-quit) "view-lock-mode" nil t)
+
+  (with-eval-after-load 'view
+    (add-hook 'view-mode-hook #'view-lock-timer-start))
+
+  (with-eval-after-load 'view-lock-mode
+    (setq view-lock-start-time (* 30 60)))
+#+end_src
+** Utility
+*** comint
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'comint
+    (setq comint-buffer-maximum-size 100000)
+    (setq comint-prompt-read-only t)
+    (setq comint-terminfo-terminal "eterm-256color"))
+#+end_src
+*** crux
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(crux-open-with
+                       crux-smart-open-line-above
+                       crux-cleanup-buffer-or-region
+                       crux-view-url
+                       crux-transpose-windows
+                       crux-duplicate-current-line-or-region
+                       crux-duplicate-and-comment-current-line-or-region
+                       crux-rename-file-and-buffer
+                       crux-visit-term-buffer
+                       crux-kill-other-buffers
+                       crux-indent-defun
+                       crux-top-join-lines
+                       crux-kill-line-backwards) "crux" nil t)
+
+  ;; keybind
+  (keymap-global-set "C-c o" #'crux-open-with)
+  (keymap-global-set "C-S-o" #'crux-smart-open-line-above)
+  (keymap-global-set "C-c u" #'crux-view-url)
+  (keymap-global-set "C-x 4 t" #'crux-transpose-windows)
+  (keymap-global-set "C-c d" #'crux-duplicate-current-line-or-region)
+  (keymap-global-set "C-c M-d" #'crux-duplicate-and-comment-current-line-or-region)
+  (keymap-global-set "C-c r" #'crux-rename-file-and-buffer)
+  (keymap-global-set "C-c M-t" #'crux-visit-term-buffer)
+  (keymap-global-set "C-c k" #'crux-kill-other-buffers)
+  (keymap-global-set "C-M-z" #'crux-indent-defun)
+  (keymap-global-set "C-^" #'crux-top-join-lines)
+  (keymap-global-set "C-DEL" #'crux-kill-line-backwards)
+#+end_src
+*** delsel
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(delete-selection-mode) "delsel" nil t)
+
+  (add-hook 'window-setup-hook #'delete-selection-mode)
+#+end_src
+*** dogears
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dogears-go
+                       dogears-back
+                       dogears-forward
+                       dogears-list
+                       dogears-sidebar) "dogears" nil t)
+
+  ;; keybind
+  (keymap-global-set "M-g d" #'dogears-go)
+  (keymap-global-set "M-g M-b" #'dogears-back)
+  (keymap-global-set "M-g M-f" #'dogears-forward)
+  (keymap-global-set "M-g M-d" #'dogears-list)
+  (keymap-global-set "M-g M-D" #'dogears-sidebar)
+#+end_src
+*** goto-addr
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(goto-address-prog-mode goto-address-mode) "goto-address" nil t)
+
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hook #'goto-address-prog-mode))
+
+  (with-eval-after-load 'text-mode
+    (add-hook 'text-mode-hook #'goto-address-mode))
+#+END_SRC
+*** minimap
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(minimap-mode) "minimap" nil t)
+
+  (keymap-global-set "C-c m" #'minimap-mode)
+
+  (with-eval-after-load 'minimap
+    (setq minimap-window-location 'right)
+    (setq minimap-update-delay 0.2)
+    (setq minimap-minimum-width 20)
+    (setq minimap-major-modes '(prog-mode org-mode)))
+#+end_src
+*** puni
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(puni-global-mode puni-disable-puni-mode) "puni" nil t)
+
+  (add-hook 'window-setup-hook #'puni-global-mode)
+
+  (with-eval-after-load 'lisp-mode
+    (add-hook 'lisp-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'emacs-lisp-mode
+    (add-hook 'emacs-lisp-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'clojure-mode
+    (add-hook 'clojure-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'lisp-interaction-mode
+    (add-hook 'lisp-interacton-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'scheme
+    (add-hook 'scheme-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'simple
+    (add-hook 'eval-expression-minibuffer-setup-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'ielm
+    (add-hook 'inferior-emacs-lisp-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'minibuffer
+    (add-hook 'minibuffer-mode-hook #'puni-disable-puni-mode))
+#+end_src
+*** quickrun
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(quickrun) "quickrun" nil t)
+#+end_src
+*** restclient
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(restclient-mode) "restclient" nil t)
+#+end_src
+*** smartparens
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'smartparens)
+#+END_SRC
+*** smart-jump
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'smart-jump)
+#+end_src
+*** string-inflection
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(string-inflection-all-cycle) "string-inflection" nil t)
+#+end_src
+*** uuid
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(uuid-string) "uuid" nil t)
+
+  (defun my/uuid ()
+    (interactive)
+    (insert (uuid-string)))
+
+  (defalias 'uuid #'my/uuid)
+#+end_src
+*** woman
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(woman woman-find-file) "woman" nil t)
+#+end_src
+* Remote Access
+** docker-tramp
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(docker-tramp-add-method) "docker-tramp" nil t)
+
+  ;; (add-hook 'window-setup-hook #'docker-tramp-add-method)
+
+  (with-eval-after-load 'tramp
+    (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
+#+end_src
+** consult-tramp
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(consult-tramp) "consult-tramp" nil t)
+#+end_src
+* Monitor
+** Process
+*** proced
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(proced) "proced" nil t)
+
+  (with-eval-after-load 'proced
+    ;; hooks
+    (add-hook 'proced-mode-hook #'proced-toggle-auto-update)
+
+    ;; config
+    (setq proced-auto-update-interval 10)
+    (setq proced-tree-flag t)
+    (setq proced-format 'long))
+#+end_src
+*** proced-narrow
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(proced-narrow) "proced-narrow" nil t)
+
+  (with-eval-after-load 'proced
+    (define-key proced-mode-map (kbd "/") #'proced-narrow))
+#+end_src
+** System
+*** symon
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(symon-mode) "symon" nil t)
+#+end_src
+** Minor Modes
+*** command-log-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(clm/toggle-command-log-buffer) "command-log-mode" nil t)
+
+  (defalias 'command-log #'clm/toggle-command-log-buffer)
+#+end_src
+** Statistics
+*** esup
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(esup) "esup" nil t)
+#+END_SRC
+*** explain-pause-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(explain-pause-mode) "explain-pause-mode" nil t)
+#+end_src
+*** disk-usage
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(disk-usage disk-usage-here) "disk-usage" nil t)
+#+end_src
+*** keyfreq
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(keyfreq-mode keyfreq-autosave-mode) "keyfreq" nil t)
+
+  (add-hook 'window-setup-hook #'keyfreq-mode)
+  (add-hook 'window-setup-hook #'keyfreq-autosave-mode)
+#+end_src
+*** uptimes
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(uptimes) "uptimes" nil t)
+#+end_src
+* Misc Package
+** Joke
+*** hacker-typer
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(hacker-typer) "hacker-typer" nil t)
+#+end_src
+*** power-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(power-mode) "power-mode" nil t)
+#+end_src
+*** sudden-death
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(sudden-death) "sudden-death" nil t)
+#+end_src
+*** redacted
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(redacted-mode) "redacted" nil t)
+
+  (defun my/redacted-mode ()
+    (interactive)
+    (read-only-mode (if redacted-mode -1 1))
+    (redacted-mode (if redacted-mode -1 1)))
+#+end_src
+*** lorem ipsum
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(lorem-ipsum-insert-sentences
+                       lorem-ipsum-insert-paragraphs
+                       lorem-ipsum-insert-list) "lorem-ipsum" nil t)
+#+end_src
+** Password
+*** pass
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(pass pass-view-mode) "pass" nil t)
+
+  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/password-store/.*\\.gpg") 'pass-view-mode))
+
+  (with-eval-after-load 'pass
+    (setq pass-suppress-confirmations t))
+#+end_src
+** Dictionary
+*** define-word
+#+begin_src emacs-lisp :tangle yes
+  (defun my/define-word ()
+    (interactive)
+    (if (use-region-p)
+        (call-interactively #'define-word-at-point)
+      (call-interactively #'define-word)))
+
+  (with-eval-after-load 'define-word
+    (setq define-word-displayfn-alist
+            '((wordnik . takeokunn/define-word--display-in-buffer)
+              (openthesaurus . takeokunn/define-word--display-in-buffer)
+              (webster . takeokunn/define-word--display-in-buffer)
+              (weblio . takeokunn/define-word--display-in-buffer))))
+#+end_src
+** Googling
+*** google-this
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(google-this) "google-this" nil t)
+#+END_SRC
+*** google-translate
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
+#+end_src
 ** Mail
 *** mu4e
 #+begin_src emacs-lisp :tangle yes
@@ -2688,56 +2740,268 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '() "mu4e-dashboard" nil t)
 #+end_src
-** Minor Modes
-*** command-log-mode
+** GC
+*** gcmh
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(clm/toggle-command-log-buffer) "command-log-mode" nil t)
+  (autoload-if-found '(gcmh-mode) "gcmh" nil t)
 
-  (defalias 'command-log #'clm/toggle-command-log-buffer)
-#+end_src
-** Narrowing
-*** fancy-narrow
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(fancy-narrow-mode) "fancy-narrow" nil t)
+  (add-hook 'window-setup-hook #'gcmh-mode)
 
-  ;; (with-eval-after-load 'org
-  ;;   (add-hook 'org-mode-hook #'fancy-narrow-mode))
+  (with-eval-after-load 'gcmh
+    ;; config
+    (setq gcmh-verbose t)
 
-  ;; (with-eval-after-load 'elisp-mode
-  ;;   (add-hook 'emacs-lisp-mode-hook #'fancy-narrow-mode))
-
-  ;; (with-eval-after-load 'lisp-mode
-  ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-mode))
-
-  ;; (with-eval-after-load 'clojure-mode
-  ;;   (add-hook 'clojure-mode-hook #'fancy-narrow-mode))
-#+end_src
-*** origami
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
-
-  (add-hook 'window-setup-hook #'global-origami-mode)
-#+end_src
-** Process
-*** proced
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(proced) "proced" nil t)
-
-  (with-eval-after-load 'proced
     ;; hooks
-    (add-hook 'proced-mode-hook #'proced-toggle-auto-update)
+    (defvar my/gcmh-status nil)
+    (advice-add #'garbage-collect
+                :before
+                (defun my/gcmh-log-start (&rest _)
+                  (when gcmh-verbose
+                    (setq my/gcmh-status "Running GC..."))))
+
+    (advice-add #'gcmh-message
+                :override
+                (defun my/gcmh-message (format-string &rest args)
+                  (setq my/gcmh-status
+                        (apply #'format-message format-string args))
+                  (run-with-timer 2 nil
+                                  (lambda ()
+                                    (setq my/gcmh-status nil))))))
+#+end_src
+** Client
+*** md4rd
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(md4rd
+                       md4rd-login
+                       md4rd-visit
+                       md4rd-widget-expand-all
+                       md4rd-widget-collapse-all
+                       md4rd-reply
+                       md4rd-upvote
+                       md4rd-downvote
+                       md4rd-widget-toggle-line
+                       md4rd-refresh-login
+                       md4rd-indent-all-the-lines) "md4rd" nil t)
+
+  (with-eval-after-load 'md4rd
+    (add-hook 'md4rd-mode-hook #'md4rd-indent-all-the-lines)
+    (run-with-timer 0 3540 #'md4rd-refresh-login)
 
     ;; config
-    (setq proced-auto-update-interval 10)
-    (setq proced-tree-flag t)
-    (setq proced-format 'long))
-#+end_src
-*** proced-narrow
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(proced-narrow) "proced-narrow" nil t)
+    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
+    ;; (setq md4rd--oauth-access-token "your-access-token-here")
+    ;; (setq md4rd--oauth-refresh-token "your-refresh-token-here")
 
-  (with-eval-after-load 'proced
-    (define-key proced-mode-map (kbd "/") #'proced-narrow))
+    ;; keymap
+    (define-key md4rd-mode-map (kbd "u") 'tree-mode-goto-parent)
+    (define-key md4rd-mode-map (kbd "o") 'md4rd-open)
+    (define-key md4rd-mode-map (kbd "v") 'md4rd-visit)
+    (define-key md4rd-mode-map (kbd "e") 'tree-mode-toggle-expand)
+    (define-key md4rd-mode-map (kbd "E") 'md4rd-widget-expand-all)
+    (define-key md4rd-mode-map (kbd "C") 'md4rd-widget-collapse-all)
+    (define-key md4rd-mode-map (kbd "n") 'widget-forward)
+    (define-key md4rd-mode-map (kbd "j") 'widget-forward)
+    (define-key md4rd-mode-map (kbd "h") 'backward-button)
+    (define-key md4rd-mode-map (kbd "p") 'widget-backward)
+    (define-key md4rd-mode-map (kbd "k") 'widget-backward)
+    (define-key md4rd-mode-map (kbd "l") 'forward-button)
+    (define-key md4rd-mode-map (kbd "q") 'kill-current-buffer)
+    (define-key md4rd-mode-map (kbd "r") 'md4rd-reply)
+    (define-key md4rd-mode-map (kbd "u") 'md4rd-upvote)
+    (define-key md4rd-mode-map (kbd "d") 'md4rd-downvote)
+    (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
+#+end_src
+* EWW
+** basic
+#+begin_src emacs-lisp :tangle yes
+  (defun my/eww-rename-buffer ()
+    "Rename the name of current EWW buffer."
+    (let* ((title (plist-get eww-data :title))
+           (url (file-name-base (eww-current-url)))
+           (buffer-name (or (if (and title (> (length title) 0))
+                                title
+                              nil)
+                            url "")))
+      (rename-buffer (format "eww: %s" buffer-name) t)))
+
+  (with-eval-after-load 'eww
+    ;; config
+    (setq eww-header-line-format nil)
+    (setq eww-search-prefix "http://www.google.co.jp/search?q="))
+
+  (with-eval-after-load 'eww
+    ;; keybind
+    (define-key eww-mode-map (kbd "C") #'eww-set-character-encoding)
+    (define-key eww-mode-map (kbd "C-j") #'eww-follow-link)
+    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading)
+    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading))
+
+  (with-eval-after-load 'eww
+    ;; hooks
+    (add-hook 'eww-after-render #'my/eww-rename-buffer))
+#+end_src
+** eww-lnum
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eww-lnum-follow eww-lnum-universal) "eww-lnum" nil t)
+
+  (with-eval-after-load 'eww
+    ;; keybinds
+    (define-key eww-mode-map "f" #'eww-lnum-follow)
+    (define-key eww-mode-map "F" #'eww-lnum-universal))
+#+end_src
+* Dired
+** basic
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'dired
+    ;; config
+    (setq dired-dwim-target nil)
+    (setq dired-hide-details-hide-symlink-targets nil)
+    (setq dired-listing-switches "-alh")
+    (setq dired-recursive-copies 'always)
+    (setq dired-use-ls-dired nil)
+
+    ;; hook
+    (add-hook 'dired-mode-hook #'(lambda () (display-line-numbers-mode -1))))
+#+end_src
+** dired-collapse
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-collapse-mode) "dired-collapse" nil t)
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (add-hook 'dired-mode #'dired-collapse-mode))
+#+end_src
+** dired-filter
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-filter-mode) "dired-filter" nil t)
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (add-hook 'dired-mode #'dired-filter-mode))
+#+end_src
+** TODO dired-narrow
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
+
+  ;; (with-eval-after-load 'dired
+  ;;   (add-hook 'dired-mode-hook #'dired-narrow-mode))
+#+end_src
+** TODO dired-open
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-open-file) "dired-open" nil t)
+
+  ;; (with-eval-after-load 'dired
+  ;;   (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
+#+end_src
+** dired-ranger
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '() "dired-ranger" nil t)
+#+end_src
+** dired-quick-sort
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-quick-sort-setup) "dired-quick-sort" nil t)
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (add-hook 'dired-mode-hook #'dired-quick-sort-setup))
+#+end_src
+** dired-subtree
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dired-subtree-apply-filter) "dired-subtree" nil t)
+#+end_src
+** diredfl
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(diredfl-global-mode) "diredfl" nil t)
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (add-hook 'dired-mode-hook #'diredfl-global-mode))
+#+end_src
+* Buffer/Window/File
+** Buffer
+*** auto-save-buffers-enhanced
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
+
+  ;; (add-hook 'window-setup-hook #'auto-save-buffers-enhanced)
+
+  (with-eval-after-load 'auto-save-buffers-enhanced
+    (setq auto-save-buffers-enhanced-interval 10))
+#+end_src
+*** editorconfig
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
+
+  (add-hook 'emacs-startup-hook #'editorconfig-mode)
+#+END_SRC
+*** persistent-scratch
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(persistent-scratch-setup-default) "persistent-scratch" nil t)
+
+  (add-hook 'window-setup-hook #'persistent-scratch-setup-default)
+
+  (with-eval-after-load 'persistent-scratch
+    ;; config
+    (setq persistent-scratch-autosave-interval 100))
+#+end_src
+*** popwin
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(popwin-mode) "popwin" nil t)
+
+  (add-hook 'emacs-startup-hook #'popwin-mode)
+
+#+end_src
+*** whitespace
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
+
+  (when window-system
+    (add-hook 'emacs-startup-hook #'global-whitespace-mode))
+
+  (with-eval-after-load 'whitespace
+    ;; config
+    (setq whitespace-style '(face tabs tab-mark spaces space-mark))
+    (setq whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
+                                          (tab-mark ?\t [?\xBB ?\t] [?\\ ?\t]))))
+#+END_SRC
+** File
+*** recentf
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(recentf-mode) "recentf" nil t)
+
+  (add-hook 'window-setup-hook #'recentf-mode)
+
+  (with-eval-after-load 'recentf
+    ;; config
+    (setq recentf-auto-cleanup 'never)
+    (setq recentf-max-menu-items 10000)
+    (setq recentf-max-saved-items 10000)
+    (setq recentf-save-file  "~/.emacs.d/.recentf")
+    (setq recentf-exclude '(".recentf" "\\.gpg\\")))
+#+END_SRC
+*** open-junk-file
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
+
+  (with-eval-after-load 'open-junk-file
+    ;; config
+    (setq open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
+#+END_SRC
+*** vlf
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
+
+  ;; (vlf-disable-for-function tags-verify-table "etags")
+  ;; (vlf-disable-for-function tag-find-file-of-tag-noselect "etags")
+  ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (define-key dired-mode-map (kbd "V") #'dired-vlf))
+#+end_src
+*** sudo-edit
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
 #+end_src
 ** Project
 *** projectile
@@ -2792,15 +3056,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'projectile-recentf :override #'consult-projectile-recentf)
     (advice-add 'projectile-switch-project :override #'consult-projectile-switch-project))
 #+end_src
-** Refactor
-*** emr
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(emr-show-refactor-menu) "emr" nil t)
-
-  (with-eval-after-load 'prog-mode
-    ;; keybinds
-    (define-key prog-mode-map (kbd "M-RET") #'emr-show-refactor-menu))
-#+END_SRC
 ** Search
 *** TODO migemo
 #+begin_src emacs-lisp :tangle yes
@@ -2809,6 +3064,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;; (add-hook 'window-setup-hook #'migemo-init)
 
   ;; (with-eval-after-load 'migemo
+  ;;   ;; config
   ;;   (setq migemo-command "cmigemo")
   ;;   (setq migemo-dictionary "~/.nix-profile/share/migemo/utf-8/migemo-dict")
   ;;   (setq migemo-user-dictionary nil)
@@ -2926,344 +3182,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq affe-find-command "fd --color=never --full-path")
     (setq affe-regexp-function 'orderless-pattern-compiler))
 #+end_src
-*** compile-multi
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(compile-multi) "compile-multi" nil t)
-  (autoload-if-found '(consult-compile-multi-mode) "consult-compile-multi" nil t)
-  (autoload-if-found '(compile-multi-embark-mode) "compile-multi-embark" nil t)
-
-  (keymap-global-set "C-x m" #'compile-multi)
-
-  ;; (with-eval-after-load 'consult
-  ;;   (consult-compile-multi-mode))
-
-  ;; (with-eval-after-load 'embark
-  ;;   (compile-multi-embark-mode))
-#+end_src
-*** vertico
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(vertico-mode) "vertico" nil t)
-  (autoload-if-found '(vertico-directory-tidy
-                       vertico-directory-enter
-                       vertico-directory-delete-char
-                       vertico-directory-delete-word) "vertico-directory" nil t)
-  (autoload-if-found '(vertico-flat-mode) "vertico-flat" nil t)
-
-  (add-hook 'window-setup-hook #'vertico-mode)
-
-  (with-eval-after-load 'rfn-eshadow
-    (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
-
-  (with-eval-after-load 'vertico
-    (setq vertico-count 8)
-    (setq vertico-cycle t))
-#+end_src
-*** TODO marginalia
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(marginalia-mode) "marginalia" nil t)
-
-  ;; (add-hook 'window-setup-hook #'marginalia-mode)
-
-  (with-eval-after-load 'minibuffer
-    (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
-#+end_src
-*** orderless
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(orderless-all-completions orderless-try-completion) "orderless" nil t)
-
-  (with-eval-after-load 'minibuffer
-    ;; config
-    (setq xcompletion-styles '(orderless basic))
-
-    ;; (setq completion-category-overrides '((file (styles basic partial-completion))))
-    (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
-                                                      "Completion of multiple components, in any order.")))
-#+end_src
-** Shell
-*** exec-path-from-shell
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
-
-  (add-hook 'window-setup-hook #'exec-path-from-shell-initialize)
-
-  (with-eval-after-load 'exec-path-from-shell
-    (setq exec-path-from-shell-variables '("PATH"
-                                             "GEM_HOME"
-                                             "GOROOT"
-                                             "GOPATH"
-                                             "LSP_USE_PLISTS"
-                                             "TERM"
-                                             "SSH_AUTH_SOCK"
-                                             "NATIVE_FULL_AOT"
-                                             "GPG_TTY")))
-#+END_SRC
-** Snippet
-*** yasnippet
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(yas-global-mode) "yasnippet" nil t)
-
-  (add-hook 'window-setup-hook #'yas-global-mode)
-#+end_src
-*** consult-yasnippet
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(consult-yasnippet) "consult-yasnippet" nil t)
-
-  (keymap-global-set "C-c y" #'consult-yasnippet)
-  (keymap-global-set "C-c C-y" #'consult-yasnippet)
-#+end_src
-** Statistics
-*** esup
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(esup) "esup" nil t)
-#+END_SRC
-*** explain-pause-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(explain-pause-mode) "explain-pause-mode" nil t)
-#+end_src
-*** disk-usage
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(disk-usage disk-usage-here) "disk-usage" nil t)
-#+end_src
-*** keyfreq
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(keyfreq-mode keyfreq-autosave-mode) "keyfreq" nil t)
-
-  (add-hook 'window-setup-hook #'keyfreq-mode)
-  (add-hook 'window-setup-hook #'keyfreq-autosave-mode)
-#+end_src
-*** uptimes
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(uptimes) "uptimes" nil t)
-#+end_src
-** Syntax
-*** syntax-subword
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-syntax-subword-mode) "syntax-subword" nil t)
-
-  (add-hook 'window-setup-hook #'global-syntax-subword-mode)
-#+end_src
-** System
-*** symon
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(symon-mode) "symon" nil t)
-#+end_src
-** Tab
-*** tab-bar
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(tab-bar-mode
-                       tab-bar-history-mode
-                       tab-previous
-                       tab-next) "tab-bar" nil t)
-
-  (add-hook 'window-setup-hook #'tab-bar-history-mode)
-
-  (keymap-global-set "C-x C-t" tab-prefix-map)
-  (keymap-global-set "M-[" #'tab-previous)
-  (keymap-global-set "M-]" #'tab-next)
-
-
-  (with-eval-after-load 'tab-bar
-    ;; rename tab-bar with projectile
-    (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
-
-    ;; config
-    (setq tab-bar-close-button-show nil)
-    (setq tab-bar-close-last-tab-choice nil)
-    (setq tab-bar-close-tab-select 'left)
-    (setq tab-bar-history-mode nil)
-    (setq tab-bar-new-tab-choice "*scratch*")
-    (setq tab-bar-new-button-show nil)
-    (setq tab-bar-tab-name-truncated-max 12)
-    (setq tab-bar-separator " | ")
-
-    ;; advice
-    ;; close neotree when tab bar action
-    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
-
-    ;; function
-    (defun my/tab-bar-rename-tab ()
-      (interactive)
-      (let ((proj-name (projectile-project-name)))
-        (tab-bar-rename-tab proj-name)))
-
-    ;; hook
-    (add-hook 'tab-bar-mode-hook #'(lambda () (display-line-numbers-mode -1))))
-#+end_src
-** Template
-*** auto-insert
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(auto-insert-mode) "autoinsert" nil t)
-
-  ;; (add-hook 'window-setup-hook #'auto-insert-mode)
-
-  (with-eval-after-load 'autoinsert
-    (setq auto-insert-directory "~/.emacs.d/auto-insert"))
-#+end_src
-** Undo
-*** undo-tree
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-undo-tree-mode) "undo-tree" nil t)
-
-  (add-hook 'window-setup-hook #'global-undo-tree-mode)
-
-  (with-eval-after-load 'undo-tree
-    (setq undo-tree-auto-save-history nil))
-#+end_src
-** View Mode
-*** view-mode
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'files
-    (add-hook 'find-file-hooks #'view-mode))
-
-  (with-eval-after-load 'view
-    ;; hooks
-    (add-hook 'view-mode-hook #'my/enable-view-mode-automatically)
-
-    ;; keybind
-    (define-key view-mode-map (kbd "f") #'forward-char)
-    (define-key view-mode-map (kbd "b") #'backward-char)
-    (define-key view-mode-map (kbd "n") #'my/org-view-next-heading)
-    (define-key view-mode-map (kbd "p") #'my/org-view-previous-heading)
-    (define-key view-mode-map (kbd "@") #'set-mark-command)
-    (define-key view-mode-map (kbd "C-c '") #'my/org-edit-special)
-    (define-key view-mode-map (kbd "C-c C-C") #'my/org-ctrl-c-ctrl-c)
-    (define-key view-mode-map (kbd "e") nil)
-    (define-key view-mode-map (kbd "C-j") nil)
-    (define-key view-mode-map (kbd "C-i") #'my/view-tab)
-    (define-key view-mode-map (kbd "S-C-i") #'my/view-shifttab)
-
-    ;; functions
-    (defun my/org-view-next-heading ()
-      (interactive)
-      (if (and (derived-mode-p 'org-mode)
-               (org-at-heading-p))
-          (org-next-visible-heading 1)
-        (next-line)))
-
-    (defun my/org-view-previous-heading ()
-      (interactive)
-      (if (and (derived-mode-p 'org-mode)
-               (org-at-heading-p))
-          (org-previous-visible-heading 1)
-        (previous-line)))
-
-    (defun my/view-tab ()
-      (interactive)
-      (when (and (derived-mode-p 'org-mode)
-                 (or (org-at-heading-p)
-                     (org-at-property-drawer-p)))
-        (let ((view-mode nil))
-          (org-cycle))))
-
-    (defun my/view-shifttab ()
-      (interactive)
-      (when (derived-mode-p 'org-mode)
-        (let ((view-mode nil))
-          (org-shifttab))))
-
-    (defun my/org-edit-special ()
-      (interactive)
-      (when (derived-mode-p 'org-mode)
-        (view-mode -1)
-        (org-edit-special)))
-
-    (defun my/org-ctrl-c-ctrl-c ()
-      (interactive)
-      (when (derived-mode-p 'org-mode)
-        (view-mode -1)
-        (org-ctrl-c-ctrl-c)))
-
-    (defvar my/view-mode-timer nil)
-    (defun my/enable-view-mode-automatically ()
-      (if view-mode
-          (when my/view-mode-timer
-            (cancel-timer my/view-mode-timer))
-        (setq my/view-mode-timer (run-with-idle-timer (* 60 10) nil #'view-mode))))
-
-    ;; advices
-    (advice-add 'view--disable :before #'(lambda (&rest _) (view-lock-mode -1))))
-#+end_src
-*** view-lock-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(view-lock-timer-start view-lock-quit) "view-lock-mode" nil t)
-
-  (with-eval-after-load 'view
-    (add-hook 'view-mode-hook #'view-lock-timer-start))
-
-  (with-eval-after-load 'view-lock-mode
-    (setq view-lock-start-time (* 30 60)))
-#+end_src
-** Password
-*** pass
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(pass pass-view-mode) "pass" nil t)
-
-  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/password-store/.*\\.gpg") 'pass-view-mode))
-
-  (with-eval-after-load 'pass
-    (setq pass-suppress-confirmations t))
-#+end_src
-** Utility
-*** comint
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'comint
-    (setq comint-buffer-maximum-size 100000)
-    (setq comint-prompt-read-only t)
-    (setq comint-terminfo-terminal "eterm-256color"))
-#+end_src
-*** crux
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(crux-open-with
-                       crux-smart-open-line-above
-                       crux-cleanup-buffer-or-region
-                       crux-view-url
-                       crux-transpose-windows
-                       crux-duplicate-current-line-or-region
-                       crux-duplicate-and-comment-current-line-or-region
-                       crux-rename-file-and-buffer
-                       crux-visit-term-buffer
-                       crux-kill-other-buffers
-                       crux-indent-defun
-                       crux-top-join-lines
-                       crux-kill-line-backwards) "crux" nil t)
-
-  ;; keybind
-  (keymap-global-set "C-c o" #'crux-open-with)
-  (keymap-global-set "C-S-o" #'crux-smart-open-line-above)
-  (keymap-global-set "C-c u" #'crux-view-url)
-  (keymap-global-set "C-x 4 t" #'crux-transpose-windows)
-  (keymap-global-set "C-c d" #'crux-duplicate-current-line-or-region)
-  (keymap-global-set "C-c M-d" #'crux-duplicate-and-comment-current-line-or-region)
-  (keymap-global-set "C-c r" #'crux-rename-file-and-buffer)
-  (keymap-global-set "C-c M-t" #'crux-visit-term-buffer)
-  (keymap-global-set "C-c k" #'crux-kill-other-buffers)
-  (keymap-global-set "C-M-z" #'crux-indent-defun)
-  (keymap-global-set "C-^" #'crux-top-join-lines)
-  (keymap-global-set "C-DEL" #'crux-kill-line-backwards)
-#+end_src
-*** delsel
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(delete-selection-mode) "delsel" nil t)
-
-  (add-hook 'window-setup-hook #'delete-selection-mode)
-#+end_src
-*** dogears
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dogears-go
-                       dogears-back
-                       dogears-forward
-                       dogears-list
-                       dogears-sidebar) "dogears" nil t)
-
-  ;; keybind
-  (keymap-global-set "M-g d" #'dogears-go)
-  (keymap-global-set "M-g M-b" #'dogears-back)
-  (keymap-global-set "M-g M-f" #'dogears-forward)
-  (keymap-global-set "M-g M-d" #'dogears-list)
-  (keymap-global-set "M-g M-D" #'dogears-sidebar)
-#+end_src
 *** embark
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(embark-act embark-dwim embark-prefix-help-command) "embark" nil t)
@@ -3330,118 +3248,58 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; consult
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 #+end_src
-*** goto-addr
+*** compile-multi
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(goto-address-prog-mode goto-address-mode) "goto-address" nil t)
+  (autoload-if-found '(compile-multi) "compile-multi" nil t)
+  (autoload-if-found '(consult-compile-multi-mode) "consult-compile-multi" nil t)
+  (autoload-if-found '(compile-multi-embark-mode) "compile-multi-embark" nil t)
 
-  (with-eval-after-load 'prog-mode
-    (add-hook 'prog-mode-hook #'goto-address-prog-mode))
+  (keymap-global-set "C-x m" #'compile-multi)
 
-  (with-eval-after-load 'text-mode
-    (add-hook 'text-mode-hook #'goto-address-mode))
-#+END_SRC
-*** htmlize
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'htmlize
-    (setq htmlize-html-charset 'utf-8))
+  ;; (with-eval-after-load 'consult
+  ;;   (consult-compile-multi-mode))
+
+  ;; (with-eval-after-load 'embark
+  ;;   (compile-multi-embark-mode))
 #+end_src
-*** midnight
+*** vertico
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(midnight-mode) "midnight" nil t)
+  (autoload-if-found '(vertico-mode) "vertico" nil t)
+  (autoload-if-found '(vertico-directory-tidy
+                       vertico-directory-enter
+                       vertico-directory-delete-char
+                       vertico-directory-delete-word) "vertico-directory" nil t)
+  (autoload-if-found '(vertico-flat-mode) "vertico-flat" nil t)
 
-  (add-hook 'window-setup-hook #'midnight-mode)
+  (add-hook 'window-setup-hook #'vertico-mode)
 
-  (with-eval-after-load 'midnight
-    (setq clean-buffer-list-delay-general 1))
+  (with-eval-after-load 'rfn-eshadow
+    (add-hook 'rfn-eshadow-update-overlay #'vertico-directory-tidy))
+
+  (with-eval-after-load 'vertico
+    (setq vertico-count 8)
+    (setq vertico-cycle t))
 #+end_src
-*** minimap
+*** marginalia
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(minimap-mode) "minimap" nil t)
+  (autoload-if-found '(marginalia-mode) "marginalia" nil t)
 
-  (keymap-global-set "C-c m" #'minimap-mode)
-
-  (with-eval-after-load 'minimap
-    (setq minimap-window-location 'right)
-    (setq minimap-update-delay 0.2)
-    (setq minimap-minimum-width 20)
-    (setq minimap-major-modes '(prog-mode org-mode)))
-#+end_src
-*** puni
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(puni-global-mode puni-disable-puni-mode) "puni" nil t)
-
-  (add-hook 'window-setup-hook #'puni-global-mode)
-
-  (with-eval-after-load 'lisp-mode
-    (add-hook 'lisp-mode-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'emacs-lisp-mode
-    (add-hook 'emacs-lisp-mode-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'clojure-mode
-    (add-hook 'clojure-mode-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'lisp-interaction-mode
-    (add-hook 'lisp-interacton-mode-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'scheme
-    (add-hook 'scheme-mode-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'simple
-    (add-hook 'eval-expression-minibuffer-setup-hook #'puni-disable-puni-mode))
-
-  (with-eval-after-load 'ielm
-    (add-hook 'inferior-emacs-lisp-mode-hook #'puni-disable-puni-mode))
+  (add-hook 'window-setup-hook #'marginalia-mode)
 
   (with-eval-after-load 'minibuffer
-    (add-hook 'minibuffer-mode-hook #'puni-disable-puni-mode))
+    (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
 #+end_src
-*** quickrun
+*** orderless
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(quickrun) "quickrun" nil t)
-#+end_src
-*** restclient
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(restclient-mode) "restclient" nil t)
-#+end_src
-*** smartparens
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'smartparens)
-#+END_SRC
-*** smart-jump
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'smart-jump)
-#+end_src
-*** string-inflection
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(string-inflection-all-cycle) "string-inflection" nil t)
-#+end_src
-*** sudo-edit
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
-#+end_src
-*** topsy
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(topsy-mode) "topsy" nil t)
-  ;; (with-eval-after-load 'prog-mode
-  ;;   (add-hook 'prog-mode-hook #'topsy-mode))
+  (autoload-if-found '(orderless-all-completions orderless-try-completion) "orderless" nil t)
 
-  ;; (with-eval-after-load 'lsp-ui-mode
-  ;;   (add-hook 'lsp-ui-mode-hook #'(lambda () (topsy-mode -1))))
-#+end_src
-*** uuid
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(uuid-string) "uuid" nil t)
+  (with-eval-after-load 'minibuffer
+    ;; config
+    (setq xcompletion-styles '(orderless basic))
 
-  (defun my/uuid ()
-    (interactive)
-    (insert (uuid-string)))
-
-  (defalias 'uuid #'my/uuid)
-#+end_src
-*** woman
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(woman woman-find-file) "woman" nil t)
+    ;; (setq completion-category-overrides '((file (styles basic partial-completion))))
+    (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
+                                                      "Completion of multiple components, in any order.")))
 #+end_src
 ** Window
 *** ace-window
@@ -3481,19 +3339,151 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (keymap-global-set "C-c C-z" #'zoom-window-zoom)
 #+end_src
-** Remote Access
-*** docker-tramp
+* Cursor
+** avy
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(docker-tramp-add-method) "docker-tramp" nil t)
+  (autoload-if-found '(avy-goto-word-1) "avy" nil t)
 
-  ;; (add-hook 'window-setup-hook #'docker-tramp-add-method)
-
-  (with-eval-after-load 'tramp
-    (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
+  (with-eval-after-load 'avy
+    ;; config
+    (setq avy-all-windows nil)
+    (setq avy-background t))
 #+end_src
-*** consult-tramp
+** avy-zap
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(consult-tramp) "consult-tramp" nil t)
+  (autoload-if-found '(avy-zap-up-to-char-dwim) "avy-zap" nil t)
+#+end_src
+** expand-region
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(er/expand-region) "expand-region" nil t)
+
+  (add-hook 'window-setup-hook #'transient-mark-mode)
+#+end_src
+** multiple-cursors
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(mc/mark-next-like-this mc/mark-previous-like-this mc/mark-all-like-this) "multiple-cursors" nil t)
+#+END_SRC
+* Awesome Package
+** Command
+*** amx
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(amx-mode) "amx" nil t)
+
+  (add-hook 'window-setup-hook #'amx-mode)
+
+  (with-eval-after-load 'amx
+    ;; config
+    (setq amx-history-length 100))
+#+END_SRC
+** GPG
+*** epa-file
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(epa-file-enable) "epa-file" nil t)
+
+  (add-hook 'window-setup-hook #'epa-file-enable)
+
+  (with-eval-after-load 'epa-file
+    ;; config
+    (setq epa-file-encrypt-to '("bararararatty@gmail.com"))
+    (setq epa-file-select-keys 'silent)
+    (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+    (setq epg-pinentry-mode 'loopback)
+
+    ;; fset
+    (fset 'epg-wait-for-status 'ignore))
+#+end_src
+*** pinentry
+https://github.com/ch11ng/exwm/wiki#gpg-pinentry
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(pinentry-start) "pinentry" nil t)
+#+end_src
+** Help
+*** helpful
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(helpful-callable
+                       helpful-function
+                       helpful-macro
+                       helpful-command
+                       helpful-key
+                       helpful-variable
+                       helpful-at-point) "helpful" nil t)
+#+end_src
+** Shell
+*** exec-path-from-shell
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
+
+  (add-hook 'window-setup-hook #'exec-path-from-shell-initialize)
+
+  (with-eval-after-load 'exec-path-from-shell
+    (setq exec-path-from-shell-variables '("PATH"
+                                             "GEM_HOME"
+                                             "GOROOT"
+                                             "GOPATH"
+                                             "LSP_USE_PLISTS"
+                                             "TERM"
+                                             "SSH_AUTH_SOCK"
+                                             "NATIVE_FULL_AOT"
+                                             "GPG_TTY")))
+#+END_SRC
+** Tab
+*** tab-bar
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(tab-bar-mode
+                       tab-bar-history-mode
+                       tab-previous
+                       tab-next) "tab-bar" nil t)
+
+  (add-hook 'window-setup-hook #'tab-bar-history-mode)
+
+  (keymap-global-set "C-x C-t" tab-prefix-map)
+  (keymap-global-set "M-[" #'tab-previous)
+  (keymap-global-set "M-]" #'tab-next)
+
+
+  (with-eval-after-load 'tab-bar
+    ;; rename tab-bar with projectile
+    (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
+
+    ;; config
+    (setq tab-bar-close-button-show nil)
+    (setq tab-bar-close-last-tab-choice nil)
+    (setq tab-bar-close-tab-select 'left)
+    (setq tab-bar-history-mode nil)
+    (setq tab-bar-new-tab-choice "*scratch*")
+    (setq tab-bar-new-button-show nil)
+    (setq tab-bar-tab-name-truncated-max 12)
+    (setq tab-bar-separator " | ")
+
+    ;; advice
+    ;; close neotree when tab bar action
+    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
+
+    ;; function
+    (defun my/tab-bar-rename-tab ()
+      (interactive)
+      (let ((proj-name (projectile-project-name)))
+        (tab-bar-rename-tab proj-name)))
+
+    ;; hook
+    (add-hook 'tab-bar-mode-hook #'(lambda () (display-line-numbers-mode -1))))
+#+end_src
+** Utility
+*** htmlize
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'htmlize
+    (setq htmlize-html-charset 'utf-8))
+#+end_src
+*** midnight
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(midnight-mode) "midnight" nil t)
+
+  (add-hook 'window-setup-hook #'midnight-mode)
+
+  (with-eval-after-load 'midnight
+    (setq clean-buffer-list-delay-general 1))
 #+end_src
 * Language Specific
 ** Basic Lisp
@@ -4153,18 +4143,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-archive-subtree :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
     (advice-add 'org-archive-subtree :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
 #+END_SRC
-*** org-clock
+*** TODO org-clock
 #+begin_src emacs-lisp :tangle yes
   ;; (add-hook 'kill-emacs-hook #'org-clock-save)
 
-  (with-eval-after-load 'org
-    ;; hooks
-    (add-hook 'org-mode-hook #'org-clock-load))
+  ;; (with-eval-after-load 'org
+  ;;   ;; hooks
+  ;;   (add-hook 'org-mode-hook #'org-clock-load))
 
-  (with-eval-after-load 'org-clock
-    ;; config
-    (setq org-clock-out-remove-zero-time-clocks t)
-    (setq org-clock-clocked-in-display 'mode-line))
+  ;; (with-eval-after-load 'org-clock
+  ;;   ;; config
+  ;;   (setq org-clock-out-remove-zero-time-clocks t)
+  ;;   (setq org-clock-clocked-in-display 'mode-line))
 #+end_src
 *** org-list
 #+begin_src emacs-lisp :tangle yes
