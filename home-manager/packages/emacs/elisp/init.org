@@ -1521,21 +1521,20 @@
     ;; config
     (setq xterm-color-preserve-properties t))
 #+end_src
-** Theme
-*** nerd-icons-dired
+** nerd-icons-dired
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-dired-mode) "nerd-icons-dired" nil t)
 
   (with-eval-after-load 'dired-mode
     (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
 #+end_src
-*** nerd-icons-completion
+** nerd-icons-completion
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
 
   ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
 #+end_src
-*** dashboard
+** dashboard
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
 
@@ -1545,7 +1544,7 @@
     (setq dashboard-startup-banner 4)
     (setq dashboard-items '((recents . 10))))
 #+end_src
-*** dimmer
+** dimmer
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dimmer-configure-which-key
                        dimmer-configure-org
@@ -1556,7 +1555,7 @@
   (add-hook 'window-setup-hook #'dimmer-configure-which-key)
   ;; (add-hook 'window-setup-hook #'dimmer-configure-org)
 #+end_src
-*** doom-themes
+** doom-themes
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(doom-themes-enable-org-fontification) "doom-themes-ext-org" nil t)
 
@@ -1572,7 +1571,7 @@
     (setq doom-themes-enable-bold t)
     (setq doom-themes-enable-italic t))
 #+END_SRC
-*** doom-modeline
+** doom-modeline
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
 
@@ -1587,7 +1586,7 @@
     (setq doom-modeline-major-mode-icon `,(display-graphic-p))
     (setq doom-modeline-minor-modes nil))
 #+END_SRC
-*** hl-line
+** hl-line
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-hl-line-mode) "hl-line-mode" nil t)
 
@@ -1600,7 +1599,7 @@
     (set-face-attribute 'hl-line nil :inherit nil)
     (set-face-background 'hl-line "#444642"))
 #+END_SRC
-*** idle-highlight-mode
+** idle-highlight-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
 
@@ -1610,7 +1609,7 @@
   (with-eval-after-load 'prog-mode
     (add-hook 'prog-mode-hook #'idle-highlight-mode))
 #+end_src
-*** neotree
+** neotree
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(neotree-hide neotree-dir neotree-make-executor neo-open-file neo-open-dir) "neotree" nil t)
 
@@ -1639,7 +1638,7 @@
     ;;                                           :dir-fn  #'neo-open-dir))
     )
 #+END_SRC
-*** nyan-mode
+** nyan-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nyan-mode) "nyan-mode" nil t)
 
@@ -1649,13 +1648,13 @@
     (setq nyan-cat-face-number 5)
     (setq nyan-animate-nyancat t))
 #+END_SRC
-*** volatile-highlights
+** volatile-highlights
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
 
   (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
 #+end_src
-*** idle-highlight-mode
+** idle-highlight-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
 
