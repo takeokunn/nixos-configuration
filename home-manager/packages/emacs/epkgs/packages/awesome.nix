@@ -51,6 +51,8 @@ in with epkgs; [
   define-word
 
   # Dired
+  dired-narrow
+  dired-open
   dired-quick-sort
   diredfl
 

@@ -174,81 +174,6 @@
             #'(lambda ()
                 (fset 'yes-or-no-p 'y-or-n-p)))
 #+end_src
-** global keybind
-#+begin_src emacs-lisp :tangle yes
-  (keymap-global-set "M-¥" #'(lambda () (interactive) (insert "\\")))
-  (keymap-global-set "C-a" #'back-to-indentation)
-  (keymap-global-set "C-z" nil)
-  (keymap-global-set "C-;" #'comment-dwim)
-  (keymap-global-set "C-M-/" #'undo-redo)
-  (keymap-global-set "C-c i" #'find-function)
-  (keymap-global-set "C-c C-o" #'org-open-at-point)
-  (keymap-global-set "C-x C-o" #'other-window)
-  (keymap-global-set "M-h" #'backward-kill-word)
-
-  (keymap-global-set "C-x l" 'next-buffer)
-  (keymap-global-set "C-x h" 'previous-buffer)
-  (keymap-global-set "C-x C-b" #'switch-to-buffer)
-
-  (keymap-global-set "C-x C-k" nil)
-
-  (keymap-global-set "C-M-@" 'er/expand-region)
-
-  (keymap-global-set "C-c f" #'paredit-forward-slurp-sexp)
-  (keymap-global-set "M-s" #'paredit-splice-sexp)
-
-  (keymap-global-set "C-:" #'avy-goto-word-1)
-  (keymap-global-set "M-z" 'avy-zap-up-to-char-dwim)
-
-  (keymap-global-set "M-d" #'my/delete-forward-block)
-
-  (keymap-global-set "C->" #'mc/mark-next-like-this)
-  (keymap-global-set "C-<" #'mc/mark-previous-like-this)
-  (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
-
-  (keymap-global-set "C-x j" #'open-junk-file)
-
-  (keymap-global-set "C-x g" #'my/magit-status)
-  (keymap-global-set "C-x G" #'magit-blame)
-
-  (keymap-global-set "C-h f" #'helpful-callable)
-  (keymap-global-set "C-h v" #'helpful-variable)
-  (keymap-global-set "C-h k" #'helpful-key)
-  (keymap-global-set "C-c C-d" #'helpful-at-point)
-  (keymap-global-set "C-h F" #'helpful-function)
-  (keymap-global-set "C-h C" #'helpful-command)
-
-  (keymap-global-set "C-x C-j" #'skk-mode)
-
-  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
-  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
-  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
-
-  (keymap-global-set "C-x C-w" #'mu4e)
-
-  (keymap-global-set "C-c t" #'origami-recursively-toggle-node)
-  (keymap-global-set "C-c C-t" #'origami-recursively-toggle-node)
-
-  (keymap-global-set "C-c c" #'org-capture)
-  (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
-  (keymap-global-set "C-c l" #'org-store-link)
-  (keymap-global-set "C-c a" #'org-agenda)
-  (keymap-global-set "C-c n g" #'org-roam-graph)
-  (keymap-global-set "C-c n l" #'org-roam-buffer-toggle)
-  (keymap-global-set "C-c n f" #'org-roam-node-find)
-  (keymap-global-set "C-c n i" #'org-roam-node-insert)
-  (keymap-global-set "C-c n c" #'org-roam-capture)
-  (keymap-global-set "C-c n d" #'org-roam-dailies-map)
-  (keymap-global-set "C-c n j" #'org-roam-dailies-goto-today)
-  (keymap-global-set "C-c n e" #'consult-org-roam-file-find)
-  (keymap-global-set "C-c n b" #'consult-org-roam-backlinks)
-  (keymap-global-set "C-c n B" #'consult-org-roam-backlinks-recursive)
-  (keymap-global-set "C-c n l" #'consult-org-roam-forward-links)
-  (keymap-global-set "C-c n r" #'consult-org-roam-search)
-
-  (when window-system
-    (keymap-global-set "C-x C-c" nil))
-#+END_SRC
 ** minibuffer
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'minibuffer
@@ -357,6 +282,30 @@
 #+begin_src emacs-lisp :tangle yes
   (setq indent-tabs-mode nil)
   (setq tab-width 4)
+#+END_SRC
+* Global Keybind
+** basic
+#+begin_src emacs-lisp :tangle yes
+  (keymap-global-set "M-¥" #'(lambda () (interactive) (insert "\\")))
+  (keymap-global-set "C-a" #'back-to-indentation)
+  (keymap-global-set "C-z" nil)
+  (keymap-global-set "C-;" #'comment-dwim)
+  (keymap-global-set "C-M-/" #'undo-redo)
+  (keymap-global-set "C-c i" #'find-function)
+  (keymap-global-set "C-c C-o" #'org-open-at-point)
+  (keymap-global-set "C-x C-o" #'other-window)
+  (keymap-global-set "M-h" #'backward-kill-word)
+
+  (keymap-global-set "C-x l" #'next-buffer)
+  (keymap-global-set "C-x h" #'previous-buffer)
+  (keymap-global-set "C-x C-b" #'switch-to-buffer)
+
+  (keymap-global-set "C-x C-k" nil)
+
+  (keymap-global-set "M-d" #'my/delete-forward-block)
+
+  (when window-system
+    (keymap-global-set "C-x C-c" nil))
 #+END_SRC
 * Language
 ** apache-mode
@@ -1530,7 +1479,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
 
-  ;; (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
+  (add-hook 'window-setup-hook #'nerd-icons-completion-marginalia-setup)
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp :tangle yes
@@ -1669,6 +1618,8 @@
 ** ddskk
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
+
+  (keymap-global-set "C-x C-j" #'skk-mode)
 
   (defun my/skk-C-j-key (arg)
     (interactive "P")
@@ -1813,6 +1764,9 @@
   (autoload-if-found '(magit-status magit-blame) "magit")
 
   (add-hook 'window-setup-hook #'global-git-commit-mode)
+
+  (keymap-global-set "C-x g" #'my/magit-status)
+  (keymap-global-set "C-x G" #'magit-blame)
 
   (defun my/magit-status ()
     (interactive)
@@ -2022,6 +1976,9 @@
 *** origami
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
+
+  (keymap-global-set "C-c t" #'origami-recursively-toggle-node)
+  (keymap-global-set "C-c C-t" #'origami-recursively-toggle-node)
 
   (add-hook 'window-setup-hook #'global-origami-mode)
 #+end_src
@@ -2659,6 +2616,10 @@
   (autoload-if-found '(lorem-ipsum-insert-sentences
                        lorem-ipsum-insert-paragraphs
                        lorem-ipsum-insert-list) "lorem-ipsum" nil t)
+
+  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
+  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
+  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
 #+end_src
 ** Password
 *** pass
@@ -2699,6 +2660,8 @@
 *** mu4e
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mu4e) "mu4e" nil t)
+
+  (keymap-global-set "C-x C-w" #'mu4e)
 
   (with-eval-after-load 'mu4e
     ;; config
@@ -2879,19 +2842,19 @@
     ;; hooks
     (add-hook 'dired-mode #'dired-filter-mode))
 #+end_src
-** TODO dired-narrow
+** dired-narrow
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
 
-  ;; (with-eval-after-load 'dired
-  ;;   (add-hook 'dired-mode-hook #'dired-narrow-mode))
+  (with-eval-after-load 'dired
+    (add-hook 'dired-mode-hook #'dired-narrow-mode))
 #+end_src
-** TODO dired-open
+** dired-open
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-open-file) "dired-open" nil t)
 
-  ;; (with-eval-after-load 'dired
-  ;;   (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
+  (with-eval-after-load 'dired
+    (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
 #+end_src
 ** dired-ranger
 #+begin_src emacs-lisp :tangle yes
@@ -2982,6 +2945,8 @@
 *** open-junk-file
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
+
+  (keymap-global-set "C-x j" #'open-junk-file)
 
   (with-eval-after-load 'open-junk-file
     ;; config
@@ -3114,10 +3079,12 @@
                        consult-mode-command
 
                        ;; other
+  		     consult-completion-in-region
                        consult-preview-at-point-mode
                        consult-register-window) "consult" nil t)
+
   (autoload-if-found '(consult-compile-error) "consult-compile" nil t)
-  ;; (autoload-if-found '(consult-org-heading consult-org-agenda) "consult-org" nil t)
+  (autoload-if-found '(consult-org-heading consult-org-agenda) "consult-org" nil t)
   (autoload-if-found '(consult-imenu consult-imenu-multi) "consult-imenu" nil t)
   (autoload-if-found '(consult-kmacro) "consult-kmacro" nil t)
   (autoload-if-found '(consult-xref) "consult-xref" nil t)
@@ -3159,6 +3126,10 @@
 
   ;; Minibuffer history
   (with-eval-after-load 'minibuffer
+    ;; config
+    (setq completion-in-region-function #'consult-completion-in-region)
+
+    ;; keybinds
     (define-key minibuffer-local-map (kbd "M-s") #'consult-history)
     (define-key minibuffer-local-map (kbd "M-r") #'consult-history))
 
@@ -3211,17 +3182,17 @@
          (funcall #',split-type)
          (call-interactively #',fn)))
 
-    (defun my/sudo-find-file (file)
-      "Open FILE as root."
-      (interactive "FOpen file as root: ")
-      (when (file-writable-p file)
-        (user-error "File is user writeable, aborting sudo"))
-      (find-file (if (file-remote-p file)
-                     (concat "/" (file-remote-p file 'method) ":"
-                             (file-remote-p file 'user) "@" (file-remote-p file 'host)
-                             "|sudo:root@"
-                             (file-remote-p file 'host) ":" (file-remote-p file 'localname))
-                   (concat "/sudo:root@localhost:" file))))
+    ;; (defun my/sudo-find-file (file)
+    ;;   "Open FILE as root."
+    ;;   (interactive "FOpen file as root: ")
+    ;;   (when (file-writable-p file)
+    ;;     (user-error "File is user writeable, aborting sudo"))
+    ;;   (find-file (if (file-remote-p file)
+    ;;                  (concat "/" (file-remote-p file 'method) ":"
+    ;;                          (file-remote-p file 'user) "@" (file-remote-p file 'host)
+    ;;                          "|sudo:root@"
+    ;;                          (file-remote-p file 'host) ":" (file-remote-p file 'localname))
+    ;;                (concat "/sudo:root@localhost:" file))))
 
     ;; config
     (setq embark-mixed-indicator-delay 0.1)
@@ -3243,7 +3214,7 @@
     (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
 
     ;; sudo
-    (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
+    ;; (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
     ;; consult
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
@@ -3295,7 +3266,7 @@
 
   (with-eval-after-load 'minibuffer
     ;; config
-    (setq xcompletion-styles '(orderless basic))
+    (setq completion-styles '(orderless basic))
 
     ;; (setq completion-category-overrides '((file (styles basic partial-completion))))
     (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
@@ -3344,6 +3315,8 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-goto-word-1) "avy" nil t)
 
+  (keymap-global-set "C-:" #'avy-goto-word-1)
+
   (with-eval-after-load 'avy
     ;; config
     (setq avy-all-windows nil)
@@ -3352,16 +3325,24 @@
 ** avy-zap
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-zap-up-to-char-dwim) "avy-zap" nil t)
+
+  (keymap-global-set "M-z" #'avy-zap-up-to-char-dwim)
 #+end_src
 ** expand-region
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(er/expand-region) "expand-region" nil t)
 
   (add-hook 'window-setup-hook #'transient-mark-mode)
+
+  (keymap-global-set "C-M-@" #'er/expand-region)
 #+end_src
 ** multiple-cursors
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mc/mark-next-like-this mc/mark-previous-like-this mc/mark-all-like-this) "multiple-cursors" nil t)
+
+  (keymap-global-set "C->" #'mc/mark-next-like-this)
+  (keymap-global-set "C-<" #'mc/mark-previous-like-this)
+  (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
 #+END_SRC
 * Awesome Package
 ** Command
@@ -3407,6 +3388,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        helpful-key
                        helpful-variable
                        helpful-at-point) "helpful" nil t)
+
+  (keymap-global-set "C-h f" #'helpful-callable)
+  (keymap-global-set "C-h v" #'helpful-variable)
+  (keymap-global-set "C-h k" #'helpful-key)
+  (keymap-global-set "C-c C-d" #'helpful-at-point)
+  (keymap-global-set "C-h F" #'helpful-function)
+  (keymap-global-set "C-h C" #'helpful-command)
 #+end_src
 ** Shell
 *** exec-path-from-shell
@@ -3494,6 +3482,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        paredit-splice-sexp
                        paredit-define-keys)
                      "paredit" nil t)
+
+  (keymap-global-set "C-c f" #'paredit-forward-slurp-sexp)
+  (keymap-global-set "M-s" #'paredit-splice-sexp)
 
   (with-eval-after-load 'paredit
     ;; hooks
@@ -4102,6 +4093,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 ** Basic
 *** org
 #+begin_src emacs-lisp :tangle yes
+  (keymap-global-set "C-c l" #'org-store-link)
+  (keymap-global-set "C-c a" #'org-agenda)
+
   (with-eval-after-load 'org
     ;; keybind
     (define-key org-mode-map (kbd "C-c ,") #'org-insert-structure-template)
@@ -4143,18 +4137,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-archive-subtree :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
     (advice-add 'org-archive-subtree :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
 #+END_SRC
-*** TODO org-clock
+*** org-clock
 #+begin_src emacs-lisp :tangle yes
-  ;; (add-hook 'kill-emacs-hook #'org-clock-save)
+  (autoload-if-found '(org-clock-load org-clock-save) "org-clock" nil t)
 
-  ;; (with-eval-after-load 'org
-  ;;   ;; hooks
-  ;;   (add-hook 'org-mode-hook #'org-clock-load))
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'org-clock-load))
 
-  ;; (with-eval-after-load 'org-clock
-  ;;   ;; config
-  ;;   (setq org-clock-out-remove-zero-time-clocks t)
-  ;;   (setq org-clock-clocked-in-display 'mode-line))
+  (with-eval-after-load 'org-clock
+    ;; config
+    (setq org-clock-out-remove-zero-time-clocks t)
+    (setq org-clock-clocked-in-display 'mode-line))
 #+end_src
 *** org-list
 #+begin_src emacs-lisp :tangle yes
@@ -4170,12 +4164,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     ;; keybind
     (add-to-list 'org-speed-commands '("d" org-todo "DONE"))
-    ;; (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading))
-    )
+    (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading)))
 #+end_src
 *** org-capture
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-capture) "org-capture" nil t)
+
+  (keymap-global-set "C-c c" #'org-capture)
 
   (with-eval-after-load 'org-capture
     ;; advice
@@ -4267,6 +4262,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-projectile-project-todo-completing-read)
                      "org-projectile" nil t)
 
+  (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
+
   (with-eval-after-load 'org
     (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
 #+end_src
@@ -4329,34 +4326,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setq org-link-file-path-type 'relative))
 #+end_src
-*** TODO org-link-beautify
+*** org-link-beautify
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "emacsmirror/org-link-beautify"))
-  ;;
-  ;; (with-delayed-execution
-  ;;   (message "Install org-link-beautify...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/org-link-beautify"))
-  ;;
-  ;;   (autoload-if-found '(org-link-beautify-mode) "org-link-beautify" nil t)
-  ;;
-  ;;   ;; (with-eval-after-load 'org
-  ;;   ;;   (add-hook 'org-mode-hook #'org-link-beautify-mode))
-  ;;   )
+  (autoload-if-found '(org-link-beautify-mode) "org-link-beautify" nil t)
+
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'org-link-beautify-mode))
 #+end_src
 *** TODO orgit
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "magit/orgit"))
-  ;;
-  ;; (with-delayed-execution
-  ;;   (message "Install orgit...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/orgit"))
-  ;;
-  ;;   (autoload-if-found '(orgit-store-link) "orgit" nil t)
-  ;;
-  ;;   (with-eval-after-load 'magit
-  ;;     (define-key magit-mode-map [remap org-store-link] #'orgit-store-link)))
+  (autoload-if-found '(orgit-store-link) "orgit" nil t)
+
+  ;; (with-eval-after-load 'magit
+  ;;   (define-key magit-mode-map [remap org-store-link] #'orgit-store-link))
 #+end_src
 ** Org Agenda
 *** Basic
@@ -4655,6 +4638,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-graph) "org-roam" nil t)
 
+  (keymap-global-set "C-c n g" #'org-roam-graph)
+  (keymap-global-set "C-c n l" #'org-roam-buffer-toggle)
+  (keymap-global-set "C-c n f" #'org-roam-node-find)
+  (keymap-global-set "C-c n i" #'org-roam-node-insert)
+  (keymap-global-set "C-c n c" #'org-roam-capture)
+  (keymap-global-set "C-c n d" #'org-roam-dailies-map)
+  (keymap-global-set "C-c n j" #'org-roam-dailies-goto-today)
+
   (with-eval-after-load 'org-roam
     ;; config
     (setq org-roam-directory `,(concat (s-trim-right (shell-command-to-string "ghq root"))
@@ -4771,17 +4762,28 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** consult-org-roam
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(consult-org-roam-mode) "consult-org-roam" nil t)
+  (autoload-if-found '(consult-org-roam-mode
+  		     consult-org-roam-file-find
+  		     consult-org-roam-backlinks
+  		     consult-org-roam-backlinks-recursive
+  		     consult-org-roam-forward-links
+  		     consult-org-roam-search) "consult-org-roam" nil t)
+
+  (keymap-global-set "C-c n e" #'consult-org-roam-file-find)
+  (keymap-global-set "C-c n b" #'consult-org-roam-backlinks)
+  (keymap-global-set "C-c n B" #'consult-org-roam-backlinks-recursive)
+  (keymap-global-set "C-c n l" #'consult-org-roam-forward-links)
+  (keymap-global-set "C-c n r" #'consult-org-roam-search)
 
   (with-eval-after-load 'org
     ;; hooks
     (add-hook 'org-mode-hook #'consult-org-roam-mode))
 
-  ;; (with-eval-after-load 'consult-org-roam
-  ;;   ;; config
-  ;;   (setq consult-org-roam-grep-func #'consult-ripgrep)
-  ;;   (setq consult-org-roam-buffer-narrow-key ?r)
-  ;;   (setq consult-org-roam-buffer-after-buffers t))
+  (with-eval-after-load 'consult-org-roam
+    ;; config
+    (setq consult-org-roam-grep-func #'consult-ripgrep)
+    (setq consult-org-roam-buffer-narrow-key ?r)
+    (setq consult-org-roam-buffer-after-buffers t))
 #+end_src
 *** org-roam-ui
 #+begin_src emacs-lisp :tangle yes
