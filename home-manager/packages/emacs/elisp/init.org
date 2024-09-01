@@ -112,7 +112,7 @@
 
   (with-eval-after-load 'minibuffer
     (add-hook 'minibuffer-inactive-mode-hook #'my/disable-show-trailing-whitespace))
-  x
+
   (with-eval-after-load 'simple
     (add-hook 'fundamental-mode-hook #'my/disable-show-trailing-whitespace))
 #+END_SRC
@@ -257,7 +257,7 @@
 ** warning
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'warnings
-    (setq warning-minimum-level :error))
+    (setopt warning-minimum-level :error))
 #+end_src
 ** fontset
 #+begin_src emacs-lisp :tangle yes
@@ -481,10 +481,6 @@
 #+begin_src emacs-lisp :tangle yes
   (setq enable-recursive-minibuffers t)
 #+end_src
-** inhibit-compacting-font-caches
-#+begin_src emacs-lisp :tangle yes
-  (setq inhibit-compacting-font-caches t)
-#+end_src
 ** save-place-mode
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'simple
@@ -513,9 +509,9 @@
   (setq completion-ignore-case t)
 #+end_src
 ** time locale
-   #+begin_src emacs-lisp :tangle yes
-     (setq system-time-locale "C")
-   #+END_SRC
+#+begin_src emacs-lisp :tangle yes
+  (setq system-time-locale "C")
+#+END_SRC
 ** kill-ringのサイズを変更
 #+begin_src emacs-lisp :tangle yes
   (setq kill-ring-max 100000)

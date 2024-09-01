@@ -60,6 +60,10 @@
 #+begin_src emacs-lisp :tangle yes
   (advice-add 'x-apply-session-resources :override 'ignore)
 #+end_src
+** inhibit-compacting-font-caches
+#+begin_src emacs-lisp :tangle yes
+  (setq inhibit-compacting-font-caches t)
+#+end_src
 ** history-delete-duplicates
 #+begin_src emacs-lisp :tangle yes
   (setq history-delete-duplicates t)
