@@ -35,10 +35,10 @@
   (setq create-lockfiles nil)
 #+END_SRC
 ** GC/Memory
-   #+begin_src emacs-lisp :tangle yes
-     (setq gc-cons-threshold (* 10 128 1024 1024))
-     (setq garbage-collection-messages nil)
-   #+END_SRC
+#+begin_src emacs-lisp :tangle yes
+  (setq gc-cons-threshold (* 10 128 1024 1024))
+  (setq garbage-collection-messages nil)
+#+END_SRC
 ** read-process
 #+begin_src emacs-lisp :tangle yes
   (setq read-process-output-max (* 8 1024 1024))

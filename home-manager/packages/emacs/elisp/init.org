@@ -535,7 +535,11 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(apache-mode) "apache-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.htaccess$" . apache-mode))
+  (add-to-list 'auto-mode-alist '("/\\.htaccess\\'" . apache-mode))
+  (add-to-list 'auto-mode-alist '("/\\(?:access\\|httpd\\|srm\\)\\.conf\\'" . apache-mode))
+  (add-to-list 'auto-mode-alist '("/apache2/.+\\.conf\\'" . apache-mode))
+  (add-to-list 'auto-mode-alist '("/httpd/conf/.+\\.conf\\'" . apache-mode))
+  (add-to-list 'auto-mode-alist '("/apache2/sites-\\(?:available\\|enabled\\)/" . apache-mode))
 #+end_src
 ** bazel-mode
 #+begin_src emacs-lisp :tangle yes
@@ -558,12 +562,11 @@
 ** cfn-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cfn-mode) "cfn-mode" nil t)
-  ;; (autoload-if-found '(flycheck-cfn-setup) "flycheck-cfn" nil t)
 
   (add-to-list 'magic-mode-alist '("\\(---\n\\)?AWSTemplateFormatVersion:" . cfn-mode))
 
-  ;; (with-eval-after-load 'cfn-mode
-  ;;   (add-hook 'cfn-mode-hook #'flycheck-cfn-setup))
+  (with-eval-after-load 'cfn-mode
+    (add-hook 'cfn-mode-hook #'flycheck-mode))
 #+end_src
 ** clojure-mode
 #+begin_src emacs-lisp :tangle yes
@@ -757,14 +760,14 @@
 #+END_SRC
 ** go-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(go-mode) "go-mode" nil t)
+  (autoload-if-found '(go-mode gofmt-before-save) "go-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
   (add-to-list 'auto-mode-alist '("^go.mod$" . go-mode))
 
   (with-eval-after-load 'go-mode
     ;; config
-    (setq gofmt-command "goimports")
+    (setopt gofmt-command "goimports")
 
     ;; hook
     (add-hook 'before-save-hook #'gofmt-before-save))
@@ -782,7 +785,8 @@
   (add-to-list 'auto-mode-alist '("\\.graphql\\'" . graphql-mode))
 
   (with-eval-after-load 'graphql-mode
-    (setq graphql-indent-level 4))
+    ;; config
+    (setopt graphql-indent-level 4))
 #+end_src
 ** graphviz-dot-mode
 #+begin_src emacs-lisp :tangle yes
@@ -792,6 +796,7 @@
   (add-to-list 'auto-mode-alist '("\\.gv\\'" . graphviz-dot-mode))
 
   (with-eval-after-load 'graphviz-dot-mode
+    ;; config
     (setq graphviz-dot-auto-indent-on-semi nil)
     (setq graphviz-dot-indent-width 2))
 #+end_src
@@ -860,8 +865,8 @@
 
   (with-eval-after-load 'js2-mode
     ;; config
-    (setq js2-strict-missing-semi-warning nil)
-    (setq js2-missing-semi-one-line-override nil))
+    (setopt js2-strict-missing-semi-warning nil)
+    (setopt js2-missing-semi-one-line-override nil))
 #+END_SRC
 ** json-mode
 #+begin_src emacs-lisp :tangle yes
@@ -873,6 +878,7 @@
   (add-to-list 'auto-mode-alist '("\\.markuplintrc$" . json-mode))
 
   (with-eval-after-load 'json-mode
+    ;; hooks
     (add-hook 'json-mode-hook #'flycheck-mode))
 #+END_SRC
 ** jsonnet-mode
@@ -909,13 +915,9 @@
 #+END_SRC
 ** lua-mode
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(lua-mode) "lua-mode" nil t)
+  (autoload-if-found '(lua-mode) "lua-mode" nil t)
 
-  ;; (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-
-  (use-package lua-mode
-    :config
-    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode)))
+  (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
 #+end_src
 ** markdown-mode
 #+begin_src emacs-lisp :tangle yes
@@ -927,24 +929,24 @@
   (with-eval-after-load 'markdown-mode
     ;; config
     (setq markdown-code-lang-modes (append '(("diff" . diff-mode)
-                                               ("hs" . haskell-mode)
-                                               ("html" . web-mode)
-                                               ("ini" . conf-mode)
-                                               ("js" . web-mode)
-                                               ("jsx" . web-mode)
-                                               ("md" . markdown-mode)
-                                               ("pl6" . raku-mode)
-                                               ("py" . python-mode)
-                                               ("rb" . ruby-mode)
-                                               ("rs" . rustic-mode)
-                                               ("sqlite3" . sql-mode)
-                                               ("ts" . typescript-mode)
-                                               ("typescript" . typescript-mode)
-                                               ("tsx" . web-mode)
-                                               ("yaml". yaml-mode)
-                                               ("zsh" . sh-mode)
-                                               ("php" . php-mode))
-                                             markdown-code-lang-modes))
+                                             ("hs" . haskell-mode)
+                                             ("html" . web-mode)
+                                             ("ini" . conf-mode)
+                                             ("js" . web-mode)
+                                             ("jsx" . web-mode)
+                                             ("md" . markdown-mode)
+                                             ("pl6" . raku-mode)
+                                             ("py" . python-mode)
+                                             ("rb" . ruby-mode)
+                                             ("rs" . rustic-mode)
+                                             ("sqlite3" . sql-mode)
+                                             ("ts" . typescript-mode)
+                                             ("typescript" . typescript-mode)
+                                             ("tsx" . web-mode)
+                                             ("yaml". yaml-mode)
+                                             ("zsh" . sh-mode)
+                                             ("php" . php-mode))
+                                           markdown-code-lang-modes))
 
     ;; markdown
     (add-hook 'markdown-mode #'orgtbl-mode))
@@ -964,7 +966,7 @@
 
   (with-eval-after-load 'makefile-mode
     ;; config
-    (setq makefile-electric-keys t)
+    (setopt makefile-electric-keys t)
 
     ;; hook
     (add-hook 'makefile-mode-hook #'flycheck-mode))
@@ -1015,7 +1017,8 @@
   (add-to-list 'auto-mode-alist '("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 
   (with-eval-after-load 'nginx-mode
-    (setq nginx-indent-tabs-mode t))
+    ;; config
+    (setopt nginx-indent-tabs-mode t))
 #+END_SRC
 ** nov-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1024,6 +1027,7 @@
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 
   (with-eval-after-load 'nov
+    ;; hook
     (add-hook 'nov-mode-hook #'(lambda () (view-mode -1))))
 #+end_src
 ** pcap-mode
@@ -1066,7 +1070,7 @@
     (define-key php-mode-map (kbd "C-.") nil)
 
     ;; config
-    (setq php-mode-coding-style 'psr2)
+    (setopt php-mode-coding-style 'psr2)
 
     ;; phpstan
     (define-derived-mode phpstan-mode php-mode "phpstan"))
@@ -1108,8 +1112,9 @@
   (add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
 
   (with-eval-after-load 'processing-mode
-    (setq processing-location "/opt/processing/processing-java")
-    (setq processing-output-dir "/tmp"))
+    ;; config
+    (setopt processing-location "/opt/processing/processing-java")
+    (setopt processing-output-dir "/tmp"))
 #+END_SRC
 ** python-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1156,8 +1161,9 @@
 
   (add-to-list 'auto-mode-alist '("\\.rs$" . rust-mode))
 
-  (with-eval-after-load 'rust-mode
-    (setq rust-format-on-save t))
+  (with-eval-after-load 'rust-rustfmt
+    ;; config
+    (setopt rust-format-on-save t))
 #+END_SRC
 ** scala-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1171,7 +1177,8 @@
   (add-to-list 'auto-mode-alist '(".guix-channel" . scheme-mode))
 
   (with-eval-after-load 'scheme
-    (setq scheme-program-name "gosh -i"))
+    ;; config
+    (setopt scheme-program-name "gosh -i"))
 #+end_src
 ** scad-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1187,6 +1194,7 @@
   (add-to-list 'auto-mode-alist '("\\.sass$" . scss-mode))
 
   (with-eval-after-load 'scss-mode
+    ;; hooks
     (add-hook 'scss-mode-hook #'flycheck-mode))
 #+end_src
 ** shell-mode
@@ -1271,6 +1279,7 @@
   (add-to-list 'auto-mode-alist '("\\.tf$" . terraform-mode))
 
   (with-eval-after-load 'terraform-mode
+    ;; hooks
     (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
     (add-hook 'terraform-mode-hook #'flycheck-mode))
 #+END_SRC
@@ -1292,6 +1301,7 @@
   (add-to-list 'auto-mode-alist '("\\.toml$" . toml-mode))
 
   (with-eval-after-load 'toml-mode
+    ;; hooks
     (add-hook 'toml-mode-hook #'flycheck-mode))
 #+END_SRC
 ** tmux-mode
@@ -1319,6 +1329,7 @@
   (add-to-list 'auto-mode-alist '("\\(\\.v?v\\|\\.vsh\\)$" . v-mode))
 
   (with-eval-after-load 'v-mode
+    ;; keybind
     (define-key v-mode-map (kbd "M-z") #'v-menu)
     (define-key v-mode-map (kbd "C-c C-f") #'v-format-buffer))
 #+end_src
@@ -1329,7 +1340,7 @@
   (add-to-list 'auto-mode-alist '("\\.vue$" . vue-mode))
 
   (with-eval-after-load 'vue-html-mode
-    (setq vue-html-extra-indent 4))
+    (setopt vue-html-extra-indent 4))
 #+END_SRC
 ** vimrc-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1356,9 +1367,10 @@
   (add-to-list 'auto-mode-alist '("\\.liquid$" . web-mode))
 
   (with-eval-after-load 'web-mode
-    (setq web-mode-comment-style 2)
-    (setq web-mode-enable-auto-pairing nil)
-    (setq web-mode-enable-auto-indentation nil))
+    ;; config
+    (setopt web-mode-comment-style 2)
+    (setopt web-mode-enable-auto-pairing nil)
+    (setopt web-mode-enable-auto-indentation nil))
 #+END_SRC
 ** web-php-blade-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1375,7 +1387,8 @@
   (add-to-list 'auto-mode-alist '("\\.cbf$" . wolfram-mode))
 
   (with-eval-after-load 'wolfram-mode
-    (setq wolfram-path "path-to-dir"))
+    ;; config
+    (setopt wolfram-path "path-to-dir"))
 #+end_src
 ** yaml-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1385,6 +1398,7 @@
   (add-to-list 'auto-mode-alist '("\\.aclpolicy$" . yaml-mode))
 
   (with-eval-after-load 'yaml-mode
+    ;; hooks
     (add-hook 'yaml-mode-hook #'flycheck-mode))
 #+END_SRC
 ** yarn-mode
@@ -1448,7 +1462,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-mode flycheck-define-checker) "flycheck" nil t)
 #+end_src
-*** flycheck-textlint
+*** TODO flycheck-textlint
 #+begin_src emacs-lisp :tangle yes
   ;; (add-hook 'window-setup-hook
   ;;           #'(lambda ()
@@ -1473,7 +1487,7 @@
   (with-eval-after-load 'elisp-mode
     (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup))
 #+end_src
-*** flycheck-projectile
+*** TODO flycheck-projectile
 #+begin_src emacs-lisp :tangle yes
   ;; (eval-when-compile
   ;;   (el-clone :repo "nbfalcon/flycheck-projectile"))
@@ -1482,6 +1496,10 @@
   ;;   (message "Install flycheck-projectile...")
   ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/flycheck-projectile"))
   ;;   (autoload-if-found '(flycheck-projectile-list-errors) "flycheck-projectile" nil t))
+#+end_src
+*** TODO flycheck-cfn
+#+begin_src emacs-lisp
+  ;; (autoload-if-found '(flycheck-cfn-setup) "flycheck-cfn" nil t)
 #+end_src
 ** Client
 *** md4rd
