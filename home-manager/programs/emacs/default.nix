@@ -8,9 +8,9 @@ in {
 
   home.file = {
     ".emacs.d/init.el".text =
-      tangle (builtins.readFile ../../packages/elisp/init.org);
+      tangle (builtins.readFile ../../packages/emacs/elisp/init.org);
     ".emacs.d/early-init.el".text =
-      tangle (builtins.readFile ../../packages/elisp/early-init.org);
+      tangle (builtins.readFile ../../packages/emacs/elisp/early-init.org);
   };
 
   home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs ];

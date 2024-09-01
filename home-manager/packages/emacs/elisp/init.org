@@ -27,7 +27,7 @@
 #+end_src
 ** env
 #+begin_src emacs-lisp :tangle yes
-  (defconst my/enable-profile nil
+  (defconst my/enable-profile t
     "If true, enable profile")
 #+end_src
 * Macro Utilities
@@ -98,12 +98,6 @@
       `(dolist (f ,functions)
          (autoload f ,file ,docstring ,interactive ,type))))
 #+end_src
-** common lispを使う
-#+begin_src emacs-lisp :tangle yes
-  (eval-and-compile
-    (setq byte-compile-warnings '(cl-functions))
-    (require 'cl-lib nil t))
-#+end_src
 * Basic
 ** 末尾のスペースを可視化する
 #+begin_src emacs-lisp :tangle yes
@@ -116,15 +110,9 @@
   (with-eval-after-load 'esh-mode
     (add-hook 'eshell-mode-hook #'my/disable-show-trailing-whitespace))
 
-  (with-eval-after-load 'eww
-    (add-hook 'eww-mode-hook #'my/disable-show-trailing-whitespace))
-
   (with-eval-after-load 'minibuffer
     (add-hook 'minibuffer-inactive-mode-hook #'my/disable-show-trailing-whitespace))
-
-  (with-eval-after-load 'dashboard
-    (add-hook 'dashboard-mode-hook #'my/disable-show-trailing-whitespace))
-
+  x
   (with-eval-after-load 'simple
     (add-hook 'fundamental-mode-hook #'my/disable-show-trailing-whitespace))
 #+END_SRC
@@ -132,7 +120,8 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-display-line-numbers-mode) "display-line-numbers" nil t)
 
-  (add-hook 'window-setup-hook #'global-display-line-numbers-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'global-display-line-numbers-mode))
 
   (with-eval-after-load 'display-line-numbers
     (setq display-line-numbers-grow-only t))
@@ -140,24 +129,25 @@
 ** C-kで行削除
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'simple
-    (setq kill-whole-line t))
+    (setopt kill-whole-line t))
 #+END_SRC
 ** カッコの中をハイライトする
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'window-setup-hook #'show-paren-mode)
+  (autoload-if-found '(show-paren-mode) "display-line-numbers" nil t)
+
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'show-paren-mode))
 
   (with-eval-after-load 'paren
-    (setq show-paren-style 'mixed))
+    (setopt show-paren-style 'mixed))
 #+END_SRC
 ** カッコが自動的に作られるようにする
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'window-setup-hook #'electric-pair-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'electric-pair-mode))
 #+END_SRC
 ** coding system
 #+begin_src emacs-lisp :tangle yes
-  ;; language and locale
-  (setq system-time-locale "C")
-
   ;; coding system
   (add-hook 'window-setup-hook
             #'(lambda ()
@@ -166,9 +156,9 @@
                 (set-selection-coding-system 'utf-8-unix)))
 
   ;; prefer-coding-system take effect equally to follows
-  (setq locale-coding-system 'utf-8-unix)
   (add-hook 'window-setup-hook
             #'(lambda ()
+  	      (setq locale-coding-system 'utf-8-unix)
                 (set-buffer-file-coding-system 'utf-8-unix)
                 (set-file-name-coding-system 'utf-8-unix)
                 (set-terminal-coding-system 'utf-8-unix)
@@ -176,7 +166,8 @@
 #+end_src
 ** global-auto-revert-mode
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'window-setup-hook #'global-auto-revert-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'global-auto-revert-mode))
 #+end_src
 ** yes/no to y/n
 #+begin_src emacs-lisp :tangle yes
@@ -207,10 +198,11 @@
 #+END_SRC
 ** minibuffer
 #+begin_src emacs-lisp :tangle yes
-  (define-key minibuffer-mode-map (kbd "C-h") #'delete-backward-char)
-  (define-key minibuffer-mode-map (kbd "M-h") #'backward-kill-word)
-  (define-key minibuffer-mode-map (kbd "C-j") #'exit-minibuffer)
-  (define-key minibuffer-mode-map (kbd "M-RET") #'exit-minibuffer)
+  (with-eval-after-load 'minibuffer
+    (define-key minibuffer-mode-map (kbd "C-h") #'delete-backward-char)
+    (define-key minibuffer-mode-map (kbd "M-h") #'backward-kill-word)
+    (define-key minibuffer-mode-map (kbd "C-j") #'exit-minibuffer)
+    (define-key minibuffer-mode-map (kbd "M-RET") #'exit-minibuffer))
 #+end_src
 ** savehistを有効にする
 #+begin_src emacs-lisp :tangle yes
@@ -234,19 +226,19 @@
 ** pluginをnative compする
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'comp-run
-    (setq native-comp-async-jobs-number 8)
-    (setq native-comp-speed 2)
-    (setq native-comp-always-compile t))
+    (setopt native-comp-async-jobs-number 8)
+    (setopt native-comp-speed 3)
+    (setopt native-comp-always-compile t))
 #+end_src
 ** native compのwarningを抑える
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'warnings
-    (setq warning-suppress-types '((comp))))
+    (setopt warning-suppress-types '((comp))))
 #+end_src
 ** 同一bufferの名前を変える
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'uniquify
-    (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+    (setopt uniquify-buffer-name-style 'post-forward-angle-brackets))
 #+end_src
 ** killできないようにする
 #+begin_src emacs-lisp :tangle yes
@@ -260,7 +252,7 @@
 ** 日時表示
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'time
-    (setq display-time-24hr-format t))
+    (setopt display-time-24hr-format t))
 #+end_src
 ** warning
 #+begin_src emacs-lisp :tangle yes
@@ -495,36 +487,49 @@
 #+end_src
 ** save-place-mode
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'window-setup-hook #'save-place-mode)
+  (with-eval-after-load 'simple
+    (add-hook 'fundamental-mode-hook #'save-place-mode))
 #+end_src
 ** enable-local-variables
 #+begin_src emacs-lisp :tangle yes
-  (setq enable-local-variables :all)
+  (setopt enable-local-variables :all)
 #+end_src
 ** password
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'password-cache
-    (setq password-cache t)
-    (setq password-cache-expiry 3600))
+    (setopt password-cache t)
+    (setopt password-cache-expiry 3600))
 #+end_src
 ** tab-width
 #+begin_src emacs-lisp :tangle yes
   (setq tab-width 4)
 #+end_src
-** indentはspaceにする
-#+begin_src emacs-lisp :tangle yes
-  (add-hook 'window-setup-hook
-            #'(lambda ()
-                (indent-tabs-mode nil)))
-#+end_src
 ** 検索で大文字小文字を区別しない
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'minibuffer
-    (setq read-file-name-completion-ignore-case t))
+    (setopt read-file-name-completion-ignore-case t))
 
   (setq read-buffer-completion-ignore-case t)
   (setq completion-ignore-case t)
 #+end_src
+** time locale
+   #+begin_src emacs-lisp :tangle yes
+     (setq system-time-locale "C")
+   #+END_SRC
+** kill-ringのサイズを変更
+#+begin_src emacs-lisp :tangle yes
+  (setq kill-ring-max 100000)
+  (custom-set-variables '(savehist-additional-variables '(kill-ring)))
+#+end_src
+** 折り返ししない
+#+begin_src emacs-lisp :tangle yes
+  (setq truncate-lines t)
+  (setq truncate-partial-width-windows t)
+#+end_src
+** indent
+#+begin_src emacs-lisp :tangle yes
+  (setq indent-tabs-mode nil)
+#+END_SRC
 * Language
 ** apache-mode
 #+begin_src emacs-lisp :tangle yes

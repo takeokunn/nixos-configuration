@@ -24,57 +24,38 @@
   (push '(tool-bar-lines . 0) default-frame-alist)
 #+end_src
 ** スタートアップメッセージを非表示
-   #+begin_src emacs-lisp :tangle yes
-     (setq inhibit-startup-message t)
-   #+END_SRC
+#+begin_src emacs-lisp :tangle yes
+  (setq inhibit-startup-message t)
+#+END_SRC
 ** 自動生成ファイルを無効にする
-   #+begin_src emacs-lisp :tangle yes
-     (setq make-backup-files nil)
-     (setq auto-save-default nil)
-     (setq auto-save-list-file-prefix nil)
-     (setq create-lockfiles nil)
-   #+END_SRC
-** time locale
-   #+begin_src emacs-lisp :tangle yes
-     (setq system-time-locale "C")
-   #+END_SRC
+#+begin_src emacs-lisp :tangle yes
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq auto-save-list-file-prefix nil)
+  (setq create-lockfiles nil)
+#+END_SRC
 ** GC/Memory
    #+begin_src emacs-lisp :tangle yes
-     (setq gc-cons-threshold (* 128 1024 1024))
+     (setq gc-cons-threshold (* 10 128 1024 1024))
      (setq garbage-collection-messages nil)
    #+END_SRC
 ** read-process
 #+begin_src emacs-lisp :tangle yes
   (setq read-process-output-max (* 8 1024 1024))
 #+end_src
-** indent
-   #+begin_src emacs-lisp :tangle yes
-     (setq indent-tabs-mode nil)
-   #+END_SRC
 ** ビープ音を消す
-   #+begin_src emacs-lisp :tangle yes
-     (setq ring-bell-function 'ignore)
-   #+end_src
-** デフォルトのpathをかえる
-   #+begin_src emacs-lisp :tangle yes
-     (setq default-directory "~/")
-     (setq command-line-default-directory "~/")
-   #+end_src
-** kill-ringのサイズを変更
-   #+begin_src emacs-lisp :tangle yes
-     (setq kill-ring-max 100000)
-     (custom-set-variables '(savehist-additional-variables '(kill-ring)))
-   #+end_src
-** 折り返ししない
 #+begin_src emacs-lisp :tangle yes
-  (setq truncate-lines t)
-  (setq truncate-partial-width-windows t)
+  (setq ring-bell-function 'ignore)
+#+end_src
+** デフォルトのpathをかえる
+#+begin_src emacs-lisp :tangle yes
+  (setq default-directory "~/")
+  (setq command-line-default-directory "~/")
 #+end_src
 ** scratch buffer
-   #+begin_src emacs-lisp :tangle yes
-     (setq initial-scratch-message nil)
-     ;; (setq initial-major-mode 'org-mode)
-   #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (setq initial-scratch-message nil)
+#+end_src
 ** x session resourcesを無視します
 #+begin_src emacs-lisp :tangle yes
   (advice-add 'x-apply-session-resources :override 'ignore)

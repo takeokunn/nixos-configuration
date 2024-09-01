@@ -14,7 +14,7 @@ let
   darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
   # emacs
-  emacsPkgs = import ./packages/emacs.nix { inherit pkgs; };
+  emacsPkgs = import ./packages/emacs { inherit pkgs; };
 
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
