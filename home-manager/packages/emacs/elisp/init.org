@@ -1336,6 +1336,7 @@
   (add-to-list 'auto-mode-alist '("\\.vue$" . vue-mode))
 
   (with-eval-after-load 'vue-html-mode
+    ;; config
     (setopt vue-html-extra-indent 4))
 #+END_SRC
 ** vimrc-mode
@@ -3948,24 +3949,31 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(elfeed) "elfeed" nil t)
 
   (with-eval-after-load 'elfeed-show
+    ;; config
     (setopt elfeed-show-entry-switch #'display-buffer))
 
   (with-eval-after-load 'elfeed-db
-    (setopt elfeed-db-directory "~/.cache/elfeed"))
+    ;; config
+    (setq elfeed-db-directory "~/.cache/elfeed"))
 
   (with-eval-after-load 'elfeed-search
+    ;; config
     (setopt elfeed-search-filter "@2-week-ago"))
 
   (with-eval-after-load 'elfeed-curl
+    ;; config
     (setopt elfeed-curl-max-connections 32))
 #+end_src
 ** elfeed-org
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elfeed-org) "elfeed-org" nil t)
 
-  (add-hook 'window-setup-hook #'elfeed-org)
+  (with-eval-after-load 'elfeed-search
+    ;; hooks
+    (add-hook 'elfeed-search-mode-hook #'elfeed-org))
 
   (with-eval-after-load 'elfeed-org
+    ;; config
     (setq rmh-elfeed-org-files '("~/.ghq/github.com/takeokunn/private/elfeed.org"))
     (setq rmh-elfeed-org-auto-ignore-invalid-feeds t))
 #+end_src
@@ -3976,7 +3984,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-x w" #'elfeed-dashboard)
 
   (with-eval-after-load 'elfeed-dashboard
-    (setopt elfeed-dashboard-file (locate-user-emacs-file "elfeed-dashboard.org")))
+    ;; config
+    (setq elfeed-dashboard-file (locate-user-emacs-file "elfeed-dashboard.org")))
 #+end_src
 ** elfeed-goodies
 #+begin_src emacs-lisp :tangle yes
