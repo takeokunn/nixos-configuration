@@ -1498,7 +1498,8 @@
   (add-hook 'window-setup-hook #'dimmer-mode)
 
   (with-eval-after-load 'dimmer
-    (setq dimmer-fraction 0.1))
+    ;; config
+    (setq dimmer-fraction 0.05))
 #+end_src
 ** Doom
 *** doom-themes
@@ -2851,6 +2852,7 @@
   (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
 
   (with-eval-after-load 'dired
+    ;; hooks
     (add-hook 'dired-mode-hook #'dired-narrow-mode))
 #+end_src
 ** dired-open
@@ -2858,6 +2860,7 @@
   (autoload-if-found '(dired-open-file) "dired-open" nil t)
 
   (with-eval-after-load 'dired
+    ;; keybind
     (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
 #+end_src
 ** dired-ranger
@@ -2916,7 +2919,6 @@
   (autoload-if-found '(popwin-mode) "popwin" nil t)
 
   (add-hook 'emacs-startup-hook #'popwin-mode)
-
 #+end_src
 *** whitespace
 #+begin_src emacs-lisp :tangle yes
@@ -2975,9 +2977,21 @@
 ** Project
 *** projectile
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(projectile-mode) "projectile" nil t)
+  (autoload-if-found '(projectile-mode
+  		     projectile-clear-known-projects
+  		     projectile-cleanup-known-projects) "projectile" nil t)
+
+  (defun my/update-projectile-known-projects ()
+    (interactive)
+    (projectile-clear-known-projects)
+    (projectile-cleanup-known-projects)
+    (setq projectile-known-projects (mapcar
+                                     (lambda (x)
+                                       (abbreviate-file-name (concat x "/")))
+                                     (split-string (shell-command-to-string "ghq list --full-path")))))
 
   (add-hook 'window-setup-hook #'projectile-mode)
+  (add-hook 'window-setup-hook #'my/update-projectile-known-projects)
 
   (with-eval-after-load 'projectile
     ;; keybind
@@ -2990,17 +3004,7 @@
     ;; config
     (setq projectile-switch-project-action 'projectile-dired)
     (setq projectile-enable-caching t)
-    (setq projectile-use-git-grep t)
-
-    ;; function
-    (defun my/update-projectile-known-projects ()
-      (interactive)
-      (projectile-clear-known-projects)
-      (projectile-cleanup-known-projects)
-      (setq projectile-known-projects (mapcar
-                                         (lambda (x)
-                                           (abbreviate-file-name (concat x "/")))
-                                         (split-string (shell-command-to-string "ghq list --full-path"))))))
+    (setq projectile-use-git-grep t))
 #+end_src
 *** consult-projectile
 #+begin_src emacs-lisp :tangle yes
@@ -3159,75 +3163,72 @@
 #+end_src
 *** TODO embark
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(embark-act embark-dwim embark-prefix-help-command) "embark" nil t)
+  (autoload-if-found '(embark-act embark-dwim embark-prefix-help-command) "embark" nil t)
+
+  (keymap-global-set "C-." #'embark-act)
+  (keymap-global-set "C-h B" #'embark-prefix-help-command)
+
+  (with-eval-after-load 'embark
+    ;; macros
+    (defmacro my/embark-ace-action (fn)
+      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+         (interactive)
+         (with-demoted-errors "%s"
+           (aw-switch-to-window (aw-select nil))
+           (call-interactively (symbol-function ',fn)))))
+
+    (defmacro my/embark-split-action (fn split-type)
+      `(defun ,(intern (concat "my/embark-"
+                               (symbol-name fn)
+                               "-"
+                               (car (last (split-string
+                                           (symbol-name split-type) "-"))))) ()
+         (interactive)
+         (funcall #',split-type)
+         (call-interactively #',fn)))
+
+    (defun my/sudo-find-file (file)
+      "Open FILE as root."
+      (interactive "FOpen file as root: ")
+      (when (file-writable-p file)
+        (user-error "File is user writeable, aborting sudo"))
+      (find-file (if (file-remote-p file)
+                     (concat "/" (file-remote-p file 'method) ":"
+                             (file-remote-p file 'user) "@" (file-remote-p file 'host)
+                             "|sudo:root@"
+                             (file-remote-p file 'host) ":" (file-remote-p file 'localname))
+                   (concat "/sudo:root@localhost:" file))))
+
+    ;; config
+    (setq embark-mixed-indicator-delay 0.1)
+    (setq prefix-help-command #'embark-prefix-help-command)
+
+    ;; ace-window
+    (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+    (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+    (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+
+    ;; split window(2)
+    (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
+    (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
+    (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
+
+    ;; split window(3)
+    (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
+    (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
+    (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
+
+    ;; sudo
+    (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
+
+    ;; consult
+    (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
+#+end_src
+*** TODO embark-consult
+#+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(embark-consult-outline-candidates
   ;;                      embark-consult-imenu-candidates
   ;;                      embark-consult-imenu-or-outline-candidates) "embark-consult" nil t)
-
-  ;; (keymap-global-set "C-." #'embark-act)
-  ;; (keymap-global-set "C-h B" #'embark-prefix-help-command)
-
-  ;; (with-eval-after-load 'embark
-  ;;   ;; macros
-  ;;   (defmacro my/embark-ace-action (fn)
-  ;;     `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-  ;;        (interactive)
-  ;;        (with-demoted-errors "%s"
-  ;;          (aw-switch-to-window (aw-select nil))
-  ;;          (call-interactively (symbol-function ',fn)))))
-
-  ;;   (defmacro my/embark-split-action (fn split-type)
-  ;;     `(defun ,(intern (concat "my/embark-"
-  ;;                              (symbol-name fn)
-  ;;                              "-"
-  ;;                              (car (last (split-string
-  ;;                                          (symbol-name split-type) "-"))))) ()
-  ;;        (interactive)
-  ;;        (funcall #',split-type)
-  ;;        (call-interactively #',fn)))
-
-  ;;   (defun my/sudo-find-file (file)
-  ;;     "Open FILE as root."
-  ;;     (interactive "FOpen file as root: ")
-  ;;     (when (file-writable-p file)
-  ;;       (user-error "File is user writeable, aborting sudo"))
-  ;;     (find-file (if (file-remote-p file)
-  ;;                    (concat "/" (file-remote-p file 'method) ":"
-  ;;                            (file-remote-p file 'user) "@" (file-remote-p file 'host)
-  ;;                            "|sudo:root@"
-  ;;                            (file-remote-p file 'host) ":" (file-remote-p file 'localname))
-  ;;                  (concat "/sudo:root@localhost:" file))))
-
-  ;;   ;; config
-  ;;   (setq embark-mixed-indicator-delay 0.1)
-  ;;   (setq prefix-help-command #'embark-prefix-help-command)
-
-  ;;   ;; ace-window
-  ;;   (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-  ;;   (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-  ;;   (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
-
-  ;;   ;; split window(2)
-  ;;   (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
-  ;;   (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
-  ;;   (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
-
-  ;;   ;; split window(3)
-  ;;   (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
-  ;;   (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
-  ;;   (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
-
-  ;;   ;; sudo
-  ;;   (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
-
-  ;;   ;; consult
-  ;;   (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
-#+end_src
-*** embark-consult
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(embark-consult-outline-candidates
-                       embark-consult-imenu-candidates
-                       embark-consult-imenu-or-outline-candidates) "embark-consult" nil t)
 #+end_src
 *** compile-multi
 #+begin_src emacs-lisp :tangle yes
@@ -3254,9 +3255,7 @@
 #+end_src
 *** marginalia
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(marginalia-mode) "marginalia" nil t)
-
-  ;; (add-hook 'emacs-startup-hook #'marginalia-mode)
+  (autoload-if-found '(marginalia-mode marginalia-cycle) "marginalia" nil t)
 
   (with-eval-after-load 'minibuffer
     ;; hooks
@@ -3269,8 +3268,7 @@
   (with-eval-after-load 'minibuffer
     ;; config
     (setq completion-styles '(orderless basic))
-
-    ;; (setq completion-category-overrides '((file (styles basic partial-completion))))
+    (setq completion-category-overrides '((file (styles basic partial-completion))))
     (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
                                                       "Completion of multiple components, in any order.")))
 #+end_src
@@ -3282,6 +3280,7 @@
   (keymap-global-set "C-x o" #'ace-window)
 
   (with-eval-after-load 'ace-window
+    ;; config
     (setq aw-dispatch-always t)
     (setq aw-scope 'frame)
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
@@ -3303,8 +3302,7 @@
     (define-key writeroom-mode-map (kbd "C-M-=") #'writeroom-adjust-width)
 
     ;; config
-    (setq writeroom-width 150)
-    (setq writeroom-maximize-window nil))
+    (setq writeroom-width 150))
 #+end_src
 *** zoom-window
 #+begin_src emacs-lisp :tangle yes
@@ -3377,6 +3375,7 @@
 #+end_src
 *** pinentry
 https://github.com/ch11ng/exwm/wiki#gpg-pinentry
+
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pinentry-start) "pinentry" nil t)
 #+end_src
@@ -3407,14 +3406,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'exec-path-from-shell
     (setq exec-path-from-shell-variables '("PATH"
-                                             "GEM_HOME"
-                                             "GOROOT"
-                                             "GOPATH"
-                                             "LSP_USE_PLISTS"
-                                             "TERM"
-                                             "SSH_AUTH_SOCK"
-                                             "NATIVE_FULL_AOT"
-                                             "GPG_TTY")))
+                                           "GEM_HOME"
+                                           "GOROOT"
+                                           "GOPATH"
+                                           "LSP_USE_PLISTS"
+                                           "TERM"
+                                           "SSH_AUTH_SOCK"
+                                           "NATIVE_FULL_AOT"
+                                           "GPG_TTY")))
 #+END_SRC
 ** Tab
 *** tab-bar
@@ -4320,9 +4319,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-link-beautify-mode) "org-link-beautify" nil t)
 
-  (with-eval-after-load 'org
-    ;; hooks
-    (add-hook 'org-mode-hook #'org-link-beautify-mode))
+  ;; (with-eval-after-load 'org
+  ;;   ;; hooks
+  ;;   (add-hook 'org-mode-hook #'org-link-beautify-mode))
 #+end_src
 *** TODO orgit
 #+begin_src emacs-lisp :tangle yes
