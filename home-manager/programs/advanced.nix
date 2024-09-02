@@ -1,7 +1,7 @@
-{ lib, pkgs, wezterm-flake, neovim-nightly-overlay, emacsPkgs, org-babel }:
+{ lib, pkgs, wezterm-flake, neovim-nightly-overlay, org-babel }:
 let
   awscli = import ./awscli;
-  emacs = import ./emacs { inherit pkgs emacsPkgs org-babel; };
+  emacs = import ./emacs { inherit pkgs org-babel; };
   git = import ./git;
   nix-index = import ./nix-index;
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay; };
