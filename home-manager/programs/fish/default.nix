@@ -48,7 +48,7 @@
     plugins = [
       {
         name = "fish-bd";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "0rax";
           repo = "fish-bd";
           rev = "ab686e028bfe95fa561a4f4e57840e36902d4d7d";
@@ -57,7 +57,7 @@
       }
       {
         name = "fish-artisan-completion";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "adriaanzon";
           repo = "fish-artisan-completion";
           rev = "8e8d726b3862fcb972abb652fb8c1a9fb9207a64";
@@ -66,7 +66,7 @@
       }
       {
         name = "fish-artisan-completion";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "adriaanzon";
           repo = "fish-artisan-completion";
           rev = "8e8d726b3862fcb972abb652fb8c1a9fb9207a64";
@@ -75,7 +75,7 @@
       }
       {
         name = "fish-artisan-completion";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "adriaanzon";
           repo = "fish-artisan-completion";
           rev = "8e8d726b3862fcb972abb652fb8c1a9fb9207a64";
@@ -84,7 +84,7 @@
       }
       {
         name = "fish-ghq";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "decors";
           repo = "fish-ghq";
           rev = "cafaaabe63c124bf0714f89ec715cfe9ece87fa2";
@@ -93,7 +93,7 @@
       }
       {
         name = "dracula";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "dracula";
           repo = "fish";
           rev = "269cd7d76d5104fdc2721db7b8848f6224bdf554";
@@ -102,7 +102,7 @@
       }
       {
         name = "done";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "franciscolourenco";
           repo = "done";
           rev = "eb32ade85c0f2c68cbfcff3036756bbf27a4f366";
@@ -111,7 +111,7 @@
       }
       {
         name = "autopair";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "jorgebucaran";
           repo = "autopair.fish";
           rev = "4d1752ff5b39819ab58d7337c69220342e9de0e2";
@@ -120,7 +120,7 @@
       }
       {
         name = "nix-completions";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "kidonng";
           repo = "nix-completions.fish";
           rev = "cd8a43bed96e0acc02228bc77502be8ba5fa0548";
@@ -129,7 +129,7 @@
       }
       {
         name = "nix-env";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "lilyball";
           repo = "nix-env.fish";
           rev = "7b65bd228429e852c8fdfa07601159130a818cfa";
@@ -138,7 +138,7 @@
       }
       {
         name = "fish-dart-completions";
-        src = builtins.fetchFromGitHub {
+        src = pkgs.fetchFromGitHub {
           owner = "takeokunn";
           repo = "fish-dart-completions";
           rev = "f52734d3bbb79f362aa6541b490f74df49f124ff";

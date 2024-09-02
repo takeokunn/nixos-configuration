@@ -8,17 +8,10 @@ in with lib; {
       type = types.lines;
       default = "";
     };
-    plugins = mkOption {
-      type = types.listOf pluginModule;
-      default = [ ];
-    };
   };
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
     home.file.".tigrc".text = cfg.config;
-    xdg.configFile = mkMerge
-      ((map (plugin: { ".tig/${plugin.name}".source = plugin.src; })
-        cfg.plugins));
   };
 }
