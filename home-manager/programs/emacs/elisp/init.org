@@ -2981,17 +2981,7 @@
   		     projectile-clear-known-projects
   		     projectile-cleanup-known-projects) "projectile" nil t)
 
-  (defun my/update-projectile-known-projects ()
-    (interactive)
-    (projectile-clear-known-projects)
-    (projectile-cleanup-known-projects)
-    (setq projectile-known-projects (mapcar
-                                     (lambda (x)
-                                       (abbreviate-file-name (concat x "/")))
-                                     (split-string (shell-command-to-string "ghq list --full-path")))))
-
   (add-hook 'window-setup-hook #'projectile-mode)
-  (add-hook 'window-setup-hook #'my/update-projectile-known-projects)
 
   (with-eval-after-load 'projectile
     ;; keybind
@@ -3000,6 +2990,16 @@
 
     ;; hooks
     (add-hook 'projectile-mode-hook #'my/update-projectile-known-projects)
+
+    ;; function
+    (defun my/update-projectile-known-projects ()
+      (interactive)
+      (projectile-clear-known-projects)
+      (projectile-cleanup-known-projects)
+      (setq projectile-known-projects (mapcar
+                                       (lambda (x)
+                                         (abbreviate-file-name (concat x "/")))
+                                       (split-string (shell-command-to-string "ghq list --full-path")))))
 
     ;; config
     (setq projectile-switch-project-action 'projectile-dired)

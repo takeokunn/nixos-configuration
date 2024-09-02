@@ -55,6 +55,7 @@
 ** scratch buffer
 #+begin_src emacs-lisp :tangle yes
   (setq initial-scratch-message nil)
+  (setq initial-major-mode 'fundamental-mode)
 #+end_src
 ** x session resourcesを無視します
 #+begin_src emacs-lisp :tangle yes
