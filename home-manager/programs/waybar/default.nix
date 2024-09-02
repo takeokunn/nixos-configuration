@@ -6,5 +6,4 @@
   };
 
   programs.waybar.enable = pkgs.stdenv.isLinux;
-
 }

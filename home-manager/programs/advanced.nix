@@ -5,6 +5,7 @@ let
   git = import ./git;
   nix-index = import ./nix-index;
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay; };
+  nyxt = import ./nyxt { inherit pkgs; };
   roswell = import ./roswell { inherit pkgs; };
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
@@ -20,6 +21,7 @@ in [
   git
   nix-index
   neovim
+  nyxt
   roswell
   wezterm
 
