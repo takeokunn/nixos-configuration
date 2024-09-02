@@ -1,1 +1,1 @@
-[ ./tig.nix ]
+[ ./tig.nix ./peco.nix ./wget.nix ]

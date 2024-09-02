@@ -1,4 +1,18 @@
 { pkgs }: {
-  home.file.".config/peco/config.json".source = ./config.json;
-  home.packages = [ pkgs.peco ];
+  programs.peco = {
+    enable = true;
+    config = ''
+      {
+          "Use256Color": true,
+          "StickySelection": true,
+          "Prompt": "[peco] >",
+          "Keymap": {
+              "C-k": "peco.KillEndOfLine",
+              "M-v": "peco.ScrollPageUp",
+              "C-v": "peco.ScrollPageDown",
+              "C-x,C-c": "peco.Cancel"
+          }
+      }
+    '';
+  };
 }
