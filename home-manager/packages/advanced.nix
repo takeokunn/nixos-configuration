@@ -5,6 +5,9 @@ let
   ecspresso = pkgs.callPackage ./nixpkgs/ecspresso { };
   isucrud = pkgs.callPackage ./nixpkgs/isucrud { };
 in with pkgs; [
+  # for cli
+  tokei
+
   # for infra/isucon
   # mitamae
   ecspresso
@@ -19,7 +22,7 @@ in with pkgs; [
   # for ai
   ollama
 
-  # for misc
+  # for web service
   discord
   drawio
   slack

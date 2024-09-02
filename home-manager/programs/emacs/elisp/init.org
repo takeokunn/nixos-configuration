@@ -3170,58 +3170,58 @@
 
   (with-eval-after-load 'embark
     ;; macros
-    (defmacro my/embark-ace-action (fn)
-      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-         (interactive)
-         (with-demoted-errors "%s"
-           (aw-switch-to-window (aw-select nil))
-           (call-interactively (symbol-function ',fn)))))
+    ;; (defmacro my/embark-ace-action (fn)
+    ;;   `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+    ;;      (interactive)
+    ;;      (with-demoted-errors "%s"
+    ;;        (aw-switch-to-window (aw-select nil))
+    ;;        (call-interactively (symbol-function ',fn)))))
 
-    (defmacro my/embark-split-action (fn split-type)
-      `(defun ,(intern (concat "my/embark-"
-                               (symbol-name fn)
-                               "-"
-                               (car (last (split-string
-                                           (symbol-name split-type) "-"))))) ()
-         (interactive)
-         (funcall #',split-type)
-         (call-interactively #',fn)))
+    ;; (defmacro my/embark-split-action (fn split-type)
+    ;;   `(defun ,(intern (concat "my/embark-"
+    ;;                            (symbol-name fn)
+    ;;                            "-"
+    ;;                            (car (last (split-string
+    ;;                                        (symbol-name split-type) "-"))))) ()
+    ;;      (interactive)
+    ;;      (funcall #',split-type)
+    ;;      (call-interactively #',fn)))
 
-    (defun my/sudo-find-file (file)
-      "Open FILE as root."
-      (interactive "FOpen file as root: ")
-      (when (file-writable-p file)
-        (user-error "File is user writeable, aborting sudo"))
-      (find-file (if (file-remote-p file)
-                     (concat "/" (file-remote-p file 'method) ":"
-                             (file-remote-p file 'user) "@" (file-remote-p file 'host)
-                             "|sudo:root@"
-                             (file-remote-p file 'host) ":" (file-remote-p file 'localname))
-                   (concat "/sudo:root@localhost:" file))))
+    ;; (defun my/sudo-find-file (file)
+    ;;   "Open FILE as root."
+    ;;   (interactive "FOpen file as root: ")
+    ;;   (when (file-writable-p file)
+    ;;     (user-error "File is user writeable, aborting sudo"))
+    ;;   (find-file (if (file-remote-p file)
+    ;;                  (concat "/" (file-remote-p file 'method) ":"
+    ;;                          (file-remote-p file 'user) "@" (file-remote-p file 'host)
+    ;;                          "|sudo:root@"
+    ;;                          (file-remote-p file 'host) ":" (file-remote-p file 'localname))
+    ;;                (concat "/sudo:root@localhost:" file))))
 
     ;; config
     (setq embark-mixed-indicator-delay 0.1)
     (setq prefix-help-command #'embark-prefix-help-command)
 
     ;; ace-window
-    (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-    (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-    (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+    ;; (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+    ;; (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+    ;; (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
 
     ;; split window(2)
-    (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
-    (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
-    (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
+    ;; (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
+    ;; (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
+    ;; (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
 
     ;; split window(3)
-    (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
-    (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
-    (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
+    ;; (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
+    ;; (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
+    ;; (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
 
     ;; sudo
-    (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
+    ;; (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
-    ;; consult
+    ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 #+end_src
 *** TODO embark-consult
@@ -4345,8 +4345,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-super-agenda-mode) "org-super-agenda" nil t)
 
-  (with-eval-after-load 'org
-    (add-hook 'org-mode-hook #'org-super-agenda-mode))
+  (add-hook 'emacs-startup-hook #'org-super-agenda-mode)
 
   (with-eval-after-load 'org-super-agenda
     ;; config
