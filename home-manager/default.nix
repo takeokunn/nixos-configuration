@@ -13,6 +13,9 @@ let
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
   darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
+  # modules
+  modules = import ./modules;
+
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs; };
   advancedPrograms = import ./programs/advanced.nix {
@@ -23,7 +26,7 @@ let
   basicServices = import ./services/basic.nix;
   advancedServices = import ./services/advanced.nix { inherit pkgs; };
 in {
-  imports = basicPrograms ++ advancedPrograms ++ basicServices
+  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices
     ++ advancedServices;
 
   home.stateVersion = "24.05";
