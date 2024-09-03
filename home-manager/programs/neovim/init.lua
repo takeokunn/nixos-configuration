@@ -4,7 +4,7 @@ vim.opt.clipboard:append('unnamed')
 vim.opt.backspace = "indent,eol,start"
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
-vim.opt.laststatus = 2
+vim.opt.laststatus = 3
 vim.opt.statusline = "%y"
 vim.opt.showmatch = true
 vim.opt.wrapscan = true
@@ -23,8 +23,8 @@ vim.opt.incsearch = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
-vim.keymap.set('n', '/', '/\\v', { noremap = true })
-vim.keymap.set('n', '<Leader><Leader>', 'V', { noremap = true })
-vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { noremap = true })
+vim.keymap.set('n', '/', '/\\v', { remap = false })
+vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
+vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
 
 vim.cmd.syntax("on")
