@@ -5,12 +5,21 @@
     withNodeJs = false;
     withRuby = false;
     withPython3 = false;
+
     plugins = with pkgs.vimPlugins; [
       dracula-nvim
       lualine-nvim
       vim-markdown
       hop-nvim
+      gitsigns-nvim
+      undotree
+      editorconfig-vim
+      rainbow
+      auto-pairs
+      vim-bracketed-paste
     ];
+
+    coc.enable = true;
   };
 
   xdg.configFile."nvim/init.lua".source = ./init.lua;

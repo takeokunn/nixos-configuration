@@ -29,7 +29,10 @@ vim.cmd.syntax("on")
 
 -- keymap
 
+vim.g.mapleader = ','
+
 vim.keymap.set('n', '/', '/\\v', { remap = false })
+vim.keymap.set('n', 'U', '<C-r>', { remap = false })
 vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
 vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
 
@@ -49,3 +52,21 @@ require('lualine').setup {
 
 require'hop'.setup { }
 vim.keymap.set('n', 's', '<Cmd>HopChar2<CR>')
+
+-- gitsigns
+
+require('gitsigns').setup()
+
+-- neotree
+
+vim.g.undotree_WindowLayout = 3
+vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
+vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
+
+-- rainbow
+
+vim.g.rainbow_active = 1
+
+-- coc
+
+vim.keymap.set('n', 'gd', '<Plug>(coc-definition)', { silent = true })
