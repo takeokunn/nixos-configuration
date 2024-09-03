@@ -1,3 +1,5 @@
+-- basic
+
 vim.opt.encoding = "utf-8"
 vim.opt.fileencodings = "utf-8,euc-jp,cp932"
 vim.opt.clipboard:append('unnamed')
@@ -23,8 +25,27 @@ vim.opt.incsearch = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
+vim.cmd.syntax("on")
+
+-- keymap
+
 vim.keymap.set('n', '/', '/\\v', { remap = false })
 vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
 vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
 
-vim.cmd.syntax("on")
+-- theme
+
+vim.cmd[[colorscheme dracula]]
+
+require('lualine').setup {
+  options = {
+    icons_enabled = false,
+    section_separators = '',
+    component_separators = ''
+  }
+}
+
+-- cursor
+
+require'hop'.setup { }
+vim.keymap.set('n', 's', '<Cmd>HopChar2<CR>')
