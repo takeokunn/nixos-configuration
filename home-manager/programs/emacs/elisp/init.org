@@ -2717,7 +2717,7 @@
 
   (with-eval-after-load 'gcmh
     ;; config
-    (setq gcmh-verbose t)
+    (setq gcmh-verbose nil)
 
     ;; hooks
     (defvar my/gcmh-status nil)

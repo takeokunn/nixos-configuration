@@ -9,6 +9,7 @@ let
   programs = import ./modules/programs.nix;
   security = import ./modules/security.nix { inherit username; };
   services = import ./modules/services.nix { inherit username; };
+  sops = import ./modules/sops.nix;
   systemd = import ./modules/systemd.nix;
   time = import ./modules/time.nix;
   users = import ./modules/users.nix { inherit pkgs username; };
@@ -26,6 +27,7 @@ in {
     programs
     security
     services
+    sops
     systemd
     time
     users

@@ -4,7 +4,6 @@ with pkgs; [
   devbox
   devenv
   du-dust
-  git
   lnav
   nkf
   offlineimap
