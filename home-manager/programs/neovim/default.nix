@@ -18,7 +18,6 @@ in {
       hop-nvim
       gitsigns-nvim
       undotree
-      editorconfig-vim
       rainbow
       auto-pairs
       vim-bracketed-paste
