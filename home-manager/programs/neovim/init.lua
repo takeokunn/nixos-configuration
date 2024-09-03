@@ -70,3 +70,7 @@ vim.g.rainbow_active = 1
 -- coc
 
 vim.keymap.set('n', 'gd', '<Plug>(coc-definition)', { silent = true })
+
+-- skkeleton
+
+vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
