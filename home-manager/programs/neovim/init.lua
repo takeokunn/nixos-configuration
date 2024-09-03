@@ -23,9 +23,6 @@ vim.opt.incsearch = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
-vim.keymap.set('n', '/', [[/\v]])
-vim.keymap.set('n', '/', [[/\v]])
-
 vim.keymap.set('n', '/', '/\\v', { noremap = true })
 vim.keymap.set('n', '<Leader><Leader>', 'V', { noremap = true })
 vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { noremap = true })
