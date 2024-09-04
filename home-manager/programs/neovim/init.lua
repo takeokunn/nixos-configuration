@@ -25,9 +25,11 @@ vim.opt.incsearch = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
+-- syntax
+
 vim.cmd.syntax("on")
 
--- keymap
+-- basic keymap
 
 vim.g.mapleader = ','
 
@@ -36,41 +38,23 @@ vim.keymap.set('n', 'U', '<C-r>', { remap = false })
 vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
 vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
 
--- theme
+-- window keymap
 
-vim.cmd[[colorscheme dracula]]
+vim.keymap.set('n', 'sj', '<C-w>j', { noremap = true, silent = true })
+vim.keymap.set('n', 'sk', '<C-w>k', { noremap = true, silent = true })
+vim.keymap.set('n', 'sl', '<C-w>l', { noremap = true, silent = true })
+vim.keymap.set('n', 'sh', '<C-w>h', { noremap = true, silent = true })
+vim.keymap.set('n', 'sJ', '<C-w>J', { noremap = true, silent = true })
+vim.keymap.set('n', 'sK', '<C-w>K', { noremap = true, silent = true })
+vim.keymap.set('n', 'sL', '<C-w>L', { noremap = true, silent = true })
+vim.keymap.set('n', 'sH', '<C-w>H', { noremap = true, silent = true })
+vim.keymap.set('n', 'sw', '<C-w>w', { noremap = true, silent = true })
 
-require('lualine').setup {
-  options = {
-    icons_enabled = false,
-    section_separators = '',
-    component_separators = ''
-  }
-}
+-- buffer keymap
 
--- cursor
+vim.keymap.set('n', 'sp', ':<C-u>bp<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'sn', ':<C-u>bn<CR>', { noremap = true, silent = true })
 
-require'hop'.setup { }
-vim.keymap.set('n', 's', '<Cmd>HopChar2<CR>')
-
--- gitsigns
-
-require('gitsigns').setup()
-
--- neotree
-
-vim.g.undotree_WindowLayout = 3
-vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
-vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
-
--- rainbow
-
-vim.g.rainbow_active = 1
-
--- coc
+-- coc keymap
 
 vim.keymap.set('n', 'gd', '<Plug>(coc-definition)', { silent = true })
-
--- skkeleton
-
-vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
