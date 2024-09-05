@@ -1,0 +1,42 @@
+{
+    "dracula-sublime": {
+        "cargoLocks": null,
+        "date": "2023-08-30",
+        "extract": null,
+        "name": "dracula-sublime",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "dracula",
+            "repo": "sublime",
+            "rev": "456d3289827964a6cb503a3b0a6448f4326f291b",
+            "sha256": "sha256-8mCovVSrBjtFi5q+XQdqAaqOt3Q+Fo29eIDwECOViro=",
+            "type": "github"
+        },
+        "version": "456d3289827964a6cb503a3b0a6448f4326f291b"
+    },
+    "sublime-gleam": {
+        "cargoLocks": null,
+        "date": "2020-10-25",
+        "extract": null,
+        "name": "sublime-gleam",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "molnarmark",
+            "repo": "sublime-gleam",
+            "rev": "ff9638511e05b0aca236d63071c621977cffce38",
+            "sha256": "sha256-94moZz9r5cMVPWTyzGlbpu9p2p/5Js7/KV6V4Etqvbo=",
+            "type": "github"
+        },
+        "version": "ff9638511e05b0aca236d63071c621977cffce38"
+    }
+}

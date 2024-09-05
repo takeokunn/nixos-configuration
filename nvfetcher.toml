@@ -1,0 +1,11 @@
+# for bat
+
+[dracula-sublime]
+src.git = "https://github.com/dracula/sublime"
+src.branch = "master"
+fetch.github = "dracula/sublime"
+
+[sublime-gleam]
+src.git = "https://github.com/molnarmark/sublime-gleam"
+src.branch = "main"
+fetch.github = "molnarmark/sublime-gleam"
