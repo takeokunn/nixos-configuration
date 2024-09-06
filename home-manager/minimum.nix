@@ -11,7 +11,8 @@ let
   modules = import ./modules;
 
   # programs
-  basicPrograms = import ./programs/basic.nix { inherit pkgs; };
+  sources = pkgs.callPackage ../_sources/generated.nix { };
+  basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
 
   # services
   basicServices = import ./services/basic.nix;

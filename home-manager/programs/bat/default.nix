@@ -1,6 +1,4 @@
-{ pkgs }:
-let sources = pkgs.callPackage ../../../_sources/generated.nix { };
-in {
+{ pkgs, sources }: {
   programs.bat = {
     enable = true;
     themes = {

@@ -1,6 +1,4 @@
-{ pkgs }:
-let sources = pkgs.callPackage ../../../_sources/generated.nix { };
-in {
+{ pkgs, sources }: {
   home.file = {
     # completions
     ".config/fish/completions/" = {
@@ -49,39 +47,39 @@ in {
 
     plugins = [
       {
-        name = "fish-bd";
+        name = sources.fish-bd.pname;
         src = sources.fish-bd.src;
       }
       {
-        name = "fish-artisan-completion";
+        name = sources.fish-artisan-completion.pname;
         src = sources.fish-artisan-completion.src;
       }
       {
-        name = "fish-ghq";
+        name = sources.fish-ghq.pname;
         src = sources.fish-ghq.src;
       }
       {
-        name = "dracula";
+        name = sources.dracula-fish.pname;
         src = sources.dracula-fish.src;
       }
       {
-        name = "done";
+        name = sources.fish-done.pname;
         src = sources.fish-done.src;
       }
       {
-        name = "autopair";
-        src = sources.fish-autopair;
+        name = sources.fish-autopair.pname;
+        src = sources.fish-autopair.src;
       }
       {
-        name = "nix-completions";
+        name = sources.fish-nix-completions.pname;
         src = sources.fish-nix-completions.src;
       }
       {
-        name = "nix-env";
+        name = sources.fish-nix-env.pname;
         src = sources.fish-nix-env.src;
       }
       {
-        name = "fish-dart-completions";
+        name = sources.fish-dart-completions.pname;
         src = sources.fish-dart-completions.src;
       }
     ];

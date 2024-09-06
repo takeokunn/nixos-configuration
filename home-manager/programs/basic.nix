@@ -1,11 +1,11 @@
-{ pkgs }:
+{ pkgs, sources }:
 let
-  bat = import ./bat { inherit pkgs; };
+  bat = import ./bat { inherit pkgs sources; };
   bottom = import ./bottom;
   direnv = import ./direnv;
   editorconfig = import ./editorconfig { inherit pkgs; };
   eza = import ./eza;
-  fish = import ./fish { inherit pkgs; };
+  fish = import ./fish { inherit pkgs sources; };
   gnupg = import ./gnupg;
   misc = import ./misc;
   mu = import ./mu;

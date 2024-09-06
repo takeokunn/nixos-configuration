@@ -57,7 +57,7 @@ src.git = "https://github.com/takeokunn/fish-dart-completions"
 src.branch = "main"
 fetch.github = "takeokunn/fish-dart-completions"
 
-# neovim
+# for neovim
 
 [vimdoc-ja]
 src.git = "https://github.com/vim-jp/vimdoc-ja"
