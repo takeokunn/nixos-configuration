@@ -2528,8 +2528,8 @@
 
   ;; (add-hook 'window-setup-hook #'docker-tramp-add-method)
 
-  (with-eval-after-load 'tramp
-    (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
+  ;; (with-eval-after-load 'tramp
+  ;;   (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
 #+end_src
 ** consult-tramp
 #+begin_src emacs-lisp :tangle yes

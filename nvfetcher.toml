@@ -9,3 +9,67 @@ fetch.github = "dracula/sublime"
 src.git = "https://github.com/molnarmark/sublime-gleam"
 src.branch = "main"
 fetch.github = "molnarmark/sublime-gleam"
+
+# for fish
+
+[fish-bd]
+src.git = "https://github.com/0rax/fish-bd"
+src.branch = "master"
+fetch.github = "0rax/fish-bd"
+
+[fish-artisan-completion]
+src.git = "https://github.com/adriaanzon/fish-artisan-completion"
+src.branch = "master"
+fetch.github = "adriaanzon/fish-artisan-completion"
+
+[fish-ghq]
+src.git = "https://github.com/decors/fish-ghq"
+src.branch = "master"
+fetch.github = "decors/fish-ghq"
+
+[dracula-fish]
+src.git = "https://github.com/dracula/fish"
+src.branch = "master"
+fetch.github = "dracula/fish"
+
+[fish-done]
+src.git = "https://github.com/franciscolourenco/done"
+src.branch = "master"
+fetch.github = "franciscolourenco/done"
+
+[fish-autopair]
+src.git = "https://github.com/jorgebucaran/autopair.fish"
+src.branch = "main"
+fetch.github = "jorgebucaran/autopair.fish"
+
+[fish-nix-completions]
+src.git = "https://github.com/kidonng/nix-completions.fish"
+src.branch = "master"
+fetch.github = "kidonng/nix-completions.fish"
+
+[fish-nix-env]
+src.git = "https://github.com/lilyball/nix-env.fish"
+src.branch = "master"
+fetch.github = "lilyball/nix-env.fish"
+
+[fish-dart-completions]
+src.git = "https://github.com/takeokunn/fish-dart-completions"
+src.branch = "main"
+fetch.github = "takeokunn/fish-dart-completions"
+
+# neovim
+
+[vimdoc-ja]
+src.git = "https://github.com/vim-jp/vimdoc-ja"
+src.branch = "master"
+fetch.github = "vim-jp/vimdoc-ja"
+
+[denops-helloworld]
+src.git = "https://github.com/vim-denops/denops-helloworld.vim"
+src.branch = "main"
+fetch.github = "vim-denops/denops-helloworld.vim"
+
+[skkeleton]
+src.git = "https://github.com/vim-skk/skkeleton"
+src.branch = "main"
+fetch.github = "vim-skk/skkeleton"
