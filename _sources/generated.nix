@@ -49,6 +49,54 @@
     };
     date = "2024-08-16";
   };
+  emacs-eshell-fringe-status = {
+    pname = "emacs-eshell-fringe-status";
+    version = "adc6997c68e39c0d52a2af1b2fd5cf2057783797";
+    src = fetchFromGitHub {
+      owner = "ryuslash";
+      repo = "eshell-fringe-status";
+      rev = "adc6997c68e39c0d52a2af1b2fd5cf2057783797";
+      fetchSubmodules = false;
+      sha256 = "sha256-QHJxU+fX6sr0duNEdObRY7cqnfqdGX3mLJQ0KTcjlrM=";
+    };
+    date = "2017-01-18";
+  };
+  emacs-eshell-multiple = {
+    pname = "emacs-eshell-multiple";
+    version = "342c36ef9c71df8738f4435fd4381f506631e7aa";
+    src = fetchFromGitHub {
+      owner = "takeokunn";
+      repo = "eshell-multiple";
+      rev = "342c36ef9c71df8738f4435fd4381f506631e7aa";
+      fetchSubmodules = false;
+      sha256 = "sha256-+4x8Xkaqj44rcvrqv/3M8p+b842c6uLNBGPMaDtQUbs=";
+    };
+    date = "2022-08-17";
+  };
+  emacs-eshell-syntax-highlighting = {
+    pname = "emacs-eshell-syntax-highlighting";
+    version = "26f49633308ea876b5850256e07622de34ad0bdd";
+    src = fetchFromGitHub {
+      owner = "akreisher";
+      repo = "eshell-syntax-highlighting";
+      rev = "26f49633308ea876b5850256e07622de34ad0bdd";
+      fetchSubmodules = false;
+      sha256 = "sha256-MPypD9p1gUEFGQmq06vCcmuQa9E2dVsVDba6n0fHVNw=";
+    };
+    date = "2024-06-30";
+  };
+  emacs-fish-repl = {
+    pname = "emacs-fish-repl";
+    version = "5dd66957e494ea201de6e2b0c934dbac6f12743a";
+    src = fetchFromGitHub {
+      owner = "takeokunn";
+      repo = "fish-repl.el";
+      rev = "5dd66957e494ea201de6e2b0c934dbac6f12743a";
+      fetchSubmodules = false;
+      sha256 = "sha256-6clzUsB7dllXKe5CeT0kwZl5Cjs9KKhPFaDa9B0aUHE=";
+    };
+    date = "2021-09-24";
+  };
   emacs-llm = {
     pname = "emacs-llm";
     version = "e19a678e84bf8168cac48662063bc44ca783cfad";
@@ -60,6 +108,30 @@
       sha256 = "sha256-o0Rwjj9anh81R4wdcyUdGStRSnJWPIHz15tPhztUer4=";
     };
     date = "2024-09-03";
+  };
+  emacs-php-doc-block = {
+    pname = "emacs-php-doc-block";
+    version = "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81";
+    src = fetchFromGitHub {
+      owner = "moskalyovd";
+      repo = "emacs-php-doc-block";
+      rev = "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81";
+      fetchSubmodules = false;
+      sha256 = "sha256-pmCOsKcKcFNZP/ipj5bj9IAK+Ulthso+HQKpzakRCzA=";
+    };
+    date = "2020-03-23";
+  };
+  emacs-rainbow-csv = {
+    pname = "emacs-rainbow-csv";
+    version = "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e";
+    src = fetchFromGitHub {
+      owner = "emacs-vs";
+      repo = "rainbow-csv";
+      rev = "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e";
+      fetchSubmodules = false;
+      sha256 = "sha256-5EoBFKgUDLyC9oZDP7vY3Ldk6An39Qo4ngkIHgrB8dU=";
+    };
+    date = "2024-07-21";
   };
   fish-artisan-completion = {
     pname = "fish-artisan-completion";

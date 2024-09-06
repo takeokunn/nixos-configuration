@@ -1,11 +1,6 @@
-{ epkgs, pkgs }:
+{ sources, epkgs, pkgs }:
 let
-  rainbow-csv = pkgs.callPackage ./nixpkgs/rainbow-csv.nix { inherit epkgs; };
-  # laravel-tinker-repl =
-  #   pkgs.callPackage ./nixpkgs/laravel-tinker-repl.nix { inherit epkgs; };
-  emacs-php-doc-block =
-    pkgs.callPackage ./nixpkgs/emacs-php-doc-block.nix { inherit epkgs; };
-  fish-repl = pkgs.callPackage ./nixpkgs/fish-repl.nix { inherit epkgs; };
+  language_specific = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
 in with epkgs; [
   # Basic Lisp
   paredit
@@ -37,7 +32,7 @@ in with epkgs; [
   clang-format
 
   # Csv
-  rainbow-csv
+  language_specific.rainbow-csv
 
   # JavaScript/TypeScript
   nodejs-repl
@@ -59,7 +54,7 @@ in with epkgs; [
   php-runtime
   psysh
   # laravel-tinker-repl
-  emacs-php-doc-block
+  language_specific.emacs-php-doc-block
   phpstan
   phpunit
 
@@ -68,7 +63,7 @@ in with epkgs; [
   markdown-preview-mode
 
   # Fish
-  fish-repl
+  language_specific.fish-repl
 
   # Haskell
   hindent

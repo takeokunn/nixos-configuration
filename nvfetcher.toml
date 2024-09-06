@@ -85,3 +85,33 @@ fetch.github = "copilot-emacs/copilot.el"
 src.git = "https://github.com/ahyatt/llm"
 src.branch = "main"
 fetch.github = "ahyatt/llm"
+
+[emacs-rainbow-csv]
+src.git = "https://github.com/emacs-vs/rainbow-csv"
+src.branch = "master"
+fetch.github = "emacs-vs/rainbow-csv"
+
+[emacs-php-doc-block]
+src.git = "https://github.com/moskalyovd/emacs-php-doc-block"
+src.branch = "master"
+fetch.github = "moskalyovd/emacs-php-doc-block"
+
+[emacs-fish-repl]
+src.git = "https://github.com/takeokunn/fish-repl.el"
+src.branch = "main"
+fetch.github = "takeokunn/fish-repl.el"
+
+[emacs-eshell-fringe-status]
+src.git = "https://github.com/ryuslash/eshell-fringe-status"
+src.branch = "master"
+fetch.github = "ryuslash/eshell-fringe-status"
+
+[emacs-eshell-multiple]
+src.git = "https://github.com/takeokunn/eshell-multiple"
+src.branch = "main"
+fetch.github = "takeokunn/eshell-multiple"
+
+[emacs-eshell-syntax-highlighting]
+src.git = "https://github.com/akreisher/eshell-syntax-highlighting"
+src.branch = "master"
+fetch.github = "akreisher/eshell-syntax-highlighting"

@@ -79,6 +79,86 @@
         },
         "version": "535ef61e82f09d744cd5b097b1fc99f08cce175c"
     },
+    "emacs-eshell-fringe-status": {
+        "cargoLocks": null,
+        "date": "2017-01-18",
+        "extract": null,
+        "name": "emacs-eshell-fringe-status",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "ryuslash",
+            "repo": "eshell-fringe-status",
+            "rev": "adc6997c68e39c0d52a2af1b2fd5cf2057783797",
+            "sha256": "sha256-QHJxU+fX6sr0duNEdObRY7cqnfqdGX3mLJQ0KTcjlrM=",
+            "type": "github"
+        },
+        "version": "adc6997c68e39c0d52a2af1b2fd5cf2057783797"
+    },
+    "emacs-eshell-multiple": {
+        "cargoLocks": null,
+        "date": "2022-08-17",
+        "extract": null,
+        "name": "emacs-eshell-multiple",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "takeokunn",
+            "repo": "eshell-multiple",
+            "rev": "342c36ef9c71df8738f4435fd4381f506631e7aa",
+            "sha256": "sha256-+4x8Xkaqj44rcvrqv/3M8p+b842c6uLNBGPMaDtQUbs=",
+            "type": "github"
+        },
+        "version": "342c36ef9c71df8738f4435fd4381f506631e7aa"
+    },
+    "emacs-eshell-syntax-highlighting": {
+        "cargoLocks": null,
+        "date": "2024-06-30",
+        "extract": null,
+        "name": "emacs-eshell-syntax-highlighting",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "akreisher",
+            "repo": "eshell-syntax-highlighting",
+            "rev": "26f49633308ea876b5850256e07622de34ad0bdd",
+            "sha256": "sha256-MPypD9p1gUEFGQmq06vCcmuQa9E2dVsVDba6n0fHVNw=",
+            "type": "github"
+        },
+        "version": "26f49633308ea876b5850256e07622de34ad0bdd"
+    },
+    "emacs-fish-repl": {
+        "cargoLocks": null,
+        "date": "2021-09-24",
+        "extract": null,
+        "name": "emacs-fish-repl",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "takeokunn",
+            "repo": "fish-repl.el",
+            "rev": "5dd66957e494ea201de6e2b0c934dbac6f12743a",
+            "sha256": "sha256-6clzUsB7dllXKe5CeT0kwZl5Cjs9KKhPFaDa9B0aUHE=",
+            "type": "github"
+        },
+        "version": "5dd66957e494ea201de6e2b0c934dbac6f12743a"
+    },
     "emacs-llm": {
         "cargoLocks": null,
         "date": "2024-09-03",
@@ -98,6 +178,46 @@
             "type": "github"
         },
         "version": "e19a678e84bf8168cac48662063bc44ca783cfad"
+    },
+    "emacs-php-doc-block": {
+        "cargoLocks": null,
+        "date": "2020-03-23",
+        "extract": null,
+        "name": "emacs-php-doc-block",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "moskalyovd",
+            "repo": "emacs-php-doc-block",
+            "rev": "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81",
+            "sha256": "sha256-pmCOsKcKcFNZP/ipj5bj9IAK+Ulthso+HQKpzakRCzA=",
+            "type": "github"
+        },
+        "version": "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81"
+    },
+    "emacs-rainbow-csv": {
+        "cargoLocks": null,
+        "date": "2024-07-21",
+        "extract": null,
+        "name": "emacs-rainbow-csv",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "emacs-vs",
+            "repo": "rainbow-csv",
+            "rev": "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e",
+            "sha256": "sha256-5EoBFKgUDLyC9oZDP7vY3Ldk6An39Qo4ngkIHgrB8dU=",
+            "type": "github"
+        },
+        "version": "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e"
     },
     "fish-artisan-completion": {
         "cargoLocks": null,
