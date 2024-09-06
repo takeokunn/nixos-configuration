@@ -5,10 +5,10 @@ let
   awesome = import ./packages/awesome.nix { inherit epkgs pkgs; };
   language_specific =
     import ./packages/language_specific.nix { inherit epkgs pkgs; };
-  elfeed = import ./packages/elfeed.nix { inherit epkgs; };
-  eshell = import ./packages/eshell { inherit epkgs pkgs; };
+  elfeed = import ./packages/elfeed { inherit epkgs; };
+  eshell = import ./packages/eshell.nix { inherit epkgs pkgs; };
   org_mode = import ./packages/org_mode.nix { inherit epkgs pkgs; };
-  exwm = import ./packages/exwm.nix { inherit epkgs; };
+  exwm = import ./packages/exwm { inherit epkgs; };
   ai = import ./packages/ai { inherit epkgs pkgs sources; };
 in language ++ awesome ++ language_specific ++ elfeed ++ eshell ++ org_mode
 ++ exwm ++ ai
