@@ -115,3 +115,85 @@ fetch.github = "takeokunn/eshell-multiple"
 src.git = "https://github.com/akreisher/eshell-syntax-highlighting"
 src.branch = "master"
 fetch.github = "akreisher/eshell-syntax-highlighting"
+
+[emacs-bazel-mode]
+src.git = "https://github.com/bazelbuild/emacs-bazel-mode"
+src.branch = "master"
+fetch.github = "bazelbuild/emacs-bazel-mode"
+
+[emacs-direnv-mode]
+src.git = "https://github.com/wbolster/emacs-direnv"
+src.branch = "main"
+fetch.github = "wbolster/emacs-direnv"
+
+# TODO
+
+[emacs-systemd-mode]
+src.git = "https://github.com/holomorph/systemd-mode"
+src.branch = "master"
+fetch.github = "holomorph/systemd-mode"
+
+[emacs-web-php-blade-mode]
+src.git = "https://github.com/takeokunn/web-php-blade-mode"
+src.branch = "main"
+fetch.github = "takeokunn/web-php-blade-mode"
+
+[emacs-org-view-mode]
+src.git = "https://github.com/amno1/org-view-mode"
+src.branch = "main"
+fetch.github = "amno1/org-view-mode"
+
+[emacs-org-dashboard]
+src.git = "https://github.com/bard/org-dashboard"
+src.branch = "main"
+fetch.github = "bard/org-dashboard"
+
+[emacs-org-volume]
+src.git = "https://github.com/akirak/org-volume"
+src.branch = "main"
+fetch.github = "akirak/org-volume"
+
+[emacs-ob-phpstan]
+src.git = "https://github.com/emacs-php/ob-phpstan"
+src.branch = "main"
+fetch.github = "emacs-php/ob-phpstan"
+
+[emacs-ob-treesitter]
+src.git = "https://github.com/takeokunn/ob-tree-sitter"
+src.branch = "main"
+fetch.github = "takeokunn/ob-tree-sitter"
+
+[emacs-ox-hatena]
+src.git = "https://github.com/zonkyy/ox-hatena"
+src.branch = "main"
+fetch.github = "zonkyy/ox-hatena"
+
+[emacs-flycheck-projectile]
+src.git = "https://github.com/nbfalcon/flycheck-projectile"
+src.branch = "main"
+fetch.github = "nbfalcon/flycheck-projectile"
+
+[emacs-view-lock-mode]
+src.git = "https://github.com/s-fubuki/view-lock-mode"
+src.branch = "main"
+fetch.github = "s-fubuki/view-lock-mode"
+
+[emacs-consult-tramp]
+src.git = "https://github.com/Ladicle/consult-tramp"
+src.branch = "main"
+fetch.github = "Ladicle/consult-tramp"
+
+[emacs-explain-pause-mode]
+src.git = "https://github.com/lastquestion/explain-pause-mode"
+src.branch = "main"
+fetch.github = "lastquestion/explain-pause-mode"
+
+[emacs-mu4e-dashboard]
+src.git = "https://github.com/rougier/mu4e-dashboard"
+src.branch = "main"
+fetch.github = "rougier/mu4e-dashboard"
+
+[emacs-pinentry]
+src.git = "https://github.com/ueno/pinentry-el"
+src.branch = "main"
+fetch.github = "ueno/pinentry-el"

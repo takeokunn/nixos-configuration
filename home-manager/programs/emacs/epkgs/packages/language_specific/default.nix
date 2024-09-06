@@ -1,6 +1,5 @@
 { sources, epkgs, pkgs }:
-let
-  language_specific = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
 in with epkgs; [
   # Basic Lisp
   paredit
@@ -32,7 +31,7 @@ in with epkgs; [
   clang-format
 
   # Csv
-  language_specific.rainbow-csv
+  plugins.rainbow-csv
 
   # JavaScript/TypeScript
   nodejs-repl
@@ -54,7 +53,7 @@ in with epkgs; [
   php-runtime
   psysh
   # laravel-tinker-repl
-  language_specific.emacs-php-doc-block
+  plugins.emacs-php-doc-block
   phpstan
   phpunit
 
@@ -63,7 +62,7 @@ in with epkgs; [
   markdown-preview-mode
 
   # Fish
-  language_specific.fish-repl
+  plugins.fish-repl
 
   # Haskell
   hindent

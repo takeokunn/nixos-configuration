@@ -59,6 +59,26 @@
         },
         "version": "456d3289827964a6cb503a3b0a6448f4326f291b"
     },
+    "emacs-bazel-mode": {
+        "cargoLocks": null,
+        "date": "2023-09-19",
+        "extract": null,
+        "name": "emacs-bazel-mode",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "bazelbuild",
+            "repo": "emacs-bazel-mode",
+            "rev": "769b30dc18282564d614d7044195b5a0c1a0a5f3",
+            "sha256": "sha256-riB6U1gTuYdStwzejvlsSneMYYFSDvdUFNdaFx3l8BA=",
+            "type": "github"
+        },
+        "version": "769b30dc18282564d614d7044195b5a0c1a0a5f3"
+    },
     "emacs-copilot": {
         "cargoLocks": null,
         "date": "2024-08-16",
@@ -78,6 +98,26 @@
             "type": "github"
         },
         "version": "535ef61e82f09d744cd5b097b1fc99f08cce175c"
+    },
+    "emacs-direnv-mode": {
+        "cargoLocks": null,
+        "date": "2024-03-14",
+        "extract": null,
+        "name": "emacs-direnv-mode",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "wbolster",
+            "repo": "emacs-direnv",
+            "rev": "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f",
+            "sha256": "sha256-g500rooMfkVX22u/HNELT+rKv0+q51Xg4k4R48fPyKw=",
+            "type": "github"
+        },
+        "version": "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f"
     },
     "emacs-eshell-fringe-status": {
         "cargoLocks": null,
@@ -161,7 +201,7 @@
     },
     "emacs-llm": {
         "cargoLocks": null,
-        "date": "2024-09-03",
+        "date": "2024-09-06",
         "extract": null,
         "name": "emacs-llm",
         "passthru": null,
@@ -173,11 +213,11 @@
             "name": null,
             "owner": "ahyatt",
             "repo": "llm",
-            "rev": "e19a678e84bf8168cac48662063bc44ca783cfad",
-            "sha256": "sha256-o0Rwjj9anh81R4wdcyUdGStRSnJWPIHz15tPhztUer4=",
+            "rev": "152a6ed44ae43641e35a0d2ce2cf9f9d35f23999",
+            "sha256": "sha256-jYt0VlZsjXYjmNvvSnHDnjFNfTraXZHfn9MJkq+Py18=",
             "type": "github"
         },
-        "version": "e19a678e84bf8168cac48662063bc44ca783cfad"
+        "version": "152a6ed44ae43641e35a0d2ce2cf9f9d35f23999"
     },
     "emacs-php-doc-block": {
         "cargoLocks": null,
@@ -218,6 +258,26 @@
             "type": "github"
         },
         "version": "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e"
+    },
+    "emacs-systemd-mode": {
+        "cargoLocks": null,
+        "date": "2023-01-31",
+        "extract": null,
+        "name": "emacs-systemd-mode",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "holomorph",
+            "repo": "systemd-mode",
+            "rev": "8742607120fbc440821acbc351fda1e8e68a8806",
+            "sha256": "sha256-oj/E+b3oS/2QNNxTYDZ5Zwq/OHKI2FgN/eRV5EAexrE=",
+            "type": "github"
+        },
+        "version": "8742607120fbc440821acbc351fda1e8e68a8806"
     },
     "fish-artisan-completion": {
         "cargoLocks": null,

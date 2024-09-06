@@ -2593,192 +2593,6 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(uptimes) "uptimes" nil t)
 #+end_src
-* Misc Package
-** Joke
-*** hacker-typer
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(hacker-typer) "hacker-typer" nil t)
-#+end_src
-*** power-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(power-mode) "power-mode" nil t)
-#+end_src
-*** sudden-death
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(sudden-death) "sudden-death" nil t)
-#+end_src
-*** redacted
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(redacted-mode) "redacted" nil t)
-
-  (defun my/redacted-mode ()
-    (interactive)
-    (read-only-mode (if redacted-mode -1 1))
-    (redacted-mode (if redacted-mode -1 1)))
-#+end_src
-*** lorem ipsum
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(lorem-ipsum-insert-sentences
-                       lorem-ipsum-insert-paragraphs
-                       lorem-ipsum-insert-list) "lorem-ipsum" nil t)
-
-  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
-  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
-  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
-#+end_src
-** Password
-*** pass
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(pass pass-view-mode) "pass" nil t)
-
-  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/password-store/.*\\.gpg") 'pass-view-mode))
-
-  (with-eval-after-load 'pass
-    (setq pass-suppress-confirmations t))
-#+end_src
-** Dictionary
-*** define-word
-#+begin_src emacs-lisp :tangle yes
-  (defun my/define-word ()
-    (interactive)
-    (if (use-region-p)
-        (call-interactively #'define-word-at-point)
-      (call-interactively #'define-word)))
-
-  (with-eval-after-load 'define-word
-    (setq define-word-displayfn-alist
-            '((wordnik . takeokunn/define-word--display-in-buffer)
-              (openthesaurus . takeokunn/define-word--display-in-buffer)
-              (webster . takeokunn/define-word--display-in-buffer)
-              (weblio . takeokunn/define-word--display-in-buffer))))
-#+end_src
-** Googling
-*** google-this
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(google-this) "google-this" nil t)
-#+END_SRC
-*** google-translate
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
-#+end_src
-** Mail
-*** mu4e
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(mu4e) "mu4e" nil t)
-
-  (keymap-global-set "C-x C-w" #'mu4e)
-
-  (with-eval-after-load 'mu4e
-    ;; config
-    (setq mail-user-agent 'mu4e-user-agent))
-
-  (with-eval-after-load 'mu4e-update
-    ;; config
-    (setq mu4e-get-mail-command "offlineimap")
-    (setq mu4e-update-interval (* 5 60))
-    (setq mu4e-index-cleanup nil)
-    (setq mu4e-index-lazy-check t))
-
-  (with-eval-after-load 'mu4e-view
-    ;; config
-    (setq mu4e-split-view 'horizontal))
-
-  (with-eval-after-load 'mu4e-folders
-    ;; config
-    (setq mu4e-maildir-shortcuts '((:maildir "/INBOX" :key ?i)
-                                     (:maildir "/Redmine" :key ?r)
-                                     (:maildir "/GitHub" :key ?g)
-                                     (:maildir "/Emacs" :key ?e)
-                                     (:maildir "/Guix" :key ?u))))
-
-  (with-eval-after-load 'mm-decode
-    (add-to-list 'mm-discouraged-alternatives "text/html")
-    (add-to-list 'mm-discouraged-alternatives "text/richtext"))
-#+end_src
-*** TODO mu4e-views
-#+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "lordpretzel/mu4e-views"))
-
-  ;; (with-delayed-execution
-  ;; (message "Install mu4e-views...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/mu4e-views"))
-#+end_src
-*** TODO mu4e-dashboard
-#+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '() "mu4e-dashboard" nil t)
-#+end_src
-** GC
-*** gcmh
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(gcmh-mode) "gcmh" nil t)
-
-  (add-hook 'window-setup-hook #'gcmh-mode)
-
-  (with-eval-after-load 'gcmh
-    ;; config
-    (setq gcmh-verbose nil)
-
-    ;; hooks
-    (defvar my/gcmh-status nil)
-    (advice-add #'garbage-collect
-                :before
-                (defun my/gcmh-log-start (&rest _)
-                  (when gcmh-verbose
-                    (setq my/gcmh-status "Running GC..."))))
-
-    (advice-add #'gcmh-message
-                :override
-                (defun my/gcmh-message (format-string &rest args)
-                  (setq my/gcmh-status
-                        (apply #'format-message format-string args))
-                  (run-with-timer 2 nil
-                                  (lambda ()
-                                    (setq my/gcmh-status nil))))))
-#+end_src
-** Client
-*** md4rd
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(md4rd
-                       md4rd-login
-                       md4rd-visit
-                       md4rd-widget-expand-all
-                       md4rd-widget-collapse-all
-                       md4rd-reply
-                       md4rd-upvote
-                       md4rd-downvote
-                       md4rd-widget-toggle-line
-                       md4rd-refresh-login
-                       md4rd-indent-all-the-lines) "md4rd" nil t)
-
-  (with-eval-after-load 'md4rd
-    (add-hook 'md4rd-mode-hook #'md4rd-indent-all-the-lines)
-    (run-with-timer 0 3540 #'md4rd-refresh-login)
-
-    ;; config
-    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
-    ;; (setq md4rd--oauth-access-token "your-access-token-here")
-    ;; (setq md4rd--oauth-refresh-token "your-refresh-token-here")
-
-    ;; keymap
-    (define-key md4rd-mode-map (kbd "u") 'tree-mode-goto-parent)
-    (define-key md4rd-mode-map (kbd "o") 'md4rd-open)
-    (define-key md4rd-mode-map (kbd "v") 'md4rd-visit)
-    (define-key md4rd-mode-map (kbd "e") 'tree-mode-toggle-expand)
-    (define-key md4rd-mode-map (kbd "E") 'md4rd-widget-expand-all)
-    (define-key md4rd-mode-map (kbd "C") 'md4rd-widget-collapse-all)
-    (define-key md4rd-mode-map (kbd "n") 'widget-forward)
-    (define-key md4rd-mode-map (kbd "j") 'widget-forward)
-    (define-key md4rd-mode-map (kbd "h") 'backward-button)
-    (define-key md4rd-mode-map (kbd "p") 'widget-backward)
-    (define-key md4rd-mode-map (kbd "k") 'widget-backward)
-    (define-key md4rd-mode-map (kbd "l") 'forward-button)
-    (define-key md4rd-mode-map (kbd "q") 'kill-current-buffer)
-    (define-key md4rd-mode-map (kbd "r") 'md4rd-reply)
-    (define-key md4rd-mode-map (kbd "u") 'md4rd-upvote)
-    (define-key md4rd-mode-map (kbd "d") 'md4rd-downvote)
-    (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
-#+end_src
 * EWW
 ** basic
 #+begin_src emacs-lisp :tangle yes
@@ -2887,154 +2701,8 @@
     ;; hooks
     (add-hook 'dired-mode-hook #'diredfl-global-mode))
 #+end_src
-* Buffer/Window/File
-** Buffer
-*** auto-save-buffers-enhanced
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
-
-  ;; (add-hook 'window-setup-hook #'auto-save-buffers-enhanced)
-
-  (with-eval-after-load 'auto-save-buffers-enhanced
-    (setq auto-save-buffers-enhanced-interval 10))
-#+end_src
-*** editorconfig
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
-
-  (add-hook 'emacs-startup-hook #'editorconfig-mode)
-#+END_SRC
-*** persistent-scratch
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(persistent-scratch-setup-default) "persistent-scratch" nil t)
-
-  (add-hook 'window-setup-hook #'persistent-scratch-setup-default)
-
-  (with-eval-after-load 'persistent-scratch
-    ;; config
-    (setq persistent-scratch-autosave-interval 100))
-#+end_src
-*** popwin
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(popwin-mode) "popwin" nil t)
-
-  (add-hook 'emacs-startup-hook #'popwin-mode)
-#+end_src
-*** whitespace
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
-
-  (when window-system
-    (add-hook 'emacs-startup-hook #'global-whitespace-mode))
-
-  (with-eval-after-load 'whitespace
-    ;; config
-    (setq whitespace-style '(face tabs tab-mark spaces space-mark))
-    (setq whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
-                                          (tab-mark ?\t [?\xBB ?\t] [?\\ ?\t]))))
-#+END_SRC
-** File
-*** recentf
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(recentf-mode) "recentf" nil t)
-
-  (add-hook 'window-setup-hook #'recentf-mode)
-
-  (with-eval-after-load 'recentf
-    ;; config
-    (setq recentf-auto-cleanup 'never)
-    (setq recentf-max-menu-items 10000)
-    (setq recentf-max-saved-items 10000)
-    (setq recentf-save-file  "~/.emacs.d/.recentf")
-    (setq recentf-exclude '(".recentf" "\\.gpg\\")))
-#+END_SRC
-*** open-junk-file
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
-
-  (keymap-global-set "C-x j" #'open-junk-file)
-
-  (with-eval-after-load 'open-junk-file
-    ;; config
-    (setq open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
-#+END_SRC
-*** vlf
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
-
-  ;; (vlf-disable-for-function tags-verify-table "etags")
-  ;; (vlf-disable-for-function tag-find-file-of-tag-noselect "etags")
-  ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (define-key dired-mode-map (kbd "V") #'dired-vlf))
-#+end_src
-*** sudo-edit
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
-#+end_src
-** Project
-*** projectile
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(projectile-mode
-  		     projectile-clear-known-projects
-  		     projectile-cleanup-known-projects) "projectile" nil t)
-
-  (add-hook 'window-setup-hook #'projectile-mode)
-
-  (with-eval-after-load 'projectile
-    ;; keybind
-    (keymap-global-set "M-p" #'projectile-command-map)
-    (keymap-global-set "C-c p" #'projectile-command-map)
-
-    ;; hooks
-    (add-hook 'projectile-mode-hook #'my/update-projectile-known-projects)
-
-    ;; function
-    (defun my/update-projectile-known-projects ()
-      (interactive)
-      (projectile-clear-known-projects)
-      (projectile-cleanup-known-projects)
-      (setq projectile-known-projects (mapcar
-                                       (lambda (x)
-                                         (abbreviate-file-name (concat x "/")))
-                                       (split-string (shell-command-to-string "ghq list --full-path")))))
-
-    ;; config
-    (setq projectile-switch-project-action 'projectile-dired)
-    (setq projectile-enable-caching t)
-    (setq projectile-use-git-grep t))
-#+end_src
-*** consult-projectile
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(consult-projectile-switch-to-buffer
-                       consult-projectile-switch-to-buffer-other-window
-                       consult-projectile-switch-to-buffer-other-frame
-                       consult-projectile-find-dir
-                       consult-projectile-find-file
-                       consult-projectile-find-file-other-window
-                       consult-projectile-find-file-other-frame
-                       consult-projectile-recentf
-                       consult-projectile-switch-project) "consult-projectile" nil t)
-
-  (with-eval-after-load 'projectile
-    ;; advice
-    (advice-add 'projectile-switch-to-buffer :override #'consult-projectile-switch-to-buffer)
-    (advice-add 'projectile-switch-to-buffer-other-window :override #'consult-projectile-switch-to-buffer-other-window)
-    (advice-add 'projectile-switch-to-buffer-other-frame :override #'consult-projectile-switch-to-buffer-other-frame)
-    (advice-add 'projectile-find-dir :override #'consult-projectile-find-dir)
-    (advice-add 'projectile-find-file :override #'consult-projectile-find-file)
-    (advice-add 'projectile-find-file-other-window :override #'consult-projectile-find-file-other-window)
-    (advice-add 'projectile-find-file-other-frame :override #'consult-projectile-find-file-other-frame)
-    (advice-add 'projectile-recentf :override #'consult-projectile-recentf)
-    (advice-add 'projectile-switch-project :override #'consult-projectile-switch-project)
-
-    ;; keybind
-    (keymap-global-set "C-x B" #'consult-projectile-switch-to-buffer))
-#+end_src
-** Search
-*** TODO migemo
+* Search
+** TODO migemo
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(migemo-init) "migemo" nil t)
 
@@ -3050,7 +2718,7 @@
   ;;   (setq migemo-use-pattern-alist t)
   ;;   (setq migemo-use-frequent-pattern-alist t))
 #+end_src
-*** wgrep
+** wgrep
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(wgrep-setup) "wgrep" nil t)
 
@@ -3058,7 +2726,7 @@
     ;; hooks
     (add-hook 'grep-setup-hook 'wgrep-setup))
 #+end_src
-*** consult
+** consult
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-bookmark
                        consult-buffer
@@ -3155,7 +2823,7 @@
     (setq xref-show-xrefs-function #'consult-xref)
     (setq xref-show-definitions-function #'consult-xref))
 #+end_src
-*** affe
+** affe
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(affe-grep) "affe" nil t)
 
@@ -3165,7 +2833,7 @@
     (setq affe-find-command "fd --color=never --full-path")
     (setq affe-regexp-function 'orderless-pattern-compiler))
 #+end_src
-*** TODO embark
+** TODO embark
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(embark-act embark-dwim embark-prefix-help-command) "embark" nil t)
 
@@ -3228,13 +2896,13 @@
     ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 #+end_src
-*** TODO embark-consult
+** TODO embark-consult
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(embark-consult-outline-candidates
   ;;                      embark-consult-imenu-candidates
   ;;                      embark-consult-imenu-or-outline-candidates) "embark-consult" nil t)
 #+end_src
-*** compile-multi
+** compile-multi
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(compile-multi) "compile-multi" nil t)
   (autoload-if-found '(consult-compile-multi-mode) "consult-compile-multi" nil t)
@@ -3245,7 +2913,7 @@
   ;; (add-hook emacs-startup-hook #'consult-compile-multi-mode)
   ;; (add-hook emacs-startup-hook #'compile-multi-embark-mode)
 #+end_src
-*** vertico
+** vertico
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vertico-mode) "vertico-autoloads" nil t)
   (autoload-if-found '(vertico-flat-mode) "vertico-flat" nil t)
@@ -3257,7 +2925,7 @@
     (setq vertico-count 8)
     (setq vertico-cycle t))
 #+end_src
-*** marginalia
+** marginalia
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode marginalia-cycle) "marginalia" nil t)
 
@@ -3265,7 +2933,7 @@
     ;; hooks
     (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
 #+end_src
-*** orderless
+** orderless
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orderless-all-completions orderless-try-completion) "orderless" nil t)
 
@@ -3276,8 +2944,156 @@
     (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
                                                       "Completion of multiple components, in any order.")))
 #+end_src
-** Window
-*** ace-window
+* Buffer
+** auto-save-buffers-enhanced
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
+
+  ;; (add-hook 'window-setup-hook #'auto-save-buffers-enhanced)
+
+  (with-eval-after-load 'auto-save-buffers-enhanced
+    (setq auto-save-buffers-enhanced-interval 10))
+#+end_src
+** editorconfig
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
+
+  (add-hook 'emacs-startup-hook #'editorconfig-mode)
+#+END_SRC
+** persistent-scratch
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(persistent-scratch-setup-default) "persistent-scratch" nil t)
+
+  (add-hook 'window-setup-hook #'persistent-scratch-setup-default)
+
+  (with-eval-after-load 'persistent-scratch
+    ;; config
+    (setq persistent-scratch-autosave-interval 100))
+#+end_src
+** popwin
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(popwin-mode) "popwin" nil t)
+
+  (add-hook 'emacs-startup-hook #'popwin-mode)
+#+end_src
+** whitespace
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
+
+  (when window-system
+    (add-hook 'emacs-startup-hook #'global-whitespace-mode))
+
+  (with-eval-after-load 'whitespace
+    ;; config
+    (setq whitespace-style '(face tabs tab-mark spaces space-mark))
+    (setq whitespace-display-mappings '((space-mark ?\u3000 [?\u25a1])
+                                          (tab-mark ?\t [?\xBB ?\t] [?\\ ?\t]))))
+#+END_SRC
+
+* File
+** recentf
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(recentf-mode) "recentf" nil t)
+
+  (add-hook 'window-setup-hook #'recentf-mode)
+
+  (with-eval-after-load 'recentf
+    ;; config
+    (setq recentf-auto-cleanup 'never)
+    (setq recentf-max-menu-items 10000)
+    (setq recentf-max-saved-items 10000)
+    (setq recentf-save-file  "~/.emacs.d/.recentf")
+    (setq recentf-exclude '(".recentf" "\\.gpg\\")))
+#+END_SRC
+** open-junk-file
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
+
+  (keymap-global-set "C-x j" #'open-junk-file)
+
+  (with-eval-after-load 'open-junk-file
+    ;; config
+    (setq open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
+#+END_SRC
+** vlf
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
+
+  ;; (vlf-disable-for-function tags-verify-table "etags")
+  ;; (vlf-disable-for-function tag-find-file-of-tag-noselect "etags")
+  ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
+
+  (with-eval-after-load 'dired
+    ;; hooks
+    (define-key dired-mode-map (kbd "V") #'dired-vlf))
+#+end_src
+** sudo-edit
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
+#+end_src
+
+* Project
+** projectile
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(projectile-mode
+  		     projectile-clear-known-projects
+  		     projectile-cleanup-known-projects) "projectile" nil t)
+
+  (add-hook 'window-setup-hook #'projectile-mode)
+
+  (with-eval-after-load 'projectile
+    ;; keybind
+    (keymap-global-set "M-p" #'projectile-command-map)
+    (keymap-global-set "C-c p" #'projectile-command-map)
+
+    ;; hooks
+    (add-hook 'projectile-mode-hook #'my/update-projectile-known-projects)
+
+    ;; function
+    (defun my/update-projectile-known-projects ()
+      (interactive)
+      (projectile-clear-known-projects)
+      (projectile-cleanup-known-projects)
+      (setq projectile-known-projects (mapcar
+                                       (lambda (x)
+                                         (abbreviate-file-name (concat x "/")))
+                                       (split-string (shell-command-to-string "ghq list --full-path")))))
+
+    ;; config
+    (setq projectile-switch-project-action 'projectile-dired)
+    (setq projectile-enable-caching t)
+    (setq projectile-use-git-grep t))
+#+end_src
+** consult-projectile
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(consult-projectile-switch-to-buffer
+                       consult-projectile-switch-to-buffer-other-window
+                       consult-projectile-switch-to-buffer-other-frame
+                       consult-projectile-find-dir
+                       consult-projectile-find-file
+                       consult-projectile-find-file-other-window
+                       consult-projectile-find-file-other-frame
+                       consult-projectile-recentf
+                       consult-projectile-switch-project) "consult-projectile" nil t)
+
+  (with-eval-after-load 'projectile
+    ;; advice
+    (advice-add 'projectile-switch-to-buffer :override #'consult-projectile-switch-to-buffer)
+    (advice-add 'projectile-switch-to-buffer-other-window :override #'consult-projectile-switch-to-buffer-other-window)
+    (advice-add 'projectile-switch-to-buffer-other-frame :override #'consult-projectile-switch-to-buffer-other-frame)
+    (advice-add 'projectile-find-dir :override #'consult-projectile-find-dir)
+    (advice-add 'projectile-find-file :override #'consult-projectile-find-file)
+    (advice-add 'projectile-find-file-other-window :override #'consult-projectile-find-file-other-window)
+    (advice-add 'projectile-find-file-other-frame :override #'consult-projectile-find-file-other-frame)
+    (advice-add 'projectile-recentf :override #'consult-projectile-recentf)
+    (advice-add 'projectile-switch-project :override #'consult-projectile-switch-project)
+
+    ;; keybind
+    (keymap-global-set "C-x B" #'consult-projectile-switch-to-buffer))
+#+end_src
+
+* Window
+** ace-window
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ace-window) "ace-window" nil t)
 
@@ -3290,7 +3106,7 @@
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
     (setq aw-minibuffer-flag t))
 #+end_src
-*** writeroom-mode
+** writeroom-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(writeroom-mode
                        writeroom-decrease-width
@@ -3308,11 +3124,54 @@
     ;; config
     (setq writeroom-width 150))
 #+end_src
-*** zoom-window
+** zoom-window
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(zoom-window-zoom) "zoom-window" nil t)
 
   (keymap-global-set "C-c C-z" #'zoom-window-zoom)
+#+end_src
+** tab-bar
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(tab-bar-mode
+                       tab-bar-history-mode
+                       tab-previous
+                       tab-next) "tab-bar" nil t)
+
+  (add-hook 'window-setup-hook #'tab-bar-history-mode)
+
+  (keymap-global-set "C-x C-t" tab-prefix-map)
+  (keymap-global-set "M-[" #'tab-previous)
+  (keymap-global-set "M-]" #'tab-next)
+
+
+  (with-eval-after-load 'tab-bar
+    ;; rename tab-bar with projectile
+    (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
+
+    ;; config
+    (setq tab-bar-close-button-show nil)
+    (setq tab-bar-close-last-tab-choice nil)
+    (setq tab-bar-close-tab-select 'left)
+    (setq tab-bar-history-mode nil)
+    (setq tab-bar-new-tab-choice "*scratch*")
+    (setq tab-bar-new-button-show nil)
+    (setq tab-bar-tab-name-truncated-max 12)
+    (setq tab-bar-separator " | ")
+
+    ;; advice
+    ;; close neotree when tab bar action
+    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
+    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
+
+    ;; function
+    (defun my/tab-bar-rename-tab ()
+      (interactive)
+      (let ((proj-name (projectile-project-name)))
+        (tab-bar-rename-tab proj-name)))
+
+    ;; hook
+    (add-hook 'tab-bar-mode-hook #'(lambda () (display-line-numbers-mode -1))))
 #+end_src
 * Cursor
 ** avy
@@ -3348,7 +3207,193 @@
   (keymap-global-set "C-<" #'mc/mark-previous-like-this)
   (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
 #+END_SRC
+* Client
+** Mail
+*** mu4e
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(mu4e) "mu4e" nil t)
+
+  (keymap-global-set "C-x C-w" #'mu4e)
+
+  (with-eval-after-load 'mu4e
+    ;; config
+    (setq mail-user-agent 'mu4e-user-agent))
+
+  (with-eval-after-load 'mu4e-update
+    ;; config
+    (setq mu4e-get-mail-command "offlineimap")
+    (setq mu4e-update-interval (* 5 60))
+    (setq mu4e-index-cleanup nil)
+    (setq mu4e-index-lazy-check t))
+
+  (with-eval-after-load 'mu4e-view
+    ;; config
+    (setq mu4e-split-view 'horizontal))
+
+  (with-eval-after-load 'mu4e-folders
+    ;; config
+    (setq mu4e-maildir-shortcuts '((:maildir "/INBOX" :key ?i)
+                                     (:maildir "/Redmine" :key ?r)
+                                     (:maildir "/GitHub" :key ?g)
+                                     (:maildir "/Emacs" :key ?e)
+                                     (:maildir "/Guix" :key ?u))))
+
+  (with-eval-after-load 'mm-decode
+    (add-to-list 'mm-discouraged-alternatives "text/html")
+    (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+#+end_src
+*** TODO mu4e-views
+#+begin_src emacs-lisp :tangle yes
+  ;; (eval-when-compile
+  ;;   (el-clone :repo "lordpretzel/mu4e-views"))
+
+  ;; (with-delayed-execution
+  ;; (message "Install mu4e-views...")
+  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/mu4e-views"))
+#+end_src
+*** TODO mu4e-dashboard
+#+begin_src emacs-lisp :tangle yes
+  ;; (autoload-if-found '() "mu4e-dashboard" nil t)
+#+end_src
+** Googling
+*** google-this
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(google-this) "google-this" nil t)
+#+END_SRC
+*** google-translate
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
+#+end_src
+** Client
+*** md4rd
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(md4rd
+                       md4rd-login
+                       md4rd-visit
+                       md4rd-widget-expand-all
+                       md4rd-widget-collapse-all
+                       md4rd-reply
+                       md4rd-upvote
+                       md4rd-downvote
+                       md4rd-widget-toggle-line
+                       md4rd-refresh-login
+                       md4rd-indent-all-the-lines) "md4rd" nil t)
+
+  (with-eval-after-load 'md4rd
+    (add-hook 'md4rd-mode-hook #'md4rd-indent-all-the-lines)
+    (run-with-timer 0 3540 #'md4rd-refresh-login)
+
+    ;; config
+    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
+    ;; (setq md4rd--oauth-access-token "your-access-token-here")
+    ;; (setq md4rd--oauth-refresh-token "your-refresh-token-here")
+
+    ;; keymap
+    (define-key md4rd-mode-map (kbd "u") 'tree-mode-goto-parent)
+    (define-key md4rd-mode-map (kbd "o") 'md4rd-open)
+    (define-key md4rd-mode-map (kbd "v") 'md4rd-visit)
+    (define-key md4rd-mode-map (kbd "e") 'tree-mode-toggle-expand)
+    (define-key md4rd-mode-map (kbd "E") 'md4rd-widget-expand-all)
+    (define-key md4rd-mode-map (kbd "C") 'md4rd-widget-collapse-all)
+    (define-key md4rd-mode-map (kbd "n") 'widget-forward)
+    (define-key md4rd-mode-map (kbd "j") 'widget-forward)
+    (define-key md4rd-mode-map (kbd "h") 'backward-button)
+    (define-key md4rd-mode-map (kbd "p") 'widget-backward)
+    (define-key md4rd-mode-map (kbd "k") 'widget-backward)
+    (define-key md4rd-mode-map (kbd "l") 'forward-button)
+    (define-key md4rd-mode-map (kbd "q") 'kill-current-buffer)
+    (define-key md4rd-mode-map (kbd "r") 'md4rd-reply)
+    (define-key md4rd-mode-map (kbd "u") 'md4rd-upvote)
+    (define-key md4rd-mode-map (kbd "d") 'md4rd-downvote)
+    (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
+#+end_src
 * Awesome Package
+** Joke
+*** hacker-typer
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(hacker-typer) "hacker-typer" nil t)
+#+end_src
+*** power-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(power-mode) "power-mode" nil t)
+#+end_src
+*** sudden-death
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(sudden-death) "sudden-death" nil t)
+#+end_src
+*** redacted
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(redacted-mode) "redacted" nil t)
+
+  (defun my/redacted-mode ()
+    (interactive)
+    (read-only-mode (if redacted-mode -1 1))
+    (redacted-mode (if redacted-mode -1 1)))
+#+end_src
+*** lorem ipsum
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(lorem-ipsum-insert-sentences
+                       lorem-ipsum-insert-paragraphs
+                       lorem-ipsum-insert-list) "lorem-ipsum" nil t)
+
+  (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
+  (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
+  (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
+#+end_src
+** Password
+*** pass
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(pass pass-view-mode) "pass" nil t)
+
+  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/password-store/.*\\.gpg") 'pass-view-mode))
+
+  (with-eval-after-load 'pass
+    (setq pass-suppress-confirmations t))
+#+end_src
+** Dictionary
+*** define-word
+#+begin_src emacs-lisp :tangle yes
+  (defun my/define-word ()
+    (interactive)
+    (if (use-region-p)
+        (call-interactively #'define-word-at-point)
+      (call-interactively #'define-word)))
+
+  (with-eval-after-load 'define-word
+    (setq define-word-displayfn-alist
+            '((wordnik . takeokunn/define-word--display-in-buffer)
+              (openthesaurus . takeokunn/define-word--display-in-buffer)
+              (webster . takeokunn/define-word--display-in-buffer)
+              (weblio . takeokunn/define-word--display-in-buffer))))
+#+end_src
+** GC
+*** gcmh
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(gcmh-mode) "gcmh" nil t)
+
+  (add-hook 'window-setup-hook #'gcmh-mode)
+
+  (with-eval-after-load 'gcmh
+    ;; config
+    (setq gcmh-verbose nil)
+
+    ;; hooks
+    (defvar my/gcmh-status nil)
+    (advice-add #'garbage-collect
+                :before
+                (defun my/gcmh-log-start (&rest _)
+                  (when gcmh-verbose
+                    (setq my/gcmh-status "Running GC..."))))
+
+    (advice-add #'gcmh-message
+                :override
+                (defun my/gcmh-message (format-string &rest args)
+                  (setq my/gcmh-status
+                        (apply #'format-message format-string args))
+                  (run-with-timer 2 nil
+                                  (lambda ()
+                                    (setq my/gcmh-status nil))))))
+#+end_src
 ** Command
 *** amx
 #+begin_src emacs-lisp :tangle yes
@@ -3419,50 +3464,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                            "NATIVE_FULL_AOT"
                                            "GPG_TTY")))
 #+END_SRC
-** Tab
-*** tab-bar
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(tab-bar-mode
-                       tab-bar-history-mode
-                       tab-previous
-                       tab-next) "tab-bar" nil t)
-
-  (add-hook 'window-setup-hook #'tab-bar-history-mode)
-
-  (keymap-global-set "C-x C-t" tab-prefix-map)
-  (keymap-global-set "M-[" #'tab-previous)
-  (keymap-global-set "M-]" #'tab-next)
-
-
-  (with-eval-after-load 'tab-bar
-    ;; rename tab-bar with projectile
-    (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
-
-    ;; config
-    (setq tab-bar-close-button-show nil)
-    (setq tab-bar-close-last-tab-choice nil)
-    (setq tab-bar-close-tab-select 'left)
-    (setq tab-bar-history-mode nil)
-    (setq tab-bar-new-tab-choice "*scratch*")
-    (setq tab-bar-new-button-show nil)
-    (setq tab-bar-tab-name-truncated-max 12)
-    (setq tab-bar-separator " | ")
-
-    ;; advice
-    ;; close neotree when tab bar action
-    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
-
-    ;; function
-    (defun my/tab-bar-rename-tab ()
-      (interactive)
-      (let ((proj-name (projectile-project-name)))
-        (tab-bar-rename-tab proj-name)))
-
-    ;; hook
-    (add-hook 'tab-bar-mode-hook #'(lambda () (display-line-numbers-mode -1))))
-#+end_src
 ** Utility
 *** htmlize
 #+begin_src emacs-lisp :tangle yes

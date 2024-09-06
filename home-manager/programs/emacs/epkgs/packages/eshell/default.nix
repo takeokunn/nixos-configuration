@@ -1,14 +1,13 @@
 { epkgs, pkgs, sources }:
-let
-  language_specific = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
 in with epkgs; [
   esh-help
   eshell-did-you-mean
   eshell-z
   fish-completion
-  language_specific.eshell-multiple
-  language_specific.eshell-syntax-highlighting
-  language_specific.eshell-fringe-status
+  plugins.eshell-multiple
+  plugins.eshell-syntax-highlighting
+  plugins.eshell-fringe-status
   # eat
   mistty
 ]

@@ -37,6 +37,18 @@
     };
     date = "2023-08-30";
   };
+  emacs-bazel-mode = {
+    pname = "emacs-bazel-mode";
+    version = "769b30dc18282564d614d7044195b5a0c1a0a5f3";
+    src = fetchFromGitHub {
+      owner = "bazelbuild";
+      repo = "emacs-bazel-mode";
+      rev = "769b30dc18282564d614d7044195b5a0c1a0a5f3";
+      fetchSubmodules = false;
+      sha256 = "sha256-riB6U1gTuYdStwzejvlsSneMYYFSDvdUFNdaFx3l8BA=";
+    };
+    date = "2023-09-19";
+  };
   emacs-copilot = {
     pname = "emacs-copilot";
     version = "535ef61e82f09d744cd5b097b1fc99f08cce175c";
@@ -48,6 +60,18 @@
       sha256 = "sha256-/ZDnEZWUFcKnUtFrd/4C7LX16GAdUQncU8ZnYzntKS0=";
     };
     date = "2024-08-16";
+  };
+  emacs-direnv-mode = {
+    pname = "emacs-direnv-mode";
+    version = "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f";
+    src = fetchFromGitHub {
+      owner = "wbolster";
+      repo = "emacs-direnv";
+      rev = "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f";
+      fetchSubmodules = false;
+      sha256 = "sha256-g500rooMfkVX22u/HNELT+rKv0+q51Xg4k4R48fPyKw=";
+    };
+    date = "2024-03-14";
   };
   emacs-eshell-fringe-status = {
     pname = "emacs-eshell-fringe-status";
@@ -99,15 +123,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "e19a678e84bf8168cac48662063bc44ca783cfad";
+    version = "152a6ed44ae43641e35a0d2ce2cf9f9d35f23999";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "e19a678e84bf8168cac48662063bc44ca783cfad";
+      rev = "152a6ed44ae43641e35a0d2ce2cf9f9d35f23999";
       fetchSubmodules = false;
-      sha256 = "sha256-o0Rwjj9anh81R4wdcyUdGStRSnJWPIHz15tPhztUer4=";
+      sha256 = "sha256-jYt0VlZsjXYjmNvvSnHDnjFNfTraXZHfn9MJkq+Py18=";
     };
-    date = "2024-09-03";
+    date = "2024-09-06";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
@@ -132,6 +156,18 @@
       sha256 = "sha256-5EoBFKgUDLyC9oZDP7vY3Ldk6An39Qo4ngkIHgrB8dU=";
     };
     date = "2024-07-21";
+  };
+  emacs-systemd-mode = {
+    pname = "emacs-systemd-mode";
+    version = "8742607120fbc440821acbc351fda1e8e68a8806";
+    src = fetchFromGitHub {
+      owner = "holomorph";
+      repo = "systemd-mode";
+      rev = "8742607120fbc440821acbc351fda1e8e68a8806";
+      fetchSubmodules = false;
+      sha256 = "sha256-oj/E+b3oS/2QNNxTYDZ5Zwq/OHKI2FgN/eRV5EAexrE=";
+    };
+    date = "2023-01-31";
   };
   fish-artisan-completion = {
     pname = "fish-artisan-completion";
