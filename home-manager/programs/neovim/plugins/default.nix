@@ -1,7 +1,6 @@
-{ pkgs }:
+{ pkgs, sources }:
 let
-  basic = import ./basic.nix { inherit pkgs; };
-  denops = import ./denops.nix { inherit pkgs; };
-  themes = import ./themes.nix { inherit pkgs; };
-  ddu = import ./ddu.nix { inherit pkgs; };
+  basic = import ./basic { inherit pkgs sources; };
+  denops = import ./denops { inherit pkgs sources; };
+  themes = import ./themes { inherit pkgs; };
 in basic ++ denops ++ themes

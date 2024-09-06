@@ -1,5 +1,5 @@
-{ pkgs }:
-let vimdoc-ja = pkgs.callPackage ./nixpkgs/vimdoc-ja.nix { };
+{ pkgs, sources }:
+let basic = pkgs.callPackage ./plugins.nix { inherit sources; };
 in with pkgs.vimPlugins; [
   vim-markdown
   {
@@ -35,5 +35,5 @@ in with pkgs.vimPlugins; [
   }
   auto-pairs
   vim-bracketed-paste
-  vimdoc-ja
+  basic.vimdoc-ja
 ]
