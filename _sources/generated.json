@@ -59,6 +59,46 @@
         },
         "version": "456d3289827964a6cb503a3b0a6448f4326f291b"
     },
+    "emacs-copilot": {
+        "cargoLocks": null,
+        "date": "2024-08-16",
+        "extract": null,
+        "name": "emacs-copilot",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "copilot-emacs",
+            "repo": "copilot.el",
+            "rev": "535ef61e82f09d744cd5b097b1fc99f08cce175c",
+            "sha256": "sha256-/ZDnEZWUFcKnUtFrd/4C7LX16GAdUQncU8ZnYzntKS0=",
+            "type": "github"
+        },
+        "version": "535ef61e82f09d744cd5b097b1fc99f08cce175c"
+    },
+    "emacs-llm": {
+        "cargoLocks": null,
+        "date": "2024-09-03",
+        "extract": null,
+        "name": "emacs-llm",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "ahyatt",
+            "repo": "llm",
+            "rev": "e19a678e84bf8168cac48662063bc44ca783cfad",
+            "sha256": "sha256-o0Rwjj9anh81R4wdcyUdGStRSnJWPIHz15tPhztUer4=",
+            "type": "github"
+        },
+        "version": "e19a678e84bf8168cac48662063bc44ca783cfad"
+    },
     "fish-artisan-completion": {
         "cargoLocks": null,
         "date": "2021-11-16",

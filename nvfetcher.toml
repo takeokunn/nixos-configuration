@@ -73,3 +73,15 @@ fetch.github = "vim-denops/denops-helloworld.vim"
 src.git = "https://github.com/vim-skk/skkeleton"
 src.branch = "main"
 fetch.github = "vim-skk/skkeleton"
+
+# for emacs
+
+[emacs-copilot]
+src.git = "https://github.com/copilot-emacs/copilot.el"
+src.branch = "main"
+fetch.github = "copilot-emacs/copilot.el"
+
+[emacs-llm]
+src.git = "https://github.com/ahyatt/llm"
+src.branch = "main"
+fetch.github = "ahyatt/llm"

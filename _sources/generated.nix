@@ -37,6 +37,30 @@
     };
     date = "2023-08-30";
   };
+  emacs-copilot = {
+    pname = "emacs-copilot";
+    version = "535ef61e82f09d744cd5b097b1fc99f08cce175c";
+    src = fetchFromGitHub {
+      owner = "copilot-emacs";
+      repo = "copilot.el";
+      rev = "535ef61e82f09d744cd5b097b1fc99f08cce175c";
+      fetchSubmodules = false;
+      sha256 = "sha256-/ZDnEZWUFcKnUtFrd/4C7LX16GAdUQncU8ZnYzntKS0=";
+    };
+    date = "2024-08-16";
+  };
+  emacs-llm = {
+    pname = "emacs-llm";
+    version = "e19a678e84bf8168cac48662063bc44ca783cfad";
+    src = fetchFromGitHub {
+      owner = "ahyatt";
+      repo = "llm";
+      rev = "e19a678e84bf8168cac48662063bc44ca783cfad";
+      fetchSubmodules = false;
+      sha256 = "sha256-o0Rwjj9anh81R4wdcyUdGStRSnJWPIHz15tPhztUer4=";
+    };
+    date = "2024-09-03";
+  };
   fish-artisan-completion = {
     pname = "fish-artisan-completion";
     version = "8e8d726b3862fcb972abb652fb8c1a9fb9207a64";
