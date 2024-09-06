@@ -49,6 +49,18 @@
     };
     date = "2023-09-19";
   };
+  emacs-consult-tramp = {
+    pname = "emacs-consult-tramp";
+    version = "befa62baca768caa457b167e773b91f1bc7d661f";
+    src = fetchFromGitHub {
+      owner = "Ladicle";
+      repo = "consult-tramp";
+      rev = "befa62baca768caa457b167e773b91f1bc7d661f";
+      fetchSubmodules = false;
+      sha256 = "sha256-Ddeat4FfQS+5BvAP41xNsNw3bzTJv41xuaIA5a44Kvc=";
+    };
+    date = "2022-03-17";
+  };
   emacs-copilot = {
     pname = "emacs-copilot";
     version = "535ef61e82f09d744cd5b097b1fc99f08cce175c";
@@ -109,6 +121,18 @@
     };
     date = "2024-06-30";
   };
+  emacs-explain-pause-mode = {
+    pname = "emacs-explain-pause-mode";
+    version = "2356c8c3639cbeeb9751744dbe737267849b4b51";
+    src = fetchFromGitHub {
+      owner = "lastquestion";
+      repo = "explain-pause-mode";
+      rev = "2356c8c3639cbeeb9751744dbe737267849b4b51";
+      fetchSubmodules = false;
+      sha256 = "sha256-++znrjiDSx+cy4okFBBXUBkRFdtnE2x+trkmqjB3Njs=";
+    };
+    date = "2020-07-27";
+  };
   emacs-fish-repl = {
     pname = "emacs-fish-repl";
     version = "5dd66957e494ea201de6e2b0c934dbac6f12743a";
@@ -120,6 +144,18 @@
       sha256 = "sha256-6clzUsB7dllXKe5CeT0kwZl5Cjs9KKhPFaDa9B0aUHE=";
     };
     date = "2021-09-24";
+  };
+  emacs-flycheck-projectile = {
+    pname = "emacs-flycheck-projectile";
+    version = "ce6e9e8793a55dace13d5fa13badab2dca3b5ddb";
+    src = fetchFromGitHub {
+      owner = "nbfalcon";
+      repo = "flycheck-projectile";
+      rev = "ce6e9e8793a55dace13d5fa13badab2dca3b5ddb";
+      fetchSubmodules = false;
+      sha256 = "sha256-p3/y9iTfgYKJyRNXF2cB7Jam36QWIq4/ZUB+G+YRHjQ=";
+    };
+    date = "2020-10-31";
   };
   emacs-llm = {
     pname = "emacs-llm";
@@ -133,6 +169,90 @@
     };
     date = "2024-09-06";
   };
+  emacs-mu4e-dashboard = {
+    pname = "emacs-mu4e-dashboard";
+    version = "c9c09b7ed6433070de148b656ac273b7fb7cec07";
+    src = fetchFromGitHub {
+      owner = "rougier";
+      repo = "mu4e-dashboard";
+      rev = "c9c09b7ed6433070de148b656ac273b7fb7cec07";
+      fetchSubmodules = false;
+      sha256 = "sha256-bCelxaT+qaR2W80Cr591A4cRycIFJmXjeY8/aqIpl5g=";
+    };
+    date = "2024-01-22";
+  };
+  emacs-ob-phpstan = {
+    pname = "emacs-ob-phpstan";
+    version = "c77355e70703affffb166b7100b9e9f3efb21c6e";
+    src = fetchFromGitHub {
+      owner = "emacs-php";
+      repo = "ob-phpstan";
+      rev = "c77355e70703affffb166b7100b9e9f3efb21c6e";
+      fetchSubmodules = false;
+      sha256 = "sha256-UTWlpszxXC1sue6E72bIeL+1NKzJ+VC1WQBXOZD0mwI=";
+    };
+    date = "2024-03-27";
+  };
+  emacs-ob-treesitter = {
+    pname = "emacs-ob-treesitter";
+    version = "c3fac35f95dcaffdb90836c606d119717c43238d";
+    src = fetchFromGitHub {
+      owner = "takeokunn";
+      repo = "ob-treesitter";
+      rev = "c3fac35f95dcaffdb90836c606d119717c43238d";
+      fetchSubmodules = false;
+      sha256 = "sha256-3lroCj3FhRS1wgb/UVHYO4CjgP1rsicqB/rARvzsfoc=";
+    };
+    date = "2024-01-06";
+  };
+  emacs-org-dashboard = {
+    pname = "emacs-org-dashboard";
+    version = "02c0699771d199075a286e4502340ca6e7c9e831";
+    src = fetchFromGitHub {
+      owner = "bard";
+      repo = "org-dashboard";
+      rev = "02c0699771d199075a286e4502340ca6e7c9e831";
+      fetchSubmodules = false;
+      sha256 = "sha256-OWwRHMFJvxIKwu+6wdsd+b2zRTX3Q0nbEQi7sl8fIn4=";
+    };
+    date = "2017-12-23";
+  };
+  emacs-org-view-mode = {
+    pname = "emacs-org-view-mode";
+    version = "16d7c87a1bef54abd892f0fda2a541043c42e097";
+    src = fetchFromGitHub {
+      owner = "amno1";
+      repo = "org-view-mode";
+      rev = "16d7c87a1bef54abd892f0fda2a541043c42e097";
+      fetchSubmodules = false;
+      sha256 = "sha256-bLRUHFzVA6+04iY1tnmFQzBRgW6P09+gK9it8D8QrVA=";
+    };
+    date = "2024-02-18";
+  };
+  emacs-org-volume = {
+    pname = "emacs-org-volume";
+    version = "caa30d5b958c9f37854d7ab35c99445c00bc7d1e";
+    src = fetchFromGitHub {
+      owner = "akirak";
+      repo = "org-volume";
+      rev = "caa30d5b958c9f37854d7ab35c99445c00bc7d1e";
+      fetchSubmodules = false;
+      sha256 = "sha256-J1DdP10uc6KeWl+ZhsEBifEJ99lDyKlmcuInHa5p3/M=";
+    };
+    date = "2024-07-23";
+  };
+  emacs-ox-hatena = {
+    pname = "emacs-ox-hatena";
+    version = "24777234566f5472b0e8b3c5faeb2e045fd91e12";
+    src = fetchFromGitHub {
+      owner = "zonkyy";
+      repo = "ox-hatena";
+      rev = "24777234566f5472b0e8b3c5faeb2e045fd91e12";
+      fetchSubmodules = false;
+      sha256 = "sha256-gQ6oU2t/xlyTK4FRInqeHd9AH+vRpCBM/aMbpn1tHTU=";
+    };
+    date = "2013-08-23";
+  };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
     version = "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81";
@@ -144,6 +264,18 @@
       sha256 = "sha256-pmCOsKcKcFNZP/ipj5bj9IAK+Ulthso+HQKpzakRCzA=";
     };
     date = "2020-03-23";
+  };
+  emacs-pinentry = {
+    pname = "emacs-pinentry";
+    version = "a6441224da04656370e993e2616185cc31afaff9";
+    src = fetchFromGitHub {
+      owner = "ueno";
+      repo = "pinentry-el";
+      rev = "a6441224da04656370e993e2616185cc31afaff9";
+      fetchSubmodules = false;
+      sha256 = "sha256-xgzdwLEsjjkyPB6z1WM/N+rZNbndKXMPNUZ7Uaa8zT8=";
+    };
+    date = "2023-11-26";
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
@@ -157,6 +289,18 @@
     };
     date = "2024-07-21";
   };
+  emacs-sudden-death = {
+    pname = "emacs-sudden-death";
+    version = "791a63d3f4df192e71f4232a9a4c5588f4b43dfb";
+    src = fetchFromGitHub {
+      owner = "yewton";
+      repo = "sudden-death.el";
+      rev = "791a63d3f4df192e71f4232a9a4c5588f4b43dfb";
+      fetchSubmodules = false;
+      sha256 = "sha256-+h6nWW9upcwWfIvYaF4It38+ouhqeBttm1dVbxpvanw=";
+    };
+    date = "2018-02-17";
+  };
   emacs-systemd-mode = {
     pname = "emacs-systemd-mode";
     version = "8742607120fbc440821acbc351fda1e8e68a8806";
@@ -168,6 +312,30 @@
       sha256 = "sha256-oj/E+b3oS/2QNNxTYDZ5Zwq/OHKI2FgN/eRV5EAexrE=";
     };
     date = "2023-01-31";
+  };
+  emacs-view-lock-mode = {
+    pname = "emacs-view-lock-mode";
+    version = "508b1a4b6d5e040455535331244104f5122e340b";
+    src = fetchFromGitHub {
+      owner = "s-fubuki";
+      repo = "view-lock-mode";
+      rev = "508b1a4b6d5e040455535331244104f5122e340b";
+      fetchSubmodules = false;
+      sha256 = "sha256-WUhQO/4O0NBpUfNofGUsS7Rfbel8iEGk+qCyOs9o0Ik=";
+    };
+    date = "2024-07-06";
+  };
+  emacs-web-php-blade-mode = {
+    pname = "emacs-web-php-blade-mode";
+    version = "a4463d2732caa8c3650826ee4fc79f3fd29c9e56";
+    src = fetchFromGitHub {
+      owner = "takeokunn";
+      repo = "web-php-blade-mode";
+      rev = "a4463d2732caa8c3650826ee4fc79f3fd29c9e56";
+      fetchSubmodules = false;
+      sha256 = "sha256-hZKMck0xJWTub81yCupCie+Z8FFFFP26IRm7uN/mbTI=";
+    };
+    date = "2022-06-22";
   };
   fish-artisan-completion = {
     pname = "fish-artisan-completion";

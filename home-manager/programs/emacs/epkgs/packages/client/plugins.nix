@@ -4,7 +4,7 @@
     version = "0.0.1";
     src = sources.emacs-mu4e-dashboard.src;
 
-    packageRequires = with epkgs; [ flycheck ];
+    packageRequires = with epkgs; [ mu4e async ];
 
     ignoreCompilationError = false;
   };

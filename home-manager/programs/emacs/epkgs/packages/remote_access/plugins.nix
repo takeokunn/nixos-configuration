@@ -4,6 +4,8 @@
     version = "0.0.1";
     src = sources.emacs-consult-tramp.src;
 
+    packageRequires = with epkgs; [ consult ];
+
     ignoreCompilationError = false;
   };
 }

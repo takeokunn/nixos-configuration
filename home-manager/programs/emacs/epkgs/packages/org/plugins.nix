@@ -20,6 +20,8 @@
     version = "0.0.1";
     src = sources.emacs-org-volume.src;
 
+    packageRequires = with epkgs; [ request dash f ];
+
     ignoreCompilationError = false;
   };
 

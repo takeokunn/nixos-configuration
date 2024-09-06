@@ -1,6 +1,9 @@
 { pkgs, epkgs, sources }:
 let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
 in with epkgs; [
+  # Command
+  amx
+
   # Cursor
   avy
   avy-zap

@@ -126,8 +126,6 @@ src.git = "https://github.com/wbolster/emacs-direnv"
 src.branch = "main"
 fetch.github = "wbolster/emacs-direnv"
 
-# TODO
-
 [emacs-systemd-mode]
 src.git = "https://github.com/holomorph/systemd-mode"
 src.branch = "master"
@@ -145,12 +143,12 @@ fetch.github = "amno1/org-view-mode"
 
 [emacs-org-dashboard]
 src.git = "https://github.com/bard/org-dashboard"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "bard/org-dashboard"
 
 [emacs-org-volume]
 src.git = "https://github.com/akirak/org-volume"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "akirak/org-volume"
 
 [emacs-ob-phpstan]
@@ -159,18 +157,18 @@ src.branch = "main"
 fetch.github = "emacs-php/ob-phpstan"
 
 [emacs-ob-treesitter]
-src.git = "https://github.com/takeokunn/ob-tree-sitter"
+src.git = "https://github.com/takeokunn/ob-treesitter"
 src.branch = "main"
-fetch.github = "takeokunn/ob-tree-sitter"
+fetch.github = "takeokunn/ob-treesitter"
 
 [emacs-ox-hatena]
 src.git = "https://github.com/zonkyy/ox-hatena"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "zonkyy/ox-hatena"
 
 [emacs-flycheck-projectile]
 src.git = "https://github.com/nbfalcon/flycheck-projectile"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "nbfalcon/flycheck-projectile"
 
 [emacs-view-lock-mode]
@@ -185,7 +183,7 @@ fetch.github = "Ladicle/consult-tramp"
 
 [emacs-explain-pause-mode]
 src.git = "https://github.com/lastquestion/explain-pause-mode"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "lastquestion/explain-pause-mode"
 
 [emacs-mu4e-dashboard]
@@ -195,5 +193,10 @@ fetch.github = "rougier/mu4e-dashboard"
 
 [emacs-pinentry]
 src.git = "https://github.com/ueno/pinentry-el"
-src.branch = "main"
+src.branch = "master"
 fetch.github = "ueno/pinentry-el"
+
+[emacs-sudden-death]
+src.git = "https://github.com/yewton/sudden-death.el"
+src.branch = "master"
+fetch.github = "yewton/sudden-death.el"
