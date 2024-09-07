@@ -1,19 +1,19 @@
 { config, pkgs, xremap, username, ... }:
 let
-  boot = import ./modules/boot.nix;
-  fonts = import ./modules/fonts.nix { inherit pkgs; };
-  hardware = import ./modules/hardware.nix;
-  i18n = import ./modules/i18n.nix;
-  networking = import ./modules/networking.nix { inherit config; };
-  nix = import ./modules/nix.nix;
-  programs = import ./modules/programs.nix;
-  security = import ./modules/security.nix { inherit username; };
-  services = import ./modules/services.nix { inherit username; };
-  sops = import ./modules/sops.nix;
-  systemd = import ./modules/systemd.nix;
-  time = import ./modules/time.nix;
-  users = import ./modules/users.nix { inherit pkgs username; };
-  virtualisation = import ./modules/virtualisation.nix;
+  boot = import ./config/boot.nix;
+  fonts = import ./config/fonts.nix { inherit pkgs; };
+  hardware = import ./config/hardware.nix;
+  i18n = import ./config/i18n.nix;
+  networking = import ./config/networking.nix { inherit config; };
+  nix = import ./config/nix.nix;
+  programs = import ./config/programs.nix;
+  security = import ./config/security.nix { inherit username; };
+  services = import ./config/services.nix { inherit username; };
+  sops = import ./config/sops.nix;
+  systemd = import ./config/systemd.nix;
+  time = import ./config/time.nix;
+  users = import ./config/users.nix { inherit pkgs username; };
+  virtualisation = import ./config/virtualisation.nix;
 in {
   system.stateVersion = "24.05";
   imports = [
