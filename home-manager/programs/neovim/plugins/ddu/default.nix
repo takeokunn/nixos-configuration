@@ -1,0 +1,42 @@
+{ pkgs, sources }:
+let plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
+in [
+  plugins.ddu
+  plugins.ddu-ui-ff
+  plugins.ddu-ui-filer
+  plugins.ddu-kind-file
+  plugins.ddu-kind-word
+  plugins.ddu-source-file
+  plugins.ddu-source-file_rec
+  plugins.ddu-source-line
+  plugins.ddu-filter-matcher_substring
+  plugins.ddu-filter-matcher_hidden
+  plugins.ddu-filter-matcher_relative
+  plugins.ddu-source-path_history
+  plugins.ddu-source-action
+  plugins.ddu-source-register
+  plugins.ddu-source-dummy
+  plugins.ddu-source-ghq
+  plugins.readme-viewer
+  plugins.ddu-filter-kensaku
+  plugins.ddu-filter-merge
+  plugins.ddu-filter-converter_relativepath
+  plugins.ddu-filter-fuse
+  plugins.ddu-source-git_diff
+  plugins.ddu-source-git_status
+  plugins.ddu-source-mr
+  plugins.ddu-filter-converter_hl_dir
+  plugins.ddu-source-git_branch
+  plugins.ddu-source-git_diff_tree
+  plugins.ddu-source-git_log
+  plugins.ddu-source-file_external
+  plugins.ddu-source-help
+  plugins.ddu-source-highlight
+  plugins.ddu-column-icon_filename
+  plugins.ddu-source-buffer
+  plugins.ddu-source-rg
+  plugins.ddu-filter-converter_devicon
+  plugins.ddu-source-lsp
+  plugins.ddu-gh_project
+  plugins.ddu-source-nvim-notify
+]
