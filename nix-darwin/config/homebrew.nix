@@ -16,6 +16,7 @@
       "orbstack"
       "raycast"
       "sequel-ace"
+      "sf-symbols"
       "sublime-text"
     ];
     masApps = {
