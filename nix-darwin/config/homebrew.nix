@@ -7,6 +7,7 @@
       cleanup = "uninstall";
     };
     taps = [ "dracula/install" "nikitabobko/tap" ];
+    brews = [ "pinentry-mac" "terminal-notifier" ];
     casks = [
       "aerospace"
       "aquaskk"

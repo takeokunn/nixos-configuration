@@ -11,7 +11,6 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
-  darwinPkgs = import ./packages/darwin.nix { inherit pkgs; };
 
   # modules
   modules = import ./modules;
@@ -31,6 +30,5 @@ in {
     ++ advancedServices;
 
   home.stateVersion = "24.05";
-  home.packages = basicPkgs ++ advancedPkgs
-    ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
+  home.packages = basicPkgs ++ advancedPkgs;
 }
