@@ -15,11 +15,5 @@
     };
   };
 
-  programs.fish = {
-    shellAliases = { cat = "bat"; };
-
-    interactiveShellInit = ''
-      set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-    '';
-  };
+  programs.fish = { shellAliases = { cat = "bat"; }; };
 }

@@ -4,7 +4,6 @@ with pkgs; [
   devbox
   devenv
   du-dust
-  lnav
   nkf
   offlineimap
   openssl

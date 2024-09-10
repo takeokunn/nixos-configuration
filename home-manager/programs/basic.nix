@@ -9,6 +9,7 @@ let
   gnupg = import ./gnupg;
   misc = import ./misc;
   mu = import ./mu;
+  lnav = import ./lnav;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
@@ -27,6 +28,7 @@ in [
   gnupg
   misc
   mu
+  lnav
   password-store
   peco
   readline
