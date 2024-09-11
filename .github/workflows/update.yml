@@ -1,0 +1,38 @@
+name: update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * *'
+
+jobs:
+  nix-flake:
+    name: Nix Flake Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: prepare nix
+        uses: cachix/install-nix-action@v27
+      - uses: cachix/cachix-action@v14
+        with:
+          name: devenv
+      - name: Install devenv.sh
+        run: nix profile install nixpkgs#devenv
+
+      # update
+      - name: Run nvfetcher
+        run: nix run nixpkgs#nvfetcher
+      - name: Run flake update
+        run: nix flake update
+      - name: Run devenv update
+        run: devenv update
+
+      # git push
+      - name: Commit changes
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Update lockfiles"
+          git push origin HEAD
