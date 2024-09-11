@@ -26,6 +26,5 @@
       xwayland.enable = true;
       wrapperFeatures.gtk = true;
     };
-    waybar.enable = true;
   };
 }
