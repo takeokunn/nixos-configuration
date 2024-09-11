@@ -6,8 +6,8 @@ on:
     - cron: '0 19 * * *'
 
 jobs:
-  nix-flake:
-    name: Nix Flake Check
+  nix-update:
+    name: Update lockfile
     runs-on: ubuntu-latest
     permissions:
       contents: write
