@@ -435,15 +435,15 @@
   };
   skkeleton = {
     pname = "skkeleton";
-    version = "843b02bb4893938bb5fe31f81b28922c314bd7a6";
+    version = "1cfb8fd95aebfdb7803b52dafe8e5e934f356127";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "843b02bb4893938bb5fe31f81b28922c314bd7a6";
+      rev = "1cfb8fd95aebfdb7803b52dafe8e5e934f356127";
       fetchSubmodules = false;
-      sha256 = "sha256-n0odWstft+Wmn7t4IsmSC5d2CIR2CpTyPo1JZ1bf964=";
+      sha256 = "sha256-6rcQr15LGYgViZo+ZWW18kGvuELgD/49hZEFFVPR488=";
     };
-    date = "2024-09-10";
+    date = "2024-09-11";
   };
   sublime-gleam = {
     pname = "sublime-gleam";
