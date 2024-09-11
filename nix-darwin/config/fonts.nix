@@ -10,5 +10,6 @@
     hackgen-font
     hackgen-nf-font
     nerdfonts
+    emacs-all-the-icons-fonts
   ];
 }
