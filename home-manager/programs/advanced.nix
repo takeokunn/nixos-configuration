@@ -6,7 +6,7 @@ let
   nix-index = import ./nix-index;
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay sources; };
   nyxt = import ./nyxt { inherit pkgs; };
-  roswell = import ./roswell { inherit pkgs; };
+  # roswell = import ./roswell { inherit pkgs; };
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
   # for window manager
@@ -22,7 +22,7 @@ in [
   nix-index
   neovim
   nyxt
-  roswell
+  # roswell
   wezterm
 
   # for window manager
