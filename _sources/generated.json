@@ -1061,7 +1061,7 @@
     },
     "vim-ddc-source-lsp": {
         "cargoLocks": null,
-        "date": "2024-09-04",
+        "date": "2024-09-12",
         "extract": null,
         "name": "vim-ddc-source-lsp",
         "passthru": null,
@@ -1073,11 +1073,11 @@
             "name": null,
             "owner": "Shougo",
             "repo": "ddc-source-lsp",
-            "rev": "0c9ddf4281b67de629d37ac9e1f9e160f919543e",
-            "sha256": "sha256-1pWVNc0ZJMTrVcwt3Ne+qAyoVOKbC+wyTh4/R5SIBOo=",
+            "rev": "e192e2eaaba4d2d2a0f0f63d139f173ce0dc885f",
+            "sha256": "sha256-fWoS/6AD6ZiDxl9IvDyhust96/eewdwBM6waaW3CC8A=",
             "type": "github"
         },
-        "version": "0c9ddf4281b67de629d37ac9e1f9e160f919543e"
+        "version": "e192e2eaaba4d2d2a0f0f63d139f173ce0dc885f"
     },
     "vim-ddc-source-lsp-setup": {
         "cargoLocks": null,
@@ -2041,7 +2041,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-09-10",
+        "date": "2024-09-12",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2053,10 +2053,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "01bed034bed25d73d9119b367e9891e107346d40",
-            "sha256": "sha256-9fttwvzCrTcu/ZEczofHccy0N41pzWHDD5VkuQClVY4=",
+            "rev": "5def080df61b4fef38a026282f2eb012798b4f1c",
+            "sha256": "sha256-uyHYQ48dfoFfNvB/OomtiFif7KP2/roMWDleGrvAF4M=",
             "type": "github"
         },
-        "version": "01bed034bed25d73d9119b367e9891e107346d40"
+        "version": "5def080df61b4fef38a026282f2eb012798b4f1c"
     }
 }
