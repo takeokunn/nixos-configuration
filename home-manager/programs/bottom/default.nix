@@ -56,6 +56,7 @@
         group_processes = true;
         hide_table_gap = true;
         rate = 700;
+        enable_gpu_memory = true;
       };
     };
   };
