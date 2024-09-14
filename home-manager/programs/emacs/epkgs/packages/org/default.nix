@@ -1,15 +1,15 @@
 { epkgs, pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   # Basic
   org-journal
   org-generate
   org-pomodoro
-  plugins.org-view-mode
+  packages.org-view-mode
   org-random-todo
   org-projectile
-  plugins.org-dashboard
-  plugins.org-volume
+  packages.org-dashboard
+  packages.org-volume
   org-ql
 
   # Theme
@@ -42,7 +42,7 @@ in with epkgs; [
   ob-translate
   ob-typescript
   ob-php
-  plugins.ob-phpstan
+  packages.ob-phpstan
   ob-http
   ob-mermaid
   ob-graphql
@@ -50,14 +50,14 @@ in with epkgs; [
   ob-elixir
   ob-dart
   ob-fsharp
-  plugins.ob-treesitter
+  packages.ob-treesitter
   ob-base64
   org-nix-shell
 
   # Org Publish
   ox-gfm
   ox-zenn
-  plugins.ox-hatena
+  packages.ox-hatena
   ox-qmd
   ox-hugo
 

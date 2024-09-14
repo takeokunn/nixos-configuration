@@ -1,5 +1,5 @@
 { sources, epkgs, pkgs }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   # Basic Lisp
   paredit
@@ -31,7 +31,7 @@ in with epkgs; [
   clang-format
 
   # Csv
-  plugins.rainbow-csv
+  packages.rainbow-csv
 
   # JavaScript/TypeScript
   nodejs-repl
@@ -53,7 +53,7 @@ in with epkgs; [
   php-runtime
   psysh
   # laravel-tinker-repl
-  plugins.emacs-php-doc-block
+  packages.emacs-php-doc-block
   phpstan
   phpunit
 
@@ -62,7 +62,7 @@ in with epkgs; [
   markdown-preview-mode
 
   # Fish
-  plugins.fish-repl
+  packages.fish-repl
 
   # Haskell
   hindent

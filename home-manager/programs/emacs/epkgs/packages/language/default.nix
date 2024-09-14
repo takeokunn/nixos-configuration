@@ -1,8 +1,8 @@
 { epkgs, pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit epkgs sources; };
+let packages = pkgs.callPackage ./packages.nix { inherit epkgs sources; };
 in with epkgs; [
   apache-mode
-  plugins.bazel-mode
+  packages.bazel-mode
   bison-mode
   cask-mode
   cfn-mode
@@ -16,7 +16,7 @@ in with epkgs; [
   crystal-mode
   dart-mode
   dhall-mode
-  plugins.direnv-mode
+  packages.direnv-mode
   docker-compose-mode
   dockerfile-mode
   dotenv-mode
@@ -72,7 +72,7 @@ in with epkgs; [
   ssh-config-mode
   swift-mode
   syslog-mode
-  plugins.systemd-mode
+  packages.systemd-mode
   terraform-mode
   toml-mode
   tmux-mode
@@ -82,7 +82,7 @@ in with epkgs; [
   vimrc-mode
   wat-mode
   web-mode
-  plugins.web-php-blade-mode
+  packages.web-php-blade-mode
   wolfram-mode
   yaml-mode
   yarn-mode

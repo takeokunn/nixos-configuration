@@ -1,10 +1,10 @@
 { epkgs, pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   proced-narrow
   symon
   esup
-  plugins.explain-pause-mode
+  packages.explain-pause-mode
   disk-usage
   keyfreq
   uptimes

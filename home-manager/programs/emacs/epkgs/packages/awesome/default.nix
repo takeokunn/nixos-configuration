@@ -1,5 +1,5 @@
 { pkgs, epkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   # Command
   amx
@@ -20,7 +20,7 @@ in with epkgs; [
   gcmh
 
   # GPG
-  plugins.pinentry-el
+  packages.pinentry-el
 
   # Help
   helpful
@@ -28,7 +28,7 @@ in with epkgs; [
   # Joke
   hacker-typer
   power-mode
-  plugins.sudden-death
+  packages.sudden-death
   redacted
   lorem-ipsum
 

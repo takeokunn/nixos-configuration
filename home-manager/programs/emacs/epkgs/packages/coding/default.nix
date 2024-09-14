@@ -1,10 +1,10 @@
 { epkgs, pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   # check
   flycheck
   flycheck-elsa
-  plugins.flycheck-projectile
+  packages.flycheck-projectile
   flycheck-cfn
   flycheck-phpstan
 
@@ -64,7 +64,7 @@ in with epkgs; [
   undo-tree
 
   # View Mode
-  plugins.view-lock-mode
+  packages.view-lock-mode
 
   # Utility
   crux

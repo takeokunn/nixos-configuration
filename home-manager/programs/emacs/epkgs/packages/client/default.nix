@@ -1,5 +1,5 @@
 { epkgs, pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources epkgs; };
+let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
 in with epkgs; [
   # Client
   md4rd
@@ -11,5 +11,5 @@ in with epkgs; [
   # Mail
   mu4e
   mu4e-views
-  plugins.mu4e-dashboard
+  packages.mu4e-dashboard
 ]
