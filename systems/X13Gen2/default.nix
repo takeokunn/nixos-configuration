@@ -14,10 +14,11 @@ in {
       home-manager.nixosModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users."${username}" = import ../../home-manager {
-          inherit system nixpkgs org-babel emacs-overlay wezterm-flake
-            neovim-nightly-overlay;
-        };
+        home-manager.users."${username}" =
+          import ../../home-manager/advanced.nix {
+            inherit system nixpkgs org-babel emacs-overlay wezterm-flake
+              neovim-nightly-overlay;
+          };
       }
     ];
   };

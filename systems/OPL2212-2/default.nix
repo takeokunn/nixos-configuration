@@ -17,10 +17,11 @@ in {
       home-manager.darwinModules.home-manager
       {
         home-manager.useUserPackages = true;
-        home-manager.users."${username}" = import ../../home-manager {
-          inherit system nixpkgs emacs-overlay wezterm-flake
-            neovim-nightly-overlay org-babel;
-        };
+        home-manager.users."${username}" =
+          import ../../home-manager/advanced.nix {
+            inherit system nixpkgs emacs-overlay wezterm-flake
+              neovim-nightly-overlay org-babel;
+          };
       }
     ];
   };
