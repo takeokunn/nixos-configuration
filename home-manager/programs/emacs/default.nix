@@ -12,12 +12,20 @@ in {
     };
   };
 
-  home.file = {
-    ".config/emacs/init.el".text = tangle (builtins.readFile ./elisp/init.org);
-    ".config/emacs/early-init.el".text =
-      tangle (builtins.readFile ./elisp/early-init.org);
-    ".config/emacs/yasnippet.org".source = ./yasnippet.org;
-  };
+  home = {
+    file = {
+      ".config/emacs/init.el".text =
+        tangle (builtins.readFile ./elisp/init.org);
+      ".config/emacs/early-init.el".text =
+        tangle (builtins.readFile ./elisp/early-init.org);
+      ".config/emacs/yasnippet.org".source = ./yasnippet.org;
+    };
 
-  home.packages = with pkgs; [ emacs-lsp-booster pinentry-emacs cmigemo ];
+    packages = with pkgs; [ emacs-lsp-booster pinentry-emacs cmigemo ];
+
+    sessionVariables = {
+      EDITOR = "emacsclient -nw";
+      HOMEBREW_EDITOR = "emacsclient -nw";
+    };
+  };
 }

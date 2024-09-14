@@ -3555,8 +3555,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                   (require 'slime)
                   (require 'slime-autoloads)
 
-                  (load (expand-file-name "$HOME/.roswell/helper.el"))
-
                   (defun my/slime-history ()
                     (interactive)
                     (if (and (fboundp '-distinct)
