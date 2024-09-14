@@ -47,15 +47,15 @@
   outputs = { self, nixpkgs, nix-darwin, home-manager, org-babel, emacs-overlay
     , nixos-hardware, xremap, nix-on-droid, wezterm-flake
     , neovim-nightly-overlay, sops-nix, ... }: {
-      darwinConfigurations = (import ./systems/OPL2212-2 {
+      darwinConfigurations = (import ./hosts/OPL2212-2 {
         inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
           wezterm-flake neovim-nightly-overlay;
       });
-      nixosConfigurations = (import ./systems/X13Gen2 {
+      nixosConfigurations = (import ./hosts/X13Gen2 {
         inherit self nixpkgs home-manager org-babel emacs-overlay nixos-hardware
           xremap wezterm-flake neovim-nightly-overlay sops-nix;
       });
-      nixOnDroidConfigurations = (import ./systems/OPPO-A79 {
+      nixOnDroidConfigurations = (import ./hosts/OPPO-A79 {
         inherit self nixpkgs home-manager nix-on-droid;
       });
     };

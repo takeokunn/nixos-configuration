@@ -2,7 +2,6 @@
   programs.eza = {
     enable = true;
     git = true;
-    icons = true;
 
     enableBashIntegration = false;
     enableZshIntegration = false;

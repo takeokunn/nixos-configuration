@@ -1528,7 +1528,8 @@
     (setq doom-modeline-buffer-file-name-style 'truncate-with-project)
     (setq doom-modeline-icon `,(display-graphic-p))
     (setq doom-modeline-major-mode-icon `,(display-graphic-p))
-    (setq doom-modeline-minor-modes nil))
+    (setq doom-modeline-minor-modes nil)
+    (setq doom-modeline-check-icon nil))
 #+END_SRC
 ** hl-line
 #+begin_src emacs-lisp :tangle yes
