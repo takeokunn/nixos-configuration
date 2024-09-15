@@ -1,8 +1,8 @@
 name: ci
 
 on:
+  workflow_call:
   pull_request:
-  push:
 
 jobs:
   actionlint:
