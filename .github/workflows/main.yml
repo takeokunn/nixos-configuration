@@ -26,6 +26,8 @@ jobs:
         run: wget https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el
       - name: build
         run: emacs --batch --load htmlize.el --load script.el --funcall export-org-files
+      - name: move init.html to index.html
+        run: mv public/init.html public/index.html
 
       # for Deploy Github Pages
       - name: Setup Pages
