@@ -1,0 +1,40 @@
+name: Deploy github pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: ci
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: purcell/setup-emacs@master
+        with:
+          version: 29.4
+      - uses: actions/checkout@v4
+
+      # for Build Html
+      - name: wget htmlize
+        run: wget https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el
+      - name: build
+        run: emacs --batch --load htmlize.el --load script.el --funcall export-org-files
+
+      # for Deploy Github Pages
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
