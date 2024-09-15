@@ -4,6 +4,7 @@
     tmp = {
       useTmpfs = true;
       cleanOnBoot = true;
+      tmpfsSize = "95%";
     };
     loader = {
       systemd-boot = {
