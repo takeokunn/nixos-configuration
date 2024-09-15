@@ -1,13 +1,12 @@
 { pkgs }:
 let
-  # system = pkgs.system;
-  # mitamae = pkgs.callPackage ./nixpkgs/mitamae { inherit system; };
   ecspresso = pkgs.callPackage ./nixpkgs/ecspresso { };
   isucrud = pkgs.callPackage ./nixpkgs/isucrud { };
 in with pkgs; [
-  # for infra/isucon
-  # mitamae
+  # for infra
   ecspresso
+
+  # for isucrud
   isucrud
 
   # for network tools
