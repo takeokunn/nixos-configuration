@@ -14,6 +14,6 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    config = import ../home-manager/minimum.nix { inherit system nixpkgs; };
+    config = import ../home-manager/basic.nix { inherit system nixpkgs; };
   };
 }
