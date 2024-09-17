@@ -4073,35 +4073,35 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key org-mode-map (kbd "C-c C-,") #'org-insert-structure-template)
 
     ;; directory
-    (setopt org-directory "~/.ghq/github.com/takeokunn/private")
+    (setq org-directory "~/.ghq/github.com/takeokunn/private")
 
     ;; todo
-    (setopt org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "|" "DONE(d)")))
+    (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "|" "DONE(d)")))
 
     ;; startup
-    (setopt org-startup-folded 'show3levels)
-    (setopt org-startup-truncated nil)
+    (setq org-startup-folded 'show3levels)
+    (setq org-startup-truncated nil)
 
     (defvar my/org-agenda-files `(,(concat org-directory "/agenda")
                                   ,(concat org-directory "/archive/2023")
                                   ,(concat org-directory "/archive/2024")))
 
-    (setopt org-agenda-files my/org-agenda-files)
-    (setopt org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
+    (setq org-agenda-files my/org-agenda-files)
+    (setq org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
                                            (format-time-string "%Y" (current-time))
                                            (format-time-string "%Y-%m-%d" (current-time))))
 
     ;; log
-    (setopt org-log-into-drawer t)
-    (setopt org-log-done 'time)
+    (setq org-log-into-drawer t)
+    (setq org-log-done 'time)
 
     (defun my/update-org-agenda-files ()
       (interactive)
-      (setopt org-agenda-files my/org-agenda-files)))
+      (setq org-agenda-files my/org-agenda-files)))
 
   (with-eval-after-load 'org-src
     ;; config
-    (setopt org-src-window-setup 'current-window))
+    (setq org-src-window-setup 'current-window))
 
   (with-eval-after-load 'org-archive
     ;; archive
@@ -4118,20 +4118,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-clock
     ;; config
-    (setopt org-clock-out-remove-zero-time-clocks t)
-    (setopt org-clock-clocked-in-display 'mode-line))
+    (setq org-clock-out-remove-zero-time-clocks t)
+    (setq org-clock-clocked-in-display 'mode-line))
 #+end_src
 *** org-list
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-list
-    (setopt org-list-allow-alphabetical t))
+    (setq org-list-allow-alphabetical t))
 #+end_src
 *** org-keys
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-keys
     ;; config
-    (setopt org-use-extra-keys t)
-    (setopt org-use-speed-commands t)
+    (setq org-use-extra-keys t)
+    (setq org-use-speed-commands t)
 
     ;; keybind
     (add-to-list 'org-speed-commands '("d" org-todo "DONE"))
@@ -4149,9 +4149,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-capture :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode)))
 
     ;; config
-    (setopt org-capture-use-agenda-date t)
-    (setopt org-capture-bookmark nil)
-    (setopt org-capture-templates `(("t" "Todo" entry (file ,(expand-file-name "todo.org" org-directory))
+    (setq org-capture-use-agenda-date t)
+    (setq org-capture-bookmark nil)
+    (setq org-capture-templates `(("t" "Todo" entry (file ,(expand-file-name "todo.org" org-directory))
                                      "* %?")
                                     ("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
                                      "* %?")
@@ -4162,7 +4162,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-duration
     ;; config
-    (setopt org-duration-format (quote h:mm)))
+    (setq org-duration-format (quote h:mm)))
 #+end_src
 *** org-id
 #+begin_src emacs-lisp :tangle yes
@@ -4170,8 +4170,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-id
     ;; config
-    (setopt org-id-locations-file (expand-file-name ".org-id-locations" org-directory))
-    (setopt org-id-extra-files (append org-agenda-text-search-extra-files)))
+    (setq org-id-locations-file (expand-file-name ".org-id-locations" org-directory))
+    (setq org-id-extra-files (append org-agenda-text-search-extra-files)))
 #+end_src
 *** org-crypt
 #+begin_src emacs-lisp :tangle yes
@@ -4183,8 +4183,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-crypt
     ;; config
-    (setopt org-crypt-key nil)
-    (setopt org-tags-exclude-from-inheritance '("crypt")))
+    (setq org-crypt-key nil)
+    (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
 *** org-table
 #+begin_src emacs-lisp :tangle yes
@@ -4207,9 +4207,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-journal
     ;; config
-    (setopt org-journal-dir (expand-file-name "journal" org-directory))
-    (setopt org-journal-start-on-weekday 7)
-    (setopt org-journal-prefix-key "C-c j"))
+    (setq org-journal-dir (expand-file-name "journal" org-directory))
+    (setq org-journal-start-on-weekday 7)
+    (setq org-journal-prefix-key "C-c j"))
 #+end_src
 *** org-generate
 #+begin_src emacs-lisp :tangle yes
@@ -4236,7 +4236,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
 
   (with-eval-after-load 'org
-    (setopt org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
+    (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
 #+end_src
 *** org-dashboard
 #+begin_src emacs-lisp :tangle yes
@@ -4255,7 +4255,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-faces
     ;; config
-    (setopt org-link '(t (:foreground "#ebe087" :underline t))))
+    (setq org-link '(t (:foreground "#ebe087" :underline t))))
 #+end_src
 *** org-superstar
 #+begin_src emacs-lisp :tangle yes
@@ -4295,7 +4295,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'ol
     ;; config
-    (setopt org-link-file-path-type 'relative))
+    (setq org-link-file-path-type 'relative))
 #+end_src
 *** org-link-beautify
 #+begin_src emacs-lisp :tangle yes
@@ -4319,9 +4319,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-agenda
     ;; config
-    (setopt org-agenda-span 'day)
-    (setopt org-agenda-start-on-weekday 1)
-    (setopt org-agenda-todo-ignore-with-date t))
+    (setq org-agenda-span 'day)
+    (setq org-agenda-start-on-weekday 1)
+    (setq org-agenda-todo-ignore-with-date t))
 #+end_src
 *** org-super-agenda
 #+begin_src emacs-lisp :tangle yes
@@ -4405,7 +4405,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'ob-core
     ;; config
-    (setopt org-confirm-babel-evaluate nil)
+    (setq org-confirm-babel-evaluate nil)
     (add-to-list 'org-babel-default-header-args '(:results . "output")))
 
   (with-eval-after-load 'ob-eval
@@ -4642,7 +4642,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'org-roam-db
     ;; config
     (setopt org-roam-database-connector 'sqlite)
-    (setopt org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
+    (setq org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
 #+end_src
 *** org-roam-capture
 #+begin_src emacs-lisp :tangle yes
@@ -4751,9 +4751,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'consult-org-roam
     ;; config
-    (setopt consult-org-roam-grep-func #'consult-ripgrep)
-    (setopt consult-org-roam-buffer-narrow-key ?r)
-    (setopt consult-org-roam-buffer-after-buffers t))
+    (setq consult-org-roam-grep-func #'consult-ripgrep)
+    (setq consult-org-roam-buffer-narrow-key ?r)
+    (setq consult-org-roam-buffer-after-buffers t))
 #+end_src
 *** org-roam-ui
 #+begin_src emacs-lisp :tangle yes
