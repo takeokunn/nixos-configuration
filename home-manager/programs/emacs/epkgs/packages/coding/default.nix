@@ -6,7 +6,6 @@ in with epkgs; [
   flycheck-elsa
   packages.flycheck-projectile
   flycheck-cfn
-  flycheck-phpstan
 
   # completion
   corfu
