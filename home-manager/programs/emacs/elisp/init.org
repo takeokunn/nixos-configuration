@@ -177,7 +177,6 @@
 ** minibuffer
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'minibuffer
-    (define-key minibuffer-mode-map (kbd "C-h") #'delete-backward-char)
     (define-key minibuffer-mode-map (kbd "M-h") #'backward-kill-word)
     (define-key minibuffer-mode-map (kbd "C-j") #'exit-minibuffer)
     (define-key minibuffer-mode-map (kbd "M-RET") #'exit-minibuffer))
@@ -1810,10 +1809,6 @@
   (with-eval-after-load 'magit-log
     ;; keybinds
     (define-key magit-log-mode-map (kbd "C-j") #'magit-visit-thing))
-
-  (with-eval-after-load 'git-commit
-    ;; keybinds
-    (define-key git-commit-mode-map (kbd "C-h") #'delete-backward-char))
 #+END_SRC
 *** magit-file-icons
 #+begin_src emacs-lisp :tangle yes

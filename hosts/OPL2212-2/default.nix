@@ -3,7 +3,7 @@
 let
   system = "aarch64-darwin";
   username = "obara";
-  configuration = { pkgs, ... }: {
+  configuration = { ... }: {
     users.users.${username}.home = "/Users/${username}";
   };
   lib = nixpkgs.lib;
