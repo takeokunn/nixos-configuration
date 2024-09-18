@@ -2998,10 +2998,6 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
 
-  ;; (vlf-disable-for-function tags-verify-table "etags")
-  ;; (vlf-disable-for-function tag-find-file-of-tag-noselect "etags")
-  ;; (vlf-disable-for-function helm-etags-create-buffer "helm-tags")
-
   (with-eval-after-load 'dired
     ;; hooks
     (define-key dired-mode-map (kbd "V") #'dired-vlf))
@@ -3010,7 +3006,6 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
 #+end_src
-
 * Project
 ** projectile
 #+begin_src emacs-lisp :tangle yes

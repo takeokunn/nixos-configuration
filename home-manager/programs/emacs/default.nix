@@ -18,10 +18,10 @@ in {
         tangle (builtins.readFile ./elisp/init.org);
       ".config/emacs/early-init.el".text =
         tangle (builtins.readFile ./elisp/early-init.org);
-      ".config/emacs/yasnippet.org".source = ./misc/yasnippet.org;
+      ".config/emacs/misc/yasnippet.org".source = ./misc/yasnippet.org;
     };
 
-    packages = with pkgs; [ emacs-lsp-booster pinentry-emacs cmigemo ];
+    packages = with pkgs; [ emacs-lsp-booster pinentry-emacs ];
 
     sessionVariables = {
       EDITOR = "emacsclient -nw";
