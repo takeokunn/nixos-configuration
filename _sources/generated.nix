@@ -1131,27 +1131,27 @@
   };
   vim-ddu-ui-ff = {
     pname = "vim-ddu-ui-ff";
-    version = "8685ab0328716e2faa888f7089c1710adc424c3f";
+    version = "7593f81fde3846d47695422bec00e70868b111fc";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-ff";
-      rev = "8685ab0328716e2faa888f7089c1710adc424c3f";
+      rev = "7593f81fde3846d47695422bec00e70868b111fc";
       fetchSubmodules = false;
-      sha256 = "sha256-LWtk0XGXTJKKs0BNgegLokvhEYkHvtxmeGQek5AIi4s=";
+      sha256 = "sha256-kNMKjEYmbmjZD4etwM61XBDyhxmbMtrY4UkzkNCO2Sw=";
     };
-    date = "2024-09-15";
+    date = "2024-09-19";
   };
   vim-ddu-ui-filer = {
     pname = "vim-ddu-ui-filer";
-    version = "881147fb7c85688ae98dc07c3ed020db94ada84e";
+    version = "447fcdf8a91e5872bc18ef4630ca1c4b35f3039b";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-filer";
-      rev = "881147fb7c85688ae98dc07c3ed020db94ada84e";
+      rev = "447fcdf8a91e5872bc18ef4630ca1c4b35f3039b";
       fetchSubmodules = false;
-      sha256 = "sha256-on6bbtD8FGEp6MWwMEQe/SEYcTNmfNq3gvk4MZ6bZRg=";
+      sha256 = "sha256-4da8eeyArrV0ckYFhM7877QxNgkPp0759x7o5FmliHI=";
     };
-    date = "2024-09-15";
+    date = "2024-09-19";
   };
   vim-denippet = {
     pname = "vim-denippet";
