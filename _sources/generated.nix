@@ -435,15 +435,15 @@
   };
   skkeleton = {
     pname = "skkeleton";
-    version = "039aebf7c2b7ed76989696dbd477e220731e19f9";
+    version = "1035184420cfff705770a5b04aabe0ed0acb4db8";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "039aebf7c2b7ed76989696dbd477e220731e19f9";
+      rev = "1035184420cfff705770a5b04aabe0ed0acb4db8";
       fetchSubmodules = false;
-      sha256 = "sha256-nvwnyFTiGyVseyGfp92szbh4Ca+EgJ3otbMk8xFVCBY=";
+      sha256 = "sha256-u1Bd/tNpftheBkIRunu29h3VWISGcu38dbRdui8WRqc=";
     };
-    date = "2024-09-16";
+    date = "2024-09-20";
   };
   sublime-gleam = {
     pname = "sublime-gleam";
@@ -603,15 +603,15 @@
   };
   vim-ddc-source-file = {
     pname = "vim-ddc-source-file";
-    version = "c92ada90263fa7ed6588a2ce1aab0b3bf42c63fc";
+    version = "f2e9d706a74b843d11c55c2a39bcd7e7d9ac7b24";
     src = fetchFromGitHub {
       owner = "LumaKernel";
       repo = "ddc-source-file";
-      rev = "c92ada90263fa7ed6588a2ce1aab0b3bf42c63fc";
+      rev = "f2e9d706a74b843d11c55c2a39bcd7e7d9ac7b24";
       fetchSubmodules = false;
-      sha256 = "sha256-mNSXnD+AWWroiikCuNJJp/B9Iit6I+sTQdu/BC6SJtw=";
+      sha256 = "sha256-L7r6HLaeYIFy4VFpB1CRTC2KiMoN0OSWv8n+VI07/d8=";
     };
-    date = "2024-09-04";
+    date = "2024-09-20";
   };
   vim-ddc-source-input = {
     pname = "vim-ddc-source-input";
