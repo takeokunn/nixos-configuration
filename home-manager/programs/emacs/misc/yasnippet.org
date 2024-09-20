@@ -12,7 +12,7 @@
 * snippets
 ** c-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/c-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/c-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -26,7 +26,7 @@
 #+end_src
 ** css-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/css-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/css-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -46,7 +46,7 @@
   }
 #+end_src
 *** media
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/css-mode/media") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/css-mode/media") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: media
   # key: media
@@ -57,7 +57,7 @@
 #+end_src
 ** clojure-mode/
 *** info
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/clojure-mode/info") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/clojure-mode/info") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: info
   # key: info
@@ -65,7 +65,7 @@
   (info "##### $1" ${1:object})
 #+end_src
 *** defn
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/clojure-mode/defn") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/clojure-mode/defn") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: defn
   # key: defn
@@ -78,7 +78,7 @@
 #+end_src
 ** emacs-lisp-mode/
 *** cond
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/cond") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/cond") :mkdirp yes :noweb yes
 # -*- mode: snippet -*-
 # contributor: Xah Lee (XahLee.org)
 # name: cond
@@ -88,7 +88,7 @@
  (${1:condition} ${2:body})$0)
 #+end_src
 *** el-clone
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/el-clone") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/el-clone") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: el-clone
   # key: el-clone
@@ -97,7 +97,7 @@
     (el-clone :repo "$1"))
 #+end_src
 *** header
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/header") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/header") :mkdirp yes :noweb yes
 # -*- mode: snippet; -*-
 # contributor: kchenphy <https://www.github.com/kchenphy>
 # name: package header
@@ -142,7 +142,7 @@ ${11:(message "Hello World!")}
 ;;; $1.el ends here
 #+end_src
 *** kill-buffer
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/kill-buffer") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/kill-buffer") :mkdirp yes :noweb yes
 # -*- mode: snippet -*-
 # contributor: Xah Lee (XahLee.org)
 # name: kill-buffer
@@ -152,7 +152,7 @@ ${11:(message "Hello World!")}
 (kill-buffer $0)
 #+end_src
 *** lambda
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/lambda") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/lambda") :mkdirp yes :noweb yes
 # -*- mode: snippet; -*-
 # contributor: Xah Lee (XahLee.org)
 # name: lambda
@@ -162,7 +162,7 @@ ${11:(message "Hello World!")}
 
 #+end_src
 *** minor
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/minor") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/minor") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: minor
   # key: minor
@@ -185,7 +185,7 @@ ${11:(message "Hello World!")}
   (provide '$1-mode)
 #+end_src
 *** with-delayed-execution
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/emacs-lisp-mode/with-delayed-execution") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/emacs-lisp-mode/with-delayed-execution") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: with-delayed-execution
   # key: with-delayed-execution
@@ -197,7 +197,7 @@ ${11:(message "Hello World!")}
 #+end_src
 ** fish-mode/
 *** bang
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/bang") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/bang") :mkdirp yes :noweb yes
 # name: bang
 # key: !
 # --
@@ -206,7 +206,7 @@ $0
 
 #+end_src
 *** block
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/block") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/block") :mkdirp yes :noweb yes
 # name: begin ... end
 # key: block
 # --
@@ -215,7 +215,7 @@ begin
 end
 #+end_src
 *** breakpoint
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/breakpoint") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/breakpoint") :mkdirp yes :noweb yes
  # name: breakpoint
  # key: breakpoint
  # --
@@ -223,7 +223,7 @@ end
  $0
  #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/for") :mkdirp yes :noweb yes
 # name: for loop
 # key: for
 # --
@@ -232,7 +232,7 @@ for ${1:var} in ${2:stuff}
 end
 #+end_src
 *** function
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/function") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/function") :mkdirp yes :noweb yes
 # name: function
 # key: function
 # --
@@ -241,7 +241,7 @@ function ${1:name}
 end
 #+end_src
 *** if
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/if") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/if") :mkdirp yes :noweb yes
 # name: if ... ... else ... end
 # key: if
 # --
@@ -253,7 +253,7 @@ end
 $0
 #+end_src
 *** switch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/switch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/switch") :mkdirp yes :noweb yes
 # name: switch
 # key: switch
 # --
@@ -263,7 +263,7 @@ switch ${1:condition}
 end
 #+end_src
 *** while
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fish-mode/while") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fish-mode/while") :mkdirp yes :noweb yes
 # name: while loop
 # key: while
 # --
@@ -273,7 +273,7 @@ end
 #+end_src
 ** fundamental-mode/
 *** current-date
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fundamental-mode/current-date") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fundamental-mode/current-date") :mkdirp yes :noweb yes
   # name: current-date
   # key: dd
   # contributor : Kristof Molnar-Tatai <kristof.mlnr@gmail.com>
@@ -281,7 +281,7 @@ end
   `(format-time-string "%Y-%m-%d")`
 #+end_src
 *** mode-line
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/fundamental-mode/mode-line") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/fundamental-mode/mode-line") :mkdirp yes :noweb yes
   # name: Mode line
   # key: mode-line
   # --
@@ -289,11 +289,11 @@ end
 #+end_src
 ** git-commit-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/git-commit-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/git-commit-mode/.yas-parents") :mkdirp yes :noweb yes
 text-mode
 #+end_src
 *** type
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/git-commit-mode/type") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/git-commit-mode/type") :mkdirp yes :noweb yes
 # name: type
 # key: type
 # --
@@ -301,14 +301,14 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
 #+end_src
 ** go-mode/
 *** append
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/append") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/append") :mkdirp yes :noweb yes
   # name: for append
   # key: append
   # --
   $1 = append($1, $0)
 #+end_src
 *** case
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/case") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/case") :mkdirp yes :noweb yes
   # name: switch case
   # key: case
   # --
@@ -316,7 +316,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
           $0
 #+end_src
 *** error
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/error") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/error") :mkdirp yes :noweb yes
   # name: error
   # key: error
   # --
@@ -325,7 +325,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/for") :mkdirp yes :noweb yes
   # name: for range
   # key: range
   # --
@@ -334,7 +334,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** func
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/func") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/func") :mkdirp yes :noweb yes
   # name: func
   # key: func
   # --
@@ -344,7 +344,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** handler
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/handler") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/handler") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: handler
   # key: handler
@@ -354,7 +354,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** init
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/init") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/init") :mkdirp yes :noweb yes
   # name: init
   # key: init
   # --
@@ -363,7 +363,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** interface
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/interface") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/interface") :mkdirp yes :noweb yes
   # name: interface
   # key: type
   # --
@@ -372,7 +372,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** main
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/main") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/main") :mkdirp yes :noweb yes
   # name: main
   # key: main
   # --
@@ -381,14 +381,14 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** package
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/package") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/package") :mkdirp yes :noweb yes
   # name: package
   # key: package
   # --
   package ${1:main}
 #+end_src
 *** struct
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/struct") :mkdirp yes :noweb yesp
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/struct") :mkdirp yes :noweb yesp
   # name: struct
   # key: struct
   # --
@@ -398,7 +398,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** switch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/switch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/switch") :mkdirp yes :noweb yes
   # name: for switch
   # key: switch
   # --
@@ -409,7 +409,7 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
   }
 #+end_src
 *** test
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/go-mode/test") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/go-mode/test") :mkdirp yes :noweb yes
   # name: test
   # key: test
   # --
@@ -419,14 +419,14 @@ ${1:$$(yas-choose-value '("fix" "hotfix" "add" "update" "change" "clean" "disabl
 #+end_src
 ** js-mode/
 *** alert
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/alert") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/alert") :mkdirp yes :noweb yes
   # name: alert
   # key: alert
   # --
   alert($0);
 #+end_src
 *** class
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/class") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/class") :mkdirp yes :noweb yes
 # name: class
 # key: class
 # --
@@ -440,14 +440,14 @@ class ${1:Class}${2: extends ${3:ParentClass}} {
 }
 #+end_src
 *** const
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/const") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/const") :mkdirp yes :noweb yes
 # name: const declaration
 # key: const
 # --
 const ${1:name} = ${2:initial};
 #+end_src
 *** each
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/each") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/each") :mkdirp yes :noweb yes
 # name: each
 # --
 ${1:collection}.forEach(function (${2:elem}) {
@@ -455,7 +455,7 @@ ${1:collection}.forEach(function (${2:elem}) {
 });
 #+end_src
 *** else
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/else") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/else") :mkdirp yes :noweb yes
   # name: else
   # key: else
   # --
@@ -464,7 +464,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** export-const
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/export-const") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/export-const") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: export-const
   # key: export-const
@@ -475,7 +475,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** export-default
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/export-default") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/export-default") :mkdirp yes :noweb yes
   # name: export-default
   # key: export-default
   # --
@@ -485,7 +485,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** for-in
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/for-in") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/for-in") :mkdirp yes :noweb yes
   # name: for-in
   # key: for-in
   # --
@@ -495,7 +495,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** for-of
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/for-on") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/for-on") :mkdirp yes :noweb yes
   # name: for-of
   # key: fof-of
   # --
@@ -505,7 +505,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/for") :mkdirp yes :noweb yes
   # name: for
   # --
   for (let ${1:i} = ${2:0}; $1 < ${3:collection}.length; $1++) {
@@ -513,7 +513,7 @@ ${1:collection}.forEach(function (${2:elem}) {
   }
 #+end_src
 *** function
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/function") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/function") :mkdirp yes :noweb yes
   # name: function
   # key: function
   # --
@@ -523,7 +523,7 @@ ${1:collection}.forEach(function (${2:elem}) {
 
 #+end_src
 *** if
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/if") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/if") :mkdirp yes :noweb yes
 # name: if
 # --
 if (${1:condition}) {
@@ -531,7 +531,7 @@ if (${1:condition}) {
 }
 #+end_src
 *** lambda
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/lambda") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/lambda") :mkdirp yes :noweb yes
   # name: lambda
   # key: lambda
   # --
@@ -540,14 +540,14 @@ if (${1:condition}) {
   };
 #+end_src
 *** log
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/log") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/log") :mkdirp yes :noweb yes
   # name: log (console.log)
   # key: log
   # --
   console.log(${2:"$3 >> ", }${1:var})
 #+end_src
 *** import
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/import") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/import") :mkdirp yes :noweb yes
   # name: import
   # key: import
   # --
@@ -555,14 +555,14 @@ if (${1:condition}) {
   import ${2:moduleName} from '${1:module}'$0
 #+end_src
 *** let
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/let") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/let") :mkdirp yes :noweb yes
 # name: let declaration
 # key: let
 # --
 let ${1:name} = ${2:initial};
 #+end_src
 *** setInterval
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/setInterval") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/setInterval") :mkdirp yes :noweb yes
   # name: setInterval
   # key: setInterval
   # --
@@ -572,7 +572,7 @@ let ${1:name} = ${2:initial};
   }, ${0:intervalInms})
 #+end_src
 *** setTimeout
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/setTimeout") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/setTimeout") :mkdirp yes :noweb yes
   # name: setTimeOut
   # key: setTimeOut
   # --
@@ -582,7 +582,7 @@ let ${1:name} = ${2:initial};
   }, ${1:delayInms})
 #+end_src
 *** sleep
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/sleep") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/sleep") :mkdirp yes :noweb yes
   # name: sleep
   # key: sleep
   # --
@@ -590,7 +590,7 @@ let ${1:name} = ${2:initial};
   const sleep = ms => new Promise(res => setTimeout(res, ms));
 #+end_src
 *** styled
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/styled") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/styled") :mkdirp yes :noweb yes
   # name: styled
   # key: styled
   # --
@@ -600,7 +600,7 @@ let ${1:name} = ${2:initial};
   \`
 #+end_src
 *** switch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/switch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/switch") :mkdirp yes :noweb yes
   # name: switch
   # key: switch
   # --
@@ -612,7 +612,7 @@ let ${1:name} = ${2:initial};
   }
 #+end_src
 *** try-catch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js-mode/try-catch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/try-catch") :mkdirp yes :noweb yes
   # name: try...catch statement
   # key: try
   # --
@@ -626,19 +626,19 @@ let ${1:name} = ${2:initial};
 #+end_src
 ** js2-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/js2-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js2-mode/.yas-parents") :mkdirp yes :noweb yes
 js-mode
 #+end_src
 ** lisp-mode/
 *** main
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/main") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/main") :mkdirp yes :noweb yes
   # name: main
   # key: main
   # --
   (defun main () $0)
 #+end_src
 *** class
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/class") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/class") :mkdirp yes :noweb yes
 # name: class
 # key: cls
 # --
@@ -648,7 +648,7 @@ js-mode
 $0
 #+end_src
 *** comment
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/comment") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/comment") :mkdirp yes :noweb yes
 # name: comment
 # key: /*
 # --
@@ -656,7 +656,7 @@ $0
 $0
 #+end_src
 *** cond
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/cond") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/cond") :mkdirp yes :noweb yes
 # name: cond
 # key: cond
 # --
@@ -666,7 +666,7 @@ $0
 $0
 #+end_src
 *** defun
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/defun") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/defun") :mkdirp yes :noweb yes
 # name: defun
 # key: defun
 # --
@@ -675,7 +675,7 @@ $0
 )
 #+end_src
 *** defpackage
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/defpackage") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/defpackage") :mkdirp yes :noweb yes
 # name: defpackage
 # key: defp
 # --
@@ -687,7 +687,7 @@ $0
    (:export :$0))
 #+end_src
 *** do
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/do") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/do") :mkdirp yes :noweb yes
 # name: do
 # key: do
 # --
@@ -698,7 +698,7 @@ $0
 $0
 #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/for") :mkdirp yes :noweb yes
 # name: do
 # key: for
 # --
@@ -707,7 +707,7 @@ $0
 $0
 #+end_src
 *** foreach
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/foreach") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/foreach") :mkdirp yes :noweb yes
 # name: do
 # key: foreach
 # --
@@ -716,14 +716,14 @@ $0
 $0
 #+end_src
 *** format
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/format") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/format") :mkdirp yes :noweb yes
 # name: format
 # key: print
 # --
 (format t "~& $0 ~%")
 #+end_src
 *** if
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/if") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/if") :mkdirp yes :noweb yes
 # name: if
 # key: if
 # --
@@ -732,7 +732,7 @@ $0
 $0
 #+end_src
 *** if-else
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/if-else") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/if-else") :mkdirp yes :noweb yes
 # name: if-else (...) (...) (...) ...
 # key: if-else
 # --
@@ -742,7 +742,7 @@ $0
 $0
 #+end_src
 *** if-not
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/if-not") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/if-not") :mkdirp yes :noweb yes
 # name: if-not (...) (...)  ...
 # key: if-not
 # --
@@ -751,7 +751,7 @@ $0
 $0
 #+end_src
 *** slot
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/slot") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/slot") :mkdirp yes :noweb yes
 # name: slot
 # key: slot
 # --
@@ -766,7 +766,7 @@ $0
 $0
 #+end_src
 *** typecast
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/lisp-mode/typecast") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/lisp-mode/typecast") :mkdirp yes :noweb yes
 # name: typecast
 # name: cast
 # --
@@ -775,7 +775,7 @@ $0
 #+end_src
 ** makefile-mode/
 *** all
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/makefile-mode/all") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/makefile-mode/all") :mkdirp yes :noweb yes
   # name: all
   # key: all
   # --
@@ -783,7 +783,7 @@ $0
   all: $0
 #+end_src
 *** help
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/makefile-mode/help") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/makefile-mode/help") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: help
   # key: help
@@ -793,7 +793,7 @@ $0
       @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 #+end_src
 *** phony
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/makefile-mode/phony") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/makefile-mode/phony") :mkdirp yes :noweb yes
   # name: phony
   # --
   .PHONY: $1
@@ -802,7 +802,7 @@ $0
 #+end_src
 ** markdown-mode/
 *** code
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/markdown-mode/code") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/code") :mkdirp yes :noweb yes
 # name: Code block
 # key: code
 # --
@@ -811,7 +811,7 @@ $0
 \`\`\`
 #+end_src
 *** highlight
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/markdown-mode/highlight") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/highlight") :mkdirp yes :noweb yes
 # name: Highlight
 # contributor: nguyenvinhlinh <nguyenvinhlinh93@gmail.com>
 # key: highlight
@@ -821,7 +821,7 @@ ${0:content}
 {% endhighlight %}
 #+end_src
 *** hr
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/markdown-mode/hr") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/hr") :mkdirp yes :noweb yes
 # name: Horizontal Rule (-)
 # key: hr
 # --
@@ -829,7 +829,7 @@ ${0:content}
 $0
 #+end_src
 *** img
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/markdown-mode/img") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/img") :mkdirp yes :noweb yes
 # name: Image
 # contributor: Peng Deng <dengpeng@gmail.com>
 # key: img
@@ -837,7 +837,7 @@ $0
 ![${1:Alt Text}](${2:URL} $3) $0
 #+end_src
 *** link
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/markdown-mode/link") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/link") :mkdirp yes :noweb yes
 # name: Link
 # contributor: Peng Deng <dengpeng@gmail.com>
 # key: link
@@ -846,7 +846,7 @@ $0
 #+end_src
 ** org-mode/
 *** ai-block
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/ai-block") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/ai-block") :mkdirp yes :noweb yes
   #name: ai-block
   #key: ai-block
   # --
@@ -855,7 +855,7 @@ $0
   ,#+end_ai
 #+end_src
 *** ai-image
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/ai-image") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/ai-image") :mkdirp yes :noweb yes
   #name: ai-image
   #key: ai-image
   # --
@@ -864,14 +864,14 @@ $0
   ,#+end_ai
 #+end_src
 *** author
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/author") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/author") :mkdirp yes :noweb yes
   # name: author
   # key: author
   # --
   ,#+AUTHOR: $0
 #+end_src
 *** blog-hugo
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/blog-hugo") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/blog-hugo") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: blog-hugo
   # key: blog-hugo
@@ -889,7 +889,7 @@ $0
   ,#+STARTUP: nohideblocks
 #+end_src
 *** blog-zenn
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/blog-zenn") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/blog-zenn") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: blog-zenn
   # key: blog-zenn
@@ -906,7 +906,7 @@ $0
   ,#+OPTIONS: toc:nil
 #+end_src
 *** center
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/center") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/center") :mkdirp yes :noweb yes
 # name: center
 # key: center
 # --
@@ -915,7 +915,7 @@ $0
 #+end_center
 #+end_src
 *** content
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/content") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/content") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: content
   # key: content
@@ -924,14 +924,14 @@ $0
   ,#+STARTUP: nohideblocks
 #+end_src
 *** date
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/date") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/date") :mkdirp yes :noweb yes
 # name: date
 # key: date
 # --
 #+DATE: ${1:year}:${2:month}:${3:day}
 #+end_src
 *** diary
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/diary") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary") :mkdirp yes :noweb yes
   # name: diary
   # key: diary
   # type: snippet
@@ -948,7 +948,7 @@ $0
   ,**** 一言
 #+end_src
 *** diary-mtg-template-monday
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/diary-mtg-template-monday") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary-mtg-template-monday") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: diary-mtg-template-monday
   # key: diary-mtg-template-monday
@@ -1000,7 +1000,7 @@ $0
   :END:
 #+end_src
 *** diary-mtg-template-tuesday
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/diary-mtg-template-tuesday") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary-mtg-template-tuesday") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: diary-mtg-template-tuesday
   # key: diary-mtg-template-tuesday
@@ -1045,7 +1045,7 @@ $0
   :END:
 #+end_src
 *** diary-mtg-template-friday
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/diary-mtg-template-friday") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary-mtg-template-friday") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: diary-mtg-template-friday
   # key: diary-mtg-template-friday
@@ -1097,7 +1097,7 @@ $0
   :END:
 #+end_src
 *** diary-mtg-template-saturday
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/diary-mtg-template-saturday") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary-mtg-template-saturday") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: diary-mtg-template-saturday
   # key: diary-mtg-template-saturday
@@ -1149,28 +1149,28 @@ $0
   :END:
 #+end_src
 *** description
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/description") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/description") :mkdirp yes :noweb yes
 # name: description
 # key: desc
 # --
 #+DESCRIPTION: $0
 #+end_src
 *** email
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/email") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/email") :mkdirp yes :noweb yes
 # name: email
 # key: email
 # --
 #+email: $0
 #+end_src
 *** embedded
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/embedded") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/embedded") :mkdirp yes :noweb yes
   # name: embedded
   # key: embedded
   # --
   src_${1:lang}${2:[${3:where}]}{${4:code}}
 #+end_src
 *** entry
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/entry") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/entry") :mkdirp yes :noweb yes
   # name: entry
   # key: entry
   # --
@@ -1182,7 +1182,7 @@ $0
   ,#+end_html
 #+end_src
 *** exampleblock
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/exampleblock") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/exampleblock") :mkdirp yes :noweb yes
   # name: example
   # key: example
   # --
@@ -1191,7 +1191,7 @@ $0
   ,#+end_example
 #+end_src
 *** export
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/export") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/export") :mkdirp yes :noweb yes
 # name: export
 # key: export
 # --
@@ -1200,7 +1200,7 @@ $0
 #+end_export
 #+end_src
 *** figure
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/figure") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/figure") :mkdirp yes :noweb yes
   # name: figure
   # key: figure
   # --
@@ -1209,14 +1209,14 @@ $0
   ,#+label: fig:${3:label}$0
 #+end_src
 *** html
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/html") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/html") :mkdirp yes :noweb yes
   # name: html
   # key: html
   # --
   ,#+html:$1
 #+end_src
 *** image
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/image") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/image") :mkdirp yes :noweb yes
   # name: image
   # key: image
   # --
@@ -1224,42 +1224,42 @@ $0
   [[file:${2:image_path}]]$0
 #+end_src
 *** img
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/img") :mkdirp yes :noweb yesp
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/img") :mkdirp yes :noweb yesp
 # name: img
 # key: img
 # --
 <img src="$1" alt="$2" align="${3:left}" title="${4:image title}" class="img" $5/>$0
 #+end_src
 *** include
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/include") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/include") :mkdirp yes :noweb yes
 # name: include
 # key: include
 # --
 #+include: $0
 #+end_src
 *** keywords
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/keywords") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/keywords") :mkdirp yes :noweb yes
 # name: keywords
 # key: keywords
 # --
 #+keywords: $0
 #+end_src
 *** language
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/language") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/language") :mkdirp yes :noweb yes
 # name: language
 # key: language
 # --
 #+language: ${1:en}
 #+end_src
 *** link
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/link") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/link") :mkdirp yes :noweb yes
 # name: link
 # key: link
 # --
 [[${1:link}][${2:description}]]
 #+end_src
 *** matrix
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/matrix") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/matrix") :mkdirp yes :noweb yes
 # name: matrix
 # key: matrix
 # possible improvement, compute the number of lines from the argument to array
@@ -1272,14 +1272,14 @@ $0
 \right \)
 #+end_src
 *** options
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/options") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/options") :mkdirp yes :noweb yes
 # name: options
 # key: options
 # --
 #+options: h:${1:1} num:${2:t||nil} toc:${3:t||nil}$0
 #+end_src
 *** rv_background
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/rv_background") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/rv_background") :mkdirp yes :noweb yes
 # name: reveal_single_colored_background
 # key: reveal_single_colored_background
 # --
@@ -1288,7 +1288,7 @@ $0
 :end:
 #+end_src
 *** rv_image_background
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/rv_image_background") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/rv_image_background") :mkdirp yes :noweb yes
 # name: reveal_image_background
 # key: <rib
 # --
@@ -1298,28 +1298,28 @@ $0
     :end:
 #+end_src
 *** setup
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/setup") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/setup") :mkdirp yes :noweb yes
   # name: setup
   # key: setup
   # --
   ,#+setup: $0
 #+end_src
 *** setupfile
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/setupfile") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/setupfile") :mkdirp yes :noweb yes
   # name: setupfile
   # key: setupfile
   # --
   ,#+setupfile: $0
 #+end_src
 *** style
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/style") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/style") :mkdirp yes :noweb yes
 # name: style
 # key: style
 # --
 #+style: <link rel="stylesheet" type="text/css" href="$1" />
 #+end_src
 *** table
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/table") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/table") :mkdirp yes :noweb yes
 # name: table
 # key: table
 # --
@@ -1328,7 +1328,7 @@ $0
 |--------------+----------------|
 #+end_src
 *** task-develop
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/task-develop") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-develop") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: task-develop
   # key: task-develop
@@ -1340,7 +1340,7 @@ $0
   ,*** TODO redmineに記述する
 #+end_src
 *** task-document
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/task-document") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-document") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: task-document
   # key: task-document
@@ -1351,7 +1351,7 @@ $0
   ,*** TODO 共有する
 #+end_src
 *** task-ope
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/task-ope") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-ope") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: task-ope
   # key: task-ope
@@ -1360,7 +1360,7 @@ $0
   ,*** TODO redmineに記述する
 #+end_src
 *** translate
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/translate") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/translate") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: translate
   # key: translate
@@ -1370,14 +1370,14 @@ $0
   ,#+end_src
 #+end_src
 *** title
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/title") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/title") :mkdirp yes :noweb yes
 # name: title
 # key: title
 # --
 #+title: $0
 #+end_src
 *** uml
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/uml") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/uml") :mkdirp yes :noweb yes
 # name: uml
 # key: uml
 # contributor : Robert O'Connor
@@ -1387,7 +1387,7 @@ $1
 #+end_uml
 #+end_src
 *** verse
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/verse") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/verse") :mkdirp yes :noweb yes
 # name: verse
 # key: verse
 # --
@@ -1396,14 +1396,14 @@ $0
 #+end_verse
 #+end_src
 *** video
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/video") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/video") :mkdirp yes :noweb yes
 # name: video
 # key: video
 # --
 [[${1:link of the video}][file:${2:link of the image}]
 #+end_src
 *** roam
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/org-mode/roam") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/roam") :mkdirp yes :noweb yes
   # name: roam
   # key: <roam
   # --
@@ -1411,7 +1411,7 @@ $0
 #+end_src
 ** php-mode/
 *** .yas-setup.el
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/.yas-setup.el") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/.yas-setup.el") :mkdirp yes :noweb yes
   (require 'yasnippet)
 
   (defun yas-php-get-class-name-by-file-name ()
@@ -1422,7 +1422,7 @@ $0
                                    (buffer-name (current-buffer))))))
 #+end_src
 *** __call
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/__call") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/__call") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: __call()
@@ -1435,7 +1435,7 @@ $0
   }
 #+end_src
 *** __construct
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/__construct") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/__construct") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: __construct()
   # key: __construct
@@ -1445,7 +1445,7 @@ $0
   }
 #+end_src
 *** abstruct
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/abstract") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/abstract") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: abstract
   # key: abstract
@@ -1456,7 +1456,7 @@ $0
   }
 #+end_src
 *** class
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/class") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/class") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: class
   # key: class
@@ -1468,7 +1468,7 @@ $0
   }
 #+end_src
 *** const
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/const") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/const") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: const
@@ -1478,7 +1478,7 @@ $0
   const ${1:NAME} = ${2:value};
 #+end_src
 *** dd
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/dd") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/dd") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: dd
   # key: dd
@@ -1486,7 +1486,7 @@ $0
   dd($1);
 #+end_src
 *** ddd
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/ddd") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/ddd") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: ddd
   # key: ddd
@@ -1494,7 +1494,7 @@ $0
   ddd($1);
 #+end_src
 *** declare
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/declare") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/declare") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: declare
   # key: declare
@@ -1503,7 +1503,7 @@ $0
   declare(strict_types=1);
 #+end_src
 *** doc
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/doc") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/doc") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # key: /**
   # group: annotation
@@ -1513,7 +1513,7 @@ $0
    ,*/
 #+end_src
 *** dumptype
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/dumptype") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/dumptype") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: dumptype
   # key: dumptype
@@ -1521,7 +1521,7 @@ $0
   \PHPStan\dumpType($0);
 #+end_src
 *** enum
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/enum") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/enum") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: takeo obara<bararararatty@gmail.com>
   # name: enum
@@ -1536,7 +1536,7 @@ $0
   }
 #+end_src
 *** final
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/final") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/final") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: final
   # key: final
@@ -1548,7 +1548,7 @@ $0
   }
 #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/for") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: for
   # key: for
@@ -1559,7 +1559,7 @@ $0
   }
 #+end_src
 *** foreach
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/foreach") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/foreach") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: foreach
@@ -1571,7 +1571,7 @@ $0
   }
 #+end_src
 *** function
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/function") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/function") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: function
   # key: function
@@ -1582,7 +1582,7 @@ $0
   }
 #+end_src
 *** interface
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/interface") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/interface") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: interface
@@ -1595,7 +1595,7 @@ $0
   }
 #+end_src
 *** log
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/log") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/log") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: log
   # key: log
@@ -1606,7 +1606,7 @@ $0
   \Log::info('--------------------------------------------');
 #+end_src
 *** php
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/php") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/php") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: php
   # key: php
@@ -1619,7 +1619,7 @@ $0
   $0
 #+end_src
 *** psysh
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/psysh") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/psysh") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: psysh
@@ -1629,7 +1629,7 @@ $0
   eval(\Psy\sh());
 #+end_src
 *** match
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/match") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/match") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: takeo obara<bararararatty@gmail.com>
   # name: match
@@ -1642,7 +1642,7 @@ $0
   };
 #+end_src
 *** switch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/swtich") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/swtich") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: switch
@@ -1657,7 +1657,7 @@ $0
   }
 #+end_src
 *** trait
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/trait") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/trait") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: trait
@@ -1670,7 +1670,7 @@ $0
   }
 #+end_src
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -1685,7 +1685,7 @@ $0
   }
 #+end_src
 *** var_dump
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/var_dump") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/var_dump") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # contributor: USAMI Kenta <tadsan@zonu.me>
   # name: var_dump()
@@ -1695,7 +1695,7 @@ $0
   var_dump(${1:$var});
 #+end_src
 *** @phpstan-ignore-line
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/phpstan-ignore-line") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpstan-ignore-line") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: @phpstan-ignore-line
   # key: phpstan-ignore-line
@@ -1704,7 +1704,7 @@ $0
   // @phpstan-ignore-line$0
 #+end_src
 *** @phpstan-ignore-next-line
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/phpstan-ignore-next-line") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpstan-ignore-next-line") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: @phpstan-ignore-next-line
   # key: phpstan-ignore-next-line
@@ -1713,7 +1713,7 @@ $0
   // @phpstan-ignore-next-line$0
 #+end_src
 *** phpunit-setup
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/phpunit-template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpunit-template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: phpunit-setup
   # key: phpunit-setup
@@ -1726,7 +1726,7 @@ $0
   }
 #+end_src
 *** phpunit-template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-mode/phpunit-template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpunit-template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: phpunit-template
   # key: phpunit-template
@@ -1741,12 +1741,12 @@ $0
 #+end_src
 ** php-ts-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/php-ts-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-ts-mode/.yas-parents") :mkdirp yes :noweb yes
 php-mode
 #+end_src
 ** prog-mode/
 *** .yas-setup.el
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/.yas-setup.el") :mkdirp yes :noweb yesp
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/.yas-setup.el") :mkdirp yes :noweb yesp
   (require 'yasnippet)
   ;; whitespace removing functions from Magnar Sveen ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (defun yas-s-trim-left (s)
@@ -1778,7 +1778,7 @@ php-mode
       (yas-s-trim comment-end)))
 #+end_src
 *** comment
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/comment") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/comment") :mkdirp yes :noweb yes
   # contributor: sh-ow <sh-ow@users.noreply.github.com>
   # name: comment
   # key: co
@@ -1786,7 +1786,7 @@ php-mode
   `(yas-trimmed-comment-start)` ${1:comment}`(unless (eq (length comment-end) 0) (concat " " (yas-trimmed-comment-end)))`$0
 #+end_src
 *** comment-block
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/comment-block") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/comment-block") :mkdirp yes :noweb yes
 # name: comment-block
 # key: comment-block
 # --
@@ -1823,7 +1823,7 @@ ${1:$(let* ((col (current-column))
        (concat start str end))}$0
 #+end_src
 *** commentblock-two
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/commentblock-two") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/commentblock-two") :mkdirp yes :noweb yes
   # name: commentblock-two
   # key: commentblock-two
   # --
@@ -1840,7 +1840,7 @@ ${1:$(let* ((col (current-column))
   $0
 #+end_src
 *** fixme
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/fixme") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/fixme") :mkdirp yes :noweb yes
 # name: fixme
 # key: fi
 # condition: (not (eq major-mode 'sh-mode))
@@ -1848,14 +1848,14 @@ ${1:$(let* ((col (current-column))
 `comment-start`FIXME: $0`comment-end`
 #+end_src
 *** todo
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/todo") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/todo") :mkdirp yes :noweb yes
 # name: todo
 # key: t
 # --
 `comment-start`TODO: $0`comment-end`
 #+end_src
 *** xxx
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prog-mode/xxx") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prog-mode/xxx") :mkdirp yes :noweb yes
 # name: xxx
 # key: x
 # --
@@ -1863,7 +1863,7 @@ ${1:$(let* ((col (current-column))
 #+end_src
 ** prisma-mode/
 *** datasource
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prisma-mode/datasource") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prisma-mode/datasource") :mkdirp yes :noweb yes
   # name: datasource
   # key: datasource
   # --
@@ -1873,7 +1873,7 @@ ${1:$(let* ((col (current-column))
   }
 #+end_src
 *** generator
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prisma-mode/generator") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prisma-mode/generator") :mkdirp yes :noweb yes
    # name: generator
    # key: generator
    # --
@@ -1883,7 +1883,7 @@ ${1:$(let* ((col (current-column))
  #+end_src
 
 *** model
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/prisma-mode/model") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/prisma-mode/model") :mkdirp yes :noweb yes
   # name: model
   # key: model
   # --
@@ -1893,7 +1893,7 @@ ${1:$(let* ((col (current-column))
 #+end_src
 ** robots-txt-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/robots-txt-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/robots-txt-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -1906,7 +1906,7 @@ ${1:$(let* ((col (current-column))
 #+end_src
 ** scheme-mode/
 *** guix-bzr-reference
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-bzr-reference") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-bzr-reference") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-bzr-reference
   # key: bzr-reference...
@@ -1916,7 +1916,7 @@ ${1:$(let* ((col (current-column))
     (revision ${2:ref}))
 #+end_src
 *** guix-cvs-reference
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-cvs-reference") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-cvs-reference") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-cvs-reference
   # key: cvs-reference...
@@ -1927,7 +1927,7 @@ ${1:$(let* ((col (current-column))
     (revision "${3:revision}"))
 #+end_src
 *** guix-hg-reference
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-csv-reference") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-csv-reference") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-hg-reference
   # key: hg-reference...
@@ -1937,7 +1937,7 @@ ${1:$(let* ((col (current-column))
     (changeset ${2:changeset}))
 #+end_src
 *** guix-origin
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-origin") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-origin") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-origin
   # key: origin...
@@ -1969,7 +1969,7 @@ ${1:$(let* ((col (current-column))
       "$2")))
 #+end_src
 *** guix-package
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-package") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-package") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-package
   # key: package...
@@ -2022,7 +2022,7 @@ ${1:$(let* ((col (current-column))
       (license $7)))
 #+end_src
 *** guix-svn-reference
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/scheme-mode/guix-svn-reference") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/scheme-mode/guix-svn-reference") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guix-svn-reference
   # key: svn-reference...
@@ -2033,7 +2033,7 @@ ${1:$(let* ((col (current-column))
 #+end_src
 ** snippet-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/snippet-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/snippet-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -2045,7 +2045,7 @@ ${1:$(let* ((col (current-column))
   $0
 #+end_src
 *** header
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/snippet-mode/header") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/snippet-mode/header") :mkdirp yes :noweb yes
   # name: header
   # key: header
   # --
@@ -2058,7 +2058,7 @@ ${1:$(let* ((col (current-column))
 #+end_src
 ** sql-mode/
 *** constraint
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sql-mode/constraint") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sql-mode/constraint") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: constraint
   # key: constraint
@@ -2066,7 +2066,7 @@ ${1:$(let* ((col (current-column))
   CONSTRAINT [${1:PK_Name}] PRIMARY KEY ${2:CLUSTERED} ([${3:ColumnName}])
 #+end_src
 *** create
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sql-mode/create") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sql-mode/create") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: create
   # key: create
@@ -2079,14 +2079,14 @@ ${1:$(let* ((col (current-column))
   )
 #+end_src
 *** insert
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sql-mode/insert") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sql-mode/insert") :mkdirp yes :noweb yes
 # name: insert
 # key: insert
 # --
 INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
 #+end_src
 *** update
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sql-mode/update") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sql-mode/update") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: update
   # key: update
@@ -2097,7 +2097,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   $0
 #+end_src
 *** delete
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sql-mode/delete") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sql-mode/delete") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: delete
   # key: delete
@@ -2109,7 +2109,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
 #+end_src
 ** ssh-config-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/ssh-config-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/ssh-config-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -2122,7 +2122,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
 #+end_src
 ** terraform-mode/
 *** provider
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/provider") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/provider") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: provider
   # key: provider
@@ -2132,7 +2132,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** locals
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/locals") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/locals") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: locals
   # key: locals
@@ -2142,7 +2142,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** module
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/module") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/module") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: module
   # key: mod
@@ -2153,7 +2153,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** resource
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/resource") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/resource") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: resource
   # key: resource
@@ -2163,7 +2163,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** output
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/output") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/output") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: output
   # key: output
@@ -2173,7 +2173,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** variable
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/variable") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/variable") :mkdirp yes :noweb yes
   # name: variable
   # key: variable
   # --
@@ -2183,7 +2183,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** data
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/data") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/data") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: data
   # key: data
@@ -2193,7 +2193,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** terraform
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/terraform") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/terraform") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: terraform
   # key: terraform
@@ -2205,7 +2205,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
   }
 #+end_src
 *** variables
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/terraform-mode/variables") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/terraform-mode/variables") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: variable
   # key: variable
@@ -2217,7 +2217,7 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
 
 ** toml-mode/
 *** plugins
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/toml-mode/plugins") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/toml-mode/plugins") :mkdirp yes :noweb yes
   [[plugins]]
   repo = '$1'
   ${2:hook_add = '''
@@ -2226,11 +2226,11 @@ INSERT INTO ${table-name} (${col1, col2}) VALUES (${'val1', 'val2'});$0
 #+end_src
 ** typescript-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/.yas-parents") :mkdirp yes :noweb yes
 js-mode
 #+end_src
 *** abstract
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/abstract") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/abstract") :mkdirp yes :noweb yes
 # name: abstract
 # key: abstract
 # --
@@ -2244,7 +2244,7 @@ abstract class ${1:Class} {
 }
 #+end_src
 *** export-type
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/export-type") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/export-type") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: export-type
   # key: export-type
@@ -2254,7 +2254,7 @@ abstract class ${1:Class} {
   }
 #+end_src
 *** interface
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/interface") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/interface") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: interface
   # key: interface
@@ -2264,7 +2264,7 @@ abstract class ${1:Class} {
   }
 #+end_src
 *** namespace
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/namespace") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/namespace") :mkdirp yes :noweb yes
   # name: namespace
   # key: namespace
   # --
@@ -2274,7 +2274,7 @@ abstract class ${1:Class} {
   }
 #+end_src
 *** type
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/type") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/type") :mkdirp yes :noweb yes
   # name: type
   # key: type
   # --
@@ -2283,7 +2283,7 @@ abstract class ${1:Class} {
   }
 #+end_src
 *** use-props
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-mode/use-props") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/use-props") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: use-props
   # key: use-props
@@ -2298,11 +2298,11 @@ abstract class ${1:Class} {
 #+end_src
 ** typescript-tsx-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-tsx-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-tsx-mode/.yas-parents") :mkdirp yes :noweb yes
   web-mode
 #+end_src
 *** index
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-tsx-mode/index") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-tsx-mode/index") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: index
   # key: index
@@ -2314,7 +2314,7 @@ abstract class ${1:Class} {
   export const ${1:Index}: React.FC = () => <Layout {...useProps()} />
 #+end_src
 *** layout
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/typescript-tsx-mode/layout") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-tsx-mode/layout") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: layout
   # key: layout
@@ -2334,11 +2334,11 @@ abstract class ${1:Class} {
 #+end_src
 ** vue-mode/
 *** .yas-parents
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/vue-mode/.yas-parents") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/vue-mode/.yas-parents") :mkdirp yes :noweb yes
   js-mode
 #+end_src
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/vue-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/vue-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -2357,7 +2357,7 @@ abstract class ${1:Class} {
 #+end_src
 ** web-mode/
 *** html5
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/html5") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/html5") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: html5
   # key: html
@@ -2375,7 +2375,7 @@ abstract class ${1:Class} {
   </html>
 #+end_src
 *** style
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/style") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/style") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: style
   # key: style
@@ -2385,7 +2385,7 @@ abstract class ${1:Class} {
   </style>
 #+end_src
 *** form
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/form") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/form") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # key: form
   # name: form
@@ -2395,7 +2395,7 @@ abstract class ${1:Class} {
   </form>
 #+end_src
 *** href
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/href") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/href") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: href
   # key: href
@@ -2403,7 +2403,7 @@ abstract class ${1:Class} {
   <a href="$1">$0</a>
 #+end_src
 *** input
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/input") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/input") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: input
   # key: input
@@ -2411,7 +2411,7 @@ abstract class ${1:Class} {
   <input${1: type="$2"}${3: name="$4"}${5: value="$6"}>$0
 #+end_src
 *** img
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/img") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/img") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: img
   # key: img
@@ -2419,7 +2419,7 @@ abstract class ${1:Class} {
   <img src="$1"${2: alt="$3"}>$0
 #+end_src
 *** favicon
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/favicon") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/favicon") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: favicon
   # key: favicon
@@ -2427,7 +2427,7 @@ abstract class ${1:Class} {
   <link rel="icon" href="${1:/favicon.ico}">$0
 #+end_src
 *** meta
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/meta") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/meta") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: meta
   # key: meta
@@ -2437,7 +2437,7 @@ abstract class ${1:Class} {
   <meta name="keywords" content="${3:keywords}">
 #+end_src
 *** ogp
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/ogp") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/ogp") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: ogp
   # key: ogp
@@ -2452,7 +2452,7 @@ abstract class ${1:Class} {
   <meta name="twitter:card" content="$8">
 #+end_src
 *** dns-prefetch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/dns-prefetch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/dns-prefetch") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: dns-prefetch
   # key: dns-prefetch
@@ -2461,7 +2461,7 @@ abstract class ${1:Class} {
   <link as="${1:stylesheet}" rel="dns-prefetch" href="$2">$0
 #+end_src
 *** preload
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/preload") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/preload") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: preload
   # key: preload
@@ -2470,7 +2470,7 @@ abstract class ${1:Class} {
   <link as="${1:stylesheet}" rel="preload" href="$2">$0
 #+end_src
 *** prefetch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/prefetch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/prefetch") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: prefetch
   # key: prefetch
@@ -2479,7 +2479,7 @@ abstract class ${1:Class} {
   <link as="${1:stylesheet}" rel="prefetch" href="$2">$0
 #+end_src
 *** preconnect
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-mode/preconnect") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-mode/preconnect") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: preconnect
   # key: preconnect
@@ -2489,7 +2489,7 @@ abstract class ${1:Class} {
 #+end_src
 ** web-php-blade-mode/
 *** auth
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/auth") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/auth") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: auth
   # key: auth
@@ -2500,7 +2500,7 @@ abstract class ${1:Class} {
 
 #+end_src
 *** empty
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/empty") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/empty") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: empty
   # key: empty
@@ -2510,7 +2510,7 @@ abstract class ${1:Class} {
   @endempty
 #+end_src
 *** env
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/env") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/env") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: env
   # key: env
@@ -2520,7 +2520,7 @@ abstract class ${1:Class} {
   @endenv
 #+end_src
 *** error
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/error") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/error") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: error
   # key: error
@@ -2530,7 +2530,7 @@ abstract class ${1:Class} {
   @enderror
 #+end_src
 *** for
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/for") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/for") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: for
   # key: for
@@ -2540,7 +2540,7 @@ abstract class ${1:Class} {
   @endfor
 #+end_src
 *** foreach
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/foreach") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/foreach") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: foreach
   # key: foreach
@@ -2550,7 +2550,7 @@ abstract class ${1:Class} {
   @endforeach
 #+end_src
 *** guest
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/guest") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/guest") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: guest
   # key: guest
@@ -2560,7 +2560,7 @@ abstract class ${1:Class} {
   @endguest
 #+end_src
 *** if
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/if") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/if") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: if
   # key: if
@@ -2570,7 +2570,7 @@ abstract class ${1:Class} {
   @endif
 #+end_src
 *** include
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/include") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/include") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: include
   # key: include
@@ -2578,7 +2578,7 @@ abstract class ${1:Class} {
   @include('$0')
 #+end_src
 *** isset
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/isset") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/isset") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: isset
   # key: isset
@@ -2588,7 +2588,7 @@ abstract class ${1:Class} {
   @endisset
 #+end_src
 *** once
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/once") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/once") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: once
   # key: once
@@ -2598,7 +2598,7 @@ abstract class ${1:Class} {
   @endonce
 #+end_src
 *** php
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/php") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/php") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: php
   # key: php
@@ -2608,7 +2608,7 @@ abstract class ${1:Class} {
   @endphp
 #+end_src
 *** production
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/production") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/production") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: production
   # key: production
@@ -2618,7 +2618,7 @@ abstract class ${1:Class} {
   @endproduction
 #+end_src
 *** section
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/section") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/section") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: section
   # key: section
@@ -2628,7 +2628,7 @@ abstract class ${1:Class} {
   @endsection
 #+end_src
 *** switch
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/switch") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/switch") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: switch
   # key: switch
@@ -2642,7 +2642,7 @@ abstract class ${1:Class} {
   @endswitch
 #+end_src
 *** unless
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/unless") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/unless") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: unless
   # key: unless
@@ -2652,7 +2652,7 @@ abstract class ${1:Class} {
   @endunless
 #+end_src
 *** yield
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/yield") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/yield") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: yield
   # key: yeild
@@ -2660,7 +2660,7 @@ abstract class ${1:Class} {
   @yeild('$0')
 #+end_src
 *** while
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/web-php-blade-mode/while") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/while") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: while
   # key: while
@@ -2671,7 +2671,7 @@ abstract class ${1:Class} {
 #+end_src
 ** sh-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/sh-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/sh-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
@@ -2684,7 +2684,7 @@ abstract class ${1:Class} {
 #+end_src
 ** pass-view-mode/
 *** template
-#+begin_src snippet :tangle (expand-file-name "~/.config/emacs/snippets/pass-view-mode/template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/pass-view-mode/template") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: template
   # key: template
