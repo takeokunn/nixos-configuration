@@ -4544,6 +4544,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'org-src
     (add-to-list 'org-src-lang-modes '("base64" . base64)))
 #+end_src
+*** ob-lisp
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'ob-lisp
+    (defalias 'org-babel-execute:common-lisp 'org-babel-execute:lisp))
+#+end_src
 *** org-nix-shell
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-nix-shell-mode) "org-nix-shell" nil t)
