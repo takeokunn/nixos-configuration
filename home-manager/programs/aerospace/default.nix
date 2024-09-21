@@ -1,1 +1,6 @@
-{ home.file.".config/aerospace/aerospace.toml".source = ./aerospace.toml; }
+{
+  programs.aerospace = {
+    enable = true;
+    config = builtins.readFile ./aerospace.toml;
+  };
+}
