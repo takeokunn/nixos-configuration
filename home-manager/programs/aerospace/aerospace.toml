@@ -55,7 +55,6 @@ alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
 alt-shift-0 = ['move-node-to-workspace 10', 'workspace 10']
 
 alt-r = 'mode resize'
-alt-shift-c = 'reload-config'
 
 [mode.resize.binding]
 h = 'resize width -50'
@@ -79,7 +78,7 @@ esc = 'mode main'
 
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace 1'
+run = ["layout floating", "move-node-to-workspace 1"]
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Terminal'
