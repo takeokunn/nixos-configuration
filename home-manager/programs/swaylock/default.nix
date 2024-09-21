@@ -1,9 +1,8 @@
 { lib, pkgs }: {
   home.packages = with pkgs; lib.optionals pkgs.stdenv.isLinux [ swayidle ];
+
   programs.swaylock = {
     enable = pkgs.stdenv.isLinux;
-    # package = pkgs.swaylock-effects;
-
     settings = {
       daemonize = true;
       show-failed-attempts = true;

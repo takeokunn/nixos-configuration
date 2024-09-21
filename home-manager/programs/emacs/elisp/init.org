@@ -867,6 +867,12 @@
 
   (add-to-list 'auto-mode-alist '("\\.pu$" . plantuml-mode))
 #+END_SRC
+** po-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(po-mode) "po-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("\\.po$" . po-mode))
+#+END_SRC
 ** protobuf-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(protobuf-mode) "protobuf-mode" nil t)

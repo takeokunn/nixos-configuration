@@ -56,6 +56,7 @@ in with epkgs; [
   php-mode
   phpt-mode
   plantuml-mode
+  po-mode
   protobuf-mode
   pug-mode
   prisma-mode
