@@ -10,7 +10,7 @@ let
   wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
 
   # for window manager
-  aerospace = import ./aerospace;
+  aerospace = import ./aerospace { inherit pkgs; };
   rofi = import ./rofi { inherit pkgs; };
   sway = import ./sway;
   swaylock = import ./swaylock { inherit lib pkgs; };

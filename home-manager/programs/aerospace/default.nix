@@ -1,6 +1,6 @@
-{
+{ pkgs }: {
   programs.aerospace = {
-    enable = true;
+    enable = pkgs.stdenv.isDarwin;
     config = builtins.readFile ./aerospace.toml;
   };
 }
