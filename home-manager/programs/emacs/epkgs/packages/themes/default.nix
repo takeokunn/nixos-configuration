@@ -16,4 +16,5 @@ with epkgs; [
   volatile-highlights
   idle-highlight-mode
   font-lock-studio
+  emojify
 ]
