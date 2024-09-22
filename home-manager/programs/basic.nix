@@ -3,6 +3,7 @@ let
   bat = import ./bat { inherit pkgs sources; };
   bottom = import ./bottom;
   direnv = import ./direnv;
+  dust = import ./dust;
   editorconfig = import ./editorconfig { inherit pkgs; };
   eza = import ./eza;
   fish = import ./fish { inherit pkgs sources; };
@@ -23,6 +24,7 @@ in [
   bat
   bottom
   direnv
+  dust
   editorconfig
   eza
   fish

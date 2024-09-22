@@ -1,1 +1,9 @@
-[ ./tig.nix ./peco.nix ./wget.nix ./nyxt.nix ./lnav.nix ./aerospace.nix ]
+[
+  ./aerospace.nix
+  ./dust.nix
+  ./lnav.nix
+  ./nyxt.nix
+  ./peco.nix
+  ./tig.nix
+  ./wget.nix
+]

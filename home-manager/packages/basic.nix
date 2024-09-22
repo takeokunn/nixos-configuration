@@ -3,7 +3,6 @@ with pkgs; [
   # for terminal tools
   devbox
   devenv
-  du-dust
   nkf
   offlineimap
   openssl
