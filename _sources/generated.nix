@@ -495,15 +495,15 @@
   };
   vim-ddc-fuzzy = {
     pname = "vim-ddc-fuzzy";
-    version = "d1d52878aaab9953503092b5eb3f07e65aedf83b";
+    version = "c31f6d26b4c786f5811c042bec27ac6ce882a82f";
     src = fetchFromGitHub {
       owner = "tani";
       repo = "ddc-fuzzy";
-      rev = "d1d52878aaab9953503092b5eb3f07e65aedf83b";
+      rev = "c31f6d26b4c786f5811c042bec27ac6ce882a82f";
       fetchSubmodules = false;
-      sha256 = "sha256-jacl8HuLy18vPpibgEYKB3DdI2Rk+H/mee3cde7wFP4=";
+      sha256 = "sha256-2d2A+9r6yfmSmDAVSbQXEfl5EXNnimJFSLpXOVVUrMc=";
     };
-    date = "2024-09-13";
+    date = "2024-09-23";
   };
   vim-ddc-matcher_head = {
     pname = "vim-ddc-matcher_head";
