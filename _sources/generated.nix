@@ -459,15 +459,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "479dd6bb0edabd73f886fe913eed46b369517885";
+    version = "68b93c10819bbf0f1c0ddf162e7c052bd4a0fe77";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "479dd6bb0edabd73f886fe913eed46b369517885";
+      rev = "68b93c10819bbf0f1c0ddf162e7c052bd4a0fe77";
       fetchSubmodules = false;
-      sha256 = "sha256-37j1ke0mHVDVhaN9pMD03eUTIVb+dR+uqfq93luQ/5M=";
+      sha256 = "sha256-TpEo0k8P2K8/+OyrjCcIZWVqP+3lXUSqkWkmqqmrmr0=";
     };
-    date = "2024-09-03";
+    date = "2024-09-23";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -1179,15 +1179,15 @@
   };
   vim-friendly-snippets = {
     pname = "vim-friendly-snippets";
-    version = "00ebcaa159e817150bd83bfe2d51fa3b3377d5c4";
+    version = "00ba9dd3df89509f95437b8d595553707c46d5ea";
     src = fetchFromGitHub {
       owner = "rafamadriz";
       repo = "friendly-snippets";
-      rev = "00ebcaa159e817150bd83bfe2d51fa3b3377d5c4";
+      rev = "00ba9dd3df89509f95437b8d595553707c46d5ea";
       fetchSubmodules = false;
-      sha256 = "sha256-kwGyfXZ+jZ3PIniESUGBltBm2fRXV5ArNhSo+zosdco=";
+      sha256 = "sha256-yTsuV5unoujY0mhLINssYYBWCeefe+nJaxQHJKm7hlk=";
     };
-    date = "2024-07-14";
+    date = "2024-09-22";
   };
   vim-neco = {
     pname = "vim-neco";

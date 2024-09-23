@@ -3332,7 +3332,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pass pass-view-mode) "pass" nil t)
 
-  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/password-store/.*\\.gpg") 'pass-view-mode))
+  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/private/password-store/.*\\.gpg") 'pass-view-mode))
 
   (with-eval-after-load 'pass
     (setopt pass-suppress-confirmations t))
