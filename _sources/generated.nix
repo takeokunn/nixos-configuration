@@ -459,15 +459,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "68b93c10819bbf0f1c0ddf162e7c052bd4a0fe77";
+    version = "657e2365d2865e5774c095556098fb2a9aeace4a";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "68b93c10819bbf0f1c0ddf162e7c052bd4a0fe77";
+      rev = "657e2365d2865e5774c095556098fb2a9aeace4a";
       fetchSubmodules = false;
-      sha256 = "sha256-TpEo0k8P2K8/+OyrjCcIZWVqP+3lXUSqkWkmqqmrmr0=";
+      sha256 = "sha256-lPfeAJMSJFBXAz2Dsvo8rUCCUdVwo8EStOaZ/V+U6PA=";
     };
-    date = "2024-09-23";
+    date = "2024-09-24";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -543,15 +543,15 @@
   };
   vim-ddc-sorter_rank = {
     pname = "vim-ddc-sorter_rank";
-    version = "5566bcca71d244d5ac8d5eb97b3db3661e5d00c9";
+    version = "98d1beaa3a94c7a1198c1d6b0440bd9bde7be212";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc-sorter_rank";
-      rev = "5566bcca71d244d5ac8d5eb97b3db3661e5d00c9";
+      rev = "98d1beaa3a94c7a1198c1d6b0440bd9bde7be212";
       fetchSubmodules = false;
-      sha256 = "sha256-3HhlFlTuphpIR3JznFK8CjKhPgWLYLvXl6YVMIx16wA=";
+      sha256 = "sha256-Ppc00e61YYo+5Wl0YoR5drUt+1cVFNNleojz7eJcw6M=";
     };
-    date = "2024-09-03";
+    date = "2024-09-24";
   };
   vim-ddc-source-around = {
     pname = "vim-ddc-source-around";
@@ -591,27 +591,27 @@
   };
   vim-ddc-source-codeium = {
     pname = "vim-ddc-source-codeium";
-    version = "2eb9b9a57b4f3ce92ffcd26067b1ad99e325a841";
+    version = "f9eca2071a330c3e8c62ae243e5e30fd711dfede";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc-source-codeium";
-      rev = "2eb9b9a57b4f3ce92ffcd26067b1ad99e325a841";
+      rev = "f9eca2071a330c3e8c62ae243e5e30fd711dfede";
       fetchSubmodules = false;
-      sha256 = "sha256-micmT3OYLiYVckfge6QF1rlqZPAYw3M6n+lVu6oECco=";
+      sha256 = "sha256-UJt3lXGGe9gstIakOI+mfDEoALdLUBWiRYmUePtPPp4=";
     };
-    date = "2024-09-03";
+    date = "2024-09-24";
   };
   vim-ddc-source-file = {
     pname = "vim-ddc-source-file";
-    version = "f2e9d706a74b843d11c55c2a39bcd7e7d9ac7b24";
+    version = "34b362d45957183b4ec99d618a19a5f5f517c365";
     src = fetchFromGitHub {
       owner = "LumaKernel";
       repo = "ddc-source-file";
-      rev = "f2e9d706a74b843d11c55c2a39bcd7e7d9ac7b24";
+      rev = "34b362d45957183b4ec99d618a19a5f5f517c365";
       fetchSubmodules = false;
-      sha256 = "sha256-L7r6HLaeYIFy4VFpB1CRTC2KiMoN0OSWv8n+VI07/d8=";
+      sha256 = "sha256-SC7+7dx7kyat3J8XEa+tUxlh4lwtrOyd0iE21EcyExw=";
     };
-    date = "2024-09-20";
+    date = "2024-09-24";
   };
   vim-ddc-source-input = {
     pname = "vim-ddc-source-input";
@@ -711,15 +711,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "46bf47a864f85c1ed307494e3e4b6aca9aea823b";
+    version = "071e1eb692204cca23a8bbdf5fb28d1fd369e79b";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "46bf47a864f85c1ed307494e3e4b6aca9aea823b";
+      rev = "071e1eb692204cca23a8bbdf5fb28d1fd369e79b";
       fetchSubmodules = false;
-      sha256 = "sha256-NHATUJQfGpRPp+k+TJ1qRD0Saffx7DZVNU2cpr7PW7U=";
+      sha256 = "sha256-zJ9G21IO+TP0DYdDORwUN2FAAow8j6gp9V19UcDHkwg=";
     };
-    date = "2024-09-15";
+    date = "2024-09-24";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
@@ -1203,15 +1203,15 @@
   };
   vim-pum = {
     pname = "vim-pum";
-    version = "e18e30c02eae0463a5837e1ea692f02821fcae0e";
+    version = "287298cde6c206bd5e1853c9dfebf129eae1983e";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "pum.vim";
-      rev = "e18e30c02eae0463a5837e1ea692f02821fcae0e";
+      rev = "287298cde6c206bd5e1853c9dfebf129eae1983e";
       fetchSubmodules = false;
-      sha256 = "sha256-g0OWKZSMCBuB52gbiStYHIKTAjfJiU+jGXO/l+8wJjk=";
+      sha256 = "sha256-Ij7eIcUQr+TWIoqSNnxpKMxjLq4SH5y88gAtJxR+7FU=";
     };
-    date = "2024-08-26";
+    date = "2024-09-24";
   };
   vim-readme-viewer = {
     pname = "vim-readme-viewer";
