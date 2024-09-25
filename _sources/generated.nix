@@ -63,15 +63,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "8ddfbee370d4c6705b3bbd9532d0c722a78ba844";
+    version = "b5878d6a8c741138b5efbf4fe1c594f3fd69dbdd";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "8ddfbee370d4c6705b3bbd9532d0c722a78ba844";
+      rev = "b5878d6a8c741138b5efbf4fe1c594f3fd69dbdd";
       fetchSubmodules = false;
-      sha256 = "sha256-iMstEFd/Des5AGJY26S1MsC/lxceVr0WGFkLJpIUUZg=";
+      sha256 = "sha256-02ywlMPku1FIritZjjtxbQW6MmPvSwmRCrudYsUb8bU=";
     };
-    date = "2024-09-06";
+    date = "2024-09-25";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -459,27 +459,27 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "657e2365d2865e5774c095556098fb2a9aeace4a";
+    version = "29bdd147e0241e0b1f11fc51c990d6302f19155d";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "657e2365d2865e5774c095556098fb2a9aeace4a";
+      rev = "29bdd147e0241e0b1f11fc51c990d6302f19155d";
       fetchSubmodules = false;
-      sha256 = "sha256-lPfeAJMSJFBXAz2Dsvo8rUCCUdVwo8EStOaZ/V+U6PA=";
+      sha256 = "sha256-7gV8NRE67j5XoJf2jccgLLtKynZiiLGjrfRDpd8eiNY=";
     };
-    date = "2024-09-24";
+    date = "2024-09-25";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
-    version = "3288a5fcf9f698fe0d6f56a3d9f0cff4c121d7d7";
+    version = "f332e16ed82ec31c4a5afe3da5117e0b5e0c6902";
     src = fetchFromGitHub {
       owner = "matsui54";
       repo = "ddc-buffer";
-      rev = "3288a5fcf9f698fe0d6f56a3d9f0cff4c121d7d7";
+      rev = "f332e16ed82ec31c4a5afe3da5117e0b5e0c6902";
       fetchSubmodules = false;
-      sha256 = "sha256-Uma9+lvJaMJ3d1fC1pLLUHFEDrtUKDVVTkShycBxPg0=";
+      sha256 = "sha256-Dgohfr2aJrkVUn/Y7fWSZwJqpD9VCzgP6sqcfxjh2pY=";
     };
-    date = "2024-08-02";
+    date = "2024-09-25";
   };
   vim-ddc-converter_remove_overlap = {
     pname = "vim-ddc-converter_remove_overlap";
