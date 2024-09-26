@@ -1,6 +1,7 @@
 { pkgs }: {
   services.swayidle = {
-    enable = pkgs.stdenv.isLinux;
+    # enable = pkgs.stdenv.isLinux;
+    enable = false;
     timeouts = [
       {
         timeout = 60;

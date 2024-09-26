@@ -2,8 +2,7 @@
   home.packages = with pkgs; lib.optionals pkgs.stdenv.isLinux [ swayidle ];
 
   programs.swaylock = {
-    # enable = pkgs.stdenv.isLinux;
-    enable = false;
+    enable = pkgs.stdenv.isLinux;
     settings = {
       daemonize = true;
       show-failed-attempts = true;
