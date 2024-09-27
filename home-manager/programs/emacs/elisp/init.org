@@ -3553,7 +3553,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'slime
     ;; config
-    (setopt slime-net-coding-system 'utf-8-unix))
+    (setopt slime-net-coding-system 'utf-8-unix)
+    (setopt inferior-lisp-program "ros run -Q"))
 
   (with-eval-after-load 'slime-repl
     ;; keybinds
