@@ -36,7 +36,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: prepare nix
-        uses: cachix/install-nix-action@V28
+        uses: cachix/install-nix-action@v29
       - name: flake check
         run: nix flake check
   dependabot:
