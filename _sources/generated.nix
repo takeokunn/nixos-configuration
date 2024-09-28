@@ -435,15 +435,15 @@
   };
   skkeleton = {
     pname = "skkeleton";
-    version = "1035184420cfff705770a5b04aabe0ed0acb4db8";
+    version = "438737ec49bcf1303521bdcccb5e06ced7b60c5e";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "1035184420cfff705770a5b04aabe0ed0acb4db8";
+      rev = "438737ec49bcf1303521bdcccb5e06ced7b60c5e";
       fetchSubmodules = false;
-      sha256 = "sha256-u1Bd/tNpftheBkIRunu29h3VWISGcu38dbRdui8WRqc=";
+      sha256 = "sha256-beQDAlgM9E3Xy+xQMAIfqrc7/j5ahboHi2Wa8T8zQFU=";
     };
-    date = "2024-09-20";
+    date = "2024-09-28";
   };
   sublime-gleam = {
     pname = "sublime-gleam";
@@ -1131,27 +1131,27 @@
   };
   vim-ddu-ui-ff = {
     pname = "vim-ddu-ui-ff";
-    version = "7593f81fde3846d47695422bec00e70868b111fc";
+    version = "87a31610a864c46f2e3b519fe4d3bba03365f3dd";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-ff";
-      rev = "7593f81fde3846d47695422bec00e70868b111fc";
+      rev = "87a31610a864c46f2e3b519fe4d3bba03365f3dd";
       fetchSubmodules = false;
-      sha256 = "sha256-kNMKjEYmbmjZD4etwM61XBDyhxmbMtrY4UkzkNCO2Sw=";
+      sha256 = "sha256-J4bTaNa9sStnZX3VnPaXABKxCncSdxxA6N4CH8GCvCQ=";
     };
-    date = "2024-09-19";
+    date = "2024-09-28";
   };
   vim-ddu-ui-filer = {
     pname = "vim-ddu-ui-filer";
-    version = "447fcdf8a91e5872bc18ef4630ca1c4b35f3039b";
+    version = "279909ba565ce585587d376aab0828fdb4dc1f14";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-filer";
-      rev = "447fcdf8a91e5872bc18ef4630ca1c4b35f3039b";
+      rev = "279909ba565ce585587d376aab0828fdb4dc1f14";
       fetchSubmodules = false;
-      sha256 = "sha256-4da8eeyArrV0ckYFhM7877QxNgkPp0759x7o5FmliHI=";
+      sha256 = "sha256-lt8Tgm3B+CYGTkI0wpBhvdzB4Gk/r3RoHTdWCSmvVrQ=";
     };
-    date = "2024-09-19";
+    date = "2024-09-28";
   };
   vim-denippet = {
     pname = "vim-denippet";
