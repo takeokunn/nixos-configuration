@@ -261,7 +261,7 @@
     },
     "emacs-llm": {
         "cargoLocks": null,
-        "date": "2024-09-17",
+        "date": "2024-09-28",
         "extract": null,
         "name": "emacs-llm",
         "passthru": null,
@@ -273,11 +273,11 @@
             "name": null,
             "owner": "ahyatt",
             "repo": "llm",
-            "rev": "7ca20902f2546cb46a9efa22d000aa79992b1c07",
-            "sha256": "sha256-BCuUQYN19lRP2diFCVscJU0GczS43LZ+KVyB9yn4kDE=",
+            "rev": "406cb0d69dccdd3b0c65306a4d35c5df2afb7131",
+            "sha256": "sha256-QucigH6K401GCZNaZ6x1ZJk/iww68v2XBsBx4SbJ/E0=",
             "type": "github"
         },
-        "version": "7ca20902f2546cb46a9efa22d000aa79992b1c07"
+        "version": "406cb0d69dccdd3b0c65306a4d35c5df2afb7131"
     },
     "emacs-mu4e-dashboard": {
         "cargoLocks": null,
@@ -2001,7 +2001,7 @@
     },
     "vim-pum": {
         "cargoLocks": null,
-        "date": "2024-09-24",
+        "date": "2024-09-29",
         "extract": null,
         "name": "vim-pum",
         "passthru": null,
@@ -2013,11 +2013,11 @@
             "name": null,
             "owner": "Shougo",
             "repo": "pum.vim",
-            "rev": "287298cde6c206bd5e1853c9dfebf129eae1983e",
-            "sha256": "sha256-Ij7eIcUQr+TWIoqSNnxpKMxjLq4SH5y88gAtJxR+7FU=",
+            "rev": "fd14ce2c1d4a378d50b6532bb05e7ad7935930c1",
+            "sha256": "sha256-AZ0b7OJCSN4IEvmewLVMuLTpvpG4aXr169a2Yi0HVjI=",
             "type": "github"
         },
-        "version": "287298cde6c206bd5e1853c9dfebf129eae1983e"
+        "version": "fd14ce2c1d4a378d50b6532bb05e7ad7935930c1"
     },
     "vim-readme-viewer": {
         "cargoLocks": null,
@@ -2041,7 +2041,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-09-27",
+        "date": "2024-09-29",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2053,10 +2053,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "0f266abd6808603ba94d74ea9a9596ab6fc7844a",
-            "sha256": "sha256-Ir27A1TYt6H1O9sV6+y62uMmOb+CWgTGQL5+sDCkxuA=",
+            "rev": "35b50adf0d41df2a2e04686d210a549ec6aa100c",
+            "sha256": "sha256-epdoNViFmtl4G/SDWX50zHeF9uotd3/VFC8eGa7prUI=",
             "type": "github"
         },
-        "version": "0f266abd6808603ba94d74ea9a9596ab6fc7844a"
+        "version": "35b50adf0d41df2a2e04686d210a549ec6aa100c"
     }
 }
