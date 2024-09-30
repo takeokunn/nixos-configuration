@@ -1203,15 +1203,15 @@
   };
   vim-pum = {
     pname = "vim-pum";
-    version = "fd14ce2c1d4a378d50b6532bb05e7ad7935930c1";
+    version = "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "pum.vim";
-      rev = "fd14ce2c1d4a378d50b6532bb05e7ad7935930c1";
+      rev = "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e";
       fetchSubmodules = false;
-      sha256 = "sha256-AZ0b7OJCSN4IEvmewLVMuLTpvpG4aXr169a2Yi0HVjI=";
+      sha256 = "sha256-WxoANiROXuWjp4y5j3IGjLv7AE4trukDUCjq8XwNTH8=";
     };
-    date = "2024-09-29";
+    date = "2024-09-30";
   };
   vim-readme-viewer = {
     pname = "vim-readme-viewer";
