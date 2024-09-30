@@ -1,23 +1,18 @@
 { pkgs }:
 with pkgs; [
   # for terminal tools
+  dasel
   devbox
   devenv
-  nkf
   offlineimap
   openssl
   pv
   rlwrap
-  tree
   unixtools.procps
   unixtools.watch
 
-  # for query
-  csvq
-  jq
-  yq
-
   # for git
+  gh
   ghq
 
   # for password tools
