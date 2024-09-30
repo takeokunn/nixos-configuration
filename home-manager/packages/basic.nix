@@ -6,8 +6,6 @@ with pkgs; [
   devenv
   offlineimap
   openssl
-  pv
-  rlwrap
   unixtools.procps
   unixtools.watch
 
