@@ -60,13 +60,51 @@
 
       diff = { patience = true; };
 
+      # thanks https://github.com/dracula/git/blob/master/config/gitconfig
       color = {
         ui = "auto";
-        status = "auto";
-        diff = "auto";
-        branch = "auto";
-        interactive = "auto";
-        grep = "auto";
+        status = {
+          added = "green";
+          changed = "yellow";
+          header = "";
+          localBranch = "";
+          nobranch = "";
+          remoteBranch = "cyan bold";
+          unmerged = "magenta bold reverse";
+          untracked = "red";
+          updated = "green bold";
+        };
+        diff = {
+          commit = "";
+          func = "cyan";
+          plain = "";
+          whitespace = "magenta reverse";
+          meta = "white";
+          frag = "cyan bold reverse";
+          old = "red";
+          new = "green";
+        };
+        branch = {
+          current = "cyan bold reverse";
+          local = "white";
+          plain = "";
+          remote = "cyan";
+        };
+        interactive = {
+          error = "";
+          header = "";
+          help = "";
+          prompt = "";
+        };
+        grep = {
+          context = "";
+          filename = "";
+          function = "";
+          linenumber = "white";
+          match = "";
+          selected = "";
+          separator = "";
+        };
       };
 
       url = { "git@github.com:".insteadOf = "https://github.com/"; };
