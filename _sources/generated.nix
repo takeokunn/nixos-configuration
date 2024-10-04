@@ -159,15 +159,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "805ce30fc8fb0c7e0cbbc90eca61a2ac81d0c061";
+    version = "c81b44943b2bfeac5114566ab5ad66640bad1e3e";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "805ce30fc8fb0c7e0cbbc90eca61a2ac81d0c061";
+      rev = "c81b44943b2bfeac5114566ab5ad66640bad1e3e";
       fetchSubmodules = false;
-      sha256 = "sha256-qzN1iBF48uuMQgUGF79xr/c1/6tZN9iqpk0+kCj8ci4=";
+      sha256 = "sha256-oJI4cm6suy7RIVBWv5oCl9A8Al/XkmY9RVm1G+0fczE=";
     };
-    date = "2024-09-30";
+    date = "2024-10-03";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
