@@ -16,7 +16,7 @@ let
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
   ripgrep = import ./ripgrep;
-  tig = import ./tig { inherit pkgs; };
+  tig = import ./tig { inherit pkgs sources; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
   wget = import ./wget { inherit pkgs; };

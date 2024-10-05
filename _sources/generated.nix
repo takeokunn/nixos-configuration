@@ -37,6 +37,18 @@
     };
     date = "2023-08-30";
   };
+  dracula-tig = {
+    pname = "dracula-tig";
+    version = "e8a3387d8353e90cca41f5d89c3e1f74f1f7c8c6";
+    src = fetchFromGitHub {
+      owner = "dracula";
+      repo = "tig";
+      rev = "e8a3387d8353e90cca41f5d89c3e1f74f1f7c8c6";
+      fetchSubmodules = false;
+      sha256 = "sha256-PnBuQJWCqARvjZg/Mfi7imcTa+I4VYvnYSt+GGMzxCQ=";
+    };
+    date = "2022-03-20";
+  };
   emacs-bazel-mode = {
     pname = "emacs-bazel-mode";
     version = "769b30dc18282564d614d7044195b5a0c1a0a5f3";
@@ -1203,15 +1215,15 @@
   };
   vim-pum = {
     pname = "vim-pum";
-    version = "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e";
+    version = "5997cfc3b7941bde582aab276ff82e9a5f43db66";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "pum.vim";
-      rev = "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e";
+      rev = "5997cfc3b7941bde582aab276ff82e9a5f43db66";
       fetchSubmodules = false;
-      sha256 = "sha256-WxoANiROXuWjp4y5j3IGjLv7AE4trukDUCjq8XwNTH8=";
+      sha256 = "sha256-0Ua7nGR2ceuPXBWJdd7i5c3UyUUKmsFyVdxGaDrF+ms=";
     };
-    date = "2024-09-30";
+    date = "2024-10-05";
   };
   vim-readme-viewer = {
     pname = "vim-readme-viewer";
@@ -1227,14 +1239,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "99ed855350260dc628816e903c7e22c7a195087d";
+    version = "6d8f3ddf53e20c36defa78bb48c33d2a773c4580";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "99ed855350260dc628816e903c7e22c7a195087d";
+      rev = "6d8f3ddf53e20c36defa78bb48c33d2a773c4580";
       fetchSubmodules = false;
-      sha256 = "sha256-X1i+xJICXe+rf9G+VV4spRP/O0J78euLh3CPXBLEJ2E=";
+      sha256 = "sha256-Kbd2J24Dt5YsGZEvVmbR+K17ByTPFes1842/aMYniYg=";
     };
-    date = "2024-10-03";
+    date = "2024-10-04";
   };
 }

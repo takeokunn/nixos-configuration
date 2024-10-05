@@ -59,6 +59,26 @@
         },
         "version": "456d3289827964a6cb503a3b0a6448f4326f291b"
     },
+    "dracula-tig": {
+        "cargoLocks": null,
+        "date": "2022-03-20",
+        "extract": null,
+        "name": "dracula-tig",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "dracula",
+            "repo": "tig",
+            "rev": "e8a3387d8353e90cca41f5d89c3e1f74f1f7c8c6",
+            "sha256": "sha256-PnBuQJWCqARvjZg/Mfi7imcTa+I4VYvnYSt+GGMzxCQ=",
+            "type": "github"
+        },
+        "version": "e8a3387d8353e90cca41f5d89c3e1f74f1f7c8c6"
+    },
     "emacs-bazel-mode": {
         "cargoLocks": null,
         "date": "2023-09-19",
@@ -2001,7 +2021,7 @@
     },
     "vim-pum": {
         "cargoLocks": null,
-        "date": "2024-09-30",
+        "date": "2024-10-05",
         "extract": null,
         "name": "vim-pum",
         "passthru": null,
@@ -2013,11 +2033,11 @@
             "name": null,
             "owner": "Shougo",
             "repo": "pum.vim",
-            "rev": "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e",
-            "sha256": "sha256-WxoANiROXuWjp4y5j3IGjLv7AE4trukDUCjq8XwNTH8=",
+            "rev": "5997cfc3b7941bde582aab276ff82e9a5f43db66",
+            "sha256": "sha256-0Ua7nGR2ceuPXBWJdd7i5c3UyUUKmsFyVdxGaDrF+ms=",
             "type": "github"
         },
-        "version": "30ecd0e6169c0311ce212c41d6ff3c16ea959d8e"
+        "version": "5997cfc3b7941bde582aab276ff82e9a5f43db66"
     },
     "vim-readme-viewer": {
         "cargoLocks": null,
@@ -2041,7 +2061,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-10-03",
+        "date": "2024-10-04",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2053,10 +2073,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "99ed855350260dc628816e903c7e22c7a195087d",
-            "sha256": "sha256-X1i+xJICXe+rf9G+VV4spRP/O0J78euLh3CPXBLEJ2E=",
+            "rev": "6d8f3ddf53e20c36defa78bb48c33d2a773c4580",
+            "sha256": "sha256-Kbd2J24Dt5YsGZEvVmbR+K17ByTPFes1842/aMYniYg=",
             "type": "github"
         },
-        "version": "99ed855350260dc628816e903c7e22c7a195087d"
+        "version": "6d8f3ddf53e20c36defa78bb48c33d2a773c4580"
     }
 }

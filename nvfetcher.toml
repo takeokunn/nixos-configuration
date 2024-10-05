@@ -1,3 +1,9 @@
+# for tig
+[dracula-tig]
+src.git = "https://github.com/dracula/tig"
+src.branch = "master"
+fetch.github = "dracula/tig"
+
 # for bat
 
 [dracula-sublime]
