@@ -289,6 +289,30 @@
     };
     date = "2023-11-26";
   };
+  emacs-plz-event-source = {
+    pname = "emacs-plz-event-source";
+    version = "1d584eb8d015faa839141ac68e934dde89a6e2ab";
+    src = fetchFromGitHub {
+      owner = "r0man";
+      repo = "plz-event-source";
+      rev = "1d584eb8d015faa839141ac68e934dde89a6e2ab";
+      fetchSubmodules = false;
+      sha256 = "sha256-V64y+9AwsbmMVfJux8WIDwP1vYuQpl5d4UBrGg4mDjo=";
+    };
+    date = "2024-09-24";
+  };
+  emacs-plz-media-type = {
+    pname = "emacs-plz-media-type";
+    version = "ce83948804b543cb1e22d80cc88f4bee7a23780d";
+    src = fetchFromGitHub {
+      owner = "r0man";
+      repo = "plz-media-type";
+      rev = "ce83948804b543cb1e22d80cc88f4bee7a23780d";
+      fetchSubmodules = false;
+      sha256 = "sha256-ueX/L/5xHPjV6rO4uQc4/ZZvmk235y9Zc3rkfAfUo/0=";
+    };
+    date = "2024-09-24";
+  };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
     version = "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e";

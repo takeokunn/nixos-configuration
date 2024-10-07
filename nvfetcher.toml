@@ -190,6 +190,16 @@ src.git = "https://github.com/yewton/sudden-death.el"
 src.branch = "master"
 fetch.github = "yewton/sudden-death.el"
 
+[emacs-plz-event-source]
+src.git = "https://github.com/r0man/plz-event-source"
+src.branch = "main"
+fetch.github = "r0man/plz-event-source"
+
+[emacs-plz-media-type]
+src.git = "https://github.com/r0man/plz-media-type"
+src.branch = "main"
+fetch.github = "r0man/plz-media-type"
+
 # for neovim
 
 [vimdoc-ja]

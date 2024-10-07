@@ -479,6 +479,46 @@
         },
         "version": "a6441224da04656370e993e2616185cc31afaff9"
     },
+    "emacs-plz-event-source": {
+        "cargoLocks": null,
+        "date": "2024-09-24",
+        "extract": null,
+        "name": "emacs-plz-event-source",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "r0man",
+            "repo": "plz-event-source",
+            "rev": "1d584eb8d015faa839141ac68e934dde89a6e2ab",
+            "sha256": "sha256-V64y+9AwsbmMVfJux8WIDwP1vYuQpl5d4UBrGg4mDjo=",
+            "type": "github"
+        },
+        "version": "1d584eb8d015faa839141ac68e934dde89a6e2ab"
+    },
+    "emacs-plz-media-type": {
+        "cargoLocks": null,
+        "date": "2024-09-24",
+        "extract": null,
+        "name": "emacs-plz-media-type",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "r0man",
+            "repo": "plz-media-type",
+            "rev": "ce83948804b543cb1e22d80cc88f4bee7a23780d",
+            "sha256": "sha256-ueX/L/5xHPjV6rO4uQc4/ZZvmk235y9Zc3rkfAfUo/0=",
+            "type": "github"
+        },
+        "version": "ce83948804b543cb1e22d80cc88f4bee7a23780d"
+    },
     "emacs-rainbow-csv": {
         "cargoLocks": null,
         "date": "2024-07-21",
