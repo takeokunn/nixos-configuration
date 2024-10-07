@@ -26,6 +26,7 @@
     extraConfig = ''
       set -g pane-base-index 1
       set -g display-panes-time 15000
+      set -g default-command $SHELL
 
       set-option -g status-position top
       set-option -g status-right '[%Y-%m-%d(%a) %H:%M]'
