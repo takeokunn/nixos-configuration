@@ -1,6 +1,8 @@
 { username }: {
   services = {
     ntp.enable = true;
+    cachix-agent.enable = true;
+
     ollama = {
       enable = true;
       acceleration = "rocm";
