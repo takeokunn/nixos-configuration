@@ -2,6 +2,7 @@
   services = {
     ntp.enable = true;
     cachix-agent.enable = true;
+    cachix-watch-store.enable = true;
 
     ollama = {
       enable = true;

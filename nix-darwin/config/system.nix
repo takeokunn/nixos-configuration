@@ -10,6 +10,10 @@
         AppleShowAllExtensions = true;
         _FXShowPosixPathInTitle = true;
       };
+      universalaccess = {
+        reduceMotion = true;
+        reduceTransparency = true;
+      };
       dock = {
         autohide = true;
         show-recents = false;
@@ -22,8 +26,9 @@
       };
     };
 
+    environment.shells = with pkgs; [ fish ];
+
     activationScripts.extraActivation.text = ''
-      chsh -s ${pkgs.fish}/bin/fish
       softwareupdate --all --install
     '';
   };
