@@ -6,8 +6,8 @@ in with epkgs; [
   eshell-z
   fish-completion
   packages.eshell-multiple
-  packages.eshell-syntax-highlighting
-  packages.eshell-fringe-status
+  eshell-syntax-highlighting
+  eshell-fringe-status
   # eat
   mistty
 ]

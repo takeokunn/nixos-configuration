@@ -1570,14 +1570,7 @@
     ;; config
     (setopt eglot-events-buffer-size nil)
     (setopt eglot-autoshutdown t)
-    (setopt eglot-extend-to-xref t)
-
-    ;; language server
-    ;; (add-to-list 'eglot-server-programs '(php-mode . ("intelephense" "--stdio")))
-    ;; (add-to-list 'eglot-server-programs '(clojure-mode clojurescript-mode clojurec-mode
-    ;;                                                    . ("/Users/take/.emacs.d/.cache/lsp/clojure/clojure-lsp"
-    ;;                                                       "listen" "--verbose")))
-    )
+    (setopt eglot-extend-to-xref t))
 #+end_src
 *** lsp-mode
 #+begin_src emacs-lisp :tangle yes
@@ -3326,6 +3319,12 @@
   (keymap-global-set "C-c C-l s" #'lorem-ipsum-insert-sentences)
   (keymap-global-set "C-c C-l p" #'lorem-ipsum-insert-paragraphs)
   (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
+#+end_src
+*** zalgo-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(zalgo-transform-word
+  		     zalgo-mode
+  		     zalgo-transform-region) "zalgo-mode" nil t)
 #+end_src
 ** Password
 *** pass

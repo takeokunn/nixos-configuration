@@ -14,4 +14,12 @@
 
     ignoreCompilationError = false;
   };
+
+  zalgo-mode = epkgs.melpaBuild {
+    pname = "zalgo-mode";
+    version = "0.0.1";
+    src = sources.emacs-zalgo-mode.src;
+
+    ignoreCompilationError = false;
+  };
 }

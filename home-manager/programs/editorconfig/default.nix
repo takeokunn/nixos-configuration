@@ -25,7 +25,7 @@
       "*.{yml,yaml}" = { indent_size = 2; };
       "*.tf" = { indent_size = 2; };
       "*.scala" = { indent_size = 2; };
-      "package.json" = { indent_size = 2; };
+      "*.json" = { indent_size = 2; };
       "*.{el,lisp,asd}" = { max_line_length = 80; };
       "*.v" = {
         indent_size = 4;
@@ -38,5 +38,4 @@
       "*.nix" = { indent_size = 2; };
     };
   };
-
 }
