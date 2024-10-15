@@ -1167,15 +1167,15 @@
   };
   vim-ddu-ui-filer = {
     pname = "vim-ddu-ui-filer";
-    version = "6a019b2b0fcdcc79dca90807ed24dc899b7e5d13";
+    version = "6fe710f3be4309386ad992e750e05f7cf80e73f9";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-filer";
-      rev = "6a019b2b0fcdcc79dca90807ed24dc899b7e5d13";
+      rev = "6fe710f3be4309386ad992e750e05f7cf80e73f9";
       fetchSubmodules = false;
-      sha256 = "sha256-Fkb0Q/8QqvBTRCESL+FgMiMhXTCwr2rp2iDaY8yIcWU=";
+      sha256 = "sha256-scM7MVkJ6NM64pPjTXB7hJ9rcEWZb5tftmRrJ9VdCIw=";
     };
-    date = "2024-10-03";
+    date = "2024-10-15";
   };
   vim-denippet = {
     pname = "vim-denippet";
