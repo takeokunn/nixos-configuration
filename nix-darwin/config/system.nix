@@ -26,8 +26,6 @@
       };
     };
 
-    environment.shells = with pkgs; [ fish ];
-
     activationScripts.extraActivation.text = ''
       softwareupdate --all --install
     '';
