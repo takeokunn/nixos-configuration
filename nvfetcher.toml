@@ -90,20 +90,10 @@ src.git = "https://github.com/takeokunn/fish-repl.el"
 src.branch = "main"
 fetch.github = "takeokunn/fish-repl.el"
 
-[emacs-eshell-fringe-status]
-src.git = "https://github.com/ryuslash/eshell-fringe-status"
-src.branch = "master"
-fetch.github = "ryuslash/eshell-fringe-status"
-
 [emacs-eshell-multiple]
 src.git = "https://github.com/takeokunn/eshell-multiple"
 src.branch = "main"
 fetch.github = "takeokunn/eshell-multiple"
-
-[emacs-eshell-syntax-highlighting]
-src.git = "https://github.com/akreisher/eshell-syntax-highlighting"
-src.branch = "master"
-fetch.github = "akreisher/eshell-syntax-highlighting"
 
 [emacs-bazel-mode]
 src.git = "https://github.com/bazelbuild/emacs-bazel-mode"
@@ -199,6 +189,11 @@ fetch.github = "r0man/plz-event-source"
 src.git = "https://github.com/r0man/plz-media-type"
 src.branch = "main"
 fetch.github = "r0man/plz-media-type"
+
+[emacs-zalgo-mode]
+src.git = "https://github.com/nehrbash/zalgo-mode"
+src.branch = "main"
+fetch.github = "nehrbash/zalgo-mode"
 
 # for neovim
 

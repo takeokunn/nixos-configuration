@@ -4,7 +4,7 @@ in {
   programs.emacs = {
     enable = true;
     package = pkgs.emacsWithPackagesFromUsePackage {
-      config = ./elisp/init.org;
+      config = builtins.toFile "empty.el" "";
       defaultInitFile = true;
       package = pkgs.emacs-git;
       alwaysTangle = true;

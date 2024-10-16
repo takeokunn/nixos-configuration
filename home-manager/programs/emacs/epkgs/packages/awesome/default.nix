@@ -31,6 +31,7 @@ in with epkgs; [
   packages.sudden-death
   redacted
   lorem-ipsum
+  packages.zalgo-mode
 
   # Minor Modes
   command-log-mode
