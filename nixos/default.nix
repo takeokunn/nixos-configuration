@@ -9,7 +9,6 @@ let
   programs = import ./config/programs.nix;
   security = import ./config/security.nix { inherit username; };
   services = import ./config/services.nix { inherit username; };
-  sops = import ./config/sops.nix;
   systemd = import ./config/systemd.nix;
   time = import ./config/time.nix;
   users = import ./config/users.nix { inherit pkgs username; };
@@ -27,7 +26,6 @@ in {
     programs
     security
     services
-    sops
     systemd
     time
     users

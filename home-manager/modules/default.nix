@@ -4,6 +4,7 @@
   ./lnav.nix
   ./nyxt.nix
   ./peco.nix
+  ./sops.nix
   ./tig.nix
   ./wget.nix
 ]
