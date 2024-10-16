@@ -147,15 +147,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "c81b44943b2bfeac5114566ab5ad66640bad1e3e";
+    version = "d68649bdf02bd6e3b554f3cb14204f885b7a63ff";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "c81b44943b2bfeac5114566ab5ad66640bad1e3e";
+      rev = "d68649bdf02bd6e3b554f3cb14204f885b7a63ff";
       fetchSubmodules = false;
-      sha256 = "sha256-oJI4cm6suy7RIVBWv5oCl9A8Al/XkmY9RVm1G+0fczE=";
+      sha256 = "sha256-sC26M1e8X56nIPzftSrGlXETcnSutDv53ROQG2RseK0=";
     };
-    date = "2024-10-03";
+    date = "2024-10-15";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -483,15 +483,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "517a127d10b7babe46647fd571ae468cf3a2b647";
+    version = "ae43c61dd0ebcf6ce7549c7c7bfebcdfaeac7d07";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "517a127d10b7babe46647fd571ae468cf3a2b647";
+      rev = "ae43c61dd0ebcf6ce7549c7c7bfebcdfaeac7d07";
       fetchSubmodules = false;
-      sha256 = "sha256-EQWqAU+9ENRUcc67d9Cy6d3ZPTGqr6XrENfPiOGoXPg=";
+      sha256 = "sha256-xcHL/TE7DRWrh+P5sKh3SfV7oqnuR/ptuoY1O338qnM=";
     };
-    date = "2024-10-14";
+    date = "2024-10-16";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -735,15 +735,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "53ba00ff2aa9a06c74680e2e520364afe071d799";
+    version = "9bb89d84e7556aaa2a0fbc805d3d8340d04cd98d";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "53ba00ff2aa9a06c74680e2e520364afe071d799";
+      rev = "9bb89d84e7556aaa2a0fbc805d3d8340d04cd98d";
       fetchSubmodules = false;
-      sha256 = "sha256-yvM4BaXzRFicniDjeVRJZ9Dbn0atJ6kL20+whMS9YoU=";
+      sha256 = "sha256-t7JF/jloMaoqx1AowK5xaGnytKZIIKX8mG77u3g0dMA=";
     };
-    date = "2024-10-07";
+    date = "2024-10-16";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
