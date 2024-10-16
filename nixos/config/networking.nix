@@ -16,7 +16,7 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            psk = "uengspy3bwdkb";
+            psk = config.sops.secrets.home-wifi-psk.path;
           };
         };
       };

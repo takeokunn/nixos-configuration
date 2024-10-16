@@ -8,14 +8,15 @@ let
   eza = import ./eza;
   fish = import ./fish { inherit pkgs sources; };
   gnupg = import ./gnupg;
+  lnav = import ./lnav;
   man = import ./man;
   misc = import ./misc;
   mu = import ./mu;
-  lnav = import ./lnav;
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
   ripgrep = import ./ripgrep;
+  sops = import ./sops;
   tig = import ./tig { inherit pkgs sources; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
@@ -29,14 +30,15 @@ in [
   eza
   fish
   gnupg
+  lnav
   man
   misc
   mu
-  lnav
   password-store
   peco
   readline
   ripgrep
+  sops
   tig
   tmux
   vim
