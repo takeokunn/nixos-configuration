@@ -181,6 +181,18 @@
     };
     date = "2024-03-27";
   };
+  emacs-ob-racket = {
+    pname = "emacs-ob-racket";
+    version = "c7b7eee58fcde2ad515b72288742e555e7ec7915";
+    src = fetchFromGitHub {
+      owner = "hasu";
+      repo = "emacs-ob-racket";
+      rev = "c7b7eee58fcde2ad515b72288742e555e7ec7915";
+      fetchSubmodules = false;
+      sha256 = "sha256-yv+PP1JyEvMxEToNbgDbgWih/GHdauwfYLzPaEPsEC8=";
+    };
+    date = "2024-05-31";
+  };
   emacs-ob-treesitter = {
     pname = "emacs-ob-treesitter";
     version = "c3fac35f95dcaffdb90836c606d119717c43238d";
@@ -1251,14 +1263,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "e49e736d1d71dc0692d13badf2c0b335f615d394";
+    version = "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "e49e736d1d71dc0692d13badf2c0b335f615d394";
+      rev = "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c";
       fetchSubmodules = false;
-      sha256 = "sha256-4+vbT4qY8z1MDnTp7zzgVuyn5GIsgPOUNUcjWBBqNKo=";
+      sha256 = "sha256-7BwblbzPcvQ1JwJ9io2fxOXhrn/T1umonCyhMPoxaTQ=";
     };
-    date = "2024-10-14";
+    date = "2024-10-17";
   };
 }

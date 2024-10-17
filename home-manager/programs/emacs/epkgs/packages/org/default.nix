@@ -51,6 +51,7 @@ in with epkgs; [
   ob-dart
   ob-fsharp
   packages.ob-treesitter
+  packages.ob-racket
   ob-base64
   org-nix-shell
 

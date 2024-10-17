@@ -299,6 +299,26 @@
         },
         "version": "c77355e70703affffb166b7100b9e9f3efb21c6e"
     },
+    "emacs-ob-racket": {
+        "cargoLocks": null,
+        "date": "2024-05-31",
+        "extract": null,
+        "name": "emacs-ob-racket",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "hasu",
+            "repo": "emacs-ob-racket",
+            "rev": "c7b7eee58fcde2ad515b72288742e555e7ec7915",
+            "sha256": "sha256-yv+PP1JyEvMxEToNbgDbgWih/GHdauwfYLzPaEPsEC8=",
+            "type": "github"
+        },
+        "version": "c7b7eee58fcde2ad515b72288742e555e7ec7915"
+    },
     "emacs-ob-treesitter": {
         "cargoLocks": null,
         "date": "2024-01-06",
@@ -2081,7 +2101,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-10-14",
+        "date": "2024-10-17",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2093,10 +2113,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "e49e736d1d71dc0692d13badf2c0b335f615d394",
-            "sha256": "sha256-4+vbT4qY8z1MDnTp7zzgVuyn5GIsgPOUNUcjWBBqNKo=",
+            "rev": "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c",
+            "sha256": "sha256-7BwblbzPcvQ1JwJ9io2fxOXhrn/T1umonCyhMPoxaTQ=",
             "type": "github"
         },
-        "version": "e49e736d1d71dc0692d13badf2c0b335f615d394"
+        "version": "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c"
     }
 }

@@ -33,6 +33,14 @@
     ignoreCompilationError = false;
   };
 
+  ob-racket = epkgs.melpaBuild {
+    pname = "ob-racket";
+    version = "0.0.1";
+    src = sources.emacs-ob-racket.src;
+
+    ignoreCompilationError = false;
+  };
+
   ob-treesitter = epkgs.melpaBuild {
     pname = "ob-treesitter";
     version = "0.0.1";

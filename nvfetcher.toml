@@ -140,6 +140,11 @@ src.git = "https://github.com/takeokunn/ob-treesitter"
 src.branch = "main"
 fetch.github = "takeokunn/ob-treesitter"
 
+[emacs-ob-racket]
+src.git = "https://github.com/hasu/emacs-ob-racket"
+src.branch = "master"
+fetch.github = "hasu/emacs-ob-racket"
+
 [emacs-ox-hatena]
 src.git = "https://github.com/zonkyy/ox-hatena"
 src.branch = "master"

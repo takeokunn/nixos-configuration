@@ -913,6 +913,10 @@
 
   (add-to-list 'auto-mode-alist '("\\.pr[io]$" . qt-pro-mode))
 #+end_src
+** racket-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(racket-mode) "racket-mode" nil t)
+#+end_src
 ** robots-txt-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(robots-txt-mode) "robots-txt-mode" nil t)
@@ -4561,6 +4565,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ob-lisp
     (defalias 'org-babel-execute:common-lisp 'org-babel-execute:lisp))
+#+end_src
+*** ob-racket
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-babel-execute:racket) "ob-racket" nil t)
+
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("racket" . racket)))
 #+end_src
 *** org-nix-shell
 #+begin_src emacs-lisp :tangle yes

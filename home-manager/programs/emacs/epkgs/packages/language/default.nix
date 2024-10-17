@@ -63,6 +63,7 @@ in with epkgs; [
   processing-mode
   python-mode
   qt-pro-mode
+  racket-mode
   robots-txt-mode
   rust-mode
   scala-mode
