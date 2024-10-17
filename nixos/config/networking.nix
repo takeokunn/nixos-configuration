@@ -1,4 +1,4 @@
-{ config }: {
+{
   networking = {
     hostName = "nixos";
     networkmanager = {
@@ -16,7 +16,7 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            psk = config.sops.secrets.home-wifi-psk.path;
+            psk = "uengspy3bwdkb";
           };
         };
       };
