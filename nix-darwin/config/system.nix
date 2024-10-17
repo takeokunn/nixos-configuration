@@ -10,10 +10,6 @@
         AppleShowAllExtensions = true;
         _FXShowPosixPathInTitle = true;
       };
-      universalaccess = {
-        reduceMotion = true;
-        reduceTransparency = true;
-      };
       dock = {
         autohide = true;
         show-recents = false;
