@@ -4354,9 +4354,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-hyperscheduler-open) "org-hyperscheduler" nil t)
 #+end_src
-*** org-timeblock
+*** TODO org-timeblock
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-timeblock-list org-timeblock-mode) "org-timeblock" nil t)
+  ;; (autoload-if-found '(org-timeblock-list org-timeblock-mode) "org-timeblock" nil t)
 #+end_src
 ** Org External Tools
 *** org-redmine

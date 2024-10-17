@@ -28,7 +28,7 @@ in with epkgs; [
   # Org Agenda
   org-super-agenda
   org-hyperscheduler
-  org-timeblock
+  # org-timeblock
 
   # Org External Tools
   org-redmine

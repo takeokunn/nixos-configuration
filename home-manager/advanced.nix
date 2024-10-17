@@ -3,6 +3,9 @@
 let
   lib = nixpkgs.lib;
 
+  # nvfetcher
+  sources = pkgs.callPackage ../_sources/generated.nix { };
+
   # packages
   pkgs = import nixpkgs {
     inherit system;
@@ -16,7 +19,6 @@ let
   modules = import ./modules;
 
   # programs
-  sources = pkgs.callPackage ../_sources/generated.nix { };
   basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
   advancedPrograms = import ./programs/advanced.nix {
     inherit lib pkgs wezterm-flake neovim-nightly-overlay org-babel sources;
