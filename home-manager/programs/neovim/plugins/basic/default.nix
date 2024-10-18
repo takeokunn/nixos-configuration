@@ -7,7 +7,7 @@ in with pkgs.vimPlugins; [
     plugin = hop-nvim;
     config = ''
       require('hop').setup { }
-      -- vim.keymap.set('n', 's', '<Cmd>HopChar1<CR>')
+      vim.keymap.set('n', 'f', '<Cmd>HopChar1<CR>')
     '';
   }
   {
@@ -56,6 +56,7 @@ in with pkgs.vimPlugins; [
     config = ''
       local builtin = require('telescope.builtin')
       vim.keymap.set('n', '<leader>ff', builtin.git_files, { desc = 'Telescope find git files' })
+      vim.keymap.set('n', '<leader>fo', builtin.current_buffer_fuzzy_find, { desc = 'Telescope buffer fuzzy find' })
       vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
       vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
@@ -63,17 +64,50 @@ in with pkgs.vimPlugins; [
   }
   {
     type = "lua";
+    plugin = nvim-cmp;
+    config = ''
+      local cmp = require("cmp")
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+          end,
+        },
+        sources = {
+          { name = "nvim_lsp" },
+          { name = "path" },
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ['<C-l>'] = cmp.mapping.complete(),
+          ['<C-e>'] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+        }),
+        experimental = {
+          ghost_text = true,
+        },
+      })
+    '';
+  }
+  {
+    type = "lua";
     plugin = nvim-lspconfig;
     config = ''
       local lspconfig = require('lspconfig')
+
+      vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { silent = true, buffer = buffer })
+
       if vim.fn.executable('nil') == 1 then
-        lspconfig.nil_ls.setup({
-                  ['nil'] = {
-                    formatting = {
-                      command = { 'nixfmt' },
-                    },
-                  }
-            })
+        lspconfig.nil_ls.setup {
+          settings = {
+            ['nil'] = {
+              formatting = {
+                command = { 'nixfmt' }
+              }
+            }
+          }
+        }
       end
     '';
   }
