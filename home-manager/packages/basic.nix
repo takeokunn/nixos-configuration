@@ -2,7 +2,6 @@
 with pkgs; [
   # for terminal tools
   dasel
-  devbox
   devenv
   offlineimap
   openssl

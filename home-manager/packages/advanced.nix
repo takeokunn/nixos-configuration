@@ -3,9 +3,6 @@ with pkgs; [
   # for network tools
   speedtest-cli
 
-  # for DB
-  mysql
-
   # for ai
   ollama
 

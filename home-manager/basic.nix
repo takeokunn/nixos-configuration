@@ -1,5 +1,8 @@
 { system, nixpkgs }:
 let
+  # nvfetcher
+  sources = pkgs.callPackage ../_sources/generated.nix { };
+
   # packages
   pkgs = import nixpkgs {
     inherit system;
@@ -11,7 +14,6 @@ let
   modules = import ./modules;
 
   # programs
-  sources = pkgs.callPackage ../_sources/generated.nix { };
   basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
 
   # services
