@@ -37,6 +37,7 @@ vim.keymap.set('n', '/', '/\\v', { remap = false })
 vim.keymap.set('n', 'U', '<C-r>', { remap = false })
 vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
 vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
+vim.keymap.set('i', '<C-j>', '<CR>')
 
 -- window keymap
 

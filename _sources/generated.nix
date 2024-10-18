@@ -1213,6 +1213,18 @@
     };
     date = "2024-05-06";
   };
+  vim-fern = {
+    pname = "vim-fern";
+    version = "2cf57c60df508d15878e03c1e8fb12506384212a";
+    src = fetchFromGitHub {
+      owner = "lambdalisue";
+      repo = "vim-fern";
+      rev = "2cf57c60df508d15878e03c1e8fb12506384212a";
+      fetchSubmodules = false;
+      sha256 = "sha256-0GHaVPCeKHbCp4mbit+3l9Rp630+elZr1n+DS61VteU=";
+    };
+    date = "2024-10-16";
+  };
   vim-friendly-snippets = {
     pname = "vim-friendly-snippets";
     version = "de8fce94985873666bd9712ea3e49ee17aadb1ed";

@@ -2019,6 +2019,26 @@
         },
         "version": "81c09c53a61e4b42234fee43ce26f0ceb196b9b7"
     },
+    "vim-fern": {
+        "cargoLocks": null,
+        "date": "2024-10-16",
+        "extract": null,
+        "name": "vim-fern",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "lambdalisue",
+            "repo": "vim-fern",
+            "rev": "2cf57c60df508d15878e03c1e8fb12506384212a",
+            "sha256": "sha256-0GHaVPCeKHbCp4mbit+3l9Rp630+elZr1n+DS61VteU=",
+            "type": "github"
+        },
+        "version": "2cf57c60df508d15878e03c1e8fb12506384212a"
+    },
     "vim-friendly-snippets": {
         "cargoLocks": null,
         "date": "2024-10-07",

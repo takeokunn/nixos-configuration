@@ -4,4 +4,9 @@
     version = sources.vimdoc-ja.date;
     src = sources.vimdoc-ja.src;
   };
+  vim-fern = vimUtils.buildVimPlugin {
+    pname = sources.vim-fern.pname;
+    version = sources.vim-fern.date;
+    src = sources.vim-fern.src;
+  };
 }

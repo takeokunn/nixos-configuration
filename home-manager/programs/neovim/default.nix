@@ -7,8 +7,6 @@
     withPython3 = false;
     plugins = import ./plugins { inherit pkgs sources; };
 
-    coc.enable = true;
-
     extraLuaConfig = builtins.readFile ./init.lua;
   };
 }

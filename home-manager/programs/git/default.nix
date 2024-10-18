@@ -27,7 +27,7 @@
         autocrlf = false;
         precomposeunicode = true;
         untrackedCache = true;
-        fsmonitor = true;
+        fsmonitor = false;
       };
 
       commit = {
