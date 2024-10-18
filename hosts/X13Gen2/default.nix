@@ -1,5 +1,5 @@
 { self, nixpkgs, home-manager, org-babel, emacs-overlay, nixos-hardware, xremap
-, wezterm-flake, neovim-nightly-overlay, sops-nix }:
+, neovim-nightly-overlay, sops-nix }:
 let
   username = "take";
   system = "x86_64-linux";
@@ -16,7 +16,7 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users."${username}" =
           import ../../home-manager/advanced.nix {
-            inherit system nixpkgs org-babel emacs-overlay wezterm-flake
+            inherit system nixpkgs org-babel emacs-overlay
               neovim-nightly-overlay;
           };
       }

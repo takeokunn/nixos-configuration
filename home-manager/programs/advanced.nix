@@ -1,4 +1,4 @@
-{ lib, pkgs, wezterm-flake, neovim-nightly-overlay, org-babel, sources }:
+{ lib, pkgs, neovim-nightly-overlay, org-babel, sources }:
 let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs org-babel sources; };
@@ -7,7 +7,7 @@ let
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay sources; };
   nyxt = import ./nyxt { inherit pkgs; };
   roswell = import ./roswell { inherit pkgs; };
-  wezterm = import ./wezterm { inherit pkgs wezterm-flake; };
+  wezterm = import ./wezterm { inherit pkgs; };
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
