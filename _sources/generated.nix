@@ -1237,6 +1237,18 @@
     };
     date = "2024-10-07";
   };
+  vim-gin = {
+    pname = "vim-gin";
+    version = "0d0fc6efa72a65bace3bd4ae1f76ad753006ca0d";
+    src = fetchFromGitHub {
+      owner = "lambdalisue";
+      repo = "vim-gin";
+      rev = "0d0fc6efa72a65bace3bd4ae1f76ad753006ca0d";
+      fetchSubmodules = false;
+      sha256 = "sha256-ozESeZ+vEIOMVG9EvHk+s6sUB7YW6whf+yXiwp8Rgmw=";
+    };
+    date = "2024-09-25";
+  };
   vim-neco = {
     pname = "vim-neco";
     version = "1b95bedbeed0b4c81466d40b16bfb0c0ff16721d";
@@ -1275,14 +1287,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c";
+    version = "ed0cfafc87f6fb4d6ec32bcd259c6b4a00687def";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "f65446fa6f89f47ddbe6b1a5d2b4aa7ec4533d5c";
+      rev = "ed0cfafc87f6fb4d6ec32bcd259c6b4a00687def";
       fetchSubmodules = false;
-      sha256 = "sha256-7BwblbzPcvQ1JwJ9io2fxOXhrn/T1umonCyhMPoxaTQ=";
+      sha256 = "sha256-mnBpEZIoeQ9LBpARFaJezUF0b9m42ls7hbZJ2TrAv/I=";
     };
-    date = "2024-10-17";
+    date = "2024-10-18";
   };
 }

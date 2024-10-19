@@ -55,7 +55,3 @@ vim.keymap.set('n', 'sw', '<C-w>w', { noremap = true, silent = true })
 
 vim.keymap.set('n', 'sp', ':<C-u>bp<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'sn', ':<C-u>bn<CR>', { noremap = true, silent = true })
-
--- coc keymap
-
-vim.keymap.set('n', 'gd', '<Plug>(coc-definition)', { silent = true })

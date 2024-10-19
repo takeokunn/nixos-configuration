@@ -1,13 +1,12 @@
 { pkgs, sources }:
 let plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
 in with pkgs.vimPlugins; [
-  denops-vim
-  plugins.denops-helloworld
   {
     type = "lua";
-    plugin = plugins.skkeleton;
+    plugin = gitsigns-nvim;
     config = ''
-      vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
+      require('gitsigns').setup()
     '';
   }
+  plugins.vim-gin
 ]

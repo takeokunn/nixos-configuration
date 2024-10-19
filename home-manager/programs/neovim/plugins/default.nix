@@ -1,8 +1,12 @@
 { pkgs, sources }:
 let
   basic = import ./basic { inherit pkgs sources; };
-  denops = import ./denops { inherit pkgs sources; };
+  # ddu = import ./ddu { inherit pkgs sources; };
+  # ddc = import ./ddc { inherit pkgs sources; };
+  git = import ./git { inherit pkgs sources; };
+  language = import ./language { inherit pkgs sources; };
+  lsp = import ./lsp { inherit pkgs; };
+  skk = import ./skk { inherit pkgs sources; };
   themes = import ./themes { inherit pkgs; };
-  ddu = import ./ddu { inherit pkgs sources; };
-  ddc = import ./ddc { inherit pkgs sources; };
-in basic ++ denops ++ themes ++ ddu ++ ddc
+  telescope = import ./telescope { inherit pkgs; };
+in basic ++ git ++ language ++ lsp ++ skk ++ themes ++ telescope

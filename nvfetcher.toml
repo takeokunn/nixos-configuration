@@ -541,3 +541,8 @@ fetch.github = "uga-rosa/denippet.vim"
 src.git = "https://github.com/lambdalisue/vim-fern"
 src.branch = "main"
 fetch.github = "lambdalisue/vim-fern"
+
+[vim-gin]
+src.git = "https://github.com/lambdalisue/vim-gin"
+src.branch = "main"
+fetch.github = "lambdalisue/vim-gin"
