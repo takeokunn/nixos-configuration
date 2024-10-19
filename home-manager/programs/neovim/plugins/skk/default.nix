@@ -5,5 +5,8 @@ in [{
   plugin = plugins.skkeleton;
   config = ''
     vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
+    vim.fn['skkeleton#config']({
+      globalDictionaries = { "${pkgs.skk-dicts}//share/SKK-JISYO.L" }
+    })
   '';
 }]
