@@ -3,6 +3,7 @@
     enable = true;
     package = pkgs.rio;
     settings = {
+      fonts.size = 20;
       renderer = {
         performance = "High";
         backend = "Automatic";
@@ -40,10 +41,6 @@
         light-red = "#FF6E6E";
         light-white = "#FFFFFF";
         light-yellow = "#FFFFA5";
-      };
-      fonts = {
-        size = 20;
-        family = "cascadiacode";
       };
     };
   };
