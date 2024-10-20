@@ -7,7 +7,6 @@ let
   neovim = import ./neovim { inherit pkgs neovim-nightly-overlay sources; };
   nyxt = import ./nyxt { inherit pkgs; };
   roswell = import ./roswell { inherit pkgs; };
-  wezterm = import ./wezterm { inherit pkgs; };
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
@@ -23,7 +22,6 @@ in [
   neovim
   nyxt
   roswell
-  wezterm
 
   # for window manager
   aerospace

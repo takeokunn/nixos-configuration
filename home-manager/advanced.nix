@@ -1,7 +1,5 @@
 { system, nixpkgs, org-babel, emacs-overlay, neovim-nightly-overlay }:
 let
-  lib = nixpkgs.lib;
-
   # nvfetcher
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
@@ -20,7 +18,8 @@ let
   # programs
   basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
   advancedPrograms = import ./programs/advanced.nix {
-    inherit lib pkgs neovim-nightly-overlay org-babel sources;
+    inherit (nixpkgs) lib;
+    inherit pkgs neovim-nightly-overlay org-babel sources;
   };
 
   # services
