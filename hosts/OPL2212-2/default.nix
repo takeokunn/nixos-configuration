@@ -1,15 +1,15 @@
-{ self, nixpkgs, nix-darwin, home-manager, org-babel, emacs-overlay
-, neovim-nightly-overlay }:
+{ inputs }:
 let
+  inherit (inputs) nix-darwin home-manager;
   system = "aarch64-darwin";
   username = "obara";
   configuration = { ... }: {
     users.users.${username}.home = "/Users/${username}";
   };
-  lib = nixpkgs.lib;
 in {
   OPL2212-2 = nix-darwin.lib.darwinSystem {
-    inherit system lib;
+    inherit system;
+    inherit (inputs.nixpkgs) lib;
     specialArgs = { inherit username; };
     modules = [
       configuration
@@ -19,8 +19,9 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users."${username}" =
           import ../../home-manager/advanced.nix {
-            inherit system nixpkgs emacs-overlay neovim-nightly-overlay
-              org-babel;
+            inherit system;
+            inherit (inputs)
+              nixpkgs emacs-overlay neovim-nightly-overlay org-babel;
           };
       }
     ];

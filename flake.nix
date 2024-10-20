@@ -40,19 +40,9 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, org-babel, emacs-overlay
-    , nixos-hardware, xremap, nix-on-droid, neovim-nightly-overlay, sops-nix
-    , ... }: {
-      darwinConfigurations = (import ./hosts/OPL2212-2 {
-        inherit self nixpkgs nix-darwin home-manager org-babel emacs-overlay
-          neovim-nightly-overlay;
-      });
-      nixosConfigurations = (import ./hosts/X13Gen2 {
-        inherit self nixpkgs home-manager org-babel emacs-overlay nixos-hardware
-          xremap neovim-nightly-overlay sops-nix;
-      });
-      nixOnDroidConfigurations = (import ./hosts/OPPO-A79 {
-        inherit self nixpkgs home-manager nix-on-droid;
-      });
-    };
+  outputs = inputs: {
+    darwinConfigurations = (import ./hosts/OPL2212-2 { inherit inputs; });
+    nixosConfigurations = (import ./hosts/X13Gen2 { inherit inputs; });
+    nixOnDroidConfigurations = (import ./hosts/OPPO-A79 { inherit inputs; });
+  };
 }

@@ -1,12 +1,12 @@
-{ self, nixpkgs, home-manager, org-babel, emacs-overlay, nixos-hardware, xremap
-, neovim-nightly-overlay, sops-nix }:
+{ inputs }:
 let
+  inherit (inputs) nixpkgs xremap sops-nix home-manager;
   username = "take";
   system = "x86_64-linux";
 in {
   X13Gen2 = nixpkgs.lib.nixosSystem {
     inherit system;
-    specialArgs = { inherit xremap username; };
+    specialArgs = { inherit username xremap; };
     modules = [
       ../../nixos
       ./hardware-configuration.nix
@@ -16,8 +16,9 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users."${username}" =
           import ../../home-manager/advanced.nix {
-            inherit system nixpkgs org-babel emacs-overlay
-              neovim-nightly-overlay;
+            inherit system;
+            inherit (inputs)
+              nixpkgs org-babel emacs-overlay neovim-nightly-overlay;
           };
       }
     ];

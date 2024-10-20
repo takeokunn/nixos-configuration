@@ -1,5 +1,7 @@
-{ self, nixpkgs, home-manager, nix-on-droid }:
-let system = "aarch64-linux";
+{ inputs }:
+let
+  inherit (inputs) nixpkgs nix-on-droid;
+  system = "aarch64-linux";
 in {
   OPPO-A79 = nix-on-droid.lib.nixOnDroidConfiguration {
     modules = [ ../../nix-on-droid ];
