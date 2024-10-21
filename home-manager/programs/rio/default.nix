@@ -3,7 +3,7 @@
     enable = true;
     package = pkgs.rio;
     settings = {
-      fonts.size = 20;
+      fonts.size = 18;
       renderer = {
         performance = "High";
         backend = "Automatic";

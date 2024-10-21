@@ -20,8 +20,7 @@ in {
         home-manager.users."${username}" =
           import ../../home-manager/advanced.nix {
             inherit system;
-            inherit (inputs)
-              nixpkgs emacs-overlay neovim-nightly-overlay org-babel;
+            inherit (inputs) nixpkgs emacs-overlay org-babel;
           };
       }
     ];

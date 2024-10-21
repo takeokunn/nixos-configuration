@@ -1,7 +1,6 @@
-{ pkgs, neovim-nightly-overlay, sources }: {
+{ pkgs, sources }: {
   programs.neovim = {
     enable = true;
-    package = neovim-nightly-overlay.packages.${pkgs.system}.default;
     withNodeJs = false;
     withRuby = false;
     withPython3 = false;

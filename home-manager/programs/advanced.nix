@@ -1,10 +1,9 @@
-{ lib, pkgs, neovim-nightly-overlay, org-babel, sources }:
+{ lib, pkgs, org-babel, sources }:
 let
   awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs org-babel sources; };
   git = import ./git;
   nix-index = import ./nix-index;
-  neovim = import ./neovim { inherit pkgs neovim-nightly-overlay sources; };
   nyxt = import ./nyxt { inherit pkgs; };
   rio = import ./rio { inherit pkgs; };
   roswell = import ./roswell { inherit pkgs; };
@@ -20,7 +19,6 @@ in [
   emacs
   git
   nix-index
-  neovim
   nyxt
   rio
   roswell

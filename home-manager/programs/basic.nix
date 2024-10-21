@@ -12,6 +12,7 @@ let
   man = import ./man;
   misc = import ./misc;
   mu = import ./mu;
+  neovim = import ./neovim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
@@ -35,6 +36,7 @@ in [
   misc
   mu
   password-store
+  neovim
   peco
   readline
   ripgrep
