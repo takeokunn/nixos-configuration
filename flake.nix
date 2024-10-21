@@ -37,8 +37,14 @@
   };
 
   outputs = inputs: {
-    darwinConfigurations = (import ./hosts/OPL2212-2 { inherit inputs; });
-    nixosConfigurations = (import ./hosts/X13Gen2 { inherit inputs; });
-    nixOnDroidConfigurations = (import ./hosts/OPPO-A79 { inherit inputs; });
+    darwinConfigurations = {
+      OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+    };
+    nixosConfigurations = {
+      X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
+    };
+    nixOnDroidConfigurations = {
+      OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
+    };
   };
 }
