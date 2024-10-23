@@ -241,7 +241,7 @@
     },
     "emacs-llm": {
         "cargoLocks": null,
-        "date": "2024-10-15",
+        "date": "2024-10-22",
         "extract": null,
         "name": "emacs-llm",
         "passthru": null,
@@ -253,11 +253,11 @@
             "name": null,
             "owner": "ahyatt",
             "repo": "llm",
-            "rev": "d68649bdf02bd6e3b554f3cb14204f885b7a63ff",
-            "sha256": "sha256-sC26M1e8X56nIPzftSrGlXETcnSutDv53ROQG2RseK0=",
+            "rev": "ee44eadb01a1cba25558e6976d838cefbc69d9e8",
+            "sha256": "sha256-f3Bvv1InuD3oo7HcOiEeNUeu/gMp+MZMYdaVucexYeY=",
             "type": "github"
         },
-        "version": "d68649bdf02bd6e3b554f3cb14204f885b7a63ff"
+        "version": "ee44eadb01a1cba25558e6976d838cefbc69d9e8"
     },
     "emacs-mu4e-dashboard": {
         "cargoLocks": null,
@@ -1961,7 +1961,7 @@
     },
     "vim-ddu-ui-filer": {
         "cargoLocks": null,
-        "date": "2024-10-15",
+        "date": "2024-10-23",
         "extract": null,
         "name": "vim-ddu-ui-filer",
         "passthru": null,
@@ -1973,11 +1973,11 @@
             "name": null,
             "owner": "Shougo",
             "repo": "ddu-ui-filer",
-            "rev": "6fe710f3be4309386ad992e750e05f7cf80e73f9",
-            "sha256": "sha256-scM7MVkJ6NM64pPjTXB7hJ9rcEWZb5tftmRrJ9VdCIw=",
+            "rev": "987fd68eb2ab4207d00eba7bdd097116e10ff629",
+            "sha256": "sha256-DjbJj1q9EzpwkxNriZIFyu+VVfmpp+slth9ga9iy4LU=",
             "type": "github"
         },
-        "version": "6fe710f3be4309386ad992e750e05f7cf80e73f9"
+        "version": "987fd68eb2ab4207d00eba7bdd097116e10ff629"
     },
     "vim-denippet": {
         "cargoLocks": null,
@@ -2141,7 +2141,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-10-22",
+        "date": "2024-10-23",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2153,10 +2153,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "1289c70b9ea264b304ee14744ae36c7ed57f2db5",
-            "sha256": "sha256-aQPhEjCwsZaIizWPloXxfs8lLY5PLqOBbP1ClbkfcMg=",
+            "rev": "7c701af91b21f1abf3db3f627404a67afe88d274",
+            "sha256": "sha256-xRqPPahWCcIdQshhiTNi8VNJ1lYh93LcwpcBGBHEc5M=",
             "type": "github"
         },
-        "version": "1289c70b9ea264b304ee14744ae36c7ed57f2db5"
+        "version": "7c701af91b21f1abf3db3f627404a67afe88d274"
     }
 }
