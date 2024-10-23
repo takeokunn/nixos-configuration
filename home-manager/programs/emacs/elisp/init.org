@@ -3444,15 +3444,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
 
   (with-eval-after-load 'exec-path-from-shell
-    (setopt exec-path-from-shell-variables '("PATH"
-                                           "GEM_HOME"
-                                           "GOROOT"
-                                           "GOPATH"
-                                           "LSP_USE_PLISTS"
-                                           "TERM"
-                                           "SSH_AUTH_SOCK"
-                                           "NATIVE_FULL_AOT"
-                                           "GPG_TTY")))
+    (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK")))
 #+END_SRC
 ** Utility
 *** htmlize
