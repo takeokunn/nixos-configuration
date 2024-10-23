@@ -1,12 +1,13 @@
 { pkgs }: {
   programs.tmux = {
     enable = true;
-    terminal = "xterm-256color";
+    terminal = "screen-256color";
     baseIndex = 1;
     escapeTime = 1;
     historyLimit = 999999999;
     keyMode = "vi";
     prefix = "C-q";
+    secureSocket = true;
     plugins = with pkgs; [
       tmuxPlugins.open
       tmuxPlugins.resurrect
@@ -24,16 +25,17 @@
     ];
 
     extraConfig = ''
-      set -g pane-base-index 1
-      set -g display-panes-time 15000
-      set -g default-command $SHELL
-
+      set-option -g pane-base-index 1
+      set-option -g display-panes-time 15000
+      set-option -g default-command $SHELL
       set-option -g status-position top
       set-option -g status-right '[%Y-%m-%d(%a) %H:%M]'
       set-option -g status-interval 1
       set-option -g status-justify centre
       set-option -g status-bg "colour238"
       set-option -g status-fg "colour255"
+
+      set-option -ga terminal-overrides ",xterm-256color:Tc"
 
       bind-key C-g display-panes
 

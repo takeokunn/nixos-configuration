@@ -27,6 +27,7 @@
 
       # env
       set -x TMPDIR /tmp
+      set -x COLORTERM truecolor
 
       if test -d /etc/profiles/per-user/(whoami)/bin
         fish_add_path /etc/profiles/per-user/(whoami)/bin
