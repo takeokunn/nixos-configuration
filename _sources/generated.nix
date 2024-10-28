@@ -675,15 +675,15 @@
   };
   vim-ddc-source-lsp = {
     pname = "vim-ddc-source-lsp";
-    version = "23b69013f2948c80b3938165a0cb414f58e26ada";
+    version = "e11540a9c4b88adc4a9c003d93df07267e13839d";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc-source-lsp";
-      rev = "23b69013f2948c80b3938165a0cb414f58e26ada";
+      rev = "e11540a9c4b88adc4a9c003d93df07267e13839d";
       fetchSubmodules = false;
-      sha256 = "sha256-B8KnrDKcW8oSmlVELs1YZkGMwlWmc9ZXgOoQs0scrkA=";
+      sha256 = "sha256-Tp+b6r0j9+cIGXkWWlxpmOuZAHSEL3OjqcFWtLFOV0k=";
     };
-    date = "2024-09-15";
+    date = "2024-10-28";
   };
   vim-ddc-source-lsp-setup = {
     pname = "vim-ddc-source-lsp-setup";
