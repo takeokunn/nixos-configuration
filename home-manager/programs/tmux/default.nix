@@ -35,7 +35,7 @@
       set-option -g status-bg "colour238"
       set-option -g status-fg "colour255"
 
-      set-option -ga terminal-overrides ",xterm-256color:Tc"
+      # set-option -ga terminal-overrides ",xterm-256color:Tc"
 
       bind-key C-g display-panes
 
