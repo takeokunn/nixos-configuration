@@ -10,4 +10,13 @@ in {
       };
     };
   };
+
+  programs.git = {
+    extraConfig = {
+      branch.main = {
+        sync = true;
+        syncNewFiles = true;
+      };
+    };
+  };
 }
