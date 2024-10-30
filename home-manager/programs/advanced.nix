@@ -4,6 +4,7 @@ let
   git = import ./git;
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
+  offlineimap = import ./offlineimap { inherit pkgs; };
   rio = import ./rio { inherit pkgs; };
 
   # for window manager
@@ -17,6 +18,7 @@ in [
   git
   nix-index
   nyxt
+  offlineimap
   rio
 
   # for window manager

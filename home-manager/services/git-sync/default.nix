@@ -1,13 +1,11 @@
-{ config, ... }:
-let homeDirectory = config.home.homeDirectory;
-in {
+{ config, ... }: {
   services.git-sync = {
     enable = true;
     repositories = {
       "private" = {
         uri = "git@github.com:takeokunn/private";
-        path = "${homeDirectory}/ghq/github.com/takeokunn/private";
-        interval = 3600;
+        path = "${config.home.homeDirectory}/ghq/github.com/takeokunn/private";
+        interval = 600;
       };
     };
   };
