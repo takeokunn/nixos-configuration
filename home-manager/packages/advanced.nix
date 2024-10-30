@@ -1,8 +1,5 @@
 { pkgs }:
 with pkgs; [
-  # for network tools
-  speedtest-cli
-
   # for ai
   ollama
 

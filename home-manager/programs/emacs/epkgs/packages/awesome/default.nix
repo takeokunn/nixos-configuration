@@ -43,4 +43,5 @@ in with epkgs; [
   password-store
   password-store-otp
   pass
+  password-generator
 ]

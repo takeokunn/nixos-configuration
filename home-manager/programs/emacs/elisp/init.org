@@ -3340,6 +3340,15 @@
   (with-eval-after-load 'pass
     (setopt pass-suppress-confirmations t))
 #+end_src
+*** password-generator
+#+begin_src emacs-lisp
+  (autoload-if-found '(password-generator-simple
+                       password-generator-strong
+                       password-generator-paranoid
+                       password-generator-numeric
+                       password-generator-phonetic
+                       password-generator-custom) "password-generator" nil t)
+#+end_src
 ** Dictionary
 *** define-word
 #+begin_src emacs-lisp :tangle yes

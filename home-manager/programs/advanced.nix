@@ -1,6 +1,5 @@
 { lib, pkgs, org-babel, sources }:
 let
-  awscli = import ./awscli;
   emacs = import ./emacs { inherit pkgs org-babel sources; };
   git = import ./git;
   nix-index = import ./nix-index;
@@ -14,7 +13,6 @@ let
   swaylock = import ./swaylock { inherit lib pkgs; };
   waybar = import ./waybar { inherit pkgs; };
 in [
-  awscli
   emacs
   git
   nix-index
