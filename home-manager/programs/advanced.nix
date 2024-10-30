@@ -6,7 +6,6 @@ let
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
   rio = import ./rio { inherit pkgs; };
-  roswell = import ./roswell { inherit pkgs; };
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
@@ -21,7 +20,6 @@ in [
   nix-index
   nyxt
   rio
-  roswell
 
   # for window manager
   aerospace
