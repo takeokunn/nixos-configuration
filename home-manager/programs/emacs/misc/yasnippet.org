@@ -1409,6 +1409,23 @@ $0
   # --
   ,#+roam_tags: $0
 #+end_src
+*** nix-shell
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/nix-shell") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: nix-shell
+  # key: nix-shell
+  # --
+  ,#+name: ${1:tmp}-shell
+  ,#+BEGIN_SRC nix :noweb yes
+    { pkgs ? import <nixpkgs> { } }:
+      pkgs.mkShell { buildInputs = with pkgs; [ $2 ]; }
+  ,#+END_SRC
+
+  ,#+begin_src shell :nix-shell $1-shell :results output
+    $0
+  ,#+end_src
+#+end_src
+
 ** php-mode/
 *** .yas-setup.el
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/.yas-setup.el") :mkdirp yes :noweb yes
