@@ -627,15 +627,15 @@
   };
   vim-ddc-source-codeium = {
     pname = "vim-ddc-source-codeium";
-    version = "f9eca2071a330c3e8c62ae243e5e30fd711dfede";
+    version = "dea3e1633710aca878f6fc9310fa2f3e300327e1";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc-source-codeium";
-      rev = "f9eca2071a330c3e8c62ae243e5e30fd711dfede";
+      rev = "dea3e1633710aca878f6fc9310fa2f3e300327e1";
       fetchSubmodules = false;
-      sha256 = "sha256-UJt3lXGGe9gstIakOI+mfDEoALdLUBWiRYmUePtPPp4=";
+      sha256 = "sha256-qYLS1b9bYLNXb1zMtzOqattOhU0utIBAkTj0mCyzEu0=";
     };
-    date = "2024-09-24";
+    date = "2024-11-01";
   };
   vim-ddc-source-file = {
     pname = "vim-ddc-source-file";
@@ -1107,15 +1107,15 @@
   };
   vim-ddu-source-mr = {
     pname = "vim-ddu-source-mr";
-    version = "88434598c654e4bd3e1454bbccc7b99f1023c2db";
+    version = "554ff20119b85ac22f850106c2156e783aa77478";
     src = fetchFromGitHub {
       owner = "kuuote";
       repo = "ddu-source-mr";
-      rev = "88434598c654e4bd3e1454bbccc7b99f1023c2db";
+      rev = "554ff20119b85ac22f850106c2156e783aa77478";
       fetchSubmodules = false;
-      sha256 = "sha256-FJa/bHfFpg81xKlbrn50NCaROnwuWJGrpQN12Lmi47o=";
+      sha256 = "sha256-3JscH4SV1qLqadTof7UBPzkXfHRu7l2Acw1zmezX98A=";
     };
-    date = "2024-09-01";
+    date = "2024-11-01";
   };
   vim-ddu-source-nvim-notify = {
     pname = "vim-ddu-source-nvim-notify";
@@ -1287,14 +1287,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "8574d3690a3c6583ce224db80524cc0c0dea71f7";
+    version = "efe8abbd42e3d2708a6852bae1897c53dfc4cb84";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "8574d3690a3c6583ce224db80524cc0c0dea71f7";
+      rev = "efe8abbd42e3d2708a6852bae1897c53dfc4cb84";
       fetchSubmodules = false;
-      sha256 = "sha256-oRj0ZRNR1zzJevP2YAl3LcCOQJXyKQdd+AXG4da3mXg=";
+      sha256 = "sha256-NNAQMmkqZCSSiDUtzkuu5eqXBXoxElaYZK/eKpVMfUY=";
     };
-    date = "2024-10-26";
+    date = "2024-11-01";
   };
 }

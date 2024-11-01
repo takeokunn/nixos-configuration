@@ -1041,7 +1041,7 @@
     },
     "vim-ddc-source-codeium": {
         "cargoLocks": null,
-        "date": "2024-09-24",
+        "date": "2024-11-01",
         "extract": null,
         "name": "vim-ddc-source-codeium",
         "passthru": null,
@@ -1053,11 +1053,11 @@
             "name": null,
             "owner": "Shougo",
             "repo": "ddc-source-codeium",
-            "rev": "f9eca2071a330c3e8c62ae243e5e30fd711dfede",
-            "sha256": "sha256-UJt3lXGGe9gstIakOI+mfDEoALdLUBWiRYmUePtPPp4=",
+            "rev": "dea3e1633710aca878f6fc9310fa2f3e300327e1",
+            "sha256": "sha256-qYLS1b9bYLNXb1zMtzOqattOhU0utIBAkTj0mCyzEu0=",
             "type": "github"
         },
-        "version": "f9eca2071a330c3e8c62ae243e5e30fd711dfede"
+        "version": "dea3e1633710aca878f6fc9310fa2f3e300327e1"
     },
     "vim-ddc-source-file": {
         "cargoLocks": null,
@@ -1841,7 +1841,7 @@
     },
     "vim-ddu-source-mr": {
         "cargoLocks": null,
-        "date": "2024-09-01",
+        "date": "2024-11-01",
         "extract": null,
         "name": "vim-ddu-source-mr",
         "passthru": null,
@@ -1853,11 +1853,11 @@
             "name": null,
             "owner": "kuuote",
             "repo": "ddu-source-mr",
-            "rev": "88434598c654e4bd3e1454bbccc7b99f1023c2db",
-            "sha256": "sha256-FJa/bHfFpg81xKlbrn50NCaROnwuWJGrpQN12Lmi47o=",
+            "rev": "554ff20119b85ac22f850106c2156e783aa77478",
+            "sha256": "sha256-3JscH4SV1qLqadTof7UBPzkXfHRu7l2Acw1zmezX98A=",
             "type": "github"
         },
-        "version": "88434598c654e4bd3e1454bbccc7b99f1023c2db"
+        "version": "554ff20119b85ac22f850106c2156e783aa77478"
     },
     "vim-ddu-source-nvim-notify": {
         "cargoLocks": null,
@@ -2141,7 +2141,7 @@
     },
     "vimdoc-ja": {
         "cargoLocks": null,
-        "date": "2024-10-26",
+        "date": "2024-11-01",
         "extract": null,
         "name": "vimdoc-ja",
         "passthru": null,
@@ -2153,10 +2153,10 @@
             "name": null,
             "owner": "vim-jp",
             "repo": "vimdoc-ja",
-            "rev": "8574d3690a3c6583ce224db80524cc0c0dea71f7",
-            "sha256": "sha256-oRj0ZRNR1zzJevP2YAl3LcCOQJXyKQdd+AXG4da3mXg=",
+            "rev": "efe8abbd42e3d2708a6852bae1897c53dfc4cb84",
+            "sha256": "sha256-NNAQMmkqZCSSiDUtzkuu5eqXBXoxElaYZK/eKpVMfUY=",
             "type": "github"
         },
-        "version": "8574d3690a3c6583ce224db80524cc0c0dea71f7"
+        "version": "efe8abbd42e3d2708a6852bae1897c53dfc4cb84"
     }
 }
