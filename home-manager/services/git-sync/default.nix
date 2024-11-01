@@ -2,7 +2,7 @@
   services.git-sync = {
     enable = true;
     repositories = {
-      "private" = {
+      private = {
         uri = "git@github.com:takeokunn/private";
         path = "${config.home.homeDirectory}/ghq/github.com/takeokunn/private";
         interval = 600;
