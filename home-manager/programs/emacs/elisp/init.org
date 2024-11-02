@@ -1689,6 +1689,12 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp-docker-start) "lsp-docker" nil t)
 #+end_src
+*** lsp-dart
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'(lambda ()
+  			       (require 'lsp-dart))))
+#+end_src
 *** dap-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dap-debug) "dap-mode" nil t)
@@ -4020,6 +4026,21 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(py-isort-region
                        py-isort-buffer
                        py-isort-before-save) "py-isort" nil t)
+#+end_src
+** Dart
+*** flutter
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(flutter-test-mode
+                       flutter-run
+                       flutter-run-device
+                       flutter-run-or-hot-reload
+                       flutter-test-all
+                       flutter-test-current-file
+                       flutter-test-at-point
+                       flutter-mode) "flutter" nil t)
+
+  (with-eval-after-load 'flutter
+    (add-hook 'flutter-mode-hook #'flutter--initialize))
 #+end_src
 * Elfeed
 ** elfeed

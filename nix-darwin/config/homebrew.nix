@@ -19,6 +19,7 @@
       "android-studio"
       "aquaskk"
       "dracula-xcode"
+      "flutter"
       "google-chrome"
       "keycastr"
       "orbstack"

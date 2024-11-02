@@ -83,4 +83,7 @@ with epkgs;
 
   # Python
   py-isort
+
+  # Dart
+  flutter
 ]

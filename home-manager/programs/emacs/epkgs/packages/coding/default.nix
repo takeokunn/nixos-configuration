@@ -61,6 +61,7 @@ with epkgs;
   lsp-scheme
   lsp-haskell
   lsp-pyright
+  lsp-dart
   # lsp-bridge
 
   # Syntax
