@@ -497,7 +497,7 @@ ${1:collection}.forEach(function (${2:elem}) {
 *** for-of
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/js-mode/for-on") :mkdirp yes :noweb yes
   # name: for-of
-  # key: fof-of
+  # key: for-of
   # --
 
   for(const ${1:item} of ${2:object}) {
@@ -2672,9 +2672,9 @@ abstract class ${1:Class} {
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/yield") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: yield
-  # key: yeild
+  # key: yield
   # --
-  @yeild('$0')
+  @yield('$0')
 #+end_src
 *** while
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/web-php-blade-mode/while") :mkdirp yes :noweb yes

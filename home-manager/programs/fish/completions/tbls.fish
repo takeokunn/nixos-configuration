@@ -79,7 +79,7 @@ function __tbls_clear_perform_completion_once_result
     __tbls_debug ""
     __tbls_debug "========= clearing previously set __tbls_perform_completion_once_result variable =========="
     set --erase __tbls_perform_completion_once_result
-    __tbls_debug "Succesfully erased the variable __tbls_perform_completion_once_result"
+    __tbls_debug "Successfully erased the variable __tbls_perform_completion_once_result"
 end
 
 function __tbls_requires_order_preservation

@@ -23,7 +23,7 @@
           tmux_attach_session_if_needed
       end
 
-      # supress fish_greeting
+      # suppress fish_greeting
       set fish_greeting
 
       # env

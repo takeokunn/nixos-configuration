@@ -69,13 +69,13 @@ complete -c $PROG -f -n '__fish_pass_uses_command ls' -a "(__fish_pass_print_ent
 complete -c $PROG -f -n __fish_pass_needs_command -a insert -d 'Command: insert new password'
 complete -c $PROG -f -n '__fish_pass_uses_command insert' -s e -l echo -d 'Echo the password on console'
 complete -c $PROG -f -n '__fish_pass_uses_command insert' -s m -l multiline -d 'Provide multiline password entry'
-complete -c $PROG -f -n '__fish_pass_uses_command insert' -s f -l force -d 'Do not prompt before overwritting'
+complete -c $PROG -f -n '__fish_pass_uses_command insert' -s f -l force -d 'Do not prompt before overwriting'
 complete -c $PROG -f -n '__fish_pass_uses_command insert' -a "(__fish_pass_print_entry_dirs)"
 
 complete -c $PROG -f -n __fish_pass_needs_command -a generate -d 'Command: generate new password'
 complete -c $PROG -f -n '__fish_pass_uses_command generate' -s n -l no-symbols -d 'Do not use special symbols'
 complete -c $PROG -f -n '__fish_pass_uses_command generate' -s c -l clip -d 'Put the password in clipboard'
-complete -c $PROG -f -n '__fish_pass_uses_command generate' -s f -l force -d 'Do not prompt before overwritting'
+complete -c $PROG -f -n '__fish_pass_uses_command generate' -s f -l force -d 'Do not prompt before overwriting'
 complete -c $PROG -f -n '__fish_pass_uses_command generate' -s i -l in-place -d 'Replace only the first line with the generated password'
 complete -c $PROG -f -n '__fish_pass_uses_command generate' -a "(__fish_pass_print_entry_dirs)"
 

@@ -167,7 +167,7 @@ complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l var
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l auto-approve
 
-# docs optioin
+# docs option
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l project -s p
@@ -323,10 +323,10 @@ complete -c waypoint -n '__fish_seen_subcommand_from pipeline' -xa list -d "List
 complete -c waypoint -n '__fish_seen_subcommand_from pipeline' -xa run -d "Manually execute a pipeline by name."
 
 # project subcommand
-complete -c waypoint -n '__fish_seen_subcommand_from projet' -xa apply -d "Create or update a project."
-complete -c waypoint -n '__fish_seen_subcommand_from projet' -xa destroy -d "Delete the specified project and optionally destroy its resources."
-complete -c waypoint -n '__fish_seen_subcommand_from projet' -xa inspect -d "Inspect the details of a project."
-complete -c waypoint -n '__fish_seen_subcommand_from projet' -xa list -d "List all registered projects."
+complete -c waypoint -n '__fish_seen_subcommand_from project' -xa apply -d "Create or update a project."
+complete -c waypoint -n '__fish_seen_subcommand_from project' -xa destroy -d "Delete the specified project and optionally destroy its resources."
+complete -c waypoint -n '__fish_seen_subcommand_from project' -xa inspect -d "Inspect the details of a project."
+complete -c waypoint -n '__fish_seen_subcommand_from project' -xa list -d "List all registered projects."
 
 # runner subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa adopt -d "Adopt a pending runner"

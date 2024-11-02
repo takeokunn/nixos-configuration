@@ -216,12 +216,12 @@ complete -f -c guix -n '__fish_guix_using_command build' -a "--with-graft=" -d '
 #### package
 set -l remotecommands install install-from-expression install-from-file remove upgrade manifest do-no-upgrade roll-back search-paths list-generations delete-generations switch-generation profile bootstrap verbose search list-installed list-available show load-path keep-failed keep-going dry-run fallback no.substitutes substitute-urls no-grafts no-offload max-silent-time timenout verbosity rounds cores max-jobs with-source with-input with-graft
 complete -f -c guix -n __fish_guix_needs_command -a package -d 'Install, remove, or upgrade packages in a single transaction.'
-complete -f -c guix -n '__fish_guix_using_command package' -s i -l install -d 'install PACKAGEs'
+complete -f -c guix -n '__fish_guix_using_command package' -s i -l install -d 'install PACKAGEEs'
 complete -f -c guix -n '__fish_guix_using_command package' -s e -d 'install the package EXP evaluates to'
 complete -f -c guix -n '__fish_guix_using_command package' -a "--install-from-expression=" -d 'install the package EXP evaluates to'
 complete -f -c guix -n '__fish_guix_using_command package' -s f -d 'install the package that the code within FILE evaluates to'
 complete -f -c guix -n '__fish_guix_using_command package' -a "--install-from-file=" -d 'install the package that the code within FILE evaluates to'
-complete -f -c guix -n '__fish_guix_using_command package' -s r -l remove -d 'remove PACKAGEs'
+complete -f -c guix -n '__fish_guix_using_command package' -s r -l remove -d 'remove PACKAGEEs'
 complete -f -c guix -n '__fish_guix_using_command package' -s u -l upgrade -d '[=REGEXP] upgrade all the installed packages matching REGEXP'
 complete -f -c guix -n '__fish_guix_using_command package' -s m -d 'create a new profile generation with the manifest from FILE'
 complete -f -c guix -n '__fish_guix_using_command package' -a "--manifest=" -d 'create a new profile generation with the manifest from FILE'
@@ -298,7 +298,7 @@ complete -f -c guix -n '__fish_guix_using_command publish' -l repl -d '[=PORT] s
 
 #### lint
 set -l remotecommands checkers list-checkers
-complete -f -c guix -n __fish_guix_needs_command -a lint -d 'Run a set of checkers on the specificied package.'
+complete -f -c guix -n __fish_guix_needs_command -a lint -d 'Run a set of checkers on the specified package.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l list-checkers -d 'Display the list of available lint checkers.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l checkers -d 'Only run the specified checkers.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l description -d 'Validate package descriptions.'
