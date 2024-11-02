@@ -38,7 +38,7 @@ jobs:
       - name: prepare nix
         uses: cachix/install-nix-action@v30
       - name: flake check
-        run: nix flake check
+        run: nix flake check --all-systems
   dependabot:
     runs-on: ubuntu-latest
     needs: [actionlint, secretlint, nix-flake]
