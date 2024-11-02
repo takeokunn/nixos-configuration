@@ -34,6 +34,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     };
+    flake-parts.url = "github:hercules-ci/flake-parts";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -42,34 +43,47 @@
 
   outputs =
     {
-      self,
-      nixpkgs,
+      flake-parts,
       treefmt-nix,
       ...
     }@inputs:
-    let
+
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "aarch64-darwin"
         "aarch64-linux"
         "x86_64-linux"
       ];
-      eachSystem = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
-      treefmtEval = eachSystem (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
-    in
-    {
-      formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
-      checks = eachSystem (pkgs: {
-        formatting = treefmtEval.${pkgs.system}.config.build.check self;
-      });
 
-      darwinConfigurations = {
-        OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+      imports = [ treefmt-nix.flakeModule ];
+
+      flake = {
+        darwinConfigurations = {
+          OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+        };
+        nixosConfigurations = {
+          X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
+        };
+        nixOnDroidConfigurations = {
+          OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
+        };
       };
-      nixosConfigurations = {
-        X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
-      };
-      nixOnDroidConfigurations = {
-        OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
-      };
+
+      perSystem =
+        { ... }:
+        {
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs = {
+              actionlint.enable = true;
+              nixfmt.enable = true;
+              taplo.enable = true;
+              jsonfmt.enable = true;
+              yamlfmt.enable = true;
+              fish_indent.enable = true;
+              stylua.enable = true;
+            };
+          };
+        };
     };
 }
