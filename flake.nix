@@ -82,6 +82,8 @@
               yamlfmt.enable = true;
               fish_indent.enable = true;
               stylua.enable = true;
+              shfmt.enable = true;
+              prettier.enable = true;
             };
           };
         };

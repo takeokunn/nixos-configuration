@@ -1,56 +1,56 @@
 @import url("./colors.css");
 * {
-    border: none;
-    border-radius: 0;
-    font-family: Iosevka;
-    font-size: 11pt;
-    min-height: 0;
+  border: none;
+  border-radius: 0;
+  font-family: Iosevka;
+  font-size: 11pt;
+  min-height: 0;
 }
 
 window#waybar {
-    opacity: 0.9;
-    background: @background-darker;
-    color: @foreground;
-    border-bottom: 2px solid @background;
+  opacity: 0.9;
+  background: @background-darker;
+  color: @foreground;
+  border-bottom: 2px solid @background;
 }
 
 #workspaces button {
-    padding: 0 10px;
-    background: @background;
-    color: @foreground;
+  padding: 0 10px;
+  background: @background;
+  color: @foreground;
 }
 
 #workspaces button:hover {
-    box-shadow: inherit;
-    text-shadow: inherit;
-    background-image: linear-gradient(0deg, @selection, @background-darker);
+  box-shadow: inherit;
+  text-shadow: inherit;
+  background-image: linear-gradient(0deg, @selection, @background-darker);
 }
 
 #workspaces button.active {
-    background-image: linear-gradient(0deg, @purple, @selection);
+  background-image: linear-gradient(0deg, @purple, @selection);
 }
 
 #workspaces button.urgent {
-    background-image: linear-gradient(0deg, @red, @background-darker);
+  background-image: linear-gradient(0deg, @red, @background-darker);
 }
 
 #taskbar button.active {
-    background-image: linear-gradient(0deg, @selection, @background-darker);
+  background-image: linear-gradient(0deg, @selection, @background-darker);
 }
 
 #clock {
-    padding: 0 4px;
-    background: @background;
+  padding: 0 4px;
+  background: @background;
 }
 
 #custom-right-arrow-dark,
 #custom-left-arrow-dark {
-    color: @background-darker;
+  color: @background-darker;
 }
 #custom-right-arrow-light,
 #custom-left-arrow-light {
-    color: @background;
-    background: @background-darker;
+  color: @background;
+  background: @background-darker;
 }
 
 #workspaces,
@@ -63,27 +63,27 @@ window#waybar {
 #battery,
 #disk,
 #tray {
-    background: @background-darker;
+  background: @background-darker;
 }
 
 #workspaces button {
-    padding: 0 2px;
-    color: @foreground;
+  padding: 0 2px;
+  color: @foreground;
 }
 
 #workspaces button.focused {
-    color: @cyan;
+  color: @cyan;
 }
 
 #workspaces button:hover {
-    box-shadow: inherit;
-    text-shadow: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
 }
 
 #workspaces button:hover {
-    background: @background-darker;
-    border: @background-darker;
-    padding: 0 3px;
+  background: @background-darker;
+  border: @background-darker;
+  padding: 0 3px;
 }
 
 #clock,
@@ -92,5 +92,5 @@ window#waybar {
 #cpu,
 #battery,
 #disk {
-    padding: 0 10px;
+  padding: 0 10px;
 }
