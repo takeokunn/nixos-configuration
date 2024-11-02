@@ -1,5 +1,6 @@
 { epkgs }:
-with epkgs; [
+with epkgs;
+[
   migemo
   wgrep
   consult

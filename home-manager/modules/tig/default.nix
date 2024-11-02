@@ -1,6 +1,14 @@
-{ pkgs, lib, config, ... }:
-let cfg = config.programs.tig;
-in with lib; {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+let
+  cfg = config.programs.tig;
+in
+with lib;
+{
   options.programs.tig = {
     enable = mkEnableOption "Text-mode interface for git";
     package = mkPackageOption pkgs "tig" { };

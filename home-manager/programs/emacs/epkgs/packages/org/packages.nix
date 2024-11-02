@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   org-view-mode = epkgs.melpaBuild {
     pname = "org-view-mode";
     version = "0.0.1";
@@ -20,7 +21,11 @@
     version = "0.0.1";
     src = sources.emacs-org-volume.src;
 
-    packageRequires = with epkgs; [ request dash f ];
+    packageRequires = with epkgs; [
+      request
+      dash
+      f
+    ];
 
     ignoreCompilationError = false;
   };

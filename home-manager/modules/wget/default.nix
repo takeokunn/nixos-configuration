@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   cfg = config.programs.wget;
   wgetConf = ''
@@ -15,7 +20,9 @@ let
     robots = ${cfg.robots}
     server_response = ${cfg.serverResponse}
   '';
-in with lib; {
+in
+with lib;
+{
   options.programs.wget = {
     enable = mkEnableOption "Simplistic interactive filtering tool";
     package = mkPackageOption pkgs "wget" { };

@@ -1,10 +1,14 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   copilot = epkgs.melpaBuild {
     pname = "copilot";
     version = "0.0.1";
     src = sources.emacs-copilot.src;
 
-    packageRequires = with epkgs; [ f editorconfig ];
+    packageRequires = with epkgs; [
+      f
+      editorconfig
+    ];
 
     ignoreCompilationError = false;
   };
@@ -24,7 +28,10 @@
     version = "0.0.1";
     src = sources.emacs-plz-event-source.src;
 
-    packageRequires = with epkgs; [ plz plz-media-type ];
+    packageRequires = with epkgs; [
+      plz
+      plz-media-type
+    ];
 
     ignoreCompilationError = false;
   };
@@ -34,7 +41,11 @@
     version = "0.0.1";
     src = sources.emacs-llm.src;
 
-    packageRequires = with epkgs; [ plz plz-media-type plz-event-source ];
+    packageRequires = with epkgs; [
+      plz
+      plz-media-type
+      plz-event-source
+    ];
 
     ignoreCompilationError = false;
   };

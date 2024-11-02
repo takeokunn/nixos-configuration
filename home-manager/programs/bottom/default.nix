@@ -27,10 +27,12 @@
         }
         {
           ratio = 3;
-          child = [{
-            default = true;
-            type = "proc";
-          }];
+          child = [
+            {
+              default = true;
+              type = "proc";
+            }
+          ];
         }
       ];
       colors = {

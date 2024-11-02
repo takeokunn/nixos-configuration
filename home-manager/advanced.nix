@@ -1,4 +1,9 @@
-{ system, nixpkgs, org-babel, emacs-overlay }:
+{
+  system,
+  nixpkgs,
+  org-babel,
+  emacs-overlay,
+}:
 let
   # nvfetcher
   sources = pkgs.callPackage ../_sources/generated.nix { };
@@ -25,9 +30,9 @@ let
   # services
   basicServices = import ./services/basic.nix;
   advancedServices = import ./services/advanced.nix { inherit pkgs; };
-in {
-  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices
-    ++ advancedServices;
+in
+{
+  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
   home.stateVersion = "24.05";
   home.packages = basicPkgs ++ advancedPkgs;

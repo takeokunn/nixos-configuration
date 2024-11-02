@@ -1,1 +1,10 @@
-[ ./aerospace ./dust ./lnav ./nyxt ./peco ./sops ./tig ./wget ]
+[
+  ./aerospace
+  ./dust
+  ./lnav
+  ./nyxt
+  ./peco
+  ./sops
+  ./tig
+  ./wget
+]

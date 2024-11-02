@@ -22,7 +22,8 @@ let
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
   wget = import ./wget { inherit pkgs; };
-in [
+in
+[
   bat
   bottom
   direnv

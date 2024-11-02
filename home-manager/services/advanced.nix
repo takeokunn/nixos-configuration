@@ -5,4 +5,11 @@ let
   swayidle = import ./swayidle { inherit pkgs; };
   swaync = import ./swaync { inherit pkgs; };
   swayosd = import ./swayosd { inherit pkgs; };
-in [ git-sync mako swayidle swaync swayosd ]
+in
+[
+  git-sync
+  mako
+  swayidle
+  swaync
+  swayosd
+]

@@ -1,4 +1,5 @@
-{ pkgs, sources }: {
+{ pkgs, sources }:
+{
   home.file = {
     # completions
     ".config/fish/completions/" = {

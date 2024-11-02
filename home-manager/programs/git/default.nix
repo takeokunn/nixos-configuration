@@ -16,7 +16,13 @@
       fix = "commit --amend --no-edit";
     };
 
-    ignores = [ "*.swp" "*.save" "*.fasl" "*~" ".DS_Store" ];
+    ignores = [
+      "*.swp"
+      "*.save"
+      "*.fasl"
+      "*~"
+      ".DS_Store"
+    ];
 
     extraConfig = {
       core = {
@@ -35,7 +41,9 @@
         gpgsign = true;
       };
 
-      tag = { gpgsign = true; };
+      tag = {
+        gpgsign = true;
+      };
 
       user = {
         name = "takeokunn";
@@ -43,22 +51,34 @@
         signingkey = "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C";
       };
 
-      ghq = { root = "~/.ghq"; };
+      ghq = {
+        root = "~/.ghq";
+      };
 
       fetch = {
         prune = true;
         writeCommitGraph = true;
       };
 
-      pull = { rebase = false; };
+      pull = {
+        rebase = false;
+      };
 
-      push = { default = "nothing"; };
+      push = {
+        default = "nothing";
+      };
 
-      github = { user = "takeokunn"; };
+      github = {
+        user = "takeokunn";
+      };
 
-      gpg = { program = "gpg"; };
+      gpg = {
+        program = "gpg";
+      };
 
-      diff = { patience = true; };
+      diff = {
+        patience = true;
+      };
 
       # thanks https://github.com/dracula/git/blob/master/config/gitconfig
       color = {
@@ -107,11 +127,17 @@
         };
       };
 
-      url = { "git@github.com:".insteadOf = "https://github.com/"; };
+      url = {
+        "git@github.com:".insteadOf = "https://github.com/";
+      };
 
-      init = { defaultBranch = "main"; };
+      init = {
+        defaultBranch = "main";
+      };
 
-      rerere = { enabled = true; };
+      rerere = {
+        enabled = true;
+      };
 
       rebase = {
         autoStash = true;

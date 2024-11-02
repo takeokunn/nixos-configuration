@@ -1,6 +1,13 @@
-{ sources, epkgs, pkgs }:
-let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
-in with epkgs; [
+{
+  sources,
+  epkgs,
+  pkgs,
+}:
+let
+  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+in
+with epkgs;
+[
   # Basic Lisp
   paredit
   rainbow-delimiters

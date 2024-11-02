@@ -1,5 +1,8 @@
-{ pkgs, sources }: {
-  home.file = { ".tig/dracula/".source = sources.dracula-tig.src; };
+{ pkgs, sources }:
+{
+  home.file = {
+    ".tig/dracula/".source = sources.dracula-tig.src;
+  };
 
   programs.tig = {
     enable = true;

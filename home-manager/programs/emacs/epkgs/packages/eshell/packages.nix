@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   eshell-multiple = epkgs.melpaBuild {
     pname = "eshell-multiple";
     version = "0.0.1";

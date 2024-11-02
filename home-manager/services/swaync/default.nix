@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   services.swaync = {
     enable = pkgs.stdenv.isLinux;
     settings = {

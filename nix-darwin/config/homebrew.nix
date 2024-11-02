@@ -6,8 +6,14 @@
       upgrade = true;
       cleanup = "uninstall";
     };
-    taps = [ "dracula/install" "nikitabobko/tap" ];
-    brews = [ "pinentry-mac" "terminal-notifier" ];
+    taps = [
+      "dracula/install"
+      "nikitabobko/tap"
+    ];
+    brews = [
+      "pinentry-mac"
+      "terminal-notifier"
+    ];
     casks = [
       "aerospace"
       "android-studio"

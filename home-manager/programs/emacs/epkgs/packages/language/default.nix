@@ -1,6 +1,13 @@
-{ epkgs, pkgs, sources }:
-let packages = pkgs.callPackage ./packages.nix { inherit epkgs sources; };
-in with epkgs; [
+{
+  epkgs,
+  pkgs,
+  sources,
+}:
+let
+  packages = pkgs.callPackage ./packages.nix { inherit epkgs sources; };
+in
+with epkgs;
+[
   apache-mode
   packages.bazel-mode
   bison-mode

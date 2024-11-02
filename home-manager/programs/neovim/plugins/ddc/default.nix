@@ -1,6 +1,8 @@
 { pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
-in [
+let
+  plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
+in
+[
   plugins.ddc-source-file
   plugins.ddc-converter_remove_overlap
   plugins.ddc-matcher_head

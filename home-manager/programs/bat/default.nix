@@ -1,4 +1,5 @@
-{ pkgs, sources }: {
+{ pkgs, sources }:
+{
   programs.bat = {
     enable = true;
     themes = {
@@ -15,5 +16,9 @@
     };
   };
 
-  programs.fish = { shellAliases = { cat = "bat"; }; };
+  programs.fish = {
+    shellAliases = {
+      cat = "bat";
+    };
+  };
 }

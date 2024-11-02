@@ -15,16 +15,34 @@ let
   file = import ./packages/file { inherit epkgs; };
   ime = import ./packages/ime { inherit epkgs; };
   language = import ./packages/language { inherit epkgs pkgs sources; };
-  language_specific =
-    import ./packages/language_specific { inherit epkgs pkgs sources; };
+  language_specific = import ./packages/language_specific { inherit epkgs pkgs sources; };
   monitor = import ./packages/monitor { inherit epkgs pkgs sources; };
   org = import ./packages/org { inherit epkgs pkgs sources; };
   project = import ./packages/project { inherit epkgs; };
-  remote_access =
-    import ./packages/remote_access { inherit epkgs pkgs sources; };
+  remote_access = import ./packages/remote_access { inherit epkgs pkgs sources; };
   themes = import ./packages/themes { inherit epkgs; };
   search = import ./packages/search { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
-in ai ++ awesome ++ buffer ++ client ++ coding ++ cursor ++ dired ++ elfeed
-++ eshell ++ eww ++ exwm ++ file ++ ime ++ language ++ language_specific
-++ monitor ++ org ++ project ++ remote_access ++ themes ++ search ++ window
+in
+ai
+++ awesome
+++ buffer
+++ client
+++ coding
+++ cursor
+++ dired
+++ elfeed
+++ eshell
+++ eww
+++ exwm
+++ file
+++ ime
+++ language
+++ language_specific
+++ monitor
+++ org
+++ project
+++ remote_access
+++ themes
+++ search
+++ window

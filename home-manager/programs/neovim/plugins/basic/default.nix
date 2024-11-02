@@ -1,6 +1,9 @@
 { pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
-in with pkgs.vimPlugins; [
+let
+  plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
+in
+with pkgs.vimPlugins;
+[
   # cursor
   {
     type = "lua";

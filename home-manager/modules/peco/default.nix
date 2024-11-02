@@ -1,8 +1,15 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   cfg = config.programs.peco;
   jsonFormat = pkgs.formats.json { };
-in with lib; {
+in
+with lib;
+{
   options.programs.peco = {
     enable = mkEnableOption "Simplistic interactive filtering tool";
     package = mkPackageOption pkgs "peco" { };
@@ -11,7 +18,6 @@ in with lib; {
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
-    xdg.configFile."peco/config.json".source =
-      jsonFormat.generate "config.json" cfg.config;
+    xdg.configFile."peco/config.json".source = jsonFormat.generate "config.json" cfg.config;
   };
 }

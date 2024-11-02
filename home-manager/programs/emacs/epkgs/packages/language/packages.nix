@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   bazel-mode = epkgs.melpaBuild {
     pname = "bazel";
     version = "0.0.1";

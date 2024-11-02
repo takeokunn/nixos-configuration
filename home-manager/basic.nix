@@ -18,7 +18,8 @@ let
 
   # services
   basicServices = import ./services/basic.nix;
-in {
+in
+{
   imports = modules ++ basicPrograms ++ basicServices;
   home.stateVersion = "24.05";
   home.packages = basicPkgs;

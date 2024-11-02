@@ -1,6 +1,8 @@
 { pkgs, sources }:
-let plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
-in [
+let
+  plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
+in
+[
   plugins.ddu
   plugins.ddu-ui-ff
   plugins.ddu-ui-filer

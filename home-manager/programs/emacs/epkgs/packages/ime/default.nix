@@ -1,1 +1,6 @@
-{ epkgs }: with epkgs; [ ddskk ddskk-posframe ]
+{ epkgs }:
+with epkgs;
+[
+  ddskk
+  ddskk-posframe
+]

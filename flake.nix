@@ -34,17 +34,36 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     };
+    systems.url = "github:nix-systems/default";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs: {
-    darwinConfigurations = {
-      OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+  outputs =
+    {
+      nixpkgs,
+      systems,
+      treefmt-nix,
+      ...
+    }@inputs:
+    let
+      eachSystem = f: nixpkgs.lib.genAttrs (import systems) (system: f nixpkgs.legacyPackages.${system});
+      treefmtEval = eachSystem (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
+    in
+    {
+      formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
+
+      darwinConfigurations = {
+        OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+      };
+      nixosConfigurations = {
+        X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
+      };
+      nixOnDroidConfigurations = {
+        OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
+      };
     };
-    nixosConfigurations = {
-      X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
-    };
-    nixOnDroidConfigurations = {
-      OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
-    };
-  };
 }

@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   programs.peco = {
     enable = true;
     config = {

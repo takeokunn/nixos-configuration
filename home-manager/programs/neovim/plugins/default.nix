@@ -9,4 +9,5 @@ let
   skk = import ./skk { inherit pkgs sources; };
   themes = import ./themes { inherit pkgs; };
   telescope = import ./telescope { inherit pkgs; };
-in basic ++ git ++ language ++ lsp ++ skk ++ themes ++ telescope
+in
+basic ++ git ++ language ++ lsp ++ skk ++ themes ++ telescope

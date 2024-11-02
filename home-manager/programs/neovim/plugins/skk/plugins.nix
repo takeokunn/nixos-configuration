@@ -1,4 +1,5 @@
-{ vimUtils, sources }: {
+{ vimUtils, sources }:
+{
 
   skkeleton = vimUtils.buildVimPlugin {
     pname = sources.skkeleton.pname;

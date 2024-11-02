@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   services.mako = {
     enable = pkgs.stdenv.isLinux;
     backgroundColor = "#282a36";

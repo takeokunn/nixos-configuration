@@ -1,7 +1,10 @@
 {
   networking = {
-    knownNetworkServices =
-      [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
+    knownNetworkServices = [
+      "Wi-Fi"
+      "Ethernet Adaptor"
+      "Thunderbolt Ethernet"
+    ];
     dns = [
       "8.8.8.8"
       "8.8.4.4"

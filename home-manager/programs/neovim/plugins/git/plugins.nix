@@ -1,4 +1,5 @@
-{ vimUtils, sources }: {
+{ vimUtils, sources }:
+{
 
   vim-gin = vimUtils.buildVimPlugin {
     pname = sources.vim-gin.pname;

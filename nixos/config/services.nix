@@ -1,4 +1,5 @@
-{ username }: {
+{ username }:
+{
   services = {
     ntp.enable = true;
     cachix-agent.enable = true;
@@ -35,10 +36,14 @@
       userName = username;
       serviceMode = "system";
       config = {
-        modmap = [{
-          name = "CapsLock to Ctrl";
-          remap = { CapsLock = "Ctrl_L"; };
-        }];
+        modmap = [
+          {
+            name = "CapsLock to Ctrl";
+            remap = {
+              CapsLock = "Ctrl_L";
+            };
+          }
+        ];
       };
     };
 

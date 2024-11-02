@@ -1,4 +1,5 @@
-{ pkgs, sources }: {
+{ pkgs, sources }:
+{
   programs.neovim = {
     enable = true;
     withNodeJs = false;

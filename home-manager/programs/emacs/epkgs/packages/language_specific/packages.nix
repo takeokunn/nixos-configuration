@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   rainbow-csv = epkgs.melpaBuild {
     pname = "rainbow-csv";
     version = "0.0.1";

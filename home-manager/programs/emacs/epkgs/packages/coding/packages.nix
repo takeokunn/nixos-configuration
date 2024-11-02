@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   flycheck-projectile = epkgs.melpaBuild {
     pname = "flycheck-projectile";
     version = "0.0.1";

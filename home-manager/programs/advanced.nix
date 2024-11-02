@@ -1,4 +1,9 @@
-{ lib, pkgs, org-babel, sources }:
+{
+  lib,
+  pkgs,
+  org-babel,
+  sources,
+}:
 let
   emacs = import ./emacs { inherit pkgs org-babel sources; };
   git = import ./git;
@@ -13,7 +18,8 @@ let
   sway = import ./sway;
   swaylock = import ./swaylock { inherit lib pkgs; };
   waybar = import ./waybar { inherit pkgs; };
-in [
+in
+[
   emacs
   git
   nix-index

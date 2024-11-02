@@ -1,1 +1,4 @@
-{ pkgs }: { home.packages = [ pkgs.offlineimap ]; }
+{ pkgs }:
+{
+  home.packages = [ pkgs.offlineimap ];
+}

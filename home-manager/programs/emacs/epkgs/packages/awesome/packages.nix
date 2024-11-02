@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   pinentry-el = epkgs.melpaBuild {
     pname = "pinentry";
     version = "0.0.1";

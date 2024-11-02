@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   services.swayidle = {
     # enable = pkgs.stdenv.isLinux;
     enable = false;

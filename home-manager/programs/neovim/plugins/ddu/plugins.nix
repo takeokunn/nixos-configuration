@@ -1,4 +1,5 @@
-{ vimUtils, sources }: {
+{ vimUtils, sources }:
+{
   ddu = vimUtils.buildVimPlugin {
     pname = sources.vim-ddu.pname;
     version = sources.vim-ddu.date;

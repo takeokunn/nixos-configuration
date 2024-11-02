@@ -1,6 +1,13 @@
-{ pkgs, epkgs, sources }:
-let packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
-in with epkgs; [
+{
+  pkgs,
+  epkgs,
+  sources,
+}:
+let
+  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+in
+with epkgs;
+[
   # Command
   amx
 

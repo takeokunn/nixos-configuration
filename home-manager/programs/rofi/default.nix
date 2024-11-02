@@ -1,9 +1,13 @@
-{ pkgs }: {
+{ pkgs }:
+{
   home.file.".config/rofi/themes/dracula.rasi".source = ./themes/dracula.rasi;
   programs.rofi = {
     enable = pkgs.stdenv.isLinux;
     font = "Cica 16";
-    plugins = with pkgs; [ rofi-calc rofi-power-menu ];
+    plugins = with pkgs; [
+      rofi-calc
+      rofi-power-menu
+    ];
 
     pass = {
       enable = pkgs.stdenv.isLinux;

@@ -1,5 +1,6 @@
 { epkgs }:
-with epkgs; [
+with epkgs;
+[
   highlight-indent-guides
   hl-todo
   xterm-color

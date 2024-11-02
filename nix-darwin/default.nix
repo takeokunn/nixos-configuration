@@ -8,6 +8,16 @@ let
   networking = import ./config/networking.nix;
   security = import ./config/security.nix { inherit username; };
   launchd = import ./config/launchd.nix { inherit pkgs; };
-in {
-  imports = [ nix services fonts system homebrew networking security launchd ];
+in
+{
+  imports = [
+    nix
+    services
+    fonts
+    system
+    homebrew
+    networking
+    security
+    launchd
+  ];
 }

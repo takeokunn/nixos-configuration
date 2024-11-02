@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   home.packages = with pkgs; [ editorconfig-core-c ];
   editorconfig = {
     enable = true;
@@ -22,20 +23,40 @@
         indent_size = 4;
         indent_style = "tab";
       };
-      "*.{yml,yaml}" = { indent_size = 2; };
-      "*.tf" = { indent_size = 2; };
-      "*.scala" = { indent_size = 2; };
-      "*.json" = { indent_size = 2; };
-      "*.{el,lisp,asd}" = { max_line_length = 80; };
+      "*.{yml,yaml}" = {
+        indent_size = 2;
+      };
+      "*.tf" = {
+        indent_size = 2;
+      };
+      "*.scala" = {
+        indent_size = 2;
+      };
+      "*.json" = {
+        indent_size = 2;
+      };
+      "*.{el,lisp,asd}" = {
+        max_line_length = 80;
+      };
       "*.v" = {
         indent_size = 4;
         indent_style = "tab";
       };
-      "*.{ts,tsx}" = { indent_size = 2; };
-      "*.toml" = { indent_size = 2; };
-      "*.xml" = { indent_size = 2; };
-      "*.jsonnet" = { indent_size = 2; };
-      "*.nix" = { indent_size = 2; };
+      "*.{ts,tsx}" = {
+        indent_size = 2;
+      };
+      "*.toml" = {
+        indent_size = 2;
+      };
+      "*.xml" = {
+        indent_size = 2;
+      };
+      "*.jsonnet" = {
+        indent_size = 2;
+      };
+      "*.nix" = {
+        indent_size = 2;
+      };
     };
   };
 }

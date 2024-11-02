@@ -1,1 +1,6 @@
-{ epkgs }: with epkgs; [ open-junk-file vlf ]
+{ epkgs }:
+with epkgs;
+[
+  open-junk-file
+  vlf
+]

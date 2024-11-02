@@ -1,5 +1,6 @@
 { pkgs }:
-with pkgs.vimPlugins; [
+with pkgs.vimPlugins;
+[
   {
     type = "lua";
     plugin = telescope-nvim;

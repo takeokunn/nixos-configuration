@@ -1,4 +1,5 @@
-{ vimUtils, sources }: {
+{ vimUtils, sources }:
+{
   ddc-source-file = vimUtils.buildVimPlugin {
     pname = sources.vim-ddc-source-file.pname;
     version = sources.vim-ddc-source-file.date;

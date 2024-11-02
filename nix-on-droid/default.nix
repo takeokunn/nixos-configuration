@@ -1,5 +1,14 @@
-{ nixpkgs, pkgs, system, ... }: {
-  environment.packages = with pkgs; [ git emacs ];
+{
+  nixpkgs,
+  pkgs,
+  system,
+  ...
+}:
+{
+  environment.packages = with pkgs; [
+    git
+    emacs
+  ];
 
   time.timeZone = "Asia/Tokyo";
 

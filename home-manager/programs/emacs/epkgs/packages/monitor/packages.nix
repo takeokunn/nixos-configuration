@@ -1,4 +1,5 @@
-{ sources, epkgs }: {
+{ sources, epkgs }:
+{
   explain-pause-mode = epkgs.melpaBuild {
     pname = "explain-pause-mode";
     version = "0.0.1";

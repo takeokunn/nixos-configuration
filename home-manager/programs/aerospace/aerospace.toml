@@ -10,7 +10,7 @@ after-startup-command = ['exec-and-forget sketchybar']
 exec-on-workspace-change = [
   '/bin/bash',
   '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)'
+  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)',
 ]
 
 accordion-padding = 0

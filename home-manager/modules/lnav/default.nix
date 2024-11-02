@@ -1,8 +1,15 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   cfg = config.programs.lnav;
   jsonFormat = pkgs.formats.json { };
-in with lib; {
+in
+with lib;
+{
   options.programs.lnav = {
     enable = mkEnableOption "Log file navigator";
     package = mkPackageOption pkgs "lnav" { };
@@ -11,7 +18,6 @@ in with lib; {
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
-    xdg.configFile."lnav/config.json".source =
-      jsonFormat.generate "config.json" cfg.config;
+    xdg.configFile."lnav/config.json".source = jsonFormat.generate "config.json" cfg.config;
   };
 }

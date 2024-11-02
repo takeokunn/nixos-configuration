@@ -1,4 +1,9 @@
-{ pkgs, xremap, username, ... }:
+{
+  pkgs,
+  xremap,
+  username,
+  ...
+}:
 let
   boot = import ./config/boot.nix;
   fonts = import ./config/fonts.nix { inherit pkgs; };
@@ -13,7 +18,8 @@ let
   time = import ./config/time.nix;
   users = import ./config/users.nix { inherit pkgs username; };
   virtualisation = import ./config/virtualisation.nix;
-in {
+in
+{
   system.stateVersion = "24.05";
   imports = [
     xremap.nixosModules.default

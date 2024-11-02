@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   system = {
     stateVersion = 4;
     defaults = {

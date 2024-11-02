@@ -1,1 +1,6 @@
-{ epkgs }: with epkgs; [ projectile consult-projectile ]
+{ epkgs }:
+with epkgs;
+[
+  projectile
+  consult-projectile
+]
