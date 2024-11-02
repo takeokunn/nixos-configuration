@@ -3,5 +3,5 @@ keys:
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
-    - pgp:
-      - *take
+      - pgp:
+          - *take

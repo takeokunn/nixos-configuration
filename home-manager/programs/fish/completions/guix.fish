@@ -91,7 +91,7 @@ function __fish_guix_needs_command
                     #     set skip_next 0
                     #     continue
                     # these behave like commands and everything after them is ignored
-                case "--help" "--version"
+                case --help --version
                     return 1
                     # We assume that any other token that's not an argument to a general option is a command
                 case "*"
@@ -121,20 +121,20 @@ complete -f -c guix -s V -l version -d 'Display version information.'
 
 #### download
 set -l remotecommands format no-check-certificate
-complete -f -c guix -n '__fish_guix_needs_command' -a download -d 'Download object from source into the gnu store'
+complete -f -c guix -n __fish_guix_needs_command -a download -d 'Download object from source into the gnu store'
 complete -f -c guix -n '__fish_guix_using_command download' -s f -l format -d'Write the hash in the given format'
 complete -f -c guix -n '__fish_guix_using_command download' -l no-check-certificate -d 'Do not validate the certificate of HTTPS servers'
 
 #### pull
 set -l remotecommands verbose url bootstrap
-complete -f -c guix -n '__fish_guix_needs_command' -a pull -d 'Download and deploy the latest version of Guix'
+complete -f -c guix -n __fish_guix_needs_command -a pull -d 'Download and deploy the latest version of Guix'
 complete -f -c guix -n '__fish_guix_using_command pull' -l verbose -d 'produce verbose output'
 complete -f -c guix -n '__fish_guix_using_command pull' -l url -d 'download the Guix tarball from URL'
 complete -f -c guix -n '__fish_guix_using_command pull' -l bootstrap -d 'use the bootstrap Guile to build the new Guix'
 
 #### system
 set -l remotecommands reconfigure roll-back switch-generation list-generations build container vm image init extension-graph shepherd-graph load-path keep-failed keep-going dry-run fallback no-substitutes substitutes-urls no-grafts no-offload max-silent-time timeout verbosity rounds cores max-jobs derivation on-error image-size no-grub share expose full-boot
-complete -f -c guix -n '__fish_guix_needs_command' -a system -d 'Build the operating system declared in FILE according to ACTION.'
+complete -f -c guix -n __fish_guix_needs_command -a system -d 'Build the operating system declared in FILE according to ACTION.'
 complete -f -c guix -n '__fish_guix_using_command system' -l reconfigure -d 'switch to a new operating system configuration'
 complete -f -c guix -n '__fish_guix_using_command system' -l roll-back -d 'switch to the previous operating system configuration'
 complete -f -c guix -n '__fish_guix_using_command system' -l switch-generation -d 'switch to an existing operating system configuration'
@@ -174,7 +174,7 @@ complete -f -c guix -n '__fish_guix_using_command system' -l full-boot -d 'for \
 
 #### build
 set -l remotecommands expression file source sources system target derivations check repair root quiet log-file load-path keep-failed keep-going dry-run fallback no-substitutes substitute-urls no-grafts no-offload max-silent-time timeout verbosity rounds cores max-jobs with-source with-input with-graft
-complete -f -c guix -n '__fish_guix_needs_command' -a build -d 'Build the given PACKAGE-OR-DERIVATION and return their output paths.'
+complete -f -c guix -n __fish_guix_needs_command -a build -d 'Build the given PACKAGE-OR-DERIVATION and return their output paths.'
 complete -f -c guix -n '__fish_guix_using_command build' -a "--expression=" -d 'build the package or derivation EXPR evaluates to'
 complete -f -c guix -n '__fish_guix_using_command build' -s f -d 'build the package or derivation that the code within FILE evaluates to' --exclusive --arguments "(ls -ap)"
 # The command below is broken:
@@ -215,7 +215,7 @@ complete -f -c guix -n '__fish_guix_using_command build' -a "--with-graft=" -d '
 
 #### package
 set -l remotecommands install install-from-expression install-from-file remove upgrade manifest do-no-upgrade roll-back search-paths list-generations delete-generations switch-generation profile bootstrap verbose search list-installed list-available show load-path keep-failed keep-going dry-run fallback no.substitutes substitute-urls no-grafts no-offload max-silent-time timenout verbosity rounds cores max-jobs with-source with-input with-graft
-complete -f -c guix -n '__fish_guix_needs_command' -a package -d 'Install, remove, or upgrade packages in a single transaction.'
+complete -f -c guix -n __fish_guix_needs_command -a package -d 'Install, remove, or upgrade packages in a single transaction.'
 complete -f -c guix -n '__fish_guix_using_command package' -s i -l install -d 'install PACKAGEs'
 complete -f -c guix -n '__fish_guix_using_command package' -s e -d 'install the package EXP evaluates to'
 complete -f -c guix -n '__fish_guix_using_command package' -a "--install-from-expression=" -d 'install the package EXP evaluates to'
@@ -266,14 +266,14 @@ complete -f -c guix -n '__fish_guix_using_command package' -a "--with-graft=" -d
 
 #### size
 set -l remotecommands substitute-urls= system= map-file=
-complete -f -c guix -n '__fish_guix_needs_command' -a size -d 'Report the size of PACKAGE and its dependencies.'
+complete -f -c guix -n __fish_guix_needs_command -a size -d 'Report the size of PACKAGE and its dependencies.'
 complete -f -c guix -n '__fish_guix_using_command size' -a "--substitute-urls=" -d 'fetch substitute from URLS if they are authorized'
 complete -f -c guix -n '__fish_guix_using_command size' -a "--system=" -d 'consider packages for SYSTEM--e.g., "i686-linux"'
 complete -f -c guix -n '__fish_guix_using_command size' -a "--map-file=" -d 'write to FILE a graphical map of disk usage'
 
 #### refresh
 set -l remotecommands expression update select type list-updaters list-dependent key-server gpg key-download
-complete -f -c guix -n '__fish_guix_needs_command' -a refresh -d 'Update package definitions to match the latest upstream version'
+complete -f -c guix -n __fish_guix_needs_command -a refresh -d 'Update package definitions to match the latest upstream version'
 # FIXME: Too long. When PACKAGE... is given, update only the specified packages. Otherwise update all the packages of the distribution, or the subset thereof specified with `--select`.'
 complete -f -c guix -n '__fish_guix_using_command refresh' -a "--expression=" -d 'consider the package EXPR evaluates to'
 complete -f -c guix -n '__fish_guix_using_command refresh' -l update -d 'update source files in place'
@@ -288,7 +288,7 @@ complete -f -c guix -n '__fish_guix_using_command refresh' -a "--key-download=" 
 
 #### publish
 set -l remotecommands port= listen= user= compression ttl= repl
-complete -f -c guix -n '__fish_guix_needs_command' -a publish -d 'Publish /gnu/store over HTTP.'
+complete -f -c guix -n __fish_guix_needs_command -a publish -d 'Publish /gnu/store over HTTP.'
 complete -f -c guix -n '__fish_guix_using_command publish' -a "--port=" -d 'listen on PORT'
 complete -f -c guix -n '__fish_guix_using_command publish' -a "--listen=" -d 'listen on the network interface for HOST'
 complete -f -c guix -n '__fish_guix_using_command publish' -a "--user=" -d 'change privileges to USER as soon as possible'
@@ -298,7 +298,7 @@ complete -f -c guix -n '__fish_guix_using_command publish' -l repl -d '[=PORT] s
 
 #### lint
 set -l remotecommands checkers list-checkers
-complete -f -c guix -n '__fish_guix_needs_command' -a lint -d 'Run a set of checkers on the specificied package.'
+complete -f -c guix -n __fish_guix_needs_command -a lint -d 'Run a set of checkers on the specificied package.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l list-checkers -d 'Display the list of available lint checkers.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l checkers -d 'Only run the specified checkers.'
 complete -f -c guix -n '__fish_guix_using_command lint' -l description -d 'Validate package descriptions.'
@@ -318,7 +318,7 @@ complete -f -c guix -n '__fish_guix_using_command lint' -l formatting -d 'Look f
 
 #### import
 set -l remotecommands import gnu nix pypi cpan hackage elpa gem cran crate texlive json
-complete -f -c guix -n '__fish_guix_needs_command' -a import -d 'Run IMPORTER with ARGS'
+complete -f -c guix -n __fish_guix_needs_command -a import -d 'Run IMPORTER with ARGS'
 ##### import gnu
 complete -f -c guix -n '__fish_guix_using_command import; and not __fish_seen_subcommand_from $remotecommands' -a gnu -d 'Return a package declaration template for PACKAGE, a GNU package.'
 complete -f -c guix -n '__fish_guix_using_command import; and __fish_seen_subcommand_from gnu' -a "--key-download=" -d 'handle missing OpenPGP keys according to POLICY: "always", "never", and "interactive", which is also used when "key-download" is not specified.'
@@ -353,7 +353,7 @@ complete -f -c guix -n '__fish_guix_using_command import; and __fish_seen_subcom
 
 #### hash
 set -l remotecommands exclude-vcs format= recursive
-complete -f -c guix -n '__fish_guix_needs_command' -a hash -d 'Return the cryptographic hash of a FILE.'
+complete -f -c guix -n __fish_guix_needs_command -a hash -d 'Return the cryptographic hash of a FILE.'
 complete -f -c guix -n '__fish_guix_using_command hash' -s x -l exclude-vcs -d 'Exclude version control directories.'
 complete -f -c guix -n '__fish_guix_using_command hash' -s f -d 'Write the hash in the given format.' --exclusive --arguments "nix-base32 base32 base16 hex hexadecimal"
 complete -f -c guix -n '__fish_guix_using_command hash' -a "--format=" -d 'Write the hash in the given format.' --exclusive --arguments "nix-base32 base32 base16 hex hexadecimal"
@@ -361,7 +361,7 @@ complete -f -c guix -n '__fish_guix_using_command hash' -s r -l recursive -d 'Co
 
 #### graph
 set -l remotecommands backend list-backends type list-types expression
-complete -f -c guix -n '__fish_guix_needs_command' -a graph -d 'Emit a Graphviz (dot) representation of the dependencies of a PACKAGE.'
+complete -f -c guix -n __fish_guix_needs_command -a graph -d 'Emit a Graphviz (dot) representation of the dependencies of a PACKAGE.'
 complete -f -c guix -n '__fish_guix_using_command graph' -l backend -d 'Produce a graph with the given backend TYPE'
 complete -f -c guix -n '__fish_guix_using_command graph' -l list-backends -d 'list the available graph backends'
 complete -f -c guix -n '__fish_guix_using_command graph' -l type -d 'represent nodes of the given TYPE'
@@ -370,7 +370,7 @@ complete -f -c guix -n '__fish_guix_using_command graph' -l expression -d 'consi
 
 #### gc
 set -l remotecommands collect-garbage free-space delete optimize list-dead list-live references requisites referrers verify list-failures clear-failures
-complete -f -c guix -n '__fish_guix_needs_command' -a gc -d 'Invoke the garbage collector.'
+complete -f -c guix -n __fish_guix_needs_command -a gc -d 'Invoke the garbage collector.'
 complete -f -c guix -n '__fish_guix_using_command gc' -s C -d 'collect at least MIN bytes of garbage'
 complete -f -c guix -n '__fish_guix_using_command gc' -a "--collect-garbage=" -d 'collect at least MIN bytes of garbage'
 complete -f -c guix -n '__fish_guix_using_command gc' -s F -d 'attempt to reach FREE available space in the store'
@@ -389,7 +389,7 @@ complete -f -c guix -n '__fish_guix_using_command gc' -l clear-failures -d 'remo
 
 #### environment
 set -l remotecommands expression load ad-hoc pure search-paths system root container network share expose bootstrap load-path keep-failed keep-going dry-run fallback no-substitutes substitute-urls no-grafts no-offload max-silent-time timeout verbosity rounds cores max-jobs
-complete -f -c guix -n '__fish_guix_needs_command' -a environment -d 'Build an environment that includes the dependencies of PACKAGE and execute COMMAND or an interactive shell in that environment.'
+complete -f -c guix -n __fish_guix_needs_command -a environment -d 'Build an environment that includes the dependencies of PACKAGE and execute COMMAND or an interactive shell in that environment.'
 complete -f -c guix -n '__fish_guix_using_command environment' -s e -d 'Create environment for the package that EXPR evaluates to'
 complete -f -c guix -n '__fish_guix_using_command environment' -a "--expression=" -d 'Create environment for the package that EXPR evaluates to'
 complete -f -c guix -n '__fish_guix_using_command environment' -s l -d 'create environment for the package that the code within FILE evaluates to.'
@@ -426,11 +426,11 @@ complete -f -c guix -n '__fish_guix_using_command environment' -s M -d 'allow at
 complete -f -c guix -n '__fish_guix_using_command environment' -a "--max-jobs=" -d 'allow at most N build jobs'
 
 #### edit
-complete -f -c guix -n '__fish_guix_needs_command' -a edit -d 'Start $VISUAL or $EDITOR to edit the definitions of PACKAGE.'
+complete -f -c guix -n __fish_guix_needs_command -a edit -d 'Start $VISUAL or $EDITOR to edit the definitions of PACKAGE.'
 
 #### copy
 set -l remotecommands to= from= load-path= keep-failed keep-going dry-run fallback no-substitutes substitute-urls= no-grafts no-offload max-silent-time= timeout= verbosity= rounds= cores= max-jobs=
-complete -f -c guix -n '__fish_guix_needs_command' -a copy -d 'Copy ITEMS to or from the specified host over SSH.'
+complete -f -c guix -n __fish_guix_needs_command -a copy -d 'Copy ITEMS to or from the specified host over SSH.'
 complete -f -c guix -n '__fish_guix_using_command copy' -a "--to=" -d 'send ITEMS to HOST'
 complete -f -c guix -n '__fish_guix_using_command copy' -a "--from=" -d 'receive ITEMS from HOST'
 complete -f -c guix -n '__fish_guix_using_command copy' -s L -d 'prepend DIR to the package module search path'
@@ -454,18 +454,18 @@ complete -f -c guix -n '__fish_guix_using_command copy' -a "--max-jobs=" -d 'all
 
 #### container
 set -l remotecommands exec
-complete -f -c guix -n '__fish_guix_needs_command' -a container -d 'Build and manipulate Linux containers.'
+complete -f -c guix -n __fish_guix_needs_command -a container -d 'Build and manipulate Linux containers.'
 complete -f -c guix -n '__fish_guix_using_command container' -l exec -d 'Execute a command inside of an existing container.'
 
 #### challenge
 set -l remotecommands substitute-urls verbose
-complete -f -c guix -n '__fish_guix_needs_command' -a challenge -d 'Challenge the substitutes for PACKAGE provided by one or more servers.'
+complete -f -c guix -n __fish_guix_needs_command -a challenge -d 'Challenge the substitutes for PACKAGE provided by one or more servers.'
 complete -f -c guix -n '__fish_guix_using_command challenge' -a "--substitute-urls=" -d 'compare build results with those at URLS'
 complete -f -c guix -n '__fish_guix_using_command challenge' -s v -l verbose -d 'show details about successful comparisons'
 
 #### archive
 set -l remotecommands export format= recursive import missing extract= generate-key authorize expression= source system= target= load-path= keep-failed keep-going dry-run fallback no-substitutes substitute-urls= no-grafts no-offload max-silent-time= timeout= verbosity= rounds= cores= max-jobs=
-complete -f -c guix -n '__fish_guix_needs_command' -a archive -d 'Export/import one or more packages from/to the store.'
+complete -f -c guix -n __fish_guix_needs_command -a archive -d 'Export/import one or more packages from/to the store.'
 complete -f -c guix -n '__fish_guix_using_command archive' -l export -d 'export the specified files/packages to stdout'
 complete -f -c guix -n '__fish_guix_using_command archive' -a "--format=" -d 'export files/packages in the specified format FMT'
 complete -f -c guix -n '__fish_guix_using_command archive' -l recursive -d 'combined with \'--export\', include dependencies'
@@ -496,20 +496,20 @@ complete -f -c guix -n '__fish_guix_using_command archive' -a "--max-jobs=" -d '
 
 #### pack
 set -l remotecommands --load-path= --keep-failed --keep-going --dry-run --fallback --no-substitutes --substitute-urls= --no-grafts --no-offload --max-silent-time= --timeout= --verbosity= --rounds= --cores= --max-jobs= --with-source= --with-input= --with-graft= --format= --expression= --system= --target= --compression= --symlink= --localstatedir --help --version
-complete -f -c guix -n '__fish_guix_needs_command' -a pack -d 'Create a bundle of PACKAGE.'
+complete -f -c guix -n __fish_guix_needs_command -a pack -d 'Create a bundle of PACKAGE.'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--load-path=" -d 'prepend DIR to the package module search path'
 complete -f -c guix -n '__fish_guix_using_command pack' -s L -d 'prepend DIR to the package module search path'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--keep-failed" -d 'keep build tree of failed builds'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --keep-failed -d 'keep build tree of failed builds'
 complete -f -c guix -n '__fish_guix_using_command pack' -s K -d 'keep build tree of failed builds'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--keep-going" -d 'keep going when some of the derivations fail'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --keep-going -d 'keep going when some of the derivations fail'
 complete -f -c guix -n '__fish_guix_using_command pack' -s k -d 'keep going when some of the derivations fail'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--dry-run" -d 'do not build the derivations'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --dry-run -d 'do not build the derivations'
 complete -f -c guix -n '__fish_guix_using_command pack' -s n -d 'do not build the derivations'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--fallback" -d 'fall back to building when the substituter fails'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--no-substitutes" -d 'build instead of resorting to pre-built substitutes'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --fallback -d 'fall back to building when the substituter fails'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --no-substitutes -d 'build instead of resorting to pre-built substitutes'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--substitute-urls=" -d 'fetch substitute from URLS if they are authorized'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--no-grafts" -d 'do not graft packages'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--no-offload" -d 'do not attempt to offload builds via the build hook'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --no-grafts -d 'do not graft packages'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --no-offload -d 'do not attempt to offload builds via the build hook'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--max-silent-time=" -d 'mark the build as failed after SECONDS of silence'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--timeout=" -d 'mark the build as failed after SECONDS of activity'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--verbosity=" -d 'use the given verbosity LEVEL'
@@ -532,12 +532,12 @@ complete -f -c guix -n '__fish_guix_using_command pack' -a "--compression=" -d '
 complete -f -c guix -n '__fish_guix_using_command pack' -s C -d 'compress using TOOL--e.g., "lzip"'
 complete -f -c guix -n '__fish_guix_using_command pack' -a "--symlink=" -d 'create symlinks to the profile according to SPEC'
 complete -f -c guix -n '__fish_guix_using_command pack' -s S -d 'create symlinks to the profile according to SPEC'
-complete -f -c guix -n '__fish_guix_using_command pack' -a "--localstatedir" -d 'include /var/guix in the resulting pack'
+complete -f -c guix -n '__fish_guix_using_command pack' -a --localstatedir -d 'include /var/guix in the resulting pack'
 
 
 ## weather
 set -l remotecommands substitute-urls manifest system
-complete -f -c guix -n '__fish_guix_needs_command' -a weather -d 'Report the availability of substitutes-'
+complete -f -c guix -n __fish_guix_needs_command -a weather -d 'Report the availability of substitutes-'
 complete -f -c guix -n '__fish_guix_using_command weather' -a "--substitute-urls=" -d 'check for available substitutes at URLS'
 complete -f -c guix -n '__fish_guix_using_command weather' -s m -d 'look up substitutes for packages specified in MANIFEST'
 complete -f -c guix -n '__fish_guix_using_command weather' -a "--manifest=" -d 'look up substitutes for packages specified in MANIFEST'

@@ -1,23 +1,23 @@
 function skylark
     set -l brand_id
     switch $argv
-        case "gusto"
+        case gusto
             set brand_id 1
-        case "bamiyan"
+        case bamiyan
             set brand_id 2
-        case "jonathan"
+        case jonathan
             set brand_id 3
-        case "yumean"
+        case yumean
             set brand_id 4
-        case "steak_gusto"
+        case steak_gusto
             set brand_id 5
-        case "grazie_gardens"
+        case grazie_gardens
             set brand_id 6
-        case "aiya"
+        case aiya
             set brand_id 7
-        case "karayoshi"
+        case karayoshi
             set brand_id 13
-        case "tonkara_tei"
+        case tonkara_tei
             set brand_id 14
         case '*'
             echo "invalid argument: please input [gusto, bamiyan, jonathan yumean steak_gusto grazie_gardens aiya karayoshi tonkara_tei]"

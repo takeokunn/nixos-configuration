@@ -32,7 +32,7 @@ complete -c ecspresso -n '__fish_seen_subcommand_from appspec' -l task-definitio
 complete -c ecspresso -n '__fish_seen_subcommand_from appspec' -l update-service -d "update service definition with task definition arn"
 
 # delete options
-complete -c ecspresso -n '__fish_seen_subcommand_from delete' -l dry-run -d "dry-run"
+complete -c ecspresso -n '__fish_seen_subcommand_from delete' -l dry-run -d dry-run
 complete -c ecspresso -n '__fish_seen_subcommand_from delete' -l force -d "delete without confirmation"
 complete -c ecspresso -n '__fish_seen_subcommand_from delete' -l terminate -d "delete with terminate tasks"
 

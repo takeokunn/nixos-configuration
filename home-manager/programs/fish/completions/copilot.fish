@@ -3,7 +3,7 @@
 function __copilot_debug
     set -l file "$BASH_COMP_DEBUG_FILE"
     if test -n "$file"
-        echo "$argv" >> $file
+        echo "$argv" >>$file
     end
 end
 
@@ -165,7 +165,7 @@ if type -q copilot
     # The space after the program name is essential to trigger completion for the program
     # and not completion of the program name itself.
     # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
-    complete --do-complete "copilot " > /dev/null 2>&1
+    complete --do-complete "copilot " >/dev/null 2>&1
 end
 
 # Remove any pre-existing completions for the program since we will be handling all of them.
@@ -173,4 +173,4 @@ complete -c copilot -e
 
 # The call to __copilot_prepare_completions will setup __copilot_comp_results
 # which provides the program's completion choices.
-complete -c copilot -n '__copilot_prepare_completions' -f -a '$__copilot_comp_results'
+complete -c copilot -n __copilot_prepare_completions -f -a '$__copilot_comp_results'

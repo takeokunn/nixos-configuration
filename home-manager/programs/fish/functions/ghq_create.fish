@@ -6,7 +6,7 @@ function ghq_create
 
     # Add README.md
     cd (ghq root)/github.com/takeokunn/(echo $argv)
-    echo "# "(echo $argv) >> README.md
+    echo "# "(echo $argv) >>README.md
     git add README.md
     git commit -m "Add README.md"
     git branch -M main

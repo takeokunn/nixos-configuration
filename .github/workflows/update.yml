@@ -1,10 +1,8 @@
 name: update
-
 on:
   workflow_dispatch:
   schedule:
     - cron: 0 19 * * *
-
 jobs:
   nix-update:
     name: Update lockfile
@@ -16,13 +14,14 @@ jobs:
         uses: actions/checkout@v4
       - name: prepare nix
         uses: cachix/install-nix-action@v30
-
       # update
       - name: Run nvfetcher
         run: nix run nixpkgs#nvfetcher
       - name: Run flake update
         run: nix flake update
-
+      # fmt
+      - name: Run fmt
+        run: nix fmt
       # git push
       - name: Commit changes
         run: |

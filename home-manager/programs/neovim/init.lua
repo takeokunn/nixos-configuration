@@ -2,7 +2,7 @@
 
 vim.opt.encoding = "utf-8"
 vim.opt.fileencodings = "utf-8,euc-jp,cp932"
-vim.opt.clipboard:append('unnamed')
+vim.opt.clipboard:append("unnamed")
 vim.opt.backspace = "indent,eol,start"
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
@@ -32,27 +32,27 @@ vim.cmd.syntax("on")
 
 -- basic keymap
 
-vim.g.mapleader = ','
+vim.g.mapleader = ","
 
-vim.keymap.set('n', '/', '/\\v', { remap = false })
-vim.keymap.set('n', 'U', '<C-r>', { remap = false })
-vim.keymap.set('n', '<Leader><Leader>', 'V', { remap = false })
-vim.keymap.set('n', '<Esc><Esc>', '<Cmd>nohlsearch<CR><Esc>', { remap = false })
-vim.keymap.set('i', '<C-j>', '<CR>')
+vim.keymap.set("n", "/", "/\\v", { remap = false })
+vim.keymap.set("n", "U", "<C-r>", { remap = false })
+vim.keymap.set("n", "<Leader><Leader>", "V", { remap = false })
+vim.keymap.set("n", "<Esc><Esc>", "<Cmd>nohlsearch<CR><Esc>", { remap = false })
+vim.keymap.set("i", "<C-j>", "<CR>")
 
 -- window keymap
 
-vim.keymap.set('n', 'sj', '<C-w>j', { noremap = true, silent = true })
-vim.keymap.set('n', 'sk', '<C-w>k', { noremap = true, silent = true })
-vim.keymap.set('n', 'sl', '<C-w>l', { noremap = true, silent = true })
-vim.keymap.set('n', 'sh', '<C-w>h', { noremap = true, silent = true })
-vim.keymap.set('n', 'sJ', '<C-w>J', { noremap = true, silent = true })
-vim.keymap.set('n', 'sK', '<C-w>K', { noremap = true, silent = true })
-vim.keymap.set('n', 'sL', '<C-w>L', { noremap = true, silent = true })
-vim.keymap.set('n', 'sH', '<C-w>H', { noremap = true, silent = true })
-vim.keymap.set('n', 'sw', '<C-w>w', { noremap = true, silent = true })
+vim.keymap.set("n", "sj", "<C-w>j", { noremap = true, silent = true })
+vim.keymap.set("n", "sk", "<C-w>k", { noremap = true, silent = true })
+vim.keymap.set("n", "sl", "<C-w>l", { noremap = true, silent = true })
+vim.keymap.set("n", "sh", "<C-w>h", { noremap = true, silent = true })
+vim.keymap.set("n", "sJ", "<C-w>J", { noremap = true, silent = true })
+vim.keymap.set("n", "sK", "<C-w>K", { noremap = true, silent = true })
+vim.keymap.set("n", "sL", "<C-w>L", { noremap = true, silent = true })
+vim.keymap.set("n", "sH", "<C-w>H", { noremap = true, silent = true })
+vim.keymap.set("n", "sw", "<C-w>w", { noremap = true, silent = true })
 
 -- buffer keymap
 
-vim.keymap.set('n', 'sp', ':<C-u>bp<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', 'sn', ':<C-u>bn<CR>', { noremap = true, silent = true })
+vim.keymap.set("n", "sp", ":<C-u>bp<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "sn", ":<C-u>bn<CR>", { noremap = true, silent = true })
