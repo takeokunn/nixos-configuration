@@ -10,6 +10,7 @@
     brews = [ "pinentry-mac" "terminal-notifier" ];
     casks = [
       "aerospace"
+      "android-studio"
       "aquaskk"
       "dracula-xcode"
       "google-chrome"
