@@ -44,6 +44,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       systems,
       treefmt-nix,
@@ -55,6 +56,9 @@
     in
     {
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
+      checks = eachSystem (pkgs: {
+        formatting = treefmtEval.${pkgs.system}.config.build.check self;
+      });
 
       darwinConfigurations = {
         OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
