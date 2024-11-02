@@ -786,7 +786,10 @@
   (add-to-list 'auto-mode-alist '("\\.nix$" . nix-mode))
   (add-to-list 'auto-mode-alist '("\\.drv$" . nix-drv-mode))
 
-  (add-hook 'before-save-hook #'nix-format-before-save)
+  (defun my/nix-fmt ()
+    (interactive)
+    (let ((default-directory (locate-dominating-file default-directory ".git")))
+      (shell-command-to-string "nix fmt")))
 #+end_src
 ** nginx-mode
 #+begin_src emacs-lisp :tangle yes
