@@ -1,6 +1,5 @@
 {
   "private": true,
-  "name": "private",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx secretlint --secretlintignore .gitignore \"**/*\""

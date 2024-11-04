@@ -4031,13 +4031,22 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** flutter
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flutter-test-mode
-                       flutter-run
-                       flutter-run-device
-                       flutter-run-or-hot-reload
-                       flutter-test-all
-                       flutter-test-current-file
-                       flutter-test-at-point
-                       flutter-mode) "flutter" nil t)
+                        flutter-run
+                        flutter-run-device
+                        flutter-run-or-hot-reload
+                        flutter-test-all
+                        flutter-test-current-file
+                        flutter-test-at-point
+                        flutter-mode) "flutter" nil t)
+
+  (defun my/flutter-switch-buffer ()
+    (interactive "P")
+    (if (get-buffer-process flutter-buffer-name)
+        (pop-to-buffer flutter-buffer-name)
+      (flutter-run-or-hot-reload)))
+
+  (with-eval-after-load 'dart
+    (define-key dart-mode-map (kbd "C-c C-z") #'my/flutter-switch-buffer))
 
   (with-eval-after-load 'flutter
     (add-hook 'flutter-mode-hook #'flutter--initialize))
