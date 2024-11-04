@@ -281,8 +281,8 @@
 ** indent/tab
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook
-  	  #'(lambda ()
-  	      (indent-tabs-mode nil)))
+          #'(lambda ()
+              (indent-tabs-mode nil)))
 #+END_SRC
 * Global Keybind
 ** basic
@@ -1474,8 +1474,8 @@
 
   (add-hook 'emacs-startup-hook #'key-chord-mode)
   (add-hook 'emacs-startup-hook #'(lambda ()
-  				 (key-chord-define-global "fj" #'view-mode)
-  				 (key-chord-define-global "jf" #'view-mode)))
+                                 (key-chord-define-global "fj" #'view-mode)
+                                 (key-chord-define-global "jf" #'view-mode)))
 #+end_src
 *** key-combo
 #+begin_src emacs-lisp :tangle yes
@@ -1693,7 +1693,7 @@
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'(lambda ()
-  			       (require 'lsp-dart))))
+                               (require 'lsp-dart))))
 #+end_src
 *** dap-mode
 #+begin_src emacs-lisp :tangle yes
@@ -2324,7 +2324,7 @@
                        consult-mode-command
 
                        ;; other
-  		     consult-completion-in-region
+                       consult-completion-in-region
                        consult-preview-at-point-mode
                        consult-register-window) "consult" nil t)
 
@@ -2596,8 +2596,8 @@
 ** projectile
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(projectile-mode
-  		     projectile-clear-known-projects
-  		     projectile-cleanup-known-projects) "projectile" nil t)
+                       projectile-clear-known-projects
+                       projectile-cleanup-known-projects) "projectile" nil t)
 
   (add-hook 'emacs-startup-hook #'projectile-mode)
 
@@ -3336,8 +3336,8 @@
 *** zalgo-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(zalgo-transform-word
-  		     zalgo-mode
-  		     zalgo-transform-region) "zalgo-mode" nil t)
+                       zalgo-mode
+                       zalgo-transform-region) "zalgo-mode" nil t)
 #+end_src
 ** Password
 *** pass
@@ -4031,25 +4031,23 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** flutter
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flutter-test-mode
-                        flutter-run
-                        flutter-run-device
-                        flutter-run-or-hot-reload
-                        flutter-test-all
-                        flutter-test-current-file
-                        flutter-test-at-point
-                        flutter-mode) "flutter" nil t)
-
-  (defun my/flutter-switch-buffer ()
-    (interactive "P")
-    (if (get-buffer-process flutter-buffer-name)
-        (pop-to-buffer flutter-buffer-name)
-      (flutter-run-or-hot-reload)))
-
-  (with-eval-after-load 'dart
-    (define-key dart-mode-map (kbd "C-c C-z") #'my/flutter-switch-buffer))
+                       flutter-run
+                       flutter-run-device
+                       flutter-run-or-hot-reload
+                       flutter-test-all
+                       flutter-test-current-file
+                       flutter-test-at-point
+                       flutter-mode) "flutter" nil t)
 
   (with-eval-after-load 'flutter
     (add-hook 'flutter-mode-hook #'flutter--initialize))
+
+  (with-eval-after-load 'dart
+    (define-key dart-mode-map (kbd "C-c C-z")
+                #'(lambda ()
+                    (interactive "P")
+                    (when (get-buffer "*Flutter")
+                      (pop-to-buffer "*Flutter*")))))
 #+end_src
 * Elfeed
 ** elfeed
