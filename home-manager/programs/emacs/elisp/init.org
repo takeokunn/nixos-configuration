@@ -4040,14 +4040,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        flutter-mode) "flutter" nil t)
 
   (with-eval-after-load 'flutter
-    (add-hook 'flutter-mode-hook #'flutter--initialize))
+    (add-hook 'flutter-mode-hook
+              #'(lambda ()
+                  (push '("*Flutter*") popwin:special-display-config)
+                  (flutter--initialize))))
 
-  (with-eval-after-load 'dart
-    (define-key dart-mode-map (kbd "C-c C-z")
-                #'(lambda ()
-                    (interactive "P")
-                    (when (get-buffer "*Flutter")
-                      (pop-to-buffer "*Flutter*")))))
+  (defun my/flutter-switch-buffer ()
+    (interactive)
+    (when (get-buffer "*Flutter*")
+      (pop-to-buffer "*Flutter*")))
+
+  (with-eval-after-load 'dart-mode
+    (define-key dart-mode-map (kbd "C-c z") #'my/flutter-switch-buffer))
 #+end_src
 * Elfeed
 ** elfeed
@@ -4788,11 +4792,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** consult-org-roam
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-org-roam-mode
-  		     consult-org-roam-file-find
-  		     consult-org-roam-backlinks
-  		     consult-org-roam-backlinks-recursive
-  		     consult-org-roam-forward-links
-  		     consult-org-roam-search) "consult-org-roam" nil t)
+                     consult-org-roam-file-find
+                     consult-org-roam-backlinks
+                     consult-org-roam-backlinks-recursive
+                     consult-org-roam-forward-links
+                     consult-org-roam-search) "consult-org-roam" nil t)
 
   (keymap-global-set "C-c n e" #'consult-org-roam-file-find)
   (keymap-global-set "C-c n b" #'consult-org-roam-backlinks)
