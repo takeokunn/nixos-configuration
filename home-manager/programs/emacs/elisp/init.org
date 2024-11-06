@@ -1260,23 +1260,24 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-mode flycheck-define-checker) "flycheck" nil t)
 #+end_src
-*** TODO flycheck-textlint
+*** flycheck-textlint
 #+begin_src emacs-lisp :tangle yes
-  ;; (add-hook 'emacs-startup-hook
-  ;;           #'(lambda ()
-  ;;               (flycheck-define-checker textlint
-  ;;                 "A linter for prose."
-  ;;                 :command ("npx" "textlint" "--format" "unix" source-inplace)
-  ;;                 :error-patterns
-  ;;                 ((warning line-start (file-name) ":" line ":" column ": "
-  ;;                           (id (one-or-more (not (any " "))))
-  ;;                           (message (one-or-more not-newline)
-  ;;                                    (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-  ;;                           line-end))
-  ;;                 :modes (org-mode))
+  (defun my/setup-flycheck-textlint ()
+    (interactive)
+    (flycheck-define-checker textlint
+      "A linter for prose."
+      :command ("npx" "textlint" "--format" "unix" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+                (id (one-or-more (not (any " "))))
+                (message (one-or-more not-newline)
+                         (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+                line-end))
+      :modes (org-mode))
+    (add-to-list 'flycheck-checkers 'textlint))
 
-  ;;               (with-eval-after-load 'flycheck
-  ;;                 (add-to-list 'flycheck-checkers 'textlint))))
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'my/setup-flycheck-textlint))
 #+end_src
 *** flycheck-elsa
 #+begin_src emacs-lisp :tangle yes
