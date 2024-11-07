@@ -152,15 +152,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "14dbbde595adbcb621e0bb0429f4982c9a9bc2cc";
+    version = "8ca514e53e7e05ae782a47f4cc32c81cd3349a65";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "14dbbde595adbcb621e0bb0429f4982c9a9bc2cc";
+      rev = "8ca514e53e7e05ae782a47f4cc32c81cd3349a65";
       fetchSubmodules = false;
-      sha256 = "sha256-stogbNORqtE5X22eSgsR3vNcvKeifC7NPX48WhZ8g/Q=";
+      sha256 = "sha256-7xaxrvBK0ELvvyw19yPcsNHCf2KnUAv5Ix/aKnt/a2k=";
     };
-    date = "2024-11-05";
+    date = "2024-11-03";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -296,15 +296,15 @@
   };
   emacs-plz-media-type = {
     pname = "emacs-plz-media-type";
-    version = "bf0bda2bf6258eae34ad25ed92c29627289360f7";
+    version = "9e1c361c01a553eb28157c1cb92e34f7953d7d6f";
     src = fetchFromGitHub {
       owner = "r0man";
       repo = "plz-media-type";
-      rev = "bf0bda2bf6258eae34ad25ed92c29627289360f7";
+      rev = "9e1c361c01a553eb28157c1cb92e34f7953d7d6f";
       fetchSubmodules = false;
-      sha256 = "sha256-g6+SpUFXRxN6JZonHzUCN4Xtfiqc2OHI+UbrNQzASwg=";
+      sha256 = "sha256-ZPRJUTXtLNf03hjUdq8YxnoFYb8EC4zokR1wJGv2obY=";
     };
-    date = "2024-11-04";
+    date = "2024-11-02";
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
@@ -500,15 +500,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "238c1a743f3b349e16fb3a5a4a00bb387292f436";
+    version = "feb4798064b69099dd7ad3beef46d202f64cb3eb";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "238c1a743f3b349e16fb3a5a4a00bb387292f436";
+      rev = "feb4798064b69099dd7ad3beef46d202f64cb3eb";
       fetchSubmodules = false;
-      sha256 = "sha256-7kF1Ki1qccWcDokbRPLZpt5wg65GQPwAwnuE/8/nhng=";
+      sha256 = "sha256-bZiqhhtDEYCnOeOFVt/VqTL2vDKxS7VVWOdsIqTbnG8=";
     };
-    date = "2024-11-05";
+    date = "2024-11-04";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -1064,15 +1064,15 @@
   };
   vim-ddu-source-help = {
     pname = "vim-ddu-source-help";
-    version = "007fe7d24d65b031c36d77f59374fc59f63f8323";
+    version = "b25d3b89b5e70c7d6b1bbc29d8db66fcbe2b00e4";
     src = fetchFromGitHub {
       owner = "matsui54";
       repo = "ddu-source-help";
-      rev = "007fe7d24d65b031c36d77f59374fc59f63f8323";
+      rev = "b25d3b89b5e70c7d6b1bbc29d8db66fcbe2b00e4";
       fetchSubmodules = false;
-      sha256 = "sha256-T9hcox6P3ZBcAwj3DQPtX/lCUcGL2DNf/gHCAv/rgXU=";
+      sha256 = "sha256-aUMZ30dib5irpK6sY5MX+3vnXGSSbU2iHFLvPlktkEo=";
     };
-    date = "2024-11-05";
+    date = "2023-11-18";
   };
   vim-ddu-source-highlight = {
     pname = "vim-ddu-source-highlight";
@@ -1172,15 +1172,15 @@
   };
   vim-ddu-ui-ff = {
     pname = "vim-ddu-ui-ff";
-    version = "f7fcf058549a798efd7a0b0df34e91e8f8fda268";
+    version = "6d8ebbfb9eb970f1a040879107be6e9b24ef7749";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-ff";
-      rev = "f7fcf058549a798efd7a0b0df34e91e8f8fda268";
+      rev = "6d8ebbfb9eb970f1a040879107be6e9b24ef7749";
       fetchSubmodules = false;
-      sha256 = "sha256-0BpihEqj2BbaDkZYaXuxiFf/Zx39a0Kutvw1cyTWVv8=";
+      sha256 = "sha256-XoyHPNhCaxbo63gCW7ba/wPW8su5Kt2WGdDsWNQGnT0=";
     };
-    date = "2024-11-06";
+    date = "2024-11-02";
   };
   vim-ddu-ui-filer = {
     pname = "vim-ddu-ui-filer";
@@ -1292,14 +1292,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "02099efd2c771f2826fa89b3cba49583682e9b11";
+    version = "068be62dc76116c21ab4cf67b8ce0783d51b1719";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "02099efd2c771f2826fa89b3cba49583682e9b11";
+      rev = "068be62dc76116c21ab4cf67b8ce0783d51b1719";
       fetchSubmodules = false;
-      sha256 = "sha256-NKAbCNgZHXfEGuh6aRtI7gCCiJRmc3F1sT92VqSEFX8=";
+      sha256 = "sha256-gqlISN+0izP9RhJ/Hi7e/TT3EoktpaFCYw8CvIV8qlo=";
     };
-    date = "2024-11-06";
+    date = "2024-11-04";
   };
 }
