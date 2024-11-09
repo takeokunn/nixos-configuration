@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   home = {
     file.".config/git/message".source = ./message;
     packages = with pkgs; [ git-secrets ];
