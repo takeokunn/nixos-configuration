@@ -1199,11 +1199,11 @@
 
   (add-to-list 'auto-mode-alist '("yarn\\.lock\\'" . yarn-mode))
 #+end_src
-** zig-mode
+** TODO zig-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(zig-mode) "zig-mode" nil t)
+  ;; (autoload-if-found '(zig-mode) "zig-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
 #+end_src
 * IME
 ** ddskk

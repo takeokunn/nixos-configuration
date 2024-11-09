@@ -1,7 +1,7 @@
 { pkgs }:
 {
   programs.rio = {
-    enable = false;
+    enable = true;
     package = pkgs.rio;
     settings = {
       fonts.size = 18;
