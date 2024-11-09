@@ -7,5 +7,4 @@ with pkgs;
 
   # for git
   ghq
-  git-secrets
 ]

@@ -6,7 +6,7 @@
 }:
 let
   emacs = import ./emacs { inherit pkgs org-babel sources; };
-  git = import ./git;
+  git = import ./git { inherit pkgs; };
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap { inherit pkgs; };
