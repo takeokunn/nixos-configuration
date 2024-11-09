@@ -93,21 +93,25 @@ if.app-id = 'org.gnu.Emacs'
 run = ['move-node-to-workspace 3']
 
 [[on-window-detected]]
+if.app-id = 'com.jgraph.drawio.desktop'
+run = ['move-node-to-workspace 4']
+
+[[on-window-detected]]
+if.app-id = 'io.flutterflow.prod.mac'
+run = ['move-node-to-workspace 4']
+
+[[on-window-detected]]
 if.app-id = 'com.hnc.Discord'
+run = ['move-node-to-workspace 9']
+
+[[on-window-detected]]
+if.app-id = 'com.hnc.Discord'
+run = ['move-node-to-workspace 9']
+
+[[on-window-detected]]
+if.app-id = 'com.openai.chat'
 run = ['move-node-to-workspace 9']
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = ['move-node-to-workspace 10']
-
-[[on-window-detected]]
-if.app-id = 'com.jgraph.drawio.desktop'
-run = ['move-node-to-workspace 4']
-
-[[on-window-detected]]
-if.app-id = 'jp.naver.line.mac'
-run = ['move-node-to-workspace 4']
-
-[[on-window-detected]]
-if.app-id = 'com.apple.dt.Xcode'
-run = ['move-node-to-workspace 4']
