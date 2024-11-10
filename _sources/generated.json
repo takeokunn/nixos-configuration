@@ -241,7 +241,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2024-11-09",
+    "date": "2024-11-10",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -253,11 +253,11 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "213964f792882e72cc5142c448729ffa40da4412",
-      "sha256": "sha256-R5By5y6DsGk5O1nmM8ySFPElB44JKg5pqRyD0EUBttc=",
+      "rev": "f7ec12d5700b3c4a55bb7a7c2f51cf2683fe42fa",
+      "sha256": "sha256-W1z+G2CV2qKsDYdXZWKURMKHPu2QyOaeAP5t8B33scU=",
       "type": "github"
     },
-    "version": "213964f792882e72cc5142c448729ffa40da4412"
+    "version": "f7ec12d5700b3c4a55bb7a7c2f51cf2683fe42fa"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -821,7 +821,7 @@
   },
   "vim-ddc": {
     "cargoLocks": null,
-    "date": "2024-11-07",
+    "date": "2024-11-10",
     "extract": null,
     "name": "vim-ddc",
     "passthru": null,
@@ -833,11 +833,11 @@
       "name": null,
       "owner": "Shougo",
       "repo": "ddc.vim",
-      "rev": "8001d04ee541f8c34c040d17921905e2282f1e46",
-      "sha256": "sha256-KbAMSIfUGQZw1ru+EbLQELoNmrmkDMDKKFK01N0ZKsU=",
+      "rev": "146cd0eda07e238abf14f97e4927dfe9dd361e63",
+      "sha256": "sha256-F6/g9L00hcFFwam6afL4qzD6/oBugx2UTQmnm2U7+ek=",
       "type": "github"
     },
-    "version": "8001d04ee541f8c34c040d17921905e2282f1e46"
+    "version": "146cd0eda07e238abf14f97e4927dfe9dd361e63"
   },
   "vim-ddc-buffer": {
     "cargoLocks": null,

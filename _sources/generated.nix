@@ -152,15 +152,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "213964f792882e72cc5142c448729ffa40da4412";
+    version = "f7ec12d5700b3c4a55bb7a7c2f51cf2683fe42fa";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "213964f792882e72cc5142c448729ffa40da4412";
+      rev = "f7ec12d5700b3c4a55bb7a7c2f51cf2683fe42fa";
       fetchSubmodules = false;
-      sha256 = "sha256-R5By5y6DsGk5O1nmM8ySFPElB44JKg5pqRyD0EUBttc=";
+      sha256 = "sha256-W1z+G2CV2qKsDYdXZWKURMKHPu2QyOaeAP5t8B33scU=";
     };
-    date = "2024-11-09";
+    date = "2024-11-10";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -500,15 +500,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "8001d04ee541f8c34c040d17921905e2282f1e46";
+    version = "146cd0eda07e238abf14f97e4927dfe9dd361e63";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "8001d04ee541f8c34c040d17921905e2282f1e46";
+      rev = "146cd0eda07e238abf14f97e4927dfe9dd361e63";
       fetchSubmodules = false;
-      sha256 = "sha256-KbAMSIfUGQZw1ru+EbLQELoNmrmkDMDKKFK01N0ZKsU=";
+      sha256 = "sha256-F6/g9L00hcFFwam6afL4qzD6/oBugx2UTQmnm2U7+ek=";
     };
-    date = "2024-11-07";
+    date = "2024-11-10";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
