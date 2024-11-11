@@ -1,7 +1,7 @@
 { config, ... }:
 {
   services.git-sync = {
-    enable = true;
+    enable = false;
     repositories = {
       private = {
         uri = "git@github.com:takeokunn/private";

@@ -4454,7 +4454,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'ob-core
     ;; config
     (setq org-confirm-babel-evaluate nil)
-    (add-to-list 'org-babel-default-header-args '(:results . "output")))
+    (setq org-babel-default-header-args '((:session . "none")
+                                          (:results . "drawer replace")
+                                          (:exports . "code")
+                                          (:cache . "no")
+                                          (:noweb . "no")
+                                          (:hlines . "no")
+                                          (:tangle . "no"))))
 
   (with-eval-after-load 'ob-eval
     ;; advice
@@ -4463,6 +4469,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                             (when (not (string= (nth 1 args)
                                                 "mysql: [Warning] Using a password on the command line interface can be insecure.\n"))
                               (apply old-func args)))))
+
 
 #+end_src
 *** ob-async
