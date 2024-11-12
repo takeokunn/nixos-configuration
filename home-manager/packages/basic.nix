@@ -7,6 +7,4 @@ with pkgs;
 
   # for git
   ghq
-
-  ansible
 ]
