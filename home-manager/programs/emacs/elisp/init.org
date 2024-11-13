@@ -3480,6 +3480,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'midnight
     (setopt clean-buffer-list-delay-general 1))
 #+end_src
+** Mouse
+*** inhibit-mouse
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(inhibit-mouse-mode) "inhibit-mouse" nil t)
+
+  (add-hook 'emacs-startup-hook #'inhibit-mouse-mode)
+#+end_src
 * Language Specific
 ** Basic Lisp
 *** paredit

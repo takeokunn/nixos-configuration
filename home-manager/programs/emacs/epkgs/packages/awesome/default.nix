@@ -51,4 +51,7 @@ with epkgs;
   password-store-otp
   pass
   password-generator
+
+  # Mouse
+  inhibit-mouse
 ]
