@@ -11,6 +11,7 @@ let
   nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap { inherit pkgs; };
   rio = import ./rio { inherit pkgs; };
+  ssh = import ./ssh;
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
@@ -26,6 +27,7 @@ in
   nyxt
   offlineimap
   rio
+  ssh
 
   # for window manager
   aerospace
