@@ -1,14 +1,14 @@
 { pkgs, sources }:
 {
-  home.file = {
+  xdg.configFile = {
     # completions
-    ".config/fish/completions/" = {
+    "fish/completions/" = {
       source = ./completions;
       recursive = true;
     };
 
     # functions
-    ".config/fish/functions/" = {
+    "fish/functions/" = {
       source = ./functions;
       recursive = true;
     };

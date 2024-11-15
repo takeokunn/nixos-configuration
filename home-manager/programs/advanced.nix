@@ -12,6 +12,7 @@ let
   offlineimap = import ./offlineimap { inherit pkgs; };
   rio = import ./rio { inherit pkgs; };
   ssh = import ./ssh;
+  sketchybar = import ./sketchybar;
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
@@ -28,6 +29,7 @@ in
   offlineimap
   rio
   ssh
+  sketchybar
 
   # for window manager
   aerospace
