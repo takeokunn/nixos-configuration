@@ -303,11 +303,16 @@
   (keymap-global-set "C-x C-k" nil)
 
   (keymap-global-set "M-d" #'my/delete-forward-block)
+  (keymap-global-set "M-L" #'syntax-subword-downcase)
 
   (when window-system
     (keymap-global-set "C-x C-c" nil))
 #+END_SRC
 * Language
+** ansible
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(ansible-mode) "ansible" nil t)
+#+end_src
 ** apache-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(apache-mode) "apache-mode" nil t)

@@ -8,6 +8,7 @@ let
 in
 with epkgs;
 [
+  ansible
   apache-mode
   packages.bazel-mode
   bison-mode
