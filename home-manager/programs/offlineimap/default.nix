@@ -1,11 +1,9 @@
 {
   programs.offlineimap = {
     enable = true;
-    extraConfig = {
-      general = {
-        accounts = "Gmail";
-        maxsyncaccounts = 1;
-      };
+    extraConfig.general = {
+      accounts = "Gmail";
+      maxsyncaccounts = 1;
     };
   };
 
@@ -15,7 +13,7 @@
       offlineimap = {
         enable = true;
         extraConfig.remote = {
-          maxconnections = 2;
+          maxconnections = 10;
         };
       };
       flavor = "gmail.com";
