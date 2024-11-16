@@ -5,7 +5,10 @@
     defaults = {
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;
       LaunchServices.LSQuarantine = false;
-      NSGlobalDomain.AppleShowAllExtensions = true;
+      NSGlobalDomain = {
+        _HIHideMenuBar = true;
+        AppleShowAllExtensions = true;
+      };
       finder = {
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
