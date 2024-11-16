@@ -4,25 +4,20 @@
       source = ./sketchybarrc;
       executable = true;
     };
-    "sketchybar/plugins/battery.sh" = {
-      source = ./plugins/battery.sh;
+    "sketchybar/items" = {
+      source = ./items;
       executable = true;
+      recursive = true;
     };
-    "sketchybar/plugins/clock.sh" = {
-      source = ./plugins/clock.sh;
+    "sketchybar/plugins" = {
+      source = ./plugins;
       executable = true;
+      recursive = true;
     };
-    "sketchybar/plugins/front_app.sh" = {
-      source = ./plugins/front_app.sh;
+    "sketchybar/scripts" = {
+      source = ./scripts;
       executable = true;
-    };
-    "sketchybar/plugins/space.sh" = {
-      source = ./plugins/space.sh;
-      executable = true;
-    };
-    "sketchybar/plugins/volume.sh" = {
-      source = ./plugins/volume.sh;
-      executable = true;
+      recursive = true;
     };
   };
 }
