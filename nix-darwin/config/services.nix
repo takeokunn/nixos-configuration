@@ -1,7 +1,7 @@
 {
   services = {
     nix-daemon.enable = true;
-    sketchybar.enable = false;
+    sketchybar.enable = true;
 
     offlineimap = {
       enable = true;

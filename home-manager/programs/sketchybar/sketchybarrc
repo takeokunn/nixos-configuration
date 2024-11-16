@@ -1,7 +1,6 @@
 #!/bin/bash
 
 PLUGIN_DIR="$CONFIG_DIR/plugins"
-ITEM_DIR="$CONFIG_DIR/items"
 
 ##### Color #####
 
@@ -45,25 +44,6 @@ sketchybar --add item logo left \
                  background.padding_left=4 \
                  click_script="sketchybar --update"
 
-sketchybar --add event aerospace_workspace_change
-
-for sid in $(aerospace list-workspaces --all); do
-    sketchybar --add item space.$sid left \
-        --subscribe space.$sid aerospace_workspace_change \
-        --set space.$sid icon=${sid} \
-                         icon.padding_left=20 \
-                         icon.padding_right=20 \
-                         icon.highlight_color=0xffE48FA8 \
-                         background.padding_left=-4 \
-                         background.padding_right=-4 \
-                         background.color=0xff3C3E4F \
-                         background.drawing=on \
-                         label.drawing=off \
-                         label="$sid" \
-                         click_script="aerospace workspace $sid" \
-                         script="$CONFIG_DIR/plugins/aerospace.sh $sid"
-done
-
 sketchybar --add item space_separator left \
            --set space_separator icon= \
                                  background.padding_left=23 \
@@ -72,7 +52,7 @@ sketchybar --add item space_separator left \
                                  icon.color=0xff92B3F5
 
 sketchybar --add item window_title left \
-           --set window_title script="~/.config/sketchybar/plugins/window_title.sh" \
+           --set window_title script="$PLUGIN_DIR/window_title.sh" \
                               icon.drawing=off \
                               label.color=0xffb7bdf4 \
            --subscribe window_title front_app_switched
@@ -89,18 +69,12 @@ sketchybar --default label.padding_left=6 \
                      background.padding_left=4 \
                      background.corner_radius=5
 
-sketchybar --add item spot_logo center \
-           --set spot_logo icon= \
-                           label.drawing=off \
-                           icon.color=0xff121219 \
-                           background.color=0xffEDC4E5
-
 ############## RIGHT ITEMS ##############
 
 sketchybar --add item time right \
            --set time update_freq=1 \
                       icon.drawing=off \
-                      script="~/.config/sketchybar/plugins/time.sh" \
+                      script="$PLUGIN_DIR/time.sh" \
                       background.color=0xff3C3E4F \
                       background.padding_left=0
 
@@ -114,7 +88,7 @@ sketchybar --add item time_logo right\
 sketchybar --add item date right \
            --set date update_freq=1000 \
                       icon.drawing=off \
-                      script="~/.config/sketchybar/plugins/date.sh" \
+                      script="$PLUGIN_DIR/date.sh" \
                       background.color=0xff3C3E4F \
                       background.padding_left=0
 
@@ -124,44 +98,18 @@ sketchybar --add item clock_logo right\
                             label.drawing=off \
                             background.color=0xff92B3F5
 
-# sketchybar --add item battery right \
-#            --set battery update_freq=3 \
-#                          icon.drawing=off \
-#                          script="~/.config/sketchybar/plugins/power.sh" \
-#                          background.color=0xff3C3E4F \
-#                          background.padding_left=0
+sketchybar --add item battery right \
+           --set battery update_freq=3 \
+                         icon.drawing=off \
+                         script="$PLUGIN_DIR/power.sh" \
+                         background.color=0xff3C3E4F \
+                         background.padding_left=0
 
-# sketchybar --add item power_logo right \
-#            --set power_logo icon= \
-#                  icon.color=0xff121219 \
-#                  label.drawing=off \
-#                  background.color=0xffB3E1A7
-
-# sketchybar --add item net right \
-#            --set net script="~/.config/sketchybar/plugins/net.sh" \
-#                      icon.drawing=off \
-#                      background.color=0xff3C3E4F \
-#                      background.padding_left=0
-
-# sketchybar --add item net_logo right \
-#            --set net_logo icon=\
-#                      icon.color=0xff121219\
-#                      label.drawing=off \
-#                      background.color=0xffE0A3AD
-
-# sketchybar --add item temp_logo right \
-#            --set temp_logo icon=\
-#                      icon.color=0xff121219\
-#                      label.drawing=off \
-#                      background.color=0xffF5E3B5
-
-# sketchybar --add item pressure_logo right \
-#            --set pressure_logo icon=󰈸\
-#                      icon.color=0xff121219\
-#                      label.drawing=off \
-#                      background.color=0xff92B3F5
-
-# sketchybar --subscribe net wifi_change wired_change
+sketchybar --add item power_logo right \
+           --set power_logo icon= \
+                            icon.color=0xff121219 \
+                            label.drawing=off \
+                            background.color=0xffB3E1A7
 
 ############## UPDATE ##############
 
