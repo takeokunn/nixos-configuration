@@ -1,31 +1,5 @@
-#!/usr/bin/env sh
-#
+#!/bin/bash
 
-# Full network name
-#LABEL="$(networksetup -listallhardwareports | awk '/Wi-Fi/{getline; print $2}' | xargs networksetup -getairportnetwork | sed "s/Current Wi-Fi Network: //")"
-
-# If first word is longer than 10 characters, print first 7 characters
-# If first word is shorter than 10 characters, print first word and first 2 characters of second word if any
-# LABEL="$(networksetup -listallhardwareports | awk '/Wi-Fi/{getline; print $2}' | xargs networksetup -getairportnetwork | sed "s/Current Wi-Fi Network: //" |
-#   awk '{
-#     if ($0 ~ /You are not associated with an AirPort network/) {
-#       print "N/A";
-#       exit;
-#     }
-#     else if (length($1) > 10) {
-#       label=substr($1, 1, 7);
-#       gsub(/ $/, "", label);
-#       print label "...";
-#     }
-#     else {
-#       print $1;
-#       if (NF > 1) {
-#         print(" ");
-#         printf substr($2, 1, 2) "...";
-#       }
-#     }
-#   }')"
-#
 # Get Wi-Fi network information
 WI_FI_INFO=$(networksetup -listallhardwareports | awk '/Wi-Fi/{getline; print $2}')
 
