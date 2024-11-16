@@ -148,14 +148,14 @@
         }
         {
           "if".app-id = "com.hnc.Discord";
-          run = [ "move-node-to-workspace 9" ];
-        }
-        {
-          "if".app-id = "com.openai.chat";
-          run = [ "move-node-to-workspace 9" ];
+          run = [ "move-node-to-workspace 7" ];
         }
         {
           "if".app-id = "com.anthropic.claudefordesktop";
+          run = [ "move-node-to-workspace 8" ];
+        }
+        {
+          "if".app-id = "com.openai.chat";
           run = [ "move-node-to-workspace 9" ];
         }
         {

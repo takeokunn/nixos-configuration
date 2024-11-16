@@ -9,7 +9,7 @@ let
   git = import ./git { inherit pkgs; };
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
-  offlineimap = import ./offlineimap { inherit pkgs; };
+  offlineimap = import ./offlineimap;
   rio = import ./rio { inherit pkgs; };
   ssh = import ./ssh;
   sketchybar = import ./sketchybar;
