@@ -120,60 +120,46 @@
 
       on-window-detected = [
         {
-          "if" = {
-            app-id = "com.google.Chrome";
-          };
+          "if".app-id = "com.google.Chrome";
           run = [
             "layout floating"
             "move-node-to-workspace 1"
           ];
         }
         {
-          "if" = {
-            app-id = "com.apple.Terminal";
-          };
+          "if".app-id = "com.apple.Terminal";
           run = [ "move-node-to-workspace 2" ];
         }
         {
-          "if" = {
-            app-id = "com.raphaelamorim.rio";
-          };
+          "if".app-id = "com.raphaelamorim.rio";
           run = [ "move-node-to-workspace 2" ];
         }
         {
-          "if" = {
-            app-id = "org.gnu.Emacs";
-          };
+          "if".app-id = "org.gnu.Emacs";
           run = [ "move-node-to-workspace 3" ];
         }
         {
-          "if" = {
-            app-id = "com.jgraph.drawio.desktop";
-          };
+          "if".app-id = "com.jgraph.drawio.desktop";
           run = [ "move-node-to-workspace 4" ];
         }
         {
-          "if" = {
-            app-id = "io.flutterflow.prod.mac";
-          };
+          "if".app-id = "io.flutterflow.prod.mac";
           run = [ "move-node-to-workspace 4" ];
         }
         {
-          "if" = {
-            app-id = "com.hnc.Discord";
-          };
+          "if".app-id = "com.hnc.Discord";
           run = [ "move-node-to-workspace 9" ];
         }
         {
-          "if" = {
-            app-id = "com.openai.chat";
-          };
+          "if".app-id = "com.openai.chat";
           run = [ "move-node-to-workspace 9" ];
         }
         {
-          "if" = {
-            app-id = "com.tinyspeck.slackmacgap";
-          };
+          "if".app-id = "com.anthropic.claudefordesktop";
+          run = [ "move-node-to-workspace 9" ];
+        }
+        {
+          "if".app-id = "com.tinyspeck.slackmacgap";
           run = [ "move-node-to-workspace 10" ];
         }
       ];

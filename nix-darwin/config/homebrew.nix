@@ -18,6 +18,7 @@
       "aerospace"
       "android-studio"
       "aquaskk"
+      "claude"
       "chatgpt"
       "dracula-xcode"
       "flutter"
