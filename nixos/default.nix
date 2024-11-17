@@ -20,7 +20,7 @@ let
   virtualisation = import ./config/virtualisation.nix;
 in
 {
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
   imports = [
     xremap.nixosModules.default
     boot

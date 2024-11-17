@@ -34,6 +34,6 @@ in
 {
   imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
-  home.stateVersion = "24.05";
+  home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;
 }
