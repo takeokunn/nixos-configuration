@@ -200,6 +200,11 @@ src.git = "https://github.com/nehrbash/zalgo-mode"
 src.branch = "main"
 fetch.github = "nehrbash/zalgo-mode"
 
+[emacs-ob-fish]
+src.git = "https://github.com/takeokunn/ob-fish"
+src.branch = "main"
+fetch.github = "takeokunn/ob-fish"
+
 # for neovim
 
 [vimdoc-ja]

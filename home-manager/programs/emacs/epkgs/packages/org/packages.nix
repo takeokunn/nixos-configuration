@@ -54,6 +54,14 @@
     ignoreCompilationError = false;
   };
 
+  ob-fish = epkgs.melpaBuild {
+    pname = "ob-fish";
+    version = "0.0.1";
+    src = sources.emacs-ob-fish.src;
+
+    ignoreCompilationError = false;
+  };
+
   ox-hatena = epkgs.melpaBuild {
     pname = "ox-hatena";
     version = "0.0.1";

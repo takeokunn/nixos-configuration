@@ -43,7 +43,7 @@ with epkgs;
 
   # Org Babel
   ob-async
-  # ob-fish
+  packages.ob-fish
   ob-rust
   ob-go
   ob-translate

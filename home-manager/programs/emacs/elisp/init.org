@@ -431,6 +431,8 @@
   (autoload-if-found '(direnv-mode direnv-envrc-mode) "direnv" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.envrc" . direnv-envrc-mode))
+
+  (add-hook 'emacs-startup-hook #'direnv-mode)
 #+end_src
 ** docker-compose-mode
 #+begin_src emacs-lisp :tangle yes
@@ -4492,10 +4494,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** ob-fish
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(org-babel-execute:fish) "ob-fish" nil t)
+  (autoload-if-found '(org-babel-execute:fish) "ob-fish" nil t)
 
-  ;; (with-eval-after-load 'org-src
-  ;;   (add-to-list 'org-src-lang-modes '("fish" . fish)))
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("fish" . fish)))
 #+end_src
 *** ob-rust
 #+begin_src emacs-lisp :tangle yes
