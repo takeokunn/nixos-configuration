@@ -27,10 +27,5 @@ in
       emacs-lsp-booster
       pinentry-emacs
     ];
-
-    sessionVariables = {
-      EDITOR = "emacsclient -nw";
-      HOMEBREW_EDITOR = "emacsclient -nw";
-    };
   };
 }
