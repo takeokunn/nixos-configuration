@@ -8,10 +8,12 @@
     };
     taps = [
       "dracula/install"
+      "FelixKratz/formulae"
       "nikitabobko/tap"
     ];
     brews = [
       "pinentry-mac"
+      "sketchybar"
       "terminal-notifier"
     ];
     casks = [
