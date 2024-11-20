@@ -62,7 +62,7 @@ with epkgs;
   lsp-haskell
   lsp-pyright
   lsp-dart
-  # lsp-bridge
+  lsp-bridge
 
   # Syntax
   syntax-subword

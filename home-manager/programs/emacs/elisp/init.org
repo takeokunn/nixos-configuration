@@ -1841,22 +1841,12 @@
 #+end_src
 *** TODO lsp-bridge
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "manateelazycat/lsp-bridge"))
+  (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
 
-  ;; (with-delayed-execution
-  ;;   (message "Install lsp-bridge...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-bridge"))
-
-  ;;   (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
-
-  ;;   (with-eval-after-load 'lsp-bridge
-  ;;     ;; config
-  ;;     (setopt lsp-bridge-php-lsp-server "phpactor")
-
-  ;;     ;; keybind
-  ;;     (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
-  ;;     (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references)))
+  (with-eval-after-load 'lsp-bridge
+      ;; keybind
+    (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
+    (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references))
 #+end_src
 ** Syntax
 *** syntax-subword
@@ -4724,7 +4714,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-roam-db
     ;; config
-    (setopt org-roam-database-connector 'sqlite)
     (setq org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
 #+end_src
 *** org-roam-capture
