@@ -1127,9 +1127,11 @@
 #+END_SRC
 ** typst-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(typst-mode) "typst-mode" nil t)
+  ;; (autoload-if-found '(typst-mode) "typst-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.typ\\'" . typst-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.typ\\'" . typst-mode))
+
+  (define-derived-mode typst-mode prog-mode "typst")
 #+END_SRC
 ** v-mode
 #+begin_src emacs-lisp :tangle yes
@@ -4636,6 +4638,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'org-nix-shell-mode))
 #+end_src
 ** Org Publish
+*** ox
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-export-define-backend) "ox" nil t)
+#+end_src
 *** ox-html
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ox-html
@@ -4648,9 +4654,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** ox-gfm
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-gfm-export-as-markdown
-                         org-gfm-convert-region-to-md
-                         org-gfm-export-to-markdown
-                         org-gfm-publish-to-gfm) "ox-gfm" nil t)
+                       org-gfm-convert-region-to-md
+                       org-gfm-export-to-markdown
+                       org-gfm-publish-to-gfm) "ox-gfm" nil t)
 #+end_src
 *** ox-zenn
 #+begin_src emacs-lisp :tangle yes
@@ -4684,10 +4690,49 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** ox-typst
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-typst-export-as-typst
+  (autoload-if-found '(org-typst-export-block
+                       org-typst-headline
+                       org-typst-item
+                       org-typst-keyword
+                       org-typst-section
+                       org-typst-src-block
+                       org-typst-format-drawer-function
+                       org-typst-format-inlinetask-function
+                       org-typst-export-as-typst
                        org-typst-export-to-typst
                        org-typst-export-to-pdf
                        org-typst-compile) "ox-typst" nil t)
+
+  (org-export-define-backend 'typst-slide
+    '((export-block . org-typst-export-block)
+      (headline . org-typst-headline)
+      (item . org-typst-item)
+      (keyword . org-typst-keyword)
+      (section . org-typst-section)
+      (src-block . org-typst-src-block))
+    :menu-entry
+    '(?y "Export to Typst"
+         ((?F "As Typst buffer" org-typst-export-as-typst)
+          (?f "As Typst file" org-typst-export-to-typst)
+          (?p "As PDF file" org-typst-export-to-pdf)))
+    :options-alist
+    '((:typst-format-drawer-function nil nil #'(lambda (_ contents) contents))
+      (:typst-format-inlinetask-function nil
+                                         nil
+                                         #'(lambda (_ contents) contents))))
+
+  (defun org-typst-slide-export-as-typst
+      (&optional async subtreep visible-only body-only ext-plist)
+    (interactive)
+    (org-export-to-buffer 'typst-slide "*Org Typst Slide Export*"
+      async subtreep visible-only body-only ext-plist))
+
+  (defun org-typst-slide-export-to-typst
+      (&optional async subtreep visible-only body-only ext-plist)
+    (interactive)
+    (let ((outfile (org-export-output-file-name ".typ" subtreep)))
+      (org-export-to-file 'typst-slide outfile
+        async subtreep visible-only body-only ext-plist)))
 #+end_src
 ** Org Roam
 *** basic
