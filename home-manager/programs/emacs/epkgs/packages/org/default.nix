@@ -68,6 +68,7 @@ with epkgs;
   packages.ox-hatena
   ox-qmd
   ox-hugo
+  packages.ox-typst
 
   # Org Roam
   org-roam

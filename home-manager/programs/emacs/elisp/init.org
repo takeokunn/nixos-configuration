@@ -4676,6 +4676,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt org-hugo-auto-set-lastmod t))
 #+end_src
+*** ox-typst
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-typst-export-as-typst
+                       org-typst-export-to-typst
+                       org-typst-export-to-pdf
+                       org-typst-compile) "ox-typst" nil t)
+#+end_src
 ** Org Roam
 *** basic
 #+begin_src emacs-lisp :tangle yes

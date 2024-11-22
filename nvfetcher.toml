@@ -205,6 +205,11 @@ src.git = "https://github.com/takeokunn/ob-fish"
 src.branch = "main"
 fetch.github = "takeokunn/ob-fish"
 
+[emacs-ox-typst]
+src.git = "https://github.com/jmpunkt/ox-typst"
+src.branch = "main"
+fetch.github = "jmpunkt/ox-typst"
+
 # for neovim
 
 [vimdoc-ja]

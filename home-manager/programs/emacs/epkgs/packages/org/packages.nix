@@ -69,4 +69,12 @@
 
     ignoreCompilationError = false;
   };
+
+  ox-typst = epkgs.melpaBuild {
+    pname = "ox-typst";
+    version = "0.0.1";
+    src = sources.emacs-ox-typst.src;
+
+    ignoreCompilationError = false;
+  };
 }
