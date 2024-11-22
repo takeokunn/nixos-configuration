@@ -210,6 +210,11 @@ src.git = "https://github.com/jmpunkt/ox-typst"
 src.branch = "main"
 fetch.github = "jmpunkt/ox-typst"
 
+[emacs-typst-mode]
+src.git = "https://github.com/Ziqi-Yang/typst-mode.el"
+src.branch = "main"
+fetch.github = "Ziqi-Yang/typst-mode.el"
+
 # for neovim
 
 [vimdoc-ja]

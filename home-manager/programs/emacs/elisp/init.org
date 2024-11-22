@@ -1125,6 +1125,12 @@
   (add-to-list 'auto-mode-alist '("\\.jsx$" . typescript-tsx-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-tsx-mode))
 #+END_SRC
+** typst-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(typst-mode) "typst-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("\\.typ\\'" . typst-mode))
+#+END_SRC
 ** v-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(v-mode v-menu v-format-buffer) "v-mode" nil t)

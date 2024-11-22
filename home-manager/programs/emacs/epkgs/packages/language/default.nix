@@ -87,6 +87,7 @@ with epkgs;
   toml-mode
   tmux-mode
   typescript-mode
+  packages.typst-mode
   v-mode
   vue-mode
   vimrc-mode

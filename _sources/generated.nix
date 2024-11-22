@@ -270,6 +270,18 @@
     };
     date = "2013-08-23";
   };
+  emacs-ox-typst = {
+    pname = "emacs-ox-typst";
+    version = "3adcf5e0775341446a72a1b38a05ef3c4c7e59d0";
+    src = fetchFromGitHub {
+      owner = "jmpunkt";
+      repo = "ox-typst";
+      rev = "3adcf5e0775341446a72a1b38a05ef3c4c7e59d0";
+      fetchSubmodules = false;
+      sha256 = "sha256-2CmODYYtzPtNi07WOxqIhp6WUVyQM/0QsdPAvfdyNzs=";
+    };
+    date = "2024-11-14";
+  };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
     version = "bdf1ddba2cadd52ee7dd5691baefc6306ea62c81";
@@ -284,15 +296,15 @@
   };
   emacs-pinentry = {
     pname = "emacs-pinentry";
-    version = "a6441224da04656370e993e2616185cc31afaff9";
+    version = "bee37d95fbd080959cd0859b66227390265de3b4";
     src = fetchFromGitHub {
       owner = "ueno";
       repo = "pinentry-el";
-      rev = "a6441224da04656370e993e2616185cc31afaff9";
+      rev = "bee37d95fbd080959cd0859b66227390265de3b4";
       fetchSubmodules = false;
-      sha256 = "sha256-xgzdwLEsjjkyPB6z1WM/N+rZNbndKXMPNUZ7Uaa8zT8=";
+      sha256 = "sha256-ek6ctC4ZM21Yzdr72OP4uO+hxIbmj5yvDxgkOiUfXGk=";
     };
-    date = "2023-11-26";
+    date = "2024-11-22";
   };
   emacs-plz-event-source = {
     pname = "emacs-plz-event-source";
@@ -353,6 +365,18 @@
       sha256 = "sha256-oj/E+b3oS/2QNNxTYDZ5Zwq/OHKI2FgN/eRV5EAexrE=";
     };
     date = "2023-01-31";
+  };
+  emacs-typst-mode = {
+    pname = "emacs-typst-mode";
+    version = "5776fd4f3608350ff6a2b61b118d38165d342aa3";
+    src = fetchFromGitHub {
+      owner = "Ziqi-Yang";
+      repo = "typst-mode.el";
+      rev = "5776fd4f3608350ff6a2b61b118d38165d342aa3";
+      fetchSubmodules = false;
+      sha256 = "sha256-mqkcNDgx7lc6kUSFFwSATRT+UcOglkeu+orKLiU9Ldg=";
+    };
+    date = "2023-09-25";
   };
   emacs-view-lock-mode = {
     pname = "emacs-view-lock-mode";
@@ -692,15 +716,15 @@
   };
   vim-ddc-source-lsp = {
     pname = "vim-ddc-source-lsp";
-    version = "e11540a9c4b88adc4a9c003d93df07267e13839d";
+    version = "873230b0a6448f3c5e9cdba95567ddf6896848ed";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc-source-lsp";
-      rev = "e11540a9c4b88adc4a9c003d93df07267e13839d";
+      rev = "873230b0a6448f3c5e9cdba95567ddf6896848ed";
       fetchSubmodules = false;
-      sha256 = "sha256-Tp+b6r0j9+cIGXkWWlxpmOuZAHSEL3OjqcFWtLFOV0k=";
+      sha256 = "sha256-lSMSwHlSeqp1sYEP7xbFzQso/vxw6cM8FSX3fEERnxA=";
     };
-    date = "2024-10-28";
+    date = "2024-11-22";
   };
   vim-ddc-source-lsp-setup = {
     pname = "vim-ddc-source-lsp-setup";
@@ -1304,14 +1328,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "9d0b5cd31b90b95d3ad2b9efa6d7287fb48cf7cf";
+    version = "a47ff3835d062870a83558f7d3fdf0560e8d4904";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "9d0b5cd31b90b95d3ad2b9efa6d7287fb48cf7cf";
+      rev = "a47ff3835d062870a83558f7d3fdf0560e8d4904";
       fetchSubmodules = false;
-      sha256 = "sha256-TV0m70z27UbzNia4WOtOQuHwM/SKbs/GEJKnYWFf0Z8=";
+      sha256 = "sha256-dM+inX/FMguJKI5Dw7PKOZh8txkh3tY5r/6rjVMAJQU=";
     };
-    date = "2024-11-20";
+    date = "2024-11-22";
   };
 }

@@ -34,4 +34,14 @@
 
     ignoreCompilationError = false;
   };
+
+  typst-mode = epkgs.melpaBuild {
+    pname = "typst-mode";
+    version = "0.0.1";
+    src = sources.emacs-typst-mode.src;
+
+    packageRequires = with epkgs; [ polymode ];
+
+    ignoreCompilationError = false;
+  };
 }
