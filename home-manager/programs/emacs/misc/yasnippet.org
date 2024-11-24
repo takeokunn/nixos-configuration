@@ -886,7 +886,7 @@ $0
   ,#+HUGO_TAGS: $3 $4
   ,#+HUGO_DRAFT: true
   ,#+STARTUP: content
-  ,#+STARTUP: nohideblocks
+  ,#+STARTUP: fold
 #+end_src
 *** blog-zenn
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/blog-zenn") :mkdirp yes :noweb yes
@@ -902,7 +902,7 @@ $0
   ,#+GFM_CUSTOM_FRONT_MATTER: :type tech
   ,#+GFM_CUSTOM_FRONT_MATTER: :published false
   ,#+STARTUP: content
-  ,#+STARTUP: nohideblocks
+  ,#+STARTUP: fold
   ,#+OPTIONS: toc:nil
 #+end_src
 *** center

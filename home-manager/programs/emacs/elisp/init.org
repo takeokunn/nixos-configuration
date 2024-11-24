@@ -4696,8 +4696,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-typst-keyword
                        org-typst-section
                        org-typst-src-block
-                       org-typst-format-drawer-function
-                       org-typst-format-inlinetask-function
                        org-typst-export-as-typst
                        org-typst-export-to-typst
                        org-typst-export-to-pdf
