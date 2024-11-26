@@ -215,6 +215,11 @@ src.git = "https://github.com/Ziqi-Yang/typst-mode.el"
 src.branch = "main"
 fetch.github = "Ziqi-Yang/typst-mode.el"
 
+[emacs-copilot-chat]
+src.git = "https://github.com/chep/copilot-chat.el"
+src.branch = "master"
+fetch.github = "chep/copilot-chat.el"
+
 # for neovim
 
 [vimdoc-ja]

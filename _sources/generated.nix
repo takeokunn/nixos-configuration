@@ -90,6 +90,18 @@
     };
     date = "2024-11-18";
   };
+  emacs-copilot-chat = {
+    pname = "emacs-copilot-chat";
+    version = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
+    src = fetchFromGitHub {
+      owner = "chep";
+      repo = "copilot-chat.el";
+      rev = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
+      fetchSubmodules = false;
+      sha256 = "sha256-2ktpUNHSpKS4RU//aQYjRvLy/1Dy17zVD8v+SiGfBfU=";
+    };
+    date = "2024-11-25";
+  };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
     version = "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f";
@@ -152,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "90c2451d0c0d1b9598e67b2c1a3516a8496f130f";
+    version = "0cea38595a4569471c07080ab53067fd66aa9f4d";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "90c2451d0c0d1b9598e67b2c1a3516a8496f130f";
+      rev = "0cea38595a4569471c07080ab53067fd66aa9f4d";
       fetchSubmodules = false;
-      sha256 = "sha256-56tXbeTyOs2EDQAWIXWKvuvVV8F+20fc6hesY+ms7E0=";
+      sha256 = "sha256-bau/KFUS6GrPUS3LLlr04lbnTWlMXf/uK4IQjhc7bMc=";
     };
-    date = "2024-11-17";
+    date = "2024-11-23";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -272,15 +284,15 @@
   };
   emacs-ox-typst = {
     pname = "emacs-ox-typst";
-    version = "3adcf5e0775341446a72a1b38a05ef3c4c7e59d0";
+    version = "0352b368f7713606bef2e90f76b6e7af3171e08f";
     src = fetchFromGitHub {
       owner = "jmpunkt";
       repo = "ox-typst";
-      rev = "3adcf5e0775341446a72a1b38a05ef3c4c7e59d0";
+      rev = "0352b368f7713606bef2e90f76b6e7af3171e08f";
       fetchSubmodules = false;
-      sha256 = "sha256-2CmODYYtzPtNi07WOxqIhp6WUVyQM/0QsdPAvfdyNzs=";
+      sha256 = "sha256-HjPJXIJ9mqbmMrqtFVyb9BlykxqhhfcKuvYZHExH398=";
     };
-    date = "2024-11-14";
+    date = "2024-11-24";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
@@ -296,15 +308,15 @@
   };
   emacs-pinentry = {
     pname = "emacs-pinentry";
-    version = "bee37d95fbd080959cd0859b66227390265de3b4";
+    version = "77991a491f3fc4673dfdd959ba6b4c9b0111150f";
     src = fetchFromGitHub {
       owner = "ueno";
       repo = "pinentry-el";
-      rev = "bee37d95fbd080959cd0859b66227390265de3b4";
+      rev = "77991a491f3fc4673dfdd959ba6b4c9b0111150f";
       fetchSubmodules = false;
-      sha256 = "sha256-ek6ctC4ZM21Yzdr72OP4uO+hxIbmj5yvDxgkOiUfXGk=";
+      sha256 = "sha256-IEVvu9/G0Nl0CH8e+Vj+KRWvtUxKMMAMgz+2NhftTsY=";
     };
-    date = "2024-11-22";
+    date = "2024-11-23";
   };
   emacs-plz-event-source = {
     pname = "emacs-plz-event-source";
@@ -536,15 +548,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "b38600717fde59dd452bc1c980afe2e05fd975a7";
+    version = "ec2a8963b3710aaaebc07a513e79eaa9cbb52be6";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "b38600717fde59dd452bc1c980afe2e05fd975a7";
+      rev = "ec2a8963b3710aaaebc07a513e79eaa9cbb52be6";
       fetchSubmodules = false;
-      sha256 = "sha256-eNgSoI4ReprFVTkuuKJHvSuaDtAuaCo0FHPHUUhWAlI=";
+      sha256 = "sha256-hsqWZ2qs5YzMWQoc9h5XOArEmaJct8XeV9m+0Lnd7U4=";
     };
-    date = "2024-11-21";
+    date = "2024-11-25";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -788,15 +800,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "2795fe5cb44bc97eb7493f4e4c19aecb76147595";
+    version = "828531f3a38b5dbb219b18056e1765e6854097f1";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "2795fe5cb44bc97eb7493f4e4c19aecb76147595";
+      rev = "828531f3a38b5dbb219b18056e1765e6854097f1";
       fetchSubmodules = false;
-      sha256 = "sha256-uCpuqsz1BE+2HJEm8RM//v+aT61wOb6cx9P8GZcPTP8=";
+      sha256 = "sha256-ywEyaGdBP+VIz/I/q/W7GUxrro9A+fY1eRU9Ap3FGNk=";
     };
-    date = "2024-11-21";
+    date = "2024-11-26";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
@@ -824,15 +836,15 @@
   };
   vim-ddu-filter-converter_hl_dir = {
     pname = "vim-ddu-filter-converter_hl_dir";
-    version = "547c53cc291c57169c0512105cf3a804ef36c9ab";
+    version = "da37299907a9ea2a2c92f32a204394f367511207";
     src = fetchFromGitHub {
       owner = "kyoh86";
       repo = "ddu-filter-converter_hl_dir";
-      rev = "547c53cc291c57169c0512105cf3a804ef36c9ab";
+      rev = "da37299907a9ea2a2c92f32a204394f367511207";
       fetchSubmodules = false;
-      sha256 = "sha256-qod+JHAkNCkdYwyXKUuVTI+pPXRl6djfoDfqGNxbpwQ=";
+      sha256 = "sha256-PXJXVfUqrHS0RqoespTT18DpwcrCiPOAYoIhwjeYtlQ=";
     };
-    date = "2024-11-02";
+    date = "2024-11-26";
   };
   vim-ddu-filter-converter_relativepath = {
     pname = "vim-ddu-filter-converter_relativepath";
@@ -956,15 +968,15 @@
   };
   vim-ddu-source-action = {
     pname = "vim-ddu-source-action";
-    version = "3584cec7b248615ec3afb98de64202ff7cbacdfe";
+    version = "cd43a27fab44b38feb188394d5edb8090d5772ad";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-source-action";
-      rev = "3584cec7b248615ec3afb98de64202ff7cbacdfe";
+      rev = "cd43a27fab44b38feb188394d5edb8090d5772ad";
       fetchSubmodules = false;
-      sha256 = "sha256-72KKXfMHeyWqDlmvpU9UQjjwQJFZxMiQrZGpk3d4t10=";
+      sha256 = "sha256-DIbC8oIy0PEc6fq7H/LSU6h338X83da9R/BwT03UU7c=";
     };
-    date = "2024-09-04";
+    date = "2024-11-25";
   };
   vim-ddu-source-buffer = {
     pname = "vim-ddu-source-buffer";
@@ -1040,15 +1052,15 @@
   };
   vim-ddu-source-git_branch = {
     pname = "vim-ddu-source-git_branch";
-    version = "115e33e481f057d6d112f357d7a0b951e073226d";
+    version = "720f91167d7bae649dd07c919cb53d4b390f8151";
     src = fetchFromGitHub {
       owner = "kyoh86";
       repo = "ddu-source-git_branch";
-      rev = "115e33e481f057d6d112f357d7a0b951e073226d";
+      rev = "720f91167d7bae649dd07c919cb53d4b390f8151";
       fetchSubmodules = false;
-      sha256 = "sha256-d5ycVl4+zl0norZZ2NKt5HiUJ2afm+QRxbmYoUKnfNs=";
+      sha256 = "sha256-kadKF+kNTJd3Qev/ZdidgjjdCz3Tw96sRHxmdN6gtSg=";
     };
-    date = "2024-11-02";
+    date = "2024-11-26";
   };
   vim-ddu-source-git_diff = {
     pname = "vim-ddu-source-git_diff";
@@ -1064,27 +1076,27 @@
   };
   vim-ddu-source-git_diff_tree = {
     pname = "vim-ddu-source-git_diff_tree";
-    version = "34a07dd0de12fd1d5a9135937c3a0479248fbfdc";
+    version = "ccc8078d890f2d575550899ecb202dcd5613c4e1";
     src = fetchFromGitHub {
       owner = "kyoh86";
       repo = "ddu-source-git_diff_tree";
-      rev = "34a07dd0de12fd1d5a9135937c3a0479248fbfdc";
+      rev = "ccc8078d890f2d575550899ecb202dcd5613c4e1";
       fetchSubmodules = false;
-      sha256 = "sha256-COJoYpyHBkVJGpwj6vhj8XEly8YPOrx7a03bjH3PvV4=";
+      sha256 = "sha256-wi7hKu64C4cRneK9kL3UsZd460cyZETkkqWlUC7zLJw=";
     };
-    date = "2024-11-02";
+    date = "2024-11-26";
   };
   vim-ddu-source-git_log = {
     pname = "vim-ddu-source-git_log";
-    version = "00ff34aa1fc39da9b009f8a8381db2cef38c05b5";
+    version = "87e921100eefc911e9a18f1b1bf10d0a7f1216da";
     src = fetchFromGitHub {
       owner = "kyoh86";
       repo = "ddu-source-git_log";
-      rev = "00ff34aa1fc39da9b009f8a8381db2cef38c05b5";
+      rev = "87e921100eefc911e9a18f1b1bf10d0a7f1216da";
       fetchSubmodules = false;
-      sha256 = "sha256-1s3yBRwyXsQDRDQDGOAysMW50EjF/8Q7cQSgmdw8rzo=";
+      sha256 = "sha256-q/fiESKwX+u++iHpg14TSLQ5WwQHZqAomLiWqW+95I0=";
     };
-    date = "2024-11-02";
+    date = "2024-11-26";
   };
   vim-ddu-source-git_status = {
     pname = "vim-ddu-source-git_status";
@@ -1208,27 +1220,27 @@
   };
   vim-ddu-ui-ff = {
     pname = "vim-ddu-ui-ff";
-    version = "8dc80e22d2e79f07b8458d351c4c33144be1c66c";
+    version = "1bab10a1b7b888e99607b5905d3a8a5fbdff831c";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-ff";
-      rev = "8dc80e22d2e79f07b8458d351c4c33144be1c66c";
+      rev = "1bab10a1b7b888e99607b5905d3a8a5fbdff831c";
       fetchSubmodules = false;
-      sha256 = "sha256-dJ/OEB9o2nF3H3SSpYolqkZ6BeDh2RJ1/EKhQnmKiuI=";
+      sha256 = "sha256-mrMUHxlCXNIA1Jnkfak8hd/BVdt00MG7wldoPGFVEjs=";
     };
-    date = "2024-11-14";
+    date = "2024-11-25";
   };
   vim-ddu-ui-filer = {
     pname = "vim-ddu-ui-filer";
-    version = "f43600eb478d7cf2810e95d86527bb097fe3927d";
+    version = "ae274747bd02a2771ce4e54ea7d9a307457c905d";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-ui-filer";
-      rev = "f43600eb478d7cf2810e95d86527bb097fe3927d";
+      rev = "ae274747bd02a2771ce4e54ea7d9a307457c905d";
       fetchSubmodules = false;
-      sha256 = "sha256-ab6W42norm633M77qpVs645O6LHQlrg37ykSyUya2XU=";
+      sha256 = "sha256-1A5SVkIZTM0P0MAmQ4bvFG3MMy1S7D7yAnkB3vcSU6Q=";
     };
-    date = "2024-11-12";
+    date = "2024-11-25";
   };
   vim-denippet = {
     pname = "vim-denippet";
@@ -1304,15 +1316,15 @@
   };
   vim-pum = {
     pname = "vim-pum";
-    version = "d2bc1abbcaf29a3a90b212f9b93c5dd898a2b143";
+    version = "195bfd8407355c63b1ba55b07031f41b362502df";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "pum.vim";
-      rev = "d2bc1abbcaf29a3a90b212f9b93c5dd898a2b143";
+      rev = "195bfd8407355c63b1ba55b07031f41b362502df";
       fetchSubmodules = false;
-      sha256 = "sha256-rGuTrLLv5bsa7doR4FuLfQo36/m8nBdNev2Xg2e3Lg4=";
+      sha256 = "sha256-by1O2qA5602EahNIM6GQQv9tCM6WWaUEWSqNJVDqkhg=";
     };
-    date = "2024-11-07";
+    date = "2024-11-25";
   };
   vim-readme-viewer = {
     pname = "vim-readme-viewer";
@@ -1328,13 +1340,13 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "a47ff3835d062870a83558f7d3fdf0560e8d4904";
+    version = "7ce6c1f1313ae5795ecba5846ee79ba25ea68152";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "a47ff3835d062870a83558f7d3fdf0560e8d4904";
+      rev = "7ce6c1f1313ae5795ecba5846ee79ba25ea68152";
       fetchSubmodules = false;
-      sha256 = "sha256-dM+inX/FMguJKI5Dw7PKOZh8txkh3tY5r/6rjVMAJQU=";
+      sha256 = "sha256-wBZeT8NRFFQVgDUvorzcpnLQmn580IHjN0AXVMuzUtM=";
     };
     date = "2024-11-22";
   };

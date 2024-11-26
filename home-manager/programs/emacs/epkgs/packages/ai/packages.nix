@@ -49,4 +49,19 @@
 
     ignoreCompilationError = false;
   };
+
+  copilot-chat = epkgs.melpaBuild {
+    pname = "copilot-chat";
+    version = "0.0.1";
+    src = sources.emacs-copilot-chat.src;
+
+    packageRequires = with epkgs; [
+      request
+      markdown-mode
+      chatgpt-shell
+      magit
+    ];
+
+    ignoreCompilationError = false;
+  };
 }

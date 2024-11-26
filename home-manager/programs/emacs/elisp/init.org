@@ -4983,6 +4983,27 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key copilot-mode-map (kbd "C-c # i") #'copilot-complete)
     (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion))
 #+end_src
+** copilot-chat.el
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(copilot-chat-ask-and-insert
+                       copilot-chat-explain
+                       copilot-chat-review
+                       copilot-chat-doc
+                       copilot-chat-fix
+                       copilot-chat-optimize
+                       copilot-chat-test
+                       copilot-chat-explain-symbol-at-line
+                       copilot-chat-explain-defun
+                       copilot-chat-custom-prompt-function
+                       copilot-chat-review-whole-buffer
+                       copilot-chat-switch-to-buffer
+                       copilot-chat-custom-prompt-selection
+                       copilot-chat-custom-prompt-mini-buffer
+                       copilot-chat-list
+                       copilot-chat-display
+                       copilot-chat-insert-commit-message
+                       copilot-chat-set-model) "copilot-chat" nil t)
+#+end_src
 ** llm
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(make-llm-ollama) "llm-ollama" nil t)
