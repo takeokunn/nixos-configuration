@@ -92,15 +92,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
+    version = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
+      rev = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
       fetchSubmodules = false;
-      sha256 = "sha256-eyOSL+xQ6gU3izGx/araOxf+6C8qN46o7kevKmAhL+g=";
+      sha256 = "sha256-2ktpUNHSpKS4RU//aQYjRvLy/1Dy17zVD8v+SiGfBfU=";
     };
-    date = "2024-11-26";
+    date = "2024-11-25";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -908,15 +908,15 @@
   };
   vim-ddu-filter-matcher_substring = {
     pname = "vim-ddu-filter-matcher_substring";
-    version = "065a9984d142d7b18d18401f3a27d876fdc07674";
+    version = "d6defcd1f4a87cc717a72cc620307f9b1e11290d";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-filter-matcher_substring";
-      rev = "065a9984d142d7b18d18401f3a27d876fdc07674";
+      rev = "d6defcd1f4a87cc717a72cc620307f9b1e11290d";
       fetchSubmodules = false;
-      sha256 = "sha256-itshDJ+aS8Vl3OSxfBIczwYwb/u1hdnxBfmXb6O/InU=";
+      sha256 = "sha256-NDN3NIzM8eD+BU+6vl4grKXV0uvpAp30ziSuobfgkDs=";
     };
-    date = "2024-11-26";
+    date = "2024-09-03";
   };
   vim-ddu-filter-merge = {
     pname = "vim-ddu-filter-merge";
