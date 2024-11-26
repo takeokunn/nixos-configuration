@@ -14,7 +14,6 @@ with epkgs;
   org-pomodoro
   packages.org-view-mode
   org-random-todo
-  org-projectile
   packages.org-dashboard
   packages.org-volume
   org-ql
@@ -35,7 +34,6 @@ with epkgs;
   # Org Agenda
   org-super-agenda
   org-hyperscheduler
-  # org-timeblock
 
   # Org External Tools
   org-redmine
@@ -76,4 +74,5 @@ with epkgs;
   org-roam-ui
   org-roam-timestamps
   org-roam-ql
+  org-roam-ql-ql
 ]

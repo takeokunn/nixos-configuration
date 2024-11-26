@@ -22,9 +22,7 @@ with epkgs;
 
   # git
   magit
-  magit-file-icons
   magit-gptcommit
-  forge
   git-gutter
   git-gutter-fringe
   git-timemachine
@@ -55,12 +53,9 @@ with epkgs;
   lsp-sourcekit
   ccls
   consult-lsp
-  lsp-docker
   dap-mode
   lsp-ui
   lsp-scheme
-  lsp-haskell
-  lsp-pyright
   lsp-dart
   lsp-bridge
 

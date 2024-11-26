@@ -1317,7 +1317,7 @@
 
   (with-eval-after-load 'cfn-mode
     ;; hooks
-    (add-hook 'cfn-mode-hook #'flycheck-elsa-setup))
+    (add-hook 'cfn-mode-hook #'flycheck-cfn-setup))
 #+end_src
 ** Completion
 *** corfu
@@ -1416,32 +1416,20 @@
     ;; keybinds
     (define-key magit-log-mode-map (kbd "C-j") #'magit-visit-thing))
 #+END_SRC
-*** magit-file-icons
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(magit-file-icons-mode) "magit-file-icons" nil t)
-
-  ;; (with-eval-after-load 'magit
-  ;;   (add-hook 'magit-mode-hook #'magit-file-icons-mode))
-#+end_src
 *** magit-gptcommit
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(magit-gptcommit-status-buffer-setup
                        magit-gptcommit-mode
                        magit-gptcommit-commit-accept) "magit-gptcommit" nil t)
 
-  ;; (magit-gptcommit-status-buffer-setup)
-
   (with-eval-after-load 'magit
     ;; hooks
+    (add-hook 'magit-mode #'magit-gptcommit-status-buffer-setup)
     (add-hook 'magit-mode #'magit-gptcommit-mode))
 
   (with-eval-after-load 'git-commit
     ;; keybinds
     (define-key git-commit-mode-map (kbd "C-c C-g") #'magit-gptcommit-commit-accept))
-#+end_src
-*** magit-forge
-#+begin_src emacs-lisp :tangle yes
-  ;; (add-hook 'magit-mode-hook #'(lambda () (require 'forge)))
 #+end_src
 *** git-gutter
 #+begin_src emacs-lisp :tangle yes
@@ -1569,16 +1557,13 @@
   (autoload-if-found '(fancy-narrow-mode) "fancy-narrow" nil t)
 
   ;; (with-eval-after-load 'org
-  ;;   (add-hook 'org-mode-hook #'fancy-narrow-mode))
+  ;;   (add-hook 'org-mode-hook #'fancy-narrow-local-mode))
 
   ;; (with-eval-after-load 'elisp-mode
-  ;;   (add-hook 'emacs-lisp-mode-hook #'fancy-narrow-mode))
+  ;;   (add-hook 'emacs-lisp-mode-hook #'fancy-narrow-local-mode))
 
   ;; (with-eval-after-load 'lisp-mode
-  ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-mode))
-
-  ;; (with-eval-after-load 'clojure-mode
-  ;;   (add-hook 'clojure-mode-hook #'fancy-narrow-mode))
+  ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-local-mode))
 #+end_src
 *** origami
 #+begin_src emacs-lisp :tangle yes
@@ -1676,10 +1661,10 @@
     ;; config
     (setopt lsp-nix-nil-max-mem 100000))
 #+END_SRC
-*** TODO emacs-ccls
+*** emacs-ccls
 #+begin_src emacs-lisp :tangle yes
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (add-hook 'lsp-mode-hook #'(lambda () (require 'ccls))))
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'(lambda () (require 'ccls))))
 #+end_src
 *** lsp-php-key
 #+begin_src emacs-lisp :tangle yes
@@ -1705,10 +1690,6 @@
     ;; config
     (setopt lsp-treemacs-error-list-severity 1)
     (setopt lsp-treemacs-error-list-current-project-only t))
-#+end_src
-*** lsp-docker
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(lsp-docker-start) "lsp-docker" nil t)
 #+end_src
 *** lsp-dart
 #+begin_src emacs-lisp :tangle yes
@@ -1753,9 +1734,6 @@
                                        :mode "remote"
                                        :host "localhost"
                                        :port 9003)))
-
-  ;; (with-eval-after-load 'js2-mode
-  ;;   (add-hook 'js2-mode-hook #'dap-node-setup))
 
   (with-eval-after-load 'go-mode
     ;; hooks
@@ -1822,32 +1800,9 @@
   (autoload-if-found '(lsp-scheme) "lsp-scheme" nil t)
 
   (with-eval-after-load 'scheme
-    ;; (add-hook 'scheme-mode-hook #'lsp-scheme)
-    )
-
-  (with-eval-after-load 'lsp-scheme
-    (setopt lsp-scheme-implementation "guile"))
+    (add-hook 'scheme-mode-hook #'lsp-scheme))
 #+end_src
-*** TODO lsp-haskell
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(lsp) "lsp-haskell" nil t)
-#+end_src
-*** TODO lsp-pyright
-#+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "emacs-lsp/lsp-pyright"))
-
-  ;; (with-delayed-execution
-  ;;   (message "Install lsp-pyright...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/lsp-pyright"))
-
-  ;;   ;; (with-eval-after-load 'python-mode
-  ;;   ;;   (add-hook 'python-mode-hook #'(lambda ()
-  ;;   ;;                                   (require 'lsp-pyright)
-  ;;   ;;                                   (lsp))))
-  ;;   )
-#+end_src
-*** TODO lsp-bridge
+*** lsp-bridge
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
 
@@ -1872,16 +1827,6 @@
 
   (with-eval-after-load 'undo-tree
     (setopt undo-tree-auto-save-history nil))
-#+end_src
-** Template
-*** auto-insert
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(auto-insert-mode) "autoinsert" nil t)
-
-  ;; (add-hook 'emacs-startup-hook #'auto-insert-mode)
-
-  (with-eval-after-load 'autoinsert
-    (setopt auto-insert-directory "~/.emacs.d/auto-insert"))
 #+end_src
 ** View Mode
 *** view-mode
@@ -2019,7 +1964,6 @@
                        dogears-list
                        dogears-sidebar) "dogears" nil t)
 
-  ;; keybind
   (keymap-global-set "M-g d" #'dogears-go)
   (keymap-global-set "M-g M-b" #'dogears-back)
   (keymap-global-set "M-g M-f" #'dogears-forward)
@@ -2086,13 +2030,11 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(restclient-mode) "restclient" nil t)
 #+end_src
-*** smartparens
-#+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'smartparens)
-#+END_SRC
 *** smart-jump
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'smart-jump)
+  (autoload-if-found '(smart-jump-setup-default-registers) "smart-jump" nil t)
+
+  (add-hook 'emacs-startup-hook #'smart-jump-setup-default-registers)
 #+end_src
 *** string-inflection
 #+begin_src emacs-lisp :tangle yes
@@ -2105,22 +2047,27 @@
   (defun my/uuid ()
     (interactive)
     (insert (uuid-string)))
-
-  (defalias 'uuid #'my/uuid)
 #+end_src
 *** woman
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(woman woman-find-file) "woman" nil t)
 #+end_src
 * Remote Access
+** tramp
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(tramp-set-completion-function) "tramp" nil t)
+#+end_src
 ** docker-tramp
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(docker-tramp-add-method) "docker-tramp" nil t)
+  (autoload-if-found '(docker-tramp-add-method
+  		     docker-tramp-cleanup
+  		     docker-tramp-add-method) "docker-tramp" nil t)
 
-  ;; (add-hook 'emacs-startup-hook #'docker-tramp-add-method)
+  (add-hook 'emacs-startup-hook #'docker-tramp-add-method)
 
-  ;; (with-eval-after-load 'tramp
-  ;;   (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
+  (with-eval-after-load 'tramp
+    (docker-tramp-add-method)
+    (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
 #+end_src
 ** consult-tramp
 #+begin_src emacs-lisp :tangle yes
@@ -2800,28 +2747,24 @@
 
   (with-eval-after-load 'mu4e-folders
     ;; config
-    (setopt mu4e-maildir-shortcuts '((:maildir "/INBOX" :key ?i)
-                                     (:maildir "/Redmine" :key ?r)
-                                     (:maildir "/GitHub" :key ?g)
-                                     (:maildir "/Emacs" :key ?e)
-                                     (:maildir "/Guix" :key ?u))))
+    (setopt mu4e-maildir-shortcuts '((:maildir "/Gmail/INBOX" :key ?i)
+  				   (:maildir "/Gmail/Emacs" :key ?e)
+  				   (:maildir "/Gmail/GitHub" :key ?h)
+  				   (:maildir "/Gmail/Guix" :key ?g)
+  				   (:maildir "/Gmail/PHP" :key ?p)
+  				   (:maildir "/Gmail/RakutenSecurity" :key ?r))))
 
   (with-eval-after-load 'mm-decode
     (add-to-list 'mm-discouraged-alternatives "text/html")
     (add-to-list 'mm-discouraged-alternatives "text/richtext"))
 #+end_src
-*** TODO mu4e-views
+*** mu4e-views
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "lordpretzel/mu4e-views"))
-
-  ;; (with-delayed-execution
-  ;; (message "Install mu4e-views...")
-  ;;   (add-to-list 'load-path (locate-user-emacs-file "el-clone/mu4e-views"))
+  (autoload-if-found '() "mu4e-views" nil t)
 #+end_src
-*** TODO mu4e-dashboard
+*** mu4e-dashboard
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '() "mu4e-dashboard" nil t)
+  (autoload-if-found '(mu4e-dashboard-mode) "mu4e-dashboard" nil t)
 #+end_src
 ** Googling
 *** google-this
@@ -3617,10 +3560,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; hooks
     (add-hook 'ielm-mode-hook #'turn-on-eldoc-mode))
 #+end_src
-*** trinary
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '() "trinary" nil t)
-#+end_src
 *** elsa
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elsa-run) "elsa" nil t)
@@ -3687,8 +3626,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** my/ielm-history
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(my/ielm-history) "ielm" nil t)
-
   (defun my/ielm-history ()
     (interactive)
     (insert
@@ -3781,10 +3718,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 ** Csv
 *** rainbow-csv
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(rainbow-csv-mode) "rainbow-csv" nil t)
+  (autoload-if-found '(rainbow-csv-mode) "rainbow-csv" nil t)
 
-  ;; (with-eval-after-load 'csv-mode
-  ;;   (add-hook 'csv-mode-hook #'rainbow-csv-mode))
+  (with-eval-after-load 'csv-mode
+    (add-hook 'csv-mode-hook #'rainbow-csv-mode))
 #+end_src
 ** JavaScript/TypeScript
 *** nodejs-repl
@@ -3910,7 +3847,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 ** PHP
 *** composer
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '() "composer" nil t)
+  (autoload-if-found '(composer-get-config
+  		     composer-get-bin-dir
+  		     composer-install
+  		     composer-dump-autoload
+  		     composer-require
+  		     composer-update
+  		     composer-find-json-file
+  		     composer-view-lock-file
+  		     composer-run-vendor-bin-command
+  		     composer-run-script
+  		     composer-setup-managed-phar
+  		     composer) "composer" nil t)
 #+end_src
 *** php-runtime
 #+begin_src emacs-lisp :tangle yes
@@ -4172,7 +4120,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+END_SRC
 *** org-clock
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-clock-load org-clock-save) "org-clock" nil t)
+  (autoload-if-found '(org-clock-load) "org-clock" nil t)
 
   (with-eval-after-load 'org
     ;; hooks
@@ -4289,17 +4237,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-random-todo org-random-todo-goto-current) "org-random-todo" nil t)
 #+end_src
-*** org-projectile
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-projectile-todo-files
-                       org-projectile-project-todo-completing-read)
-                     "org-projectile" nil t)
-
-  (keymap-global-set "C-c n p" #'org-projectile-project-todo-completing-read)
-
-  (with-eval-after-load 'org
-    (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
-#+end_src
 *** org-dashboard
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-dashboard-display) "org-dashboard" nil t)
@@ -4367,12 +4304,19 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   ;; hooks
   ;;   (add-hook 'org-mode-hook #'org-link-beautify-mode))
 #+end_src
-*** TODO orgit
+*** orgit
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orgit-store-link) "orgit" nil t)
 
-  ;; (with-eval-after-load 'magit
-  ;;   (define-key magit-mode-map [remap org-store-link] #'orgit-store-link))
+  (with-eval-after-load 'org
+    (with-eval-after-load 'magit
+      (keymap-set magit-mode-map "<remap> <org-store-link>" #'orgit-store-link)
+
+      (org-link-set-parameters "orgit"
+                               :store    #'orgit-status-store
+                               :follow   #'orgit-status-open
+                               :export   #'orgit-status-export
+                               :complete #'orgit-status-complete-link)))
 #+end_src
 ** Org Agenda
 *** Basic
@@ -4407,10 +4351,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** org-hyperscheduler
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-hyperscheduler-open) "org-hyperscheduler" nil t)
-#+end_src
-*** TODO org-timeblock
-#+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(org-timeblock-list org-timeblock-mode) "org-timeblock" nil t)
 #+end_src
 ** Org External Tools
 *** org-redmine
@@ -4483,14 +4423,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                             (when (not (string= (nth 1 args)
                                                 "mysql: [Warning] Using a password on the command line interface can be insecure.\n"))
                               (apply old-func args)))))
-
-
 #+end_src
 *** ob-async
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ob-async-org-babel-execute-src-block) "ob-async" nil t)
-
-  ;; (advice-add 'org-babel-execute-src-block :around #'ob-async-org-babel-execute-src-block)
 #+end_src
 *** ob-fish
 #+begin_src emacs-lisp :tangle yes
@@ -4910,21 +4846,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt org-roam-timestamps-remember-timestamps nil))
 #+end_src
-*** org-roam-search-node-insert
+*** org-roam-ql
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '() "org-roam-search-node-insert" nil t)
+  (autoload-if-found '(org-roam-ql-nodes
+                       org-roam-ql-search
+                       org-roam-ql-defpred
+                       org-roam-ql-agenda-buffer-from-roam-buffer
+                       org-roam-ql-refresh-buffer
+                       org-dblock-write:org-roam-ql) "org-roam-ql" nil t)
 #+end_src
-*** TODO org-roam-ql
+*** org-roam-ql-ql
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(org-roam-ql-nodes
-  ;;                      org-roam-ql-search
-  ;;                      org-roam-ql-defpred
-  ;;                      org-roam-ql-agenda-buffer-from-roam-buffer
-  ;;                      org-roam-ql-refresh-buffer
-  ;;                      org-dblock-write:org-roam-ql) "org-roam-ql" nil t)
-  ;; (autoload-if-found '(org-roam-ql-ql-init) "org-roam-ql-ql" nil t)
+  (autoload-if-found '(org-roam-ql-ql-init) "org-roam-ql-ql" nil t)
 
-  ;; (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
+  (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
 #+end_src
 * EXWM
 ** TODO exwm
@@ -5089,8 +5024,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (save-excursion
       (mark-whole-buffer)
       (copy-region-as-kill (region-beginning) (region-end))))
-
-  (defalias 'copy-buffer 'my/copy-buffer)
 #+end_src
 ** my/ghq-get
 #+begin_src emacs-lisp :tangle yes
@@ -5102,8 +5035,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (mapconcat #'shell-quote-argument
                    (list "ghq" "get" url)
                    " ")))))
-
-  (defalias 'ghq-get 'my/ghq-get)
 #+end_src
 ** my/gh-browse
 #+begin_src emacs-lisp :tangle yes
@@ -5114,8 +5045,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (mapconcat #'shell-quote-argument
                  (list "gh" "browse")
                  " "))))
-
-  (defalias 'gh-browse 'my/gh-browse)
 #+end_src
 ** my/indent-all
 #+begin_src emacs-lisp :tangle yes
@@ -5125,8 +5054,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (mark-whole-buffer)
       (untabify (region-beginning) (region-end))
       (indent-region (region-beginning) (region-end))))
-
-  (defalias 'indent-buffer 'my/indent-buffer)
 #+end_src
 ** my/move-line
 #+begin_src emacs-lisp :tangle yes
@@ -5197,8 +5124,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (defun my/actionlint ()
     (interactive)
     (shell-command-to-string "actionlint"))
-
-  (defalias 'actionlint 'my/actionlint)
 #+end_src
 ** my/build-info
 #+begin_src emacs-lisp :tangle yes
@@ -5234,8 +5159,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (interactive)
     (insert
      (format-time-string "%Y-%m-%d %a" (current-time))))
-
-  (defalias 'today 'my/today)
 #+end_src
 ** my/subword
 #+begin_src emacs-lisp :tangle yes

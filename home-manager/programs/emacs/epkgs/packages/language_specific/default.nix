@@ -17,7 +17,6 @@ with epkgs;
 
   # Emacs Lisp
   eros
-  trinary
   elsa
   lispxmp
   macrostep
