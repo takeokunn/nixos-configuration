@@ -2425,18 +2425,16 @@
 ** compile-multi
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(compile-multi) "compile-multi" nil t)
-  (autoload-if-found '(consult-compile-multi-mode) "consult-compile-multi" nil t)
   (autoload-if-found '(compile-multi-embark-mode) "compile-multi-embark" nil t)
 
   (keymap-global-set "C-x m" #'compile-multi)
 
-  ;; (add-hook emacs-startup-hook #'consult-compile-multi-mode)
-  ;; (add-hook emacs-startup-hook #'compile-multi-embark-mode)
+  (with-eval-after-load 'embark
+    (advice-add 'embark-act :after #'(lambda () (compile-multi-embark-mode t))))
 #+end_src
 ** vertico
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vertico-mode) "vertico-autoloads" nil t)
-  (autoload-if-found '(vertico-flat-mode) "vertico-flat" nil t)
 
   (add-hook 'emacs-startup-hook #'vertico-mode)
 
@@ -2449,7 +2447,12 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode marginalia-cycle) "marginalia" nil t)
 
+  (add-hook 'emacs-startup-hook #'marginalia-mode)
+
   (with-eval-after-load 'minibuffer
+    ;; config
+    (setopt marginalia-align-offset 25)
+
     ;; hooks
     (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
 #+end_src
@@ -2459,10 +2462,10 @@
 
   (with-eval-after-load 'minibuffer
     ;; config
-    (setopt completion-styles '(orderless basic))
-    (setopt completion-category-overrides '((file (styles basic partial-completion))))
     (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
-                                                      "Completion of multiple components, in any order.")))
+                                                      "Completion of multiple components, in any order."))
+    (setopt completion-styles '(orderless initials flex basic))
+    (setopt completion-category-overrides '((file (styles flex basic partial-completion)))))
 #+end_src
 * Buffer
 ** auto-save-buffers-enhanced
