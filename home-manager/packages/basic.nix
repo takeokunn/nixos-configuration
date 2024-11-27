@@ -6,6 +6,7 @@ with pkgs;
   unixtools.watch
 
   # for git
+  gh
   ghq
 
   # for nix

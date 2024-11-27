@@ -10,6 +10,9 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
+  # misc
+  misc = import ./misc;
+
   # modules
   modules = import ./modules;
 
@@ -20,7 +23,7 @@ let
   basicServices = import ./services/basic.nix;
 in
 {
-  imports = modules ++ basicPrograms ++ basicServices;
+  imports = misc ++ modules ++ basicPrograms ++ basicServices;
   home.stateVersion = "24.11";
   home.packages = basicPkgs;
 }

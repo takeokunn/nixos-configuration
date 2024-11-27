@@ -17,6 +17,9 @@ let
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
 
+  # misc
+  misc = import ./misc;
+
   # modules
   modules = import ./modules;
 
@@ -32,7 +35,7 @@ let
   advancedServices = import ./services/advanced.nix { inherit pkgs; };
 in
 {
-  imports = modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;
