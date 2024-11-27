@@ -97,5 +97,5 @@ with epkgs;
   wolfram-mode
   yaml-mode
   yarn-mode
-  # zig-mode
+  zig-mode
 ]

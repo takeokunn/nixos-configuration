@@ -1219,11 +1219,11 @@
 
   (add-to-list 'auto-mode-alist '("yarn\\.lock\\'" . yarn-mode))
 #+end_src
-** TODO zig-mode
+** zig-mode
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(zig-mode) "zig-mode" nil t)
+  (autoload-if-found '(zig-mode) "zig-mode" nil t)
 
-  ;; (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
+  (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
 #+end_src
 * IME
 ** ddskk
@@ -2765,6 +2765,10 @@
 *** mu4e-dashboard
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mu4e-dashboard-mode) "mu4e-dashboard" nil t)
+
+  (with-eval-after-load 'mu4e-dashboard
+    ;; config
+    (setopt mu4e-dashboard-file "~/.emacs.d/misc/mu4e-dashboard.org"))
 #+end_src
 ** Googling
 *** google-this

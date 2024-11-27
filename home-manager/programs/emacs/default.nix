@@ -21,7 +21,7 @@ in
       ".emacs.d/init.el".text = tangle (builtins.readFile ./elisp/init.org);
       ".emacs.d/early-init.el".text = tangle (builtins.readFile ./elisp/early-init.org);
       ".emacs.d/misc/yasnippet.org".source = ./misc/yasnippet.org;
-      ".emacs.d/misc/yasnippet.org".source = ./misc/mu4e-dashboard.org;
+      ".emacs.d/misc/mu4e-dashboard.org".source = ./misc/mu4e-dashboard.org;
     };
 
     packages = with pkgs; [
