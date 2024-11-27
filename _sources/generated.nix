@@ -92,15 +92,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
+    version = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "74c078e1c9a3a455ba8c7c1ab8d1e2a6f8a3b9b6";
+      rev = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
       fetchSubmodules = false;
-      sha256 = "sha256-2ktpUNHSpKS4RU//aQYjRvLy/1Dy17zVD8v+SiGfBfU=";
+      sha256 = "sha256-eyOSL+xQ6gU3izGx/araOxf+6C8qN46o7kevKmAhL+g=";
     };
-    date = "2024-11-25";
+    date = "2024-11-26";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -164,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "0cea38595a4569471c07080ab53067fd66aa9f4d";
+    version = "b7787a306da12492f6189f6318261a63d1507486";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "0cea38595a4569471c07080ab53067fd66aa9f4d";
+      rev = "b7787a306da12492f6189f6318261a63d1507486";
       fetchSubmodules = false;
-      sha256 = "sha256-bau/KFUS6GrPUS3LLlr04lbnTWlMXf/uK4IQjhc7bMc=";
+      sha256 = "sha256-gX3g1v1dKh/hGviEP1xbKRvc3hTW0f/p9Iw1fTlwNUQ=";
     };
-    date = "2024-11-23";
+    date = "2024-11-27";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -800,15 +800,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "828531f3a38b5dbb219b18056e1765e6854097f1";
+    version = "8103503e97853b3c3255d3007477c579ba77f3d9";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "828531f3a38b5dbb219b18056e1765e6854097f1";
+      rev = "8103503e97853b3c3255d3007477c579ba77f3d9";
       fetchSubmodules = false;
-      sha256 = "sha256-ywEyaGdBP+VIz/I/q/W7GUxrro9A+fY1eRU9Ap3FGNk=";
+      sha256 = "sha256-7P11ZyZWPQXq5fb7668t+iqXWMycFsBeaKcD26zne0w=";
     };
-    date = "2024-11-26";
+    date = "2024-11-27";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
@@ -908,15 +908,15 @@
   };
   vim-ddu-filter-matcher_substring = {
     pname = "vim-ddu-filter-matcher_substring";
-    version = "d6defcd1f4a87cc717a72cc620307f9b1e11290d";
+    version = "065a9984d142d7b18d18401f3a27d876fdc07674";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-filter-matcher_substring";
-      rev = "d6defcd1f4a87cc717a72cc620307f9b1e11290d";
+      rev = "065a9984d142d7b18d18401f3a27d876fdc07674";
       fetchSubmodules = false;
-      sha256 = "sha256-NDN3NIzM8eD+BU+6vl4grKXV0uvpAp30ziSuobfgkDs=";
+      sha256 = "sha256-itshDJ+aS8Vl3OSxfBIczwYwb/u1hdnxBfmXb6O/InU=";
     };
-    date = "2024-09-03";
+    date = "2024-11-26";
   };
   vim-ddu-filter-merge = {
     pname = "vim-ddu-filter-merge";
@@ -1100,15 +1100,15 @@
   };
   vim-ddu-source-git_status = {
     pname = "vim-ddu-source-git_status";
-    version = "31d4aabb2e6f54a0f4278751283c45245896e522";
+    version = "d501a212702db543a8084827aa955a85d54d2a78";
     src = fetchFromGitHub {
       owner = "kuuote";
       repo = "ddu-source-git_status";
-      rev = "31d4aabb2e6f54a0f4278751283c45245896e522";
+      rev = "d501a212702db543a8084827aa955a85d54d2a78";
       fetchSubmodules = false;
-      sha256 = "sha256-j1c7yYpbtZdEEWjasC4hZSBAOGk7/EZJqvX5mSYFklE=";
+      sha256 = "sha256-WfoXeTtQnmKaF8SQRRYrrIYGOtOWvVpEGJBHIr4RNOQ=";
     };
-    date = "2024-08-11";
+    date = "2024-11-27";
   };
   vim-ddu-source-help = {
     pname = "vim-ddu-source-help";
@@ -1340,14 +1340,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "7ce6c1f1313ae5795ecba5846ee79ba25ea68152";
+    version = "dd0792570b9aa515adf284960c60510fe124541c";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "7ce6c1f1313ae5795ecba5846ee79ba25ea68152";
+      rev = "dd0792570b9aa515adf284960c60510fe124541c";
       fetchSubmodules = false;
-      sha256 = "sha256-wBZeT8NRFFQVgDUvorzcpnLQmn580IHjN0AXVMuzUtM=";
+      sha256 = "sha256-eoMFx4UpSydXqj7OSiv+HriOuQTpcMUu6SUSQTfsgvs=";
     };
-    date = "2024-11-22";
+    date = "2024-11-27";
   };
 }
