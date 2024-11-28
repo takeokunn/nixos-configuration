@@ -2060,8 +2060,8 @@
 ** docker-tramp
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(docker-tramp-add-method
-  		     docker-tramp-cleanup
-  		     docker-tramp-add-method) "docker-tramp" nil t)
+                       docker-tramp-cleanup
+                       docker-tramp-add-method) "docker-tramp" nil t)
 
   (add-hook 'emacs-startup-hook #'docker-tramp-add-method)
 
@@ -2751,11 +2751,11 @@
   (with-eval-after-load 'mu4e-folders
     ;; config
     (setopt mu4e-maildir-shortcuts '((:maildir "/Gmail/INBOX" :key ?i)
-  				   (:maildir "/Gmail/Emacs" :key ?e)
-  				   (:maildir "/Gmail/GitHub" :key ?h)
-  				   (:maildir "/Gmail/Guix" :key ?g)
-  				   (:maildir "/Gmail/PHP" :key ?p)
-  				   (:maildir "/Gmail/RakutenSecurity" :key ?r))))
+                                     (:maildir "/Gmail/Emacs" :key ?e)
+                                     (:maildir "/Gmail/GitHub" :key ?h)
+                                     (:maildir "/Gmail/Guix" :key ?g)
+                                     (:maildir "/Gmail/PHP" :key ?p)
+                                     (:maildir "/Gmail/RakutenSecurity" :key ?r))))
 
   (with-eval-after-load 'mm-decode
     (add-to-list 'mm-discouraged-alternatives "text/html")
@@ -3855,17 +3855,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** composer
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(composer-get-config
-  		     composer-get-bin-dir
-  		     composer-install
-  		     composer-dump-autoload
-  		     composer-require
-  		     composer-update
-  		     composer-find-json-file
-  		     composer-view-lock-file
-  		     composer-run-vendor-bin-command
-  		     composer-run-script
-  		     composer-setup-managed-phar
-  		     composer) "composer" nil t)
+                       composer-get-bin-dir
+                       composer-install
+                       composer-dump-autoload
+                       composer-require
+                       composer-update
+                       composer-find-json-file
+                       composer-view-lock-file
+                       composer-run-vendor-bin-command
+                       composer-run-script
+                       composer-setup-managed-phar
+                       composer) "composer" nil t)
 #+end_src
 *** php-runtime
 #+begin_src emacs-lisp :tangle yes
@@ -4168,12 +4168,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setq org-capture-use-agenda-date t)
     (setq org-capture-bookmark nil)
-    (setq org-capture-templates `(("t" "Todo" entry (file ,(expand-file-name "todo.org" org-directory))
-                                     "* %?")
-                                    ("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
-                                     "* %?")
-                                    ("j" "Journal" entry (file+olp+datetree ,(expand-file-name "journal.org" org-directory))
-                                     "* %U\n%?\n%i\n"))))
+    (setq org-capture-templates `(("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
+                                   "* %T\n%?")
+                                  ("j" "Journal" entry (file+olp+datetree ,(expand-file-name "journal.org" org-directory))
+                                   "* %U\n%?\n%i\n"))))
 #+end_src
 *** org-duration
 #+begin_src emacs-lisp :tangle yes
