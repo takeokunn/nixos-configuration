@@ -1,4 +1,3 @@
-{ emacs-overlay }:
 let
   lnav-overlay = (
     self: super: {
@@ -17,7 +16,4 @@ let
   );
 
 in
-[
-  (import emacs-overlay)
-  lnav-overlay
-]
+[ lnav-overlay ]

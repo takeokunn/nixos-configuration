@@ -7,6 +7,7 @@
 let
   emacs = import ./emacs { inherit pkgs org-babel sources; };
   gh = import ./gh;
+  gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
@@ -25,6 +26,7 @@ in
 [
   emacs
   gh
+  gh-dash
   git
   nix-index
   nyxt

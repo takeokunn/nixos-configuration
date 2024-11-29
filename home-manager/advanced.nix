@@ -9,10 +9,12 @@ let
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
+  basicOverlay = import ./overlay/basic.nix;
+  advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = import ./overlay { inherit emacs-overlay; };
+    overlays = basicOverlay ++ advancedOverlay;
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };

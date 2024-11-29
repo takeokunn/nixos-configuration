@@ -4,9 +4,11 @@ let
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
+  basicOverlay = import ./overlay/basic.nix;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
+    overlays = basicOverlay;
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
