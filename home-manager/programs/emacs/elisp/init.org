@@ -3316,6 +3316,15 @@
                        password-generator-phonetic
                        password-generator-custom) "password-generator" nil t)
 #+end_src
+*** sops
+#+begin_src emacs-lisp
+  (autoload-if-found '(sops-save-file
+                       sops-cancel
+                       sops-edit-file
+                       global-sops-mode) "sops" nil t)
+
+  (add-hook 'emacs-startup-hook #'global-sops-mode)
+#+end_src
 ** Dictionary
 *** define-word
 #+begin_src emacs-lisp :tangle yes
