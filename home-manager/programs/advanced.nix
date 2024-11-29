@@ -9,12 +9,13 @@ let
   gh = import ./gh;
   gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };
+  lnav = import ./lnav { inherit pkgs; };
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap;
   rio = import ./rio { inherit pkgs; };
-  ssh = import ./ssh;
   sketchybar = import ./sketchybar;
+  ssh = import ./ssh;
 
   # for window manager
   aerospace = import ./aerospace { inherit pkgs; };
@@ -28,12 +29,13 @@ in
   gh
   gh-dash
   git
+  lnav
   nix-index
   nyxt
   offlineimap
   rio
-  ssh
   sketchybar
+  ssh
 
   # for window manager
   aerospace
