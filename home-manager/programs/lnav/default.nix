@@ -1,6 +1,6 @@
 {
   programs.lnav = {
-    enable = false;
+    enable = true;
     config = {
       ui.theme = "dracula";
       format-repos = [
