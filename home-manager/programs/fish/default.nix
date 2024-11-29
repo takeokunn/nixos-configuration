@@ -30,9 +30,6 @@
       set -x TMPDIR /tmp
       set -x COLORTERM truecolor
 
-      # for nix
-      set -x NIX_CONFIG "access-tokens = github.com="(gh auth token)
-
       if test -d /etc/profiles/per-user/(whoami)/bin
         fish_add_path /etc/profiles/per-user/(whoami)/bin
       end
