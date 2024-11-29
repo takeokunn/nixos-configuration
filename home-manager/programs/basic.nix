@@ -8,7 +8,7 @@ let
   eza = import ./eza;
   fish = import ./fish { inherit pkgs sources; };
   gnupg = import ./gnupg;
-  lnav = import ./lnav;
+  lnav = import ./lnav { inherit pkgs; };
   man = import ./man;
   misc = import ./misc;
   mu = import ./mu;

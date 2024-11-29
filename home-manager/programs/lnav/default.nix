@@ -1,6 +1,7 @@
-{
+{ pkgs }: {
   programs.lnav = {
     enable = true;
+    package = pkgs.lnav;
     config = {
       ui.theme = "dracula";
       format-repos = [
