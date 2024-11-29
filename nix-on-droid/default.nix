@@ -5,10 +5,7 @@
   ...
 }:
 {
-  environment.packages = with pkgs; [
-    git
-    emacs
-  ];
+  environment.packages = with pkgs; [ git ];
 
   time.timeZone = "Asia/Tokyo";
 
