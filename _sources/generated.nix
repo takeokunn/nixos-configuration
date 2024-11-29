@@ -992,15 +992,15 @@
   };
   vim-ddu-source-dummy = {
     pname = "vim-ddu-source-dummy";
-    version = "c7c5c20fa2a7f7e2e228afd51a8b615d06ff491f";
+    version = "ebe720c286d970dfe940c74e0bb545d907257cff";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu-source-dummy";
-      rev = "c7c5c20fa2a7f7e2e228afd51a8b615d06ff491f";
+      rev = "ebe720c286d970dfe940c74e0bb545d907257cff";
       fetchSubmodules = false;
-      sha256 = "sha256-msnaHsmhQuBShrJ9z7A+5CRKXYfBXZymOQHPfdgScZU=";
+      sha256 = "sha256-BJYOh6V7yqNl0eLpRGK9lF2WCxyGpDE11eD0EVA/4M0=";
     };
-    date = "2024-09-03";
+    date = "2024-11-28";
   };
   vim-ddu-source-file = {
     pname = "vim-ddu-source-file";
@@ -1340,14 +1340,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "dd0792570b9aa515adf284960c60510fe124541c";
+    version = "791ee6f1ba8e558e3cbc379a52b06e26beeaa63b";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "dd0792570b9aa515adf284960c60510fe124541c";
+      rev = "791ee6f1ba8e558e3cbc379a52b06e26beeaa63b";
       fetchSubmodules = false;
-      sha256 = "sha256-eoMFx4UpSydXqj7OSiv+HriOuQTpcMUu6SUSQTfsgvs=";
+      sha256 = "sha256-foBVFZspKWv5GHnAmfkcd8oxPJnwCgsb3aOxz3QQZms=";
     };
-    date = "2024-11-27";
+    date = "2024-11-28";
   };
 }
