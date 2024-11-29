@@ -9,6 +9,7 @@ in
 with epkgs;
 [
   # Basic Lisp
+  paredit
   rainbow-delimiters
 
   # Common Lisp

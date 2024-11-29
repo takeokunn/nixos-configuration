@@ -1998,8 +1998,26 @@
 
   (add-hook 'emacs-startup-hook #'puni-global-mode)
 
+  (with-eval-after-load 'lisp-mode
+    (add-hook 'lisp-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'emacs-lisp-mode
+    (add-hook 'emacs-lisp-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'clojure-mode
+    (add-hook 'clojure-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'lisp-interaction-mode
+    (add-hook 'lisp-interacton-mode-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'scheme
+    (add-hook 'scheme-mode-hook #'puni-disable-puni-mode))
+
   (with-eval-after-load 'simple
     (add-hook 'eval-expression-minibuffer-setup-hook #'puni-disable-puni-mode))
+
+  (with-eval-after-load 'ielm
+    (add-hook 'inferior-emacs-lisp-mode-hook #'puni-disable-puni-mode))
 
   (with-eval-after-load 'minibuffer
     (add-hook 'minibuffer-mode-hook #'puni-disable-puni-mode))
@@ -2300,11 +2318,10 @@
   (keymap-global-set "M-g I" #'consult-imenu-multi)
 
   ;; C-o bindings in `search-map'
-  (keymap-global-set "C-o"
-  		   #'(lambda ()
-                         (interactive)
-                         (let ((word (thing-at-point 'symbol 'no-properties)))
-                           (consult-line word))))
+  (keymap-global-set "C-o" #'(lambda ()
+                               (interactive)
+                               (let ((word (thing-at-point 'symbol 'no-properties)))
+                                 (consult-line word))))
 
   ;; Isearch integration
   (with-eval-after-load 'isearch
@@ -3434,6 +3451,50 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 * Language Specific
 ** Basic Lisp
+*** paredit
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(enable-paredit-mode
+                       paredit-forward-slurp-sexp
+                       paredit-splice-sexp
+                       paredit-define-keys)
+                     "paredit" nil t)
+
+  (keymap-global-set "C-c f" #'paredit-forward-slurp-sexp)
+  (keymap-global-set "M-s" #'paredit-splice-sexp)
+
+  (with-eval-after-load 'paredit
+    ;; hooks
+    (add-hook 'paredit-mode-hook #'paredit-define-keys))
+
+  (with-eval-after-load 'lisp-mode
+    ;; hooks
+    (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+    (add-hook 'lisp-data-mode-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'emacs-lisp-mode
+    ;; hooks
+    (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'clojure-mode
+    ;; hooks
+    (add-hook 'clojure-mode-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'lisp-interaction-mode
+    ;; hooks
+    (add-hook 'lisp-interacton-mode-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'scheme
+    ;; hooks
+    (add-hook 'scheme-mode-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'simple
+    ;; hooks
+    (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode))
+
+  (with-eval-after-load 'ielm
+    ;; hooks
+    (add-hook 'inferior-emacs-lisp-mode-hook #'enable-paredit-mode))
+#+END_SRC
 *** rainbow-delimiter
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(rainbow-delimiters-mode-enable) "rainbow-delimiters" nil t)
