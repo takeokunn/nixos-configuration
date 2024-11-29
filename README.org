@@ -7,7 +7,7 @@
 |------------------+-----------+---------+----------------+--------|
 | M1 Mac Pro       | OPL2212-2 | OSX     | aarch64-darwin | ○      |
 | Thinkpad X13Gen2 | X13Gen2   | NixOS   | x86_64-linux   | ○      |
-| Android OPPO-A79 | OPPO-A79  | Android | aarch64-linux  | ○      |
+| Android OPPO-A79 | OPPO-A79  | Android | aarch64-linux  | ×      |
 
 ** Usage
 *** for OPL2212-2
@@ -20,5 +20,5 @@
 #+end_src
 *** for OPPO-A79
 #+begin_src shell
-  nix-on-droid switch --extra-experimental-features 'flakes nix-command' --flake .#OPPO-A79 --show-trace
+  nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
