@@ -14,6 +14,7 @@ nixpkgs.lib.nixosSystem {
   specialArgs = {
     inherit username xremap;
   };
+
   modules = [
     ../../nixos
     ./hardware-configuration.nix

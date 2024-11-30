@@ -12,7 +12,7 @@
       noto-fonts-monochrome-emoji
       hackgen-font
       hackgen-nf-font
-      fira-code-nerdfont
+      nerd-fonts.fira-code
       emacs-all-the-icons-fonts
       font-awesome
       font-awesome_5

@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   xremap,
   username,
   ...
@@ -9,7 +10,7 @@ let
   fonts = import ./config/fonts.nix { inherit pkgs; };
   hardware = import ./config/hardware.nix;
   i18n = import ./config/i18n.nix;
-  networking = import ./config/networking.nix;
+  networking = import ./config/networking.nix { inherit config; };
   nix = import ./config/nix.nix;
   programs = import ./config/programs.nix;
   security = import ./config/security.nix { inherit username; };
@@ -21,6 +22,13 @@ let
 in
 {
   system.stateVersion = "24.11";
+
+  sops = {
+    defaultSopsFile = ../secrets/password.yaml;
+    age.sshKeyPaths = [ "/home/take/.ssh/id_ed25519" ];
+    secrets.home-wifi-psk = { };
+  };
+
   imports = [
     xremap.nixosModules.default
     boot
