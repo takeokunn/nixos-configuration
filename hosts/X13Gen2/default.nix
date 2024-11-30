@@ -16,6 +16,15 @@ nixpkgs.lib.nixosSystem {
   };
 
   modules = [
+    {
+      sops = {
+        defaultSopsFile = ../../secrets/password.yaml;
+        age.sshKeyPaths = [ "/home/take/.ssh/id_ed25519" ];
+        secrets = {
+          home-wifi-psk = { };
+        };
+      };
+    }
     ../../nixos
     ./hardware-configuration.nix
     sops-nix.nixosModules.sops
