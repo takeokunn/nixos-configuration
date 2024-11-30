@@ -273,11 +273,11 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "3d045ddf1f8db8ec8700572f10df27e912710dad",
-      "sha256": "sha256-vl6+PByq1gvP9hPyQgXnrHcp8WziC2lcPr1++5+UIoQ=",
+      "rev": "0f5897151e910164d39f0075ced06f4d43200d50",
+      "sha256": "sha256-N4KgrAxoJ6IM2N1p9eoeN31GYFyArsPZ7eL0AjLK7kw=",
       "type": "github"
     },
-    "version": "3d045ddf1f8db8ec8700572f10df27e912710dad"
+    "version": "0f5897151e910164d39f0075ced06f4d43200d50"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -461,7 +461,7 @@
   },
   "emacs-ox-typst": {
     "cargoLocks": null,
-    "date": "2024-11-24",
+    "date": "2024-11-30",
     "extract": null,
     "name": "emacs-ox-typst",
     "passthru": null,
@@ -473,11 +473,11 @@
       "name": null,
       "owner": "jmpunkt",
       "repo": "ox-typst",
-      "rev": "0352b368f7713606bef2e90f76b6e7af3171e08f",
-      "sha256": "sha256-HjPJXIJ9mqbmMrqtFVyb9BlykxqhhfcKuvYZHExH398=",
+      "rev": "d00fc1d21657f925c7bd92e9b9cab51047bbcb2f",
+      "sha256": "sha256-DcJ1p5TlzxJZ5jOQ8c+hTAv0XqEMOZtIy1LrWbxUDOM=",
       "type": "github"
     },
-    "version": "0352b368f7713606bef2e90f76b6e7af3171e08f"
+    "version": "d00fc1d21657f925c7bd92e9b9cab51047bbcb2f"
   },
   "emacs-php-doc-block": {
     "cargoLocks": null,
@@ -1741,7 +1741,7 @@
   },
   "vim-ddu-source-git_branch": {
     "cargoLocks": null,
-    "date": "2024-11-26",
+    "date": "2024-11-30",
     "extract": null,
     "name": "vim-ddu-source-git_branch",
     "passthru": null,
@@ -1753,11 +1753,11 @@
       "name": null,
       "owner": "kyoh86",
       "repo": "ddu-source-git_branch",
-      "rev": "720f91167d7bae649dd07c919cb53d4b390f8151",
-      "sha256": "sha256-kadKF+kNTJd3Qev/ZdidgjjdCz3Tw96sRHxmdN6gtSg=",
+      "rev": "57bec3aaa4b4fdb7e72aa9f1a9e91bd87a855411",
+      "sha256": "sha256-AlXifk5VmVOlycucVA07cnFNnd+NWeGwfraHRinqqmQ=",
       "type": "github"
     },
-    "version": "720f91167d7bae649dd07c919cb53d4b390f8151"
+    "version": "57bec3aaa4b4fdb7e72aa9f1a9e91bd87a855411"
   },
   "vim-ddu-source-git_diff": {
     "cargoLocks": null,
@@ -1781,7 +1781,7 @@
   },
   "vim-ddu-source-git_diff_tree": {
     "cargoLocks": null,
-    "date": "2024-11-26",
+    "date": "2024-11-30",
     "extract": null,
     "name": "vim-ddu-source-git_diff_tree",
     "passthru": null,
@@ -1793,15 +1793,15 @@
       "name": null,
       "owner": "kyoh86",
       "repo": "ddu-source-git_diff_tree",
-      "rev": "ccc8078d890f2d575550899ecb202dcd5613c4e1",
-      "sha256": "sha256-wi7hKu64C4cRneK9kL3UsZd460cyZETkkqWlUC7zLJw=",
+      "rev": "bbd406d0fb4a88bbb6fa603bed07d752cb4163ee",
+      "sha256": "sha256-eKm9/C7cLL8EVwawHjqv5rZjljSzlDFECE1lbBl21pQ=",
       "type": "github"
     },
-    "version": "ccc8078d890f2d575550899ecb202dcd5613c4e1"
+    "version": "bbd406d0fb4a88bbb6fa603bed07d752cb4163ee"
   },
   "vim-ddu-source-git_log": {
     "cargoLocks": null,
-    "date": "2024-11-26",
+    "date": "2024-11-30",
     "extract": null,
     "name": "vim-ddu-source-git_log",
     "passthru": null,
@@ -1813,11 +1813,11 @@
       "name": null,
       "owner": "kyoh86",
       "repo": "ddu-source-git_log",
-      "rev": "87e921100eefc911e9a18f1b1bf10d0a7f1216da",
-      "sha256": "sha256-q/fiESKwX+u++iHpg14TSLQ5WwQHZqAomLiWqW+95I0=",
+      "rev": "ffc049ed2ba809ac9f28f81462831bcfebba79b8",
+      "sha256": "sha256-vTckqZzZojF8/rjH2A26/ZnPMFzdo8/OgCD3fDcSZ1Q=",
       "type": "github"
     },
-    "version": "87e921100eefc911e9a18f1b1bf10d0a7f1216da"
+    "version": "ffc049ed2ba809ac9f28f81462831bcfebba79b8"
   },
   "vim-ddu-source-git_status": {
     "cargoLocks": null,
@@ -2221,7 +2221,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2024-11-28",
+    "date": "2024-11-30",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -2233,10 +2233,10 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "791ee6f1ba8e558e3cbc379a52b06e26beeaa63b",
-      "sha256": "sha256-foBVFZspKWv5GHnAmfkcd8oxPJnwCgsb3aOxz3QQZms=",
+      "rev": "97ec0c360a4e523b7eedcd1457f75f1cce236a45",
+      "sha256": "sha256-zgEy1/wMTibxTbO99xvfJaJMu23IyeqcyOTcRJ9tlf0=",
       "type": "github"
     },
-    "version": "791ee6f1ba8e558e3cbc379a52b06e26beeaa63b"
+    "version": "97ec0c360a4e523b7eedcd1457f75f1cce236a45"
   }
 }
