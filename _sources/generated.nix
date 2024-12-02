@@ -92,15 +92,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
+    version = "dca0e4f43633e36514f094ab435dbb849d7fcfc6";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "b6d919022a81ae6f8e024a9cce2a8250a2451d09";
+      rev = "dca0e4f43633e36514f094ab435dbb849d7fcfc6";
       fetchSubmodules = false;
-      sha256 = "sha256-eyOSL+xQ6gU3izGx/araOxf+6C8qN46o7kevKmAhL+g=";
+      sha256 = "sha256-9u5oQJESWMIfZAy2GvimarjoS+eOhEInOBoslyy7mH0=";
     };
-    date = "2024-11-26";
+    date = "2024-12-02";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -1280,15 +1280,15 @@
   };
   vim-friendly-snippets = {
     pname = "vim-friendly-snippets";
-    version = "de8fce94985873666bd9712ea3e49ee17aadb1ed";
+    version = "efff286dd74c22f731cdec26a70b46e5b203c619";
     src = fetchFromGitHub {
       owner = "rafamadriz";
       repo = "friendly-snippets";
-      rev = "de8fce94985873666bd9712ea3e49ee17aadb1ed";
+      rev = "efff286dd74c22f731cdec26a70b46e5b203c619";
       fetchSubmodules = false;
-      sha256 = "sha256-H94Ryad0ZsSg/gioUgW+7sowij7GgtEUMNFi1IOZAys=";
+      sha256 = "sha256-I8SRZxnoNC6SOWW+scoA77Jwyxcb4eUczppLdyOiZe0=";
     };
-    date = "2024-10-07";
+    date = "2024-12-01";
   };
   vim-gin = {
     pname = "vim-gin";
@@ -1340,14 +1340,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "1b6cae260964e7bbd9b370ff5bd799a3d3faea36";
+    version = "92e88fda3bfc64318ad448b3e3b66a8bb5561c28";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "1b6cae260964e7bbd9b370ff5bd799a3d3faea36";
+      rev = "92e88fda3bfc64318ad448b3e3b66a8bb5561c28";
       fetchSubmodules = false;
-      sha256 = "sha256-e1VhMyRTg8wjaM9I5ttPlZKQiBKQ5PMOQyuyQK47AIU=";
+      sha256 = "sha256-PLgjpq717tvehzhno6zA9I9DOrHvOJvMX2hvtuwyMFA=";
     };
-    date = "2024-12-01";
+    date = "2024-12-02";
   };
 }
