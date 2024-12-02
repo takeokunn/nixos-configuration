@@ -298,8 +298,6 @@
 
   (keymap-global-set "C-x l" #'next-buffer)
   (keymap-global-set "C-x h" #'previous-buffer)
-  (keymap-global-set "C-x C-b" #'switch-to-buffer)
-
   (keymap-global-set "C-x C-k" nil)
 
   (keymap-global-set "M-d" #'my/delete-forward-block)
@@ -2603,7 +2601,7 @@
     (advice-add 'projectile-switch-project :override #'consult-projectile-switch-project)
 
     ;; keybind
-    (keymap-global-set "C-x B" #'consult-projectile-switch-to-buffer))
+    (keymap-global-set "C-x C-b" #'consult-projectile-switch-to-buffer))
 #+end_src
 
 * Window
@@ -2674,9 +2672,9 @@
 
     ;; advice
     ;; close neotree when tab bar action
-    ;; (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
-    ;; (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
+    (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
+    (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
+    (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
 
     ;; function
     (defun my/tab-bar-rename-tab ()
@@ -3215,10 +3213,10 @@
     (add-hook 'neotree-mode-hook #'(lambda () (display-line-numbers-mode -1)))
 
     ;; keybind
-    ;; (define-key neotree-mode-map (kbd "C-j") (neotree-make-executor
-    ;;                                           :file-fn #'neo-open-file
-    ;;                                           :dir-fn  #'neo-open-dir))
-    )
+    (define-key neotree-mode-map (kbd "C-j")
+                (neotree-make-executor
+                 :file-fn #'neo-open-file
+                 :dir-fn  #'neo-open-dir)))
 #+END_SRC
 ** nyan-mode
 #+begin_src emacs-lisp :tangle yes
