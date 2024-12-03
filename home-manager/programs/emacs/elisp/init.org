@@ -1410,6 +1410,10 @@
   (with-eval-after-load 'magit-log
     ;; keybinds
     (define-key magit-log-mode-map (kbd "C-j") #'magit-visit-thing))
+
+  (with-eval-after-load 'magit-mode
+    ;; config
+    (setopt magit-display-buffer-function #'magit-display-buffer-fullcolumn-most-v1))
 #+END_SRC
 *** magit-gptcommit
 #+begin_src emacs-lisp :tangle yes
@@ -2561,6 +2565,7 @@
     ;; function
     (defun my/update-projectile-known-projects ()
       (interactive)
+      (projectile-remove-current-project-from-known-projects)
       (projectile-clear-known-projects)
       (projectile-cleanup-known-projects)
       (setopt projectile-known-projects (mapcar
@@ -2570,7 +2575,6 @@
 
     ;; config
     (setopt projectile-switch-project-action 'projectile-dired)
-    (setopt projectile-enable-caching t)
     (setopt projectile-use-git-grep t))
 #+end_src
 ** consult-projectile
@@ -3097,7 +3101,11 @@
 #+begin_src emacs-lisp
   (autoload-if-found '(global-emojify-mode) "emojify" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-emojify-mode)
+  (with-eval-after-load 'text-mode
+    (add-hook 'text-mode-hook #'global-emojify-mode))
+
+  (with-eval-after-load 'org-mode
+    (remove-hook 'org-mode-hook #'emojify-mode))
 #+end_src
 *** nerd-icons-dired
 #+begin_src emacs-lisp :tangle yes
