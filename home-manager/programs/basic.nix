@@ -10,7 +10,6 @@ let
   gnupg = import ./gnupg;
   man = import ./man;
   misc = import ./misc;
-  mu = import ./mu;
   neovim = import ./neovim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
@@ -33,7 +32,6 @@ in
   gnupg
   man
   misc
-  mu
   password-store
   neovim
   peco

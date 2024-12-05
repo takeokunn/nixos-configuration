@@ -1,1 +1,3 @@
-{ programs.mu.enable = true; }
+{
+  programs.mu.enable = true;
+}

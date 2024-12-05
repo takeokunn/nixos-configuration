@@ -9,7 +9,6 @@
 
   accounts.email.accounts = {
     Gmail = {
-      primary = true;
       offlineimap = {
         enable = true;
         extraConfig.remote = {
