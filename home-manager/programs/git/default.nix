@@ -30,7 +30,6 @@
 
     extraConfig = {
       core = {
-        editor = "emacs -nw";
         quotepath = "off";
         ignorecase = false;
         safecrlf = true;

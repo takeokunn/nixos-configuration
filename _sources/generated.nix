@@ -548,15 +548,15 @@
   };
   vim-ddc = {
     pname = "vim-ddc";
-    version = "0743f16a9e8a34b5c421cf9dcbaef76281af73a4";
+    version = "479d44b655f78c0079743c7892f58c4168eafff2";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddc.vim";
-      rev = "0743f16a9e8a34b5c421cf9dcbaef76281af73a4";
+      rev = "479d44b655f78c0079743c7892f58c4168eafff2";
       fetchSubmodules = false;
-      sha256 = "sha256-Fs0+Fz9mE99O3LF2bNzuzdgeDNgNtWJCuBqFQgbrgek=";
+      sha256 = "sha256-L9PNnrftzNoXwOiEKf2TQx/dVlTLraEkPQ34W7ujSVg=";
     };
-    date = "2024-12-03";
+    date = "2024-12-04";
   };
   vim-ddc-buffer = {
     pname = "vim-ddc-buffer";
@@ -800,15 +800,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "00770e1e2695815a0b32ace99198c832cacc4c39";
+    version = "6d4ada80f190c3f32068587430758de34d037486";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "00770e1e2695815a0b32ace99198c832cacc4c39";
+      rev = "6d4ada80f190c3f32068587430758de34d037486";
       fetchSubmodules = false;
-      sha256 = "sha256-9WV7se1tLxhucJMdCJAVYcqxVDcFaCXa+TRtoRuTrsI=";
+      sha256 = "sha256-SYDsRmWNxQw+uoMwnZuAAtcjeMy8NYVx6ngWIGvGf50=";
     };
-    date = "2024-12-03";
+    date = "2024-12-04";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
@@ -1340,14 +1340,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "1fdd045c5dac3738e5b2e7922198a3d5631ae5b0";
+    version = "ed6e3dcdd4ed485a991e63fe3638091ec6145a25";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "1fdd045c5dac3738e5b2e7922198a3d5631ae5b0";
+      rev = "ed6e3dcdd4ed485a991e63fe3638091ec6145a25";
       fetchSubmodules = false;
-      sha256 = "sha256-j/SDG6vpI9yD0WPQ8xlvxVRCQSsFqoOVKDTSFgI4anM=";
+      sha256 = "sha256-kGYoebMXwHA1jr+taBPFwrl4pR6rK/nanvtFulPEeJk=";
     };
-    date = "2024-12-03";
+    date = "2024-12-04";
   };
 }

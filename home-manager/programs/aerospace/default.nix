@@ -147,11 +147,15 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
-          "if".app-id = "com.hnc.Discord";
+          "if".app-id = "com.obsproject.obs-studio";
           run = [ "move-node-to-workspace 7" ];
         }
         {
-          "if".app-id = "com.anthropic.claudefordesktop";
+          "if".app-id = "com.github.tattn.VCam";
+          run = [ "move-node-to-workspace 7" ];
+        }
+        {
+          "if".app-id = "com.hnc.Discord";
           run = [ "move-node-to-workspace 8" ];
         }
         {

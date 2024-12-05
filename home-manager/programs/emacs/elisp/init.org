@@ -302,6 +302,7 @@
 
   (keymap-global-set "M-d" #'my/delete-forward-block)
   (keymap-global-set "M-L" #'syntax-subword-downcase)
+  (keymap-global-set "C-L" #'syntax-subword-downcase)
 
   (when window-system
     (keymap-global-set "C-x C-c" nil))
@@ -2554,24 +2555,18 @@
 
   (add-hook 'emacs-startup-hook #'projectile-mode)
 
+  (defun my/update-projectile-known-projects ()
+    (interactive)
+    (projectile-clear-known-projects)
+    (projectile-cleanup-known-projects)
+    (setopt projectile-known-projects (mapcar
+                                       (lambda (x)
+                                         (abbreviate-file-name (concat x "/")))
+                                       (split-string (shell-command-to-string "ghq list --full-path")))))
   (with-eval-after-load 'projectile
     ;; keybind
     (keymap-global-set "M-p" #'projectile-command-map)
     (keymap-global-set "C-c p" #'projectile-command-map)
-
-    ;; hooks
-    (add-hook 'projectile-mode-hook #'my/update-projectile-known-projects)
-
-    ;; function
-    (defun my/update-projectile-known-projects ()
-      (interactive)
-      (projectile-remove-current-project-from-known-projects)
-      (projectile-clear-known-projects)
-      (projectile-cleanup-known-projects)
-      (setopt projectile-known-projects (mapcar
-                                       (lambda (x)
-                                         (abbreviate-file-name (concat x "/")))
-                                       (split-string (shell-command-to-string "ghq list --full-path")))))
 
     ;; config
     (setopt projectile-switch-project-action 'projectile-dired)
@@ -4206,7 +4201,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-crypt
     ;; config
-    (setq org-crypt-key nil)
+    (setq org-crypt-key "0B10DAA7BA0236D73822 87660F79C0AB03FD7A1C")
     (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
 *** org-table
@@ -4319,17 +4314,47 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** orgit
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(orgit-store-link) "orgit" nil t)
+  (autoload-if-found '(orgit-store-link
+
+                       ;; orgit
+                       orgit-status-store
+                       orgit-status-open
+                       orgit-status-export
+                       orgit-status-complete-link
+
+                       ;; orgit-log
+                       orgit-log-store
+                       orgit-log-open
+                       orgit-log-export
+                       orgit-log-complete-link
+
+                       ;; orgit-rev
+                       orgit-rev-store
+                       orgit-rev-open
+                       orgit-rev-export
+                       orgit-rev-complete-link) "orgit" nil t)
 
   (with-eval-after-load 'org
-    (with-eval-after-load 'magit
-      (keymap-set magit-mode-map "<remap> <org-store-link>" #'orgit-store-link)
+    (org-link-set-parameters "orgit"
+                             :store    #'orgit-status-store
+                             :follow   #'orgit-status-open
+                             :export   #'orgit-status-export
+                             :complete #'orgit-status-complete-link)
 
-      (org-link-set-parameters "orgit"
-                               :store    #'orgit-status-store
-                               :follow   #'orgit-status-open
-                               :export   #'orgit-status-export
-                               :complete #'orgit-status-complete-link)))
+    (org-link-set-parameters "orgit-log"
+                             :store    #'orgit-log-store
+                             :follow   #'orgit-log-open
+                             :export   #'orgit-log-export
+                             :complete #'orgit-log-complete-link)
+
+    (org-link-set-parameters "orgit-rev"
+                             :store    #'orgit-rev-store
+                             :follow   #'orgit-rev-open
+                             :export   #'orgit-rev-export
+                             :complete #'orgit-rev-complete-link))
+
+  (with-eval-after-load 'magit
+    (keymap-set magit-mode-map "<remap> <org-store-link>" #'orgit-store-link))
 #+end_src
 ** Org Agenda
 *** Basic
