@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   programs.msmtp = {
     enable = true;
     extraConfig = ''
