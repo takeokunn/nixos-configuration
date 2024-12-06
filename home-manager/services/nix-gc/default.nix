@@ -1,7 +1,7 @@
 {
   nix.gc = {
     automatic = true;
-    frequency = "daily";
+    frequency = "monthly";
     options = "--delete-older-than 3d";
   };
 }

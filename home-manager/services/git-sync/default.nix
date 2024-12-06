@@ -1,7 +1,7 @@
 { config, ... }:
 {
   services.git-sync = {
-    enable = false;
+    enable = true;
     repositories = {
       private = {
         uri = "git@github.com:takeokunn/private";
@@ -16,6 +16,7 @@
       branch.main = {
         sync = true;
         syncNewFiles = true;
+        autocommitscript = "git add -A; git commit -m 'Auto-commit changes';";
       };
     };
   };
