@@ -2021,7 +2021,7 @@
   },
   "vim-ddu-ui-ff": {
     "cargoLocks": null,
-    "date": "2024-11-25",
+    "date": "2024-12-07",
     "extract": null,
     "name": "vim-ddu-ui-ff",
     "passthru": null,
@@ -2033,11 +2033,11 @@
       "name": null,
       "owner": "Shougo",
       "repo": "ddu-ui-ff",
-      "rev": "1bab10a1b7b888e99607b5905d3a8a5fbdff831c",
-      "sha256": "sha256-mrMUHxlCXNIA1Jnkfak8hd/BVdt00MG7wldoPGFVEjs=",
+      "rev": "37b3d71dc518519901350d68f461990991c17d89",
+      "sha256": "sha256-RrJf2J/W+q/DB14FoI1VkSzLeo6sxEMq5kCIWgNE9+Q=",
       "type": "github"
     },
-    "version": "1bab10a1b7b888e99607b5905d3a8a5fbdff831c"
+    "version": "37b3d71dc518519901350d68f461990991c17d89"
   },
   "vim-ddu-ui-filer": {
     "cargoLocks": null,
@@ -2101,7 +2101,7 @@
   },
   "vim-fern": {
     "cargoLocks": null,
-    "date": "2024-11-17",
+    "date": "2024-12-07",
     "extract": null,
     "name": "vim-fern",
     "passthru": null,
@@ -2113,11 +2113,11 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "vim-fern",
-      "rev": "95218a9eeb5bf25ff30196b8700eeb64b8f3aeba",
-      "sha256": "sha256-F8BildfIm18fvU7i+RYI2WHjaXvx/c3+uw0v8bpnbfw=",
+      "rev": "56f7c0dafb94dc9161f0edf67f88ada99b96de81",
+      "sha256": "sha256-vYdG3QHLnHIznhFwMQgM2UVQ1+doWqW5pAEQ2SWFxCA=",
       "type": "github"
     },
-    "version": "95218a9eeb5bf25ff30196b8700eeb64b8f3aeba"
+    "version": "56f7c0dafb94dc9161f0edf67f88ada99b96de81"
   },
   "vim-friendly-snippets": {
     "cargoLocks": null,
