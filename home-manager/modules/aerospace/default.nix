@@ -36,7 +36,6 @@ with lib;
   };
 
   config = mkIf cfg.enable {
-    xdg.configFile."aerospace/aerospace.toml".source =
-      settingsFormat.generate "aerospace.toml" cfg.settings;
+    xdg.configFile."aerospace/aerospace.toml".source = settingsFormat.generate "aerospace.toml" cfg.settings;
   };
 }
