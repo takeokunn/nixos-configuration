@@ -4304,14 +4304,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setq org-link-file-path-type 'relative))
 #+end_src
-*** org-link-beautify
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-link-beautify-mode) "org-link-beautify" nil t)
-
-  ;; (with-eval-after-load 'org
-  ;;   ;; hooks
-  ;;   (add-hook 'org-mode-hook #'org-link-beautify-mode))
-#+end_src
 *** orgit
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orgit-store-link

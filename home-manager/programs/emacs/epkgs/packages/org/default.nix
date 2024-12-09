@@ -28,7 +28,6 @@ with epkgs;
   org-tree-slide
 
   # Org Link
-  org-link-beautify
   orgit
 
   # Org Agenda
