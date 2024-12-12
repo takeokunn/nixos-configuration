@@ -296,13 +296,9 @@
   (keymap-global-set "C-c C-o" #'org-open-at-point)
   (keymap-global-set "C-x C-o" #'other-window)
 
-  (keymap-global-set "C-x l" #'next-buffer)
-  (keymap-global-set "C-x h" #'previous-buffer)
   (keymap-global-set "C-x C-k" nil)
 
   (keymap-global-set "M-d" #'my/delete-forward-block)
-  (keymap-global-set "M-L" #'syntax-subword-downcase)
-  (keymap-global-set "C-L" #'syntax-subword-downcase)
 
   (when window-system
     (keymap-global-set "C-x C-c" nil))
@@ -2684,9 +2680,9 @@
 * Cursor
 ** avy
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(avy-goto-word-1) "avy" nil t)
+  (autoload-if-found '(avy-goto-char) "avy" nil t)
 
-  (keymap-global-set "C-:" #'avy-goto-word-1)
+  (keymap-global-set "C-:" #'avy-goto-char)
 
   (with-eval-after-load 'avy
     ;; config

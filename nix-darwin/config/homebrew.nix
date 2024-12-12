@@ -24,6 +24,7 @@
       "dracula-xcode"
       "flutter"
       "flutterflow"
+      "font-sketchybar-app-font"
       "google-chrome"
       "keycastr"
       "obs"
