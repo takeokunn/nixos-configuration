@@ -3091,12 +3091,6 @@
 *** emojify
 #+begin_src emacs-lisp
   (autoload-if-found '(global-emojify-mode) "emojify" nil t)
-
-  (with-eval-after-load 'text-mode
-    (add-hook 'text-mode-hook #'global-emojify-mode))
-
-  (with-eval-after-load 'org-mode
-    (remove-hook 'org-mode-hook #'emojify-mode))
 #+end_src
 *** nerd-icons-dired
 #+begin_src emacs-lisp :tangle yes
