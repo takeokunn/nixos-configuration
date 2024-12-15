@@ -1,18 +1,16 @@
-* Mailboxes                 *[[mu:flag:unread|%2d][ 4]]*
+* Mailboxes                 *[[mu:flag:unread|%3d][4]]*
 
-/[i]/ [[mu:m:/inria/inbox or m:/gmail/inbox or m:/univ/inbox][Inbox]] /.............../ /[[mu:m:/inria/inbox or m:/gmail/inbox or m:/univ/inbox|%2d][ 4]]/
-/[f]/ [[mu:flag:flagged][Important]] /........../ /[[mu:flag:flagged|%3d][281]]/
-/[s]/ [[mu:m:/inria/sent or m:/gmail/sent or m:/univ/sent][Sent]] /............../ /[[mu:m:/inria/sent or m:/gmail/sent or m:/univ/sent|%4d][7186]]/
-/[a]/ [[mu:m:/inria/archive or m:/gmail/archive or m:/univ/archive][Archive]] /........../ /[[mu:m:/inria/archive or m:/gmail/archive or m:/univ/archive|%5d][44978]]/
+/[i]/ [[mu:m:/Gmail/INBOX][Inbox]] /.............../ /[[mu:m:/Gmail/INBOX|%3d][4]]/
+/[i]/ [[mu:m:/Gmail/Emacs][Emacs]] /.............../ /[[mu:m:/Gmail/Emacs|%3d][4]]/
+/[i]/ [[mu:m:/Gmail/GitHub][GitHub]] /.............../ /[[mu:m:/Gmail/Emacs|%3d][4]]/
+/[i]/ [[mu:m:/Gmail/Guix][Guix]] /.............../ /[[mu:m:/Gmail/Guix|%3d][4]]/
 
 * Smart mailboxes
 
 /[t]/ [[mu:date:today..now][Today]] /............../ /[[mu:date:today..now|%3d][ 19]]/
 /[y]/ [[mu:date:2d..today and not date:today..now][Yesterday]] /........../ /[[mu:date:2d..today and not date:today..now|%3d][380]]/
-
-** Mailing lists
-
-[[mu:list:emacs-devel.gnu.org][Emacs development]] /.../ /[[mu:list:emacs-devel.gnu.org|%4d][3538]]/
+/[w]/ [[mu:date:1w..now][Last week]] /......... /[[mu:date:7d..now|%4d][1196]]/
+/[m]/ [[mu:date:4w..now][Last month]] /......../ /[[mu:date:4w..|%4d][3924]]/
 
 * /Configuration/
 :PROPERTIES:
@@ -28,10 +26,10 @@ mu find --sortfield=date --reverse --fields "f s" $query  | head -$count
 #+END_SRC
 
 #+KEYMAP: u | mu4e-headers-search "flag:unread"
-#+KEYMAP: i | mu4e-headers-search "m:/inria/inbox or m:/gmail/inbox or m:/univ/inbox"
-#+KEYMAP: d | mu4e-headers-search "m:/inria/drafts or m:/gmail/drafts or m:/univ/drafts"
-#+KEYMAP: s | mu4e-headers-search "m:/inria/sent or m:/gmail/sent or m:/univ/sent"
-#+KEYMAP: f | mu4e-headers-search "flag:flagged"
+#+KEYMAP: i | mu4e-headers-search "m:/Gmail/INBOX"
+#+KEYMAP: e | mu4e-headers-search "m:/Gmail/Emacs"
+#+KEYMAP: h | mu4e-headers-search "m:/Gmail/GitHub"
+#+KEYMAP: g | mu4e-headers-search "m:/Gmail/Guix"
 
 #+KEYMAP: t | mu4e-headers-search "date:today..now"
 #+KEYMAP: y | mu4e-headers-search "date:2d..today and not date:today..now"

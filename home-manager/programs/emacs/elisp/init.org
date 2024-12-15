@@ -2740,8 +2740,7 @@
                                      (:maildir "/Gmail/Emacs" :key ?e)
                                      (:maildir "/Gmail/GitHub" :key ?h)
                                      (:maildir "/Gmail/Guix" :key ?g)
-                                     (:maildir "/Gmail/PHP" :key ?p)
-                                     (:maildir "/Gmail/RakutenSecurity" :key ?r))))
+                                     (:maildir "/Gmail/PHP" :key ?p))))
 
   (with-eval-after-load 'mm-decode
     (add-to-list 'mm-discouraged-alternatives "text/html")
@@ -2753,7 +2752,7 @@
 #+end_src
 *** mu4e-dashboard
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(mu4e-dashboard-mode) "mu4e-dashboard" nil t)
+  (autoload-if-found '(mu4e-dashboard) "mu4e-dashboard" nil t)
 
   (with-eval-after-load 'mu4e-dashboard
     ;; config
@@ -4191,8 +4190,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-crypt
     ;; config
-    (setq org-crypt-key "0B10DAA7BA0236D73822 87660F79C0AB03FD7A1C")
-    (setq org-tags-exclude-from-inheritance '("crypt")))
+    (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C")
+    (setopt org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
 *** org-table
 #+begin_src emacs-lisp :tangle yes
