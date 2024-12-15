@@ -4242,6 +4242,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-volume-update-entry-from-dblock) "org-volume" nil t)
 #+end_src
+*** org-sliced-images
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-sliced-images-mode) "org-sliced-images" nil t)
+
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'org-sliced-images-mode))
+#+end_src
 *** org-ql
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-ql-query org-ql-select) "org-ql" nil t)
