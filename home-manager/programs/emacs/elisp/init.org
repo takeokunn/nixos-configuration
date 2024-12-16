@@ -1277,11 +1277,11 @@
 #+end_src
 *** flycheck-textlint
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'flycheck
+  (defun my/flycheck-textlint-setup ()
+    (interactive)
     (flycheck-define-checker textlint
       "A linter for prose."
-      :command ("nix" "develop" "--command" "bash" "-c"
-                "textlint --format unix" source-inplace)
+      :command ("textlint" "--format" "unix" source-inplace)
       :error-patterns
       ((warning line-start (file-name) ":" line ":" column ": "
                 (id (one-or-more (not (any " "))))
@@ -1290,6 +1290,8 @@
                 line-end))
       :modes (org-mode))
     (add-to-list 'flycheck-checkers 'textlint))
+
+  (add-hook 'emacs-startup-hook #'my/flycheck-textlint-setup)
 #+end_src
 *** flycheck-elsa
 #+begin_src emacs-lisp :tangle yes
