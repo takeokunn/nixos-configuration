@@ -2728,7 +2728,7 @@
   (with-eval-after-load 'mu4e-update
     ;; config
     (setopt mu4e-get-mail-command "offlineimap")
-    (setopt mu4e-update-interval (* 5 60))
+    (setopt mu4e-update-interval (* 1 60))
     (setopt mu4e-index-cleanup nil)
     (setopt mu4e-index-lazy-check t))
 

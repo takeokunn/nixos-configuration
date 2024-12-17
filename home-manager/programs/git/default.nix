@@ -97,6 +97,7 @@
           untracked = "red";
           updated = "green bold";
         };
+
         diff = {
           commit = "";
           func = "cyan";
@@ -107,18 +108,21 @@
           old = "red";
           new = "green";
         };
+
         branch = {
           current = "cyan bold reverse";
           local = "white";
           plain = "";
           remote = "cyan";
         };
+
         interactive = {
           error = "";
           header = "";
           help = "";
           prompt = "";
         };
+
         grep = {
           context = "";
           filename = "";
@@ -146,6 +150,10 @@
         autoStash = true;
         abbreviateCommands = false;
         autosquash = true;
+      };
+
+      merge = {
+        conflictStyle = "diff3";
       };
 
       secrets = {
