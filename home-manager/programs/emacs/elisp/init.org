@@ -883,6 +883,12 @@
 
   (add-to-list 'auto-mode-alist '("\\.po$" . po-mode))
 #+END_SRC
+** prolog
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(prolog-mode) "prolog-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("\\.pl$" . prolog-mode))
+#+end_src
 ** protobuf-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(protobuf-mode) "protobuf-mode" nil t)
@@ -4593,6 +4599,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-src
     (add-to-list 'org-src-lang-modes '("racket" . racket)))
+#+end_src
+*** ob-prolog
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-babel-execute:prolog) "ob-prolog" nil t)
+
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("prolog" . pl)))
 #+end_src
 *** org-nix-shell
 #+begin_src emacs-lisp :tangle yes

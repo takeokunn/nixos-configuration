@@ -58,6 +58,7 @@ with epkgs;
   packages.ob-treesitter
   packages.ob-racket
   ob-base64
+  ob-prolog
   org-nix-shell
 
   # Org Publish
