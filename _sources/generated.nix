@@ -164,13 +164,13 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "e8dfb898a9a4e1056269aba81eafc412b583849a";
+    version = "8a489f2178f7cc6ccf7fab63e196ff9db2a5fadf";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "e8dfb898a9a4e1056269aba81eafc412b583849a";
+      rev = "8a489f2178f7cc6ccf7fab63e196ff9db2a5fadf";
       fetchSubmodules = false;
-      sha256 = "sha256-MKEavIlXwxkHS12IHcipRVRZrLTkduOXcWOlv0OBtV8=";
+      sha256 = "sha256-3Qum0FK+p88+qsXHEevrqsiu+EzJHrKH+b9AtKB2UbI=";
     };
     date = "2024-12-21";
   };
