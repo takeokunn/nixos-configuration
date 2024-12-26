@@ -41,8 +41,8 @@ with pkgs.vimPlugins;
   plugins.vimdoc-ja
 
   # denops
-  denops-vim
-  plugins.denops-helloworld
+  # denops-vim
+  # plugins.denops-helloworld
 
   # utils
   auto-pairs

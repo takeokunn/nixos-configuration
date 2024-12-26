@@ -3,11 +3,11 @@ let
   plugins = pkgs.callPackage ./plugins.nix { inherit sources; };
 in
 [
-  {
-    type = "lua";
-    plugin = plugins.skkeleton;
-    config = ''
-      vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
-    '';
-  }
+  # {
+  #   type = "lua";
+  #   plugin = plugins.skkeleton;
+  #   config = ''
+  #     vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
+  #   '';
+  # }
 ]
