@@ -1178,6 +1178,7 @@
   (add-to-list 'auto-mode-alist '("\\.svg$" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl$" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.liquid$" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.ejs$" . web-mode))
 
   (with-eval-after-load 'web-mode
     ;; config
@@ -1277,6 +1278,10 @@
 #+end_src
 * Coding
 ** Check
+*** flymake-proc
+#+begin_src emacs-lisp :tangle yes
+  (require 'flymake-proc)
+#+end_src
 *** flycheck
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-mode flycheck-define-checker) "flycheck" nil t)
@@ -2420,8 +2425,16 @@
     ;; sudo
     (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
-    ;; embark
-    (define-key embark-region-map (kbd "T") #'ellama-translate)
+    ;; ellama
+    (define-key embark-general-map (kbd "T") #'ellama-translate)
+
+    ;; copilot-chat
+    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
+    (define-key embark-general-map (kbd "R") #'copilot-chat-review)
+    (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
+    (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
+    (define-key embark-general-map (kbd "O") #'copilot-chat-optimize)
+    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
 
     ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
