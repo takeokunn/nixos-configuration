@@ -150,11 +150,11 @@
     version = sources.vim-ddu-source-help.date;
     src = sources.vim-ddu-source-help.src;
   };
-  # ddu-source-highlight = vimUtils.buildVimPlugin {
-  #   pname = sources.vim-ddu-source-highlight.pname;
-  #   version = sources.vim-ddu-source-highlight.date;
-  #   src = sources.vim-ddu-source-highlight.src;
-  # };
+  ddu-source-highlight = vimUtils.buildVimPlugin {
+    pname = sources.vim-ddu-source-highlight.pname;
+    version = sources.vim-ddu-source-highlight.date;
+    src = sources.vim-ddu-source-highlight.src;
+  };
   ddu-column-icon_filename = vimUtils.buildVimPlugin {
     pname = sources.vim-ddu-column-icon_filename.pname;
     version = sources.vim-ddu-column-icon_filename.date;
