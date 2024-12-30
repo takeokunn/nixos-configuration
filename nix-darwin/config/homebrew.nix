@@ -21,6 +21,7 @@
       "android-studio"
       "aquaskk"
       "chatgpt"
+      "cleanshot"
       "dracula-xcode"
       "flutter"
       "flutterflow"
