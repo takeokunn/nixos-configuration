@@ -387,10 +387,10 @@ src.git = "https://github.com/matsui54/ddu-source-help"
 src.branch = "main"
 fetch.github = "matsui54/ddu-source-help"
 
-[vim-ddu-source-highlight]
-src.git = "https://github.com/matsui54/ddu-source-highlight"
-src.branch = "main"
-fetch.github = "matsui54/ddu-source-highlight"
+# [vim-ddu-source-highlight]
+# src.git = "https://github.com/matsui54/ddu-source-highlight"
+# src.branch = "main"
+# fetch.github = "matsui54/ddu-source-highlight"
 
 [vim-ddu-column-icon_filename]
 src.git = "https://github.com/ryota2357/ddu-column-icon_filename"
