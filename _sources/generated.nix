@@ -344,15 +344,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e";
+    version = "e65a0a9055bd4426139bd331abb683c6bc03d670";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e";
+      rev = "e65a0a9055bd4426139bd331abb683c6bc03d670";
       fetchSubmodules = false;
-      sha256 = "sha256-5EoBFKgUDLyC9oZDP7vY3Ldk6An39Qo4ngkIHgrB8dU=";
+      sha256 = "sha256-VAdr9wafTIbXg4Q26Pr9xu/ibZAfnyz57/M3kmeqgk4=";
     };
-    date = "2024-07-21";
+    date = "2025-01-01";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
@@ -800,15 +800,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "29e5f94f6f982018282a6bd8c5865f56e8b4853b";
+    version = "825234db39d2c178209feeba35fa0b89da1a64a6";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "29e5f94f6f982018282a6bd8c5865f56e8b4853b";
+      rev = "825234db39d2c178209feeba35fa0b89da1a64a6";
       fetchSubmodules = false;
-      sha256 = "sha256-qXSJ2ueYWc3gHDLFAmKket7eHxETQaS7JoBwaRpmgas=";
+      sha256 = "sha256-tVuRXqiwNGXa76OJbi877qgWgC/jTOYnQ8R7j6hRt2o=";
     };
-    date = "2024-12-31";
+    date = "2025-01-01";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";

@@ -561,7 +561,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2024-07-21",
+    "date": "2025-01-01",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -573,11 +573,11 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e",
-      "sha256": "sha256-5EoBFKgUDLyC9oZDP7vY3Ldk6An39Qo4ngkIHgrB8dU=",
+      "rev": "e65a0a9055bd4426139bd331abb683c6bc03d670",
+      "sha256": "sha256-VAdr9wafTIbXg4Q26Pr9xu/ibZAfnyz57/M3kmeqgk4=",
       "type": "github"
     },
-    "version": "aa09e2cc79d32f890177c6d0b0376c4aa2708d3e"
+    "version": "e65a0a9055bd4426139bd331abb683c6bc03d670"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,
@@ -1321,7 +1321,7 @@
   },
   "vim-ddu": {
     "cargoLocks": null,
-    "date": "2024-12-31",
+    "date": "2025-01-01",
     "extract": null,
     "name": "vim-ddu",
     "passthru": null,
@@ -1333,11 +1333,11 @@
       "name": null,
       "owner": "Shougo",
       "repo": "ddu.vim",
-      "rev": "29e5f94f6f982018282a6bd8c5865f56e8b4853b",
-      "sha256": "sha256-qXSJ2ueYWc3gHDLFAmKket7eHxETQaS7JoBwaRpmgas=",
+      "rev": "825234db39d2c178209feeba35fa0b89da1a64a6",
+      "sha256": "sha256-tVuRXqiwNGXa76OJbi877qgWgC/jTOYnQ8R7j6hRt2o=",
       "type": "github"
     },
-    "version": "29e5f94f6f982018282a6bd8c5865f56e8b4853b"
+    "version": "825234db39d2c178209feeba35fa0b89da1a64a6"
   },
   "vim-ddu-column-icon_filename": {
     "cargoLocks": null,
