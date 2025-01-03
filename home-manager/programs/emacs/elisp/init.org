@@ -4122,12 +4122,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     (defvar my/org-agenda-files `(,(concat org-directory "/agenda")
                                   ,(concat org-directory "/archive/2023")
-                                  ,(concat org-directory "/archive/2024")))
+                                  ,(concat org-directory "/archive/2024")
+                                  ,(concat org-directory "/archive/2025")))
 
     (setq org-agenda-files my/org-agenda-files)
     (setq org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
-                                           (format-time-string "%Y" (current-time))
-                                           (format-time-string "%Y-%m-%d" (current-time))))
+                                         (format-time-string "%Y" (current-time))
+                                         (format-time-string "%Y-%m-%d" (current-time))))
 
     ;; log
     (setq org-log-into-drawer t)
