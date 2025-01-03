@@ -53,6 +53,9 @@ with epkgs;
   password-generator
   sops
 
+  # pdf
+  pdf-tools
+
   # Mouse
   inhibit-mouse
 ]
