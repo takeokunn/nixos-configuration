@@ -13,6 +13,21 @@
     ignoreCompilationError = false;
   };
 
+  copilot-chat = epkgs.melpaBuild {
+    pname = "copilot-chat";
+    version = "0.0.1";
+    src = sources.emacs-copilot-chat.src;
+
+    packageRequires = with epkgs; [
+      request
+      markdown-mode
+      chatgpt-shell
+      magit
+    ];
+
+    ignoreCompilationError = false;
+  };
+
   plz-media-type = epkgs.melpaBuild {
     pname = "plz-media-type";
     version = "0.0.1";
@@ -45,21 +60,6 @@
       plz
       plz-media-type
       plz-event-source
-    ];
-
-    ignoreCompilationError = false;
-  };
-
-  copilot-chat = epkgs.melpaBuild {
-    pname = "copilot-chat";
-    version = "0.0.1";
-    src = sources.emacs-copilot-chat.src;
-
-    packageRequires = with epkgs; [
-      request
-      markdown-mode
-      chatgpt-shell
-      magit
     ];
 
     ignoreCompilationError = false;
