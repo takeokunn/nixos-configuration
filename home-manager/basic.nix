@@ -2,13 +2,14 @@
   system,
   nixpkgs,
   org-babel,
+  emacs-overlay,
 }:
 let
   # nvfetcher
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
-  basicOverlay = import ./overlay/basic.nix;
+  basicOverlay = import ./overlay/basic.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;

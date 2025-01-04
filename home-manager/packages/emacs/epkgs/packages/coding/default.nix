@@ -35,6 +35,7 @@ with epkgs;
   key-combo
   dmacro
   god-mode
+  which-key
 
   # refactor
   emr

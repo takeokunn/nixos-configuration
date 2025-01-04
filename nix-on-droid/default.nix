@@ -3,6 +3,7 @@
   pkgs,
   system,
   org-babel,
+  emacs-overlay,
   ...
 }:
 {
@@ -17,6 +18,9 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    config = import ../home-manager/basic.nix { inherit system nixpkgs org-babel; };
+    config = import ../home-manager/basic.nix {
+      inherit system nixpkgs;
+      inherit org-babel emacs-overlay;
+    };
   };
 }
