@@ -15,6 +15,4 @@ with epkgs;
   packages.eshell-multiple
   eshell-syntax-highlighting
   eshell-fringe-status
-  # eat
-  mistty
 ]

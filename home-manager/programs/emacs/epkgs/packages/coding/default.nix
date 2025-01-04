@@ -33,7 +33,6 @@ with epkgs;
   # keyboard
   key-chord
   key-combo
-  which-key
   dmacro
   god-mode
 

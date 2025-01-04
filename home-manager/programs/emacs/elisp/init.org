@@ -4098,6 +4098,156 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'elfeed-goodies
     (setopt elfeed-goodies/entry-pane-size 0.6))
 #+end_src
+* Eshell
+** basic
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'esh-mode
+    ;; hook
+    (add-hook 'eshell-mode-hook #'(lambda () (display-line-numbers-mode -1)))
+
+    ;; keymap
+    (define-key eshell-mode-map (kbd "C-h") #'delete-backward-char)
+    (define-key eshell-mode-map (kbd "M-p") #'eshell-previous-matching-input-from-input))
+
+  (with-eval-after-load 'em-cmpl
+    (setopt eshell-cmpl-ignore-case t))
+
+  (with-eval-after-load 'em-glob
+    (setopt eshell-glob-include-dot-files t)
+    (setopt eshell-glob-include-dot-dot nil)
+    (setopt eshell-glob-show-progress t))
+
+  (with-eval-after-load 'em-hist
+    (setopt eshell-history-size 100000)
+    (setopt eshell-hist-ignoredups t))
+
+  (with-eval-after-load 'em-alias
+    (setopt eshell-command-aliases-list '(("ll" "ls -la"))))
+
+  (with-eval-after-load 'esh-cmd
+    (setopt eshell-prefer-lisp-functions nil))
+
+  (with-eval-after-load 'em-term
+    (setopt eshell-destroy-buffer-when-process-dies t))
+#+end_src
+** functions
+#+begin_src emacs-lisp :tangle yes
+  (defun eshell/ff (&rest args)
+    "Open a file in Emacs with ARGS, Some habits die hard."
+    (if (null args)
+        (bury-buffer)
+      (mapc #'find-file (mapcar #'expand-file-name (eshell-flatten-list (reverse args))))))
+
+  (defun eshell/unpack (file &rest args)
+    "Unpack FILE with ARGS."
+    (let ((command (some (lambda (x)
+                           (if (string-match-p (car x) file)
+                               (cadr x)))
+                         '((".*\.tar.bz2" "tar xjf")
+                           (".*\.tar.gz" "tar xzf")
+                           (".*\.bz2" "bunzip2")
+                           (".*\.rar" "unrar x")
+                           (".*\.gz" "gunzip")
+                           (".*\.tar" "tar xf")
+                           (".*\.tbz2" "tar xjf")
+                           (".*\.tgz" "tar xzf")
+                           (".*\.zip" "unzip")
+                           (".*\.Z" "uncompress")
+                           (".*" "echo 'Could not unpack the file:'")))))
+      (let ((unpack-command(concat command " " file " " (mapconcat 'identity args " "))))
+        (eshell/printnl "Unpack command: " unpack-command)
+        (eshell-command-result unpack-command))))
+
+  (defun my/cat-with-syntax-highlight (filename)
+    "Like cat(1) but with syntax highlighting."
+    (let ((existing-buffer (get-file-buffer filename))
+          (buffer (find-file-noselect filename)))
+      (eshell-print
+       (with-current-buffer buffer
+         (if (fboundp 'font-lock-ensure)
+             (font-lock-ensure)
+           (with-no-warnings
+             (font-lock-fontify-buffer)))
+         (let ((contents (buffer-string)))
+           (remove-text-properties 0 (length contents) '(read-only nil) contents)
+           contents)))
+      (unless existing-buffer
+        (kill-buffer buffer))
+      nil))
+
+  (advice-add 'eshell/cat :override #'my/cat-with-syntax-highlight)
+#+end_src
+** prompt
+#+begin_src emacs-lisp :tangle yes
+  (defun my/eshell-prompt ()
+    (concat (abbreviate-file-name (eshell/pwd))
+            (if (= (user-uid) 0) " # " " $ ")))
+
+  (with-eval-after-load 'em-prompt
+    (setopt eshell-prompt-function #'my/eshell-prompt))
+#+end_src
+** eshell-fringe-status
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eshell-fringe-status-mode) "eshell-fringe-status" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (add-hook 'eshell-mode-hook #'eshell-fringe-status-mode))
+#+end_src
+** esh-help
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(setup-esh-help-eldoc) "esh-help" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (add-hook 'eshell-mode-hook #'setup-esh-help-eldoc))
+#+end_src
+** eshell-multiple
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eshell-multiple-new
+                       eshell-multiple-next
+                       eshell-multiple-prev
+                       eshell-multiple-clear-buffer
+                       eshell-multiple-switch-buffer
+                       eshell-multiple-dedicated-toggle
+                       eshell-multiple-dedicated-open
+                       eshell-multiple-dedicated-close)
+                     "eshell-multiple" nil t)
+
+  (defalias 'eshell/new #'eshell-multiple-new)
+  (defalias 'eshell/next #'eshell-multiple-next)
+  (defalias 'eshell/prev #'eshell-multiple-prev)
+  (defalias 'eshell/clear #'eshell-multiple-clear-buffer)
+
+  (with-eval-after-load 'esh-mode
+    (define-key eshell-mode-map (kbd "C-l") #'eshell-multiple-clear-buffer))
+#+end_src
+** eshell-z
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eshell-z) "eshell-z" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-z))
+#+end_src
+** eshell-did-you-mean
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eshell-did-you-mean-setup) "eshell-did-you-mean" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (add-hook 'eshell-mode-hook #'eshell-did-you-mean-setup))
+#+end_src
+** eshell-syntax-highlight
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(eshell-syntax-highlighting-global-mode) "eshell-syntax-highlighting" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (add-hook 'eshell-mode-hook #'eshell-syntax-highlighting-global-mode))
+#+end_src
+** emacs-fish-completion
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(global-fish-completion-mode) "fish-completion" nil t)
+
+  (with-eval-after-load 'esh-mode
+    (add-hook 'eshell-mode-hook #'global-fish-completion-mode))
+#+end_src
 * Org Mode
 ** Basic
 *** org
