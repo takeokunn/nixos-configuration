@@ -1,10 +1,16 @@
-{ pkgs, sources }:
+{
+  pkgs,
+  sources,
+  org-babel,
+  emacsPkg,
+}:
 let
   bat = import ./bat { inherit pkgs sources; };
   bottom = import ./bottom;
   direnv = import ./direnv;
   dust = import ./dust;
   editorconfig = import ./editorconfig { inherit pkgs; };
+  emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   eza = import ./eza;
   fish = import ./fish { inherit pkgs sources; };
   gnupg = import ./gnupg;
@@ -27,6 +33,7 @@ in
   direnv
   dust
   editorconfig
+  emacs
   eza
   fish
   gnupg

@@ -1,12 +1,9 @@
 {
   lib,
   pkgs,
-  org-babel,
   sources,
-  emacsPkg,
 }:
 let
-  emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
   gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };
@@ -28,7 +25,6 @@ let
   waybar = import ./waybar { inherit pkgs; };
 in
 [
-  emacs
   gh
   gh-dash
   git

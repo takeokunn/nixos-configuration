@@ -18,7 +18,10 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
-  emacsPkg = import ./packages/emacs { inherit pkgs sources; };
+
+  # emacs package
+  emacs = import ./packages/emacs { inherit pkgs sources; };
+  emacsPkg = emacs.emacs-stable;
 
   # misc
   misc = import ./misc;
@@ -27,11 +30,13 @@ let
   modules = import ./modules;
 
   # programs
-  basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
+  basicPrograms = import ./programs/basic.nix {
+    inherit pkgs sources;
+    inherit org-babel emacsPkg;
+  };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs org-babel sources;
-    inherit emacsPkg;
+    inherit pkgs sources;
   };
 
   # services

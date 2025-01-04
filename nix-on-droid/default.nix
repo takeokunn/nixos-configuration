@@ -2,13 +2,11 @@
   nixpkgs,
   pkgs,
   system,
+  org-babel,
   ...
 }:
 {
-  environment.packages = with pkgs; [
-    git
-    emacs
-  ];
+  environment.packages = with pkgs; [ git ];
 
   time.timeZone = "Asia/Tokyo";
 
@@ -19,6 +17,6 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    config = import ../home-manager/basic.nix { inherit system nixpkgs; };
+    config = import ../home-manager/basic.nix { inherit system nixpkgs org-babel; };
   };
 }
