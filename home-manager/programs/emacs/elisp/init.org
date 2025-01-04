@@ -5075,46 +5075,29 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
 #+end_src
 * EXWM
-** TODO exwm
+** exwm
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "ch11ng/exwm"))
+  (autoload-if-found '(exwm-input-set-key) "exwm-input" nil t)
 #+end_src
-** TODO exwm-edit
+** exwm-edit
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "agzam/exwm-edit"))
+  (autoload-if-found '(exwm-edit--compose-minibuffer) "exwm-edit" nil t)
 
-  ;; (when (string= system-type "gnu/linux")
-  ;;   (with-delayed-execution
-  ;;     (message "Install exwm-edit...")
-  ;;     (add-to-list 'load-path (locate-user-emacs-file "el-clone/exwm-edit"))
+  ;; (exwm-input-set-key (kbd "C-c '") #'exwm-edit--compose-minibuffer)
+  ;; (exwm-input-set-key (kbd "C-c C-'") #'exwm-edit--compose-minibuffer)
 
-  ;;     (autoload-if-found '(exwm-edit--compose-minibuffer) "exwm-edit" nil t)
-
-  ;;     (exwm-input-set-key (kbd "C-c '") #'exwm-edit--compose-minibuffer)
-  ;;     (exwm-input-set-key (kbd "C-c C-'") #'exwm-edit--compose-minibuffer)
-
-  ;;     (with-eval-after-load 'exwm-edit
-  ;;       (setq exwm-edit-bind-default-keys nil))))
+  (with-eval-after-load 'exwm-edit
+    (setq exwm-edit-bind-default-keys nil))
 #+end_src
-** TODO exwm-modeline
+** exwm-modeline
 #+begin_src emacs-lisp :tangle yes
-  ;; (eval-when-compile
-  ;;   (el-clone :repo "SqrtMinusOne/exwm-modeline"))
+  (autoload-if-found '(exwm-modeline-mode) "exwm-modeline")
 
-  ;; (when (string= system-type "gnu/linux")
-  ;;   (with-delayed-execution
-  ;;     (message "Install exwm-modeline...")
-  ;;     (add-to-list 'load-path (locate-user-emacs-file "el-clone/exwm-modeline"))
+  (with-eval-after-load 'exwm-core
+    (add-hook 'exwm-mode-hook #'exwm-modeline-mode))
 
-  ;;     (autoload-if-found '(exwm-modeline-mode) "exwm-modeline")
-
-  ;;     (with-eval-after-load 'exwm-core
-  ;;       (add-hook 'exwm-mode-hook #'exwm-modeline-mode))
-
-  ;;     (with-eval-after-load 'exwm-modeline
-  ;;       (setq exwm-modeline-short t))))
+  (with-eval-after-load 'exwm-modeline
+    (setopt exwm-modeline-short t))
 #+end_src
 * AI
 ** copilot.el

@@ -30,12 +30,8 @@ let
   basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit
-      pkgs
-      org-babel
-      sources
-      emacsPkg
-      ;
+    inherit pkgs org-babel sources;
+    inherit emacsPkg;
   };
 
   # services
