@@ -1,7 +1,7 @@
 {
   pkgs,
+  emacsPkg,
   org-babel,
-  sources,
 }:
 let
   tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
@@ -9,11 +9,7 @@ in
 {
   programs.emacs = {
     enable = true;
-    package = pkgs.emacsWithPackagesFromUsePackage {
-      config = builtins.toFile "empty.el" "";
-      package = pkgs.emacs-git;
-      extraEmacsPackages = import ./epkgs { inherit pkgs sources; };
-    };
+    package = emacsPkg;
   };
 
   home = {

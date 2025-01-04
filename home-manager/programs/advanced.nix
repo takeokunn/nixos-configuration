@@ -3,9 +3,10 @@
   pkgs,
   org-babel,
   sources,
+  emacsPkg,
 }:
 let
-  emacs = import ./emacs { inherit pkgs org-babel sources; };
+  emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
   gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };

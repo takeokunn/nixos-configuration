@@ -5,7 +5,7 @@
   (interactive)
   (let ((org-html-htmlize-output-type 'css)
         (org-publish-project-alist `(("org"
-                                      :base-directory "./home-manager/programs/emacs/elisp/"
+                                      :base-directory "./home-manager/packages/emacs/elisp/"
                                       :base-extension "org"
                                       :exclude "README.org"
                                       :publishing-directory "public/"))))

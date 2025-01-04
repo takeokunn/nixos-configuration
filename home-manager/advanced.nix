@@ -18,6 +18,7 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
+  emacsPkg = import ./packages/emacs { inherit pkgs sources; };
 
   # misc
   misc = import ./misc;
@@ -29,12 +30,19 @@ let
   basicPrograms = import ./programs/basic.nix { inherit pkgs sources; };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs org-babel sources;
+    inherit
+      pkgs
+      org-babel
+      sources
+      emacsPkg
+      ;
   };
 
   # services
   basicServices = import ./services/basic.nix;
-  advancedServices = import ./services/advanced.nix { inherit pkgs; };
+  advancedServices = import ./services/advanced.nix {
+    inherit pkgs emacsPkg;
+  };
 in
 {
   imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
