@@ -2429,12 +2429,12 @@
     (define-key embark-general-map (kbd "T") #'ellama-translate)
 
     ;; copilot-chat
-    ;; (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
-    ;; (define-key embark-general-map (kbd "R") #'copilot-chat-review)
-    ;; (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
-    ;; (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
-    ;; (define-key embark-general-map (kbd "O") #'copilot-chat-optimize)
-    ;; (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
+    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
+    (define-key embark-general-map (kbd "R") #'copilot-chat-review)
+    (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
+    (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
+    (define-key embark-general-map (kbd "O") #'copilot-chat-optimize)
+    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
 
     ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
@@ -5116,24 +5116,24 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 ** copilot-chat.el
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(copilot-chat-ask-and-insert
-  ;;                      copilot-chat-explain
-  ;;                      copilot-chat-review
-  ;;                      copilot-chat-doc
-  ;;                      copilot-chat-fix
-  ;;                      copilot-chat-optimize
-  ;;                      copilot-chat-test
-  ;;                      copilot-chat-explain-symbol-at-line
-  ;;                      copilot-chat-explain-defun
-  ;;                      copilot-chat-custom-prompt-function
-  ;;                      copilot-chat-review-whole-buffer
-  ;;                      copilot-chat-switch-to-buffer
-  ;;                      copilot-chat-custom-prompt-selection
-  ;;                      copilot-chat-custom-prompt-mini-buffer
-  ;;                      copilot-chat-list
-  ;;                      copilot-chat-display
-  ;;                      copilot-chat-insert-commit-message
-  ;;                      copilot-chat-set-model) "copilot-chat" nil t)
+  (autoload-if-found '(copilot-chat-ask-and-insert
+                       copilot-chat-explain
+                       copilot-chat-review
+                       copilot-chat-doc
+                       copilot-chat-fix
+                       copilot-chat-optimize
+                       copilot-chat-test
+                       copilot-chat-explain-symbol-at-line
+                       copilot-chat-explain-defun
+                       copilot-chat-custom-prompt-function
+                       copilot-chat-review-whole-buffer
+                       copilot-chat-switch-to-buffer
+                       copilot-chat-custom-prompt-selection
+                       copilot-chat-custom-prompt-mini-buffer
+                       copilot-chat-list
+                       copilot-chat-display
+                       copilot-chat-insert-commit-message
+                       copilot-chat-set-model) "copilot-chat" nil t)
 #+end_src
 ** llm
 #+begin_src emacs-lisp :tangle yes
