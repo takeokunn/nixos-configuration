@@ -21,7 +21,7 @@ let
 
   # emacs package
   emacs = import ./packages/emacs { inherit pkgs sources; };
-  emacsPkg = emacs.emacs-git;
+  emacsPkg = emacs.emacs-unstable;
 
   # misc
   misc = import ./misc;
