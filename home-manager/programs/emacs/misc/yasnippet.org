@@ -1317,7 +1317,8 @@ $0
   ,*** TODO 要件を確認する
   ,*** TODO 修正する
   ,*** TODO pull requestを出す
-  ,*** TODO reviewを通してmergeする
+  ,*** TODO reviewを通す
+  ,*** TODO QAを通してmergeする
   ,*** TODO redmineに記述する
 #+end_src
 *** task-document
