@@ -121,7 +121,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-display-line-numbers-mode) "display-line-numbers" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-display-line-numbers-mode)
+  ;; (add-hook 'emacs-startup-hook #'global-display-line-numbers-mode)
 
   (with-eval-after-load 'display-line-numbers
     (setopt display-line-numbers-grow-only t))
@@ -2188,10 +2188,7 @@
     (setopt dired-hide-details-hide-symlink-targets nil)
     (setopt dired-listing-switches "-alh")
     (setopt dired-recursive-copies 'always)
-    (setopt dired-use-ls-dired nil)
-
-    ;; hook
-    (add-hook 'dired-mode-hook #'(lambda () (display-line-numbers-mode -1))))
+    (setopt dired-use-ls-dired nil))
 #+end_src
 ** dired-collapse
 #+begin_src emacs-lisp :tangle yes
@@ -2693,10 +2690,7 @@
     (defun my/tab-bar-rename-tab ()
       (interactive)
       (let ((proj-name (projectile-project-name)))
-        (tab-bar-rename-tab proj-name)))
-
-    ;; hook
-    (add-hook 'tab-bar-mode-hook #'(lambda () (display-line-numbers-mode -1))))
+        (tab-bar-rename-tab proj-name))))
 #+end_src
 * Cursor
 ** avy
@@ -3218,9 +3212,6 @@
     ;; config
     (setopt neo-theme 'ascii)
     (setopt neo-show-hidden-files t)
-
-    ;; hook
-    (add-hook 'neotree-mode-hook #'(lambda () (display-line-numbers-mode -1)))
 
     ;; keybind
     (define-key neotree-mode-map (kbd "C-j")
@@ -4102,9 +4093,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 ** basic
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'esh-mode
-    ;; hook
-    (add-hook 'eshell-mode-hook #'(lambda () (display-line-numbers-mode -1)))
-
     ;; keymap
     (define-key eshell-mode-map (kbd "C-h") #'delete-backward-char)
     (define-key eshell-mode-map (kbd "M-p") #'eshell-previous-matching-input-from-input))

@@ -92,15 +92,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "0f9420ad54b8c6c163601c31dfb88dda6ededcbb";
+    version = "51f63723205da3ef80da44321c34bad5283ee5d6";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "0f9420ad54b8c6c163601c31dfb88dda6ededcbb";
+      rev = "51f63723205da3ef80da44321c34bad5283ee5d6";
       fetchSubmodules = false;
-      sha256 = "sha256-np5xt0b0SFOXeTmpv7mm6TED/mi6YikcDHxfQH4lsz0=";
+      sha256 = "sha256-Yqm4itPJcVC4d00ozFw2U8eB766L6P4lFuox/NKAqDw=";
     };
-    date = "2025-01-05";
+    date = "2025-01-10";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -164,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "9e754cd75a2dcde8c3b58a4a96a675504240d7e9";
+    version = "8351ee98641f5ef88226d79d130d4066154afaa8";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "9e754cd75a2dcde8c3b58a4a96a675504240d7e9";
+      rev = "8351ee98641f5ef88226d79d130d4066154afaa8";
       fetchSubmodules = false;
-      sha256 = "sha256-sDTDz4yzF0LbRD09yUshp4DyH5FLBHyTCMaFh3yYCFw=";
+      sha256 = "sha256-P9j6A53umU9bjw2UymUvdn/KCLqBZyiI+ykID6KnOOo=";
     };
-    date = "2025-01-02";
+    date = "2025-01-11";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -800,15 +800,15 @@
   };
   vim-ddu = {
     pname = "vim-ddu";
-    version = "c78fdf685ddc483ee893eaa62caa67604f89d7fb";
+    version = "878c8e0ec6aacfc38f37aaf5bea06ff4223472a1";
     src = fetchFromGitHub {
       owner = "Shougo";
       repo = "ddu.vim";
-      rev = "c78fdf685ddc483ee893eaa62caa67604f89d7fb";
+      rev = "878c8e0ec6aacfc38f37aaf5bea06ff4223472a1";
       fetchSubmodules = false;
-      sha256 = "sha256-zSv365BaihmaqA1mPdyK1k39tgQWKgGmaZy0R6UAsA4=";
+      sha256 = "sha256-+TtTnL4leY7U1piJTUY7Ru3xh8Ybwv1jOyIYII/grJU=";
     };
-    date = "2025-01-07";
+    date = "2025-01-11";
   };
   vim-ddu-column-icon_filename = {
     pname = "vim-ddu-column-icon_filename";
