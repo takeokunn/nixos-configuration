@@ -3253,6 +3253,10 @@
   (with-eval-after-load 'idle-highlight-mode
     (setopt idle-highlight-idle-time 0.1))
 #+end_src
+** modus-themes
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '() "modus-themes" nil t)
+#+end_src
 * Awesome Package
 ** Joke
 *** hacker-typer

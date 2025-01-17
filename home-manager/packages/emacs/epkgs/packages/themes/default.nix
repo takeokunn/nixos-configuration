@@ -18,4 +18,5 @@ with epkgs;
   idle-highlight-mode
   font-lock-studio
   emojify
+  modus-themes
 ]
