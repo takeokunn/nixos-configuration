@@ -1051,7 +1051,7 @@ $0
   ,*** TODO 日報準備
   ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 朝会[0/1]
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`> DEADLINE: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`>
-  :LOGBOOK:n
+  :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:30] =>  0:15
   :END:
   ,*** TODO 日報準備
