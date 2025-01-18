@@ -26,6 +26,8 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - uses: DeterminateSystems/flake-checker-action@main
+      - name: flake check
+        run: nix flake check --all-systems
   dependabot:
     runs-on: ubuntu-latest
     needs: [secretlint, nix-flake]
