@@ -15,9 +15,6 @@
           maxconnections = 10;
         };
       };
-      flavor = "gmail.com";
-      realName = "takeo obara";
-      address = "bararararatty@gmail.com";
       passwordCommand = [
         "pass"
         "show"

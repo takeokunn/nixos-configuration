@@ -50,4 +50,13 @@ in
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;
+
+  accounts.email.accounts = {
+    Gmail = {
+      primary = true;
+      flavor = "gmail.com";
+      realName = "takeo obara";
+      address = "bararararatty@gmail.com";
+    };
+  };
 }

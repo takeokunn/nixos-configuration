@@ -46,6 +46,9 @@ with epkgs;
   # Shell
   exec-path-from-shell
 
+  # Utility
+  lte
+
   # Password
   password-store
   password-store-otp

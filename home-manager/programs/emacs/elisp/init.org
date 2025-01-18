@@ -3445,6 +3445,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'midnight
     (setopt clean-buffer-list-delay-general 1))
 #+end_src
+*** lte
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(lte-truncate-table-mode) "lte" nil t)
+
+  (with-eval-after-load 'markdown-mode
+    (add-hook 'markdown-mode-hook #'lte-truncate-table-mode))
+
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'lte-truncate-table-mode))
+#+end_src
 ** Mouse
 *** inhibit-mouse
 #+begin_src emacs-lisp :tangle yes
