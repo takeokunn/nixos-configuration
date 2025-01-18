@@ -242,21 +242,6 @@ src.git = "https://github.com/Shougo/neco-vim"
 src.branch = "master"
 fetch.github = "Shougo/neco-vim"
 
-[vim-pum]
-src.git = "https://github.com/Shougo/pum.vim"
-src.branch = "main"
-fetch.github = "Shougo/pum.vim"
-
-[vim-ddc-shell-history]
-src.git = "https://github.com/delphinus/ddc-shell-history"
-src.branch = "main"
-fetch.github = "delphinus/ddc-shell-history"
-
-[vim-ddc-buffer]
-src.git = "https://github.com/matsui54/ddc-buffer"
-src.branch = "main"
-fetch.github = "matsui54/ddc-buffer"
-
 [vim-friendly-snippets]
 src.git = "https://github.com/rafamadriz/friendly-snippets"
 src.branch = "main"
@@ -266,21 +251,6 @@ fetch.github = "rafamadriz/friendly-snippets"
 src.git = "https://github.com/ryoppippi/denippet-autoimport-vscode"
 src.branch = "main"
 fetch.github = "ryoppippi/denippet-autoimport-vscode"
-
-[vim-ddc-fuzzy]
-src.git = "https://github.com/tani/ddc-fuzzy"
-src.branch = "main"
-fetch.github = "tani/ddc-fuzzy"
-
-[vim-ddc-source-lsp-setup]
-src.git = "https://github.com/uga-rosa/ddc-source-lsp-setup"
-src.branch = "main"
-fetch.github = "uga-rosa/ddc-source-lsp-setup"
-
-[vim-ddc-source-nvim-lua]
-src.git = "https://github.com/uga-rosa/ddc-source-nvim-lua"
-src.branch = "main"
-fetch.github = "uga-rosa/ddc-source-nvim-lua"
 
 [vim-denippet]
 src.git = "https://github.com/uga-rosa/denippet.vim"
