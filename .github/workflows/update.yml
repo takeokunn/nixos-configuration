@@ -14,8 +14,8 @@ jobs:
         uses: actions/checkout@v4
       - name: prepare nix
         uses: cachix/install-nix-action@v30
-      # - name: Run nvfetcher
-      #   run: nix run nixpkgs#nvfetcher
+      - name: Run nvfetcher
+        run: nix run nixpkgs#nvfetcher
       - name: Run flake update
         run: nix flake update
       - name: Run fmt
