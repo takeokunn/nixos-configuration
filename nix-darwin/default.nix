@@ -1,23 +1,25 @@
 { pkgs, username, ... }:
 let
-  nix = import ./config/nix.nix;
   fonts = import ./config/fonts.nix { inherit pkgs; };
+  homebrew = import ./config/homebrew.nix;
+  launchd = import ./config/launchd.nix { inherit pkgs; };
+  networking = import ./config/networking.nix;
+  nix = import ./config/nix.nix;
+  security = import ./config/security.nix { inherit username; };
   services = import ./config/services;
   system = import ./config/system.nix { inherit pkgs; };
-  homebrew = import ./config/homebrew.nix;
-  networking = import ./config/networking.nix;
-  security = import ./config/security.nix { inherit username; };
-  launchd = import ./config/launchd.nix { inherit pkgs; };
+  time = import ./config/time.nix;
 in
 {
   imports = [
-    nix
-    services
     fonts
-    system
     homebrew
-    networking
-    security
     launchd
+    networking
+    nix
+    security
+    services
+    system
+    time
   ];
 }
