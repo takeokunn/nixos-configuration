@@ -1,5 +1,4 @@
 [
-  ./aerospace
   ./dust
   ./lnav
   ./nyxt

@@ -17,7 +17,6 @@
       "terminal-notifier"
     ];
     casks = [
-      "aerospace"
       "android-studio"
       "aquaskk"
       "chatgpt"

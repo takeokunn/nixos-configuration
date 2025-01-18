@@ -17,7 +17,6 @@ let
   ssh = import ./ssh;
 
   # for window manager
-  aerospace = import ./aerospace { inherit pkgs; };
   rofi = import ./rofi { inherit pkgs; };
   sway = import ./sway;
   swaylock = import ./swaylock { inherit lib pkgs; };
@@ -37,7 +36,6 @@ in
   ssh
 
   # for window manager
-  aerospace
   rofi
   sway
   swaylock

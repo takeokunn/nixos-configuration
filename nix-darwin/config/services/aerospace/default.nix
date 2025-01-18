@@ -1,7 +1,6 @@
-{ pkgs }:
 {
-  programs.aerospace = {
-    enable = pkgs.stdenv.isDarwin;
+  services.aerospace = {
+    enable = true;
     settings = {
       start-at-login = false;
       enable-normalization-flatten-containers = true;
@@ -13,6 +12,7 @@
         "-c"
         "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)"
       ];
+
       gaps = {
         inner = {
           horizontal = 0;

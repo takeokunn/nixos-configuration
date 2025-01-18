@@ -6,6 +6,7 @@
     maxCacheTtl = 3600;
     maxCacheTtlSsh = 3600;
     enableSshSupport = true;
+    enableExtraSocket = true;
   };
 
   programs.fish = {
