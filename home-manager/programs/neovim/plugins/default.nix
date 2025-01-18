@@ -1,8 +1,6 @@
 { pkgs, sources }:
 let
   basic = import ./basic { inherit pkgs sources; };
-  # ddu = import ./ddu { inherit pkgs sources; };
-  # ddc = import ./ddc { inherit pkgs sources; };
   git = import ./git { inherit pkgs sources; };
   language = import ./language { inherit pkgs sources; };
   lsp = import ./lsp { inherit pkgs; };
