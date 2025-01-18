@@ -546,66 +546,6 @@
     };
     date = "2020-10-25";
   };
-  vim-ddc-buffer = {
-    pname = "vim-ddc-buffer";
-    version = "f332e16ed82ec31c4a5afe3da5117e0b5e0c6902";
-    src = fetchFromGitHub {
-      owner = "matsui54";
-      repo = "ddc-buffer";
-      rev = "f332e16ed82ec31c4a5afe3da5117e0b5e0c6902";
-      fetchSubmodules = false;
-      sha256 = "sha256-Dgohfr2aJrkVUn/Y7fWSZwJqpD9VCzgP6sqcfxjh2pY=";
-    };
-    date = "2024-09-25";
-  };
-  vim-ddc-fuzzy = {
-    pname = "vim-ddc-fuzzy";
-    version = "963f18c14bdb19f3925af0f7f775725be4438f3b";
-    src = fetchFromGitHub {
-      owner = "tani";
-      repo = "ddc-fuzzy";
-      rev = "963f18c14bdb19f3925af0f7f775725be4438f3b";
-      fetchSubmodules = false;
-      sha256 = "sha256-872qOOx0O2EyfpucZuZ7va7vhOMCoOUBBpHdNSyLnT8=";
-    };
-    date = "2025-01-07";
-  };
-  vim-ddc-shell-history = {
-    pname = "vim-ddc-shell-history";
-    version = "b3aab22c09b892fee75fdf27a1bc0f9ab35fd262";
-    src = fetchFromGitHub {
-      owner = "delphinus";
-      repo = "ddc-shell-history";
-      rev = "b3aab22c09b892fee75fdf27a1bc0f9ab35fd262";
-      fetchSubmodules = false;
-      sha256 = "sha256-2b9sT7GbckTYu1QzYlI8UT5PKlq//SkeJPLRCCgvKDM=";
-    };
-    date = "2021-12-31";
-  };
-  vim-ddc-source-lsp-setup = {
-    pname = "vim-ddc-source-lsp-setup";
-    version = "a8a06af203d402e0874060bcd8a0b89b32a52224";
-    src = fetchFromGitHub {
-      owner = "uga-rosa";
-      repo = "ddc-source-lsp-setup";
-      rev = "a8a06af203d402e0874060bcd8a0b89b32a52224";
-      fetchSubmodules = false;
-      sha256 = "sha256-bSTA1QQPdtUxuTA73eaHtVwWFRTP/rANtidAWuWmSPc=";
-    };
-    date = "2023-12-08";
-  };
-  vim-ddc-source-nvim-lua = {
-    pname = "vim-ddc-source-nvim-lua";
-    version = "2b0d0f47efa14d7e7ac2c473861b095dcf99f020";
-    src = fetchFromGitHub {
-      owner = "uga-rosa";
-      repo = "ddc-source-nvim-lua";
-      rev = "2b0d0f47efa14d7e7ac2c473861b095dcf99f020";
-      fetchSubmodules = false;
-      sha256 = "sha256-PrGSp7DRic7G/PPJ9IqPwvOTrfccXTLlfYmyQjomSgY=";
-    };
-    date = "2024-01-22";
-  };
   vim-denippet = {
     pname = "vim-denippet";
     version = "9a19bb6ddcdeb7a60860ac27e180d6d400ab10c7";
@@ -677,18 +617,6 @@
       sha256 = "sha256-5tFAsxc7qYOw611qCsMc8iDjpydlm7s3ZSPir7zfNz8=";
     };
     date = "2023-08-15";
-  };
-  vim-pum = {
-    pname = "vim-pum";
-    version = "f6ba3223260c228c0c7fd19a189ce36e20325b85";
-    src = fetchFromGitHub {
-      owner = "Shougo";
-      repo = "pum.vim";
-      rev = "f6ba3223260c228c0c7fd19a189ce36e20325b85";
-      fetchSubmodules = false;
-      sha256 = "sha256-rYswWOgnG5A4rSFknMWz2z1feeoYx/JVJlhYsuoZzXU=";
-    };
-    date = "2025-01-12";
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
