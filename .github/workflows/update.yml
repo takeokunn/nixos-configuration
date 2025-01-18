@@ -15,7 +15,10 @@ jobs:
       - name: prepare nix
         uses: cachix/install-nix-action@v30
       - name: Run nvfetcher
-        run: nix run nixpkgs#nvfetcher
+        run: |
+          export LANG=en_US.UTF-8
+          export LC_ALL=en_US.UTF-8
+          nix run nixpkgs#nvfetcher
       - name: Run flake update
         run: nix flake update
       - name: Run fmt
