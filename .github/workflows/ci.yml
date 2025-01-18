@@ -22,12 +22,10 @@ jobs:
     name: Nix Flake Check
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: prepare nix
-        uses: cachix/install-nix-action@v30
-      - name: flake check
-        run: nix flake check --all-systems
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: DeterminateSystems/flake-checker-action@main
   dependabot:
     runs-on: ubuntu-latest
     needs: [secretlint, nix-flake]
