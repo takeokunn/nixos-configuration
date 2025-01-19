@@ -4,6 +4,7 @@
     enable = true;
     package = emacsPkg;
     client.enable = true;
+    defaultEditor = true;
   };
 
   programs.fish = {

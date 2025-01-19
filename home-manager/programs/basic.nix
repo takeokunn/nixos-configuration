@@ -21,6 +21,7 @@ let
   peco = import ./peco { inherit pkgs; };
   readline = import ./readline;
   ripgrep = import ./ripgrep;
+  jq = import ./jq;
   sops = import ./sops;
   tig = import ./tig { inherit pkgs sources; };
   tmux = import ./tmux { inherit pkgs; };
@@ -44,6 +45,7 @@ in
   peco
   readline
   ripgrep
+  jq
   sops
   tig
   tmux
