@@ -1128,11 +1128,9 @@
 #+END_SRC
 ** typst-mode
 #+begin_src emacs-lisp :tangle yes
-  ;; (autoload-if-found '(typst-mode) "typst-mode" nil t)
+  (autoload-if-found '(typst-mode) "typst-mode" nil t)
 
-  ;; (add-to-list 'auto-mode-alist '("\\.typ\\'" . typst-mode))
-
-  (define-derived-mode typst-mode prog-mode "typst")
+  (add-to-list 'auto-mode-alist '("\\.typ$" . typst-mode))
 #+END_SRC
 ** v-mode
 #+begin_src emacs-lisp :tangle yes
@@ -3087,6 +3085,8 @@
               ("NOW" . "#dca3a3")
               ("SOMEDAY" . "#dc8cc3")
               ("WAIT" . "#7cb8bb")
+  	    ("REVIEW" . "e60a39")
+  	    ("QA" . "#88CF88")
               ("DONE" . "#afd8af")
               ("FIXME" . "#cc9393"))))
 #+end_src
@@ -4266,7 +4266,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-directory "~/.ghq/github.com/takeokunn/private")
 
     ;; todo
-    (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "|" "DONE(d)")))
+    (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "REVIEW(r)" "QA(q)" "|" "DONE(d)")))
 
     ;; startup
     (setq org-startup-folded 'show3levels)
