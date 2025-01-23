@@ -1667,6 +1667,10 @@
   (with-eval-after-load 'lsp-nil
     ;; config
     (setopt lsp-nix-nil-max-mem 100000))
+
+  (with-eval-after-load 'lsp-copilot
+    ;; config
+    (setopt lsp-copilot-enabled nil))
 #+END_SRC
 *** emacs-ccls
 #+begin_src emacs-lisp :tangle yes
@@ -4292,7 +4296,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-src
     ;; config
-    (setq org-src-window-setup 'current-window))
+    (setopt org-src-window-setup 'current-window)
+    (setopt org-src-fontify-natively nil))
 
   (with-eval-after-load 'org-archive
     ;; archive
