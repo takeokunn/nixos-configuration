@@ -2433,7 +2433,6 @@
     (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
     (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
     (define-key embark-general-map (kbd "O") #'copilot-chat-optimize)
-    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
 
     ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
@@ -5141,6 +5140,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        copilot-chat-display
                        copilot-chat-insert-commit-message
                        copilot-chat-set-model) "copilot-chat" nil t)
+
+  (with-eval-after-load 'copilot-chat
+    (setopt copilot-chat-frontend 'org-mode))
 #+end_src
 ** llm
 #+begin_src emacs-lisp :tangle yes
