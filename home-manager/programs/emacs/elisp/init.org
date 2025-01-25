@@ -5382,6 +5382,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                 (point))))
         (kill-region (point) (min syntax-move-point subword-move-point)))))
 #+end_src
+** my/insert-date-at-point
+#+begin_src emacs-lisp :tangle yes
+  (defun my/insert-date-at-point ()
+    "Minibufferで日付を選択し、カーソル位置に `YYYY/MM/DD DOW` フォーマットで挿入する。"
+    (interactive)
+    (let ((date (org-read-date nil nil nil "日付を選択してください:")))
+      (insert (format-time-string "%Y/%m/%d %a" (org-time-string-to-time date)))))
+#+end_src
 * Footer
 ** Magic File Name を有効にする
 #+begin_src emacs-lisp :tangle yes
