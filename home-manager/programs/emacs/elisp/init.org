@@ -4558,7 +4558,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                       (:name "TODO List..." :todo "TODO")
                                       (:name "WAIT List..." :todo "WAIT")
                                       (:name "DONE List..." :todo "DONE")
-                                      (:name "SOMEDAY List..." :todo "SOMEDAY"))))
+                                      (:name "SOMEDAY List..." :todo "SOMEDAY")
+                                      (:discard (:anything t)))))
 #+end_src
 *** org-hyperscheduler
 #+begin_src emacs-lisp :tangle yes

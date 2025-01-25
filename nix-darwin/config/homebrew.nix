@@ -29,6 +29,7 @@
       "keycastr"
       "obs"
       "orbstack"
+      "proxyman"
       "raycast"
       "sequel-ace"
       "sf-symbols"
