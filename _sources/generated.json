@@ -274,7 +274,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-01-22",
+    "date": "2025-01-25",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -286,12 +286,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "358bbaaf2cc65b2d775d75734c0fb15cc9f2c109",
-      "sha256": "sha256-fMJKqEgyXbuYoIobwgZhI+0IqRVRWe4A8tINGXnWxpA=",
+      "rev": "ef63b1832bd61a7fb21eb7f5752e0774bbfcc5a4",
+      "sha256": "sha256-W8d4er9Pt2cBTXVw2mmKyh3aRZMWt3YK44vQ8Vw/6FY=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "358bbaaf2cc65b2d775d75734c0fb15cc9f2c109"
+    "version": "ef63b1832bd61a7fb21eb7f5752e0774bbfcc5a4"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -988,7 +988,7 @@
   },
   "vim-fern": {
     "cargoLocks": null,
-    "date": "2025-01-07",
+    "date": "2025-01-26",
     "extract": null,
     "name": "vim-fern",
     "passthru": null,
@@ -1000,12 +1000,12 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "vim-fern",
-      "rev": "0912da576f4beae177cda58b4cd5984e40548b84",
-      "sha256": "sha256-op4jzFFQt5qrIcNV9BiXxEaDvwSzoXSFQWG6XqPtxYo=",
+      "rev": "cb5be74e4a343c8187be91b6be4475b2d73755a2",
+      "sha256": "sha256-l75EKeF4NAA9zkuEs2Sz4/OjW8WyV6hO3pO95r9Z3Zw=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "0912da576f4beae177cda58b4cd5984e40548b84"
+    "version": "cb5be74e4a343c8187be91b6be4475b2d73755a2"
   },
   "vim-friendly-snippets": {
     "cargoLocks": null,
