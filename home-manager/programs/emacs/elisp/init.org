@@ -456,8 +456,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dotenv-mode) "dotenv-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '(".env" . dotenv-mode))
-  (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode))
+  (add-to-list 'auto-mode-alist '(".env$" . dotenv-mode))
 #+end_src
 ** elixir-mode
 #+begin_src emacs-lisp :tangle yes
@@ -4372,9 +4371,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-encrypt-entries
                        org-decrypt-entry
                        org-decrypt-entries) "org-crypt" nil t)
-
-  (with-eval-after-load 'org
-    (add-to-list 'org-tags-exclude-from-inheritance org-crypt-tag-matcher))
 
   (with-eval-after-load 'org-crypt
     ;; config
