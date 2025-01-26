@@ -2744,7 +2744,7 @@
     (setopt mu4e-get-mail-command "offlineimap")
     (setopt mu4e-update-interval (* 1 60))
     (setopt mu4e-index-cleanup nil)
-    (setopt mu4e-index-lazy-check t))
+    (setopt mu4e-index-lazy-check nil))
 
   (with-eval-after-load 'mu4e-view
     ;; config
@@ -4368,11 +4368,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** org-crypt
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-encrypt-entry org-decrypt-entry org-crypt-use-before-save-magic) "org-crypt" nil t)
+  (autoload-if-found '(org-encrypt-entry
+                       org-encrypt-entries
+                       org-decrypt-entry
+                       org-decrypt-entries) "org-crypt" nil t)
 
   (with-eval-after-load 'org
-    ;; hooks
-    (add-hook 'org-mode-hook #'org-crypt-use-before-save-magic))
+    (add-to-list 'org-tags-exclude-from-inheritance org-crypt-tag-matcher))
 
   (with-eval-after-load 'org-crypt
     ;; config
