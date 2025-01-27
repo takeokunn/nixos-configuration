@@ -4376,6 +4376,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C")
     (setopt org-tags-exclude-from-inheritance '("crypt")))
+
+  (advice-add 'org-babel-tangle :before #'org-encrypt-entries)
+  (advice-add 'org-babel-tangle :after #'org-decrypt-entries)
 #+end_src
 *** org-table
 #+begin_src emacs-lisp :tangle yes

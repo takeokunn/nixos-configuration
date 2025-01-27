@@ -6,3 +6,4 @@ node_modules/
 .neotree
 htmlize.el
 public/
+home-manager/programs/emacs/elisp/init.el
