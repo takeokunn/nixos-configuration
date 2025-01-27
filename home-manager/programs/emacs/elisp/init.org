@@ -2743,7 +2743,7 @@
     (setopt mu4e-get-mail-command "offlineimap")
     (setopt mu4e-update-interval (* 1 60))
     (setopt mu4e-index-cleanup nil)
-    (setopt mu4e-index-lazy-check nil))
+    (setopt mu4e-index-lazy-check t))
 
   (with-eval-after-load 'mu4e-view
     ;; config
@@ -3087,8 +3087,8 @@
               ("NOW" . "#dca3a3")
               ("SOMEDAY" . "#dc8cc3")
               ("WAIT" . "#7cb8bb")
-  	    ("REVIEW" . "e60a39")
-  	    ("QA" . "#88CF88")
+              ("REVIEW" . "e60a39")
+              ("QA" . "#88CF88")
               ("DONE" . "#afd8af")
               ("FIXME" . "#cc9393"))))
 #+end_src
@@ -4372,13 +4372,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-decrypt-entry
                        org-decrypt-entries) "org-crypt" nil t)
 
-  (with-eval-after-load 'org-crypt
+  (with-eval-after-load 'org
     ;; config
-    (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C")
     (setopt org-tags-exclude-from-inheritance '("crypt")))
 
-  (advice-add 'org-babel-tangle :before #'org-encrypt-entries)
-  (advice-add 'org-babel-tangle :after #'org-decrypt-entries)
+  (with-eval-after-load 'org-crypt
+    ;; config
+    (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C"))
+
+  (advice-add 'org-babel-tangle :before #'org-decrypt-entries)
+  (advice-add 'org-babel-tangle :after #'org-encrypt-entries)
 #+end_src
 *** org-table
 #+begin_src emacs-lisp :tangle yes
