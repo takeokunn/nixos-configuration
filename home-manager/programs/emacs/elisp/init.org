@@ -2493,16 +2493,6 @@
 
   (add-hook 'emacs-startup-hook #'editorconfig-mode)
 #+END_SRC
-** persistent-scratch
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(persistent-scratch-setup-default) "persistent-scratch" nil t)
-
-  (add-hook 'emacs-startup-hook #'persistent-scratch-setup-default)
-
-  (with-eval-after-load 'persistent-scratch
-    ;; config
-    (setopt persistent-scratch-autosave-interval 100))
-#+end_src
 ** popwin
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(popwin-mode) "popwin" nil t)
