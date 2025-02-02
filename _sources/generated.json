@@ -211,7 +211,7 @@
   },
   "emacs-explain-pause-mode": {
     "cargoLocks": null,
-    "date": "2020-07-27",
+    "date": "2025-02-01",
     "extract": null,
     "name": "emacs-explain-pause-mode",
     "passthru": null,
@@ -223,12 +223,12 @@
       "name": null,
       "owner": "lastquestion",
       "repo": "explain-pause-mode",
-      "rev": "2356c8c3639cbeeb9751744dbe737267849b4b51",
-      "sha256": "sha256-++znrjiDSx+cy4okFBBXUBkRFdtnE2x+trkmqjB3Njs=",
+      "rev": "ac3eb69f36f345506aad05a6d9bc3ef80d26914b",
+      "sha256": "sha256-6FDYnE9rT12f2Lx3yg2tpDVm9txF2VoVxZvADpm4BoM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "2356c8c3639cbeeb9751744dbe737267849b4b51"
+    "version": "ac3eb69f36f345506aad05a6d9bc3ef80d26914b"
   },
   "emacs-fish-repl": {
     "cargoLocks": null,

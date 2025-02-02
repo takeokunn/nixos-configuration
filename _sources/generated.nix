@@ -128,15 +128,15 @@
   };
   emacs-explain-pause-mode = {
     pname = "emacs-explain-pause-mode";
-    version = "2356c8c3639cbeeb9751744dbe737267849b4b51";
+    version = "ac3eb69f36f345506aad05a6d9bc3ef80d26914b";
     src = fetchFromGitHub {
       owner = "lastquestion";
       repo = "explain-pause-mode";
-      rev = "2356c8c3639cbeeb9751744dbe737267849b4b51";
+      rev = "ac3eb69f36f345506aad05a6d9bc3ef80d26914b";
       fetchSubmodules = false;
-      sha256 = "sha256-++znrjiDSx+cy4okFBBXUBkRFdtnE2x+trkmqjB3Njs=";
+      sha256 = "sha256-6FDYnE9rT12f2Lx3yg2tpDVm9txF2VoVxZvADpm4BoM=";
     };
-    date = "2020-07-27";
+    date = "2025-02-01";
   };
   emacs-fish-repl = {
     pname = "emacs-fish-repl";
