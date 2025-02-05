@@ -2427,7 +2427,7 @@
     (define-key embark-general-map (kbd "T") #'ellama-translate)
 
     ;; copilot-chat
-    (define-key embark-general-map (kbd "E") #'copilot-chat-explain-defun)
+    (define-key embark-general-map (kbd "D") #'copilot-chat-explain-defun)
     (define-key embark-general-map (kbd "R") #'copilot-chat-review)
     (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
     (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
