@@ -59,4 +59,7 @@ with pkgs.vimPlugins;
       vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
     '';
   }
+
+  # denops
+  denops-vim
 ]

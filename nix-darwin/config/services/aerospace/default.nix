@@ -135,6 +135,10 @@
           run = [ "move-node-to-workspace 2" ];
         }
         {
+          "if".app-id = "net.kovidgoyal.kitty";
+          run = [ "move-node-to-workspace 2" ];
+        }
+        {
           "if".app-id = "org.gnu.Emacs";
           run = [ "move-node-to-workspace 3" ];
         }
