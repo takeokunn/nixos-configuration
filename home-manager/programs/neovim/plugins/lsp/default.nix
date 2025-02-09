@@ -55,4 +55,33 @@ with pkgs.vimPlugins;
       end
     '';
   }
+  {
+    type = "lua";
+    plugin = lspsaga-nvim;
+    config = ''
+      require('lspsaga').setup({
+        code_action = {
+          extend_gitsigns = true,
+        },
+        finder = {
+          max_height = 0.7,
+          left_width = 0.3,
+          right_width = 0.6,
+          keys = {
+            shuttle = "<Space>w",
+            toggle_or_open = "<CR>"
+          }
+        },
+        lightbulb = {
+          enable = false,
+        }
+      })
+
+      vim.keymap.set('n', '<M-d>', "<cmd>Lspsaga peek_definition<CR>", opts)
+      vim.keymap.set('n', '<M-j>', "<cmd>Lspsaga diagnostic_jump_next<CR>", opts)
+      vim.keymap.set('n', '<M-k>', "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts)
+      vim.keymap.set('n', '<M-s>', vim.lsp.buf.hover, opts)
+      vim.keymap.set({ 'n', 'i' }, '<S-M-r>', "<cmd>Lspsaga rename<CR>", opts)
+    '';
+  }
 ]

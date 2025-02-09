@@ -12,7 +12,8 @@ let
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap;
-  rio = import ./rio { inherit pkgs; };
+  rio = import ./rio;
+  kitty = import ./kitty;
   sketchybar = import ./sketchybar;
   ssh = import ./ssh;
 
@@ -32,6 +33,7 @@ in
   nyxt
   offlineimap
   rio
+  kitty
   sketchybar
   ssh
 

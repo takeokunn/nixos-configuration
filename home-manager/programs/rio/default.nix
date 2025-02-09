@@ -1,8 +1,6 @@
-{ pkgs }:
 {
   programs.rio = {
     enable = true;
-    package = pkgs.rio;
     settings = {
       fonts.size = 18;
       renderer = {
