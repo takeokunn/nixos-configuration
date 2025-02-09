@@ -4,7 +4,7 @@
 
     # thanks: https://draculatheme.com/kitty
     extraConfig = ''
-      font_size 12.0
+      font_size 16.0
 
       #######################################################
       #                      diff.conf                      #
