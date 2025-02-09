@@ -5,6 +5,7 @@
     networkmanager = {
       enable = true;
       ensureProfiles.profiles = {
+        environmentFiles = config.sops.secrets.home-wifi.path;
         home-wifi = {
           connection = {
             id = "Buffalo-G-90E0";
@@ -17,7 +18,7 @@
           wifi-security = {
             auth-alg = "open";
             key-mgmt = "wpa-psk";
-            psk = "uengspy3bwdkb"; # config.sops.secrets.home-wifi-psk.path;
+            psk = "uengspy3bwdkb"; # $HOME_WIFI_PASSWORD
           };
         };
       };
