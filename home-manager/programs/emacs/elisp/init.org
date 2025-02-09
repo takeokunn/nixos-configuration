@@ -546,17 +546,14 @@
 #+END_SRC
 ** go-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(go-mode gofmt-before-save) "go-mode" nil t)
+  (autoload-if-found '(go-mode gofmt) "go-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
   (add-to-list 'auto-mode-alist '("^go.mod$" . go-mode))
 
   (with-eval-after-load 'go-mode
     ;; config
-    (setopt gofmt-command "goimports")
-
-    ;; hook
-    (add-hook 'before-save-hook #'gofmt-before-save))
+    (setopt gofmt-command "goimports"))
 #+END_SRC
 ** gradle-mode
 #+begin_src emacs-lisp :tangle yes
@@ -787,7 +784,7 @@
   (autoload-if-found '(nix-drv-mode) "nix-drv-mode" nil t)
   (autoload-if-found '(nix-shell-unpack nix-shell-configure nix-shell-build) "nix-shell" nil t)
   (autoload-if-found '(nix-repl) "nix-repl" nil t)
-  (autoload-if-found '(nix-format-before-save) "nix-format" nil t)
+  (autoload-if-found '(nix-format-buffer) "nix-format" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.nix$" . nix-mode))
   (add-to-list 'auto-mode-alist '("\\.drv$" . nix-drv-mode))
@@ -842,17 +839,11 @@
 ** php-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(php-mode php-current-class php-current-namespace) "php-mode" nil t)
-  (autoload-if-found '(php-format-this-buffer-file
-                       php-format-project
-                       php-format-on-after-save-hook
-                       php-format-auto-mode) "php-format" nil t)
+  (autoload-if-found '(php-format-this-buffer-file) "php-format" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
 
   (with-eval-after-load 'php-mode
-    ;; hook
-    (add-hook 'php-mode-hook #'php-format-auto-mode)
-
     ;; keybind
     (define-key php-mode-map (kbd "C-c C--") #'php-current-class)
     (define-key php-mode-map (kbd "C-c C-=") #'php-current-namespace)
@@ -1077,13 +1068,12 @@
 #+end_src
 ** terraform-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(terraform-mode terraform-format-on-save-mode) "terraform-mode" nil t)
+  (autoload-if-found '(terraform-mode) "terraform-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.tf$" . terraform-mode))
 
   (with-eval-after-load 'terraform-mode
     ;; hooks
-    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
     (add-hook 'terraform-mode-hook #'flycheck-mode))
 #+END_SRC
 ** text-mode
@@ -1814,12 +1804,12 @@
 #+end_src
 *** lsp-bridge
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
+  ;; (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
 
-  (with-eval-after-load 'lsp-bridge
-      ;; keybind
-    (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
-    (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references))
+  ;; (with-eval-after-load 'lsp-bridge
+  ;;     ;; keybind
+  ;;   (define-key lsp-bridge-mode-map (kbd "M-.") #'lsp-bridge-find-impl)
+  ;;   (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references))
 #+end_src
 ** Syntax
 *** syntax-subword
@@ -3734,11 +3724,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 *** clang-format
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(clang-format-buffer) "clang-format" nil t)
-
-  (add-hook 'before-save-hook
-            #'(lambda ()
-                (when (member major-mode '(c-mode c++-mode))
-                  (clang-format-buffer))))
 #+end_src
 ** Csv
 *** rainbow-csv

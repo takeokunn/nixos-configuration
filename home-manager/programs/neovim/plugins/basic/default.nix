@@ -37,12 +37,11 @@ with pkgs.vimPlugins;
     '';
   }
 
+  # indent
+  vim-textobj-entire
+
   # docs
   plugins.vimdoc-ja
-
-  # denops
-  # denops-vim
-  # plugins.denops-helloworld
 
   # utils
   auto-pairs

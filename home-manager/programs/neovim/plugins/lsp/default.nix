@@ -6,6 +6,7 @@ with pkgs.vimPlugins;
     plugin = nvim-cmp;
     config = ''
       local cmp = require("cmp")
+
       cmp.setup({
         snippet = {
           expand = function(args)
@@ -47,6 +48,10 @@ with pkgs.vimPlugins;
             }
           }
         }
+      end
+
+      if vim.fn.executable('typescript-language-server') == 1 then
+        lspconfig.ts_ls.setup { }
       end
     '';
   }

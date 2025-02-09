@@ -57,7 +57,7 @@ with epkgs;
   lsp-ui
   lsp-scheme
   lsp-dart
-  lsp-bridge
+  # lsp-bridge
 
   # Syntax
   syntax-subword

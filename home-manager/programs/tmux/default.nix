@@ -11,7 +11,6 @@
     secureSocket = true;
     plugins = with pkgs; [
       tmuxPlugins.open
-      tmuxPlugins.resurrect
       tmuxPlugins.sensible
       tmuxPlugins.urlview
       tmuxPlugins.pain-control
