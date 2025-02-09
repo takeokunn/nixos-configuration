@@ -5,7 +5,7 @@
     networkmanager = {
       enable = true;
       ensureProfiles.profiles = {
-        environmentFiles = config.sops.secrets.home-wifi.path;
+        # environmentFiles = config.sops.secrets.home-wifi-psk.path;
         home-wifi = {
           connection = {
             id = "Buffalo-G-90E0";
