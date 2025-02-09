@@ -164,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "1d2250805db9e71d7d004cc0a86077ae4e498213";
+    version = "874d76211c6933f2f5e41583a495e9b3aee51fb3";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "1d2250805db9e71d7d004cc0a86077ae4e498213";
+      rev = "874d76211c6933f2f5e41583a495e9b3aee51fb3";
       fetchSubmodules = false;
-      sha256 = "sha256-UzbLXoIicLB5YYofGbbsLUyGAgapuSOpmtYACKYPDLU=";
+      sha256 = "sha256-BvpbDCVYJH/1DbRiYwZ3TbKj5JE4t0oaphv0a40KtKE=";
     };
-    date = "2025-02-08";
+    date = "2025-02-01";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -524,15 +524,15 @@
   };
   skkeleton = {
     pname = "skkeleton";
-    version = "f1f0586c69d84c6ee5f3e5a4ca76cc188161b944";
+    version = "8bb1b8782227291c8cbe2aa62a9af732557690cc";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "f1f0586c69d84c6ee5f3e5a4ca76cc188161b944";
+      rev = "8bb1b8782227291c8cbe2aa62a9af732557690cc";
       fetchSubmodules = false;
-      sha256 = "sha256-egAD1VDmoks9WwsEMOgyJmiMRV+p4f6S4sWOMKAew48=";
+      sha256 = "sha256-V86J+8rg1/5ZUL9t0k2S5H+z7KZ1DZwLwmb5yM0+vts=";
     };
-    date = "2025-02-09";
+    date = "2025-01-05";
   };
   sublime-gleam = {
     pname = "sublime-gleam";
