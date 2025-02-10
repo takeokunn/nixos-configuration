@@ -53,6 +53,10 @@ with pkgs.vimPlugins;
       if vim.fn.executable('typescript-language-server') == 1 then
         lspconfig.ts_ls.setup { }
       end
+
+      if vim.fn.executable('intelephense') == 1 then
+        lspconfig.intelephense.setup { }
+      end
     '';
   }
   {
@@ -77,11 +81,12 @@ with pkgs.vimPlugins;
         }
       })
 
-      vim.keymap.set('n', '<M-d>', "<cmd>Lspsaga peek_definition<CR>", opts)
+      vim.keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>')
+      vim.keymap.set({ 'n', 'i' }, '<S-M-r>', "<cmd>Lspsaga rename<CR>", opts)
+      vim.keymap.set('n', '<M-d>', "<cmd>Lspsaga finder def+ref<CR>", opts)
+      vim.keymap.set('n', '<M-r>', "<cmd>Lspsaga peek_definition<CR>", opts)
       vim.keymap.set('n', '<M-j>', "<cmd>Lspsaga diagnostic_jump_next<CR>", opts)
       vim.keymap.set('n', '<M-k>', "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts)
-      vim.keymap.set('n', '<M-s>', vim.lsp.buf.hover, opts)
-      vim.keymap.set({ 'n', 'i' }, '<S-M-r>', "<cmd>Lspsaga rename<CR>", opts)
     '';
   }
 ]
