@@ -1,6 +1,5 @@
 { vimUtils, sources }:
 {
-
   vim-gin = vimUtils.buildVimPlugin {
     pname = sources.vim-gin.pname;
     version = sources.vim-gin.date;

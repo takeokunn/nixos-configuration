@@ -1,25 +1,4 @@
 {
-  "denops-helloworld": {
-    "cargoLocks": null,
-    "date": "2024-07-27",
-    "extract": null,
-    "name": "denops-helloworld",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "vim-denops",
-      "repo": "denops-helloworld.vim",
-      "rev": "f975281571191cfd4e3f9e5ba77103932f7dd6e5",
-      "sha256": "sha256-w+UIj+IM/Me4Jp81bujlQLpOGUssWEqmZ3xUmWn5+mE=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "f975281571191cfd4e3f9e5ba77103932f7dd6e5"
-  },
   "dracula-fish": {
     "cargoLocks": null,
     "date": "2023-06-23",
@@ -274,7 +253,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-02-01",
+    "date": "2025-02-08",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -286,12 +265,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "874d76211c6933f2f5e41583a495e9b3aee51fb3",
-      "sha256": "sha256-BvpbDCVYJH/1DbRiYwZ3TbKj5JE4t0oaphv0a40KtKE=",
+      "rev": "1d2250805db9e71d7d004cc0a86077ae4e498213",
+      "sha256": "sha256-UzbLXoIicLB5YYofGbbsLUyGAgapuSOpmtYACKYPDLU=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "874d76211c6933f2f5e41583a495e9b3aee51fb3"
+    "version": "1d2250805db9e71d7d004cc0a86077ae4e498213"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -902,27 +881,6 @@
     },
     "version": "7b65bd228429e852c8fdfa07601159130a818cfa"
   },
-  "skkeleton": {
-    "cargoLocks": null,
-    "date": "2025-01-05",
-    "extract": null,
-    "name": "skkeleton",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "vim-skk",
-      "repo": "skkeleton",
-      "rev": "8bb1b8782227291c8cbe2aa62a9af732557690cc",
-      "sha256": "sha256-V86J+8rg1/5ZUL9t0k2S5H+z7KZ1DZwLwmb5yM0+vts=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "8bb1b8782227291c8cbe2aa62a9af732557690cc"
-  },
   "sublime-gleam": {
     "cargoLocks": null,
     "date": "2020-10-25",
@@ -1069,6 +1027,48 @@
       "type": "github"
     },
     "version": "1b95bedbeed0b4c81466d40b16bfb0c0ff16721d"
+  },
+  "vim-skkeleton": {
+    "cargoLocks": null,
+    "date": "2025-02-09",
+    "extract": null,
+    "name": "vim-skkeleton",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "vim-skk",
+      "repo": "skkeleton",
+      "rev": "f1f0586c69d84c6ee5f3e5a4ca76cc188161b944",
+      "sha256": "sha256-egAD1VDmoks9WwsEMOgyJmiMRV+p4f6S4sWOMKAew48=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "f1f0586c69d84c6ee5f3e5a4ca76cc188161b944"
+  },
+  "vim-skkeleton-azik": {
+    "cargoLocks": null,
+    "date": "2024-11-23",
+    "extract": null,
+    "name": "vim-skkeleton-azik",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "kei-s16",
+      "repo": "skkeleton-azik-kanatable",
+      "rev": "3fcb3e91099257dea59c799e63410f5d5a2d67fb",
+      "sha256": "sha256-H7wOEyptxKtW10+vIv9cehi9PQlgc2PvD6U/cBqx560=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "3fcb3e91099257dea59c799e63410f5d5a2d67fb"
   },
   "vimdoc-ja": {
     "cargoLocks": null,

@@ -1,5 +1,7 @@
 -- basic
 
+vim.opt.number = false
+vim.opt.relativenumber = false
 vim.opt.encoding = "utf-8"
 vim.opt.fileencodings = "utf-8,euc-jp,cp932"
 vim.opt.clipboard:append("unnamed")
@@ -13,9 +15,6 @@ vim.opt.wrapscan = true
 vim.opt.hlsearch = true
 vim.opt.showcmd = true
 vim.opt.title = true
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.cursorline = true
 vim.opt.foldenable = false
 vim.opt.swapfile = false
 vim.opt.expandtab = true

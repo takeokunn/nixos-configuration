@@ -227,15 +227,15 @@ src.git = "https://github.com/vim-jp/vimdoc-ja"
 src.branch = "master"
 fetch.github = "vim-jp/vimdoc-ja"
 
-[denops-helloworld]
-src.git = "https://github.com/vim-denops/denops-helloworld.vim"
-src.branch = "main"
-fetch.github = "vim-denops/denops-helloworld.vim"
-
-[skkeleton]
+[vim-skkeleton]
 src.git = "https://github.com/vim-skk/skkeleton"
 src.branch = "main"
 fetch.github = "vim-skk/skkeleton"
+
+[vim-skkeleton-azik]
+src.git = "https://github.com/kei-s16/skkeleton-azik-kanatable"
+src.branch = "main"
+fetch.github = "kei-s16/skkeleton-azik-kanatable"
 
 [vim-neco]
 src.git = "https://github.com/Shougo/neco-vim"

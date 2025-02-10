@@ -2,8 +2,14 @@
 {
 
   skkeleton = vimUtils.buildVimPlugin {
-    pname = sources.skkeleton.pname;
-    version = sources.skkeleton.date;
-    src = sources.skkeleton.src;
+    pname = sources.vim-skkeleton.pname;
+    version = sources.vim-skkeleton.date;
+    src = sources.vim-skkeleton.src;
+  };
+
+  skkeleton-azik = vimUtils.buildVimPlugin {
+    pname = sources.vim-skkeleton-azik.pname;
+    version = sources.vim-skkeleton-azik.date;
+    src = sources.vim-skkeleton-azik.src;
   };
 }
