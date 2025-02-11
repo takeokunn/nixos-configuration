@@ -127,7 +127,7 @@
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
-    "date": "2025-02-05",
+    "date": "2025-02-11",
     "extract": null,
     "name": "emacs-copilot-chat",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "a3a9f13506f6bb8105c625bbd731e6c0e741eec2",
-      "sha256": "sha256-RrMQk8Pv9AbXvfLzUhleYwsSZnGBhkFGB+wQkr6F8kU=",
+      "rev": "e5c1e32d6555510b97f120ad713d5997531c6ea8",
+      "sha256": "sha256-+UL0W7d9nq5wWPA5eYnYF7j6UqIQAnOa6o59i7aHXG4=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "a3a9f13506f6bb8105c625bbd731e6c0e741eec2"
+    "version": "e5c1e32d6555510b97f120ad713d5997531c6ea8"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
@@ -253,7 +253,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-02-08",
+    "date": "2025-02-11",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -265,12 +265,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "1d2250805db9e71d7d004cc0a86077ae4e498213",
-      "sha256": "sha256-UzbLXoIicLB5YYofGbbsLUyGAgapuSOpmtYACKYPDLU=",
+      "rev": "286b1cf18eb358ac9c208a709a625f3ee19ae451",
+      "sha256": "sha256-xSulffI0ldupLdTH3SJyLilCtUl674ppI0BvgY35/iM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "1d2250805db9e71d7d004cc0a86077ae4e498213"
+    "version": "286b1cf18eb358ac9c208a709a625f3ee19ae451"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -568,7 +568,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2025-01-01",
+    "date": "2025-02-10",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -580,12 +580,12 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "e65a0a9055bd4426139bd331abb683c6bc03d670",
-      "sha256": "sha256-VAdr9wafTIbXg4Q26Pr9xu/ibZAfnyz57/M3kmeqgk4=",
+      "rev": "303e2fcb65cac2084f5e96bf79fc9c432ff859f2",
+      "sha256": "sha256-ujdik3y5Xprod1Hz25TLmT0IjkjBmPTh78ZvKKNl76I=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "e65a0a9055bd4426139bd331abb683c6bc03d670"
+    "version": "303e2fcb65cac2084f5e96bf79fc9c432ff859f2"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,

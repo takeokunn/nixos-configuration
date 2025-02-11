@@ -80,15 +80,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "a3a9f13506f6bb8105c625bbd731e6c0e741eec2";
+    version = "e5c1e32d6555510b97f120ad713d5997531c6ea8";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "a3a9f13506f6bb8105c625bbd731e6c0e741eec2";
+      rev = "e5c1e32d6555510b97f120ad713d5997531c6ea8";
       fetchSubmodules = false;
-      sha256 = "sha256-RrMQk8Pv9AbXvfLzUhleYwsSZnGBhkFGB+wQkr6F8kU=";
+      sha256 = "sha256-+UL0W7d9nq5wWPA5eYnYF7j6UqIQAnOa6o59i7aHXG4=";
     };
-    date = "2025-02-05";
+    date = "2025-02-11";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -152,15 +152,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "1d2250805db9e71d7d004cc0a86077ae4e498213";
+    version = "286b1cf18eb358ac9c208a709a625f3ee19ae451";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "1d2250805db9e71d7d004cc0a86077ae4e498213";
+      rev = "286b1cf18eb358ac9c208a709a625f3ee19ae451";
       fetchSubmodules = false;
-      sha256 = "sha256-UzbLXoIicLB5YYofGbbsLUyGAgapuSOpmtYACKYPDLU=";
+      sha256 = "sha256-xSulffI0ldupLdTH3SJyLilCtUl674ppI0BvgY35/iM=";
     };
-    date = "2025-02-08";
+    date = "2025-02-11";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -332,15 +332,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "e65a0a9055bd4426139bd331abb683c6bc03d670";
+    version = "303e2fcb65cac2084f5e96bf79fc9c432ff859f2";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "e65a0a9055bd4426139bd331abb683c6bc03d670";
+      rev = "303e2fcb65cac2084f5e96bf79fc9c432ff859f2";
       fetchSubmodules = false;
-      sha256 = "sha256-VAdr9wafTIbXg4Q26Pr9xu/ibZAfnyz57/M3kmeqgk4=";
+      sha256 = "sha256-ujdik3y5Xprod1Hz25TLmT0IjkjBmPTh78ZvKKNl76I=";
     };
-    date = "2025-01-01";
+    date = "2025-02-10";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
