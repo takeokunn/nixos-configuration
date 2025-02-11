@@ -558,6 +558,18 @@
     };
     date = "2025-01-26";
   };
+  vim-fern-renderer-nerdfont = {
+    pname = "vim-fern-renderer-nerdfont";
+    version = "325629c68eb543229715b68920fbcb92b206beb6";
+    src = fetchFromGitHub {
+      owner = "lambdalisue";
+      repo = "vim-fern-renderer-nerdfont";
+      rev = "325629c68eb543229715b68920fbcb92b206beb6";
+      fetchSubmodules = false;
+      sha256 = "sha256-bcFIyPHxdckmmEGSCr9F5hLGTENF+KgRoz2BK49rGv4=";
+    };
+    date = "2024-07-13";
+  };
   vim-friendly-snippets = {
     pname = "vim-friendly-snippets";
     version = "efff286dd74c22f731cdec26a70b46e5b203c619";
@@ -593,6 +605,18 @@
       sha256 = "sha256-5tFAsxc7qYOw611qCsMc8iDjpydlm7s3ZSPir7zfNz8=";
     };
     date = "2023-08-15";
+  };
+  vim-nerdfont = {
+    pname = "vim-nerdfont";
+    version = "339e5e0f725ad5552c0910653a8b1fbb59eed2b8";
+    src = fetchFromGitHub {
+      owner = "lambdalisue";
+      repo = "vim-nerdfont";
+      rev = "339e5e0f725ad5552c0910653a8b1fbb59eed2b8";
+      fetchSubmodules = false;
+      sha256 = "sha256-WUZikdEheDmzxggzwbOP7IXscMEgDMTp9Kh//dvlyTU=";
+    };
+    date = "2024-12-29";
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";

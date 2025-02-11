@@ -4,6 +4,8 @@ let
 in
 with pkgs.vimPlugins;
 [
+  editorconfig-nvim
+
   # cursor
   {
     type = "lua";
@@ -25,6 +27,17 @@ with pkgs.vimPlugins;
       vim.keymap.set('n', '<leader>e', '<cmd>Fern . -drawer<cr>')
     '';
   }
+  {
+    type = "lua";
+    plugin = plugins.vim-nerdfont;
+  }
+  {
+    type = "lua";
+    plugin = plugins.vim-fern-renderer-nerdfont;
+    config = ''
+      vim.g["fern#renderer"] = "nerdfont"
+    '';
+  }
 
   # history tree
   {
@@ -38,6 +51,7 @@ with pkgs.vimPlugins;
   }
 
   # indent
+  vim-table-mode
   vim-textobj-entire
 
   # docs
@@ -62,4 +76,7 @@ with pkgs.vimPlugins;
 
   # denops
   denops-vim
+
+  # dashboard
+  dashboard-nvim
 ]

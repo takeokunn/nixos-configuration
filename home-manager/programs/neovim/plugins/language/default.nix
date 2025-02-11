@@ -1,6 +1,6 @@
 { pkgs, sources }:
 with pkgs.vimPlugins;
 [
-  # orgmode
+  orgmode
   vim-markdown
 ]

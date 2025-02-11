@@ -965,6 +965,27 @@
     },
     "version": "cb5be74e4a343c8187be91b6be4475b2d73755a2"
   },
+  "vim-fern-renderer-nerdfont": {
+    "cargoLocks": null,
+    "date": "2024-07-13",
+    "extract": null,
+    "name": "vim-fern-renderer-nerdfont",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "lambdalisue",
+      "repo": "vim-fern-renderer-nerdfont",
+      "rev": "325629c68eb543229715b68920fbcb92b206beb6",
+      "sha256": "sha256-bcFIyPHxdckmmEGSCr9F5hLGTENF+KgRoz2BK49rGv4=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "325629c68eb543229715b68920fbcb92b206beb6"
+  },
   "vim-friendly-snippets": {
     "cargoLocks": null,
     "date": "2024-12-01",
@@ -1027,6 +1048,27 @@
       "type": "github"
     },
     "version": "1b95bedbeed0b4c81466d40b16bfb0c0ff16721d"
+  },
+  "vim-nerdfont": {
+    "cargoLocks": null,
+    "date": "2024-12-29",
+    "extract": null,
+    "name": "vim-nerdfont",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "lambdalisue",
+      "repo": "vim-nerdfont",
+      "rev": "339e5e0f725ad5552c0910653a8b1fbb59eed2b8",
+      "sha256": "sha256-WUZikdEheDmzxggzwbOP7IXscMEgDMTp9Kh//dvlyTU=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "339e5e0f725ad5552c0910653a8b1fbb59eed2b8"
   },
   "vim-skkeleton": {
     "cargoLocks": null,
