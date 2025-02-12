@@ -5128,6 +5128,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        copilot-mode
                        global-copilot-mode) "copilot" nil t)
 
+  (keymap-global-set "C-x C-:" #'copilot-mode)
+
   (with-eval-after-load 'copilot
     ;; config
     (setopt copilot-log-max 100000)
