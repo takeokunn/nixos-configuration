@@ -16,12 +16,15 @@
       color0 = "#21222c";
       color8 = "#6272a4";
 
+      # red
       color1 = "#ff5555";
       color9 = "#ff6e6e";
 
+      # green
       color2 = "#50fa7b";
       color10 = "#69ff94";
 
+      # yellow
       color3 = "#f1fa8c";
       color11 = "#ffffa5";
 
