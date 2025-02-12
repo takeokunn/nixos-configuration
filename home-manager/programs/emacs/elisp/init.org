@@ -811,10 +811,6 @@
   (autoload-if-found '(nov-mode) "nov" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-
-  (with-eval-after-load 'nov
-    ;; hook
-    (add-hook 'nov-mode-hook #'(lambda () (view-mode -1))))
 #+end_src
 ** pcap-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1613,10 +1609,6 @@
     (setopt lsp-log-io nil)
     (setopt lsp-file-watch-threshold 20000))
 
-  (with-eval-after-load 'lsp-rename
-    (advice-add 'lsp-rename :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
-    (advice-add 'lsp-rename :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
-
   (with-eval-after-load 'lsp-diagnostics
     ;; config
     (setopt lsp-diagnostics-flycheck-default-level 'info))
@@ -1831,8 +1823,14 @@
 ** View Mode
 *** view-mode
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'files
-    (add-hook 'find-file-hooks #'view-mode))
+  (with-eval-after-load 'prog-mode
+    (add-hook 'prog-mode-hooks #'view-mode))
+
+  (with-eval-after-load 'org
+    (add-hook 'org-mode-hook #'view-mode))
+
+  (with-eval-after-load 'markdown-mode
+    (add-hook 'markdown-mode-hook #'view-mode))
 
   (with-eval-after-load 'view
     ;; hooks
@@ -2417,11 +2415,7 @@
     (define-key embark-general-map (kbd "T") #'ellama-translate)
 
     ;; copilot-chat
-    (define-key embark-general-map (kbd "D") #'copilot-chat-explain-defun)
-    (define-key embark-general-map (kbd "R") #'copilot-chat-review)
-    (define-key embark-general-map (kbd "D") #'copilot-chat-doc)
-    (define-key embark-general-map (kbd "F") #'copilot-chat-fix)
-    (define-key embark-general-map (kbd "O") #'copilot-chat-optimize)
+    (define-key embark-general-map (kbd "C") #'copilot-chat-transient-code)
 
     ;; hooks
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
@@ -4313,11 +4307,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-c c" #'org-capture)
 
   (with-eval-after-load 'org-capture
-    ;; advice
-    (advice-add 'org-capture :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
-    (advice-add 'org-capture :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode)))
-
-    ;; config
+      ;; config
     (setq org-capture-use-agenda-date t)
     (setq org-capture-bookmark nil)
     (setq org-capture-templates `(("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
@@ -5098,31 +5088,28 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     ;; keymap
     (define-key copilot-mode-map (kbd "C-c # i") #'copilot-complete)
-    (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion))
+    (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)
+    (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion)
+    (define-key copilot-mode-map (kbd "C-S-a") #'copilot-accept-completion))
 #+end_src
 ** copilot-chat.el
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(copilot-chat-ask-and-insert
-                       copilot-chat-explain
-                       copilot-chat-review
-                       copilot-chat-doc
-                       copilot-chat-fix
-                       copilot-chat-optimize
-                       copilot-chat-test
-                       copilot-chat-explain-symbol-at-line
-                       copilot-chat-explain-defun
-                       copilot-chat-custom-prompt-function
-                       copilot-chat-review-whole-buffer
-                       copilot-chat-switch-to-buffer
-                       copilot-chat-custom-prompt-selection
-                       copilot-chat-custom-prompt-mini-buffer
-                       copilot-chat-list
-                       copilot-chat-display
-                       copilot-chat-insert-commit-message
-                       copilot-chat-set-model) "copilot-chat" nil t)
+  (autoload-if-found '(copilot-chat-transient
+                       copilot-chat-transient-buffers
+                       copilot-chat-transient-code
+                       copilot-chat-insert-commit-message) "copilot-chat" nil t)
+
+  (with-eval-after-load 'git-commit
+    (add-hook 'git-commit-setup-hook #'copilot-chat-insert-commit-message))
 
   (with-eval-after-load 'copilot-chat
     (setopt copilot-chat-frontend 'org-mode))
+
+  (with-eval-after-load 'copilot-chat-common
+    (setopt copilot-chat-prompt "あなたは一流のコーディングチューターです。コードの説明は、高レベルな概念と詳細な内容のバランスが完璧です。あなたのアプローチにより、学習者はコードの書き方だけでなく、効果的なプログラミングを導く基本原理も理解できます。\n名前を尋ねられた場合、必ず「GitHub Copilot」と答えてください。\nユーザーの要件を正確かつ厳密に守ってください。\n専門知識はソフトウェア開発トピックに厳密に限定されています。\nMicrosoft のコンテンツポリシーに従ってください。\n著作権を侵害する内容は避けてください。\nソフトウェア開発に関連しない質問には、AIプログラミングアシスタントであることを簡単に伝えるだけにしてください。\n回答は簡潔かつ非個人的なものにしてください。\nMarkdown形式を使用して回答してください。\nコードブロックの最初にプログラミング言語名を必ず記述してください。\n全体を三重バッククオートで囲まないようにしてください。\nユーザーは Neovim という IDE を使用しています。この IDE には、開いているファイルのエディタ、統合ユニットテストサポート、コード実行結果を表示する出力ペイン、統合ターミナルがあります。\nアクティブなドキュメントは、ユーザーが現在見ているソースコードです。\n1 回の会話で 1 つの回答しかできません。\n\n追加ルール\nステップごとに考えてください：\n1. 提供されたコード選択部分やユーザーの質問、関連するエラー、プロジェクトの詳細、クラス定義などを確認します。\n2. コードや概念、ユーザーの質問が不明確な場合は、明確化する質問を行います。\n3. ユーザーが特定の質問やエラーを提供している場合は、選択されたコードと追加のコンテキストに基づいて答えてください。それ以外の場合は、選択されたコードの説明に集中します。\n4. コードの可読性やパフォーマンス向上の機会があれば、提案を行ってください。\n\n簡潔でわかりやすく、かつ徹底的な説明を心がけ、広範な予備知識があると仮定しないでください。\n開発者に親しみやすい用語やアナロジーを使用してください。\n注意すべき点や、初心者が見落としがちな部分を指摘してください。\n提供されたコンテキストに沿った具体的で関連性の高い例を示してください。\n"))
+
+  (with-eval-after-load 'copilot-chat-copilot
+    (setopt copilot-chat-prompt-review "次のコードをレビューしてください。\n"))
 #+end_src
 ** llm
 #+begin_src emacs-lisp :tangle yes
