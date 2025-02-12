@@ -317,6 +317,10 @@
   (add-to-list 'auto-mode-alist '("/apache2/.+\\.conf\\'" . apache-mode))
   (add-to-list 'auto-mode-alist '("/httpd/conf/.+\\.conf\\'" . apache-mode))
   (add-to-list 'auto-mode-alist '("/apache2/sites-\\(?:available\\|enabled\\)/" . apache-mode))
+
+  (with-eval-after-load 'apache-mode
+    ;; hook
+    (add-hook 'apache-mode-hook #'view-mode))
 #+end_src
 ** bazel-mode
 #+begin_src emacs-lisp :tangle yes
@@ -344,7 +348,8 @@
 
   (with-eval-after-load 'cfn-mode
     ;; hooks
-    (add-hook 'cfn-mode-hook #'flycheck-mode))
+    (add-hook 'cfn-mode-hook #'flycheck-mode)
+    (add-hook 'cfn-mode-hook #'view-mode))
 #+end_src
 ** clojure-mode
 #+begin_src emacs-lisp :tangle yes
@@ -374,12 +379,20 @@
   (add-to-list 'auto-mode-alist '("\\.cnf$" . conf-mode))
   (add-to-list 'auto-mode-alist '("yabairc$" . conf-mode))
   (add-to-list 'auto-mode-alist '("skhdrc$" . conf-mode))
+
+  (with-eval-after-load 'conf-mode
+    ;; hook
+    (add-hook 'conf-mode-hook #'view-mode))
 #+end_src
 ** crontab-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(crontab-mode) "crontab-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.?cron\\(tab\\)?\\'" . crontab-mode))
+
+  (with-eval-after-load 'crontab-mode
+    ;; hook
+    (add-hook 'crontab-mode-hook #'view-mode))
 #+end_src
 ** csharp-mode
 #+begin_src emacs-lisp :tangle yes
@@ -392,6 +405,10 @@
   (autoload-if-found '(csv-mode) "csv-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.csv$" . csv-mode))
+
+  (with-eval-after-load 'csv-mode
+    ;; hook
+    (add-hook 'csv-mode-hook #'view-mode))
 #+END_SRC
 ** cuda-mode
 #+begin_src emacs-lisp :tangle yes
@@ -427,6 +444,10 @@
 
   (add-to-list 'auto-mode-alist '("\\.envrc" . direnv-envrc-mode))
 
+  (with-eval-after-load 'direnv
+    ;; hook
+    (add-hook 'direnv-mode-hook #'view-mode))
+
   (define-minor-mode direnv-local-mode
     "Minor mode to automatically update the environment using direnv for the current buffer."
     :global nil
@@ -439,6 +460,10 @@
   (autoload-if-found '(docker-compose-mode) "docker-compose-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\docker-compose*" . docker-compose-mode))
+
+  (with-eval-after-load 'docker-compose-mode
+    ;; hook
+    (add-hook 'docker-compose-mode-hook #'view-mode))
 #+end_src
 ** dockerfile-mode
 #+begin_src emacs-lisp :tangle yes
@@ -457,6 +482,9 @@
   (autoload-if-found '(dotenv-mode) "dotenv-mode" nil t)
 
   (add-to-list 'auto-mode-alist '(".env$" . dotenv-mode))
+
+  (with-eval-after-load 'dotenv-mode
+    (add-hook 'dotenv-mode-hook #'view-mode))
 #+end_src
 ** elixir-mode
 #+begin_src emacs-lisp :tangle yes
@@ -521,6 +549,10 @@
   (add-to-list 'auto-mode-alist '("/git/ignore\\'" . gitignore-mode))
   (add-to-list 'auto-mode-alist '("CODEOWNERS" . gitignore-mode))
 
+  (with-eval-after-load 'gitignore-mode
+    ;; hook
+    (add-hook 'gitignore-mode-hook #'view-mode))
+
   ;; gitconfig-mode
   (add-to-list 'auto-mode-alist '("\\.git-pr-release$" . gitconfig-mode))
   (add-to-list 'auto-mode-alist '("\\.editorconfig$" . gitconfig-mode))
@@ -531,11 +563,19 @@
   (add-to-list 'auto-mode-alist '("/\\.gitmodules\\'" . gitconfig-mode))
   (add-to-list 'auto-mode-alist '("/etc/gitconfig\\'" . gitconfig-mode))
 
+  (with-eval-after-load 'gitconfig-mode
+    ;; hook
+    (add-hook 'gitconfig-mode-hook #'view-mode))
+
   ;; gitattributes
   (add-to-list 'auto-mode-alist '("/\\.gitattributes\\'" . gitattributes-mode))
   (add-to-list 'auto-mode-alist '("\.gitattributes$" . gitattributes-mode))
   (add-to-list 'auto-mode-alist '("/info/attributes\\'" . gitattributes-mode))
   (add-to-list 'auto-mode-alist '("/git/attributes\\'" . gitattributes-mode))
+
+  (with-eval-after-load 'gitattributes-mode
+    ;; hook
+    (add-hook 'gitattributes-mode-hook #'view-mode))
 #+end_src
 ** glsl-mode
 #+begin_src emacs-lisp :tangle yes
@@ -731,8 +771,9 @@
                                                ("php" . php-mode))
                                              markdown-code-lang-modes))
 
-    ;; markdown
-    (add-hook 'markdown-mode #'orgtbl-mode))
+    ;; hook
+    (add-hook 'markdown-mode #'orgtbl-mode)
+    (add-hook 'markdown-mode #'view-mode))
 #+END_SRC
 ** mermaid-mode
 #+begin_src emacs-lisp :tangle yes
@@ -765,6 +806,9 @@
   (autoload-if-found '(neon-mode) "neon-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.neon$" . neon-mode))
+
+  (with-eval-after-load 'neon-mode
+    (add-hook 'neon-mode-hook #'view-mode))
 #+end_src
 ** nim-mode
 #+begin_src emacs-lisp :tangle yes
@@ -811,6 +855,10 @@
   (autoload-if-found '(nov-mode) "nov" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+  (with-eval-after-load 'nov-mode
+    ;; hooks
+    (add-hook 'nov-mode-hook #'view-mode))
 #+end_src
 ** pcap-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1014,6 +1062,11 @@
   (add-to-list 'auto-mode-alist '("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode))
   (add-to-list 'auto-mode-alist '("/known_hosts\\'" . ssh-config-mode))
   (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-config-mode))
+
+  (with-eval-after-load 'ssh-config-mode
+    ;; hooks
+    (add-hook 'ssh-config-mode-hook #'view-mode)
+    (add-hook 'ssh-known-hosts-mode-hook #'view-mode))
 #+END_SRC
 ** sql-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1061,6 +1114,10 @@
                                   . systemd-mode))
   (add-to-list 'auto-mode-alist `(,(rx "/systemd/" (+? anything) ".d/" (+? (not (any ?/))) ".conf" string-end)
                                   . systemd-mode))
+
+  (with-eval-after-load 'systemd
+    ;; hooks
+    (add-hook 'systemd-mode-hook #'view-mode))
 #+end_src
 ** terraform-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1082,6 +1139,9 @@
   (add-to-list 'auto-mode-alist '("\\.colorrc$" . conf-space-mode))
   (add-to-list 'auto-mode-alist '("\\.asdfrc$" . conf-space-mode))
   (add-to-list 'auto-mode-alist '("credentials$" . conf-space-mode))
+
+  (with-eval-after-load 'conf-mode
+    (add-hook 'conf-space-mode-hook #'view-mode))
 #+end_src
 ** toml-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1091,7 +1151,8 @@
 
   (with-eval-after-load 'toml-mode
     ;; hooks
-    (add-hook 'toml-mode-hook #'flycheck-mode))
+    (add-hook 'toml-mode-hook #'flycheck-mode)
+    (add-hook 'toml-mode-hook #'view-mode))
 #+END_SRC
 ** tmux-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1116,6 +1177,9 @@
   (autoload-if-found '(typst-mode) "typst-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.typ$" . typst-mode))
+
+  (with-eval-after-load 'typst-mode
+    (add-hook 'typst-mode-hook #'view-mode))
 #+END_SRC
 ** v-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1196,13 +1260,18 @@
 
   (with-eval-after-load 'yaml-mode
     ;; hooks
-    (add-hook 'yaml-mode-hook #'flycheck-mode))
+    (add-hook 'yaml-mode-hook #'flycheck-mode)
+    (add-hook 'yaml-mode-hook #'view-mode))
 #+END_SRC
 ** yarn-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yarn-mode) "yarn-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("yarn\\.lock\\'" . yarn-mode))
+
+  (with-eval-after-load 'yarn-mode
+    ;; hooks
+    (add-hook 'yarn-mode-hook #'view-mode))
 #+end_src
 ** zig-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1824,13 +1893,7 @@
 *** view-mode
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'prog-mode
-    (add-hook 'prog-mode-hooks #'view-mode))
-
-  (with-eval-after-load 'org
-    (add-hook 'org-mode-hook #'view-mode))
-
-  (with-eval-after-load 'markdown-mode
-    (add-hook 'markdown-mode-hook #'view-mode))
+    (add-hook 'prog-mode-hook #'view-mode))
 
   (with-eval-after-load 'view
     ;; hooks
@@ -4233,6 +4296,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key org-mode-map (kbd "C-c ,") #'org-insert-structure-template)
     (define-key org-mode-map (kbd "C-c C-,") #'org-insert-structure-template)
 
+    ;; hooks
+    (add-hook 'org-mode-hook #'view-mode)
+
     ;; directory
     (setq org-directory "~/.ghq/github.com/takeokunn/private")
 
@@ -4265,11 +4331,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt org-src-window-setup 'current-window)
     (setopt org-src-fontify-natively nil))
-
-  (with-eval-after-load 'org-archive
-    ;; archive
-    (advice-add 'org-archive-subtree :before #'(lambda (&rest _) (remove-hook 'find-file-hooks #'view-mode)))
-    (advice-add 'org-archive-subtree :after #'(lambda (&rest _) (add-hook 'find-file-hooks #'view-mode))))
 #+END_SRC
 *** org-clock
 #+begin_src emacs-lisp :tangle yes
