@@ -1477,21 +1477,6 @@
     ;; config
     (setopt magit-display-buffer-function #'magit-display-buffer-fullcolumn-most-v1))
 #+END_SRC
-*** magit-gptcommit
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(magit-gptcommit-status-buffer-setup
-                       magit-gptcommit-mode
-                       magit-gptcommit-commit-accept) "magit-gptcommit" nil t)
-
-  (with-eval-after-load 'magit
-    ;; hooks
-    (add-hook 'magit-mode #'magit-gptcommit-status-buffer-setup)
-    (add-hook 'magit-mode #'magit-gptcommit-mode))
-
-  (with-eval-after-load 'git-commit
-    ;; keybinds
-    (define-key git-commit-mode-map (kbd "C-c C-g") #'magit-gptcommit-commit-accept))
-#+end_src
 *** git-gutter
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(git-gutter-mode) "git-gutter" nil t)

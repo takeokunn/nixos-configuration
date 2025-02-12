@@ -22,7 +22,6 @@ with epkgs;
 
   # git
   magit
-  magit-gptcommit
   git-gutter
   git-gutter-fringe
   git-timemachine
