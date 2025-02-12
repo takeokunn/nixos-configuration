@@ -5124,9 +5124,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 * AI
 ** copilot.el
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(copilot-login
-                       copilot-mode
-                       global-copilot-mode) "copilot" nil t)
+  (autoload-if-found '(copilot-login copilot-mode) "copilot" nil t)
 
   (keymap-global-set "C-x C-:" #'copilot-mode)
 
@@ -5142,10 +5140,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 ** copilot-chat.el
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(copilot-chat-transient
-                       copilot-chat-transient-buffers
-                       copilot-chat-transient-code
-                       copilot-chat-insert-commit-message) "copilot-chat" nil t)
+  (autoload-if-found '(copilot-chat-transient-code copilot-chat-insert-commit-message) "copilot-chat" nil t)
 
   (with-eval-after-load 'git-commit
     (add-hook 'git-commit-setup-hook #'copilot-chat-insert-commit-message))
