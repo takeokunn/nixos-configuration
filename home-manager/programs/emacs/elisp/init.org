@@ -4353,7 +4353,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-c c" #'org-capture)
 
   (with-eval-after-load 'org-capture
-      ;; config
+    ;; advice
+    (advice-add 'org-capture
+                :before #'(lambda (&rest _)
+                            (remove-hook 'org-mode-hook #'view-mode)
+                            (remove-hook 'prog-mode-hook #'view-mode)))
+    (advice-add 'org-capture
+                :after #'(lambda (&rest _)
+                           (add-hook 'org-mode-hook #'view-mode)
+                           (add-hook 'prog-mode-hook #'view-mode)))
+
+    ;; config
     (setq org-capture-use-agenda-date t)
     (setq org-capture-bookmark nil)
     (setq org-capture-templates `(("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
@@ -5133,10 +5143,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt copilot-log-max 100000)
 
     ;; keymap
-    (define-key copilot-mode-map (kbd "C-c # i") #'copilot-complete)
     (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)
-    (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion)
-    (define-key copilot-mode-map (kbd "C-S-a") #'copilot-accept-completion))
+    (define-key copilot-mode-map (kbd "C-S-a") #'copilot-accept-completion)
+    (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion))
 #+end_src
 ** copilot-chat.el
 #+begin_src emacs-lisp :tangle yes
