@@ -11,6 +11,6 @@ with pkgs.vimPlugins;
       require('gitsigns').setup()
     '';
   }
-  git-blame-nvim
+  # git-blame-nvim
   plugins.vim-gin
 ]
