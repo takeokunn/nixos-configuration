@@ -80,15 +80,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "e5c1e32d6555510b97f120ad713d5997531c6ea8";
+    version = "efc6af7acc6c92165a71942ec30dafe73ac8ff1a";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "e5c1e32d6555510b97f120ad713d5997531c6ea8";
+      rev = "efc6af7acc6c92165a71942ec30dafe73ac8ff1a";
       fetchSubmodules = false;
-      sha256 = "sha256-+UL0W7d9nq5wWPA5eYnYF7j6UqIQAnOa6o59i7aHXG4=";
+      sha256 = "sha256-bQJG7sVKt0KsYGrC3YuwWFDCK9PGr4qTBFerasNgSwo=";
     };
-    date = "2025-02-11";
+    date = "2025-02-12";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -152,15 +152,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "286b1cf18eb358ac9c208a709a625f3ee19ae451";
+    version = "bfabae264ff39a22ddd20c485b97db20293c465a";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "286b1cf18eb358ac9c208a709a625f3ee19ae451";
+      rev = "bfabae264ff39a22ddd20c485b97db20293c465a";
       fetchSubmodules = false;
-      sha256 = "sha256-xSulffI0ldupLdTH3SJyLilCtUl674ppI0BvgY35/iM=";
+      sha256 = "sha256-QPOMlh69yXN22gokgdfAOcB7kaGcImm0FzLfgmu0yjk=";
     };
-    date = "2025-02-11";
+    date = "2025-02-13";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -548,15 +548,15 @@
   };
   vim-fern = {
     pname = "vim-fern";
-    version = "cb5be74e4a343c8187be91b6be4475b2d73755a2";
+    version = "ea7228938b7defa364f06054a5cc3503e2217033";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-fern";
-      rev = "cb5be74e4a343c8187be91b6be4475b2d73755a2";
+      rev = "ea7228938b7defa364f06054a5cc3503e2217033";
       fetchSubmodules = false;
-      sha256 = "sha256-l75EKeF4NAA9zkuEs2Sz4/OjW8WyV6hO3pO95r9Z3Zw=";
+      sha256 = "sha256-a+z5SWJCYCtn7XjOZ4nirH8sx1uSRfZFv9+i6++Dnyc=";
     };
-    date = "2025-01-26";
+    date = "2025-02-13";
   };
   vim-fern-renderer-nerdfont = {
     pname = "vim-fern-renderer-nerdfont";
