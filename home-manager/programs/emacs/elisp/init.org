@@ -290,12 +290,12 @@
   (keymap-global-set "C-c C-o" #'org-open-at-point)
   (keymap-global-set "C-x C-o" #'other-window)
 
-  (keymap-global-set "C-x C-k" nil)
+  (keymap-global-unset "C-x C-k")
 
   (keymap-global-set "M-d" #'my/delete-forward-block)
 
   (when window-system
-    (keymap-global-set "C-x C-c" nil))
+    (keymap-global-unset "C-x C-c"))
 #+END_SRC
 * Language
 ** ansible
@@ -436,9 +436,14 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(direnv-envrc-mode direnv--enable direnv--disable) "direnv" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.envrc" . direnv-envrc-mode))
+  (add-to-list 'auto-mode-alist '("\\.envrc$" . direnv-envrc-mode))
 
   (with-eval-after-load 'direnv
+    ;; config
+    (setopt direnv-always-show-summary nil)
+    (setopt direnv-show-paths-in-summary nil)
+    (setopt direnv-use-faces-in-summary nil)
+
     ;; hook
     (add-hook 'direnv-mode-hook #'view-mode))
 #+end_src
@@ -2453,7 +2458,7 @@
     (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
     ;; ellama
-    (define-key embark-general-map (kbd "E") #'ellama-transient-main-menu)
+    (define-key embark-general-map (kbd "L") #'ellama-transient-main-menu)
 
     ;; copilot-chat
     (define-key embark-general-map (kbd "C") #'copilot-chat-transient-code)
