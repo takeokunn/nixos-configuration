@@ -441,13 +441,6 @@
   (with-eval-after-load 'direnv
     ;; hook
     (add-hook 'direnv-mode-hook #'view-mode))
-
-  (define-minor-mode direnv-local-mode
-    "Minor mode to automatically update the environment using direnv for the current buffer."
-    :global nil
-    (if direnv-local-mode
-        (direnv--enable)
-      (direnv--disable)))
 #+end_src
 ** docker-compose-mode
 #+begin_src emacs-lisp :tangle yes
@@ -4316,7 +4309,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt org-src-window-setup 'current-window)
     (setopt org-src-fontify-natively nil)
-    (setopt org-src-tab-acts-natively nil))
+    (setopt org-src-tab-acts-natively nil)
+
+    ;; hooks
+    (add-hook 'org-src-mode-hook
+              #'(lambda () (setq-local indent-tabs-mode nil))))
 #+END_SRC
 *** org-clock
 #+begin_src emacs-lisp :tangle yes
