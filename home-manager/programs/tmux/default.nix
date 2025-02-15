@@ -9,6 +9,11 @@
     keyMode = "vi";
     prefix = "C-q";
     secureSocket = true;
+    shell = "${pkgs.fish}/bin/fish";
+    newSession = true;
+    customPaneNavigationAndResize = true;
+    resizeAmount = 5;
+
     plugins = with pkgs; [
       tmuxPlugins.open
       tmuxPlugins.sensible
@@ -25,17 +30,14 @@
     ];
 
     extraConfig = ''
-      set-option -g pane-base-index 1
-      set-option -g display-panes-time 15000
       set-option -g default-command $SHELL
+      set-option -g display-panes-time 15000
       set-option -g status-position top
       set-option -g status-right '[%Y-%m-%d(%a) %H:%M]'
       set-option -g status-interval 1
       set-option -g status-justify centre
       set-option -g status-bg "colour238"
       set-option -g status-fg "colour255"
-
-      # set-option -ga terminal-overrides ",xterm-256color:Tc"
 
       bind-key C-g display-panes
 
@@ -47,11 +49,6 @@
       bind-key -T copy-mode-vi v     send-keys -X begin-selection
       bind-key -T copy-mode-vi y     send-keys -X copy-pipe "pbcopy"
       bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "pbcopy"
-
-      bind -r H resize-pane -L 5
-      bind -r J resize-pane -D 5
-      bind -r K resize-pane -U 5
-      bind -r L resize-pane -R 5
     '';
   };
 }

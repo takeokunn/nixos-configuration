@@ -50,8 +50,3 @@ vim.keymap.set("n", "sK", "<C-w>K", { noremap = true, silent = true })
 vim.keymap.set("n", "sL", "<C-w>L", { noremap = true, silent = true })
 vim.keymap.set("n", "sH", "<C-w>H", { noremap = true, silent = true })
 vim.keymap.set("n", "sw", "<C-w>w", { noremap = true, silent = true })
-
--- buffer keymap
-
-vim.keymap.set("n", "sp", ":<C-u>bp<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "sn", ":<C-u>bn<CR>", { noremap = true, silent = true })

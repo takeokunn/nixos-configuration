@@ -1635,10 +1635,7 @@
     (add-to-list 'lsp-language-id-configuration '("php-ts-mode" . "php"))
 
     ;; advice
-    (advice-add 'lsp-rename
-                :before #'(lambda (&rest _)
-                            (add-hook 'find-file-hook #'(lambda ()
-                                                          (view-mode -1)))))
+    (advice-add 'lsp-rename :around #'my/advice-disable-buffer-readonly)
 
     ;; ignore path
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]vendor")
@@ -1943,10 +1940,18 @@
             (cancel-timer my/view-mode-timer))
         (setopt my/view-mode-timer (run-with-idle-timer (* 60 10) nil #'view-mode))))
 
+    (defun my/disable-buffer-readonly ()
+      (setq-local buffer-read-only nil))
+
+    (defun my/advice-disable-buffer-readonly (old-func &rest args)
+      (add-hook 'view-mode-hook #'my/disable-buffer-readonly)
+      (apply old-func args)
+      (remove-hook 'view-mode-hook #'my/disable-buffer-readonly))
+
     ;; advices
     (advice-add 'view--disable :before #'(lambda (&rest _) (view-lock-mode -1))))
 #+end_src
-*** view-lock-mode
+**** view-lock-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(view-lock-timer-start view-lock-quit) "view-lock-mode" nil t)
 
@@ -4309,7 +4314,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (defun my/update-org-agenda-files ()
       (interactive)
       (setq org-agenda-files my/org-agenda-files)))
-
+#+END_SRC
+*** org-src
+#+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-src
     ;; config
     (setopt org-src-window-setup 'current-window)
@@ -4318,7 +4325,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     ;; hooks
     (add-hook 'org-src-mode-hook
-              #'(lambda () (setq-local indent-tabs-mode nil))))
+              #'(lambda ()
+                  (setq-local indent-tabs-mode nil)
+                  (view-mode -1))))
 #+END_SRC
 *** org-clock
 #+begin_src emacs-lisp :tangle yes
@@ -4403,9 +4412,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'org-crypt
     ;; config
     (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C"))
-
-  (advice-add 'org-babel-tangle :before #'org-decrypt-entries)
-  (advice-add 'org-babel-tangle :after #'org-encrypt-entries)
 #+end_src
 *** org-table
 #+begin_src emacs-lisp :tangle yes
@@ -4664,6 +4670,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                             (when (not (string= (nth 1 args)
                                                 "mysql: [Warning] Using a password on the command line interface can be insecure.\n"))
                               (apply old-func args)))))
+
+  (with-eval-after-load 'ob-tangle
+    ;; advice
+    (advice-add 'org-babel-tangle :before #'org-decrypt-entries)
+    (advice-add 'org-babel-tangle :after #'org-encrypt-entries)
+    (advice-add 'org-babel-tangle :around #'my/advice-disable-buffer-readonly))
 #+end_src
 *** ob-async
 #+begin_src emacs-lisp :tangle yes

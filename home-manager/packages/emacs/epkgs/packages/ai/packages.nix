@@ -23,6 +23,7 @@
       markdown-mode
       chatgpt-shell
       magit
+      polymode
     ];
 
     ignoreCompilationError = false;

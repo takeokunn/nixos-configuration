@@ -9,6 +9,11 @@
     enable = true;
     lfs.enable = true;
 
+    maintenance = {
+      enable = true;
+      timers = "daily";
+    };
+
     delta = {
       enable = true;
       options = {
@@ -38,6 +43,15 @@
       ".DS_Store"
     ];
 
+    userName = "takeokunn";
+    userEmail = "bararararatty@gmail.com";
+
+    signing = {
+      key = "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C";
+      format = "openpgp";
+      signByDefault = true;
+    };
+
     extraConfig = {
       core = {
         quotepath = "off";
@@ -51,17 +65,6 @@
 
       commit = {
         template = "~/.config/git/message";
-        gpgsign = true;
-      };
-
-      tag = {
-        gpgsign = true;
-      };
-
-      user = {
-        name = "takeokunn";
-        email = "bararararatty@gmail.com";
-        signingkey = "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C";
       };
 
       ghq = {
@@ -159,11 +162,14 @@
       rebase = {
         autoStash = true;
         abbreviateCommands = false;
-        autosquash = true;
       };
 
       merge = {
         conflictStyle = "diff3";
+      };
+
+      includeIf = {
+        "~/.config/git/private".path = "~/.config/git/private";
       };
 
       secrets = {
