@@ -52,6 +52,10 @@
       signByDefault = true;
     };
 
+    includes = [
+      { path = "~/.config/git/config.d/maintenance.conf"; }
+    ];
+
     extraConfig = {
       core = {
         quotepath = "off";
@@ -166,10 +170,6 @@
 
       merge = {
         conflictStyle = "diff3";
-      };
-
-      includeIf = {
-        "~/.config/git/private".path = "~/.config/git/private";
       };
 
       secrets = {
