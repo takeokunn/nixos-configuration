@@ -4573,7 +4573,10 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setq org-agenda-span 'day)
     (setq org-agenda-start-on-weekday 1)
-    (setq org-agenda-todo-ignore-with-date t))
+    (setq org-agenda-todo-ignore-with-date t)
+
+    ;; advices
+    (advice-add 'org-archive-subtree :around #'my/advice-disable-buffer-readonly))
 #+end_src
 *** org-super-agenda
 #+begin_src emacs-lisp :tangle yes

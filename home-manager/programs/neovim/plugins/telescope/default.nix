@@ -6,6 +6,12 @@ with pkgs.vimPlugins;
     plugin = telescope-nvim;
     config = ''
       require('telescope').setup {
+        defaults = {
+          mappings = {
+            i = { ["<esc>"] = actions.close },
+            n = { ["q"] = actions.close }
+          }
+        },
         extensions = {
           fzf = {
             fuzzy = true,
@@ -22,7 +28,7 @@ with pkgs.vimPlugins;
       vim.keymap.set('n', '<leader>g', builtin.live_grep)
       vim.keymap.set('n', '<leader>b', builtin.buffers)
       vim.keymap.set('n', '<leader>h', builtin.help_tags)
-      vim.keymap.set('n', '<leader>r', builtin.help_tags)
+      vim.keymap.set('n', '<leader>r', builtin.registers)
     '';
   }
   telescope-ui-select-nvim
