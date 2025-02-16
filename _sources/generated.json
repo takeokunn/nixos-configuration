@@ -127,7 +127,7 @@
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
-    "date": "2025-02-14",
+    "date": "2025-02-16",
     "extract": null,
     "name": "emacs-copilot-chat",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "5002ee8104299b713b8ee6226b9b5d0a9cfb2df6",
-      "sha256": "sha256-rSn3pGhrwoes0DclzM6mooL6buwFvVxyMVAA53vcoBw=",
+      "rev": "d358e33f3f37267774c92f413f528cff89ecccb9",
+      "sha256": "sha256-EDPsT2mITkkMMlfDb+8/E4ToCWxPzfjQyvCYXSJrwUE=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "5002ee8104299b713b8ee6226b9b5d0a9cfb2df6"
+    "version": "d358e33f3f37267774c92f413f528cff89ecccb9"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
@@ -1114,7 +1114,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-02-15",
+    "date": "2025-02-16",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1126,11 +1126,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "5f0ffeca31f0f9d24885bdca69c6a1ca833f3071",
-      "sha256": "sha256-5Xu+9uw9MfDNQGztjcjASp0kKrdWaSM2gLe8U1Qseq8=",
+      "rev": "c5d39de128997f43d77ceec4a0a4038a2d2a9638",
+      "sha256": "sha256-e3sW3YVhaW0VX+uNgqoRh9Ceo9P/L6JapOCqjsuOg2M=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "5f0ffeca31f0f9d24885bdca69c6a1ca833f3071"
+    "version": "c5d39de128997f43d77ceec4a0a4038a2d2a9638"
   }
 }
