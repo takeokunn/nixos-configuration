@@ -20,11 +20,7 @@
         "show"
         "private/develop/google/offlineimap"
       ];
-      imap = {
-        host = "imap.gmail.com";
-        port = 993;
-        tls.enable = true;
-      };
+      imap.tls.enable = true;
     };
   };
 }
