@@ -1423,6 +1423,16 @@ $0
   {$0
   }
 #+end_src
+*** aaa
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/aaa") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: aaa
+  # key: aaa
+  # --
+  // Arrange
+  // Act
+  // Assert
+#+end_src
 *** abstruct
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/abstract") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
