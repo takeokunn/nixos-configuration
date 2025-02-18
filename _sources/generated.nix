@@ -68,13 +68,13 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "6fc7307fa32d01e4a96f7c96b26dfec78ee2a866";
+    version = "b6cef1c3b445a4b557275beef0599161dda82061";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "6fc7307fa32d01e4a96f7c96b26dfec78ee2a866";
+      rev = "b6cef1c3b445a4b557275beef0599161dda82061";
       fetchSubmodules = false;
-      sha256 = "sha256-Iumc+0eR/1mhd5AlHBa6UIHQzpvUFYW0RLKr4fitWHQ=";
+      sha256 = "sha256-NRW2ReiJ62hJtT98Qk6qcrdXmMYhmHZL7NcW9Eacml4=";
     };
     date = "2025-02-17";
   };
@@ -548,15 +548,15 @@
   };
   vim-fern = {
     pname = "vim-fern";
-    version = "ea7228938b7defa364f06054a5cc3503e2217033";
+    version = "60d9a56380123198fe318c250d29a4a44bb952e9";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-fern";
-      rev = "ea7228938b7defa364f06054a5cc3503e2217033";
+      rev = "60d9a56380123198fe318c250d29a4a44bb952e9";
       fetchSubmodules = false;
-      sha256 = "sha256-a+z5SWJCYCtn7XjOZ4nirH8sx1uSRfZFv9+i6++Dnyc=";
+      sha256 = "sha256-QA/Q1rlMbWJJa3IEqjhvf4/2i3RHPirwlwMtMTuKLnQ=";
     };
-    date = "2025-02-13";
+    date = "2025-02-18";
   };
   vim-fern-renderer-nerdfont = {
     pname = "vim-fern-renderer-nerdfont";
@@ -644,14 +644,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "c5d39de128997f43d77ceec4a0a4038a2d2a9638";
+    version = "c55e28a889dad54420b80c322071ca5d328f5ebf";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "c5d39de128997f43d77ceec4a0a4038a2d2a9638";
+      rev = "c55e28a889dad54420b80c322071ca5d328f5ebf";
       fetchSubmodules = false;
-      sha256 = "sha256-e3sW3YVhaW0VX+uNgqoRh9Ceo9P/L6JapOCqjsuOg2M=";
+      sha256 = "sha256-6qQY6E/QGx2zgghhwG14hWY7Qh2UAYGdZLB/48/lOPw=";
     };
-    date = "2025-02-16";
+    date = "2025-02-18";
   };
 }
