@@ -102,6 +102,18 @@
     };
     date = "2024-03-14";
   };
+  emacs-eglot-booster = {
+    pname = "emacs-eglot-booster";
+    version = "e6daa6bcaf4aceee29c8a5a949b43eb1b89900ed";
+    src = fetchFromGitHub {
+      owner = "jdtsmith";
+      repo = "eglot-booster";
+      rev = "e6daa6bcaf4aceee29c8a5a949b43eb1b89900ed";
+      fetchSubmodules = false;
+      sha256 = "sha256-PLfaXELkdX5NZcSmR1s/kgmU16ODF8bn56nfTh9g6bs=";
+    };
+    date = "2024-10-29";
+  };
   emacs-eshell-multiple = {
     pname = "emacs-eshell-multiple";
     version = "342c36ef9c71df8738f4435fd4381f506631e7aa";

@@ -48,6 +48,7 @@ with epkgs;
   origami
 
   # LSP
+  packages.eglot-booster
   lsp-mode
   lsp-sourcekit
   ccls

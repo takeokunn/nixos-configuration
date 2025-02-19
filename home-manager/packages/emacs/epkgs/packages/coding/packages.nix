@@ -17,4 +17,12 @@
 
     ignoreCompilationError = false;
   };
+
+  eglot-booster = epkgs.melpaBuild {
+    pname = "eglot-booster";
+    version = "0.0.1";
+    src = sources.emacs-eglot-booster.src;
+
+    ignoreCompilationError = false;
+  };
 }

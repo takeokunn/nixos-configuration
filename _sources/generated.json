@@ -167,6 +167,27 @@
     },
     "version": "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f"
   },
+  "emacs-eglot-booster": {
+    "cargoLocks": null,
+    "date": "2024-10-29",
+    "extract": null,
+    "name": "emacs-eglot-booster",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "jdtsmith",
+      "repo": "eglot-booster",
+      "rev": "e6daa6bcaf4aceee29c8a5a949b43eb1b89900ed",
+      "sha256": "sha256-PLfaXELkdX5NZcSmR1s/kgmU16ODF8bn56nfTh9g6bs=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "e6daa6bcaf4aceee29c8a5a949b43eb1b89900ed"
+  },
   "emacs-eshell-multiple": {
     "cargoLocks": null,
     "date": "2022-08-17",

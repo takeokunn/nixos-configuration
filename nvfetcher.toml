@@ -220,6 +220,11 @@ src.git = "https://github.com/chep/copilot-chat.el"
 src.branch = "master"
 fetch.github = "chep/copilot-chat.el"
 
+[emacs-eglot-booster]
+src.git = "https://github.com/jdtsmith/eglot-booster"
+src.branch = "main"
+fetch.github = "jdtsmith/eglot-booster"
+
 # for neovim
 
 [vimdoc-ja]
