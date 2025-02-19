@@ -3115,7 +3115,8 @@
               ("REVIEW" . "e60a39")
               ("QA" . "#88CF88")
               ("DONE" . "#afd8af")
-              ("FIXME" . "#cc9393"))))
+              ("FIXME" . "#cc9393")
+              ("MEMO" . "#coffee"))))
 #+end_src
 *** xterm-color
 #+begin_src emacs-lisp :tangle yes
@@ -3953,6 +3954,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        phpunit-current-class
                        phpunit-current-project
                        phpunit-group) "phpunit" nil t)
+
+  (with-eval-after-load 'php-mode
+    (keymap-set php-mode-map "C-c ;" #'phpunit-current-test))
 #+end_src
 ** Markdown
 *** poly-markdown

@@ -1,6 +1,5 @@
 { pkgs }:
 with pkgs.vimPlugins;
 [
-  # orgmode
-  vim-markdown
+  nvim-treesitter.withAllGrammars
 ]

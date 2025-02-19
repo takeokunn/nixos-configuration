@@ -1294,6 +1294,10 @@ $0
   # name: task-develop
   # key: task-develop
   # --
+  - ticket: xxx
+  - github: xxx
+  - slack: xxx
+
   ,*** TODO 要件を確認する
   ,*** TODO 修正する
   ,*** TODO pull requestを出す
@@ -1307,6 +1311,10 @@ $0
   # name: task-document
   # key: task-document
   # --
+  - ticket: xxx
+  - github: xxx
+  - slack: xxx
+
   ,*** TODO wikiを作成する
   ,*** TODO アウトラインを書く
   ,*** TODO 詳細を書く
@@ -1318,6 +1326,10 @@ $0
   # name: task-ope
   # key: task-ope
   # --
+  - ticket: xxx
+  - github: xxx
+  - slack: xxx
+
   ,*** TODO 定型オペをする
   ,*** TODO redmineに記述する
 #+end_src
