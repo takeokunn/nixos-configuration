@@ -2693,6 +2693,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
   (with-eval-after-load 'projectile-git-autofetch
     ;; config
+    (setopt projectile-git-autofetch-notify nil)
     (setopt projectile-git-autofetch-interval 180))
 #+end_src
 * Window

@@ -45,6 +45,7 @@
     shellAliases = {
       cdd = "cd ~/Desktop";
       make = "make -j8";
+      magit = "emacsclient -nw --alternate-editor=\"\" -e \"(magit-status)\"";
     };
 
     plugins = [
