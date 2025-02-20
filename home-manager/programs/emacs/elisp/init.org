@@ -1802,29 +1802,29 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dap-mode-hook #'dap-tooltip-mode)
     (add-hook 'dap-stopped-hook #'(lambda (arg) (call-interactively #'dap-hydra))))
 
-  (with-eval-after-load 'php-mode
-    ;; hooks
-    (add-hook 'php-mode-hook #'dap-php-setup))
+  ;; (with-eval-after-load 'php-mode
+  ;;   ;; hooks
+  ;;   (add-hook 'php-mode-hook #'dap-php-setup))
 
-  (with-eval-after-load 'dap-php
-    ;; config
-    (setopt dap-php-debug-path `,(expand-file-name "xdebug/vscode-php-debug" dap-utils-extension-path))
+  ;; (with-eval-after-load 'dap-php
+  ;;   ;; config
+  ;;   (setopt dap-php-debug-path `,(expand-file-name "xdebug/vscode-php-debug" dap-utils-extension-path))
 
-    ;; register
-    (dap-register-debug-template "Laravel Run Configuration"
-                                 (list :type "php"
-                                       :request "launch"
-                                       :mode "remote"
-                                       :host "localhost"
-                                       :port 9003)))
+  ;;   ;; register
+  ;;   (dap-register-debug-template "Laravel Run Configuration"
+  ;;                                (list :type "php"
+  ;;                                      :request "launch"
+  ;;                                      :mode "remote"
+  ;;                                      :host "localhost"
+  ;;                                      :port 9003)))
 
-  (with-eval-after-load 'go-mode
-    ;; hooks
-    (add-hook 'go-mode-hook #'dap-go-setup))
+  ;; (with-eval-after-load 'go-mode
+  ;;   ;; hooks
+  ;;   (add-hook 'go-mode-hook #'dap-go-setup))
 
-  (with-eval-after-load 'ruby-mode
-    ;; hooks
-    (add-hook 'ruby-mode-hook #'dap-ruby-setup))
+  ;; (with-eval-after-load 'ruby-mode
+  ;;   ;; hooks
+  ;;   (add-hook 'ruby-mode-hook #'dap-ruby-setup))
 #+END_SRC
 *** lsp-ui
 #+begin_src emacs-lisp :tangle yes
@@ -2685,6 +2685,16 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (keymap-global-set "C-x C-b" #'consult-projectile-switch-to-buffer))
 #+end_src
 
+** projectile-git-autofetch
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(projectile-git-autofetch-setup) "projectile-git-autofetch" nil t)
+
+  (add-hook 'emacs-startup-hook #'projectile-git-autofetch-setup)
+
+  (with-eval-after-load 'projectile-git-autofetch
+    ;; config
+    (setopt projectile-git-autofetch-interval 180))
+#+end_src
 * Window
 ** ace-window
 #+begin_src emacs-lisp :tangle yes
