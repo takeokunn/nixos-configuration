@@ -127,7 +127,7 @@
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
-    "date": "2025-02-16",
+    "date": "2025-02-21",
     "extract": null,
     "name": "emacs-copilot-chat",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "d358e33f3f37267774c92f413f528cff89ecccb9",
-      "sha256": "sha256-EDPsT2mITkkMMlfDb+8/E4ToCWxPzfjQyvCYXSJrwUE=",
+      "rev": "8a0049cb2eaab4f1aa62a074728f1ed5832a42c7",
+      "sha256": "sha256-JHIb4P5CYnKm8MncBgdT1whugm+4NkXysj2rZSDsEkQ=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "d358e33f3f37267774c92f413f528cff89ecccb9"
+    "version": "8a0049cb2eaab4f1aa62a074728f1ed5832a42c7"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
@@ -1072,7 +1072,7 @@
   },
   "vim-nerdfont": {
     "cargoLocks": null,
-    "date": "2024-12-29",
+    "date": "2025-02-21",
     "extract": null,
     "name": "vim-nerdfont",
     "passthru": null,
@@ -1084,12 +1084,12 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "vim-nerdfont",
-      "rev": "339e5e0f725ad5552c0910653a8b1fbb59eed2b8",
-      "sha256": "sha256-WUZikdEheDmzxggzwbOP7IXscMEgDMTp9Kh//dvlyTU=",
+      "rev": "3605ba4ba4dc0295f5eb400506fd05b451df3e1f",
+      "sha256": "sha256-srTetFxbf1ZltYCBXB308WayMupRwQMJLd7Up7kYEuU=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "339e5e0f725ad5552c0910653a8b1fbb59eed2b8"
+    "version": "3605ba4ba4dc0295f5eb400506fd05b451df3e1f"
   },
   "vim-skkeleton": {
     "cargoLocks": null,

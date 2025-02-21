@@ -80,15 +80,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "d358e33f3f37267774c92f413f528cff89ecccb9";
+    version = "8a0049cb2eaab4f1aa62a074728f1ed5832a42c7";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "d358e33f3f37267774c92f413f528cff89ecccb9";
+      rev = "8a0049cb2eaab4f1aa62a074728f1ed5832a42c7";
       fetchSubmodules = false;
-      sha256 = "sha256-EDPsT2mITkkMMlfDb+8/E4ToCWxPzfjQyvCYXSJrwUE=";
+      sha256 = "sha256-JHIb4P5CYnKm8MncBgdT1whugm+4NkXysj2rZSDsEkQ=";
     };
-    date = "2025-02-16";
+    date = "2025-02-21";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -620,15 +620,15 @@
   };
   vim-nerdfont = {
     pname = "vim-nerdfont";
-    version = "339e5e0f725ad5552c0910653a8b1fbb59eed2b8";
+    version = "3605ba4ba4dc0295f5eb400506fd05b451df3e1f";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-nerdfont";
-      rev = "339e5e0f725ad5552c0910653a8b1fbb59eed2b8";
+      rev = "3605ba4ba4dc0295f5eb400506fd05b451df3e1f";
       fetchSubmodules = false;
-      sha256 = "sha256-WUZikdEheDmzxggzwbOP7IXscMEgDMTp9Kh//dvlyTU=";
+      sha256 = "sha256-srTetFxbf1ZltYCBXB308WayMupRwQMJLd7Up7kYEuU=";
     };
-    date = "2024-12-29";
+    date = "2025-02-21";
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
