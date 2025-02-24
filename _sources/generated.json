@@ -274,7 +274,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-02-18",
+    "date": "2025-02-23",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -286,12 +286,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "a45117b148dca964e439ce034be8a3463b1e2e9b",
-      "sha256": "sha256-dtBeLMPN1Zph4MorhlMIAoFjHpV7Yxi4KRhl6HPKDbI=",
+      "rev": "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd",
+      "sha256": "sha256-FWEoH818a9WEFPnahQZH05oFxXXZHX7Hqm20/QbMTpE=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "a45117b148dca964e439ce034be8a3463b1e2e9b"
+    "version": "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -589,7 +589,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2025-02-10",
+    "date": "2025-02-24",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -601,12 +601,12 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "303e2fcb65cac2084f5e96bf79fc9c432ff859f2",
-      "sha256": "sha256-ujdik3y5Xprod1Hz25TLmT0IjkjBmPTh78ZvKKNl76I=",
+      "rev": "26834579e65987a70d6ff384ce9fc811aaf0ed94",
+      "sha256": "sha256-04inVMX9zQPPnDAlvSPAP9TM7o7AJM5+tF53vPUkmZM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "303e2fcb65cac2084f5e96bf79fc9c432ff859f2"
+    "version": "26834579e65987a70d6ff384ce9fc811aaf0ed94"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,

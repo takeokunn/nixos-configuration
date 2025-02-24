@@ -164,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "a45117b148dca964e439ce034be8a3463b1e2e9b";
+    version = "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "a45117b148dca964e439ce034be8a3463b1e2e9b";
+      rev = "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd";
       fetchSubmodules = false;
-      sha256 = "sha256-dtBeLMPN1Zph4MorhlMIAoFjHpV7Yxi4KRhl6HPKDbI=";
+      sha256 = "sha256-FWEoH818a9WEFPnahQZH05oFxXXZHX7Hqm20/QbMTpE=";
     };
-    date = "2025-02-18";
+    date = "2025-02-23";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -344,15 +344,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "303e2fcb65cac2084f5e96bf79fc9c432ff859f2";
+    version = "26834579e65987a70d6ff384ce9fc811aaf0ed94";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "303e2fcb65cac2084f5e96bf79fc9c432ff859f2";
+      rev = "26834579e65987a70d6ff384ce9fc811aaf0ed94";
       fetchSubmodules = false;
-      sha256 = "sha256-ujdik3y5Xprod1Hz25TLmT0IjkjBmPTh78ZvKKNl76I=";
+      sha256 = "sha256-04inVMX9zQPPnDAlvSPAP9TM7o7AJM5+tF53vPUkmZM=";
     };
-    date = "2025-02-10";
+    date = "2025-02-24";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
