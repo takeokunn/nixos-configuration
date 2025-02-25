@@ -274,7 +274,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-02-23",
+    "date": "2025-02-25",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -286,12 +286,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd",
-      "sha256": "sha256-FWEoH818a9WEFPnahQZH05oFxXXZHX7Hqm20/QbMTpE=",
+      "rev": "cb62272688282002fbabb917c859be74b9acd74b",
+      "sha256": "sha256-EBpfUHUEpSzyd7Vdo/GrateWKTnWvv4B5KIXbh79dS8=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "ef3c55e9c8b7fee127a21fe72e35adae4a7b00bd"
+    "version": "cb62272688282002fbabb917c859be74b9acd74b"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
