@@ -25,7 +25,7 @@
     };
 
     aliases = {
-      st = "status";
+      st = "status --ignore-submodules=all";
       br = "branch";
       co = "commit";
       ch = "checkout";
@@ -77,6 +77,8 @@
 
       fetch = {
         prune = true;
+        pruneTags = true;
+        all = true;
         writeCommitGraph = true;
       };
 
