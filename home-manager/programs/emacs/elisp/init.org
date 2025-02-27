@@ -3513,7 +3513,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
 
   (with-eval-after-load 'exec-path-from-shell
-    (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK")))
+    (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH")))
 #+END_SRC
 ** Utility
 *** htmlize
@@ -5220,6 +5220,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'copilot
     ;; config
     (setopt copilot-log-max 100000)
+    (setopt copilot-server-executable (getenv "COPILOT_LANGUAGE_SERVER_PATH"))
 
     ;; keymap
     (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)

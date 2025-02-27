@@ -18,7 +18,7 @@ let
   };
   nodePkgs = pkgs.callPackage ../node2nix { inherit pkgs; };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
-  advancedPkgs = import ./packages/advanced.nix { inherit pkgs nodePkgs; };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs; };
 
   # emacs package
   emacs = import ./packages/emacs { inherit pkgs sources; };
@@ -37,7 +37,7 @@ let
   };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs sources;
+    inherit pkgs nodePkgs sources;
   };
 
   # services

@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  nodePkgs,
   sources,
 }:
 let
@@ -15,6 +16,7 @@ let
   kitty = import ./kitty;
   sketchybar = import ./sketchybar;
   ssh = import ./ssh;
+  copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
 
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
@@ -34,6 +36,7 @@ in
   kitty
   sketchybar
   ssh
+  copilot-language-server
 
   # for window manager
   rofi

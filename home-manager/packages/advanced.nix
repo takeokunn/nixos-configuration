@@ -1,4 +1,4 @@
-{ pkgs, nodePkgs }:
+{ pkgs }:
 with pkgs;
 [
   # for ai
@@ -8,7 +8,4 @@ with pkgs;
   discord
   drawio
   slack
-
-  # for node2nix
-  nodePkgs."@github/copilot-language-server"
 ]
