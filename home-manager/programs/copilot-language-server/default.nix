@@ -13,7 +13,9 @@ in
 
   programs.fish = {
     interactiveShellInit = ''
-      set -gx COPILOT_LANGUAGE_SERVER_PATH ${nodePkgs."@github/copilot-language-server"}/lib/node_modules/@github/copilot-language-server/native/${platform}/copilot-language-server
+      set -gx COPILOT_LANGUAGE_SERVER_PATH ${
+        nodePkgs."@github/copilot-language-server"
+      }/lib/node_modules/@github/copilot-language-server/native/${platform}/copilot-language-server
     '';
   };
 }
