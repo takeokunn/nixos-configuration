@@ -1,6 +1,7 @@
 { pkgs }:
 {
   services.ollama = {
-    enable = pkgs.stdenv.isLinux;
+    enable = true;
+    host = "0.0.0.0";
   };
 }
