@@ -4,6 +4,7 @@ let
 in
 with pkgs.vimPlugins;
 [
+  vim-gnupg
   editorconfig-nvim
 
   # cursor
