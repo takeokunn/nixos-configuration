@@ -1,7 +1,7 @@
-{ emacsPkg, ... }:
+{ pkgs, emacsPkg, ... }:
 {
   services.emacs = {
-    enable = true;
+    enable = pkgs.stdenv.isLinux;
     package = emacsPkg;
     client.enable = true;
     defaultEditor = true;

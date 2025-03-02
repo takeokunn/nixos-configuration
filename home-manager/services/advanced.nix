@@ -1,6 +1,6 @@
 { pkgs, emacsPkg }:
 let
-  emacs = import ./emacs { inherit emacsPkg; };
+  emacs = import ./emacs { inherit pkgs emacsPkg; };
   mako = import ./mako { inherit pkgs; };
   ollama = import ./ollama { inherit pkgs; };
   gpg-agent = import ./gpg-agent;

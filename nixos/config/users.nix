@@ -15,7 +15,6 @@
       alsa-utils
       wl-clipboard
       grim
-      xwaylandvideobridge
     ];
   };
 }
