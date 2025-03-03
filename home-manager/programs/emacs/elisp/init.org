@@ -1705,11 +1705,6 @@
   (with-eval-after-load 'lsp-copilot
     ;; config
     (setopt lsp-copilot-enabled nil))
-
-  (with-eval-after-load 'lsp-icons
-    ;; config
-    (setopt lsp-modeline-code-action-icons-enable nil))
-
 #+END_SRC
 *** emacs-lsp-booster
 
