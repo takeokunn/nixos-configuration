@@ -5259,11 +5259,23 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(ellama-transient-main-menu) "ellama" nil t)
   (autoload-if-found '(ellama-community-prompts-select-blueprint) "ellama-community-prompts")
 
+  (keymap-global-set "C-c e" #'ellama-transient-main-menu)
+
   (with-eval-after-load 'ellama
     ;; config
     (setopt ellama-language "日本語")
-    (setopt ellama-provider (progn
-                              (make-llm-ollama :chat-model "gemma2:9b" :embedding-model "gemma2:9b")))
+
+    (let ((gemma2 (make-llm-ollama :chat-model "gemma2:9b" :embedding-model "gemma2:9b"))
+          (codellama (make-llm-ollama :chat-model "codellama:latest" :embedding-model "codellama:latest"))
+          (deepseek (make-llm-ollama :chat-model "deepseek-r1:8b" :embedding-model "deepseek-r1:8b")))
+      (setopt ellama-provider gemma2)
+      (setopt ellama-translation-provider gemma2)
+      (setopt ellama-summarization-provider deepseek)
+      (setopt ellama-coding-provider codellama)
+      (setopt ellama-providers
+              `(("gemma2" . ,gemma2)
+                ("codellama" . ,codellama)
+                ("deepseek" . ,deepseek))))
 
     ;; advice
     (advice-add 'ellama-instant
