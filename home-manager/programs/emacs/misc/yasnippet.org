@@ -953,36 +953,31 @@ $0
   # name: diary-mtg-template-monday
   # key: diary-mtg-template-monday
   # --
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
   ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` TGIF
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))`>
   :LOGBOOK:
@@ -995,30 +990,26 @@ $0
   # name: diary-mtg-template-tuesday
   # key: diary-mtg-template-tuesday
   # --
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 0)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 1)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
   ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` TGIF
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
@@ -1031,36 +1022,31 @@ $0
   # name: diary-mtg-template-friday
   # key: diary-mtg-template-friday
   # --
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
   ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))` TGIF
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 7)))`>
   :LOGBOOK:
@@ -1073,36 +1059,31 @@ $0
   # name: diary-mtg-template-saturday
   # key: diary-mtg-template-saturday
   # --
-  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 2)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 3)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 4)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 5)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 5)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
-  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 6)))` 朝会[0/1]
+  ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 6)))` 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:15]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 10:30] =>  0:15
   :END:
-  ,*** TODO 日報準備
   ,** TODO `(format-time-string "%m-%d %a" (time-add (current-time) (days-to-time 6)))` TGIF
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`>
   :LOGBOOK:
@@ -1287,6 +1268,18 @@ $0
 #+caption: ${1: caption of the table}
 |${2:column 1} | ${3: column 2} |
 |--------------+----------------|
+#+end_src
+*** task-response
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-response") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: task-response
+  # key: task-response
+  # --
+
+  - slack: xxx
+
+  ,*** TODO 要件を確認する
+  ,*** TODO 返事をする
 #+end_src
 *** task-develop
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-develop") :mkdirp yes :noweb yes
