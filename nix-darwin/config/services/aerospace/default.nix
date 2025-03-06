@@ -1,6 +1,6 @@
 {
   services.aerospace = {
-    enable = false;
+    enable = true;
     settings = {
       start-at-login = false;
       enable-normalization-flatten-containers = true;
