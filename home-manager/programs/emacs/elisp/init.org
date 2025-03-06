@@ -5431,10 +5431,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 ** my/today
 #+begin_src emacs-lisp :tangle yes
-  (defun my/today ()
-    (interactive)
+  (defun my/today (&optional iso-format)
+    (interactive "P")
     (insert
-     (format-time-string "%Y-%m-%d %a" (current-time))))
+     (format-time-string
+      (if iso-format "%Y-%m-%dT%T%z" "%Y-%m-%d %a")
+      (current-time))))
 #+end_src
 ** my/subword
 #+begin_src emacs-lisp :tangle yes
