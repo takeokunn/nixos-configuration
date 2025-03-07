@@ -108,7 +108,6 @@ function __devbox_requires_order_preservation
     return 1
 end
 
-
 # This function does two things:
 # - Obtain the completions and store them in the global __devbox_comp_results
 # - Return false if file completion should be performed

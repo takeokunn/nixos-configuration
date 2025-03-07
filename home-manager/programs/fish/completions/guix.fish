@@ -534,7 +534,6 @@ complete -f -c guix -n '__fish_guix_using_command pack' -a "--symlink=" -d 'crea
 complete -f -c guix -n '__fish_guix_using_command pack' -s S -d 'create symlinks to the profile according to SPEC'
 complete -f -c guix -n '__fish_guix_using_command pack' -a --localstatedir -d 'include /var/guix in the resulting pack'
 
-
 ## weather
 set -l remotecommands substitute-urls manifest system
 complete -f -c guix -n __fish_guix_needs_command -a weather -d 'Report the availability of substitutes-'
