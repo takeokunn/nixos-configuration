@@ -151,6 +151,10 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
+          "if".app-id = "com.sequel-ace.sequel-ace";
+          run = [ "move-node-to-workspace 4" ];
+        }
+        {
           "if".app-id = "com.obsproject.obs-studio";
           run = [ "move-node-to-workspace 7" ];
         }
