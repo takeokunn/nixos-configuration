@@ -1327,7 +1327,7 @@ $0
   ,*** TODO redmineに記述する
 #+end_src
 *** task-review
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-ope") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-review") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: task-review
   # key: task-review
