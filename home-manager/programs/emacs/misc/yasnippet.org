@@ -1326,6 +1326,17 @@ $0
   ,*** TODO 定型オペをする
   ,*** TODO redmineに記述する
 #+end_src
+*** task-review
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-ope") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: task-review
+  # key: task-review
+  # --
+  - github: xxx
+
+  ,*** TODO レビューする
+  ,*** TODO コメントをする
+#+end_src
 *** translate
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/translate") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
