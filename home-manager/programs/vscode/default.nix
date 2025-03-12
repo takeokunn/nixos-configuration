@@ -28,13 +28,9 @@
         };
         vim = {
           showmodename = true;
-          leader = "<space>";
+          leader = ",";
           easymotion = true;
           easymotionKeys = "hklyuiopnm,qwertzxcvbasdgjf";
-          easymotionMarkerBackgroundColor = "#E5E9F0";
-          easymotionMarkerForegroundColorOneChar = "#5E81AC";
-          easymotionMarkerForegroundColorTwoCharFirst = "#8FBCBB";
-          easymotionMarkerForegroundColorTwoCharSecond = "#88C0D0";
           easymotionMarkerFontWeight = "bold";
           hlsearch = true;
           useSystemClipboard = true;
