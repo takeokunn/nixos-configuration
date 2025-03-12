@@ -16,6 +16,7 @@
         tamasfe.even-better-toml
         oderwat.indent-rainbow
         mechatroner.rainbow-csv
+        dracula-theme.theme-dracula
       ];
 
       userSettings = {
@@ -25,6 +26,10 @@
             enabled = false;
             renderCharacters = false;
           };
+        };
+        workbench = {
+          colorTheme = "Dracula Theme";
+          sideBar.location = "left";
         };
         vim = {
           showmodename = true;
