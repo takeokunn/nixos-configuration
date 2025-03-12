@@ -17,6 +17,7 @@ let
   sketchybar = import ./sketchybar;
   ssh = import ./ssh;
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
+  vscode = import ./vscode { inherit pkgs; };
 
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
@@ -37,6 +38,7 @@ in
   sketchybar
   ssh
   copilot-language-server
+  vscode
 
   # for window manager
   rofi
