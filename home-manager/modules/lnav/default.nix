@@ -18,6 +18,8 @@ with lib;
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
-    xdg.configFile."lnav/config.json".source = jsonFormat.generate "config.json" cfg.config;
+    xdg.configFile = {
+      "lnav/config.json".source = jsonFormat.generate "config.json" cfg.config;
+    };
   };
 }

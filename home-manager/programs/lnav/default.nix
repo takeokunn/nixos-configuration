@@ -14,6 +14,11 @@
     };
   };
 
+  xdg.configFile."lnav/formats/installed/" = {
+    source = ./formats;
+    recursive = true;
+  };
+
   programs.fish = {
     interactiveShellInit = ''
       set -x MANPAGER "lnav -q"

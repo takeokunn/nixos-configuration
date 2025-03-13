@@ -155,6 +155,10 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
+          "if".app-id = "com.microsoft.VSCode";
+          run = [ "move-node-to-workspace 5" ];
+        }
+        {
           "if".app-id = "com.obsproject.obs-studio";
           run = [ "move-node-to-workspace 7" ];
         }

@@ -1,0 +1,41 @@
+{
+    "laravellogger": {
+        "title": "Laravel logger format",
+        "description": "Log format used by Laravel logger class",
+        "url": "",
+        "regex": {
+            "main": {
+                "pattern": "\\[(?<timestamp>.*)\\]\\s(?<env>\\w+)\\.(?<level>\\w+):(?<body>.*)"
+            }
+        },
+        "timestamp-format": [
+            "%Y-%m-%d %H:%M:%S"
+        ],
+        "level-field": "level",
+        "level": {
+            "critical": "CRITICAL",
+            "error": "ERROR",
+            "warning": "WARNING",
+            "info": "INFO",
+            "debug": "DEBUG"
+        },
+        "value": {
+            "level": {
+                "kind": "string",
+                "identifier": true
+            },
+            "env": {
+                "kind": "string",
+                "identifier": true
+            },
+            "body": {
+                "kind": "string"
+            }
+        },
+        "sample": [
+            {
+                "line": "[2021-11-04 21:25:12] test.DEBUG: A problem occurred"
+            }
+        ]
+    }
+}
