@@ -20,6 +20,10 @@ jobs:
           export LC_ALL=en_US.UTF-8
           nix run nixpkgs#nvfetcher
       - name: Run flake update
+        run: |
+          cd node2nix/
+          nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
+      - name: Run flake update
         run: nix flake update
       - name: Run fmt
         run: nix fmt
