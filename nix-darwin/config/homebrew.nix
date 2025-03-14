@@ -21,6 +21,7 @@
       "aquaskk"
       "chatgpt"
       "cleanshot"
+      "cursor"
       "dracula-xcode"
       "flutter"
       "flutterflow"
@@ -37,6 +38,7 @@
     ];
     masApps = {
       LINE = 539883307;
+      amazon-kindle = 302584613;
     };
   };
 }
