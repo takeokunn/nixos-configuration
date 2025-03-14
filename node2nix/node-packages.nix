@@ -45,10 +45,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.276.0";
+    version = "1.285.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.276.0.tgz";
-      sha512 = "yoAQUbp6/K4AIe+lQDZKM6fvkOeXY75YVqSnnS7ZYPb+ibB2CrnC+4ndqMOWRCDItnKbWpg/o6TkTjZUQPDf4A==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.285.0.tgz";
+      sha512 = "UHX2WTTKN36EN0NY5UUpHxjD56P5vLfxvkpkE8po8fE9PRWBl31VSnU0mYpzzewdoaXReoXhcDg7cAsdT4CyvA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -60,6 +60,24 @@ in
       description = "Your AI pair programmer";
       homepage = "https://github.com/github/copilot-language-server-release";
       license = "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
+    name = "_at_anthropic-ai_slash_claude-code";
+    packageName = "@anthropic-ai/claude-code";
+    version = "0.2.41";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.41.tgz";
+      sha512 = "tbzmDPsD+WQ/KnA92kKpxb3/PEYk1FDbpIMvbzXFuXDONXW66o4seTl4JcpBVtb9zk5wv6srTlB7M9Nn7Tel1A==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Use Claude, Anthropic's AI assistant, right from your terminal. Claude can understand your codebase, edit files, run terminal commands, and handle entire workflows for you.";
+      homepage = "https://github.com/anthropics/claude-code";
+      license = "SEE LICENSE IN README.md";
     };
     production = true;
     bypassCache = true;

@@ -145,23 +145,23 @@
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'electric-pair-mode)
 #+END_SRC
-** coding system
+** TODO coding system
 #+begin_src emacs-lisp :tangle yes
-  ;; coding system
-  (add-hook 'emacs-startup-hook
-            #'(lambda ()
-                (set-default-coding-systems 'utf-8-unix)
-                (prefer-coding-system 'utf-8-unix)
-                (set-selection-coding-system 'utf-8-unix)))
+  ;; ;; coding system
+  ;; (add-hook 'emacs-startup-hook
+  ;;           #'(lambda ()
+  ;;               (set-default-coding-systems 'utf-8-unix)
+  ;;               (prefer-coding-system 'utf-8-unix)
+  ;;               (set-selection-coding-system 'utf-8-unix)))
 
-  ;; prefer-coding-system take effect equally to follows
-  (add-hook 'emacs-startup-hook
-            #'(lambda ()
-                (setq locale-coding-system 'utf-8-unix)
-                (set-buffer-file-coding-system 'utf-8-unix)
-                (set-file-name-coding-system 'utf-8-unix)
-                (set-terminal-coding-system 'utf-8-unix)
-                (set-keyboard-coding-system 'utf-8-unix)))
+  ;; ;; prefer-coding-system take effect equally to follows
+  ;; (add-hook 'emacs-startup-hook
+  ;;           #'(lambda ()
+  ;;               (setq locale-coding-system 'utf-8-unix)
+  ;;               (set-buffer-file-coding-system 'utf-8-unix)
+  ;;               (set-file-name-coding-system 'utf-8-unix)
+  ;;               (set-terminal-coding-system 'utf-8-unix)
+  ;;               (set-keyboard-coding-system 'utf-8-unix)))
 #+end_src
 ** global-auto-revert-mode
 #+begin_src emacs-lisp :tangle yes
