@@ -80,15 +80,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "0e5c78eb8dbc83be2febfbf2ef40145911a964b1";
+    version = "fe28abe5ba3ef98d848c036630abf965b65e9ca8";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "0e5c78eb8dbc83be2febfbf2ef40145911a964b1";
+      rev = "fe28abe5ba3ef98d848c036630abf965b65e9ca8";
       fetchSubmodules = false;
-      sha256 = "sha256-qIWYXnME07kmQATf1MY0QAknif43J/NMkHfF5xNFt0s=";
+      sha256 = "sha256-aVucDi0OVl7YyiwGOtIIq0qbUM5wptTJWfH3GGBB9UM=";
     };
-    date = "2025-03-13";
+    date = "2025-03-15";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";

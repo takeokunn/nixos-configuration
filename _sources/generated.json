@@ -127,7 +127,7 @@
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
-    "date": "2025-03-13",
+    "date": "2025-03-15",
     "extract": null,
     "name": "emacs-copilot-chat",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "0e5c78eb8dbc83be2febfbf2ef40145911a964b1",
-      "sha256": "sha256-qIWYXnME07kmQATf1MY0QAknif43J/NMkHfF5xNFt0s=",
+      "rev": "fe28abe5ba3ef98d848c036630abf965b65e9ca8",
+      "sha256": "sha256-aVucDi0OVl7YyiwGOtIIq0qbUM5wptTJWfH3GGBB9UM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "0e5c78eb8dbc83be2febfbf2ef40145911a964b1"
+    "version": "fe28abe5ba3ef98d848c036630abf965b65e9ca8"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
