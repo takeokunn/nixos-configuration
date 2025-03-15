@@ -145,24 +145,6 @@
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'electric-pair-mode)
 #+END_SRC
-** TODO coding system
-#+begin_src emacs-lisp :tangle yes
-  ;; ;; coding system
-  ;; (add-hook 'emacs-startup-hook
-  ;;           #'(lambda ()
-  ;;               (set-default-coding-systems 'utf-8-unix)
-  ;;               (prefer-coding-system 'utf-8-unix)
-  ;;               (set-selection-coding-system 'utf-8-unix)))
-
-  ;; ;; prefer-coding-system take effect equally to follows
-  ;; (add-hook 'emacs-startup-hook
-  ;;           #'(lambda ()
-  ;;               (setq locale-coding-system 'utf-8-unix)
-  ;;               (set-buffer-file-coding-system 'utf-8-unix)
-  ;;               (set-file-name-coding-system 'utf-8-unix)
-  ;;               (set-terminal-coding-system 'utf-8-unix)
-  ;;               (set-keyboard-coding-system 'utf-8-unix)))
-#+end_src
 ** global-auto-revert-mode
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'global-auto-revert-mode)
@@ -5257,7 +5239,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 ** ellama
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(ellama-transient-main-menu) "ellama" nil t)
+  (autoload-if-found '(ellama-transient-main-menu) "ellama-transient" nil t)
+  (autoload-if-found '(ellama-blueprint-select) "ellama-blueprint" nil t)
+  (autoload-if-found '(ellama-context-prompt-with-context) "ellama-context" nil t)
   (autoload-if-found '(ellama-community-prompts-select-blueprint) "ellama-community-prompts")
 
   (keymap-global-set "C-c e" #'ellama-transient-main-menu)

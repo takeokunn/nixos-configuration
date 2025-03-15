@@ -2,7 +2,7 @@
   services.aerospace = {
     enable = true;
     settings = {
-      start-at-login = false;
+      start-at-login = true;
       enable-normalization-flatten-containers = true;
       enable-normalization-opposite-orientation-for-nested-containers = true;
       accordion-padding = 0;
@@ -169,6 +169,10 @@
         {
           "if".app-id = "com.hnc.Discord";
           run = [ "move-node-to-workspace 8" ];
+        }
+        {
+          "if".app-id = "com.anthropic.claudefordesktop";
+          run = [ "move-node-to-workspace 9" ];
         }
         {
           "if".app-id = "com.openai.chat";

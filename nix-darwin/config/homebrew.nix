@@ -19,7 +19,7 @@
     casks = [
       "android-studio"
       "aquaskk"
-      "chatgpt"
+      "claude"
       "cleanshot"
       "cursor"
       "dracula-xcode"
