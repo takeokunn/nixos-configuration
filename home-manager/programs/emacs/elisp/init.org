@@ -5447,6 +5447,26 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (let ((date (org-read-date nil nil nil "日付を選択してください:")))
       (insert (format-time-string "%Y/%m/%d %a" (org-time-string-to-time date)))))
 #+end_src
+** my/copy-claude-file-to-private
+#+begin_src emacs-lisp
+  (defun my/copy-claude-file-to-private ()
+    "Copy current claude output file to private repository."
+    (interactive)
+    (let* ((file-path (buffer-file-name))
+           (file-name (file-name-nondirectory file-path))
+           (repo-name (projectile-project-name))
+           (file-base (file-name-sans-extension file-name)))
+      (if (and file-path repo-name)
+          (let ((target-dir (expand-file-name (concat "~/ghq/github.com/takeokunn/private/claude/outputs/" repo-name)))
+                (target-file file-name))
+            ;; ディレクトリが存在しない場合は作成
+            (unless (file-directory-p target-dir)
+              (make-directory target-dir t))
+            ;; ファイルをコピー
+            (copy-file file-path (expand-file-name target-file target-dir) t)
+            (message "Copied %s to %s/%s" file-name target-dir target-file))
+        (message "Could not determine project name or file path"))))
+#+end_src
 * Footer
 ** Magic File Name を有効にする
 #+begin_src emacs-lisp :tangle yes

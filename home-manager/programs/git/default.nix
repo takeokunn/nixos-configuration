@@ -38,6 +38,7 @@
       "*.fasl"
       "*~"
       ".DS_Store"
+      ".claude/"
     ];
 
     userName = "takeokunn";

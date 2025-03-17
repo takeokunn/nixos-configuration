@@ -1287,6 +1287,7 @@ $0
   # name: task-develop
   # key: task-develop
   # --
+  - branch: xxx
   - ticket: xxx
   - github: xxx
   - slack: xxx
