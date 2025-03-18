@@ -1294,7 +1294,9 @@ $0
 
   ,*** TODO 要件を確認する
   ,*** TODO 修正する
-  ,*** TODO pull requestを出す
+  ,*** TODO pull requestを出す[0/2]
+  ,**** TODO descriptionを埋める
+  ,**** TODO QA項目を埋める
   ,*** TODO reviewを通す
   ,*** TODO QAを通してmergeする
   ,*** TODO redmineに記述する

@@ -1597,17 +1597,24 @@
 ** LSP
 *** eglot
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(eglot) "eglot" nil t)
+  (autoload-if-found '(eglot-ensure) "eglot" nil t)
 
   (with-eval-after-load 'eglot
     ;; config
     (setopt eglot-events-buffer-size nil)
     (setopt eglot-autoshutdown t)
-    (setopt eglot-extend-to-xref t))
+    (setopt eglot-extend-to-xref t)
+
+    ;; add
+    (add-to-list 'eglot-server-programs
+                 '(typescript-mode . ("deno" "lsp"
+                                      :initializationOptions (:deno (:enable t))))))
 #+end_src
 *** eglot-booster
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eglot-booster-mode) "eglot-booster" nil t)
+
+  (add-hook 'emacs-startup-hook #'eglot-booster-mode)
 #+end_src
 *** lsp-mode
 #+begin_src emacs-lisp :tangle yes
@@ -5218,7 +5225,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'copilot-chat-common
     ;; config
-    (setopt copilot-chat-model "claude-3.7-sonnet")
+    (setopt copilot-chat-model "gpt-4o")
     (setopt copilot-chat-frontend 'shell-maker))
 
   (with-eval-after-load 'copilot-chat-prompts
