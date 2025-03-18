@@ -39,6 +39,7 @@
       "*~"
       ".DS_Store"
       ".claude/"
+      ".dir-locals-2.el"
     ];
 
     userName = "takeokunn";
