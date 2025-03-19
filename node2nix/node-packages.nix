@@ -45,10 +45,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.288.0";
+    version = "1.289.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.288.0.tgz";
-      sha512 = "d27/Nn9+/Oa45yaFO2Hd7JsE+kL++SO5nk9HimqHNQcy4Si5gbLWgxTvgOlysddr3CmQQ4tTNibKj795ZsGXEQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.289.0.tgz";
+      sha512 = "A8MpBgiya18z1KWGbot8Iv8Sw6mgbtys5h+Y/acIKi3L4u+CIclVuk1hvicm7wjJgtSH+YTxtZzsklJmyMKt8Q==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -68,10 +68,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.48";
+    version = "0.2.49";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.48.tgz";
-      sha512 = "Av9EC7oBGSgNzJ8IFyYQnzCURtzmUZb1fRL+4vKJunCF33nCkTW82DEOKsfcj+Z268/Pf8WhXuI/vLbwpMdymw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.49.tgz";
+      sha512 = "65X8dOKwZxohHOk3T3m3udqDC7bMCQJIYcCOA704IH3dM6TvvgJANAYR3rAaIL3/eSOijOFjMUfDWifLNv/OCQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
