@@ -1649,7 +1649,8 @@
     (setopt lsp-idle-delay 0.8)
     (setopt lsp-enable-links nil)
     (setopt lsp-log-io nil)
-    (setopt lsp-file-watch-threshold 20000))
+    (setopt lsp-file-watch-threshold 20000)
+    (setopt lsp-client-packages (delq 'lsp-volar lsp-client-packages)))
 
   (with-eval-after-load 'lsp-diagnostics
     ;; config
@@ -1658,7 +1659,7 @@
   (with-eval-after-load 'lsp-completion
     ;; config
     (setopt lsp-completion-no-cache t)
-    (setopt lsp-prefer-capf t))
+    (setopt lsp-completion-provider :none))
 
   (with-eval-after-load 'lsp-php
     ;; for intelephense
@@ -1676,11 +1677,10 @@
     (setopt lsp-javascript-display-parameter-type-hints t)
     (setopt lsp-javascript-display-parameter-name-hints-when-argument-matches-name t)
     (setopt lsp-javascript-display-property-declaration-type-hints t)
-    (setopt lsp-javascript-display-variable-type-hints t))
+    (setopt lsp-javascript-display-variable-type-hints t)
 
-  (with-eval-after-load 'lsp-completion
-    ;; config
-    (setopt lsp-completion-provider :none))
+    ;; for deno
+    (setopt lsp-clients-deno-enable-unstable t))
 
   (with-eval-after-load 'lsp-ruby
     ;; config
@@ -2766,7 +2766,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 * Cursor
 ** avy
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(avy-goto-char) "avy" nil t)
+  (autoload-if-found '(avy-goto-char avy-process) "avy" nil t)
 
   (keymap-global-set "C-:" #'avy-goto-char)
 
