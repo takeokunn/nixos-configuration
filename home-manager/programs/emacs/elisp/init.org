@@ -416,7 +416,7 @@
 #+end_src
 ** direnv-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(direnv-envrc-mode direnv--enable direnv--disable) "direnv" nil t)
+  (autoload-if-found '(direnv-envrc-mode direnv-allow) "direnv" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.envrc$" . direnv-envrc-mode))
 
