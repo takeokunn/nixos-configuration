@@ -1145,6 +1145,9 @@
   (define-derived-mode typescript-tsx-mode typescript-mode "tsx")
   (add-to-list 'auto-mode-alist '("\\.jsx$" . typescript-tsx-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-tsx-mode))
+
+  ;; for deno
+  (define-derived-mode deno-mode typescript-mode "deno")
 #+END_SRC
 ** typst-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1620,7 +1623,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp lsp-deferred lsp-org lsp-register-client make-lsp-client) "lsp-mode" nil t)
   (autoload-if-found '(lsp-lens-mode lsp-lens-refresh lsp-lens--enable) "lsp-lens" nil t)
-  (autoload-if-found '(lsp-modeline-workspace-status-mode) "lsp-modeline" nil t)
+  (autoload-if-found '(lsp-modeline-workspace-status-mode lsp-modeline-code-actions-mode) "lsp-modeline" nil t)
   (autoload-if-found '(lsp-headerline-breadcrumb-mode) "lsp-headerline" nil t)
   (autoload-if-found '(lsp-diagnostics-mode) "lsp-diagnostics" nil t)
 
@@ -1650,7 +1653,8 @@
     (setopt lsp-enable-links nil)
     (setopt lsp-log-io nil)
     (setopt lsp-file-watch-threshold 20000)
-    (setopt lsp-client-packages (delq 'lsp-volar lsp-client-packages)))
+    (setopt lsp-client-packages (delq 'lsp-volar lsp-client-packages))
+    (setopt lsp-modeline-code-actions-enable nil))
 
   (with-eval-after-load 'lsp-diagnostics
     ;; config
@@ -4726,8 +4730,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'ob-tangle
     ;; advice
-    (advice-add 'org-babel-tangle :before #'org-decrypt-entries)
-    (advice-add 'org-babel-tangle :after #'org-encrypt-entries)
+    ;; (advice-add 'org-babel-tangle :before #'org-decrypt-entries)
+    ;; (advice-add 'org-babel-tangle :after #'org-encrypt-entries)
     (advice-add 'org-babel-tangle :around #'my/advice-disable-buffer-readonly))
 #+end_src
 *** ob-async
@@ -4878,6 +4882,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-src
     (add-to-list 'org-src-lang-modes '("prolog" . pl)))
+#+end_src
+*** ob-deno
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-babel-execute:deno) "ob-deno" nil t)
+
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("deno" . deno)))
 #+end_src
 *** org-nix-shell
 #+begin_src emacs-lisp :tangle yes

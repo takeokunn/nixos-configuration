@@ -54,6 +54,7 @@ with epkgs;
   ob-swift
   ob-elixir
   ob-dart
+  ob-deno
   ob-fsharp
   packages.ob-treesitter
   packages.ob-racket

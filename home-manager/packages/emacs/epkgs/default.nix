@@ -22,6 +22,7 @@ let
   remote_access = import ./packages/remote_access { inherit epkgs pkgs sources; };
   themes = import ./packages/themes { inherit epkgs; };
   search = import ./packages/search { inherit epkgs; };
+  tree-sitter = import ./packages/tree-sitter { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
 in
 ai
@@ -45,4 +46,5 @@ ai
 ++ remote_access
 ++ themes
 ++ search
+++ tree-sitter
 ++ window
