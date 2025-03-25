@@ -127,7 +127,7 @@
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
-    "date": "2025-03-19",
+    "date": "2025-03-25",
     "extract": null,
     "name": "emacs-copilot-chat",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "d379abce9e3f878187a2c7126035caceca560feb",
-      "sha256": "sha256-Yzu9Xubkxzt8KDJi/gRJr+HJ69wZeMPWP22MJa6zAJY=",
+      "rev": "439c8809b69609ad5692890e74da29e5f17fd711",
+      "sha256": "sha256-cCeLBteRPiNMfGFZqPECSsp/NkGJvWXUF/BkWwphWYM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "d379abce9e3f878187a2c7126035caceca560feb"
+    "version": "439c8809b69609ad5692890e74da29e5f17fd711"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
@@ -274,7 +274,7 @@
   },
   "emacs-llm": {
     "cargoLocks": null,
-    "date": "2025-03-22",
+    "date": "2025-03-23",
     "extract": null,
     "name": "emacs-llm",
     "passthru": null,
@@ -286,12 +286,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "1db38147a5af03aff19ab9ceed87b8697ce1315d",
-      "sha256": "sha256-luRGizxESQAk0UfIFHo1w9nh5QkQ3r0FZBN/qawaqI8=",
+      "rev": "8fbb242585a3f06505f237fe597289fc5f1ca308",
+      "sha256": "sha256-aotzsukFF7dkB27ALxErvUzHbR1sx0Z/PlvRrOovQbY=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "1db38147a5af03aff19ab9ceed87b8697ce1315d"
+    "version": "8fbb242585a3f06505f237fe597289fc5f1ca308"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -1147,11 +1147,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "42a003a11e97e85644a10ee624ebe10d6cbbd321",
-      "sha256": "sha256-ubjgE+tT+Py09zNTjzIFN/u38jC58C82yTjTdW73yzY=",
+      "rev": "7f89e228b813a650455cbe169a3b3a3aca07259d",
+      "sha256": "sha256-Vunb/QDlSttcPdSM4F9JDsGqPX+NliEhj9khvbJWrRE=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "42a003a11e97e85644a10ee624ebe10d6cbbd321"
+    "version": "7f89e228b813a650455cbe169a3b3a3aca07259d"
   }
 }
