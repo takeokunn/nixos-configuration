@@ -3336,6 +3336,11 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (autoload-if-found '() "modus-themes" nil t)
 #+end_src
 * Awesome Package
+** Demo
+*** presentation
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(presentation-mode) "presentation" nil t)
+#+end_src
 ** Joke
 *** hacker-typer
 #+begin_src emacs-lisp :tangle yes
@@ -5270,7 +5275,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     (let ((gemma2 (make-llm-ollama :chat-model "gemma2:9b" :embedding-model "gemma2:9b"))
           (codellama (make-llm-ollama :chat-model "codellama:latest" :embedding-model "codellama:latest"))
-          (deepseek (make-llm-ollama :chat-model "deepseek-r1:8b" :embedding-model "deepseek-r1:8b")))
+          (deepseek (make-llm-ollama :chat-model "deepseek-r1:8b" :embedding-model "deepseek-r1:8b"))
+          (llama3 (make-llm-ollama :chat-model "llama3:8b" :embedding-model "llama3:8b")))
       (setopt ellama-provider gemma2)
       (setopt ellama-translation-provider gemma2)
       (setopt ellama-summarization-provider deepseek)
@@ -5278,15 +5284,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (setopt ellama-providers
               `(("gemma2" . ,gemma2)
                 ("codellama" . ,codellama)
-                ("deepseek" . ,deepseek))))
+                ("deepseek" . ,deepseek)
+                ("llama3" . ,llama3))))
 
     ;; advice
-    (advice-add 'ellama-instant
-                :before #'(lambda (&rest _)
-                            (remove-hook 'org-mode-hook #'view-mode)))
-    (advice-add 'ellama-instant
-                :after #'(lambda (&rest _)
-                           (add-hook 'org-mode-hook #'view-mode))))
+    (advice-add 'ellama-instant :around #'my/advice-disable-buffer-readonly))
 #+end_src
 * MyFunc
 ** my/beginning-of-intendation
