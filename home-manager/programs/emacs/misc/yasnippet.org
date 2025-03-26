@@ -2304,6 +2304,18 @@ abstract class ${1:Class} {
     }
   }
 #+end_src
+*** Deno.test
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-mode/deno-test") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: deno-test
+  # key: deno-test
+  # --
+  Deno.test("$1", () => {
+    assertEquals(1, 1);
+    $0
+  });
+#+end_src
+
 ** typescript-tsx-mode/
 *** .yas-parents
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/typescript-tsx-mode/.yas-parents") :mkdirp yes :noweb yes
