@@ -8,9 +8,6 @@ let
 in
 with epkgs;
 [
-  # Demo
-  presentation
-
   # Command
   amx
 
