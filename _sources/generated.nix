@@ -80,15 +80,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "439c8809b69609ad5692890e74da29e5f17fd711";
+    version = "fb789c721e0697e587b8a5bbdd4e46e6104f80bc";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "439c8809b69609ad5692890e74da29e5f17fd711";
+      rev = "fb789c721e0697e587b8a5bbdd4e46e6104f80bc";
       fetchSubmodules = false;
-      sha256 = "sha256-cCeLBteRPiNMfGFZqPECSsp/NkGJvWXUF/BkWwphWYM=";
+      sha256 = "sha256-dga0xe2djg+ZLiyDqKM85uTO9pkkMoVnPpBbsXj3K1Q=";
     };
-    date = "2025-03-25";
+    date = "2025-03-27";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -164,15 +164,15 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "8fbb242585a3f06505f237fe597289fc5f1ca308";
+    version = "14af3e3aae33e8c9320f296bcadfa7ee22517e78";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "8fbb242585a3f06505f237fe597289fc5f1ca308";
+      rev = "14af3e3aae33e8c9320f296bcadfa7ee22517e78";
       fetchSubmodules = false;
-      sha256 = "sha256-aotzsukFF7dkB27ALxErvUzHbR1sx0Z/PlvRrOovQbY=";
+      sha256 = "sha256-xWzaAiKLq2OVAuIbkN+TAVksaXEe0halgnACzzfzKoQ=";
     };
-    date = "2025-03-23";
+    date = "2025-03-26";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -284,15 +284,15 @@
   };
   emacs-ox-typst = {
     pname = "emacs-ox-typst";
-    version = "8f25cf584b764943e94dd715c410eba0835e054e";
+    version = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
     src = fetchFromGitHub {
       owner = "jmpunkt";
       repo = "ox-typst";
-      rev = "8f25cf584b764943e94dd715c410eba0835e054e";
+      rev = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
       fetchSubmodules = false;
-      sha256 = "sha256-UTfEqEmek8bcYQJ/eg1tWpBn+zjQiGO4DvvMIBPIvQQ=";
+      sha256 = "sha256-Anxo/Baju4YfD+EyWqW1x1u2TYkGoDETII220cTIgmM=";
     };
-    date = "2025-03-17";
+    date = "2025-03-26";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
@@ -560,15 +560,15 @@
   };
   vim-fern = {
     pname = "vim-fern";
-    version = "60d9a56380123198fe318c250d29a4a44bb952e9";
+    version = "67a98a1f32706139fa26c6fc1f77a210ade469b3";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-fern";
-      rev = "60d9a56380123198fe318c250d29a4a44bb952e9";
+      rev = "67a98a1f32706139fa26c6fc1f77a210ade469b3";
       fetchSubmodules = false;
-      sha256 = "sha256-QA/Q1rlMbWJJa3IEqjhvf4/2i3RHPirwlwMtMTuKLnQ=";
+      sha256 = "sha256-yXYrZ6yut3ofUTLWyozW6euIP8UWlAskT1tuxEUgPeg=";
     };
-    date = "2025-02-18";
+    date = "2025-03-27";
   };
   vim-fern-renderer-nerdfont = {
     pname = "vim-fern-renderer-nerdfont";
