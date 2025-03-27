@@ -3340,6 +3340,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 *** presentation
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(presentation-mode) "presentation" nil t)
+
+  (add-hook 'emacs-startup-hook #'presentation-mode)
 #+end_src
 ** Joke
 *** hacker-typer
