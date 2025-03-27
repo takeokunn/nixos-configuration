@@ -284,15 +284,15 @@
   };
   emacs-ox-typst = {
     pname = "emacs-ox-typst";
-    version = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
+    version = "8f25cf584b764943e94dd715c410eba0835e054e";
     src = fetchFromGitHub {
       owner = "jmpunkt";
       repo = "ox-typst";
-      rev = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
+      rev = "8f25cf584b764943e94dd715c410eba0835e054e";
       fetchSubmodules = false;
-      sha256 = "sha256-Anxo/Baju4YfD+EyWqW1x1u2TYkGoDETII220cTIgmM=";
+      sha256 = "sha256-UTfEqEmek8bcYQJ/eg1tWpBn+zjQiGO4DvvMIBPIvQQ=";
     };
-    date = "2025-03-26";
+    date = "2025-03-17";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
