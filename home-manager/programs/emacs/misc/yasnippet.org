@@ -1287,6 +1287,7 @@ $0
   # name: task-develop
   # key: task-develop
   # --
+
   - branch: xxx
   - ticket: xxx
   - github: xxx
@@ -1307,6 +1308,7 @@ $0
   # name: task-document
   # key: task-document
   # --
+
   - ticket: xxx
   - github: xxx
   - slack: xxx
@@ -1322,6 +1324,7 @@ $0
   # name: task-ope
   # key: task-ope
   # --
+
   - acc: xxx
   - ticket: xxx
   - slack: xxx
@@ -1335,10 +1338,24 @@ $0
   # name: task-review
   # key: task-review
   # --
+
   - github: xxx
 
   ,*** TODO レビューする
   ,*** TODO コメントをする
+#+end_src
+*** task-blog
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-blog") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: task-blog
+  # key: task-blog
+  # --
+
+  - blog:
+
+  ,*** TODO org-roamでファイルを作る
+  ,*** TODO ブログを書く
+  ,*** TODO 公開する
 #+end_src
 *** translate
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/translate") :mkdirp yes :noweb yes
