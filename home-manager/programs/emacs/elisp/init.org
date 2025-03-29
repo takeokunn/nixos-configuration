@@ -260,6 +260,10 @@
   (setq truncate-lines t)
   (setq truncate-partial-width-windows t)
 #+end_src
+** use-dialog-box off
+#+begin_src emacs-lisp :tangle yes
+  (setq use-dialog-box nil)
+#+end_src
 * Global Keybind
 ** basic
 #+begin_src emacs-lisp :tangle yes
@@ -2220,11 +2224,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 ** xwidges
 #+begin_src emacs-lisp :tangle yes
   (require 'xwidget nil t)
-
-  (with-eval-after-load 'browse-url
-    ;; config
-    (when (fboundp 'xwidget-webkit-browse-url)
-      (setopt browse-url-browser-function #'xwidget-webkit-browse-url)))
 #+end_src
 ** basic
 #+begin_src emacs-lisp :tangle yes
@@ -5229,7 +5228,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'copilot-chat-common
     ;; config
-    (setopt copilot-chat-model "gpt-4o")
+    (setopt copilot-chat-follow t)
     (setopt copilot-chat-frontend 'shell-maker))
 
   (with-eval-after-load 'copilot-chat-prompts
