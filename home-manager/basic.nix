@@ -18,7 +18,10 @@ let
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
   # emacs package
-  emacs = import ./packages/emacs { inherit pkgs sources; };
+  emacs = import ./packages/emacs {
+    inherit (nixpkgs) lib;
+    inherit pkgs sources;
+  };
   emacsPkg = emacs.emacs-stable;
 
   # modules

@@ -2217,6 +2217,15 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (autoload-if-found '(uptimes) "uptimes" nil t)
 #+end_src
 * EWW
+** xwidges
+#+begin_src emacs-lisp :tangle yes
+  (require 'xwidget nil t)
+
+  (with-eval-after-load 'browse-url
+    ;; config
+    (when (fboundp 'xwidget-webkit-browse-url)
+      (setopt browse-url-browser-function #'xwidget-webkit-browse-url)))
+#+end_src
 ** basic
 #+begin_src emacs-lisp :tangle yes
   (defun my/eww-rename-buffer ()
@@ -2232,16 +2241,14 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (with-eval-after-load 'eww
     ;; config
     (setopt eww-header-line-format nil)
-    (setopt eww-search-prefix "http://www.google.co.jp/search?q="))
+    (setopt eww-search-prefix "http://www.google.co.jp/search?q=")
 
-  (with-eval-after-load 'eww
     ;; keybind
     (define-key eww-mode-map (kbd "C") #'eww-set-character-encoding)
     (define-key eww-mode-map (kbd "C-j") #'eww-follow-link)
     (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading)
-    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading))
+    (define-key eww-mode-map (kbd "T") #'eww-goto-title-heading)
 
-  (with-eval-after-load 'eww
     ;; hooks
     (add-hook 'eww-after-render #'my/eww-rename-buffer))
 #+end_src

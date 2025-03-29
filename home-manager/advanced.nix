@@ -21,8 +21,11 @@ let
   advancedPkgs = import ./packages/advanced.nix { inherit pkgs nodePkgs; };
 
   # emacs package
-  emacs = import ./packages/emacs { inherit pkgs sources; };
-  emacsPkg = emacs.emacs-unstable-xwidgets;
+  emacs = import ./packages/emacs {
+    inherit (nixpkgs) lib;
+    inherit pkgs sources;
+  };
+  emacsPkg = emacs.emacs-unstable;
 
   # misc
   misc = import ./misc;
