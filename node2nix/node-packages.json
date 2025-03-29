@@ -1,1 +1,5 @@
-["@github/copilot-language-server", "@anthropic-ai/claude-code"]
+[
+  "@github/copilot-language-server",
+  "@anthropic-ai/claude-code",
+  "@modelcontextprotocol/server-brave-search"
+]
