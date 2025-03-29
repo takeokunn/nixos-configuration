@@ -3615,31 +3615,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'scheme-mode-hook #'rainbow-delimiters-mode-enable))
 #+END_SRC
 ** Common Lisp
-*** slime
+*** sly
 #+begin_src emacs-lisp :tangle yes
-  (with-eval-after-load 'lisp-mode
-    ;; hooks
-    (add-hook 'lisp-mode-hook
-              #'(lambda ()
-                  (require 'slime)
-                  (require 'slime-autoloads)
+  (require 'sly-autoloads)
 
-                  (defun my/slime-history ()
-                    (interactive)
-                    (if (and (fboundp '-distinct)
-                             (fboundp 'f-read-text))
-                        (insert
-                         (completing-read
-                          "choice history: "
-                          (-distinct (read (f-read-text "~/.slime-history.eld"))))))))))
-
-  (with-eval-after-load 'slime
+  (with-eval-after-load 'sly
     ;; config
-    (setopt slime-net-coding-system 'utf-8-unix))
+    (setopt sly-command-switch-to-existing-lisp 'always))
 
-  (with-eval-after-load 'slime-repl
-    ;; keybinds
-    (define-key slime-repl-mode-map (kbd "C-c C-r") #'my/slime-history))
+  (with-eval-after-load 'lisp-mode
+    ;; hook
+    (add-hook 'lisp-data-mode #'(lambda () (view-mode -1))))
 #+END_SRC
 *** hyperspec
 #+begin_src emacs-lisp :tangle yes

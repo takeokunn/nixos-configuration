@@ -1,5 +1,13 @@
 { sources, epkgs }:
 {
+  aio = epkgs.melpaBuild {
+    pname = "aio";
+    version = "0.0.1";
+    src = sources.emacs-aio.src;
+
+    ignoreCompilationError = false;
+  };
+
   copilot = epkgs.melpaBuild {
     pname = "copilot";
     version = "0.0.1";
@@ -19,6 +27,7 @@
     src = sources.emacs-copilot-chat.src;
 
     packageRequires = with epkgs; [
+      aio
       request
       markdown-mode
       chatgpt-shell

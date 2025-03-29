@@ -13,7 +13,11 @@ with epkgs;
   rainbow-delimiters
 
   # Common Lisp
-  slime
+  sly
+  sly-asdf
+  sly-macrostep
+  sly-named-readtables
+  sly-overlay
 
   # Emacs Lisp
   eros

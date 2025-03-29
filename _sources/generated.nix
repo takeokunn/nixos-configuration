@@ -42,6 +42,18 @@
     };
     date = "2022-03-20";
   };
+  emacs-aio = {
+    pname = "emacs-aio";
+    version = "da93523e235529fa97d6f251319d9e1d6fc24a41";
+    src = fetchFromGitHub {
+      owner = "skeeto";
+      repo = "emacs-aio";
+      rev = "da93523e235529fa97d6f251319d9e1d6fc24a41";
+      fetchSubmodules = false;
+      sha256 = "sha256-5jh7UYD6qVo1uLMf1G55xzyODXDQvpIl7C/Tfstf3UI=";
+    };
+    date = "2020-06-10";
+  };
   emacs-bazel-mode = {
     pname = "emacs-bazel-mode";
     version = "769b30dc18282564d614d7044195b5a0c1a0a5f3";
@@ -80,15 +92,15 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "fb789c721e0697e587b8a5bbdd4e46e6104f80bc";
+    version = "c9a6d47f503e9008fb683525d6d0f2269bc89a5b";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "fb789c721e0697e587b8a5bbdd4e46e6104f80bc";
+      rev = "c9a6d47f503e9008fb683525d6d0f2269bc89a5b";
       fetchSubmodules = false;
-      sha256 = "sha256-dga0xe2djg+ZLiyDqKM85uTO9pkkMoVnPpBbsXj3K1Q=";
+      sha256 = "sha256-vqJO1jUNZ7O4t/ivKZeXr9GMa9JQCb7bnVBujlC0M8M=";
     };
-    date = "2025-03-27";
+    date = "2025-03-28";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";

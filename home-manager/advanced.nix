@@ -22,7 +22,7 @@ let
 
   # emacs package
   emacs = import ./packages/emacs { inherit pkgs sources; };
-  emacsPkg = emacs.emacs-unstable;
+  emacsPkg = emacs.emacs-unstable-xwidgets;
 
   # misc
   misc = import ./misc;
