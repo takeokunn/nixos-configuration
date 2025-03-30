@@ -7,4 +7,12 @@ in
     aerospace
     sketchybar
   ];
+
+  services.nextdns = {
+    enable = true;
+    arguments = [
+      "-profile"
+      "2c6735"
+    ];
+  };
 }
