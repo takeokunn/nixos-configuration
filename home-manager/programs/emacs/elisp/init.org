@@ -3631,7 +3631,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'lisp-mode
     ;; hook
-    (add-hook 'lisp-data-mode #'(lambda () (view-mode -1))))
+    (add-hook 'lisp-data-mode-hook #'(lambda () (view-mode -1))))
 #+END_SRC
 *** hyperspec
 #+begin_src emacs-lisp :tangle yes
@@ -5228,7 +5228,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'copilot-chat-common
     ;; config
-    (setopt copilot-chat-follow t)
     (setopt copilot-chat-frontend 'shell-maker))
 
   (with-eval-after-load 'copilot-chat-prompts
