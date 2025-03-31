@@ -71,8 +71,7 @@ src.branch = "main"
 fetch.github = "copilot-emacs/copilot.el"
 
 [emacs-llm]
-src.git = "https://github.com/ahyatt/llm"
-src.branch = "main"
+src.github_tag = "ahyatt/llm"
 fetch.github = "ahyatt/llm"
 
 [emacs-rainbow-csv]
@@ -101,8 +100,7 @@ src.branch = "master"
 fetch.github = "bazelbuild/emacs-bazel-mode"
 
 [emacs-direnv-mode]
-src.git = "https://github.com/wbolster/emacs-direnv"
-src.branch = "main"
+src.github_tag = "wbolster/emacs-direnv"
 fetch.github = "wbolster/emacs-direnv"
 
 [emacs-systemd-mode]
@@ -216,8 +214,7 @@ src.branch = "main"
 fetch.github = "Ziqi-Yang/typst-mode.el"
 
 [emacs-copilot-chat]
-src.git = "https://github.com/chep/copilot-chat.el"
-src.branch = "master"
+src.github_tag = "chep/copilot-chat.el"
 fetch.github = "chep/copilot-chat.el"
 
 [emacs-eglot-booster]
@@ -226,8 +223,7 @@ src.branch = "main"
 fetch.github = "jdtsmith/eglot-booster"
 
 [emacs-aio]
-src.git = "https://github.com/skeeto/emacs-aio"
-src.branch = "master"
+src.github_tag = "skeeto/emacs-aio"
 fetch.github = "skeeto/emacs-aio"
 
 # for neovim

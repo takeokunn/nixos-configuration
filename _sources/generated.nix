@@ -44,15 +44,14 @@
   };
   emacs-aio = {
     pname = "emacs-aio";
-    version = "da93523e235529fa97d6f251319d9e1d6fc24a41";
+    version = "1.0";
     src = fetchFromGitHub {
       owner = "skeeto";
       repo = "emacs-aio";
-      rev = "da93523e235529fa97d6f251319d9e1d6fc24a41";
+      rev = "1.0";
       fetchSubmodules = false;
-      sha256 = "sha256-5jh7UYD6qVo1uLMf1G55xzyODXDQvpIl7C/Tfstf3UI=";
+      sha256 = "sha256-pHyavT7n6ntUnD39CxYmQ1NqU2XjocUy8G5kciQI8vg=";
     };
-    date = "2020-06-10";
   };
   emacs-bazel-mode = {
     pname = "emacs-bazel-mode";
@@ -80,39 +79,37 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "7d105d708a23d16cdfd5240500be8bb02f95a46e";
+    version = "ec2d61ecc679dea951590fbfe297cceee19ce341";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "7d105d708a23d16cdfd5240500be8bb02f95a46e";
+      rev = "ec2d61ecc679dea951590fbfe297cceee19ce341";
       fetchSubmodules = false;
-      sha256 = "sha256-ATIyNAnd1pU82xdGH7+z9zkOcDVJhYhh65QDQ73NiL0=";
+      sha256 = "sha256-QS8Y7opTOXvzMt1R8niOf6WdpxwVE8vA7HbhAfuKTWE=";
     };
-    date = "2025-02-23";
+    date = "2025-03-31";
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "c9a6d47f503e9008fb683525d6d0f2269bc89a5b";
+    version = "v2.0.1";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "c9a6d47f503e9008fb683525d6d0f2269bc89a5b";
+      rev = "v2.0.1";
       fetchSubmodules = false;
-      sha256 = "sha256-vqJO1jUNZ7O4t/ivKZeXr9GMa9JQCb7bnVBujlC0M8M=";
+      sha256 = "sha256-7ACNuOxwLiZw3SRnjZ9fn0ynezrHtKYFXFwMRm4yt/8=";
     };
-    date = "2025-03-28";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
-    version = "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f";
+    version = "2.2.0";
     src = fetchFromGitHub {
       owner = "wbolster";
       repo = "emacs-direnv";
-      rev = "c0bf3b81c7a97e2a0d06d05495e86848254fcc1f";
+      rev = "2.2.0";
       fetchSubmodules = false;
-      sha256 = "sha256-g500rooMfkVX22u/HNELT+rKv0+q51Xg4k4R48fPyKw=";
+      sha256 = "sha256-zDVAd1gJT7ba+F02lT5O+RniKGwONmfrACpRPd+1xTE=";
     };
-    date = "2024-03-14";
   };
   emacs-eglot-booster = {
     pname = "emacs-eglot-booster";
@@ -176,15 +173,14 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "14af3e3aae33e8c9320f296bcadfa7ee22517e78";
+    version = "0.24.2";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "14af3e3aae33e8c9320f296bcadfa7ee22517e78";
+      rev = "0.24.2";
       fetchSubmodules = false;
-      sha256 = "sha256-xWzaAiKLq2OVAuIbkN+TAVksaXEe0halgnACzzfzKoQ=";
+      sha256 = "sha256-wXTanIl6NMSIp6EPZ4U2cj8jWGYeqBGvorHcpb4c6k8=";
     };
-    date = "2025-03-26";
   };
   emacs-mu4e-dashboard = {
     pname = "emacs-mu4e-dashboard";
@@ -644,15 +640,15 @@
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
-    version = "547297bd1e6b8abd8b6ece7e25ed15e67cb41beb";
+    version = "cf385775279c0c7eed3fbebfac1022f1f05ea292";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "547297bd1e6b8abd8b6ece7e25ed15e67cb41beb";
+      rev = "cf385775279c0c7eed3fbebfac1022f1f05ea292";
       fetchSubmodules = false;
-      sha256 = "sha256-Il9d46Cmm57WkkU9nudPsbvKJis76aPR9Kn+s2w2afw=";
+      sha256 = "sha256-DA/k2KxGqxYtyJcnV1g2lLbMtNKBXpPGje5WeYYnbtQ=";
     };
-    date = "2025-03-29";
+    date = "2025-03-30";
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";
@@ -668,14 +664,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "aafee0c7e1927661f50a31631e8e610b7453bc96";
+    version = "1597458583cc3a98ea252752a03e2f2eb83cbeb7";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "aafee0c7e1927661f50a31631e8e610b7453bc96";
+      rev = "1597458583cc3a98ea252752a03e2f2eb83cbeb7";
       fetchSubmodules = false;
-      sha256 = "sha256-lvkpbRQiJZfz0ViUuaoTHqaQRnM2a4LeH6+uZZaC2R8=";
+      sha256 = "sha256-yZSC7T0EPdxVgCK6WGxwsm4f0RJoGBuJma+0eYKLyvc=";
     };
-    date = "2025-03-29";
+    date = "2025-03-31";
   };
 }
