@@ -139,12 +139,12 @@
       "name": null,
       "owner": "copilot-emacs",
       "repo": "copilot.el",
-      "rev": "463ed62b7b00729118e0ab9f1588eea6f6b8e18d",
-      "sha256": "sha256-sgvhb06NGc16bHu5IgNqaTO+kIvZQW/UYm9DetCBXp8=",
+      "rev": "0951cc6444bb89fd7c7adfd986457d9c92d7eac2",
+      "sha256": "sha256-bjwEyAa6JKoYR9xsvZmL3HMfvdgKD9xYMUl3YbX1n4E=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "463ed62b7b00729118e0ab9f1588eea6f6b8e18d"
+    "version": "0951cc6444bb89fd7c7adfd986457d9c92d7eac2"
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
