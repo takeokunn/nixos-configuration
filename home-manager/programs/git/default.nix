@@ -40,6 +40,7 @@
       ".DS_Store"
       ".claude/"
       ".dir-locals-2.el"
+      ".aider*"
     ];
 
     userName = "takeokunn";
