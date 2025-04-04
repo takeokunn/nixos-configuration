@@ -14,4 +14,5 @@ with epkgs;
   packages.plz-event-source
   packages.copilot-chat
   ellama
+  aidermacs
 ]
