@@ -3,7 +3,7 @@ with pkgs;
 [
   # for ai
   ollama
-  aider-chat
+  (aider-chat.withOptional { withAll = true; })
   nodePkgs."@anthropic-ai/claude-code"
   nodePkgs."@modelcontextprotocol/server-brave-search"
 

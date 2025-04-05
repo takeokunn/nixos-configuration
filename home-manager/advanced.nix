@@ -25,7 +25,7 @@ let
     inherit (nixpkgs) lib;
     inherit pkgs sources;
   };
-  emacsPkg = emacs.emacs-unstable;
+  emacsPkg = emacs.emacs-unstable-without-nativecomp;
 
   # misc
   misc = import ./misc;

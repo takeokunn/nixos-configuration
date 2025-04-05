@@ -25,6 +25,22 @@ in
 
   emacs-unstable = pkgs.emacsWithPackagesFromUsePackage {
     config = builtins.toFile "empty.el" "";
+    package = pkgs.emacs-unstable;
+    extraEmacsPackages = import ./epkgs { inherit pkgs sources; };
+    override = override;
+  };
+
+  emacs-unstable-without-nativecomp = pkgs.emacsWithPackagesFromUsePackage {
+    config = builtins.toFile "empty.el" "";
+    package = pkgs.emacs-unstable.override {
+      withNativeCompilation = false;
+    };
+    extraEmacsPackages = import ./epkgs { inherit pkgs sources; };
+    override = override;
+  };
+
+  emacs-unstable-with-widgets = pkgs.emacsWithPackagesFromUsePackage {
+    config = builtins.toFile "empty.el" "";
     package = pkgs.emacs-unstable.overrideAttrs (old: {
       buildInputs =
         old.buildInputs
