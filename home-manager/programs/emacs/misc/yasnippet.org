@@ -1339,6 +1339,7 @@ $0
   # key: task-review
   # --
 
+  - branch: xxx
   - github: xxx
 
   ,*** TODO レビューする

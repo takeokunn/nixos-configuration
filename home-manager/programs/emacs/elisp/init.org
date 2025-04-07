@@ -264,6 +264,14 @@
 #+begin_src emacs-lisp :tangle yes
   (setq use-dialog-box nil)
 #+end_src
+** ediff
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'ediff-wind
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+
+  (with-eval-after-load 'winner
+    (add-hook 'emacs-startup-hook #'winner-mode))
+#+end_src
 * Global Keybind
 ** basic
 #+begin_src emacs-lisp :tangle yes
@@ -5283,7 +5291,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-x C-/" #'aidermacs-transient-menu)
 
   (with-eval-after-load 'aidermacs
-    (setopt aidermacs-watch-files t))
+    (setopt aidermacs-extra-args '("--yes-always"))
+    (setopt aidermacs-use-architect-mode t)
+    (setopt aidermacs-auto-commits t)
+    (setopt aidermacs-watch-files t)
+    (setopt aidermacs-auto-accept-architect t))
 
   (with-eval-after-load 'aidermacs-output
     (setopt aidermacs-show-diff-after-change t))
