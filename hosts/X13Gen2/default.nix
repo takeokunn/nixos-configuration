@@ -16,26 +16,18 @@ nixpkgs.lib.nixosSystem {
   };
 
   modules = [
-    {
-      sops = {
-        defaultSopsFile = ../../secrets/password.yaml;
-        age.sshKeyPaths = [ "/home/take/.ssh/id_ed25519" ];
-        secrets = {
-          home-wifi-psk = { };
-        };
-      };
-    }
     ../../nixos
     ./hardware-configuration.nix
     sops-nix.nixosModules.sops
     home-manager.nixosModules.home-manager
     {
       home-manager.useUserPackages = true;
-      home-manager.users."${username}" = import ../../home-manager/advanced.nix {
+      home-manager.users."${username}" = import ../../home-manager/advanced.nix;
+      extraSpecialArgs = {
         inherit system;
         inherit (inputs) nixpkgs;
         inherit (inputs) mcp-servers-nix;
-        inherit (inputs) org-babel emacs-overlay;
+        inherit (inputs) emacs-overlay org-babel;
       };
     }
   ];

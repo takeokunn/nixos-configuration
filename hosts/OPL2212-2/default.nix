@@ -1,6 +1,11 @@
 { inputs }:
 let
-  inherit (inputs) nix-darwin home-manager nixpkgs;
+  inherit (inputs)
+    nix-darwin
+    home-manager
+    nixpkgs
+    sops-nix
+    ;
   system = "aarch64-darwin";
   pkgs = import nixpkgs { inherit system; };
 
@@ -22,12 +27,16 @@ nix-darwin.lib.darwinSystem {
     ../../nix-darwin
     home-manager.darwinModules.home-manager
     {
-      home-manager.useUserPackages = true;
-      home-manager.users."${username}" = import ../../home-manager/advanced.nix {
-        inherit system;
-        inherit (inputs) nixpkgs;
-        inherit (inputs) mcp-servers-nix;
-        inherit (inputs) emacs-overlay org-babel;
+      home-manager = {
+        useUserPackages = true;
+        sharedModules = [ sops-nix.homeManagerModules.sops ];
+        users."${username}" = import ../../home-manager/advanced.nix;
+        extraSpecialArgs = {
+          inherit system username;
+          inherit (inputs) nixpkgs;
+          inherit (inputs) mcp-servers-nix;
+          inherit (inputs) emacs-overlay org-babel;
+        };
       };
     }
   ];

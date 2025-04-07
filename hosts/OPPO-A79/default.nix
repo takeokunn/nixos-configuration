@@ -12,11 +12,7 @@ nix-on-droid.lib.nixOnDroidConfiguration {
   modules = [ ../../nix-on-droid ];
   pkgs = import nixpkgs { inherit system; };
   extraSpecialArgs = {
-    inherit
-      nixpkgs
-      system
-      org-babel
-      emacs-overlay
-      ;
+    inherit nixpkgs system;
+    inherit org-babel emacs-overlay;
   };
 }

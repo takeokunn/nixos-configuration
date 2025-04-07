@@ -1,9 +1,12 @@
 {
+  config,
   system,
+  username,
   nixpkgs,
   org-babel,
   emacs-overlay,
   mcp-servers-nix,
+  ...
 }:
 let
   # nvfetcher
@@ -50,8 +53,13 @@ let
     inherit pkgs emacsPkg;
   };
 
+  # sops
+  sops = [
+    (import ../sops { inherit username; })
+  ];
+
   # mcp servers
-  mcpServers = import ./mcp-servers { inherit pkgs mcp-servers-nix; };
+  mcpServers = import ./mcp-servers { inherit pkgs config mcp-servers-nix; };
 in
 {
   imports =
@@ -61,6 +69,7 @@ in
     ++ advancedPrograms
     ++ basicServices
     ++ advancedServices
+    ++ sops
     ++ mcpServers;
 
   home.stateVersion = "24.11";
