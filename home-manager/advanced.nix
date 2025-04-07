@@ -3,6 +3,7 @@
   nixpkgs,
   org-babel,
   emacs-overlay,
+  mcp-servers-nix,
 }:
 let
   # nvfetcher
@@ -48,9 +49,19 @@ let
   advancedServices = import ./services/advanced.nix {
     inherit pkgs emacsPkg;
   };
+
+  # mcp servers
+  mcpServers = import ./mcp-servers { inherit pkgs mcp-servers-nix; };
 in
 {
-  imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  imports =
+    misc
+    ++ modules
+    ++ basicPrograms
+    ++ advancedPrograms
+    ++ basicServices
+    ++ advancedServices
+    ++ mcpServers;
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;

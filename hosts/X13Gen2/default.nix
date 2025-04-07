@@ -33,7 +33,9 @@ nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users."${username}" = import ../../home-manager/advanced.nix {
         inherit system;
-        inherit (inputs) nixpkgs org-babel emacs-overlay;
+        inherit (inputs) nixpkgs;
+        inherit (inputs) mcp-servers-nix;
+        inherit (inputs) org-babel emacs-overlay;
       };
     }
   ];

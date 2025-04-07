@@ -469,6 +469,26 @@
         "type": "github"
       }
     },
+    "mcp-servers-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1743964260,
+        "narHash": "sha256-y09nlk3cPazQUu8mVTyaZBGpJ9iOs18jZvQh2DkuLWI=",
+        "owner": "natsukium",
+        "repo": "mcp-servers-nix",
+        "rev": "2f242905643b0b1145def24d66cd1b98ef5bf71f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "natsukium",
+        "repo": "mcp-servers-nix",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -778,6 +798,7 @@
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
+        "mcp-servers-nix": "mcp-servers-nix",
         "nix-darwin": "nix-darwin",
         "nix-on-droid": "nix-on-droid",
         "nixos-hardware": "nixos-hardware",
