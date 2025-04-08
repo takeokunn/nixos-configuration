@@ -1,11 +1,8 @@
 { inputs }:
 let
-  inherit (inputs)
-    nix-darwin
-    home-manager
-    nixpkgs
-    sops-nix
-    ;
+  inherit (inputs) nix-darwin home-manager;
+  inherit (inputs) nixpkgs sops-nix;
+
   system = "aarch64-darwin";
   pkgs = import nixpkgs { inherit system; };
 

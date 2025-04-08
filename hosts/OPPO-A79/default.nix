@@ -1,11 +1,7 @@
 { inputs }:
 let
-  inherit (inputs)
-    nixpkgs
-    nix-on-droid
-    org-babel
-    emacs-overlay
-    ;
+  inherit (inputs) nixpkgs nix-on-droid;
+  inherit (inputs) org-babel emacs-overlay;
   system = "aarch64-linux";
 in
 nix-on-droid.lib.nixOnDroidConfiguration {

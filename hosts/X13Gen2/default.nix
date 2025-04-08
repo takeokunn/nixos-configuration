@@ -1,11 +1,8 @@
 { inputs }:
 let
-  inherit (inputs)
-    nixpkgs
-    xremap
-    sops-nix
-    home-manager
-    ;
+  inherit (inputs) nixpkgs xremap;
+  inherit (inputs) sops-nix home-manager;
+
   username = "take";
   system = "x86_64-linux";
 in
@@ -22,6 +19,7 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
     {
       home-manager.useUserPackages = true;
+      sharedModules = [ sops-nix.homeManagerModules.sops ];
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
       extraSpecialArgs = {
         inherit system;

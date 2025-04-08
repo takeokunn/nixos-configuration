@@ -1,7 +1,6 @@
 {
   config,
   system,
-  username,
   nixpkgs,
   org-babel,
   emacs-overlay,
