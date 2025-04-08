@@ -2,9 +2,12 @@
 {
   sops = {
     defaultSopsFile = ./password.yaml;
-    age.sshKeyPaths = [
-      "/Users/${username}/.ssh/id_ed25519"
-    ];
+    defaultSopsFormat = "yaml";
+    gnupg = {
+      sshKeyPaths = [
+        "/Users/${username}/.ssh/id_ed25519.pub"
+      ];
+    };
     secrets = {
       home-wifi-psk = { };
       brave-api-token = { };
