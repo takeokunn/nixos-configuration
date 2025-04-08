@@ -1,9 +1,9 @@
-{ username }:
+{ homeDirectory }:
 {
   sops = {
     defaultSopsFile = ./password.yaml;
     gnupg = {
-      home = "/Users/${username}/.gnupg";
+      home = "${homeDirectory}/.gnupg";
     };
     secrets = {
       home-wifi-psk = { };

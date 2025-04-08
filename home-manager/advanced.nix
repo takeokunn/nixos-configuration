@@ -55,7 +55,9 @@ let
 
   # sops
   sops = [
-    (import ../sops { inherit username; })
+    (import ../sops {
+      homeDirectory = config.home.homeDirectory;
+    })
   ];
 
   # mcp servers
