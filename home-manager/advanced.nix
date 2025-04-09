@@ -61,12 +61,8 @@ let
 
   # mcp servers
   mcpServers = import ./mcp-servers {
-    inherit
-      pkgs
-      config
-      mcp-servers-nix
-      nodePkgs
-      ;
+    inherit pkgs nodePkgs;
+    inherit config mcp-servers-nix;
   };
 in
 {
