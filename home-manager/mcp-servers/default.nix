@@ -22,6 +22,24 @@ let
         "10"
       ];
     };
+
+    servers.sitemcp-awesome-yasunori = {
+      command = "${nodePkgs."sitemcp"}/bin/sitemcp";
+      args = [
+        "https://awesome.yasunori.dev/"
+        "--concurrency"
+        "10"
+      ];
+    };
+
+    servers.sitemcp-openlogi-faq = {
+      command = "${nodePkgs."sitemcp"}/bin/sitemcp";
+      args = [
+        "https://help.openlogi.com"
+        "--concurrency"
+        "10"
+      ];
+    };
   };
 in
 [
