@@ -2,6 +2,7 @@
   pkgs,
   config,
   mcp-servers-nix,
+  nodePkgs,
 }:
 let
   programs = {
@@ -13,9 +14,13 @@ let
     };
   };
   settings = {
-    servers.sitemcp = {
-      command = "${pkgs.lib.getExe' pkgs.nodejs "npx"}";
-      args = [ "sitemcp" ];
+    servers.sitemcp-takeokunn-org = {
+      command = "${nodePkgs."sitemcp"}/bin/sitemcp";
+      args = [
+        "https://www.takeokunn.org/"
+        "--concurrency"
+        "10"
+      ];
     };
   };
 in
