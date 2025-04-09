@@ -316,15 +316,15 @@
   };
   emacs-pinentry = {
     pname = "emacs-pinentry";
-    version = "77991a491f3fc4673dfdd959ba6b4c9b0111150f";
+    version = "0079964a1dde954ccb2ce8a28613d8020c549a36";
     src = fetchFromGitHub {
       owner = "ueno";
       repo = "pinentry-el";
-      rev = "77991a491f3fc4673dfdd959ba6b4c9b0111150f";
+      rev = "0079964a1dde954ccb2ce8a28613d8020c549a36";
       fetchSubmodules = false;
-      sha256 = "sha256-IEVvu9/G0Nl0CH8e+Vj+KRWvtUxKMMAMgz+2NhftTsY=";
+      sha256 = "sha256-3ssN2dfGwynWd0J+F3aS4SDEADDqpgkRACWBE49/HMU=";
     };
-    date = "2024-11-23";
+    date = "2025-04-08";
   };
   emacs-plz-event-source = {
     pname = "emacs-plz-event-source";
