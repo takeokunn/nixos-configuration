@@ -79,15 +79,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "bb517382be5d0dc673f9381e9c2a0956dfc9dc45";
+    version = "3e36a9825616e756f16c7c6a33f4edd5fb466260";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "bb517382be5d0dc673f9381e9c2a0956dfc9dc45";
+      rev = "3e36a9825616e756f16c7c6a33f4edd5fb466260";
       fetchSubmodules = false;
-      sha256 = "sha256-OKjaeZaixOe0t2eZOoKQkhvH6eTN020lR1UxkGnH3pU=";
+      sha256 = "sha256-bMLQZH30TrHs0LppxEsANwMUbZhOmpByu2/xCqkKIDI=";
     };
-    date = "2025-04-04";
+    date = "2025-04-10";
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
@@ -664,14 +664,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "3d2db8d052181c6f3e39dfdbe5003a1bbda6b3e9";
+    version = "c862cfe1bc974172ce00bc967d5e45f4512e1da3";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "3d2db8d052181c6f3e39dfdbe5003a1bbda6b3e9";
+      rev = "c862cfe1bc974172ce00bc967d5e45f4512e1da3";
       fetchSubmodules = false;
-      sha256 = "sha256-rHiQ8yaLw6Yx/R20fsE98/nOZXNkXj8wZJJAg2r4lxk=";
+      sha256 = "sha256-8CuDDKQui8MC84rWHHYuSlqlHvAo882w/c2FXwZCAnU=";
     };
-    date = "2025-04-07";
+    date = "2025-04-10";
   };
 }
