@@ -41,6 +41,7 @@
       ".claude/"
       ".dir-locals-2.el"
       ".aider*"
+      "TAGS"
     ];
 
     userName = "takeokunn";
