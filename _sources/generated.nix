@@ -568,15 +568,15 @@
   };
   vim-fern = {
     pname = "vim-fern";
-    version = "67a98a1f32706139fa26c6fc1f77a210ade469b3";
+    version = "c02752d58fa934702905c3abeb4d9d260402cd29";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-fern";
-      rev = "67a98a1f32706139fa26c6fc1f77a210ade469b3";
+      rev = "c02752d58fa934702905c3abeb4d9d260402cd29";
       fetchSubmodules = false;
-      sha256 = "sha256-yXYrZ6yut3ofUTLWyozW6euIP8UWlAskT1tuxEUgPeg=";
+      sha256 = "sha256-Bwq6yMctme8CRq8RJeb6hSgMZFCwUd1r7kxL6ODnf+U=";
     };
-    date = "2025-03-27";
+    date = "2025-04-11";
   };
   vim-fern-renderer-nerdfont = {
     pname = "vim-fern-renderer-nerdfont";
