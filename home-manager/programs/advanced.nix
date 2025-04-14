@@ -9,7 +9,7 @@ let
   gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };
   lnav = import ./lnav { inherit pkgs; };
-  mu = import ./mu;
+  mu = import ./mu { inherit pkgs; };
   nix-index = import ./nix-index;
   nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap;
