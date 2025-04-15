@@ -1,4 +1,5 @@
-{ pkgs }: {
+{ pkgs }:
+{
   programs.mu = {
     enable = true;
     package = pkgs.mu;
