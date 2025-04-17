@@ -21,13 +21,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.9.0" = {
+    "@modelcontextprotocol/sdk-1.10.0" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.9.0";
+      version = "1.10.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.9.0.tgz";
-        sha512 = "Jq2EUCQpe0iyO5FGpzVYDNFR6oR53AIrwph9yWl7uSc7IWUMsrmpmSaTGra5hQNunXpM+9oit85p924jWuHzUA==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.10.0.tgz";
+        sha512 = "wijOavYZfSOADbVM0LA7mrQ17N4IKNdFcfezknCCsZ1Y1KstVWlkDZ5ebcxuQJmqTTxsNjBHLc7it1SV0TBiPg==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -1110,7 +1110,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.9.0"
+      sources."@modelcontextprotocol/sdk-1.10.0"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."body-parser-2.2.0"
