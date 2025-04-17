@@ -1062,10 +1062,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.303.0";
+    version = "1.304.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.303.0.tgz";
-      sha512 = "ldELj7+YsJeUKcwU8FiMX5XJDpBWYlyEyGGYEgiZC5VojhrHifp2eoGodsI/CiJY8Kt6arKMwhVYCovKrtoFRA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.304.0.tgz";
+      sha512 = "XTgfbxq63l+D35/H4k6QPVBuCvw3aaVwrXfppXiRZlAGgHxDhdXnuxuucQ2dVpsUsot++6LTDBkB09EmOLcjhA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1085,10 +1085,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.70";
+    version = "0.2.72";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.70.tgz";
-      sha512 = "OwwTPIjnz2O36yaby/7kYu/94bG2AZaRvZ8BfWdDHMbGhRO+MxpEVjwy9E5mIWKv0y5IgZljqg+mfxAqghoMpQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.72.tgz";
+      sha512 = "46h1S1/ZA7ktx4kwIY2VWZmSL3wMqPrWGYDhcS8kieelxOx4u8dLxLs1einVCmNB5Jgsr3Tz9YLF69NRnEUvlg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1103,10 +1103,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.3.3";
+    version = "0.3.5";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.3.3.tgz";
-      sha512 = "KSt35kTUOHtJ6y822bzI++Z18/jr90Eg46wA0ez7f4s9Y2Etdw5OtQL7C8Z3Ak4AIg0/wCNqs/dlprEwcoiRzw==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.3.5.tgz";
+      sha512 = "VljLgxlLN+HwrA44+iLAm5xxUxpb1oXRm2MWDweIfprzR7iFhBNDv4CNgk7V/4lfMPjzBp7NJDE7Suv7kvdJ1w==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
