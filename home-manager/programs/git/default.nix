@@ -42,6 +42,7 @@
       ".dir-locals-2.el"
       ".aider*"
       "TAGS"
+      ".neotree"
     ];
 
     userName = "takeokunn";
