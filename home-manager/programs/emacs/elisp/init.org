@@ -4410,7 +4410,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     ;; keybind
     (add-to-list 'org-speed-commands '("d" org-todo "DONE"))
-    (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading)))
+    (add-to-list 'org-speed-commands '("j" call-interactively #'consult-org-heading))
+    (add-to-list 'org-speed-commands '("$" call-interactively #'org-archive-subtree)))
 #+end_src
 *** org-capture
 #+begin_src emacs-lisp :tangle yes
