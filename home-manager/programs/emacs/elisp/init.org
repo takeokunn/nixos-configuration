@@ -5498,6 +5498,41 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
             (message "Copied %s to %s/%s" file-name target-dir target-file))
         (message "Could not determine project name or file path"))))
 #+end_src
+** my/copy-projectile-github-url
+#+begin_src emacs-lisp
+  (defun my/copy-projectile-github-url ()
+    "Copy the GitHub URL of the current line in the current Projectile project."
+    (interactive)
+    (unless (projectile-project-p)
+      (error "Not in a Projectile project"))
+    (let* ((project-root (projectile-project-root))
+           (file-path (file-relative-name (buffer-file-name) project-root))
+           (line-number (line-number-at-pos))
+           (remote-url (string-trim (shell-command-to-string "git config --get remote.origin.url")))
+           (branch (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD")))
+           (https-remote
+            (cond
+             ;; ssh://git@github.com/ORG/REPO
+             ((string-match "^ssh://git@\\(.*?\\)/\\(.*\\)$" remote-url)
+              (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
+             ;; git@github.com:ORG/REPO.git
+             ((string-match "^git@\\(.*?\\):\\(.*\\)$" remote-url)
+              (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
+             (t remote-url)))
+           (https-remote (replace-regexp-in-string "\\.git$" "" https-remote))
+           (url (format "%s/blob/%s/%s#L%d"
+                        https-remote branch file-path line-number)))
+      (kill-new url)
+      (message "Copied to clipboard: %s" url)))
+#+end_src
+** my/copy-projectile-relative-path
+#+begin_src emacs-lisp
+  (defun my/copy-projectile-relative-path ()
+    (interactive)
+    (let ((url (string-remove-prefix (projectile-project-root) buffer-file-name)))
+      (kill-new url)
+      (message "Copied to clipboard: %s" url)))
+#+end_src
 * Footer
 ** Magic File Name を有効にする
 #+begin_src emacs-lisp :tangle yes
