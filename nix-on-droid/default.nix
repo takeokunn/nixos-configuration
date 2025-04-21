@@ -2,8 +2,6 @@
   nixpkgs,
   pkgs,
   system,
-  org-babel,
-  emacs-overlay,
   ...
 }:
 {
@@ -20,7 +18,6 @@
     useGlobalPkgs = true;
     config = import ../home-manager/basic.nix {
       inherit system nixpkgs;
-      inherit org-babel emacs-overlay;
     };
   };
 }

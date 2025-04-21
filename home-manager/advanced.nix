@@ -12,8 +12,8 @@ let
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
-  basicOverlay = import ./overlay/basic.nix { inherit emacs-overlay; };
-  advancedOverlay = import ./overlay/advanced.nix;
+  basicOverlay = import ./overlay/basic.nix;
+  advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
@@ -39,11 +39,11 @@ let
   # programs
   basicPrograms = import ./programs/basic.nix {
     inherit pkgs sources;
-    inherit org-babel emacsPkg;
   };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
     inherit pkgs nodePkgs sources;
+    inherit org-babel emacsPkg;
   };
 
   # services

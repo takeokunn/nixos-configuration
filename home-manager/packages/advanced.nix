@@ -3,7 +3,9 @@ with pkgs;
 [
   # for ai
   ollama
-  (aider-chat.withOptional { withAll = true; })
+  (aider-chat.overrideAttrs (old: {
+    doCheck = false;
+  }))
   nodePkgs."@anthropic-ai/claude-code"
 
   # for web service

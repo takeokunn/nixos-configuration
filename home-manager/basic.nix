@@ -1,15 +1,13 @@
 {
   system,
   nixpkgs,
-  org-babel,
-  emacs-overlay,
 }:
 let
   # nvfetcher
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
-  basicOverlay = import ./overlay/basic.nix { inherit emacs-overlay; };
+  basicOverlay = import ./overlay/basic.nix;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
@@ -17,20 +15,12 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
 
-  # emacs package
-  emacs = import ./packages/emacs {
-    inherit (nixpkgs) lib;
-    inherit pkgs sources;
-  };
-  emacsPkg = emacs.emacs-stable;
-
   # modules
   modules = import ./modules;
 
   # programs
   basicPrograms = import ./programs/basic.nix {
     inherit pkgs sources;
-    inherit org-babel emacsPkg;
   };
 
   # services
