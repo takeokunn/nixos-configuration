@@ -428,8 +428,9 @@
 #+end_src
 ** direnv-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(direnv-envrc-mode direnv-allow) "direnv" nil t)
+  (autoload-if-found '(direnv-envrc-mode direnv-mode direnv-allow) "direnv" nil t)
 
+  (add-hook 'emacs-startup-hook #'direnv-mode)
   (add-to-list 'auto-mode-alist '("\\.envrc$" . direnv-envrc-mode))
 
   (with-eval-after-load 'direnv
@@ -3635,6 +3636,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'sly
     ;; config
+    (setopt inferior-lisp-program "sbcl")
     (setopt sly-command-switch-to-existing-lisp 'always))
 
   (with-eval-after-load 'lisp-mode
