@@ -267,7 +267,7 @@
 ** ediff
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ediff-wind
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+    (setopt ediff-window-setup-function 'ediff-setup-windows-plain))
 
   (with-eval-after-load 'winner
     (add-hook 'emacs-startup-hook #'winner-mode))
@@ -1424,6 +1424,7 @@
   (add-hook 'emacs-startup-hook #'global-git-commit-mode)
 
   (keymap-global-set "C-x g" #'my/magit-status)
+  (keymap-global-set "C-x C-g" #'my/magit-status)
   (keymap-global-set "C-x G" #'magit-blame)
 
   (defun my/magit-status ()
