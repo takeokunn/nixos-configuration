@@ -2658,7 +2658,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (advice-add 'projectile-switch-project :before #'my/update-projectile-known-projects)
 
     ;; keybind
-    (keymap-global-set "M-p" #'projectile-command-map)
     (keymap-global-set "C-x p" #'projectile-command-map)
     (keymap-global-set "C-x C-p" #'projectile-command-map)
 
