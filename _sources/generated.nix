@@ -79,15 +79,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "229d8544834a8d446ec9747102ad160280a65620";
+    version = "6c8ad4e4b65f5eec026325db2ac5a0aaedd8b22c";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "229d8544834a8d446ec9747102ad160280a65620";
+      rev = "6c8ad4e4b65f5eec026325db2ac5a0aaedd8b22c";
       fetchSubmodules = false;
-      sha256 = "sha256-1OJwP0xoxAgleaxUGcCrlfHvo0Bqzf+tEH6jOwRBZ6c=";
+      sha256 = "sha256-y47yC8+8KnGCCpynTYfer8Hww221/MpyL9mPrAAkOXc=";
     };
-    date = "2025-04-17";
+    date = "2025-04-23";
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
@@ -208,15 +208,15 @@
   };
   emacs-ob-phpstan = {
     pname = "emacs-ob-phpstan";
-    version = "c77355e70703affffb166b7100b9e9f3efb21c6e";
+    version = "8846475a2fb1b7e72d7cd49ec8b76c1292fb0e96";
     src = fetchFromGitHub {
       owner = "emacs-php";
       repo = "ob-phpstan";
-      rev = "c77355e70703affffb166b7100b9e9f3efb21c6e";
+      rev = "8846475a2fb1b7e72d7cd49ec8b76c1292fb0e96";
       fetchSubmodules = false;
-      sha256 = "sha256-UTWlpszxXC1sue6E72bIeL+1NKzJ+VC1WQBXOZD0mwI=";
+      sha256 = "sha256-/t1wCV5S02crJylg7btzf78q1Eieq5KTP7hJpi+lkRY=";
     };
-    date = "2024-03-27";
+    date = "2025-04-22";
   };
   emacs-ob-racket = {
     pname = "emacs-ob-racket";
@@ -352,15 +352,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "c005ea8c031d2f3917a378a02b6e352caff2f983";
+    version = "30f0313833e84c1f417b4b84e6d37924e3d4eaab";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "c005ea8c031d2f3917a378a02b6e352caff2f983";
+      rev = "30f0313833e84c1f417b4b84e6d37924e3d4eaab";
       fetchSubmodules = false;
-      sha256 = "sha256-bKuL87/vqXtepB+h/kjsJw6jD95NUzf/k9FhE7Y8a18=";
+      sha256 = "sha256-LZ1ZX/ls+4KVaUzZlWLVIaXjUDHoZbmRE06lr1BG+vc=";
     };
-    date = "2025-02-26";
+    date = "2025-04-22";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
@@ -664,14 +664,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "27a5fc928f0f5191ee8088c4671d1381b22c21c3";
+    version = "0a4b5f636270b1720351c2c9378f659853c09e47";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "27a5fc928f0f5191ee8088c4671d1381b22c21c3";
+      rev = "0a4b5f636270b1720351c2c9378f659853c09e47";
       fetchSubmodules = false;
-      sha256 = "sha256-3+wr6r4/BIEFUF/ktbfjBtI0AxaOV7useneEsQNJLkM=";
+      sha256 = "sha256-NBBLzzN0qqYwzf0i2sv9GOGq2gTI9fr6v3UyHtSZsdA=";
     };
-    date = "2025-04-21";
+    date = "2025-04-22";
   };
 }

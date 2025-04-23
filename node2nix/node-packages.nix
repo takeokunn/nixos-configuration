@@ -21,13 +21,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.10.1" = {
+    "@modelcontextprotocol/sdk-1.10.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.10.1";
+      version = "1.10.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.10.1.tgz";
-        sha512 = "xNYdFdkJqEfIaTVP1gPKoEvluACHZsHZegIoICX8DM1o6Qf3G5u2BQJHmgd0n4YgRPqqK/u1ujQvrgAxxSJT9w==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.10.2.tgz";
+        sha512 = "rb6AMp2DR4SN+kc6L1ta2NCpApyA9WYNx3CrTSZvGxq9wH71bRur+zRqPfg0vQ9mjywR7qZdX2RGHOPq3ss+tA==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -289,6 +289,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/entities/-/entities-4.5.0.tgz";
         sha512 = "V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==";
+      };
+    };
+    "entities-6.0.0" = {
+      name = "entities";
+      packageName = "entities";
+      version = "6.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/entities/-/entities-6.0.0.tgz";
+        sha512 = "aKstq2TDOndCn4diEyp9Uq/Flu2i1GlLkc6XIDQSDMuaFE3OPW5OphLCyQ5SpSJZTb4reN+kTcYru5yIfXoRPw==";
       };
     };
     "es-define-property-1.0.1" = {
@@ -660,13 +669,13 @@ let
         sha512 = "lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==";
       };
     };
-    "parse5-7.2.1" = {
+    "parse5-7.3.0" = {
       name = "parse5";
       packageName = "parse5";
-      version = "7.2.1";
+      version = "7.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/parse5/-/parse5-7.2.1.tgz";
-        sha512 = "BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==";
+        url = "https://registry.npmjs.org/parse5/-/parse5-7.3.0.tgz";
+        sha512 = "IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==";
       };
     };
     "parse5-htmlparser2-tree-adapter-7.1.0" = {
@@ -1085,10 +1094,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.76";
+    version = "0.2.78";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.76.tgz";
-      sha512 = "O/Wl5skIOp+BuaxGoQJiMEu3Ovo4/LxivLwDFwcH/I1LSQxt4fn5D4j1hMKBOFNDLKsVY3vZdMHSHYgw2gzQZQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.78.tgz";
+      sha512 = "kXjjTYKTp6rG7Vis8ryC4tRNij+jO75zG7y6ymotTFMTuZljGcG07daO8KuGHBz8ZGAxnzWbEQqTB7gkZ2/0HA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1103,14 +1112,14 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.3.6";
+    version = "0.4.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.3.6.tgz";
-      sha512 = "9by0U8rq2mTbGGAJ4x8ETAH/7ItZkWU7RFt0D+SWgBAl4KvuIEarowkX35cNXmVNZbAuzB3jQTUh0ZQiSUmEhQ==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.1.tgz";
+      sha512 = "a7u3haYMeel5PZPleTXy+fUQZLps8DMLmA7qkvk1jSlzfQRO94QisfLnbnEFtypODLrIa3vV/m45iUkTGZeQNA==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.10.1"
+      sources."@modelcontextprotocol/sdk-1.10.2"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."body-parser-2.2.0"
@@ -1188,7 +1197,14 @@ in
       sources."object-inspect-1.13.4"
       sources."on-finished-2.4.1"
       sources."once-1.4.0"
-      sources."parse5-7.2.1"
+      (
+        sources."parse5-7.3.0"
+        // {
+          dependencies = [
+            sources."entities-6.0.0"
+          ];
+        }
+      )
       sources."parse5-htmlparser2-tree-adapter-7.1.0"
       sources."parse5-parser-stream-7.1.2"
       sources."parseurl-1.3.3"
