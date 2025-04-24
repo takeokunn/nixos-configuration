@@ -2736,7 +2736,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key writeroom-mode-map (kbd "C-M-=") #'writeroom-adjust-width)
 
     ;; config
-    (setq writeroom-width 150))
+    (setopt writeroom-width 150))
 #+end_src
 ** zoom-window
 #+begin_src emacs-lisp :tangle yes
@@ -2773,14 +2773,14 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key tab-prefix-map (kbd "r") #'my/tab-bar-rename-tab)
 
     ;; config
-    (setq tab-bar-close-button-show nil)
-    (setq tab-bar-close-last-tab-choice nil)
-    (setq tab-bar-close-tab-select 'left)
-    (setq tab-bar-history-mode nil)
-    (setq tab-bar-new-tab-choice "*scratch*")
-    (setq tab-bar-new-button-show nil)
-    (setq tab-bar-tab-name-truncated-max 12)
-    (setq tab-bar-separator " | ")
+    (setopt tab-bar-close-button-show nil)
+    (setopt tab-bar-close-last-tab-choice nil)
+    (setopt tab-bar-close-tab-select 'left)
+    (setopt tab-bar-history-mode nil)
+    (setopt tab-bar-new-tab-choice "*scratch*")
+    (setopt tab-bar-new-button-show nil)
+    (setopt tab-bar-tab-name-truncated-max 12)
+    (setopt tab-bar-separator " | ")
 
     ;; advice
     ;; close neotree when tab bar action
@@ -5048,25 +5048,25 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'org-roam-capture
     ;; config
     (setopt org-roam-capture-templates '(("f" "Fleeting(一時メモ)" plain "%?"
-                                          :target (file+head "org/fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("l" "Literature(文献)" plain "%?"
-                                          :target (file+head "org/literature/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/literature/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("p" "Permanent(記事)" plain "%?"
-                                          :target (file+head "org/permanent/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/permanent/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("d" "Diary(日記)" plain "%?"
-                                          :target (file+head "org/diary/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/diary/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("z" "Zenn" plain "%?"
-                                          :target (file+head "org/zenn/articles/%<%Y%m%d%H%M%S>.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "zenn/org/articles/%<%Y%m%d%H%M%S>.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("m" "Private" plain "%?"
-                                          :target (file+head "org/private/%<%Y%m%d%H%M%S>.org.gpg" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/private/%<%Y%m%d%H%M%S>.org.gpg" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
                                          ("o" "Poem" plain "%?"
-                                          :target (file+head "org/poem/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
+                                          :target (file+head "hugo/org/poem/%<%Y%m%d%H%M%S>-${slug}.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t))))
 #+end_src
 *** org-roam-dailies
