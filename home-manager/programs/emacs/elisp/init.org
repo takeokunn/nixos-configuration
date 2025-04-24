@@ -2665,6 +2665,10 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; config
     (setopt projectile-switch-project-action 'projectile-dired)
     (setopt projectile-use-git-grep t))
+
+
+  (with-eval-after-load 'window
+    (add-hook 'window-buffer-change-functions #'my/tab-bar-rename-tab))
 #+end_src
 ** consult-projectile
 #+begin_src emacs-lisp :tangle yes
@@ -2749,7 +2753,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (autoload-if-found '(tab-bar-mode
                        tab-bar-history-mode
                        tab-previous
-                       tab-next) "tab-bar" nil t)
+                       tab-next
+                       tab-bar-rename-tab) "tab-bar" nil t)
 
   (add-hook 'emacs-startup-hook #'tab-bar-history-mode)
 
@@ -2757,6 +2762,10 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "M-[" #'tab-previous)
   (keymap-global-set "M-]" #'tab-next)
 
+  (defun my/tab-bar-rename-tab ()
+    (interactive)
+    (let ((proj-name (projectile-project-name)))
+      (tab-bar-rename-tab proj-name)))
 
   (with-eval-after-load 'tab-bar
     ;; rename tab-bar with projectile
@@ -2776,13 +2785,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; close neotree when tab bar action
     (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
     (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
-    (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide)))
-
-    ;; function
-    (defun my/tab-bar-rename-tab ()
-      (interactive)
-      (let ((proj-name (projectile-project-name)))
-        (tab-bar-rename-tab proj-name))))
+    (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide))))
 #+end_src
 * Cursor
 ** avy
