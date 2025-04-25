@@ -4014,7 +4014,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        phpunit-group) "phpunit" nil t)
 
   (with-eval-after-load 'php-mode
-    (keymap-set php-mode-map "C-c ;" #'phpunit-current-test))
+    (keymap-set php-mode-map "C-c ;" #'phpunit-current-test)
+    (keymap-set php-mode-map "C-c C-;" #'phpunit-current-test))
 #+end_src
 ** Markdown
 *** poly-markdown
