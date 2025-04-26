@@ -1424,7 +1424,6 @@
   (add-hook 'emacs-startup-hook #'global-git-commit-mode)
 
   (keymap-global-set "C-x g" #'my/magit-status)
-  (keymap-global-set "C-x C-g" #'my/magit-status)
   (keymap-global-set "C-x G" #'magit-blame)
 
   (defun my/magit-status ()
