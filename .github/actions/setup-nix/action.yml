@@ -1,10 +1,8 @@
 name: Run setup-nix
 description: Set up Nix environment for GitHub Actions
-
 inputs:
   cachix-auth-token:
     required: true
-
 runs:
   using: composite
   steps:
@@ -14,4 +12,4 @@ runs:
     - uses: cachix/cachix-action@v14
       with:
         name: nixos-configuration
-        authToken: '${{ inputs.cachix-auth-token }}'
+        authToken: "${{ inputs.cachix-auth-token }}"
