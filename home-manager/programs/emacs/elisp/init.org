@@ -3884,18 +3884,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'typescript-mode
     ;; hooks
-    ;; (remove-hook 'typescript-mode-hook #'jest-minor-mode)
-
-    ;; config
-    (setopt jest-executable "npx jest"))
-
-  ;; (with-eval-after-load 'typescript-mode
-  ;;   (add-hook 'typescript-mode-hook
-  ;;             #'(lambda ()
-  ;;                 (projectile-register-project-type 'npx '("package.json" "yarn.lock")
-  ;;                                                   :project-file "package.json"
-  ;;                                                   :test "npx jest"
-  ;;                                                   :test-suffix ".spec"))))
+    (add-hook 'typescript-mode-hook #'jest-minor-mode))
 #+end_src
 ** Ruby
 *** robe
