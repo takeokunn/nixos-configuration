@@ -21,6 +21,7 @@ let
   ssh = import ./ssh;
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
   vscode = import ./vscode { inherit pkgs; };
+  nix-init = import ./nix-init;
 
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
@@ -43,6 +44,7 @@ in
   ssh
   copilot-language-server
   vscode
+  nix-init
 
   # for window manager
   rofi
