@@ -18,17 +18,17 @@ jobs:
         uses: ./.github/actions/setup-nix
         with:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Run nvfetcher
-        run: |
-          export LANG=en_US.UTF-8
-          export LC_ALL=en_US.UTF-8
-          nix run nixpkgs#nvfetcher
+      # - name: Run nvfetcher
+      #   run: |
+      #     export LANG=en_US.UTF-8
+      #     export LC_ALL=en_US.UTF-8
+      #     nix run nixpkgs#nvfetcher
       - name: Run node2nix
         run: |
           cd node2nix/
           nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
-      - name: Run flake update
-        run: nix flake update
+      # - name: Run flake update
+      #   run: nix flake update
       - name: Run fmt
         run: nix fmt
       - name: Set up Git config
@@ -38,5 +38,5 @@ jobs:
       - name: Commit changes
         run: |
           git add .
-          git commit -m "Update lockfiles"
-          git push origin HEAD
+          git commit -S -m "Update lockfiles"
+          git push origin main
