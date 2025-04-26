@@ -1,4 +1,3 @@
-{ pkgs, sources }:
 {
   programs.nix-init = {
     enable = true;

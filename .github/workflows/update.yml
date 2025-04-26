@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: 0 11 * * *
+
 jobs:
   nix-update:
     name: Update lockfile
@@ -14,6 +15,8 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - uses: DeterminateSystems/flake-checker-action@main
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run nvfetcher
         run: |
           export LANG=en_US.UTF-8
