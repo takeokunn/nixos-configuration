@@ -173,13 +173,13 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "0.24.2";
+    version = "0.25.0";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "0.24.2";
+      rev = "0.25.0";
       fetchSubmodules = false;
-      sha256 = "sha256-wXTanIl6NMSIp6EPZ4U2cj8jWGYeqBGvorHcpb4c6k8=";
+      sha256 = "sha256-0Phza0RpXF9ni7k8ZEgtqbULMFxRji3E4aGoYom8Ig4=";
     };
   };
   emacs-mu4e-dashboard = {

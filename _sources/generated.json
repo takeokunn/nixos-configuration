@@ -307,12 +307,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "0.24.2",
-      "sha256": "sha256-wXTanIl6NMSIp6EPZ4U2cj8jWGYeqBGvorHcpb4c6k8=",
+      "rev": "0.25.0",
+      "sha256": "sha256-0Phza0RpXF9ni7k8ZEgtqbULMFxRji3E4aGoYom8Ig4=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "0.24.2"
+    "version": "0.25.0"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
