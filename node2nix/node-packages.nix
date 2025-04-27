@@ -1377,10 +1377,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.309.0";
+    version = "1.310.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.309.0.tgz";
-      sha512 = "Vhdk2omRNbMvW6+M+LXxzRrOBO7frN844vQUZ0iuus3YSZMdy8OgNhZsQdtCAMy2WvQRaSNPSIq8zN2p5KHczg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.310.0.tgz";
+      sha512 = "Czhx7fDYT/O1zj9hK7oox/VcBAQKz+MCuF/ytWZoDFTs95EL9idXBOZdIPiROkd/PdeBD4lalUtWRKpLT1ysPw==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1458,10 +1458,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.4.2";
+    version = "0.4.3";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.2.tgz";
-      sha512 = "Rayhs89wGRO6eh2yTUQyaxr6QQQ5uBlepAzCTeazi2ZkFFJfUlXA8xXSqY6hCsmjZ9B7FcGkRquZeaWw0pYYrw==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.3.tgz";
+      sha512 = "qcZTJdHX9LRbXilBUHqX3N7L7XmiXyd/+DFB1/9lf5ArlHTLut3Cb3plpc8sNJXbtXiYuMlPYScmaHW4h7lKPA==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
