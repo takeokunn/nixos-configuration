@@ -16,7 +16,6 @@
       "chatgpt"
       "claude"
       "cleanshot"
-      "excalidraw"
       "font-sketchybar-app-font"
       "google-chrome"
       "keycastr"
