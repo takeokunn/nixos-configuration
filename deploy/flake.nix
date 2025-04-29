@@ -18,22 +18,22 @@
           withNativeCompilation = false;
         };
       in
-        {
-          packages = {
-            build = pkgs.stdenv.mkDerivation {
-              name = "emacs-takeokunn-org";
-              src = ../.;
-              nativeBuildInputs = with pkgs; [
-                (emacsPkg.pkgs.withPackages (epkgs: with epkgs; [ htmlize ]))
-              ];
-              buildPhase = ''
-                emacs --batch --load deploy/script.el --funcall export-org-files
-              '';
-              installPhase = ''
-                cp -r public/ $out/
-              '';
-            };
+      {
+        packages = {
+          build = pkgs.stdenv.mkDerivation {
+            name = "emacs-takeokunn-org";
+            src = ../.;
+            nativeBuildInputs = with pkgs; [
+              (emacsPkg.pkgs.withPackages (epkgs: with epkgs; [ htmlize ]))
+            ];
+            buildPhase = ''
+              emacs --batch --load deploy/script.el --funcall export-org-files
+            '';
+            installPhase = ''
+              cp -r public/ $out/
+            '';
           };
-        }
+        };
+      }
     );
 }
