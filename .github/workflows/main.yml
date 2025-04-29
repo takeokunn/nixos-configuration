@@ -22,7 +22,7 @@ jobs:
         with:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: nix build
-        run: nix build ./deploy#build
+        run: nix build ./deploy#emacs-takeokunn-org
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

@@ -20,7 +20,7 @@
       in
       {
         packages = {
-          build = pkgs.stdenv.mkDerivation {
+          emacs-takeokunn-org = pkgs.stdenv.mkDerivation {
             name = "emacs-takeokunn-org";
             src = ../.;
             nativeBuildInputs = with pkgs; [
