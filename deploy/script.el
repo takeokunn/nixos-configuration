@@ -1,4 +1,7 @@
+(require 'htmlize)
 (require 'ox-publish)
+
+(setq org-publish-timestamp-directory "./.org-timestamps")
 
 (defun export-org-files ()
   "Exports Org files to html."
@@ -8,5 +11,5 @@
                                       :base-directory "./home-manager/programs/emacs/elisp/"
                                       :base-extension "org"
                                       :exclude "README.org"
-                                      :publishing-directory "public/"))))
+                                      :publishing-directory "./public/"))))
     (org-publish-all t)))

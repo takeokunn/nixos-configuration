@@ -16,25 +16,20 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: purcell/setup-emacs@master
-        with:
-          version: 29.4
       - uses: actions/checkout@v4
-      # for Build Html
-      - name: wget htmlize
-        run: wget https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el
-      - name: build
-        run: emacs --batch --load htmlize.el --load script.el --funcall export-org-files
-      - name: move init.html to index.html
-        run: mv public/init.html public/index.html
-      # for Deploy Github Pages
+      - name: Setup nix
+        uses: ./.github/actions/setup-nix
+        with:
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: nix build
+        run: nix build ./deploy#build
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./result
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
