@@ -11,5 +11,5 @@
                                       :base-directory "./home-manager/programs/emacs/elisp/"
                                       :base-extension "org"
                                       :exclude "README.org"
-                                      :publishing-directory "./public/"))))
+                                      :publishing-directory "./public"))))
     (org-publish-all t)))

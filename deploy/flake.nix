@@ -30,6 +30,7 @@
               emacs --batch --load deploy/script.el --funcall export-org-files
             '';
             installPhase = ''
+              mv public/init.html public/index.html
               cp -r public/ $out/
             '';
           };
