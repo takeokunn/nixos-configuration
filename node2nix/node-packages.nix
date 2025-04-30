@@ -804,13 +804,13 @@ let
         sha512 = "8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==";
       };
     };
-    "node-abi-3.74.0" = {
+    "node-abi-3.75.0" = {
       name = "node-abi";
       packageName = "node-abi";
-      version = "3.74.0";
+      version = "3.75.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/node-abi/-/node-abi-3.74.0.tgz";
-        sha512 = "c5XK0MjkGBrQPGYG24GBADZud0NCbznxNx0ZkS+ebUTrmV1qTDxPxSL8zEAPURXSbLRWVexxmP4986BziahL5w==";
+        url = "https://registry.npmjs.org/node-abi/-/node-abi-3.75.0.tgz";
+        sha512 = "OhYaY5sDsIka7H7AtijtI9jwGYLyl29eQn/W623DiN/MIv5sUqc4g7BIDThX+gb7di9f6xK02nkp8sdfFWZLTg==";
       };
     };
     "nth-check-2.1.1" = {
@@ -1400,10 +1400,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.90";
+    version = "0.2.94";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.90.tgz";
-      sha512 = "2EkO2Nna4EOe0Umy/LGOrxrkLQj/bEvLm3lpuFj+IhNT9FWT4mN28aiHxDc8BiV2TPRx3qCCyAbPqRNBf+sd/A==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.94.tgz";
+      sha512 = "IHYUqgX9FJbKoMSf1S0727wdmXENABE+fZii0CL2mBYuQ+yxg2FApz2JNX9I7J3Ss8EXZaw3AkoQe6138sSdBw==";
     };
     dependencies = [
       sources."base64-js-1.5.1"
@@ -1427,7 +1427,7 @@ in
       sources."minimist-1.2.8"
       sources."mkdirp-classic-0.5.3"
       sources."napi-build-utils-2.0.0"
-      sources."node-abi-3.74.0"
+      sources."node-abi-3.75.0"
       sources."once-1.4.0"
       sources."prebuild-install-7.1.3"
       sources."pump-3.0.2"
