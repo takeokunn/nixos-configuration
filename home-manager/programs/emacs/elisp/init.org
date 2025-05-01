@@ -5530,6 +5530,49 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (kill-new url)
       (message "Copied to clipboard: %s" url)))
 #+end_src
+** my/projectile-php-open-corresponding-test
+#+begin_src emacs-lisp
+  (defun my/generate-core-test-path (relative-path)
+    "Given a Core app relative path, generate the corresponding test path."
+    (let* ((parts (split-string relative-path "/"))
+           (domain-path (cl-subseq parts 1 (1- (length parts)))) ;; skip Core, keep middle
+           (file-name (file-name-base (car (last parts))))
+           (test-path (append '("Core" "Unit") domain-path))
+           (test-file (concat (mapconcat #'identity test-path "/") "/" file-name "Test.php")))
+      test-file))
+
+  (defun my/generate-ecplatform-test-path (relative-path)
+    "Given an ECPlatforms app relative path, generate the corresponding test path."
+    (let* ((parts (split-string relative-path "/"))
+           (platform (car parts))
+           (domain-path (cl-subseq parts 1 (1- (length parts)))) ;; middle part
+           (file-name (file-name-base (car (last parts))))
+           (test-path (append (list "ECPlatforms" platform) '("Unit") domain-path))
+           (test-file (concat (mapconcat #'identity test-path "/") "/" file-name "Test.php")))
+      test-file))
+
+  (defun my/projectile-php-open-corresponding-test ()
+    "Open corresponding PHPUnit test file from app/ using specific Core/ECPlatforms rules."
+    (interactive)
+    (let* ((file (buffer-file-name))
+           (project-root (projectile-project-root))
+           (app-root (expand-file-name "app/" project-root))
+           (test-root (expand-file-name "tests/" project-root)))
+      (if (and file (string-prefix-p app-root file))
+          (let* ((relative (file-relative-name file app-root))
+                 (parts (split-string relative "/"))
+                 (subdir (car parts))
+                 (test-file
+                  (cond
+                   ((string= subdir "Core") (my/generate-core-test-path relative))
+                   ((string= subdir "ECPlatforms") (my/generate-ecplatform-test-path (mapconcat #'identity (cdr parts) "/")))
+                   (t (user-error "Unknown app type: %s" subdir))))
+                 (full-path (expand-file-name test-file test-root)))
+            (if (file-exists-p full-path)
+                (find-file full-path)
+              (message "Test file not found: %s" full-path)))
+        (message "Not in app/ directory."))))
+#+end_src
 * Footer
 ** Magic File Name を有効にする
 #+begin_src emacs-lisp :tangle yes
