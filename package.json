@@ -5,7 +5,7 @@
     "lint": "npx secretlint --secretlintignore .gitignore \"**/*\""
   },
   "devDependencies": {
-    "@secretlint/secretlint-rule-preset-recommend": "^9.3.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^9.3.2",
     "secretlint": "^9.3.1"
   }
 }
