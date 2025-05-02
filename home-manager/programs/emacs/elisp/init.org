@@ -272,6 +272,10 @@
   (with-eval-after-load 'winner
     (add-hook 'emacs-startup-hook #'winner-mode))
 #+end_src
+** debug-on-quit
+#+begin_src emacs-lisp :tangle yes
+  (setq debug-on-quit t)
+#+end_src
 * Global Keybind
 ** basic
 #+begin_src emacs-lisp :tangle yes
