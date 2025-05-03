@@ -56,6 +56,7 @@ with pkgs.vimPlugins;
   vim-textobj-entire
 
   # docs
+  vim-manpager
   plugins.vimdoc-ja
 
   # utils
