@@ -9,4 +9,10 @@
 
     extraLuaConfig = builtins.readFile ./init.lua;
   };
+
+  programs.fish = {
+    interactiveShellInit = ''
+      set -x MANPAGER "nvim +Man!"
+    '';
+  };
 }
