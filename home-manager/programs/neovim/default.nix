@@ -12,7 +12,6 @@
 
   programs.fish = {
     interactiveShellInit = ''
-      set -x PAGER "nvim +Man!"
       set -x MANPAGER "nvim +Man!"
     '';
   };
