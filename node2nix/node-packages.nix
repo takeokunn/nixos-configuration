@@ -1353,13 +1353,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.24.3" = {
+    "zod-3.24.4" = {
       name = "zod";
       packageName = "zod";
-      version = "3.24.3";
+      version = "3.24.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.24.3.tgz";
-        sha512 = "HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.24.4.tgz";
+        sha512 = "OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1588,7 +1588,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.24.3"
+      sources."zod-3.24.4"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
