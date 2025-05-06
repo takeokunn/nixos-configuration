@@ -79,15 +79,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "784edd550508c88582f04013b1d5ea5b3824746c";
+    version = "782970051c4ad569140fcc24ff6eacb0f0b40cef";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "784edd550508c88582f04013b1d5ea5b3824746c";
+      rev = "782970051c4ad569140fcc24ff6eacb0f0b40cef";
       fetchSubmodules = false;
-      sha256 = "sha256-JXahmStgmDmtF9HUbDiZSH53zZz2p6lCDuwj70PmAW8=";
+      sha256 = "sha256-BtdVXvVi8pi5qn0ptmWs77eIxfUpAf9UNgWKHqc1qL4=";
     };
-    date = "2025-04-28";
+    date = "2025-05-05";
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
@@ -292,15 +292,15 @@
   };
   emacs-ox-typst = {
     pname = "emacs-ox-typst";
-    version = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
+    version = "5c7f4f8a72b8c07f457581ee0047811ea72de71d";
     src = fetchFromGitHub {
       owner = "jmpunkt";
       repo = "ox-typst";
-      rev = "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84";
+      rev = "5c7f4f8a72b8c07f457581ee0047811ea72de71d";
       fetchSubmodules = false;
-      sha256 = "sha256-Anxo/Baju4YfD+EyWqW1x1u2TYkGoDETII220cTIgmM=";
+      sha256 = "sha256-Iyly5TARClsEVRk/hVlPlj6IQJeEKasMyQg33AO1G9U=";
     };
-    date = "2025-03-26";
+    date = "2025-05-05";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";

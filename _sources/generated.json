@@ -127,7 +127,7 @@
   },
   "emacs-copilot": {
     "cargoLocks": null,
-    "date": "2025-04-28",
+    "date": "2025-05-05",
     "extract": null,
     "name": "emacs-copilot",
     "passthru": null,
@@ -139,12 +139,12 @@
       "name": null,
       "owner": "copilot-emacs",
       "repo": "copilot.el",
-      "rev": "784edd550508c88582f04013b1d5ea5b3824746c",
-      "sha256": "sha256-JXahmStgmDmtF9HUbDiZSH53zZz2p6lCDuwj70PmAW8=",
+      "rev": "782970051c4ad569140fcc24ff6eacb0f0b40cef",
+      "sha256": "sha256-BtdVXvVi8pi5qn0ptmWs77eIxfUpAf9UNgWKHqc1qL4=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "784edd550508c88582f04013b1d5ea5b3824746c"
+    "version": "782970051c4ad569140fcc24ff6eacb0f0b40cef"
   },
   "emacs-copilot-chat": {
     "cargoLocks": null,
@@ -505,7 +505,7 @@
   },
   "emacs-ox-typst": {
     "cargoLocks": null,
-    "date": "2025-03-26",
+    "date": "2025-05-05",
     "extract": null,
     "name": "emacs-ox-typst",
     "passthru": null,
@@ -517,12 +517,12 @@
       "name": null,
       "owner": "jmpunkt",
       "repo": "ox-typst",
-      "rev": "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84",
-      "sha256": "sha256-Anxo/Baju4YfD+EyWqW1x1u2TYkGoDETII220cTIgmM=",
+      "rev": "5c7f4f8a72b8c07f457581ee0047811ea72de71d",
+      "sha256": "sha256-Iyly5TARClsEVRk/hVlPlj6IQJeEKasMyQg33AO1G9U=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "0cb0aa7f0c54bb2239516a0a4b02ce5ff7458a84"
+    "version": "5c7f4f8a72b8c07f457581ee0047811ea72de71d"
   },
   "emacs-php-doc-block": {
     "cargoLocks": null,
