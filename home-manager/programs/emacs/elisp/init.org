@@ -2660,6 +2660,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (with-eval-after-load 'projectile
     ;; advice
     (advice-add 'projectile-switch-project :before #'my/update-projectile-known-projects)
+    (advice-add 'projectile-replace :around #'my/advice-disable-buffer-readonly)
+    (advice-add 'projectile-replace-regexp :around #'my/advice-disable-buffer-readonly)
 
     ;; keybind
     (keymap-global-set "C-x p" #'projectile-command-map)
@@ -3571,6 +3573,25 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(pdf-occur-global-minor-mode) "pdf-occur" nil t)
 
   (add-hook 'emacs-startup-hook #'pdf-tools-install)
+#+end_src
+** Jump
+*** dumb-jump
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dumb-jump-mode
+                       dumb-jump-xref-activate
+                       dumb-jump-go
+                       dumb-jump-back) "dumb-jump" nil t)
+
+  (add-hook 'emacs-startup-hook #'dumb-jump-mode)
+
+  (with-eval-after-load 'xref
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+  (with-eval-after-load 'dumb-jump
+    (setopt dumb-jump-force-searcher 'rg)
+    (setopt dumb-jump-prefer-searcher 'rg)
+    (setopt dumb-jump-default-project "")
+    (setopt dumb-jump-disable-obsolete-warnings t))
 #+end_src
 * Language Specific
 ** Basic Lisp

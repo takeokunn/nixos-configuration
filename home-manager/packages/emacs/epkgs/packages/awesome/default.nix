@@ -8,6 +8,8 @@ let
 in
 with epkgs;
 [
+  dumb-jump
+
   # Command
   amx
 
