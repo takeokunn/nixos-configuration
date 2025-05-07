@@ -1400,10 +1400,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.102";
+    version = "0.2.103";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.102.tgz";
-      sha512 = "zJV6aOHoPhOe3n6TLd4zhoHHG0T/lc7iWiW17xIOvnE31lEALTZZa/a6VBUR+sTTOr3RAy/QfYOs5zq51qIKvA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.103.tgz";
+      sha512 = "xIQf2JyOiuOz6D4QEUVsFb00Wn6WfYHAGs+iB9trB7jfbxzctr9iYC2gRptSzzy7B8Y/MU8cpW8+lH5qjA7c+Q==";
     };
     dependencies = [
       sources."base64-js-1.5.1"
