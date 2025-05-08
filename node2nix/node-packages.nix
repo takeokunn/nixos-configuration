@@ -57,13 +57,13 @@ let
         sha512 = "AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==";
       };
     };
-    "better-sqlite3-11.9.1" = {
+    "better-sqlite3-11.10.0" = {
       name = "better-sqlite3";
       packageName = "better-sqlite3";
-      version = "11.9.1";
+      version = "11.10.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-11.9.1.tgz";
-        sha512 = "Ba0KR+Fzxh2jDRhdg6TSH0SJGzb8C0aBY4hR8w8madIdIzzC6Y1+kx5qR6eS1Z+Gy20h6ZU28aeyg0z1VIrShQ==";
+        url = "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-11.10.0.tgz";
+        sha512 = "EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ==";
       };
     };
     "bindings-1.5.0" = {
@@ -1377,10 +1377,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.314.0";
+    version = "1.316.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.314.0.tgz";
-      sha512 = "4Wrj1hKCMhUpLP6xHyj+xhdGF7+n/RnAGNhzpgw27gl81YEI4gdR6/CELA0Vt0eib+y30l41AdGJxTsIwusfVQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.316.0.tgz";
+      sha512 = "DQCIWpMKyc5Nqr8kcF3zQ31DcnjrWYnPNzHilALf+Wocmcxf5UcOR0kOMCgUlKZjuKAsWWILXC99sRktWImbhQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1400,14 +1400,14 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.103";
+    version = "0.2.104";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.103.tgz";
-      sha512 = "xIQf2JyOiuOz6D4QEUVsFb00Wn6WfYHAGs+iB9trB7jfbxzctr9iYC2gRptSzzy7B8Y/MU8cpW8+lH5qjA7c+Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.104.tgz";
+      sha512 = "HYeJ/G3Wa0YgDrYFSoFVfH374rmxX7T00LMuEUsLdpzJhKx6qsnfpqQmCKLCLtNda5NG5F/P7OkFSIjJSqEEkA==";
     };
     dependencies = [
       sources."base64-js-1.5.1"
-      sources."better-sqlite3-11.9.1"
+      sources."better-sqlite3-11.10.0"
       sources."bindings-1.5.0"
       sources."bl-4.1.0"
       sources."buffer-5.7.1"
