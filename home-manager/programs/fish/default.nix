@@ -85,6 +85,10 @@
         name = sources.fish-dart-completions.pname;
         src = sources.fish-dart-completions.src;
       }
+      {
+        name = "fzf";
+        src = pkgs.fishPlugins.fzf.src;
+      }
     ];
   };
 }

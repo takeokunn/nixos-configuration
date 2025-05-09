@@ -9,6 +9,7 @@ let
   dust = import ./dust;
   editorconfig = import ./editorconfig { inherit pkgs; };
   eza = import ./eza;
+  fd = import ./fd;
   fish = import ./fish { inherit pkgs sources; };
   gnupg = import ./gnupg;
   man = import ./man;
@@ -16,6 +17,7 @@ let
   neovim = import ./neovim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
   peco = import ./peco { inherit pkgs; };
+  fzf = import ./fzf;
   readline = import ./readline;
   ripgrep = import ./ripgrep;
   jq = import ./jq;
@@ -32,6 +34,7 @@ in
   dust
   editorconfig
   eza
+  fd
   fish
   gnupg
   man
@@ -39,6 +42,7 @@ in
   password-store
   neovim
   peco
+  fzf
   readline
   ripgrep
   jq

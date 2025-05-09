@@ -274,7 +274,7 @@
 #+end_src
 ** debug-on-error
 #+begin_src emacs-lisp :tangle yes
-  (setq debug-on-error t)
+  (setq debug-on-error nil)
 #+end_src
 * Global Keybind
 ** basic

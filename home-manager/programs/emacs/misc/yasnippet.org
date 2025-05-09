@@ -1401,6 +1401,39 @@ $0
     $0
   ,#+end_src
 #+end_src
+*** fleeting
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/fleeting") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: fleeting
+  # key: fleeting
+  # --
+  ,* 背景・動機
+
+  - どのような課題意識・ニーズがあったか
+    - e.g. ◯◯ツールでは〜ができずに困っていた
+    - e.g. △△な成果物を作るため、より柔軟なxx環境が欲しかった
+
+  ,* 試したこと・やったこと
+
+  - 実施内容、設計方針、使用技術
+    - e.g. ◯◯を用いて構成を再設計
+    - e.g. 外部リソース・ライブラリの活用
+    - e.g. 自作の〜テンプレートでレイアウト制御
+
+  ,* 得られた結果・所感
+
+  - 成果、苦労した点、気づき
+    - e.g. ◯◯の表現力が予想以上だった
+    - e.g. △△の構文で詰まったが、〜で解決
+    - e.g. 複数人で共通スタイルを使えるようになった
+
+  ,* 今後の展開・検討事項
+
+  - 派生プロジェクト、汎用化、他分野展開
+    - e.g. OSSテンプレートとして配布予定
+    - e.g. CI/CDでの自動PDF出力＋SNSシェアを統合
+    - e.g. ◯◯領域にも応用できそうなので検討中
+#+end_src
 
 ** php-mode/
 *** .yas-setup.el
@@ -1606,7 +1639,6 @@ $0
   # --
   \Log::info('--------------------------------------------');
   \Log::info($1);
-  \Log::info('--------------------------------------------');
 #+end_src
 *** php
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/php") :mkdirp yes :noweb yes
