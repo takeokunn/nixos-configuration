@@ -1,7 +1,9 @@
 {
   programs.fzf = {
     enable = true;
-    tmux.enableShellIntegration = true;
+
+    historyWidgetOptions = [ "--reverse" ];
+    fileWidgetOptions = [ "-p" ];
 
     colors = {
       fg = "#f8f8f2";
