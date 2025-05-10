@@ -1,0 +1,5 @@
+{
+  programs.pandoc = {
+    enable = true;
+  };
+}

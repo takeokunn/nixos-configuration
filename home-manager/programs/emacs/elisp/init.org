@@ -4039,11 +4039,19 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** markdown-preview-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(markdown-preview-open-browser markdown-preview-mode) "markdown-preview-mode" nil t)
+  (autoload-if-found '(markdown-preview-open-browser
+                       markdown-preview-mode
+                       markdown-preview-cleanup) "markdown-preview-mode" nil t)
 
   (with-eval-after-load 'markdown-preview-mode
     ;; config
-    (setopt markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
+    (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+
+    ;; advice
+    (defun my/markdown-preview-css-filter (orig-return)
+      (concat orig-return "<style>img { max-width: 100%; }</style>"))
+
+    (advice-add 'markdown-preview--css :filter-return #'my/markdown-preview-css-filter))
 #+end_src
 ** Fish
 *** fish-repl

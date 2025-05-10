@@ -22,6 +22,7 @@ let
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
   vscode = import ./vscode { inherit pkgs; };
   nix-init = import ./nix-init;
+  pandoc = import ./pandoc;
 
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
@@ -45,6 +46,7 @@ in
   copilot-language-server
   vscode
   nix-init
+  pandoc
 
   # for window manager
   rofi
