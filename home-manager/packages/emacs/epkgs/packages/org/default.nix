@@ -18,6 +18,7 @@ with epkgs;
   packages.org-volume
   org-ql
   org-sliced-images
+  org-preview-html
 
   # Theme
   org-superstar

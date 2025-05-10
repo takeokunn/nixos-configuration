@@ -4558,6 +4558,15 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-ql-query org-ql-select) "org-ql" nil t)
 #+end_src
+*** org-preview-html
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-preview-html-mode
+                       org-preview-html-refresh
+                       org-preview-html-pop-window-to-frame) "org-preview-html" nil t)
+
+  (with-eval-after-load 'org-preview-html
+    (setopt org-preview-html-viewer 'xwidget))
+#+end_src
 ** Theme
 *** org-faces
 #+begin_src emacs-lisp :tangle yes
