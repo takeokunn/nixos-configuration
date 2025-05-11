@@ -43,6 +43,8 @@
       ".aider*"
       "TAGS"
       ".neotree"
+      ".direnv"
+      ".devenv"
     ];
 
     userName = "takeokunn";

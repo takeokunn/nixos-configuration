@@ -1,6 +1,8 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
+  yubikey-manager
+
   # for ai
   ollama
   (aider-chat.overrideAttrs (old: {

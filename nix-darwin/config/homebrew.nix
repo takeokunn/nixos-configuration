@@ -25,6 +25,7 @@
       "sequel-ace"
       "sf-symbols"
       "sublime-text"
+      "yubico-yubikey-manager"
     ];
     # masApps = {
     #   LINE = 539883307;

@@ -4051,7 +4051,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (defun my/markdown-preview-css-filter (orig-return)
       (concat orig-return "<style>img { max-width: 100%; }</style>"))
 
-    (advice-add 'markdown-preview--css :filter-return #'my/markdown-preview-css-filter))
+    (advice-add 'markdown-preview--css :filter-return #'my/markdown-preview-css-filter)
+
+    (defun my/markdown-preview--start-with-xwidget (orig-fun &rest args)
+      (let ((browse-url-browser-function #'xwidget-webkit-browse-url))
+        (apply orig-fun args)))
+
+    (advice-add 'markdown-preview--start :around #'my/markdown-preview--start-with-xwidget))
 #+end_src
 ** Fish
 *** fish-repl
