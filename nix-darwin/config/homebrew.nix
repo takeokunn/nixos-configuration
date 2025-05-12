@@ -8,7 +8,7 @@
     };
     brews = [
       "pinentry-mac"
-      "sketchybar"
+      # "sketchybar"
       "terminal-notifier"
     ];
     casks = [
@@ -25,11 +25,6 @@
       "sequel-ace"
       "sf-symbols"
       "sublime-text"
-      "yubico-yubikey-manager"
     ];
-    # masApps = {
-    #   LINE = 539883307;
-    #   amazon-kindle = 302584613;
-    # };
-  };
+ };
 }
