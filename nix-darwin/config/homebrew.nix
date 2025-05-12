@@ -8,7 +8,6 @@
     };
     brews = [
       "pinentry-mac"
-      # "sketchybar"
       "terminal-notifier"
     ];
     casks = [
@@ -16,6 +15,7 @@
       "chatgpt"
       "claude"
       "cleanshot"
+      "font-hack-nerd-font"
       "font-sketchybar-app-font"
       "google-chrome"
       "keycastr"
@@ -26,5 +26,5 @@
       "sf-symbols"
       "sublime-text"
     ];
- };
+  };
 }

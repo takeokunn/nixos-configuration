@@ -20,7 +20,6 @@ let
   sketchybar = import ./sketchybar;
   ssh = import ./ssh;
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
-  vscode = import ./vscode { inherit pkgs; };
   nix-init = import ./nix-init;
   pandoc = import ./pandoc;
 
@@ -44,7 +43,6 @@ in
   sketchybar
   ssh
   copilot-language-server
-  vscode
   nix-init
   pandoc
 

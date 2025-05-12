@@ -77,7 +77,7 @@
       };
 
       ghq = {
-        root = "~/.ghq";
+        root = "~/ghq";
       };
 
       fetch = {

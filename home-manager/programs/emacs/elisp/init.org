@@ -3490,15 +3490,20 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
   (add-hook 'emacs-startup-hook #'epa-file-enable)
 
+  (fset 'epg-wait-for-status 'ignore)
+
+  (with-eval-after-load 'epa-hook
+    ;; config
+    (setopt epa-file-encrypt-to '("bararararatty@gmail.com")))
+
   (with-eval-after-load 'epa-file
     ;; config
-    (setopt epa-file-encrypt-to '("bararararatty@gmail.com"))
     (setopt epa-file-select-keys 'silent)
-    (setopt epa-file-cache-passphrase-for-symmetric-encryption t)
-    (setopt epg-pinentry-mode 'loopback)
+    (setopt epa-file-cache-passphrase-for-symmetric-encryption t))
 
-    ;; fset
-    (fset 'epg-wait-for-status 'ignore))
+  (with-eval-after-load 'epg-config
+    ;; config
+    (setopt epg-pinentry-mode 'loopback))
 #+end_src
 *** pinentry
 https://github.com/ch11ng/exwm/wiki#gpg-pinentry
