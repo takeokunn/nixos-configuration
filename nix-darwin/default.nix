@@ -8,6 +8,8 @@ let
   services = import ./config/services;
   system = import ./config/system.nix { inherit pkgs; };
   time = import ./config/time.nix;
+  keyboard = import ./config/keyboard.nix;
+  startup = import ./config/startup.nix;
 in
 {
   imports = [
@@ -19,5 +21,7 @@ in
     services
     system
     time
+    keyboard
+    startup
   ];
 }
