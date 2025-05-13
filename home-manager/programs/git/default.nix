@@ -45,6 +45,7 @@
       ".neotree"
       ".direnv"
       ".devenv"
+      ".pre-commit-config.yaml"
     ];
 
     userName = "takeokunn";
