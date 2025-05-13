@@ -1666,6 +1666,7 @@
     (add-hook 'lsp-configure-hook #'lsp-diagnostics-mode)
 
     ;; config
+    (setopt lsp-response-timeout 60)
     (setopt lsp-idle-delay 0.8)
     (setopt lsp-enable-links nil)
     (setopt lsp-log-io nil)
