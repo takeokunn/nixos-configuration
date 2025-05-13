@@ -1029,13 +1029,13 @@ let
         sha512 = "YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==";
       };
     };
-    "semver-7.7.1" = {
+    "semver-7.7.2" = {
       name = "semver";
       packageName = "semver";
-      version = "7.7.1";
+      version = "7.7.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/semver/-/semver-7.7.1.tgz";
-        sha512 = "hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==";
+        url = "https://registry.npmjs.org/semver/-/semver-7.7.2.tgz";
+        sha512 = "RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==";
       };
     };
     "send-1.2.0" = {
@@ -1236,13 +1236,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-6.21.2" = {
+    "undici-6.21.3" = {
       name = "undici";
       packageName = "undici";
-      version = "6.21.2";
+      version = "6.21.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-6.21.2.tgz";
-        sha512 = "uROZWze0R0itiAKVPsYhFov9LxrPMHLMEQFszeI2gCN6bnIIZ8twzBCJcN2LJrBBLfrP0t1FW0g+JmKVl8Vk1g==";
+        url = "https://registry.npmjs.org/undici/-/undici-6.21.3.tgz";
+        sha512 = "gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==";
       };
     };
     "unpipe-1.0.0" = {
@@ -1377,10 +1377,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.318.0";
+    version = "1.319.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.318.0.tgz";
-      sha512 = "tP+0AWrPJMOxOG4P+FOk3VJelzwMymhPqbhPWuQ9512UbZdz9aMvXL3SYieZpV5oAqX5evLKiArEXY6tu/aXtA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.319.0.tgz";
+      sha512 = "SicoidG61WNUs/EJRglJEry6j8ZaJrKKcx/ZznDMxorVAQp7fTeNoE+fbM2lH+qgieZIt/f+pVagYePFIxsMVg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1400,10 +1400,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.107";
+    version = "0.2.108";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.107.tgz";
-      sha512 = "Z5UzGWfK3ohvuVBG0NZfPFP2S8PXZk37c6hmoWI7vtPNa7rCtKNyexqCs1kjN4oW8Ou9eIooeQd+FOXdKTTJFw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.108.tgz";
+      sha512 = "ponVKdxl4JNPVlrcYZ0+GPUkgwhRsyYxVWrF7F+15052JRAE8BI6y98FEC7Ne87/5jesXIhEz/CG77MKomxD/w==";
     };
     dependencies = [
       sources."base64-js-1.5.1"
@@ -1434,7 +1434,7 @@ in
       sources."rc-1.2.8"
       sources."readable-stream-3.6.2"
       sources."safe-buffer-5.2.1"
-      sources."semver-7.7.1"
+      sources."semver-7.7.2"
       sources."simple-concat-1.0.1"
       sources."simple-get-4.0.1"
       sources."string_decoder-1.3.0"
@@ -1458,10 +1458,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.4.3";
+    version = "0.4.4";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.3.tgz";
-      sha512 = "qcZTJdHX9LRbXilBUHqX3N7L7XmiXyd/+DFB1/9lf5ArlHTLut3Cb3plpc8sNJXbtXiYuMlPYScmaHW4h7lKPA==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.4.tgz";
+      sha512 = "atBt7Z7cX+3Vvb0x1+APAKSCRUHDAbRKQBMOUsuTnus/fH7TQygjKSDw4W763eD8Hp7mbYnUBBqjs7K4c/UdVg==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
@@ -1580,7 +1580,7 @@ in
       sources."turndown-7.2.0"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
-      sources."undici-6.21.2"
+      sources."undici-6.21.3"
       sources."unpipe-1.0.0"
       sources."vary-1.1.2"
       sources."webidl-conversions-7.0.0"
