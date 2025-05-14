@@ -17,6 +17,8 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           fingerprint: AA9FDAC790F6622DFABD16F578D9E77CFA1C6D36
+          git_committer_name: takeokunn
+          git_committer_email: bararararatty@gmail.com
           git_user_signingkey: true
           git_commit_gpgsign: true
 
@@ -37,10 +39,6 @@ jobs:
       #   run: nix flake update
       # - name: Run fmt
       #   run: nix fmt
-      - name: Set up Git config
-        run: |
-          git config --global user.name "takeokunn"
-          git config --global user.email "bararararatty@gmail.com"
       - name: Commit changes
         run: |
           echo "hello" >> README.org
