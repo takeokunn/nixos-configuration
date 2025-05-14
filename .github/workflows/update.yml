@@ -15,7 +15,6 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          git-user-signingkey: ${{ secrets.GPG_KEY_ID }}
           git_user_signingkey: true
           git_commit_gpgsign: true
 
