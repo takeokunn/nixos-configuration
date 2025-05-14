@@ -16,8 +16,6 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           fingerprint: AA9FDAC790F6622DFABD16F578D9E77CFA1C6D36
-          git_committer_name: GitHub Actions
-          git_committer_email: 41898282+github-actions[bot]@users.noreply.github.com
           git_user_signingkey: true
           git_commit_gpgsign: true
           git_config_global: true
