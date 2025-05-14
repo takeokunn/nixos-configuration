@@ -39,8 +39,8 @@ jobs:
       #   run: nix fmt
       - name: Set up Git config
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "takeokunn"
+          git config --global user.email "bararararatty@gmail.com"
       - name: Commit changes
         run: |
           echo "hello" >> README.org
