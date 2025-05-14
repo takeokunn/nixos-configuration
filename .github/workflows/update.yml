@@ -16,33 +16,31 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           fingerprint: AA9FDAC790F6622DFABD16F578D9E77CFA1C6D36
+          git_committer_name: GitHub Actions
           git_user_signingkey: true
           git_commit_gpgsign: true
           git_config_global: true
           trust_level: 5
-
       - uses: actions/checkout@v4
-      # - name: Setup nix
-      #   uses: ./.github/actions/setup-nix
-      #   with:
-      #     cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      # - name: Run nvfetcher
-      #   run: |
-      #     export LANG=en_US.UTF-8
-      #     export LC_ALL=en_US.UTF-8
-      #     nix run nixpkgs#nvfetcher
-      # - name: Run node2nix
-      #   run: |
-      #     cd node2nix/
-      #     nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
-      # - name: Run flake update
-      #   run: nix flake update
-      # - name: Run fmt
-      #   run: nix fmt
+      - name: Setup nix
+        uses: ./.github/actions/setup-nix
+        with:
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Run nvfetcher
+        run: |
+          export LANG=en_US.UTF-8
+          export LC_ALL=en_US.UTF-8
+          nix run nixpkgs#nvfetcher
+      - name: Run node2nix
+        run: |
+          cd node2nix/
+          nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
+      - name: Run flake update
+        run: nix flake update
+      - name: Run fmt
+        run: nix fmt
       - name: Commit changes
         run: |
-          echo "test" >> dummy.txt
-          git add dummy.txt
-          git commit -S -m "test signed commit"
-          git log --show-signature -1
+          git add .
+          git commit -S -m "Update lockfile"
           git push origin HEAD
