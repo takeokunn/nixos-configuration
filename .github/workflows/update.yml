@@ -40,7 +40,8 @@ jobs:
       #   run: nix fmt
       - name: Commit changes
         run: |
-          echo "hello" >> README.org
-          git add .
-          git commit -S -m "Update lockfiles"
+          echo "test" >> dummy.txt
+          git add dummy.txt
+          git commit -S -m "test signed commit"
+          git log --show-signature -1
           git push origin HEAD
