@@ -10,6 +10,14 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - uses: actions/checkout@v4
       - name: Setup nix
         uses: ./.github/actions/setup-nix
@@ -35,5 +43,5 @@ jobs:
       - name: Commit changes
         run: |
           git add .
-          git commit -m "Update lockfiles"
+          git commit -S -m "Update lockfiles"
           git push origin HEAD
