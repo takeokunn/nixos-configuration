@@ -10,6 +10,7 @@ let
   time = import ./config/time.nix;
   keyboard = import ./config/keyboard.nix;
   startup = import ./config/startup.nix;
+  power = import ./config/power.nix;
 in
 {
   imports = [
@@ -23,5 +24,6 @@ in
     time
     keyboard
     startup
+    power
   ];
 }
