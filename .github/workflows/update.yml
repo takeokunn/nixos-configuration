@@ -43,5 +43,5 @@ jobs:
         run: |
           echo "hello" >> README.org
           git add .
-          git commit --signed -m "Update lockfiles"
+          git commit -S -m "Update lockfiles"
           git push origin HEAD --signed
