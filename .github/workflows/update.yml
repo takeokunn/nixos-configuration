@@ -20,29 +20,30 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
-      - name: Setup nix
-        uses: ./.github/actions/setup-nix
-        with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Run nvfetcher
-        run: |
-          export LANG=en_US.UTF-8
-          export LC_ALL=en_US.UTF-8
-          nix run nixpkgs#nvfetcher
-      - name: Run node2nix
-        run: |
-          cd node2nix/
-          nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
-      - name: Run flake update
-        run: nix flake update
-      - name: Run fmt
-        run: nix fmt
-      - name: Set up Git config
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # - name: Setup nix
+      #   uses: ./.github/actions/setup-nix
+      #   with:
+      #     cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      # - name: Run nvfetcher
+      #   run: |
+      #     export LANG=en_US.UTF-8
+      #     export LC_ALL=en_US.UTF-8
+      #     nix run nixpkgs#nvfetcher
+      # - name: Run node2nix
+      #   run: |
+      #     cd node2nix/
+      #     nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
+      # - name: Run flake update
+      #   run: nix flake update
+      # - name: Run fmt
+      #   run: nix fmt
+      # - name: Set up Git config
+      #   run: |
+      #     git config --global user.name "GitHub Actions"
+      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Commit changes
         run: |
+          echo "hello" >> README.org
           git add .
           git commit -S -m "Update lockfiles"
           git push origin HEAD
