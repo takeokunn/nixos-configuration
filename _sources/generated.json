@@ -841,7 +841,7 @@
   },
   "fish-done": {
     "cargoLocks": null,
-    "date": "2024-04-11",
+    "date": "2025-05-15",
     "extract": null,
     "name": "fish-done",
     "passthru": null,
@@ -853,12 +853,12 @@
       "name": null,
       "owner": "franciscolourenco",
       "repo": "done",
-      "rev": "eb32ade85c0f2c68cbfcff3036756bbf27a4f366",
-      "sha256": "sha256-DMIRKRAVOn7YEnuAtz4hIxrU93ULxNoQhW6juxCoh4o=",
+      "rev": "0bfe402753681f705a482694fcaf20c2bfc6deb7",
+      "sha256": "sha256-WA6DBrPBuXRIloO05UBunTJ9N01d6tO1K1uqojjO0mo=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "eb32ade85c0f2c68cbfcff3036756bbf27a4f366"
+    "version": "0bfe402753681f705a482694fcaf20c2bfc6deb7"
   },
   "fish-ghq": {
     "cargoLocks": null,

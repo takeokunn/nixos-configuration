@@ -67,14 +67,8 @@ let
 in
 {
   imports =
-    misc
-    ++ modules
-    ++ basicPrograms
-    ++ advancedPrograms
-    ++ basicServices
-    ++ advancedServices
-    ++ sops
-    # ++ mcpServers
+    misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices ++ sops
+  # ++ mcpServers
   ;
 
   home.stateVersion = "24.11";
