@@ -1421,6 +1421,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-git-commit-mode) "git-commit" nil t)
   (autoload-if-found '(magit-status magit-blame) "magit")
+  (autoload-if-found '(magit-branch) "magit-branch")
 
   (add-hook 'emacs-startup-hook #'global-git-commit-mode)
 
@@ -1487,11 +1488,12 @@
     (let ((pr (read-number "GitHub PR number (branch): ")))
       (my/magit-gh-pr-checkout pr nil)))
 
-  (transient-append-suffix 'magit-branch "c"
-    '("p" "Checkout PR (detach)" my/magit-gh-pr-checkout-detach))
+  (with-eval-after-load 'magit-branch
+    (transient-append-suffix 'magit-branch "c"
+      '("p" "Checkout PR (detach)" my/magit-gh-pr-checkout-detach))
 
-  (transient-append-suffix 'magit-branch "c"
-    '("P" "Checkout PR (branch)" my/magit-gh-pr-checkout-normal))
+    (transient-append-suffix 'magit-branch "c"
+      '("P" "Checkout PR (branch)" my/magit-gh-pr-checkout-normal)))
 #+END_SRC
 *** git-gutter
 #+begin_src emacs-lisp :tangle yes
