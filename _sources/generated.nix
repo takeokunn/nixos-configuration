@@ -664,14 +664,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "6da26df73f2b564c2b7aef4cc9dc6f260b47e65a";
+    version = "532352271206e2c1b7a3eebe42a3e2b7e980cbdf";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "6da26df73f2b564c2b7aef4cc9dc6f260b47e65a";
+      rev = "532352271206e2c1b7a3eebe42a3e2b7e980cbdf";
       fetchSubmodules = false;
-      sha256 = "sha256-2/VDWUquXJt2y2qm98GvDr2b7B9FuZtwyv9N23nzhws=";
+      sha256 = "sha256-8CBflyv5s1SfFcBfvk8E7QU3ClnD2mKGbwbEXD7WN/k=";
     };
-    date = "2025-05-13";
+    date = "2025-05-16";
   };
 }
