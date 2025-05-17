@@ -1265,7 +1265,6 @@ $0
   # key: task-develop
   # --
 
-  - branch: xxx
   - ticket: xxx
   - github: xxx
   - slack: xxx
@@ -1316,7 +1315,6 @@ $0
   # key: task-review
   # --
 
-  - branch: xxx
   - github: xxx
 
   ,*** TODO レビューする
