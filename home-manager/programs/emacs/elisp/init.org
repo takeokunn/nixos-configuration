@@ -1467,6 +1467,31 @@
   (with-eval-after-load 'magit-mode
     ;; config
     (setopt magit-display-buffer-function #'magit-display-buffer-fullcolumn-most-v1))
+
+  (defun my/magit-gh-pr-checkout (pr-number detach)
+    (let* ((args (append '("pr" "checkout")
+                         (when detach '("--detach"))
+                         (list (number-to-string pr-number))))
+           (cmd (string-join (cons "gh" args) " ")))
+      (message "Executing: %s" cmd)
+      (apply #'call-process "gh" nil nil nil args)
+      (magit-refresh)))
+
+  (defun my/magit-gh-pr-checkout-detach ()
+    (interactive)
+    (let ((pr (read-number "GitHub PR number (detach): ")))
+      (my/magit-gh-pr-checkout pr t)))
+
+  (defun my/magit-gh-pr-checkout-normal ()
+    (interactive)
+    (let ((pr (read-number "GitHub PR number (branch): ")))
+      (my/magit-gh-pr-checkout pr nil)))
+
+  (transient-append-suffix 'magit-branch "c"
+    '("p" "Checkout PR (detach)" my/magit-gh-pr-checkout-detach))
+
+  (transient-append-suffix 'magit-branch "c"
+    '("P" "Checkout PR (branch)" my/magit-gh-pr-checkout-normal))
 #+END_SRC
 *** git-gutter
 #+begin_src emacs-lisp :tangle yes
