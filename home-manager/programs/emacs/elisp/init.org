@@ -1684,7 +1684,7 @@
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].direnv")
 
     ;; enable flycheck
-    (add-hook 'lsp-mode-hook #'flycheck-mode)
+    ;; (add-hook 'lsp-mode-hook #'flycheck-mode)
 
     ;; enable diagnostics
     (add-hook 'lsp-configure-hook #'lsp-diagnostics-mode)
