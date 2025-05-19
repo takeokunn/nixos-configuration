@@ -1,6 +1,7 @@
-{ pkgs }:
+{ pkgs, username }:
 {
   system = {
+    primaryUser = username;
     stateVersion = 5;
     defaults = {
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;

@@ -1,6 +1,7 @@
 { pkgs }:
 {
   fonts.packages = with pkgs; [
+    monaspace
     noto-fonts
     noto-fonts-lgc-plus
     noto-fonts-cjk-sans

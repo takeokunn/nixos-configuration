@@ -6,7 +6,7 @@ let
   nix = import ./config/nix.nix;
   security = import ./config/security.nix { inherit username; };
   services = import ./config/services;
-  system = import ./config/system.nix { inherit pkgs; };
+  system = import ./config/system.nix { inherit pkgs username; };
   time = import ./config/time.nix;
   keyboard = import ./config/keyboard.nix;
   startup = import ./config/startup.nix;
