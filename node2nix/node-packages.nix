@@ -1139,10 +1139,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.117";
+    version = "0.2.120";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.117.tgz";
-      sha512 = "0mJr2n7bxoBLpxT7DjhOXkVK7lZB3ML5uUAhC3pny/IipF6Q+05XPO2UNoaNLB/9yhXSUmu0cNwmHz6m1e2Oqw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.120.tgz";
+      sha512 = "VRKDu1iYAExfFi24o3etWvXCq7WJlXYTZ412Qh7kUarxlMF+3Sq1KMrBdLWffZiT944EC7O7l92EbRUD87Mmpg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1157,10 +1157,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.4.4";
+    version = "0.5.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.4.4.tgz";
-      sha512 = "atBt7Z7cX+3Vvb0x1+APAKSCRUHDAbRKQBMOUsuTnus/fH7TQygjKSDw4W763eD8Hp7mbYnUBBqjs7K4c/UdVg==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.0.tgz";
+      sha512 = "3JO+acJlFdnEKpqXAPTyu0GLJVUdCFaE8ew1eQ1i9/EU6S4cNb6XFE6fP5hg0wE39nyoEkQ3eSnOgmd/AZcRFg==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
