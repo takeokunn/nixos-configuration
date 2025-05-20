@@ -1092,13 +1092,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.24.4" = {
+    "zod-3.25.7" = {
       name = "zod";
       packageName = "zod";
-      version = "3.24.4";
+      version = "3.25.7";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.24.4.tgz";
-        sha512 = "OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.7.tgz";
+        sha512 = "YGdT1cVRmKkOg6Sq7vY7IkxdphySKnXhaUmFI4r4FcuFVNgpCb9tZfNwXbT6BPjD5oz0nubFsoo9pIqKrDcCvg==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1139,10 +1139,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.120";
+    version = "0.2.122";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.120.tgz";
-      sha512 = "VRKDu1iYAExfFi24o3etWvXCq7WJlXYTZ412Qh7kUarxlMF+3Sq1KMrBdLWffZiT944EC7O7l92EbRUD87Mmpg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.122.tgz";
+      sha512 = "q9XnW6a4btqHM2XYxkcl2d7dDNRTX8pvaeisiNWYzAOSKC+wUfOrkioUUS3BG+i6sNtJB03jPKJdqvEvtXbZjw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1157,10 +1157,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.5.0";
+    version = "0.5.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.0.tgz";
-      sha512 = "3JO+acJlFdnEKpqXAPTyu0GLJVUdCFaE8ew1eQ1i9/EU6S4cNb6XFE6fP5hg0wE39nyoEkQ3eSnOgmd/AZcRFg==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.1.tgz";
+      sha512 = "KwpsmReQ80j3yXlj+MBd/gS53xtvN1Xe8AVasbsIzUlT8cdZx3EHf/9smkjqWpCWVZr2npKxWgginDUW58+Pxw==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
@@ -1292,7 +1292,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.24.4"
+      sources."zod-3.25.7"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
