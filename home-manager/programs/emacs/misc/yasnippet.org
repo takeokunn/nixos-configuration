@@ -1746,7 +1746,7 @@ $0
   // @phpstan-ignore-next-line$0
 #+end_src
 *** phpunit-setup
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpunit-template") :mkdirp yes :noweb yes
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/phpunit-setup") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
   # name: phpunit-setup
   # key: phpunit-setup
