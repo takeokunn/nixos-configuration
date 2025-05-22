@@ -2183,18 +2183,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(tramp-set-completion-function) "tramp" nil t)
 #+end_src
-** docker-tramp
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(docker-tramp-add-method
-                       docker-tramp-cleanup
-                       docker-tramp-add-method) "docker-tramp" nil t)
-
-  (add-hook 'emacs-startup-hook #'docker-tramp-add-method)
-
-  (with-eval-after-load 'tramp
-    (docker-tramp-add-method)
-    (tramp-set-completion-function docker-tramp-method docker-tramp-completion-function-alist))
-#+end_src
 ** consult-tramp
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-tramp) "consult-tramp" nil t)
