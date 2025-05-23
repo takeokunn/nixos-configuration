@@ -1700,7 +1700,7 @@
 
   (with-eval-after-load 'lsp-diagnostics
     ;; config
-    (setopt lsp-diagnostics-flycheck-default-level 'error))
+    (setopt lsp-diagnostics-flycheck-default-level 'warning))
 
   (with-eval-after-load 'lsp-completion
     ;; config
@@ -4031,11 +4031,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** phpstan
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(phpstan-analyze-file phpstan-analyze-this-file) "phpstan" nil t)
+  (autoload-if-found '(phpstan-analyze-this-file
+                       phpstan-analyze-file
+                       phpstan-analyze-project
+                       phpstan-generate-baseline
+                       phpstan-find-baseline-file
+                       phpstan-pro
+                       phpstan-insert-ignore
+                       phpstan-copy-dumped-type
+                       phpstan-insert-dumptype) "phpstan" nil t)
 
   (with-eval-after-load 'phpstan
     ;; config
-    (setopt phpstan-memory-limit "4G"))
+    (setopt phpstan-memory-limit "4G")
+    (setopt phpstan-activate-editor-mode t))
 #+end_src
 *** phpunit
 #+begin_src emacs-lisp :tangle yes
