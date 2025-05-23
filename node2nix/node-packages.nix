@@ -21,13 +21,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.11.5" = {
+    "@modelcontextprotocol/sdk-1.12.0" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.11.5";
+      version = "1.12.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.11.5.tgz";
-        sha512 = "gS7Q7IHpKxjVaNLMUZyTtatZ63ca3h418zPPntAhu/MvG5yfz/8HMcDAOpvpQfx3V3dsw9QQxk8RuFNrQhLlgA==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.12.0.tgz";
+        sha512 = "m//7RlINx1F3sz3KqwY1WWzVgTcYX52HYk4bJ1hkBXV3zccAEth+jRvG8DBRrdaQuRsPAJOx2MH3zaHNCKL7Zg==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -48,13 +48,13 @@ let
         sha512 = "5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==";
       };
     };
-    "ajv-8.17.1" = {
+    "ajv-6.12.6" = {
       name = "ajv";
       packageName = "ajv";
-      version = "8.17.1";
+      version = "6.12.6";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ajv/-/ajv-8.17.1.tgz";
-        sha512 = "B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==";
+        url = "https://registry.npmjs.org/ajv/-/ajv-6.12.6.tgz";
+        sha512 = "j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==";
       };
     };
     "body-parser-2.2.0" = {
@@ -399,13 +399,13 @@ let
         sha512 = "f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==";
       };
     };
-    "fast-uri-3.0.6" = {
-      name = "fast-uri";
-      packageName = "fast-uri";
-      version = "3.0.6";
+    "fast-json-stable-stringify-2.1.0" = {
+      name = "fast-json-stable-stringify";
+      packageName = "fast-json-stable-stringify";
+      version = "2.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/fast-uri/-/fast-uri-3.0.6.tgz";
-        sha512 = "Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==";
+        url = "https://registry.npmjs.org/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz";
+        sha512 = "lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==";
       };
     };
     "fill-range-7.1.1" = {
@@ -579,13 +579,13 @@ let
         sha512 = "RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==";
       };
     };
-    "json-schema-traverse-1.0.0" = {
+    "json-schema-traverse-0.4.1" = {
       name = "json-schema-traverse";
       packageName = "json-schema-traverse";
-      version = "1.0.0";
+      version = "0.4.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz";
-        sha512 = "NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==";
+        url = "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz";
+        sha512 = "xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==";
       };
     };
     "math-intrinsics-1.1.0" = {
@@ -786,6 +786,15 @@ let
         sha512 = "llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==";
       };
     };
+    "punycode-2.3.1" = {
+      name = "punycode";
+      packageName = "punycode";
+      version = "2.3.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz";
+        sha512 = "vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==";
+      };
+    };
     "qs-6.14.0" = {
       name = "qs";
       packageName = "qs";
@@ -811,15 +820,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/raw-body/-/raw-body-3.0.0.tgz";
         sha512 = "RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==";
-      };
-    };
-    "require-from-string-2.0.2" = {
-      name = "require-from-string";
-      packageName = "require-from-string";
-      version = "2.0.2";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz";
-        sha512 = "Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==";
       };
     };
     "router-2.2.0" = {
@@ -1002,6 +1002,15 @@ let
         sha512 = "pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==";
       };
     };
+    "uri-js-4.4.1" = {
+      name = "uri-js";
+      packageName = "uri-js";
+      version = "4.4.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz";
+        sha512 = "7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==";
+      };
+    };
     "vary-1.1.2" = {
       name = "vary";
       packageName = "vary";
@@ -1092,13 +1101,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.20" = {
+    "zod-3.25.23" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.20";
+      version = "3.25.23";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.20.tgz";
-        sha512 = "z03fqpTMDF1G02VLKUMt6vyACE7rNWkh3gpXVHgPTw28NPtDFRGvcpTtPwn2kMKtQ0idtYJUTxchytmnqYswcw==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.23.tgz";
+        sha512 = "Od2bdMosahjSrSgJtakrwjMDb1zM1A3VIHCPGveZt/3/wlrTWBya2lmEh2OYe4OIu8mPTmmr0gnLHIWQXdtWBg==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1139,10 +1148,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "0.2.126";
+    version = "1.0.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-0.2.126.tgz";
-      sha512 = "YBAtMs0OobKlrmvCicl8DZa8uLOSiaorW+V0aVYeGVU6q/lf7ZoPmckZT2B3e8rS43tgXmjadK/KHdJ1UztT6Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.2.tgz";
+      sha512 = "6p7RMXEcVfymsJ7v0GyMfA3gcD2AbFVSb9b1Py4tbxM2ensjyaSx3wVQW2QiFk+9mhoRkYc0ETVnJ1x/G0LW7g==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1164,10 +1173,10 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.11.5"
+      sources."@modelcontextprotocol/sdk-1.12.0"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
-      sources."ajv-8.17.1"
+      sources."ajv-6.12.6"
       sources."body-parser-2.2.0"
       sources."boolbase-1.0.0"
       sources."braces-3.0.3"
@@ -1205,7 +1214,7 @@ in
       sources."express-5.1.0"
       sources."express-rate-limit-7.5.0"
       sources."fast-deep-equal-3.1.3"
-      sources."fast-uri-3.0.6"
+      sources."fast-json-stable-stringify-2.1.0"
       sources."fill-range-7.1.1"
       sources."finalhandler-2.1.0"
       sources."forwarded-0.2.0"
@@ -1232,7 +1241,7 @@ in
       sources."is-number-7.0.0"
       sources."is-promise-4.0.0"
       sources."isexe-2.0.0"
-      sources."json-schema-traverse-1.0.0"
+      sources."json-schema-traverse-0.4.1"
       sources."math-intrinsics-1.1.0"
       sources."media-typer-1.1.0"
       sources."merge-descriptors-2.0.0"
@@ -1262,10 +1271,10 @@ in
       sources."picomatch-2.3.1"
       sources."pkce-challenge-5.0.0"
       sources."proxy-addr-2.0.7"
+      sources."punycode-2.3.1"
       sources."qs-6.14.0"
       sources."range-parser-1.2.1"
       sources."raw-body-3.0.0"
-      sources."require-from-string-2.0.2"
       sources."router-2.2.0"
       sources."safe-buffer-5.2.1"
       sources."safer-buffer-2.1.2"
@@ -1286,13 +1295,14 @@ in
       sources."type-is-2.0.1"
       sources."undici-6.21.3"
       sources."unpipe-1.0.0"
+      sources."uri-js-4.4.1"
       sources."vary-1.1.2"
       sources."webidl-conversions-7.0.0"
       sources."whatwg-encoding-3.1.1"
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.20"
+      sources."zod-3.25.23"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
