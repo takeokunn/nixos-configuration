@@ -1101,13 +1101,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.28" = {
+    "zod-3.25.30" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.28";
+      version = "3.25.30";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.28.tgz";
-        sha512 = "/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.30.tgz";
+        sha512 = "VolhdEtu6TJr/fzGuHA/SZ5ixvXqA6ADOG9VRcQ3rdOKmF5hkmcJbyaQjUH5BgmpA9gej++zYRX7zjSmdReIwA==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1166,10 +1166,10 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.5.5";
+    version = "0.5.6";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.5.tgz";
-      sha512 = "VFlSNADXhz4tFX5npFAMsRm10Jz9odvzrE4j88Q3iFj6sUfRjxJ64tu/E9SAXQnNN1CcfMvnU5hpF8wSiHQnhg==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.6.tgz";
+      sha512 = "EVGW8u+Y1fDJGNc8X2v5RbbkArsvGRasUZ8XPO98TUD1HMSOJna9ji/j5tEJ5szmZoaNPInnWJq4Kr+GFJO4Mw==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
@@ -1302,7 +1302,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.28"
+      sources."zod-3.25.30"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
