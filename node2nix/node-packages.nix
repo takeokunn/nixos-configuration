@@ -1101,13 +1101,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.30" = {
+    "zod-3.25.32" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.30";
+      version = "3.25.32";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.30.tgz";
-        sha512 = "VolhdEtu6TJr/fzGuHA/SZ5ixvXqA6ADOG9VRcQ3rdOKmF5hkmcJbyaQjUH5BgmpA9gej++zYRX7zjSmdReIwA==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.32.tgz";
+        sha512 = "OSm2xTIRfW8CV5/QKgngwmQW/8aPfGdaQFlrGoErlgg/Epm7cjb6K6VEyExfe65a3VybUOnu381edLb0dfJl0g==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1125,10 +1125,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.323.0";
+    version = "1.324.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.323.0.tgz";
-      sha512 = "mz91v3QRjNk9LwcA2CdjBUiF3ysOxwTctSpQpDT2301LQIE/RY+j1OcxhD87rcsv5f+2WVhCnIbEIb4HAhS4Tw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.324.0.tgz";
+      sha512 = "mVLyKeOxR/H4hnkVc9thsIDhsrHhDoKqfGw/AYGHOzMG5nK+PY+Y9xX4CxijiV/kqq84aK8r1M/WaJbX+iaDKg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1302,7 +1302,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.30"
+      sources."zod-3.25.32"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
