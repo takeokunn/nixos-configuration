@@ -16,7 +16,9 @@ let
   settings = {
     servers.sitemcp-takeokunn-org = {
       command = "${nodePkgs."sitemcp"}/bin/sitemcp";
-      args = [ "https://www.takeokunn.org/" ];
+      args = [
+        "https://www.takeokunn.org/"
+      ];
     };
   };
 in

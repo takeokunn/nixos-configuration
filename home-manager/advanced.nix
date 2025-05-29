@@ -60,16 +60,21 @@ let
   ];
 
   # mcp servers
-  # mcpServers = import ./mcp-servers {
-  #   inherit pkgs nodePkgs;
-  #   inherit config mcp-servers-nix;
-  # };
+  mcpServers = import ./mcp-servers {
+    inherit pkgs nodePkgs;
+    inherit config mcp-servers-nix;
+  };
 in
 {
   imports =
-    misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices ++ sops
-  # ++ mcpServers
-  ;
+    misc
+    ++ modules
+    ++ basicPrograms
+    ++ advancedPrograms
+    ++ basicServices
+    ++ advancedServices
+    ++ sops
+    ++ mcpServers;
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;
