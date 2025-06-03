@@ -1,7 +1,6 @@
 #+TITLE: Yasnippet Configurations
 #+AUTHOR: takeokunn
 #+EMAIL: bararararatty@gmail.com
-#+STARTUP: content
 #+STARTUP: fold
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
