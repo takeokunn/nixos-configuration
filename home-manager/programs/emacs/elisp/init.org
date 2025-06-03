@@ -4405,7 +4405,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'view-mode)
 
     ;; directory
-    (setq org-directory "~/ghq/github.com/takeokunn/private")
+    (setq org-directory "~/ghq/github.com/takeokunn/private/agenda")
 
     ;; todo
     (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "REVIEW(r)" "QA(q)" "|" "DONE(d)")))
@@ -4414,7 +4414,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-startup-folded 'show3levels)
     (setq org-startup-truncated nil)
 
-    (defvar my/org-agenda-files `(,(concat org-directory "/agenda")
+    (defvar my/org-agenda-files `(,(concat org-directory "/task")
                                   ,(concat org-directory "/archive/2023")
                                   ,(concat org-directory "/archive/2024")
                                   ,(concat org-directory "/archive/2025")))

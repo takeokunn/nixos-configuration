@@ -987,8 +987,8 @@ $0
 *** diary-mtg-template-saturday
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/diary-mtg-template-saturday") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
-  # name: diary-mtg-template-friday
-  # key: diary-mtg-template-friday
+  # name: diary-mtg-template-saturday
+  # key: diary-mtg-template-saturday
   # --
   ,** TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 連携先拡大 朝会
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))`>

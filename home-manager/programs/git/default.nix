@@ -46,6 +46,7 @@
       ".direnv"
       ".devenv"
       ".pre-commit-config.yaml"
+      ".markdown-preview.html"
     ];
 
     userName = "takeokunn";
