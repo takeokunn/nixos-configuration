@@ -1101,13 +1101,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.49" = {
+    "zod-3.25.51" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.49";
+      version = "3.25.51";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.49.tgz";
-        sha512 = "JMMPMy9ZBk3XFEdbM3iL1brx4NUSejd6xr3ELrrGEfGb355gjhiAWtG3K5o+AViV/3ZfkIrCzXsZn6SbLwTR8Q==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.51.tgz";
+        sha512 = "TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1148,10 +1148,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.9";
+    version = "1.0.10";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.9.tgz";
-      sha512 = "bLjWQV3QLw5kn2glu3ncjUDtB9zJzuzRjqGDjfzXEA3QbXSL7E/x5o+06qu7w9hd8CQzIXq6t2hKTET3Hlvitg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.10.tgz";
+      sha512 = "MQ4+bDwjaf5BzAlujREyhwJJuBtgnbNI7DYiEaRB+BeoMxovRYLQXyo9/WK+NIhovf8rJQNXP9q6+wHrN1BpZw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1302,7 +1302,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.49"
+      sources."zod-3.25.51"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
