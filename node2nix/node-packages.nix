@@ -939,6 +939,15 @@ let
         sha512 = "RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==";
       };
     };
+    "statuses-2.0.2" = {
+      name = "statuses";
+      packageName = "statuses";
+      version = "2.0.2";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/statuses/-/statuses-2.0.2.tgz";
+        sha512 = "DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==";
+      };
+    };
     "to-regex-range-5.0.1" = {
       name = "to-regex-range";
       packageName = "to-regex-range";
@@ -1101,13 +1110,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.55" = {
+    "zod-3.25.56" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.55";
+      version = "3.25.56";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.55.tgz";
-        sha512 = "219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.56.tgz";
+        sha512 = "rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1148,10 +1157,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.16";
+    version = "1.0.17";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.16.tgz";
-      sha512 = "Lqf2yPnNF5fMZ4xw41lON+4J5RLNjIYO+2OgoLqzxRTT4u3gLQJ2uSrW0lSL9otDThMiY5SokzbMU1MAm7KKPA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.17.tgz";
+      sha512 = "+MX/pKOKXG2HLSh7WJIgiILdumqRgcORUX0iSQmAfn+UEoHSYSuFWZWuWBpixaa8W4tiTCC06uN4pgzinCU6jw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1234,7 +1243,14 @@ in
       sources."has-symbols-1.1.0"
       sources."hasown-2.0.2"
       sources."htmlparser2-9.1.0"
-      sources."http-errors-2.0.0"
+      (
+        sources."http-errors-2.0.0"
+        // {
+          dependencies = [
+            sources."statuses-2.0.1"
+          ];
+        }
+      )
       sources."iconv-lite-0.6.3"
       sources."inherits-2.0.4"
       sources."ipaddr.js-1.9.1"
@@ -1287,7 +1303,7 @@ in
       sources."side-channel-list-1.0.0"
       sources."side-channel-map-1.0.1"
       sources."side-channel-weakmap-1.0.2"
-      sources."statuses-2.0.1"
+      sources."statuses-2.0.2"
       sources."to-regex-range-5.0.1"
       sources."toidentifier-1.0.1"
       sources."turndown-7.2.0"
@@ -1302,7 +1318,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.55"
+      sources."zod-3.25.56"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
