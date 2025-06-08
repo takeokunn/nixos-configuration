@@ -884,7 +884,6 @@ $0
   ,#+HUGO_SECTION: posts/$3
   ,#+HUGO_TAGS: $3 $4
   ,#+HUGO_DRAFT: true
-  ,#+STARTUP: content
   ,#+STARTUP: fold
 #+end_src
 *** blog-zenn
@@ -900,7 +899,6 @@ $0
   ,#+GFM_CUSTOM_FRONT_MATTER: :emoji 👍
   ,#+GFM_CUSTOM_FRONT_MATTER: :type tech
   ,#+GFM_CUSTOM_FRONT_MATTER: :published false
-  ,#+STARTUP: content
   ,#+STARTUP: fold
   ,#+OPTIONS: toc:nil
 #+end_src
@@ -919,7 +917,6 @@ $0
   # name: content
   # key: content
   # --
-  ,#+STARTUP: content
   ,#+STARTUP: nohideblocks
 #+end_src
 *** date
