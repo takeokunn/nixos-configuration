@@ -7,6 +7,7 @@
       cleanup = "uninstall";
     };
     brews = [
+      "pdfpc"
       "pinentry-mac"
       "terminal-notifier"
     ];
