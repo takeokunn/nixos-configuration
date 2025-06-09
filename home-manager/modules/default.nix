@@ -1,7 +1,6 @@
 [
   ./dust
   ./lnav
-  ./nyxt
   ./peco
   ./sops
   ./tig

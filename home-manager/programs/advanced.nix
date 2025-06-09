@@ -14,7 +14,6 @@ let
   lnav = import ./lnav { inherit pkgs; };
   mu = import ./mu { inherit pkgs; };
   nix-index = import ./nix-index;
-  nyxt = import ./nyxt { inherit pkgs; };
   offlineimap = import ./offlineimap;
   kitty = import ./kitty;
   sketchybar = import ./sketchybar;
@@ -37,7 +36,6 @@ in
   lnav
   mu
   nix-index
-  nyxt
   offlineimap
   kitty
   sketchybar
