@@ -111,13 +111,13 @@ let
         sha512 = "+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==";
       };
     };
-    "cheerio-1.0.0" = {
+    "cheerio-1.1.0" = {
       name = "cheerio";
       packageName = "cheerio";
-      version = "1.0.0";
+      version = "1.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.0.0.tgz";
-        sha512 = "quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==";
+        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.1.0.tgz";
+        sha512 = "+0hMx9eYhJvWbgpKV9hN7jg0JcwydpopZE4hgi+KvQtByZXPp04NiCWU0LzcAbP63abZckIHkTQaXVF52mX3xQ==";
       };
     };
     "cheerio-select-2.1.0" = {
@@ -282,13 +282,13 @@ let
         sha512 = "Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==";
       };
     };
-    "encoding-sniffer-0.2.0" = {
+    "encoding-sniffer-0.2.1" = {
       name = "encoding-sniffer";
       packageName = "encoding-sniffer";
-      version = "0.2.0";
+      version = "0.2.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/encoding-sniffer/-/encoding-sniffer-0.2.0.tgz";
-        sha512 = "ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==";
+        url = "https://registry.npmjs.org/encoding-sniffer/-/encoding-sniffer-0.2.1.tgz";
+        sha512 = "5gvq20T6vfpekVtqrYQsSCFZ1wEg5+wW0/QaZMWkFr6BqD3NfKs0rLCx4rrVlSWJeZb5NBJgVLswK/w2MWU+Gw==";
       };
     };
     "entities-4.5.0" = {
@@ -300,13 +300,13 @@ let
         sha512 = "V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==";
       };
     };
-    "entities-6.0.0" = {
+    "entities-6.0.1" = {
       name = "entities";
       packageName = "entities";
-      version = "6.0.0";
+      version = "6.0.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/entities/-/entities-6.0.0.tgz";
-        sha512 = "aKstq2TDOndCn4diEyp9Uq/Flu2i1GlLkc6XIDQSDMuaFE3OPW5OphLCyQ5SpSJZTb4reN+kTcYru5yIfXoRPw==";
+        url = "https://registry.npmjs.org/entities/-/entities-6.0.1.tgz";
+        sha512 = "aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==";
       };
     };
     "es-define-property-1.0.1" = {
@@ -507,13 +507,13 @@ let
         sha512 = "0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==";
       };
     };
-    "htmlparser2-9.1.0" = {
+    "htmlparser2-10.0.0" = {
       name = "htmlparser2";
       packageName = "htmlparser2";
-      version = "9.1.0";
+      version = "10.0.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/htmlparser2/-/htmlparser2-9.1.0.tgz";
-        sha512 = "5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==";
+        url = "https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.0.0.tgz";
+        sha512 = "TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==";
       };
     };
     "http-errors-2.0.0" = {
@@ -993,13 +993,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-6.21.3" = {
+    "undici-7.10.0" = {
       name = "undici";
       packageName = "undici";
-      version = "6.21.3";
+      version = "7.10.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-6.21.3.tgz";
-        sha512 = "gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.10.0.tgz";
+        sha512 = "u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==";
       };
     };
     "unpipe-1.0.0" = {
@@ -1192,7 +1192,7 @@ in
       sources."bytes-3.1.2"
       sources."call-bind-apply-helpers-1.0.2"
       sources."call-bound-1.0.4"
-      sources."cheerio-1.0.0"
+      sources."cheerio-1.1.0"
       sources."cheerio-select-2.1.0"
       sources."content-disposition-1.0.0"
       sources."content-type-1.0.5"
@@ -1211,7 +1211,7 @@ in
       sources."dunder-proto-1.0.1"
       sources."ee-first-1.1.1"
       sources."encodeurl-2.0.0"
-      sources."encoding-sniffer-0.2.0"
+      sources."encoding-sniffer-0.2.1"
       sources."entities-4.5.0"
       sources."es-define-property-1.0.1"
       sources."es-errors-1.3.0"
@@ -1242,7 +1242,14 @@ in
       )
       sources."has-symbols-1.1.0"
       sources."hasown-2.0.2"
-      sources."htmlparser2-9.1.0"
+      (
+        sources."htmlparser2-10.0.0"
+        // {
+          dependencies = [
+            sources."entities-6.0.1"
+          ];
+        }
+      )
       (
         sources."http-errors-2.0.0"
         // {
@@ -1275,7 +1282,7 @@ in
         sources."parse5-7.3.0"
         // {
           dependencies = [
-            sources."entities-6.0.0"
+            sources."entities-6.0.1"
           ];
         }
       )
@@ -1309,7 +1316,7 @@ in
       sources."turndown-7.2.0"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
-      sources."undici-6.21.3"
+      sources."undici-7.10.0"
       sources."unpipe-1.0.0"
       sources."uri-js-4.4.1"
       sources."vary-1.1.2"
