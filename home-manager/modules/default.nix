@@ -1,4 +1,5 @@
 [
+  ./aider
   ./dust
   ./lnav
   ./peco

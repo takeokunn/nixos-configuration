@@ -23,12 +23,12 @@
   })
   (final: prev: {
     lnav = prev.lnav.overrideAttrs (old: {
-      version = "2025-05-03-HEAD";
+      version = "2025-06-11-HEAD";
       src = prev.fetchFromGitHub {
         owner = "tstack";
         repo = "lnav";
-        rev = "adec0dc8ec0ffd5a7f06c19852edc35d00dc4fe1";
-        hash = "sha256-Dk+pFg+Tt1krFmEzoT4sW8dPd0x5kCD6vTIQVzAvs3A=";
+        rev = "4640885e61bc639f6c12a0e3208a210e6978fcd8";
+        hash = "sha256-XS3/km2sJwRnWloLKu9X9z07+qBFRfUsaRpZVYjoclI=";
       };
     });
   })

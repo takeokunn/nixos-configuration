@@ -7,6 +7,7 @@
   emacsPkg,
 }:
 let
+  aider = import ./aider;
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
   gh-dash = import ./gh-dash;
@@ -29,6 +30,7 @@ let
   waybar = import ./waybar { inherit pkgs; };
 in
 [
+  aider
   emacs
   gh
   gh-dash
