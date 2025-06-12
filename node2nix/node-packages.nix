@@ -1110,13 +1110,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.61" = {
+    "zod-3.25.63" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.61";
+      version = "3.25.63";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.61.tgz";
-        sha512 = "fzfJgUw78LTNnHujj9re1Ov/JJQkRZZGDMcYqSx7Hp4rPOkKywaFHq0S6GoHeXs0wGNE/sIOutkXgnwzrVOGCQ==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.63.tgz";
+        sha512 = "3ttCkqhtpncYXfP0f6dsyabbYV/nEUW+Xlu89jiXbTBifUfjaSqXOG6JnQPLtqt87n7KAmnMqcjay6c0Wq0Vbw==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1134,10 +1134,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.332.0";
+    version = "1.333.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.332.0.tgz";
-      sha512 = "thJxeMt68K+jodoEJEtzzN2TeKo7wTDj75rGV9qtx17An81cazXKiqcaCNO7p/u+wRNONOiw69b/TfRCxrnAdg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.333.0.tgz";
+      sha512 = "qq1iaFBjJMQOEFMmpMA9c8VJO4sV1PIK8Uf8YSb/hpgpHl1jrUjIzu3SxLQuTrAUrzc/GRH1p1vqkht685Qo5w==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1157,10 +1157,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.18";
+    version = "1.0.22";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.18.tgz";
-      sha512 = "UXg3DkT64IVbtdHyrqUly5/IHGC1J4MXyNP6R4yycePucNK59ViVprMHKkWMdhCeiYMx8DkA6frbuBTYYKavwQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.22.tgz";
+      sha512 = "vqfDHq4KNtUzUiwdsls8+2aTrC1Rn96iH+yOyCrBjHjJwojzU6pt3MOAMkJHMeErKeGqve+I7HM6mFw0OgZgqw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1325,7 +1325,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.61"
+      sources."zod-3.25.63"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
