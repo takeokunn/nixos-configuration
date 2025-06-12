@@ -5367,7 +5367,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-x C-/" #'aidermacs-transient-menu)
 
   (with-eval-after-load 'aidermacs
-    (setopt aidermacs-extra-args '("--yes-always"))
     (setopt aidermacs-use-architect-mode t)
     (setopt aidermacs-auto-commits t)
     (setopt aidermacs-watch-files t)
