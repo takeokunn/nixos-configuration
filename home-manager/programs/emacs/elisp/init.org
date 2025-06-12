@@ -2682,6 +2682,10 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; config
     (setopt projectile-switch-project-action 'projectile-dired)
     (setopt projectile-use-git-grep t))
+
+  (with-eval-after-load 'fileloop
+    ;; advice
+    (advice-add 'fileloop-continue :before #'my/disable-buffer-readonly))
 #+end_src
 ** consult-projectile
 #+begin_src emacs-lisp :tangle yes
