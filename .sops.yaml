@@ -4,4 +4,4 @@ creation_rules:
   - path_regex: sops/[^/]+\.yaml$
     key_groups:
       - pgp:
-          - *take
+          - *take 

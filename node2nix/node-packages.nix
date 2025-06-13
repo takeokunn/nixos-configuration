@@ -21,13 +21,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.12.1" = {
+    "@modelcontextprotocol/sdk-1.12.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.12.1";
+      version = "1.12.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.12.1.tgz";
-        sha512 = "KG1CZhZfWg+u8pxeM/mByJDScJSrjjxLc8fwQqbsS8xCjBmQfMNEBTotYdNanKekepnfRI85GtgQlctLFpcYPw==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.12.2.tgz";
+        sha512 = "ShQesHTyTZfcpjnMCUOH1gbhK9CZXL30GLFw4hN8qOiIaRKbkOl91uw79WP4v3Mh4QUffjkUO60ZtBUEzaRaOg==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -1110,13 +1110,13 @@ let
         sha512 = "l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==";
       };
     };
-    "zod-3.25.63" = {
+    "zod-3.25.64" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.63";
+      version = "3.25.64";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.63.tgz";
-        sha512 = "3ttCkqhtpncYXfP0f6dsyabbYV/nEUW+Xlu89jiXbTBifUfjaSqXOG6JnQPLtqt87n7KAmnMqcjay6c0Wq0Vbw==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.64.tgz";
+        sha512 = "hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==";
       };
     };
     "zod-to-json-schema-3.24.5" = {
@@ -1134,10 +1134,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.333.0";
+    version = "1.335.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.333.0.tgz";
-      sha512 = "qq1iaFBjJMQOEFMmpMA9c8VJO4sV1PIK8Uf8YSb/hpgpHl1jrUjIzu3SxLQuTrAUrzc/GRH1p1vqkht685Qo5w==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.335.0.tgz";
+      sha512 = "uX5t6kOlWau4WtpL/WQLL8qADE4iHSfbDojYRVq8kTIjg1u5w6Ty7wqddnfyPUIpTltifsBVoHjHpW5vdhf55g==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -1182,7 +1182,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.12.1"
+      sources."@modelcontextprotocol/sdk-1.12.2"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -1325,7 +1325,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.63"
+      sources."zod-3.25.64"
       sources."zod-to-json-schema-3.24.5"
     ];
     buildInputs = globalBuildInputs;
