@@ -21,13 +21,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.12.2" = {
+    "@modelcontextprotocol/sdk-1.12.3" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.12.2";
+      version = "1.12.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.12.2.tgz";
-        sha512 = "ShQesHTyTZfcpjnMCUOH1gbhK9CZXL30GLFw4hN8qOiIaRKbkOl91uw79WP4v3Mh4QUffjkUO60ZtBUEzaRaOg==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.12.3.tgz";
+        sha512 = "DyVYSOafBvk3/j1Oka4z5BWT8o4AFmoNyZY9pALOm7Lh3GZglR71Co4r4dEUoqDWdDazIZQHBe7J2Nwkg6gHgQ==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -1157,10 +1157,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.22";
+    version = "1.0.24";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.22.tgz";
-      sha512 = "vqfDHq4KNtUzUiwdsls8+2aTrC1Rn96iH+yOyCrBjHjJwojzU6pt3MOAMkJHMeErKeGqve+I7HM6mFw0OgZgqw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.24.tgz";
+      sha512 = "4S6ly2297ngNlto7IFZeEicS9u0yRDhocOzndWFovGBb+iUoEPKdZa/rhVk/tcyCADL6S+mMkiGQOlqFDrN3JQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -1182,7 +1182,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.12.2"
+      sources."@modelcontextprotocol/sdk-1.12.3"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
