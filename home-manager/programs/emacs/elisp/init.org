@@ -1153,6 +1153,7 @@
 
   ;; for ts/deno
   (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.mts$" . typescript-mode))
 
   ;; for tsx
   (define-derived-mode typescript-tsx-mode typescript-mode "tsx")
