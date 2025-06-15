@@ -1162,6 +1162,11 @@
 
   ;; for deno
   (define-derived-mode deno-mode typescript-mode "deno")
+
+  (with-eval-after-load 'typescript-mode
+    ;; hooks
+    (add-hook 'typescript-mode-hook #'emmet-mode)
+    (add-hook 'typescript-tsx-mode-hook #'emmet-mode))
 #+END_SRC
 ** typst-mode
 #+begin_src emacs-lisp :tangle yes
@@ -1222,7 +1227,10 @@
     ;; config
     (setopt web-mode-comment-style 2)
     (setopt web-mode-enable-auto-pairing nil)
-    (setopt web-mode-enable-auto-indentation nil))
+    (setopt web-mode-enable-auto-indentation nil)
+
+    ;; hooks
+    (add-hook 'web-mode-hook #'emmet-mode))
 #+END_SRC
 ** web-php-blade-mode
 #+begin_src emacs-lisp :tangle yes
@@ -4113,10 +4121,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; hooks
     (add-hook 'html-mode-hook #'emmet-mode))
 
-  (with-eval-after-load 'web-mode
-    ;; hooks
-    (add-hook 'web-mode-hook #'emmet-mode))
-
   (with-eval-after-load 'css-mode
     ;; hooks
     (add-hook 'css-mode-hook #'emmet-mode))
@@ -4128,14 +4132,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'web-php-blade-mode
     ;; hooks
     (add-hook 'web-php-blade-mode #'emmet-mode))
-
-  (with-eval-after-load 'typescript-mode
-    ;; hooks
-    (add-hook 'typescript-tsx-mode-hook #'emmet-mode))
-
-  (with-eval-after-load 'vue-mode
-    ;; hooks
-    (add-hook 'vue-mode-hook #'emmet-mode))
 
   (with-eval-after-load 'emmet-mode
     ;; keybinds
