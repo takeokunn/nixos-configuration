@@ -292,15 +292,15 @@
   };
   emacs-ox-typst = {
     pname = "emacs-ox-typst";
-    version = "71bc9eb5f257d66ab64b04575df98e36cf615277";
+    version = "fb48e38a7a38f33d6109ebe611823a6a939fd17f";
     src = fetchFromGitHub {
       owner = "jmpunkt";
       repo = "ox-typst";
-      rev = "71bc9eb5f257d66ab64b04575df98e36cf615277";
+      rev = "fb48e38a7a38f33d6109ebe611823a6a939fd17f";
       fetchSubmodules = false;
-      sha256 = "sha256-bhs03WbmjYkpqXfn8pwOLevLOJpwQTNIUz3D9kJkMKI=";
+      sha256 = "sha256-Y+q3k2IhE3hzG9GWmGVzjrB6XTuLoCf7ayhIQUq7e4Y=";
     };
-    date = "2025-06-11";
+    date = "2025-06-15";
   };
   emacs-php-doc-block = {
     pname = "emacs-php-doc-block";
@@ -664,13 +664,13 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "f798fbee93dc18230d0570144061799e4700b2e1";
+    version = "28c75de6561e7ff3ab346e3c64b66ada0b674cba";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "f798fbee93dc18230d0570144061799e4700b2e1";
+      rev = "28c75de6561e7ff3ab346e3c64b66ada0b674cba";
       fetchSubmodules = false;
-      sha256 = "sha256-f5yfOvZ3dMkr/gP1pJVaBmoptFs86t1Soppya59OUYE=";
+      sha256 = "sha256-Zg1PNH18hwgsB4gOY0RKnPmsKTo/CmjuMRCcq+bKLBg=";
     };
     date = "2025-06-15";
   };
