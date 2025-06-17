@@ -398,18 +398,6 @@
     };
     date = "2023-09-25";
   };
-  emacs-view-lock-mode = {
-    pname = "emacs-view-lock-mode";
-    version = "508b1a4b6d5e040455535331244104f5122e340b";
-    src = fetchFromGitHub {
-      owner = "s-fubuki";
-      repo = "view-lock-mode";
-      rev = "508b1a4b6d5e040455535331244104f5122e340b";
-      fetchSubmodules = false;
-      sha256 = "sha256-WUhQO/4O0NBpUfNofGUsS7Rfbel8iEGk+qCyOs9o0Ik=";
-    };
-    date = "2024-07-06";
-  };
   emacs-web-php-blade-mode = {
     pname = "emacs-web-php-blade-mode";
     version = "a4463d2732caa8c3650826ee4fc79f3fd29c9e56";

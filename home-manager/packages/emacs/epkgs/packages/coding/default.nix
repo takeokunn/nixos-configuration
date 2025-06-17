@@ -65,9 +65,6 @@ with epkgs;
   # Undo
   undo-tree
 
-  # View Mode
-  packages.view-lock-mode
-
   # Utility
   crux
   dogears

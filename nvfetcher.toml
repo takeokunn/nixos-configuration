@@ -153,11 +153,6 @@ src.git = "https://github.com/nbfalcon/flycheck-projectile"
 src.branch = "master"
 fetch.github = "nbfalcon/flycheck-projectile"
 
-[emacs-view-lock-mode]
-src.git = "https://github.com/s-fubuki/view-lock-mode"
-src.branch = "main"
-fetch.github = "s-fubuki/view-lock-mode"
-
 [emacs-consult-tramp]
 src.git = "https://github.com/Ladicle/consult-tramp"
 src.branch = "main"

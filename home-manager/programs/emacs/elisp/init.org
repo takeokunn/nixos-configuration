@@ -2031,20 +2031,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (defun my/advice-disable-buffer-readonly (old-func &rest args)
       (add-hook 'view-mode-hook #'my/disable-buffer-readonly)
       (apply old-func args)
-      (remove-hook 'view-mode-hook #'my/disable-buffer-readonly))
-
-    ;; advices
-    (advice-add 'view--disable :before #'(lambda (&rest _) (view-lock-mode -1))))
-#+end_src
-**** view-lock-mode
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(view-lock-timer-start view-lock-quit) "view-lock-mode" nil t)
-
-  (with-eval-after-load 'view
-    (add-hook 'view-mode-hook #'view-lock-timer-start))
-
-  (with-eval-after-load 'view-lock-mode
-    (setopt view-lock-start-time (* 30 60)))
+      (remove-hook 'view-mode-hook #'my/disable-buffer-readonly)))
 #+end_src
 ** Utility
 *** comint

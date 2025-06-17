@@ -10,14 +10,6 @@
     ignoreCompilationError = false;
   };
 
-  view-lock-mode = epkgs.melpaBuild {
-    pname = "view-lock-mode";
-    version = "0.0.1";
-    src = sources.emacs-view-lock-mode.src;
-
-    ignoreCompilationError = false;
-  };
-
   eglot-booster = epkgs.melpaBuild {
     pname = "eglot-booster";
     version = "0.0.1";

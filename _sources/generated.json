@@ -692,27 +692,6 @@
     },
     "version": "5776fd4f3608350ff6a2b61b118d38165d342aa3"
   },
-  "emacs-view-lock-mode": {
-    "cargoLocks": null,
-    "date": "2024-07-06",
-    "extract": null,
-    "name": "emacs-view-lock-mode",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "s-fubuki",
-      "repo": "view-lock-mode",
-      "rev": "508b1a4b6d5e040455535331244104f5122e340b",
-      "sha256": "sha256-WUhQO/4O0NBpUfNofGUsS7Rfbel8iEGk+qCyOs9o0Ik=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "508b1a4b6d5e040455535331244104f5122e340b"
-  },
   "emacs-web-php-blade-mode": {
     "cargoLocks": null,
     "date": "2022-06-22",
