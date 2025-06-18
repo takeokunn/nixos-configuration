@@ -91,13 +91,13 @@
   };
   emacs-copilot-chat = {
     pname = "emacs-copilot-chat";
-    version = "v2.0.1";
+    version = "v3.0.0";
     src = fetchFromGitHub {
       owner = "chep";
       repo = "copilot-chat.el";
-      rev = "v2.0.1";
+      rev = "v3.0.0";
       fetchSubmodules = false;
-      sha256 = "sha256-7ACNuOxwLiZw3SRnjZ9fn0ynezrHtKYFXFwMRm4yt/8=";
+      sha256 = "sha256-oj8koAG+TKGu+gZftOExYtYlM9m1Z0cPZLiNOUIpktI=";
     };
   };
   emacs-direnv-mode = {

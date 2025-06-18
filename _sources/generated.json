@@ -160,12 +160,12 @@
       "name": null,
       "owner": "chep",
       "repo": "copilot-chat.el",
-      "rev": "v2.0.1",
-      "sha256": "sha256-7ACNuOxwLiZw3SRnjZ9fn0ynezrHtKYFXFwMRm4yt/8=",
+      "rev": "v3.0.0",
+      "sha256": "sha256-oj8koAG+TKGu+gZftOExYtYlM9m1Z0cPZLiNOUIpktI=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "v2.0.1"
+    "version": "v3.0.0"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
