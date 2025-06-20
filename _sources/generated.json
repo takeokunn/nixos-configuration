@@ -505,7 +505,7 @@
   },
   "emacs-ox-typst": {
     "cargoLocks": null,
-    "date": "2025-06-15",
+    "date": "2025-06-19",
     "extract": null,
     "name": "emacs-ox-typst",
     "passthru": null,
@@ -517,12 +517,12 @@
       "name": null,
       "owner": "jmpunkt",
       "repo": "ox-typst",
-      "rev": "fb48e38a7a38f33d6109ebe611823a6a939fd17f",
-      "sha256": "sha256-Y+q3k2IhE3hzG9GWmGVzjrB6XTuLoCf7ayhIQUq7e4Y=",
+      "rev": "5d574b78e9b06bea47422d57d827c38f30806b5d",
+      "sha256": "sha256-gpH/jgdXYT5bp38v+Gb+ek4fHXEGgiEcgiLUcc/qZJU=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "fb48e38a7a38f33d6109ebe611823a6a939fd17f"
+    "version": "5d574b78e9b06bea47422d57d827c38f30806b5d"
   },
   "emacs-php-doc-block": {
     "cargoLocks": null,
