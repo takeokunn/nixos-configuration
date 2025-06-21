@@ -6,4 +6,5 @@
   ./sops
   ./tig
   ./wget
+  ./zellij
 ]
