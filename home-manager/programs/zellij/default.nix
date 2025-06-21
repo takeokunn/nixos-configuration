@@ -23,11 +23,11 @@
               bind "Ctrl [" { SwitchToMode "Normal"; }
           }
 
-          locked {
+          locked clear-defaults=true {
               bind "Ctrl g" { SwitchToMode "Normal"; }
           }
 
-          normal {
+          normal clear-defaults=true {
               bind "Ctrl [" { SwitchToMode "Locked"; }
 
               bind "p" { SwitchToMode "Pane"; }
