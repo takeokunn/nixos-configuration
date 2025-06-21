@@ -13,6 +13,8 @@
       scroll_buffer_size = 100000;
       show_startup_tips = false;
       show_release_notes = false;
+      tab_bar = false;
+      hide_status_bar = true;
     };
   };
 }
