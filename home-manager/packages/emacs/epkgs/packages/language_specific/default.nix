@@ -89,4 +89,7 @@ with epkgs;
 
   # Dart
   flutter
+
+  # Golang
+  gotest
 ]

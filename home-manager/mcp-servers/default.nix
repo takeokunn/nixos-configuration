@@ -6,7 +6,7 @@
 }:
 let
   programs = {
-    fetch.enable = true;
+    # fetch.enable = true;
     playwright.enable = true;
     brave-search = {
       enable = true;

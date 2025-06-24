@@ -47,7 +47,7 @@
       ".devenv"
       ".pre-commit-config.yaml"
       ".markdown-preview.html"
-      ".worktrees/"
+      ".worktree/"
     ];
 
     userName = "takeokunn";

@@ -4175,6 +4175,22 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'dart-mode
     (define-key dart-mode-map (kbd "C-c z") #'my/flutter-switch-buffer))
 #+end_src
+** Go
+*** gotest
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(go-test-current-file
+                       go-test-current-test
+                       go-test-current-project
+                       go-test-current-benchmark
+                       go-run) "gotest" nil t)
+
+  (with-eval-after-load 'go-mode
+    (keymap-set go-mode-map "C-x f" #'go-test-current-file)
+    (keymap-set go-mode-map "C-x t" #'go-test-current-test)
+    (keymap-set go-mode-map "C-x p" #'go-test-current-project)
+    (keymap-set go-mode-map "C-x b" #'go-test-current-benchmark)
+    (keymap-set go-mode-map "C-x x" #'go-run))
+#+end_src
 * Elfeed
 ** elfeed
 #+begin_src emacs-lisp :tangle yes
