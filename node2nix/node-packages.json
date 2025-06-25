@@ -1,1 +1,6 @@
-["@github/copilot-language-server", "@anthropic-ai/claude-code", "sitemcp"]
+[
+  "@github/copilot-language-server",
+  "@anthropic-ai/claude-code",
+  "sitemcp",
+  "@google/gemini-cli"
+]

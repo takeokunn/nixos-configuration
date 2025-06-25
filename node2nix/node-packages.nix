@@ -12,6 +12,15 @@
 
 let
   sources = {
+    "@google/gemini-cli-0.1.1" = {
+      name = "_at_google_slash_gemini-cli";
+      packageName = "@google/gemini-cli";
+      version = "0.1.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.1.tgz";
+        sha512 = "6/NGntIvC2yBUPVYeMUP0MtmNgi+uBJPi+h/RmxPKRNBD1L8h+Y7VUJPpAoTi9Yl43fM6l2poPHtxwgPK1L6qA==";
+      };
+    };
     "@mixmark-io/domino-2.2.0" = {
       name = "_at_mixmark-io_slash_domino";
       packageName = "@mixmark-io/domino";
@@ -1119,13 +1128,13 @@ let
         sha512 = "idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==";
       };
     };
-    "zod-to-json-schema-3.24.5" = {
+    "zod-to-json-schema-3.24.6" = {
       name = "zod-to-json-schema";
       packageName = "zod-to-json-schema";
-      version = "3.24.5";
+      version = "3.24.6";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod-to-json-schema/-/zod-to-json-schema-3.24.5.tgz";
-        sha512 = "/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==";
+        url = "https://registry.npmjs.org/zod-to-json-schema/-/zod-to-json-schema-3.24.6.tgz";
+        sha512 = "h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==";
       };
     };
   };
@@ -1326,13 +1335,33 @@ in
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
       sources."zod-3.25.67"
-      sources."zod-to-json-schema-3.24.5"
+      sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
     meta = {
       description = "Fetch an entire site and use it as a MCP Server";
       homepage = "https://github.com/ryoppippi/sitemcp#readme";
       license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  "@google/gemini-cli" = nodeEnv.buildNodePackage {
+    name = "_at_google_slash_gemini-cli";
+    packageName = "@google/gemini-cli";
+    version = "0.1.1";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.1.tgz";
+      sha512 = "6/NGntIvC2yBUPVYeMUP0MtmNgi+uBJPi+h/RmxPKRNBD1L8h+Y7VUJPpAoTi9Yl43fM6l2poPHtxwgPK1L6qA==";
+    };
+    dependencies = [
+      sources."@google/gemini-cli-0.1.1"
+    ];
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "[![Gemini CLI CI](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml)";
+      homepage = "https://github.com/google-gemini/gemini-cli#readme";
     };
     production = true;
     bypassCache = true;
