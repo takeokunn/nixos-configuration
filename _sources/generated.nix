@@ -20,15 +20,15 @@
   };
   dracula-sublime = {
     pname = "dracula-sublime";
-    version = "456d3289827964a6cb503a3b0a6448f4326f291b";
+    version = "d490b57c08f3d110ff61a07ec6edcc1ed9e24a63";
     src = fetchFromGitHub {
       owner = "dracula";
       repo = "sublime";
-      rev = "456d3289827964a6cb503a3b0a6448f4326f291b";
+      rev = "d490b57c08f3d110ff61a07ec6edcc1ed9e24a63";
       fetchSubmodules = false;
-      sha256 = "sha256-8mCovVSrBjtFi5q+XQdqAaqOt3Q+Fo29eIDwECOViro=";
+      sha256 = "sha256-7veVVrLPW3T7KkkelDmgPW5kp+b12naKSKwCXBgjL1k=";
     };
-    date = "2023-08-30";
+    date = "2025-06-24";
   };
   dracula-tig = {
     pname = "dracula-tig";
@@ -592,15 +592,15 @@
   };
   vim-gin = {
     pname = "vim-gin";
-    version = "05a183c704d1582711d0c5229776d06b4599bcbb";
+    version = "7c4b98011a2d5bdf7342031f9c8ae7a1c11b584b";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-gin";
-      rev = "05a183c704d1582711d0c5229776d06b4599bcbb";
+      rev = "7c4b98011a2d5bdf7342031f9c8ae7a1c11b584b";
       fetchSubmodules = false;
-      sha256 = "sha256-qFtYa4qLP3Q2g55QOMeZeArFLcG4gLMtzVDxKhZiEdI=";
+      sha256 = "sha256-IKnjAGwXxIUi9DN2EtmPJbojCP0IhQhDppZDBUNYNGQ=";
     };
-    date = "2025-06-19";
+    date = "2025-06-24";
   };
   vim-neco = {
     pname = "vim-neco";
@@ -652,14 +652,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "9be5c6d2d41505fe7f0c3656220c117cb7614a5f";
+    version = "8430e66df45b1480a4bff682f25d614408215bc8";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "9be5c6d2d41505fe7f0c3656220c117cb7614a5f";
+      rev = "8430e66df45b1480a4bff682f25d614408215bc8";
       fetchSubmodules = false;
-      sha256 = "sha256-6cXP73yNzs0ik+0hq6fl8/jj1Px3hEEgBWWurjTsXzE=";
+      sha256 = "sha256-uFxP6GWyP7hdIObbCGiw0VaA5diqjspGyoSvdXs2GKE=";
     };
-    date = "2025-06-22";
+    date = "2025-06-23";
   };
 }
