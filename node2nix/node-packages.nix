@@ -39,13 +39,13 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.1.4" = {
+    "@google/gemini-cli-core-0.1.5" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.1.4";
+      version = "0.1.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.4.tgz";
-        sha512 = "5x2Y/UReU5BpWkLa8IYjw1vFQJUO2YsOvCjX14TzVryqdeMMToQRPxkRANXDuXbDYqg4wTuln/cq3FOUFPSwCg==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.5.tgz";
+        sha512 = "JHBhT36sWd7NHeqhrG30ex0sddZgi2Mw2PG80H5tRYKPP6xa4P1a2c0nLMt3nQ2snnsmemawiRB7YXDGEUhd8g==";
       };
     };
     "@google/genai-1.7.0" = {
@@ -120,13 +120,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.13.1" = {
+    "@modelcontextprotocol/sdk-1.13.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.13.1";
+      version = "1.13.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.13.1.tgz";
-        sha512 = "8q6+9aF0yA39/qWT/uaIj6zTpC+Qu07DnN/lb9mjoquCJsAh6l3HyYqc9O3t2j7GilseOQOQimLg7W3By6jqvg==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.13.2.tgz";
+        sha512 = "Vx7qOcmoKkR3qhaQ9qf3GxiVKCEu+zfJddHv6x3dY/9P6+uIwJnmuAur5aB+4FDXf41rRrDnOEGkviX5oYZ67w==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -1272,13 +1272,13 @@ let
         sha512 = "1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==";
       };
     };
-    "dotenv-16.5.0" = {
+    "dotenv-16.6.0" = {
       name = "dotenv";
       packageName = "dotenv";
-      version = "16.5.0";
+      version = "16.6.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/dotenv/-/dotenv-16.5.0.tgz";
-        sha512 = "m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==";
+        url = "https://registry.npmjs.org/dotenv/-/dotenv-16.6.0.tgz";
+        sha512 = "Omf1L8paOy2VJhILjyhrhqwLIdstqm1BvcDPKg4NGAlkwEu9ODyrFbvk8UymUOMCT+HXo31jg1lArIrVAAhuGA==";
       };
     };
     "dunder-proto-1.0.1" = {
@@ -3414,13 +3414,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-7.10.0" = {
+    "undici-7.11.0" = {
       name = "undici";
       packageName = "undici";
-      version = "7.10.0";
+      version = "7.11.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-7.10.0.tgz";
-        sha512 = "u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.11.0.tgz";
+        sha512 = "heTSIac3iLhsmZhUCjyS3JQEkZELateufzZuBaVM5RHXdSBMb1LPMQf5x+FH7qjsZYDP0ttAc3nnVpUB+wYbOg==";
       };
     };
     "undici-types-7.8.0" = {
@@ -3819,7 +3819,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.13.1"
+      sources."@modelcontextprotocol/sdk-1.13.2"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -3953,7 +3953,7 @@ in
       sources."turndown-7.2.0"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
-      sources."undici-7.10.0"
+      sources."undici-7.11.0"
       sources."unpipe-1.0.0"
       sources."uri-js-4.4.1"
       sources."vary-1.1.2"
@@ -3978,10 +3978,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.1.4";
+    version = "0.1.5";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.4.tgz";
-      sha512 = "RgHzsejPPHVGSUmtR22ByL3oDNA1Jt2Q4cD79j1ZaZOn7MOmMAgJmTWNCN1kyatMvrkISL3x+h2sjwC1knw+EQ==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.5.tgz";
+      sha512 = "6kgiaaCiixG0VNRMP608KzGtWGsDPFPbnSJciTVQMOSSNVS1bsoRprTrjCpdLfWLWC6illfMMUmlExSJ1TLDWQ==";
     };
     dependencies = [
       (
@@ -3994,7 +3994,7 @@ in
       )
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.1.4"
+      sources."@google/gemini-cli-core-0.1.5"
       sources."@google/genai-1.7.0"
       sources."@grpc/grpc-js-1.13.4"
       sources."@grpc/proto-loader-0.7.15"
@@ -4009,7 +4009,7 @@ in
       sources."@js-sdsl/ordered-map-4.4.2"
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
-      sources."@modelcontextprotocol/sdk-1.13.1"
+      sources."@modelcontextprotocol/sdk-1.13.2"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.52.1"
       sources."@opentelemetry/context-async-hooks-1.25.1"
@@ -4181,7 +4181,7 @@ in
           ];
         }
       )
-      sources."dotenv-16.5.0"
+      sources."dotenv-16.6.0"
       sources."dunder-proto-1.0.1"
       sources."eastasianwidth-0.2.0"
       sources."ecdsa-sig-formatter-1.0.11"
@@ -4545,7 +4545,7 @@ in
           ];
         }
       )
-      sources."undici-7.10.0"
+      sources."undici-7.11.0"
       sources."undici-types-7.8.0"
       sources."unicorn-magic-0.1.0"
       sources."unpipe-1.0.0"
@@ -4627,6 +4627,7 @@ in
     buildInputs = globalBuildInputs;
     meta = {
       description = "Gemini CLI";
+      homepage = "https://github.com/google-gemini/gemini-cli#readme";
     };
     production = true;
     bypassCache = true;
