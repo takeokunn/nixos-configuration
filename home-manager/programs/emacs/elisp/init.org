@@ -4185,11 +4185,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        go-run) "gotest" nil t)
 
   (with-eval-after-load 'go-mode
-    (keymap-set go-mode-map "C-x f" #'go-test-current-file)
-    (keymap-set go-mode-map "C-x t" #'go-test-current-test)
-    (keymap-set go-mode-map "C-x p" #'go-test-current-project)
-    (keymap-set go-mode-map "C-x b" #'go-test-current-benchmark)
-    (keymap-set go-mode-map "C-x x" #'go-run))
+    (keymap-set go-mode-map "C-x ! f" #'go-test-current-file)
+    (keymap-set go-mode-map "C-x ! t" #'go-test-current-test)
+    (keymap-set go-mode-map "C-x ! p" #'go-test-current-project)
+    (keymap-set go-mode-map "C-x ! b" #'go-test-current-benchmark)
+    (keymap-set go-mode-map "C-x ! x" #'go-run))
 #+end_src
 * Elfeed
 ** elfeed
