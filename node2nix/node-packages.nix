@@ -1101,22 +1101,22 @@ let
         sha512 = "uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==";
       };
     };
-    "css-select-5.1.0" = {
+    "css-select-5.2.2" = {
       name = "css-select";
       packageName = "css-select";
-      version = "5.1.0";
+      version = "5.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/css-select/-/css-select-5.1.0.tgz";
-        sha512 = "nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==";
+        url = "https://registry.npmjs.org/css-select/-/css-select-5.2.2.tgz";
+        sha512 = "TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==";
       };
     };
-    "css-what-6.1.0" = {
+    "css-what-6.2.2" = {
       name = "css-what";
       packageName = "css-what";
-      version = "6.1.0";
+      version = "6.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/css-what/-/css-what-6.1.0.tgz";
-        sha512 = "HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==";
+        url = "https://registry.npmjs.org/css-what/-/css-what-6.2.2.tgz";
+        sha512 = "u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==";
       };
     };
     "csstype-3.1.3" = {
@@ -3693,13 +3693,13 @@ let
         sha512 = "+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==";
       };
     };
-    "ws-8.18.2" = {
+    "ws-8.18.3" = {
       name = "ws";
       packageName = "ws";
-      version = "8.18.2";
+      version = "8.18.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ws/-/ws-8.18.2.tgz";
-        sha512 = "DMricUmwGZUVr++AEAe2uiVM7UoO9MAVZMDu05UQOaUII0lp+zOzLLU4Xqh/JvTqklB1T4uELaaPBKyjE1r4fQ==";
+        url = "https://registry.npmjs.org/ws/-/ws-8.18.3.tgz";
+        sha512 = "PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==";
       };
     };
     "xdg-basedir-5.1.0" = {
@@ -3837,8 +3837,8 @@ in
       sources."cookie-signature-1.2.2"
       sources."cors-2.8.5"
       sources."cross-spawn-7.0.6"
-      sources."css-select-5.1.0"
-      sources."css-what-6.1.0"
+      sources."css-select-5.2.2"
+      sources."css-what-6.2.2"
       sources."debug-4.4.1"
       sources."depd-2.0.0"
       sources."dom-serializer-2.0.0"
@@ -4606,7 +4606,7 @@ in
         }
       )
       sources."wrappy-1.0.2"
-      sources."ws-8.18.2"
+      sources."ws-8.18.3"
       sources."xdg-basedir-5.1.0"
       sources."y18n-5.0.8"
       (
