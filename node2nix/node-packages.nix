@@ -39,22 +39,22 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.1.7" = {
+    "@google/gemini-cli-core-0.1.9" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.1.7";
+      version = "0.1.9";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.7.tgz";
-        sha512 = "V3KYamCruqhBSoWNvWm5MJn6EwwZVv/129h0f2SFVfgJP759QVAvcnT4nGq18Jf5nNqDkq01Uug3yR/NfGJN+g==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.9.tgz";
+        sha512 = "NFmu0qivppBZ3JT6to0A2+tEtcvWcWuhbfyTz42Wm2AoAtl941lTbcd/TiBryK0yWz3WCkqukuDxl+L7axLpvA==";
       };
     };
-    "@google/genai-1.7.0" = {
+    "@google/genai-1.8.0" = {
       name = "_at_google_slash_genai";
       packageName = "@google/genai";
-      version = "1.7.0";
+      version = "1.8.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/genai/-/genai-1.7.0.tgz";
-        sha512 = "s/OZLkrIfBwc+SFFaZoKdEogkw4in0YRTGc4Q483jnfchNBWzrNe560eZEfGJHQRPn6YfzJgECCx0sqEOMWvYw==";
+        url = "https://registry.npmjs.org/@google/genai/-/genai-1.8.0.tgz";
+        sha512 = "n3KiMFesQCy2R9iSdBIuJ0JWYQ1HZBJJkmt4PPZMGZKvlgHhBAGw1kUMyX+vsAIzprN3lK45DI755lm70wPOOg==";
       };
     };
     "@grpc/grpc-js-1.13.4" = {
@@ -120,13 +120,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.13.2" = {
+    "@modelcontextprotocol/sdk-1.13.3" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.13.2";
+      version = "1.13.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.13.2.tgz";
-        sha512 = "Vx7qOcmoKkR3qhaQ9qf3GxiVKCEu+zfJddHv6x3dY/9P6+uIwJnmuAur5aB+4FDXf41rRrDnOEGkviX5oYZ67w==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.13.3.tgz";
+        sha512 = "bGwA78F/U5G2jrnsdRkPY3IwIwZeWUEfb5o764b79lb0rJmMT76TLwKhdNZOWakOQtedYefwIR4emisEMvInKA==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -543,13 +543,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.0.8" = {
+    "@types/node-24.0.10" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.0.8";
+      version = "24.0.10";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.0.8.tgz";
-        sha512 = "WytNrFSgWO/esSH9NbpWUfTMGQwCGIKfCmNlmFDNiI5gGhgMmEA+V1AEvKLeBNvvtBnailJtkrEa2OIISwrVAA==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.0.10.tgz";
+        sha512 = "ENHwaH+JIRTDIEEbDK6QSQntAYGtbvdDXnMXnZaZ6k13Du1dPMmprkEHIL7ok2Wl2aZevetwTAb5S+7yIF+enA==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -1920,13 +1920,13 @@ let
         sha512 = "QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==";
       };
     };
-    "ink-5.2.1" = {
+    "ink-6.0.1" = {
       name = "ink";
       packageName = "ink";
-      version = "5.2.1";
+      version = "6.0.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ink/-/ink-5.2.1.tgz";
-        sha512 = "BqcUyWrG9zq5HIwW6JcfFHsIYebJkWWb4fczNah1goUO0vv5vneIlfwuS85twyJ5hYR/y18FlAYUxrO9ChIWVg==";
+        url = "https://registry.npmjs.org/ink/-/ink-6.0.1.tgz";
+        sha512 = "vhhFrCodTHZAPPSdMYzLEbeI0Ug37R9j6yA0kLKok9kSK53lQtj/RJhEQJUjq6OwT4N33nxqSRd/7yXhEhVPIw==";
       };
     };
     "ink-big-text-2.0.0" = {
@@ -2793,13 +2793,13 @@ let
         sha512 = "y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==";
       };
     };
-    "react-18.3.1" = {
+    "react-19.1.0" = {
       name = "react";
       packageName = "react";
-      version = "18.3.1";
+      version = "19.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react/-/react-18.3.1.tgz";
-        sha512 = "wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==";
+        url = "https://registry.npmjs.org/react/-/react-19.1.0.tgz";
+        sha512 = "FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==";
       };
     };
     "react-devtools-core-4.28.5" = {
@@ -2820,13 +2820,13 @@ let
         sha512 = "24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==";
       };
     };
-    "react-reconciler-0.29.2" = {
+    "react-reconciler-0.32.0" = {
       name = "react-reconciler";
       packageName = "react-reconciler";
-      version = "0.29.2";
+      version = "0.32.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.29.2.tgz";
-        sha512 = "zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==";
+        url = "https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.32.0.tgz";
+        sha512 = "2NPMOzgTlG0ZWdIf3qG+dcbLSoAc/uLfOwckc3ofy5sSK0pLJqnQLpUFxvGcN2rlXSjnVtGeeFLNimCQEj5gOQ==";
       };
     };
     "read-package-up-11.0.0" = {
@@ -2944,6 +2944,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz";
         sha512 = "UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==";
+      };
+    };
+    "scheduler-0.26.0" = {
+      name = "scheduler";
+      packageName = "scheduler";
+      version = "0.26.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/scheduler/-/scheduler-0.26.0.tgz";
+        sha512 = "NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==";
       };
     };
     "selderee-0.11.0" = {
@@ -3794,10 +3803,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.38";
+    version = "1.0.40";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.38.tgz";
-      sha512 = "hPZbJCt7O8T872wbCXGiwF210DzMBo/k3EVKB6EZQB10b73ZQIEflAWGTC2ZvBcMp79qAR4F6c82V0+Cc6o0sg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.40.tgz";
+      sha512 = "qC2SFowyHWvvik2ZbNCuE9V6+VXIsk2XB/liFMJxZBk0C8y2Hc6LEqGltKTjaFwkq2+NPcrImE4RZwBPfh2N3A==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3812,14 +3821,14 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.5.6";
+    version = "0.5.7";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.6.tgz";
-      sha512 = "EVGW8u+Y1fDJGNc8X2v5RbbkArsvGRasUZ8XPO98TUD1HMSOJna9ji/j5tEJ5szmZoaNPInnWJq4Kr+GFJO4Mw==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.7.tgz";
+      sha512 = "YRDV5qbxyBnoouC/0RCD36aGqqev3DllYMp6KgNPniB+ukqJEatSw5TpRkpak1BuG9Yx/AeMLRvTsY/pFDH7kQ==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.13.2"
+      sources."@modelcontextprotocol/sdk-1.13.3"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -3967,7 +3976,7 @@ in
     ];
     buildInputs = globalBuildInputs;
     meta = {
-      description = "Fetch an entire site and use it as a MCP Server";
+      description = "Fetch an entire site and use it as an MCP Server";
       homepage = "https://github.com/ryoppippi/sitemcp#readme";
       license = "MIT";
     };
@@ -3978,24 +3987,17 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.1.7";
+    version = "0.1.9";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.7.tgz";
-      sha512 = "iMYGTAHykJeryg3x5f7pwN9Apv0Ofmmt5HFrgU2zkZS8EK7oX8h+JtuT98M4ny9bXcoGiX73aUmmQc+j1YPP7g==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.9.tgz";
+      sha512 = "St+77rJX5K7XTIvBVs+NctJBtr0l155jPhUbNHQucRSZ7By2Yy3PEALEADwscpe1DWXjp2LRXS3gfZGoZZrweg==";
     };
     dependencies = [
-      (
-        sources."@alcalzone/ansi-tokenize-0.1.3"
-        // {
-          dependencies = [
-            sources."is-fullwidth-code-point-4.0.0"
-          ];
-        }
-      )
+      sources."@alcalzone/ansi-tokenize-0.1.3"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.1.7"
-      sources."@google/genai-1.7.0"
+      sources."@google/gemini-cli-core-0.1.9"
+      sources."@google/genai-1.8.0"
       sources."@grpc/grpc-js-1.13.4"
       sources."@grpc/proto-loader-0.7.15"
       (
@@ -4010,7 +4012,7 @@ in
       sources."@js-sdsl/ordered-map-4.4.2"
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
-      sources."@modelcontextprotocol/sdk-1.13.2"
+      sources."@modelcontextprotocol/sdk-1.13.3"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.52.1"
       sources."@opentelemetry/context-async-hooks-1.25.1"
@@ -4063,7 +4065,7 @@ in
       sources."@types/hast-3.0.4"
       sources."@types/html-to-text-9.0.4"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.0.8"
+      sources."@types/node-24.0.10"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.1.8"
       sources."@types/shimmer-1.2.0"
@@ -4142,7 +4144,6 @@ in
         sources."cli-truncate-4.0.0"
         // {
           dependencies = [
-            sources."is-fullwidth-code-point-4.0.0"
             sources."slice-ansi-5.0.0"
           ];
         }
@@ -4291,7 +4292,7 @@ in
       sources."index-to-position-1.1.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
-      sources."ink-5.2.1"
+      sources."ink-6.0.1"
       sources."ink-big-text-2.0.0"
       sources."ink-gradient-3.0.0"
       sources."ink-link-4.1.0"
@@ -4305,7 +4306,7 @@ in
       sources."is-data-descriptor-1.0.1"
       sources."is-descriptor-1.0.3"
       sources."is-docker-3.0.0"
-      sources."is-fullwidth-code-point-5.0.0"
+      sources."is-fullwidth-code-point-4.0.0"
       sources."is-in-ci-1.0.0"
       sources."is-inside-container-1.0.0"
       sources."is-installed-globally-1.0.0"
@@ -4386,7 +4387,7 @@ in
           ];
         }
       )
-      sources."react-18.3.1"
+      sources."react-19.1.0"
       (
         sources."react-devtools-core-4.28.5"
         // {
@@ -4397,7 +4398,14 @@ in
         }
       )
       sources."react-is-16.13.1"
-      sources."react-reconciler-0.29.2"
+      (
+        sources."react-reconciler-0.32.0"
+        // {
+          dependencies = [
+            sources."scheduler-0.26.0"
+          ];
+        }
+      )
       sources."read-package-up-11.0.0"
       sources."read-pkg-9.0.1"
       sources."registry-auth-token-5.1.0"
@@ -4434,7 +4442,14 @@ in
       sources."side-channel-weakmap-1.0.2"
       sources."signal-exit-3.0.7"
       sources."simple-git-3.28.0"
-      sources."slice-ansi-7.1.0"
+      (
+        sources."slice-ansi-7.1.0"
+        // {
+          dependencies = [
+            sources."is-fullwidth-code-point-5.0.0"
+          ];
+        }
+      )
       sources."spdx-correct-3.2.0"
       sources."spdx-exceptions-2.5.0"
       sources."spdx-expression-parse-3.0.1"
