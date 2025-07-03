@@ -7,6 +7,7 @@
   emacsPkg,
 }:
 let
+  awscli = import ./awscli;
   aider = import ./aider;
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
@@ -30,6 +31,7 @@ let
   waybar = import ./waybar { inherit pkgs; };
 in
 [
+  awscli
   aider
   emacs
   gh
