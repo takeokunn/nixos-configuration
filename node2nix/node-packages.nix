@@ -3756,13 +3756,13 @@ let
         sha512 = "0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==";
       };
     };
-    "zod-3.25.69" = {
+    "zod-3.25.71" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.69";
+      version = "3.25.71";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.69.tgz";
-        sha512 = "cjUx+boz8dfYGssYKLGNTF5VUF6NETpcZCDTN3knhUUXQTAAvErzRhV3pgeCZm2YsL4HOwtEHPonlsshPu2I0A==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.71.tgz";
+        sha512 = "BsBc/NPk7h8WsUWYWYL+BajcJPY8YhjelaWu2NMLuzgraKAz4Lb4/6K11g9jpuDetjMiqhZ6YaexFLOC0Ogi3Q==";
       };
     };
     "zod-to-json-schema-3.24.6" = {
@@ -3971,7 +3971,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.69"
+      sources."zod-3.25.71"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
@@ -4566,7 +4566,7 @@ in
       )
       sources."yargs-parser-21.1.1"
       sources."yoga-layout-3.2.1"
-      sources."zod-3.25.69"
+      sources."zod-3.25.71"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
