@@ -208,10 +208,6 @@ src.git = "https://github.com/Ziqi-Yang/typst-mode.el"
 src.branch = "main"
 fetch.github = "Ziqi-Yang/typst-mode.el"
 
-[emacs-copilot-chat]
-src.github_tag = "chep/copilot-chat.el"
-fetch.github = "chep/copilot-chat.el"
-
 [emacs-eglot-booster]
 src.git = "https://github.com/jdtsmith/eglot-booster"
 src.branch = "main"

@@ -12,7 +12,7 @@ with epkgs;
   packages.llm
   packages.plz-media-type
   packages.plz-event-source
-  packages.copilot-chat
+  copilot-chat
   ellama
   aidermacs
 ]

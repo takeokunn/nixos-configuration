@@ -21,23 +21,6 @@
     ignoreCompilationError = false;
   };
 
-  copilot-chat = epkgs.melpaBuild {
-    pname = "copilot-chat";
-    version = "0.0.1";
-    src = sources.emacs-copilot-chat.src;
-
-    packageRequires = with epkgs; [
-      aio
-      request
-      markdown-mode
-      chatgpt-shell
-      magit
-      polymode
-    ];
-
-    ignoreCompilationError = false;
-  };
-
   plz-media-type = epkgs.melpaBuild {
     pname = "plz-media-type";
     version = "0.0.1";

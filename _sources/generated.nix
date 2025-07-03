@@ -89,17 +89,6 @@
     };
     date = "2025-06-30";
   };
-  emacs-copilot-chat = {
-    pname = "emacs-copilot-chat";
-    version = "v3.0.0";
-    src = fetchFromGitHub {
-      owner = "chep";
-      repo = "copilot-chat.el";
-      rev = "v3.0.0";
-      fetchSubmodules = false;
-      sha256 = "sha256-oj8koAG+TKGu+gZftOExYtYlM9m1Z0cPZLiNOUIpktI=";
-    };
-  };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
     version = "2.2.0";
@@ -173,13 +162,13 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "0.26.1";
+    version = "0.27.0";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "0.26.1";
+      rev = "0.27.0";
       fetchSubmodules = false;
-      sha256 = "sha256-K5SjKs6nv7wVY8jLmbw1rN3YX3d/xgtTEplTm4PzrnY=";
+      sha256 = "sha256-rI2PZoncCoyuAe9ufBoZ1EdlswHmXNXTkdHkt3mjK2Y=";
     };
   };
   emacs-mu4e-dashboard = {
