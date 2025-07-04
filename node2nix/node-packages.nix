@@ -120,13 +120,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.13.3" = {
+    "@modelcontextprotocol/sdk-1.15.0" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.13.3";
+      version = "1.15.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.13.3.tgz";
-        sha512 = "bGwA78F/U5G2jrnsdRkPY3IwIwZeWUEfb5o764b79lb0rJmMT76TLwKhdNZOWakOQtedYefwIR4emisEMvInKA==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.15.0.tgz";
+        sha512 = "67hnl/ROKdb03Vuu0YOr+baKTvf1/5YBHBm9KnZdjdAh8hjt4FRCPD5ucwxGB237sBpzlqQsLy1PFu7z/ekZ9Q==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -3756,13 +3756,13 @@ let
         sha512 = "0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==";
       };
     };
-    "zod-3.25.71" = {
+    "zod-3.25.72" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.71";
+      version = "3.25.72";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.71.tgz";
-        sha512 = "BsBc/NPk7h8WsUWYWYL+BajcJPY8YhjelaWu2NMLuzgraKAz4Lb4/6K11g9jpuDetjMiqhZ6YaexFLOC0Ogi3Q==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.72.tgz";
+        sha512 = "Cl+fe4dNL4XumOBNBsr0lHfA80PQiZXHI4xEMTEr8gt6aGz92t3lBA32e71j9+JeF/VAYvdfBnuwJs+BMx/BrA==";
       };
     };
     "zod-to-json-schema-3.24.6" = {
@@ -3803,10 +3803,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.41";
+    version = "1.0.43";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.41.tgz";
-      sha512 = "6E5SCb1I/pC4WCEFGwmyo4M4bL9vBuk7qkC78v9ZFX9PAxmKX94SEj422igdLeucBYX99ZqKSMYfsJEqTeIo2Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.43.tgz";
+      sha512 = "VnuRK4s/R9ZRTkwH4gUjsp4SiBQXq7Y0B47OtgeXIZYVQYkhTW8m+E0IisFzXXFIyTQrE0SodGCpvgLhAYzGCg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3828,7 +3828,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.13.3"
+      sources."@modelcontextprotocol/sdk-1.15.0"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -3971,7 +3971,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.71"
+      sources."zod-3.25.72"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
@@ -4012,7 +4012,7 @@ in
       sources."@js-sdsl/ordered-map-4.4.2"
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
-      sources."@modelcontextprotocol/sdk-1.13.3"
+      sources."@modelcontextprotocol/sdk-1.15.0"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.52.1"
       sources."@opentelemetry/context-async-hooks-1.25.1"
@@ -4566,7 +4566,7 @@ in
       )
       sources."yargs-parser-21.1.1"
       sources."yoga-layout-3.2.1"
-      sources."zod-3.25.71"
+      sources."zod-3.25.72"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
