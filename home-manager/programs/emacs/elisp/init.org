@@ -3328,6 +3328,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; config
     (setopt neo-theme 'ascii)
     (setopt neo-show-hidden-files t)
+    (setopt neo-window-position 'right)
 
     ;; keybind
     (define-key neotree-mode-map (kbd "C-j")
