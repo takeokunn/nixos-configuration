@@ -633,13 +633,13 @@ let
         sha512 = "n02Vykv5uA3eHGM/Z2dQrcD56kL8TyDb2p1+0P83PClMnC/nc+anbQRhIOWnSq4Ke/KvDPrY3C9hDtC/A3eHnQ==";
       };
     };
-    "agent-base-7.1.3" = {
+    "agent-base-7.1.4" = {
       name = "agent-base";
       packageName = "agent-base";
-      version = "7.1.3";
+      version = "7.1.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/agent-base/-/agent-base-7.1.3.tgz";
-        sha512 = "jRR5wdylq8CkOe6hei19GGZnxM6rBGwFl3Bg0YItGDimvjGtAvdZk4Pu6Cl4u4Igsws4a1fd1Vq3ezrhn4KmFw==";
+        url = "https://registry.npmjs.org/agent-base/-/agent-base-7.1.4.tgz";
+        sha512 = "MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==";
       };
     };
     "ajv-6.12.6" = {
@@ -3780,10 +3780,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.339.0";
+    version = "1.341.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.339.0.tgz";
-      sha512 = "aslbk9SV6cdbXTQjA8f6CBdFlEstxEp+JYnJ8vuEYAz2i/qrrjFHdAUpoFNPgtg4+JfP+629RZ2CVYLzxNRKog==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.341.0.tgz";
+      sha512 = "u0RfW9A68+RM7evQSCICH/uK/03p9bzp/8+2+zg6GDC/u3O2F8V+G1RkvlqfrckXrQZd1rImO41ch7ns3A4zMQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3803,10 +3803,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.43";
+    version = "1.0.44";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.43.tgz";
-      sha512 = "VnuRK4s/R9ZRTkwH4gUjsp4SiBQXq7Y0B47OtgeXIZYVQYkhTW8m+E0IisFzXXFIyTQrE0SodGCpvgLhAYzGCg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.44.tgz";
+      sha512 = "GCX0KeMcyhLlfs/dLWlMiHShAMmjt8d7xcVUS53z7VnV6s3cIIrRPsKQ/xX/Q9rFm5dSVmRnzU88Ku28fb3QKQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4095,7 +4095,7 @@ in
       )
       sources."acorn-8.15.0"
       sources."acorn-import-attributes-1.9.5"
-      sources."agent-base-7.1.3"
+      sources."agent-base-7.1.4"
       sources."ajv-6.12.6"
       (
         sources."ansi-align-3.0.1"
