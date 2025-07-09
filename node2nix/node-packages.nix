@@ -543,13 +543,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.0.10" = {
+    "@types/node-24.0.12" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.0.10";
+      version = "24.0.12";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.0.10.tgz";
-        sha512 = "ENHwaH+JIRTDIEEbDK6QSQntAYGtbvdDXnMXnZaZ6k13Du1dPMmprkEHIL7ok2Wl2aZevetwTAb5S+7yIF+enA==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.0.12.tgz";
+        sha512 = "LtOrbvDf5ndC9Xi+4QZjVL0woFymF/xSTKZKPgrrl7H7XoeDvnD+E2IclKVDyaK9UM756W/3BXqSU+JEHopA9g==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -1425,13 +1425,13 @@ let
         sha512 = "FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==";
       };
     };
-    "es-toolkit-1.39.6" = {
+    "es-toolkit-1.39.7" = {
       name = "es-toolkit";
       packageName = "es-toolkit";
-      version = "1.39.6";
+      version = "1.39.7";
       src = fetchurl {
-        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.39.6.tgz";
-        sha512 = "uiVjnLem6kkfXumlwUEWEKnwUN5QbSEB0DHy2rNJt0nkYcob5K0TXJ7oJRzhAcvx+SRmz4TahKyN5V9cly/IPA==";
+        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.39.7.tgz";
+        sha512 = "ek/wWryKouBrZIjkwW2BFf91CWOIMvoy2AE5YYgUrfWsJQM2Su1LoLtrw8uusEpN9RfqLlV/0FVNjT0WMv8Bxw==";
       };
     };
     "escalade-3.2.0" = {
@@ -3756,13 +3756,13 @@ let
         sha512 = "0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==";
       };
     };
-    "zod-3.25.75" = {
+    "zod-3.25.76" = {
       name = "zod";
       packageName = "zod";
-      version = "3.25.75";
+      version = "3.25.76";
       src = fetchurl {
-        url = "https://registry.npmjs.org/zod/-/zod-3.25.75.tgz";
-        sha512 = "OhpzAmVzabPOL6C3A3gpAifqr9MqihV/Msx3gor2b2kviCgcb+HM9SEOpMWwwNp9MRunWnhtAKUoo0AHhjyPPg==";
+        url = "https://registry.npmjs.org/zod/-/zod-3.25.76.tgz";
+        sha512 = "gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==";
       };
     };
     "zod-to-json-schema-3.24.6" = {
@@ -3971,7 +3971,7 @@ in
       sources."whatwg-mimetype-4.0.0"
       sources."which-2.0.2"
       sources."wrappy-1.0.2"
-      sources."zod-3.25.75"
+      sources."zod-3.25.76"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
@@ -4065,7 +4065,7 @@ in
       sources."@types/hast-3.0.4"
       sources."@types/html-to-text-9.0.4"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.0.10"
+      sources."@types/node-24.0.12"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.1.8"
       sources."@types/shimmer-1.2.0"
@@ -4204,7 +4204,7 @@ in
       sources."es-define-property-1.0.1"
       sources."es-errors-1.3.0"
       sources."es-object-atoms-1.1.1"
-      sources."es-toolkit-1.39.6"
+      sources."es-toolkit-1.39.7"
       sources."escalade-3.2.0"
       sources."escape-goat-4.0.0"
       sources."escape-html-1.0.3"
@@ -4566,7 +4566,7 @@ in
       )
       sources."yargs-parser-21.1.1"
       sources."yoga-layout-3.2.1"
-      sources."zod-3.25.75"
+      sources."zod-3.25.76"
       sources."zod-to-json-schema-3.24.6"
     ];
     buildInputs = globalBuildInputs;
