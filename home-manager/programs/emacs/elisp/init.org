@@ -598,17 +598,17 @@
     ;; config
     (setopt graphql-indent-level 4))
 #+end_src
-** graphviz-dot-mode
+** TODO graphviz-dot-mode
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(graphviz-dot-mode) "graphviz-dot-mode" nil t)
+  ;; (autoload-if-found '(graphviz-dot-mode) "graphviz-dot-mode" nil t)
 
-  (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
-  (add-to-list 'auto-mode-alist '("\\.gv\\'" . graphviz-dot-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.gv\\'" . graphviz-dot-mode))
 
-  (with-eval-after-load 'graphviz-dot-mode
-    ;; config
-    (setopt graphviz-dot-auto-indent-on-semi nil)
-    (setopt graphviz-dot-indent-width 2))
+  ;; (with-eval-after-load 'graphviz-dot-mode
+  ;;   ;; config
+  ;;   (setopt graphviz-dot-auto-indent-on-semi nil)
+  ;;   (setopt graphviz-dot-indent-width 2))
 #+end_src
 ** groovy-mode
 #+begin_src emacs-lisp :tangle yes

@@ -38,7 +38,7 @@ with epkgs;
   go-mode
   gradle-mode
   graphql-mode
-  graphviz-dot-mode
+  # graphviz-dot-mode
   groovy-mode
   hack-mode
   haskell-mode

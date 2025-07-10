@@ -33,13 +33,18 @@
       if test -d /etc/profiles/per-user/(whoami)/bin
           fish_add_path /etc/profiles/per-user/(whoami)/bin
       end
+
+      if test -d $HOME/ghq/github.com/takeokunn/private-cli
+          fish_add_path $HOME/ghq/github.com/takeokunn/private-cli/result/bin/
+          private-cli completion fish | source
+      end
     '';
 
     shellInitLast = ''
       # for private.fish
-        if test -e ~/.config/fish/private.fish
-            source ~/.config/fish/private.fish
-        end
+      if test -e ~/.config/fish/private.fish
+          source ~/.config/fish/private.fish
+      end
     '';
 
     shellAliases = {
