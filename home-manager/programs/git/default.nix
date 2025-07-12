@@ -159,6 +159,10 @@
           selected = "";
           separator = "";
         };
+
+        blame = {
+          markIgnoredLines = true;
+        };
       };
 
       url = {
