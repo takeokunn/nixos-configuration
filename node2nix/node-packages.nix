@@ -39,13 +39,13 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.1.11" = {
+    "@google/gemini-cli-core-0.1.12" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.1.11";
+      version = "0.1.12";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.11.tgz";
-        sha512 = "Cdbstn6xiPDak09Oaoe46Om0Pv2dC1EkFYQwUlw/ooDeLIzeHAYCfHBuP/95fwahsdZhJcJ567yGqvc7IirlaQ==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.12.tgz";
+        sha512 = "oI6DYfzHztROW65b0kzIBP9Lu3jgP9LCE203A60tQY8JRBWtLyStYa7Wn0RQNl8v/Ym1C6xYcuFcJVEs1tFUIQ==";
       };
     };
     "@google/genai-1.8.0" = {
@@ -4059,10 +4059,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.1.11";
+    version = "0.1.12";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.11.tgz";
-      sha512 = "hsJSLnPHHZtCjOHiyb+tYOzro6Ka6QWojjLenL9lSSlxomxslzr1Pswd7HiAP3icPluNMXvlt/+lVy9iHHTVAw==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.12.tgz";
+      sha512 = "TFgp+2MgDZbk2aZnOVcUj8KVKVQqlHfBcImyKECZbKQ5Z6kklOXbNpPT9K7X75N7wq67bPVrgiR8X4PxstbkLg==";
     };
     dependencies = [
       (
@@ -4075,7 +4075,7 @@ in
       )
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.1.11"
+      sources."@google/gemini-cli-core-0.1.12"
       sources."@google/genai-1.8.0"
       sources."@grpc/grpc-js-1.13.4"
       sources."@grpc/proto-loader-0.7.15"
