@@ -4409,6 +4409,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; hooks
     (add-hook 'org-mode-hook #'view-mode)
 
+    ;; agenda
+    (setopt org-tags-match-list-sublevels nil)
+
     ;; directory
     (setq org-directory "~/ghq/github.com/takeokunn/private/agenda")
 
@@ -4499,12 +4502,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                            (add-hook 'prog-mode-hook #'view-mode)))
 
     ;; config
+
     (setq org-capture-use-agenda-date t)
     (setq org-capture-bookmark nil)
     (setq org-capture-templates `(("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
                                    "* %T\n%?")
                                   ("j" "Journal" entry (file+olp+datetree ,(expand-file-name "journal.org" org-directory))
-                                   "* %U\n%?\n%i\n"))))
+                                   "* %U\n%?\n%i\n")
+                                  ("1" "OPENLOGI" entry (file+headline ,(expand-file-name "task/openlogi.org" org-directory) "Backlog")
+                                   "** TODO Capture %U\n%?")
+                                  ("2" "Other" entry (file+headline ,(expand-file-name "task/other.org" org-directory) "Backlog")
+                                   "** TODO Capture %U\n%?"))))
 #+end_src
 *** org-duration
 #+begin_src emacs-lisp :tangle yes
@@ -4706,6 +4714,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-agenda-span 'day)
     (setq org-agenda-start-on-weekday 1)
     (setq org-agenda-todo-ignore-with-date t)
+    (setq org-agenda-todo-list-sublevels nil)
 
     ;; advices
     (advice-add 'org-archive-subtree :around #'my/advice-disable-buffer-readonly))
