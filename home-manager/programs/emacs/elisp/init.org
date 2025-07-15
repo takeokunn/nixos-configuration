@@ -4613,6 +4613,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'org-preview-html
     (setopt org-preview-html-viewer 'xwidget))
 #+end_src
+*** org-table-highlight
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-table-highlight-mode) "org-preview-html" nil t)
+
+  (with-eval-after-load 'org
+    ;; hooks
+    (add-hook 'org-mode-hook #'org-table-highlight-mode))
+#+end_src
 ** Theme
 *** org-faces
 #+begin_src emacs-lisp :tangle yes
