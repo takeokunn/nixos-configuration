@@ -671,6 +671,7 @@
 
   ;; js2-mode
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.cjs$" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.mjs$" . js2-mode))
 
   (with-eval-after-load 'js2-mode
@@ -4615,7 +4616,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+end_src
 *** org-table-highlight
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-table-highlight-mode) "org-preview-html" nil t)
+  (autoload-if-found '(org-table-highlight-mode) "org-table-highlight" nil t)
 
   (with-eval-after-load 'org
     ;; hooks
