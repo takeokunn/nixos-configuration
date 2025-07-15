@@ -10,5 +10,6 @@ with pkgs;
 
   # for web service
   discord
+  drawio
   slack
 ]
