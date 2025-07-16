@@ -9,7 +9,7 @@ let
     # fetch.enable = true;
     playwright.enable = true;
     brave-search = {
-      enable = true;
+      enable = false;
       envFile = config.sops.secrets.brave-api-token.path;
     };
   };

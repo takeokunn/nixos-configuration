@@ -213,10 +213,6 @@ src.git = "https://github.com/jdtsmith/eglot-booster"
 src.branch = "main"
 fetch.github = "jdtsmith/eglot-booster"
 
-[emacs-aio]
-src.github_tag = "skeeto/emacs-aio"
-fetch.github = "skeeto/emacs-aio"
-
 # for neovim
 
 [vimdoc-ja]

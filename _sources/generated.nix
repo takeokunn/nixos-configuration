@@ -42,17 +42,6 @@
     };
     date = "2022-03-20";
   };
-  emacs-aio = {
-    pname = "emacs-aio";
-    version = "1.0";
-    src = fetchFromGitHub {
-      owner = "skeeto";
-      repo = "emacs-aio";
-      rev = "1.0";
-      fetchSubmodules = false;
-      sha256 = "sha256-pHyavT7n6ntUnD39CxYmQ1NqU2XjocUy8G5kciQI8vg=";
-    };
-  };
   emacs-bazel-mode = {
     pname = "emacs-bazel-mode";
     version = "769b30dc18282564d614d7044195b5a0c1a0a5f3";
@@ -641,14 +630,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "560e86652ffa0cb1f7ee00994611dc2482116e6f";
+    version = "d16f93ee7f94634b4ff0dbc644452e49c1b929af";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "560e86652ffa0cb1f7ee00994611dc2482116e6f";
+      rev = "d16f93ee7f94634b4ff0dbc644452e49c1b929af";
       fetchSubmodules = false;
-      sha256 = "sha256-gDRnjjaqI0jTm29l6AAd0kA00xWxPgZlx+rXt3FzOQs=";
+      sha256 = "sha256-KEy+LpTGwWd9FNoo6VCr7CFjzNeWV2e0is5tHtjbpn8=";
     };
-    date = "2025-07-12";
+    date = "2025-07-15";
   };
 }

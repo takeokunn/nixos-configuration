@@ -4,11 +4,7 @@
   sources,
 }:
 let
-  override = final: prev: {
-    dap-mode = prev.melpaPackages.dap-mode.overrideAttrs (old: {
-      preBuild = null;
-    });
-  };
+  override = final: prev: { };
 in
 {
   emacs-git = pkgs.emacsWithPackagesFromUsePackage {

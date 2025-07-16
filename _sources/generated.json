@@ -62,27 +62,6 @@
     },
     "version": "e8a3387d8353e90cca41f5d89c3e1f74f1f7c8c6"
   },
-  "emacs-aio": {
-    "cargoLocks": null,
-    "date": null,
-    "extract": null,
-    "name": "emacs-aio",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "skeeto",
-      "repo": "emacs-aio",
-      "rev": "1.0",
-      "sha256": "sha256-pHyavT7n6ntUnD39CxYmQ1NqU2XjocUy8G5kciQI8vg=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "1.0"
-  },
   "emacs-bazel-mode": {
     "cargoLocks": null,
     "date": "2023-09-19",
@@ -1114,7 +1093,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-07-12",
+    "date": "2025-07-15",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1126,11 +1105,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "560e86652ffa0cb1f7ee00994611dc2482116e6f",
-      "sha256": "sha256-gDRnjjaqI0jTm29l6AAd0kA00xWxPgZlx+rXt3FzOQs=",
+      "rev": "d16f93ee7f94634b4ff0dbc644452e49c1b929af",
+      "sha256": "sha256-KEy+LpTGwWd9FNoo6VCr7CFjzNeWV2e0is5tHtjbpn8=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "560e86652ffa0cb1f7ee00994611dc2482116e6f"
+    "version": "d16f93ee7f94634b4ff0dbc644452e49c1b929af"
   }
 }
