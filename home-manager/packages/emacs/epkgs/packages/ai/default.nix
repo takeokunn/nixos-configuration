@@ -4,7 +4,7 @@
 with epkgs;
 [
   # copilot
-  # copilot-chat
+  copilot-chat
   ellama
   aidermacs
 ]
