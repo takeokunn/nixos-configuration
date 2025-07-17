@@ -91,15 +91,15 @@
   };
   emacs-eglot-booster = {
     pname = "emacs-eglot-booster";
-    version = "1260d2f7dd18619b42359aa3e1ba6871aa52fd26";
+    version = "cab7803c4f0adc7fff9da6680f90110674bb7a22";
     src = fetchFromGitHub {
       owner = "jdtsmith";
       repo = "eglot-booster";
-      rev = "1260d2f7dd18619b42359aa3e1ba6871aa52fd26";
+      rev = "cab7803c4f0adc7fff9da6680f90110674bb7a22";
       fetchSubmodules = false;
-      sha256 = "sha256-teAKWDDL7IrCBiZUVIVlB3W22G9H6IrWiRV/P62dFy0=";
+      sha256 = "sha256-xUBQrQpw+JZxcqT1fy/8C2tjKwa7sLFHXamBm45Fa4Y=";
     };
-    date = "2025-04-28";
+    date = "2025-07-16";
   };
   emacs-eshell-multiple = {
     pname = "emacs-eshell-multiple";
@@ -606,15 +606,15 @@
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
-    version = "1dac3eec07e5edb004be56360546320112ded218";
+    version = "3e7c78c8575745f0c642cd82b11032e3dd0eb5a2";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "1dac3eec07e5edb004be56360546320112ded218";
+      rev = "3e7c78c8575745f0c642cd82b11032e3dd0eb5a2";
       fetchSubmodules = false;
-      sha256 = "sha256-CjEckt3P+hzRy0XGsEOI7EkeKdQ3m3mbwtgFvyzpkEE=";
+      sha256 = "sha256-5CU2jdAreUNBMZpUxXkHKAjk+rtQnrzgQQ96/6CQGCM=";
     };
-    date = "2025-07-13";
+    date = "2025-07-17";
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";

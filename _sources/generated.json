@@ -148,7 +148,7 @@
   },
   "emacs-eglot-booster": {
     "cargoLocks": null,
-    "date": "2025-04-28",
+    "date": "2025-07-16",
     "extract": null,
     "name": "emacs-eglot-booster",
     "passthru": null,
@@ -160,12 +160,12 @@
       "name": null,
       "owner": "jdtsmith",
       "repo": "eglot-booster",
-      "rev": "1260d2f7dd18619b42359aa3e1ba6871aa52fd26",
-      "sha256": "sha256-teAKWDDL7IrCBiZUVIVlB3W22G9H6IrWiRV/P62dFy0=",
+      "rev": "cab7803c4f0adc7fff9da6680f90110674bb7a22",
+      "sha256": "sha256-xUBQrQpw+JZxcqT1fy/8C2tjKwa7sLFHXamBm45Fa4Y=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "1260d2f7dd18619b42359aa3e1ba6871aa52fd26"
+    "version": "cab7803c4f0adc7fff9da6680f90110674bb7a22"
   },
   "emacs-eshell-multiple": {
     "cargoLocks": null,
@@ -1051,7 +1051,7 @@
   },
   "vim-skkeleton": {
     "cargoLocks": null,
-    "date": "2025-07-13",
+    "date": "2025-07-17",
     "extract": null,
     "name": "vim-skkeleton",
     "passthru": null,
@@ -1063,12 +1063,12 @@
       "name": null,
       "owner": "vim-skk",
       "repo": "skkeleton",
-      "rev": "1dac3eec07e5edb004be56360546320112ded218",
-      "sha256": "sha256-CjEckt3P+hzRy0XGsEOI7EkeKdQ3m3mbwtgFvyzpkEE=",
+      "rev": "3e7c78c8575745f0c642cd82b11032e3dd0eb5a2",
+      "sha256": "sha256-5CU2jdAreUNBMZpUxXkHKAjk+rtQnrzgQQ96/6CQGCM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "1dac3eec07e5edb004be56360546320112ded218"
+    "version": "3e7c78c8575745f0c642cd82b11032e3dd0eb5a2"
   },
   "vim-skkeleton-azik": {
     "cargoLocks": null,
