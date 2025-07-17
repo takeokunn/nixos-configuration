@@ -4,7 +4,11 @@
   sources,
 }:
 let
-  override = final: prev: { };
+  override = final: prev: {
+    copilot = prev.copilot.overrideAttrs (_: {
+      postPatch = "";
+    });
+  };
 in
 {
   emacs-git = pkgs.emacsWithPackagesFromUsePackage {
