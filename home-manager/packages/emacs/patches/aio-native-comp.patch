@@ -1,10 +1,10 @@
 diff --git a/aio.el b/aio.el
-index 5d9b3cf..451a7a0 100644
+index 203f441..e6ac57a 100644
 --- a/aio.el
 +++ b/aio.el
-@@ -31,2 +31,2 @@
+@@ -24,2 +24,2 @@
+ (require 'cl-lib)
  (require 'generator)
- (require 'rx)
 
 +(eval-and-compile
 +  ;; Tell the native compiler about the types defined with `record`.
