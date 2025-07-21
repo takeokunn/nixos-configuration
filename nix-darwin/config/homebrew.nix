@@ -13,8 +13,6 @@
     ];
     casks = [
       "aquaskk"
-      "chatgpt"
-      "claude"
       "cleanshot"
       "font-hack-nerd-font"
       "font-sketchybar-app-font"

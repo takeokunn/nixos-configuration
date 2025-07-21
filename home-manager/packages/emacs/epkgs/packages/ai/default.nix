@@ -3,8 +3,8 @@
 }:
 with epkgs;
 [
-  copilot
-  copilot-chat
+  # copilot
+  # copilot-chat
   ellama
   aidermacs
 ]
