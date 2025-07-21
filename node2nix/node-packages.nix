@@ -921,13 +921,13 @@ let
         sha512 = "zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==";
       };
     };
-    "cheerio-1.1.0" = {
+    "cheerio-1.1.1" = {
       name = "cheerio";
       packageName = "cheerio";
-      version = "1.1.0";
+      version = "1.1.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.1.0.tgz";
-        sha512 = "+0hMx9eYhJvWbgpKV9hN7jg0JcwydpopZE4hgi+KvQtByZXPp04NiCWU0LzcAbP63abZckIHkTQaXVF52mX3xQ==";
+        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.1.1.tgz";
+        sha512 = "bTXxVZeOfc3I97S4CSYVjcYvaTp92YOlwEUrVRtYrkuVn7S8/QKnnozVlztPcXlU039S2UxtsjAMyFRbX3V9gQ==";
       };
     };
     "cheerio-select-2.1.0" = {
@@ -3856,7 +3856,7 @@ in
       sources."bytes-3.1.2"
       sources."call-bind-apply-helpers-1.0.2"
       sources."call-bound-1.0.4"
-      sources."cheerio-1.1.0"
+      sources."cheerio-1.1.1"
       sources."cheerio-select-2.1.0"
       sources."content-disposition-1.0.0"
       sources."content-type-1.0.5"
