@@ -1,0 +1,22 @@
+diff --git a/aio.el b/aio.el
+index 5d9b3cf..451a7a0 100644
+--- a/aio.el
++++ b/aio.el
+@@ -31,2 +31,2 @@
+ (require 'generator)
+ (require 'rx)
+
++(eval-and-compile
++  ;; Tell the native compiler about the types defined with `record`.
++  (when (and (fboundp 'native-comp-available-p)
++             (native-comp-available-p))
++    (cl-defstruct aio-promise)
++    (cl-defstruct aio-select)
++    (cl-defstruct aio-sem)
++    (put 'aio-promise 'comp-native-type-proper t)
++    (put 'aio-select 'comp-native-type-proper t)
++    (put 'aio-sem 'comp-native-type-proper t)))
++
+ ;; Register new error types
+ (define-error 'aio-cancel "Promise was canceled")
+ (define-error 'aio-timeout "Timeout was reached")
