@@ -921,13 +921,13 @@ let
         sha512 = "zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==";
       };
     };
-    "cheerio-1.1.1" = {
+    "cheerio-1.1.2" = {
       name = "cheerio";
       packageName = "cheerio";
-      version = "1.1.1";
+      version = "1.1.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.1.1.tgz";
-        sha512 = "bTXxVZeOfc3I97S4CSYVjcYvaTp92YOlwEUrVRtYrkuVn7S8/QKnnozVlztPcXlU039S2UxtsjAMyFRbX3V9gQ==";
+        url = "https://registry.npmjs.org/cheerio/-/cheerio-1.1.2.tgz";
+        sha512 = "IkxPpb5rS/d1IiLbHMgfPuS0FgiWTtFIm/Nj+2woXDLTZ7fOT2eqzgYbdMlLweqlHbsZjxEChoVK+7iph7jyQg==";
       };
     };
     "cheerio-select-2.1.0" = {
@@ -3798,10 +3798,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.345.0";
+    version = "1.346.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.345.0.tgz";
-      sha512 = "itvJoa/ba0SfgWhk0UiyR3I6XZ6/n3WFFOfsViOitorDQSAU130YS9CfZ/9DESbTxeC7Viv5NRwyDNwkyZJf4Q==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.346.0.tgz";
+      sha512 = "V8CSEHYpiUMgegFCpvpp8Qzj0ZAqgZOaddgT9oxK/mJ4NAqCh+qDphsEKjoyr6PCtHjBwopt8zIdyYT6AxdxTA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3821,10 +3821,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.56";
+    version = "1.0.57";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.56.tgz";
-      sha512 = "LYOlv9uXtLrJcJqSLvQlhy7shhC6MHEXuSGZ/+BazM4LY36ng3cmKjTCDny0kZQxa+u/+MYOXUrkmkJm2qR75Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.57.tgz";
+      sha512 = "zMymGZzjG+JO9iKC5N5pAy8AxyHIMPCL6U3HYCR3vCj5M+Y0s3GAMma6GkvCXWFixRN6KSZItKw3HbQiaIBYlw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3856,7 +3856,7 @@ in
       sources."bytes-3.1.2"
       sources."call-bind-apply-helpers-1.0.2"
       sources."call-bound-1.0.4"
-      sources."cheerio-1.1.1"
+      sources."cheerio-1.1.2"
       sources."cheerio-select-2.1.0"
       sources."content-disposition-1.0.0"
       sources."content-type-1.0.5"
