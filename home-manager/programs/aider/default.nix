@@ -1,6 +1,6 @@
 {
   programs.aider = {
-    enable = false;
+    enable = true;
     config = {
       dark-mode = true;
       model = "gemini";
