@@ -1280,7 +1280,8 @@ $0
   - blog:
 
   ,*** TODO org-roamでファイルを作る
-  ,*** TODO ブログを書く
+  ,*** TODO アウトラインを書く
+  ,*** TODO 文章を書く
   ,*** TODO 公開する
 #+end_src
 *** translate

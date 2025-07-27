@@ -38,7 +38,6 @@
       "*.fasl"
       "*~"
       ".DS_Store"
-      ".claude/"
       ".dir-locals-2.el"
       ".aider*"
       "TAGS"
@@ -47,7 +46,6 @@
       ".devenv"
       ".pre-commit-config.yaml"
       ".markdown-preview.html"
-      ".worktree/"
     ];
 
     userName = "takeokunn";
