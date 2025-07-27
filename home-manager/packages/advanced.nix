@@ -1,6 +1,7 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
+  similarity
   yubikey-manager
 
   # for ai
