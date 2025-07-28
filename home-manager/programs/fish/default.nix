@@ -20,7 +20,7 @@
     shellInit = ''
       # for tmux
       if type -q tmux && test -z $TMUX && status --is-login
-          tmux_attach_session_if_needed
+          tmux attach-session -t default || tmux new-session -s default
       end
 
       # suppress fish_greeting
