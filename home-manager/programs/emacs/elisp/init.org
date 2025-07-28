@@ -4432,6 +4432,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
                                          (format-time-string "%Y" (current-time))
                                          (format-time-string "%Y-%m-%d" (current-time))))
+    ;; clock
+    (setq org-extend-today-until 4)
+    (setq org-use-effective-time t)
 
     ;; log
     (setq org-log-into-drawer t)
