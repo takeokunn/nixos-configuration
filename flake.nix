@@ -42,6 +42,10 @@
       url = "github:natsukium/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -65,7 +69,13 @@
           OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
         };
         nixosConfigurations = {
-          X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
+          X13Gen2 = inputs.nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              ./hosts/X13Gen2
+              inputs.disko.nixosModules.disko
+            ];
+          };
         };
         nixOnDroidConfigurations = {
           OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
