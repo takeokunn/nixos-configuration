@@ -19,9 +19,9 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
     {
       home-manager.useUserPackages = true;
-      sharedModules = [ sops-nix.homeManagerModules.sops ];
+      home-manager.sharedModules = [ sops-nix.homeManagerModules.sops ];
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
-      extraSpecialArgs = {
+      home-manager.extraSpecialArgs = {
         inherit system;
         inherit (inputs) nixpkgs;
         inherit (inputs) mcp-servers-nix;

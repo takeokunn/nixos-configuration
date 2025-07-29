@@ -14,13 +14,17 @@
     xserver = {
       enable = true;
       xkb.layout = "jp";
-      displayManager.gdm.enable = true;
     };
 
-    displayManager.autoLogin = {
-      enable = true;
-      user = username;
+    displayManager = {
+      gdm.enable = true;
+      autoLogin = {
+        enable = true;
+        user = username;
+      };
     };
+
+    pulseaudio.enable = false;
 
     pipewire = {
       enable = true;
