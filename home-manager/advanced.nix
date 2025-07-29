@@ -28,7 +28,7 @@ let
     inherit (nixpkgs) lib;
     inherit pkgs sources;
   };
-  emacsPkg = emacs.emacs-unstable-with-widgets;
+  emacsPkg = if pkgs.stdenv.isDarwin then emacs.emacs-unstable-with-widgets else emacs.emacs-unstable;
 
   # misc
   misc = import ./misc;
