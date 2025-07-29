@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   disko.devices = {
     disk = {
