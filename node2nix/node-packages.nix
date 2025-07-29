@@ -2811,13 +2811,13 @@ let
         sha512 = "y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==";
       };
     };
-    "react-19.1.0" = {
+    "react-19.1.1" = {
       name = "react";
       packageName = "react";
-      version = "19.1.0";
+      version = "19.1.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react/-/react-19.1.0.tgz";
-        sha512 = "FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==";
+        url = "https://registry.npmjs.org/react/-/react-19.1.1.tgz";
+        sha512 = "w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==";
       };
     };
     "react-devtools-core-4.28.5" = {
@@ -3816,10 +3816,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.348.0";
+    version = "1.349.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.348.0.tgz";
-      sha512 = "CV1+hU9I29GXrZKwdRj2x7ur47IAoqa56FWwnkI/Cvs0BdTTrLigJlOseeFCQ1bglnIyr6ZLFCduBahDtqR1AQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.349.0.tgz";
+      sha512 = "QXpMV9DkAuGJiRAVfIH7VZxfFyAabayljqjvtafWMESSktepGn5LYPxbEEmGVhHULlv77XCzNg5QKImbRTMqzA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3839,10 +3839,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.61";
+    version = "1.0.62";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.61.tgz";
-      sha512 = "+gjKzY1hsWfHoH52SgKR6E0ujCDPyyRsjyRShtZfS0urKd8VQq3D/DF3hvT3P4JJeW0YuWp5Dep0aSRON+/FFA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.62.tgz";
+      sha512 = "uWjIvjtOudC/knp7QMJhICdIcvEP8Nuz+0Rj3DeZc5eYyHgtiYTsb5mVTou2P7OTsCfwc3ajFdbFbtyq/LwYSw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4417,7 +4417,7 @@ in
           ];
         }
       )
-      sources."react-19.1.0"
+      sources."react-19.1.1"
       (
         sources."react-devtools-core-4.28.5"
         // {
