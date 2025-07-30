@@ -3,6 +3,7 @@
   services = {
     ntp.enable = true;
     cachix-agent.enable = true;
+    pcscd.enable = true;
 
     ollama = {
       enable = true;
