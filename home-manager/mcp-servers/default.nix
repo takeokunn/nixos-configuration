@@ -10,7 +10,6 @@ let
     playwright.enable = true;
     brave-search = {
       enable = false;
-      # envFile = config.sops.secrets.brave-api-token.path;
     };
   };
   settings = {

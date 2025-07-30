@@ -1,7 +1,0 @@
-keys:
-  - &take 0B10DAA7BA0236D7382287660F79C0AB03FD7A1C
-creation_rules:
-  - path_regex: sops/[^/]+\.yaml$
-    key_groups:
-      - pgp:
-          - *take

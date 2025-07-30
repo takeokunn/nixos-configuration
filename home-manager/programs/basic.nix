@@ -21,7 +21,6 @@ let
   readline = import ./readline;
   ripgrep = import ./ripgrep;
   jq = import ./jq;
-  # sops = import ./sops;
   tig = import ./tig { inherit pkgs sources; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
@@ -47,7 +46,6 @@ in
   readline
   ripgrep
   jq
-  # sops
   tig
   tmux
   vim

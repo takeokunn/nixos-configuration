@@ -1,7 +1,11 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
+  # lint
   similarity
+
+  # security
+  sops
   yubikey-manager
 
   # for ai
