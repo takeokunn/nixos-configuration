@@ -9,6 +9,24 @@
 
   services.xserver.videoDrivers = [ "amdgpu" ];
 
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/784ff1be-5b0e-4b59-af05-bf03cb580b42";
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/B589-AD30";
+    fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
+  };
+
+  swapDevices = [
+    { device = "/dev/disk/by-uuid/94617a47-e3be-4a19-9e70-1264c383b719"; }
+  ];
+
   boot = {
     initrd = {
       availableKernelModules = [
