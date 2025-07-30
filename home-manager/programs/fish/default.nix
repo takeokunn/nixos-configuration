@@ -19,7 +19,7 @@
 
     shellInit = ''
       # for tmux
-      if type -q tmux && test -z $TMUX && status --is-login
+      if type -q tmux && test -z $TMUX
           tmux attach-session -t 0 || tmux new-session
       end
 
