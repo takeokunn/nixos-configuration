@@ -3441,7 +3441,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        sops-edit-file
                        global-sops-mode) "sops" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-sops-mode)
+  ;; (add-hook 'emacs-startup-hook #'global-sops-mode)
 #+end_src
 ** Dictionary
 *** define-word

@@ -5,10 +5,6 @@
       git_protocol = "ssh";
     };
 
-    hosts = {
-      "github.com".user = "takeokunn";
-    };
-
     gitCredentialHelper = {
       enable = true;
       hosts = [

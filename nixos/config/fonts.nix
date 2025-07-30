@@ -2,6 +2,7 @@
 {
   fonts = {
     fontDir.enable = true;
+    fontconfig.enable = true;
     packages = with pkgs; [
       noto-fonts
       noto-fonts-lgc-plus
