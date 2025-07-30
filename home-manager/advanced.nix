@@ -52,12 +52,12 @@ let
     inherit pkgs emacsPkg;
   };
 
-  # sops
-  sops = [
-    (import ../sops {
-      homeDirectory = config.home.homeDirectory;
-    })
-  ];
+  # # sops
+  # sops = [
+  #   (import ../sops {
+  #     homeDirectory = config.home.homeDirectory;
+  #   })
+  # ];
 
   # mcp servers
   mcpServers = import ./mcp-servers {
@@ -73,7 +73,7 @@ in
     ++ advancedPrograms
     ++ basicServices
     ++ advancedServices
-    ++ sops
+    # ++ sops
     ++ mcpServers;
 
   home.stateVersion = "24.11";

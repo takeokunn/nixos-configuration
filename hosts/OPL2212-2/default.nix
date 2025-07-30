@@ -1,7 +1,8 @@
 { inputs }:
 let
   inherit (inputs) nix-darwin home-manager;
-  inherit (inputs) nixpkgs sops-nix;
+  # inherit (inputs) nixpkgs sops-nix;
+  inherit (inputs) nixpkgs;
 
   system = "aarch64-darwin";
   pkgs = import nixpkgs { inherit system; };
@@ -26,7 +27,7 @@ nix-darwin.lib.darwinSystem {
     {
       home-manager = {
         useUserPackages = true;
-        sharedModules = [ sops-nix.homeManagerModules.sops ];
+        # sharedModules = [ sops-nix.homeManagerModules.sops ];
         users."${username}" = import ../../home-manager/advanced.nix;
         extraSpecialArgs = {
           inherit system username;

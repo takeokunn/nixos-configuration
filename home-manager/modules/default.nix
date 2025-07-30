@@ -3,7 +3,7 @@
   ./dust
   ./lnav
   ./peco
-  ./sops
+  # ./sops
   ./tig
   ./wget
   ./zellij

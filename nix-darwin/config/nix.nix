@@ -4,6 +4,7 @@
     settings = {
       experimental-features = "nix-command flakes";
       max-jobs = 8;
+      download-buffer-size = 268435456;
     };
     extraOptions = ''
       extra-substituters = https://devenv.cachix.org

@@ -829,7 +829,6 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-stable": "nixpkgs-stable",
         "org-babel": "org-babel",
-        "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix",
         "xremap": "xremap"
       }
@@ -847,26 +846,6 @@
       "original": {
         "owner": "andreymatin",
         "repo": "scss-reset",
-        "type": "github"
-      }
-    },
-    "sops-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1752544651,
-        "narHash": "sha256-GllP7cmQu7zLZTs9z0J2gIL42IZHa9CBEXwBY9szT0U=",
-        "owner": "Mic92",
-        "repo": "sops-nix",
-        "rev": "2c8def626f54708a9c38a5861866660395bb3461",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Mic92",
-        "repo": "sops-nix",
         "type": "github"
       }
     },
