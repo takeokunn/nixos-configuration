@@ -1,7 +1,7 @@
 { inputs }:
 let
   inherit (inputs) nixpkgs xremap;
-  inherit (inputs) sops-nix home-manager;
+  inherit (inputs) sops-nix home-manager disko;
 
   username = "take";
   system = "x86_64-linux";
@@ -16,6 +16,7 @@ nixpkgs.lib.nixosSystem {
     ../../nixos
     ./hardware-configuration.nix
     ./disko-config.nix
+    disko.nixosModules.disko
     sops-nix.nixosModules.sops
     home-manager.nixosModules.home-manager
     {
