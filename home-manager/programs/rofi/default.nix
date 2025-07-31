@@ -1,18 +1,17 @@
 { pkgs }:
 {
-  home.file.".config/rofi/themes/dracula.rasi".source = ./themes/dracula.rasi;
+  xdg.configFile = {
+    "rofi/themes/dracula.rasi".source = ./themes/dracula.rasi;
+  };
+
   programs.rofi = {
     enable = pkgs.stdenv.isLinux;
+    theme = "dracula";
     font = "HackGenNerd 16";
     plugins = with pkgs; [
       rofi-calc
       rofi-power-menu
     ];
-
-    pass = {
-      enable = pkgs.stdenv.isLinux;
-      stores = [ "$HOME/ghq/github.com/takeokunn/private/password-store" ];
-    };
 
     extraConfig = {
       modi = "window,run,drun";
@@ -23,16 +22,7 @@
       display-run = "  Run";
       display-drun = " Application";
       display-filebrowser = " Filebrowser";
-      # timeout = {
-      #   action = "kb-cancel";
-      #   delay = 60;
-      # };
-      # filebrowser = {
-      #   directory = "$HOME";
-      #   directories-first = true;
-      #   sorting-method = "name";
-      # };
+      disable-history= false;
     };
-    theme = "dracula";
   };
 }

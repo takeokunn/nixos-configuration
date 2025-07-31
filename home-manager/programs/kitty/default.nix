@@ -65,12 +65,9 @@
     };
   };
 
-  home.file.".config/kitty/emacsclient_transparent.conf" = {
-    text = ''
-      # メインのKitty設定を読み込む（キーバインドなど共通設定が必要な場合）
+  xdg.configFile = {
+    ".config/kitty/emacsclient_transparent.conf".text = ''
       include ~/.config/kitty/kitty.conf
-
-      # 背景の透過度を設定 (0.0: 完全透明, 1.0: 完全不透明)
       background_opacity 0.8
     '';
   };
