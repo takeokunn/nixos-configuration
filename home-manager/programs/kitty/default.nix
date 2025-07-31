@@ -64,4 +64,14 @@
       inactive_border_color = "#6272a4";
     };
   };
+
+  home.file.".config/kitty/emacsclient_transparent.conf" = {
+    text = ''
+      # メインのKitty設定を読み込む（キーバインドなど共通設定が必要な場合）
+      include ~/.config/kitty/kitty.conf
+
+      # 背景の透過度を設定 (0.0: 完全透明, 1.0: 完全不透明)
+      background_opacity 0.8
+    '';
+  };
 }

@@ -6,6 +6,10 @@
       source = ./ime.sh;
       executable = true;
     };
+    ".config/sway/emacs-ime.sh" = {
+      source = ./emacs-ime.sh;
+      executable = true;
+    };
     ".config/sway/config.d/" = {
       source = ./config.d;
       recursive = true;
