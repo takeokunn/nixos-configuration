@@ -1,116 +1,53 @@
 {
   "layer": "top",
   "position": "top",
+  "height": 24,
+  "spacing": 4,
   "modules-left": [
-    "sway/workspaces",
-    "custom/right-arrow-dark"
+    "wlr/workspaces",
+    "wlr/taskbar"
   ],
   "modules-center": [
-    "custom/left-arrow-dark",
-    "clock#1",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "clock#2",
-    "custom/right-arrow-dark",
-    "custom/right-arrow-light",
-    "clock#3",
-    "custom/right-arrow-dark"
+    "hyprland/window"
   ],
   "modules-right": [
-    "custom/left-arrow-dark",
-    "pulseaudio",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "memory",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "cpu",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "battery",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "disk",
-    "custom/left-arrow-light",
-    "custom/left-arrow-dark",
-    "tray"
+    "tray",
+    "hyprland/language",
+    "custom/weather",
+    "clock"
   ],
-  "custom/left-arrow-dark": {
-    "format": "",
-    "tooltip": false
-  },
-  "custom/left-arrow-light": {
-    "format": "",
-    "tooltip": false
-  },
-  "custom/right-arrow-dark": {
-    "format": "",
-    "tooltip": false
-  },
-  "custom/right-arrow-light": {
-    "format": "",
-    "tooltip": false
-  },
-  "sway/workspaces": {
-    "disable-scroll": true,
-    "format": "{name}"
-  },
-  "clock#1": {
-    "format": "{:%a}",
-    "tooltip": false
-  },
-  "clock#2": {
-    "format": "{:%Y-%m-%d}",
-    "tooltip": false
-  },
-  "clock#3": {
-    "format": "{:%H:%M}",
-    "tooltip": false
-  },
-  "pulseaudio": {
-    "format": "{icon} {volume:2}%",
-    "format-bluetooth": "{icon}  {volume}%",
-    "format-muted": "MUTE",
-    "format-icons": {
-      "headphones": "  ",
-      "default": [
-        " ",
-        "  "
-      ]
-    },
-    "scroll-step": 5,
-    "on-click": "pamixer -t",
-    "on-click-right": "pavucontrol"
-  },
-  "memory": {
-    "interval": 5,
-    "format": "Mem {}%"
-  },
-  "cpu": {
-    "interval": 5,
-    "format": "CPU {usage:2}%"
-  },
-  "battery": {
-    "states": {
-      "good": 95,
-      "warning": 30,
-      "critical": 15
-    },
-    "format": "{icon} {capacity}%",
-    "format-icons": [
-      " ",
-      " ",
-      " ",
-      " ",
-      " "
+  "wlr/taskbar": {
+    "on-click": "activate",
+    "on-click-middle": "close",
+    "ignore-list": [
+      "foot"
     ]
   },
-  "disk": {
-    "interval": 5,
-    "format": "Disk {percentage_used:2}%",
-    "path": "/"
+  "wlr/workspaces": {
+    "on-click": "activate",
+    "on-scroll-up": "hyprctl dispatch workspace e-1",
+    "on-scroll-down": "hyprctl dispatch workspace e+1"
+  },
+  "hyprland/window": {
+    "max-length": 128
+  },
+  "clock": {
+    "format": "{:%c}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
   },
   "tray": {
-    "icon-size": 20
+    "spacing": 4
+  },
+  "custom/weather": {
+    "exec": "~/.config/waybar/wittr.sh",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "interval": 900
+  },
+  "hyprland/language": {
+    "format-pl": "[pl]",
+    "format-en": "[us]",
+    "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
   }
 }

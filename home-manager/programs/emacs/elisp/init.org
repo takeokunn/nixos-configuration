@@ -4506,14 +4506,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                            (add-hook 'prog-mode-hook #'view-mode)))
 
     ;; config
-
     (setq org-capture-use-agenda-date t)
     (setq org-capture-bookmark nil)
     (setq org-capture-templates `(("m" "Memo" entry (file ,(expand-file-name "memo.org" org-directory))
                                    "* %T\n%?")
                                   ("j" "Journal" entry (file+olp+datetree ,(expand-file-name "journal.org" org-directory))
                                    "* %U\n%?\n%i\n")
-                                  ("1" "OPENLOGI" entry (file+headline ,(expand-file-name "task/openlogi.org" org-directory) "Backlog")
+                                  ("1" "Attm" entry (file+headline ,(expand-file-name "task/attm.org" org-directory) "Backlog")
                                    "** TODO Capture %U\n%?")
                                   ("2" "Other" entry (file+headline ,(expand-file-name "task/other.org" org-directory) "Backlog")
                                    "** TODO Capture %U\n%?"))))
