@@ -3,7 +3,7 @@
   home.file.".config/rofi/themes/dracula.rasi".source = ./themes/dracula.rasi;
   programs.rofi = {
     enable = pkgs.stdenv.isLinux;
-    font = "Cica 16";
+    font = "HackGenNerd 16";
     plugins = with pkgs; [
       rofi-calc
       rofi-power-menu

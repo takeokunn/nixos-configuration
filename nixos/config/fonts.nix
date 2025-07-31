@@ -16,9 +16,6 @@
       emacs-all-the-icons-fonts
       font-awesome
       font-awesome_5
-      iosevka
-      (iosevka-bin.override { variant = "Aile"; })
-      (iosevka-bin.override { variant = "Etoile"; })
     ];
   };
 }

@@ -4,7 +4,7 @@
 
     settings = {
       font_size = 14.0;
-      font_family = "monospace";
+      font_family = "HackGenNerd";
 
       # thanks. https://github.com/dracula/kitty/blob/master/dracula.conf
       foreground = "#f8f8f2";

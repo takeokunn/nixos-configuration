@@ -12,7 +12,7 @@
       effect-blur = "13x13";
       effect-vignette = "0.5:0.5";
       color = "6272A4";
-      font = "Inter";
+      font = "HackGenNerd";
       indicator = true;
       indicator-radius = 200;
       indicator-thickness = 20;

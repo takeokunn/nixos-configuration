@@ -3149,8 +3149,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
                   ;; non Noto fonts
                   (set-fontset-font t 'kana "UniHentaiKana" nil 'append)
-                  (set-fontset-font t 'latin "Iosevka" nil 'append)
-                  (set-fontset-font t 'symbol "Iosevka" nil 'append)
+                  (set-fontset-font t 'latin "HackGenNerd" nil 'append)
+                  (set-fontset-font t 'symbol "HackGenNerd" nil 'append)
 
                   ;; Nerd Font (defined thru -#xfd46)
                   (set-fontset-font t '( #xe000 .  #xf136) "Inconsolata Nerd Font"))))
