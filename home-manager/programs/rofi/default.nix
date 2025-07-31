@@ -22,7 +22,7 @@
       display-run = "  Run";
       display-drun = " Application";
       display-filebrowser = " Filebrowser";
-      disable-history= false;
+      disable-history = false;
     };
   };
 }
