@@ -1,5 +1,6 @@
 { pkgs, emacsPkg }:
 let
+  autorandr = import ./autorandr { inherit pkgs; };
   emacs = import ./emacs { inherit pkgs emacsPkg; };
   mako = import ./mako { inherit pkgs; };
   ollama = import ./ollama { inherit pkgs; };
@@ -9,6 +10,7 @@ let
   swayosd = import ./swayosd { inherit pkgs; };
 in
 [
+  autorandr
   emacs
   mako
   ollama
