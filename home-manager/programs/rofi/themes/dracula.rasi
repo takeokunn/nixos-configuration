@@ -12,7 +12,8 @@
     drac-red: #ff5555;
     drac-yel: #f1fa8c;
 
-    font: "Jetbrains Mono 12";
+    font: "HackGenNerd";
+    font-size: 16px;
 
     foreground: @drac-fgd;
     background-color: @drac-bgd;
@@ -110,9 +111,9 @@
 }
 
 #scrollbar {
-    width:        2px ;
+    width:        2px;
     border:       0;
-    handle-width: 8px ;
+    handle-width: 8px;
     padding:      0;
 }
 
@@ -154,7 +155,7 @@
 #textbox-prompt-colon {
     expand:     false;
     str:        ">";
-    margin:     0px 0.3em 0em 0em ;
+    margin:     0px 0.5em 0em 0em ;
     text-color: @drac-pur;
 }
 
@@ -162,3 +163,4 @@ element-text, element-icon {
     background-color: inherit;
     text-color: inherit;
 }
+
