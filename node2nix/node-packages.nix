@@ -129,13 +129,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.17.0" = {
+    "@modelcontextprotocol/sdk-1.17.1" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.17.0";
+      version = "1.17.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.0.tgz";
-        sha512 = "qFfbWFA7r1Sd8D697L7GkTd36yqDuTkvz0KfOGkgXR8EUhQn3/EDNIR/qUdQNMT8IjmasBvHWuXeisxtXTQT2g==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.1.tgz";
+        sha512 = "CPle1OQehbWqd25La9Ack5B07StKIxh4+Bf19qnpZKJC1oI22Y0czZHbifjw1UoczIfKBwBDAp/dFxvHG13B5A==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -3450,13 +3450,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-7.12.0" = {
+    "undici-7.13.0" = {
       name = "undici";
       packageName = "undici";
-      version = "7.12.0";
+      version = "7.13.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-7.12.0.tgz";
-        sha512 = "GrKEsc3ughskmGA9jevVlIOPMiiAHJ4OFUtaAH+NhfTUSiZ1wMPIQqQvAJUrJspFXJt3EBWgpAeoHEDVT1IBug==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.13.0.tgz";
+        sha512 = "l+zSMssRqrzDcb3fjMkjjLGmuiiK2pMIcV++mJaAc9vhjSGpvM7h43QgP+OAMb1GImHmbPyG2tBXeuyG5iY4gA==";
       };
     };
     "undici-types-7.8.0" = {
@@ -3816,10 +3816,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.351.0";
+    version = "1.352.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.351.0.tgz";
-      sha512 = "Owpl/cOTMQwXYArYuB1KCZGYkAScSb4B1TxPrKxAM10nIBeCtyHuEc1NQ0Pw05asMAHnoHWHVGQDrJINjlA8Ww==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.352.0.tgz";
+      sha512 = "mjzFDEkniCCV8ullyaaMVpERWqlpo/gIk34B+3bZ98hNoPeTA1LIkB9vIk4XBOnRA/tUkqLx6uV++vRPVmCA+A==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3839,10 +3839,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.64";
+    version = "1.0.65";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.64.tgz";
-      sha512 = "AI3Q/50+znj80gV1Aua4MOGLuOxS4G6m11CmYYyDCFuoVMzskG1aSI5fxAyGol3N5GI4Tuw0YPmANJdZ/MNvhQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.65.tgz";
+      sha512 = "MUpHFOzdx8EKw3DogQObsL5nseXbMInGHInqRyMVBf2/aLnD4IHEFOuyR5SfnINI9E8lEiqIOy0p3muu60j3uA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3857,14 +3857,14 @@ in
   sitemcp = nodeEnv.buildNodePackage {
     name = "sitemcp";
     packageName = "sitemcp";
-    version = "0.5.7";
+    version = "0.5.8";
     src = fetchurl {
-      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.7.tgz";
-      sha512 = "YRDV5qbxyBnoouC/0RCD36aGqqev3DllYMp6KgNPniB+ukqJEatSw5TpRkpak1BuG9Yx/AeMLRvTsY/pFDH7kQ==";
+      url = "https://registry.npmjs.org/sitemcp/-/sitemcp-0.5.8.tgz";
+      sha512 = "Cuh5OLqrowlZLslstU7yETYUg4GPevFaISXRhLXU3ZgBqqEJwAHSg/j3vpBhluIfGQfav+Uc8YWj7c+fClpWDA==";
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.17.0"
+      sources."@modelcontextprotocol/sdk-1.17.1"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -3998,7 +3998,7 @@ in
       sources."turndown-7.2.0"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
-      sources."undici-7.12.0"
+      sources."undici-7.13.0"
       sources."unpipe-1.0.0"
       sources."uri-js-4.4.1"
       sources."vary-1.1.2"
@@ -4057,7 +4057,7 @@ in
       sources."@js-sdsl/ordered-map-4.4.2"
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
-      sources."@modelcontextprotocol/sdk-1.17.0"
+      sources."@modelcontextprotocol/sdk-1.17.1"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.52.1"
       sources."@opentelemetry/context-async-hooks-1.25.1"
@@ -4535,7 +4535,7 @@ in
       sources."tr46-0.0.3"
       sources."type-fest-4.41.0"
       sources."type-is-2.0.1"
-      sources."undici-7.12.0"
+      sources."undici-7.13.0"
       sources."undici-types-7.8.0"
       sources."unicorn-magic-0.1.0"
       sources."unpipe-1.0.0"
