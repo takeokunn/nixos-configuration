@@ -10,44 +10,45 @@
 * {
   border: none;
   border-radius: 0;
-  font-family: "HackGen";
+  font-family: Iosevka;
   font-size: 11pt;
   min-height: 0;
 }
 
 window#waybar {
-  background: #282a36;
-  color: #f8f8f2;
-  border-bottom: 2px solid #44475a;
+  opacity: 0.9;
+  background: @background-darker;
+  color: @foreground;
+  border-bottom: 2px solid @background;
 }
 
 #workspaces button {
   padding: 0 10px;
-  background: #282a36;
-  color: #f8f8f2;
+  background: @background;
+  color: @foreground;
 }
 
 #workspaces button:hover {
   box-shadow: inherit;
   text-shadow: inherit;
-  background-image: linear-gradient(0deg, #6272a4, #282a36);
+  background-image: linear-gradient(0deg, @selection, @background-darker);
 }
 
 #workspaces button.focused,
 #workspaces button.active {
-  background-image: linear-gradient(0deg, #bd93f9, #6272a4);
+  background-image: linear-gradient(0deg, @purple, @selection);
 }
 
 #workspaces button.urgent {
-  background-image: linear-gradient(0deg, #ff5555, #282a36);
+  background-image: linear-gradient(0deg, @red, @background-darker);
 }
 
 #taskbar button.active {
-  background-image: linear-gradient(0deg, #6272a4, #282a36);
+  background-image: linear-gradient(0deg, @selection, @background-darker);
 }
 
 #clock {
   padding: 0 4px;
-  background: #282a36;
+  background: @background;
 }
 

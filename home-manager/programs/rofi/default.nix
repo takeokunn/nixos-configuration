@@ -14,6 +14,13 @@
 
     extraConfig = {
       show-icons = true;
+      icon-theme = "Nordzy-dark";
+      sidebar-mode = true;
+      display-window = " Window";
+      display-run = "  Run";
+      display-drun = " Application";
+      display-filebrowser = " Filebrowser";
+      disable-history = false;
     };
   };
 }
