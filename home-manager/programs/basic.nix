@@ -16,7 +16,6 @@ let
   misc = import ./misc;
   neovim = import ./neovim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
-  peco = import ./peco { inherit pkgs; };
   fzf = import ./fzf;
   readline = import ./readline;
   ripgrep = import ./ripgrep;
@@ -41,7 +40,6 @@ in
   misc
   password-store
   neovim
-  peco
   fzf
   readline
   ripgrep

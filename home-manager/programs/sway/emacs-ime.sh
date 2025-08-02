@@ -1,11 +1,10 @@
-#!/bin/bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p bash
 
 TEMP_FILE=$(mktemp)
 
-# Kittyを起動し、専用の設定ファイルを適用し、タイトルを設定
-# -c は --config の短縮形
 kitty \
-  -c ~/.config/kitty/emacsclient_transparent.conf \
+  --config ~/.config/kitty/emacsclient_transparent.conf \
   --title "Temporary Editor" \
   sh -c "
 emacsclient -c --eval \

@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   nodePkgs,
   sources,
@@ -27,7 +26,7 @@ let
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
   sway = import ./sway;
-  swaylock = import ./swaylock { inherit lib pkgs; };
+  swaylock = import ./swaylock { inherit pkgs; };
   waybar = import ./waybar { inherit pkgs; };
 in
 [

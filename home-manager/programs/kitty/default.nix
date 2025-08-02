@@ -3,7 +3,7 @@
     enable = true;
 
     settings = {
-      font_size = 14.0;
+      font_size = 13.0;
       font_family = "HackGenNerd";
 
       # thanks. https://github.com/dracula/kitty/blob/master/dracula.conf

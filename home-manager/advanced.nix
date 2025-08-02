@@ -41,7 +41,6 @@ let
     inherit pkgs sources;
   };
   advancedPrograms = import ./programs/advanced.nix {
-    inherit (nixpkgs) lib;
     inherit pkgs nodePkgs sources;
     inherit org-babel emacsPkg;
   };
