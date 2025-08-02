@@ -6,8 +6,6 @@ let
   ollama = import ./ollama { inherit pkgs; };
   gpg-agent = import ./gpg-agent;
   swayidle = import ./swayidle { inherit pkgs; };
-  swaync = import ./swaync { inherit pkgs; };
-  swayosd = import ./swayosd { inherit pkgs; };
 in
 [
   autorandr
@@ -16,6 +14,4 @@ in
   ollama
   gpg-agent
   swayidle
-  swaync
-  swayosd
 ]
