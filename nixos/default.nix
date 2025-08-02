@@ -7,6 +7,7 @@
 }:
 let
   boot = import ./config/boot.nix;
+  containers = import ./config/containers.nix;
   fonts = import ./config/fonts.nix { inherit pkgs; };
   hardware = import ./config/hardware.nix;
   i18n = import ./config/i18n.nix;
@@ -26,6 +27,7 @@ in
   imports = [
     xremap.nixosModules.default
     boot
+    containers
     fonts
     hardware
     i18n

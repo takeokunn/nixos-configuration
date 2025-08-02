@@ -4,7 +4,7 @@
     enable = pkgs.stdenv.isLinux;
     timeouts = [
       {
-        timeout = 60;
+        timeout = 900;
         command = "${pkgs.swaylock}/bin/swaylock -fF";
       }
     ];

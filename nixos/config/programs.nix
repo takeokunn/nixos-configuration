@@ -3,6 +3,7 @@
     fish.enable = true;
     firefox.enable = true;
     noisetorch.enable = true;
+    nix-ld.enable = true;
 
     chromium = {
       enable = true;

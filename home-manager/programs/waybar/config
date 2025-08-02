@@ -8,7 +8,7 @@
     "clock": {
         "tooltip-format": "{:%Y-%m-%d | %H:%M}",
         "format-alt": "{:%Y-%m-%d}",
-        "format": "{:%a %Y-%m-%d %I:%M %p}"
+        "format": "{:%a %Y-%m-%d}"
     },
     "cpu": {
         "format": "　{usage}%"
