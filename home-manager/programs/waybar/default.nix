@@ -1,9 +1,8 @@
 { pkgs }:
 {
-  xdg.configFile = {
-    "waybar/style.css".source = ./style.css;
-    "waybar/config".source = ./config;
-    "waybar/wittr.sh".source = ./wittr.sh;
+  home.file = {
+    ".config/waybar/style.css".source = ./style.css;
+    ".config/waybar/config".source = ./config;
   };
 
   programs.waybar.enable = pkgs.stdenv.isLinux;

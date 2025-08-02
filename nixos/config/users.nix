@@ -13,6 +13,7 @@
     useDefaultShell = true;
     packages = with pkgs; [
       alsa-utils
+      pavucontrol
       wl-clipboard
       grim
     ];

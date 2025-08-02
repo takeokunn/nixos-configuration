@@ -13,7 +13,7 @@
     drac-yel: #f1fa8c;
 
     font: "HackGenNerd";
-    font-size: 16px;
+    font-size: 14px;
 
     foreground: @drac-fgd;
     background-color: @drac-bgd;
