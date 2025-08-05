@@ -711,6 +711,13 @@
     (define-key jsonnet-mode-map (kbd "C-c C-f") #'jsonnet-jump)
     (define-key jsonnet-mode-map (kbd "C-c C-r") #'jsonnet-reformat-buffer))
 #+end_src
+** just-mode
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(just-mode) "just-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("/[Jj]ustfile\\'" . just-mode))
+  (add-to-list 'auto-mode-alist '("\\.[Jj]ust\\(file\\)?\\'" . just-mode))
+#+end_src
 ** kotlin-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(kotlin-mode) "kotlin-mode" nil t)

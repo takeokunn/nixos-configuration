@@ -49,6 +49,7 @@ with epkgs;
   js2-mode
   json-mode
   jsonnet-mode
+  just-mode
   kotlin-mode
   lua-mode
   markdown-mode

@@ -1,6 +1,8 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
+  rustup
+
   # lint
   similarity
 
