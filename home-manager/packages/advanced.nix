@@ -1,14 +1,15 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
-  rustup
-
-  # lint
+  # for lint
   similarity
 
-  # security
+  # for security
   sops
   yubikey-manager
+
+  # for docker
+  lazydocker
 
   # for ai
   ollama
