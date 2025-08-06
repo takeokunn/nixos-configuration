@@ -39,13 +39,13 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.1.17" = {
+    "@google/gemini-cli-core-0.1.18" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.1.17";
+      version = "0.1.18";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.17.tgz";
-        sha512 = "uTlt96mDKgEPSsBx4KwyQqmlXzyvWPw3WardF/kxlCEtkpjdyTNSEB9FfiaSH1SITIBKkdcd8HWnTlEz2KHFvg==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.18.tgz";
+        sha512 = "a6FVWR70LaNenjxThqaitizA/zoZy00zHyLunB3FZFldRs0D3vkFMAd3tZsEF7MLl0sWZCGRA38BK2LR/I0iww==";
       };
     };
     "@google/genai-1.9.0" = {
@@ -1578,6 +1578,15 @@ let
         sha512 = "Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==";
       };
     };
+    "fdir-6.4.6" = {
+      name = "fdir";
+      packageName = "fdir";
+      version = "6.4.6";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/fdir/-/fdir-6.4.6.tgz";
+        sha512 = "hiFoqpyZcfNm1yc4u8oWCf9A2c4D3QjCrks3zmoVKVxpQRzmPNar1hUJcBG2RQHvEVGDN+Jm81ZheVLAQMK6+w==";
+      };
+    };
     "figures-6.1.0" = {
       name = "figures";
       packageName = "figures";
@@ -2721,6 +2730,15 @@ let
         sha512 = "JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==";
       };
     };
+    "picomatch-4.0.3" = {
+      name = "picomatch";
+      packageName = "picomatch";
+      version = "4.0.3";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz";
+        sha512 = "5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==";
+      };
+    };
     "pkce-challenge-5.0.0" = {
       name = "pkce-challenge";
       packageName = "pkce-challenge";
@@ -3848,10 +3866,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.68";
+    version = "1.0.69";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.68.tgz";
-      sha512 = "L3c73LgUjy3SM6Kkx3ny7docd+MIAQ6c1BA2Q17eXTd5gIa0VH5Fj+UPobfUmu69LPiO97iV6UOeHwiH9G7lNg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.69.tgz";
+      sha512 = "kF86lNI9o6rt14cEDw16G89rHz4pL0lv/sASztV8XenEeQ/6VUZ5Jk+icYg6XTQKe33BsdtNKFS3IL3iLyzQyw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4032,10 +4050,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.1.17";
+    version = "0.1.18";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.17.tgz";
-      sha512 = "VLS8G8bD/zVHVe7RKCP/cPzvuAlPqUk3PwyohUfr+bI8k5eYWF86nlAjqgysEKVcoCAYJ2Tr7OCh6Z/6W0OPLw==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.18.tgz";
+      sha512 = "C50iWTra4GIi5RzK8di7gn3zxkPxSTufjAATqfZCCJCS7+MApgo7NWvHTCxCeACd1lTX3ZonUKxeoc/V2UeVYQ==";
     };
     dependencies = [
       (
@@ -4048,7 +4066,7 @@ in
       )
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.1.17"
+      sources."@google/gemini-cli-core-0.1.18"
       sources."@google/genai-1.9.0"
       sources."@grpc/grpc-js-1.13.4"
       sources."@grpc/proto-loader-0.7.15"
@@ -4271,6 +4289,7 @@ in
       sources."fast-deep-equal-3.1.3"
       sources."fast-json-stable-stringify-2.1.0"
       sources."fast-uri-3.0.6"
+      sources."fdir-6.4.6"
       sources."figures-6.1.0"
       sources."fill-range-7.1.1"
       sources."finalhandler-2.1.0"
@@ -4387,7 +4406,14 @@ in
       sources."math-intrinsics-1.1.0"
       sources."media-typer-1.1.0"
       sources."merge-descriptors-2.0.0"
-      sources."micromatch-4.0.8"
+      (
+        sources."micromatch-4.0.8"
+        // {
+          dependencies = [
+            sources."picomatch-2.3.1"
+          ];
+        }
+      )
       sources."mime-db-1.54.0"
       sources."mime-types-3.0.1"
       sources."mimic-fn-2.1.0"
@@ -4425,7 +4451,7 @@ in
       sources."path-to-regexp-8.2.0"
       sources."peberminta-0.9.0"
       sources."picocolors-1.1.1"
-      sources."picomatch-2.3.1"
+      sources."picomatch-4.0.3"
       sources."pkce-challenge-5.0.0"
       sources."prop-types-15.8.1"
       sources."proto-list-1.2.4"
