@@ -1,17 +1,6 @@
 {
   programs.gh = {
     enable = true;
-    settings = {
-      git_protocol = "ssh";
-    };
-
-    gitCredentialHelper = {
-      enable = true;
-      hosts = [
-        "https://github.com"
-        "https://gist.github.com"
-      ];
-    };
   };
 
   programs.fish = {

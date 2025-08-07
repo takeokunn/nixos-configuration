@@ -6,7 +6,7 @@ let
   system = "aarch64-darwin";
   pkgs = import nixpkgs { inherit system; };
 
-  username = "obara";
+  username = "take";
   configuration =
     { ... }:
     {

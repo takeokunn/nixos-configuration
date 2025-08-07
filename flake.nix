@@ -62,7 +62,7 @@
 
       flake = {
         darwinConfigurations = {
-          OPL2212-2 = import ./hosts/OPL2212-2 { inherit inputs; };
+          Attm-M4-Max = import ./hosts/Attm-M4-Max { inherit inputs; };
         };
         nixosConfigurations = {
           X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
