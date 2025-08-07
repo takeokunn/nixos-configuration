@@ -12,7 +12,6 @@ with pkgs;
   lazydocker
 
   # for ai
-  ollama
   nodePkgs."@anthropic-ai/claude-code"
   nodePkgs."@google/gemini-cli"
 

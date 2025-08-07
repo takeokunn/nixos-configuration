@@ -12,5 +12,15 @@
     emacs-git = prev.emacs-git.override {
       withNativeCompilation = false;
     };
+    ollama = prev.ollama.overrideAttrs (oldAttrs: {
+      version = "0.11.2";
+      src = final.fetchFromGitHub {
+        owner = "ollama";
+        repo = "ollama";
+        tag = "v0.11.2";
+        hash = "sha256-NZaaCR6nD6YypelnlocPn/43tpUz0FMziAlPvsdCb44=";
+      };
+      doCheck = false;
+    });
   })
 ]
