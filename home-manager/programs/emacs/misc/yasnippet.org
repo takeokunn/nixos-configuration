@@ -843,6 +843,19 @@ $0
 # --
 [${1:Link Text}](${2:URL} $3) $0
 #+end_src
+*** issue
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/markdown-mode/issue") :mkdirp yes :noweb yes
+  # name: issue
+  # key: issue
+  # --
+  # 背景
+
+  $0
+
+  # 対応項目
+
+  - xxx
+#+end_src
 ** org-mode/
 *** ai-block
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/ai-block") :mkdirp yes :noweb yes
