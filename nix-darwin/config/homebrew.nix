@@ -24,7 +24,6 @@
       "sequel-ace"
       "sf-symbols"
       "sublime-text"
-      "watchman"
     ];
   };
 }
