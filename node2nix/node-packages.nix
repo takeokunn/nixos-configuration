@@ -552,13 +552,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.2.0" = {
+    "@types/node-24.2.1" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.2.0";
+      version = "24.2.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.2.0.tgz";
-        sha512 = "3xyG3pMCq3oYCNg7/ZP+E1ooTaGB4cG8JWRsqqOYQdbWNY4zbaV0Ennrd7stjiJEFZCaybcIgpTjJWHRfBSIDw==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.2.1.tgz";
+        sha512 = "DRh5K+ka5eJic8CjH7td8QpYEV6Zo10gfRkjHCO3weqZHWDtAaSTFtl4+VMqOJ4N5jcuhZ9/l+yy8rVgw7BQeQ==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -3866,10 +3866,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.71";
+    version = "1.0.72";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.71.tgz";
-      sha512 = "2Z1HU8TiOSRZSZdHCPs+ih942cteUQ9Yx1EHHW5fO9y+gwxPYDR8Xbh/rAJMl/G58cJIn2jRiZmkWcGMN+Iqqg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.72.tgz";
+      sha512 = "nA/l/xKX4sgOE0Y6P3o6czNGQqlyqJPjs9CHFxantsmyKvOot9VlRW4AiEAn42hQrZReCXeSnt8LOMx9ev7Erg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4137,7 +4137,7 @@ in
       sources."@types/hast-3.0.4"
       sources."@types/html-to-text-9.0.4"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.2.0"
+      sources."@types/node-24.2.1"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.1.9"
       sources."@types/shimmer-1.2.0"
