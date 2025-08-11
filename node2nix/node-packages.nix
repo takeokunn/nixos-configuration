@@ -1452,13 +1452,13 @@ let
         sha512 = "FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==";
       };
     };
-    "es-toolkit-1.39.8" = {
+    "es-toolkit-1.39.9" = {
       name = "es-toolkit";
       packageName = "es-toolkit";
-      version = "1.39.8";
+      version = "1.39.9";
       src = fetchurl {
-        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.39.8.tgz";
-        sha512 = "A8QO9TfF+rltS8BXpdu8OS+rpGgEdnRhqIVxO/ZmNvnXBYgOdSsxukT55ELyP94gZIntWJ+Li9QRrT2u1Kitpg==";
+        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.39.9.tgz";
+        sha512 = "9OtbkZmTA2Qc9groyA1PUNeb6knVTkvB2RSdr/LcJXDL8IdEakaxwXLHXa7VX/Wj0GmdMJPR3WhnPGhiP3E+qg==";
       };
     };
     "escalade-3.2.0" = {
@@ -3843,10 +3843,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.353.0";
+    version = "1.354.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.353.0.tgz";
-      sha512 = "Cm7R/3nmKrH0SqUOJf3mDF5XYSILLPqg+ympvPoAq4QGy+U1mbc1JQpX2QGjZ0EVkhO1rF4Q9zIE2pFgTPZQSQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.354.0.tgz";
+      sha512 = "PaqNGvZLVsgq8RXfVb3/AgEDdzPtVIrVHyIqPbDpljSeO+JiluZhIN0tZAP4QMZDcNV3qiddjGZ17oJV9EuKBQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4269,7 +4269,7 @@ in
       sources."es-define-property-1.0.1"
       sources."es-errors-1.3.0"
       sources."es-object-atoms-1.1.1"
-      sources."es-toolkit-1.39.8"
+      sources."es-toolkit-1.39.9"
       sources."escalade-3.2.0"
       sources."escape-goat-4.0.0"
       sources."escape-html-1.0.3"
