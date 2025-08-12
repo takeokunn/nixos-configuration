@@ -186,15 +186,15 @@
   };
   emacs-ob-phpstan = {
     pname = "emacs-ob-phpstan";
-    version = "8846475a2fb1b7e72d7cd49ec8b76c1292fb0e96";
+    version = "f5c9c062097c2e60ea56a4fc3d4556727adbab08";
     src = fetchFromGitHub {
       owner = "emacs-php";
       repo = "ob-phpstan";
-      rev = "8846475a2fb1b7e72d7cd49ec8b76c1292fb0e96";
+      rev = "f5c9c062097c2e60ea56a4fc3d4556727adbab08";
       fetchSubmodules = false;
-      sha256 = "sha256-/t1wCV5S02crJylg7btzf78q1Eieq5KTP7hJpi+lkRY=";
+      sha256 = "sha256-4UQ7Bz2s7aRgF7PHeGX0EQUkeYM8Lw5X5zv52ndvTms=";
     };
-    date = "2025-04-22";
+    date = "2025-08-11";
   };
   emacs-ob-racket = {
     pname = "emacs-ob-racket";
@@ -606,15 +606,15 @@
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
-    version = "5ddb49351854fb5c3406c071a82d2f50612afcf3";
+    version = "e60d2a1d5b3372f3fa2bf087fc76c85e56afc955";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "5ddb49351854fb5c3406c071a82d2f50612afcf3";
+      rev = "e60d2a1d5b3372f3fa2bf087fc76c85e56afc955";
       fetchSubmodules = false;
-      sha256 = "sha256-W0EdS/3QAykPN55MvO1VKrsWxEI807bzxgQgfS9UBqk=";
+      sha256 = "sha256-8fBcIGFV3F3q1Nj6xopZOVdhN14Vd51Gm+g0L07xlyI=";
     };
-    date = "2025-08-05";
+    date = "2025-08-11";
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";
