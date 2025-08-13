@@ -330,15 +330,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "30f0313833e84c1f417b4b84e6d37924e3d4eaab";
+    version = "46a1acc8f981bfda254c88e7390f8c94837aead2";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "30f0313833e84c1f417b4b84e6d37924e3d4eaab";
+      rev = "46a1acc8f981bfda254c88e7390f8c94837aead2";
       fetchSubmodules = false;
-      sha256 = "sha256-LZ1ZX/ls+4KVaUzZlWLVIaXjUDHoZbmRE06lr1BG+vc=";
+      sha256 = "sha256-oH6IbFpSOHJ/8oIjnRFfXOOE59sMnnYFuQWn1PDNokI=";
     };
-    date = "2025-04-22";
+    date = "2025-08-12";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
@@ -630,14 +630,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "c23f8f7246a7cc4089275e5f763cda679532e687";
+    version = "d69dda8f5a0de1e65b30ffc65b836984607f8ad3";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "c23f8f7246a7cc4089275e5f763cda679532e687";
+      rev = "d69dda8f5a0de1e65b30ffc65b836984607f8ad3";
       fetchSubmodules = false;
-      sha256 = "sha256-gEBaTVqUeBo83AEdeaU8WC9QyW+gwDHgm6pfyp/Zu8g=";
+      sha256 = "sha256-OTWgOkNcxI86/upUaycdpv+5Csr7ftO2yEVh8HjzsxI=";
     };
-    date = "2025-08-11";
+    date = "2025-08-13";
   };
 }
