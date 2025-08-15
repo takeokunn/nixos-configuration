@@ -568,7 +568,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2025-08-12",
+    "date": "2025-08-14",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -580,12 +580,12 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "46a1acc8f981bfda254c88e7390f8c94837aead2",
-      "sha256": "sha256-oH6IbFpSOHJ/8oIjnRFfXOOE59sMnnYFuQWn1PDNokI=",
+      "rev": "0865b7c0e95ca1f8ce561df55d497d2e90774efc",
+      "sha256": "sha256-hCUmgdPA2kyRkArkLvrxoNb9TmZC1wIC2UrjCxAD0HQ=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "46a1acc8f981bfda254c88e7390f8c94837aead2"
+    "version": "0865b7c0e95ca1f8ce561df55d497d2e90774efc"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,
@@ -1051,7 +1051,7 @@
   },
   "vim-skkeleton": {
     "cargoLocks": null,
-    "date": "2025-08-11",
+    "date": "2025-08-15",
     "extract": null,
     "name": "vim-skkeleton",
     "passthru": null,
@@ -1063,12 +1063,12 @@
       "name": null,
       "owner": "vim-skk",
       "repo": "skkeleton",
-      "rev": "e60d2a1d5b3372f3fa2bf087fc76c85e56afc955",
-      "sha256": "sha256-8fBcIGFV3F3q1Nj6xopZOVdhN14Vd51Gm+g0L07xlyI=",
+      "rev": "995c2e4581e0250a5b26f0e09293a96cae925cea",
+      "sha256": "sha256-3ZGpwE8zv/A1Mg57R7CgjwT8FHYBnxhTUcGH5rKf7Ag=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "e60d2a1d5b3372f3fa2bf087fc76c85e56afc955"
+    "version": "995c2e4581e0250a5b26f0e09293a96cae925cea"
   },
   "vim-skkeleton-azik": {
     "cargoLocks": null,
@@ -1093,7 +1093,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-08-13",
+    "date": "2025-08-14",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1105,11 +1105,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "6d69f9356f292fbec3011b2b36e48fa0bcfb0d8c",
-      "sha256": "sha256-yTryjjt3RMyQRUTwT6hK5NsBpJQdmtInRPf0SN9tbco=",
+      "rev": "6e99b320968248a44077fa6bab884aa122cffdc5",
+      "sha256": "sha256-LINAqBm/E/eDj9WALXS0X3SVBUGnpSbvRrAKGu+vi4Q=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "6d69f9356f292fbec3011b2b36e48fa0bcfb0d8c"
+    "version": "6e99b320968248a44077fa6bab884aa122cffdc5"
   }
 }

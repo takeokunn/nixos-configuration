@@ -129,13 +129,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.17.2" = {
+    "@modelcontextprotocol/sdk-1.17.3" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.17.2";
+      version = "1.17.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.2.tgz";
-        sha512 = "EFLRNXR/ixpXQWu6/3Cu30ndDFIFNaqUXcTqsGebujeMan9FzhAaFFswLRiFj61rgygDRr8WO1N+UijjgRxX9g==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.3.tgz";
+        sha512 = "JPwUKWSsbzx+DLFznf/QZ32Qa+ptfbUlHhRLrBQBAFu9iI1iYvizM4p+zhhRDceSsPutXp4z+R/HPVphlIiclg==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -1578,13 +1578,13 @@ let
         sha512 = "Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==";
       };
     };
-    "fdir-6.4.6" = {
+    "fdir-6.5.0" = {
       name = "fdir";
       packageName = "fdir";
-      version = "6.4.6";
+      version = "6.5.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/fdir/-/fdir-6.4.6.tgz";
-        sha512 = "hiFoqpyZcfNm1yc4u8oWCf9A2c4D3QjCrks3zmoVKVxpQRzmPNar1hUJcBG2RQHvEVGDN+Jm81ZheVLAQMK6+w==";
+        url = "https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz";
+        sha512 = "tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==";
       };
     };
     "figures-6.1.0" = {
@@ -1974,13 +1974,13 @@ let
         sha512 = "QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==";
       };
     };
-    "ink-6.1.1" = {
+    "ink-6.2.0" = {
       name = "ink";
       packageName = "ink";
-      version = "6.1.1";
+      version = "6.2.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ink/-/ink-6.1.1.tgz";
-        sha512 = "Bqw78FX+1TSIGxs6bdvohgoy6mTfqjFJVNyYzXn8HIyZyVmwLX8XdnhUtUwyaelLCqLz8uuFseCbomRZWjyo5g==";
+        url = "https://registry.npmjs.org/ink/-/ink-6.2.0.tgz";
+        sha512 = "NQbNokT11cuxlIcCDfBMk1vEwaqc/cjTSqc4R4JugBO4BpWVe2B2A6ElC2koZQ9Vj91z0C40zid/jxOF2hJL9A==";
       };
     };
     "ink-big-text-2.0.0" = {
@@ -3450,13 +3450,13 @@ let
         sha512 = "N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==";
       };
     };
-    "turndown-7.2.0" = {
+    "turndown-7.2.1" = {
       name = "turndown";
       packageName = "turndown";
-      version = "7.2.0";
+      version = "7.2.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/turndown/-/turndown-7.2.0.tgz";
-        sha512 = "eCZGBN4nNNqM9Owkv9HAtWRYfLA4h909E/WGAWWBpmB275ehNhZyk87/Tpvjbp0jjNl9XwCsbe6bm6CqFsgD+A==";
+        url = "https://registry.npmjs.org/turndown/-/turndown-7.2.1.tgz";
+        sha512 = "7YiPJw6rLClQL3oUKN3KgMaXeJJ2lAyZItclgKDurqnH61so4k4IH/qwmMva0zpuJc/FhRExBBnk7EbeFANlgQ==";
       };
     };
     "turndown-plugin-gfm-1.0.2" = {
@@ -3870,10 +3870,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.356.0";
+    version = "1.357.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.356.0.tgz";
-      sha512 = "wgAXgBjTtBcqEicc4G8ocBhehuGcqanp8bTKEfbXKc/5FoDQ65iT2ws6JvySqKTHH6zA+R15h+Kqdua97iydsw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.357.0.tgz";
+      sha512 = "kxGiClBSlmHHDnK62UhCcJafPR3PJPmYZcdhxuiEKsXfUoPCMo98n5V4iziWfWbFtkVQDaWP4fI3T/fT7lyeOQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3893,10 +3893,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.80";
+    version = "1.0.81";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.80.tgz";
-      sha512 = "OpJb8LZBYuQ21lmT71c65NwUKGtQiva8dyKmCIPWnRIXHDaZ/31zzpDqcxgONUKUiZrnHqoMXwEwWyPyhD0+dA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.81.tgz";
+      sha512 = "kiRgAhQ2vuodkHDAZjuR0aaNchl9SZLq0QF46JKsOw0Ik1eyEN0tdsF++AV//Ub1j4iS1fGIrU10uE7aqFfKYw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3918,7 +3918,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.17.2"
+      sources."@modelcontextprotocol/sdk-1.17.3"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -4049,7 +4049,7 @@ in
       sources."statuses-2.0.2"
       sources."to-regex-range-5.0.1"
       sources."toidentifier-1.0.1"
-      sources."turndown-7.2.0"
+      sources."turndown-7.2.1"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
       sources."undici-7.13.0"
@@ -4110,7 +4110,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       (
-        sources."@modelcontextprotocol/sdk-1.17.2"
+        sources."@modelcontextprotocol/sdk-1.17.3"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4310,7 +4310,7 @@ in
       sources."fast-deep-equal-3.1.3"
       sources."fast-json-stable-stringify-2.1.0"
       sources."fast-uri-3.0.6"
-      sources."fdir-6.4.6"
+      sources."fdir-6.5.0"
       sources."figures-6.1.0"
       sources."fill-range-7.1.1"
       sources."finalhandler-2.1.0"
@@ -4374,7 +4374,7 @@ in
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
       (
-        sources."ink-6.1.1"
+        sources."ink-6.2.0"
         // {
           dependencies = [
             sources."signal-exit-3.0.7"
