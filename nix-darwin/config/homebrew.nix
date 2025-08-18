@@ -14,6 +14,7 @@
     casks = [
       "aquaskk"
       "cleanshot"
+      "clickup"
       "font-hack-nerd-font"
       "font-sketchybar-app-font"
       "google-chrome"
