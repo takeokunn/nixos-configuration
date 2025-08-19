@@ -39,13 +39,13 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.1.21" = {
+    "@google/gemini-cli-core-0.1.22" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.1.21";
+      version = "0.1.22";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.21.tgz";
-        sha512 = "6VwJRATuDniWtBbhKHB9Kc+UC33zYRQTlciVG1mHE7aWxhLlyEfg5xreedQPpMHu3km5KW7HcNOcgT3thsb6uA==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.1.22.tgz";
+        sha512 = "PvIod0b8+vB8Wfdpr4axiDopL6sxeQ/4qF4Q1zdXOD3ANUYSLuhq3Af8OrugA0so6vCjDMllyKcnOmGT6s6+ag==";
       };
     };
     "@google/genai-1.13.0" = {
@@ -190,6 +190,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/@opentelemetry/exporter-logs-otlp-grpc/-/exporter-logs-otlp-grpc-0.52.1.tgz";
         sha512 = "sXgcp4fsL3zCo96A0LmFIGYOj2LSEDI6wD7nBYRhuDDxeRsk18NQgqRVlCf4VIyTBZzGu1M7yOtdFukQPgII1A==";
+      };
+    };
+    "@opentelemetry/exporter-logs-otlp-http-0.52.1" = {
+      name = "_at_opentelemetry_slash_exporter-logs-otlp-http";
+      packageName = "@opentelemetry/exporter-logs-otlp-http";
+      version = "0.52.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@opentelemetry/exporter-logs-otlp-http/-/exporter-logs-otlp-http-0.52.1.tgz";
+        sha512 = "qKgywId2DbdowPZpOBXQKp0B8DfhfIArmSic15z13Nk/JAOccBUQdPwDjDnjsM5f0ckZFMVR2t/tijTUAqDZoA==";
       };
     };
     "@opentelemetry/exporter-metrics-otlp-grpc-0.52.1" = {
@@ -1515,13 +1524,13 @@ let
         sha512 = "CRT1WTyuQoD771GW56XEZFQ/ZoSfWid1alKGDYMmkt2yl8UXrVR4pspqWNEcqKvVIzg6PAltWjxcSSPrboA4iA==";
       };
     };
-    "eventsource-parser-3.0.3" = {
+    "eventsource-parser-3.0.5" = {
       name = "eventsource-parser";
       packageName = "eventsource-parser";
-      version = "3.0.3";
+      version = "3.0.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/eventsource-parser/-/eventsource-parser-3.0.3.tgz";
-        sha512 = "nVpZkTMM9rF6AQ9gPJpFsNAMt48wIzB5TQgiTLdHiuO8XEDhUgZEhqKlZWXbIzo9VmJ/HvysHqEaVeD5v9TPvA==";
+        url = "https://registry.npmjs.org/eventsource-parser/-/eventsource-parser-3.0.5.tgz";
+        sha512 = "bSRG85ZrMdmWtm7qkF9He9TNRzc/Bm99gEJMaQoHJ9E6Kv9QBbsldh2oMj7iXmYNEAVvNgvv5vPorG6W+XtBhQ==";
       };
     };
     "express-5.1.0" = {
@@ -3893,10 +3902,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.83";
+    version = "1.0.84";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.83.tgz";
-      sha512 = "Mm+88khPbg9eAUbrWGirigWeC4xu2hH0ns3+lnfKWX3e8RJDOV9vnCHjzbEIVXvvvw1YmeIO7TxsFk5/MVuhGA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.84.tgz";
+      sha512 = "+Qu+z1jTdZPu0UL4dalntkofDGL0BgWqs6XmRlq+RuxurHJy58zKae4PL8naevrkbgazauIPYDDGmHF3u+B0uQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3955,7 +3964,7 @@ in
       sources."escape-html-1.0.3"
       sources."etag-1.8.1"
       sources."eventsource-3.0.7"
-      sources."eventsource-parser-3.0.3"
+      sources."eventsource-parser-3.0.5"
       sources."express-5.1.0"
       sources."express-rate-limit-7.5.1"
       sources."fast-deep-equal-3.1.3"
@@ -4077,10 +4086,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.1.21";
+    version = "0.1.22";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.21.tgz";
-      sha512 = "EA4EiEiGVJqlr4xoX/0Rj/uQvbksD2Ue4wZCtxPdwZ92slUhB0DhU50I+ibDUKyN023ps08GYk/mjwt+JrjcZg==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.22.tgz";
+      sha512 = "gjwpvKykDxD9iXMUsoZM7jY3LfCo6f846gB9T77VhDabc2dpFSPiUN1o/gF4e66+/LAycK66v+DEr35qS4DHuw==";
     };
     dependencies = [
       (
@@ -4093,7 +4102,7 @@ in
       )
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.1.21"
+      sources."@google/gemini-cli-core-0.1.22"
       sources."@google/genai-1.13.0"
       sources."@grpc/grpc-js-1.13.4"
       sources."@grpc/proto-loader-0.7.15"
@@ -4123,6 +4132,7 @@ in
       sources."@opentelemetry/context-async-hooks-1.25.1"
       sources."@opentelemetry/core-1.25.1"
       sources."@opentelemetry/exporter-logs-otlp-grpc-0.52.1"
+      sources."@opentelemetry/exporter-logs-otlp-http-0.52.1"
       sources."@opentelemetry/exporter-metrics-otlp-grpc-0.52.1"
       sources."@opentelemetry/exporter-metrics-otlp-http-0.52.1"
       sources."@opentelemetry/exporter-trace-otlp-grpc-0.52.1"
@@ -4303,7 +4313,7 @@ in
       sources."escape-string-regexp-2.0.0"
       sources."etag-1.8.1"
       sources."eventsource-3.0.7"
-      sources."eventsource-parser-3.0.3"
+      sources."eventsource-parser-3.0.5"
       sources."express-5.1.0"
       sources."express-rate-limit-7.5.1"
       sources."extend-3.0.2"
