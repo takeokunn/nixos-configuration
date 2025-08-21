@@ -2316,13 +2316,13 @@ let
         sha512 = "NOW9QQXMoZGg/oqnVNoNTTIFEIid1627WCffUBJEdMxYApq7mNE7CpzucIPc+ZQg25Phej7IJSmX3hO+oblOtQ==";
       };
     };
-    "ky-1.8.2" = {
+    "ky-1.9.0" = {
       name = "ky";
       packageName = "ky";
-      version = "1.8.2";
+      version = "1.9.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ky/-/ky-1.8.2.tgz";
-        sha512 = "XybQJ3d4Ea1kI27DoelE5ZCT3bSJlibYTtQuMsyzKox3TMyayw1asgQdl54WroAm+fIA3ZCr8zXW2RpR7qWVpA==";
+        url = "https://registry.npmjs.org/ky/-/ky-1.9.0.tgz";
+        sha512 = "NgBeR/cu7kuC4BAeF1rnXhfoI2uQ9RBe8zl5vo87ASsf1iIQoCeOxyt6Io6K4Ki++5ItCavXAtbEWWCGFciQ6g==";
       };
     };
     "latest-version-9.0.0" = {
@@ -3879,10 +3879,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.357.0";
+    version = "1.360.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.357.0.tgz";
-      sha512 = "kxGiClBSlmHHDnK62UhCcJafPR3PJPmYZcdhxuiEKsXfUoPCMo98n5V4iziWfWbFtkVQDaWP4fI3T/fT7lyeOQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.360.0.tgz";
+      sha512 = "/aRJ3DZZJ+altvodRAYk7dgqag7a4N8ibbwXa0golJIjM7cd7H9p+uxYqDt+Ep+lpKHStVgYkX7F9RrdwRsEbA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3902,10 +3902,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.85";
+    version = "1.0.86";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.85.tgz";
-      sha512 = "rvLGGSnHQLJI3dP7C/d3Or5LQvgDEae5wurMG4Fs9ourzt+k8YA6WAHeuJmSUq7o7Z2fZTaojcM3VOLzUBEl7w==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.86.tgz";
+      sha512 = "js1h6JUnFJ1dHvFPBiCxwFChaWjh28XOFamrwebmhOIUBVhQZwMfDJYsNfRyv0qEwpxKxYedvK4nv4WqMCwu9Q==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4422,7 +4422,7 @@ in
       sources."jwa-2.0.1"
       sources."jws-4.0.0"
       sources."kind-of-3.2.2"
-      sources."ky-1.8.2"
+      sources."ky-1.9.0"
       sources."latest-version-9.0.0"
       sources."leac-0.6.0"
       sources."lodash.camelcase-4.3.0"
