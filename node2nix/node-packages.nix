@@ -1983,13 +1983,13 @@ let
         sha512 = "QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==";
       };
     };
-    "ink-6.2.1" = {
+    "ink-6.2.2" = {
       name = "ink";
       packageName = "ink";
-      version = "6.2.1";
+      version = "6.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ink/-/ink-6.2.1.tgz";
-        sha512 = "ZF3V9bHcWqqSrMClU9FRIBLQel1mc7H6zKSTt/MSCh2uks4T3xKq4qb9Z+aC7dOPGU4Ahy/Mw1hvUCl77F4EPg==";
+        url = "https://registry.npmjs.org/ink/-/ink-6.2.2.tgz";
+        sha512 = "LN1f+/D8KKqMqRux08fIfA9wsEAJ9Bu9CiI3L6ih7bnqNSDUXT/JVJ0rUIc4NkjPiPaeI3BVNREcLYLz9ePSEg==";
       };
     };
     "ink-big-text-2.0.0" = {
@@ -3879,10 +3879,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.360.0";
+    version = "1.362.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.360.0.tgz";
-      sha512 = "/aRJ3DZZJ+altvodRAYk7dgqag7a4N8ibbwXa0golJIjM7cd7H9p+uxYqDt+Ep+lpKHStVgYkX7F9RrdwRsEbA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.362.0.tgz";
+      sha512 = "4lBt/nVRGCiOZx1Btuvp043ZhGqb3/o8aZzG564nOTOgy3MtQfsNCwzbci+7hZXEuRIPM4bZjBqIzTZ2S2nu9Q==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3893,7 +3893,7 @@ in
     meta = {
       description = "Your AI pair programmer";
       homepage = "https://github.com/github/copilot-language-server-release";
-      license = "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features";
+      license = "MIT";
     };
     production = true;
     bypassCache = true;
@@ -3902,10 +3902,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.86";
+    version = "1.0.88";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.86.tgz";
-      sha512 = "js1h6JUnFJ1dHvFPBiCxwFChaWjh28XOFamrwebmhOIUBVhQZwMfDJYsNfRyv0qEwpxKxYedvK4nv4WqMCwu9Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.88.tgz";
+      sha512 = "Np6H4EjkbmNolUpx98DvqLXV/iJrw2y7dz2rDJ7av9ajMz6HZfB8bdJV5D75+jO+Gk1pvA54HCIm0c65lDrzcw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4390,7 +4390,7 @@ in
       sources."index-to-position-1.1.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
-      sources."ink-6.2.1"
+      sources."ink-6.2.2"
       sources."ink-big-text-2.0.0"
       sources."ink-gradient-3.0.0"
       sources."ink-link-4.1.0"
