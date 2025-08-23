@@ -19,7 +19,6 @@ with epkgs;
   org-ql
   org-sliced-images
   org-preview-html
-  org-table-highlight
 
   # Theme
   org-superstar
