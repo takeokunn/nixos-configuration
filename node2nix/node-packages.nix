@@ -129,13 +129,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.17.3" = {
+    "@modelcontextprotocol/sdk-1.17.4" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.17.3";
+      version = "1.17.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.3.tgz";
-        sha512 = "JPwUKWSsbzx+DLFznf/QZ32Qa+ptfbUlHhRLrBQBAFu9iI1iYvizM4p+zhhRDceSsPutXp4z+R/HPVphlIiclg==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.4.tgz";
+        sha512 = "zq24hfuAmmlNZvik0FLI58uE5sriN0WWsQzIlYnzSuKDAHFqJtBFrl/LfB1NLgJT5Y7dEBzaX4yAKqOPrcetaw==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -579,13 +579,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.1.10" = {
+    "@types/react-19.1.11" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.1.10";
+      version = "19.1.11";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.1.10.tgz";
-        sha512 = "EhBeSYX0Y6ye8pNebpKrwFJq7BoQ8J5SO6NlvNwwHjSj6adXJViPQrKlsyPw7hLBLvckEMO1yxeGdR82YBBlDg==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.1.11.tgz";
+        sha512 = "lr3jdBw/BGj49Eps7EvqlUaoeA0xpj3pc0RoJkHpYaCHkVK7i28dKyImLQb3JVlqs3aYSXf7qYuWOW/fgZnTXQ==";
       };
     };
     "@types/shimmer-1.2.0" = {
@@ -3513,13 +3513,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-7.14.0" = {
+    "undici-7.15.0" = {
       name = "undici";
       packageName = "undici";
-      version = "7.14.0";
+      version = "7.15.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-7.14.0.tgz";
-        sha512 = "Vqs8HTzjpQXZeXdpsfChQTlafcMQaaIwnGwLam1wudSSjlJeQ3bw1j+TLPePgrCnCpUXx7Ba5Pdpf5OBih62NQ==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.15.0.tgz";
+        sha512 = "7oZJCPvvMvTd0OlqWsIxTuItTpJBpU1tcbVl24FMn3xt3+VSunwUasmfPJRE57oNO1KsZ4PgA1xTdAX4hq8NyQ==";
       };
     };
     "undici-types-7.10.0" = {
@@ -3902,10 +3902,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.88";
+    version = "1.0.89";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.88.tgz";
-      sha512 = "Np6H4EjkbmNolUpx98DvqLXV/iJrw2y7dz2rDJ7av9ajMz6HZfB8bdJV5D75+jO+Gk1pvA54HCIm0c65lDrzcw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.89.tgz";
+      sha512 = "FKzFA0whQ1oVqdq3HG7gE3aojcZfGxrhza9z7OMDUFm4YMADHQxn6TWxWss5dhzXze7vd+QOn8CuH+uHnhAr4w==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3927,7 +3927,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.17.3"
+      sources."@modelcontextprotocol/sdk-1.17.4"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -4061,7 +4061,7 @@ in
       sources."turndown-7.2.1"
       sources."turndown-plugin-gfm-1.0.2"
       sources."type-is-2.0.1"
-      sources."undici-7.14.0"
+      sources."undici-7.15.0"
       sources."unpipe-1.0.0"
       sources."uri-js-4.4.1"
       sources."vary-1.1.2"
@@ -4113,7 +4113,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       (
-        sources."@modelcontextprotocol/sdk-1.17.3"
+        sources."@modelcontextprotocol/sdk-1.17.4"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4176,7 +4176,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.3.0"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.1.10"
+      sources."@types/react-19.1.11"
       sources."@types/shimmer-1.2.0"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/unist-3.0.3"
@@ -4598,7 +4598,7 @@ in
       sources."tr46-0.0.3"
       sources."type-fest-4.41.0"
       sources."type-is-2.0.1"
-      sources."undici-7.14.0"
+      sources."undici-7.15.0"
       sources."undici-types-7.10.0"
       sources."unicorn-magic-0.1.0"
       sources."unpipe-1.0.0"
