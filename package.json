@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "@secretlint/secretlint-rule-preset-recommend": "^11.1.0",
-    "secretlint": "^11.0.2"
+    "secretlint": "^11.1.0"
   }
 }
