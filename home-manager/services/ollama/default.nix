@@ -1,7 +1,7 @@
 { pkgs }:
 {
   services.ollama = {
-    enable = false;
+    enable = true;
     package = pkgs.ollama;
     host = "0.0.0.0";
   };
