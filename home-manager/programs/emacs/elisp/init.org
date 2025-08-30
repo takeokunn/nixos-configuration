@@ -1969,9 +1969,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'prog-mode-hook #'view-mode))
 
   (with-eval-after-load 'view
-    ;; hooks
-    (add-hook 'view-mode-hook #'my/enable-view-mode-automatically)
-
     ;; keybind
     (define-key view-mode-map (kbd "f") #'forward-char)
     (define-key view-mode-map (kbd "b") #'backward-char)
@@ -2025,13 +2022,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
       (when (derived-mode-p 'org-mode)
         (view-mode -1)
         (org-ctrl-c-ctrl-c)))
-
-    (defvar my/view-mode-timer nil)
-    (defun my/enable-view-mode-automatically ()
-      (if view-mode
-          (when my/view-mode-timer
-            (cancel-timer my/view-mode-timer))
-        (setopt my/view-mode-timer (run-with-idle-timer (* 60 10) nil #'view-mode))))
 
     (defun my/disable-buffer-readonly ()
       (setq-local buffer-read-only nil))
