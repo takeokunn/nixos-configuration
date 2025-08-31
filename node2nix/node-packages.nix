@@ -1740,13 +1740,13 @@ let
         sha512 = "DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==";
       };
     };
-    "get-east-asian-width-1.3.0" = {
+    "get-east-asian-width-1.3.1" = {
       name = "get-east-asian-width";
       packageName = "get-east-asian-width";
-      version = "1.3.0";
+      version = "1.3.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/get-east-asian-width/-/get-east-asian-width-1.3.0.tgz";
-        sha512 = "vpeMIQKxczTD/0s2CdEWHcb0eeJe6TFjxb+J5xgX7hScxqrGuyjmv4c1D4A/gelKfyox0gJJwIHF+fLjeaM8kQ==";
+        url = "https://registry.npmjs.org/get-east-asian-width/-/get-east-asian-width-1.3.1.tgz";
+        sha512 = "R1QfovbPsKmosqTnPoRFiJ7CF9MLRgb53ChvMZm+r4p76/+8yKDy17qLL2PKInORy2RkZZekuK0efYgmzTkXyQ==";
       };
     };
     "get-intrinsic-1.3.0" = {
@@ -2154,13 +2154,13 @@ let
         sha512 = "O4L094N2/dZ7xqVdrXhh9r1KODPJpFms8B5sGdJLPy664AgvXsreZUyCQQNItZRDlYug4xStLjNp/sz3HvBowQ==";
       };
     };
-    "is-fullwidth-code-point-5.0.0" = {
+    "is-fullwidth-code-point-5.1.0" = {
       name = "is-fullwidth-code-point";
       packageName = "is-fullwidth-code-point";
-      version = "5.0.0";
+      version = "5.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-5.0.0.tgz";
-        sha512 = "OVa3u9kkBbw7b8Xw5F9P+D/T9X+Z4+JruYVNapTjPYZYUznQ5YfWeFkOj606XYYW8yugTfC8Pj0hYqvi4ryAhA==";
+        url = "https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-5.1.0.tgz";
+        sha512 = "5XHYaSyiqADb4RnZ1Bdad6cPp8Toise4TzEjcOYDHZkTCbKgiUl7WTUCpNWHuxmDt91wnsZBc9xinNzopv3JMQ==";
       };
     };
     "is-in-ci-1.0.0" = {
@@ -4114,7 +4114,7 @@ in
         sources."@alcalzone/ansi-tokenize-0.2.0"
         // {
           dependencies = [
-            sources."is-fullwidth-code-point-5.0.0"
+            sources."is-fullwidth-code-point-5.1.0"
           ];
         }
       )
@@ -4355,7 +4355,7 @@ in
       sources."gaxios-6.7.1"
       sources."gcp-metadata-6.1.1"
       sources."get-caller-file-2.0.5"
-      sources."get-east-asian-width-1.3.0"
+      sources."get-east-asian-width-1.3.1"
       sources."get-intrinsic-1.3.0"
       sources."get-proto-1.0.1"
       sources."glob-10.4.5"
@@ -4590,7 +4590,7 @@ in
         sources."slice-ansi-7.1.0"
         // {
           dependencies = [
-            sources."is-fullwidth-code-point-5.0.0"
+            sources."is-fullwidth-code-point-5.1.0"
           ];
         }
       )
