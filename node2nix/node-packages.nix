@@ -129,13 +129,13 @@ let
         sha512 = "Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==";
       };
     };
-    "@modelcontextprotocol/sdk-1.17.4" = {
+    "@modelcontextprotocol/sdk-1.17.5" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.17.4";
+      version = "1.17.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.4.tgz";
-        sha512 = "zq24hfuAmmlNZvik0FLI58uE5sriN0WWsQzIlYnzSuKDAHFqJtBFrl/LfB1NLgJT5Y7dEBzaX4yAKqOPrcetaw==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.17.5.tgz";
+        sha512 = "QakrKIGniGuRVfWBdMsDea/dx1PNE739QJ7gCM41s9q+qaCYTHCdsIBXQVVXry3mfWAiaM9kT22Hyz53Uw8mfg==";
       };
     };
     "@mozilla/readability-0.5.0" = {
@@ -399,13 +399,13 @@ let
         sha512 = "UhdbPF19pMpBtCWYP5lHbTogLWx9N0EBxtdagvkn5YtsAnCBZzL7SjktG+ZmupRgifsHMjwUaCCaVmqGfSADmA==";
       };
     };
-    "@opentelemetry/semantic-conventions-1.36.0" = {
+    "@opentelemetry/semantic-conventions-1.37.0" = {
       name = "_at_opentelemetry_slash_semantic-conventions";
       packageName = "@opentelemetry/semantic-conventions";
-      version = "1.36.0";
+      version = "1.37.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.36.0.tgz";
-        sha512 = "TtxJSRD8Ohxp6bKkhrm27JRHAxPczQA7idtcTOMYI+wQRRrfgqxHv1cFbCApcSnNjtXkmzFozn6jQtFrOmbjPQ==";
+        url = "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.37.0.tgz";
+        sha512 = "JD6DerIKdJGmRp4jQyX5FlrQjA4tjOw1cvfsPAZXfOOEErMUHjPcPSICS+6WnM0nB0efSFARh0KAZss+bvExOA==";
       };
     };
     "@pnpm/config.env-replace-1.1.0" = {
@@ -1335,13 +1335,13 @@ let
         sha512 = "1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==";
       };
     };
-    "dotenv-17.2.1" = {
+    "dotenv-17.2.2" = {
       name = "dotenv";
       packageName = "dotenv";
-      version = "17.2.1";
+      version = "17.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/dotenv/-/dotenv-17.2.1.tgz";
-        sha512 = "kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==";
+        url = "https://registry.npmjs.org/dotenv/-/dotenv-17.2.2.tgz";
+        sha512 = "Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==";
       };
     };
     "dunder-proto-1.0.1" = {
@@ -2766,13 +2766,13 @@ let
         sha512 = "Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==";
       };
     };
-    "path-to-regexp-8.2.0" = {
+    "path-to-regexp-8.3.0" = {
       name = "path-to-regexp";
       packageName = "path-to-regexp";
-      version = "8.2.0";
+      version = "8.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-8.2.0.tgz";
-        sha512 = "TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ==";
+        url = "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-8.3.0.tgz";
+        sha512 = "7jdwVIRtsP8MYpdXSwOS0YdD0Du+qOoF/AEPIt88PcCFrZCzx41oxku1jD88hZBwbNUIEfpqvuhjFaMAqMTWnA==";
       };
     };
     "peberminta-0.9.0" = {
@@ -3897,10 +3897,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.364.0";
+    version = "1.366.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.364.0.tgz";
-      sha512 = "nwOpEeOYySWvLwvesK9P/Sh+3jEosWqLRx7j1Gaug4n5MNnQEgGJ7Kbn2TmQZGSDIkQK+eKK6ekwbRw5T+xOrA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.366.0.tgz";
+      sha512 = "6mySoUSxfYKqbwUZlR/x7UUQt3koVQB0lsqdaQLrych/J+jWemDumvdI/KvM0tTeLlJU0xYR2lU2SOrhZjoBxg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3920,10 +3920,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.100";
+    version = "1.0.102";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.100.tgz";
-      sha512 = "b4FRo3t46kPawzE8pT7nxtDc9NdYPTFaPoGGns/ZNqsqRu2jKMiSjjt5DiFvfaBZA8Tnt2qXbv4nd1vqR9Ru8Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.102.tgz";
+      sha512 = "UIC6qNgKNZi1nLTf1bQvxNfd74xIAqJjIx6vggh3bJOMtuXBiFwrfPk1Pdf9CayYgwZYXgSmxYYaASt6i6ficQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -3945,7 +3945,7 @@ in
     };
     dependencies = [
       sources."@mixmark-io/domino-2.2.0"
-      sources."@modelcontextprotocol/sdk-1.17.4"
+      sources."@modelcontextprotocol/sdk-1.17.5"
       sources."@mozilla/readability-0.5.0"
       sources."accepts-2.0.0"
       sources."ajv-6.12.6"
@@ -4053,7 +4053,7 @@ in
       sources."parse5-parser-stream-7.1.2"
       sources."parseurl-1.3.3"
       sources."path-key-3.1.1"
-      sources."path-to-regexp-8.2.0"
+      sources."path-to-regexp-8.3.0"
       sources."picomatch-2.3.1"
       sources."pkce-challenge-5.0.0"
       sources."proxy-addr-2.0.7"
@@ -4131,7 +4131,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       (
-        sources."@modelcontextprotocol/sdk-1.17.4"
+        sources."@modelcontextprotocol/sdk-1.17.5"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4167,7 +4167,7 @@ in
       sources."@opentelemetry/sdk-node-0.203.0"
       sources."@opentelemetry/sdk-trace-base-2.0.1"
       sources."@opentelemetry/sdk-trace-node-2.0.1"
-      sources."@opentelemetry/semantic-conventions-1.36.0"
+      sources."@opentelemetry/semantic-conventions-1.37.0"
       sources."@pnpm/config.env-replace-1.1.0"
       (
         sources."@pnpm/network.ca-file-1.0.2"
@@ -4315,7 +4315,7 @@ in
       sources."domhandler-5.0.3"
       sources."domutils-3.2.2"
       sources."dot-prop-9.0.0"
-      sources."dotenv-17.2.1"
+      sources."dotenv-17.2.2"
       sources."dunder-proto-1.0.1"
       sources."eastasianwidth-0.2.0"
       sources."ecdsa-sig-formatter-1.0.11"
@@ -4493,7 +4493,7 @@ in
       sources."path-key-3.1.1"
       sources."path-parse-1.0.7"
       sources."path-scurry-1.11.1"
-      sources."path-to-regexp-8.2.0"
+      sources."path-to-regexp-8.3.0"
       sources."peberminta-0.9.0"
       sources."picocolors-1.1.1"
       sources."picomatch-4.0.3"
