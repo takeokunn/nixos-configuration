@@ -1956,6 +1956,15 @@ let
         sha512 = "4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==";
       };
     };
+    "iconv-lite-0.7.0" = {
+      name = "iconv-lite";
+      packageName = "iconv-lite";
+      version = "0.7.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.7.0.tgz";
+        sha512 = "cf6L2Ds3h57VVmkZe+Pn+5APsT7FpqJtEhhieDCvrE2MK5Qk9MyffgQyuxQTm6BChfeZNtcOLHp9IcWRVcIcBQ==";
+      };
+    };
     "ignore-7.0.5" = {
       name = "ignore";
       packageName = "ignore";
@@ -2892,13 +2901,13 @@ let
         sha512 = "Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==";
       };
     };
-    "raw-body-3.0.0" = {
+    "raw-body-3.0.1" = {
       name = "raw-body";
       packageName = "raw-body";
-      version = "3.0.0";
+      version = "3.0.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/raw-body/-/raw-body-3.0.0.tgz";
-        sha512 = "RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==";
+        url = "https://registry.npmjs.org/raw-body/-/raw-body-3.0.1.tgz";
+        sha512 = "9G8cA+tuMS75+6G/TzW8OtLzmBDMo8p1JRxN5AZ+LAp8uxGA8V8GZm4GQ4/N5QNQEnLmg6SS7wyuSmbKepiKqA==";
       };
     };
     "rc-1.2.8" = {
@@ -3897,10 +3906,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.366.0";
+    version = "1.367.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.366.0.tgz";
-      sha512 = "6mySoUSxfYKqbwUZlR/x7UUQt3koVQB0lsqdaQLrych/J+jWemDumvdI/KvM0tTeLlJU0xYR2lU2SOrhZjoBxg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.367.0.tgz";
+      sha512 = "gkH1Sp3SA+BWHl2h/yIdy1kYOREesTp1CC+IrxYIUNjy0cjdkOm5rcF6oO6BIcJttRwT9Ug8C1J5guVXhWcsSg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -3920,10 +3929,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.102";
+    version = "1.0.103";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.102.tgz";
-      sha512 = "UIC6qNgKNZi1nLTf1bQvxNfd74xIAqJjIx6vggh3bJOMtuXBiFwrfPk1Pdf9CayYgwZYXgSmxYYaASt6i6ficQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.103.tgz";
+      sha512 = "hUj95G2ydlcIoKS5yALUNysRzuMCKZCxQ7CjjmSAkeNgf591rtNTJjQWjnTAfuljyk1a2trvXmYo/zNAChDsDA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4060,7 +4069,14 @@ in
       sources."punycode-2.3.1"
       sources."qs-6.14.0"
       sources."range-parser-1.2.1"
-      sources."raw-body-3.0.0"
+      (
+        sources."raw-body-3.0.1"
+        // {
+          dependencies = [
+            sources."iconv-lite-0.7.0"
+          ];
+        }
+      )
       sources."router-2.2.0"
       sources."safe-buffer-5.2.1"
       sources."safer-buffer-2.1.2"
@@ -4506,7 +4522,14 @@ in
       sources."pupa-3.1.0"
       sources."qs-6.14.0"
       sources."range-parser-1.2.1"
-      sources."raw-body-3.0.0"
+      (
+        sources."raw-body-3.0.1"
+        // {
+          dependencies = [
+            sources."iconv-lite-0.7.0"
+          ];
+        }
+      )
       (
         sources."rc-1.2.8"
         // {
