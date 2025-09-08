@@ -1058,27 +1058,27 @@ $0
   # name: diary-measure-template-saturday
   # key: diary-measure-template-saturday
   # --
-  ,** [#A] TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 計測用
+  ,** TODO [#A] `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 計測用
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 12:00]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 2)))` 18:00] =>  6:00
   :END:
-  ,** [#A] TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 計測用
+  ,** TODO [#A] `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 計測用
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 12:00]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 3)))` 18:00] =>  6:00
   :END:
-  ,** [#A] TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 計測用
+  ,** TODO [#A] `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 計測用
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 12:00]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 4)))` 18:00] =>  6:00
   :END:
-  ,** [#A] TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 計測用
+  ,** TODO [#A] `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 計測用
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 12:00]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 5)))` 18:00] =>  6:00
   :END:
-  ,** [#A] TODO `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 計測用
+  ,** TODO [#A] `(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 計測用
   SCHEDULED: <`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))`>
   :LOGBOOK:
   CLOCK: [`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 12:00]--[`(format-time-string "%Y-%m-%d %a" (time-add (current-time) (days-to-time 6)))` 18:00] =>  6:00

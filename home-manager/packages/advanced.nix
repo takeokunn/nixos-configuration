@@ -13,7 +13,7 @@ with pkgs;
 
   # for ai
   nodePkgs."@anthropic-ai/claude-code"
-  nodePkgs."@google/gemini-cli"
+  # nodePkgs."@google/gemini-cli"
 
   # for web service
   discord
