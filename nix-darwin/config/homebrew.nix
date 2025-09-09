@@ -15,7 +15,7 @@
       "aquaskk"
       "cleanshot"
       "clickup"
-      "docker"
+      "docker-desktop"
       "font-hack-nerd-font"
       "font-sketchybar-app-font"
       "google-chrome"
