@@ -1,7 +1,7 @@
 { nodePkgs }:
 {
   xdg.configFile = {
-    "claude-code/statusline.sh".source = ./statusline.sh;
+    "claude-code/statusline.sh".source = ./scripts/statusline.sh;
   };
 
   programs.claude-code = {
