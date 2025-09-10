@@ -1,4 +1,4 @@
-{ nodePkgs }:
+{ pkgs, nodePkgs }:
 {
   xdg.configFile = {
     "claude-code/statusline.sh".source = ./scripts/statusline.sh;
@@ -14,7 +14,6 @@
       includeCoAuthoredBy = false;
       autoCompactEnabled = false;
       enableAllProjectMcpServers = true;
-      enabledMcpjsonServers = [ "context7" ];
       feedbackSurveyState.lastShownTime = 1754089004345;
       outputStyle = "Explanatory";
 
@@ -73,17 +72,6 @@
       };
 
       hooks = {
-        SessionStart = [
-          {
-            matcher = "startup|clear";
-            hooks = [
-              {
-                type = "command";
-                command = "date -Iseconds";
-              }
-            ];
-          }
-        ];
         Stop = [
           {
             hooks = [
@@ -95,6 +83,31 @@
           }
         ];
       };
+    };
+
+    mcpServers = {
+      time = {
+        type = "stdio";
+        command = "${pkgs.mcp-server-time}/bin/mcp-server-time";
+        args = [ "--local-timezone=Asia/Tokyo" ];
+      };
+      # playwright = {
+      #   type = "stdio";
+      #   command = "${pkgs.playwright-mcp}/bin/playwright-mcp";
+      # };
+      # serena = {
+      #   type = "stdio";
+      #   command = "${pkgs.serena}/bin/serena";
+      #   args = [
+      #     "start-mcp-server"
+      #     "--context"
+      #     "ide-assistant"
+      #   ];
+      # };
+      # context7 = {
+      #   type = "stdio";
+      #   command = "${pkgs.context7-mcp}/bin/context7-mcp";
+      # };
     };
   };
 }

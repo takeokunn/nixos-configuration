@@ -17,7 +17,7 @@ let
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = basicOverlay ++ advancedOverlay;
+    overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ];
   };
   nodePkgs = pkgs.callPackage ../node2nix {
     inherit pkgs;

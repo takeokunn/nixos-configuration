@@ -8,7 +8,7 @@
 let
   awscli = import ./awscli;
   aider = import ./aider;
-  claude-code = import ./claude-code { inherit nodePkgs; };
+  claude-code = import ./claude-code { inherit pkgs nodePkgs; };
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
   gh-dash = import ./gh-dash;
