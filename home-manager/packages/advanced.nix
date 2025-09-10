@@ -1,4 +1,4 @@
-{ pkgs, nodePkgs }:
+{ pkgs }:
 with pkgs;
 [
   # for lint
@@ -10,9 +10,6 @@ with pkgs;
 
   # for docker
   lazydocker
-
-  # for ai
-  nodePkgs."@anthropic-ai/claude-code"
 
   # for web service
   discord
