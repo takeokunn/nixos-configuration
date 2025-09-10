@@ -1,4 +1,4 @@
-{ pkgs, sources }:
+{ sources }:
 {
   programs.bat = {
     enable = true;
