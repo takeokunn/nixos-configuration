@@ -83,4 +83,22 @@ in
     bypassCache = true;
     reconstructLock = true;
   };
+  ccusage = nodeEnv.buildNodePackage {
+    name = "ccusage";
+    packageName = "ccusage";
+    version = "16.2.3";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-16.2.3.tgz";
+      sha512 = "/BvsGfNjZ45SwSyzZy6xhQpwm2w8x2dp1yRGZql8115DQS3PNFNF9QJ+1YLMF0OayY/BU5R/mUQdd12DLekySQ==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Usage analysis tool for Claude Code";
+      homepage = "https://github.com/ryoppippi/ccusage#readme";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
 }

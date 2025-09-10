@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, nodePkgs }:
 with pkgs;
 [
   # for lint
@@ -10,6 +10,9 @@ with pkgs;
 
   # for docker
   lazydocker
+
+  # for ai
+  nodePkgs."ccusage"
 
   # for web service
   discord
