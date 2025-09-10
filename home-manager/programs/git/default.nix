@@ -46,6 +46,8 @@
       ".devenv"
       ".pre-commit-config.yaml"
       ".markdown-preview.html"
+      ".serena/"
+      "**/.claude/settings.local.json"
     ];
 
     userName = "takeokunn";

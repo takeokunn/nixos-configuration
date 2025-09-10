@@ -1,8 +1,11 @@
 {
   programs.ssh = {
     enable = true;
-    compression = true;
-    serverAliveInterval = 15;
+    enableDefaultConfig = false;
     includes = [ "config.d/*" ];
+    matchBlocks."*" = {
+      compression = true;
+      serverAliveInterval = 15;
+    };
   };
 }
