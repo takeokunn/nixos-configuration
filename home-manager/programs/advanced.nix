@@ -1,6 +1,7 @@
 {
   pkgs,
   nodePkgs,
+  mcp-servers-nix,
   sources,
   org-babel,
   emacsPkg,
@@ -8,7 +9,7 @@
 let
   awscli = import ./awscli;
   aider = import ./aider;
-  claude-code = import ./claude-code { inherit pkgs nodePkgs; };
+  claude-code = import ./claude-code { inherit pkgs nodePkgs mcp-servers-nix; };
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   gh = import ./gh;
   gh-dash = import ./gh-dash;

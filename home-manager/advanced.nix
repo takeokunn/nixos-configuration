@@ -17,7 +17,7 @@ let
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ];
+    overlays = basicOverlay ++ advancedOverlay;
   };
   nodePkgs = pkgs.callPackage ../node2nix {
     inherit pkgs;
@@ -45,6 +45,7 @@ let
   advancedPrograms = import ./programs/advanced.nix {
     inherit pkgs nodePkgs sources;
     inherit org-babel emacsPkg;
+    inherit mcp-servers-nix;
   };
 
   # services

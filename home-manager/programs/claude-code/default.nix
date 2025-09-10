@@ -1,9 +1,9 @@
-{ pkgs, nodePkgs }:
 {
-  xdg.configFile = {
-    "claude-code/statusline.sh".source = ./scripts/statusline.sh;
-  };
-
+  pkgs,
+  mcp-servers-nix,
+  nodePkgs,
+}:
+{
   programs.claude-code = {
     enable = true;
     package = nodePkgs."@anthropic-ai/claude-code";
@@ -68,7 +68,7 @@
 
       statusLine = {
         type = "command";
-        command = "~/.config/claude-code/statusline.sh";
+        command = ./scripts/statusline.sh;
       };
 
       hooks = {
@@ -85,29 +85,21 @@
       };
     };
 
-    mcpServers = {
-      time = {
-        type = "stdio";
-        command = "${pkgs.mcp-server-time}/bin/mcp-server-time";
-        args = [ "--local-timezone=Asia/Tokyo" ];
-      };
-      playwright = {
-        type = "stdio";
-        command = "${pkgs.playwright-mcp}/bin/mcp-server-playwright";
-      };
-      serena = {
-        type = "stdio";
-        command = "${pkgs.serena}/bin/serena";
-        args = [
-          "start-mcp-server"
-          "--context"
-          "ide-assistant"
-        ];
-      };
-      context7 = {
-        type = "stdio";
-        command = "${pkgs.context7-mcp}/bin/context7-mcp";
-      };
-    };
+    mcpServers =
+      (mcp-servers-nix.lib.evalModule pkgs {
+        programs = {
+          context7.enable = true;
+          playwright.enable = true;
+          serena = {
+            enable = true;
+            args = [
+              "--context"
+              "ide-assistant"
+              "--enable-web-dashboard"
+              "False"
+            ];
+          };
+        };
+      }).config.settings.servers;
   };
 }
