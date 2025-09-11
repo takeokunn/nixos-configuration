@@ -21,26 +21,24 @@
         deny = [
           "Bash(rm -rf /*)"
           "Bash(rm -rf /)"
-          "Bash(sudo rm -*)"
+          "Bash(sudo rm -:*)"
           "Bash(chmod 777 /*)"
           "Bash(chmod -R 777 /*)"
-          "Bash(dd if=*)"
-          "Bash(mkfs.*)"
-          "Bash(fdisk -*)"
-          "Bash(format -*)"
-          "Bash(shutdown -*)"
-          "Bash(reboot -*)"
-          "Bash(halt -*)"
-          "Bash(poweroff -*)"
-          "Bash(killall -*)"
-          "Bash(pkill -*)"
-          "Bash(curl * | bash)"
-          "Bash(wget * | bash)"
-          "Bash(nc -l -*)"
-          "Bash(ncat -l -*)"
-          "Bash(netcat -l -*)"
-          "Bash(rm -rf ~*)"
-          "Bash(rm -rf $HOME*)"
+          "Bash(dd if=:*)"
+          "Bash(mkfs.:*)"
+          "Bash(fdisk -:*)"
+          "Bash(format -:*)"
+          "Bash(shutdown -:*)"
+          "Bash(reboot -:*)"
+          "Bash(halt -:*)"
+          "Bash(poweroff -:*)"
+          "Bash(killall -:*)"
+          "Bash(pkill -:*)"
+          "Bash(nc -l -:*)"
+          "Bash(ncat -l -:*)"
+          "Bash(netcat -l -:*)"
+          "Bash(rm -rf ~:*)"
+          "Bash(rm -rf $HOME:*)"
           "Bash(rm -rf ~/.ssh*)"
           "Bash(rm -rf ~/.config*)"
         ];
@@ -69,6 +67,7 @@
       statusLine = {
         type = "command";
         command = ./scripts/statusline.sh;
+        padding = 0;
       };
 
       hooks = {
