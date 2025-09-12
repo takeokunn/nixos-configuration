@@ -9,7 +9,6 @@
     package = nodePkgs."@anthropic-ai/claude-code";
     settings = {
       theme = "dark";
-      model = "opus";
       autoUpdates = false;
       includeCoAuthoredBy = false;
       autoCompactEnabled = false;
