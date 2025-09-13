@@ -72,16 +72,6 @@
       };
 
       hooks = {
-        SessionStart = [
-          {
-            matcher = "startup";
-            hooks = [{
-              type = "command";
-              command = "rm -rf .serena/cache/ && ${pkgs.serena}/bin/serena project index";
-            }];
-          }
-        ];
-
         Stop = [
           {
             hooks = [
