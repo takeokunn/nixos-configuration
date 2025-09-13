@@ -4,6 +4,8 @@
   nodePkgs,
 }:
 {
+  home.file.".claude/CLAUDE.md".source = ./CLAUDE.md;
+
   programs.claude-code = {
     enable = true;
     package = nodePkgs."@anthropic-ai/claude-code";
@@ -70,6 +72,16 @@
       };
 
       hooks = {
+        SessionStart = [
+          {
+            matcher = "startup";
+            hooks = [{
+              type = "command";
+              command = "rm -rf .serena/cache/ && ${pkgs.serena}/bin/serena project index";
+            }];
+          }
+        ];
+
         Stop = [
           {
             hooks = [
