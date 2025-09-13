@@ -83,6 +83,14 @@
       };
     };
 
+    commands = {
+      ask = builtins.readFile ./commands/ask.md;
+      bug = builtins.readFile ./commands/bug.md;
+      define = builtins.readFile ./commands/define.md;
+      execute = builtins.readFile ./commands/execute.md;
+      update-docs = builtins.readFile ./commands/update-docs.md;
+    };
+
     mcpServers =
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {
