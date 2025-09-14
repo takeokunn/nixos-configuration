@@ -12,7 +12,7 @@ with pkgs;
   lazydocker
 
   # for ai
-  gemini-cli
+  # nodePkgs."@google/gemini-cli"
   nodePkgs."ccusage"
 
   # for web service
