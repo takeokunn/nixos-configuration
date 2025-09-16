@@ -633,13 +633,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.4.0" = {
+    "@types/node-24.5.0" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.4.0";
+      version = "24.5.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.4.0.tgz";
-        sha512 = "gUuVEAK4/u6F9wRLznPUU4WGUacSEBDPoC2TrBkw3GAnOLHBL45QdfHOXp1kJ4ypBGLxTOB+t7NJLpKoC3gznQ==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.5.0.tgz";
+        sha512 = "y1dMvuvJspJiPSDZUQ+WMBvF7dpnEqN4x9DDC9ie5Fs/HUZJA3wFp7EhHoVaKX/iI0cRoECV8X2jL8zi0xrHCg==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -1128,13 +1128,13 @@ let
         sha512 = "qj+f8APARXHrM0hraqXYb2/bOVSV4PvJQlNZ/DVj0QrmNM2q2euizkeuVckQ57J+W0mRH6Hvi+k50M4Jul2VRQ==";
       };
     };
-    "configstore-7.0.0" = {
+    "configstore-7.1.0" = {
       name = "configstore";
       packageName = "configstore";
-      version = "7.0.0";
+      version = "7.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/configstore/-/configstore-7.0.0.tgz";
-        sha512 = "yk7/5PN5im4qwz0WFZW3PXnzHgPu9mX29Y8uZ3aefe2lBPC1FYttWZRcaW9fKkT0pBCJyuQ2HfbmPVaODi9jcQ==";
+        url = "https://registry.npmjs.org/configstore/-/configstore-7.1.0.tgz";
+        sha512 = "N4oog6YJWbR9kGyXvS7jEykLDXIE2C0ILYqNBZBp9iwiJpoCBWYsuAdW6PPFn6w06jjnC+3JstVvWHO4cZqvRg==";
       };
     };
     "content-disposition-1.0.0" = {
@@ -1758,13 +1758,13 @@ let
         sha512 = "Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==";
       };
     };
-    "fs-extra-11.3.1" = {
+    "fs-extra-11.3.2" = {
       name = "fs-extra";
       packageName = "fs-extra";
-      version = "11.3.1";
+      version = "11.3.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/fs-extra/-/fs-extra-11.3.1.tgz";
-        sha512 = "eXvGGwZ5CL17ZSwHWd3bbgk7UUpF6IFHtP57NYYakPvHOs8GDgDe5KJI36jIJzDkJ6eJjuzRA8eBQb6SkKue0g==";
+        url = "https://registry.npmjs.org/fs-extra/-/fs-extra-11.3.2.tgz";
+        sha512 = "Xr9F6z6up6Ws+NjzMCZc6WXg2YFRlrLP9NQDO3VQrWrfiojdhS56TzueT88ze0uBdCTwEIhQ3ptnmKeWGFAe0A==";
       };
     };
     "function-bind-1.1.2" = {
@@ -2946,13 +2946,13 @@ let
         sha512 = "ueGLflrrnvwB3xuo/uGob5pd5FN7l0MsLf0Z87o/UQmRtwjvfylfc9MurIxRAWywCYTgrvpXBcqjV4OfCYGCIQ==";
       };
     };
-    "pretty-ms-9.2.0" = {
+    "pretty-ms-9.3.0" = {
       name = "pretty-ms";
       packageName = "pretty-ms";
-      version = "9.2.0";
+      version = "9.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/pretty-ms/-/pretty-ms-9.2.0.tgz";
-        sha512 = "4yf0QO/sllf/1zbZWYnvWw3NxCQwLXKzIj0G849LSufP15BXKM0rbD2Z3wVnkMfjdn/CB0Dpp444gYAACdsplg==";
+        url = "https://registry.npmjs.org/pretty-ms/-/pretty-ms-9.3.0.tgz";
+        sha512 = "gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==";
       };
     };
     "prop-types-15.8.1" = {
@@ -3009,13 +3009,13 @@ let
         sha512 = "vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==";
       };
     };
-    "pupa-3.1.0" = {
+    "pupa-3.2.1" = {
       name = "pupa";
       packageName = "pupa";
-      version = "3.1.0";
+      version = "3.2.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/pupa/-/pupa-3.1.0.tgz";
-        sha512 = "FLpr4flz5xZTSJxSeaheeMKN/EDzMdK7b8PTOC6a5PYFKTucWbdqjgqaEyH0shFiSJrVB1+Qqi4Tk19ccU6Aug==";
+        url = "https://registry.npmjs.org/pupa/-/pupa-3.2.1.tgz";
+        sha512 = "6koJt2wLdmDICU5Yht9X4mYjQUFcah7cAu9PEgGP+JGbLQpUQFfaCauHLeutygSkt50oMEX7oAQNmUHxGh5GHQ==";
       };
     };
     "qs-6.14.0" = {
@@ -3675,13 +3675,13 @@ let
         sha512 = "QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==";
       };
     };
-    "undici-types-7.11.0" = {
+    "undici-types-7.12.0" = {
       name = "undici-types";
       packageName = "undici-types";
-      version = "7.11.0";
+      version = "7.12.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici-types/-/undici-types-7.11.0.tgz";
-        sha512 = "kt1ZriHTi7MU+Z/r9DOdAI3ONdaR3M3csEaRc6ewa4f4dTvX4cQCbJ4NkEn0ohE4hHtq85+PhPSTY+pO/1PwgA==";
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-7.12.0.tgz";
+        sha512 = "goOacqME2GYyOZZfb5Lgtu+1IDmAlAEu5xnD3+xTzS10hT0vzpf0SPjkXwAw9Jm+4n/mQGDP3LO8CPbYROeBfQ==";
       };
     };
     "unicorn-magic-0.1.0" = {
@@ -4032,10 +4032,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.371.0";
+    version = "1.373.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.371.0.tgz";
-      sha512 = "49CT02ElprSuG9zxM4y6TRQri0/a5doazxj3Qfz/whMtOTxiHhfHD/lmPUZXcEgOVVEovTUN7Znzx2ZLPtx3Fw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.373.0.tgz";
+      sha512 = "tcRyxEvm36M30x5v3u/OuPnPENZJsmbMkcY+6A45Fsr0ZtUJF7BtAS/Si/2QTCVJndA2Oi7taicIuqSDucAR/Q==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4055,10 +4055,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.113";
+    version = "1.0.115";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.113.tgz";
-      sha512 = "K/+N/rECfWa1ZauWLD6C/CnX6bxxAck5CFDuK58JjRN8v6QDuJVX7HZcNCanB0ucxEkaczAwvWnEM+UjFQsdqw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.115.tgz";
+      sha512 = "scnmcSgtmRM4wUUWr+BfU+krK+m/n4Sxvhu9ePUlYRWklWrYnySvJ1WrAZG6/v9G6vDLDdoKIW7yol8SGnOSqA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4073,10 +4073,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "16.2.4";
+    version = "16.2.5";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-16.2.4.tgz";
-      sha512 = "B/sLmE4Aqz6Z27D6Oouq58Hk7MdiSLMooAb3IqpwSMrloX3NLCJ4Uf4wP/s7hjIRP07+iAyxgJ+3tw9w3a98Aw==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-16.2.5.tgz";
+      sha512 = "RcxrPj9CuAn/+1Z2Fh/oc/r0N9/jujFDBcWwdwMF9ehhG8lvY9oOtq3Nbb76rajaqdMSdtkLZ0ILYMrQEwZIbw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4189,7 +4189,7 @@ in
       sources."@types/html-to-text-9.0.4"
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.4.0"
+      sources."@types/node-24.5.0"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.1.13"
       sources."@types/tinycolor2-1.4.6"
@@ -4280,7 +4280,7 @@ in
       sources."color-name-1.1.4"
       sources."command-exists-1.2.9"
       sources."config-chain-1.1.13"
-      sources."configstore-7.0.0"
+      sources."configstore-7.1.0"
       sources."content-disposition-1.0.0"
       sources."content-type-1.0.5"
       sources."convert-to-spaces-2.0.1"
@@ -4384,7 +4384,7 @@ in
       sources."forwarded-0.2.0"
       sources."forwarded-parse-2.1.2"
       sources."fresh-2.0.0"
-      sources."fs-extra-11.3.1"
+      sources."fs-extra-11.3.2"
       sources."function-bind-1.1.2"
       sources."fzf-0.5.2"
       sources."gaxios-6.7.1"
@@ -4541,14 +4541,14 @@ in
       sources."picocolors-1.1.1"
       sources."picomatch-4.0.3"
       sources."pkce-challenge-5.0.0"
-      sources."pretty-ms-9.2.0"
+      sources."pretty-ms-9.3.0"
       sources."prop-types-15.8.1"
       sources."proto-list-1.2.4"
       sources."protobufjs-7.5.4"
       sources."proxy-addr-2.0.7"
       sources."pump-3.0.3"
       sources."punycode-2.3.1"
-      sources."pupa-3.1.0"
+      sources."pupa-3.2.1"
       sources."qs-6.14.0"
       sources."quick-lru-5.1.1"
       sources."range-parser-1.2.1"
@@ -4666,7 +4666,7 @@ in
       sources."type-fest-4.41.0"
       sources."type-is-2.0.1"
       sources."undici-7.16.0"
-      sources."undici-types-7.11.0"
+      sources."undici-types-7.12.0"
       sources."unicorn-magic-0.1.0"
       sources."unique-string-3.0.0"
       sources."universalify-2.0.1"
