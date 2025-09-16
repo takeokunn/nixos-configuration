@@ -56,6 +56,7 @@ with epkgs;
   password-store-otp
   pass
   password-generator
+  sops
 
   # pdf
   pdf-tools

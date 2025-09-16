@@ -3434,12 +3434,12 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+end_src
 *** sops
 #+begin_src emacs-lisp
-  ;; (autoload-if-found '(sops-save-file
-                       ;; sops-cancel
-                       ;; sops-edit-file
-                       ;; global-sops-mode) "sops" nil t)
+  (autoload-if-found '(sops-save-file
+                       sops-cancel
+                       sops-edit-file
+                       global-sops-mode) "sops" nil t)
 
-  ;; (add-hook 'emacs-startup-hook #'global-sops-mode)
+  (add-hook 'emacs-startup-hook #'global-sops-mode)
 #+end_src
 ** Dictionary
 *** define-word
