@@ -57,22 +57,22 @@ let
         sha512 = "hdTYu39QgDFxv+FB6BK2zi4UIJGWhx2iPc0pHQ0C5Q/RCi+m+4gsryIzTGO+riqWcUA8/WGYp6hpqckdOBNysw==";
       };
     };
-    "@grpc/grpc-js-1.13.4" = {
+    "@grpc/grpc-js-1.14.0" = {
       name = "_at_grpc_slash_grpc-js";
       packageName = "@grpc/grpc-js";
-      version = "1.13.4";
+      version = "1.14.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@grpc/grpc-js/-/grpc-js-1.13.4.tgz";
-        sha512 = "GsFaMXCkMqkKIvwCQjCrwH+GHbPKBjhwo/8ZuUkWHqbI73Kky9I+pQltrlT0+MWpedCoosda53lgjYfyEPgxBg==";
+        url = "https://registry.npmjs.org/@grpc/grpc-js/-/grpc-js-1.14.0.tgz";
+        sha512 = "N8Jx6PaYzcTRNzirReJCtADVoq4z7+1KQ4E70jTg/koQiMoUSN1kbNjPOqpPbhMFhfU1/l7ixspPl8dNY+FoUg==";
       };
     };
-    "@grpc/proto-loader-0.7.15" = {
+    "@grpc/proto-loader-0.8.0" = {
       name = "_at_grpc_slash_proto-loader";
       packageName = "@grpc/proto-loader";
-      version = "0.7.15";
+      version = "0.8.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@grpc/proto-loader/-/proto-loader-0.7.15.tgz";
-        sha512 = "tMXdRCfYVixjuFK+Hk0Q1s38gV9zDiDJfWL3h1rv4Qc39oILCu1TRTDt7+fGUI8K4G1Fj125Hx/ru3azECWTyQ==";
+        url = "https://registry.npmjs.org/@grpc/proto-loader/-/proto-loader-0.8.0.tgz";
+        sha512 = "rc1hOQtjIWGxcxpb9aHAfLpIctjEnsDehj0DAiVfBlmT84uvR0uUtN2hEi/ecvWVjXUGf5qPF4qEgiLOx1YIMQ==";
       };
     };
     "@iarna/toml-2.2.5" = {
@@ -633,13 +633,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.5.0" = {
+    "@types/node-24.5.1" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.5.0";
+      version = "24.5.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.5.0.tgz";
-        sha512 = "y1dMvuvJspJiPSDZUQ+WMBvF7dpnEqN4x9DDC9ie5Fs/HUZJA3wFp7EhHoVaKX/iI0cRoECV8X2jL8zi0xrHCg==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.5.1.tgz";
+        sha512 = "/SQdmUP2xa+1rdx7VwB9yPq8PaKej8TD5cQ+XfKDPWWC+VDJU4rvVVagXqKUzhKjtFoNA8rXDJAkCxQPAe00+Q==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -3009,13 +3009,13 @@ let
         sha512 = "vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==";
       };
     };
-    "pupa-3.2.1" = {
+    "pupa-3.3.0" = {
       name = "pupa";
       packageName = "pupa";
-      version = "3.2.1";
+      version = "3.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/pupa/-/pupa-3.2.1.tgz";
-        sha512 = "6koJt2wLdmDICU5Yht9X4mYjQUFcah7cAu9PEgGP+JGbLQpUQFfaCauHLeutygSkt50oMEX7oAQNmUHxGh5GHQ==";
+        url = "https://registry.npmjs.org/pupa/-/pupa-3.3.0.tgz";
+        sha512 = "LjgDO2zPtoXP2wJpDjZrGdojii1uqO0cnwKoIoUzkfS98HDmbeiGmYiXo3lXeFlq2xvne1QFQhwYXSUCLKtEuA==";
       };
     };
     "qs-6.14.0" = {
@@ -4055,10 +4055,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.115";
+    version = "1.0.117";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.115.tgz";
-      sha512 = "scnmcSgtmRM4wUUWr+BfU+krK+m/n4Sxvhu9ePUlYRWklWrYnySvJ1WrAZG6/v9G6vDLDdoKIW7yol8SGnOSqA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.117.tgz";
+      sha512 = "ZSBFpwPqMZJZq9//BYSW0MLGQY0svAtncPe2EVxohO87Gym6Dqi+IRSVZkWSwF07gmzZH3luqrepX3q33l7T+Q==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4102,8 +4102,8 @@ in
       sources."@babel/helper-validator-identifier-7.27.1"
       sources."@google/gemini-cli-core-0.4.1"
       sources."@google/genai-1.16.0"
-      sources."@grpc/grpc-js-1.13.4"
-      sources."@grpc/proto-loader-0.7.15"
+      sources."@grpc/grpc-js-1.14.0"
+      sources."@grpc/proto-loader-0.8.0"
       sources."@iarna/toml-2.2.5"
       (
         sources."@isaacs/cliui-8.0.2"
@@ -4189,7 +4189,7 @@ in
       sources."@types/html-to-text-9.0.4"
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.5.0"
+      sources."@types/node-24.5.1"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.1.13"
       sources."@types/tinycolor2-1.4.6"
@@ -4548,7 +4548,7 @@ in
       sources."proxy-addr-2.0.7"
       sources."pump-3.0.3"
       sources."punycode-2.3.1"
-      sources."pupa-3.2.1"
+      sources."pupa-3.3.0"
       sources."qs-6.14.0"
       sources."quick-lru-5.1.1"
       sources."range-parser-1.2.1"
