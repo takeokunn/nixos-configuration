@@ -2,6 +2,7 @@
   nix = {
     optimise.automatic = true;
     settings = {
+      sandbox = true;
       experimental-features = "nix-command flakes";
       max-jobs = 8;
       download-buffer-size = 268435456;
