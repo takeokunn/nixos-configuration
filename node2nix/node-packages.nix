@@ -39,13 +39,13 @@ let
         sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
       };
     };
-    "@google/gemini-cli-core-0.5.3" = {
+    "@google/gemini-cli-core-0.5.4" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.5.3";
+      version = "0.5.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.5.3.tgz";
-        sha512 = "1soAuhtoXamYdCz+LGBQr4gCLTltixNcDEf1Ufq0XUyFOYJ/VDN5r8MfUMhcqONzVTOOp8qQ4jxKWr9llM0ByQ==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.5.4.tgz";
+        sha512 = "dDskAD+RJR7KZiKeNjERLANMHW7OcZekl9ranVBbdMpnuCie0TN+VtJgeNnV/2lPKn5R9i39ccHiJcgv4SRqDw==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -138,13 +138,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.18.0" = {
+    "@modelcontextprotocol/sdk-1.18.1" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.18.0";
+      version = "1.18.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.18.0.tgz";
-        sha512 = "JvKyB6YwS3quM+88JPR0axeRgvdDu3Pv6mdZUy+w4qVkCzGgumb9bXG/TmtDRQv+671yaofVfXSQmFLlWU5qPQ==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.18.1.tgz";
+        sha512 = "d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -2127,13 +2127,13 @@ let
         sha512 = "QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==";
       };
     };
-    "ink-6.3.0" = {
+    "ink-6.3.1" = {
       name = "ink";
       packageName = "ink";
-      version = "6.3.0";
+      version = "6.3.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ink/-/ink-6.3.0.tgz";
-        sha512 = "2CbJAa7XeziZYe6pDS5RVLirRY28iSGMQuEV8jRU5NQsONQNfcR/BZHHc9vkMg2lGYTHTM2pskxC1YmY28p6bQ==";
+        url = "https://registry.npmjs.org/ink/-/ink-6.3.1.tgz";
+        sha512 = "3wGwITGrzL6rkWsi2gEKzgwdafGn4ZYd3u4oRp+sOPvfoxEHlnoB5Vnk9Uy5dMRUhDOqF3hqr4rLQ4lEzBc2sQ==";
       };
     };
     "ink-gradient-3.0.0" = {
@@ -3054,13 +3054,13 @@ let
         sha512 = "w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==";
       };
     };
-    "react-devtools-core-4.28.5" = {
+    "react-devtools-core-6.1.5" = {
       name = "react-devtools-core";
       packageName = "react-devtools-core";
-      version = "4.28.5";
+      version = "6.1.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-4.28.5.tgz";
-        sha512 = "cq/o30z9W2Wb4rzBefjv5fBalHU0rJGZCHAkf/RHSBWSSYwh8PlQTqqOJmgIIbBtpj27T6FIPXeomIjZtCNVqA==";
+        url = "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-6.1.5.tgz";
+        sha512 = "ePrwPfxAnB+7hgnEr8vpKxL9cmnp7F322t8oqcPshbIQQhDKgFDW4tjhF2wjVbdXF9O/nyuy3sQWd9JGpiLPvA==";
       };
     };
     "react-is-16.13.1" = {
@@ -4001,10 +4001,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.117";
+    version = "1.0.119";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.117.tgz";
-      sha512 = "ZSBFpwPqMZJZq9//BYSW0MLGQY0svAtncPe2EVxohO87Gym6Dqi+IRSVZkWSwF07gmzZH3luqrepX3q33l7T+Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.119.tgz";
+      sha512 = "0SxTgt7Htr2okxL2Uk0Mv5eB8JxBrRCZCdtTNwuYC/OBl2F7UDM8YFtIwHz97ygCoJw49j7SL6s+/MIZGaEzrA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4019,10 +4019,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "16.2.5";
+    version = "17.0.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-16.2.5.tgz";
-      sha512 = "RcxrPj9CuAn/+1Z2Fh/oc/r0N9/jujFDBcWwdwMF9ehhG8lvY9oOtq3Nbb76rajaqdMSdtkLZ0ILYMrQEwZIbw==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.0.2.tgz";
+      sha512 = "t8W/L8bjOvH0BtnPusATWGmMrrWVqQ3Yp5Jb+zqws9FbL3nxAeScPDH43BVaXbKIK98fJSFmKapRJnnfTSR4Rg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4037,16 +4037,16 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.5.3";
+    version = "0.5.4";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.5.3.tgz";
-      sha512 = "NyiRCzv5kPtpHEUTSiNzj7uLDqGLFKDJ9jebpAGbNP6psxOkS5DOPcpOAqWf8+Du1fwqjr9kKLqch8dZRXoA5Q==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.5.4.tgz";
+      sha512 = "iOcNpJb3nsB0cIwaHtkm67WpCWePnwFA7zwjQqQU42Uq+gHqibPs3tx1kq1Pb4GOLS45plMlfpYR6j4MgBRAcQ==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.0"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
-      sources."@google/gemini-cli-core-0.5.3"
+      sources."@google/gemini-cli-core-0.5.4"
       sources."@google/genai-1.16.0"
       sources."@grpc/grpc-js-1.14.0"
       sources."@grpc/proto-loader-0.8.0"
@@ -4066,7 +4066,7 @@ in
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
       (
-        sources."@modelcontextprotocol/sdk-1.18.0"
+        sources."@modelcontextprotocol/sdk-1.18.1"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4389,7 +4389,7 @@ in
       sources."index-to-position-1.1.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
-      sources."ink-6.3.0"
+      sources."ink-6.3.1"
       sources."ink-gradient-3.0.0"
       sources."ink-spinner-5.0.0"
       sources."ipaddr.js-1.9.1"
@@ -4508,7 +4508,7 @@ in
       )
       sources."react-19.1.1"
       (
-        sources."react-devtools-core-4.28.5"
+        sources."react-devtools-core-6.1.5"
         // {
           dependencies = [
             sources."utf-8-validate-5.0.10"
