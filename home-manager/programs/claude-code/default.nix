@@ -85,6 +85,16 @@
       };
     };
 
+    agents = {
+      clean = builtins.readFile ./agents/clean.md;
+      design = builtins.readFile ./agents/design.md;
+      docs = builtins.readFile ./agents/docs.md;
+      memory = builtins.readFile ./agents/memory.md;
+      merge = builtins.readFile ./agents/merge.md;
+      quality = builtins.readFile ./agents/quality.md;
+      test = builtins.readFile ./agents/test.md;
+    };
+
     commands = {
       ask = builtins.readFile ./commands/ask.md;
       bug = builtins.readFile ./commands/bug.md;
