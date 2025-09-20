@@ -129,12 +129,12 @@ priority: medium
 function processOrder(order) {
   // 注文検証 (20行)
   if (!order.id || !order.items || order.items.length === 0) {
-    throw new Error('Invalid order');
+    throw new Error("Invalid order");
   }
   // 在庫確認 (15行)
   for (let item of order.items) {
     if (inventory[item.id] < item.quantity) {
-      throw new Error('Insufficient stock');
+      throw new Error("Insufficient stock");
     }
   }
   // 価格計算 (25行)
@@ -157,14 +157,14 @@ function processOrder(order) {
 
 function validateOrder(order) {
   if (!order.id || !order.items || order.items.length === 0) {
-    throw new Error('Invalid order');
+    throw new Error("Invalid order");
   }
 }
 
 function checkInventory(items) {
   for (let item of items) {
     if (inventory[item.id] < item.quantity) {
-      throw new Error('Insufficient stock');
+      throw new Error("Insufficient stock");
     }
   }
 }
@@ -174,7 +174,7 @@ function calculateTotal(items) {
 }
 
 function finalizeOrder(order, total) {
-  saveOrder({...order, total});
+  saveOrder({ ...order, total });
   sendConfirmation(order.email);
 }
 ```
@@ -184,11 +184,11 @@ function finalizeOrder(order, total) {
 ```javascript
 // Before: 条件分岐多数
 function calculateShipping(order, method) {
-  if (method === 'standard') {
+  if (method === "standard") {
     return order.weight * 0.1;
-  } else if (method === 'express') {
+  } else if (method === "express") {
     return order.weight * 0.2 + 5;
-  } else if (method === 'overnight') {
+  } else if (method === "overnight") {
     return order.weight * 0.3 + 10;
   }
   return 0;
@@ -197,7 +197,7 @@ function calculateShipping(order, method) {
 // After: Strategy Pattern
 class ShippingStrategy {
   calculate(order) {
-    throw new Error('Must implement calculate method');
+    throw new Error("Must implement calculate method");
   }
 }
 
@@ -235,19 +235,19 @@ class ShippingCalculator {
 ```javascript
 // Before: 重複コード
 function getUserById(id) {
-  const query = 'SELECT * FROM users WHERE id = ?';
+  const query = "SELECT * FROM users WHERE id = ?";
   const result = db.query(query, [id]);
   if (result.length === 0) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
   return result[0];
 }
 
 function getProductById(id) {
-  const query = 'SELECT * FROM products WHERE id = ?';
+  const query = "SELECT * FROM products WHERE id = ?";
   const result = db.query(query, [id]);
   if (result.length === 0) {
-    throw new Error('Product not found');
+    throw new Error("Product not found");
   }
   return result[0];
 }
@@ -263,11 +263,11 @@ function findById(table, id, entityName) {
 }
 
 function getUserById(id) {
-  return findById('users', id, 'User');
+  return findById("users", id, "User");
 }
 
 function getProductById(id) {
-  return findById('products', id, 'Product');
+  return findById("products", id, "Product");
 }
 ```
 
@@ -275,13 +275,13 @@ function getProductById(id) {
 
 ```javascript
 const technicalDebtMetrics = {
-  cyclomaticComplexity: 8,     // 循環的複雑度
-  codeChurn: 15,               // コード変更頻度
-  duplicatedLines: 5,          // 重複行数率 (%)
-  testCoverage: 85,            // テストカバレッジ (%)
-  maintainabilityIndex: 75,    // 保守性指数
-  couplingFactor: 0.3,         // 結合度
-  cohesionFactor: 0.8          // 凝集度
+  cyclomaticComplexity: 8, // 循環的複雑度
+  codeChurn: 15, // コード変更頻度
+  duplicatedLines: 5, // 重複行数率 (%)
+  testCoverage: 85, // テストカバレッジ (%)
+  maintainabilityIndex: 75, // 保守性指数
+  couplingFactor: 0.3, // 結合度
+  cohesionFactor: 0.8, // 凝集度
 };
 ```
 
@@ -359,9 +359,9 @@ const technicalDebtMetrics = {
     "maintainability_improvement": "22%"
   },
   "before_after_metrics": {
-    "cyclomatic_complexity": {"before": 8.5, "after": 6.2},
-    "code_duplication": {"before": "12%", "after": "4%"},
-    "test_coverage": {"before": "82%", "after": "85%"}
+    "cyclomatic_complexity": { "before": 8.5, "after": 6.2 },
+    "code_duplication": { "before": "12%", "after": "4%" },
+    "test_coverage": { "before": "82%", "after": "85%" }
   }
 }
 ```

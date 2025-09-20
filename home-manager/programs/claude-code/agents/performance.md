@@ -126,11 +126,11 @@ priority: high
 
 ```javascript
 const coreWebVitals = {
-  LCP: 2.5,      // Largest Contentful Paint (秒)
-  FID: 100,      // First Input Delay (ミリ秒)
-  CLS: 0.1,      // Cumulative Layout Shift
-  FCP: 1.8,      // First Contentful Paint (秒)
-  TTI: 3.8       // Time to Interactive (秒)
+  LCP: 2.5, // Largest Contentful Paint (秒)
+  FID: 100, // First Input Delay (ミリ秒)
+  CLS: 0.1, // Cumulative Layout Shift
+  FCP: 1.8, // First Contentful Paint (秒)
+  TTI: 3.8, // Time to Interactive (秒)
 };
 ```
 
@@ -138,11 +138,11 @@ const coreWebVitals = {
 
 ```javascript
 const serverMetrics = {
-  responseTime: 200,     // レスポンス時間 (ミリ秒)
-  throughput: 1000,      // スループット (req/sec)
-  cpuUsage: 80,          // CPU使用率 (%)
-  memoryUsage: 85,       // メモリ使用率 (%)
-  errorRate: 1           // エラー率 (%)
+  responseTime: 200, // レスポンス時間 (ミリ秒)
+  throughput: 1000, // スループット (req/sec)
+  cpuUsage: 80, // CPU使用率 (%)
+  memoryUsage: 85, // メモリ使用率 (%)
+  errorRate: 1, // エラー率 (%)
 };
 ```
 
@@ -191,17 +191,17 @@ function findDuplicates(arr) {
 ```javascript
 // Before: メモリリーク
 function createHandler() {
-  const largeData = new Array(1000000).fill('data');
-  return function() {
-    console.log('Handler called');
+  const largeData = new Array(1000000).fill("data");
+  return function () {
+    console.log("Handler called");
     // largeDataへの参照がクロージャで保持される
   };
 }
 
 // After: 適切なクリーンアップ
 function createHandler() {
-  return function() {
-    console.log('Handler called');
+  return function () {
+    console.log("Handler called");
     // 必要なデータのみ参照
   };
 }
@@ -211,10 +211,10 @@ function createHandler() {
 
 ```javascript
 // Before: 同期読み込み
-import { heavyLibrary } from 'heavy-library';
+import { heavyLibrary } from "heavy-library";
 
 // After: 動的インポート
-const loadHeavyLibrary = () => import('heavy-library');
+const loadHeavyLibrary = () => import("heavy-library");
 ```
 
 ## 分析結果レポート

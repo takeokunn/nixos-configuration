@@ -186,14 +186,16 @@ document\.write\(\w+\)
 ## セキュリティスコア計算
 
 ```javascript
-securityScore = Math.max(0, 100 - (
-  criticalVulns * 25 +
-  highVulns * 10 +
-  mediumVulns * 5 +
-  lowVulns * 1 +
-  secretLeaks * 20 +
-  weakCrypto * 15
-));
+securityScore = Math.max(
+  0,
+  100 -
+    (criticalVulns * 25 +
+      highVulns * 10 +
+      mediumVulns * 5 +
+      lowVulns * 1 +
+      secretLeaks * 20 +
+      weakCrypto * 15),
+);
 ```
 
 ## 実行タイミング
