@@ -4,11 +4,10 @@
   nodePkgs,
 }:
 {
-  home.file.".claude/CLAUDE.md".source = ./CLAUDE.md;
-
   programs.claude-code = {
     enable = true;
     package = nodePkgs."@anthropic-ai/claude-code";
+    memory.source = ./CLAUDE.md;
     settings = {
       theme = "dark";
       autoUpdates = false;
