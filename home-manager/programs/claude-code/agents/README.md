@@ -2,15 +2,17 @@
 
 ## ファイル構成
 
-| ファイル   | 責任領域         | 優先度     |
-| ---------- | ---------------- | ---------- |
-| design.md  | 設計検証         | critical   |
-| quality.md | 品質保証         | high       |
-| docs.md    | ドキュメント管理 | high       |
-| test.md    | テスト管理       | medium     |
-| clean.md   | コード削除       | medium     |
-| merge.md   | 競合解決         | on-demand  |
-| memory.md  | 知識管理         | continuous |
+| ファイル        | 責任領域                 | 優先度     |
+| --------------- | ------------------------ | ---------- |
+| security.md     | セキュリティ脆弱性検出   | critical   |
+| design.md       | 設計検証                 | critical   |
+| performance.md  | パフォーマンス最適化     | high       |
+| quality.md      | 品質保証                 | high       |
+| docs.md         | ドキュメント管理         | high       |
+| test.md         | テスト管理               | medium     |
+| clean.md        | コード削除               | medium     |
+| merge.md        | 競合解決                 | on-demand  |
+| memory.md       | 知識管理                 | continuous |
 
 ## 仕様書形式
 

@@ -91,8 +91,11 @@
       docs = builtins.readFile ./agents/docs.md;
       memory = builtins.readFile ./agents/memory.md;
       merge = builtins.readFile ./agents/merge.md;
+      performance = builtins.readFile ./agents/performance.md;
       quality = builtins.readFile ./agents/quality.md;
+      security = builtins.readFile ./agents/security.md;
       test = builtins.readFile ./agents/test.md;
+      refactor = builtins.readFile ./agents/refactor.md;
     };
 
     commands = {
