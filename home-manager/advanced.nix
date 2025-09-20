@@ -53,12 +53,6 @@ let
   advancedServices = import ./services/advanced.nix {
     inherit pkgs emacsPkg;
   };
-
-  # mcp servers
-  mcpServers = import ./mcp-servers {
-    inherit pkgs nodePkgs;
-    inherit config mcp-servers-nix;
-  };
 in
 {
   imports =
@@ -67,8 +61,7 @@ in
     ++ basicPrograms
     ++ advancedPrograms
     ++ basicServices
-    ++ advancedServices
-    ++ mcpServers;
+    ++ advancedServices;
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;

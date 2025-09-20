@@ -111,6 +111,8 @@
         programs = {
           context7.enable = true;
           playwright.enable = true;
+          terraform.enable = true;
+          nixos.enable = true;
           serena = {
             enable = true;
             args = [
