@@ -55,13 +55,7 @@ let
   };
 in
 {
-  imports =
-    misc
-    ++ modules
-    ++ basicPrograms
-    ++ advancedPrograms
-    ++ basicServices
-    ++ advancedServices;
+  imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
   home.stateVersion = "24.11";
   home.packages = basicPkgs ++ advancedPkgs;
