@@ -777,13 +777,13 @@ let
         sha512 = "IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==";
       };
     };
-    "ansi-escapes-7.1.0" = {
+    "ansi-escapes-7.1.1" = {
       name = "ansi-escapes";
       packageName = "ansi-escapes";
-      version = "7.1.0";
+      version = "7.1.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ansi-escapes/-/ansi-escapes-7.1.0.tgz";
-        sha512 = "YdhtCd19sKRKfAAUsrcC1wzm4JuzJoiX4pOJqIoW2qmKj5WzG/dL8uUJ0361zaXtHqK7gEhOwtAtz7t3Yq3X5g==";
+        url = "https://registry.npmjs.org/ansi-escapes/-/ansi-escapes-7.1.1.tgz";
+        sha512 = "Zhl0ErHcSRUaVfGUeUdDuLgpkEo8KIFjB4Y9uAc46ScOpdDiU1Dbyplh7qWJeJ/ZHpbyMSM26+X3BySgnIz40Q==";
       };
     };
     "ansi-regex-5.0.1" = {
@@ -4172,7 +4172,7 @@ in
           ];
         }
       )
-      sources."ansi-escapes-7.1.0"
+      sources."ansi-escapes-7.1.1"
       sources."ansi-regex-5.0.1"
       sources."ansi-styles-6.2.3"
       sources."atomically-2.0.3"
