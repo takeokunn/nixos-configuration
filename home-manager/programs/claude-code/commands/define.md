@@ -15,6 +15,7 @@ readonly_tools:
   - name: serena
     description: プロジェクト内のセマンティック検索や、LSP検索、ドキュメント化を行うMCP。効率的な調査を目的として必要に応じて利用
 ---
+
 # define - 要件定義専用コマンド
 
 ## 目的
