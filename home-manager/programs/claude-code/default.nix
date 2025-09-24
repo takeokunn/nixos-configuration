@@ -102,7 +102,7 @@
       bug = builtins.readFile ./commands/bug.md;
       define = builtins.readFile ./commands/define.md;
       execute = builtins.readFile ./commands/execute.md;
-      doc = builtins.readFile ./commands/doc.md;
+      markdown = builtins.readFile ./commands/markdown.md;
     };
 
     mcpServers =

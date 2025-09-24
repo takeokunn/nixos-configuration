@@ -1,3 +1,20 @@
+---
+argument-hint: [message]
+description: 要件定義専用コマンド
+readonly_tools:
+  - name: Read
+    description: ファイル内容確認
+  - name: Grep
+    description: パターン検索
+  - name: Glob
+    description: ファイル探索
+  - name: LS
+    description: ディレクトリ構造確認
+  - name: context7
+    description: フレームワーク・ライブラリの最新のドキュメントを提供するMCP（利用が可能な場合、率先して使う）
+  - name: serena
+    description: プロジェクト内のセマンティック検索や、LSP検索、ドキュメント化を行うMCP。効率的な調査を目的として必要に応じて利用
+---
 # define - 要件定義専用コマンド
 
 ## 目的
