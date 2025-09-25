@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.6.0" = {
+    "@google/gemini-cli-core-0.6.1" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.6.0";
+      version = "0.6.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.6.0.tgz";
-        sha512 = "PJ6VS0j/HS1Gs2OAphnKBhyy74e06x5e8pqDB4HGGWXa1v39uBmOLeim2rC085VpINHWNbfTp9/qeuL3HYbFNw==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.6.1.tgz";
+        sha512 = "/sMtuZs8Xj2yNe7bhDKOHxD9OCSjBMajTU5GFxmhyJo45sO7o2GydZOXsSIZna1oRQBuw0uHH/qys6S6DEQrTQ==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -2433,13 +2433,13 @@ let
         sha512 = "Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==";
       };
     };
-    "import-in-the-middle-1.14.2" = {
+    "import-in-the-middle-1.14.3" = {
       name = "import-in-the-middle";
       packageName = "import-in-the-middle";
-      version = "1.14.2";
+      version = "1.14.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-1.14.2.tgz";
-        sha512 = "5tCuY9BV8ujfOpwtAGgsTx9CGUapcFMEEyByLv1B+v2+6DhAcw+Zr0nhQT7uwaZ7DiourxFEscghOR8e1aPLQw==";
+        url = "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-1.14.3.tgz";
+        sha512 = "ajmxBgfBxVO9GWzD79xktBvMk2kTrqsXPKV0jg5pcwwcFpuLNSHwcPPvp4cgCQshlWz2ivgu5JiuRgDh+2ixGQ==";
       };
     };
     "indent-string-5.0.0" = {
@@ -2451,13 +2451,13 @@ let
         sha512 = "m6FAo/spmsW2Ab2fU35JTYwtOKa2yAwXSwgjSv1TJzh4Mh7mC3lzAOVLBprb72XsTrgkEIsl7YrFNAiDiRhIGg==";
       };
     };
-    "index-to-position-1.1.0" = {
+    "index-to-position-1.2.0" = {
       name = "index-to-position";
       packageName = "index-to-position";
-      version = "1.1.0";
+      version = "1.2.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/index-to-position/-/index-to-position-1.1.0.tgz";
-        sha512 = "XPdx9Dq4t9Qk1mTMbWONJqU7boCoumEH7fRET37HX5+khDUl3J2W6PdALxhILYlIYx2amlwYcRPp28p0tSiojg==";
+        url = "https://registry.npmjs.org/index-to-position/-/index-to-position-1.2.0.tgz";
+        sha512 = "Yg7+ztRkqslMAS2iFaU+Oa4KTSidr63OsFGlOrJoW981kIYO3CGCS3wA95P1mUi/IVSJkn0D479KTJpVpvFNuw==";
       };
     };
     "inherits-2.0.4" = {
@@ -4514,10 +4514,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.123";
+    version = "1.0.124";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.123.tgz";
-      sha512 = "egniOpnrjpm8pA2ygj9aDw+rZ0jKJdso94CvKlKzdVcLdw0r0FSMvgxWRGGxjHuqcl6BP6yhHGSKlZ6qzd14OA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.124.tgz";
+      sha512 = "qQVOGc9ScDEGjD8u6ur2g56EI6kI5E8JHtwzUKYzytpoCRrb5r7BcqbzdTWExttla/oTk6OUmItxqZ1Y4kpz3Q==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4550,10 +4550,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.6.0";
+    version = "0.6.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.6.0.tgz";
-      sha512 = "G6M1+fA0rvviujYu0CIfSirLRi1T7axlrkXXOgyvTM45miJpVeygjS3TiJ10MQmVbsaO+GBvg8gSXYj9SEFEbQ==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.6.1.tgz";
+      sha512 = "My89PFAmkbcBxPdWQ2ysiq9oFc0vPr1PCCCZhJnZr7CdQSN6+GFo9nyW093rPWQqRoFdjqk+3O/U5k1JJyk+VQ==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.0"
@@ -4582,7 +4582,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.6.0"
+      sources."@google/gemini-cli-core-0.6.1"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -4984,9 +4984,9 @@ in
       sources."human-signals-8.0.1"
       sources."iconv-lite-0.6.3"
       sources."ignore-7.0.5"
-      sources."import-in-the-middle-1.14.2"
+      sources."import-in-the-middle-1.14.3"
       sources."indent-string-5.0.0"
-      sources."index-to-position-1.1.0"
+      sources."index-to-position-1.2.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
       sources."ink-6.3.1"
