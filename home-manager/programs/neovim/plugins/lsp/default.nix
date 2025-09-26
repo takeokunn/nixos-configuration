@@ -44,6 +44,12 @@ with pkgs.vimPlugins;
             ['nil'] = {
               formatting = {
                 command = { 'nixfmt' }
+              },
+              nix = {
+                flake = {
+                  autoEvalInputs = true,
+                  nixpkgsInputName = "nixpkgs"
+                }
               }
             }
           }

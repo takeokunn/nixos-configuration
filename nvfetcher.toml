@@ -269,3 +269,8 @@ fetch.github = "lambdalisue/vim-fern-renderer-nerdfont"
 src.git = "https://github.com/lambdalisue/vim-gin"
 src.branch = "main"
 fetch.github = "lambdalisue/vim-gin"
+
+[nvim-aibo]
+src.git = "https://github.com/lambdalisue/nvim-aibo"
+src.branch = "main"
+fetch.github = "lambdalisue/nvim-aibo"

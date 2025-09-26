@@ -26,7 +26,8 @@ with pkgs.vimPlugins;
     type = "lua";
     plugin = plugins.vim-fern;
     config = ''
-      vim.keymap.set('n', '<leader>e', '<cmd>Fern . -drawer<cr>')
+      vim.g["fern#drawer_width"] = 50
+      vim.keymap.set('n', '<leader>e', '<cmd>Fern . -right -drawer<cr>')
     '';
   }
   {
@@ -82,4 +83,6 @@ with pkgs.vimPlugins;
 
   # dashboard
   dashboard-nvim
+
+  plugins.nvim-aibo
 ]

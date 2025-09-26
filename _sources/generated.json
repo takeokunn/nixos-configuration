@@ -860,6 +860,27 @@
     },
     "version": "7b65bd228429e852c8fdfa07601159130a818cfa"
   },
+  "nvim-aibo": {
+    "cargoLocks": null,
+    "date": "2025-09-25",
+    "extract": null,
+    "name": "nvim-aibo",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "lambdalisue",
+      "repo": "nvim-aibo",
+      "rev": "4f221fece6ec34c764ece7fde68c0f719db0bbdc",
+      "sha256": "sha256-zXY19q1W0fQELVVDjGZxWD7GbsIGuTDAFyK3FrkVxH8=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "4f221fece6ec34c764ece7fde68c0f719db0bbdc"
+  },
   "sublime-gleam": {
     "cargoLocks": null,
     "date": "2020-10-25",

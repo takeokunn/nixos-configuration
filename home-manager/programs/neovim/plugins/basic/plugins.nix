@@ -20,4 +20,9 @@
     version = sources.vim-fern-renderer-nerdfont.date;
     src = sources.vim-fern-renderer-nerdfont.src;
   };
+  nvim-aibo = vimUtils.buildVimPlugin {
+    pname = sources.nvim-aibo.pname;
+    version = sources.nvim-aibo.date;
+    src = sources.nvim-aibo.src;
+  };
 }

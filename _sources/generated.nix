@@ -496,6 +496,18 @@
     };
     date = "2021-11-29";
   };
+  nvim-aibo = {
+    pname = "nvim-aibo";
+    version = "4f221fece6ec34c764ece7fde68c0f719db0bbdc";
+    src = fetchFromGitHub {
+      owner = "lambdalisue";
+      repo = "nvim-aibo";
+      rev = "4f221fece6ec34c764ece7fde68c0f719db0bbdc";
+      fetchSubmodules = false;
+      sha256 = "sha256-zXY19q1W0fQELVVDjGZxWD7GbsIGuTDAFyK3FrkVxH8=";
+    };
+    date = "2025-09-25";
+  };
   sublime-gleam = {
     pname = "sublime-gleam";
     version = "ff9638511e05b0aca236d63071c621977cffce38";
