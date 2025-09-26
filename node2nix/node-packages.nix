@@ -228,13 +228,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.18.1" = {
+    "@modelcontextprotocol/sdk-1.18.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.18.1";
+      version = "1.18.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.18.1.tgz";
-        sha512 = "d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.18.2.tgz";
+        sha512 = "beedclIvFcCnPrYgHsylqiYJVJ/CI47Vyc4tY8no1/Li/O8U4BTlJfy6ZwxkYwx+Mx10nrgwSVrA7VBbhh4slg==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -2433,13 +2433,13 @@ let
         sha512 = "Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==";
       };
     };
-    "import-in-the-middle-1.14.3" = {
+    "import-in-the-middle-1.14.4" = {
       name = "import-in-the-middle";
       packageName = "import-in-the-middle";
-      version = "1.14.3";
+      version = "1.14.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-1.14.3.tgz";
-        sha512 = "ajmxBgfBxVO9GWzD79xktBvMk2kTrqsXPKV0jg5pcwwcFpuLNSHwcPPvp4cgCQshlWz2ivgu5JiuRgDh+2ixGQ==";
+        url = "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-1.14.4.tgz";
+        sha512 = "eWjxh735SJLFJJDs5X82JQ2405OdJeAHDBnaoFCfdr5GVc7AWc9xU7KbrF+3Xd5F2ccP1aQFKtY+65X6EfKZ7A==";
       };
     };
     "indent-string-5.0.0" = {
@@ -4491,10 +4491,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.375.0";
+    version = "1.376.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.375.0.tgz";
-      sha512 = "LbQL4l4V8qvgWNtyrTB0pkOxBvsTp9tfmEeX/RpeFQdMCNfZaxeFiy4lEA60zvFOqnLAVBdAeT4vyOXFuz8/gg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.376.0.tgz";
+      sha512 = "E2s91bbaEt9u/Sf9liKzvCEM4Wz6R7cmyizVBBjOljMyTe3D+jJ7hPKkaWHV9YB4fxFXfYkuINFtwxHNtnszzA==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4514,10 +4514,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.124";
+    version = "1.0.126";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.124.tgz";
-      sha512 = "qQVOGc9ScDEGjD8u6ur2g56EI6kI5E8JHtwzUKYzytpoCRrb5r7BcqbzdTWExttla/oTk6OUmItxqZ1Y4kpz3Q==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.126.tgz";
+      sha512 = "DvzpL0LLB5nXRgJi4h+peDVys8sjfy5/QJMiketpqUd9SebTE673KnZ28lwEY4s944t/ywA80oNaJLXHMbqfcQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4532,10 +4532,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "17.0.2";
+    version = "17.0.3";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.0.2.tgz";
-      sha512 = "t8W/L8bjOvH0BtnPusATWGmMrrWVqQ3Yp5Jb+zqws9FbL3nxAeScPDH43BVaXbKIK98fJSFmKapRJnnfTSR4Rg==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.0.3.tgz";
+      sha512 = "pXqyZ9vbYX9ed7eKNcyTnhwOPFM6Cb6bkwbRBibDKOvpJwqIXkZq2rQ4kPEjumJ4AWn4RXZ2GMpANMqZSkYRTA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4609,7 +4609,7 @@ in
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
       (
-        sources."@modelcontextprotocol/sdk-1.18.1"
+        sources."@modelcontextprotocol/sdk-1.18.2"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4984,7 +4984,7 @@ in
       sources."human-signals-8.0.1"
       sources."iconv-lite-0.6.3"
       sources."ignore-7.0.5"
-      sources."import-in-the-middle-1.14.3"
+      sources."import-in-the-middle-1.14.4"
       sources."indent-string-5.0.0"
       sources."index-to-position-1.2.0"
       sources."inherits-2.0.4"
