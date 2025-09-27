@@ -14,5 +14,9 @@
     interactiveShellInit = ''
       set -x MANPAGER "nvim -c ASMANPAGER -"
     '';
+
+    shellAliases = {
+      aibo = "nvim -c 'Aibo claude --dangerously-skip-permissions'";
+    };
   };
 }
