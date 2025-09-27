@@ -777,13 +777,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.1.13" = {
+    "@types/react-19.1.14" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.1.13";
+      version = "19.1.14";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.1.13.tgz";
-        sha512 = "hHkbU/eoO3EG5/MZkuFSKmYqPbSVk5byPFa3e7y/8TybHiLMACgI8seVYlicwk7H5K/rI2px9xrQp/C+AUDTiQ==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.1.14.tgz";
+        sha512 = "ukd93VGzaNPMAUPy0gRDSC57UuQbnH9Kussp7HBjM06YFi9uZTFhOvMSO2OKqXm1rSgzOE+pVx1k1PYHGwlc8Q==";
       };
     };
     "@types/request-2.48.13" = {
@@ -4491,10 +4491,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.376.0";
+    version = "1.377.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.376.0.tgz";
-      sha512 = "E2s91bbaEt9u/Sf9liKzvCEM4Wz6R7cmyizVBBjOljMyTe3D+jJ7hPKkaWHV9YB4fxFXfYkuINFtwxHNtnszzA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.377.0.tgz";
+      sha512 = "uvLACipYTIFI+55FK9NeiQ9eVsxbjcewSm9ttCpalZkOi9t3aa/3peJi+XHh2BLV/r1rPzARC4aRb/escbvxcw==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4514,10 +4514,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "1.0.126";
+    version = "1.0.127";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.126.tgz";
-      sha512 = "DvzpL0LLB5nXRgJi4h+peDVys8sjfy5/QJMiketpqUd9SebTE673KnZ28lwEY4s944t/ywA80oNaJLXHMbqfcQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-1.0.127.tgz";
+      sha512 = "5L0nzdNjH4jAj/sw7pP/J48/XwJ8sYFUvbkeStm+1lOyJOkAtWVBErdfju0D4j4zKUQfFrZewt4m/Hagd6W1Pw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4684,7 +4684,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.5.2"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.1.13"
+      sources."@types/react-19.1.14"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
