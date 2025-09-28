@@ -498,15 +498,15 @@
   };
   nvim-aibo = {
     pname = "nvim-aibo";
-    version = "4f221fece6ec34c764ece7fde68c0f719db0bbdc";
+    version = "71f992e8a8b9903090a4f75ad10b15b5d9b10a88";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "nvim-aibo";
-      rev = "4f221fece6ec34c764ece7fde68c0f719db0bbdc";
+      rev = "71f992e8a8b9903090a4f75ad10b15b5d9b10a88";
       fetchSubmodules = false;
-      sha256 = "sha256-zXY19q1W0fQELVVDjGZxWD7GbsIGuTDAFyK3FrkVxH8=";
+      sha256 = "sha256-AUo1c8gEQRuTDGtlXwbxhIqyDni/Yp0DU/jhgH0A8XE=";
     };
-    date = "2025-09-25";
+    date = "2025-09-28";
   };
   sublime-gleam = {
     pname = "sublime-gleam";
@@ -618,15 +618,15 @@
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
-    version = "fff5e390d3f39d715b70fc6062802e0bed47dc6e";
+    version = "8fa36fc8065d600706d5edeeb1008a5233eb1d51";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "fff5e390d3f39d715b70fc6062802e0bed47dc6e";
+      rev = "8fa36fc8065d600706d5edeeb1008a5233eb1d51";
       fetchSubmodules = false;
-      sha256 = "sha256-n5hR4acqKTy5Ipx3FoWNtL3zQJ8FCz8cUhW4srKVrWU=";
+      sha256 = "sha256-WC5dBRQstelX5o9oz7Lc23hTbZkYYpiEd+1Qs1sjRYY=";
     };
-    date = "2025-09-24";
+    date = "2025-09-27";
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";
