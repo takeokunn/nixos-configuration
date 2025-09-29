@@ -28,8 +28,8 @@
     dontInstallDoc = true;
     doCheck = false;
     # vimPluginGenTagsフックを完全に無効化
-    nativeBuildInputs = [];
-    buildInputs = [];
+    nativeBuildInputs = [ ];
+    buildInputs = [ ];
     # fixupPhaseを完全にオーバーライド
     fixupPhase = ''
       # ヘルプタグ生成をスキップし、何もしない

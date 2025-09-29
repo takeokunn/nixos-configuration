@@ -271,6 +271,5 @@ src.branch = "main"
 fetch.github = "lambdalisue/vim-gin"
 
 [nvim-aibo]
-src.git = "https://github.com/lambdalisue/nvim-aibo"
-src.branch = "main"
+src.github_tag = "lambdalisue/nvim-aibo"
 fetch.github = "lambdalisue/nvim-aibo"
