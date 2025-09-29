@@ -22,7 +22,10 @@
   };
   nvim-aibo = vimUtils.buildVimPlugin {
     pname = sources.nvim-aibo.pname;
-    version = sources.nvim-aibo.date;
+    version = sources.nvim-aibo.version;
     src = sources.nvim-aibo.src;
+    # ヘルプタグ生成エラーを回避
+    dontInstallDoc = true;
+    doCheck = false;
   };
 }
