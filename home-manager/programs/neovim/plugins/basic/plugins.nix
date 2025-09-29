@@ -27,10 +27,13 @@
     # ヘルプタグ生成エラーを回避
     dontInstallDoc = true;
     doCheck = false;
-    # vimPluginGenTagsフックを無効化
+    # vimPluginGenTagsフックを完全に無効化
     nativeBuildInputs = [];
-    postFixup = ''
-      # ヘルプタグ生成をスキップ
+    buildInputs = [];
+    # fixupPhaseを完全にオーバーライド
+    fixupPhase = ''
+      # ヘルプタグ生成をスキップし、何もしない
+      echo "Skipping help tag generation for nvim-aibo"
     '';
   };
 }
