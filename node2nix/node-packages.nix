@@ -777,13 +777,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.1.14" = {
+    "@types/react-19.1.15" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.1.14";
+      version = "19.1.15";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.1.14.tgz";
-        sha512 = "ukd93VGzaNPMAUPy0gRDSC57UuQbnH9Kussp7HBjM06YFi9uZTFhOvMSO2OKqXm1rSgzOE+pVx1k1PYHGwlc8Q==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.1.15.tgz";
+        sha512 = "+kLxJpaJzXybyDyFXYADyP1cznTO8HSuBpenGlnKOAkH4hyNINiywvXS/tGJhsrGGP/gM185RA3xpjY0Yg4erA==";
       };
     };
     "@types/request-2.48.13" = {
@@ -1317,13 +1317,13 @@ let
         sha512 = "LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==";
       };
     };
-    "comment-json-4.2.5" = {
+    "comment-json-4.3.0" = {
       name = "comment-json";
       packageName = "comment-json";
-      version = "4.2.5";
+      version = "4.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.2.5.tgz";
-        sha512 = "bKw/r35jR3HGt5PEPm1ljsQQGyCrR8sFGNiN5L+ykDHdpO8Smxkrkla9Yi6NkQyUrb8V54PGhfMs6NrIwtxtdw==";
+        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.3.0.tgz";
+        sha512 = "DczdmbvWLd09KATFWY0xcihOO45b32+5V34vZg1oelxqgjtGJotaLrrdFpJRLOdG6Wb031qcg4zOKgnQoBWbEw==";
       };
     };
     "config-chain-1.1.13" = {
@@ -2260,15 +2260,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz";
         sha512 = "EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==";
-      };
-    };
-    "has-own-prop-2.0.0" = {
-      name = "has-own-prop";
-      packageName = "has-own-prop";
-      version = "2.0.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/has-own-prop/-/has-own-prop-2.0.0.tgz";
-        sha512 = "Pq0h+hvsVm6dDEa8x82GnLSYHOzNDt7f0ddFa3FqcQlgzEiptPqL+XrOJNavjOzSYiYWIrgeVYYgGlLmnxwilQ==";
       };
     };
     "has-symbols-1.1.0" = {
@@ -3540,15 +3531,6 @@ let
         sha512 = "+crtS5QjFRqFCoQmvGduwYWEBng99ZvmFvF+cUJkGYF1L1BfU8C6Zp9T7f5vPAwyLkUExpvK+ANVZmGU49qi4Q==";
       };
     };
-    "repeat-string-1.6.1" = {
-      name = "repeat-string";
-      packageName = "repeat-string";
-      version = "1.6.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/repeat-string/-/repeat-string-1.6.1.tgz";
-        sha512 = "PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==";
-      };
-    };
     "require-directory-2.1.1" = {
       name = "require-directory";
       packageName = "require-directory";
@@ -4684,7 +4666,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.5.2"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.1.14"
+      sources."@types/react-19.1.15"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
@@ -4787,7 +4769,7 @@ in
       sources."color-name-1.1.4"
       sources."combined-stream-1.0.8"
       sources."command-exists-1.2.9"
-      sources."comment-json-4.2.5"
+      sources."comment-json-4.3.0"
       sources."config-chain-1.1.13"
       sources."configstore-7.1.0"
       sources."content-disposition-1.0.0"
@@ -4953,7 +4935,6 @@ in
       )
       sources."gtoken-7.1.0"
       sources."has-flag-4.0.0"
-      sources."has-own-prop-2.0.0"
       sources."has-symbols-1.1.0"
       sources."has-tostringtag-1.0.2"
       sources."hasown-2.0.2"
@@ -5127,7 +5108,6 @@ in
       sources."readable-stream-3.6.2"
       sources."registry-auth-token-5.1.0"
       sources."registry-url-6.0.1"
-      sources."repeat-string-1.6.1"
       sources."require-directory-2.1.1"
       sources."require-from-string-2.0.2"
       sources."require-in-the-middle-7.5.2"

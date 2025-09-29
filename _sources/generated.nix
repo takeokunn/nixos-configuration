@@ -498,13 +498,13 @@
   };
   nvim-aibo = {
     pname = "nvim-aibo";
-    version = "v0.5.0";
+    version = "v0.5.1";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "nvim-aibo";
-      rev = "v0.5.0";
+      rev = "v0.5.1";
       fetchSubmodules = false;
-      sha256 = "sha256-AUo1c8gEQRuTDGtlXwbxhIqyDni/Yp0DU/jhgH0A8XE=";
+      sha256 = "sha256-8JxaQE2auGDiAlsrkcjPi00L7XiFcTYX7PmyQzK65cQ=";
     };
   };
   sublime-gleam = {
