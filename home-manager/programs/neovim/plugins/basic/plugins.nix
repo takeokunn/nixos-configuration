@@ -27,5 +27,10 @@
     # ヘルプタグ生成エラーを回避
     dontInstallDoc = true;
     doCheck = false;
+    # vimPluginGenTagsフックを無効化
+    nativeBuildInputs = [];
+    postFixup = ''
+      # ヘルプタグ生成をスキップ
+    '';
   };
 }
