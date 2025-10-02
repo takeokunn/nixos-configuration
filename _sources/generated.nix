@@ -498,13 +498,13 @@
   };
   nvim-aibo = {
     pname = "nvim-aibo";
-    version = "v0.5.3";
+    version = "v0.6.1";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "nvim-aibo";
-      rev = "v0.5.3";
+      rev = "v0.6.1";
       fetchSubmodules = false;
-      sha256 = "sha256-HeYd9zKV1f+4ymrckOFsBC3RA+tqmQN8aNX+EkSCqHg=";
+      sha256 = "sha256-Zj6eJcNXVWFm5EWZb+VHdUmwkbgQD71i3GK8mUxW3Nc=";
     };
   };
   sublime-gleam = {
@@ -581,15 +581,15 @@
   };
   vim-gin = {
     pname = "vim-gin";
-    version = "f0305adce1d2daadc53be872a60ceef39a270d28";
+    version = "a75dfa25134b438a120a66940be3d9b90c49bb81";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-gin";
-      rev = "f0305adce1d2daadc53be872a60ceef39a270d28";
+      rev = "a75dfa25134b438a120a66940be3d9b90c49bb81";
       fetchSubmodules = false;
-      sha256 = "sha256-4CqqTHoQXCQVzaNgh3tFjRjoNMew6OdyeJMbLYyhCdM=";
+      sha256 = "sha256-4964mNGLIhmWbmvAmIv59IO71g/7E7dMQKsudSM6wGE=";
     };
-    date = "2025-09-24";
+    date = "2025-10-01";
   };
   vim-neco = {
     pname = "vim-neco";

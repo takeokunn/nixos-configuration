@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.6.1" = {
+    "@google/gemini-cli-core-0.7.0" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.6.1";
+      version = "0.7.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.6.1.tgz";
-        sha512 = "/sMtuZs8Xj2yNe7bhDKOHxD9OCSjBMajTU5GFxmhyJo45sO7o2GydZOXsSIZna1oRQBuw0uHH/qys6S6DEQrTQ==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.7.0.tgz";
+        sha512 = "x2hxjrRsNCCsOfDywcYBnQD0qCWC31/NXTUkdMdwjvkDLQkQ0H27A0sSQR/lkuYeBzKdNRmyNBjmsiX+isyYUA==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -759,13 +759,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.6.1" = {
+    "@types/node-24.6.2" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.6.1";
+      version = "24.6.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.6.1.tgz";
-        sha512 = "ljvjjs3DNXummeIaooB4cLBKg2U6SPI6Hjra/9rRIy7CpM0HpLtG9HptkMKAb4HYWy5S7HUvJEuWgr/y0U8SHw==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.6.2.tgz";
+        sha512 = "d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -777,13 +777,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.1.16" = {
+    "@types/react-19.2.0" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.1.16";
+      version = "19.2.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.1.16.tgz";
-        sha512 = "WBM/nDbEZmDUORKnh5i1bTnAz6vTohUf9b8esSMu+b24+srbaxa04UbJgWx78CVfNXA20sNu0odEIluZDFdCog==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.2.0.tgz";
+        sha512 = "1LOH8xovvsKsCBq1wnT4ntDUdCJKmnEakhsuoUSy6ExlHCkGP2hqnatagYTgFk6oeL0VU31u7SNjunPN+GchtA==";
       };
     };
     "@types/request-2.48.13" = {
@@ -3477,13 +3477,13 @@ let
         sha512 = "y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==";
       };
     };
-    "react-19.1.1" = {
+    "react-19.2.0" = {
       name = "react";
       packageName = "react";
-      version = "19.1.1";
+      version = "19.2.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react/-/react-19.1.1.tgz";
-        sha512 = "w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==";
+        url = "https://registry.npmjs.org/react/-/react-19.2.0.tgz";
+        sha512 = "tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==";
       };
     };
     "react-devtools-core-6.1.5" = {
@@ -4541,10 +4541,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "17.1.0";
+    version = "17.1.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.0.tgz";
-      sha512 = "Ti/1hcE5lEs6vgLKOEl/rBuvLGbPIZL9eiWLjU8o6MoAKBNUQtA+Aw4CtNtzfjC3RHcZpmeHnM6Q5xwJ/XSq4A==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.1.tgz";
+      sha512 = "r3XzWc62rp5/ueIiWv1TUG7NqrSrSZYNdMtGBqHqe+50QqVkqik/tdGEx+tmiBBBHY0/0bU0qaWCVwtgjVfXXw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4559,10 +4559,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.6.1";
+    version = "0.7.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.6.1.tgz";
-      sha512 = "My89PFAmkbcBxPdWQ2ysiq9oFc0vPr1PCCCZhJnZr7CdQSN6+GFo9nyW093rPWQqRoFdjqk+3O/U5k1JJyk+VQ==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.7.0.tgz";
+      sha512 = "SFj6kkM19aTrMpMADGNzLkNvAu2SaU8vzOmvOHW/HH3gQGWG43M69jrcUztTpGmOMgt3JwHouzsr7Z68iU2pjw==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.0"
@@ -4591,7 +4591,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.6.1"
+      sources."@google/gemini-cli-core-0.7.0"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -4691,9 +4691,9 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.6.1"
+      sources."@types/node-24.6.2"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.1.16"
+      sources."@types/react-19.2.0"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
@@ -5121,7 +5121,7 @@ in
           ];
         }
       )
-      sources."react-19.1.1"
+      sources."react-19.2.0"
       (
         sources."react-devtools-core-6.1.5"
         // {
