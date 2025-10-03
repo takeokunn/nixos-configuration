@@ -228,13 +228,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.18.2" = {
+    "@modelcontextprotocol/sdk-1.19.1" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.18.2";
+      version = "1.19.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.18.2.tgz";
-        sha512 = "beedclIvFcCnPrYgHsylqiYJVJ/CI47Vyc4tY8no1/Li/O8U4BTlJfy6ZwxkYwx+Mx10nrgwSVrA7VBbhh4slg==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.19.1.tgz";
+        sha512 = "3Y2h3MZKjec1eAqSTBclATlX+AbC6n1LgfVzRMJLt3v6w0RCYgwLrjbxPDbhsYHt6Wdqc/aCceNJYgj448ELQQ==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -1335,13 +1335,13 @@ let
         sha512 = "LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==";
       };
     };
-    "comment-json-4.3.0" = {
+    "comment-json-4.4.1" = {
       name = "comment-json";
       packageName = "comment-json";
-      version = "4.3.0";
+      version = "4.4.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.3.0.tgz";
-        sha512 = "DczdmbvWLd09KATFWY0xcihOO45b32+5V34vZg1oelxqgjtGJotaLrrdFpJRLOdG6Wb031qcg4zOKgnQoBWbEw==";
+        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.4.1.tgz";
+        sha512 = "r1To31BQD5060QdkC+Iheai7gHwoSZobzunqkf2/kQ6xIAfJyrKNAFUwdKvkK7Qgu7pVTKQEa7ok7Ed3ycAJgg==";
       };
     };
     "config-chain-1.1.13" = {
@@ -4523,10 +4523,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.1";
+    version = "2.0.5";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.1.tgz";
-      sha512 = "2SboYcdJ+dsE2K784dbJ4ohVWlAkLZhU7mZG1lebyG6TvGLXLhjc2qTEfCxSeelCjJHhIh/YkNpe06veB4IgBw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.5.tgz";
+      sha512 = "A7Nnbxf4yvfgnzIbML+IYYkyz4Wmg7McHpqi0pzDmyoz3TUQI1KJc798mlQ0bY7ZeLdrzA0IRCv7yR6bwTa3fA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4618,7 +4618,7 @@ in
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
       (
-        sources."@modelcontextprotocol/sdk-1.18.2"
+        sources."@modelcontextprotocol/sdk-1.19.1"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4798,7 +4798,7 @@ in
       sources."color-name-1.1.4"
       sources."combined-stream-1.0.8"
       sources."command-exists-1.2.9"
-      sources."comment-json-4.3.0"
+      sources."comment-json-4.4.1"
       sources."config-chain-1.1.13"
       sources."configstore-7.1.0"
       sources."content-disposition-1.0.0"
