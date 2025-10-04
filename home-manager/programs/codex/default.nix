@@ -4,6 +4,8 @@
   nodePkgs,
 }:
 let
+  tomlFormat = pkgs.formats.toml { };
+
   config = mcp-servers-nix.lib.mkConfig pkgs {
     flavor = "codex";
     format = "toml-inline";
@@ -24,6 +26,25 @@ let
       };
     };
   };
+  settings = {
+    model = "gpt-5-codex";
+    model_reasoning_summary = "auto";
+    network_access = true;
+    approval_policy = "never";
+    sandbox_mode = "danger-full-access";
+    trust_level = "trusted";
+    notify = [
+      "terminal-notifier"
+      "-message"
+      "\"対応完了しました\""
+      "-title"
+      "\"Codex\""
+      "-sound"
+      "Blow"
+    ];
+    model_reasoning_effort = "high";
+    tools.web_search = true;
+  };
 in
 {
   programs.codex = {
@@ -37,32 +58,14 @@ in
       '';
     };
     custom-instructions = builtins.readFile ./AGENTS.md;
-    settings = {
-      model = "gpt-5-codex";
-      model_reasoning_summary = "auto";
-      network_access = true;
-      approval_policy = "never";
-      sandbox_mode = "danger-full-access";
-      trust_level = "trusted";
-      notify = [
-        "terminal-notifier"
-        "-message"
-        "\"対応完了しました\""
-        "-title"
-        "\"Codex\""
-        "-sound"
-        "Blow"
-      ];
-      model_reasoning_effort = "high";
-      tools.web_search = true;
-    };
   };
 
   home.file = {
-    ".codex/prompts/ask.md".source = ./prompts/ask.md;
-    ".codex/prompts/bug.md".source = ./prompts/bug.md;
-    ".codex/prompts/define.md".source = ./prompts/define.md;
-    ".codex/prompts/execute.md".source = ./prompts/execute.md;
-    ".codex/prompts/markdown.md".source = ./prompts/markdown.md;
+    ".codex/config.toml".source = tomlFormat.generate "codex-config" settings;
+    # ".codex/prompts/ask.md".source = ./prompts/ask.md;
+    # ".codex/prompts/bug.md".source = ./prompts/bug.md;
+    # ".codex/prompts/define.md".source = ./prompts/define.md;
+    # ".codex/prompts/execute.md".source = ./prompts/execute.md;
+    # ".codex/prompts/markdown.md".source = ./prompts/markdown.md;
   };
 }
