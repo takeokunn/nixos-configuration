@@ -57,4 +57,12 @@ in
       tools.web_search = true;
     };
   };
+
+  home.file = {
+    ".codex/prompts/ask.md".source = ./prompts/ask.md;
+    ".codex/prompts/bug.md".source = ./prompts/bug.md;
+    ".codex/prompts/define.md".source = ./prompts/define.md;
+    ".codex/prompts/execute.md".source = ./prompts/execute.md;
+    ".codex/prompts/markdown.md".source = ./prompts/markdown.md;
+  };
 }
