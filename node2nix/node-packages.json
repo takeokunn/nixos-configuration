@@ -2,5 +2,6 @@
   "@github/copilot-language-server",
   "@anthropic-ai/claude-code",
   "ccusage",
-  "@google/gemini-cli"
+  "@google/gemini-cli",
+  "@openai/codex"
 ]
