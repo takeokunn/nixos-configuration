@@ -1263,93 +1263,18 @@ $0
 |${2:column 1} | ${3: column 2} |
 |--------------+----------------|
 #+end_src
-*** task-response
+*** task
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-response") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-
-  # name: task-response
-  # key: task-response
+  # name: task
+  # key: task
   # --
 
-  - slack: xxx
+  - url: xxx
 
   ,*** TODO 要件を確認する
-  ,*** TODO 返事をする
-#+end_src
-*** task-develop
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-develop") :mkdirp yes :noweb yes
-  # -*- mode: snippet -*-
-  # name: task-develop
-  # key: task-develop
-  # --
-
-  - ticket: xxx
-  - github: xxx
-  - slack: xxx
-
-  ,*** TODO 要件を確認する
-  ,*** TODO 修正する
-  ,*** TODO pull requestを出す[0/2]
-  ,**** TODO descriptionを埋める
-  ,**** TODO QA項目を埋める
-  ,*** TODO reviewを通す
-  ,*** TODO QAを通してmergeする
-  ,*** TODO redmineに記述する
-#+end_src
-*** task-document
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-document") :mkdirp yes :noweb yes
-  # -*- mode: snippet -*-
-  # name: task-document
-  # key: task-document
-  # --
-
-  - ticket: xxx
-  - github: xxx
-  - slack: xxx
-
-  ,*** TODO wikiを作成する
-  ,*** TODO アウトラインを書く
-  ,*** TODO 詳細を書く
-  ,*** TODO 共有する
-#+end_src
-*** task-ope
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-ope") :mkdirp yes :noweb yes
-  # -*- mode: snippet -*-
-  # name: task-ope
-  # key: task-ope
-  # --
-
-  - acc: xxx
-  - ticket: xxx
-  - slack: xxx
-
-  ,*** TODO 状況を把握する
-  ,*** TODO redmineに記述する
-#+end_src
-*** task-review
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-review") :mkdirp yes :noweb yes
-  # -*- mode: snippet -*-
-  # name: task-review
-  # key: task-review
-  # --
-
-  - github: xxx
-
-  ,*** TODO レビューする
-  ,*** TODO コメントをする
-#+end_src
-*** task-blog
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/task-blog") :mkdirp yes :noweb yes
-  # -*- mode: snippet -*-
-  # name: task-blog
-  # key: task-blog
-  # --
-
-  - blog:
-
-  ,*** TODO org-roamでファイルを作る
-  ,*** TODO アウトラインを書く
-  ,*** TODO 文章を書く
-  ,*** TODO 公開する
+  ,*** TODO 対応する
+  ,*** TODO 報告する
 #+end_src
 *** translate
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/translate") :mkdirp yes :noweb yes
