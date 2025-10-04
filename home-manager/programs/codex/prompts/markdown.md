@@ -7,7 +7,7 @@ AIが生成した文章をmarkdownファイルとして作成・更新するス�
 ### 基本構文
 
 ```bash
-/markdown [ファイルパス] [オプション]
+/markdown
 ```
 
 **実行例**
@@ -15,20 +15,7 @@ AIが生成した文章をmarkdownファイルとして作成・更新するス�
 ```bash
 # 自動判定でファイル出力
 /markdown
-
-# 指定ファイルに出力
-/markdown ./docs/api-spec.md
-
-# 強制更新・新規作成
-/markdown ./docs/readme.md --update
-/markdown ./docs/feature.md --create
 ```
-
-**パラメータ**
-
-- `ファイルパス`: 出力先（省略時は自動生成）
-- `--update`: 既存ファイル強制更新
-- `--create`: 新規ファイル強制作成
 
 ### ファイル判定ロジック
 
@@ -42,29 +29,6 @@ AIが生成した文章をmarkdownファイルとして作成・更新するス�
 - **新規**: 類似度30%未満 OR 独立テーマ OR `--create`指定
 
 ## 技術仕様
-
-### 処理フロー
-
-```mermaid
-flowchart TD
-    A[/markdown実行] --> B{パス指定?}
-    B -->|Yes| C[指定パス]
-    B -->|No| D[自動生成]
-    C --> E[ファイル確認]
-    D --> E
-    E --> F{存在?}
-    F -->|No| G[Write tool]
-    F -->|Yes| H[類似度分析]
-    H --> I{70%以上?}
-    I -->|Yes| J[Edit tool]
-    I -->|No| G
-    G --> K[完了]
-    J --> K
-
-    style A fill:#e1f5fe
-    style G fill:#c8e6c9
-    style J fill:#fff3e0
-```
 
 ### 実装詳細
 
@@ -97,9 +61,3 @@ flowchart TD
 - 修正履歴・変更ログ
 - 検討過程・議論経緯
 - 変更理由・過去バージョン比較
-
-## Claude Code統合
-
-- スラッシュコマンドとして環境統合
-- 対話型・バッチ実行両対応
-- 既存ファイル操作toolとの連携
