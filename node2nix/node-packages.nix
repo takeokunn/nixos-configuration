@@ -759,13 +759,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.6.2" = {
+    "@types/node-24.7.0" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.6.2";
+      version = "24.7.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.6.2.tgz";
-        sha512 = "d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.7.0.tgz";
+        sha512 = "IbKooQVqUBrlzWTi79E8Fw78l8k1RNtlDDNWsFZs7XonuQSJ8oNYfEeclhprUldXISRMLzBpILuKgPlIxm+/Yw==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -4125,13 +4125,13 @@ let
         sha512 = "QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==";
       };
     };
-    "undici-types-7.13.0" = {
+    "undici-types-7.14.0" = {
       name = "undici-types";
       packageName = "undici-types";
-      version = "7.13.0";
+      version = "7.14.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici-types/-/undici-types-7.13.0.tgz";
-        sha512 = "Ov2Rr9Sx+fRgagJ5AX0qvItZG/JKKoBRAVITs1zk7IqZGTJUwgUr7qoYBpWwakpWilTZFM98rG/AFRocu10iIQ==";
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-7.14.0.tgz";
+        sha512 = "QQiYxHuyZ9gQUIrmPo3IA+hUl4KYk8uSA7cHrcKd/l3p1OTpZcM0Tbp9x7FAtXdAYhlasd60ncPpgu6ihG6TOA==";
       };
     };
     "unicorn-magic-0.1.0" = {
@@ -4691,7 +4691,7 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.6.2"
+      sources."@types/node-24.7.0"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.2.0"
       sources."@types/request-2.48.13"
@@ -5240,7 +5240,7 @@ in
         }
       )
       sources."undici-7.16.0"
-      sources."undici-types-7.13.0"
+      sources."undici-types-7.14.0"
       sources."unicorn-magic-0.1.0"
       sources."universalify-2.0.1"
       sources."unpipe-1.0.0"
