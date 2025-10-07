@@ -777,13 +777,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.2.0" = {
+    "@types/react-19.2.2" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.2.0";
+      version = "19.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.2.0.tgz";
-        sha512 = "1LOH8xovvsKsCBq1wnT4ntDUdCJKmnEakhsuoUSy6ExlHCkGP2hqnatagYTgFk6oeL0VU31u7SNjunPN+GchtA==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.2.2.tgz";
+        sha512 = "6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA==";
       };
     };
     "@types/request-2.48.13" = {
@@ -4523,10 +4523,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.8";
+    version = "2.0.9";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.8.tgz";
-      sha512 = "GeNV0px4GrLnoFlC0Vv5aN0J4JlFV/xEf6KsvfMf3WdkyeaAaUR7MiMl/D6A7hb1fDF4a5nI/mCLEZZC0prpNQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.9.tgz";
+      sha512 = "2IAXb7OogfoTVv7fa4vnMxhUSnQ5yx7ije0xmjvLKrw7CGEiE2cvxKeFGg7nHjL0EE64CrVWYscS3SwD/7/HhQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4693,7 +4693,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.7.0"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.2.0"
+      sources."@types/react-19.2.2"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
@@ -5312,10 +5312,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.44.0";
+    version = "0.45.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.44.0.tgz";
-      sha512 = "5QNxwcuNn1aZMIzBs9E//vVLLRTZ8jkJRZas2XJgYdBNiSSlGzIuOfPBPXPNiQ2hRPKVqI4/APWIck4jxhw2KA==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.45.0.tgz";
+      sha512 = "ykQ8WuOMJotk+tIfEhqBNrbrtn6FzG98huVxnOq/xbAjq94YPdyQRhZx6+ukwEqhBbV06Seo88RY+vbYi40urg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
