@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.8.1" = {
+    "@google/gemini-cli-core-0.7.0" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.8.1";
+      version = "0.7.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.8.1.tgz";
-        sha512 = "WrAVjmTjPY55fmsJM32zMC12TFMInnymsKuEwhdPbG8RKNeaFONEu1RSPnmF2Dcmh4U1k14tjrOE04M/l+7K9g==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.7.0.tgz";
+        sha512 = "x2hxjrRsNCCsOfDywcYBnQD0qCWC31/NXTUkdMdwjvkDLQkQ0H27A0sSQR/lkuYeBzKdNRmyNBjmsiX+isyYUA==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -181,15 +181,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/@isaacs/cliui/-/cliui-8.0.2.tgz";
         sha512 = "O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==";
-      };
-    };
-    "@isaacs/fs-minipass-4.0.1" = {
-      name = "_at_isaacs_slash_fs-minipass";
-      packageName = "@isaacs/fs-minipass";
-      version = "4.0.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/@isaacs/fs-minipass/-/fs-minipass-4.0.1.tgz";
-        sha512 = "wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==";
       };
     };
     "@joshua.litt/get-ripgrep-0.0.2" = {
@@ -1243,15 +1234,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/chardet/-/chardet-2.1.0.tgz";
         sha512 = "bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==";
-      };
-    };
-    "chownr-3.0.0" = {
-      name = "chownr";
-      packageName = "chownr";
-      version = "3.0.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/chownr/-/chownr-3.0.0.tgz";
-        sha512 = "+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==";
       };
     };
     "cjs-module-lexer-1.4.3" = {
@@ -3036,15 +3018,6 @@ let
         sha512 = "qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==";
       };
     };
-    "minizlib-3.1.0" = {
-      name = "minizlib";
-      packageName = "minizlib";
-      version = "3.1.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/minizlib/-/minizlib-3.1.0.tgz";
-        sha512 = "KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==";
-      };
-    };
     "mnemonist-0.40.3" = {
       name = "mnemonist";
       packageName = "mnemonist";
@@ -3711,13 +3684,13 @@ let
         sha512 = "5TF+l7p4+OsnP8BCCvSyZiSPc4x4//p5uPwK8TCnVPJYRmU2aYKMpOXvw8zM5a5JvuuCGN1jmsMwuU2W02ukfA==";
       };
     };
-    "semver-7.7.3" = {
+    "semver-7.7.2" = {
       name = "semver";
       packageName = "semver";
-      version = "7.7.3";
+      version = "7.7.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/semver/-/semver-7.7.3.tgz";
-        sha512 = "SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==";
+        url = "https://registry.npmjs.org/semver/-/semver-7.7.2.tgz";
+        sha512 = "RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==";
       };
     };
     "send-1.2.0" = {
@@ -4069,15 +4042,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz";
         sha512 = "ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==";
-      };
-    };
-    "tar-7.5.1" = {
-      name = "tar";
-      packageName = "tar";
-      version = "7.5.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/tar/-/tar-7.5.1.tgz";
-        sha512 = "nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==";
       };
     };
     "teeny-request-9.0.0" = {
@@ -4467,15 +4431,6 @@ let
         sha512 = "0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==";
       };
     };
-    "yallist-5.0.0" = {
-      name = "yallist";
-      packageName = "yallist";
-      version = "5.0.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz";
-        sha512 = "YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==";
-      };
-    };
     "yargs-17.7.2" = {
       name = "yargs";
       packageName = "yargs";
@@ -4568,10 +4523,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.10";
+    version = "2.0.9";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.10.tgz";
-      sha512 = "y2B6OW5MneWYqzWq0NbzzgcsCtI0S7c//IDt4DYzmkGgpES3B2aFpmFB9wMvAuxy7aOs1gap3DIudobaFzs+YQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.9.tgz";
+      sha512 = "2IAXb7OogfoTVv7fa4vnMxhUSnQ5yx7ije0xmjvLKrw7CGEiE2cvxKeFGg7nHjL0EE64CrVWYscS3SwD/7/HhQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4586,10 +4541,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "17.1.3";
+    version = "17.1.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.3.tgz";
-      sha512 = "1fgnlS3kLQo61m7Nz5AUj7le57+K6JaSN5KC0/hD+oNzRvg6Uss0TNKLCuIjNjm7b0LCiN+4DjKSNHJWCiAwxg==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.2.tgz";
+      sha512 = "Y2tGbJmPDJDwW9H9zab1mHqbIwAnYnQL+eCfNfL+IWBrgTKPdaFg5hhL0j45zjvxpz0A4/Ik4UbcUYWcTe9IoQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4604,10 +4559,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.8.1";
+    version = "0.7.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.8.1.tgz";
-      sha512 = "faZIMN3qjsfOzBenr/cVhlscfdarehJZh+t7aaJUQuoIL6Gur6/a3lMMtNzxqc0N4Hc9gUkuC5aMs84+UhyEVg==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.7.0.tgz";
+      sha512 = "SFj6kkM19aTrMpMADGNzLkNvAu2SaU8vzOmvOHW/HH3gQGWG43M69jrcUztTpGmOMgt3JwHouzsr7Z68iU2pjw==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.0"
@@ -4636,7 +4591,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.8.1"
+      sources."@google/gemini-cli-core-0.7.0"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -4657,7 +4612,6 @@ in
           ];
         }
       )
-      sources."@isaacs/fs-minipass-4.0.1"
       sources."@joshua.litt/get-ripgrep-0.0.2"
       sources."@js-sdsl/ordered-map-4.4.2"
       sources."@kwsites/file-exists-1.1.1"
@@ -4778,7 +4732,6 @@ in
         sources."ansi-align-3.0.1"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
             sources."emoji-regex-8.0.0"
             sources."is-fullwidth-code-point-3.0.0"
             sources."string-width-4.2.3"
@@ -4787,7 +4740,7 @@ in
         }
       )
       sources."ansi-escapes-7.1.1"
-      sources."ansi-regex-6.2.2"
+      sources."ansi-regex-5.0.1"
       sources."ansi-styles-6.2.3"
       sources."array-timsort-1.0.3"
       sources."arrify-2.0.1"
@@ -4808,21 +4761,12 @@ in
       sources."bundle-name-4.1.0"
       sources."bytes-3.1.2"
       sources."cacheable-lookup-7.0.0"
-      (
-        sources."cacheable-request-12.0.1"
-        // {
-          dependencies = [
-            sources."get-stream-9.0.1"
-            sources."is-stream-4.0.1"
-          ];
-        }
-      )
+      sources."cacheable-request-12.0.1"
       sources."call-bind-apply-helpers-1.0.2"
       sources."call-bound-1.0.4"
       sources."camelcase-8.0.0"
       sources."chalk-5.6.2"
       sources."chardet-2.1.0"
-      sources."chownr-3.0.0"
       sources."cjs-module-lexer-1.4.3"
       sources."cli-boxes-3.0.0"
       sources."cli-cursor-4.0.0"
@@ -4840,7 +4784,6 @@ in
         sources."cliui-8.0.1"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
             sources."ansi-styles-4.3.0"
             sources."emoji-regex-8.0.0"
             sources."is-fullwidth-code-point-3.0.0"
@@ -4930,7 +4873,6 @@ in
         sources."execa-9.6.0"
         // {
           dependencies = [
-            sources."get-stream-9.0.1"
             sources."is-stream-4.0.1"
             sources."signal-exit-4.1.0"
           ];
@@ -4947,7 +4889,14 @@ in
       )
       sources."express-rate-limit-7.5.1"
       sources."extend-3.0.2"
-      sources."extract-zip-2.0.1"
+      (
+        sources."extract-zip-2.0.1"
+        // {
+          dependencies = [
+            sources."get-stream-5.2.0"
+          ];
+        }
+      )
       sources."fast-deep-equal-3.1.3"
       sources."fast-json-stable-stringify-2.1.0"
       sources."fast-levenshtein-2.0.6"
@@ -4980,7 +4929,14 @@ in
       sources."get-east-asian-width-1.4.0"
       sources."get-intrinsic-1.3.1"
       sources."get-proto-1.0.1"
-      sources."get-stream-5.2.0"
+      (
+        sources."get-stream-9.0.1"
+        // {
+          dependencies = [
+            sources."is-stream-4.0.1"
+          ];
+        }
+      )
       sources."glob-10.4.5"
       (
         sources."global-directory-4.0.1"
@@ -5093,7 +5049,6 @@ in
       sources."minimatch-9.0.5"
       sources."minimist-1.2.8"
       sources."minipass-7.1.2"
-      sources."minizlib-3.1.0"
       sources."mnemonist-0.40.3"
       sources."module-details-from-path-1.0.4"
       sources."ms-2.1.3"
@@ -5197,7 +5152,7 @@ in
       sources."safer-buffer-2.1.2"
       sources."scheduler-0.26.0"
       sources."selderee-0.11.0"
-      sources."semver-7.7.3"
+      sources."semver-7.7.2"
       (
         sources."send-1.2.0"
         // {
@@ -5239,7 +5194,6 @@ in
         sources."string-width-cjs-4.2.3"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
             sources."emoji-regex-8.0.0"
             sources."is-fullwidth-code-point-3.0.0"
             sources."strip-ansi-6.0.1"
@@ -5247,22 +5201,21 @@ in
         }
       )
       sources."string_decoder-1.3.0"
-      sources."strip-ansi-7.1.2"
       (
-        sources."strip-ansi-cjs-6.0.1"
+        sources."strip-ansi-7.1.2"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
+            sources."ansi-regex-6.2.2"
           ];
         }
       )
+      sources."strip-ansi-cjs-6.0.1"
       sources."strip-final-newline-4.0.0"
       sources."strip-json-comments-3.1.1"
       sources."stubborn-fs-1.2.5"
       sources."stubs-3.0.0"
       sources."supports-color-7.2.0"
       sources."supports-preserve-symlinks-flag-1.0.0"
-      sources."tar-7.5.1"
       (
         sources."teeny-request-9.0.0"
         // {
@@ -5316,7 +5269,6 @@ in
         sources."wrap-ansi-cjs-7.0.0"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
             sources."ansi-styles-4.3.0"
             sources."emoji-regex-8.0.0"
             sources."is-fullwidth-code-point-3.0.0"
@@ -5330,12 +5282,10 @@ in
       sources."wsl-utils-0.1.0"
       sources."xdg-basedir-5.1.0"
       sources."y18n-5.0.8"
-      sources."yallist-5.0.0"
       (
         sources."yargs-17.7.2"
         // {
           dependencies = [
-            sources."ansi-regex-5.0.1"
             sources."emoji-regex-8.0.0"
             sources."is-fullwidth-code-point-3.0.0"
             sources."string-width-4.2.3"
