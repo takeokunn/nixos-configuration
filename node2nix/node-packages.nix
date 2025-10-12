@@ -777,13 +777,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.7.1" = {
+    "@types/node-24.7.2" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.7.1";
+      version = "24.7.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.7.1.tgz";
-        sha512 = "CmyhGZanP88uuC5GpWU9q+fI61j2SkhO3UGMUdfYRE6Bcy0ccyzn1Rqj9YAB/ZY4kOXmNf0ocah5GtphmLMP6Q==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.7.2.tgz";
+        sha512 = "/NbVmcGTP+lj5oa4yiYxxeBjRivKQ5Ns1eSZeB99ExsEQ6rX5XYU1Zy/gGxY/ilqtD4Etx9mKyrPxZRetiahhA==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -4747,7 +4747,7 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.7.1"
+      sources."@types/node-24.7.2"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.2.2"
       sources."@types/request-2.48.13"
