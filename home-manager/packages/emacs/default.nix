@@ -5,10 +5,7 @@
 }:
 let
   override = final: prev: {
-    aio = prev.aio.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [ ./patches/aio-native-comp.patch ];
-    });
-  };
+ };
 in
 {
   emacs-git = pkgs.emacsWithPackagesFromUsePackage {
