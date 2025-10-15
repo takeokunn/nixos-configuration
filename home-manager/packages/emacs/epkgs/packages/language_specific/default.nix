@@ -74,9 +74,6 @@ with epkgs;
   # Fish
   packages.fish-repl
 
-  # Haskell
-  hindent
-
   # Web
   emmet-mode
 

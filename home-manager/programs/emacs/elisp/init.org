@@ -4091,16 +4091,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(fish-repl) "fish-repl" nil t)
 #+end_src
-** Haskell
-*** hindent
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(hindent-mode) "hindent" nil t)
-
-  (with-eval-after-load 'haskell-mode
-    ;; hooks
-    (add-hook 'haskell-mode-hook #'hindent-mode))
-#+end_src
-** Web
+* Web
 *** emmet-mode
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(emmet-mode) "emmet-mode" nil t)
