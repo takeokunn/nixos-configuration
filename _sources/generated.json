@@ -1009,7 +1009,7 @@
   },
   "vim-gin": {
     "cargoLocks": null,
-    "date": "2025-10-12",
+    "date": "2025-10-16",
     "extract": null,
     "name": "vim-gin",
     "passthru": null,
@@ -1021,12 +1021,12 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "vim-gin",
-      "rev": "4033d58fc86789c43a6247b8fb9417d821d94ec9",
-      "sha256": "sha256-EV7klC7sVgACZGH8t8T+RuzVT1pfKLd6UB9+/0Eqeiw=",
+      "rev": "353e32d6e37228c0f51a6cf72c06210bb1340af9",
+      "sha256": "sha256-zlNdfm+oUwcvzExFvtTqnHnwE8uqdOlxeUOGmVOBwIg=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "4033d58fc86789c43a6247b8fb9417d821d94ec9"
+    "version": "353e32d6e37228c0f51a6cf72c06210bb1340af9"
   },
   "vim-neco": {
     "cargoLocks": null,

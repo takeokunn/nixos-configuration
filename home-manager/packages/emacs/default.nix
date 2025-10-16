@@ -5,7 +5,7 @@
 }:
 let
   override = final: prev: {
- };
+  };
 in
 {
   emacs-git = pkgs.emacsWithPackagesFromUsePackage {

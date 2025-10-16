@@ -581,15 +581,15 @@
   };
   vim-gin = {
     pname = "vim-gin";
-    version = "4033d58fc86789c43a6247b8fb9417d821d94ec9";
+    version = "353e32d6e37228c0f51a6cf72c06210bb1340af9";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-gin";
-      rev = "4033d58fc86789c43a6247b8fb9417d821d94ec9";
+      rev = "353e32d6e37228c0f51a6cf72c06210bb1340af9";
       fetchSubmodules = false;
-      sha256 = "sha256-EV7klC7sVgACZGH8t8T+RuzVT1pfKLd6UB9+/0Eqeiw=";
+      sha256 = "sha256-zlNdfm+oUwcvzExFvtTqnHnwE8uqdOlxeUOGmVOBwIg=";
     };
-    date = "2025-10-12";
+    date = "2025-10-16";
   };
   vim-neco = {
     pname = "vim-neco";
