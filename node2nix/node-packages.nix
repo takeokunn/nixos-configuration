@@ -246,13 +246,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.20.0" = {
+    "@modelcontextprotocol/sdk-1.20.1" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.20.0";
+      version = "1.20.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.20.0.tgz";
-        sha512 = "kOQ4+fHuT4KbR2iq2IjeV32HiihueuOf1vJkq18z08CLZ1UQrTc8BXJpVfxZkq45+inLLD+D4xx4nBjUelJa4Q==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.20.1.tgz";
+        sha512 = "j/P+yuxXfgxb+mW7OEoRCM3G47zCTDqUPivJo/VzpjbG8I9csTXtOprCf5FfOfHK4whOJny0aHuBEON+kS7CCA==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -777,13 +777,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.7.2" = {
+    "@types/node-24.8.1" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.7.2";
+      version = "24.8.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.7.2.tgz";
-        sha512 = "/NbVmcGTP+lj5oa4yiYxxeBjRivKQ5Ns1eSZeB99ExsEQ6rX5XYU1Zy/gGxY/ilqtD4Etx9mKyrPxZRetiahhA==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.8.1.tgz";
+        sha512 = "alv65KGRadQVfVcG69MuB4IzdYVpRwMG/mq8KWOaoOdyY617P5ivaDiMCGOFDWD2sAn5Q0mR3mRtUOgm99hL9Q==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -1479,13 +1479,13 @@ let
         sha512 = "RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==";
       };
     };
-    "decompress-response-6.0.0" = {
+    "decompress-response-10.0.0" = {
       name = "decompress-response";
       packageName = "decompress-response";
-      version = "6.0.0";
+      version = "10.0.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/decompress-response/-/decompress-response-6.0.0.tgz";
-        sha512 = "aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==";
+        url = "https://registry.npmjs.org/decompress-response/-/decompress-response-10.0.0.tgz";
+        sha512 = "oj7KWToJuuxlPr7VV0vabvxEIiqNMo+q0NueIiL3XhtwC6FVOX7Hr1c0C4eD0bmf7Zr+S/dSf2xvkH3Ad6sU3Q==";
       };
     };
     "deep-extend-0.6.0" = {
@@ -2262,13 +2262,13 @@ let
         sha512 = "ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==";
       };
     };
-    "got-14.5.0" = {
+    "got-14.6.0" = {
       name = "got";
       packageName = "got";
-      version = "14.5.0";
+      version = "14.6.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/got/-/got-14.5.0.tgz";
-        sha512 = "rZ8+ZMYz9yeTFmFtOiwf/Trcli8gdqgqAz0kmkEOWcT7C3BFG3Z+dLQu0y8je7RogG7Wp1obnu5GerwCaccftw==";
+        url = "https://registry.npmjs.org/got/-/got-14.6.0.tgz";
+        sha512 = "K30JHMsHcwhy+JYet3IxRFw+L9rb77y5LE3OkoAD4qzMR9/g30bWYBfkHYVJL2BBPgfU4lJsRwhy4HUkLPQc3g==";
       };
     };
     "graceful-fs-4.2.10" = {
@@ -2989,15 +2989,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/mimic-fn/-/mimic-fn-2.1.0.tgz";
         sha512 = "OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==";
-      };
-    };
-    "mimic-response-3.1.0" = {
-      name = "mimic-response";
-      packageName = "mimic-response";
-      version = "3.1.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/mimic-response/-/mimic-response-3.1.0.tgz";
-        sha512 = "z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==";
       };
     };
     "mimic-response-4.0.0" = {
@@ -4554,10 +4545,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.382.0";
+    version = "1.384.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.382.0.tgz";
-      sha512 = "Xh0Chnhu6BdcUwycOcX03gUl5cM5EoNCQnuWs4np9/aM040AjHc/mMQoCJvrrZJOC4IZdDq21F4R15XdKaZaYw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.384.0.tgz";
+      sha512 = "jvj+pHkDZFYoa/JbX/qZQkacPDTXZw0m7/vMNlli9VmDzAUwCliDAhFDNdoU4ykbGj22x8vwOJf+zXUtr2+qTg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4577,10 +4568,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.19";
+    version = "2.0.21";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.19.tgz";
-      sha512 = "9InIRKliS3TaPbWfuzJA0SoC3hLQ0Lk2lmBVFBChgd8f6aTVV5dQwHNgDnLjtl1L+HhRfMqjSgBfNaeUmzet/A==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.21.tgz";
+      sha512 = "02NcxPVjioLjo4/djzIt4aAYkYqnZsHgdzgMexLURYLR9q1+B+OLkKddKwOHL8fas3WnUGV1oyybu73BfHqQ4A==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4674,7 +4665,7 @@ in
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
       (
-        sources."@modelcontextprotocol/sdk-1.20.0"
+        sources."@modelcontextprotocol/sdk-1.20.1"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4747,7 +4738,7 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.7.2"
+      sources."@types/node-24.8.1"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.2.2"
       sources."@types/request-2.48.13"
@@ -4879,14 +4870,7 @@ in
       sources."cross-spawn-7.0.6"
       sources."csstype-3.1.3"
       sources."debug-4.4.3"
-      (
-        sources."decompress-response-6.0.0"
-        // {
-          dependencies = [
-            sources."mimic-response-3.1.0"
-          ];
-        }
-      )
+      sources."decompress-response-10.0.0"
       sources."deep-extend-0.6.0"
       sources."deepmerge-4.3.1"
       sources."default-browser-5.2.1"
@@ -5007,7 +4991,7 @@ in
       sources."googleapis-137.1.0"
       sources."googleapis-common-7.2.0"
       sources."gopd-1.2.0"
-      sources."got-14.5.0"
+      sources."got-14.6.0"
       sources."graceful-fs-4.2.11"
       (
         sources."gradient-string-2.0.2"
