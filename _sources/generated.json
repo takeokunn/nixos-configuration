@@ -1021,12 +1021,12 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "vim-gin",
-      "rev": "c165cfb01981dc01b561914fdd1651c140aa7014",
-      "sha256": "sha256-N20/nIt3AYFk4aWifxwEWT7arVrc2lTLS2blY/3Yi2E=",
+      "rev": "e447c29b9eb86152cd5d293b9a1f0293e9a1311b",
+      "sha256": "sha256-GVIYod8uuGNO7qDGLTaJ4DReaK4lmaYttuF+xq3gliA=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "c165cfb01981dc01b561914fdd1651c140aa7014"
+    "version": "e447c29b9eb86152cd5d293b9a1f0293e9a1311b"
   },
   "vim-neco": {
     "cargoLocks": null,
@@ -1072,7 +1072,7 @@
   },
   "vim-skkeleton": {
     "cargoLocks": null,
-    "date": "2025-09-27",
+    "date": "2025-10-19",
     "extract": null,
     "name": "vim-skkeleton",
     "passthru": null,
@@ -1084,12 +1084,12 @@
       "name": null,
       "owner": "vim-skk",
       "repo": "skkeleton",
-      "rev": "8fa36fc8065d600706d5edeeb1008a5233eb1d51",
-      "sha256": "sha256-WC5dBRQstelX5o9oz7Lc23hTbZkYYpiEd+1Qs1sjRYY=",
+      "rev": "0c67893ffe0448666ec76283bc0a9685ac31fba9",
+      "sha256": "sha256-6YRhQUANiYoSF5t4rV7kwU8essmUBNdejLumqR+tyTI=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "8fa36fc8065d600706d5edeeb1008a5233eb1d51"
+    "version": "0c67893ffe0448666ec76283bc0a9685ac31fba9"
   },
   "vim-skkeleton-azik": {
     "cargoLocks": null,
@@ -1114,7 +1114,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-10-17",
+    "date": "2025-10-19",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1126,11 +1126,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "ff0c66f6aefb98a9db057c9c3fcdca44f1559ee2",
-      "sha256": "sha256-J1tqQ1gb6fSgrnPgxbT8qvRdwOoJE6KfWUpA/OYCCF0=",
+      "rev": "740b54984be6c1db5829f86ea189dd2a968ae5ef",
+      "sha256": "sha256-LBuod0/8YQPzTNwclQmhBw4eshYCa1fN5thvPF2AR1U=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "ff0c66f6aefb98a9db057c9c3fcdca44f1559ee2"
+    "version": "740b54984be6c1db5829f86ea189dd2a968ae5ef"
   }
 }
