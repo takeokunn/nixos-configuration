@@ -10,28 +10,6 @@
     lfs.enable = true;
     maintenance.enable = true;
 
-    delta = {
-      enable = true;
-      options = {
-        navigate = true;
-        dark = true;
-        line-numbers = true;
-        side-by-side = true;
-      };
-    };
-
-    aliases = {
-      st = "status --ignore-submodules=all";
-      br = "branch";
-      co = "commit";
-      ch = "checkout";
-      ad = "add";
-      rs = "restore";
-      sw = "switch";
-      fix = "commit --amend --no-edit";
-      fixup = "!git log --oneline -n 20 | peco | awk '{print $1}' | xargs --no-run-if-empty -I COMMIT -o sh -c 'git commit --fixup COMMIT && git rebase -i --autosquash COMMIT~'";
-    };
-
     ignores = [
       "*.swp"
       "*.save"
@@ -50,9 +28,6 @@
       "**/.claude/settings.local.json"
     ];
 
-    userName = "takeokunn";
-    userEmail = "bararararatty@gmail.com";
-
     signing = {
       key = "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C";
       format = "openpgp";
@@ -63,7 +38,27 @@
       { path = "~/.config/git/config.d/maintenance.conf"; }
     ];
 
-    extraConfig = {
+    settings = {
+      # エイリアス設定（旧 aliases）
+      alias = {
+        st = "status --ignore-submodules=all";
+        br = "branch";
+        co = "commit";
+        ch = "checkout";
+        ad = "add";
+        rs = "restore";
+        sw = "switch";
+        fix = "commit --amend --no-edit";
+        fixup = "!git log --oneline -n 20 | peco | awk '{print $1}' | xargs --no-run-if-empty -I COMMIT -o sh -c 'git commit --fixup COMMIT && git rebase -i --autosquash COMMIT~'";
+      };
+
+      # ユーザー情報（旧 userName, userEmail）
+      user = {
+        name = "takeokunn";
+        email = "bararararatty@gmail.com";
+      };
+
+      # 以下は旧 extraConfig の内容
       core = {
         quotepath = "off";
         ignorecase = false;
@@ -194,6 +189,18 @@
           "(\"|')?(AWS|aws|Aws)?_?(ACCOUNT|account|Account)_?(ID|id|Id)?(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?"
         ];
       };
+    };
+  };
+
+  # delta設定を独立したプログラムとして移動
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      navigate = true;
+      dark = true;
+      line-numbers = true;
+      side-by-side = true;
     };
   };
 }
