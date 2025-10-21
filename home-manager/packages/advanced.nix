@@ -1,6 +1,9 @@
 { pkgs, nodePkgs }:
 with pkgs;
 [
+  # for http
+  xh
+
   # for lint
   similarity
 
