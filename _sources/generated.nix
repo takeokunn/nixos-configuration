@@ -545,15 +545,15 @@
   };
   vim-fern = {
     pname = "vim-fern";
-    version = "88f6d81c2d2348cbfb3120931ce72268195859c6";
+    version = "cb60188e312e2218f78a760f38164bbe51932c0d";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-fern";
-      rev = "88f6d81c2d2348cbfb3120931ce72268195859c6";
+      rev = "cb60188e312e2218f78a760f38164bbe51932c0d";
       fetchSubmodules = false;
-      sha256 = "sha256-61JjXnf740eZf5GvMKgJzS0qyOPt6ITGjq1A7uyu9hY=";
+      sha256 = "sha256-K5Oa79uKpt6NcLyKAqL73M5237il+gf/8YXeNcpLatU=";
     };
-    date = "2025-05-28";
+    date = "2025-10-20";
   };
   vim-fern-renderer-nerdfont = {
     pname = "vim-fern-renderer-nerdfont";
@@ -581,13 +581,13 @@
   };
   vim-gin = {
     pname = "vim-gin";
-    version = "11ea1d632336666f8e339ee8ab40380f725c4ba2";
+    version = "e9200f66986ddd447220166d4467f9c92c8565a4";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-gin";
-      rev = "11ea1d632336666f8e339ee8ab40380f725c4ba2";
+      rev = "e9200f66986ddd447220166d4467f9c92c8565a4";
       fetchSubmodules = false;
-      sha256 = "sha256-UIhaTiPYkrYXcVLOjb87cdfAHHL8nDmlJrvpL0knKCU=";
+      sha256 = "sha256-7gRGIwfZAYzcu+IqaJp+Kxwf+uZ/pyDHsyhUVcTcyqk=";
     };
     date = "2025-10-20";
   };
