@@ -95,6 +95,7 @@
       security = builtins.readFile ./agents/security.md;
       test = builtins.readFile ./agents/test.md;
       refactor = builtins.readFile ./agents/refactor.md;
+      playwright = builtins.readFile ./agents/playwright.md;
     };
 
     commands = {
