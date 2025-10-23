@@ -12,13 +12,13 @@
 
 let
   sources = {
-    "@alcalzone/ansi-tokenize-0.2.1" = {
+    "@alcalzone/ansi-tokenize-0.2.2" = {
       name = "_at_alcalzone_slash_ansi-tokenize";
       packageName = "@alcalzone/ansi-tokenize";
-      version = "0.2.1";
+      version = "0.2.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@alcalzone/ansi-tokenize/-/ansi-tokenize-0.2.1.tgz";
-        sha512 = "0rJMGIohyuFVf/uq9wCTtVLmVs/+7zoCGYkj7T8igV3XMPpjaSspXx/JvD9zmGprPVsIVvVRYVCaBkEz+SvN9g==";
+        url = "https://registry.npmjs.org/@alcalzone/ansi-tokenize/-/ansi-tokenize-0.2.2.tgz";
+        sha512 = "mkOh+Wwawzuf5wa30bvc4nA+Qb6DIrGWgBhRR/Pw4T9nsgYait8izvXkNyU78D6Wcu3Z+KUdwCmLCxlWjEotYA==";
       };
     };
     "@babel/code-frame-7.27.1" = {
@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.9.0" = {
+    "@google/gemini-cli-core-0.10.0" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.9.0";
+      version = "0.10.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.9.0.tgz";
-        sha512 = "K3zGD8m8j240s3YcFAeJM6oaLhAI5hYBdOgdycO2P2uriJTKezjeAG+FYzaK2AdOBrIVyStLT2dyy6G6ePebSQ==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.10.0.tgz";
+        sha512 = "z0/hIuVWSPy7C+88KwTbC2ejo208mlbb7UzZHzBqIvUpeU0p2JWgC24qFmpmtnuIIQMIbFs55Hqvmh6U3CYtEg==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -2820,13 +2820,13 @@ let
         sha512 = "h0Un1ieD+HUrzBH6dJXhod3ifSghk5Hw/2Y4/KHBziPlZecrFyE9YOTPU6eOs0V9pYl8gOs86fkr/KN8lUX39A==";
       };
     };
-    "ky-1.12.0" = {
+    "ky-1.13.0" = {
       name = "ky";
       packageName = "ky";
-      version = "1.12.0";
+      version = "1.13.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ky/-/ky-1.12.0.tgz";
-        sha512 = "YRLmSUHCwOJRBMArtqMRLOmO7fewn3yOoui6aB8ERkRVXupa0UiaQaKbIXteMt4jUElhbdqTMsLFHs8APxxUoQ==";
+        url = "https://registry.npmjs.org/ky/-/ky-1.13.0.tgz";
+        sha512 = "JeNNGs44hVUp2XxO3FY9WV28ymG7LgO4wju4HL/dCq1A8eKDcFgVrdCn1ssn+3Q/5OQilv5aYsL0DMt5mmAV9w==";
       };
     };
     "latest-version-9.0.0" = {
@@ -4604,13 +4604,13 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.9.0";
+    version = "0.10.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.9.0.tgz";
-      sha512 = "voLzMnHs093VvZgBA8HREN6ViZ8gdROPnmPuj1EFSxjGZRKOzlifzCTNsmBd/dSrbxIyZD3aOpTkaUQbGxX6ig==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.10.0.tgz";
+      sha512 = "ezi8Of1gTopjhERcbT7CHUNmq79qW7rNd+7nYWPFFEMjASSGd8gPYZ9SG2aNeAjz92hAMS+TuD98DVeCnVTc1g==";
     };
     dependencies = [
-      sources."@alcalzone/ansi-tokenize-0.2.1"
+      sources."@alcalzone/ansi-tokenize-0.2.2"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.27.1"
       sources."@google-cloud/common-5.0.2"
@@ -4636,7 +4636,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.9.0"
+      sources."@google/gemini-cli-core-0.10.0"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -5066,7 +5066,7 @@ in
       sources."jwa-2.0.1"
       sources."jws-4.0.0"
       sources."keyv-5.5.3"
-      sources."ky-1.12.0"
+      sources."ky-1.13.0"
       sources."latest-version-9.0.0"
       sources."leac-0.6.0"
       sources."lodash.camelcase-4.3.0"
