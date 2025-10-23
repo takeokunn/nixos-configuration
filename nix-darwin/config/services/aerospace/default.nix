@@ -1,6 +1,6 @@
 {
   services.aerospace = {
-    enable = false;
+    enable = true;
     settings = {
       enable-normalization-flatten-containers = true;
       enable-normalization-opposite-orientation-for-nested-containers = true;
