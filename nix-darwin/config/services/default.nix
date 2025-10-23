@@ -1,24 +1,14 @@
 let
   aerospace = import ./aerospace;
+  dnsmasq = import ./dnsmasq;
+  nextdns = import ./nextdns;
   sketchybar = import ./sketchybar;
 in
 {
   imports = [
     aerospace
+    dnsmasq
+    nextdns
     sketchybar
   ];
-
-  services.nextdns = {
-    enable = false;
-    arguments = [
-      "-profile"
-      "2c6735"
-    ];
-  };
-
-  services.dnsmasq = {
-    enable = true;
-    addresses."*.localhost" = "127.0.0.1";
-    bind = "127.0.0.1";
-  };
 }
