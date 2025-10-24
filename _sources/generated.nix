@@ -617,15 +617,15 @@
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
-    version = "0c67893ffe0448666ec76283bc0a9685ac31fba9";
+    version = "e441c18f963c6b414aa1f6edcd6cc9917f8d6dc0";
     src = fetchFromGitHub {
       owner = "vim-skk";
       repo = "skkeleton";
-      rev = "0c67893ffe0448666ec76283bc0a9685ac31fba9";
+      rev = "e441c18f963c6b414aa1f6edcd6cc9917f8d6dc0";
       fetchSubmodules = false;
-      sha256 = "sha256-6YRhQUANiYoSF5t4rV7kwU8essmUBNdejLumqR+tyTI=";
+      sha256 = "sha256-eDVrZvrpiflq+M7Ppk9BFars222GhDacF630ktum+ww=";
     };
-    date = "2025-10-19";
+    date = "2025-10-24";
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";

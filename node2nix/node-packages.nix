@@ -30,13 +30,13 @@ let
         sha512 = "cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==";
       };
     };
-    "@babel/helper-validator-identifier-7.27.1" = {
+    "@babel/helper-validator-identifier-7.28.5" = {
       name = "_at_babel_slash_helper-validator-identifier";
       packageName = "@babel/helper-validator-identifier";
-      version = "7.27.1";
+      version = "7.28.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.27.1.tgz";
-        sha512 = "D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==";
+        url = "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.28.5.tgz";
+        sha512 = "qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==";
       };
     };
     "@google-cloud/common-5.0.2" = {
@@ -246,13 +246,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.20.1" = {
+    "@modelcontextprotocol/sdk-1.20.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.20.1";
+      version = "1.20.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.20.1.tgz";
-        sha512 = "j/P+yuxXfgxb+mW7OEoRCM3G47zCTDqUPivJo/VzpjbG8I9csTXtOprCf5FfOfHK4whOJny0aHuBEON+kS7CCA==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.20.2.tgz";
+        sha512 = "6rqTdFt67AAAzln3NOKsXRmv5ZzPkgbfaebKBqUbts7vK1GZudqnrun5a8d3M/h955cam9RHZ6Jb4Y1XhnmFPg==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -1803,13 +1803,13 @@ let
         sha512 = "j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==";
       };
     };
-    "es-toolkit-1.40.0" = {
+    "es-toolkit-1.41.0" = {
       name = "es-toolkit";
       packageName = "es-toolkit";
-      version = "1.40.0";
+      version = "1.41.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.40.0.tgz";
-        sha512 = "8o6w0KFmU0CiIl0/Q/BCEOabF2IJaELM1T2PWj6e8KqzHv1gdx+7JtFnDwOx1kJH/isJ5NwlDG1nCr1HrRF94Q==";
+        url = "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.41.0.tgz";
+        sha512 = "bDd3oRmbVgqZCJS6WmeQieOrzpl3URcWBUVDXxOELlUW2FuW+0glPOz1n0KnRie+PdyvUZcXz2sOn00c6pPRIA==";
       };
     };
     "escalade-3.2.0" = {
@@ -4568,10 +4568,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.25";
+    version = "2.0.26";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.25.tgz";
-      sha512 = "5gooMB9DCLmzatQ+b2R0/pP2WxUSADcmpF77Qf3fIDpTf30UFreLXl2pe1exJ2kInsfiPK7PvDuJip5MDEv4CQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.26.tgz";
+      sha512 = "bk/sxGdTEbI0N7g+pTwYq5CNUjdAcvIKXvf/x5oRV9q24b42uq3gijrZGycSbWmtYTIjbzFAHeWw5n7Ic43/6w==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4612,7 +4612,7 @@ in
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
       sources."@babel/code-frame-7.27.1"
-      sources."@babel/helper-validator-identifier-7.27.1"
+      sources."@babel/helper-validator-identifier-7.28.5"
       sources."@google-cloud/common-5.0.2"
       (
         sources."@google-cloud/logging-11.2.1"
@@ -4665,7 +4665,7 @@ in
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
       (
-        sources."@modelcontextprotocol/sdk-1.20.1"
+        sources."@modelcontextprotocol/sdk-1.20.2"
         // {
           dependencies = [
             sources."ajv-6.12.6"
@@ -4903,7 +4903,7 @@ in
       sources."es-errors-1.3.0"
       sources."es-object-atoms-1.1.1"
       sources."es-set-tostringtag-2.1.0"
-      sources."es-toolkit-1.40.0"
+      sources."es-toolkit-1.41.0"
       sources."escalade-3.2.0"
       sources."escape-goat-4.0.0"
       sources."escape-html-1.0.3"
@@ -5356,14 +5356,14 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.47.0";
+    version = "0.48.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.47.0.tgz";
-      sha512 = "v0K5fDRhftqvE9oo1W3lD1DD2BhN9j4bLbw08V0Ikp3ur7fJnGEIEIM8jvom27orofOF7Es1ez0ML8N45aQWvA==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.48.0.tgz";
+      sha512 = "H8AgMpC3f3N0cZ/dGN85wcqf/c7uOWXDA/+mUcoxvGgSsFNQeDE3YhdSz+L4Fupfsps5Wq4pIS+5KieBihNRYA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
-      description = "<p align=\"center\"><code>npm i -g @openai/codex</code><br />or <code>brew install codex</code></p>";
+      description = "<p align=\"center\"><code>npm i -g @openai/codex</code><br />or <code>brew install --cask codex</code></p>";
       homepage = "https://github.com/openai/codex#readme";
       license = "Apache-2.0";
     };
