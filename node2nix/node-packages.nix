@@ -4545,10 +4545,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.387.0";
+    version = "1.388.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.387.0.tgz";
-      sha512 = "QAFmB0VQZehU7L8luyKIkjPjfcyiW8y/im6FDGzAYsO0kc3P+qxf6V5R0KGweDfVVbOT5WgZOJrxonZMc6sIeg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.388.0.tgz";
+      sha512 = "u8+ePDN9U0DztUe7Y07GMBWvcJIEf6/VdGSHKIXPcyy/MrZpfY3aZ/ION1KSx7UR3OhNxXrLAGiXT9JH+DA35A==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4568,10 +4568,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.26";
+    version = "2.0.27";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.26.tgz";
-      sha512 = "bk/sxGdTEbI0N7g+pTwYq5CNUjdAcvIKXvf/x5oRV9q24b42uq3gijrZGycSbWmtYTIjbzFAHeWw5n7Ic43/6w==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.27.tgz";
+      sha512 = "Ml4tnBeJu+K7MUFLTg8q7U2BE39Vx2D+KI7t86QnFX/K90c58ekFDUUDnfAp1PqTe9vRms6vARJiWzNxrePinA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -5356,10 +5356,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.48.0";
+    version = "0.49.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.48.0.tgz";
-      sha512 = "H8AgMpC3f3N0cZ/dGN85wcqf/c7uOWXDA/+mUcoxvGgSsFNQeDE3YhdSz+L4Fupfsps5Wq4pIS+5KieBihNRYA==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.49.0.tgz";
+      sha512 = "L1sskU5Z0sI3qBFRkBYARt7GXgvBDmpAlcDGlc3bwHQ9qwLKnu8FYbK2DLSHQcE0TqtK9esT2OQiJcBiSgriLg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
