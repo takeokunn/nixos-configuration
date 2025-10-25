@@ -8,7 +8,6 @@
 }:
 let
   awscli = import ./awscli;
-  aider = import ./aider;
   claude-code = import ./claude-code { inherit pkgs nodePkgs mcp-servers-nix; };
   codex = import ./codex { inherit pkgs nodePkgs mcp-servers-nix; };
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
@@ -34,7 +33,6 @@ let
 in
 [
   awscli
-  aider
   claude-code
   codex
   emacs

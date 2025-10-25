@@ -17,7 +17,6 @@
       "*~"
       ".DS_Store"
       ".dir-locals-2.el"
-      ".aider*"
       "TAGS"
       ".neotree"
       ".direnv"
