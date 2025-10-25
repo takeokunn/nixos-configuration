@@ -100,11 +100,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761358001,
-        "narHash": "sha256-xYHEBNf2FjLULkRo2gx/XJgnIsJaiAgjP3u+3RWTkRA=",
+        "lastModified": 1761382330,
+        "narHash": "sha256-I+7w+vkPKCAcQ5zyJgRE31L7wDTRPtlxBudirLKGpcI=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "70c4ac027fcfd35860813f1e63c89a6ff5883198",
+        "rev": "c244ca5a9374e64e4de88e496bf8a49aa8ad63bc",
         "type": "github"
       },
       "original": {
@@ -496,15 +496,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1761353572,
-        "narHash": "sha256-xwb0r+j5WTdxgqBCIiOe5xXd7z/Q4muSJOz0XjNYKNA=",
-        "owner": "natsukium",
+        "lastModified": 1761384897,
+        "narHash": "sha256-9Qhrce0Y/dRpPI0WWZMnrozID8xqI7CybtDAsZhgNnk=",
+        "owner": "takeokunn",
         "repo": "mcp-servers-nix",
-        "rev": "4acf9abdf9f17318aabc358349871c8c4daba869",
+        "rev": "23cf2c55176821345f70a21f2d7c7118788d58c9",
         "type": "github"
       },
       "original": {
-        "owner": "natsukium",
+        "owner": "takeokunn",
         "repo": "mcp-servers-nix",
         "type": "github"
       }
