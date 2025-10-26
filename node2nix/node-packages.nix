@@ -2262,13 +2262,13 @@ let
         sha512 = "ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==";
       };
     };
-    "got-14.6.0" = {
+    "got-14.6.1" = {
       name = "got";
       packageName = "got";
-      version = "14.6.0";
+      version = "14.6.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/got/-/got-14.6.0.tgz";
-        sha512 = "K30JHMsHcwhy+JYet3IxRFw+L9rb77y5LE3OkoAD4qzMR9/g30bWYBfkHYVJL2BBPgfU4lJsRwhy4HUkLPQc3g==";
+        url = "https://registry.npmjs.org/got/-/got-14.6.1.tgz";
+        sha512 = "56lZOw904LHKr6KdKN0Zbgz9Lw6cpEAAqZcS+0iY4D27caHoLiFT0EGCbrX9ZKYvt+I2lGl3a8eeDNSbmhyjkQ==";
       };
     };
     "graceful-fs-4.2.10" = {
@@ -2532,13 +2532,13 @@ let
         sha512 = "QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==";
       };
     };
-    "ink-6.3.1" = {
+    "ink-6.4.0" = {
       name = "ink";
       packageName = "ink";
-      version = "6.3.1";
+      version = "6.4.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ink/-/ink-6.3.1.tgz";
-        sha512 = "3wGwITGrzL6rkWsi2gEKzgwdafGn4ZYd3u4oRp+sOPvfoxEHlnoB5Vnk9Uy5dMRUhDOqF3hqr4rLQ4lEzBc2sQ==";
+        url = "https://registry.npmjs.org/ink/-/ink-6.4.0.tgz";
+        sha512 = "v43isNGrHeFfipbQbwz7/Eg0+aWz3ASEdT/s1Ty2JtyBzR3maE0P77FwkMET+Nzh5KbRL3efLgkT/ZzPFzW3BA==";
       };
     };
     "ink-gradient-3.0.0" = {
@@ -4991,7 +4991,7 @@ in
       sources."googleapis-137.1.0"
       sources."googleapis-common-7.2.0"
       sources."gopd-1.2.0"
-      sources."got-14.6.0"
+      sources."got-14.6.1"
       sources."graceful-fs-4.2.11"
       (
         sources."gradient-string-2.0.2"
@@ -5039,7 +5039,7 @@ in
       sources."index-to-position-1.2.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
-      sources."ink-6.3.1"
+      sources."ink-6.4.0"
       sources."ink-gradient-3.0.0"
       sources."ink-spinner-5.0.0"
       sources."ipaddr.js-1.9.1"
@@ -5356,10 +5356,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.49.0";
+    version = "0.50.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.49.0.tgz";
-      sha512 = "L1sskU5Z0sI3qBFRkBYARt7GXgvBDmpAlcDGlc3bwHQ9qwLKnu8FYbK2DLSHQcE0TqtK9esT2OQiJcBiSgriLg==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.50.0.tgz";
+      sha512 = "JsyznJwTdHZIY4u5m1Ok76WMdT54qjLRqKN93EJTPUeNSdE1kzkahSqjCwTIhrnx1vvn3uJtZ24HuOcsfTEPdA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
