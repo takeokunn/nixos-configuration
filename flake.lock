@@ -496,15 +496,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1761384897,
-        "narHash": "sha256-9Qhrce0Y/dRpPI0WWZMnrozID8xqI7CybtDAsZhgNnk=",
-        "owner": "takeokunn",
+        "lastModified": 1761387285,
+        "narHash": "sha256-mNyKzFJ/t8iup58B+ErEZP5gRTdWdpWN9GnPW/1dDsA=",
+        "owner": "natsukium",
         "repo": "mcp-servers-nix",
-        "rev": "23cf2c55176821345f70a21f2d7c7118788d58c9",
+        "rev": "354206a53564e1e4b8ce44cbd72454bd8535c7d3",
         "type": "github"
       },
       "original": {
-        "owner": "takeokunn",
+        "owner": "natsukium",
         "repo": "mcp-servers-nix",
         "type": "github"
       }
