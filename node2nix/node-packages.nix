@@ -1047,13 +1047,13 @@ let
         sha512 = "Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==";
       };
     };
-    "atomically-2.0.3" = {
+    "atomically-2.1.0" = {
       name = "atomically";
       packageName = "atomically";
-      version = "2.0.3";
+      version = "2.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/atomically/-/atomically-2.0.3.tgz";
-        sha512 = "kU6FmrwZ3Lx7/7y3hPS5QnbJfaohcIul5fGqf7ok+4KklIEk9tJ0C2IQPdacSbVUWv6zVHXEBWoWd6NrVMT7Cw==";
+        url = "https://registry.npmjs.org/atomically/-/atomically-2.1.0.tgz";
+        sha512 = "+gDffFXRW6sl/HCwbta7zK4uNqbPjv4YJEAdz7Vu+FLQHe77eZ4bvbJGi4hE0QPeJlMYMA3piXEr1UL3dAwx7Q==";
       };
     };
     "auto-bind-5.0.1" = {
@@ -4035,13 +4035,22 @@ let
         sha512 = "6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==";
       };
     };
-    "stubborn-fs-1.2.5" = {
+    "stubborn-fs-2.0.0" = {
       name = "stubborn-fs";
       packageName = "stubborn-fs";
-      version = "1.2.5";
+      version = "2.0.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/stubborn-fs/-/stubborn-fs-1.2.5.tgz";
-        sha512 = "H2N9c26eXjzL/S/K+i/RHHcFanE74dptvvjM8iwzwbVcWY/zjBbgRqF3K0DY4+OD+uTTASTBvDoxPDaPN02D7g==";
+        url = "https://registry.npmjs.org/stubborn-fs/-/stubborn-fs-2.0.0.tgz";
+        sha512 = "Y0AvSwDw8y+nlSNFXMm2g6L51rBGdAQT20J3YSOqxC53Lo3bjWRtr2BKcfYoAf352WYpsZSTURrA0tqhfgudPA==";
+      };
+    };
+    "stubborn-utils-1.0.1" = {
+      name = "stubborn-utils";
+      packageName = "stubborn-utils";
+      version = "1.0.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/stubborn-utils/-/stubborn-utils-1.0.1.tgz";
+        sha512 = "bwtct4FpoH1eYdSMFc84fxnYynWwsy2u0joj94K+6caiPnjZIpwTLHT2u7CFAS0GumaBZVB5Y2GkJ46mJS76qg==";
       };
     };
     "stubs-3.0.0" = {
@@ -4795,7 +4804,7 @@ in
       sources."async-function-1.0.0"
       sources."async-generator-function-1.0.0"
       sources."asynckit-0.4.0"
-      sources."atomically-2.0.3"
+      sources."atomically-2.1.0"
       sources."auto-bind-5.0.1"
       sources."balanced-match-1.0.2"
       sources."base64-js-1.5.1"
@@ -5252,7 +5261,8 @@ in
       )
       sources."strip-final-newline-4.0.0"
       sources."strip-json-comments-3.1.1"
-      sources."stubborn-fs-1.2.5"
+      sources."stubborn-fs-2.0.0"
+      sources."stubborn-utils-1.0.1"
       sources."stubs-3.0.0"
       sources."supports-color-7.2.0"
       sources."supports-preserve-symlinks-flag-1.0.0"
