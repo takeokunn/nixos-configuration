@@ -11,7 +11,7 @@ with lib;
 {
   options.programs.dust = {
     enable = mkEnableOption "A more intuitive version of du in rust";
-    package = mkPackageOption pkgs "du-dust" { };
+    package = mkPackageOption pkgs "dust" { };
     config = mkOption {
       type = types.lines;
       default = "";
