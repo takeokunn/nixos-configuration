@@ -38,6 +38,7 @@
     };
 
     xremap = {
+      enable = true;
       userName = username;
       serviceMode = "system";
       config = {
