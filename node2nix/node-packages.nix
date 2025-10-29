@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.10.0" = {
+    "@google/gemini-cli-core-0.11.0" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.10.0";
+      version = "0.11.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.10.0.tgz";
-        sha512 = "z0/hIuVWSPy7C+88KwTbC2ejo208mlbb7UzZHzBqIvUpeU0p2JWgC24qFmpmtnuIIQMIbFs55Hqvmh6U3CYtEg==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.11.0.tgz";
+        sha512 = "yBSFuJp134TYcpoMB2aYfTwM66zFnYhRzlTRTSbV1WihE68q5zdgraUTJ5JUNb/wEUR3mx8plRLlDOSvppX58A==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -714,6 +714,15 @@ let
         sha512 = "OS//b51j9uyR3zvwD04Kfs5kHpve2qalQ18JhY/ho3voGYUTPLEG90/ocfKPI48hyHH8T04f7KEEbK6Ue60oZQ==";
       };
     };
+    "@types/emscripten-1.41.5" = {
+      name = "_at_types_slash_emscripten";
+      packageName = "@types/emscripten";
+      version = "1.41.5";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@types/emscripten/-/emscripten-1.41.5.tgz";
+        sha512 = "cMQm7pxu6BxtHyqJ7mQZ2kXWV5SLmugybFdHCBbJ5eHzOo6VhBckEgAT3//rP5FwPHNPeEiq4SmQ5ucBwsOo4Q==";
+      };
+    };
     "@types/glob-8.1.0" = {
       name = "_at_types_slash_glob";
       packageName = "@types/glob";
@@ -777,13 +786,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.9.1" = {
+    "@types/node-24.9.2" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.9.1";
+      version = "24.9.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.9.1.tgz";
-        sha512 = "QoiaXANRkSXK6p0Duvt56W208du4P9Uye9hWLWgGMDTEoKPhuenzNcC4vGUmrNkiOKTlIrBoyNQYNpSwfEZXSg==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.9.2.tgz";
+        sha512 = "uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -3072,6 +3081,15 @@ let
         sha512 = "8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==";
       };
     };
+    "node-addon-api-8.5.0" = {
+      name = "node-addon-api";
+      packageName = "node-addon-api";
+      version = "8.5.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.5.0.tgz";
+        sha512 = "/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==";
+      };
+    };
     "node-fetch-2.7.0" = {
       name = "node-fetch";
       packageName = "node-fetch";
@@ -4134,6 +4152,24 @@ let
         sha512 = "N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==";
       };
     };
+    "tree-sitter-0.25.0" = {
+      name = "tree-sitter";
+      packageName = "tree-sitter";
+      version = "0.25.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/tree-sitter/-/tree-sitter-0.25.0.tgz";
+        sha512 = "PGZZzFW63eElZJDe/b/R/LbsjDDYJa5UEjLZJB59RQsMX+fo0j54fqBPn1MGKav/QNa0JR0zBiVaikYDWCj5KQ==";
+      };
+    };
+    "tree-sitter-bash-0.25.0" = {
+      name = "tree-sitter-bash";
+      packageName = "tree-sitter-bash";
+      version = "0.25.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/tree-sitter-bash/-/tree-sitter-bash-0.25.0.tgz";
+        sha512 = "gZtlj9+qFS81qKxpLfD6H0UssQ3QBc/F0nKkPsiFDyfQF2YBqYvglFJUzchrPpVhZe9kLZTrJ9n2J6lmka69Vg==";
+      };
+    };
     "type-fest-2.19.0" = {
       name = "type-fest";
       packageName = "type-fest";
@@ -4332,6 +4368,15 @@ let
         sha512 = "Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg==";
       };
     };
+    "web-tree-sitter-0.25.10" = {
+      name = "web-tree-sitter";
+      packageName = "web-tree-sitter";
+      version = "0.25.10";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/web-tree-sitter/-/web-tree-sitter-0.25.10.tgz";
+        sha512 = "Y09sF44/13XvgVKgO2cNDw5rGk6s26MgoZPXLESvMXeefBf7i6/73eFurre0IsTW6E14Y0ArIzhUMmjoc7xyzA==";
+      };
+    };
     "webidl-conversions-3.0.1" = {
       name = "webidl-conversions";
       packageName = "webidl-conversions";
@@ -4350,13 +4395,13 @@ let
         sha512 = "saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==";
       };
     };
-    "when-exit-2.1.4" = {
+    "when-exit-2.1.5" = {
       name = "when-exit";
       packageName = "when-exit";
-      version = "2.1.4";
+      version = "2.1.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/when-exit/-/when-exit-2.1.4.tgz";
-        sha512 = "4rnvd3A1t16PWzrBUcSDZqcAmsUIy4minDXT/CZ8F2mVDgd65i4Aalimgz1aQkRGU0iH5eT5+6Rx2TK8o443Pg==";
+        url = "https://registry.npmjs.org/when-exit/-/when-exit-2.1.5.tgz";
+        sha512 = "VGkKJ564kzt6Ms1dbgPP/yuIoQCrsFAnRbptpC5wOEsDaNsbCB2bnfnaA8i/vRs5tjUSEOtIuvl9/MyVsvQZCg==";
       };
     };
     "which-2.0.2" = {
@@ -4554,10 +4599,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.388.0";
+    version = "1.389.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.388.0.tgz";
-      sha512 = "u8+ePDN9U0DztUe7Y07GMBWvcJIEf6/VdGSHKIXPcyy/MrZpfY3aZ/ION1KSx7UR3OhNxXrLAGiXT9JH+DA35A==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.389.0.tgz";
+      sha512 = "GLuqlJNesnA13OkijEaV/bATgRDnzFsp83TGYfhM8hbI+4Ilpb3GqrRpk9Z1jpvcLnZOk04fVqJ2+dK3brRgPg==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4613,10 +4658,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.10.0";
+    version = "0.11.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.10.0.tgz";
-      sha512 = "ezi8Of1gTopjhERcbT7CHUNmq79qW7rNd+7nYWPFFEMjASSGd8gPYZ9SG2aNeAjz92hAMS+TuD98DVeCnVTc1g==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.11.0.tgz";
+      sha512 = "VC2HyT5ozmDLHnR1Bsnq5n9K0nm19thusjJR5DF8p6pmnezmz682bXqC/LZs34rsEYYSDDcj2SH/AohgB4NkBg==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4645,7 +4690,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.10.0"
+      sources."@google/gemini-cli-core-0.11.0"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -4740,6 +4785,7 @@ in
       sources."@tootallnate/once-2.0.0"
       sources."@types/caseless-0.12.5"
       sources."@types/configstore-6.0.2"
+      sources."@types/emscripten-1.41.5"
       sources."@types/glob-8.1.0"
       sources."@types/gradient-string-1.1.6"
       sources."@types/hast-3.0.4"
@@ -4747,7 +4793,7 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.9.1"
+      sources."@types/node-24.9.2"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.2.2"
       sources."@types/request-2.48.13"
@@ -5101,6 +5147,7 @@ in
       sources."module-details-from-path-1.0.4"
       sources."ms-2.1.3"
       sources."negotiator-1.0.0"
+      sources."node-addon-api-8.5.0"
       sources."node-fetch-2.7.0"
       sources."node-gyp-build-4.8.4"
       sources."normalize-package-data-6.0.2"
@@ -5280,6 +5327,8 @@ in
       sources."tinygradient-1.1.5"
       sources."toidentifier-1.0.1"
       sources."tr46-0.0.3"
+      sources."tree-sitter-0.25.0"
+      sources."tree-sitter-bash-0.25.0"
       sources."type-fest-4.41.0"
       (
         sources."type-is-2.0.1"
@@ -5310,9 +5359,10 @@ in
       sources."uuid-9.0.1"
       sources."validate-npm-package-license-3.0.4"
       sources."vary-1.1.2"
+      sources."web-tree-sitter-0.25.10"
       sources."webidl-conversions-3.0.1"
       sources."whatwg-url-5.0.0"
-      sources."when-exit-2.1.4"
+      sources."when-exit-2.1.5"
       sources."which-2.0.2"
       sources."widest-line-5.0.0"
       sources."wrap-ansi-9.0.2"
