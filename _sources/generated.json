@@ -106,7 +106,7 @@
   },
   "emacs-copilot": {
     "cargoLocks": null,
-    "date": "2025-10-28",
+    "date": "2025-10-30",
     "extract": null,
     "name": "emacs-copilot",
     "passthru": null,
@@ -118,12 +118,12 @@
       "name": null,
       "owner": "copilot-emacs",
       "repo": "copilot.el",
-      "rev": "60ded1b231e82ae9c5d427aac2c45b519c8c0c87",
-      "sha256": "sha256-sGdakYi/i013j/J6CRLk/rwi1ucULbLGcCnReDQRPQg=",
+      "rev": "952fc7a8ae06091a46995d32ebde4380e0c71142",
+      "sha256": "sha256-0MRTmWgM8UhdBIkVrM0jseLu/LGOTkeTQQv+DlO+nyw=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "60ded1b231e82ae9c5d427aac2c45b519c8c0c87"
+    "version": "952fc7a8ae06091a46995d32ebde4380e0c71142"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
