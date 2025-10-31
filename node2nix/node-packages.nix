@@ -120,13 +120,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.11.0" = {
+    "@google/gemini-cli-core-0.11.2" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.11.0";
+      version = "0.11.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.11.0.tgz";
-        sha512 = "yBSFuJp134TYcpoMB2aYfTwM66zFnYhRzlTRTSbV1WihE68q5zdgraUTJ5JUNb/wEUR3mx8plRLlDOSvppX58A==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.11.2.tgz";
+        sha512 = "iT5Lgp4ybUD4N4iOkeDBWQBU+3QzW3/7jF4XuQv8OvvI/R1hWXTRJp7/jtx/qMt9Efu1T/ZVpCSj7fBJXFfDrA==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -4098,13 +4098,13 @@ let
         sha512 = "ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==";
       };
     };
-    "tar-7.5.1" = {
+    "tar-7.5.2" = {
       name = "tar";
       packageName = "tar";
-      version = "7.5.1";
+      version = "7.5.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/tar/-/tar-7.5.1.tgz";
-        sha512 = "nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==";
+        url = "https://registry.npmjs.org/tar/-/tar-7.5.2.tgz";
+        sha512 = "7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==";
       };
     };
     "teeny-request-9.0.0" = {
@@ -4622,10 +4622,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.29";
+    version = "2.0.30";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.29.tgz";
-      sha512 = "a/dMfD9UTk+aA6DmNRSMUnMsj/Rk657qE8IKBqYS/Dt5stApJH6cSH0dmZKOIPa/qBHcekUPTrRvVpAC1mTQ9A==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.30.tgz";
+      sha512 = "DbRYVgsuKLFxrVtjEych5Eok+OwOumYj4rUJyXBy9UEIARS6ScGjU7JzTvWJSRjT+ZHV4vTUTrakGD9FJHrFtQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4658,10 +4658,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.11.0";
+    version = "0.11.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.11.0.tgz";
-      sha512 = "VC2HyT5ozmDLHnR1Bsnq5n9K0nm19thusjJR5DF8p6pmnezmz682bXqC/LZs34rsEYYSDDcj2SH/AohgB4NkBg==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.11.2.tgz";
+      sha512 = "jzF3clhv6VTQHwLZAHGmXo/9olHpRy4UKFS6kRqqMfVU1fxWvsIoQxrZce6uvSHHNIARdRQktb8IBvWxih9lqg==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4690,7 +4690,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.11.0"
+      sources."@google/gemini-cli-core-0.11.2"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.0"
@@ -5313,7 +5313,7 @@ in
       sources."stubs-3.0.0"
       sources."supports-color-7.2.0"
       sources."supports-preserve-symlinks-flag-1.0.0"
-      sources."tar-7.5.1"
+      sources."tar-7.5.2"
       (
         sources."teeny-request-9.0.0"
         // {
@@ -5416,10 +5416,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.50.0";
+    version = "0.53.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.50.0.tgz";
-      sha512 = "JsyznJwTdHZIY4u5m1Ok76WMdT54qjLRqKN93EJTPUeNSdE1kzkahSqjCwTIhrnx1vvn3uJtZ24HuOcsfTEPdA==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.53.0.tgz";
+      sha512 = "p9FxjMQuEU1LQ+YG2HPci1fafNAAvL2q8mXJkfTsPLUU1/uTsOohemtbvjC+LYTHd99Y6WseaAdmm1JBXqGsHw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
