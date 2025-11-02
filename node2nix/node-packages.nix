@@ -4062,13 +4062,13 @@ let
         sha512 = "Y0AvSwDw8y+nlSNFXMm2g6L51rBGdAQT20J3YSOqxC53Lo3bjWRtr2BKcfYoAf352WYpsZSTURrA0tqhfgudPA==";
       };
     };
-    "stubborn-utils-1.0.1" = {
+    "stubborn-utils-1.0.2" = {
       name = "stubborn-utils";
       packageName = "stubborn-utils";
-      version = "1.0.1";
+      version = "1.0.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/stubborn-utils/-/stubborn-utils-1.0.1.tgz";
-        sha512 = "bwtct4FpoH1eYdSMFc84fxnYynWwsy2u0joj94K+6caiPnjZIpwTLHT2u7CFAS0GumaBZVB5Y2GkJ46mJS76qg==";
+        url = "https://registry.npmjs.org/stubborn-utils/-/stubborn-utils-1.0.2.tgz";
+        sha512 = "zOh9jPYI+xrNOyisSelgym4tolKTJCQd5GBhK0+0xJvcYDcwlOoxF/rnFKQ2KRZknXSG9jWAp66fwP6AxN9STg==";
       };
     };
     "stubs-3.0.0" = {
@@ -5309,7 +5309,7 @@ in
       sources."strip-final-newline-4.0.0"
       sources."strip-json-comments-3.1.1"
       sources."stubborn-fs-2.0.0"
-      sources."stubborn-utils-1.0.1"
+      sources."stubborn-utils-1.0.2"
       sources."stubs-3.0.0"
       sources."supports-color-7.2.0"
       sources."supports-preserve-symlinks-flag-1.0.0"
