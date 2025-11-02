@@ -7,6 +7,7 @@ with pkgs.vimPlugins;
   vim-gnupg
   editorconfig-nvim
   vim-suda
+  goyo-vim
 
   # cursor
   {
