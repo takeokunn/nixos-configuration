@@ -34,12 +34,10 @@ with pkgs.vimPlugins;
     type = "lua";
     plugin = nvim-lspconfig;
     config = ''
-      local lspconfig = require('lspconfig')
-
       vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { silent = true, buffer = buffer })
 
       if vim.fn.executable('nil') == 1 then
-        lspconfig.nil_ls.setup {
+        vim.lsp.config('nil_ls', {
           settings = {
             ['nil'] = {
               formatting = {
@@ -53,15 +51,16 @@ with pkgs.vimPlugins;
               }
             }
           }
-        }
+        })
+        vim.lsp.enable('nil_ls')
       end
 
       if vim.fn.executable('typescript-language-server') == 1 then
-        lspconfig.ts_ls.setup { }
+        vim.lsp.enable('ts_ls')
       end
 
       if vim.fn.executable('intelephense') == 1 then
-        lspconfig.intelephense.setup { }
+        vim.lsp.enable('intelephense')
       end
     '';
   }
