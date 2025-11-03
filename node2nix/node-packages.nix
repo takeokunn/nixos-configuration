@@ -786,13 +786,13 @@ let
         sha512 = "K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==";
       };
     };
-    "@types/node-24.9.2" = {
+    "@types/node-24.10.0" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "24.9.2";
+      version = "24.10.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-24.9.2.tgz";
-        sha512 = "uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==";
+        url = "https://registry.npmjs.org/@types/node/-/node-24.10.0.tgz";
+        sha512 = "qzQZRBqkFsYyaSWXuEHc2WR9c0a0CXwiE5FWUvn7ZM+vdy1uZLfCunD38UzhuB7YN/J11ndbDBcTmOdxJo9Q7A==";
       };
     };
     "@types/normalize-package-data-2.4.4" = {
@@ -1171,6 +1171,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/bundle-name/-/bundle-name-4.1.0.tgz";
         sha512 = "tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==";
+      };
+    };
+    "byte-counter-0.1.0" = {
+      name = "byte-counter";
+      packageName = "byte-counter";
+      version = "0.1.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/byte-counter/-/byte-counter-0.1.0.tgz";
+        sha512 = "jheRLVMeUKrDBjVw2O5+k4EvR4t9wtxHL+bo/LxfkxsVeuGMy3a5SEGgXdAFA4FSzTrU8rQXQIrsZ3oBq5a0pQ==";
       };
     };
     "bytes-3.1.2" = {
@@ -2271,13 +2280,13 @@ let
         sha512 = "ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==";
       };
     };
-    "got-14.6.1" = {
+    "got-14.6.2" = {
       name = "got";
       packageName = "got";
-      version = "14.6.1";
+      version = "14.6.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/got/-/got-14.6.1.tgz";
-        sha512 = "56lZOw904LHKr6KdKN0Zbgz9Lw6cpEAAqZcS+0iY4D27caHoLiFT0EGCbrX9ZKYvt+I2lGl3a8eeDNSbmhyjkQ==";
+        url = "https://registry.npmjs.org/got/-/got-14.6.2.tgz";
+        sha512 = "bnhvxegqufyxHAmzwCZSscjGLVpw6/NzTXOk2tQVu/b9Q9FeMAgLabYulXEQRwP04UYltnkcZwvBq14fsdqvyw==";
       };
     };
     "graceful-fs-4.2.10" = {
@@ -3846,13 +3855,13 @@ let
         sha512 = "bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==";
       };
     };
-    "simple-git-3.29.0" = {
+    "simple-git-3.30.0" = {
       name = "simple-git";
       packageName = "simple-git";
-      version = "3.29.0";
+      version = "3.30.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/simple-git/-/simple-git-3.29.0.tgz";
-        sha512 = "PEBgFYc8plTys6/XuxinxAJ+6CbXVh+xxsBTOEXw/uYBd3sYlGGoyB12nX5rRPGsFrdnnZWb81qluSl7a83HtA==";
+        url = "https://registry.npmjs.org/simple-git/-/simple-git-3.30.0.tgz";
+        sha512 = "q6lxyDsCmEal/MEGhP1aVyQ3oxnagGlBDOVSIB4XUVLl1iZh0Pah6ebC9V4xBap/RfgP2WlI8EKs0WS0rMEJHg==";
       };
     };
     "slice-ansi-5.0.0" = {
@@ -4062,13 +4071,13 @@ let
         sha512 = "Y0AvSwDw8y+nlSNFXMm2g6L51rBGdAQT20J3YSOqxC53Lo3bjWRtr2BKcfYoAf352WYpsZSTURrA0tqhfgudPA==";
       };
     };
-    "stubborn-utils-1.0.1" = {
+    "stubborn-utils-1.0.2" = {
       name = "stubborn-utils";
       packageName = "stubborn-utils";
-      version = "1.0.1";
+      version = "1.0.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/stubborn-utils/-/stubborn-utils-1.0.1.tgz";
-        sha512 = "bwtct4FpoH1eYdSMFc84fxnYynWwsy2u0joj94K+6caiPnjZIpwTLHT2u7CFAS0GumaBZVB5Y2GkJ46mJS76qg==";
+        url = "https://registry.npmjs.org/stubborn-utils/-/stubborn-utils-1.0.2.tgz";
+        sha512 = "zOh9jPYI+xrNOyisSelgym4tolKTJCQd5GBhK0+0xJvcYDcwlOoxF/rnFKQ2KRZknXSG9jWAp66fwP6AxN9STg==";
       };
     };
     "stubs-3.0.0" = {
@@ -4599,10 +4608,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.389.0";
+    version = "1.390.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.389.0.tgz";
-      sha512 = "GLuqlJNesnA13OkijEaV/bATgRDnzFsp83TGYfhM8hbI+4Ilpb3GqrRpk9Z1jpvcLnZOk04fVqJ2+dK3brRgPg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.390.0.tgz";
+      sha512 = "XNnhKlWioHgeKYBSRkTs/IRTCIm0HWyi/6lIBRoDKyJ4wTpRvlhXlggnbEsxDKQ3U24b0OSXsqW5VZCfOHzTeQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4793,7 +4802,7 @@ in
       sources."@types/http-cache-semantics-4.0.4"
       sources."@types/long-4.0.2"
       sources."@types/minimatch-5.1.2"
-      sources."@types/node-24.9.2"
+      sources."@types/node-24.10.0"
       sources."@types/normalize-package-data-2.4.4"
       sources."@types/react-19.2.2"
       sources."@types/request-2.48.13"
@@ -4862,6 +4871,7 @@ in
       sources."buffer-equal-constant-time-1.0.1"
       sources."bufferutil-4.0.9"
       sources."bundle-name-4.1.0"
+      sources."byte-counter-0.1.0"
       sources."bytes-3.1.2"
       sources."cacheable-lookup-7.0.0"
       (
@@ -5046,7 +5056,7 @@ in
       sources."googleapis-137.1.0"
       sources."googleapis-common-7.2.0"
       sources."gopd-1.2.0"
-      sources."got-14.6.1"
+      sources."got-14.6.2"
       sources."graceful-fs-4.2.11"
       (
         sources."gradient-string-2.0.2"
@@ -5267,7 +5277,7 @@ in
       sources."side-channel-map-1.0.1"
       sources."side-channel-weakmap-1.0.2"
       sources."signal-exit-3.0.7"
-      sources."simple-git-3.29.0"
+      sources."simple-git-3.30.0"
       sources."slice-ansi-7.1.2"
       sources."spdx-correct-3.2.0"
       sources."spdx-exceptions-2.5.0"
@@ -5309,7 +5319,7 @@ in
       sources."strip-final-newline-4.0.0"
       sources."strip-json-comments-3.1.1"
       sources."stubborn-fs-2.0.0"
-      sources."stubborn-utils-1.0.1"
+      sources."stubborn-utils-1.0.2"
       sources."stubs-3.0.0"
       sources."supports-color-7.2.0"
       sources."supports-preserve-symlinks-flag-1.0.0"

@@ -1126,11 +1126,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "faddf42015dacca521e51727bfe0c917aec5bcb8",
-      "sha256": "sha256-eL4/XOXfvc8KICvLF9D6gDrt5iMHLFPLjuu+1zxe8CI=",
+      "rev": "800d34c52ab699cb4452e274ecbf9ff0b774626b",
+      "sha256": "sha256-BVOV2rZMJBYGEm28mw82UeOHOCBpdOMVk0ioezyiBb4=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "faddf42015dacca521e51727bfe0c917aec5bcb8"
+    "version": "800d34c52ab699cb4452e274ecbf9ff0b774626b"
   }
 }
