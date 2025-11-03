@@ -1,7 +1,7 @@
 { inputs }:
 let
   inherit (inputs) nixpkgs xremap;
-  inherit (inputs) home-manager disko;
+  inherit (inputs) home-manager disko nixvim;
 
   username = "take";
   system = "x86_64-linux";
@@ -21,9 +21,13 @@ nixpkgs.lib.nixosSystem {
     {
       home-manager.useUserPackages = true;
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
+      home-manager.sharedModules = [
+        nixvim.homeModules.nixvim
+      ];
       home-manager.extraSpecialArgs = {
         inherit system;
         inherit (inputs) nixpkgs;
+        inherit (inputs) nixvim;
         inherit (inputs) mcp-servers-nix;
         inherit (inputs) emacs-overlay org-babel;
       };

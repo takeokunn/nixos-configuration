@@ -14,7 +14,7 @@ let
   gnupg = import ./gnupg;
   man = import ./man;
   misc = import ./misc;
-  neovim = import ./neovim { inherit pkgs sources; };
+  nixvim = import ./nixvim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
   fzf = import ./fzf;
   readline = import ./readline;
@@ -38,7 +38,7 @@ in
   man
   misc
   password-store
-  neovim
+  nixvim
   fzf
   readline
   ripgrep

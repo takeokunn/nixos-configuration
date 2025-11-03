@@ -1,6 +1,6 @@
 { inputs }:
 let
-  inherit (inputs) nix-darwin home-manager;
+  inherit (inputs) nix-darwin home-manager nixvim;
   inherit (inputs) nixpkgs;
 
   system = "aarch64-darwin";
@@ -27,9 +27,10 @@ nix-darwin.lib.darwinSystem {
       home-manager = {
         useUserPackages = true;
         users."${username}" = import ../../home-manager/advanced.nix;
+        sharedModules = [ nixvim.homeModules.nixvim ];
         extraSpecialArgs = {
           inherit system username;
-          inherit (inputs) nixpkgs;
+          inherit (inputs) nixpkgs nixvim;
           inherit (inputs) mcp-servers-nix;
           inherit (inputs) emacs-overlay org-babel;
         };
