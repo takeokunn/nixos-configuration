@@ -39,6 +39,15 @@ let
         sha512 = "qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==";
       };
     };
+    "@cfworker/json-schema-4.1.1" = {
+      name = "_at_cfworker_slash_json-schema";
+      packageName = "@cfworker/json-schema";
+      version = "4.1.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@cfworker/json-schema/-/json-schema-4.1.1.tgz";
+        sha512 = "gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==";
+      };
+    };
     "@google-cloud/common-5.0.2" = {
       name = "_at_google-cloud_slash_common";
       packageName = "@google-cloud/common";
@@ -246,13 +255,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.20.2" = {
+    "@modelcontextprotocol/sdk-1.21.0" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.20.2";
+      version = "1.21.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.20.2.tgz";
-        sha512 = "6rqTdFt67AAAzln3NOKsXRmv5ZzPkgbfaebKBqUbts7vK1GZudqnrun5a8d3M/h955cam9RHZ6Jb4Y1XhnmFPg==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.21.0.tgz";
+        sha512 = "YFBsXJMFCyI1zP98u7gezMFKX4lgu/XpoZJk7ufI6UlFKXLj2hAMUuRlQX/nrmIPOmhRrG6tw2OQ2ZA/ZlXYpQ==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -928,15 +937,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/agent-base/-/agent-base-7.1.4.tgz";
         sha512 = "MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==";
-      };
-    };
-    "ajv-6.12.6" = {
-      name = "ajv";
-      packageName = "ajv";
-      version = "6.12.6";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/ajv/-/ajv-6.12.6.tgz";
-        sha512 = "j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==";
       };
     };
     "ajv-8.17.1" = {
@@ -1974,15 +1974,6 @@ let
         sha512 = "f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==";
       };
     };
-    "fast-json-stable-stringify-2.1.0" = {
-      name = "fast-json-stable-stringify";
-      packageName = "fast-json-stable-stringify";
-      version = "2.1.0";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz";
-        sha512 = "lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==";
-      };
-    };
     "fast-levenshtein-2.0.6" = {
       name = "fast-levenshtein";
       packageName = "fast-levenshtein";
@@ -2784,15 +2775,6 @@ let
         sha512 = "SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==";
       };
     };
-    "json-schema-traverse-0.4.1" = {
-      name = "json-schema-traverse";
-      packageName = "json-schema-traverse";
-      version = "0.4.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz";
-        sha512 = "xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==";
-      };
-    };
     "json-schema-traverse-1.0.0" = {
       name = "json-schema-traverse";
       packageName = "json-schema-traverse";
@@ -2838,13 +2820,13 @@ let
         sha512 = "h0Un1ieD+HUrzBH6dJXhod3ifSghk5Hw/2Y4/KHBziPlZecrFyE9YOTPU6eOs0V9pYl8gOs86fkr/KN8lUX39A==";
       };
     };
-    "ky-1.13.0" = {
+    "ky-1.14.0" = {
       name = "ky";
       packageName = "ky";
-      version = "1.13.0";
+      version = "1.14.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ky/-/ky-1.13.0.tgz";
-        sha512 = "JeNNGs44hVUp2XxO3FY9WV28ymG7LgO4wju4HL/dCq1A8eKDcFgVrdCn1ssn+3Q/5OQilv5aYsL0DMt5mmAV9w==";
+        url = "https://registry.npmjs.org/ky/-/ky-1.14.0.tgz";
+        sha512 = "Rczb6FMM6JT0lvrOlP5WUOCB7s9XKxzwgErzhKlKde1bEV90FXplV1o87fpt4PU/asJFiqjYJxAJyzJhcrxOsQ==";
       };
     };
     "latest-version-9.0.0" = {
@@ -3457,15 +3439,6 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/pumpify/-/pumpify-2.0.1.tgz";
         sha512 = "m7KOje7jZxrmutanlkS1daj1dS6z6BgslzOXmcSEpIlCxM3VJH7lG5QLeck/6hgF6F4crFf01UtQmNsJfweTAw==";
-      };
-    };
-    "punycode-2.3.1" = {
-      name = "punycode";
-      packageName = "punycode";
-      version = "2.3.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz";
-        sha512 = "vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==";
       };
     };
     "pupa-3.3.0" = {
@@ -4269,15 +4242,6 @@ let
         sha512 = "+dwUY4L35XFYEzE+OAL3sarJdUioVovq+8f7lcIJ7wnmnYQV5UD1Y/lcwaMSyaQ6Bj3JMj1XSTjZbNLHn/19yA==";
       };
     };
-    "uri-js-4.4.1" = {
-      name = "uri-js";
-      packageName = "uri-js";
-      version = "4.4.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz";
-        sha512 = "7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==";
-      };
-    };
     "url-template-2.0.8" = {
       name = "url-template";
       packageName = "url-template";
@@ -4608,10 +4572,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.390.0";
+    version = "1.391.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.390.0.tgz";
-      sha512 = "XNnhKlWioHgeKYBSRkTs/IRTCIm0HWyi/6lIBRoDKyJ4wTpRvlhXlggnbEsxDKQ3U24b0OSXsqW5VZCfOHzTeQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.391.0.tgz";
+      sha512 = "EHUbVI5R9MvzwWkh0oIHLBHiXC1B7BJ9vDAU10yYPZ2BQ+aFNdcOM/Q71dGKyH/ZuaG1Tra0LlsFgeqSQ0Z2Aw==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4631,10 +4595,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.31";
+    version = "2.0.32";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.31.tgz";
-      sha512 = "UiWopkOqZD5EHoDa8jmkT4AOVtvGWjfCOZ+hGlDqbBY5D0hia6kRDgizLsIvMRqnQr1pBAPCpyeWhH/WndaT/A==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.32.tgz";
+      sha512 = "F9uIAfhr1LCuaDDIR/boEzuGXfugC7eGdC4Gb1F7NfjDLFcmKqs2lXpB/pPTPa9Z1nldzFrXgQANUwDc1nla5Q==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4676,6 +4640,7 @@ in
       sources."@alcalzone/ansi-tokenize-0.2.2"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.28.5"
+      sources."@cfworker/json-schema-4.1.1"
       sources."@google-cloud/common-5.0.2"
       (
         sources."@google-cloud/logging-11.2.1"
@@ -4727,15 +4692,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
-      (
-        sources."@modelcontextprotocol/sdk-1.20.2"
-        // {
-          dependencies = [
-            sources."ajv-6.12.6"
-            sources."json-schema-traverse-0.4.1"
-          ];
-        }
-      )
+      sources."@modelcontextprotocol/sdk-1.21.0"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.203.0"
       sources."@opentelemetry/context-async-hooks-2.0.1"
@@ -5009,7 +4966,6 @@ in
       sources."extend-3.0.2"
       sources."extract-zip-2.0.1"
       sources."fast-deep-equal-3.1.3"
-      sources."fast-json-stable-stringify-2.1.0"
       sources."fast-levenshtein-2.0.6"
       sources."fast-uri-3.1.0"
       sources."fd-slicer-1.1.0"
@@ -5131,7 +5087,7 @@ in
       sources."jwa-2.0.1"
       sources."jws-4.0.0"
       sources."keyv-5.5.3"
-      sources."ky-1.13.0"
+      sources."ky-1.14.0"
       sources."latest-version-9.0.0"
       sources."leac-0.6.0"
       sources."lodash.camelcase-4.3.0"
@@ -5205,7 +5161,6 @@ in
       sources."proxy-addr-2.0.7"
       sources."pump-3.0.3"
       sources."pumpify-2.0.1"
-      sources."punycode-2.3.1"
       sources."pupa-3.3.0"
       sources."qs-6.14.0"
       sources."quick-lru-5.1.1"
@@ -5362,7 +5317,6 @@ in
           ];
         }
       )
-      sources."uri-js-4.4.1"
       sources."url-template-2.0.8"
       sources."utf-8-validate-6.0.5"
       sources."util-deprecate-1.0.2"
