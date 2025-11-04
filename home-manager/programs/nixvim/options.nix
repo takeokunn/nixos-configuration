@@ -1,5 +1,5 @@
 {
-  opts = {
+  programs.nixvim.opts = {
     number = false;
     relativenumber = false;
     encoding = "utf-8";
