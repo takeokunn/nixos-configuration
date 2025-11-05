@@ -6,7 +6,7 @@ let
     "x86_64-darwin" = "darwin-amd64";
     "aarch64-darwin" = "darwin-arm64";
   };
-  platform = builtins.getAttr pkgs.system platforms;
+  platform = builtins.getAttr pkgs.stdenv.hostPlatform.system platforms;
 in
 {
   home.packages = [ nodePkgs."@github/copilot-language-server" ];

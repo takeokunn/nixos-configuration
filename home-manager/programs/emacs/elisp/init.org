@@ -5264,7 +5264,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setq consult-org-roam-grep-func #'consult-ripgrep)
     (setq consult-org-roam-buffer-narrow-key ?r)
-    (setq consult-org-roam-buffer-after-buffers t))
+    (setq consult-org-roam-buffer-after-buffers nil))
 #+end_src
 *** org-roam-ui
 #+begin_src emacs-lisp :tangle yes
