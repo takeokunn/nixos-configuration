@@ -113,7 +113,7 @@
           playwright.enable = true;
           terraform.enable = true;
           nixos.enable = true;
-          codex.enable = true;
+          # codex.enable = true;
           serena = {
             enable = true;
             args = [
