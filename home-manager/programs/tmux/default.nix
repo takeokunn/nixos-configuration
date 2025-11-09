@@ -41,9 +41,6 @@
 
       bind-key C-g display-panes
 
-      bind | split-window -h -c '#{pane_current_path}'
-      bind - split-window -v -c '#{pane_current_path}'
-
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
       bind-key -T copy-mode-vi v     send-keys -X begin-selection
