@@ -24,6 +24,7 @@ let
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
   wget = import ./wget { inherit pkgs; };
+  zoxide = import ./zoxide;
 in
 [
   bat
@@ -47,4 +48,5 @@ in
   tmux
   vim
   wget
+  zoxide
 ]
