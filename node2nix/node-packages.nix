@@ -4410,10 +4410,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.393.0";
+    version = "1.394.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.393.0.tgz";
-      sha512 = "kXE1jjxl0OGHrBPtfcUP/fm4K2u+1rTudu2krNKff4VTO2HsilhvdS/t5wf48yo0nQZKhxhDC9+m4WBFi6tJpw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.394.0.tgz";
+      sha512 = "UYulD0kjYg1FitR5j6UznsEQFALMNuSbQx9SNfhc1qlsaghOChc2L5WE+ebJhF19d8gEPY9J8bn8FQaQ+k5kJw==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -5186,10 +5186,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.56.0";
+    version = "0.57.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.56.0.tgz";
-      sha512 = "Sm8zBZHzOetnDXELmydZxNzq2bWwLiHGPP2jpnw/Om/Usyk80Zt2+89sf5aWpayu0OtcxBGfjO8MgnvwpJovXg==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.57.0.tgz";
+      sha512 = "0q+BWb9g7sPmnil5/DQ72LyraJ+vJ6p0av+83OX6kkf7NpzeF4R0YEzgCOe/kbeiJMwBIjBAbt7nQzJ0KTYubQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
