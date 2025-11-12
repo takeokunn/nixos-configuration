@@ -11,7 +11,7 @@ let
   elfeed = import ./packages/elfeed { inherit epkgs; };
   eshell = import ./packages/eshell { inherit epkgs pkgs sources; };
   eww = import ./packages/eww { inherit epkgs; };
-  exwm = import ./packages/exwm { inherit epkgs; };
+  # exwm = import ./packages/exwm { inherit epkgs; };
   file = import ./packages/file { inherit epkgs; };
   ime = import ./packages/ime { inherit epkgs; };
   language = import ./packages/language { inherit epkgs pkgs sources; };
@@ -35,7 +35,7 @@ ai
 ++ elfeed
 ++ eshell
 ++ eww
-++ exwm
+# ++ exwm
 ++ file
 ++ ime
 ++ language

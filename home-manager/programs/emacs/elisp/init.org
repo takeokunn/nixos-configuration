@@ -5311,27 +5311,27 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 * EXWM
 ** exwm
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(exwm-input-set-key) "exwm-input" nil t)
+  ;; (autoload-if-found '(exwm-input-set-key) "exwm-input" nil t)
 #+end_src
 ** exwm-edit
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(exwm-edit--compose-minibuffer) "exwm-edit" nil t)
+  ;; (autoload-if-found '(exwm-edit--compose-minibuffer) "exwm-edit" nil t)
 
   ;; (exwm-input-set-key (kbd "C-c '") #'exwm-edit--compose-minibuffer)
   ;; (exwm-input-set-key (kbd "C-c C-'") #'exwm-edit--compose-minibuffer)
 
-  (with-eval-after-load 'exwm-edit
-    (setq exwm-edit-bind-default-keys nil))
+  ;; (with-eval-after-load 'exwm-edit
+  ;;   (setq exwm-edit-bind-default-keys nil))
 #+end_src
 ** exwm-modeline
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(exwm-modeline-mode) "exwm-modeline")
+  ;; (autoload-if-found '(exwm-modeline-mode) "exwm-modeline")
 
-  (with-eval-after-load 'exwm-core
-    (add-hook 'exwm-mode-hook #'exwm-modeline-mode))
+  ;; (with-eval-after-load 'exwm-core
+  ;;   (add-hook 'exwm-mode-hook #'exwm-modeline-mode))
 
-  (with-eval-after-load 'exwm-modeline
-    (setopt exwm-modeline-short t))
+  ;; (with-eval-after-load 'exwm-modeline
+  ;;   (setopt exwm-modeline-short t))
 #+end_src
 * AI
 ** copilot.el
