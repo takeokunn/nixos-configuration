@@ -13,6 +13,7 @@
     newSession = true;
     customPaneNavigationAndResize = true;
     resizeAmount = 5;
+    disableConfirmationPrompt = true;
 
     plugins = with pkgs; [
       tmuxPlugins.open
@@ -20,6 +21,13 @@
       tmuxPlugins.urlview
       tmuxPlugins.pain-control
       tmuxPlugins.jump
+      tmuxPlugins.resurrect
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+        '';
+      }
       {
         plugin = tmuxPlugins.dracula;
         extraConfig = ''

@@ -26,6 +26,7 @@
       "sequel-ace"
       "sf-symbols"
       "sublime-text"
+      "ngrok"
     ];
   };
 }
