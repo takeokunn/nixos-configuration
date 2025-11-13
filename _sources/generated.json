@@ -463,7 +463,7 @@
   },
   "emacs-ox-typst": {
     "cargoLocks": null,
-    "date": "2025-11-03",
+    "date": "2025-11-12",
     "extract": null,
     "name": "emacs-ox-typst",
     "passthru": null,
@@ -475,12 +475,12 @@
       "name": null,
       "owner": "jmpunkt",
       "repo": "ox-typst",
-      "rev": "a6f6759d269a102c2c18bf82d516568dcba895f9",
-      "sha256": "sha256-8G7P2m+Im4pSSjnYs9+95C/ds2KrglY7+9Jzcphemgc=",
+      "rev": "d75218627ca8441254b1c562c35673cbd96509ff",
+      "sha256": "sha256-DXycbhHJzjdaaZ36ooVbxQ6NVPyFVfGN9EuKc4Hh2os=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "a6f6759d269a102c2c18bf82d516568dcba895f9"
+    "version": "d75218627ca8441254b1c562c35673cbd96509ff"
   },
   "emacs-php-doc-block": {
     "cargoLocks": null,
@@ -1114,7 +1114,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-11-09",
+    "date": "2025-11-12",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1126,11 +1126,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "2f7d73d037439871caf65d58d1df0caf1efa12b4",
-      "sha256": "sha256-TItU4Z/jtXcYUM2Db2GRNkpGxdEWP1dLQrSGHKpLXU4=",
+      "rev": "7a837a752efbb637f9cec20173ea38a404a29c2f",
+      "sha256": "sha256-MrclOUlT1i+gslo3pJfvugMRfvizyXyQJEyxT+4v8rc=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "2f7d73d037439871caf65d58d1df0caf1efa12b4"
+    "version": "7a837a752efbb637f9cec20173ea38a404a29c2f"
   }
 }

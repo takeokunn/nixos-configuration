@@ -804,13 +804,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.2.3" = {
+    "@types/react-19.2.4" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.2.3";
+      version = "19.2.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.2.3.tgz";
-        sha512 = "k5dJVszUiNr1DSe8Cs+knKR6IrqhqdhpUwzqhkS8ecQTSf3THNtbfIp/umqHMpX2bv+9dkx3fwDv/86LcSfvSg==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.2.4.tgz";
+        sha512 = "tBFxBp9Nfyy5rsmefN+WXc1JeW/j2BpBHFdLZbEVfs9wn3E3NRFxwV0pJg8M1qQAexFpvz73hJXFofV0ZAu92A==";
       };
     };
     "@types/request-2.48.13" = {
@@ -1479,13 +1479,13 @@ let
         sha512 = "3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==";
       };
     };
-    "default-browser-5.2.1" = {
+    "default-browser-5.3.0" = {
       name = "default-browser";
       packageName = "default-browser";
-      version = "5.2.1";
+      version = "5.3.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/default-browser/-/default-browser-5.2.1.tgz";
-        sha512 = "WY/3TUME0x3KPYdRRxEJJvXRHV4PyPoUsxtZa78lwItwRQRHhd2U9xOscaT/YTf8uCXIAjeJOFBVEh/7FtD8Xg==";
+        url = "https://registry.npmjs.org/default-browser/-/default-browser-5.3.0.tgz";
+        sha512 = "Qq68+VkJlc8tjnPV1i7HtbIn7ohmjZa88qUvHMIK0ZKUXMCuV45cT7cEXALPUmeXCe0q1DWQkQTemHVaLIFSrg==";
       };
     };
     "default-browser-id-5.0.0" = {
@@ -4585,7 +4585,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.10.1"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.2.3"
+      sources."@types/react-19.2.4"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
@@ -4715,7 +4715,7 @@ in
       sources."decompress-response-10.0.0"
       sources."deep-extend-0.6.0"
       sources."deepmerge-4.3.1"
-      sources."default-browser-5.2.1"
+      sources."default-browser-5.3.0"
       sources."default-browser-id-5.0.0"
       sources."define-lazy-prop-3.0.0"
       sources."delayed-stream-1.0.0"
