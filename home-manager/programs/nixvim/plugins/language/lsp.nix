@@ -1,6 +1,5 @@
 { pkgs }:
 {
-  # nvim-cmp
   plugins.cmp = {
     enable = true;
     settings = {
@@ -22,7 +21,6 @@
     };
   };
 
-  # nvim-lspconfig
   plugins.lsp = {
     enable = true;
     keymaps = {
@@ -31,7 +29,6 @@
       };
     };
     servers = {
-      # nil_ls (Nix LSP)
       nil_ls = {
         enable = true;
         settings = {
@@ -46,11 +43,9 @@
           };
         };
       };
-      # TypeScript LSP
       ts_ls = {
         enable = true;
       };
-      # PHP LSP (外部インストール想定)
       intelephense = {
         enable = true;
         package = null;
@@ -58,13 +53,10 @@
     };
   };
 
-  # lspsaga
   plugins.lspsaga = {
     enable = true;
-    # 設定はデフォルトを使用
   };
 
-  # lspsaga keymaps
   keymaps = [
     {
       mode = "n";

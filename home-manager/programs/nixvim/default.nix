@@ -1,43 +1,28 @@
 { pkgs, sources }:
 let
-  # 基本設定のインポート
-  options = import ./options.nix;
-  globals = import ./globals.nix;
-  keymaps = import ./keymaps.nix;
+  # カスタムプラグインのインポート
+  customPlugins = import ./plugins/custom { inherit pkgs sources; };
 
   # プラグイン設定のインポート
-  # lsp = import ./plugins/lsp.nix { inherit pkgs; };
-  # uiConfig = import ./plugins/ui.nix { inherit pkgs; };
-  # telescopeConfig = import ./plugins/telescope.nix { inherit pkgs; };
-  # gitConfig = import ./plugins/git.nix { inherit pkgs sources; };
-  # editorConfig = import ./plugins/editor.nix { inherit pkgs sources; };
-  # japaneseConfig = import ./plugins/japanese.nix { inherit pkgs sources; };
-  # miscConfig = import ./plugins/misc.nix { inherit pkgs sources; };
+  allPlugins = import ./plugins { inherit pkgs sources customPlugins; };
+
+  # コア設定
+  core = import ./core.nix { inherit pkgs; };
+  globals = import ./globals.nix;
+
+  # オプション
+  displayOpts = import ./options/display.nix;
+  editingOpts = import ./options/editing.nix;
+  searchOpts = import ./options/search.nix;
+
+  # キーマップ
+  basicKeymaps = import ./keymaps/basic.nix;
+  windowKeymaps = import ./keymaps/window.nix;
 in
 {
-  imports = [
-    options
-    globals
-    keymaps
-  ];
-
-  programs.nixvim = {
-    enable = true;
-
-    # syntax on
-    extraConfigLua = ''
-      vim.cmd.syntax("on")
-    '';
-  };
-
-  # fishの設定
-  programs.fish = {
-    interactiveShellInit = ''
-      set -x MANPAGER "nvim -c ASMANPAGER -"
-    '';
-
-    shellAliases = {
-      aibo = "nvim -c 'Aibo claude --dangerously-skip-permissions'";
-    };
+  programs.nixvim = core // allPlugins // {
+    globals = globals;
+    opts = displayOpts // editingOpts // searchOpts;
+    keymaps = basicKeymaps ++ windowKeymaps;
   };
 }

@@ -30,22 +30,6 @@
     };
   };
 
-  # treesitter
-  plugins.treesitter = {
-    enable = true;
-    settings = {
-      highlight = {
-        enable = true;
-      };
-      indent = {
-        enable = true;
-      };
-    };
-    # すべての文法をインストール
-    grammarPackages = pkgs.vimPlugins.nvim-treesitter.allGrammars;
-  };
-
-  # telescope keymaps
   keymaps = [
     {
       mode = "n";
