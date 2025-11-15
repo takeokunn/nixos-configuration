@@ -129,13 +129,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.15.0" = {
+    "@google/gemini-cli-core-0.15.1" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.15.0";
+      version = "0.15.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.15.0.tgz";
-        sha512 = "W47aVbA4UrY0RNj5IKp0oeV+Q4oDZOu+7JcL2kFy3r/m6HdaqTd2A5gOjxnsIdrzhewPXqcGHSiAEXe5eVIUgw==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.15.1.tgz";
+        sha512 = "HXmBr6wRlirBYrwJ7qcal/FqohAl9F8IY3PuAaK9c9Ccc4g2XZyPG6NnugbLrXwU5EIBxqDqwijA5Ho9GqNsjw==";
       };
     };
     "@google/genai-1.16.0" = {
@@ -804,13 +804,13 @@ let
         sha512 = "37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==";
       };
     };
-    "@types/react-19.2.4" = {
+    "@types/react-19.2.5" = {
       name = "_at_types_slash_react";
       packageName = "@types/react";
-      version = "19.2.4";
+      version = "19.2.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/react/-/react-19.2.4.tgz";
-        sha512 = "tBFxBp9Nfyy5rsmefN+WXc1JeW/j2BpBHFdLZbEVfs9wn3E3NRFxwV0pJg8M1qQAexFpvz73hJXFofV0ZAu92A==";
+        url = "https://registry.npmjs.org/@types/react/-/react-19.2.5.tgz";
+        sha512 = "keKxkZMqnDicuvFoJbzrhbtdLSPhj/rZThDlKWCDbgXmUg0rEUFtRssDXKYmtXluZlIqiC5VqkCgRwzuyLHKHw==";
       };
     };
     "@types/request-2.48.13" = {
@@ -1434,13 +1434,13 @@ let
         sha512 = "uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==";
       };
     };
-    "csstype-3.1.3" = {
+    "csstype-3.2.0" = {
       name = "csstype";
       packageName = "csstype";
-      version = "3.1.3";
+      version = "3.2.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz";
-        sha512 = "M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==";
+        url = "https://registry.npmjs.org/csstype/-/csstype-3.2.0.tgz";
+        sha512 = "si++xzRAY9iPp60roQiFta7OFbhrgvcthrhlNAGeQptSY25uJjkfUV8OArC3KLocB8JT8ohz+qgxWCmz8RhjIg==";
       };
     };
     "debug-4.4.3" = {
@@ -1479,13 +1479,13 @@ let
         sha512 = "3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==";
       };
     };
-    "default-browser-5.3.0" = {
+    "default-browser-5.4.0" = {
       name = "default-browser";
       packageName = "default-browser";
-      version = "5.3.0";
+      version = "5.4.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/default-browser/-/default-browser-5.3.0.tgz";
-        sha512 = "Qq68+VkJlc8tjnPV1i7HtbIn7ohmjZa88qUvHMIK0ZKUXMCuV45cT7cEXALPUmeXCe0q1DWQkQTemHVaLIFSrg==";
+        url = "https://registry.npmjs.org/default-browser/-/default-browser-5.4.0.tgz";
+        sha512 = "XDuvSq38Hr1MdN47EDvYtx3U0MTqpCEn+F6ft8z2vYDzMrvQhVp0ui9oQdqW3MvK3vqUETglt1tVGgjLuJ5izg==";
       };
     };
     "default-browser-id-5.0.1" = {
@@ -4410,10 +4410,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.395.0";
+    version = "1.396.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.395.0.tgz";
-      sha512 = "hlZSr2BMO4BXK2b7GiJIa6TZZEuzu5CTJUl/nVrucZYU5Zz1M5RVBErEqGtk5f2Nwvkrl7SwNQMFdP+2feXqgw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.396.0.tgz";
+      sha512 = "oFV45nKDQsUO+2jftBddoRQm28olQNlE4L2ixVdMnUry7SLc/mYGw20hfpgpP6/rSK11YmrWmbfAE4tKqeGLkQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4433,10 +4433,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.37";
+    version = "2.0.42";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.37.tgz";
-      sha512 = "8d4qRGY9/LGqEbYNfno00wg0tprDC0dPNBBZHk8CVvl5vlB8PX2HVwlI6kok3ZNFBMDL+Hqjbp26xXC1hTL6Hw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.42.tgz";
+      sha512 = "poK4Z+mviehjjCIQe+KTU40kSTgnUitxROg79rAwN3L3A7FyvQE8v6jdakvtxYb452/8qBSf+FbvImHvuXn0rw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4451,10 +4451,10 @@ in
   ccusage = nodeEnv.buildNodePackage {
     name = "ccusage";
     packageName = "ccusage";
-    version = "17.1.4";
+    version = "17.1.5";
     src = fetchurl {
-      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.4.tgz";
-      sha512 = "TnosfQkcvjUnyNHQho21q0mlZIidC31XKjRGqIZpJRWZhuqx+v71EgzdnQmi6RpF2q24cUJ14tNlfboJxsVWvg==";
+      url = "https://registry.npmjs.org/ccusage/-/ccusage-17.1.5.tgz";
+      sha512 = "ljzdAffDSxKbIMcn2/Nmi4lOWMiRmeB+U9oG+4aMAUjSs2Fg7K7onYTJBbdxa6yTxcX7KHq/VaW2o9faQD4o+A==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4469,10 +4469,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.15.0";
+    version = "0.15.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.15.0.tgz";
-      sha512 = "U+rSHfREAmuYUlnFtWR7kN+uN3/QLx0cL0NQ52AZDtiItnztKDHtbvfg5kzyRUe2KC63faEGdPYb0SVhxC/eYw==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.15.1.tgz";
+      sha512 = "HXzgpum1KmFvJNpTSyEtduFUW/KtGiZKbt9ef/8bqExyBQtvIPpe+3RU+wOKmNzBVBjtuilL7CvMmnXnfnVAog==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4495,7 +4495,7 @@ in
       sources."@google-cloud/precise-date-4.0.0"
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
-      sources."@google/gemini-cli-core-0.15.0"
+      sources."@google/gemini-cli-core-0.15.1"
       sources."@google/genai-1.16.0"
       (
         sources."@grpc/grpc-js-1.14.1"
@@ -4585,7 +4585,7 @@ in
       sources."@types/minimatch-5.1.2"
       sources."@types/node-24.10.1"
       sources."@types/normalize-package-data-2.4.4"
-      sources."@types/react-19.2.4"
+      sources."@types/react-19.2.5"
       sources."@types/request-2.48.13"
       sources."@types/tinycolor2-1.4.6"
       sources."@types/tough-cookie-4.0.5"
@@ -4710,12 +4710,12 @@ in
       sources."core-util-is-1.0.3"
       sources."cors-2.8.5"
       sources."cross-spawn-7.0.6"
-      sources."csstype-3.1.3"
+      sources."csstype-3.2.0"
       sources."debug-4.4.3"
       sources."decompress-response-10.0.0"
       sources."deep-extend-0.6.0"
       sources."deepmerge-4.3.1"
-      sources."default-browser-5.3.0"
+      sources."default-browser-5.4.0"
       sources."default-browser-id-5.0.1"
       sources."define-lazy-prop-3.0.0"
       sources."delayed-stream-1.0.0"
