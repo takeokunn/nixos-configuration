@@ -24,6 +24,7 @@ let
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
   nix-init = import ./nix-init;
   pandoc = import ./pandoc;
+  k9s = import ./k9s;
 
   # for window manager
   rofi = import ./rofi { inherit pkgs; };
@@ -49,6 +50,7 @@ in
   copilot-language-server
   nix-init
   pandoc
+  k9s
 
   # for window manager
   rofi
