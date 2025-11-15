@@ -5,5 +5,4 @@
     modules.icons = { };
     mockDevIcons = true;
   };
-  plugins.web-devicons.enable = true;
 }
