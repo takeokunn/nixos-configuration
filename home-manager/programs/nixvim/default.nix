@@ -1,7 +1,7 @@
 { pkgs, sources }:
 let
-  # customPackages = import ./packages { inherit pkgs sources; };
-  # plugins = import ./plugins { inherit pkgs sources customPackages; };
+  customPackages = import ./packages { inherit pkgs sources; };
+  plugins = import ./plugins { inherit pkgs sources customPackages; };
   opts = import ./opts;
   keymaps = import ./keymaps;
 in
@@ -21,11 +21,13 @@ in
       maplocalleader = ",";
     };
 
-    performance.byteCompileLua = true;
+    luaLoader.enable = true;
+    performance.byteCompileLua.enable = true;
 
     clipboard.providers = {
       pbcopy.enable = pkgs.stdenv.isDarwin;
       wl-copy.enable = pkgs.stdenv.isLinux;
     };
-  };
+  }
+  // plugins;
 }

@@ -1,4 +1,8 @@
-{ pkgs, sources, customPackages }:
+{
+  pkgs,
+  sources,
+  customPackages,
+}:
 let
   coreEditing = import ./core/editing.nix { inherit pkgs; };
   coreFileExplorer = import ./core/file-explorer.nix { inherit pkgs customPackages; };
@@ -16,15 +20,15 @@ let
   toolsTelescope = import ./tools/telescope.nix { inherit pkgs; };
   toolsMisc = import ./tools/misc.nix { inherit pkgs; };
 in
-  coreEditing
-  // coreFileExplorer
-  // uiStatusline
-  // uiIcons
-  // uiDashboard
-  // languageLsp
-  // languageTreesitter
-  // languageJapanese
-  // languageMarkdown
-  // toolsGit
-  // toolsTelescope
-  // toolsMisc
+coreEditing
+// coreFileExplorer
+// uiStatusline
+// uiIcons
+// uiDashboard
+// languageLsp
+// languageTreesitter
+// languageJapanese
+// languageMarkdown
+// toolsGit
+// toolsTelescope
+// toolsMisc

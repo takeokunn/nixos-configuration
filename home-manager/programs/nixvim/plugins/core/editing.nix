@@ -19,21 +19,21 @@
     };
   };
 
-  extraPlugins = [
-    pkgs.vimPlugins.vim-bracketed-paste
-    pkgs.vimPlugins.vim-table-mode
-    pkgs.vimPlugins.vim-textobj-entire
-    pkgs.vimPlugins.auto-pairs
-    pkgs.vimPlugins.rainbow
-    pkgs.vimPlugins.vim-sandwich
+  extraPlugins = with pkgs.vimPlugins; [
+    vim-bracketed-paste
+    vim-table-mode
+    vim-textobj-entire
+    auto-pairs
+    rainbow
+    vim-sandwich
   ];
 
-  # extraConfigLua = ''
-  #   vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
-  #   vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
+  extraConfigLua = ''
+    vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
+    vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
 
-  #   vim.g.rainbow_active = 1
+    vim.g.rainbow_active = 1
 
-  #   vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
-  # '';
+    vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
+  '';
 }
