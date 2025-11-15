@@ -1,4 +1,4 @@
-{ pkgs, customPlugins }:
+{ pkgs }:
 {
   plugins.hop = {
     enable = true;
@@ -28,12 +28,12 @@
     pkgs.vimPlugins.vim-sandwich
   ];
 
-  extraConfigLua = ''
-    vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
-    vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
+  # extraConfigLua = ''
+  #   vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
+  #   vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
 
-    vim.g.rainbow_active = 1
+  #   vim.g.rainbow_active = 1
 
-    vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
-  '';
+  #   vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
+  # '';
 }

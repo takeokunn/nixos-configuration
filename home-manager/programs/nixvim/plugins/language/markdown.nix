@@ -1,7 +1,7 @@
-{ pkgs, customPlugins }:
+{ pkgs, customPackages }:
 {
   extraPlugins = [
-    customPlugins.nvim-aibo
+    customPackages.nvim-aibo
     pkgs.vimPlugins.vim-markdown
     pkgs.vimPlugins.goyo-vim
   ];

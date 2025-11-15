@@ -1,4 +1,4 @@
-{ pkgs, customPlugins }:
+{ pkgs, customPackages }:
 {
   plugins.gitsigns = {
     enable = true;
@@ -7,6 +7,6 @@
   };
 
   extraPlugins = [
-    customPlugins.vim-gin
+    customPackages.vim-gin
   ];
 }
