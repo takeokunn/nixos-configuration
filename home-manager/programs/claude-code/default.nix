@@ -104,6 +104,7 @@
       define = builtins.readFile ./commands/define.md;
       execute = builtins.readFile ./commands/execute.md;
       markdown = builtins.readFile ./commands/markdown.md;
+      feedback = builtins.readFile ./commands/feedback.md;
     };
 
     mcpServers =
