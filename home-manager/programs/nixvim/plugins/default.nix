@@ -23,7 +23,6 @@ in
 coreEditing
 // coreFileExplorer
 // uiStatusline
-// uiIcons
 // uiDashboard
 // languageLsp
 // languageTreesitter
@@ -32,3 +31,4 @@ coreEditing
 // toolsGit
 // toolsTelescope
 // toolsMisc
+// uiIcons
