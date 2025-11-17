@@ -48,6 +48,7 @@ git diff HEAD
 ### 2. 並列レビューの実行（最重要）
 
 **タイムアウト回避の必須要件**:
+
 - 3つのTaskツールを**1メッセージで同時に呼び出す**
 - 逐次実行は絶対に行わない
 
@@ -81,32 +82,38 @@ Task(subagent_type="design", ...)
 #### a) コード品質 (quality)
 
 **チェック項目**:
+
 - 命名規則、責務分離、DRY原則
 - 可読性、不要コメント・デッドコード
 
 **使用ツール**:
+
 - `serena`: `find_symbol`, `get_symbols_overview`でシンボル分析
 - `context7`: フレームワークのベストプラクティス確認
 
 #### b) セキュリティ (security)
 
 **チェック項目**:
+
 - OWASP Top 10（SQLi, XSS, CSRF等）
 - 入力検証、認証/認可
 - 機密情報の扱い（ハードコード、ログ出力）
 
 **使用ツール**:
+
 - `serena`: `find_referencing_symbols`で認証/認可フロー追跡
 - `grep`: シークレット情報のハードコード検索
 
 #### c) アーキテクチャ (design)
 
 **チェック項目**:
+
 - 既存設計との整合性
 - 依存関係の方向性
 - Serenaメモリに記録されたパターン遵守
 
 **使用ツール**:
+
 - `serena`: `list_memories`, `read_memory`で既存パターン確認
 - `serena`: `find_referencing_symbols`で依存関係分析
 
