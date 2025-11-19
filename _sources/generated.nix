@@ -68,15 +68,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "8e43edf1f3efe094ea42a21863b3b742a339742c";
+    version = "952fc7a8ae06091a46995d32ebde4380e0c71142";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "8e43edf1f3efe094ea42a21863b3b742a339742c";
+      rev = "952fc7a8ae06091a46995d32ebde4380e0c71142";
       fetchSubmodules = false;
-      sha256 = "sha256-HT9gV/zJC1qVICkDS+1+AVcYhE6ntA3gvwl2DJa8mAI=";
+      sha256 = "sha256-0MRTmWgM8UhdBIkVrM0jseLu/LGOTkeTQQv+DlO+nyw=";
     };
-    date = "2025-11-17";
+    date = "2025-10-30";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -629,26 +629,26 @@
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";
-    version = "e73e49b147163d204b41aff9a65d34e2c5a75190";
+    version = "3fcb3e91099257dea59c799e63410f5d5a2d67fb";
     src = fetchFromGitHub {
       owner = "kei-s16";
       repo = "skkeleton-azik-kanatable";
-      rev = "e73e49b147163d204b41aff9a65d34e2c5a75190";
+      rev = "3fcb3e91099257dea59c799e63410f5d5a2d67fb";
       fetchSubmodules = false;
-      sha256 = "sha256-VBf3Rpk3W8AXISss80zOx/E7WIL3e7LiCbYTN7NvGoo=";
+      sha256 = "sha256-H7wOEyptxKtW10+vIv9cehi9PQlgc2PvD6U/cBqx560=";
     };
-    date = "2025-11-16";
+    date = "2024-11-23";
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
+    version = "5c7c0c9e817ef006c57938317fff6c4484fecde5";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
+      rev = "5c7c0c9e817ef006c57938317fff6c4484fecde5";
       fetchSubmodules = false;
-      sha256 = "sha256-b7A8pxCjryaouOqH/LM9/y/DgtA9X2cei0A8IqvbOxg=";
+      sha256 = "sha256-r9eJHxVqWQgQiE8Lcf9gPc+zRPN0MMA7vteEQIeYSXQ=";
     };
-    date = "2025-11-17";
+    date = "2025-11-14";
   };
 }
