@@ -12,7 +12,6 @@ with epkgs;
   md4rd
 
   # Googling
-  google-this
   google-translate
 
   # Mail

@@ -2886,10 +2886,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt mu4e-dashboard-file "~/.emacs.d/misc/mu4e-dashboard.org"))
 #+end_src
 ** Googling
-*** google-this
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(google-this) "google-this" nil t)
-#+END_SRC
 *** google-translate
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
