@@ -15,7 +15,7 @@ let
   languageWeb = import ./language/web.nix { inherit pkgs customPackages; };
 
   toolsGit = import ./tools/git.nix { inherit pkgs customPackages; };
-  toolsTelescope = import ./tools/telescope.nix { inherit pkgs; };
+  toolsTelescope = import ./tools/telescope.nix;
   toolsMisc = import ./tools/misc.nix { inherit pkgs; };
 
   uiStatusline = import ./ui/statusline.nix { inherit pkgs; };

@@ -14,7 +14,6 @@
         telescope = true;
       };
     };
-    lazyLoad.settings.cmd = "Neogit";
   };
 
   plugins.diffview = {

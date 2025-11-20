@@ -73,6 +73,10 @@
 
       use_default_keymaps = true;
 
+      keymaps = {
+        "<Esc>" = "actions.close";
+      };
+
       float = {
         padding = 2;
         max_width = 50;

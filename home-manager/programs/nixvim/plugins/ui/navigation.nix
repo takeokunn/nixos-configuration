@@ -6,6 +6,11 @@
 
   plugins.trouble = {
     enable = true;
+    settings = {
+      keys = {
+        "<Esc>" = "close";
+      };
+    };
   };
 
   plugins.aerial = {
@@ -18,6 +23,9 @@
       layout = {
         default_direction = "right";
         placement = "edge";
+      };
+      keymaps = {
+        "<Esc>" = "actions.close";
       };
     };
     lazyLoad.settings.cmd = "AerialToggle";
