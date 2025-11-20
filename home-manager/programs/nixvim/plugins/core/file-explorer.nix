@@ -105,9 +105,9 @@
     {
       mode = "n";
       key = "<leader>e";
-      action = "<cmd>lua require('oil').toggle_float()<cr>";
+      action = "<cmd>lua require('oil').toggle_float(vim.fn.getcwd())<cr>";
       options = {
-        desc = "Toggle Oil file explorer";
+        desc = "Toggle Oil file explorer (project root)";
         silent = true;
       };
     }
