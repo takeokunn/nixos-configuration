@@ -18,12 +18,6 @@
     src = sources.vimdoc-ja.src;
   };
 
-  vim-gin = pkgs.vimUtils.buildVimPlugin {
-    pname = sources.vim-gin.pname;
-    version = sources.vim-gin.date;
-    src = sources.vim-gin.src;
-  };
-
   nvim-aibo = pkgs.vimUtils.buildVimPlugin {
     pname = sources.nvim-aibo.pname;
     version = sources.nvim-aibo.version;
