@@ -6,6 +6,7 @@
       snippet.expand.__raw = "function(args) vim.fn['vsnip#anonymous'](args.body) end";
       sources = [
         { name = "nvim_lsp"; }
+        { name = "luasnip"; }
         { name = "path"; }
       ];
       mapping = {
@@ -37,6 +38,7 @@
           };
           nix = {
             flake = {
+              autoArchive = true;
               autoEvalInputs = true;
               nixpkgsInputName = "nixpkgs";
             };
@@ -50,12 +52,45 @@
         enable = true;
         package = null;
       };
+      gopls = {
+        enable = true;
+      };
+      html = {
+        enable = true;
+      };
+      cssls = {
+        enable = true;
+      };
+      bashls = {
+        enable = true;
+      };
+      emmet_ls = {
+        enable = true;
+        filetypes = [
+          "html"
+          "css"
+          "scss"
+          "javascript"
+          "javascriptreact"
+          "typescript"
+          "typescriptreact"
+        ];
+      };
     };
   };
 
   plugins.lspsaga = {
     enable = true;
+    lazyLoad.settings = {
+      event = "LspAttach";
+    };
   };
+
+  extraConfigLua = ''
+    vim.diagnostic.config({
+      virtual_text = false
+    })
+  '';
 
   keymaps = [
     {

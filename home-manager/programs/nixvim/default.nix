@@ -3,11 +3,22 @@ let
   customPackages = import ./packages { inherit pkgs sources; };
   plugins = import ./plugins { inherit pkgs sources customPackages; };
   opts = import ./opts;
-  keymaps = import ./keymaps;
+  baseKeymaps = import ./keymaps;
+  basicGlobals = import ./globals;
+
+  keymaps = baseKeymaps ++ (plugins.keymaps or [ ]);
+  globals = basicGlobals // (plugins.globals or { });
+  userCommands = plugins.userCommands or { };
 in
 {
   programs.nixvim = {
-    inherit opts keymaps;
+    inherit
+      opts
+      keymaps
+      globals
+      userCommands
+      ;
+    inherit (plugins) plugins extraPlugins;
 
     enable = true;
     enableMan = true;
@@ -16,18 +27,27 @@ in
     editorconfig.enable = true;
     colorschemes.dracula.enable = true;
 
-    globals = {
-      mapleader = ",";
-      maplocalleader = ",";
-    };
-
     luaLoader.enable = true;
-    performance.byteCompileLua.enable = true;
+    performance.byteCompileLua = {
+      enable = true;
+      nvimRuntime = true;
+      configs = true;
+      plugins = true;
+    };
 
     clipboard.providers = {
       pbcopy.enable = pkgs.stdenv.isDarwin;
       wl-copy.enable = pkgs.stdenv.isLinux;
     };
-  }
-  // plugins;
+
+    _module.args = {
+      inherit customPackages;
+    };
+
+    imports = [
+      ./modules/vim-sandwich.nix
+      ./modules/skkeleton.nix
+      ./modules/oil-git-status.nix
+    ];
+  };
 }

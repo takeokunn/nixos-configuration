@@ -68,15 +68,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "952fc7a8ae06091a46995d32ebde4380e0c71142";
+    version = "8e43edf1f3efe094ea42a21863b3b742a339742c";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "952fc7a8ae06091a46995d32ebde4380e0c71142";
+      rev = "8e43edf1f3efe094ea42a21863b3b742a339742c";
       fetchSubmodules = false;
-      sha256 = "sha256-0MRTmWgM8UhdBIkVrM0jseLu/LGOTkeTQQv+DlO+nyw=";
+      sha256 = "sha256-HT9gV/zJC1qVICkDS+1+AVcYhE6ntA3gvwl2DJa8mAI=";
     };
-    date = "2025-10-30";
+    date = "2025-11-17";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -519,66 +519,6 @@
     };
     date = "2020-10-25";
   };
-  vim-denippet = {
-    pname = "vim-denippet";
-    version = "9a19bb6ddcdeb7a60860ac27e180d6d400ab10c7";
-    src = fetchFromGitHub {
-      owner = "uga-rosa";
-      repo = "denippet.vim";
-      rev = "9a19bb6ddcdeb7a60860ac27e180d6d400ab10c7";
-      fetchSubmodules = false;
-      sha256 = "sha256-98EGTcsh6wRkAcYKUBj2ar6HkCZav6wAt54xYrS/pJY=";
-    };
-    date = "2024-06-27";
-  };
-  vim-denippet-autoimport-vscode = {
-    pname = "vim-denippet-autoimport-vscode";
-    version = "81c09c53a61e4b42234fee43ce26f0ceb196b9b7";
-    src = fetchFromGitHub {
-      owner = "ryoppippi";
-      repo = "denippet-autoimport-vscode";
-      rev = "81c09c53a61e4b42234fee43ce26f0ceb196b9b7";
-      fetchSubmodules = false;
-      sha256 = "sha256-g3W4Ski+8dkY9fMfnFpi2Irytou4qSqb6Gess7LN7aI=";
-    };
-    date = "2024-05-06";
-  };
-  vim-fern = {
-    pname = "vim-fern";
-    version = "cb60188e312e2218f78a760f38164bbe51932c0d";
-    src = fetchFromGitHub {
-      owner = "lambdalisue";
-      repo = "vim-fern";
-      rev = "cb60188e312e2218f78a760f38164bbe51932c0d";
-      fetchSubmodules = false;
-      sha256 = "sha256-K5Oa79uKpt6NcLyKAqL73M5237il+gf/8YXeNcpLatU=";
-    };
-    date = "2025-10-20";
-  };
-  vim-fern-renderer-nerdfont = {
-    pname = "vim-fern-renderer-nerdfont";
-    version = "325629c68eb543229715b68920fbcb92b206beb6";
-    src = fetchFromGitHub {
-      owner = "lambdalisue";
-      repo = "vim-fern-renderer-nerdfont";
-      rev = "325629c68eb543229715b68920fbcb92b206beb6";
-      fetchSubmodules = false;
-      sha256 = "sha256-bcFIyPHxdckmmEGSCr9F5hLGTENF+KgRoz2BK49rGv4=";
-    };
-    date = "2024-07-13";
-  };
-  vim-friendly-snippets = {
-    pname = "vim-friendly-snippets";
-    version = "572f5660cf05f8cd8834e096d7b4c921ba18e175";
-    src = fetchFromGitHub {
-      owner = "rafamadriz";
-      repo = "friendly-snippets";
-      rev = "572f5660cf05f8cd8834e096d7b4c921ba18e175";
-      fetchSubmodules = false;
-      sha256 = "sha256-FzApcTbWfFkBD9WsYMhaCyn6ky8UmpUC2io/co/eByM=";
-    };
-    date = "2025-04-29";
-  };
   vim-gin = {
     pname = "vim-gin";
     version = "e9200f66986ddd447220166d4467f9c92c8565a4";
@@ -590,30 +530,6 @@
       sha256 = "sha256-7gRGIwfZAYzcu+IqaJp+Kxwf+uZ/pyDHsyhUVcTcyqk=";
     };
     date = "2025-10-20";
-  };
-  vim-neco = {
-    pname = "vim-neco";
-    version = "7b722cd13a44645e4ed9b1e4fe6ff8ad64f947f6";
-    src = fetchFromGitHub {
-      owner = "Shougo";
-      repo = "neco-vim";
-      rev = "7b722cd13a44645e4ed9b1e4fe6ff8ad64f947f6";
-      fetchSubmodules = false;
-      sha256 = "sha256-uBUl7DTCSRN8/YGiFKSUzTAg+BllvQ8PsTy7nzul10c=";
-    };
-    date = "2025-03-06";
-  };
-  vim-nerdfont = {
-    pname = "vim-nerdfont";
-    version = "3605ba4ba4dc0295f5eb400506fd05b451df3e1f";
-    src = fetchFromGitHub {
-      owner = "lambdalisue";
-      repo = "vim-nerdfont";
-      rev = "3605ba4ba4dc0295f5eb400506fd05b451df3e1f";
-      fetchSubmodules = false;
-      sha256 = "sha256-srTetFxbf1ZltYCBXB308WayMupRwQMJLd7Up7kYEuU=";
-    };
-    date = "2025-02-21";
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
@@ -629,26 +545,26 @@
   };
   vim-skkeleton-azik = {
     pname = "vim-skkeleton-azik";
-    version = "3fcb3e91099257dea59c799e63410f5d5a2d67fb";
+    version = "e73e49b147163d204b41aff9a65d34e2c5a75190";
     src = fetchFromGitHub {
       owner = "kei-s16";
       repo = "skkeleton-azik-kanatable";
-      rev = "3fcb3e91099257dea59c799e63410f5d5a2d67fb";
+      rev = "e73e49b147163d204b41aff9a65d34e2c5a75190";
       fetchSubmodules = false;
-      sha256 = "sha256-H7wOEyptxKtW10+vIv9cehi9PQlgc2PvD6U/cBqx560=";
+      sha256 = "sha256-VBf3Rpk3W8AXISss80zOx/E7WIL3e7LiCbYTN7NvGoo=";
     };
-    date = "2024-11-23";
+    date = "2025-11-16";
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "5c7c0c9e817ef006c57938317fff6c4484fecde5";
+    version = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "5c7c0c9e817ef006c57938317fff6c4484fecde5";
+      rev = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
       fetchSubmodules = false;
-      sha256 = "sha256-r9eJHxVqWQgQiE8Lcf9gPc+zRPN0MMA7vteEQIeYSXQ=";
+      sha256 = "sha256-b7A8pxCjryaouOqH/LM9/y/DgtA9X2cei0A8IqvbOxg=";
     };
-    date = "2025-11-14";
+    date = "2025-11-17";
   };
 }

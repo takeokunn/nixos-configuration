@@ -18,24 +18,6 @@
     src = sources.vimdoc-ja.src;
   };
 
-  vim-fern = pkgs.vimUtils.buildVimPlugin {
-    pname = sources.vim-fern.pname;
-    version = sources.vim-fern.date;
-    src = sources.vim-fern.src;
-  };
-
-  vim-nerdfont = pkgs.vimUtils.buildVimPlugin {
-    pname = sources.vim-nerdfont.pname;
-    version = sources.vim-nerdfont.date;
-    src = sources.vim-nerdfont.src;
-  };
-
-  vim-fern-renderer-nerdfont = pkgs.vimUtils.buildVimPlugin {
-    pname = sources.vim-fern-renderer-nerdfont.pname;
-    version = sources.vim-fern-renderer-nerdfont.date;
-    src = sources.vim-fern-renderer-nerdfont.src;
-  };
-
   vim-gin = pkgs.vimUtils.buildVimPlugin {
     pname = sources.vim-gin.pname;
     version = sources.vim-gin.date;

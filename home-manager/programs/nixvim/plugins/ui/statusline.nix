@@ -4,9 +4,16 @@
     enable = true;
     settings = {
       options = {
-        icons_enabled = false;
-        section_separators = "";
-        component_separators = "";
+        icons_enabled = true;
+        theme = "dracula";
+        section_separators = {
+          left = "";
+          right = "";
+        };
+        component_separators = {
+          left = "│";
+          right = "│";
+        };
       };
     };
   };

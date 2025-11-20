@@ -10,6 +10,4 @@
   expandtab = true;
 
   swapfile = false;
-  splitbelow = true;
-  splitright = true;
 }

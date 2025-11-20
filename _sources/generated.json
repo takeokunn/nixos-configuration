@@ -106,7 +106,7 @@
   },
   "emacs-copilot": {
     "cargoLocks": null,
-    "date": "2025-10-30",
+    "date": "2025-11-17",
     "extract": null,
     "name": "emacs-copilot",
     "passthru": null,
@@ -118,12 +118,12 @@
       "name": null,
       "owner": "copilot-emacs",
       "repo": "copilot.el",
-      "rev": "952fc7a8ae06091a46995d32ebde4380e0c71142",
-      "sha256": "sha256-0MRTmWgM8UhdBIkVrM0jseLu/LGOTkeTQQv+DlO+nyw=",
+      "rev": "8e43edf1f3efe094ea42a21863b3b742a339742c",
+      "sha256": "sha256-HT9gV/zJC1qVICkDS+1+AVcYhE6ntA3gvwl2DJa8mAI=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "952fc7a8ae06091a46995d32ebde4380e0c71142"
+    "version": "8e43edf1f3efe094ea42a21863b3b742a339742c"
   },
   "emacs-direnv-mode": {
     "cargoLocks": null,
@@ -902,111 +902,6 @@
     },
     "version": "ff9638511e05b0aca236d63071c621977cffce38"
   },
-  "vim-denippet": {
-    "cargoLocks": null,
-    "date": "2024-06-27",
-    "extract": null,
-    "name": "vim-denippet",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "uga-rosa",
-      "repo": "denippet.vim",
-      "rev": "9a19bb6ddcdeb7a60860ac27e180d6d400ab10c7",
-      "sha256": "sha256-98EGTcsh6wRkAcYKUBj2ar6HkCZav6wAt54xYrS/pJY=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "9a19bb6ddcdeb7a60860ac27e180d6d400ab10c7"
-  },
-  "vim-denippet-autoimport-vscode": {
-    "cargoLocks": null,
-    "date": "2024-05-06",
-    "extract": null,
-    "name": "vim-denippet-autoimport-vscode",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "ryoppippi",
-      "repo": "denippet-autoimport-vscode",
-      "rev": "81c09c53a61e4b42234fee43ce26f0ceb196b9b7",
-      "sha256": "sha256-g3W4Ski+8dkY9fMfnFpi2Irytou4qSqb6Gess7LN7aI=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "81c09c53a61e4b42234fee43ce26f0ceb196b9b7"
-  },
-  "vim-fern": {
-    "cargoLocks": null,
-    "date": "2025-10-20",
-    "extract": null,
-    "name": "vim-fern",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "lambdalisue",
-      "repo": "vim-fern",
-      "rev": "cb60188e312e2218f78a760f38164bbe51932c0d",
-      "sha256": "sha256-K5Oa79uKpt6NcLyKAqL73M5237il+gf/8YXeNcpLatU=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "cb60188e312e2218f78a760f38164bbe51932c0d"
-  },
-  "vim-fern-renderer-nerdfont": {
-    "cargoLocks": null,
-    "date": "2024-07-13",
-    "extract": null,
-    "name": "vim-fern-renderer-nerdfont",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "lambdalisue",
-      "repo": "vim-fern-renderer-nerdfont",
-      "rev": "325629c68eb543229715b68920fbcb92b206beb6",
-      "sha256": "sha256-bcFIyPHxdckmmEGSCr9F5hLGTENF+KgRoz2BK49rGv4=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "325629c68eb543229715b68920fbcb92b206beb6"
-  },
-  "vim-friendly-snippets": {
-    "cargoLocks": null,
-    "date": "2025-04-29",
-    "extract": null,
-    "name": "vim-friendly-snippets",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "rafamadriz",
-      "repo": "friendly-snippets",
-      "rev": "572f5660cf05f8cd8834e096d7b4c921ba18e175",
-      "sha256": "sha256-FzApcTbWfFkBD9WsYMhaCyn6ky8UmpUC2io/co/eByM=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "572f5660cf05f8cd8834e096d7b4c921ba18e175"
-  },
   "vim-gin": {
     "cargoLocks": null,
     "date": "2025-10-20",
@@ -1027,48 +922,6 @@
       "type": "github"
     },
     "version": "e9200f66986ddd447220166d4467f9c92c8565a4"
-  },
-  "vim-neco": {
-    "cargoLocks": null,
-    "date": "2025-03-06",
-    "extract": null,
-    "name": "vim-neco",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "Shougo",
-      "repo": "neco-vim",
-      "rev": "7b722cd13a44645e4ed9b1e4fe6ff8ad64f947f6",
-      "sha256": "sha256-uBUl7DTCSRN8/YGiFKSUzTAg+BllvQ8PsTy7nzul10c=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "7b722cd13a44645e4ed9b1e4fe6ff8ad64f947f6"
-  },
-  "vim-nerdfont": {
-    "cargoLocks": null,
-    "date": "2025-02-21",
-    "extract": null,
-    "name": "vim-nerdfont",
-    "passthru": null,
-    "pinned": false,
-    "src": {
-      "deepClone": false,
-      "fetchSubmodules": false,
-      "leaveDotGit": false,
-      "name": null,
-      "owner": "lambdalisue",
-      "repo": "vim-nerdfont",
-      "rev": "3605ba4ba4dc0295f5eb400506fd05b451df3e1f",
-      "sha256": "sha256-srTetFxbf1ZltYCBXB308WayMupRwQMJLd7Up7kYEuU=",
-      "sparseCheckout": [],
-      "type": "github"
-    },
-    "version": "3605ba4ba4dc0295f5eb400506fd05b451df3e1f"
   },
   "vim-skkeleton": {
     "cargoLocks": null,
@@ -1093,7 +946,7 @@
   },
   "vim-skkeleton-azik": {
     "cargoLocks": null,
-    "date": "2024-11-23",
+    "date": "2025-11-16",
     "extract": null,
     "name": "vim-skkeleton-azik",
     "passthru": null,
@@ -1105,16 +958,16 @@
       "name": null,
       "owner": "kei-s16",
       "repo": "skkeleton-azik-kanatable",
-      "rev": "3fcb3e91099257dea59c799e63410f5d5a2d67fb",
-      "sha256": "sha256-H7wOEyptxKtW10+vIv9cehi9PQlgc2PvD6U/cBqx560=",
+      "rev": "e73e49b147163d204b41aff9a65d34e2c5a75190",
+      "sha256": "sha256-VBf3Rpk3W8AXISss80zOx/E7WIL3e7LiCbYTN7NvGoo=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "3fcb3e91099257dea59c799e63410f5d5a2d67fb"
+    "version": "e73e49b147163d204b41aff9a65d34e2c5a75190"
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-11-14",
+    "date": "2025-11-17",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1126,11 +979,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "5c7c0c9e817ef006c57938317fff6c4484fecde5",
-      "sha256": "sha256-r9eJHxVqWQgQiE8Lcf9gPc+zRPN0MMA7vteEQIeYSXQ=",
+      "rev": "ccaee3abb62703cfcb918e3b2038621f891d01a5",
+      "sha256": "sha256-b7A8pxCjryaouOqH/LM9/y/DgtA9X2cei0A8IqvbOxg=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "5c7c0c9e817ef006c57938317fff6c4484fecde5"
+    "version": "ccaee3abb62703cfcb918e3b2038621f891d01a5"
   }
 }

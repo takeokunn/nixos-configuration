@@ -230,41 +230,6 @@ src.git = "https://github.com/kei-s16/skkeleton-azik-kanatable"
 src.branch = "main"
 fetch.github = "kei-s16/skkeleton-azik-kanatable"
 
-[vim-neco]
-src.git = "https://github.com/Shougo/neco-vim"
-src.branch = "master"
-fetch.github = "Shougo/neco-vim"
-
-[vim-friendly-snippets]
-src.git = "https://github.com/rafamadriz/friendly-snippets"
-src.branch = "main"
-fetch.github = "rafamadriz/friendly-snippets"
-
-[vim-denippet-autoimport-vscode]
-src.git = "https://github.com/ryoppippi/denippet-autoimport-vscode"
-src.branch = "main"
-fetch.github = "ryoppippi/denippet-autoimport-vscode"
-
-[vim-denippet]
-src.git = "https://github.com/uga-rosa/denippet.vim"
-src.branch = "main"
-fetch.github = "uga-rosa/denippet.vim"
-
-[vim-nerdfont]
-src.git = "https://github.com/lambdalisue/vim-nerdfont"
-src.branch = "master"
-fetch.github = "lambdalisue/vim-nerdfont"
-
-[vim-fern]
-src.git = "https://github.com/lambdalisue/vim-fern"
-src.branch = "main"
-fetch.github = "lambdalisue/vim-fern"
-
-[vim-fern-renderer-nerdfont]
-src.git = "https://github.com/lambdalisue/vim-fern-renderer-nerdfont"
-src.branch = "master"
-fetch.github = "lambdalisue/vim-fern-renderer-nerdfont"
-
 [vim-gin]
 src.git = "https://github.com/lambdalisue/vim-gin"
 src.branch = "main"

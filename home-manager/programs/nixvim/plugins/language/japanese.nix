@@ -1,28 +1,31 @@
 { pkgs, customPackages }:
 {
+  plugins.skkeleton = {
+    enable = true;
+    eggLikeNewline = true;
+    keepState = true;
+    sources = [ "skk_server" ];
+    kanaTable = "azik";
+    azikTable = "us";
+    customKanaTable = {
+      ss = [ "せい" ];
+    };
+  };
+
   extraPlugins = [
-    pkgs.vimPlugins.denops-vim
     pkgs.vimPlugins.vim-manpager
-    customPackages.skkeleton
-    customPackages.skkeleton-azik
     customPackages.vimdoc-ja
   ];
 
-  extraConfigLua = ''
-    vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { silent = true })
-
-    -- vim.fn['skkeleton#config']({
-    --   eggLikeNewline = true,
-    --   keepState = true,
-    --   sources = { "skk_server" }
-    -- })
-
-    -- vim.fn['skkeleton#azik#add_table']('us')
-    -- vim.fn['skkeleton#config']({
-    --   kanaTable = 'azik'
-    -- })
-    -- vim.call("skkeleton#register_kanatable", "azik", {
-    --   ss = { "せい" },
-    -- })
-  '';
+  keymaps = [
+    {
+      mode = [
+        "i"
+        "c"
+      ];
+      key = "<C-j>";
+      action = "<Plug>(skkeleton-toggle)";
+      options.silent = true;
+    }
+  ];
 }

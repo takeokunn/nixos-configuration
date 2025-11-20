@@ -4,14 +4,6 @@
     enable = true;
   };
 
-  keymaps = [
-    {
-      mode = "n";
-      key = "f";
-      action = "<Cmd>HopChar1<CR>";
-    }
-  ];
-
   plugins.undotree = {
     enable = true;
     settings = {
@@ -19,21 +11,69 @@
     };
   };
 
+  plugins.vim-sandwich = {
+    enable = true;
+    skipSpace = true;
+  };
+
+  plugins.luasnip = {
+    enable = true;
+    filetypeExtend = {
+      typescript = [ "javascript" ];
+      typescriptreact = [
+        "typescript"
+        "javascript"
+      ];
+    };
+  };
+
+  # Lua製の自動ペアリングプラグイン
+  plugins.nvim-autopairs = {
+    enable = true;
+    settings = {
+      check_ts = true;
+      ts_config = {
+        lua = [
+          "string"
+          "source"
+        ];
+        javascript = [
+          "string"
+          "template_string"
+        ];
+      };
+    };
+  };
+
+  # Lua製のレインボー括弧プラグイン
+  plugins.rainbow-delimiters = {
+    enable = true;
+  };
+
   extraPlugins = with pkgs.vimPlugins; [
-    vim-bracketed-paste
     vim-table-mode
     vim-textobj-entire
-    auto-pairs
-    rainbow
-    vim-sandwich
   ];
 
-  extraConfigLua = ''
-    vim.api.nvim_create_user_command('UndotreeToggleAndFocus', ':UndotreeToggle | :UndotreeFocus', {})
-    vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggleAndFocus)
+  userCommands = {
+    UndotreeToggleAndFocus = {
+      command = ":UndotreeToggle | :UndotreeFocus";
+      desc = "Toggle and focus Undotree";
+    };
+  };
 
-    vim.g.rainbow_active = 1
-
-    vim.call('operator#sandwich#set', 'add', 'char', 'skip_space', 1)
-  '';
+  keymaps = [
+    # hop
+    {
+      mode = "n";
+      key = "f";
+      action = "<Cmd>HopChar1<CR>";
+    }
+    # undotree
+    {
+      mode = "n";
+      key = "<leader>u";
+      action = "<cmd>UndotreeToggleAndFocus<CR>";
+    }
+  ];
 }
