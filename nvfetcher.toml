@@ -16,6 +16,11 @@ src.git = "https://github.com/molnarmark/sublime-gleam"
 src.branch = "main"
 fetch.github = "molnarmark/sublime-gleam"
 
+[sublime-justfile]
+src.git = "https://github.com/nk9/just_sublime"
+src.branch = "main"
+fetch.github = "nk9/just_sublime"
+
 # for fish
 
 [fish-bd]

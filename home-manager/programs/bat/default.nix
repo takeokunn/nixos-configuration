@@ -13,6 +13,10 @@
         src = sources.sublime-gleam.src;
         file = "syntax/gleam.sublime-syntax";
       };
+      justfile = {
+        src = sources.sublime-justfile.src;
+        file = "Syntax/Just.sublime-syntax";
+      };
     };
   };
 

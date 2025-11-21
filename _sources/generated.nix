@@ -519,6 +519,18 @@
     };
     date = "2020-10-25";
   };
+  sublime-justfile = {
+    pname = "sublime-justfile";
+    version = "f42cdb012b6033035ee46bfeac1ecd7dca460e55";
+    src = fetchFromGitHub {
+      owner = "nk9";
+      repo = "just_sublime";
+      rev = "f42cdb012b6033035ee46bfeac1ecd7dca460e55";
+      fetchSubmodules = false;
+      sha256 = "sha256-VxI5BPrNVOwIRwdZKm8OhTuXCVKOdG8OGKiCne9cwc8=";
+    };
+    date = "2025-05-08";
+  };
   vim-gin = {
     pname = "vim-gin";
     version = "e9200f66986ddd447220166d4467f9c92c8565a4";
@@ -557,14 +569,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
+    version = "358ae44591d48e82bc2aff0fa5262eb9a68c252a";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "ccaee3abb62703cfcb918e3b2038621f891d01a5";
+      rev = "358ae44591d48e82bc2aff0fa5262eb9a68c252a";
       fetchSubmodules = false;
-      sha256 = "sha256-b7A8pxCjryaouOqH/LM9/y/DgtA9X2cei0A8IqvbOxg=";
+      sha256 = "sha256-QaMJQC5rxrlnQH1Uo1lYR1wqKHKoh/ppUkDRCdNZgPQ=";
     };
-    date = "2025-11-17";
+    date = "2025-11-21";
   };
 }

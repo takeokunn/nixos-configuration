@@ -902,6 +902,27 @@
     },
     "version": "ff9638511e05b0aca236d63071c621977cffce38"
   },
+  "sublime-justfile": {
+    "cargoLocks": null,
+    "date": "2025-05-08",
+    "extract": null,
+    "name": "sublime-justfile",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "nk9",
+      "repo": "just_sublime",
+      "rev": "f42cdb012b6033035ee46bfeac1ecd7dca460e55",
+      "sha256": "sha256-VxI5BPrNVOwIRwdZKm8OhTuXCVKOdG8OGKiCne9cwc8=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "f42cdb012b6033035ee46bfeac1ecd7dca460e55"
+  },
   "vim-gin": {
     "cargoLocks": null,
     "date": "2025-10-20",
@@ -967,7 +988,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-11-17",
+    "date": "2025-11-21",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -979,11 +1000,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "ccaee3abb62703cfcb918e3b2038621f891d01a5",
-      "sha256": "sha256-b7A8pxCjryaouOqH/LM9/y/DgtA9X2cei0A8IqvbOxg=",
+      "rev": "358ae44591d48e82bc2aff0fa5262eb9a68c252a",
+      "sha256": "sha256-QaMJQC5rxrlnQH1Uo1lYR1wqKHKoh/ppUkDRCdNZgPQ=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "ccaee3abb62703cfcb918e3b2038621f891d01a5"
+    "version": "358ae44591d48e82bc2aff0fa5262eb9a68c252a"
   }
 }
