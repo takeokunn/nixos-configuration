@@ -16,7 +16,7 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup nix
         uses: ./.github/actions/setup-nix
         with:
