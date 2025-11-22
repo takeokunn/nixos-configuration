@@ -23,7 +23,7 @@
       "postman"
       "postico"
       "raycast"
-      # "orbstack"
+      "orbstack"
       "sequel-ace"
       "sf-symbols"
       "sublime-text"
