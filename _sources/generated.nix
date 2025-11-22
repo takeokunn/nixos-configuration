@@ -186,15 +186,15 @@
   };
   emacs-ob-phpstan = {
     pname = "emacs-ob-phpstan";
-    version = "f5c9c062097c2e60ea56a4fc3d4556727adbab08";
+    version = "99ab8b56b92037a89fa5493697b149c937ed4b2b";
     src = fetchFromGitHub {
       owner = "emacs-php";
       repo = "ob-phpstan";
-      rev = "f5c9c062097c2e60ea56a4fc3d4556727adbab08";
+      rev = "99ab8b56b92037a89fa5493697b149c937ed4b2b";
       fetchSubmodules = false;
-      sha256 = "sha256-4UQ7Bz2s7aRgF7PHeGX0EQUkeYM8Lw5X5zv52ndvTms=";
+      sha256 = "sha256-ZvMvYhGbLiCagKQoH4WC0bSAqLLIqCJaDzsuG6VHF/o=";
     };
-    date = "2025-08-11";
+    date = "2025-11-22";
   };
   emacs-ob-racket = {
     pname = "emacs-ob-racket";
@@ -330,15 +330,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "72b926888f902145b77d0a6cb3e0ff2bfe48b81c";
+    version = "776519c055a4c03e150906962ea9ba10b46c471c";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "72b926888f902145b77d0a6cb3e0ff2bfe48b81c";
+      rev = "776519c055a4c03e150906962ea9ba10b46c471c";
       fetchSubmodules = false;
-      sha256 = "sha256-HptfiyMN7PvMnkx9AJ3gA165RHIYLInDhFwB79wA7QI=";
+      sha256 = "sha256-A6iLJ7BwxfQP3Nod2mug0FNcCh+FOCkOszMqEyOWjJI=";
     };
-    date = "2025-11-10";
+    date = "2025-11-21";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
@@ -435,6 +435,18 @@
       sha256 = "sha256-GeWjoakXa0t2TsMC/wpLEmsSVGhHFhBVK3v9eyQdzv0=";
     };
     date = "2022-03-04";
+  };
+  fish-by-binds-yourself = {
+    pname = "fish-by-binds-yourself";
+    version = "c807ba8477f20624022b0146645696c1e48d2267";
+    src = fetchFromGitHub {
+      owner = "atusy";
+      repo = "by-binds-yourself";
+      rev = "c807ba8477f20624022b0146645696c1e48d2267";
+      fetchSubmodules = false;
+      sha256 = "sha256-WZaZvnOPil9CYjdUzjsM9b27TxP3AmxllbRCnxmHtzY=";
+    };
+    date = "2025-11-21";
   };
   fish-dart-completions = {
     pname = "fish-dart-completions";

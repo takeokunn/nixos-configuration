@@ -90,6 +90,10 @@
         name = sources.fish-dart-completions.pname;
         src = sources.fish-dart-completions.src;
       }
+      {
+        name = sources.fish-by-binds-yourself.pname;
+        src = sources.fish-by-binds-yourself.src;
+      }
     ];
   };
 }

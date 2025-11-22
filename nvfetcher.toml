@@ -68,6 +68,11 @@ src.git = "https://github.com/takeokunn/fish-dart-completions"
 src.branch = "main"
 fetch.github = "takeokunn/fish-dart-completions"
 
+[fish-by-binds-yourself]
+src.git = "https://github.com/atusy/by-binds-yourself"
+src.branch = "main"
+fetch.github = "atusy/by-binds-yourself"
+
 # for emacs
 
 [emacs-copilot]

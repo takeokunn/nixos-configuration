@@ -316,7 +316,7 @@
   },
   "emacs-ob-phpstan": {
     "cargoLocks": null,
-    "date": "2025-08-11",
+    "date": "2025-11-22",
     "extract": null,
     "name": "emacs-ob-phpstan",
     "passthru": null,
@@ -328,12 +328,12 @@
       "name": null,
       "owner": "emacs-php",
       "repo": "ob-phpstan",
-      "rev": "f5c9c062097c2e60ea56a4fc3d4556727adbab08",
-      "sha256": "sha256-4UQ7Bz2s7aRgF7PHeGX0EQUkeYM8Lw5X5zv52ndvTms=",
+      "rev": "99ab8b56b92037a89fa5493697b149c937ed4b2b",
+      "sha256": "sha256-ZvMvYhGbLiCagKQoH4WC0bSAqLLIqCJaDzsuG6VHF/o=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "f5c9c062097c2e60ea56a4fc3d4556727adbab08"
+    "version": "99ab8b56b92037a89fa5493697b149c937ed4b2b"
   },
   "emacs-ob-racket": {
     "cargoLocks": null,
@@ -568,7 +568,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2025-11-10",
+    "date": "2025-11-21",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -580,12 +580,12 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "72b926888f902145b77d0a6cb3e0ff2bfe48b81c",
-      "sha256": "sha256-HptfiyMN7PvMnkx9AJ3gA165RHIYLInDhFwB79wA7QI=",
+      "rev": "776519c055a4c03e150906962ea9ba10b46c471c",
+      "sha256": "sha256-A6iLJ7BwxfQP3Nod2mug0FNcCh+FOCkOszMqEyOWjJI=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "72b926888f902145b77d0a6cb3e0ff2bfe48b81c"
+    "version": "776519c055a4c03e150906962ea9ba10b46c471c"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,
@@ -754,6 +754,27 @@
       "type": "github"
     },
     "version": "ab686e028bfe95fa561a4f4e57840e36902d4d7d"
+  },
+  "fish-by-binds-yourself": {
+    "cargoLocks": null,
+    "date": "2025-11-21",
+    "extract": null,
+    "name": "fish-by-binds-yourself",
+    "passthru": null,
+    "pinned": false,
+    "src": {
+      "deepClone": false,
+      "fetchSubmodules": false,
+      "leaveDotGit": false,
+      "name": null,
+      "owner": "atusy",
+      "repo": "by-binds-yourself",
+      "rev": "c807ba8477f20624022b0146645696c1e48d2267",
+      "sha256": "sha256-WZaZvnOPil9CYjdUzjsM9b27TxP3AmxllbRCnxmHtzY=",
+      "sparseCheckout": [],
+      "type": "github"
+    },
+    "version": "c807ba8477f20624022b0146645696c1e48d2267"
   },
   "fish-dart-completions": {
     "cargoLocks": null,
