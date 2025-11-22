@@ -1,0 +1,5 @@
+{
+  programs.doggo = {
+    enable = true;
+  };
+}

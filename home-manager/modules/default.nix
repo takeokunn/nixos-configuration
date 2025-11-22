@@ -1,4 +1,5 @@
 [
+  ./doggo
   ./dust
   ./lnav
   ./peco

@@ -11,6 +11,7 @@ let
   claude-code = import ./claude-code { inherit pkgs nodePkgs mcp-servers-nix; };
   codex = import ./codex { inherit pkgs nodePkgs mcp-servers-nix; };
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
+  doggo = import ./doggo;
   gh = import ./gh;
   gh-dash = import ./gh-dash;
   git = import ./git { inherit pkgs; };
@@ -37,6 +38,7 @@ in
   claude-code
   codex
   emacs
+  doggo
   gh
   gh-dash
   git
