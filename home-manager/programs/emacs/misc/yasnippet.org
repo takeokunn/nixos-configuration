@@ -886,6 +886,20 @@ $0
   # --
   ,#+AUTHOR: $0
 #+end_src
+*** blog-devto
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/blog-devto") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: blog-devto
+  # key: blog-devto
+  # --
+
+  ,#+AUTHOR: takeokunn
+  ,#+DESCRIPTION: ${1:description}
+  ,#+TAGS: ${2:tag1 tag2}
+  ,#+DEVTO_ID:
+  ,#+DEVTO_SLUG:
+  ,#+STARTUP: fold
+#+end_src
 *** blog-hugo
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/blog-hugo") :mkdirp yes :noweb yes
   # -*- mode: snippet -*-

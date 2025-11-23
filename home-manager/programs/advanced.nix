@@ -32,6 +32,10 @@ let
   sway = import ./sway;
   swaylock = import ./swaylock { inherit pkgs; };
   waybar = import ./waybar { inherit pkgs; };
+
+  # theming
+  gtk = import ./gtk { inherit pkgs; };
+  qt = import ./qt { inherit pkgs; };
 in
 [
   awscli
@@ -59,4 +63,8 @@ in
   sway
   swaylock
   waybar
+
+  # theming
+  gtk
+  qt
 ]

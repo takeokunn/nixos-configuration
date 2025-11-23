@@ -4,7 +4,7 @@
     enable = pkgs.stdenv.isLinux;
     extraConfig = ''
       background-color=#282a36
-      text-color=#44475a
+      text-color=#f8f8f2
       border-color=#282a36
 
       [urgency=low]

@@ -5172,6 +5172,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                          ("z" "Zenn" plain "%?"
                                           :target (file+head "zenn/org/articles/%<%Y%m%d%H%M%S>.org" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
+                                         ("t" "dev.to" plain "%?"
+                                          :target (file+head "devto/articles/%<%Y%m%d%H%M%S>.org" "#+TITLE: ${title}\n")
+                                          :unnarrowed t)
                                          ("m" "Private" plain "%?"
                                           :target (file+head "hugo/org/private/%<%Y%m%d%H%M%S>.org.gpg" "#+TITLE: ${title}\n")
                                           :unnarrowed t)
