@@ -4,6 +4,7 @@
 
     settings = {
       font_size = 13.0;
+      hide_window_decorations = true;
       font_family = "HackGenNerd";
 
       # thanks. https://github.com/dracula/kitty/blob/master/dracula.conf

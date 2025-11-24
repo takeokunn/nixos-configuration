@@ -130,10 +130,6 @@
           run = [ "move-node-to-workspace 2" ];
         }
         {
-          "if".app-id = "com.raphaelamorim.rio";
-          run = [ "move-node-to-workspace 2" ];
-        }
-        {
           "if".app-id = "net.kovidgoyal.kitty";
           run = [ "move-node-to-workspace 2" ];
         }
