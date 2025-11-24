@@ -20,7 +20,7 @@ let
   nix-index = import ./nix-index;
   offlineimap = import ./offlineimap;
   kitty = import ./kitty;
-  sketchybar = import ./sketchybar;
+  sketchybar = import ./sketchybar { inherit pkgs; };
   ssh = import ./ssh;
   copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
   nix-init = import ./nix-init;

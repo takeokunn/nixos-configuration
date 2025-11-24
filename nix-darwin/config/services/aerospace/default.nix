@@ -9,7 +9,7 @@
       exec-on-workspace-change = [
         "/bin/bash"
         "-c"
-        "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)"
+        "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(/run/current-system/sw/bin/aerospace list-workspaces --focused)"
       ];
 
       gaps = {
@@ -20,7 +20,7 @@
         outer = {
           left = 0;
           bottom = 0;
-          top = 0;
+          top = 10;
           right = 0;
         };
       };
