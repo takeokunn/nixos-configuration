@@ -250,7 +250,7 @@ let
                         background.height=24 \
                         click_script="aerospace workspace $sid" \
                         script="${aerospacePlugin}" \
-                        update_freq=3 \
+                        update_freq=1 \
                   --subscribe space.$sid aerospace_workspace_change
     done
 
@@ -272,7 +272,7 @@ let
                       icon="󰥔" \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$PURPLE" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${timePlugin}"
 
     # Date
@@ -281,7 +281,7 @@ let
                       icon="󰃭" \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$PINK" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${datePlugin}"
 
     # Separator
@@ -296,7 +296,7 @@ let
     # Battery
     sketchybar --add item battery right \
                 --set battery \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${batteryPlugin}"
 
     sketchybar --add item power_icon right \
@@ -321,7 +321,7 @@ let
                       icon=󰕾 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$GREEN" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${volumePlugin}" \
                 --subscribe volume volume_change
 
@@ -331,7 +331,7 @@ let
                       icon=󰖩 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$CYAN" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${wifiPlugin}"
 
     # Separator
@@ -349,7 +349,7 @@ let
                       icon=󰍛 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$YELLOW" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${memoryPlugin}"
 
     # CPU
@@ -358,7 +358,7 @@ let
                       icon=󰻠 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$ORANGE" \
-                      update_freq=3 \
+                      update_freq=1 \
                       script="${cpuPlugin}"
 
     ############## BRACKETS - Island Groups ##############
