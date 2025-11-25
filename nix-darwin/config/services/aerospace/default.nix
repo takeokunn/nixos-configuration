@@ -142,6 +142,10 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
+          "if".app-id = "com.lambdalisue.Arto";
+          run = [ "move-node-to-workspace 4" ];
+        }
+        {
           "if".app-id = "io.flutterflow.prod.mac";
           run = [ "move-node-to-workspace 4" ];
         }
