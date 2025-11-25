@@ -178,6 +178,10 @@
           run = [ "move-node-to-workspace 9" ];
         }
         {
+          "if".app-id = "com.clickup.desktop-app";
+          run = [ "move-node-to-workspace 9" ];
+        }
+        {
           "if".app-id = "com.tinyspeck.slackmacgap";
           run = [ "move-node-to-workspace 10" ];
         }
