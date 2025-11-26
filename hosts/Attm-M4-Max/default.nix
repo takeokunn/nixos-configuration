@@ -1,6 +1,11 @@
 { inputs }:
 let
-  inherit (inputs) nix-darwin home-manager nixvim brew-nix;
+  inherit (inputs)
+    nix-darwin
+    home-manager
+    nixvim
+    brew-nix
+    ;
   inherit (inputs) nixpkgs;
 
   username = "take";

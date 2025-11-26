@@ -1,7 +1,9 @@
+{ pkgs, ... }:
 {
+  environment.systemPackages = [ pkgs.firefox ];
+
   programs = {
     fish.enable = true;
-    firefox.enable = true;
     noisetorch.enable = true;
     nix-ld.enable = true;
 

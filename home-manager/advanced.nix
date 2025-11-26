@@ -4,21 +4,24 @@
   org-babel,
   emacs-overlay,
   mcp-servers-nix,
-  brew-nix ? null,
+  brew-nix,
   ...
 }:
 let
+  isDarwin = builtins.match ".*-darwin" system != null;
+
   # nvfetcher
   sources = pkgs.callPackage ../_sources/generated.nix { };
 
   # packages
   basicOverlay = import ./overlay/basic.nix;
   advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
-  brewNixOverlay = if brew-nix != null then [ brew-nix.overlays.default ] else [ ];
+  brewNixOverlay = if isDarwin then [ brew-nix.overlays.default ] else [ ];
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+    overlays =
+      basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   nodePkgs = pkgs.callPackage ../node2nix {
     inherit pkgs;
