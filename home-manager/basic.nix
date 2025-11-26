@@ -29,5 +29,6 @@ in
 {
   imports = modules ++ basicPrograms ++ basicServices;
   home.stateVersion = "24.11";
+  home.enableNixpkgsReleaseCheck = false;
   home.packages = basicPkgs;
 }

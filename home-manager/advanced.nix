@@ -4,6 +4,7 @@
   org-babel,
   emacs-overlay,
   mcp-servers-nix,
+  brew-nix ? null,
   ...
 }:
 let
@@ -13,10 +14,11 @@ let
   # packages
   basicOverlay = import ./overlay/basic.nix;
   advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
+  brewNixOverlay = if brew-nix != null then [ brew-nix.overlays.default ] else [ ];
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ];
+    overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   nodePkgs = pkgs.callPackage ../node2nix {
     inherit pkgs;
@@ -57,6 +59,7 @@ in
   imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
   home.stateVersion = "24.11";
+  home.enableNixpkgsReleaseCheck = false;
   home.packages = basicPkgs ++ advancedPkgs;
 
   accounts.email.accounts = {

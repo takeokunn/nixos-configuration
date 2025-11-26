@@ -4,7 +4,7 @@ let
   homebrew = import ./config/homebrew.nix;
   networking = import ./config/networking.nix;
   nix = import ./config/nix.nix;
-  security = import ./config/security.nix { inherit username; };
+  security = import ./config/security.nix;
   services = import ./config/services;
   system = import ./config/system.nix { inherit pkgs username; };
   time = import ./config/time.nix;

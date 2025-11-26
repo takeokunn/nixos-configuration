@@ -21,4 +21,17 @@ with pkgs;
   # for web service
   discord
   slack
+] ++ lib.optionals stdenv.isDarwin [
+  # for macOS (brew-nix casks)
+  brewCasks.aquaskk
+  brewCasks.cleanshot
+  brewCasks.keycastr
+  brewCasks.raycast
+  brewCasks.docker-desktop
+  brewCasks.postman
+  brewCasks.postico
+  brewCasks.sequel-ace
+  brewCasks.sublime-text
+  brewCasks.ngrok
+  brewCasks.clickup
 ]
