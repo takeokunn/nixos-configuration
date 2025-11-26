@@ -265,6 +265,9 @@
 #+end_src
 ** ediff
 #+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'ediff-wind
+    (setopt ediff-window-setup-function #'ediff-setup-windows-plain))
+
   (with-eval-after-load 'winner
     (add-hook 'emacs-startup-hook #'winner-mode))
 #+end_src
