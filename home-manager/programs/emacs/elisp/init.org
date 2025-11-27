@@ -955,6 +955,9 @@
   (autoload-if-found '(python-mode) "python-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+
+  (with-eval-after-load 'python
+    (setopt python-shell-completion-native-enable nil))
 #+END_SRC
 ** qt-pro-mode
 #+begin_src emacs-lisp :tangle yes
