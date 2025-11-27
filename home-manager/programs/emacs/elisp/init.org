@@ -2297,6 +2297,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt dired-recursive-copies 'always)
     (setopt dired-use-ls-dired nil))
 #+end_src
+** wdired
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(wdired-change-to-wdired-mode) "wdired" nil t)
+
+  (with-eval-after-load 'dired
+    (define-key dired-mode-map "r" #'wdired-change-to-wdired-mode))
+#+end_src
 ** dired-collapse
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-collapse-mode) "dired-collapse" nil t)
