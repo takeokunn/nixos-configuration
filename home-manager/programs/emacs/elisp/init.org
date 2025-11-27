@@ -1489,6 +1489,9 @@
     ;; config
     (setopt magit-display-buffer-function #'magit-display-buffer-fullcolumn-most-v1))
 
+  (with-eval-after-load 'magit-diff
+    (setopt magit-diff-visit-prefer-worktree t))
+
   (defun my/magit-gh-pr-checkout (pr-number detach)
     (let* ((args (append '("pr" "checkout")
                          (when detach '("--detach"))
