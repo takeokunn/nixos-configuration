@@ -11,8 +11,12 @@
 | Thinkpad X13Gen2 | X13Gen2     | NixOS   | x86_64-linux   | ○      |
 | Android OPPO-A79 | OPPO-A79    | Android | aarch64-linux  | △      |
 
+- ◎ :: メイン
+- ○ :: 動作確認済
+- △ :: 実験中
+
 ** Usage
-*** for OPL2212-2
+*** for Attm-M4-Max
 #+begin_src shell
   sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
 #+end_src
