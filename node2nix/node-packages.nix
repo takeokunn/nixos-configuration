@@ -4608,10 +4608,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.397.0";
+    version = "1.398.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.397.0.tgz";
-      sha512 = "W4tyfELe+a52hsDSPD+FpgWY94Gaho6GQp/wt3yvnHwaUwm1rGX6NsCLN1Co2kmXiUkO6iEdqgGHOYsHEbSwZw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.398.0.tgz";
+      sha512 = "jxPSQTZ2cQtno5xKPpFN24XePcjr4PrN3YraZvADhaA2FFlEkKi0SRakq1bTEblXqZ3h5TMm/8AWQyZZ3NaMOQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
