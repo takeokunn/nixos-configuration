@@ -2305,7 +2305,11 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (autoload-if-found '(wdired-change-to-wdired-mode) "wdired" nil t)
 
   (with-eval-after-load 'dired
-    (define-key dired-mode-map "r" #'wdired-change-to-wdired-mode))
+    ;; keymap
+    (define-key dired-mode-map "r" #'wdired-change-to-wdired-mode)
+
+    ;; config
+    (setopt wdired-allow-to-change-permissions 'advanced))
 #+end_src
 ** dired-collapse
 #+begin_src emacs-lisp :tangle yes
@@ -2342,14 +2346,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 ** dired-ranger
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '() "dired-ranger" nil t)
-#+end_src
-** dired-quick-sort
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(dired-quick-sort-setup) "dired-quick-sort" nil t)
-
-  (with-eval-after-load 'dired
-    ;; hooks
-    (add-hook 'dired-mode-hook #'dired-quick-sort-setup))
 #+end_src
 ** dired-subtree
 #+begin_src emacs-lisp :tangle yes
