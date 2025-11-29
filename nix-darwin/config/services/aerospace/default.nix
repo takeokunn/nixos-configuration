@@ -110,10 +110,10 @@
         "3" = "main";
         "4" = "main";
         "5" = "secondary";
-        "6" = "secondary";
-        "7" = "secondary";
-        "8" = "secondary";
-        "9" = "secondary";
+        "6" = "main";
+        "7" = "main";
+        "8" = "main";
+        "9" = "main";
         "10" = "main";
       };
 
@@ -146,16 +146,8 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
-          "if".app-id = "io.flutterflow.prod.mac";
-          run = [ "move-node-to-workspace 4" ];
-        }
-        {
           "if".app-id = "com.sequel-ace.sequel-ace";
           run = [ "move-node-to-workspace 4" ];
-        }
-        {
-          "if".app-id = "com.microsoft.VSCode";
-          run = [ "move-node-to-workspace 5" ];
         }
         {
           "if".app-id = "com.obsproject.obs-studio";
