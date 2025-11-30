@@ -416,7 +416,6 @@ else
       enable = true;
       package = pkgs.sketchybar;
       extraPackages = with pkgs; [
-        jq
         coreutils
         aerospace
       ];
