@@ -20,7 +20,7 @@
     shellInit = ''
       # for tmux
       if type -q tmux && test -z $TMUX
-          tmux attach-session -t 0 || tmux new-session
+          tmux attach-session || tmux new-session
       end
 
       # suppress fish_greeting
@@ -32,11 +32,6 @@
 
       if test -d /etc/profiles/per-user/(whoami)/bin
           fish_add_path /etc/profiles/per-user/(whoami)/bin
-      end
-
-      if test -d $HOME/ghq/github.com/takeokunn/private-cli
-          fish_add_path $HOME/ghq/github.com/takeokunn/private-cli/result/bin/
-          private-cli completion fish | source
       end
     '';
 
