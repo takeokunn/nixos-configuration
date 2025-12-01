@@ -9,28 +9,49 @@
 #+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
 * はじめに
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 ** 基本情報
+:PROPERTIES:
+:CUSTOM_ID: basic-info
+:END:
 - repo: [[http://github.com/takeokunn/.emacs.d][takeokunn/.emacs.d]]
 - twitter: [[https://twitter.com/takeokunn][たけてぃ@takeokunn]]
 - blog: [[https://takeokunn.org][https://takeokunn.org]]
 ** See also
+:PROPERTIES:
+:CUSTOM_ID: see-also
+:END:
 - [[./early-init][early-init.org]]
 - [[./yasnippets][yasnippets.org]]
 - [[./elfeed][elfeed.org]]
 * Header
+:PROPERTIES:
+:CUSTOM_ID: header
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; init.el --- My init.el -*- lexical-binding: t -*-
   ;; Configurations for Emacs
   ;;                                         Takeo Obara  <bararararatty@gmail.com>
 #+end_src
 * Macro Utilities
+:PROPERTIES:
+:CUSTOM_ID: macro-utilities
+:END:
 ** when-darwin
+:PROPERTIES:
+:CUSTOM_ID: when-darwin
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defmacro when-darwin (&rest body)
     (when (string= system-type "darwin")
       `(progn ,@body)))
 #+end_src
 ** when-darwin-not-window-system
+:PROPERTIES:
+:CUSTOM_ID: when-darwin-not-window-system
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defmacro when-darwin-not-window-system (&rest body)
     (when (and (string= system-type "darwin")
@@ -38,12 +59,21 @@
       `(progn ,@body)))
 #+end_src
 * Boot
+:PROPERTIES:
+:CUSTOM_ID: boot
+:END:
 ** user
+:PROPERTIES:
+:CUSTOM_ID: user
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq user-full-name "takeokunn")
   (setq user-mail-address "bararararatty@gmail.com")
 #+end_src
 ** profile
+:PROPERTIES:
+:CUSTOM_ID: profile
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defconst my/enable-profile nil
     "If true, enable profile")
@@ -53,12 +83,18 @@
     (profiler-start 'cpu))
 #+end_src
 ** Magic File Name を一時的に無効にする
+:PROPERTIES:
+:CUSTOM_ID: temporarily-disable-magic-file-name
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defconst my/saved-file-name-handler-alist file-name-handler-alist)
 
   (setq file-name-handler-alist nil)
 #+end_src
 ** 起動時間計測
+:PROPERTIES:
+:CUSTOM_ID: startup-time
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defconst my/before-load-init-time (current-time))
 
@@ -88,6 +124,9 @@
   (add-hook 'after-init-hook #'my/emacs-init-time)
 #+end_src
 ** autoload-if-found
+:PROPERTIES:
+:CUSTOM_ID: autoload-if-found
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun autoload-if-found (functions file &optional docstring interactive type)
     "Set autoload iff FILE has found."
@@ -96,7 +135,13 @@
         (autoload f file docstring interactive type))))
 #+end_src
 * Basic
+:PROPERTIES:
+:CUSTOM_ID: basic
+:END:
 ** 末尾のスペースを可視化する
+:PROPERTIES:
+:CUSTOM_ID: visualize-trailing-spaces
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/disable-show-trailing-whitespace ()
     (setq show-trailing-whitespace nil))
@@ -117,6 +162,9 @@
     (add-hook 'text-mode-hook #'my/disable-show-trailing-whitespace))
 #+END_SRC
 ** 行番号を表示する
+:PROPERTIES:
+:CUSTOM_ID: display-line-numbers
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-display-line-numbers-mode) "display-line-numbers" nil t)
 
@@ -126,11 +174,17 @@
     (setopt display-line-numbers-grow-only t))
 #+END_SRC
 ** C-kで行削除
+:PROPERTIES:
+:CUSTOM_ID: kill-line-with-c-k
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'simple
     (setopt kill-whole-line t))
 #+END_SRC
 ** カッコの中をハイライトする
+:PROPERTIES:
+:CUSTOM_ID: highlight-parentheses
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(show-paren-local-mode) "display-line-numbers" nil t)
 
@@ -141,20 +195,32 @@
     (setopt show-paren-style 'mixed))
 #+END_SRC
 ** カッコが自動的に作られるようにする
+:PROPERTIES:
+:CUSTOM_ID: auto-insert-parentheses
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'electric-pair-mode)
 #+END_SRC
 ** global-auto-revert-mode
+:PROPERTIES:
+:CUSTOM_ID: global-auto-revert-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'global-auto-revert-mode)
 #+end_src
 ** yes/no to y/n
+:PROPERTIES:
+:CUSTOM_ID: yes-no-to-y-n
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook
             #'(lambda ()
                 (fset 'yes-or-no-p 'y-or-n-p)))
 #+end_src
 ** minibuffer
+:PROPERTIES:
+:CUSTOM_ID: minibuffer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'minibuffer
     (define-key minibuffer-mode-map (kbd "C-j") #'exit-minibuffer)
@@ -163,10 +229,16 @@
   (setq enable-recursive-minibuffers t)
 #+end_src
 ** savehistを有効にする
+:PROPERTIES:
+:CUSTOM_ID: enable-savehist
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'savehist-mode)
 #+end_src
 ** [mac] clipboardに入るようにする
+:PROPERTIES:
+:CUSTOM_ID: mac-clipboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/copy-from-osx ()
     (shell-command-to-string "pbpaste"))
@@ -182,6 +254,9 @@
    (setq interprogram-paste-function #'my/copy-from-osx))
 #+end_src
 ** native comp
+:PROPERTIES:
+:CUSTOM_ID: native-comp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'comp-run
     ;; config
@@ -194,11 +269,17 @@
     (setopt warning-suppress-types '((comp))))
 #+end_src
 ** 同一bufferの名前を変える
+:PROPERTIES:
+:CUSTOM_ID: uniquify-buffer-names
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'uniquify
     (setopt uniquify-buffer-name-style 'post-forward-angle-brackets))
 #+end_src
 ** killできないようにする
+:PROPERTIES:
+:CUSTOM_ID: protect-from-kill
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook
             #'(lambda ()
@@ -208,28 +289,46 @@
                   (emacs-lock-mode 'kill))))
 #+end_src
 ** 日時表示
+:PROPERTIES:
+:CUSTOM_ID: display-time
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'time
     (setopt display-time-24hr-format t))
 #+end_src
 ** warning level
+:PROPERTIES:
+:CUSTOM_ID: warning-level
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'warnings
     (setopt warning-minimum-level :error))
 #+end_src
 ** キーコマンド入力中に入力過程をミニバッファに反映する
+:PROPERTIES:
+:CUSTOM_ID: echo-keystrokes
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq echo-keystrokes 0.1)
 #+end_src
 ** save-place-mode
+:PROPERTIES:
+:CUSTOM_ID: save-place-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'save-place-mode)
 #+end_src
 ** enable-local-variables
+:PROPERTIES:
+:CUSTOM_ID: enable-local-variables
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq enable-local-variables :all)
 #+end_src
 ** password
+:PROPERTIES:
+:CUSTOM_ID: password
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'password-cache
     ;; config
@@ -237,6 +336,9 @@
     (setq password-cache-expiry 3600))
 #+end_src
 ** 検索で大文字小文字を区別しない
+:PROPERTIES:
+:CUSTOM_ID: case-insensitive-search
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'minibuffer
     (setopt read-file-name-completion-ignore-case t))
@@ -245,25 +347,40 @@
   (setq read-buffer-completion-ignore-case t)
 #+end_src
 ** time locale
+:PROPERTIES:
+:CUSTOM_ID: time-locale
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq system-time-locale "C")
 #+END_SRC
 ** kill-ringのサイズを変更
+:PROPERTIES:
+:CUSTOM_ID: change-kill-ring-size
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setopt kill-ring-max 100000)
 
   (custom-set-variables '(savehist-additional-variables '(kill-ring)))
 #+end_src
 ** 折り返ししない
+:PROPERTIES:
+:CUSTOM_ID: disable-line-wrap
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq truncate-lines t)
   (setq truncate-partial-width-windows t)
 #+end_src
 ** use-dialog-box off
+:PROPERTIES:
+:CUSTOM_ID: use-dialog-box-off
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq use-dialog-box nil)
 #+end_src
 ** ediff
+:PROPERTIES:
+:CUSTOM_ID: ediff
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ediff-wind
     (setopt ediff-window-setup-function #'ediff-setup-windows-plain))
@@ -272,11 +389,20 @@
     (add-hook 'emacs-startup-hook #'winner-mode))
 #+end_src
 ** debug-on-error
+:PROPERTIES:
+:CUSTOM_ID: debug-on-error
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq debug-on-error nil)
 #+end_src
 * Global Keybind
+:PROPERTIES:
+:CUSTOM_ID: global-keybind
+:END:
 ** basic
+:PROPERTIES:
+:CUSTOM_ID: global-keybind-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (keymap-global-set "M-¥" #'(lambda () (interactive) (insert "\\")))
   (keymap-global-set "C-a" #'back-to-indentation)
@@ -295,11 +421,20 @@
     (keymap-global-unset "C-x C-c"))
 #+END_SRC
 * Language
+:PROPERTIES:
+:CUSTOM_ID: language
+:END:
 ** ansible
+:PROPERTIES:
+:CUSTOM_ID: ansible
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ansible-mode) "ansible" nil t)
 #+end_src
 ** apache-mode
+:PROPERTIES:
+:CUSTOM_ID: apache-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(apache-mode) "apache-mode" nil t)
 
@@ -314,10 +449,16 @@
     (add-hook 'apache-mode-hook #'view-mode))
 #+end_src
 ** bazel-mode
+:PROPERTIES:
+:CUSTOM_ID: bazel-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(bazel-mode) "bazel" nil t)
 #+end_src
 ** bison-mode
+:PROPERTIES:
+:CUSTOM_ID: bison-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(bison-mode flex-mode jison-mode) "bison-mode" nil t)
 
@@ -326,12 +467,18 @@
   (add-to-list 'auto-mode-alist '("\\.jison\\'" . jison-mode))
 #+end_src
 ** cask-mode
+:PROPERTIES:
+:CUSTOM_ID: cask-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cask-mode) "cask-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("/Cask\\'" . cask-mode))
 #+end_src
 ** cfn-mode
+:PROPERTIES:
+:CUSTOM_ID: cfn-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cfn-mode) "cfn-mode" nil t)
 
@@ -343,6 +490,9 @@
     (add-hook 'cfn-mode-hook #'view-mode))
 #+end_src
 ** clojure-mode
+:PROPERTIES:
+:CUSTOM_ID: clojure-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(clojure-mode clojurescript-mode) "clojure-mode" nil t)
 
@@ -354,18 +504,27 @@
     (setopt clojure-toplevel-inside-comment-form t))
 #+END_SRC
 ** cmake-mode
+:PROPERTIES:
+:CUSTOM_ID: cmake-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cmake-mode) "cmake-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.cmake$" . cmake-mode))
 #+END_SRC
 ** coffee-mode
+:PROPERTIES:
+:CUSTOM_ID: coffee-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(coffee-mode) "coffee-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
 #+END_SRC
 ** conf-mode
+:PROPERTIES:
+:CUSTOM_ID: conf-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'auto-mode-alist '("\\.cnf$" . conf-mode))
   (add-to-list 'auto-mode-alist '("yabairc$" . conf-mode))
@@ -376,6 +535,9 @@
     (add-hook 'conf-mode-hook #'view-mode))
 #+end_src
 ** crontab-mode
+:PROPERTIES:
+:CUSTOM_ID: crontab-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(crontab-mode) "crontab-mode" nil t)
 
@@ -386,12 +548,18 @@
     (add-hook 'crontab-mode-hook #'view-mode))
 #+end_src
 ** csharp-mode
+:PROPERTIES:
+:CUSTOM_ID: csharp-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(csharp-mode) "csharp-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.cs$" . csharp-mode))
 #+END_SRC
 ** csv-mode
+:PROPERTIES:
+:CUSTOM_ID: csv-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(csv-mode) "csv-mode" nil t)
 
@@ -402,12 +570,18 @@
     (add-hook 'csv-mode-hook #'view-mode))
 #+END_SRC
 ** cuda-mode
+:PROPERTIES:
+:CUSTOM_ID: cuda-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cuda-mode) "cuda-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.cu$" . cuda-mode))
 #+end_src
 ** crystal-mode
+:PROPERTIES:
+:CUSTOM_ID: crystal-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(crystal-mode) "crystal-mode" nil t)
 
@@ -418,18 +592,27 @@
                                        "\\)\\'")) 'crystal-mode))
 #+end_src
 ** dart-mode
+:PROPERTIES:
+:CUSTOM_ID: dart-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dart-mode) "dart-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.dart$" . dart-mode))
 #+end_src
 ** dhall-mode
+:PROPERTIES:
+:CUSTOM_ID: dhall-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dhall-mode) "dhall-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.dhall$" . dhall-mode))
 #+end_src
 ** direnv-mode
+:PROPERTIES:
+:CUSTOM_ID: direnv-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(direnv-envrc-mode direnv-mode direnv-allow) "direnv" nil t)
 
@@ -446,6 +629,9 @@
     (add-hook 'direnv-mode-hook #'view-mode))
 #+end_src
 ** docker-compose-mode
+:PROPERTIES:
+:CUSTOM_ID: docker-compose-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(docker-compose-mode) "docker-compose-mode" nil t)
 
@@ -456,6 +642,9 @@
     (add-hook 'docker-compose-mode-hook #'view-mode))
 #+end_src
 ** dockerfile-mode
+:PROPERTIES:
+:CUSTOM_ID: dockerfile-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dockerfile-mode) "dockerfile-mode" nil t)
 
@@ -469,6 +658,9 @@
     (add-hook 'dockerfile-mode-hook #'flycheck-mode))
 #+END_SRC
 ** dotenv-mode
+:PROPERTIES:
+:CUSTOM_ID: dotenv-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dotenv-mode) "dotenv-mode" nil t)
 
@@ -478,6 +670,9 @@
     (add-hook 'dotenv-mode-hook #'view-mode))
 #+end_src
 ** elixir-mode
+:PROPERTIES:
+:CUSTOM_ID: elixir-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elixir-mode) "elixir-mode" nil t)
 
@@ -487,16 +682,25 @@
   (add-to-list 'auto-mode-alist '("mix\\.lock" . elixir-mode))
 #+end_src
 ** elm-mode
+:PROPERTIES:
+:CUSTOM_ID: elm-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elm-mode) "elm-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.elm$" . elm-mode))
 #+end_src
 ** emacs-lisp-mode
+:PROPERTIES:
+:CUSTOM_ID: emacs-lisp-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'auto-mode-alist '("Keg" . emacs-lisp-mode))
 #+end_src
 ** fish-mode
+:PROPERTIES:
+:CUSTOM_ID: fish-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(fish-mode) "fish-mode" nil t)
 
@@ -507,6 +711,9 @@
     (setopt fish-enable-auto-indent t))
 #+END_SRC
 ** forth-mode
+:PROPERTIES:
+:CUSTOM_ID: forth-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(forth-mode) "forth-mode" nil t)
 
@@ -517,18 +724,27 @@
   (add-to-list 'auto-mode-alist '("\\.4th$" . forth-mode))
 #+end_src
 ** fortran
+:PROPERTIES:
+:CUSTOM_ID: fortran
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(f90-mode) "f90" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.f\\(y90\\|y?pp\\)\\'" . f90-mode))
 #+end_src
 ** fsharp-mode
+:PROPERTIES:
+:CUSTOM_ID: fsharp-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(fsharp-mode) "fsharp-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.fs[iylx]?$" . fsharp-mode))
 #+end_src
 ** git-modes
+:PROPERTIES:
+:CUSTOM_ID: git-modes
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(gitignore-mode gitconfig-mode gitattributes-mode) "git-modes" nil t)
 
@@ -569,6 +785,9 @@
     (add-hook 'gitattributes-mode-hook #'view-mode))
 #+end_src
 ** glsl-mode
+:PROPERTIES:
+:CUSTOM_ID: glsl-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(glsl-mode) "glsl-mode" nil t)
 
@@ -576,6 +795,9 @@
   (add-to-list 'auto-mode-alist '("\\.fsh$" . glsl-mode))
 #+END_SRC
 ** go-mode
+:PROPERTIES:
+:CUSTOM_ID: go-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(go-mode gofmt) "go-mode" nil t)
 
@@ -587,12 +809,18 @@
     (setopt gofmt-command "goimports"))
 #+END_SRC
 ** gradle-mode
+:PROPERTIES:
+:CUSTOM_ID: gradle-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(gradle-mode) "gradle-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.gradle$" . gradle-mode))
 #+END_SRC
 ** graphql-mode
+:PROPERTIES:
+:CUSTOM_ID: graphql-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(graphql-mode) "graphql-mode" nil t)
 
@@ -603,6 +831,9 @@
     (setopt graphql-indent-level 4))
 #+end_src
 ** TODO graphviz-dot-mode
+:PROPERTIES:
+:CUSTOM_ID: todo-graphviz-dot-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(graphviz-dot-mode) "graphviz-dot-mode" nil t)
 
@@ -615,6 +846,9 @@
   ;;   (setopt graphviz-dot-indent-width 2))
 #+end_src
 ** groovy-mode
+:PROPERTIES:
+:CUSTOM_ID: groovy-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(groovy-mode) "groovy-mode" nil t)
 
@@ -623,6 +857,9 @@
   (add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
 #+end_src
 ** hack-mode
+:PROPERTIES:
+:CUSTOM_ID: hack-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(hack-mode) "hack-mode" nil t)
 
@@ -631,6 +868,9 @@
   (add-to-list 'auto-mode-alist '("\\.hhi$" . hack-mode))
 #+end_src
 ** haskell-mode
+:PROPERTIES:
+:CUSTOM_ID: haskell-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(haskell-mode) "haskell-mode" nil t)
 
@@ -638,24 +878,36 @@
   (add-to-list 'auto-mode-alist '("\\.cable$" . haskell-mode))
 #+END_SRC
 ** hcl-mode
+:PROPERTIES:
+:CUSTOM_ID: hcl-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(hcl-mode) "hcl-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.hcl$" . hcl-mode))
 #+end_src
 ** hy-mode
+:PROPERTIES:
+:CUSTOM_ID: hy-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(hy-mode) "hy-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.hy$" . hy-mode))
 #+end_src
 ** ini-mode
+:PROPERTIES:
+:CUSTOM_ID: ini-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ini-mode) "ini-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.ini$" . ini-mode))
 #+end_src
 ** jade-mode
+:PROPERTIES:
+:CUSTOM_ID: jade-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(jade-mode) "jade-mode" nil t)
   (autoload-if-found '(stylus-mode) "stylus-mode" nil t)
@@ -664,12 +916,18 @@
   (add-to-list 'auto-mode-alist '("\\.styl\\'" . stylus-mode))
 #+end_src
 ** java-mode
+:PROPERTIES:
+:CUSTOM_ID: java-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(java-mode) "java-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.java$" . java-mode))
 #+end_src
 ** js2-mode
+:PROPERTIES:
+:CUSTOM_ID: js2-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(js2-mode) "js2-mode" nil t)
 
@@ -684,6 +942,9 @@
     (setopt js2-missing-semi-one-line-override nil))
 #+END_SRC
 ** json-mode
+:PROPERTIES:
+:CUSTOM_ID: json-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(json-mode) "json-mode" nil t)
 
@@ -697,6 +958,9 @@
     (add-hook 'json-mode-hook #'flycheck-mode))
 #+END_SRC
 ** jsonnet-mode
+:PROPERTIES:
+:CUSTOM_ID: jsonnet-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(jsonnet-mode
                        jsonnet-eval-buffer
@@ -716,6 +980,9 @@
     (define-key jsonnet-mode-map (kbd "C-c C-r") #'jsonnet-reformat-buffer))
 #+end_src
 ** just-mode
+:PROPERTIES:
+:CUSTOM_ID: just-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(just-mode) "just-mode" nil t)
 
@@ -723,12 +990,18 @@
   (add-to-list 'auto-mode-alist '("\\.[Jj]ust\\(file\\)?\\'" . just-mode))
 #+end_src
 ** kotlin-mode
+:PROPERTIES:
+:CUSTOM_ID: kotlin-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(kotlin-mode) "kotlin-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.kts?\\'" . kotlin-mode))
 #+end_src
 ** lisp-mode
+:PROPERTIES:
+:CUSTOM_ID: lisp-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lisp-mode) "lisp-mode" nil t)
 
@@ -736,12 +1009,18 @@
   (add-to-list 'auto-mode-alist '("\\.sbclrc$" . lisp-mode))
 #+END_SRC
 ** lua-mode
+:PROPERTIES:
+:CUSTOM_ID: lua-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lua-mode) "lua-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
 #+end_src
 ** markdown-mode
+:PROPERTIES:
+:CUSTOM_ID: markdown-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(markdown-mode) "markdown-mode" nil t)
 
@@ -775,12 +1054,18 @@
     (add-hook 'markdown-mode #'view-mode))
 #+END_SRC
 ** mermaid-mode
+:PROPERTIES:
+:CUSTOM_ID: mermaid-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mermaid-mode) "mermaid-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.mmd\\'" . mermaid-mode))
 #+end_src
 ** makefile-mode
+:PROPERTIES:
+:CUSTOM_ID: makefile-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(makefile-mode) "makefile-mode" nil t)
 
@@ -795,12 +1080,18 @@
     (add-hook 'makefile-mode-hook #'flycheck-mode))
 #+end_src
 ** nasm-mode
+:PROPERTIES:
+:CUSTOM_ID: nasm-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nasm-mode) "nasm-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.s$" . nasm-mode))
 #+end_src
 ** neon-mode
+:PROPERTIES:
+:CUSTOM_ID: neon-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(neon-mode) "neon-mode" nil t)
 
@@ -810,18 +1101,27 @@
     (add-hook 'neon-mode-hook #'view-mode))
 #+end_src
 ** nim-mode
+:PROPERTIES:
+:CUSTOM_ID: nim-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nim-mode) "nim-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.nim\\'" . nim-mode))
 #+end_src
 ** ninja-mode
+:PROPERTIES:
+:CUSTOM_ID: ninja-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ninja-mode) "ninja-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.ninja$" . ninja-mode))
 #+end_src
 ** nix-mode
+:PROPERTIES:
+:CUSTOM_ID: nix-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nix-mode) "nix-mode" nil t)
   (autoload-if-found '(nix-drv-mode) "nix-drv-mode" nil t)
@@ -838,6 +1138,9 @@
       (shell-command-to-string "nix fmt")))
 #+end_src
 ** nginx-mode
+:PROPERTIES:
+:CUSTOM_ID: nginx-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nginx-mode) "nginx-mode" nil t)
 
@@ -850,6 +1153,9 @@
     (setopt nginx-indent-tabs-mode t))
 #+END_SRC
 ** nov-mode
+:PROPERTIES:
+:CUSTOM_ID: nov-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nov-mode) "nov" nil t)
 
@@ -860,12 +1166,18 @@
     (add-hook 'nov-mode-hook #'view-mode))
 #+end_src
 ** pcap-mode
+:PROPERTIES:
+:CUSTOM_ID: pcap-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pcap-mode) "pcap" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.pcap$" . pcap-mode))
 #+end_src
 ** phel-mode
+:PROPERTIES:
+:CUSTOM_ID: phel-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (define-derived-mode phel-mode clojure-mode "Phel"
     "Major mode for editing Phel language source files."
@@ -880,6 +1192,9 @@
   (add-to-list 'auto-mode-alist '("\\.phel$" . phel-mode))
 #+end_src
 ** php-mode
+:PROPERTIES:
+:CUSTOM_ID: php-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(php-mode php-current-class php-current-namespace) "php-mode" nil t)
   (autoload-if-found '(php-format-this-buffer-file) "php-format" nil t)
@@ -899,48 +1214,72 @@
     (define-derived-mode phpstan-mode php-mode "phpstan"))
 #+END_SRC
 ** phpt-mode
+:PROPERTIES:
+:CUSTOM_ID: phpt-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(phpt-mode) "phpt-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.phpt$" . phpt-mode))
 #+end_src
 ** plantuml-mode
+:PROPERTIES:
+:CUSTOM_ID: plantuml-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(plantuml-mode) "plantuml-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.pu$" . plantuml-mode))
 #+END_SRC
 ** po-mode
+:PROPERTIES:
+:CUSTOM_ID: po-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(po-mode) "po-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.po$" . po-mode))
 #+END_SRC
 ** prolog
+:PROPERTIES:
+:CUSTOM_ID: prolog
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(prolog-mode) "prolog-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.pl$" . prolog-mode))
 #+end_src
 ** protobuf-mode
+:PROPERTIES:
+:CUSTOM_ID: protobuf-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(protobuf-mode) "protobuf-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
 #+end_src
 ** pug-mode
+:PROPERTIES:
+:CUSTOM_ID: pug-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pug-mode) "pug-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.pug$" . pug-mode))
 #+end_src
 ** prisma-mode
+:PROPERTIES:
+:CUSTOM_ID: prisma-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(prisma-mode) "prisma-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.prisma" . prisma-mode))
 #+end_src
 ** processing-mode
+:PROPERTIES:
+:CUSTOM_ID: processing-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(processing-mode) "processing-mode" nil t)
 
@@ -951,6 +1290,9 @@
     (setopt processing-output-dir "/tmp"))
 #+END_SRC
 ** python-mode
+:PROPERTIES:
+:CUSTOM_ID: python-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(python-mode) "python-mode" nil t)
 
@@ -960,22 +1302,34 @@
     (setopt python-shell-completion-native-enable nil))
 #+END_SRC
 ** qt-pro-mode
+:PROPERTIES:
+:CUSTOM_ID: qt-pro-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(qt-pro-mode) "qt-pro-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.pr[io]$" . qt-pro-mode))
 #+end_src
 ** racket-mode
+:PROPERTIES:
+:CUSTOM_ID: racket-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(racket-mode) "racket-mode" nil t)
 #+end_src
 ** robots-txt-mode
+:PROPERTIES:
+:CUSTOM_ID: robots-txt-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(robots-txt-mode) "robots-txt-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("/robots\\.txt\\'" . robots-txt-mode))
 #+end_src
 ** ruby-mode
+:PROPERTIES:
+:CUSTOM_ID: ruby-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ruby-mode) "ruby-mode" nil t)
 
@@ -997,6 +1351,9 @@
     (setopt ruby-insert-encoding-magic-comment nil))
 #+END_SRC
 ** rust-mode
+:PROPERTIES:
+:CUSTOM_ID: rust-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(rust-mode) "rust-mode" nil t)
 
@@ -1007,12 +1364,18 @@
     (setopt rust-format-on-save t))
 #+END_SRC
 ** scala-mode
+:PROPERTIES:
+:CUSTOM_ID: scala-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(scala-mode) "scala-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.scala$" . scala-mode))
 #+END_SRC
 ** scheme-mode
+:PROPERTIES:
+:CUSTOM_ID: scheme-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'auto-mode-alist '("\\.scheme$" . scheme-mode))
   (add-to-list 'auto-mode-alist '(".guix-channel" . scheme-mode))
@@ -1022,12 +1385,18 @@
     (setopt scheme-program-name "gosh -i"))
 #+end_src
 ** scad-mode
+:PROPERTIES:
+:CUSTOM_ID: scad-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(scad-mode) "scad-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.scad\\'" . scad-mode))
 #+end_src
 ** scss-mode
+:PROPERTIES:
+:CUSTOM_ID: scss-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(scss-mode) "scss-mode" nil t)
 
@@ -1039,24 +1408,36 @@
     (add-hook 'scss-mode-hook #'flycheck-mode))
 #+end_src
 ** shell-mode
+:PROPERTIES:
+:CUSTOM_ID: shell-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(shell-mode) "shell-mode" nil t)
 
   (define-derived-mode console-mode shell-mode "console")
 #+end_src
 ** slim-mode
+:PROPERTIES:
+:CUSTOM_ID: slim-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(slim-mode) "slim-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.slim$" . slim-mode))
 #+END_SRC
 ** solidity-mode
+:PROPERTIES:
+:CUSTOM_ID: solidity-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(solidity-mode) "solidity-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.sol$" . solidity-mode))
 #+end_src
 ** ssh-config-mode
+:PROPERTIES:
+:CUSTOM_ID: ssh-config-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode) "ssh-config-mode" nil t)
 
@@ -1071,6 +1452,9 @@
     (add-hook 'ssh-known-hosts-mode-hook #'view-mode))
 #+END_SRC
 ** sql-mode
+:PROPERTIES:
+:CUSTOM_ID: sql-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'sql
     (load-library "sql-indent")
@@ -1086,18 +1470,27 @@
     (add-hook 'sql-mode-hook #'flycheck-mode))
 #+end_src
 ** swift-mode
+:PROPERTIES:
+:CUSTOM_ID: swift-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(swift-mode) "swift-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.swift$" . swift-mode))
 #+end_src
 ** syslog-mode
+:PROPERTIES:
+:CUSTOM_ID: syslog-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(syslog-mode) "syslog-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.log$" . syslog-mode))
 #+end_src
 ** systemd-mode
+:PROPERTIES:
+:CUSTOM_ID: systemd-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(systemd-mode) "systemd" nil t)
 
@@ -1122,6 +1515,9 @@
     (add-hook 'systemd-mode-hook #'view-mode))
 #+end_src
 ** terraform-mode
+:PROPERTIES:
+:CUSTOM_ID: terraform-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(terraform-mode) "terraform-mode" nil t)
 
@@ -1132,6 +1528,9 @@
     (add-hook 'terraform-mode-hook #'flycheck-mode))
 #+END_SRC
 ** text-mode
+:PROPERTIES:
+:CUSTOM_ID: text-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(conf-space-mode) "conf-mode" nil t)
 
@@ -1146,6 +1545,9 @@
     (add-hook 'conf-space-mode-hook #'view-mode))
 #+end_src
 ** toml-mode
+:PROPERTIES:
+:CUSTOM_ID: toml-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(toml-mode) "toml-mode" nil t)
 
@@ -1157,12 +1559,18 @@
     (add-hook 'toml-mode-hook #'view-mode))
 #+END_SRC
 ** tmux-mode
+:PROPERTIES:
+:CUSTOM_ID: tmux-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(tmux-mode) "tmux-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.tmux\\.conf$" . tmux-mode))
 #+end_src
 ** typescript-mode
+:PROPERTIES:
+:CUSTOM_ID: typescript-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(typescript-mode) "typescript-mode" nil t)
 
@@ -1184,6 +1592,9 @@
     (add-hook 'typescript-tsx-mode-hook #'emmet-mode))
 #+END_SRC
 ** typst-mode
+:PROPERTIES:
+:CUSTOM_ID: typst-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(typst-mode) "typst-mode" nil t)
 
@@ -1193,6 +1604,9 @@
     (add-hook 'typst-mode-hook #'view-mode))
 #+END_SRC
 ** v-mode
+:PROPERTIES:
+:CUSTOM_ID: v-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(v-mode v-menu v-format-buffer) "v-mode" nil t)
 
@@ -1204,6 +1618,9 @@
     (define-key v-mode-map (kbd "C-c C-f") #'v-format-buffer))
 #+end_src
 ** vue-mode
+:PROPERTIES:
+:CUSTOM_ID: vue-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vue-mode) "vue-mode" nil t)
 
@@ -1214,6 +1631,9 @@
     (setopt vue-html-extra-indent 4))
 #+END_SRC
 ** vimrc-mode
+:PROPERTIES:
+:CUSTOM_ID: vimrc-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vimrc-mode) "vimrc-mode" nil t)
 
@@ -1221,12 +1641,18 @@
   (add-to-list 'auto-mode-alist '("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 #+end_src
 ** wat-mode
+:PROPERTIES:
+:CUSTOM_ID: wat-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(wat-mode) "wat-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.wat?\\'" . wat-mode))
 #+end_src
 ** web-mode
+:PROPERTIES:
+:CUSTOM_ID: web-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(web-mode) "web-mode" nil t)
 
@@ -1248,12 +1674,18 @@
     (add-hook 'web-mode-hook #'emmet-mode))
 #+END_SRC
 ** web-php-blade-mode
+:PROPERTIES:
+:CUSTOM_ID: web-php-blade-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(web-php-blade-mode) "web-php-blade-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.blade\\.php$" . web-php-blade-mode))
 #+end_src
 ** wolfram-mode
+:PROPERTIES:
+:CUSTOM_ID: wolfram-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(wolfram-mode run-wolfram) "wolfram-mode" nil t)
 
@@ -1266,6 +1698,9 @@
     (setopt wolfram-path "path-to-dir"))
 #+end_src
 ** yaml-mode
+:PROPERTIES:
+:CUSTOM_ID: yaml-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yaml-mode) "yaml-mode" nil t)
 
@@ -1278,6 +1713,9 @@
     (add-hook 'yaml-mode-hook #'view-mode))
 #+END_SRC
 ** yarn-mode
+:PROPERTIES:
+:CUSTOM_ID: yarn-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yarn-mode) "yarn-mode" nil t)
 
@@ -1288,13 +1726,22 @@
     (add-hook 'yarn-mode-hook #'view-mode))
 #+end_src
 ** zig-mode
+:PROPERTIES:
+:CUSTOM_ID: zig-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(zig-mode) "zig-mode" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.zig$" . zig-mode))
 #+end_src
 * IME
+:PROPERTIES:
+:CUSTOM_ID: ime
+:END:
 ** ddskk
+:PROPERTIES:
+:CUSTOM_ID: ddskk
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
 
@@ -1335,6 +1782,9 @@
     (add-to-list 'skk-rom-kana-rule-list '(skk-kakutei-key nil my/skk-C-j-key)))
 #+END_SRC
 ** ddskk-posframe
+:PROPERTIES:
+:CUSTOM_ID: ddskk-posframe
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ddskk-posframe-mode) "ddskk-posframe" nil t)
 
@@ -1343,16 +1793,31 @@
     (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
 #+end_src
 * Coding
+:PROPERTIES:
+:CUSTOM_ID: coding
+:END:
 ** Check
+:PROPERTIES:
+:CUSTOM_ID: check
+:END:
 *** flymake-proc
+:PROPERTIES:
+:CUSTOM_ID: flymake-proc
+:END:
 #+begin_src emacs-lisp :tangle yes
   (require 'flymake-proc)
 #+end_src
 *** flycheck
+:PROPERTIES:
+:CUSTOM_ID: flycheck
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-mode flycheck-define-checker) "flycheck" nil t)
 #+end_src
 *** flycheck-textlint
+:PROPERTIES:
+:CUSTOM_ID: flycheck-textlint
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/flycheck-textlint-setup ()
     (interactive)
@@ -1371,6 +1836,9 @@
   (add-hook 'emacs-startup-hook #'my/flycheck-textlint-setup)
 #+end_src
 *** flycheck-elsa
+:PROPERTIES:
+:CUSTOM_ID: flycheck-elsa
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-elsa-setup) "flycheck-elsa" nil t)
 
@@ -1379,10 +1847,16 @@
     (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup))
 #+end_src
 *** flycheck-projectile
+:PROPERTIES:
+:CUSTOM_ID: flycheck-projectile
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flycheck-projectile-list-errors) "flycheck-projectile" nil t)
 #+end_src
 *** flycheck-cfn
+:PROPERTIES:
+:CUSTOM_ID: flycheck-cfn
+:END:
 #+begin_src emacs-lisp
   (autoload-if-found '(flycheck-cfn-setup) "flycheck-cfn" nil t)
 
@@ -1391,7 +1865,13 @@
     (add-hook 'cfn-mode-hook #'flycheck-cfn-setup))
 #+end_src
 ** Completion
+:PROPERTIES:
+:CUSTOM_ID: completion
+:END:
 *** corfu
+:PROPERTIES:
+:CUSTOM_ID: corfu
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-corfu-mode) "corfu" nil t)
 
@@ -1409,6 +1889,9 @@
     (setopt tab-always-indent 'complete))
 #+end_src
 *** cape
+:PROPERTIES:
+:CUSTOM_ID: cape
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cape-file
                        cape-dabbrev
@@ -1423,6 +1906,9 @@
     (add-to-list 'completion-at-point-functions #'cape-history))
 #+end_src
 *** prescient
+:PROPERTIES:
+:CUSTOM_ID: prescient
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(prescient-persist-mode) "prescient" nil t)
 
@@ -1433,6 +1919,9 @@
     (setopt prescient-aggressive-file-save t))
 #+end_src
 *** kind-icon
+:PROPERTIES:
+:CUSTOM_ID: kind-icon
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(kind-icon-margin-formatter) "kind-icon" nil t)
 
@@ -1440,7 +1929,13 @@
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 ** Git
+:PROPERTIES:
+:CUSTOM_ID: git
+:END:
 *** magit
+:PROPERTIES:
+:CUSTOM_ID: magit
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-git-commit-mode) "git-commit" nil t)
   (autoload-if-found '(magit-status magit-blame) "magit")
@@ -1522,6 +2017,9 @@
       '("P" "Checkout PR (branch)" my/magit-gh-pr-checkout-normal)))
 #+END_SRC
 *** git-gutter
+:PROPERTIES:
+:CUSTOM_ID: git-gutter
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(git-gutter-mode) "git-gutter" nil t)
 
@@ -1530,6 +2028,9 @@
     (setopt git-gutter:update-hooks '(after-save-hook after-revert-hook)))
 #+end_src
 *** git-gutter-fringe
+:PROPERTIES:
+:CUSTOM_ID: git-gutter-fringe
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(git-gutter-fr:init
                        git-gutter-fr:view-diff-infos
@@ -1544,18 +2045,30 @@
     (setopt git-gutter:clear-function #'git-gutter-fr:clear))
 #+end_src
 *** git-timemachine
+:PROPERTIES:
+:CUSTOM_ID: git-timemachine
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(git-timemachine) "git-timemachine" nil t)
 #+end_src
 *** gist
+:PROPERTIES:
+:CUSTOM_ID: gist
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(gist-mode) "gist" nil t)
 #+end_src
 *** blamer
+:PROPERTIES:
+:CUSTOM_ID: blamer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(blamer-mode) "blamer" nil t)
 #+end_src
 *** git-auto-commit-mode
+:PROPERTIES:
+:CUSTOM_ID: git-auto-commit-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(git-auto-commit-mode) "git-auto-commit-mode" nil t)
 
@@ -1567,7 +2080,13 @@
     (setopt gac-default-message "Update"))
 #+end_src
 ** Keyboard
+:PROPERTIES:
+:CUSTOM_ID: keyboard
+:END:
 *** key-chord
+:PROPERTIES:
+:CUSTOM_ID: key-chord
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(key-chord-mode key-chord-define-global) "key-chord" nil t)
 
@@ -1577,6 +2096,9 @@
                                  (key-chord-define-global "jf" #'view-mode)))
 #+end_src
 *** key-combo
+:PROPERTIES:
+:CUSTOM_ID: key-combo
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(key-combo-mode key-combo-define-local) "key-combo" nil t)
 
@@ -1603,23 +2125,38 @@
                   (key-combo-define-local (kbd "</") #'web-mode-element-close))))
 #+end_src
 *** which-key
+:PROPERTIES:
+:CUSTOM_ID: which-key
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(which-key-mode) "which-key" nil t)
 
   (add-hook 'emacs-startup-hook #'which-key-mode)
 #+end_src
 *** dmacro
+:PROPERTIES:
+:CUSTOM_ID: dmacro
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-dmacro-mode) "dmacro" nil t)
 
   (add-hook 'emacs-startup-hook #'global-dmacro-mode)
 #+end_src
 *** god-mode
+:PROPERTIES:
+:CUSTOM_ID: god-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(god-mode) "god-mode" nil t)
 #+end_src
 ** Refactor
+:PROPERTIES:
+:CUSTOM_ID: refactor
+:END:
 *** emr
+:PROPERTIES:
+:CUSTOM_ID: emr
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(emr-show-refactor-menu) "emr" nil t)
 
@@ -1628,13 +2165,22 @@
     (define-key prog-mode-map (kbd "M-RET") #'emr-show-refactor-menu))
 #+END_SRC
 ** Snippet
+:PROPERTIES:
+:CUSTOM_ID: snippet
+:END:
 *** yasnippet
+:PROPERTIES:
+:CUSTOM_ID: yasnippet
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yas-global-mode) "yasnippet" nil t)
 
   (add-hook 'emacs-startup-hook #'yas-global-mode)
 #+end_src
 *** consult-yasnippet
+:PROPERTIES:
+:CUSTOM_ID: consult-yasnippet
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-yasnippet) "consult-yasnippet" nil t)
 
@@ -1642,7 +2188,13 @@
   (keymap-global-set "C-c C-y" #'consult-yasnippet)
 #+end_src
 ** Narrowing
+:PROPERTIES:
+:CUSTOM_ID: narrowing
+:END:
 *** fancy-narrow
+:PROPERTIES:
+:CUSTOM_ID: fancy-narrow
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(fancy-narrow-mode) "fancy-narrow" nil t)
 
@@ -1656,6 +2208,9 @@
   ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-local-mode))
 #+end_src
 *** origami
+:PROPERTIES:
+:CUSTOM_ID: origami
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
 
@@ -1665,7 +2220,13 @@
   (add-hook 'emacs-startup-hook #'global-origami-mode)
 #+end_src
 ** LSP
+:PROPERTIES:
+:CUSTOM_ID: lsp
+:END:
 *** eglot
+:PROPERTIES:
+:CUSTOM_ID: eglot
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eglot-ensure) "eglot" nil t)
 
@@ -1681,12 +2242,18 @@
                                       :initializationOptions (:deno (:enable t))))))
 #+end_src
 *** eglot-booster
+:PROPERTIES:
+:CUSTOM_ID: eglot-booster
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eglot-booster-mode) "eglot-booster" nil t)
 
   (add-hook 'emacs-startup-hook #'eglot-booster-mode)
 #+end_src
 *** lsp-mode
+:PROPERTIES:
+:CUSTOM_ID: lsp-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp lsp-deferred lsp-org lsp-register-client make-lsp-client) "lsp-mode" nil t)
   (autoload-if-found '(lsp-lens-mode lsp-lens-refresh lsp-lens--enable) "lsp-lens" nil t)
@@ -1768,6 +2335,9 @@
     (setopt lsp-copilot-enabled nil))
 #+END_SRC
 *** emacs-lsp-booster
+:PROPERTIES:
+:CUSTOM_ID: emacs-lsp-booster
+:END:
 
 https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-mode
 
@@ -1806,16 +2376,25 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 #+end_src
 *** emacs-ccls
+:PROPERTIES:
+:CUSTOM_ID: emacs-ccls
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'(lambda () (require 'ccls))))
 #+end_src
 *** lsp-php-key
+:PROPERTIES:
+:CUSTOM_ID: lsp-php-key
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lsp-php
     (setopt lsp-intelephense-licence-key "00OXTX8OROOJH9P"))
 #+end_src
 *** consult-lsp
+:PROPERTIES:
+:CUSTOM_ID: consult-lsp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-lsp-symbols) "consult-lsp" nil t)
 
@@ -1823,6 +2402,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols))
 #+end_src
 *** lsp-treemacs
+:PROPERTIES:
+:CUSTOM_ID: lsp-treemacs
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp-treemacs-sync-mode) "lsp-treemacs" nil t)
 
@@ -1836,12 +2418,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt lsp-treemacs-error-list-current-project-only t))
 #+end_src
 *** lsp-dart
+:PROPERTIES:
+:CUSTOM_ID: lsp-dart
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'(lambda ()
                                (require 'lsp-dart))))
 #+end_src
 *** dap-mode
+:PROPERTIES:
+:CUSTOM_ID: dap-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dap-debug) "dap-mode" nil t)
   (autoload-if-found '(dap-hydra) "dap-hydra" nil t)
@@ -1888,6 +2476,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   ;;   (add-hook 'ruby-mode-hook #'dap-ruby-setup))
 #+END_SRC
 *** lsp-ui
+:PROPERTIES:
+:CUSTOM_ID: lsp-ui
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp-ui-mode) "lsp-ui" nil t)
 
@@ -1940,6 +2531,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key lsp-mode-map (kbd "C-c C-d") #'lsp-ui-doc-mode))
 #+END_SRC
 *** lsp-scheme
+:PROPERTIES:
+:CUSTOM_ID: lsp-scheme
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lsp-scheme) "lsp-scheme" nil t)
 
@@ -1947,6 +2541,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'scheme-mode-hook #'lsp-scheme))
 #+end_src
 *** lsp-bridge
+:PROPERTIES:
+:CUSTOM_ID: lsp-bridge
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(lsp-bridge-mode) "lsp-bridge" nil t)
 
@@ -1956,14 +2553,26 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   ;;   (define-key lsp-bridge-mode-map (kbd "C-c C-r") #'lsp-bridge-find-references))
 #+end_src
 ** Syntax
+:PROPERTIES:
+:CUSTOM_ID: syntax
+:END:
 *** syntax-subword
+:PROPERTIES:
+:CUSTOM_ID: syntax-subword
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-syntax-subword-mode) "syntax-subword" nil t)
 
   (add-hook 'emacs-startup-hook #'global-syntax-subword-mode)
 #+end_src
 ** Undo
+:PROPERTIES:
+:CUSTOM_ID: undo
+:END:
 *** undo-tree
+:PROPERTIES:
+:CUSTOM_ID: undo-tree
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-undo-tree-mode) "undo-tree" nil t)
 
@@ -1973,7 +2582,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt undo-tree-auto-save-history nil))
 #+end_src
 ** View Mode
+:PROPERTIES:
+:CUSTOM_ID: view-mode
+:END:
 *** view-mode
+:PROPERTIES:
+:CUSTOM_ID: view-mode-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'prog-mode
     (add-hook 'prog-mode-hook #'view-mode))
@@ -2042,7 +2657,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
       (remove-hook 'view-mode-hook #'my/disable-buffer-readonly)))
 #+end_src
 ** Utility
+:PROPERTIES:
+:CUSTOM_ID: utility
+:END:
 *** comint
+:PROPERTIES:
+:CUSTOM_ID: comint
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'comint
     (setopt comint-buffer-maximum-size 100000)
@@ -2050,6 +2671,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt comint-terminfo-terminal "eterm-256color"))
 #+end_src
 *** crux
+:PROPERTIES:
+:CUSTOM_ID: crux
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(crux-open-with
                        crux-smart-open-line-above
@@ -2080,12 +2704,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "C-DEL" #'crux-kill-line-backwards)
 #+end_src
 *** delsel
+:PROPERTIES:
+:CUSTOM_ID: delsel
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(delete-selection-mode) "delsel" nil t)
 
   (add-hook 'emacs-startup-hook #'delete-selection-mode)
 #+end_src
 *** dogears
+:PROPERTIES:
+:CUSTOM_ID: dogears
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dogears-go
                        dogears-back
@@ -2100,6 +2730,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "M-g M-D" #'dogears-sidebar)
 #+end_src
 *** goto-addr
+:PROPERTIES:
+:CUSTOM_ID: goto-addr
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(goto-address-prog-mode goto-address-mode) "goto-address" nil t)
 
@@ -2110,6 +2743,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'text-mode-hook #'goto-address-mode))
 #+END_SRC
 *** minimap
+:PROPERTIES:
+:CUSTOM_ID: minimap
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(minimap-mode) "minimap" nil t)
 
@@ -2122,6 +2758,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt minimap-major-modes '(prog-mode org-mode)))
 #+end_src
 *** puni
+:PROPERTIES:
+:CUSTOM_ID: puni
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(puni-global-mode puni-disable-puni-mode) "puni" nil t)
 
@@ -2152,24 +2791,39 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'minibuffer-mode-hook #'puni-disable-puni-mode))
 #+end_src
 *** quickrun
+:PROPERTIES:
+:CUSTOM_ID: quickrun
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(quickrun) "quickrun" nil t)
 #+end_src
 *** restclient
+:PROPERTIES:
+:CUSTOM_ID: restclient
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(restclient-mode) "restclient" nil t)
 #+end_src
 *** smart-jump
+:PROPERTIES:
+:CUSTOM_ID: smart-jump
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(smart-jump-setup-default-registers) "smart-jump" nil t)
 
   (add-hook 'emacs-startup-hook #'smart-jump-setup-default-registers)
 #+end_src
 *** string-inflection
+:PROPERTIES:
+:CUSTOM_ID: string-inflection
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(string-inflection-all-cycle) "string-inflection" nil t)
 #+end_src
 *** uuid
+:PROPERTIES:
+:CUSTOM_ID: uuid
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(uuid-string) "uuid" nil t)
 
@@ -2178,21 +2832,42 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (insert (uuid-string)))
 #+end_src
 *** woman
+:PROPERTIES:
+:CUSTOM_ID: woman
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(woman woman-find-file) "woman" nil t)
 #+end_src
 * Remote Access
+:PROPERTIES:
+:CUSTOM_ID: remote-access
+:END:
 ** tramp
+:PROPERTIES:
+:CUSTOM_ID: tramp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(tramp-set-completion-function) "tramp" nil t)
 #+end_src
 ** consult-tramp
+:PROPERTIES:
+:CUSTOM_ID: consult-tramp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-tramp) "consult-tramp" nil t)
 #+end_src
 * Monitor
+:PROPERTIES:
+:CUSTOM_ID: monitor
+:END:
 ** Process
+:PROPERTIES:
+:CUSTOM_ID: process
+:END:
 *** proced
+:PROPERTIES:
+:CUSTOM_ID: proced
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(proced) "proced" nil t)
 
@@ -2206,6 +2881,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt proced-format 'long))
 #+end_src
 *** proced-narrow
+:PROPERTIES:
+:CUSTOM_ID: proced-narrow
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(proced-narrow) "proced-narrow" nil t)
 
@@ -2214,31 +2892,58 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key proced-mode-map (kbd "/") #'proced-narrow))
 #+end_src
 ** System
+:PROPERTIES:
+:CUSTOM_ID: system
+:END:
 *** symon
+:PROPERTIES:
+:CUSTOM_ID: symon
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(symon-mode) "symon" nil t)
 #+end_src
 ** Minor Modes
+:PROPERTIES:
+:CUSTOM_ID: minor-modes
+:END:
 *** command-log-mode
+:PROPERTIES:
+:CUSTOM_ID: command-log-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(clm/toggle-command-log-buffer) "command-log-mode" nil t)
 
   (defalias 'command-log #'clm/toggle-command-log-buffer)
 #+end_src
 ** Statistics
+:PROPERTIES:
+:CUSTOM_ID: statistics
+:END:
 *** esup
+:PROPERTIES:
+:CUSTOM_ID: esup
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(esup) "esup" nil t)
 #+END_SRC
 *** explain-pause-mode
+:PROPERTIES:
+:CUSTOM_ID: explain-pause-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(explain-pause-mode) "explain-pause-mode" nil t)
 #+end_src
 *** disk-usage
+:PROPERTIES:
+:CUSTOM_ID: disk-usage
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(disk-usage disk-usage-here) "disk-usage" nil t)
 #+end_src
 *** keyfreq
+:PROPERTIES:
+:CUSTOM_ID: keyfreq
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(keyfreq-mode keyfreq-autosave-mode) "keyfreq" nil t)
 
@@ -2246,15 +2951,27 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook #'keyfreq-autosave-mode)
 #+end_src
 *** uptimes
+:PROPERTIES:
+:CUSTOM_ID: uptimes
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(uptimes) "uptimes" nil t)
 #+end_src
 * EWW
+:PROPERTIES:
+:CUSTOM_ID: eww
+:END:
 ** xwidges
+:PROPERTIES:
+:CUSTOM_ID: xwidges
+:END:
 #+begin_src emacs-lisp :tangle yes
   (require 'xwidget nil t)
 #+end_src
 ** basic
+:PROPERTIES:
+:CUSTOM_ID: eww-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/eww-rename-buffer ()
     "Rename the name of current EWW buffer."
@@ -2281,6 +2998,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'eww-after-render #'my/eww-rename-buffer))
 #+end_src
 ** eww-lnum
+:PROPERTIES:
+:CUSTOM_ID: eww-lnum
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eww-lnum-follow eww-lnum-universal) "eww-lnum" nil t)
 
@@ -2290,7 +3010,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key eww-mode-map "F" #'eww-lnum-universal))
 #+end_src
 * Dired
+:PROPERTIES:
+:CUSTOM_ID: dired
+:END:
 ** basic
+:PROPERTIES:
+:CUSTOM_ID: dired-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'dired
     ;; config
@@ -2301,6 +3027,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt dired-use-ls-dired nil))
 #+end_src
 ** wdired
+:PROPERTIES:
+:CUSTOM_ID: wdired
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(wdired-change-to-wdired-mode) "wdired" nil t)
 
@@ -2312,6 +3041,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt wdired-allow-to-change-permissions 'advanced))
 #+end_src
 ** dired-collapse
+:PROPERTIES:
+:CUSTOM_ID: dired-collapse
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-collapse-mode) "dired-collapse" nil t)
 
@@ -2320,6 +3052,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dired-mode #'dired-collapse-mode))
 #+end_src
 ** dired-filter
+:PROPERTIES:
+:CUSTOM_ID: dired-filter
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-filter-mode) "dired-filter" nil t)
 
@@ -2328,6 +3063,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dired-mode #'dired-filter-mode))
 #+end_src
 ** dired-narrow
+:PROPERTIES:
+:CUSTOM_ID: dired-narrow
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-narrow-mode) "dired-narrow" nil t)
 
@@ -2336,6 +3074,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dired-mode-hook #'dired-narrow-mode))
 #+end_src
 ** dired-open
+:PROPERTIES:
+:CUSTOM_ID: dired-open
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-open-file) "dired-open" nil t)
 
@@ -2344,18 +3085,30 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key dired-mode-map [remap dired-find-file] #'dired-open-file))
 #+end_src
 ** dired-ranger
+:PROPERTIES:
+:CUSTOM_ID: dired-ranger
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '() "dired-ranger" nil t)
 #+end_src
 ** dired-subtree
+:PROPERTIES:
+:CUSTOM_ID: dired-subtree
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-subtree-apply-filter) "dired-subtree" nil t)
 #+end_src
 ** dired-subtree
+:PROPERTIES:
+:CUSTOM_ID: dired-subtree-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dired-subtree-apply-filter) "dired-subtree" nil t)
 #+end_src
 ** diredfl
+:PROPERTIES:
+:CUSTOM_ID: diredfl
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(diredfl-global-mode) "diredfl" nil t)
 
@@ -2364,7 +3117,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dired-mode-hook #'diredfl-global-mode))
 #+end_src
 * Search
+:PROPERTIES:
+:CUSTOM_ID: search
+:END:
 ** wgrep
+:PROPERTIES:
+:CUSTOM_ID: wgrep
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(wgrep-setup) "wgrep" nil t)
 
@@ -2373,6 +3132,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'grep-setup-hook 'wgrep-setup))
 #+end_src
 ** consult
+:PROPERTIES:
+:CUSTOM_ID: consult
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-bookmark
                        consult-buffer
@@ -2470,6 +3232,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt xref-show-definitions-function #'consult-xref))
 #+end_src
 ** affe
+:PROPERTIES:
+:CUSTOM_ID: affe
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(affe-grep) "affe" nil t)
 
@@ -2480,6 +3245,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt affe-regexp-function 'orderless-pattern-compiler))
 #+end_src
 ** embark
+:PROPERTIES:
+:CUSTOM_ID: embark
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(embark-act embark-dwim embark-prefix-help-command) "embark" nil t)
 
@@ -2549,12 +3317,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 #+end_src
 ** compile-multi
+:PROPERTIES:
+:CUSTOM_ID: compile-multi
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(compile-multi) "compile-multi" nil t)
 
   (keymap-global-set "C-x m" #'compile-multi)
 #+end_src
 ** vertico
+:PROPERTIES:
+:CUSTOM_ID: vertico
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vertico-mode) "vertico-autoloads" nil t)
 
@@ -2566,6 +3340,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt vertico-cycle t))
 #+end_src
 ** marginalia
+:PROPERTIES:
+:CUSTOM_ID: marginalia
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode marginalia-cycle) "marginalia" nil t)
 
@@ -2579,6 +3356,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle))
 #+end_src
 ** orderless
+:PROPERTIES:
+:CUSTOM_ID: orderless
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orderless-all-completions orderless-try-completion) "orderless" nil t)
 
@@ -2590,7 +3370,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt completion-category-overrides '((file (styles flex basic partial-completion)))))
 #+end_src
 * Buffer
+:PROPERTIES:
+:CUSTOM_ID: buffer
+:END:
 ** auto-save-buffers-enhanced
+:PROPERTIES:
+:CUSTOM_ID: auto-save-buffers-enhanced
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
 
@@ -2600,18 +3386,27 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt auto-save-buffers-enhanced-interval 10))
 #+end_src
 ** editorconfig
+:PROPERTIES:
+:CUSTOM_ID: editorconfig
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
 
   (add-hook 'emacs-startup-hook #'editorconfig-mode)
 #+END_SRC
 ** popwin
+:PROPERTIES:
+:CUSTOM_ID: popwin
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(popwin-mode) "popwin" nil t)
 
   (add-hook 'emacs-startup-hook #'popwin-mode)
 #+end_src
 ** whitespace
+:PROPERTIES:
+:CUSTOM_ID: whitespace
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
 
@@ -2626,7 +3421,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+END_SRC
 
 * File
+:PROPERTIES:
+:CUSTOM_ID: file
+:END:
 ** recentf
+:PROPERTIES:
+:CUSTOM_ID: recentf
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(recentf-mode) "recentf" nil t)
 
@@ -2641,6 +3442,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt recentf-exclude '(".recentf" "\\.gpg\\")))
 #+END_SRC
 ** open-junk-file
+:PROPERTIES:
+:CUSTOM_ID: open-junk-file
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(open-junk-file) "open-junk-file" nil t)
 
@@ -2651,6 +3455,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt open-junk-file-format "~/.emacs.d/.junk/%Y-%m-%d-%H%M%S."))
 #+END_SRC
 ** vlf
+:PROPERTIES:
+:CUSTOM_ID: vlf
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vlf-disable-for-function) "vlf-setup" t)
 
@@ -2659,11 +3466,20 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key dired-mode-map (kbd "V") #'dired-vlf))
 #+end_src
 ** sudo-edit
+:PROPERTIES:
+:CUSTOM_ID: sudo-edit
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(sudo-edit-current-file) "sudo-edit" nil t)
 #+end_src
 * Project
+:PROPERTIES:
+:CUSTOM_ID: project
+:END:
 ** projectile
+:PROPERTIES:
+:CUSTOM_ID: projectile
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(projectile-mode
                        projectile-clear-known-projects
@@ -2699,6 +3515,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (advice-add 'fileloop-continue :before #'my/disable-buffer-readonly))
 #+end_src
 ** consult-projectile
+:PROPERTIES:
+:CUSTOM_ID: consult-projectile
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-projectile-switch-to-buffer
                        consult-projectile-switch-to-buffer-other-window
@@ -2727,6 +3546,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+end_src
 
 ** projectile-git-autofetch
+:PROPERTIES:
+:CUSTOM_ID: projectile-git-autofetch
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(projectile-git-autofetch-setup) "projectile-git-autofetch" nil t)
 
@@ -2739,7 +3561,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt projectile-git-autofetch-fetch-args '("--no-progress" "--prune" "--prune-tags")))
 #+end_src
 * Window
+:PROPERTIES:
+:CUSTOM_ID: window
+:END:
 ** ace-window
+:PROPERTIES:
+:CUSTOM_ID: ace-window
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ace-window) "ace-window" nil t)
 
@@ -2753,6 +3581,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt aw-minibuffer-flag t))
 #+end_src
 ** writeroom-mode
+:PROPERTIES:
+:CUSTOM_ID: writeroom-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(writeroom-mode
                        writeroom-decrease-width
@@ -2771,12 +3602,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt writeroom-width 150))
 #+end_src
 ** zoom-window
+:PROPERTIES:
+:CUSTOM_ID: zoom-window
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(zoom-window-zoom) "zoom-window" nil t)
 
   (keymap-global-set "C-c C-z" #'zoom-window-zoom)
 #+end_src
 ** tab-bar
+:PROPERTIES:
+:CUSTOM_ID: tab-bar
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(tab-bar-mode
                        tab-bar-history-mode
@@ -2821,7 +3658,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide))))
 #+end_src
 * Cursor
+:PROPERTIES:
+:CUSTOM_ID: cursor
+:END:
 ** avy
+:PROPERTIES:
+:CUSTOM_ID: avy
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-goto-char avy-process) "avy" nil t)
 
@@ -2833,12 +3676,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt avy-background t))
 #+end_src
 ** avy-zap
+:PROPERTIES:
+:CUSTOM_ID: avy-zap
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(avy-zap-up-to-char-dwim) "avy-zap" nil t)
 
   (keymap-global-set "M-z" #'avy-zap-up-to-char-dwim)
 #+end_src
 ** expand-region
+:PROPERTIES:
+:CUSTOM_ID: expand-region
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(er/expand-region) "expand-region" nil t)
 
@@ -2847,6 +3696,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "C-M-@" #'er/expand-region)
 #+end_src
 ** multiple-cursors
+:PROPERTIES:
+:CUSTOM_ID: multiple-cursors
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mc/mark-next-like-this mc/mark-previous-like-this mc/mark-all-like-this) "multiple-cursors" nil t)
 
@@ -2855,8 +3707,17 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "C-c C-<" #'mc/mark-all-like-this)
 #+END_SRC
 * Client
+:PROPERTIES:
+:CUSTOM_ID: client
+:END:
 ** Mail
+:PROPERTIES:
+:CUSTOM_ID: mail
+:END:
 *** mu4e
+:PROPERTIES:
+:CUSTOM_ID: mu4e
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mu4e) "mu4e" nil t)
 
@@ -2890,10 +3751,16 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-to-list 'mm-discouraged-alternatives "text/richtext"))
 #+end_src
 *** mu4e-views
+:PROPERTIES:
+:CUSTOM_ID: mu4e-views
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '() "mu4e-views" nil t)
 #+end_src
 *** mu4e-dashboard
+:PROPERTIES:
+:CUSTOM_ID: mu4e-dashboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(mu4e-dashboard) "mu4e-dashboard" nil t)
 
@@ -2902,12 +3769,24 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt mu4e-dashboard-file "~/.emacs.d/misc/mu4e-dashboard.org"))
 #+end_src
 ** Googling
+:PROPERTIES:
+:CUSTOM_ID: googling
+:END:
 *** google-translate
+:PROPERTIES:
+:CUSTOM_ID: google-translate
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(google-translate-at-point) "google-translate" nil t)
 #+end_src
 ** Client
+:PROPERTIES:
+:CUSTOM_ID: client-2
+:END:
 *** md4rd
+:PROPERTIES:
+:CUSTOM_ID: md4rd
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(md4rd
                        md4rd-login
@@ -2950,8 +3829,17 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (define-key md4rd-mode-map (kbd "t") 'md4rd-widget-toggle-line))
 #+end_src
 * Theme
+:PROPERTIES:
+:CUSTOM_ID: theme
+:END:
 ** Font
+:PROPERTIES:
+:CUSTOM_ID: font
+:END:
 *** fontset
+:PROPERTIES:
+:CUSTOM_ID: fontset
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defconst my/enable-warning-log nil)
 
@@ -3166,11 +4054,20 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                   (set-fontset-font t '( #xe000 .  #xf136) "Inconsolata Nerd Font"))))
 #+end_src
 *** font-lock-studio
+:PROPERTIES:
+:CUSTOM_ID: font-lock-studio
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(font-lock-studio) "font-lock-studio" nil t)
 #+END_SRC
 ** Color
+:PROPERTIES:
+:CUSTOM_ID: color
+:END:
 *** ansi-color
+:PROPERTIES:
+:CUSTOM_ID: ansi-color
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ansi-color-for-comint-mode-on) "ansi-color" nil t)
 
@@ -3185,6 +4082,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                   (ansi-color-apply-on-region (point-min) (point-max)))))
 #+end_src
 *** highlight-indent-guides
+:PROPERTIES:
+:CUSTOM_ID: highlight-indent-guides
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(highlight-indent-guides-mode) "highlight-indent-guides" nil t)
 
@@ -3198,6 +4098,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt highlight-indent-guides-method 'bitmap))
 #+end_src
 *** hl-todo
+:PROPERTIES:
+:CUSTOM_ID: hl-todo
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-hl-todo-mode) "hl-todo" nil t)
 
@@ -3218,6 +4121,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
               ("MEMO" . "#coffee"))))
 #+end_src
 *** xterm-color
+:PROPERTIES:
+:CUSTOM_ID: xterm-color
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(xterm-color-filter) "xterm-color" nil t)
 
@@ -3229,11 +4135,20 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt xterm-color-preserve-properties t))
 #+end_src
 ** Icon
+:PROPERTIES:
+:CUSTOM_ID: icon
+:END:
 *** emojify
+:PROPERTIES:
+:CUSTOM_ID: emojify
+:END:
 #+begin_src emacs-lisp
   (autoload-if-found '(global-emojify-mode) "emojify" nil t)
 #+end_src
 *** nerd-icons-dired
+:PROPERTIES:
+:CUSTOM_ID: nerd-icons-dired
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-dired-mode) "nerd-icons-dired" nil t)
 
@@ -3241,6 +4156,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
 #+end_src
 *** nerd-icons-completion
+:PROPERTIES:
+:CUSTOM_ID: nerd-icons-completion
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nerd-icons-completion-marginalia-setup) "nerd-icons-completion" nil t)
 
@@ -3248,6 +4166,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
 ** Dashboard
+:PROPERTIES:
+:CUSTOM_ID: dashboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dashboard-refresh-buffer) "dashboard" nil t)
 
@@ -3258,6 +4179,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt dashboard-items '((recents . 10))))
 #+end_src
 ** Dimmer
+:PROPERTIES:
+:CUSTOM_ID: dimmer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dimmer-mode) "dimmer" nil t)
 
@@ -3268,7 +4192,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt dimmer-fraction 0.05))
 #+end_src
 ** Doom
+:PROPERTIES:
+:CUSTOM_ID: doom
+:END:
 *** doom-themes
+:PROPERTIES:
+:CUSTOM_ID: doom-themes
+:END:
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook
             #'(lambda ()
@@ -3282,6 +4212,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt doom-themes-enable-italic t))
 #+END_SRC
 *** doom-modeline
+:PROPERTIES:
+:CUSTOM_ID: doom-modeline
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
 
@@ -3298,6 +4231,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt doom-modeline-check-icon nil))
 #+END_SRC
 ** hl-line
+:PROPERTIES:
+:CUSTOM_ID: hl-line
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-hl-line-mode) "hl-line-mode" nil t)
 
@@ -3311,6 +4247,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (set-face-background 'hl-line "#444642"))
 #+END_SRC
 ** idle-highlight-mode
+:PROPERTIES:
+:CUSTOM_ID: idle-highlight-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
 
@@ -3321,6 +4260,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'prog-mode-hook #'idle-highlight-mode))
 #+end_src
 ** neotree
+:PROPERTIES:
+:CUSTOM_ID: neotree
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(neotree-hide neotree-dir neotree-make-executor neo-open-file neo-open-dir) "neotree" nil t)
 
@@ -3349,6 +4291,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                  :dir-fn  #'neo-open-dir)))
 #+END_SRC
 ** nyan-mode
+:PROPERTIES:
+:CUSTOM_ID: nyan-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nyan-mode) "nyan-mode" nil t)
 
@@ -3360,12 +4305,18 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt nyan-animate-nyancat t))
 #+END_SRC
 ** volatile-highlights
+:PROPERTIES:
+:CUSTOM_ID: volatile-highlights
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
 
   (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
 #+end_src
 ** topsy
+:PROPERTIES:
+:CUSTOM_ID: topsy
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(topsy-mode) "topsy" nil t)
 
@@ -3373,6 +4324,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'yaml-mode-hook #'topsy-mode))
 #+end_src
 ** idle-highlight-mode
+:PROPERTIES:
+:CUSTOM_ID: idle-highlight-mode-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(idle-highlight-mode) "idle-highlight-mode" nil t)
 
@@ -3383,24 +4337,45 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt idle-highlight-idle-time 0.1))
 #+end_src
 ** modus-themes
+:PROPERTIES:
+:CUSTOM_ID: modus-themes
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '() "modus-themes" nil t)
 #+end_src
 * Awesome Package
+:PROPERTIES:
+:CUSTOM_ID: awesome-package
+:END:
 ** Joke
+:PROPERTIES:
+:CUSTOM_ID: joke
+:END:
 *** hacker-typer
+:PROPERTIES:
+:CUSTOM_ID: hacker-typer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(hacker-typer) "hacker-typer" nil t)
 #+end_src
 *** power-mode
+:PROPERTIES:
+:CUSTOM_ID: power-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(power-mode) "power-mode" nil t)
 #+end_src
 *** sudden-death
+:PROPERTIES:
+:CUSTOM_ID: sudden-death
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(sudden-death) "sudden-death" nil t)
 #+end_src
 *** redacted
+:PROPERTIES:
+:CUSTOM_ID: redacted
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(redacted-mode) "redacted" nil t)
 
@@ -3410,6 +4385,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (redacted-mode (if redacted-mode -1 1)))
 #+end_src
 *** lorem ipsum
+:PROPERTIES:
+:CUSTOM_ID: lorem-ipsum
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lorem-ipsum-insert-sentences
                        lorem-ipsum-insert-paragraphs
@@ -3420,13 +4398,22 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (keymap-global-set "C-c C-l l" #'lorem-ipsum-insert-list)
 #+end_src
 *** zalgo-mode
+:PROPERTIES:
+:CUSTOM_ID: zalgo-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(zalgo-transform-word
                        zalgo-mode
                        zalgo-transform-region) "zalgo-mode" nil t)
 #+end_src
 ** Password
+:PROPERTIES:
+:CUSTOM_ID: password-2
+:END:
 *** pass
+:PROPERTIES:
+:CUSTOM_ID: pass
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pass pass-view-mode) "pass" nil t)
 
@@ -3436,6 +4423,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt pass-suppress-confirmations t))
 #+end_src
 *** password-generator
+:PROPERTIES:
+:CUSTOM_ID: password-generator
+:END:
 #+begin_src emacs-lisp
   (autoload-if-found '(password-generator-simple
                        password-generator-strong
@@ -3445,6 +4435,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        password-generator-custom) "password-generator" nil t)
 #+end_src
 *** sops
+:PROPERTIES:
+:CUSTOM_ID: sops
+:END:
 #+begin_src emacs-lisp
   (autoload-if-found '(sops-save-file
                        sops-cancel
@@ -3454,7 +4447,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook #'global-sops-mode)
 #+end_src
 ** Dictionary
+:PROPERTIES:
+:CUSTOM_ID: dictionary
+:END:
 *** define-word
+:PROPERTIES:
+:CUSTOM_ID: define-word
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/define-word ()
     (interactive)
@@ -3470,7 +4469,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
               (weblio . takeokunn/define-word--display-in-buffer))))
 #+end_src
 ** GC
+:PROPERTIES:
+:CUSTOM_ID: gc
+:END:
 *** gcmh
+:PROPERTIES:
+:CUSTOM_ID: gcmh
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(gcmh-mode) "gcmh" nil t)
 
@@ -3498,7 +4503,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                                     (setopt my/gcmh-status nil))))))
 #+end_src
 ** Command
+:PROPERTIES:
+:CUSTOM_ID: command
+:END:
 *** amx
+:PROPERTIES:
+:CUSTOM_ID: amx
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(amx-mode) "amx" nil t)
 
@@ -3509,7 +4520,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt amx-history-length 100))
 #+END_SRC
 ** GPG
+:PROPERTIES:
+:CUSTOM_ID: gpg
+:END:
 *** epa-file
+:PROPERTIES:
+:CUSTOM_ID: epa-file
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(epa-file-enable) "epa-file" nil t)
 
@@ -3531,13 +4548,22 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt epg-pinentry-mode 'loopback))
 #+end_src
 *** pinentry
+:PROPERTIES:
+:CUSTOM_ID: pinentry
+:END:
 https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pinentry-start) "pinentry" nil t)
 #+end_src
 ** Help
+:PROPERTIES:
+:CUSTOM_ID: help
+:END:
 *** helpful
+:PROPERTIES:
+:CUSTOM_ID: helpful
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(helpful-callable
                        helpful-function
@@ -3555,7 +4581,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "C-h C" #'helpful-command)
 #+end_src
 ** Shell
+:PROPERTIES:
+:CUSTOM_ID: shell
+:END:
 *** exec-path-from-shell
+:PROPERTIES:
+:CUSTOM_ID: exec-path-from-shell
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
 
@@ -3565,12 +4597,21 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH")))
 #+END_SRC
 ** Utility
+:PROPERTIES:
+:CUSTOM_ID: utility-2
+:END:
 *** htmlize
+:PROPERTIES:
+:CUSTOM_ID: htmlize
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'htmlize
     (setopt htmlize-html-charset 'utf-8))
 #+end_src
 *** midnight
+:PROPERTIES:
+:CUSTOM_ID: midnight
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(midnight-mode) "midnight" nil t)
 
@@ -3580,6 +4621,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt clean-buffer-list-delay-general 1))
 #+end_src
 *** lte
+:PROPERTIES:
+:CUSTOM_ID: lte
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lte-truncate-table-mode) "lte" nil t)
 
@@ -3590,14 +4634,26 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'lte-truncate-table-mode))
 #+end_src
 ** Mouse
+:PROPERTIES:
+:CUSTOM_ID: mouse
+:END:
 *** inhibit-mouse
+:PROPERTIES:
+:CUSTOM_ID: inhibit-mouse
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(inhibit-mouse-mode) "inhibit-mouse" nil t)
 
   (add-hook 'emacs-startup-hook #'inhibit-mouse-mode)
 #+end_src
 ** PDF
+:PROPERTIES:
+:CUSTOM_ID: pdf
+:END:
 *** pdf-tools
+:PROPERTIES:
+:CUSTOM_ID: pdf-tools
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pdf-tools-install) "pdf-tools" nil t)
   (autoload-if-found '(pdf-occur-global-minor-mode) "pdf-occur" nil t)
@@ -3605,7 +4661,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'emacs-startup-hook #'pdf-tools-install)
 #+end_src
 ** Jump
+:PROPERTIES:
+:CUSTOM_ID: jump
+:END:
 *** dumb-jump
+:PROPERTIES:
+:CUSTOM_ID: dumb-jump
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dumb-jump-mode
                        dumb-jump-xref-activate
@@ -3624,8 +4686,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt dumb-jump-disable-obsolete-warnings t))
 #+end_src
 * Language Specific
+:PROPERTIES:
+:CUSTOM_ID: language-specific
+:END:
 ** Basic Lisp
+:PROPERTIES:
+:CUSTOM_ID: basic-lisp
+:END:
 *** paredit
+:PROPERTIES:
+:CUSTOM_ID: paredit
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(enable-paredit-mode
                        paredit-forward-slurp-sexp
@@ -3670,6 +4741,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'inferior-emacs-lisp-mode-hook #'enable-paredit-mode))
 #+END_SRC
 *** rainbow-delimiter
+:PROPERTIES:
+:CUSTOM_ID: rainbow-delimiter
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(rainbow-delimiters-mode-enable) "rainbow-delimiters" nil t)
 
@@ -3690,7 +4764,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'scheme-mode-hook #'rainbow-delimiters-mode-enable))
 #+END_SRC
 ** Common Lisp
+:PROPERTIES:
+:CUSTOM_ID: common-lisp
+:END:
 *** sly
+:PROPERTIES:
+:CUSTOM_ID: sly
+:END:
 #+begin_src emacs-lisp :tangle yes
   (require 'sly-autoloads)
 
@@ -3704,6 +4784,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'lisp-data-mode-hook #'(lambda () (view-mode -1))))
 #+END_SRC
 *** hyperspec
+:PROPERTIES:
+:CUSTOM_ID: hyperspec
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(hyperspec-lookup) "hyperspec" nil t)
 
@@ -3712,7 +4795,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key lisp-mode-map (kbd "C-c h") #'hyperspec-lookup))
 #+end_src
 ** Emacs Lisp
+:PROPERTIES:
+:CUSTOM_ID: emacs-lisp
+:END:
 *** eros
+:PROPERTIES:
+:CUSTOM_ID: eros
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eros-mode) "eros" nil t)
 
@@ -3721,6 +4810,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'emacs-lisp-mode-hook #'eros-mode))
 #+end_src
 *** eldoc
+:PROPERTIES:
+:CUSTOM_ID: eldoc
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(turn-on-eldoc-mode) "eldoc" nil t)
 
@@ -3734,14 +4826,23 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ielm-mode-hook #'turn-on-eldoc-mode))
 #+end_src
 *** elsa
+:PROPERTIES:
+:CUSTOM_ID: elsa
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elsa-run) "elsa" nil t)
 #+end_src
 *** lispxmp
+:PROPERTIES:
+:CUSTOM_ID: lispxmp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(lispxmp) "lispxmp" nil t)
 #+end_src
 *** macrostep
+:PROPERTIES:
+:CUSTOM_ID: macrostep
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(macrostep-expand macrostep-mode) "macrostep" nil t)
 
@@ -3750,6 +4851,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key emacs-lisp-mode-map (kbd "C-c e") #'macrostep-expand))
 #+end_src
 *** elisp-slime-nav
+:PROPERTIES:
+:CUSTOM_ID: elisp-slime-nav
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elisp-slime-nav-mode) "elisp-slime-nav" nil t)
 
@@ -3762,6 +4866,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ielm-mode-hook #'elisp-slime-nav-mode))
 #+END_SRC
 *** nameless
+:PROPERTIES:
+:CUSTOM_ID: nameless
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nameless-mode) "nameless" nil t)
 
@@ -3774,6 +4881,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ielm-mode-hook #'nameless-mode))
 #+END_SRC
 *** elisp-refs
+:PROPERTIES:
+:CUSTOM_ID: elisp-refs
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elisp-refs-function
                        elisp-refs-macro
@@ -3782,6 +4892,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        elisp-refs-symbol) "elisp-refs" nil t)
 #+end_src
 *** highlight-quoted
+:PROPERTIES:
+:CUSTOM_ID: highlight-quoted
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(highlight-quoted-mode) "highlight-quoted" nil t)
 
@@ -3790,6 +4903,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'emacs-lisp-mode-hook #'highlight-quoted-mode))
 #+end_src
 *** highlight-defined
+:PROPERTIES:
+:CUSTOM_ID: highlight-defined
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(highlight-defined-mode) "highlight-defined" nil t)
 
@@ -3798,6 +4914,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'emacs-lisp-mode-hook #'highlight-defined-mode))
 #+end_src
 *** my/ielm-history
+:PROPERTIES:
+:CUSTOM_ID: my-ielm-history
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/ielm-history ()
     (interactive)
@@ -3812,7 +4931,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
           history)))))
 #+END_SRC
 ** Clojure
+:PROPERTIES:
+:CUSTOM_ID: clojure
+:END:
 *** anakondo
+:PROPERTIES:
+:CUSTOM_ID: anakondo
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(anakondo-minor-mode) "anakondo" nil t)
 
@@ -3822,6 +4947,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (add-hook 'clojurec-mode-hook #'anakondo-minor-mode))
 #+end_src
 *** cider
+:PROPERTIES:
+:CUSTOM_ID: cider
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(cider cider-format-buffer cider-switch-to-last-clojure-buffer) "cider" nil t)
   (autoload-if-found '(cider-doc) "cider-doc" nil t)
@@ -3860,10 +4988,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key clojure-mode-map (kbd "C-c h") #'cider-doc))
 #+END_SRC
 *** kibit-helper
+:PROPERTIES:
+:CUSTOM_ID: kibit-helper
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(kibit kibit-current-file kibit-accept-proposed-change) "kibit-helper" nil t)
 #+end_src
 *** clj-refactor
+:PROPERTIES:
+:CUSTOM_ID: clj-refactor
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(clj-refactor-mode cljr-add-keybindings-with-prefix) "clj-refactor" nil t)
 
@@ -3875,16 +5009,31 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (setopt cljr-hotload-dependencies t))
 #+end_src
 *** inf-clojure
+:PROPERTIES:
+:CUSTOM_ID: inf-clojure
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(inf-clojure) "inf-clojure" nil t)
 #+end_src
 ** C/C++
+:PROPERTIES:
+:CUSTOM_ID: c-c
+:END:
 *** clang-format
+:PROPERTIES:
+:CUSTOM_ID: clang-format
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(clang-format-buffer) "clang-format" nil t)
 #+end_src
 ** Csv
+:PROPERTIES:
+:CUSTOM_ID: csv
+:END:
 *** rainbow-csv
+:PROPERTIES:
+:CUSTOM_ID: rainbow-csv
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(rainbow-csv-mode) "rainbow-csv" nil t)
 
@@ -3892,7 +5041,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'csv-mode-hook #'rainbow-csv-mode))
 #+end_src
 ** JavaScript/TypeScript
+:PROPERTIES:
+:CUSTOM_ID: javascript-typescript
+:END:
 *** nodejs-repl
+:PROPERTIES:
+:CUSTOM_ID: nodejs-repl
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nodejs-repl
                        nodejs-repl-send-last-expression
@@ -3912,6 +5067,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key js2-mode-map (kbd "C-c C-z") #'nodejs-repl-switch-to-repl))
 #+end_src
 *** js2-refactor
+:PROPERTIES:
+:CUSTOM_ID: js2-refactor
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(js2-refactor-mode) "js2-refactor" nil t)
 
@@ -3928,6 +5086,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'typescript-mode-hook #'js2-refactor-mode))
 #+END_SRC
 *** jest
+:PROPERTIES:
+:CUSTOM_ID: jest
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(jest
                        jest-file
@@ -3942,11 +5103,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'typescript-mode-hook #'jest-minor-mode))
 #+end_src
 ** Ruby
+:PROPERTIES:
+:CUSTOM_ID: ruby
+:END:
 *** robe
+:PROPERTIES:
+:CUSTOM_ID: robe
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(robe-mode inf-ruby-console-auto) "robe" nil t)
 #+end_src
 *** rubocop
+:PROPERTIES:
+:CUSTOM_ID: rubocop
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(rubocop-mode) "rubocop" nil t)
 
@@ -3958,6 +5128,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ruby-mode-hook #'rubocop-mode))
 #+end_src
 *** ruby-refactor
+:PROPERTIES:
+:CUSTOM_ID: ruby-refactor
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ruby-refactor-mode-launch) "ruby-refactor" nil t)
 
@@ -3966,6 +5139,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ruby-mode-hook #'ruby-refactor-mode-launch))
 #+END_SRC
 *** inf-ruby
+:PROPERTIES:
+:CUSTOM_ID: inf-ruby
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(inf-ruby inf-ruby-minor-mode) "inf-ruby" nil t)
 
@@ -3984,6 +5160,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
 #+END_SRC
 *** yard-mode
+:PROPERTIES:
+:CUSTOM_ID: yard-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yard-mode) "yard-mode" nil t)
 
@@ -3992,7 +5171,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'ruby-mode-hook #'yard-mode))
 #+end_src
 ** SQL
+:PROPERTIES:
+:CUSTOM_ID: sql
+:END:
 *** sql-indent
+:PROPERTIES:
+:CUSTOM_ID: sql-indent
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(sqlind-setup sqlind-minor-mode) "sql-indent" nil t)
 
@@ -4002,7 +5187,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 #+END_SRC
 ** PHP
+:PROPERTIES:
+:CUSTOM_ID: php
+:END:
 *** composer
+:PROPERTIES:
+:CUSTOM_ID: composer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(composer-get-config
                        composer-get-bin-dir
@@ -4018,10 +5209,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        composer) "composer" nil t)
 #+end_src
 *** php-runtime
+:PROPERTIES:
+:CUSTOM_ID: php-runtime
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(php-runtime-expr php-runtime-eval) "php-runtime" nil t)
 #+end_src
 *** psysh
+:PROPERTIES:
+:CUSTOM_ID: psysh
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(psysh psysh-doc) "psysh" nil t)
 
@@ -4030,6 +5227,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key php-mode-map (kbd "C-c h") #'psysh-doc))
 #+end_src
 *** laravel-tinker-repl
+:PROPERTIES:
+:CUSTOM_ID: laravel-tinker-repl
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(laravel-tinker-repl) "laravel-tinker-repl" nil t)
 
@@ -4038,10 +5238,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (define-key php-mode-map (kbd "C-c C-z") #'laravel-tinker-repl-switch-to-repl))
 #+end_src
 *** emacs-php-doc-block
+:PROPERTIES:
+:CUSTOM_ID: emacs-php-doc-block
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(php-doc-block) "php-doc-block" nil t)
 #+end_src
 *** phpstan
+:PROPERTIES:
+:CUSTOM_ID: phpstan
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(phpstan-analyze-this-file
                        phpstan-analyze-file
@@ -4059,6 +5265,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt phpstan-activate-editor-mode t))
 #+end_src
 *** phpunit
+:PROPERTIES:
+:CUSTOM_ID: phpunit
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(phpunit-current-test
                        phpunit-current-class
@@ -4070,13 +5279,22 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (keymap-set php-mode-map "C-c C-;" #'phpunit-current-test))
 #+end_src
 ** Markdown
+:PROPERTIES:
+:CUSTOM_ID: markdown
+:END:
 *** poly-markdown
+:PROPERTIES:
+:CUSTOM_ID: poly-markdown
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(poly-markdown-mode) "poly-markdown" nil t)
 
   (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
 #+end_src
 *** markdown-preview-mode
+:PROPERTIES:
+:CUSTOM_ID: markdown-preview-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(markdown-preview-open-browser
                        markdown-preview-mode
@@ -4099,12 +5317,24 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'markdown-preview--start :around #'my/markdown-preview--start-with-xwidget))
 #+end_src
 ** Fish
+:PROPERTIES:
+:CUSTOM_ID: fish
+:END:
 *** fish-repl
+:PROPERTIES:
+:CUSTOM_ID: fish-repl
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(fish-repl) "fish-repl" nil t)
 #+end_src
 ** Web
+:PROPERTIES:
+:CUSTOM_ID: web
+:END:
 *** emmet-mode
+:PROPERTIES:
+:CUSTOM_ID: emmet-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(emmet-mode) "emmet-mode" nil t)
 
@@ -4134,7 +5364,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt emmet-indent-after-insert nil))
 #+END_SRC
 ** JSON
+:PROPERTIES:
+:CUSTOM_ID: json
+:END:
 *** jq-mode
+:PROPERTIES:
+:CUSTOM_ID: jq-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(jq-interactively) "jq-mode" nil t)
 
@@ -4143,18 +5379,33 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key json-mode-map (kbd "C-c C-j") #'jq-interactively))
 #+end_src
 *** json-reformat
+:PROPERTIES:
+:CUSTOM_ID: json-reformat
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(json-reformat-region) "json-reformat" nil t)
 #+end_src
 ** Python
+:PROPERTIES:
+:CUSTOM_ID: python
+:END:
 *** py-isort
+:PROPERTIES:
+:CUSTOM_ID: py-isort
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(py-isort-region
                        py-isort-buffer
                        py-isort-before-save) "py-isort" nil t)
 #+end_src
 ** Dart
+:PROPERTIES:
+:CUSTOM_ID: dart
+:END:
 *** flutter
+:PROPERTIES:
+:CUSTOM_ID: flutter
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(flutter-test-mode
                        flutter-run
@@ -4180,7 +5431,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key dart-mode-map (kbd "C-c z") #'my/flutter-switch-buffer))
 #+end_src
 ** Go
+:PROPERTIES:
+:CUSTOM_ID: go
+:END:
 *** gotest
+:PROPERTIES:
+:CUSTOM_ID: gotest
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(go-test-current-file
                        go-test-current-test
@@ -4196,7 +5453,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (keymap-set go-mode-map "C-x ! x" #'go-run))
 #+end_src
 * Elfeed
+:PROPERTIES:
+:CUSTOM_ID: elfeed
+:END:
 ** elfeed
+:PROPERTIES:
+:CUSTOM_ID: elfeed-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elfeed) "elfeed" nil t)
 
@@ -4217,6 +5480,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt elfeed-curl-max-connections 32))
 #+end_src
 ** elfeed-org
+:PROPERTIES:
+:CUSTOM_ID: elfeed-org
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elfeed-org) "elfeed-org" nil t)
 
@@ -4230,6 +5496,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt rmh-elfeed-org-auto-ignore-invalid-feeds t))
 #+end_src
 ** elfeed-dashboard
+:PROPERTIES:
+:CUSTOM_ID: elfeed-dashboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elfeed-dashboard) "elfeed-dashboard" nil t)
 
@@ -4240,6 +5509,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt elfeed-dashboard-file (locate-user-emacs-file "elfeed-dashboard.org")))
 #+end_src
 ** elfeed-goodies
+:PROPERTIES:
+:CUSTOM_ID: elfeed-goodies
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(elfeed-goodies/setup) "elfeed-goodies" nil t)
 
@@ -4250,7 +5522,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt elfeed-goodies/entry-pane-size 0.6))
 #+end_src
 * Eshell
+:PROPERTIES:
+:CUSTOM_ID: eshell
+:END:
 ** basic
+:PROPERTIES:
+:CUSTOM_ID: eshell-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'esh-mode
     ;; keymap
@@ -4279,6 +5557,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt eshell-destroy-buffer-when-process-dies t))
 #+end_src
 ** functions
+:PROPERTIES:
+:CUSTOM_ID: functions
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun eshell/ff (&rest args)
     "Open a file in Emacs with ARGS, Some habits die hard."
@@ -4326,6 +5607,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (advice-add 'eshell/cat :override #'my/cat-with-syntax-highlight)
 #+end_src
 ** prompt
+:PROPERTIES:
+:CUSTOM_ID: prompt
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/eshell-prompt ()
     (concat (abbreviate-file-name (eshell/pwd))
@@ -4335,6 +5619,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt eshell-prompt-function #'my/eshell-prompt))
 #+end_src
 ** eshell-fringe-status
+:PROPERTIES:
+:CUSTOM_ID: eshell-fringe-status
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eshell-fringe-status-mode) "eshell-fringe-status" nil t)
 
@@ -4342,6 +5629,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'eshell-mode-hook #'eshell-fringe-status-mode))
 #+end_src
 ** esh-help
+:PROPERTIES:
+:CUSTOM_ID: esh-help
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(setup-esh-help-eldoc) "esh-help" nil t)
 
@@ -4349,6 +5639,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'eshell-mode-hook #'setup-esh-help-eldoc))
 #+end_src
 ** eshell-multiple
+:PROPERTIES:
+:CUSTOM_ID: eshell-multiple
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eshell-multiple-new
                        eshell-multiple-next
@@ -4369,6 +5662,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key eshell-mode-map (kbd "C-l") #'eshell-multiple-clear-buffer))
 #+end_src
 ** eshell-z
+:PROPERTIES:
+:CUSTOM_ID: eshell-z
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eshell-z) "eshell-z" nil t)
 
@@ -4376,6 +5672,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key eshell-mode-map (kbd "C-c C-q") #'eshell-z))
 #+end_src
 ** eshell-did-you-mean
+:PROPERTIES:
+:CUSTOM_ID: eshell-did-you-mean
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eshell-did-you-mean-setup) "eshell-did-you-mean" nil t)
 
@@ -4383,6 +5682,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'eshell-mode-hook #'eshell-did-you-mean-setup))
 #+end_src
 ** eshell-syntax-highlight
+:PROPERTIES:
+:CUSTOM_ID: eshell-syntax-highlight
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eshell-syntax-highlighting-global-mode) "eshell-syntax-highlighting" nil t)
 
@@ -4390,6 +5692,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'eshell-mode-hook #'eshell-syntax-highlighting-global-mode))
 #+end_src
 ** emacs-fish-completion
+:PROPERTIES:
+:CUSTOM_ID: emacs-fish-completion
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-fish-completion-mode) "fish-completion" nil t)
 
@@ -4397,8 +5702,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'eshell-mode-hook #'global-fish-completion-mode))
 #+end_src
 * Org Mode
+:PROPERTIES:
+:CUSTOM_ID: org-mode
+:END:
 ** Basic
+:PROPERTIES:
+:CUSTOM_ID: org-mode-basic
+:END:
 *** org
+:PROPERTIES:
+:CUSTOM_ID: org
+:END:
 #+begin_src emacs-lisp :tangle yes
   (keymap-global-set "C-c l" #'org-store-link)
   (keymap-global-set "C-c a" #'org-agenda)
@@ -4446,6 +5760,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (setq org-agenda-files my/org-agenda-files)))
 #+END_SRC
 *** org-src
+:PROPERTIES:
+:CUSTOM_ID: org-src
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-src
     ;; config
@@ -4460,6 +5777,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                   (view-mode -1))))
 #+END_SRC
 *** org-clock
+:PROPERTIES:
+:CUSTOM_ID: org-clock
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-clock-load) "org-clock" nil t)
 
@@ -4473,11 +5793,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-clock-clocked-in-display 'mode-line))
 #+end_src
 *** org-list
+:PROPERTIES:
+:CUSTOM_ID: org-list
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-list
     (setq org-list-allow-alphabetical t))
 #+end_src
 *** org-keys
+:PROPERTIES:
+:CUSTOM_ID: org-keys
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-keys
     ;; config
@@ -4490,6 +5816,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-speed-commands '("$" call-interactively #'org-archive-subtree)))
 #+end_src
 *** org-capture
+:PROPERTIES:
+:CUSTOM_ID: org-capture
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-capture) "org-capture" nil t)
 
@@ -4519,12 +5848,18 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                    "** TODO Capture %U\n%?"))))
 #+end_src
 *** org-duration
+:PROPERTIES:
+:CUSTOM_ID: org-duration
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-duration
     ;; config
     (setq org-duration-format (quote h:mm)))
 #+end_src
 *** org-id
+:PROPERTIES:
+:CUSTOM_ID: org-id
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-id-store-link) "org-id" nil t)
 
@@ -4534,6 +5869,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-id-extra-files (append org-agenda-text-search-extra-files)))
 #+end_src
 *** org-crypt
+:PROPERTIES:
+:CUSTOM_ID: org-crypt
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-encrypt-entry
                        org-encrypt-entries
@@ -4549,6 +5887,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-crypt-key "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C"))
 #+end_src
 *** org-table
+:PROPERTIES:
+:CUSTOM_ID: org-table
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orgtbl-mode org-table-begin org-table-end) "org-table" nil t)
 
@@ -4566,6 +5907,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-table-align :before #'my/org-table-align-markdown))
 #+end_src
 *** org-journal
+:PROPERTIES:
+:CUSTOM_ID: org-journal
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-journal
     ;; config
@@ -4574,30 +5918,51 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-journal-prefix-key "C-c j"))
 #+end_src
 *** org-generate
+:PROPERTIES:
+:CUSTOM_ID: org-generate
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-generate) "org-generate" nil t)
 #+end_src
 *** org-pomodoro
+:PROPERTIES:
+:CUSTOM_ID: org-pomodoro
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-pomodoro) "org-pomodoro" nil t)
 #+end_src
 *** org-view-mode
+:PROPERTIES:
+:CUSTOM_ID: org-view-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-view-mode) "org-view-mode" nil t)
 #+end_src
 *** org-random-todo
+:PROPERTIES:
+:CUSTOM_ID: org-random-todo
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-random-todo org-random-todo-goto-current) "org-random-todo" nil t)
 #+end_src
 *** org-dashboard
+:PROPERTIES:
+:CUSTOM_ID: org-dashboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-dashboard-display) "org-dashboard" nil t)
 #+end_src
 *** org-volume
+:PROPERTIES:
+:CUSTOM_ID: org-volume
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-volume-update-entry-from-dblock) "org-volume" nil t)
 #+end_src
 *** org-sliced-images
+:PROPERTIES:
+:CUSTOM_ID: org-sliced-images
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-sliced-images-mode) "org-sliced-images" nil t)
 
@@ -4605,10 +5970,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'org-sliced-images-mode))
 #+end_src
 *** org-ql
+:PROPERTIES:
+:CUSTOM_ID: org-ql
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-ql-query org-ql-select) "org-ql" nil t)
 #+end_src
 *** org-preview-html
+:PROPERTIES:
+:CUSTOM_ID: org-preview-html
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-preview-html-mode
                        org-preview-html-refresh
@@ -4618,13 +5989,22 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-preview-html-viewer 'xwidget))
 #+end_src
 ** Theme
+:PROPERTIES:
+:CUSTOM_ID: theme-2
+:END:
 *** org-faces
+:PROPERTIES:
+:CUSTOM_ID: org-faces
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'org-faces
     ;; config
     (setq org-link '(t (:foreground "#ebe087" :underline t))))
 #+end_src
 *** org-superstar
+:PROPERTIES:
+:CUSTOM_ID: org-superstar
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-superstar-mode) "org-superstar")
 
@@ -4638,7 +6018,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-superstar-leading-bullet " "))
 #+end_src
 ** Content
+:PROPERTIES:
+:CUSTOM_ID: content
+:END:
 *** toc-org
+:PROPERTIES:
+:CUSTOM_ID: toc-org
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(toc-org-mode) "toc-org" nil t)
 
@@ -4647,7 +6033,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'toc-org-mode))
 #+end_src
 ** Presentation
+:PROPERTIES:
+:CUSTOM_ID: presentation
+:END:
 *** org-tree-slide
+:PROPERTIES:
+:CUSTOM_ID: org-tree-slide
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-tree-slide-mode org-tree-slide-skip-done-toggle) "org-tree-slide" nil t)
 
@@ -4656,7 +6048,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-tree-slide-skip-outline-level 4))
 #+end_src
 ** Org Link
+:PROPERTIES:
+:CUSTOM_ID: org-link
+:END:
 *** org-link
+:PROPERTIES:
+:CUSTOM_ID: org-link-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-store-link) "ol" nil t)
 
@@ -4665,6 +6063,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-link-file-path-type 'relative))
 #+end_src
 *** orgit
+:PROPERTIES:
+:CUSTOM_ID: orgit
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(orgit-store-link
 
@@ -4709,7 +6110,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (keymap-set magit-mode-map "<remap> <org-store-link>" #'orgit-store-link))
 #+end_src
 ** Org Agenda
+:PROPERTIES:
+:CUSTOM_ID: org-agenda
+:END:
 *** Basic
+:PROPERTIES:
+:CUSTOM_ID: org-mode-org-agenda-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-agenda) "org-agenda" nil t)
 
@@ -4724,6 +6131,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-archive-subtree :around #'my/advice-disable-buffer-readonly))
 #+end_src
 *** org-super-agenda
+:PROPERTIES:
+:CUSTOM_ID: org-super-agenda
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-super-agenda-mode) "org-super-agenda" nil t)
 
@@ -4788,11 +6198,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                 (:discard (:tag ("Chore" "Routine" "Daily"))))))))))))
 #+end_src
 *** org-hyperscheduler
+:PROPERTIES:
+:CUSTOM_ID: org-hyperscheduler
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-hyperscheduler-open) "org-hyperscheduler" nil t)
 #+end_src
 ** Org External Tools
+:PROPERTIES:
+:CUSTOM_ID: org-external-tools
+:END:
 *** org-redmine
+:PROPERTIES:
+:CUSTOM_ID: org-redmine
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-redmine-get-issue) "org-redmine" nil t)
 
@@ -4802,6 +6221,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-redmine-template-property '(("project_name" . "%p_n%"))))
 #+end_src
 *** org-ai
+:PROPERTIES:
+:CUSTOM_ID: org-ai
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-ai-mode) "org-ai" nil t)
 
@@ -4817,7 +6239,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-ai-default-chat-model "gpt-3.5-turbo"))
 #+end_src
 ** Org Babel
+:PROPERTIES:
+:CUSTOM_ID: org-babel
+:END:
 *** basic
+:PROPERTIES:
+:CUSTOM_ID: org-mode-org-babel-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-do-load-languages) "org" nil t)
 
@@ -4870,10 +6298,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-babel-tangle :around #'my/advice-disable-buffer-readonly))
 #+end_src
 *** ob-async
+:PROPERTIES:
+:CUSTOM_ID: ob-async
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ob-async-org-babel-execute-src-block) "ob-async" nil t)
 #+end_src
 *** ob-fish
+:PROPERTIES:
+:CUSTOM_ID: ob-fish
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:fish) "ob-fish" nil t)
 
@@ -4881,6 +6315,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("fish" . fish)))
 #+end_src
 *** ob-rust
+:PROPERTIES:
+:CUSTOM_ID: ob-rust
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:rust) "ob-rust" nil t)
 
@@ -4888,6 +6325,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("rust" . rust)))
 #+end_src
 *** ob-go
+:PROPERTIES:
+:CUSTOM_ID: ob-go
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:go) "ob-go" nil t)
 
@@ -4895,6 +6335,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("go" . go)))
 #+end_src
 *** ob-translate
+:PROPERTIES:
+:CUSTOM_ID: ob-translate
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ob-translate:google-translate) "ob-translate" nil t)
 
@@ -4905,6 +6348,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("translate" . translate)))
 #+end_src
 *** ob-typescript
+:PROPERTIES:
+:CUSTOM_ID: ob-typescript
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:typescript) "ob-typescript" nil t)
 
@@ -4912,6 +6358,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("typescript" . typescript)))
 #+end_src
 *** ob-php
+:PROPERTIES:
+:CUSTOM_ID: ob-php
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:php) "ob-php" nil t)
 
@@ -4919,6 +6368,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("php" . php)))
 #+end_src
 *** ob-phpstan
+:PROPERTIES:
+:CUSTOM_ID: ob-phpstan
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:phpstan) "ob-phpstan" nil t)
 
@@ -4926,6 +6378,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("phpstan" . phpstan)))
 #+end_src
 *** ob-http
+:PROPERTIES:
+:CUSTOM_ID: ob-http
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:http) "ob-http" nil t)
   (autoload-if-found '(ob-http-mode) "ob-http-mode" nil t)
@@ -4934,6 +6389,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("http" . ob-http)))
 #+end_src
 *** ob-mermaid
+:PROPERTIES:
+:CUSTOM_ID: ob-mermaid
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:mermaid) "ob-mermaid" nil t)
 
@@ -4941,6 +6399,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("mermaid" . mermaid)))
 #+end_src
 *** ob-graphql
+:PROPERTIES:
+:CUSTOM_ID: ob-graphql
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:graphql) "ob-graphql" nil t)
 
@@ -4948,6 +6409,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("graphql" . graphql)))
 #+end_src
 *** ob-rust
+:PROPERTIES:
+:CUSTOM_ID: ob-rust-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:rust) "ob-rust" nil t)
 
@@ -4955,6 +6419,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("rust" . rust)))
 #+end_src
 *** ob-swift
+:PROPERTIES:
+:CUSTOM_ID: ob-swift
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:swift) "ob-swift" nil t)
 
@@ -4962,6 +6429,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("swift" . swift)))
 #+end_src
 *** ob-elixir
+:PROPERTIES:
+:CUSTOM_ID: ob-elixir
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:elixir) "ob-elixir" nil t)
 
@@ -4969,6 +6439,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("elixir" . elixir)))
 #+end_src
 *** ob-dart
+:PROPERTIES:
+:CUSTOM_ID: ob-dart
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:dart) "ob-dart" nil t)
 
@@ -4976,6 +6449,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("dart" . dart)))
 #+end_src
 *** ob-fsharp
+:PROPERTIES:
+:CUSTOM_ID: ob-fsharp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:fsharp) "ob-fsharp" nil t)
 
@@ -4983,6 +6459,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("fsharp" . fsharp)))
 #+end_src
 *** ob-treesitter
+:PROPERTIES:
+:CUSTOM_ID: ob-treesitter
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:treesitter) "ob-treesitter" nil t)
 
@@ -4993,6 +6472,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("treesitter" . treesitter)))
 #+end_src
 *** ob-base64
+:PROPERTIES:
+:CUSTOM_ID: ob-base64
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:base64) "ob-base64" nil t)
 
@@ -5000,11 +6482,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("base64" . base64)))
 #+end_src
 *** ob-lisp
+:PROPERTIES:
+:CUSTOM_ID: ob-lisp
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ob-lisp
     (defalias 'org-babel-execute:common-lisp 'org-babel-execute:lisp))
 #+end_src
 *** ob-racket
+:PROPERTIES:
+:CUSTOM_ID: ob-racket
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:racket) "ob-racket" nil t)
 
@@ -5012,6 +6500,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("racket" . racket)))
 #+end_src
 *** ob-prolog
+:PROPERTIES:
+:CUSTOM_ID: ob-prolog
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:prolog) "ob-prolog" nil t)
 
@@ -5019,6 +6510,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("prolog" . pl)))
 #+end_src
 *** ob-deno
+:PROPERTIES:
+:CUSTOM_ID: ob-deno
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-babel-execute:deno) "ob-deno" nil t)
 
@@ -5026,6 +6520,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-to-list 'org-src-lang-modes '("deno" . deno)))
 #+end_src
 *** org-nix-shell
+:PROPERTIES:
+:CUSTOM_ID: org-nix-shell
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-nix-shell-mode) "org-nix-shell" nil t)
 
@@ -5033,11 +6530,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-mode-hook #'org-nix-shell-mode))
 #+end_src
 ** Org Publish
+:PROPERTIES:
+:CUSTOM_ID: org-publish
+:END:
 *** ox
+:PROPERTIES:
+:CUSTOM_ID: ox
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-export-define-backend) "ox" nil t)
 #+end_src
 *** ox-html
+:PROPERTIES:
+:CUSTOM_ID: ox-html
+:END:
 #+begin_src emacs-lisp :tangle yes
   (with-eval-after-load 'ox-html
     ;; config
@@ -5047,6 +6553,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-html-coding-system 'utf-8-unix))
 #+end_src
 *** ox-gfm
+:PROPERTIES:
+:CUSTOM_ID: ox-gfm
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-gfm-export-as-markdown
                        org-gfm-convert-region-to-md
@@ -5054,6 +6563,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-gfm-publish-to-gfm) "ox-gfm" nil t)
 #+end_src
 *** ox-zenn
+:PROPERTIES:
+:CUSTOM_ID: ox-zenn
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-zenn-export-as-markdown
                        org-zenn-export-to-markdown
@@ -5061,18 +6573,27 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-zenn-convert-region-to-md) "ox-zenn" nil t)
 #+end_src
 *** ox-hatena
+:PROPERTIES:
+:CUSTOM_ID: ox-hatena
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-hatena-export-as-hatena
                        org-hatena-export-to-hatena
                        org-hatena-export-to-hatena-and-open) "ox-hatena" nil t)
 #+end_src
 *** ox-qmd
+:PROPERTIES:
+:CUSTOM_ID: ox-qmd
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-qmd-export-as-markdown
                        org-qmd-convert-region-to-md
                        org-qmd-export-to-markdown) "ox-qmd" nil t)
 #+end_src
 *** ox-hugo
+:PROPERTIES:
+:CUSTOM_ID: ox-hugo
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-hugo-export-as-md
                        org-hugo-export-to-md
@@ -5084,6 +6605,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-hugo-auto-set-lastmod t))
 #+end_src
 *** ox-typst
+:PROPERTIES:
+:CUSTOM_ID: ox-typst
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-typst-export-block
                        org-typst-headline
@@ -5128,7 +6652,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         async subtreep visible-only body-only ext-plist)))
 #+end_src
 ** Org Roam
+:PROPERTIES:
+:CUSTOM_ID: org-roam
+:END:
 *** basic
+:PROPERTIES:
+:CUSTOM_ID: org-mode-org-roam-basic
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-graph) "org-roam" nil t)
 
@@ -5146,10 +6676,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                          "/github.com/takeokunn/blog")))
 #+end_src
 *** org-roam-mode
+:PROPERTIES:
+:CUSTOM_ID: org-roam-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-buffer-toggle) "org-roam-mode" nil t)
 #+end_src
 *** org-roam-node
+:PROPERTIES:
+:CUSTOM_ID: org-roam-node
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-node-find org-roam-node-insert) "org-roam-node" nil t)
 
@@ -5157,6 +6693,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-roam-completion-everywhere nil))
 #+end_src
 *** org-roam-db
+:PROPERTIES:
+:CUSTOM_ID: org-roam-db
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-db-autosync-enable) "org-roam-db" nil t)
 
@@ -5168,6 +6707,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
 #+end_src
 *** org-roam-capture
+:PROPERTIES:
+:CUSTOM_ID: org-roam-capture
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-capture) "org-roam-capture" nil t)
 
@@ -5199,6 +6741,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                           :unnarrowed t))))
 #+end_src
 *** org-roam-dailies
+:PROPERTIES:
+:CUSTOM_ID: org-roam-dailies
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-dailies-map
                        org-roam-dailies-goto-today
@@ -5227,6 +6772,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key org-roam-dailies-map (kbd ".") #'org-roam-dailies-find-directory))
 #+end_src
 *** org-roam-export
+:PROPERTIES:
+:CUSTOM_ID: org-roam-export
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-export--org-html--reference) "org-roam-export" nil t)
 
@@ -5234,10 +6782,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'org-html--reference :override #'org-roam-export--org-html--reference))
 #+end_src
 *** org-roam-graph
+:PROPERTIES:
+:CUSTOM_ID: org-roam-graph
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-graph org-roam-graph--open) "org-roam-graph" nil t)
 #+end_src
 *** org-roam-overlay
+:PROPERTIES:
+:CUSTOM_ID: org-roam-overlay
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-overlay-mode) "org-roam-overlay" nil t)
 
@@ -5245,6 +6799,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (add-hook 'org-roam-mode-hook #'org-roam-overlay-mode))
 #+end_src
 *** org-roam-protocol
+:PROPERTIES:
+:CUSTOM_ID: org-roam-protocol
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-protocol-open-ref org-roam-protocol-open-node) "org-roam-protocol" nil t)
 
@@ -5257,6 +6814,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-roam-protocol-store-links t))
 #+end_src
 *** consult-org-roam
+:PROPERTIES:
+:CUSTOM_ID: consult-org-roam
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(consult-org-roam-mode
                        consult-org-roam-file-find
@@ -5282,6 +6842,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq consult-org-roam-buffer-after-buffers nil))
 #+end_src
 *** org-roam-ui
+:PROPERTIES:
+:CUSTOM_ID: org-roam-ui
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-ui-mode) "org-roam-ui" nil t)
 
@@ -5297,6 +6860,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-roam-ui-open-on-start t))
 #+end_src
 *** org-roam-timestamps
+:PROPERTIES:
+:CUSTOM_ID: org-roam-timestamps
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-timestamps-mode) "org-roam-timestamps" nil t)
 
@@ -5309,6 +6875,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-roam-timestamps-remember-timestamps nil))
 #+end_src
 *** org-roam-ql
+:PROPERTIES:
+:CUSTOM_ID: org-roam-ql
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-ql-nodes
                        org-roam-ql-search
@@ -5318,17 +6887,29 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        org-dblock-write:org-roam-ql) "org-roam-ql" nil t)
 #+end_src
 *** org-roam-ql-ql
+:PROPERTIES:
+:CUSTOM_ID: org-roam-ql-ql
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-ql-ql-init) "org-roam-ql-ql" nil t)
 
   (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
 #+end_src
 * EXWM
+:PROPERTIES:
+:CUSTOM_ID: exwm
+:END:
 ** exwm
+:PROPERTIES:
+:CUSTOM_ID: exwm-2
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(exwm-input-set-key) "exwm-input" nil t)
 #+end_src
 ** exwm-edit
+:PROPERTIES:
+:CUSTOM_ID: exwm-edit
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(exwm-edit--compose-minibuffer) "exwm-edit" nil t)
 
@@ -5339,6 +6920,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (setq exwm-edit-bind-default-keys nil))
 #+end_src
 ** exwm-modeline
+:PROPERTIES:
+:CUSTOM_ID: exwm-modeline
+:END:
 #+begin_src emacs-lisp :tangle yes
   ;; (autoload-if-found '(exwm-modeline-mode) "exwm-modeline")
 
@@ -5349,7 +6933,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   ;;   (setopt exwm-modeline-short t))
 #+end_src
 * AI
+:PROPERTIES:
+:CUSTOM_ID: ai
+:END:
 ** copilot.el
+:PROPERTIES:
+:CUSTOM_ID: copilotel
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(copilot-login copilot-mode) "copilot" nil t)
 
@@ -5366,6 +6956,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion))
 #+end_src
 ** copilot-chat.el
+:PROPERTIES:
+:CUSTOM_ID: copilot-chatel
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(copilot-chat-transient-code copilot-chat-insert-commit-message) "copilot-chat" nil t)
 
@@ -5385,6 +6978,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt copilot-chat-prompt-review "次のコードをレビューしてください。\n"))
 #+end_src
 ** llm
+:PROPERTIES:
+:CUSTOM_ID: llm
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(make-llm-ollama) "llm-ollama" nil t)
 
@@ -5393,6 +6989,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt llm-warn-on-nonfree nil))
 #+end_src
 ** ellama
+:PROPERTIES:
+:CUSTOM_ID: ellama
+:END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(ellama-transient-main-menu) "ellama-transient" nil t)
   (autoload-if-found '(ellama-blueprint-select) "ellama-blueprint" nil t)
@@ -5423,7 +7022,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (advice-add 'ellama-instant :around #'my/advice-disable-buffer-readonly))
 #+end_src
 * MyFunc
+:PROPERTIES:
+:CUSTOM_ID: myfunc
+:END:
 ** my/beginning-of-intendation
+:PROPERTIES:
+:CUSTOM_ID: my-beginning-of-intendation
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/beginning-of-intendation ()
     "move to beginning of line, or indentation"
@@ -5431,6 +7036,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (back-to-indentation))
 #+END_SRC
 ** my/copy-buffer
+:PROPERTIES:
+:CUSTOM_ID: my-copy-buffer
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/copy-buffer ()
     (interactive)
@@ -5439,6 +7047,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (copy-region-as-kill (region-beginning) (region-end))))
 #+end_src
 ** my/ghq-get
+:PROPERTIES:
+:CUSTOM_ID: my-ghq-get
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/ghq-get ()
     (interactive)
@@ -5450,6 +7061,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                    " ")))))
 #+end_src
 ** my/gh-browse
+:PROPERTIES:
+:CUSTOM_ID: my-gh-browse
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/gh-browse ()
     (interactive)
@@ -5460,6 +7074,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                  " "))))
 #+end_src
 ** my/indent-all
+:PROPERTIES:
+:CUSTOM_ID: my-indent-all
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/indent-buffer ()
     (interactive)
@@ -5469,6 +7086,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (indent-region (region-beginning) (region-end))))
 #+end_src
 ** my/move-line
+:PROPERTIES:
+:CUSTOM_ID: my-move-line
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/move-line (arg)
     (interactive)
@@ -5492,6 +7112,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (keymap-global-set "M-P" #'my/move-line-up)
 #+end_src
 ** my/reload-major-mode
+:PROPERTIES:
+:CUSTOM_ID: my-reload-major-mode
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/reload-major-mode ()
     "Reload current major mode."
@@ -5502,6 +7125,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       current-mode))
 #+END_SRC
 ** my/toggle-kill-emacs
+:PROPERTIES:
+:CUSTOM_ID: my-toggle-kill-emacs
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defvar my/kill-emacs-keybind-p t)
 
@@ -5518,6 +7144,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (keymap-global-set "C-x C-c" 'save-buffers-kill-emacs))))
 #+end_src
 ** my/get-class-name-by-file-name
+:PROPERTIES:
+:CUSTOM_ID: my-get-class-name-by-file-name
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/get-class-name-by-file-name ()
     (interactive)
@@ -5527,18 +7156,27 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                     (buffer-name (current-buffer)))))))
 #+end_src
 ** my/insert-clipboard
+:PROPERTIES:
+:CUSTOM_ID: my-insert-clipboard
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/insert-clipboard (arg)
     (interactive "sstring: ")
     (kill-new arg))
 #+end_src
 ** my/actionlint
+:PROPERTIES:
+:CUSTOM_ID: my-actionlint
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/actionlint ()
     (interactive)
     (shell-command-to-string "actionlint"))
 #+end_src
 ** my/build-info
+:PROPERTIES:
+:CUSTOM_ID: my-build-info
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/build-info ()
     "Display build information in a buffer."
@@ -5560,6 +7198,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (view-mode)))
 #+end_src
 ** my/current-ip-address
+:PROPERTIES:
+:CUSTOM_ID: my-current-ip-address
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/current-ip-address ()
     (interactive)
@@ -5567,6 +7208,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
      (shell-command-to-string "curl -s ifconfig.me")))
 #+end_src
 ** my/today
+:PROPERTIES:
+:CUSTOM_ID: my-today
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/today (&optional iso-format)
     (interactive "P")
@@ -5576,6 +7220,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (current-time))))
 #+end_src
 ** my/subword
+:PROPERTIES:
+:CUSTOM_ID: my-subword
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/delete-forward-block ()
     (interactive)
@@ -5592,6 +7239,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (kill-region (point) (min syntax-move-point subword-move-point)))))
 #+end_src
 ** my/insert-date-at-point
+:PROPERTIES:
+:CUSTOM_ID: my-insert-date-at-point
+:END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/insert-date-at-point ()
     "Minibufferで日付を選択し、カーソル位置に `YYYY/MM/DD DOW` フォーマットで挿入する。"
@@ -5600,6 +7250,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (insert (format-time-string "%Y/%m/%d %a" (org-time-string-to-time date)))))
 #+end_src
 ** my/copy-claude-file-to-private
+:PROPERTIES:
+:CUSTOM_ID: my-copy-claude-file-to-private
+:END:
 #+begin_src emacs-lisp
   (defun my/copy-claude-file-to-private ()
     "Copy current claude output file to private repository."
@@ -5620,6 +7273,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (message "Could not determine project name or file path"))))
 #+end_src
 ** my/copy-projectile-github-url
+:PROPERTIES:
+:CUSTOM_ID: my-copy-projectile-github-url
+:END:
 #+begin_src emacs-lisp
   (defun my/copy-projectile-github-url ()
     "Copy the GitHub URL of the current line in the current Projectile project."
@@ -5647,6 +7303,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (message "Copied to clipboard: %s" url)))
 #+end_src
 ** my/copy-projectile-relative-path
+:PROPERTIES:
+:CUSTOM_ID: my-copy-projectile-relative-path
+:END:
 #+begin_src emacs-lisp
   (defun my/copy-projectile-relative-path ()
     (interactive)
@@ -5655,6 +7314,9 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (message "Copied to clipboard: %s" url)))
 #+end_src
 ** my/projectile-php-open-corresponding-test
+:PROPERTIES:
+:CUSTOM_ID: my-projectile-php-open-corresponding-test
+:END:
 #+begin_src emacs-lisp
   (defun my/generate-core-test-path (relative-path)
     "Given a Core app relative path, generate the corresponding test path."
@@ -5698,11 +7360,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (message "Not in app/ directory."))))
 #+end_src
 * Footer
+:PROPERTIES:
+:CUSTOM_ID: footer
+:END:
 ** Magic File Name を有効にする
+:PROPERTIES:
+:CUSTOM_ID: enable-magic-file-name
+:END:
 #+begin_src emacs-lisp :tangle yes
   (setq file-name-handler-alist my/saved-file-name-handler-alist)
 #+end_src
 ** profilerを終了する
+:PROPERTIES:
+:CUSTOM_ID: stop-profiler
+:END:
 #+begin_src emacs-lisp :tangle yes
   (when my/enable-profile
     (profiler-report)
