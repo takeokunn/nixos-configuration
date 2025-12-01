@@ -8,6 +8,7 @@
     };
     brews = [
       "pdfpc"
+      "docker-credential-helper"
     ];
     casks = [
       "aquaskk"

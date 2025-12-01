@@ -12,6 +12,7 @@ with pkgs;
   yubikey-manager
 
   # for docker
+  kubectl
   docker-client
   lazydocker
 
