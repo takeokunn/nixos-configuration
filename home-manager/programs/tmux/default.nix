@@ -41,11 +41,7 @@
       set-option -g default-command $SHELL
       set-option -g display-panes-time 15000
       set-option -g status-position top
-      set-option -g status-right '[%Y-%m-%d(%a) %H:%M]'
       set-option -g status-interval 1
-      set-option -g status-justify centre
-      set-option -g status-bg "colour238"
-      set-option -g status-fg "colour255"
 
       bind-key C-g display-panes
 
