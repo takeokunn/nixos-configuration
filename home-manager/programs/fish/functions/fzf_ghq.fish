@@ -4,7 +4,7 @@ function fzf_ghq
         return
     end
 
-    set session_name (string replace -r '.*/([^/]+)/([^/]+)$' '$1_$2' $recent)
+    set session_name (string replace -r '.*/([^/]+)$' '$1' $recent)
 
     if test -n "$TMUX"
         if tmux has-session -t $session_name 2>/dev/null
