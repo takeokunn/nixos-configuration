@@ -129,13 +129,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.18.4" = {
+    "@google/gemini-cli-core-0.19.1" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.18.4";
+      version = "0.19.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.18.4.tgz";
-        sha512 = "nXYxwnllYlpIXMtESJNAoyCpykUbviBdRixpfn0eVC3aIeY7Z7GN3IYzOiz0sdVXjdTLsU0MePSfuaUjkpEE2A==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.19.1.tgz";
+        sha512 = "21GNDFGAZeuFHX4ugoIm05Qvuq1S2gNs9SKlPMI4sGdAJZ8PsF4p6i8Nk3DyEI5oGwLHhfNXclUBD866NeTXkw==";
       };
     };
     "@google/genai-1.30.0" = {
@@ -147,13 +147,13 @@ let
         sha512 = "3MRcgczBFbUat1wIlZoLJ0vCCfXgm7Qxjh59cZi2X08RgWLtm9hKOspzp7TOg1TV2e26/MLxR2GR5yD5GmBV2w==";
       };
     };
-    "@grpc/grpc-js-1.14.1" = {
+    "@grpc/grpc-js-1.14.2" = {
       name = "_at_grpc_slash_grpc-js";
       packageName = "@grpc/grpc-js";
-      version = "1.14.1";
+      version = "1.14.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@grpc/grpc-js/-/grpc-js-1.14.1.tgz";
-        sha512 = "sPxgEWtPUR3EnRJCEtbGZG2iX8LQDUls2wUS3o27jg07KqJFMq6YDeWvMo1wfpmy3rqRdS0rivpLwhqQtEyCuQ==";
+        url = "https://registry.npmjs.org/@grpc/grpc-js/-/grpc-js-1.14.2.tgz";
+        sha512 = "QzVUtEFyu05UNx2xr0fCQmStUO17uVQhGNowtxs00IgTZT6/W2PBLfUkj30s0FKJ29VtTa3ArVNIhNP6akQhqA==";
       };
     };
     "@grpc/proto-loader-0.7.15" = {
@@ -273,13 +273,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.23.0" = {
+    "@modelcontextprotocol/sdk-1.24.1" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.23.0";
+      version = "1.24.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.23.0.tgz";
-        sha512 = "MCGd4K9aZKvuSqdoBkdMvZNcYXCkZRYVs/Gh92mdV5IHbctX9H9uIvd4X93+9g8tBbXv08sxc/QHXTzf8y65bA==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.24.1.tgz";
+        sha512 = "YTg4v6bKSst8EJM8NXHC3nGm8kgHD08IbIBbognUeLAgGLVgLpYrgQswzLQd4OyTL4l614ejhqsDrV1//t02Qw==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -2550,13 +2550,13 @@ let
         sha512 = "JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==";
       };
     };
-    "ink-6.4.5" = {
+    "ink-6.4.6" = {
       name = "ink";
       packageName = "ink";
-      version = "6.4.5";
+      version = "6.4.6";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@jrichman/ink/-/ink-6.4.5.tgz";
-        sha512 = "mIDkZqtJbedL9XDOoqoJt3S8aGQVqEJYnCnSeLlYzkpUWCsSWC0hW40yJ0DLH86lcl8k5R5lv/9C2i/3746nWw==";
+        url = "https://registry.npmjs.org/@jrichman/ink/-/ink-6.4.6.tgz";
+        sha512 = "QHl6l1cl3zPCaRMzt9TUbTX6Q5SzvkGEZDDad0DmSf5SPmT1/90k6pGPejEvDCJprkitwObXpPaTWGHItqsy4g==";
       };
     };
     "ink-gradient-3.0.0" = {
@@ -2755,6 +2755,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/jackspeak/-/jackspeak-4.1.1.tgz";
         sha512 = "zptv57P3GpL+O0I7VdMJNBZCu+BPHVQUk55Ft8/QCJjTVxrnJHuVuX/0Bl2A6/+2oyR/ZMEuFKwmzqqZ/U5nPQ==";
+      };
+    };
+    "jose-6.1.3" = {
+      name = "jose";
+      packageName = "jose";
+      version = "6.1.3";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/jose/-/jose-6.1.3.tgz";
+        sha512 = "0TpaTfihd4QMNwrz/ob2Bp7X04yuxJkjRGi4aKmOqwhov54i6u79oCv7T+C7lo70MKH6BesI3vscD1yb/yzKXQ==";
       };
     };
     "js-tokens-4.0.0" = {
@@ -4197,13 +4206,13 @@ let
         sha512 = "PGZZzFW63eElZJDe/b/R/LbsjDDYJa5UEjLZJB59RQsMX+fo0j54fqBPn1MGKav/QNa0JR0zBiVaikYDWCj5KQ==";
       };
     };
-    "tree-sitter-bash-0.25.0" = {
+    "tree-sitter-bash-0.25.1" = {
       name = "tree-sitter-bash";
       packageName = "tree-sitter-bash";
-      version = "0.25.0";
+      version = "0.25.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/tree-sitter-bash/-/tree-sitter-bash-0.25.0.tgz";
-        sha512 = "gZtlj9+qFS81qKxpLfD6H0UssQ3QBc/F0nKkPsiFDyfQF2YBqYvglFJUzchrPpVhZe9kLZTrJ9n2J6lmka69Vg==";
+        url = "https://registry.npmjs.org/tree-sitter-bash/-/tree-sitter-bash-0.25.1.tgz";
+        sha512 = "7hMytuYIMoXOq24yRulgIxthE9YmggZIOHCyPTTuJcu6EU54tYD+4G39cUb28kxC6jMf/AbPfWGLQtgPTdh3xw==";
       };
     };
     "type-fest-2.19.0" = {
@@ -4631,10 +4640,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.56";
+    version = "2.0.57";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.56.tgz";
-      sha512 = "MD97AVZ86D6NJnUY9KpXmGw/DK6wausYR8ITZkaLsz33Trrw48ug1pQze2vRAOTvhcne58y2jQfRLQzDVFkFYw==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.57.tgz";
+      sha512 = "wxI5KTnNRu7D8PBeM3YmrPSDSMQwIc0ReLPSse0NFfQeh4PJoi1s6juqtccXifzVfidtE839qu1iY+nyqCO3gQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4667,10 +4676,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.18.4";
+    version = "0.19.1";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.18.4.tgz";
-      sha512 = "oEqmq3UuPtC5tuAX8iuJDjXpvmN73Hjb0ufzL/+Xqb3H+Vj0Uk3MxDKCOe3Jloq3uDkS2Xrp00XRwZ8Ocy4XLQ==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.19.1.tgz";
+      sha512 = "m+t3EVs24LmnNgLQLgs8fujmfae/PfB0UGffig16ZWq9afxSUGRV24JIm4/UM+oqn6eqlwgnqzLnzzuFv/McPg==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4751,7 +4760,7 @@ in
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
       (
-        sources."@google/gemini-cli-core-0.18.4"
+        sources."@google/gemini-cli-core-0.19.1"
         // {
           dependencies = [
             sources."gaxios-6.7.1"
@@ -4766,7 +4775,7 @@ in
       )
       sources."@google/genai-1.30.0"
       (
-        sources."@grpc/grpc-js-1.14.1"
+        sources."@grpc/grpc-js-1.14.2"
         // {
           dependencies = [
             sources."@grpc/proto-loader-0.8.0"
@@ -4794,7 +4803,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
-      sources."@modelcontextprotocol/sdk-1.23.0"
+      sources."@modelcontextprotocol/sdk-1.24.1"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.203.0"
       sources."@opentelemetry/context-async-hooks-2.0.1"
@@ -5198,7 +5207,7 @@ in
       sources."index-to-position-1.2.0"
       sources."inherits-2.0.4"
       sources."ini-1.3.8"
-      sources."ink-6.4.5"
+      sources."ink-6.4.6"
       sources."ink-gradient-3.0.0"
       sources."ink-spinner-5.0.0"
       sources."ipaddr.js-1.9.1"
@@ -5217,6 +5226,7 @@ in
       sources."is64bit-2.0.0"
       sources."isexe-2.0.0"
       sources."jackspeak-4.1.1"
+      sources."jose-6.1.3"
       sources."js-tokens-4.0.0"
       sources."json-bigint-1.0.0"
       sources."json-schema-traverse-1.0.0"
@@ -5444,7 +5454,7 @@ in
       sources."toidentifier-1.0.1"
       sources."tr46-0.0.3"
       sources."tree-sitter-0.25.0"
-      sources."tree-sitter-bash-0.25.0"
+      sources."tree-sitter-bash-0.25.1"
       sources."type-fest-4.41.0"
       (
         sources."type-is-2.0.1"
@@ -5538,10 +5548,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.63.0";
+    version = "0.64.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.63.0.tgz";
-      sha512 = "PyE6WdF4tLLtrtFkj4RsCV6TD6W42G1lCyT5vIHQSZNxgfbXJdXYjwW3TepjoCraJGtXhxwjcPILksBUn34s1g==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.64.0.tgz";
+      sha512 = "mO3CJiH9eoQRxRQrlBxht4SM5qYaqjToWxidEFDVa+et1ZdQpt7X3XbNIRdSohorU78E50u864MIwB32Hj3gRQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
