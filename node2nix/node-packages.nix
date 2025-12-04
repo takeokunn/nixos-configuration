@@ -273,13 +273,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.24.1" = {
+    "@modelcontextprotocol/sdk-1.24.2" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.24.1";
+      version = "1.24.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.24.1.tgz";
-        sha512 = "YTg4v6bKSst8EJM8NXHC3nGm8kgHD08IbIBbognUeLAgGLVgLpYrgQswzLQd4OyTL4l614ejhqsDrV1//t02Qw==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.24.2.tgz";
+        sha512 = "hS/kzSfchqzvUeJUsdiDHi84/kNhLIZaZ6coGQVwbYIelOBbcAwUohUfaQTLa1MvFOK/jbTnGFzraHSFwB7pjQ==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -2820,13 +2820,13 @@ let
         sha512 = "KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg==";
       };
     };
-    "keyv-5.5.4" = {
+    "keyv-5.5.5" = {
       name = "keyv";
       packageName = "keyv";
-      version = "5.5.4";
+      version = "5.5.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/keyv/-/keyv-5.5.4.tgz";
-        sha512 = "eohl3hKTiVyD1ilYdw9T0OiB4hnjef89e3dMYKz+mVKDzj+5IteTseASUsOB+EU9Tf6VNTCjDePcP6wkDGmLKQ==";
+        url = "https://registry.npmjs.org/keyv/-/keyv-5.5.5.tgz";
+        sha512 = "FA5LmZVF1VziNc0bIdCSA1IoSVnDCqE8HJIZZv2/W8YmoAM50+tnUgJR/gQZwEeIMleuIOnRnHA/UaZRNeV4iQ==";
       };
     };
     "kleur-3.0.3" = {
@@ -3558,13 +3558,13 @@ let
         sha512 = "y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==";
       };
     };
-    "react-19.2.0" = {
+    "react-19.2.1" = {
       name = "react";
       packageName = "react";
-      version = "19.2.0";
+      version = "19.2.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react/-/react-19.2.0.tgz";
-        sha512 = "tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==";
+        url = "https://registry.npmjs.org/react/-/react-19.2.1.tgz";
+        sha512 = "DGrYcCWK7tvYMnWh79yrPHt+vdx9tY+1gPZa7nJQtO/p8bLTDaHp4dzwEhQB7pZ4Xe3ok4XKuEPrVuc+wlpkmw==";
       };
     };
     "react-devtools-core-6.1.5" = {
@@ -4640,10 +4640,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.57";
+    version = "2.0.58";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.57.tgz";
-      sha512 = "wxI5KTnNRu7D8PBeM3YmrPSDSMQwIc0ReLPSse0NFfQeh4PJoi1s6juqtccXifzVfidtE839qu1iY+nyqCO3gQ==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.58.tgz";
+      sha512 = "6/n+PrMrU6QuA0rV23oimJK6R3BxefXeBLnxTumVabmzRX5oYjZLGLIdP0PCTA6rKuSeXUjjGd1yb55B0clO+w==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4803,7 +4803,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
-      sources."@modelcontextprotocol/sdk-1.24.1"
+      sources."@modelcontextprotocol/sdk-1.24.2"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.203.0"
       sources."@opentelemetry/context-async-hooks-2.0.1"
@@ -5233,7 +5233,7 @@ in
       sources."jsonfile-6.2.0"
       sources."jwa-2.0.1"
       sources."jws-4.0.0"
-      sources."keyv-5.5.4"
+      sources."keyv-5.5.5"
       sources."kleur-3.0.3"
       sources."ky-1.14.0"
       sources."latest-version-9.0.0"
@@ -5329,7 +5329,7 @@ in
           ];
         }
       )
-      sources."react-19.2.0"
+      sources."react-19.2.1"
       (
         sources."react-devtools-core-6.1.5"
         // {
