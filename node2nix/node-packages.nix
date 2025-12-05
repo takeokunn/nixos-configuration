@@ -129,13 +129,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.19.1" = {
+    "@google/gemini-cli-core-0.19.3" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.19.1";
+      version = "0.19.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.19.1.tgz";
-        sha512 = "21GNDFGAZeuFHX4ugoIm05Qvuq1S2gNs9SKlPMI4sGdAJZ8PsF4p6i8Nk3DyEI5oGwLHhfNXclUBD866NeTXkw==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.19.3.tgz";
+        sha512 = "G+kDNi6gDrs9LjDkSKI6nu6F8ABo5BKzY4Z6VjshTT6vmeBNN+W/F9GJLStlAuSzdhr+7RrsNQVrO+gaKS+m6A==";
       };
     };
     "@google/genai-1.30.0" = {
@@ -273,13 +273,13 @@ let
         sha512 = "+LGuAEIC2L7pbvkyAQVWM2Go0dAy+UWEui28g07zNtZsCBhm+gusBK8PNwLJLV5Jay+TyUYuwLIbJdjLLzqEBg==";
       };
     };
-    "@modelcontextprotocol/sdk-1.24.2" = {
+    "@modelcontextprotocol/sdk-1.24.3" = {
       name = "_at_modelcontextprotocol_slash_sdk";
       packageName = "@modelcontextprotocol/sdk";
-      version = "1.24.2";
+      version = "1.24.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.24.2.tgz";
-        sha512 = "hS/kzSfchqzvUeJUsdiDHi84/kNhLIZaZ6coGQVwbYIelOBbcAwUohUfaQTLa1MvFOK/jbTnGFzraHSFwB7pjQ==";
+        url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.24.3.tgz";
+        sha512 = "YgSHW29fuzKKAHTGe9zjNoo+yF8KaQPzDC2W9Pv41E7/57IfY+AMGJ/aDFlgTLcVVELoggKE4syABCE75u3NCw==";
       };
     };
     "@opentelemetry/api-1.9.0" = {
@@ -2811,13 +2811,13 @@ let
         sha512 = "hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==";
       };
     };
-    "jws-4.0.0" = {
+    "jws-4.0.1" = {
       name = "jws";
       packageName = "jws";
-      version = "4.0.0";
+      version = "4.0.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/jws/-/jws-4.0.0.tgz";
-        sha512 = "KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg==";
+        url = "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz";
+        sha512 = "EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==";
       };
     };
     "keyv-5.5.5" = {
@@ -4617,10 +4617,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.399.0";
+    version = "1.400.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.399.0.tgz";
-      sha512 = "ZRB8Xw/d3n9VrC4iWKqVT0WTEGkuFrq1nA8QuON4JribDxDjVRlNjxx4n65t+kIKpP1W51flH/w2PRjHFs2bDA==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.400.0.tgz";
+      sha512 = "yFA3lMqIrRzOfWrU22VClfiUb4v09IzUyzH5sdmJOHTYrHsiS5tDbNOq79QzSGrMiL8LRoBJUUqrhY+SwO34qQ==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4640,10 +4640,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.58";
+    version = "2.0.59";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.58.tgz";
-      sha512 = "6/n+PrMrU6QuA0rV23oimJK6R3BxefXeBLnxTumVabmzRX5oYjZLGLIdP0PCTA6rKuSeXUjjGd1yb55B0clO+w==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.59.tgz";
+      sha512 = "QCOtahWfU8WkAUoM4IzA01L57pScOj8WehYEzVSlF6sVKXILrpC+hZSKgOh+0ZR/Zj7IYesc6rbKoKJVxpF9Vg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4676,10 +4676,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.19.1";
+    version = "0.19.3";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.19.1.tgz";
-      sha512 = "m+t3EVs24LmnNgLQLgs8fujmfae/PfB0UGffig16ZWq9afxSUGRV24JIm4/UM+oqn6eqlwgnqzLnzzuFv/McPg==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.19.3.tgz";
+      sha512 = "a/4gPM4lNNIYI16A4x78ZFvM8UMkzptINu+8ftZC/y+PuSgZFbT3EFlqKcS5unF2XvJMajEVYAn6kLtZj4mp8g==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4760,7 +4760,7 @@ in
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
       (
-        sources."@google/gemini-cli-core-0.19.1"
+        sources."@google/gemini-cli-core-0.19.3"
         // {
           dependencies = [
             sources."gaxios-6.7.1"
@@ -4803,7 +4803,7 @@ in
       sources."@kwsites/file-exists-1.1.1"
       sources."@kwsites/promise-deferred-1.1.1"
       sources."@lvce-editor/verror-1.7.0"
-      sources."@modelcontextprotocol/sdk-1.24.2"
+      sources."@modelcontextprotocol/sdk-1.24.3"
       sources."@opentelemetry/api-1.9.0"
       sources."@opentelemetry/api-logs-0.203.0"
       sources."@opentelemetry/context-async-hooks-2.0.1"
@@ -5232,7 +5232,7 @@ in
       sources."json-schema-traverse-1.0.0"
       sources."jsonfile-6.2.0"
       sources."jwa-2.0.1"
-      sources."jws-4.0.0"
+      sources."jws-4.0.1"
       sources."keyv-5.5.5"
       sources."kleur-3.0.3"
       sources."ky-1.14.0"
@@ -5548,10 +5548,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.64.0";
+    version = "0.65.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.64.0.tgz";
-      sha512 = "mO3CJiH9eoQRxRQrlBxht4SM5qYaqjToWxidEFDVa+et1ZdQpt7X3XbNIRdSohorU78E50u864MIwB32Hj3gRQ==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.65.0.tgz";
+      sha512 = "Rfac4ytxRKiJXIIOJxp/6tOSYc7CDwhbmccbcgsQDN26J9ToKRram0Z//dAHdqeVj8laP+elTJO7ZsHBg7QoLg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
