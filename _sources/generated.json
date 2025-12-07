@@ -568,7 +568,7 @@
   },
   "emacs-rainbow-csv": {
     "cargoLocks": null,
-    "date": "2025-11-21",
+    "date": "2025-12-06",
     "extract": null,
     "name": "emacs-rainbow-csv",
     "passthru": null,
@@ -580,12 +580,12 @@
       "name": null,
       "owner": "emacs-vs",
       "repo": "rainbow-csv",
-      "rev": "776519c055a4c03e150906962ea9ba10b46c471c",
-      "sha256": "sha256-A6iLJ7BwxfQP3Nod2mug0FNcCh+FOCkOszMqEyOWjJI=",
+      "rev": "a800f2e14d6bf9f0d7d160a5e7a1c1ef829e92ae",
+      "sha256": "sha256-ALbEmkFWrK8wQ0iGfI0/CRqoKj8iNwjLaNE0XY+H/jo=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "776519c055a4c03e150906962ea9ba10b46c471c"
+    "version": "a800f2e14d6bf9f0d7d160a5e7a1c1ef829e92ae"
   },
   "emacs-sudden-death": {
     "cargoLocks": null,

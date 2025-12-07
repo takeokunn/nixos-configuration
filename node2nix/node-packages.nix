@@ -1191,13 +1191,13 @@ let
         sha512 = "+qJyx4xiKra8mZrcwhjMRMUhD5NR1R8esPkzIYxX96JiecFoxAXFuz/GpR3+ev4PE1WamHip78wV0vcmPQtp8w==";
       };
     };
-    "cacheable-request-13.0.15" = {
+    "cacheable-request-13.0.16" = {
       name = "cacheable-request";
       packageName = "cacheable-request";
-      version = "13.0.15";
+      version = "13.0.16";
       src = fetchurl {
-        url = "https://registry.npmjs.org/cacheable-request/-/cacheable-request-13.0.15.tgz";
-        sha512 = "NjiSrjv37X73FmGGU5ec/M83vWQ6q1Ae3BFe+ABfdeeMy4LOMKYTpfEjrBnLedu43clKZtsYbKrHTIQE7vKq+A==";
+        url = "https://registry.npmjs.org/cacheable-request/-/cacheable-request-13.0.16.tgz";
+        sha512 = "qwRRfUu3bPhPEgKoLAXpYJfm1E2VuHT4DCzl579k2ODyFG+43jv3iMi2wbHlreIZR3+9Sp1lp4fsaXZ9VIlmzA==";
       };
     };
     "call-bind-apply-helpers-1.0.2" = {
@@ -2818,6 +2818,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz";
         sha512 = "EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==";
+      };
+    };
+    "keyv-5.5.4" = {
+      name = "keyv";
+      packageName = "keyv";
+      version = "5.5.4";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/keyv/-/keyv-5.5.4.tgz";
+        sha512 = "eohl3hKTiVyD1ilYdw9T0OiB4hnjef89e3dMYKz+mVKDzj+5IteTseASUsOB+EU9Tf6VNTCjDePcP6wkDGmLKQ==";
       };
     };
     "keyv-5.5.5" = {
@@ -4949,7 +4958,14 @@ in
       sources."byte-counter-0.1.0"
       sources."bytes-3.1.2"
       sources."cacheable-lookup-7.0.0"
-      sources."cacheable-request-13.0.15"
+      (
+        sources."cacheable-request-13.0.16"
+        // {
+          dependencies = [
+            sources."keyv-5.5.4"
+          ];
+        }
+      )
       sources."call-bind-apply-helpers-1.0.2"
       sources."call-bound-1.0.4"
       sources."camelcase-7.0.1"

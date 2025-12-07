@@ -330,15 +330,15 @@
   };
   emacs-rainbow-csv = {
     pname = "emacs-rainbow-csv";
-    version = "776519c055a4c03e150906962ea9ba10b46c471c";
+    version = "a800f2e14d6bf9f0d7d160a5e7a1c1ef829e92ae";
     src = fetchFromGitHub {
       owner = "emacs-vs";
       repo = "rainbow-csv";
-      rev = "776519c055a4c03e150906962ea9ba10b46c471c";
+      rev = "a800f2e14d6bf9f0d7d160a5e7a1c1ef829e92ae";
       fetchSubmodules = false;
-      sha256 = "sha256-A6iLJ7BwxfQP3Nod2mug0FNcCh+FOCkOszMqEyOWjJI=";
+      sha256 = "sha256-ALbEmkFWrK8wQ0iGfI0/CRqoKj8iNwjLaNE0XY+H/jo=";
     };
-    date = "2025-11-21";
+    date = "2025-12-06";
   };
   emacs-sudden-death = {
     pname = "emacs-sudden-death";
