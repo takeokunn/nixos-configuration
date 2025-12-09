@@ -7,6 +7,8 @@ feedback_agents:
     description: セキュリティレビュー（OWASP Top 10、入力検証、認証/認可）
   - name: design
     description: アーキテクチャ整合性レビュー（既存設計との整合性、依存関係）
+  - name: docs
+    description: ドキュメント品質レビュー（正確性、可読性、網羅性）
 readonly_tools:
   - name: serena
     description: シンボル分析、メモリ確認、依存関係追跡に使用
@@ -19,12 +21,12 @@ readonly_tools:
 ## 目的
 
 **同一セッション内でClaude Codeが対応した内容**を多角的にレビューするコマンド。
-**3つのサブエージェントを並列実行**することで、タイムアウトを回避しつつ効率的なレビューを実施。
+**4つのサブエージェントを並列実行**することで、タイムアウトを回避しつつ効率的なレビューを実施。
 
 ## 基本方針
 
-- **並列実行**: 3つのTaskツールを**1メッセージで同時起動**（タイムアウト回避の必須要件）
-- **焦点を絞る**: 3観点（quality/security/design）に限定
+- **並列実行**: 4つのTaskツールを**1メッセージで同時起動**（タイムアウト回避の必須要件）
+- **焦点を絞る**: 4観点（quality/security/design/docs）に限定
 - **客観的判断**: 忖度なく指摘
 - **具体的指摘**: 抽象論ではなく具体的修正案を提示
 - **セッションベース**: git diffではなく、セッション内でのClaude Code操作を対象
@@ -57,13 +59,13 @@ readonly_tools:
 
 **タイムアウト回避の必須要件**:
 
-- 3つのTaskツールを**1メッセージで同時に呼び出す**
+- 4つのTaskツールを**1メッセージで同時に呼び出す**
 - 逐次実行は絶対に行わない
 
 **具体的な実行方法**:
 
 ```python
-# 正しい並列実行（1メッセージで3つ同時）
+# 正しい並列実行（1メッセージで4つ同時）
 Task(subagent_type="quality", description="Code quality review",
      prompt="以下のファイルのコード品質をレビュー:\n- {変更ファイル一覧}\n\nserenaのfind_symbol、get_symbols_overviewでシンボル分析し、\n命名規則、責務分離、DRY原則、可読性を評価。\n改善提案とスコア(0-100)を報告。")
 
@@ -72,6 +74,9 @@ Task(subagent_type="security", description="Security review",
 
 Task(subagent_type="design", description="Architecture review",
      prompt="以下のファイルのアーキテクチャをレビュー:\n- {変更ファイル一覧}\n\nserenaのlist_memories、read_memoryで既存パターン確認。\nfind_referencing_symbolsで依存関係分析。\n設計原則からの逸脱を指摘。")
+
+Task(subagent_type="docs", description="Documentation review",
+     prompt="以下の.mdファイルのドキュメント品質をレビュー:\n- {変更ファイル一覧}\n\n【チェック観点】\n1. 正確性・整合性: コードとの乖離、参照リンク有効性\n2. 可読性・構成: 見出し階層、Markdown構文、フォーマット統一\n3. 網羅性: 必要セクション、パラメータ説明の完全性\n\ncontext7でドキュメントベストプラクティス確認。\n改善提案とスコア(0-100)を報告。")
 ```
 
 **❌ 誤った実行方法（タイムアウトの原因）**:
@@ -83,6 +88,8 @@ Task(subagent_type="quality", ...)
 Task(subagent_type="security", ...)
 # エージェント完了を待つ
 Task(subagent_type="design", ...)
+# エージェント完了を待つ
+Task(subagent_type="docs", ...)
 ```
 
 ### 3. 各レビュー観点の詳細
@@ -125,6 +132,20 @@ Task(subagent_type="design", ...)
 - `serena`: `list_memories`, `read_memory`で既存パターン確認
 - `serena`: `find_referencing_symbols`で依存関係分析
 
+#### d) ドキュメント (docs)
+
+**チェック項目**:
+
+- 正確性・整合性: コードとドキュメントの乖離、参照リンク有効性
+- 可読性・構成: 見出し階層、Markdown構文、フォーマット統一
+- 網羅性: 必要セクション、パラメータ説明の完全性
+
+**使用ツール**:
+
+- `Read`: .mdファイル内容確認
+- `Grep`: コードとの整合性確認
+- `context7`: ドキュメントベストプラクティス確認
+
 ### 4. レビュー結果の統合
 
 各サブエージェントからの結果を統合し、以下の形式で報告:
@@ -137,6 +158,7 @@ Task(subagent_type="design", ...)
 - コード品質: XX/100
 - セキュリティ: XX/100
 - アーキテクチャ: XX/100
+- ドキュメント: XX/100
 
 **総合スコア: XX/100**
 
@@ -156,6 +178,7 @@ Task(subagent_type="design", ...)
 
 - [アーキテクチャ] 依存性注入パターンの適切な使用
 - [品質] 適切なエラーハンドリング
+- [ドキュメント] 明確な見出し階層と網羅的なパラメータ説明
 
 ## 📝 推奨アクション（優先順位順）
 
@@ -166,8 +189,8 @@ Task(subagent_type="design", ...)
 
 ## 重要な制約
 
-- **タイムアウト回避**: 3つのTaskを**1メッセージで同時起動**（逐次実行禁止）
-- **焦点を絞る**: 3観点に限定（quality/security/design）
+- **タイムアウト回避**: 4つのTaskを**1メッセージで同時起動**（逐次実行禁止）
+- **焦点を絞る**: 4観点に限定（quality/security/design/docs）
 - **具体的指摘**: 抽象論ではなく具体的修正案
 - **忖度排除**: 品質優先
 - **Serena活用**: promptに明示
@@ -176,4 +199,4 @@ Task(subagent_type="design", ...)
 ## パラメータ
 
 - `対象`: レビュー対象ファイル/ディレクトリ（省略時はセッション内の変更を自動検出）
-- `--focus=<項目>`: 特定観点のみ（quality/security/design）
+- `--focus=<項目>`: 特定観点のみ（quality/security/design/docs）
