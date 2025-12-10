@@ -191,15 +191,11 @@
     };
   };
 
-  # delta設定を独立したプログラムとして移動
-  programs.delta = {
+  programs.difftastic = {
     enable = true;
-    enableGitIntegration = true;
-    options = {
-      navigate = true;
-      dark = true;
-      line-numbers = true;
-      side-by-side = true;
+    git = {
+      enable = true;
+      diffToolMode = true;
     };
   };
 }
