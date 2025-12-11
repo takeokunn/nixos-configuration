@@ -68,15 +68,15 @@
   };
   emacs-copilot = {
     pname = "emacs-copilot";
-    version = "45b9822fced343bce3914c07a1af74df69fad309";
+    version = "7ee4758bb748beac7d29e62de5d2e752ebafb858";
     src = fetchFromGitHub {
       owner = "copilot-emacs";
       repo = "copilot.el";
-      rev = "45b9822fced343bce3914c07a1af74df69fad309";
+      rev = "7ee4758bb748beac7d29e62de5d2e752ebafb858";
       fetchSubmodules = false;
-      sha256 = "sha256-BiURw7pqdCSpOTV+RPiZ2xi/XNfppg1fKBkcsM4c4So=";
+      sha256 = "sha256-jzrf6k9yJEMR0H1hOkf1LY2p5ik++poMoAlrhrYPD2U=";
     };
-    date = "2025-12-09";
+    date = "2025-12-10";
   };
   emacs-direnv-mode = {
     pname = "emacs-direnv-mode";
@@ -234,15 +234,15 @@
   };
   emacs-org-view-mode = {
     pname = "emacs-org-view-mode";
-    version = "16d7c87a1bef54abd892f0fda2a541043c42e097";
+    version = "8082b9e9841d1a2e947ab7bebbdf0c49c4b64cdf";
     src = fetchFromGitHub {
       owner = "amno1";
       repo = "org-view-mode";
-      rev = "16d7c87a1bef54abd892f0fda2a541043c42e097";
+      rev = "8082b9e9841d1a2e947ab7bebbdf0c49c4b64cdf";
       fetchSubmodules = false;
-      sha256 = "sha256-bLRUHFzVA6+04iY1tnmFQzBRgW6P09+gK9it8D8QrVA=";
+      sha256 = "sha256-TAwa7pW4g4Lzy8BOHVNXvRs33HLFHk2YYk4XWj5+Z7U=";
     };
-    date = "2024-02-18";
+    date = "2025-12-11";
   };
   emacs-org-volume = {
     pname = "emacs-org-volume";
