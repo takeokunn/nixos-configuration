@@ -129,13 +129,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.20.0" = {
+    "@google/gemini-cli-core-0.20.2" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.20.0";
+      version = "0.20.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.20.0.tgz";
-        sha512 = "spaK3tT1Y0sU9MaRdCC9Z3kYjattwaryME44Um4QNuC66PSSY0gIxDp+NJeRJxBK0GgYG+72ZWhYCY4hQrQH7Q==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.20.2.tgz";
+        sha512 = "Cn7OM14i0PWSesBSbuV3qGcEsrGlRiN54KXzpEea1KaPSAb+iPyd5BHTs1BKEbrBfhQeaLSYvOyjro4h3xsOtw==";
       };
     };
     "@google/genai-1.30.0" = {
@@ -1308,13 +1308,13 @@ let
         sha512 = "nPdaFdQ0h/GEigbPClz11D0v/ZJEwxmeVZGeMo3Z5StPtUTkA9o1lD6QwoirYiSDzbcwn2XcjwmCp68W1IS4TA==";
       };
     };
-    "clipboardy-5.0.1" = {
+    "clipboardy-5.0.2" = {
       name = "clipboardy";
       packageName = "clipboardy";
-      version = "5.0.1";
+      version = "5.0.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/clipboardy/-/clipboardy-5.0.1.tgz";
-        sha512 = "pJ5ZDWjOT593Nli4TqlRLy33KomlAPxIFntMFxXrCqJON1cGcGPT5nNFxRxJ9m4HbfrccsYve7XwXjywW6nXVw==";
+        url = "https://registry.npmjs.org/clipboardy/-/clipboardy-5.0.2.tgz";
+        sha512 = "3IG8i8Yfb410yqDlCx9Ve3lYLFN3bD1IkrWcowT1kyTo6y4bwYf2guK9Q8a6zck5vWm7afm6Y61i7BG/Ir3FMA==";
       };
     };
     "cliui-8.0.1" = {
@@ -4640,10 +4640,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.67";
+    version = "2.0.69";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.67.tgz";
-      sha512 = "ze3/6SekyAUE+onUjYAKuF/7Qv/FVdOCtnQfT6IpURwf/sWYPIvtbtwYTE9QXROxKHMSj57nWIe/bI3eWGgKfA==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.69.tgz";
+      sha512 = "uuW3M4j3gN9kus0QH/3wEZq+JS3B0YJWzwlX2FqD421eeFVHhauN2HduO99vryHDFvtp8rH9TLKKuythBbNFHA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4676,10 +4676,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.20.0";
+    version = "0.20.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.20.0.tgz";
-      sha512 = "Yn7NHwuf0lHi+aAsrLmZ+t1Cy5YYlHSca0D8JknJTUDY84baOVinVA9gMrYRqTEa1TqFIm53qB6PTq8qoiM09Q==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.20.2.tgz";
+      sha512 = "9+NKpbE6vSZiXBCELenOiJQqk2dnXvKaygaM+0QJoSs6dYyk3xeDLnPj1Wvc/DNXchPEj3hizDGovmGdLIDOtQ==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4760,7 +4760,7 @@ in
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
       (
-        sources."@google/gemini-cli-core-0.20.0"
+        sources."@google/gemini-cli-core-0.20.2"
         // {
           dependencies = [
             sources."gaxios-6.7.1"
@@ -4970,7 +4970,7 @@ in
           ];
         }
       )
-      sources."clipboardy-5.0.1"
+      sources."clipboardy-5.0.2"
       (
         sources."cliui-8.0.1"
         // {
@@ -5548,10 +5548,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.71.0";
+    version = "0.72.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.71.0.tgz";
-      sha512 = "gHvogl1WZjl9g1G904QPehIDOHr5ZPH/lIWaubxs2h3LGaBSpJxLFxhjr7WPTRTE0CMhVrM0AAcwyDltWJbb0g==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.72.0.tgz";
+      sha512 = "/y04L2gAAAVKkfj2tzmK7scfqeW3WqO9zZLtaJ76ItVkezEr5V8334law6b9di+jRUyTykA8Oqmjir07yaQFOg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
