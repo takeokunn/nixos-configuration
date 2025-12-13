@@ -16,12 +16,16 @@ let
 
   toolsGit = import ./tools/git.nix { inherit pkgs customPackages; };
   toolsTelescope = import ./tools/telescope.nix;
+  toolsHarpoon = import ./tools/harpoon.nix { inherit pkgs; };
   toolsMisc = import ./tools/misc.nix { inherit pkgs; };
 
   uiStatusline = import ./ui/statusline.nix { inherit pkgs; };
   uiIcons = import ./ui/icons.nix { inherit pkgs; };
   uiDashboard = import ./ui/dashboard.nix { inherit pkgs; };
   uiNavigation = import ./ui/navigation.nix { inherit pkgs; };
+  uiNotifications = import ./ui/notifications.nix { inherit pkgs; };
+  uiBufferline = import ./ui/bufferline.nix { inherit pkgs; };
+  uiVisualAids = import ./ui/visual-aids.nix { inherit pkgs; };
 
   allModules = [
     coreEditing
@@ -34,11 +38,15 @@ let
     languageWeb
     toolsGit
     toolsTelescope
+    toolsHarpoon
     toolsMisc
     uiStatusline
     uiIcons
     uiDashboard
     uiNavigation
+    uiNotifications
+    uiBufferline
+    uiVisualAids
   ];
 
   merged =
