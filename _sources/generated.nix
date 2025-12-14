@@ -462,15 +462,15 @@
   };
   fish-done = {
     pname = "fish-done";
-    version = "102cf3986fbcf08e82f4125e208218fd7b597714";
+    version = "6d9bcefc6c1d170352022f824cd869fd72f05907";
     src = fetchFromGitHub {
       owner = "franciscolourenco";
       repo = "done";
-      rev = "102cf3986fbcf08e82f4125e208218fd7b597714";
+      rev = "6d9bcefc6c1d170352022f824cd869fd72f05907";
       fetchSubmodules = false;
-      sha256 = "sha256-GXKchepYti5Pb1ODFeJL3apDGg7Tn69skQQhvV2nSeQ=";
+      sha256 = "sha256-nwK78AqgaXbbM3QdCnyj9Y4ppqwPQWKV7+dh1Ksw9Ek=";
     };
-    date = "2025-12-01";
+    date = "2025-12-13";
   };
   fish-ghq = {
     pname = "fish-ghq";
@@ -581,13 +581,13 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "ea6d5fa26a3d582b77fef9953a398e33120dea77";
+    version = "07019d6efa2e949abcfa611c9a460c6108f22dd2";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "ea6d5fa26a3d582b77fef9953a398e33120dea77";
+      rev = "07019d6efa2e949abcfa611c9a460c6108f22dd2";
       fetchSubmodules = false;
-      sha256 = "sha256-EQ0/Niy7Fvd9e3AAmzf+Y78TtM2cHc5LUrL9/qI2G8M=";
+      sha256 = "sha256-dmWpHFagazKF9qhNzu5SAPtqZC1XDLqWqiQyg5sey74=";
     };
     date = "2025-12-13";
   };

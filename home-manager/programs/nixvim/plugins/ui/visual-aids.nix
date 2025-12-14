@@ -22,7 +22,12 @@
         FIX = {
           icon = " ";
           color = "error";
-          alt = [ "FIXME" "BUG" "FIXIT" "ISSUE" ];
+          alt = [
+            "FIXME"
+            "BUG"
+            "FIXIT"
+            "ISSUE"
+          ];
         };
         TODO = {
           icon = " ";
@@ -35,12 +40,19 @@
         WARN = {
           icon = " ";
           color = "warning";
-          alt = [ "WARNING" "XXX" ];
+          alt = [
+            "WARNING"
+            "XXX"
+          ];
         };
         PERF = {
           icon = " ";
           color = "hint";
-          alt = [ "OPTIM" "PERFORMANCE" "OPTIMIZE" ];
+          alt = [
+            "OPTIM"
+            "PERFORMANCE"
+            "OPTIMIZE"
+          ];
         };
         NOTE = {
           icon = " ";
@@ -49,11 +61,28 @@
         };
       };
       colors = {
-        error = [ "DiagnosticError" "ErrorMsg" "#FF5555" ];
-        warning = [ "DiagnosticWarn" "WarningMsg" "#FFB86C" ];
-        info = [ "DiagnosticInfo" "#8BE9FD" ];
-        hint = [ "DiagnosticHint" "#50FA7B" ];
-        default = [ "Identifier" "#BD93F9" ];
+        error = [
+          "DiagnosticError"
+          "ErrorMsg"
+          "#FF5555"
+        ];
+        warning = [
+          "DiagnosticWarn"
+          "WarningMsg"
+          "#FFB86C"
+        ];
+        info = [
+          "DiagnosticInfo"
+          "#8BE9FD"
+        ];
+        hint = [
+          "DiagnosticHint"
+          "#50FA7B"
+        ];
+        default = [
+          "Identifier"
+          "#BD93F9"
+        ];
       };
       highlight = {
         multiline = true;
@@ -62,7 +91,10 @@
       };
     };
     lazyLoad.settings = {
-      event = [ "BufReadPre" "BufNewFile" ];
+      event = [
+        "BufReadPre"
+        "BufNewFile"
+      ];
     };
   };
 
