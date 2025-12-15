@@ -462,15 +462,15 @@
   };
   fish-done = {
     pname = "fish-done";
-    version = "6d9bcefc6c1d170352022f824cd869fd72f05907";
+    version = "998ad4f5fc9cee36c09840a7e635b56428e554f9";
     src = fetchFromGitHub {
       owner = "franciscolourenco";
       repo = "done";
-      rev = "6d9bcefc6c1d170352022f824cd869fd72f05907";
+      rev = "998ad4f5fc9cee36c09840a7e635b56428e554f9";
       fetchSubmodules = false;
-      sha256 = "sha256-nwK78AqgaXbbM3QdCnyj9Y4ppqwPQWKV7+dh1Ksw9Ek=";
+      sha256 = "sha256-GZ1ZpcaEfbcex6XvxOFJDJqoD9C5out0W4bkkn768r0=";
     };
-    date = "2025-12-13";
+    date = "2025-12-15";
   };
   fish-ghq = {
     pname = "fish-ghq";
