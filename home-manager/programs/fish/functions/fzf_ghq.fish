@@ -22,6 +22,7 @@ function fzf_ghq
         end
     end
 
+    cd $recent
     commandline -r ''
     commandline -f repaint
 end
