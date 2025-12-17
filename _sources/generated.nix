@@ -151,13 +151,13 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "0.28.0";
+    version = "0.28.2";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "0.28.0";
+      rev = "0.28.2";
       fetchSubmodules = false;
-      sha256 = "sha256-ci+uEnb5DjRHOxXjvQU3yvAF2kfUZvBT8+/R5DYnIVM=";
+      sha256 = "sha256-auVcj9sOZpqtfXRkaK72e1QgKp/t3+K+vjX0OmgtASs=";
     };
   };
   emacs-mu4e-dashboard = {
@@ -545,15 +545,15 @@
   };
   vim-gin = {
     pname = "vim-gin";
-    version = "bed53aff3f23ff3252f1a06e975be08eb7ac0be5";
+    version = "18478a2dee183c7e84543183844d2b3dd0440553";
     src = fetchFromGitHub {
       owner = "lambdalisue";
       repo = "vim-gin";
-      rev = "bed53aff3f23ff3252f1a06e975be08eb7ac0be5";
+      rev = "18478a2dee183c7e84543183844d2b3dd0440553";
       fetchSubmodules = false;
-      sha256 = "sha256-5LjxpZw6/jP4WuZsNB3ZWKhBsGYhXmWcwM2/X6gS91w=";
+      sha256 = "sha256-ylifuKrEPpH0NxfyMUj1Seg2OXutvrQW9Y9y2TGlw70=";
     };
-    date = "2025-12-02";
+    date = "2025-12-17";
   };
   vim-skkeleton = {
     pname = "vim-skkeleton";
