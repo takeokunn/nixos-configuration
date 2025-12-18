@@ -26,7 +26,6 @@ with pkgs;
 ]
 ++ lib.optionals stdenv.isDarwin [
   # for macOS (brew-nix casks)
-  brewCasks.cleanshot
   brewCasks.keycastr
   brewCasks.raycast
   brewCasks.docker-desktop
