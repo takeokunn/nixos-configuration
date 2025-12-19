@@ -129,13 +129,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.21.2" = {
+    "@google/gemini-cli-core-0.21.3" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.21.2";
+      version = "0.21.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.21.2.tgz";
-        sha512 = "nzhzy0QbcJjeOLVMiQhcOB8vX+gQ1zF6mAypGCwGdRB75Cn3NtIfAwAILbEZGN61IuwScfTaGIpqZG/GQCNUcQ==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.21.3.tgz";
+        sha512 = "XvVduP8tsI1r4KTr4x4CzWnFUvW7lf2Cmhp0Qnx9KDH5GAya4jHNbOnE9gOQ0CY18jjtp3kGX6D1ntVJDkp12g==";
       };
     };
     "@google/genai-1.30.0" = {
@@ -1155,13 +1155,13 @@ let
         sha512 = "zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==";
       };
     };
-    "bufferutil-4.0.9" = {
+    "bufferutil-4.1.0" = {
       name = "bufferutil";
       packageName = "bufferutil";
-      version = "4.0.9";
+      version = "4.1.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.0.9.tgz";
-        sha512 = "WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==";
+        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.1.0.tgz";
+        sha512 = "ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==";
       };
     };
     "bundle-name-4.1.0" = {
@@ -2082,13 +2082,13 @@ let
         sha512 = "Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==";
       };
     };
-    "fs-extra-11.3.2" = {
+    "fs-extra-11.3.3" = {
       name = "fs-extra";
       packageName = "fs-extra";
-      version = "11.3.2";
+      version = "11.3.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/fs-extra/-/fs-extra-11.3.2.tgz";
-        sha512 = "Xr9F6z6up6Ws+NjzMCZc6WXg2YFRlrLP9NQDO3VQrWrfiojdhS56TzueT88ze0uBdCTwEIhQ3ptnmKeWGFAe0A==";
+        url = "https://registry.npmjs.org/fs-extra/-/fs-extra-11.3.3.tgz";
+        sha512 = "VWSRii4t0AFm6ixFFmLLx1t7wS1gh+ckoa84aOeapGum0h+EZd1EhEumSB+ZdDLnEPuucsVB9oB7cxJHap6Afg==";
       };
     };
     "function-bind-1.1.2" = {
@@ -4341,13 +4341,13 @@ let
         sha512 = "Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==";
       };
     };
-    "utf-8-validate-6.0.5" = {
+    "utf-8-validate-6.0.6" = {
       name = "utf-8-validate";
       packageName = "utf-8-validate";
-      version = "6.0.5";
+      version = "6.0.6";
       src = fetchurl {
-        url = "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-6.0.5.tgz";
-        sha512 = "EYZR+OpIXp9Y1eG1iueg8KRsY8TuT8VNgnanZ0uA3STqhHQTLwbl+WX76/9X5OY12yQubymBpaBSmMPkSTQcKA==";
+        url = "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-6.0.6.tgz";
+        sha512 = "q3l3P9UtEEiAHcsgsqTgf9PPjctrDWoIXW3NpOHFdRDbLvu4DLIcxHangJ4RLrWkBcKjmcs/6NkerI8T/rE4LA==";
       };
     };
     "util-deprecate-1.0.2" = {
@@ -4644,10 +4644,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.405.0";
+    version = "1.406.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.405.0.tgz";
-      sha512 = "C8inpLAgli1WmV1ygqvKZ7VIe6irMktQKNCvWW7hS3vrIf0AQCM+GFKzYmJMPVLAjdDawAPQSLdkbSR9cYyTHg==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.406.0.tgz";
+      sha512 = "yzWayzR707xuAMGS77c3G7jv0z1F1hx7Aesvp0+qBbxUJHVsrSMjUImJMIL/vWJ+kfo49rfjiTTksaxjUk1ujw==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4667,10 +4667,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.0.72";
+    version = "2.0.73";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.72.tgz";
-      sha512 = "ysJYyeyqePMUUL2/6j6yOpowk+9qhL7AaW9Betmt4K+MrK42tvNdOXLUlvxdMs05CCbvuCRqzVll4SNVQealmg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.0.73.tgz";
+      sha512 = "eprKoHFD19GCk4dAvmDC/dPr7bqe7b7VlzxwEEqcCTDx8MMFLXOkYBDpKwF0GLfAev9RYaQfe+f1gEJ4gX7gew==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4703,10 +4703,10 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.21.2";
+    version = "0.21.3";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.21.2.tgz";
-      sha512 = "NbSPuZbFwb9EFAEOFbTa8OpK/r/N29EgkQqw593t0YvVfkfu4zQJtkfjEn+e3nw8nG8TWjoBTNl0pFqppe64Pg==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.21.3.tgz";
+      sha512 = "zYcqzxLfVCcFGgtsPJ41a8wBtRe+rXRLdy/aK3eaFLbhBzGgiJpTyWQghNUGt3wggOk6H4iu/tpnK+2GpLotkA==";
     };
     dependencies = [
       sources."@alcalzone/ansi-tokenize-0.2.2"
@@ -4787,7 +4787,7 @@ in
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
       (
-        sources."@google/gemini-cli-core-0.21.2"
+        sources."@google/gemini-cli-core-0.21.3"
         // {
           dependencies = [
             sources."gaxios-6.7.1"
@@ -4972,7 +4972,7 @@ in
       sources."brace-expansion-2.0.2"
       sources."buffer-crc32-0.2.13"
       sources."buffer-equal-constant-time-1.0.1"
-      sources."bufferutil-4.0.9"
+      sources."bufferutil-4.1.0"
       sources."bundle-name-4.1.0"
       sources."byte-counter-0.1.0"
       sources."bytes-3.1.2"
@@ -5130,7 +5130,7 @@ in
       sources."forwarded-0.2.0"
       sources."forwarded-parse-2.1.2"
       sources."fresh-2.0.0"
-      sources."fs-extra-11.3.2"
+      sources."fs-extra-11.3.3"
       sources."function-bind-1.1.2"
       sources."fzf-0.5.2"
       sources."gaxios-7.1.3"
@@ -5501,7 +5501,7 @@ in
       sources."universalify-2.0.1"
       sources."unpipe-1.0.0"
       sources."url-template-2.0.8"
-      sources."utf-8-validate-6.0.5"
+      sources."utf-8-validate-6.0.6"
       sources."util-deprecate-1.0.2"
       sources."uuid-9.0.1"
       sources."validate-npm-package-license-3.0.4"
@@ -5578,10 +5578,10 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.73.0";
+    version = "0.75.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.73.0.tgz";
-      sha512 = "QeArR/mZ7/9rlf+wRoID0w46na86fzdRh77yB3tCXZfPwypn3Qv1eZrIjZDYtfRE9hiZ6AcrShGYfsmVRt1hzg==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.75.0.tgz";
+      sha512 = "jYberZ+AhIww69b+//oMKlL8hAJl8sU7B1+4IPH8weJd2ugJ8GJqsiq0w3gr2xnk5RqjP48CEXW1JWwslpqaZw==";
     };
     buildInputs = globalBuildInputs;
     meta = {

@@ -895,12 +895,12 @@
       "name": null,
       "owner": "lambdalisue",
       "repo": "nvim-aibo",
-      "rev": "v0.7.2",
-      "sha256": "sha256-eA+WKisTdZgb5hsrWd3aIUaVNS/AN13GTqHIGh2Dzn8=",
+      "rev": "v0.8.1",
+      "sha256": "sha256-1ZWuRBF6Qn6+HJHHdDZjUwbbt2+Nj6IN9BkHjkrfZks=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "v0.7.2"
+    "version": "v0.8.1"
   },
   "sublime-gleam": {
     "cargoLocks": null,
