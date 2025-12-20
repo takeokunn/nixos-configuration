@@ -2282,6 +2282,9 @@
     ;; enable diagnostics
     (add-hook 'lsp-configure-hook #'lsp-diagnostics-mode)
 
+    ;; enable completion
+    (add-hook 'lsp-configure-hook #'corfu-mode)
+
     ;; config
     (setopt lsp-response-timeout 60)
     (setopt lsp-idle-delay 0.8)
