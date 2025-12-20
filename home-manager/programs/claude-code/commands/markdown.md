@@ -1,105 +1,56 @@
-# markdownテキスト更新コマンド
+---
+argument-hint: [file-path]
+description: markdownテキスト更新コマンド
+agents:
+  - name: docs
+    description: ドキュメント管理。正確性、可読性、網羅性の検証
+    readonly: false
+  - name: memory
+    description: 知識ベース管理。Serenaメモリへの記録
+    readonly: false
+---
 
-AIが生成した文章をmarkdownファイルとして作成・更新するスラッシュコマンド。既存ファイルの更新を優先し、Living Documentとして完成された状態を維持します。
+# markdown - テキスト更新コマンド
 
-## 使用方法
+<purpose>
+他コマンド（/define, /ask, /bug 等）の実行結果をmarkdownファイルとして出力する補助コマンド。
+</purpose>
 
-### 基本構文
+<output-rules>
+## 出力ファイル
 
-```bash
-/markdown [ファイルパス] [オプション]
-```
+| 実行コンテキスト | 出力ファイル |
+|-----------------|-------------|
+| `/define` の後 | `EXECUTION.md` |
+| `/ask` `/bug` の後 | `RESEARCH.md` |
+| それ以外 | `MEMO.md` |
 
-**実行例**
+※ファイルパス指定時はそちらを優先
+</output-rules>
 
-```bash
-# 自動判定でファイル出力
-/markdown
+<workflow>
+1. 直前のコマンド実行結果を取得
+2. コンテキストに応じた出力ファイル名を決定
+3. Write/Edit toolでファイル出力
+</workflow>
 
-# 指定ファイルに出力
-/markdown ./docs/api-spec.md
-
-# 強制更新・新規作成
-/markdown ./docs/readme.md --update
-/markdown ./docs/feature.md --create
-```
-
-**パラメータ**
-
-- `ファイルパス`: 出力先（省略時は自動生成）
-- `--update`: 既存ファイル強制更新
-- `--create`: 新規ファイル強制作成
-
-### ファイル判定ロジック
-
-**自動ファイル名生成**（パス省略時）
-
-- 内容テーマ分析 → 既存ファイル検索 → `{テーマ}-{日付}.md`形式で生成
-
-**更新vs新規判定**
-
-- **更新**: 同テーマファイル存在 + 内容類似度70%以上
-- **新規**: 類似度30%未満 OR 独立テーマ OR `--create`指定
-
-## 技術仕様
-
-### 処理フロー
-
-```mermaid
-flowchart TD
-    A[/markdown実行] --> B{パス指定?}
-    B -->|Yes| C[指定パス]
-    B -->|No| D[自動生成]
-    C --> E[ファイル確認]
-    D --> E
-    E --> F{存在?}
-    F -->|No| G[Write tool]
-    F -->|Yes| H[類似度分析]
-    H --> I{70%以上?}
-    I -->|Yes| J[Edit tool]
-    I -->|No| G
-    G --> K[完了]
-    J --> K
-
-    style A fill:#e1f5fe
-    style G fill:#c8e6c9
-    style J fill:#fff3e0
-```
-
-### 実装詳細
-
-**ファイル操作**
-
-- Write/Edit toolによる安全な操作
-- UTF-8エンコーディング、LF改行
-- 原子的書き込み（全成功 or 全失敗）
-
-**エラー処理**
-
-- パーミッションエラー、容量不足、ファイルロック検出
-
-**設計原則**
-
-- 単一責任: 1ファイル = 1目的
-- 冪等性: 同入力 → 同結果
-- 原子性: 完全成功/失敗
-
-## 文書作成ガイドライン
-
-### 記載必須内容
-
-- **仕様・要求事項**: 機能的・非機能的要件
-- **技術的背景**: 実装前提知識、アーキテクチャ
-- **使用方法**: 操作手順、パラメータ、制約
-
-### 記載禁止内容
+<guidelines>
+## 記載禁止
 
 - 修正履歴・変更ログ
 - 検討過程・議論経緯
-- 変更理由・過去バージョン比較
+</guidelines>
 
-## Claude Code統合
+<examples>
+/define 認証機能の追加
+/markdown
+→ EXECUTION.md に要件定義・実行計画を出力
 
-- スラッシュコマンドとして環境統合
-- 対話型・バッチ実行両対応
-- 既存ファイル操作toolとの連携
+/ask エラーの原因は？
+/markdown
+→ RESEARCH.md に調査結果を出力
+
+/ask APIの仕様を教えて
+/markdown
+→ MEMO.md に調査結果を出力
+</examples>

@@ -85,17 +85,34 @@
     };
 
     agents = {
+      accessibility = builtins.readFile ./agents/accessibility.md;
+      api-design = builtins.readFile ./agents/api-design.md;
+      architecture = builtins.readFile ./agents/architecture.md;
+      ci-cd = builtins.readFile ./agents/ci-cd.md;
       clean = builtins.readFile ./agents/clean.md;
+      complexity = builtins.readFile ./agents/complexity.md;
+      database = builtins.readFile ./agents/database.md;
+      debug = builtins.readFile ./agents/debug.md;
+      dependency = builtins.readFile ./agents/dependency.md;
       design = builtins.readFile ./agents/design.md;
       docs = builtins.readFile ./agents/docs.md;
+      error-handling = builtins.readFile ./agents/error-handling.md;
+      estimation = builtins.readFile ./agents/estimation.md;
+      git = builtins.readFile ./agents/git.md;
+      i18n = builtins.readFile ./agents/i18n.md;
+      infrastructure = builtins.readFile ./agents/infrastructure.md;
       memory = builtins.readFile ./agents/memory.md;
       merge = builtins.readFile ./agents/merge.md;
+      migration = builtins.readFile ./agents/migration.md;
+      observability = builtins.readFile ./agents/observability.md;
       performance = builtins.readFile ./agents/performance.md;
+      playwright = builtins.readFile ./agents/playwright.md;
       quality = builtins.readFile ./agents/quality.md;
+      refactor = builtins.readFile ./agents/refactor.md;
+      requirement = builtins.readFile ./agents/requirement.md;
+      review = builtins.readFile ./agents/review.md;
       security = builtins.readFile ./agents/security.md;
       test = builtins.readFile ./agents/test.md;
-      refactor = builtins.readFile ./agents/refactor.md;
-      playwright = builtins.readFile ./agents/playwright.md;
     };
 
     commands = {
