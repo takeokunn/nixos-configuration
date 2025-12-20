@@ -62,10 +62,5 @@ in
 
   home.file = {
     ".codex/config.toml".source = tomlFormat.generate "codex-config" settings;
-    # ".codex/prompts/ask.md".source = ./prompts/ask.md;
-    # ".codex/prompts/bug.md".source = ./prompts/bug.md;
-    # ".codex/prompts/define.md".source = ./prompts/define.md;
-    # ".codex/prompts/execute.md".source = ./prompts/execute.md;
-    # ".codex/prompts/markdown.md".source = ./prompts/markdown.md;
   };
 }
