@@ -19,11 +19,11 @@ agents:
 <output-rules>
 ## 出力ファイル
 
-| 実行コンテキスト | 出力ファイル |
-|-----------------|-------------|
-| `/define` の後 | `EXECUTION.md` |
-| `/ask` `/bug` の後 | `RESEARCH.md` |
-| それ以外 | `MEMO.md` |
+| 実行コンテキスト   | 出力ファイル   |
+| ------------------ | -------------- |
+| `/define` の後     | `EXECUTION.md` |
+| `/ask` `/bug` の後 | `RESEARCH.md`  |
+| それ以外           | `MEMO.md`      |
 
 ※ファイルパス指定時はそちらを優先
 </output-rules>
@@ -39,7 +39,7 @@ agents:
 
 - 修正履歴・変更ログ
 - 検討過程・議論経緯
-</guidelines>
+  </guidelines>
 
 <examples>
 /define 認証機能の追加

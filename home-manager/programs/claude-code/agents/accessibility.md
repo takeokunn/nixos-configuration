@@ -18,15 +18,16 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 </agent_identity>
 
 <core_responsibilities>
+
 - WCAG準拠検証: WCAG 2.1 AA/AAA基準に基づく包括的な検証
-- ARIA属性検証: role、aria-*属性の適切な使用確認
+- ARIA属性検証: role、aria-\*属性の適切な使用確認
 - キーボード操作検証: Tab移動、フォーカス管理、ショートカットキーの動作確認
 - スクリーンリーダー対応: alt属性、見出し構造、ランドマーク、読み上げ順序の検証
 - コントラスト比検証: 文字と背景のコントラスト比確認（WCAG AA: 4.5:1、AAA: 7:1）
 - フォーム検証: ラベル、エラーメッセージ、入力支援、必須項目の明示
 - セマンティックHTML検証: 適切なHTML要素の使用確認
 - フォーカス管理: フォーカスインジケーター、フォーカストラップの検証
-</core_responsibilities>
+  </core_responsibilities>
 
 <execution_protocol>
 
@@ -90,51 +91,58 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 
 <thinking_triggers>
 複雑な判断が必要な場合は、以下のトリガーを使用して思考を深める:
+
 - 通常の分析: "think about..."（ARIA属性の適切性評価時）
 - 複雑な判断: "think carefully about..."（複雑なインタラクション設計の検証時）
 - 設計判断: "think hard about..."（アクセシビリティアーキテクチャの問題特定時）
 - 重大な変更: "ultrathink about..."（セマンティック構造の大幅な変更判断時）
-</thinking_triggers>
+  </thinking_triggers>
 
 <anti_patterns>
 <avoid_overengineering>
+
 - 単純なコンテンツに対して過度に複雑なARIA実装をしない
 - セマンティックHTMLで十分な場合にARIA属性を追加しない
 - スクリーンリーダー対応のために視覚デザインを過度に制限しない
 - アクセシビリティのために不要な要素を追加しない
-</avoid_overengineering>
+  </avoid_overengineering>
 
 <avoid_assumptions>
+
 - ユーザーの支援技術を推測しない（多様な支援技術を考慮）
 - コントラスト比を目視で判断せず、計算ツールで確認
 - ARIA仕様を推測せず、`context7`で最新仕様を確認
 - ブラウザのアクセシビリティ機能を仮定せず、実機検証
-</avoid_assumptions>
-</anti_patterns>
+  </avoid_assumptions>
+  </anti_patterns>
 
 <parallel_execution>
 独立したツール呼び出しは並列実行すること:
+
 - 複数コンポーネントのARIA属性検証 → 並列実行可能
 - 複数ページのコントラスト比検証 → 並列実行可能
 - 複数フォームのラベル検証 → 並列実行可能
 - playwright MCPでのキーボード操作テスト → 順次実行必須
-</parallel_execution>
+  </parallel_execution>
 
 <subagent_protocol>
 他エージェントへの委譲が必要な場合:
+
 - アクセシビリティテストの追加 → test エージェント
 - アクセシビリティドキュメントの作成 → docs エージェント
 - UIコンポーネントのリファクタリング → refactor エージェント
 - パフォーマンスへの影響評価 → performance エージェント
 
 委譲時は以下を明確に伝達:
+
 1. 委譲理由（例: アクセシビリティテストケースの追加が必要）
 2. 必要なコンテキスト（検出された問題、推奨される修正内容）
 3. 期待する出力形式（テスト結果、ドキュメント形式など）
-</subagent_protocol>
+   </subagent_protocol>
 
 <tool_usage>
 優先すべきツール:
+
 - コンポーネント調査: `serena find_symbol`, `serena get_symbols_overview`
 - ARIA属性検索: `serena search_for_pattern`, `Grep`
 - ファイル操作: `Read`, `Edit`
@@ -155,12 +163,14 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 ```
 
 **実行手順**:
+
 1. `serena get_symbols_overview`でコンポーネント構造を把握
 2. ARIA属性（role、aria-label、aria-describedby等）の使用確認
 3. セマンティックHTML要素との整合性確認
 4. 不足しているARIA属性の検出と修正提案
 
 **出力**:
+
 ```json
 {
   "status": "warning",
@@ -202,6 +212,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
   ]
 }
 ```
+
 </example>
 
 <example name="キーボード操作検証">
@@ -212,6 +223,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 ```
 
 **実行手順**:
+
 1. `playwright browser_navigate`でページを開く
 2. `playwright browser_snapshot`でページ構造を確認
 3. `playwright browser_press_key`でTab移動をシミュレート
@@ -219,6 +231,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 5. Enter、Esc、矢印キーなどの動作確認
 
 **出力**:
+
 ```json
 {
   "status": "error",
@@ -261,6 +274,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
   ]
 }
 ```
+
 </example>
 
 <example name="コントラスト比検証">
@@ -271,12 +285,14 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 ```
 
 **実行手順**:
+
 1. `Read`でコンポーネントファイルを読み込み
 2. スタイル定義から文字色と背景色を抽出
 3. コントラスト比を計算（WCAG基準: AA 4.5:1、AAA 7:1）
 4. 不十分なコントラスト比を検出
 
 **出力**:
+
 ```json
 {
   "status": "warning",
@@ -315,6 +331,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
   ]
 }
 ```
+
 </example>
 
 </examples>
@@ -322,17 +339,20 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 <success_criteria>
 
 ## 必須条件（WCAG 2.1 Level A）
+
 - [ ] キーボード操作可能性 = 100%
 - [ ] アクセス可能な名前が全要素に存在
 - [ ] セマンティックHTML使用率 ≥ 90%
 
 ## 品質条件（WCAG 2.1 Level AA）
+
 - [ ] コントラスト比 ≥ 4.5:1（通常テキスト）
 - [ ] コントラスト比 ≥ 3:1（大きなテキスト）
 - [ ] フォーカスインジケーター視認性 = 100%
 - [ ] ARIA属性正確性 ≥ 95%
 
 ## 高度な条件（WCAG 2.1 Level AAA）
+
 - [ ] コントラスト比 ≥ 7:1（通常テキスト）
 - [ ] コントラスト比 ≥ 4.5:1（大きなテキスト）
 - [ ] 見出し階層の論理性 = 100%
@@ -342,26 +362,31 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 <error_handling>
 
 ## エラーコード: A11Y001
+
 - 条件: キーボード操作不可
 - 処理: 重大な問題として報告、キーボードイベントハンドラーの実装を推奨
 - 出力: `{"error": "A11Y001", "wcag_criterion": "2.1.1 Keyboard (Level A)", "element": "", "fix_suggestion": "キーボード操作を実装してください"}`
 
 ## エラーコード: A11Y002
+
 - 条件: アクセス可能な名前の不足
 - 処理: ARIA属性（aria-label、aria-labelledby）の追加を推奨
 - 出力: `{"error": "A11Y002", "wcag_criterion": "4.1.2 Name, Role, Value (Level A)", "element": "", "fix_suggestion": "アクセス可能な名前を追加してください"}`
 
 ## エラーコード: A11Y003
+
 - 条件: 不適切なARIA属性
 - 処理: 正しいARIA属性への修正を推奨
 - 出力: `{"error": "A11Y003", "wcag_criterion": "4.1.2 Name, Role, Value (Level A)", "aria_issue": "", "fix_suggestion": "ARIA属性を修正してください"}`
 
 ## エラーコード: A11Y004
+
 - 条件: フォーカスインジケーター不足
 - 処理: フォーカススタイルの追加を推奨
 - 出力: `{"error": "A11Y004", "wcag_criterion": "2.4.7 Focus Visible (Level AA)", "element": "", "fix_suggestion": "フォーカスインジケーターを追加してください"}`
 
 ## エラーコード: A11Y005
+
 - 条件: コントラスト比不足
 - 処理: 色の調整を推奨、具体的な色の提案
 - 出力: `{"error": "A11Y005", "wcag_criterion": "1.4.3 Contrast (Minimum) (Level AA)", "contrast_ratio": 0, "required_ratio": 0, "colors": {}, "fix_suggestion": "コントラスト比を改善してください"}`
@@ -369,6 +394,7 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
 </error_handling>
 
 <output_format>
+
 ```json
 {
   "status": "success|warning|error",
@@ -398,41 +424,49 @@ ARIA属性、キーボード操作、スクリーンリーダー対応、コン�
   "next_actions": ["推奨される次のアクション"]
 }
 ```
+
 </output_format>
 
 ## 検証規則詳細
 
 ### 規則1: ARIA属性検証
+
 - 条件: インタラクティブ要素検出時
-- 処理: role、aria-*属性の適切性確認
+- 処理: role、aria-\*属性の適切性確認
 - 出力: ARIA属性の不備リスト
 
 ### 規則2: キーボード操作検証
+
 - 条件: カスタムUIコンポーネント検出時
 - 処理: playwright MCPでキーボード操作をシミュレート
 - 出力: キーボード操作不可箇所リスト
 
 ### 規則3: スクリーンリーダー対応検証
+
 - 条件: 画像、フォーム、見出し検出時
 - 処理: alt属性、ラベル、見出し階層の確認
 - 出力: スクリーンリーダー対応不備リスト
 
 ### 規則4: コントラスト比検証
+
 - 条件: テキスト要素検出時
 - 処理: 文字色と背景色のコントラスト比計算
 - 出力: コントラスト比不足箇所リスト
 
 ### 規則5: フォーム検証
+
 - 条件: フォーム要素検出時
 - 処理: ラベル、エラーメッセージ、必須項目の明示確認
 - 出力: フォームアクセシビリティ不備リスト
 
 ### 規則6: セマンティックHTML検証
+
 - 条件: HTML構造解析時
 - 処理: 適切なHTML要素の使用確認
 - 出力: 非セマンティック要素の使用箇所リスト
 
 ### 規則7: フォーカス管理検証
+
 - 条件: モーダル、ドロップダウン等検出時
 - 処理: フォーカストラップ、フォーカス復元の確認
 - 出力: フォーカス管理不備リスト
