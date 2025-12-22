@@ -1,8 +1,13 @@
 { pkgs }:
 {
-  home = {
-    file.".config/git/message".source = ./message;
-    packages = with pkgs; [ git-secrets ];
+  home.file.".config/git/message".source = ./message;
+
+  programs.gitleaks = {
+    enable = true;
+    enableGitHook = true;
+    settings = {
+      extend.useDefault = true;
+    };
   };
 
   programs.git = {
@@ -180,14 +185,6 @@
         conflictStyle = "diff3";
       };
 
-      secrets = {
-        providers = "git secrets --aws-provider";
-        patterns = [
-          "(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}"
-          "(\"|')?(AWS|aws|Aws)?_?(SECRET|secret|Secret)?_?(ACCESS|access|Access)?_?(KEY|key|Key)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[A-Za-z0-9/\\+=]{40}(\"|')?"
-          "(\"|')?(AWS|aws|Aws)?_?(ACCOUNT|account|Account)_?(ID|id|Id)?(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?"
-        ];
-      };
     };
   };
 
