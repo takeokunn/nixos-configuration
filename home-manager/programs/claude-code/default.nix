@@ -134,12 +134,8 @@
           codex.enable = true;
           serena = {
             enable = true;
-            args = [
-              "--context"
-              "ide-assistant"
-              "--enable-web-dashboard"
-              "False"
-            ];
+            context = "claude-code";
+            enableWebDashboard = false;
           };
         };
       }).config.settings.servers;
