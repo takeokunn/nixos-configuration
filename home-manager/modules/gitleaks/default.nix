@@ -238,6 +238,10 @@ in
     xdg.configFile."gitleaks/config.toml".source =
       tomlFormat.generate "gitleaks-config.toml" configToToml;
 
+    home.sessionVariables = {
+      GITLEAKS_CONFIG = "${config.xdg.configHome}/gitleaks/config.toml";
+    };
+
     programs.git.hooks.pre-commit = lib.mkIf cfg.enableGitHook preCommitHook;
   };
 }

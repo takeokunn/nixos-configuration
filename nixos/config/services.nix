@@ -1,4 +1,4 @@
-{ username }:
+{ pkgs, username }:
 {
   services = {
     ntp.enable = true;
@@ -7,7 +7,7 @@
 
     ollama = {
       enable = true;
-      acceleration = "rocm";
+      package = pkgs.ollama-rocm;
     };
     offlineimap.enable = true;
     openssh.enable = true;
