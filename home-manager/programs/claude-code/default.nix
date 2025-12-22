@@ -124,6 +124,10 @@
       feedback = builtins.readFile ./commands/feedback.md;
     };
 
+    hooks = {
+      enforce-perl = builtins.readFile ./hooks/enforce-perl.sh;
+    };
+
     mcpServers =
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {
