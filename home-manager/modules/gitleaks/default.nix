@@ -180,6 +180,12 @@ in
       description = "Enable gitleaks as git pre-commit hook";
     };
 
+    enableBashIntegration = lib.hm.shell.mkBashIntegrationOption { inherit config; };
+
+    enableZshIntegration = lib.hm.shell.mkZshIntegrationOption { inherit config; };
+
+    enableFishIntegration = lib.hm.shell.mkFishIntegrationOption { inherit config; };
+
     settings = {
       extend = {
         useDefault = lib.mkOption {
@@ -243,5 +249,19 @@ in
     };
 
     programs.git.hooks.pre-commit = lib.mkIf cfg.enableGitHook preCommitHook;
+
+    programs = {
+      bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
+        eval "$(${lib.getExe cfg.package} completion bash)"
+      '';
+
+      zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
+        eval "$(${lib.getExe cfg.package} completion zsh)"
+      '';
+
+      fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
+        ${lib.getExe cfg.package} completion fish | source
+      '';
+    };
   };
 }
