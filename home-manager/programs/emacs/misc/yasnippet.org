@@ -911,7 +911,7 @@ $0
   ,#+DESCRIPTION: ${1:description}
   ,#+DATE: ${2:`(format-time-string "%Y-%m-%dT%T%z")`}
   ,#+HUGO_BASE_DIR: ../../
-  ,#+HUGO_CATEGORIES: ${3:fleeting}
+  ,#+HUGO_CATEGORIES: ${3:$$(yas-choose-value '("diary" "fleeting" "literature" "permanent" "poem" "structure"))}
   ,#+HUGO_SECTION: posts/$3
   ,#+HUGO_TAGS: $3 $4
   ,#+HUGO_DRAFT: true
@@ -1395,23 +1395,36 @@ $0
   # name: literature
   # key: literature
   # --
-  ,* Introduction
+  ,* 文献情報
 
-  {書籍タイトル}の読書記録。
+  - 出典: xxx
+  - 著者: xxx
+  - 参照日: `(format-time-string "%Y-%m-%d")`
+  - 種別: ${4:$$(yas-choose-value '("書籍" "記事" "論文" "ブログ" "動画"))}
 
-  - 原著: xxx
+  ,* 読む目的・背景
 
-  ,* モチベーション
+  - なぜこの文献を読もうと思ったか？
+  - 何を知りたいか？（問いの設定）
+
+  ,* 重要ポイントと引用
+
+  - xxx
+    - [引用]: xxx
+    - [要約/メモ]: xxx
+
+  ,* 自分の考察・気づき
+
+  - 自分のこれまでの知識とどうつながるか？
+  - 読んでいて感じた違和感や「なるほど」と思った点:
+
+  ,* 関連する知識へのリンク
 
   - xxx
 
-  ,* 要点抜粋
+  ,* 今後の活用案
 
-  - xxx
-
-  ,* まとめ
-
-  $0
+  - [ ] この文献から「自分の考え（Permanent Note）」を切り出す
 #+end_src
 ** php-mode/
 *** .yas-setup.el
