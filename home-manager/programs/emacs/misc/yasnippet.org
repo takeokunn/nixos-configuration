@@ -1389,7 +1389,30 @@ $0
     - e.g. CI/CDでの自動PDF出力＋SNSシェアを統合
     - e.g. ◯◯領域にも応用できそうなので検討中
 #+end_src
+*** literature
+#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/literature") :mkdirp yes :noweb yes
+  # -*- mode: snippet -*-
+  # name: literature
+  # key: literature
+  # --
+  ,* Introduction
 
+  {書籍タイトル}の読書記録。
+
+  - 原著: xxx
+
+  ,* モチベーション
+
+  - xxx
+
+  ,* 要点抜粋
+
+  - xxx
+
+  ,* まとめ
+
+  $0
+#+end_src
 ** php-mode/
 *** .yas-setup.el
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/php-mode/.yas-setup.el") :mkdirp yes :noweb yes
