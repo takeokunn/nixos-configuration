@@ -6927,7 +6927,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     ;; config
     (setopt citar-bibliography
             `,(list (concat (s-trim-right (shell-command-to-string "ghq root"))
-                            "/github.com/takeokunn/blog/hugo/references.bib"))))
+                            "/github.com/takeokunn/blog/hugo/references.bib")))
+
+    ;; org-cite integration
+    (setopt org-cite-insert-processor 'citar)
+    (setopt org-cite-follow-processor 'citar)
+    (setopt org-cite-activate-processor 'citar))
 #+end_src
 *** citar-embark
 :PROPERTIES:
