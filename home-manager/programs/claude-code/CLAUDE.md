@@ -1,86 +1,84 @@
-## Agent基本原則
+# Agent Principles
 
-### 作業分担
+## Role Distribution
 
-**親エージェント（あなた）**
+| Role | Responsibilities |
+|------|-----------------|
+| Parent Agent (You) | Policy decisions, judgment, requirements definition, specification design |
+| Sub-agents | Task execution (research, documentation, code generation) |
 
-- 方針決定・判断・要件定義・仕様検討
+**Sub-agent Priority**:
+1. Custom sub-agents (project-specific)
+2. General-purpose sub-agents (Task)
 
-**子エージェント**
+## Serena MCP Usage
 
-- 詳細指示に基づく実行作業
-  - 調査
-  - ドキュメント作成
-  - コード生成
-- 優先順位：
-  1. カスタムサブエージェント（プロジェクト独自設定）
-  2. 汎用サブエージェント（Task）
+### Memory Management
 
-### Serena MCPメモリ管理（実装作業）
+**Before Implementation**:
+1. `list_memories` - Get memory list
+2. `read_memory` - Check relevant memories
+3. Strictly follow recorded patterns/conventions
 
-#### 実装前必須確認
+**Recording New Patterns** (use `write_memory`):
 
-1. `list_memories`でメモリ一覧取得
-2. `read_memory`で関連メモリ確認
-3. 記録されたパターン・規約を厳密に遵守
+| Pattern | Naming Convention |
+|---------|------------------|
+| Project conventions | `{project}-conventions` |
+| Feature patterns | `{feature}-patterns` |
+| Domain patterns | `{domain}-patterns` |
+| Layer conventions | `{layer}-conventions` |
+| Architecture decisions | `architecture-{decision}` |
+| API specs | `{service}-api-spec` |
+| Troubleshooting | `{issue}-solution` |
+| Refactoring | `refactoring-{target}` |
 
-#### 新規パターン記録
+**Maintenance**: Delete obsolete memories with `delete_memory`. Keep names concise and searchable.
 
-- 重要な実装パターン確立時は`write_memory`で記録
-- 命名規則：
-  - `{project}-conventions` - プロジェクト全体の規約
-  - `{feature}-patterns` - 機能別実装パターン
-  - `{domain}-patterns` - ドメイン固有パターン
-  - `{layer}-conventions` - レイヤー固有の規約
-  - `architecture-{decision}` - アーキテクチャ決定事項
-  - `{service}-api-spec` - 外部サービスAPI仕様
-  - `{issue}-solution` - トラブルシューティング記録
-  - `refactoring-{target}` - リファクタリング方針
+### Code Operations
 
-#### メモリ管理原則
+| Tool | Use Case |
+|------|----------|
+| `find_symbol` | Symbol search |
+| `get_symbols_overview` | File structure overview |
+| `find_referencing_symbols` | Dependency analysis |
+| `replace_symbol_body` | Replace entire function/class |
+| `insert_before_symbol` / `insert_after_symbol` | Insert code around symbols |
+| `search_for_pattern` | Cross-codebase pattern search |
 
-- 不要になったメモリは`delete_memory`で削除
-- メモリは簡潔で検索しやすい名前を使用
-- 更新頻度の高い情報は都度上書き更新
+**Principle**: Prefer symbol-level operations over reading entire files.
 
-### Serena活用（コード操作）
+## Pre-Implementation Checklist
 
-**積極活用すべきツール**：
+| Check | Action |
+|-------|--------|
+| Existing patterns | Review existing code/docs before implementing |
+| Library specs | Use Context7 for latest library documentation |
+| Duplicate prevention | Check existing code before custom implementations |
+| Memory check | Use `list_memories` for past patterns/decisions |
 
-- `find_symbol` - シンボル検索
-- `get_symbols_overview` - ファイル構造把握
-- `find_referencing_symbols` - 依存関係確認
-- `replace_symbol_body` - 関数/クラス全体の置換
-- `insert_before_symbol` / `insert_after_symbol` - シンボル前後への挿入
-- `search_for_pattern` - 横断的パターン検索
+## Constraints
 
-**原則**: ファイル全体読み込みより、シンボルレベル操作を優先すること
+| Category | Rule |
+|----------|------|
+| Git operations | Only on user request |
+| Config files | Require permission before changes |
+| Backups | Not needed (Git-managed) |
 
-### 実装前確認事項
+## Text Processing
 
-- **既存パターンの確認**: 実装前に必ず既存コード・ドキュメントを確認
-- **ライブラリ最新情報**: ライブラリ使用時はContext7で最新仕様を確認
-- **重複実装の防止**: 共通機能の独自実装前に既存コードを確認
-- **メモリ確認**: `list_memories`で過去の実装パターン・決定事項を確認
+**Required**: Always use `perl` for text processing. Never use `sed` or `awk`.
 
-### 操作制限
+```bash
+# Correct
+perl -pi -e 's/old/new/g' file.txt
 
-- **Git操作禁止**: コミット・ブランチ操作はユーザー指示時のみ
-- **設定ファイル**: 変更前に必ず許可を取得
-- **バックアップ不要**: Gitで管理されているため作成不要
+# Incorrect
+sed -i 's/old/new/g' file.txt
+```
 
-### テキスト処理
+## Documentation Rules
 
-- **必須**: テキスト処理には常に`perl`を使用し、`sed`や`awk`は使用しない
-- **例**:
-  - ❌ `sed -i 's/old/new/g' file.txt`
-  - ✅ `perl -pi -e 's/old/new/g' file.txt`
-
-### ドキュメント規則
-
-- **日時記載禁止**: 更新日時等の記載は不要
-- **簡潔性重視**: 工数・後方互換性の考慮は不要
-- **コメント規則**:
-  - 複雑なロジックのみコメント記載
-  - 日本語でのコメント記載
-  - TODOコメントは具体的に記載
+- No timestamps
+- Keep it concise (no effort/backward-compatibility considerations)
+- Comments: Only for complex logic, in Japanese, specific TODOs

@@ -1,56 +1,55 @@
 ---
 argument-hint: [file-path]
-description: markdownテキスト更新コマンド
+description: Markdown text update command
 agents:
   - name: docs
-    description: ドキュメント管理。正確性、可読性、網羅性の検証
+    description: Documentation management
     readonly: false
   - name: memory
-    description: 知識ベース管理。Serenaメモリへの記録
+    description: Knowledge base recording to Serena memory
     readonly: false
 ---
 
-# markdown - テキスト更新コマンド
+# /markdown
 
-<purpose>
-他コマンド（/define, /ask, /bug 等）の実行結果をmarkdownファイルとして出力する補助コマンド。
-</purpose>
+## Purpose
+Auxiliary command to output results from other commands (/define, /ask, /bug, etc.) as markdown files.
 
-<output-rules>
-## 出力ファイル
+## Workflow
+1. Retrieve previous command execution results
+2. Determine output filename based on context
+3. Output file using Write/Edit tool
 
-| 実行コンテキスト   | 出力ファイル   |
-| ------------------ | -------------- |
-| `/define` の後     | `EXECUTION.md` |
-| `/ask` `/bug` の後 | `RESEARCH.md`  |
-| それ以外           | `MEMO.md`      |
+## Output File Mapping
 
-※ファイルパス指定時はそちらを優先
-</output-rules>
+| Execution Context | Output File |
+|-------------------|-------------|
+| After `/define` | `EXECUTION.md` |
+| After `/ask` or `/bug` | `RESEARCH.md` |
+| Other | `MEMO.md` |
 
-<workflow>
-1. 直前のコマンド実行結果を取得
-2. コンテキストに応じた出力ファイル名を決定
-3. Write/Edit toolでファイル出力
-</workflow>
+**Note**: Specified file path takes precedence if provided
 
-<guidelines>
-## 記載禁止
+## Output
+Markdown file with command execution results in appropriate format.
 
-- 修正履歴・変更ログ
-- 検討過程・議論経緯
-  </guidelines>
+## Constraints
+- **Prohibited content**:
+  - Revision history/change logs
+  - Consideration process/discussion history
 
-<examples>
-/define 認証機能の追加
+## Examples
+
+```
+/define Add authentication feature
 /markdown
-→ EXECUTION.md に要件定義・実行計画を出力
+→ Output requirements definition/execution plan to EXECUTION.md
 
-/ask エラーの原因は？
+/ask What's the error cause?
 /markdown
-→ RESEARCH.md に調査結果を出力
+→ Output investigation results to RESEARCH.md
 
-/ask APIの仕様を教えて
+/ask Tell me about API specs
 /markdown
-→ MEMO.md に調査結果を出力
-</examples>
+→ Output investigation results to MEMO.md
+```

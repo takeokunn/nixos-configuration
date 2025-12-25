@@ -1,138 +1,116 @@
 ---
 argument-hint: [error-message]
-description: 原因調査専用コマンド
+description: Root cause investigation command
 agents:
   - name: debug
-    description: バグ調査・デバッグ支援。エラー追跡、スタックトレース分析、根本原因特定を実施
+    description: Bug investigation and debug support
     readonly: true
   - name: observability
-    description: ロギング・監視・トレーシングの設計。ログ分析の支援に使用
+    description: Logging, monitoring, tracing design
     readonly: true
   - name: error-handling
-    description: エラー処理パターンの検証と改善提案
+    description: Error handling pattern verification
     readonly: true
   - name: dependency
-    description: 依存関係起因のエラー分析
+    description: Dependency-related error analysis
     readonly: true
   - name: memory
-    description: 知識ベース管理。過去のトラブルシューティング記録の参照
+    description: Past troubleshooting record reference
     readonly: true
 readonly_tools:
   - name: Read
-    description: ファイル内容確認
+    description: File content verification
   - name: Grep
-    description: パターン検索
+    description: Pattern search
   - name: Glob
-    description: ファイル探索
+    description: File exploration
   - name: LS
-    description: ディレクトリ構造確認
+    description: Directory structure verification
   - name: context7
-    description: フレームワーク・ライブラリの最新のドキュメントを提供するMCP（利用が可能な場合、率先して使う）
+    description: Latest framework/library documentation
   - name: serena
-    description: プロジェクト内のセマンティック検索や、LSP検索、ドキュメント化を行うMCP。効率的な調査を目的として必要に応じて利用
+    description: Semantic search, LSP search, documentation
 ---
 
-# bug - 原因調査コマンド
+# /bug
 
-<purpose>
-エラーメッセージ・挙動不良から原因を特定し、事実ベースの分析結果を提供する。
-修正は行わず、調査と分析のみに専念。
-</purpose>
+## Purpose
+Identify root causes from error messages and anomalous behavior, providing fact-based analysis without performing fixes.
 
-<principles>
-ログファースト: ログを一次情報として最優先で確認
-周辺コード確認: 怪しいコードも周辺の同様実装を確認
-体系的調査: 発生経路を時系列で追跡
-事実ベース: ユーザー想定を鵜呑みにせず事実から判断
-</principles>
+## Principles
+- **Logs first**: Logs as primary information source
+- **Check surrounding code**: Verify similar implementations nearby
+- **Systematic investigation**: Track occurrence path chronologically
+- **Fact-based**: Judge from facts, not user assumptions
 
-<workflow>
-1. エラーメッセージ解析
-   - エラータイプの特定（構文エラー、実行時エラー、論理エラー等）
-   - エラー発生箇所の特定（ファイル名、行番号、関数名）
-   - スタックトレース解析
-   - タイムスタンプ確認
+## Workflow
 
-2. ログ調査（最重要）
-   - アプリケーションログの探索と確認
-   - システムログの確認（必要に応じて）
-   - エラー前後のログコンテキスト確認（発生前の処理フロー、発生時の詳細、発生後の影響範囲）
+1. **Error Message Analysis**
+   - Error type identification (syntax, runtime, logic, etc.)
+   - Error location identification (file, line, function)
+   - Stack trace analysis
+   - Timestamp verification
 
-3. コード調査
-   - 使用ツール: Read, Grep, Glob, LS, context7, serena, playwright（全て読み取り専用）
-   - 調査項目: エラー発生箇所のコード詳細、依存関係とインポート、設定ファイル、環境変数、最近の変更履歴
+2. **Log Investigation** (Critical)
+   - Application log exploration and verification
+   - System log verification (as needed)
+   - Log context around error (pre-error flow, error details, post-error impact)
 
-4. 環境調査
-   - 実行環境（OS、ランタイムバージョン、依存パッケージバージョン、環境変数）
-   - リソース状況（必要に応じて: ディスク容量、メモリ、ネットワーク）
+3. **Code Investigation**
+   - Tools: Read, Grep, Glob, LS, context7, serena, playwright (all read-only)
+   - Items: Error location code details, dependencies/imports, config files, environment variables, recent change history
 
-5. 調査結果提供
-   </workflow>
+4. **Environment Investigation**
+   - Runtime environment (OS, runtime version, dependency versions, environment variables)
+   - Resource status (as needed: disk, memory, network)
 
-<agent_delegation>
+5. **Investigation Results Delivery**
 
-## エージェント委譲（必須）
+## Agent Delegation
 
-バグ調査は **debug エージェント**に委譲すること:
+| Agent | Role | Readonly |
+|-------|------|----------|
+| debug | Error tracking, stack trace analysis, log analysis, root cause identification | yes |
+| observability | Log analysis support | yes |
+| error-handling | Error handling pattern verification and suggestions | yes |
+| dependency | Dependency-related error analysis | yes |
+| memory | Past troubleshooting record reference | yes |
 
-### debug エージェント
+### Delegation Instructions
+1. Full error message/stack trace
+2. Reproduction steps (if known)
+3. Related file paths
+4. Serena MCP usage (`find_symbol`, `find_referencing_symbols`, `search_for_pattern`)
+5. Context7 MCP usage (library version compatibility verification)
+6. **Explicit edit operation prohibition**
 
-- **用途**:
-  - エラー追跡、スタックトレース分析、ログ分析
-  - 再現手順の確立、根本原因の特定
-  - 修正提案（実装は行わない）
-- **呼び出し条件**: すべてのバグ調査リクエスト
-- **制約**: 読み取り専用（編集操作禁止、修正提案のみ）
+### Expected Output Format
+- Root cause identification
+- Reproduction steps
+- Fix suggestions (no implementation)
+- Prevention measures
 
-### 委譲時の指示に含めるべき内容
+## Output
 
-1. エラーメッセージ・スタックトレース全文
-2. 再現手順（判明している場合）
-3. 関連するファイルパス
-4. serena MCP積極利用の指示
-   - `find_symbol`: エラー発生箇所のシンボル特定
-   - `find_referencing_symbols`: 呼び出し元追跡
-   - `search_for_pattern`: パターン検索
-5. context7 MCP積極利用の指示（ライブラリバージョン互換性確認）
-6. **編集操作禁止**の明示
+**Answer Structure**:
+- Overview: Report and investigation summary
+- Log Analysis Results: Critical information from logs, error context, related warnings/info
+- Code Investigation Results: Relevant code quotes, issue identification
+- Cause Identification: Direct cause, root cause (design/config/environment), occurrence conditions
+- Investigation Metrics:
+  - Confidence: 0-100
+  - Log utilization: 0-100
+  - Objectivity: 0-100
+- Related Information: Impact scope, similar errors
+- Response Policy (no implementation): Recommended fixes, alternative approaches, prevention measures
+- Additional Investigation Items: Unclear points or items requiring further confirmation
 
-### 期待する出力形式
-
-debug エージェントからの出力を受けて、以下の形式で報告:
-
-- 根本原因の特定
-- 再現手順
-- 修正提案（実装は行わない）
-- 予防策
-  </agent_delegation>
-
-<output_format>
-回答構成:
-
-- 概要: 報告と調査結果の概要
-- ログ分析結果: ログファイルから抽出した重要情報、エラー前後のコンテキスト、関連Warning/Info
-- コード調査結果: 該当コード引用、問題点指摘
-- 原因特定: 直接的原因、根本原因（設計、設定、環境等）、発生条件
-- 調査指標:
-  - 信頼度: 0-100（原因特定の確実性）
-  - ログ活用度: 0-100（ログ情報の活用レベル）
-  - 忖度回避度: 0-100（事実ベース判断の客観性）
-- 関連情報: 影響範囲、類似エラー
-- 対応方針（実装は行わない）: 推奨される修正方法、代替アプローチ、予防策
-- 追加調査が必要な項目: 不明確な点や追加確認が必要な事項
-  </output_format>
-
-<constraints>
-- ファイルの編集・作成・削除は絶対に行わない
-- エラーの修正や実装は行わない（調査と分析のみ）
-- ログを最優先の情報源として活用
-- 不明な点は正直に報告し、追加調査の必要性を明示
-- ユーザーの推測や想定を鵜呑みにせず、事実から判断
-- 謝罪ではなく、事実に基づく調査結果を提供
-- 問題が特定できない場合は、こじつけな原因報告や無理な推測を行わない
-- 問題が特定できない場合は、その点を報告して次のステップを提案（処理順序に応じた通し番号付きログ出力、動作検証など）
-</constraints>
-
-## パラメータ
-
-- `$ARGUMENTS`: エラーメッセージなど（必須）
+## Constraints
+- Absolutely no file editing/creation/deletion
+- No error fixes or implementation (investigation and analysis only)
+- Prioritize logs as primary information source
+- Honestly report unclear points, indicate need for additional investigation
+- Don't accept user speculation at face value; judge from facts
+- Provide fact-based investigation results instead of apologies
+- If problem cannot be identified, don't force contrived causes or unreasonable speculation
+- If problem cannot be identified, report this and suggest next steps (sequential logging with numbers, behavior verification, etc.)

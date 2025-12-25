@@ -1,182 +1,151 @@
 ---
 argument-hint: [task-description]
-description: タスク遂行コマンド
+description: Task execution command
 agents:
   - name: quality
-    description: コード品質保証。構文検証、型検証、フォーマット検証を実施
+    description: Code quality assurance
     readonly: false
   - name: security
-    description: セキュリティ脆弱性検出。OWASP Top 10、入力検証、認証/認可を確認
+    description: Security vulnerability detection
     readonly: false
   - name: test
-    description: テスト戦略・品質管理。テスト作成、カバレッジ改善を実施
+    description: Test strategy and quality management
     readonly: false
   - name: refactor
-    description: リファクタリング。技術的負債解消、コード改善を実施
+    description: Refactoring and technical debt resolution
     readonly: false
   - name: docs
-    description: ドキュメント管理。API仕様、README、変更履歴の更新
+    description: Documentation management
     readonly: false
   - name: review
-    description: コードレビュー。変更後のコード品質評価
+    description: Code review
     readonly: false
   - name: debug
-    description: デバッグ支援。実装中のエラー調査
+    description: Debug support
     readonly: false
   - name: performance
-    description: パフォーマンス最適化の自動分析と改善
+    description: Performance optimization
     readonly: false
   - name: clean
-    description: 不要コードの削除とデッドコード検出
+    description: Dead code elimination
     readonly: false
   - name: error-handling
-    description: エラー処理パターンの検証と改善
+    description: Error handling pattern verification
     readonly: false
   - name: migration
-    description: マイグレーション計画と実行支援
+    description: Migration planning and execution
     readonly: false
   - name: i18n
-    description: 国際化・多言語対応（i18n/L10n）
+    description: Internationalization support
     readonly: false
   - name: accessibility
-    description: Webアクセシビリティ（WCAG）準拠検証
+    description: Web accessibility verification
     readonly: false
   - name: database
-    description: データベース設計・クエリ最適化・スキーマ管理
+    description: Database design and optimization
     readonly: false
   - name: infrastructure
-    description: インフラストラクチャ設計・IaCコード管理
+    description: Infrastructure design
     readonly: false
   - name: ci-cd
-    description: CI/CDパイプラインの設計と最適化
+    description: CI/CD pipeline design
     readonly: false
   - name: observability
-    description: ロギング・監視・トレーシングの設計
+    description: Logging, monitoring, tracing design
     readonly: false
   - name: git
-    description: Gitワークフロー・ブランチ戦略設計
+    description: Git workflow design
     readonly: false
   - name: merge
-    description: 競合解決
+    description: Conflict resolution
     readonly: false
   - name: memory
-    description: 知識ベース管理。パターン・規約の参照と記録
+    description: Knowledge base management
     readonly: false
 ---
 
-# execute - タスク遂行コマンド
+# /execute
 
-<purpose>
-サブエージェントを活用してタスクを遂行する。
-親エージェントは方針決定・判断・要件定義・仕様検討に専念し、詳細な実作業（調査・ドキュメント作成・コード生成）はサブエージェントに委譲する。
-</purpose>
+## Purpose
+Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and requirement definition.
 
-<workflow>
-1. **タスク分析**: 要求内容を理解し、作業範囲を特定
-2. **タスク分割**: 大きすぎる場合は適切な粒度に分割
-3. **依存関係整理**: 並列可能なタスクと順序実行が必要なタスクを特定
-4. **サブエージェントへ依頼**: 詳細な指示を付けて並列実行可能なタスクは同時依頼
-5. **結果統合**: 各サブエージェントの成果を統合・検証し、必要に応じて追加指示
-</workflow>
+## Workflow
+1. **Task Analysis**: Understand requirements and identify scope
+2. **Task Breakdown**: Split large tasks into manageable units
+3. **Dependency Organization**: Identify parallel vs sequential tasks
+4. **Agent Delegation**: Assign tasks with detailed instructions, execute independent tasks in parallel
+5. **Result Integration**: Verify and integrate sub-agent outputs, provide additional instructions as needed
 
-<subagent_instructions>
-各サブエージェントへの指示に含めるべき内容:
+## Sub-agent Instructions
 
-- **具体的な作業内容と期待する成果物**: 何を、どのように実装・調査するか
-- **対象ファイルパス**: 操作対象の具体的なパス
-- **serena MCP積極利用の指示**: `find_symbol`, `get_symbols_overview`, `search_for_pattern`等を活用
-- **context7 MCP積極利用の指示**: ライブラリ使用時は最新仕様を確認
-- **参照すべき既存実装**: ある場合は具体的なパスを明示
-- **メモリ確認の指示**: `list_memories`で関連するパターン・規約を確認
-  </subagent_instructions>
+Each delegation must include:
+- Specific work scope and expected deliverables
+- Target file paths
+- Serena MCP usage instructions (`find_symbol`, `get_symbols_overview`, `search_for_pattern`)
+- Context7 MCP usage instructions (verify latest library specs)
+- Reference to existing implementations (with specific paths)
+- Memory check instructions (`list_memories` for patterns/conventions)
 
-<codex_usage>
+## Codex MCP vs Custom Agents
 
-## codex MCP と カスタムエージェントの役割分担
+### Codex MCP (Code Generation Only)
 
-### codex MCP（コード生成専用）
+**Allowed**:
+- Code generation (new files/functions)
+- Code modification (editing/refactoring)
 
-**許可用途**:
+**Prohibited** (use custom agents or basic tools):
+- Research/analysis → Explore agent, Serena MCP
+- Quality verification → quality agent
+- Security verification → security agent
+- Test creation → test agent
+- Documentation → docs agent
+- Code review → review agent
 
-- コード生成（新規ファイル・新規関数の作成）
-- コード修正（既存コードの編集・リファクタリング）
+**Execution Principles**:
+- Prefer basic tools (Read/Edit/Write/Grep/Glob)
+- Minimal granularity (one clear, small task per call)
+- Staged execution (separate research, design, implementation phases)
+- No multi-file edits (split into separate calls)
+- Avoid on timeout risk
 
-**禁止用途**（カスタムエージェントまたは基本ツールを使用）:
+### Custom Agents
 
-- 調査・分析 → Explore エージェント、serena MCP
-- 品質検証 → quality エージェント
-- セキュリティ検証 → security エージェント
-- テスト作成 → test エージェント
-- ドキュメント作成 → docs エージェント
-- コードレビュー → review エージェント
+| Task Type | Agent |
+|-----------|-------|
+| Code quality verification | quality |
+| Security verification | security |
+| Test creation/coverage | test |
+| Refactoring | refactor |
+| Documentation | docs |
+| Code review | review |
+| Bug investigation | debug |
+| Codebase exploration | Explore |
 
-**実行原則**:
+## Agent Delegation
 
-- 基本ツール優先: Read/Edit/Write/Grep/Glob等で完結する場合はcodexを使用しない
-- 最小粒度の原則: 1回の呼び出しは1つの明確で小さなタスク
-- 段階的実行: 複雑な作業は「調査」「設計検討」「実装」の各フェーズを分離
-- 複数ファイル編集の禁止: ファイルごとに別の呼び出しに分割
-- タイムアウトリスクがある場合は不使用
+### Quality Assurance Phase
+- **quality**: Syntax, type, format verification
+- **security**: Vulnerability detection
 
-### カスタムエージェント（調査・レビュー・専門タスク用）
+### Implementation Phase
+- **test**: Test creation, coverage improvement
+- **refactor**: Refactoring, technical debt resolution
+- **docs**: Documentation updates
 
-タスク種別に応じて適切なエージェントを選択:
+### Review Phase
+- **review**: Post-implementation code review
 
-| タスク種別                 | 使用エージェント |
-| -------------------------- | ---------------- |
-| コード品質検証             | quality          |
-| セキュリティ検証           | security         |
-| テスト作成・カバレッジ改善 | test             |
-| リファクタリング           | refactor         |
-| ドキュメント作成・更新     | docs             |
-| コードレビュー             | review           |
-| バグ調査・デバッグ         | debug            |
-| コードベース探索           | Explore          |
+### Parallel Execution
+Execute independent tasks simultaneously:
+- quality + security: Concurrent quality and security checks
+- test + docs: Simultaneous test creation and documentation
 
-</codex_usage>
+## Output
+Task execution results with verification status and any identified issues.
 
-<agent_delegation>
-
-## エージェント委譲（必須）
-
-実装タスクは以下のエージェントを積極活用すること:
-
-### 品質保証フェーズ
-
-- **quality エージェント**: 構文検証、型検証、フォーマット検証
-- **security エージェント**: セキュリティ脆弱性検出
-
-### 実装フェーズ
-
-- **test エージェント**: テスト作成、カバレッジ改善
-- **refactor エージェント**: リファクタリング、技術的負債解消
-- **docs エージェント**: ドキュメント更新
-
-### レビューフェーズ
-
-- **review エージェント**: 実装後のコードレビュー
-
-### 委譲時の指示に含めるべき内容
-
-1. 具体的な作業内容と期待する成果物
-2. 対象ファイルパス
-3. serena MCP積極利用の指示
-   - `find_symbol`, `get_symbols_overview`: シンボル分析
-   - `find_referencing_symbols`: 依存関係確認
-   - `list_memories`, `read_memory`: 既存パターン確認
-4. context7 MCP積極利用の指示（ライブラリ最新仕様確認）
-5. 参照すべき既存実装のパス
-
-### 並列実行
-
-独立したタスクは複数エージェントに並列で委譲すること:
-
-- quality + security: 品質とセキュリティの同時検証
-- test + docs: テスト作成とドキュメント更新の同時実行
-  </agent_delegation>
-
-<constraints>
-- 与えられた指示に集中すること
-- 過去の実装を示唆するコメント、不必要なコメントは避けること
-- プロジェクトの統括・方針決定に注力し、サブエージェントを最大限活用すること
-</constraints>
+## Constraints
+- Focus on assigned tasks only
+- Avoid unnecessary comments suggesting past implementations
+- Maximize sub-agent utilization for detailed work
+- Parent agent focuses on orchestration and policy decisions

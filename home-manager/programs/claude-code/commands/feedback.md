@@ -1,227 +1,197 @@
 ---
-description: Claude Codeが直前に対応した内容をレビューするコマンド
+description: Review command for Claude Code's recent work
 modes:
   - name: define
-    description: /define後の実行計画を網羅的にレビュー
+    description: Comprehensive review of /define execution plan
     agents:
       - name: plan
-        description: 実行計画レビュー（ステップ粒度、依存関係、リスク識別、完全性、実行可能性）
+        description: Execution plan review
       - name: estimation
-        description: 見積もり妥当性レビュー（タスク粒度、リソース配分）
+        description: Estimation validity review
   - name: execute
-    description: /execute後の作業内容を網羅的にレビュー
+    description: Comprehensive review of /execute work
     agents:
       - name: quality
-        description: コード品質レビュー（命名規則、責務分離、DRY原則、可読性）
+        description: Code quality review
       - name: security
-        description: セキュリティレビュー（OWASP Top 10、入力検証、認証/認可）
+        description: Security review
       - name: design
-        description: アーキテクチャ整合性レビュー（既存設計との整合性、依存関係）
+        description: Architecture consistency review
       - name: docs
-        description: ドキュメント品質レビュー（正確性、可読性、網羅性）
+        description: Documentation quality review
       - name: performance
-        description: パフォーマンスレビュー（効率性、最適化の余地）
+        description: Performance review
       - name: test
-        description: テストカバレッジレビュー（テスト網羅性、品質）
+        description: Test coverage review
       - name: accessibility
-        description: アクセシビリティレビュー（WCAG準拠性）
+        description: Accessibility review
       - name: error-handling
-        description: エラー処理レビュー（例外処理の適切性）
+        description: Error handling review
   - name: general
-    description: 直前のClaude Code作業内容をレビュー
+    description: Review of Claude Code's recent work
     agents:
       - name: review
-        description: 直前作業の網羅的レビュー
+        description: Comprehensive work review
       - name: complexity
-        description: コード複雑度レビュー（循環的複雑度、認知的複雑度）
+        description: Code complexity review
       - name: memory
-        description: 知識ベース管理。既存パターン・規約との整合性確認
+        description: Consistency check with existing patterns
 readonly_tools:
   - name: serena
-    description: シンボル分析、メモリ確認、依存関係追跡に使用
+    description: Symbol analysis, memory verification, dependency tracking
   - name: context7
-    description: ライブラリのベストプラクティス確認に使用
+    description: Library best practices verification
 ---
 
-# feedback - レビューコマンド
+# /feedback
 
-<purpose>
-同一セッション内でClaude Codeが対応した内容を多角的にレビュー。
-直前のコマンドに応じて適切なレビューモードを自動選択し、並列実行で効率的にフィードバックを実施。
-</purpose>
+## Purpose
+Multi-faceted review of Claude Code's work within the same session, automatically selecting appropriate review mode based on previous command and executing efficiently in parallel.
 
-<mode_selection>
-会話履歴から直前のコマンドを判定してモードを選択:
+## Mode Selection
 
-| 判定条件                             | モード        | 説明                                          |
-| ------------------------------------ | ------------- | --------------------------------------------- |
-| `/define`コマンドが直前に実行された  | defineモード  | 実行計画を網羅的にフィードバック              |
-| `/execute`コマンドが直前に実行された | executeモード | 作業内容を網羅的にフィードバック              |
-| その他（上記以外の作業）             | generalモード | 直前に行ったClaude Codeの作業をフィードバック |
+| Condition | Mode | Description |
+|-----------|------|-------------|
+| `/define` executed | define | Comprehensive execution plan feedback |
+| `/execute` executed | execute | Comprehensive work content feedback |
+| Other | general | Feedback on recent Claude Code work |
 
-</mode_selection>
+## Execution
 
-<execution>
-## 並列実行（タイムアウト回避の必須要件）
+### Parallel Execution (Critical for Timeout Avoidance)
+**Important**: Launch all Task tools **simultaneously in one message**. Never execute sequentially.
 
-**重要**: Taskツールを**1メッセージで同時起動**。逐次実行は絶対に行わない。
+### define Mode (1 agent)
 
-## defineモード（1エージェント）
+**Target**: Extract execution plan (step breakdown) from conversation history
 
-**対象**: 会話履歴から実行計画（ステップ分解）を抽出
+**Review Aspects**:
+- Step granularity: Appropriately decomposed
+- Dependencies: Proper sequencing/parallelization
+- Risk identification: No overlooked technical challenges
+- Completeness: All requirements covered
+- Feasibility: Each step executable
+- Comprehensiveness: No missing necessary work
+- Clarity: Each step specific
 
-**レビュー観点**:
+**Tools**:
+- `serena`: `find_symbol`, `get_symbols_overview` for code structure
+- `serena`: `find_referencing_symbols` for dependency analysis
+- `serena`: `list_memories`, `read_memory` for existing patterns/conventions
 
-- ステップ粒度: 適切な大きさに分解されているか
-- 依存関係: 順序・並列化が適切か
-- リスク識別: 技術的課題の見落としがないか
-- 完全性: 全ての要件をカバーしているか
-- 実行可能性: 各ステップが実行可能か
-- 網羅性: 必要な作業が漏れていないか
-- 明確性: 各ステップの内容が具体的か
+### execute Mode (4 agents in parallel)
 
-**使用ツール**:
+**Target Identification**:
+1. Extract Edit/Write tool target files from conversation history
+2. Fallback: Detect uncommitted changes via git status
+3. If unclear: Confirm with user
 
-- `serena`: `find_symbol`, `get_symbols_overview`で既存コード構造確認
-- `serena`: `find_referencing_symbols`で依存関係分析
-- `serena`: `list_memories`, `read_memory`で既存パターン・規約確認
+**Important**: Review only changed code, not existing code quality issues
 
-## executeモード（4エージェント並列）
+#### a) Code Quality (quality)
+**Aspects**: Naming conventions, separation of concerns, DRY principle, readability, unnecessary comments/dead code
 
-**対象特定**:
+**Tools**:
+- `serena`: `find_symbol`, `get_symbols_overview` for symbol analysis
+- `context7`: Framework best practices
 
-1. 会話履歴からEdit/Writeツールの対象ファイルを抽出
-2. フォールバック: git statusで未コミット変更を検出
-3. 不明な場合: ユーザーに確認
+#### b) Security (security)
+**Aspects**: OWASP Top 10 (SQLi, XSS, CSRF), input validation, authentication/authorization, sensitive data handling
 
-**重要**: 変更されたコードのみをレビュー対象とし、既存コードの品質問題は指摘しない
+**Tools**:
+- `serena`: `find_referencing_symbols` for auth/authz flow tracking
+- `grep`: Hardcoded secret search
 
-### a) コード品質 (quality)
+#### c) Architecture (design)
+**Aspects**: Consistency with existing design, dependency direction, adherence to Serena memory patterns
 
-**観点**: 命名規則、責務分離、DRY原則、可読性、不要コメント・デッドコード
+**Tools**:
+- `serena`: `list_memories`, `read_memory` for existing patterns
+- `serena`: `find_referencing_symbols` for dependency analysis
 
-**使用ツール**:
+#### d) Documentation (docs)
+**Aspects**:
+- Accuracy/consistency: Code divergence, reference link validity
+- Readability/structure: Heading hierarchy, Markdown syntax, format consistency
+- Comprehensiveness: Required sections, parameter description completeness
 
-- `serena`: `find_symbol`, `get_symbols_overview`でシンボル分析
-- `context7`: フレームワークのベストプラクティス確認
+**Tools**:
+- `Read`: .md file content verification
+- `Grep`: Code consistency verification
+- `context7`: Documentation best practices
 
-### b) セキュリティ (security)
+### general Mode (1 agent)
 
-**観点**: OWASP Top 10（SQLi, XSS, CSRF等）、入力検証、認証/認可、機密情報の扱い
+**Target**: Identify recent Claude Code work from conversation history
 
-**使用ツール**:
+**Review Aspects by Work Type**:
 
-- `serena`: `find_referencing_symbols`で認証/認可フロー追跡
-- `grep`: シークレット情報のハードコード検索
+| Work Type | Check Aspects |
+|-----------|---------------|
+| Research/analysis | Investigation comprehensiveness, analysis accuracy, information organization |
+| Documentation | Accuracy, readability, comprehensiveness |
+| Code generation/modification | Quality, security, consistency |
+| Other | Goal achievement, quality, improvements |
 
-### c) アーキテクチャ (design)
+**Tools**:
+- `serena`: `list_memories`, `read_memory` for existing patterns/conventions
+- Appropriate tools based on work type
 
-**観点**: 既存設計との整合性、依存関係の方向性、Serenaメモリに記録されたパターン遵守
-
-**使用ツール**:
-
-- `serena`: `list_memories`, `read_memory`で既存パターン確認
-- `serena`: `find_referencing_symbols`で依存関係分析
-
-### d) ドキュメント (docs)
-
-**観点**:
-
-- 正確性・整合性: コードとの乖離、参照リンク有効性
-- 可読性・構成: 見出し階層、Markdown構文、フォーマット統一
-- 網羅性: 必要セクション、パラメータ説明の完全性
-
-**使用ツール**:
-
-- `Read`: .mdファイル内容確認
-- `Grep`: コードとの整合性確認
-- `context7`: ドキュメントベストプラクティス確認
-
-## generalモード（1エージェント）
-
-**対象**: 会話履歴から直前のClaude Code作業内容を特定
-
-**作業種別に応じたレビュー観点**:
-
-| 作業種別         | チェック観点                               |
-| ---------------- | ------------------------------------------ |
-| 調査・分析       | 調査範囲の網羅性、分析の正確性、情報の整理 |
-| ドキュメント作成 | 正確性、可読性、網羅性                     |
-| コード生成・修正 | 品質、セキュリティ、整合性                 |
-| その他           | 目的達成度、品質、改善点                   |
-
-**使用ツール**:
-
-- `serena`: `list_memories`, `read_memory`で既存パターン・規約確認
-- 作業内容に応じて適切なツールを選択
-  </execution>
-
-<output_format>
-各サブエージェントからの結果を統合し、以下の形式で報告:
+## Output
 
 ```markdown
-# 📊 {モード名} フィードバック結果
+# 📊 {Mode Name} Feedback Results
 
-## 📈 評価スコア
+## 📈 Evaluation Scores
 
-- {評価項目1}: XX/100
-- {評価項目2}: XX/100
+- {Metric1}: XX/100
+- {Metric2}: XX/100
   ...
 
-**総合スコア: XX/100**
+**Overall Score: XX/100**
 
-## 🔴 Critical（即座に修正が必要）
+## 🔴 Critical (Immediate Fix Required)
 
-- [カテゴリ] 問題の詳細: 場所
-  - **問題**: 問題の説明
-  - **修正案**: 具体的な修正提案
+- [Category] Issue details: Location
+  - **Problem**: Issue description
+  - **Fix**: Specific fix proposal
 
-## 🟡 Warning（修正を推奨）
+## 🟡 Warning (Fix Recommended)
 
-- [カテゴリ] 改善点の詳細: 場所
-  - **問題**: 問題の説明
-  - **推奨**: 改善提案
+- [Category] Improvement details: Location
+  - **Problem**: Issue description
+  - **Recommendation**: Improvement proposal
 
-## 🟢 Good Practice（良い実装/作業）
+## 🟢 Good Practice (Good Implementation/Work)
 
-- [カテゴリ] 評価できる点
+- [Category] Commendable aspects
 
-## 📝 推奨アクション（優先順位順）
+## 📝 Recommended Actions (Priority Order)
 
-1. [優先度: 高] 最優先の改善点
-2. [優先度: 中] 次の改善点
-3. [優先度: 低] 余裕があれば対応
+1. [Priority: High] Top improvement
+2. [Priority: Medium] Next improvement
+3. [Priority: Low] If time permits
 ```
 
-### 各モード固有の評価項目
+### Mode-Specific Metrics
 
-**defineモード**:
+**define Mode**:
+- Execution plan quality: XX/100
 
-- 実行計画品質: XX/100
+**execute Mode**:
+- Code quality: XX/100
+- Security: XX/100
+- Architecture: XX/100
+- Documentation: XX/100
 
-**executeモード**:
+**general Mode**:
+- Work quality: XX/100
 
-- コード品質: XX/100
-- セキュリティ: XX/100
-- アーキテクチャ: XX/100
-- ドキュメント: XX/100
-
-**generalモード**:
-
-- 作業品質: XX/100
-  </output_format>
-
-<constraints>
-- **タイムアウト回避**: Taskを**1メッセージで同時起動**（逐次実行禁止）
-- **コンテキスト判定**: 直前のコマンド（/define、/execute、その他）に応じてモードを自動選択
-- **具体的指摘**: 抽象論ではなく具体的修正案を提示
-- **忖度排除**: 品質優先
-- **Serena活用**: promptに明示
-- **セッションベース**: git diffではなく、セッション内のClaude Code操作を対象
-- **変更箇所限定**: executeモードでは変更されたコードのみを評価対象とし、既存コードの品質問題は指摘しない
-</constraints>
-
-## パラメータ
-
-- `対象`: レビュー対象（省略時はセッション内の変更を自動検出）
-- `--mode=<モード>`: 明示的にモードを指定（define/execute/general）
+## Constraints
+- **Timeout avoidance**: Launch all Tasks **simultaneously in one message** (no sequential execution)
+- **Context detection**: Auto-select mode based on previous command (/define, /execute, other)
+- **Specific findings**: Concrete fix proposals, not abstract theories
+- **No compliance**: Quality first
+- **Serena usage**: Explicitly in prompts
+- **Session-based**: Target Claude Code operations within session, not git diff
+- **Changed code only**: In execute mode, evaluate only changed code, not existing code quality issues
