@@ -78,4 +78,9 @@ with epkgs;
   org-roam-timestamps
   org-roam-ql
   org-roam-ql-ql
+
+  # Citar (Bibliography)
+  citar
+  citar-embark
+  citar-org-roam
 ]

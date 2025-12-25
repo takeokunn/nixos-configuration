@@ -6898,6 +6898,65 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
 #+end_src
+** Citar
+:PROPERTIES:
+:CUSTOM_ID: citar
+:END:
+*** citar
+:PROPERTIES:
+:CUSTOM_ID: citar-basic
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(citar-open
+                       citar-open-entry
+                       citar-open-files
+                       citar-open-notes
+                       citar-insert-citation
+                       citar-insert-reference
+                       citar-insert-bibtex) "citar" nil t)
+
+  (autoload-if-found '(citar-org-local-bib-files) "citar-org" nil t)
+
+  (keymap-global-set "C-c b o" #'citar-open)
+  (keymap-global-set "C-c b e" #'citar-open-entry)
+  (keymap-global-set "C-c b f" #'citar-open-files)
+  (keymap-global-set "C-c b n" #'citar-open-notes)
+  (keymap-global-set "C-c b i" #'citar-insert-citation)
+
+  (with-eval-after-load 'citar
+    ;; config
+    (setopt citar-bibliography
+            `,(list (concat (s-trim-right (shell-command-to-string "ghq root"))
+                            "/github.com/takeokunn/blog/hugo/references.bib"))))
+#+end_src
+*** citar-embark
+:PROPERTIES:
+:CUSTOM_ID: citar-embark
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(citar-embark-mode) "citar-embark" nil t)
+
+  (with-eval-after-load 'citar
+    (citar-embark-mode 1))
+#+end_src
+*** citar-org-roam
+:PROPERTIES:
+:CUSTOM_ID: citar-org-roam
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(citar-org-roam-mode
+                       citar-org-roam-cited
+                       citar-org-roam-ref-add
+                       citar-org-roam-open-current-refs) "citar-org-roam" nil t)
+
+  (with-eval-after-load 'citar
+    (citar-org-roam-mode 1))
+
+  (with-eval-after-load 'citar-org-roam
+    ;; config
+    (setopt citar-org-roam-subdir "hugo/org/literature")
+    (setopt citar-org-roam-note-title-template "${author} - ${title}"))
+#+end_src
 * EXWM
 :PROPERTIES:
 :CUSTOM_ID: exwm
