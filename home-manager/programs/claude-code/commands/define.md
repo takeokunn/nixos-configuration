@@ -76,8 +76,9 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
 <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
 <metrics>
-- Feasibility: 0-100
-- Objectivity: 0-100</metrics>
+<metric name="feasibility">0-100</metric>
+<metric name="objectivity">0-100</metric>
+</metrics>
 <constraints>Technical, operational</constraints>
 <test_requirements>Unit, integration, acceptance criteria</test_requirements>
 <outstanding_issues>Unresolved questions</outstanding_issues>

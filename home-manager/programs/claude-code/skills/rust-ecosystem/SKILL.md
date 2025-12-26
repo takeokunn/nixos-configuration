@@ -252,14 +252,14 @@ serde.workspace = true
 <usage>cargo clippy -- -D warnings</usage>
 
 <configuration>
-# In Cargo.toml
+<file_reference>In Cargo.toml</file_reference>
 [lints.clippy]
 pedantic = "warn"
 nursery = "warn"
 unwrap_used = "deny"
 expect_used = "deny"
 
-# Or in clippy.toml
+<file_reference>Or in clippy.toml</file_reference>
 
 msrv = "1.70"
 cognitive-complexity-threshold = 25
@@ -278,7 +278,7 @@ cognitive-complexity-threshold = 25
 <usage>cargo fmt</usage>
 
 <configuration>
-# rustfmt.toml
+<file_reference>rustfmt.toml</file_reference>
 edition = "2021"
 max_width = 100
 use_small_heuristics = "Max"
@@ -300,7 +300,7 @@ reorder_imports = true
 </features>
 
 <configuration>
-# .config/nextest.toml
+<file_reference>.config/nextest.toml</file_reference>
 [profile.default]
 retries = 2
 slow-timeout = { period = "60s", terminate-after = 2 }

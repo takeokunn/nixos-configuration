@@ -32,15 +32,15 @@ Provide testing patterns and strategies for comprehensive test coverage and main
 <pattern name="arrange_act_assert">
 <description>Three-phase test structure for clear test organization</description>
 <example>
-# Arrange: Set up test data and preconditions
+<test_phase>Arrange: Set up test data and preconditions</test_phase>
 user = User.new(name: "John")
 cart = ShoppingCart.new(user)
 
-# Act: Execute the code under test
+<test_phase>Act: Execute the code under test</test_phase>
 
 total = cart.calculate_total
 
-# Assert: Verify expected outcomes
+<test_phase>Assert: Verify expected outcomes</test_phase>
 
 assert_equal 0, total
 </example>
@@ -50,14 +50,14 @@ assert_equal 0, total
 <pattern name="given_when_then">
 <description>BDD-style test structure focusing on behavior</description>
 <example>
-# Given: Initial context (preconditions)
+<bdd_step>Given: Initial context (preconditions)</bdd_step>
 given_a_user_with_an_empty_cart
 
-# When: Action or trigger
+<bdd_step>When: Action or trigger</bdd_step>
 
 when_the_user_calculates_total
 
-# Then: Expected outcome
+<bdd_step>Then: Expected outcome</bdd_step>
 
 then_the_total_should_be_zero
 </example>
@@ -166,7 +166,7 @@ Invalid inputs, network failures, permission errors, timeout scenarios
 <name>Isolate tests</name>
 <description>Each test should be independent</description>
 <example>
-# Use setup/teardown to reset state
+<note>Use setup/teardown to reset state</note>
 def setup
   @database = TestDatabase.new
   @service = UserService.new(@database)
@@ -182,10 +182,10 @@ end
 <name>Make tests readable</name>
 <description>Tests serve as documentation</description>
 <example>
-# Good: Clear and descriptive
+<note>Good: Clear and descriptive</note>
 test_userRegistration_withExistingEmail_returnsError
 
-# Bad: Unclear purpose
+<note>Bad: Unclear purpose</note>
 
 test_user_reg_1
 </example>
@@ -195,13 +195,13 @@ test_user_reg_1
 <name>One assertion per concept</name>
 <description>Each test should verify one logical concept</description>
 <example>
-# Good: Single concept
+<note>Good: Single concept</note>
 test_userCreation_setsDefaultRole
   user = create_user
   assert_equal "member", user.role
 end
 
-# Avoid: Multiple unrelated assertions
+<note>Avoid: Multiple unrelated assertions</note>
 
 test_userCreation
 user = create_user
@@ -216,7 +216,7 @@ end
 <name>Use test fixtures and factories</name>
 <description>Extract common test data setup</description>
 <example>
-# Create reusable test data
+<note>Create reusable test data</note>
 def create_test_user(overrides = {})
   defaults = {
     name: "Test User",
@@ -232,7 +232,7 @@ end
 <name>Avoid magic numbers</name>
 <description>Use named constants for test values</description>
 <example>
-# Good
+<good_example>Good</good_example>
 VALID_USER_AGE = 25
 MINIMUM_AGE = 18
 test_userValidation_withValidAge_succeeds
@@ -240,7 +240,7 @@ test_userValidation_withValidAge_succeeds
   assert user.valid?
 end
 
-# Bad
+<bad_example>Bad</bad_example>
 
 test_userValidation_withValidAge_succeeds
 user = User.new(age: 25)

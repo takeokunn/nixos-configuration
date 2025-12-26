@@ -140,7 +140,7 @@ credential_process = /path/to/credential-provider
 <note>Use cases: GitHub Actions, GitLab CI, Azure DevOps with OIDC</note>
 <example>
 
-# .github/workflows/deploy.yml
+<file_reference>.github/workflows/deploy.yml</file_reference>
 
 permissions:
 id-token: write

@@ -14,7 +14,7 @@ Provide comprehensive patterns for Nix language, flakes, and Home Manager config
 <description>Nix is lazily evaluated. Expressions are only computed when needed.</description>
 <example>
 
-# Only evaluates needed attributes
+<note>Only evaluates needed attributes</note>
 
 let
 expensive = builtins.trace "Computing expensive" (1 + 1);
@@ -26,10 +26,10 @@ in
 <concept name="pure_functions">
 <description>All Nix functions are pure. Same inputs always produce same outputs.</description>
 <example>
-# Pure function - always returns same result for same input
+<note>Pure function - always returns same result for same input</note>
 double = x: x * 2;
 
-# Avoid side effects; use derivations for build actions
+<note>Avoid side effects; use derivations for build actions</note>
 
 buildResult = pkgs.stdenv.mkDerivation { ... };
 </example>
@@ -38,15 +38,15 @@ buildResult = pkgs.stdenv.mkDerivation { ... };
 <concept name="attribute_sets">
 <description>Primary data structure in Nix</description>
 <example>
-# Basic attribute set
+<note>Basic attribute set</note>
 { attr1 = value1; attr2 = value2; }
 
-# Access patterns
+<note>Access patterns</note>
 
 set.attr
 set."attr-with-dashes"
 
-# Recursive attribute set
+<note>Recursive attribute set</note>
 
 rec { a = 1; b = a + 1; }
 </example>
@@ -124,7 +124,7 @@ cp mypackage $out/bin/
   # Tools run at build time (compilers, build tools)
   nativeBuildInputs = [ cmake pkg-config ];
 
-# Libraries linked at runtime
+<note>Libraries linked at runtime</note>
 
 buildInputs = [ openssl zlib ];
 }

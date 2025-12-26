@@ -133,11 +133,11 @@ Test edge cases mentioned in documentation
 <avoid>Unnecessarily complex words, idioms that don't translate</avoid>
 <example>
 
-# Good
+<good_example>Good</good_example>
 
 Run this command to start the server.
 
-# Bad
+<bad_example>Bad</bad_example>
 
 The server can be started by running the following command.
 </example>
@@ -148,10 +148,10 @@ The server can be started by running the following command.
 <tone>丁寧だが簡潔</tone>
 <avoid>過度なカタカナ語、曖昧な表現</avoid>
 <example>
-# Good
+<good_example>Good</good_example>
 以下のコマンドでサーバーを起動します。
 
-# Bad
+<bad_example>Bad</bad_example>
 
 サーバーの起動については、下記コマンドを実行することで可能となります。
 </example>
@@ -194,7 +194,7 @@ The server can be started by running the following command.
 <pattern name="readme_structure">
 <description>Standard structure for README documentation</description>
 <example>
-# Project Name
+<note>Project Name</note>
 
 [![Badge](https://img.shields.io/badge/example-badge-blue)]
 
@@ -238,7 +238,7 @@ MIT
 <pattern name="api_documentation">
 <description>Comprehensive API reference documentation structure</description>
 <example>
-# API Reference
+<note>API Reference</note>
 
 <authentication>
 
@@ -287,7 +287,7 @@ Retrieve a list of users.
 <pattern name="design_document_structure">
 <description>Technical design document format for architectural decisions</description>
 <example>
-# Feature Name Design Document
+<note>Feature Name Design Document</note>
 
 <summary>
 
@@ -359,7 +359,7 @@ Decision: Not chosen because...
 <pattern name="user_guide_structure">
 <description>End-user documentation with step-by-step instructions</description>
 <example>
-# User Guide
+<note>User Guide</note>
 
 <getting started>
 

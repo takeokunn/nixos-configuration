@@ -73,14 +73,14 @@ Comprehensive topics: 8000-10000 tokens
 <pattern name="specific_feature">
 <description>Use topic parameter to narrow documentation focus and reduce token usage</description>
 <example>
-# For authentication-related documentation
+<note>For authentication-related documentation</note>
 topic="authentication"
 
-# For React hooks documentation
+<note>For React hooks documentation</note>
 
 topic="hooks"
 
-# For routing documentation
+<note>For routing documentation</note>
 
 topic="routing"
 </example>
@@ -96,14 +96,14 @@ get-library-docs context7CompatibleLibraryID="/facebook/react"
 <pattern name="api_reference">
 <description>Use topic parameter with specific API names for focused reference documentation</description>
 <example>
-# For specific React hook
+<note>For specific React hook</note>
 topic="useState"
 
-# For specific Next.js API
+<note>For specific Next.js API</note>
 
 topic="getServerSideProps"
 
-# For specific TypeScript utility type
+<note>For specific TypeScript utility type</note>
 
 topic="Partial"
 </example>
@@ -112,14 +112,14 @@ topic="Partial"
 <pattern name="verify_usage">
 <description>Verify codebase usage against latest documentation by combining Serena and Context7</description>
 <example>
-# 1. Use Serena to find current library usage in codebase
+<step>1. Use Serena to find current library usage in codebase</step>
 find_symbol name_path_pattern="useState"
 
-# 2. Use Context7 to get latest documentation
+<step>2. Use Context7 to get latest documentation</step>
 
 get-library-docs context7CompatibleLibraryID="/facebook/react" topic="useState"
 
-# 3. Compare current usage with documented best practices
+<step>3. Compare current usage with documented best practices</step>
 
 </example>
 </pattern>
@@ -127,14 +127,14 @@ get-library-docs context7CompatibleLibraryID="/facebook/react" topic="useState"
 <pattern name="update_dependencies">
 <description>Plan dependency updates with API migration by checking latest documentation</description>
 <example>
-# 1. Use Context7 to check latest API changes
+<step>1. Use Context7 to check latest API changes</step>
 get-library-docs context7CompatibleLibraryID="/vercel/next.js" topic="migration"
 
-# 2. Use Serena to find all usages of changed APIs
+<step>2. Use Serena to find all usages of changed APIs</step>
 
 find_referencing_symbols name_path="getStaticProps"
 
-# 3. Plan migration based on documentation
+<step>3. Plan migration based on documentation</step>
 
 </example>
 </pattern>
