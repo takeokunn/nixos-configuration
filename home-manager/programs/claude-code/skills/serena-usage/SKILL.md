@@ -143,14 +143,14 @@ find_symbol "get*" substring_matching=true  # Find all getter methods
 <concept name="reflection_tools">
 <description>Meta-cognitive tools for ensuring search quality and task alignment</description>
 <example>
-# After searching multiple files
+<note>After searching multiple files</note>
 think_about_collected_information
 
-# Before making changes
+<note>Before making changes</note>
 
 think_about_task_adherence
 
-# When task seems complete
+<note>When task seems complete</note>
 
 think_about_whether_you_are_done
 </example>
