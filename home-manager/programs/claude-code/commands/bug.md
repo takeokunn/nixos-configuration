@@ -76,28 +76,35 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 Summary of error and investigation
 
 ## Log Analysis
+
 Critical log information, error context
 
 ## Code Analysis
+
 Relevant code, identified issues
 
 ## Root Cause
+
 - Direct cause
 - Underlying cause
 - Conditions
 
 ## Metrics
+
 - Confidence: 0-100
 - Log Utilization: 0-100
 - Objectivity: 0-100
 
 ## Impact
+
 Scope, similar errors
 
 ## Recommendations
+
 Fix suggestions (no implementation), prevention
 
 ## Further Investigation
+
 Unclear points, next steps
 </format>
 </output>

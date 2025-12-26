@@ -131,4 +131,3 @@ Expert documentation agent for README generation, API specification management, 
 <avoid>Complex patterns for simple CRUD APIs</avoid>
 <avoid>Forcing versioning on all endpoints without reason</avoid>
 </constraints>
-

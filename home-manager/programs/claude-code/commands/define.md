@@ -72,42 +72,54 @@ Conduct detailed requirements definition before implementation, clarifying techn
 ## Requirements Document
 
 ### Summary
+
 One-sentence request, background, expected outcomes
 
 ### Current State
+
 Existing system, tech stack
 
 ### Functional Requirements
+
 FR-001 format (mandatory/optional)
 
 ### Non-functional Requirements
+
 Performance, security, maintainability
 
 ### Technical Specifications
+
 Design policies, impact scope, decisions
 
 ### Metrics
+
 - Feasibility: 0-100
 - Objectivity: 0-100
 
 ### Constraints
+
 Technical, operational
 
 ### Test Requirements
+
 Unit, integration, acceptance criteria
 
 ### Outstanding Issues
+
 Unresolved questions
 
 ## Task Breakdown
 
 ### Dependency Graph
+
 Task dependencies visualization
 
 ### Phased Tasks
+
 Files, overview, dependencies per phase
 
 ### Execute Handoff
+
 Decisions, references, constraints
 </format>
 </output>

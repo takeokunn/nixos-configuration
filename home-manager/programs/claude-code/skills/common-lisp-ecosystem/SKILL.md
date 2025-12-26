@@ -49,7 +49,7 @@ Convention: *earmuffs* for special variables.
   (:documentation "Greet an entity."))
 
 (defmethod greet ((p person))
-  (format t "Hello, ~a!~%" (person-name p)))
+(format t "Hello, ~a!~%" (person-name p)))
 </example>
 </pattern>
 
@@ -60,9 +60,9 @@ Convention: *earmuffs* for special variables.
   (format t "Preparing to greet...~%"))
 
 (defmethod greet :around ((p person))
-  (format t "[Start]~%")
-  (call-next-method)
-  (format t "[End]~%"))
+(format t "[Start]~%")
+(call-next-method)
+(format t "[End]~%"))
 </example>
 </pattern>
 
@@ -196,8 +196,8 @@ Convention: *earmuffs* for special variables.
 
 ;; In my-project/main.lisp:
 (defpackage #:my-project/main
-  (:use #:cl)
-  (:import-from #:my-project/utils #:helper))
+(:use #:cl)
+(:import-from #:my-project/utils #:helper))
 </example>
 </pattern>
 
@@ -216,11 +216,11 @@ Convention: *earmuffs* for special variables.
 my-project/
 ├── my-project.asd
 ├── src/
-│   ├── package.lisp
-│   ├── utils.lisp
-│   └── main.lisp
+│ ├── package.lisp
+│ ├── utils.lisp
+│ └── main.lisp
 └── tests/
-    └── test-suite.lisp
+└── test-suite.lisp
 </project_structure>
 </asdf>
 
@@ -234,9 +234,9 @@ my-project/
   (sb-ext:exit :code 0))
 
 (sb-ext:save-lisp-and-die "my-app"
-  :toplevel #'main
-  :executable t
-  :compression t)
+:toplevel #'main
+:executable t
+:compression t)
 </example>
 </pattern>
 
@@ -245,15 +245,15 @@ my-project/
 (defvar *result* nil)
 
 (let ((thread (sb-thread:make-thread
-                (lambda ()
-                  (setf *result* (heavy-computation)))
-                :name "worker")))
-  (sb-thread:join-thread thread))
+(lambda ()
+(setf _result_ (heavy-computation)))
+:name "worker")))
+(sb-thread:join-thread thread))
 
 ;; Mutex
-(defvar *lock* (sb-thread:make-mutex))
-(sb-thread:with-mutex (*lock*)
-  (critical-section))
+(defvar _lock_ (sb-thread:make-mutex))
+(sb-thread:with-mutex (_lock_)
+(critical-section))
 </example>
 </pattern>
 
@@ -295,11 +295,11 @@ my-project/
     None
     (Some a))
 
-  (declare safe-div (Integer -> Integer -> (Maybe Integer)))
-  (define (safe-div x y)
-    (if (== y 0)
-        None
-        (Some (/ x y)))))
+(declare safe-div (Integer -> Integer -> (Maybe Integer)))
+(define (safe-div x y)
+(if (== y 0)
+None
+(Some (/ x y)))))
 </example>
 </pattern>
 
@@ -309,9 +309,9 @@ my-project/
   (define-class (Printable a)
     (print-it (a -> String)))
 
-  (define-instance (Printable Integer)
-    (define (print-it x)
-      (into x))))
+(define-instance (Printable Integer)
+(define (print-it x)
+(into x))))
 </example>
 </pattern>
 
@@ -346,10 +346,10 @@ mcp__context7__get-library-docs
 <description>Resource management with unwind-protect</description>
 <example>
 (defmacro with-open-socket ((var host port) &body body)
-  `(let ((,var (make-socket ,host ,port)))
-     (unwind-protect
-          (progn ,@body)
-       (close-socket ,var))))
+`(let ((,var (make-socket ,host ,port)))
+(unwind-protect
+(progn ,@body)
+(close-socket ,var))))
 </example>
 </pattern>
 
@@ -386,7 +386,7 @@ ARG is the argument description."
 </common_patterns>
 
 <best_practices>
-<practice>Use *earmuffs* for special variables</practice>
+<practice>Use _earmuffs_ for special variables</practice>
 <practice>Use +plus-signs+ for constants</practice>
 <practice>Prefer functional style, minimize mutation</practice>
 <practice>Use appropriate condition types, not just error</practice>

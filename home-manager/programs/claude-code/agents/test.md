@@ -112,4 +112,3 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 <avoid>Assuming file existence</avoid>
 <avoid>Fragile selectors</avoid>
 </constraints>
-

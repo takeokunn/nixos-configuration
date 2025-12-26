@@ -153,18 +153,23 @@ Provide structured workflow for task execution through delegation to specialized
 Overall assessment and recommendation
 
 ## Critical Issues
+
 Must-fix items with file:line references
 
 ## Important Issues
+
 Should-fix items
 
 ## Suggestions
+
 Optional improvements
 
 ## Positive Feedback
+
 Good practices observed
 
 ## Questions
+
 Clarifications needed
 </format>
 </output>
@@ -186,4 +191,3 @@ Clarifications needed
 <avoid>Focusing only on negatives</avoid>
 <avoid>Vague feedback without specific suggestions</avoid>
 </anti_patterns>
-

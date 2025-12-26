@@ -34,6 +34,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 </recommended_base>
 
 <strict_options>
+
 <option name="strict">Enables all strict type-checking options</option>
 <option name="strictNullChecks">null and undefined handled explicitly</option>
 <option name="strictFunctionTypes">Stricter function type checking</option>
@@ -52,10 +53,10 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 <description>Modern Node.js ESM resolution (recommended)</description>
 <config>
 {
-  "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext"
-  }
+"compilerOptions": {
+"module": "nodenext",
+"moduleResolution": "nodenext"
+}
 }
 </config>
 <note>Requires "type": "module" in package.json</note>
@@ -94,15 +95,15 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 <description>Monorepo and incremental builds</description>
 <config>
 {
-  "compilerOptions": {
-    "composite": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
-  },
-  "references": [
-    { "path": "../shared" },
-    { "path": "../core" }
-  ]
+"compilerOptions": {
+"composite": true,
+"incremental": true,
+"tsBuildInfoFile": ".tsbuildinfo"
+},
+"references": [
+{ "path": "../shared" },
+{ "path": "../core" }
+]
 }
 </config>
 <command>tsc --build for incremental compilation</command>
@@ -188,7 +189,7 @@ type ToArray&lt;T&gt; = T extends any ? T[] : never;
 <pattern name="basic">
 <example>
 type Readonly&lt;T&gt; = {
-  readonly [P in keyof T]: T[P];
+readonly [P in keyof T]: T[P];
 };
 </example>
 </pattern>
@@ -233,10 +234,10 @@ type ExtractRouteParams&lt;T&gt; = T extends `${string}:${infer Param}/${infer R
 <pattern name="typeof">
 <example>
 function process(value: string | number) {
-  if (typeof value === "string") {
-    return value.toUpperCase();
-  }
-  return value.toFixed(2);
+if (typeof value === "string") {
+return value.toUpperCase();
+}
+return value.toFixed(2);
 }
 </example>
 </pattern>
@@ -258,7 +259,7 @@ interface Cat { meow(): void; }
 interface Dog { bark(): void; }
 
 function isCat(pet: Cat | Dog): pet is Cat {
-  return (pet as Cat).meow !== undefined;
+return (pet as Cat).meow !== undefined;
 }
 </example>
 </pattern>
@@ -279,11 +280,11 @@ function move(animal: Fish | Bird) {
 <branded_types>
 <description>Nominal typing via branding</description>
 <example>
-type UserId = string &amp; { readonly __brand: unique symbol };
-type OrderId = string &amp; { readonly __brand: unique symbol };
+type UserId = string &amp; { readonly **brand: unique symbol };
+type OrderId = string &amp; { readonly **brand: unique symbol };
 
 function createUserId(id: string): UserId {
-  return id as UserId;
+return id as UserId;
 }
 </example>
 <use_case>Prevent mixing similar primitive types</use_case>
@@ -293,8 +294,8 @@ function createUserId(id: string): UserId {
 <description>Type checking without widening</description>
 <example>
 const config = {
-  endpoint: "/api",
-  timeout: 3000,
+endpoint: "/api",
+timeout: 3000,
 } satisfies Record&lt;string, string | number&gt;;
 // config.endpoint is inferred as "/api" (literal), not string
 </example>
@@ -307,15 +308,15 @@ const config = {
 <description>Rust-inspired Result type for error handling</description>
 <example>
 type Result&lt;T, E = Error&gt; =
-  | { success: true; data: T }
-  | { success: false; error: E };
+| { success: true; data: T }
+| { success: false; error: E };
 
 function parseJson&lt;T&gt;(json: string): Result&lt;T&gt; {
-  try {
-    return { success: true, data: JSON.parse(json) };
-  } catch (e) {
-    return { success: false, error: e as Error };
-  }
+try {
+return { success: true, data: JSON.parse(json) };
+} catch (e) {
+return { success: false, error: e as Error };
+}
 }
 </example>
 </pattern>
@@ -351,8 +352,8 @@ try {
 <pattern name="promise_all">
 <example>
 const [users, posts] = await Promise.all([
-  fetchUsers(),
-  fetchPosts(),
+fetchUsers(),
+fetchPosts(),
 ]);
 </example>
 </pattern>
@@ -367,8 +368,8 @@ const results = await Promise.allSettled([
 ]);
 
 const successful = results
-  .filter((r): r is PromiseFulfilledResult&lt;User&gt; =&gt; r.status === "fulfilled")
-  .map((r) =&gt; r.value);
+.filter((r): r is PromiseFulfilledResult&lt;User&gt; =&gt; r.status === "fulfilled")
+.map((r) =&gt; r.value);
 </example>
 </pattern>
 
@@ -384,7 +385,7 @@ async function* paginate&lt;T&gt;(fetchPage: (page: number) =&gt; Promise&lt;T[]
 }
 
 for await (const item of paginate(fetchUsers)) {
-  console.log(item);
+console.log(item);
 }
 </example>
 </pattern>
@@ -395,7 +396,7 @@ for await (const item of paginate(fetchUsers)) {
 <example>
 // Named exports
 export const helper = () =&gt; {};
-export type Config = { /* ... */ };
+export type Config = { /_ ... _/ };
 
 // Default export
 export default class Service {}
@@ -436,16 +437,16 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  }
+eslint.configs.recommended,
+...tseslint.configs.strictTypeChecked,
+{
+languageOptions: {
+parserOptions: {
+projectService: true,
+tsconfigRootDir: import.meta.dirname,
+},
+},
+}
 );
 </example>
 </recommended_config>
@@ -479,14 +480,14 @@ export default tseslint.config(
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  test: {
-    globals: true,
-    environment: "node",
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
-    },
-  },
+test: {
+globals: true,
+environment: "node",
+coverage: {
+provider: "v8",
+reporter: ["text", "json", "html"],
+},
+},
 });
 </config>
 </vitest>
@@ -497,12 +498,12 @@ export default defineConfig({
 import type { Config } from "jest";
 
 const config: Config = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  roots: ["&lt;rootDir&gt;/src"],
-  moduleNameMapper: {
-    "^@/(.*)$": "&lt;rootDir&gt;/src/$1",
-  },
+preset: "ts-jest",
+testEnvironment: "node",
+roots: ["&lt;rootDir&gt;/src"],
+moduleNameMapper: {
+"^@/(.\*)$": "&lt;rootDir&gt;/src/$1",
+},
 };
 
 export default config;
@@ -535,11 +536,11 @@ export default config;
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
-  format: ["cjs", "esm"],
-  dts: true,
-  clean: true,
-  sourcemap: true,
+entry: ["src/index.ts"],
+format: ["cjs", "esm"],
+dts: true,
+clean: true,
+sourcemap: true,
 });
 </config>
 </tsup>

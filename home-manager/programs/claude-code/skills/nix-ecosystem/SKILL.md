@@ -115,13 +115,12 @@ final: prev: {
 {
   description = "Project description";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  };
+inputs = {
+nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+};
 
-  outputs = { self, nixpkgs, ... }@inputs: {
-    # output attributes
-  };
+outputs = { self, nixpkgs, ... }@inputs: { # output attributes
+};
 }
 </structure>
 
@@ -169,13 +168,13 @@ my-source = {
 <example>
 outputs = { self, nixpkgs, ... }:
 let
-  systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-  forAllSystems = nixpkgs.lib.genAttrs systems;
+systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+forAllSystems = nixpkgs.lib.genAttrs systems;
 in {
-  packages = forAllSystems (system:
-    let pkgs = nixpkgs.legacyPackages.${system};
-    in { default = pkgs.hello; }
-  );
+packages = forAllSystems (system:
+let pkgs = nixpkgs.legacyPackages.${system};
+in { default = pkgs.hello; }
+);
 };
 </example>
 </pattern>
@@ -206,13 +205,12 @@ devShells.default = pkgs.mkShell {
 <standard>
 { config, pkgs, lib, ... }:
 {
-  options.custom.feature = {
-    enable = lib.mkEnableOption "feature description";
-  };
+options.custom.feature = {
+enable = lib.mkEnableOption "feature description";
+};
 
-  config = lib.mkIf config.custom.feature.enable {
-    # configuration when enabled
-  };
+config = lib.mkIf config.custom.feature.enable { # configuration when enabled
+};
 }
 </standard>
 
@@ -256,9 +254,11 @@ programs.git = {
 <description>Manage dotfiles directly</description>
 <example>
 home.file.".config/app/config" = {
-  source = ./config;
-  # or
-  text = "content";
+source = ./config;
+
+# or
+
+text = "content";
 };
 </example>
 </pattern>
@@ -324,4 +324,3 @@ home-manager.nixosModules.home-manager
 }
 </pattern>
 </nixos>
-

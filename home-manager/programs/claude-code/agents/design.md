@@ -122,4 +122,3 @@ Expert system design agent for architecture evaluation, requirements definition,
 <avoid>Over-analyzing small features</avoid>
 <avoid>Estimating without reading code</avoid>
 </constraints>
-

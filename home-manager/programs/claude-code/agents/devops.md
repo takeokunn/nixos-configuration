@@ -146,4 +146,3 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 <avoid>Complex pipelines for small projects</avoid>
 <avoid>Logging every operation (performance impact)</avoid>
 </constraints>
-

@@ -136,4 +136,3 @@ Provide testing patterns and strategies for comprehensive test coverage and main
 <avoid name="slow_tests">Slow tests discourage running them</avoid>
 <avoid name="test_interdependence">Tests that depend on other tests' state</avoid>
 </anti_patterns>
-

@@ -158,44 +158,58 @@ Root cause: Missing try-finally for connection release
 Restate the question for confirmation
 
 ## Investigation
+
 Evidence-based findings with file:line references
+
 - Source 1: `path/to/file.ts:42` - finding description
 - Source 2: `path/to/other.ts:15` - finding description
 
 ## Conclusion
+
 Direct answer based on evidence
 
 ## Metrics
+
 - Confidence: 0-100
 - Evidence Coverage: 0-100
 
 ## Recommendations
+
 Suggested actions without implementation
 
 ## Unclear Points
+
 Information gaps that would improve the answer
 </format>
 
 <debugging_format>
+
 ## Problem Statement
+
 Clear description of the issue
 
 ## Reproduction Steps
+
 How to reproduce
 
 ## Investigation
+
 Evidence collected with file:line references
 
 ## Root Cause
+
 Identified cause with supporting evidence
 
 ## Solution
+
 Proposed fix with rationale
 
 ## Verification
+
 How to verify the fix works
 
 ## Prevention
+
 How to prevent recurrence
 </debugging_format>
 </output>
@@ -206,4 +220,3 @@ How to prevent recurrence
 <avoid>Making claims without file:line references</avoid>
 <avoid>Implementing fixes instead of analyzing</avoid>
 </constraints>
-

@@ -44,42 +44,50 @@ Provide structured methodology for requirements definition, ensuring comprehensi
 - Expected outcomes
 
 ## Current State
+
 - Existing system description
 - Technology stack
 - Relevant patterns and conventions
 
 ## Functional Requirements
+
 Format: FR-XXX (FR-001, FR-002, ...)
+
 - Priority: mandatory or optional
 - Clear acceptance criteria
 
 ## Non-Functional Requirements
+
 - Performance: response time, throughput
 - Security: authentication, authorization, data protection
 - Maintainability: code quality, documentation
 
 ## Technical Specifications
+
 - Design policies and patterns
 - Impact scope analysis
 - Key design decisions with rationale
 
 ## Metrics
+
 - Feasibility (0-100): Technical achievability
 - Objectivity (0-100): Evidence-based specification
 
 ## Constraints
+
 - Technical constraints: platform, language, framework
 - Operational constraints: deployment, maintenance
 
 ## Test Requirements
+
 - Unit test coverage expectations
 - Integration test scenarios
 - Acceptance criteria verification
 
 ## Task Breakdown
+
 - Dependency graph: task dependencies and execution order
 - Phased tasks: files to modify/create, overview of changes, dependencies
 - Execute handoff: key decisions, reference implementations, constraints
-</format>
-</output>
-
+  </format>
+  </output>

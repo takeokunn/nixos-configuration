@@ -42,8 +42,7 @@ Use move semantics by default; explicit Clone when needed.
 <trait name="AsRef/AsMut">Cheap reference conversions</trait>
 </common_traits>
 
-<derive_pattern>
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+<derive_pattern> #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct MyType { ... }
 </derive_pattern>
 </traits>
@@ -80,9 +79,9 @@ enum MyError {
 <description>Fluent API for complex object construction</description>
 <example>
 MyStruct::builder()
-    .field1(value1)
-    .field2(value2)
-    .build()
+.field1(value1)
+.field2(value2)
+.build()
 </example>
 </pattern>
 
@@ -218,6 +217,7 @@ unwrap_used = "deny"
 expect_used = "deny"
 
 # Or in clippy.toml
+
 msrv = "1.70"
 cognitive-complexity-threshold = 25
 </configuration>

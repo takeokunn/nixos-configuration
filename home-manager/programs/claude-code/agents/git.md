@@ -128,4 +128,3 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <avoid>Skipping validation after merge</avoid>
 <avoid>Resolving conflicts without understanding context</avoid>
 </constraints>
-

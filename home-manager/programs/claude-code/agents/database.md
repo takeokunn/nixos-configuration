@@ -144,4 +144,3 @@ Expert database agent for schema design, index optimization, query performance, 
 <avoid>Creating indexes on all columns</avoid>
 <avoid>Migrating everything at once (use phased approach)</avoid>
 </constraints>
-

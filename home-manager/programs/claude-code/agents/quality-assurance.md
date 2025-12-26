@@ -154,4 +154,3 @@ Expert quality assurance agent for code review, debugging, error handling design
 <avoid>Proposing fixes without understanding root cause</avoid>
 <avoid>Adding complex ARIA to simple content</avoid>
 </constraints>
-

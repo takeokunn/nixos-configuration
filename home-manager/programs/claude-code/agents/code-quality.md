@@ -144,4 +144,3 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 <avoid>Keeping unused code for hypothetical future use</avoid>
 <avoid>Adding unnecessary abstraction layers</avoid>
 </constraints>
-

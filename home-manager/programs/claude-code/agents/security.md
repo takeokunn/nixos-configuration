@@ -115,4 +115,3 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 <avoid>Always updating to latest (prioritize stability)</avoid>
 <avoid>Deleting deps without verifying usage</avoid>
 </constraints>
-

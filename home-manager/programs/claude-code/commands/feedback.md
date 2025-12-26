@@ -71,31 +71,38 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 ## {Mode} Feedback Results
 
 ### Evaluation Scores
+
 - {Metric1}: XX/100
 - {Metric2}: XX/100
 - Overall: XX/100
 
 ### Critical
+
 Immediate Fix Required
+
 - [Category] Issue: Location
 - Problem: Description
 - Fix: Proposal
 
 ### Warning
+
 Fix Recommended
+
 - [Category] Issue: Location
 - Problem: Description
 - Recommendation: Proposal
 
 ### Good Practice
+
 [Category] Commendable aspects
 
 ### Recommended Actions
+
 - [High] Action
 - [Medium] Action
 - [Low] Action
-</format>
-</output>
+  </format>
+  </output>
 
 <constraints>
 <must>Launch all agents simultaneously (no sequential execution)</must>

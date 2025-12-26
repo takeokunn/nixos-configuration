@@ -112,8 +112,8 @@ type ValidationError struct {
     Message string
 }
 
-func (e *ValidationError) Error() string {
-    return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
+func (e \*ValidationError) Error() string {
+return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 }
 </example>
 </pattern>
@@ -124,9 +124,9 @@ func (e *ValidationError) Error() string {
 if errors.Is(err, ErrNotFound) { ... }
 
 // Extract custom error type
-var valErr *ValidationError
+var valErr \*ValidationError
 if errors.As(err, &valErr) {
-    log.Printf("field: %s", valErr.Field)
+log.Printf("field: %s", valErr.Field)
 }
 </example>
 </pattern>
@@ -139,10 +139,10 @@ err := errors.Join(err1, err2, err3)
 </pattern>
 </patterns>
 
-<anti_patterns>
+<anti*patterns>
 <avoid>if err != nil { return err } // loses context</avoid>
 <avoid>panic() for recoverable errors</avoid>
-<avoid>_ = riskyOperation() // ignoring errors</avoid>
+<avoid>* = riskyOperation() // ignoring errors</avoid>
 </anti_patterns>
 </error_handling>
 
@@ -196,12 +196,12 @@ module github.com/user/project
 go 1.21
 
 require (
-    github.com/pkg/errors v0.9.1
-    golang.org/x/sync v0.3.0
+github.com/pkg/errors v0.9.1
+golang.org/x/sync v0.3.0
 )
 
 require (
-    golang.org/x/sys v0.10.0 // indirect
+golang.org/x/sys v0.10.0 // indirect
 )
 </example>
 </go_mod_structure>
@@ -374,9 +374,9 @@ defer cancel()
 
 select {
 case result := <-doWork(ctx):
-    return result, nil
+return result, nil
 case <-ctx.Done():
-    return nil, ctx.Err()
+return nil, ctx.Err()
 }
 </example>
 </context>

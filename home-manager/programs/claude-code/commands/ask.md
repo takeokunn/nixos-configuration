@@ -51,21 +51,27 @@ Provide accurate, evidence-based answers to project questions through fact-based
 Restate the user's question for confirmation
 
 ## Investigation
+
 Evidence-based findings with file:line references
+
 - Source 1: `path/to/file.ts:42` - finding
 - Source 2: `path/to/other.ts:15` - finding
 
 ## Conclusion
+
 Direct answer based on evidence
 
 ## Metrics
+
 - Confidence: 0-100 (based on evidence quality)
 - Evidence Coverage: 0-100 (how much relevant code was examined)
 
 ## Recommendations
+
 Optional: Suggested actions without implementation
 
 ## Unclear Points
+
 Information gaps that would improve the answer
 </format>
 </output>
