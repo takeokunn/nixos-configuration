@@ -110,6 +110,16 @@
       enforce-perl = builtins.readFile ./hooks/enforce-perl.sh;
     };
 
+    skills = {
+      requirements-definition = builtins.readFile ./skills/requirements-definition/SKILL.md;
+      investigation-patterns = builtins.readFile ./skills/investigation-patterns/SKILL.md;
+      execution-workflow = builtins.readFile ./skills/execution-workflow/SKILL.md;
+      nix-ecosystem = builtins.readFile ./skills/nix-ecosystem/SKILL.md;
+      testing-patterns = builtins.readFile ./skills/testing-patterns/SKILL.md;
+      serena-usage = builtins.readFile ./skills/serena-usage/SKILL.md;
+      context7-usage = builtins.readFile ./skills/context7-usage/SKILL.md;
+    };
+
     mcpServers =
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {

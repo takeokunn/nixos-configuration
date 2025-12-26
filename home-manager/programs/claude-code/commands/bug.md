@@ -17,100 +17,126 @@ agents:
   - name: memory
     description: Past troubleshooting record reference
     readonly: true
-readonly_tools:
-  - name: Read
-    description: File content verification
-  - name: Grep
-    description: Pattern search
-  - name: Glob
-    description: File exploration
-  - name: LS
-    description: Directory structure verification
-  - name: context7
-    description: Latest framework/library documentation
-  - name: serena
-    description: Semantic search, LSP search, documentation
+skills:
+  - name: investigation-patterns
+    description: Systematic investigation and debugging methodology
+  - name: serena-usage
+    description: Serena MCP tool patterns
+  - name: context7-usage
+    description: Context7 documentation retrieval
 ---
 
-# /bug
-
-## Purpose
+<purpose>
 Identify root causes from error messages and anomalous behavior, providing fact-based analysis without performing fixes.
+</purpose>
 
-## Principles
-- **Logs first**: Logs as primary information source
-- **Check surrounding code**: Verify similar implementations nearby
-- **Systematic investigation**: Track occurrence path chronologically
-- **Fact-based**: Judge from facts, not user assumptions
+<principles>
+<principle name="logs_first">Logs as primary information source</principle>
+<principle name="check_surrounding_code">Verify similar implementations nearby</principle>
+<principle name="systematic">Track occurrence path chronologically</principle>
+<principle name="fact_based">Judge from facts, not user assumptions</principle>
+</principles>
 
-## Workflow
+<instructions priority="critical">
+<instruction>Never modify, create, or delete files</instruction>
+<instruction>Never implement fixes; provide suggestions only</instruction>
+<instruction>Prioritize log analysis as primary information source</instruction>
+<instruction>Judge from facts, not user speculation</instruction>
+</instructions>
 
-1. **Error Message Analysis**
-   - Error type identification (syntax, runtime, logic, etc.)
-   - Error location identification (file, line, function)
-   - Stack trace analysis
-   - Timestamp verification
+<instructions priority="standard">
+<instruction>Use investigation-patterns skill for debugging methodology</instruction>
+<instruction>Delegate investigations to debug agent</instruction>
+<instruction>Report honestly if cause cannot be identified</instruction>
+</instructions>
 
-2. **Log Investigation** (Critical)
-   - Application log exploration and verification
-   - System log verification (as needed)
-   - Log context around error (pre-error flow, error details, post-error impact)
+<thinking_process>
+<step>What type of error is this? (syntax, runtime, logic)</step>
+<step>Where does it occur? (file, line, function)</step>
+<step>What logs are available?</step>
+<step>What is the error context? (before, during, after)</step>
+<step>Are there similar past issues in memory?</step>
+</thinking_process>
 
-3. **Code Investigation**
-   - Tools: Read, Grep, Glob, LS, context7, serena, playwright (all read-only)
-   - Items: Error location code details, dependencies/imports, config files, environment variables, recent change history
+<workflow>
+<phase name="analyze_error">
+<action>Error type identification</action>
+<action>Location identification (file, line, function)</action>
+<action>Stack trace analysis</action>
+<action>Timestamp verification</action>
+</phase>
 
-4. **Environment Investigation**
-   - Runtime environment (OS, runtime version, dependency versions, environment variables)
-   - Resource status (as needed: disk, memory, network)
+<phase name="investigate_logs" critical="true">
+<action>Application logs</action>
+<action>System logs (if needed)</action>
+<action>Error context (pre-error flow, details, post-error impact)</action>
+</phase>
 
-5. **Investigation Results Delivery**
+<phase name="investigate_code">
+<action>Error location details</action>
+<action>Dependencies/imports</action>
+<action>Config files</action>
+<action>Recent changes</action>
+</phase>
 
-## Agent Delegation
+<phase name="investigate_environment">
+<action>Runtime (OS, versions, env vars)</action>
+<action>Resources (disk, memory, network)</action>
+</phase>
 
-| Agent | Role | Readonly |
-|-------|------|----------|
-| debug | Error tracking, stack trace analysis, log analysis, root cause identification | yes |
-| observability | Log analysis support | yes |
-| error-handling | Error handling pattern verification and suggestions | yes |
-| dependency | Dependency-related error analysis | yes |
-| memory | Past troubleshooting record reference | yes |
+<phase name="report">Report findings with confidence metrics</phase>
+</workflow>
 
-### Delegation Instructions
-1. Full error message/stack trace
-2. Reproduction steps (if known)
-3. Related file paths
-4. Serena MCP usage (`find_symbol`, `find_referencing_symbols`, `search_for_pattern`)
-5. Context7 MCP usage (library version compatibility verification)
-6. **Explicit edit operation prohibition**
+<agent_delegation>
+<agent name="debug" role="Error tracking, stack trace, log analysis" mode="readonly" />
+<agent name="observability" role="Log analysis support" mode="readonly" />
+<agent name="error-handling" role="Error handling patterns" mode="readonly" />
+<agent name="dependency" role="Dependency-related errors" mode="readonly" />
+<agent name="memory" role="Past troubleshooting records" mode="readonly" />
 
-### Expected Output Format
-- Root cause identification
-- Reproduction steps
-- Fix suggestions (no implementation)
-- Prevention measures
+<delegation_requirements>
+<item>Full error message/stack trace</item>
+<item>Reproduction steps (if known)</item>
+<item>Related file paths</item>
+<item>Explicit edit prohibition</item>
+</delegation_requirements>
+</agent_delegation>
 
-## Output
+<output_format>
+## Overview
+Summary of error and investigation
 
-**Answer Structure**:
-- Overview: Report and investigation summary
-- Log Analysis Results: Critical information from logs, error context, related warnings/info
-- Code Investigation Results: Relevant code quotes, issue identification
-- Cause Identification: Direct cause, root cause (design/config/environment), occurrence conditions
-- Investigation Metrics:
-  - Confidence: 0-100
-  - Log utilization: 0-100
-  - Objectivity: 0-100
-- Related Information: Impact scope, similar errors
-- Response Policy (no implementation): Recommended fixes, alternative approaches, prevention measures
-- Additional Investigation Items: Unclear points or items requiring further confirmation
+## Log Analysis
+Critical log information, error context
 
-## Constraints
-- Absolutely no file editing/creation/deletion
-- No error fixes or implementation (investigation and analysis only)
-- Prioritize logs as primary information source
-- Honestly report unclear points, indicate need for additional investigation
-- Don't accept user speculation at face value; judge from facts
-- Provide fact-based investigation results instead of apologies
-- If problem cannot be identified, don't force contrived causes or unreasonable speculation
-- If problem cannot be identified, report this and suggest next steps (sequential logging with numbers, behavior verification, etc.)
+## Code Analysis
+Relevant code, identified issues
+
+## Root Cause
+- Direct cause
+- Underlying cause
+- Conditions
+
+## Metrics
+- Confidence: 0-100
+- Log Utilization: 0-100
+- Objectivity: 0-100
+
+## Impact
+Scope, similar errors
+
+## Recommendations
+Fix suggestions (no implementation), prevention
+
+## Further Investigation
+Unclear points, next steps
+</output_format>
+
+<constraints>
+<must>Keep all operations read-only</must>
+<must>Prioritize logs as primary information source</must>
+<must>Report honestly if cause cannot be identified</must>
+<avoid>Implementing fixes</avoid>
+<avoid>Accepting user speculation without verification</avoid>
+<avoid>Forcing contrived causes when evidence is insufficient</avoid>
+</constraints>

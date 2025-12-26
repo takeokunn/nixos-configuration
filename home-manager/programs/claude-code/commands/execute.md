@@ -62,90 +62,111 @@ agents:
   - name: memory
     description: Knowledge base management
     readonly: false
+skills:
+  - name: execution-workflow
+    description: Task execution, delegation, and code review patterns
+  - name: testing-patterns
+    description: Testing strategy and patterns
+  - name: serena-usage
+    description: Serena MCP tool patterns
+  - name: context7-usage
+    description: Context7 documentation retrieval
 ---
 
-# /execute
+<purpose>
+Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration.
+</purpose>
 
-## Purpose
-Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and requirement definition.
+<instructions priority="critical">
+<instruction>Delegate detailed work to specialized sub-agents</instruction>
+<instruction>Focus on orchestration and policy decisions</instruction>
+<instruction>Execute independent tasks in parallel</instruction>
+<instruction>Verify sub-agent outputs before integration</instruction>
+</instructions>
 
-## Workflow
-1. **Task Analysis**: Understand requirements and identify scope
-2. **Task Breakdown**: Split large tasks into manageable units
-3. **Dependency Organization**: Identify parallel vs sequential tasks
-4. **Agent Delegation**: Assign tasks with detailed instructions, execute independent tasks in parallel
-5. **Result Integration**: Verify and integrate sub-agent outputs, provide additional instructions as needed
+<instructions priority="standard">
+<instruction>Use execution-workflow skill for delegation patterns</instruction>
+<instruction>Prefer basic tools (Read/Edit/Write) over Codex MCP when sufficient</instruction>
+<instruction>Use Codex MCP only for code generation/modification</instruction>
+<instruction>Check Serena memories before implementation</instruction>
+</instructions>
 
-## Sub-agent Instructions
+<thinking_process>
+<step>What tasks need to be done?</step>
+<step>Which sub-agents are best suited?</step>
+<step>Which tasks can run in parallel?</step>
+<step>What dependencies exist between tasks?</step>
+<step>What verification is needed?</step>
+</thinking_process>
 
-Each delegation must include:
-- Specific work scope and expected deliverables
-- Target file paths
-- Serena MCP usage instructions (`find_symbol`, `get_symbols_overview`, `search_for_pattern`)
-- Context7 MCP usage instructions (verify latest library specs)
-- Reference to existing implementations (with specific paths)
-- Memory check instructions (`list_memories` for patterns/conventions)
+<workflow>
+<phase name="analyze">Understand requirements, identify scope</phase>
+<phase name="break_down">Split into manageable units</phase>
+<phase name="organize">Identify parallel vs sequential tasks</phase>
+<phase name="delegate">Assign with detailed instructions</phase>
+<phase name="integrate">Verify and combine results</phase>
+</workflow>
 
-## Codex MCP vs Custom Agents
+<agent_delegation>
+<phase name="quality_assurance">
+<agent name="quality" role="Syntax, type, format verification" />
+<agent name="security" role="Vulnerability detection" />
+<execution>Parallel - no dependencies</execution>
+</phase>
 
-### Codex MCP (Code Generation Only)
+<phase name="implementation">
+<agent name="test" role="Test creation, coverage" />
+<agent name="refactor" role="Refactoring, tech debt" />
+<agent name="docs" role="Documentation updates" />
+<execution>Can run in parallel if independent</execution>
+</phase>
 
-**Allowed**:
-- Code generation (new files/functions)
-- Code modification (editing/refactoring)
+<phase name="review">
+<agent name="review" role="Post-implementation review" />
+<execution>Sequential - after implementation</execution>
+</phase>
 
-**Prohibited** (use custom agents or basic tools):
-- Research/analysis → Explore agent, Serena MCP
-- Quality verification → quality agent
-- Security verification → security agent
-- Test creation → test agent
-- Documentation → docs agent
-- Code review → review agent
+<parallel_execution>
+<rule>quality + security: Concurrent checks</rule>
+<rule>test + docs: Simultaneous creation</rule>
+</parallel_execution>
+</agent_delegation>
 
-**Execution Principles**:
-- Prefer basic tools (Read/Edit/Write/Grep/Glob)
-- Minimal granularity (one clear, small task per call)
-- Staged execution (separate research, design, implementation phases)
-- No multi-file edits (split into separate calls)
-- Avoid on timeout risk
+<codex_usage>
+<allowed>
+<action>Code generation (new files/functions)</action>
+<action>Code modification (editing/refactoring)</action>
+</allowed>
 
-### Custom Agents
+<prohibited>
+<task use_instead="Explore agent, Serena MCP">Research/analysis</task>
+<task use_instead="quality agent">Quality verification</task>
+<task use_instead="security agent">Security verification</task>
+<task use_instead="test agent">Test creation</task>
+<task use_instead="docs agent">Documentation</task>
+<task use_instead="review agent">Code review</task>
+</prohibited>
 
-| Task Type | Agent |
-|-----------|-------|
-| Code quality verification | quality |
-| Security verification | security |
-| Test creation/coverage | test |
-| Refactoring | refactor |
-| Documentation | docs |
-| Code review | review |
-| Bug investigation | debug |
-| Codebase exploration | Explore |
+<principles>
+<principle>Prefer basic tools when sufficient</principle>
+<principle>One clear, small task per call</principle>
+<principle>Separate phases: research → design → implementation</principle>
+<principle>No multi-file edits in single call</principle>
+</principles>
+</codex_usage>
 
-## Agent Delegation
+<delegation_instructions>
+<item>Specific scope and expected deliverables</item>
+<item>Target file paths</item>
+<item>Reference implementations (specific paths)</item>
+<item>Memory check: `list_memories` for patterns</item>
+</delegation_instructions>
 
-### Quality Assurance Phase
-- **quality**: Syntax, type, format verification
-- **security**: Vulnerability detection
-
-### Implementation Phase
-- **test**: Test creation, coverage improvement
-- **refactor**: Refactoring, technical debt resolution
-- **docs**: Documentation updates
-
-### Review Phase
-- **review**: Post-implementation code review
-
-### Parallel Execution
-Execute independent tasks simultaneously:
-- quality + security: Concurrent quality and security checks
-- test + docs: Simultaneous test creation and documentation
-
-## Output
-Task execution results with verification status and any identified issues.
-
-## Constraints
-- Focus on assigned tasks only
-- Avoid unnecessary comments suggesting past implementations
-- Maximize sub-agent utilization for detailed work
-- Parent agent focuses on orchestration and policy decisions
+<constraints>
+<must>Delegate detailed work to sub-agents</must>
+<must>Execute independent tasks in parallel</must>
+<must>Verify outputs before integration</must>
+<avoid>Implementing detailed logic directly</avoid>
+<avoid>Unnecessary comments about past implementations</avoid>
+<avoid>Multi-file edits in single Codex call</avoid>
+</constraints>

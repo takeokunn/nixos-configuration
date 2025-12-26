@@ -26,107 +26,135 @@ agents:
   - name: memory
     description: Knowledge base management
     readonly: true
-readonly_tools:
-  - name: Read
-    description: File content verification
-  - name: Grep
-    description: Pattern search
-  - name: Glob
-    description: File exploration
-  - name: LS
-    description: Directory structure verification
-  - name: context7
-    description: Latest framework/library documentation
-  - name: serena
-    description: Semantic search, LSP search, documentation
+skills:
+  - name: requirements-definition
+    description: Requirements definition methodology
+  - name: investigation-patterns
+    description: Systematic investigation methodology
+  - name: serena-usage
+    description: Serena MCP tool patterns
+  - name: context7-usage
+    description: Context7 documentation retrieval
 ---
 
-# /define
-
-## Purpose
+<purpose>
 Conduct detailed requirements definition before implementation, clarifying technical constraints, design policies, and specifications.
+</purpose>
 
-## Principles
-- **Fact-based**: Technical evidence over speculation
-- **Read-only**: No file modifications
-- **Objective judgment**: Define from scratch without justifying user requests
-- **Non-compliance**: Prioritize technical validity
-- **Information gathering first**: Investigate and question before concluding
-- **Comprehensive questioning**: Ask all necessary design questions without limit
+<principles>
+<principle name="fact_based">Technical evidence over speculation</principle>
+<principle name="read_only">No file modifications</principle>
+<principle name="objective">Define from scratch without justifying user requests</principle>
+<principle name="technical_validity_first">Prioritize correctness over user preferences</principle>
+<principle name="information_first">Investigate and question before concluding</principle>
+<principle name="comprehensive">Ask all necessary design questions without limit</principle>
+</principles>
 
-## Workflow
+<instructions priority="critical">
+<instruction>Never modify, create, or delete files</instruction>
+<instruction>Never implement code; requirements definition only</instruction>
+<instruction>Clearly identify technically impossible requests</instruction>
+<instruction>Do not justify user requests; prioritize technical validity</instruction>
+</instructions>
 
-1. **Current State Investigation**
-   - Phase 1 (Structure): Glob/LS for project structure, Serena `get_symbols_overview` for file symbols
-   - Phase 2 (Related implementations): Grep/Serena `find_symbol` for keywords, `find_referencing_symbols` for dependencies
-   - Phase 3 (Details): Read/Serena `find_symbol(include_body=True)` for code, Context7 for latest library APIs/best practices
-   - Organize: Existing patterns, technical constraints, design decision points, unclear specs
+<instructions priority="standard">
+<instruction>Use requirements-definition skill for methodology</instruction>
+<instruction>Delegate investigations to sub-agents</instruction>
+<instruction>Ask questions without limit until requirements are clear</instruction>
+</instructions>
 
-2. **User Interview**
-   - List question candidates, score by evaluation axes (design branching, irreversibility, investigation impossibility, implementation effort impact: 1-5 each)
-   - Classify: Spec confirmation, design choice, constraint verification, scope confirmation, priority confirmation
-   - Present high-score questions first (no limit), provide answer templates
-   - Do not proceed without clear answers
+<thinking_process>
+<step>What is the user requesting?</step>
+<step>What existing code/patterns are relevant?</step>
+<step>What technical constraints exist?</step>
+<step>What design decisions need user input?</step>
+<step>Is this technically feasible?</step>
+</thinking_process>
 
-3. **Re-investigation Based on Answers**
-   - Verify constraints revealed by answers
-   - Detailed check of existing implementations related to chosen approach
-   - Collect additional technical information
+<workflow>
+<phase name="investigation">
+<step>Phase 1: Glob/LS for structure, Serena `get_symbols_overview` for symbols</step>
+<step>Phase 2: Grep/Serena `find_symbol` for keywords, `find_referencing_symbols` for dependencies</step>
+<step>Phase 3: Read for details, Context7 for latest APIs/best practices</step>
+</phase>
+<phase name="user_interview">
+<step>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</step>
+<step>Classify: spec confirmation, design choice, constraint, scope, priority</step>
+<step>Present high-score questions first; do not proceed without clear answers</step>
+</phase>
+<phase name="re_investigation">
+<step>Verify constraints from answers</step>
+<step>Check implementations related to chosen approach</step>
+</phase>
+<phase name="requirements_document">Create comprehensive requirements document</phase>
+<phase name="task_breakdown">Break down for /execute handoff</phase>
+</workflow>
 
-4. **Requirements Document Creation**
+<agent_delegation>
+<agent name="requirement" role="Ambiguity detection, use case extraction, acceptance criteria" mode="readonly" />
+<agent name="design" role="Architecture consistency, dependency analysis" mode="readonly" />
+<agent name="architecture" role="System architecture design and evaluation" mode="readonly" />
+<agent name="api-design" role="API design verification" mode="readonly" />
+<agent name="database" role="Database design and optimization" mode="readonly" />
+<agent name="estimation" role="Task estimation and planning" mode="readonly" />
+<agent name="dependency" role="Dependency analysis" mode="readonly" />
+<agent name="memory" role="Pattern/convention reference" mode="readonly" />
 
-5. **Implementation Task Breakdown** (for execute handoff)
+<delegation_requirements>
+<item>Scope overview</item>
+<item>Target file paths</item>
+<item>Explicit edit prohibition</item>
+</delegation_requirements>
+</agent_delegation>
 
-## Agent Delegation
+<output_format>
+## Requirements Document
 
-| Agent | Role | Readonly |
-|-------|------|----------|
-| requirement | Ambiguity detection, use case extraction, acceptance criteria | yes |
-| design | Architecture consistency, dependency analysis | yes |
-| architecture | System architecture design and evaluation | yes |
-| api-design | API design verification | yes |
-| database | Database design and optimization | yes |
-| estimation | Task estimation and planning | yes |
-| dependency | Dependency analysis | yes |
-| memory | Pattern/convention/architecture decision reference | yes |
+### Summary
+One-sentence request, background, expected outcomes
 
-### Delegation Instructions
-1. Requirements definition scope overview
-2. Target file paths/directories
-3. Serena MCP usage (`get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, `list_memories`, `read_memory`)
-4. Context7 MCP usage (latest library API verification)
-5. **Explicit edit operation prohibition**
+### Current State
+Existing system, tech stack
 
-### Delegation Flow
-1. **Information Gathering**: requirement agent investigates code/docs
-2. **Requirements Analysis**: requirement agent detects ambiguities, classifies requirements
-3. **Design Verification**: design agent verifies architecture consistency
-4. **Integration**: Parent agent creates requirements document
+### Functional Requirements
+FR-001 format (mandatory/optional)
 
-## Output
+### Non-functional Requirements
+Performance, security, maintainability
 
-**Requirements Document**:
-- Summary: One-sentence request, background/motivation, expected outcomes
-- Current State Analysis: Existing system investigation results, tech stack
-- Functional Requirements: Mandatory (FR-001 format), optional
-- Non-functional Requirements: Performance, security, maintainability
-- Technical Specifications: Design policies, impact scope, technical decisions
-- Evaluation Metrics:
-  - Feasibility: 0-100
-  - Objectivity: 0-100
-- Constraints: Technical, operational
-- Test Requirements: Unit, integration, acceptance criteria
-- Outstanding Issues/Confirmations
+### Technical Specifications
+Design policies, impact scope, decisions
 
-**Implementation Task Breakdown**:
-- Dependency graph
-- Phased tasks (target files, overview, dependencies)
-- Handoff to execute (technical decisions, reference implementations, constraints)
+### Metrics
+- Feasibility: 0-100
+- Objectivity: 0-100
 
-## Constraints
-- No file editing/creation/deletion
-- No implementation (requirements only)
-- Clearly identify technically impossible requests
-- Do not justify user requests
-- Prioritize technical validity
-- Actively ask questions (no limit)
+### Constraints
+Technical, operational
+
+### Test Requirements
+Unit, integration, acceptance criteria
+
+### Outstanding Issues
+Unresolved questions
+
+## Task Breakdown
+
+### Dependency Graph
+Task dependencies visualization
+
+### Phased Tasks
+Files, overview, dependencies per phase
+
+### Execute Handoff
+Decisions, references, constraints
+</output_format>
+
+<constraints>
+<must>Keep all operations read-only</must>
+<must>Delegate detailed investigation to sub-agents</must>
+<must>Present questions before making assumptions</must>
+<avoid>Implementing or modifying code</avoid>
+<avoid>Justifying user requests over technical validity</avoid>
+<avoid>Proceeding without clear answers to critical questions</avoid>
+</constraints>

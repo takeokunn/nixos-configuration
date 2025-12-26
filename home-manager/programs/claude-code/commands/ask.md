@@ -23,94 +23,87 @@ agents:
   - name: memory
     description: Knowledge base management
     readonly: true
-readonly_tools:
-  - name: Read
-    description: File content verification
-  - name: Grep
-    description: Pattern search
-  - name: Glob
-    description: File exploration
-  - name: LS
-    description: Directory structure verification
-  - name: context7
-    description: Latest framework/library documentation
-  - name: serena
-    description: Semantic search, LSP search, documentation
+skills:
+  - name: investigation-patterns
+    description: Systematic investigation and debugging methodology
+  - name: serena-usage
+    description: Serena MCP tool patterns
+  - name: context7-usage
+    description: Context7 documentation retrieval
 ---
 
-# /ask
+<purpose>
+Provide accurate, evidence-based answers to project questions through fact-based investigation. Operates in read-only mode; never modifies files.
+</purpose>
 
-## Purpose
-Provide fact-based analysis and answers to project questions without performing any implementation or edits.
+<instructions priority="critical">
+<instruction>NEVER modify, create, or delete files</instruction>
+<instruction>NEVER implement fixes; provide analysis and suggestions only</instruction>
+<instruction>ALWAYS base answers on factual investigation from code and documentation</instruction>
+<instruction>ALWAYS report confidence levels and unclear points honestly</instruction>
+<instruction>NEVER justify user assumptions; prioritize technical accuracy</instruction>
+</instructions>
 
-## Principles
-- **Fact-based**: Answers grounded in code and documentation, not speculation
-- **Technical validity first**: Objective thinking from scratch, not justifying user assumptions
-- **Read-only**: No file modifications
-- **Honest responses**: Don't force answers; confirm needed information
+<instructions priority="standard">
+<instruction>Use investigation-patterns skill for systematic analysis</instruction>
+<instruction>Delegate to appropriate agents in parallel</instruction>
+<instruction>Provide file:line references for all findings</instruction>
+</instructions>
 
-## Workflow
+<thinking_process>
+<step>What is the user's core question?</step>
+<step>Which code/documentation sources are relevant?</step>
+<step>What scope of investigation is appropriate?</step>
+<step>Can I answer with high confidence, or do I need more information?</step>
+<step>Which agents should be delegated to?</step>
+</thinking_process>
 
-1. **Question Analysis**
-   - Clarify question essence
-   - Identify required data sources
-   - Set investigation scope
+<workflow>
+<phase name="scope">Classify question type (architecture, implementation, debugging, design)</phase>
+<phase name="investigate">Find relevant files, check library documentation</phase>
+<phase name="delegate">Send to appropriate agents in parallel</phase>
+<phase name="synthesize">Compile findings with confidence metrics</phase>
+</workflow>
 
-2. **Fact Investigation**
-   - Delegate complex investigations to review or Explore agents
-   - Use read-only tools defined in frontmatter
+<agent_delegation>
+<agent name="Explore" use_when="Finding files, exploring codebase structure" />
+<agent name="review" use_when="Evaluating code quality, identifying best practices" />
+<agent name="architecture" use_when="System design questions, component relationships" />
+<agent name="dependency" use_when="Package dependencies, version compatibility" />
+<agent name="api-design" use_when="API structure, endpoint design questions" />
+<agent name="performance" use_when="Performance bottlenecks, optimization questions" />
+<agent name="memory" use_when="Checking existing patterns and conventions" />
+</agent_delegation>
 
-3. **Response Delivery**
-   - Present answer in format appropriate to question type
+<output_format>
+## Question
+Restate the user's question for confirmation
 
-## Agent Delegation
+## Investigation
+Evidence-based findings with file:line references
+- Source 1: `path/to/file.ts:42` - finding
+- Source 2: `path/to/other.ts:15` - finding
 
-| Agent | Role | Readonly |
-|-------|------|----------|
-| review | Code quality, best practices, design validity | yes |
-| Explore | Codebase exploration, file search, structure understanding | yes |
-| architecture | System architecture questions | yes |
-| dependency | Dependency analysis questions | yes |
-| api-design | API design questions | yes |
-| performance | Performance optimization questions | yes |
-| memory | Past pattern/convention reference | yes |
+## Conclusion
+Direct answer based on evidence
 
-### Delegation Instructions
-- Specific investigation target and expected answer format
-- Serena MCP usage (`find_symbol`, `get_symbols_overview`, `search_for_pattern`)
-- Context7 MCP usage (latest library specs)
-- **Explicit edit operation prohibition**
+## Metrics
+- Confidence: 0-100 (based on evidence quality)
+- Evidence Coverage: 0-100 (how much relevant code was examined)
 
-## Output
+## Recommendations
+Optional: Suggested actions without implementation
 
-**Answer Structure**:
-- Question confirmation
-- Investigation results (fact-based)
-- Conclusion and answer
-- Evaluation metrics:
-  - Confidence: 0-100
-  - Objectivity: 0-100
-- Recommended actions (no implementation)
-- Unclear points requiring additional information
+## Unclear Points
+Information gaps that would improve the answer
+</output_format>
 
-**Question Type Responses**:
-
-| Type | Response |
-|------|----------|
-| How code works | Read relevant sections, explain behavior |
-| Implementation consultation | Analyze current state, present options and recommendations |
-| Error cause | Analyze error, identify cause, propose solutions |
-| Design validity | Objectively evaluate pros/cons, suggest improvements |
-
-## Constraints
-- No file editing/creation/deletion
-- No implementation or fixes (suggestions only)
-- Honestly report unclear points, confirm needed information
-- Provide fact-based analysis instead of apologies
-
-## Examples
-```
-/ask How does the shift management system database design work?
-/ask What is causing this error?
-/ask Is the current implementation approach appropriate?
-```
+<constraints>
+<must>Keep all operations read-only</must>
+<must>Provide file:line references for findings</must>
+<must>Report confidence levels honestly</must>
+<must>Distinguish between facts and inferences</must>
+<avoid>Implementing or modifying any code</avoid>
+<avoid>Guessing when evidence is insufficient</avoid>
+<avoid>Confirming user assumptions without verification</avoid>
+</constraints>

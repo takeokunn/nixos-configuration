@@ -10,46 +10,41 @@ agents:
     readonly: false
 ---
 
-# /markdown
+<purpose>
+Output results from other commands (/define, /ask, /bug, etc.) as markdown files.
+</purpose>
 
-## Purpose
-Auxiliary command to output results from other commands (/define, /ask, /bug, etc.) as markdown files.
+<instructions priority="critical">
+<instruction>Retrieve previous command execution results</instruction>
+<instruction>Determine output filename based on context</instruction>
+<instruction>Use specified file path if provided</instruction>
+<instruction>Never include revision history or discussion process</instruction>
+</instructions>
 
-## Workflow
-1. Retrieve previous command execution results
-2. Determine output filename based on context
-3. Output file using Write/Edit tool
+<thinking_process>
+<step>What was the previous command?</step>
+<step>What is the appropriate output file?</step>
+<step>Was a specific file path provided?</step>
+<step>What content should be included/excluded?</step>
+</thinking_process>
 
-## Output File Mapping
+<workflow>
+<phase name="retrieve">Get previous command results</phase>
+<phase name="determine">Select output filename</phase>
+<phase name="output">Write file using Write/Edit tool</phase>
+</workflow>
 
-| Execution Context | Output File |
-|-------------------|-------------|
-| After `/define` | `EXECUTION.md` |
-| After `/ask` or `/bug` | `RESEARCH.md` |
-| Other | `MEMO.md` |
+<file_mapping>
+<mapping previous_command="/define" output="EXECUTION.md" />
+<mapping previous_command="/ask" output="RESEARCH.md" />
+<mapping previous_command="/bug" output="RESEARCH.md" />
+<mapping previous_command="other" output="MEMO.md" />
+<note>User-specified file path takes precedence</note>
+</file_mapping>
 
-**Note**: Specified file path takes precedence if provided
-
-## Output
-Markdown file with command execution results in appropriate format.
-
-## Constraints
-- **Prohibited content**:
-  - Revision history/change logs
-  - Consideration process/discussion history
-
-## Examples
-
-```
-/define Add authentication feature
-/markdown
-→ Output requirements definition/execution plan to EXECUTION.md
-
-/ask What's the error cause?
-/markdown
-→ Output investigation results to RESEARCH.md
-
-/ask Tell me about API specs
-/markdown
-→ Output investigation results to MEMO.md
-```
+<constraints>
+<must>Use context-appropriate filename</must>
+<must>Respect user-specified file path</must>
+<avoid>Including revision history/change logs</avoid>
+<avoid>Including consideration process/discussion history</avoid>
+</constraints>
