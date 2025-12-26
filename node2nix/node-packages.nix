@@ -1380,13 +1380,13 @@ let
         sha512 = "LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==";
       };
     };
-    "comment-json-4.5.0" = {
+    "comment-json-4.5.1" = {
       name = "comment-json";
       packageName = "comment-json";
-      version = "4.5.0";
+      version = "4.5.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.5.0.tgz";
-        sha512 = "aKl8CwoMKxVTfAK4dFN4v54AEvuUh9pzmgVIBeK6gBomLwMgceQUKKWHzJdW1u1VQXQuwnJ7nJGWYYMTl5U4yg==";
+        url = "https://registry.npmjs.org/comment-json/-/comment-json-4.5.1.tgz";
+        sha512 = "taEtr3ozUmOB7it68Jll7s0Pwm+aoiHyXKrEC8SEodL4rNpdfDLqa7PfBlrgFoCNNdR8ImL+muti5IGvktJAAg==";
       };
     };
     "config-chain-1.1.13" = {
@@ -2388,13 +2388,13 @@ let
         sha512 = "Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==";
       };
     };
-    "hono-4.11.1" = {
+    "hono-4.11.2" = {
       name = "hono";
       packageName = "hono";
-      version = "4.11.1";
+      version = "4.11.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/hono/-/hono-4.11.1.tgz";
-        sha512 = "KsFcH0xxHes0J4zaQgWbYwmz3UPOOskdqZmItstUG93+Wk1ePBLkLGwbP9zlmh1BFUiL8Qp+Xfu9P7feJWpGNg==";
+        url = "https://registry.npmjs.org/hono/-/hono-4.11.2.tgz";
+        sha512 = "o+avdUAD1v94oHkjGBhiMhBV4WBHxhbu0+CUVH78hhphKy/OKQLxtKjkmmNcrMlbYAhAbsM/9F+l3KnYxyD3Lg==";
       };
     };
     "hosted-git-info-7.0.2" = {
@@ -5018,7 +5018,7 @@ in
       sources."color-name-1.1.4"
       sources."combined-stream-1.0.8"
       sources."command-exists-1.2.9"
-      sources."comment-json-4.5.0"
+      sources."comment-json-4.5.1"
       sources."config-chain-1.1.13"
       sources."content-disposition-1.0.1"
       sources."content-type-1.0.5"
@@ -5204,7 +5204,7 @@ in
       sources."has-tostringtag-1.0.2"
       sources."hasown-2.0.2"
       sources."highlight.js-11.11.1"
-      sources."hono-4.11.1"
+      sources."hono-4.11.2"
       (
         sources."hosted-git-info-7.0.2"
         // {
