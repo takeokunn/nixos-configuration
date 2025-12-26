@@ -36,6 +36,10 @@ For detailed tool usage patterns, refer to these skills:
 - **investigation-patterns**: Evidence-based code analysis and debugging
 - **execution-workflow**: Task delegation and code review
 - **nix-ecosystem**: Nix language, flakes, and Home Manager patterns
+- **typescript-ecosystem**: TypeScript language, tsconfig, type patterns, and Context7 integration
+- **golang-ecosystem**: Go language, modules, and toolchain patterns
+- **rust-ecosystem**: Rust language, Cargo, and toolchain patterns
+- **common-lisp-ecosystem**: Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns
 - **requirements-definition**: Requirements specification methodology
 - **testing-patterns**: Test strategy and patterns
 </skills_reference>
