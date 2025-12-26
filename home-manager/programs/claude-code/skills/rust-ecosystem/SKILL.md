@@ -11,20 +11,35 @@ Provide comprehensive patterns for Rust language, Cargo project management, and 
 <rust_language>
 <ownership_borrowing>
 <concept name="ownership">
-Each value has exactly one owner. When owner goes out of scope, value is dropped.
-Use move semantics by default; explicit Clone when needed.
+<description>Each value has exactly one owner. When owner goes out of scope, value is dropped.</description>
+<use>Use move semantics by default; explicit Clone when needed</use>
 </concept>
 
 <concept name="borrowing">
-<rule name="immutable">&T allows multiple simultaneous borrows</rule>
-<rule name="mutable">&mut T allows exactly one mutable borrow</rule>
-<rule name="exclusivity">Cannot have &mut T while &T exists</rule>
+<description>Immutable and mutable references with strict rules</description>
+<rules priority="critical">
+<rule>&T allows multiple simultaneous borrows</rule>
+<rule>&mut T allows exactly one mutable borrow</rule>
+<rule>Cannot have &mut T while &T exists</rule>
+</rules>
 </concept>
 
 <concept name="lifetimes">
-<pattern name="elision">Compiler infers lifetimes in common patterns</pattern>
-<pattern name="explicit">fn foo&lt;'a&gt;(x: &'a str) -&gt; &'a str</pattern>
-<pattern name="static">'static for values that live entire program</pattern>
+<description>Lifetime annotations for reference validity</description>
+<pattern name="elision">
+<description>Compiler infers lifetimes in common patterns</description>
+</pattern>
+<pattern name="explicit">
+<description>Explicit lifetime annotations for complex cases</description>
+<example>
+fn foo&lt;'a&gt;(x: &'a str) -> &'a str {
+  x
+}
+</example>
+</pattern>
+<pattern name="static">
+<description>'static for values that live entire program</description>
+</pattern>
 </concept>
 </ownership_borrowing>
 
@@ -42,9 +57,16 @@ Use move semantics by default; explicit Clone when needed.
 <trait name="AsRef/AsMut">Cheap reference conversions</trait>
 </common_traits>
 
-<derive_pattern> #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-struct MyType { ... }
-</derive_pattern>
+<pattern name="derive">
+<description>Automatically implement common traits</description>
+<example>
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct MyType {
+  field1: String,
+  field2: i32,
+}
+</example>
+</pattern>
 </traits>
 
 <error_handling>
@@ -65,10 +87,10 @@ struct MyType { ... }
 <example>
 #[derive(Debug, thiserror::Error)]
 enum MyError {
-    #[error("IO error: {0}")]
-    Io(#[from] std::io::Error),
-    #[error("Parse error: {msg}")]
-    Parse { msg: String },
+  #[error("IO error: {0}")]
+  Io(#[from] std::io::Error),
+  #[error("Parse error: {msg}")]
+  Parse { msg: String },
 }
 </example>
 </pattern>
@@ -87,7 +109,9 @@ MyStruct::builder()
 
 <pattern name="newtype">
 <description>Wrapper type for type safety</description>
-<example>struct UserId(u64);</example>
+<example>
+struct UserId(u64);
+</example>
 </pattern>
 
 <pattern name="type_state">
@@ -97,10 +121,25 @@ MyStruct::builder()
 </common_patterns>
 
 <anti_patterns>
-<avoid name="unwrap_in_library">Use ? or proper error handling instead</avoid>
-<avoid name="clone_abuse">Prefer borrowing when possible</avoid>
-<avoid name="string_for_everything">Use enums, newtypes for domain modeling</avoid>
-<avoid name="arc_mutex_overuse">Consider channels or ownership patterns first</avoid>
+<avoid name="unwrap_in_library">
+<description>Using unwrap() in library code</description>
+<instead>Use ? or proper error handling instead</instead>
+</avoid>
+
+<avoid name="clone_abuse">
+<description>Cloning values unnecessarily</description>
+<instead>Prefer borrowing when possible</instead>
+</avoid>
+
+<avoid name="string_for_everything">
+<description>Using String for all domain values</description>
+<instead>Use enums, newtypes for domain modeling</instead>
+</avoid>
+
+<avoid name="arc_mutex_overuse">
+<description>Defaulting to Arc&lt;Mutex&lt;T&gt;&gt; for concurrency</description>
+<instead>Consider channels or ownership patterns first</instead>
+</avoid>
 </anti_patterns>
 </rust_language>
 
@@ -120,8 +159,12 @@ MyStruct::builder()
 </standard_layout>
 
 <module_organization>
-<pattern name="mod_rs">src/module/mod.rs with submodules</pattern>
-<pattern name="file_module">src/module.rs (preferred for simple modules)</pattern>
+<pattern name="mod_rs">
+<description>src/module/mod.rs with submodules</description>
+</pattern>
+<pattern name="file_module">
+<description>src/module.rs (preferred for simple modules)</description>
+</pattern>
 </module_organization>
 </project_structure>
 
@@ -130,8 +173,8 @@ MyStruct::builder()
 [package]
 name = "my-crate"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.70"
+edition = "2021" # Current edition; edition 2024 (upcoming/future)
+rust-version = "1.83" # Current stable as of Dec 2025
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -167,7 +210,7 @@ debug = true
 <workspace>
 <root_cargo_toml>
 [workspace]
-resolver = "2"
+resolver = "2"  # Current default for edition 2021; resolver "3" (upcoming, requires Edition 2024)
 members = ["crate-a", "crate-b"]
 
 [workspace.package]
@@ -266,11 +309,21 @@ fail-fast = false
 </cargo_nextest>
 
 <other_tools>
-<tool name="cargo-audit">Security vulnerability scanning</tool>
-<tool name="cargo-deny">Dependency license and security checks</tool>
-<tool name="cargo-outdated">Check for outdated dependencies</tool>
-<tool name="cargo-watch">Auto-rebuild on file changes</tool>
-<tool name="cargo-expand">Macro expansion debugging</tool>
+<tool name="cargo-audit">
+<description>Security vulnerability scanning</description>
+</tool>
+<tool name="cargo-deny">
+<description>Dependency license and security checks</description>
+</tool>
+<tool name="cargo-outdated">
+<description>Check for outdated dependencies</description>
+</tool>
+<tool name="cargo-watch">
+<description>Auto-rebuild on file changes</description>
+</tool>
+<tool name="cargo-expand">
+<description>Macro expansion debugging</description>
+</tool>
 </other_tools>
 </toolchain>
 
@@ -304,14 +357,14 @@ fail-fast = false
 </context7_integration>
 
 <best_practices>
-<practice>Use cargo check for fast iteration during development</practice>
-<practice>Run cargo clippy before committing</practice>
-<practice>Format with cargo fmt for consistent style</practice>
-<practice>Use workspace for multi-crate projects</practice>
-<practice>Prefer &str over String for function parameters</practice>
-<practice>Use impl Trait for return types when possible</practice>
-<practice>Document public API with /// doc comments</practice>
-<practice>Write unit tests alongside code in same file</practice>
-<practice>Use integration tests in tests/ for API testing</practice>
-<practice>Set rust-version in Cargo.toml for MSRV</practice>
+<practice priority="critical">Use cargo check for fast iteration during development</practice>
+<practice priority="critical">Run cargo clippy before committing</practice>
+<practice priority="critical">Format with cargo fmt for consistent style</practice>
+<practice priority="high">Use workspace for multi-crate projects</practice>
+<practice priority="high">Prefer &str over String for function parameters</practice>
+<practice priority="high">Use impl Trait for return types when possible</practice>
+<practice priority="medium">Document public API with /// doc comments</practice>
+<practice priority="medium">Write unit tests alongside code in same file</practice>
+<practice priority="medium">Use integration tests in tests/ for API testing</practice>
+<practice priority="medium">Set rust-version in Cargo.toml for MSRV</practice>
 </best_practices>

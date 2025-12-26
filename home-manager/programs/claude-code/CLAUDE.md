@@ -39,8 +39,12 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <skill name="golang-ecosystem">Go language, modules, and toolchain patterns</skill>
 <skill name="rust-ecosystem">Rust language, Cargo, and toolchain patterns</skill>
 <skill name="common-lisp-ecosystem">Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns</skill>
+<skill name="emacs-ecosystem">Emacs Lisp, configuration, org-mode, Magit, LSP patterns</skill>
+<skill name="aws-ecosystem">AWS CLI and Terraform AWS Provider patterns</skill>
 <skill name="requirements-definition">Requirements specification methodology</skill>
 <skill name="testing-patterns">Test strategy and patterns</skill>
+<skill name="technical-documentation">README, API docs, design docs, user guides</skill>
+<skill name="technical-writing">Technical blogs and articles</skill>
 </skills>
 
 <constraints>

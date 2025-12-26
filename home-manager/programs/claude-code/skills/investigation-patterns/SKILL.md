@@ -8,132 +8,195 @@ version: 0.2.0
 Provide systematic patterns for codebase investigation and debugging, ensuring evidence-based analysis with proper confidence assessment.
 </purpose>
 
-<workflow>
-<phase name="scope_classification">
-<description>Classify the question type</description>
-<type name="architecture">System design, component relationships</type>
-<type name="implementation">Specific code behavior, algorithm details</type>
-<type name="debugging">Error causes, unexpected behavior</type>
-<type name="design">Pattern usage, code organization</type>
-</phase>
+<patterns>
+<pattern name="scope_classification">
+<description>Classify the question type to determine investigation approach</description>
+<example>
+Architecture: System design, component relationships
+Implementation: Specific code behavior, algorithm details
+Debugging: Error causes, unexpected behavior
+Design: Pattern usage, code organization
+</example>
+</pattern>
 
-<phase name="source_identification">
-<description>Identify relevant sources</description>
-<source name="code">Use Serena for symbol search and dependency analysis</source>
-<source name="documentation">Check inline comments, README, API docs</source>
-<source name="history">Git log for context on changes</source>
-<source name="external">Context7 for library documentation</source>
-</phase>
+<pattern name="source_identification">
+<description>Identify relevant sources for investigation</description>
+<example>
+Code: Use Serena for symbol search and dependency analysis
+Documentation: Check inline comments, README, API docs
+History: Git log for context on changes
+External: Context7 for library documentation
+</example>
+</pattern>
 
-<phase name="evidence_collection">
-<description>Collect evidence systematically</description>
-<tool name="find_symbol">Locate specific symbols by name</tool>
-<tool name="get_symbols_overview">Understand file structure</tool>
-<tool name="find_referencing_symbols">Trace dependencies</tool>
-<tool name="search_for_pattern">Find patterns across codebase</tool>
-</phase>
+<pattern name="evidence_collection">
+<description>Collect evidence systematically using appropriate tools</description>
+<example>
+find_symbol: Locate specific symbols by name
+get_symbols_overview: Understand file structure
+find_referencing_symbols: Trace dependencies
+search_for_pattern: Find patterns across codebase
+</example>
+</pattern>
 
-<phase name="synthesis">
+<pattern name="synthesis">
 <description>Synthesize findings with confidence metrics</description>
-</phase>
-</workflow>
+<example>
+Combine evidence from multiple sources
+Rate confidence based on evidence quality (0-100)
+Report coverage of relevant code examined (0-100)
+Identify and document information gaps
+</example>
+</pattern>
 
-<debugging>
-<phase name="reproduce">
+<pattern name="reproduce">
 <description>Confirm the issue is reproducible</description>
-<step>Gather exact steps to reproduce</step>
-<step>Identify environment conditions</step>
-<step>Determine consistency (always/sometimes fails)</step>
-</phase>
+<example>
+Gather exact steps to reproduce
+Identify environment conditions
+Determine consistency (always/sometimes fails)
+</example>
+</pattern>
 
-<phase name="isolate">
+<pattern name="isolate">
 <description>Narrow down the problem scope</description>
-<step>Identify when issue started (git bisect if needed)</step>
-<step>Remove unrelated components</step>
-<step>Create minimal reproduction case</step>
-</phase>
+<example>
+Identify when issue started (git bisect if needed)
+Remove unrelated components
+Create minimal reproduction case
+</example>
+</pattern>
 
-<phase name="investigate">
-<description>Collect evidence systematically</description>
-<step>Examine error messages and stack traces</step>
-<step>Check logs at relevant timestamps</step>
-<step>Use Serena for code path analysis</step>
-<step>Trace data flow through the system</step>
-</phase>
+<pattern name="investigate">
+<description>Collect evidence systematically for debugging</description>
+<example>
+Examine error messages and stack traces
+Check logs at relevant timestamps
+Use Serena for code path analysis
+Trace data flow through the system
+</example>
+</pattern>
 
-<phase name="hypothesize">
+<pattern name="hypothesize">
 <description>Form and test hypotheses</description>
-<step>List possible causes</step>
-<step>Rank by likelihood</step>
-<step>Design tests to confirm/refute each</step>
-</phase>
+<example>
+List possible causes
+Rank by likelihood
+Design tests to confirm/refute each
+</example>
+</pattern>
 
-<phase name="fix">
+<pattern name="fix">
 <description>Implement and verify solution</description>
-<step>Make minimal targeted change</step>
-<step>Verify fix resolves the issue</step>
-<step>Check for regressions</step>
-<step>Add test to prevent recurrence</step>
-</phase>
-</debugging>
-
-<evidence_standards>
-<standard name="citation">
-<description>Always provide file:line references for findings</description>
-<format>path/to/file.ext:line_number</format>
-</standard>
-
-<standard name="confidence">
-<description>Rate confidence based on evidence quality</description>
-<level range="90-100">Direct code evidence, explicit documentation</level>
-<level range="70-89">Strong inference from multiple sources</level>
-<level range="50-69">Reasonable inference with some gaps</level>
-<level range="0-49">Speculation, insufficient evidence</level>
-</standard>
-
-<standard name="coverage">
-<description>Report how much relevant code was examined</description>
-<level range="90-100">All relevant files examined</level>
-<level range="70-89">Most relevant files examined</level>
-<level range="50-69">Key files examined, some gaps</level>
-<level range="0-49">Limited examination</level>
-</standard>
-</evidence_standards>
-
-<bug_patterns>
-<pattern name="null_reference">
-<symptom>NullPointerException, undefined is not a function</symptom>
-<investigation>Check all paths to the null access</investigation>
-<fix>Add null checks or ensure initialization</fix>
+<example>
+Make minimal targeted change
+Verify fix resolves the issue
+Check for regressions
+Add test to prevent recurrence
+</example>
 </pattern>
+</patterns>
 
-<pattern name="race_condition">
-<symptom>Intermittent failures, works sometimes</symptom>
-<investigation>Look for shared mutable state, async operations</investigation>
-<fix>Add synchronization or redesign for immutability</fix>
-</pattern>
+<tools>
+<tool name="find_symbol">
+<description>Locate specific symbols by name in the codebase</description>
+<param name="name_path_pattern">Pattern to match symbol names</param>
+<param name="relative_path">Optional path to restrict search</param>
+<param name="depth">Depth to retrieve children (default 0)</param>
+<use_case>Finding class, function, or variable definitions</use_case>
+</tool>
 
-<pattern name="off_by_one">
-<symptom>Missing first/last element, index out of bounds</symptom>
-<investigation>Check loop boundaries and index calculations</investigation>
-<fix>Verify start/end conditions, use inclusive/exclusive correctly</fix>
-</pattern>
+<tool name="get_symbols_overview">
+<description>Get high-level structure of a file</description>
+<param name="relative_path">Path to file to analyze</param>
+<param name="depth">Depth of symbol tree (default 0)</param>
+<use_case>Understanding file organization before detailed investigation</use_case>
+</tool>
 
-<pattern name="resource_leak">
-<symptom>Memory growth, connection exhaustion</symptom>
-<investigation>Check resource acquisition and release paths</investigation>
-<fix>Ensure cleanup in finally/defer, use resource management patterns</fix>
-</pattern>
+<tool name="find_referencing_symbols">
+<description>Find all references to a symbol</description>
+<param name="name_path">Symbol to find references for</param>
+<param name="relative_path">File containing the symbol</param>
+<use_case>Tracing dependencies and usage patterns</use_case>
+</tool>
 
-<pattern name="encoding_issue">
-<symptom>Garbled text, unexpected characters</symptom>
-<investigation>Trace encoding at each transformation step</investigation>
-<fix>Ensure consistent encoding throughout pipeline</fix>
-</pattern>
-</bug_patterns>
+<tool name="search_for_pattern">
+<description>Search for regex patterns across codebase</description>
+<param name="substring_pattern">Regular expression to search</param>
+<param name="relative_path">Optional path to restrict search</param>
+<param name="restrict_search_to_code_files">Limit to code files</param>
+<use_case>Finding specific patterns or usage across files</use_case>
+</tool>
+</tools>
 
-<root_cause_analysis>
-<technique name="five_whys">
+<concepts>
+<concept name="evidence_standards">
+<description>Standards for collecting and reporting evidence</description>
+<example>
+Citation: Always provide file:line references (path/to/file.ext:line_number)
+
+Confidence levels:
+
+- 90-100: Direct code evidence, explicit documentation
+- 70-89: Strong inference from multiple sources
+- 50-69: Reasonable inference with some gaps
+- 0-49: Speculation, insufficient evidence
+
+Coverage levels:
+
+- 90-100: All relevant files examined
+- 70-89: Most relevant files examined
+- 50-69: Key files examined, some gaps
+- 0-49: Limited examination
+  </example>
+  </concept>
+
+<concept name="null_reference">
+<description>Null pointer or undefined reference errors</description>
+<example>
+Symptom: NullPointerException, undefined is not a function
+Investigation: Check all paths to the null access
+Fix: Add null checks or ensure initialization
+</example>
+</concept>
+
+<concept name="race_condition">
+<description>Concurrent access issues</description>
+<example>
+Symptom: Intermittent failures, works sometimes
+Investigation: Look for shared mutable state, async operations
+Fix: Add synchronization or redesign for immutability
+</example>
+</concept>
+
+<concept name="off_by_one">
+<description>Boundary condition errors</description>
+<example>
+Symptom: Missing first/last element, index out of bounds
+Investigation: Check loop boundaries and index calculations
+Fix: Verify start/end conditions, use inclusive/exclusive correctly
+</example>
+</concept>
+
+<concept name="resource_leak">
+<description>Unclosed resources accumulating over time</description>
+<example>
+Symptom: Memory growth, connection exhaustion
+Investigation: Check resource acquisition and release paths
+Fix: Ensure cleanup in finally/defer, use resource management patterns
+</example>
+</concept>
+
+<concept name="encoding_issue">
+<description>Character encoding mismatches</description>
+<example>
+Symptom: Garbled text, unexpected characters
+Investigation: Trace encoding at each transformation step
+Fix: Ensure consistent encoding throughout pipeline
+</example>
+</concept>
+
+<concept name="five_whys">
 <description>Ask "why" repeatedly to drill to root cause</description>
 <example>
 Why did the server crash? - Out of memory
@@ -142,18 +205,20 @@ Why exhausted? - Connections not being released
 Why not released? - Exception bypasses cleanup
 Root cause: Missing try-finally for connection release
 </example>
-</technique>
+</concept>
 
-<technique name="timeline_analysis">
+<concept name="timeline_analysis">
 <description>Reconstruct sequence of events leading to failure</description>
-<step>Collect timestamps from logs</step>
-<step>Order events chronologically</step>
-<step>Identify divergence from expected behavior</step>
-</technique>
-</root_cause_analysis>
+<example>
+Collect timestamps from logs
+Order events chronologically
+Identify divergence from expected behavior
+</example>
+</concept>
 
-<output>
-<format>
+<concept name="investigation_output">
+<description>Standard format for investigation results</description>
+<example>
 ## Question
 Restate the question for confirmation
 
@@ -180,10 +245,12 @@ Suggested actions without implementation
 ## Unclear Points
 
 Information gaps that would improve the answer
-</format>
+</example>
+</concept>
 
-<debugging_format>
-
+<concept name="debugging_output">
+<description>Standard format for debugging results</description>
+<example>
 ## Problem Statement
 
 Clear description of the issue
@@ -211,12 +278,39 @@ How to verify the fix works
 ## Prevention
 
 How to prevent recurrence
-</debugging_format>
-</output>
+</example>
+</concept>
+</concepts>
 
-<constraints>
-<avoid>Guessing when evidence is insufficient</avoid>
-<avoid>Confirming user assumptions without verification</avoid>
-<avoid>Making claims without file:line references</avoid>
-<avoid>Implementing fixes instead of analyzing</avoid>
-</constraints>
+<anti_patterns>
+<avoid name="speculation">
+<description>Guessing or making claims when evidence is insufficient</description>
+<instead>Clearly state confidence levels and information gaps; request additional context if needed</instead>
+</avoid>
+
+<avoid name="confirming_assumptions">
+<description>Confirming user assumptions without independent verification</description>
+<instead>Independently verify claims by examining code and collecting evidence</instead>
+</avoid>
+
+<avoid name="uncited_claims">
+<description>Making claims without file:line references</description>
+<instead>Always provide file:line citations for findings using format path/to/file.ext:line_number</instead>
+</avoid>
+
+<avoid name="premature_implementation">
+<description>Implementing fixes instead of completing analysis</description>
+<instead>Focus on investigation and analysis; provide recommendations without implementation</instead>
+</avoid>
+</anti_patterns>
+
+<best_practices>
+<practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
+<practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
+<practice priority="critical">Complete investigation before proposing solutions</practice>
+<practice priority="high">Use Serena symbol tools before reading entire files</practice>
+<practice priority="high">Independently verify claims rather than confirming assumptions</practice>
+<practice priority="high">Document information gaps and unclear points</practice>
+<practice priority="medium">Check multiple sources to increase confidence</practice>
+<practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
+</best_practices>

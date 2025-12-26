@@ -59,53 +59,180 @@ Provide patterns for effective use of Serena MCP tools for semantic code operati
 </tool>
 </tools>
 
-<memory>
-<tool name="list_memories">List available memory files; check existing patterns before implementation</tool>
-<tool name="read_memory">Read content of a memory file; load conventions, patterns, decisions</tool>
-<tool name="write_memory">Save information for future reference; record patterns, conventions, decisions</tool>
-<tool name="delete_memory">Remove obsolete memory; clean up outdated information</tool>
-<naming>
-<pattern format="{project}-conventions">Project conventions</pattern>
-<pattern format="{feature}-patterns">Feature patterns</pattern>
-<pattern format="{domain}-patterns">Domain patterns</pattern>
-<pattern format="architecture-{decision}">Architecture decisions</pattern>
-</naming>
-</memory>
+<concepts>
+<concept name="memory_files">
+<description>Persistent storage for project patterns, conventions, and architectural decisions</description>
+<example>
+list_memories  # Check existing patterns
+read_memory "nix-conventions"  # Load Nix patterns
+write_memory "api-patterns" "REST API conventions..."  # Record new pattern
+delete_memory "outdated-pattern"  # Remove obsolete info
+</example>
+</concept>
+<concept name="memory_naming">
+<description>Consistent naming conventions for memory files</description>
+<example>
+{project}-conventions  # Project-wide conventions
+{feature}-patterns     # Feature-specific patterns
+{domain}-patterns      # Domain-specific patterns
+architecture-{decision}  # Architecture decisions
+</example>
+</concept>
+<concept name="symbol_path">
+<description>Path to symbol within a file (e.g., MyClass/myMethod)</description>
+<example>
+find_symbol "MyClass/myMethod"  # Find specific method
+find_symbol "get*" substring_matching=true  # Find all getter methods
+</example>
+</concept>
+</concepts>
 
 <patterns>
 <pattern name="explore_file">
-<step>get_symbols_overview with depth=0 for top-level view</step>
-<step>get_symbols_overview with depth=1 for class members</step>
-<step>find_symbol with include_body=true for specific implementation</step>
+<description>Systematically explore file structure from high-level to detailed</description>
+<example>
+# Step 1: Get top-level overview
+get_symbols_overview relative_path="src/main.ts" depth=0
+
+# Step 2: Explore class members
+
+get_symbols_overview relative_path="src/main.ts" depth=1
+
+# Step 3: Get specific implementation
+
+find_symbol name_path_pattern="MyClass/myMethod" include_body=true
+</example>
 </pattern>
 <pattern name="trace_dependencies">
-<step>find_symbol to locate the symbol</step>
-<step>find_referencing_symbols to find all callers</step>
-<step>Recursively trace for full dependency graph</step>
+<description>Trace symbol dependencies and callers</description>
+<example>
+
+# Step 1: Locate the symbol
+
+find_symbol name_path_pattern="processData" relative_path="src/processor.ts"
+
+# Step 2: Find all callers
+
+find_referencing_symbols name_path="processData" relative_path="src/processor.ts"
+
+# Step 3: Recursively trace for full dependency graph
+
+</example>
 </pattern>
 <pattern name="safe_refactoring">
-<step>find_symbol to understand current implementation</step>
-<step>find_referencing_symbols to identify all usages</step>
-<step>replace_symbol_body for the change</step>
-<step>Update references if interface changed</step>
+<description>Refactor with full impact analysis</description>
+<example>
+# Step 1: Understand current implementation
+find_symbol name_path_pattern="MyClass/oldMethod" include_body=true
+
+# Step 2: Identify all usages
+
+find_referencing_symbols name_path="MyClass/oldMethod" relative_path="src/myclass.ts"
+
+# Step 3: Perform the change
+
+replace_symbol_body name_path="MyClass/oldMethod" relative_path="src/myclass.ts" body="..."
+
+# Step 4: Update references if interface changed
+
+</example>
 </pattern>
 <pattern name="pattern_search">
-<step>search_for_pattern with restrict_search_to_code_files=true for code</step>
-<step>search_for_pattern with restrict_search_to_code_files=false for all files</step>
-<step>Use context_lines for surrounding code</step>
+<description>Search for patterns with appropriate scope</description>
+<example>
+# Search only in code files
+search_for_pattern substring_pattern="TODO:" restrict_search_to_code_files=true
+
+# Search in all files including configs
+
+search_for_pattern substring_pattern="api-key" restrict_search_to_code_files=false
+
+# Include context around matches
+
+search_for_pattern substring_pattern="function.\*async" context_lines_before=2 context_lines_after=3
+</example>
+</pattern>
+<pattern name="memory_workflow">
+<description>Use memories to maintain consistency across tasks</description>
+<example>
+
+# Before implementation
+
+list_memories # Check what patterns exist
+read_memory "typescript-patterns" # Load relevant patterns
+
+# During implementation
+
+# Follow the patterns loaded from memory
+
+# After implementation
+
+write_memory "api-client-pattern" "HTTP client pattern using fetch with retry logic..."
+</example>
 </pattern>
 </patterns>
 
-<rules>
+<anti_patterns>
+<avoid name="reading_entire_files">
+<description>Reading entire files when only specific symbols are needed</description>
+<instead>Use get_symbols_overview for file structure and find_symbol with include_body for specific implementations</instead>
+</avoid>
+<avoid name="unscoped_searches">
+<description>Searching entire codebase when scope is known</description>
+<instead>Use relative_path parameter to restrict search to known files or directories</instead>
+</avoid>
+<avoid name="ignoring_memories">
+<description>Implementing features without checking existing patterns</description>
+<instead>Always check list_memories and read_memory before implementation</instead>
+</avoid>
+<avoid name="manual_refactoring">
+<description>Manually updating symbol references across files</description>
+<instead>Use rename_symbol for consistent renaming with automatic reference updates</instead>
+</avoid>
+<avoid name="excessive_depth">
+<description>Using high depth values unnecessarily in get_symbols_overview</description>
+<instead>Start with depth=0, then incrementally increase if needed</instead>
+</avoid>
+</anti_patterns>
+
+<best_practices>
+<practice priority="critical">Always check memories with list_memories and read_memory before implementing new features</practice>
+<practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files</practice>
+<practice priority="high">Restrict searches by relative_path when scope is known to improve performance</practice>
+<practice priority="high">Use substring_matching for uncertain symbol names to broaden search results</practice>
+<practice priority="high">Record new patterns and conventions with write_memory for future reference</practice>
+<practice priority="medium">Use context_lines parameters in search_for_pattern to understand surrounding code</practice>
+<practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
+</best_practices>
+
+<rules priority="critical">
 <rule>Always check memories before implementing new features</rule>
 <rule>Use symbol operations over reading entire files</rule>
+<rule>Call think_about_collected_information after non-trivial search sequences</rule>
+<rule>Call think_about_task_adherence before making code changes</rule>
+</rules>
+
+<rules priority="standard">
 <rule>Restrict searches by relative_path when scope is known</rule>
 <rule>Use substring_matching for uncertain symbol names</rule>
 <rule>Record new patterns with write_memory</rule>
+<rule>Call think_about_whether_you_are_done when task appears complete</rule>
 </rules>
 
 <thinking>
-<tool name="think_about_collected_information">Call after non-trivial search sequences to evaluate sufficiency</tool>
-<tool name="think_about_task_adherence">Call before making code changes to ensure alignment</tool>
-<tool name="think_about_whether_you_are_done">Call when task appears complete to verify</tool>
+<concept name="reflection_tools">
+<description>Meta-cognitive tools for ensuring search quality and task alignment</description>
+<example>
+# After searching multiple files
+think_about_collected_information
+
+# Before making changes
+
+think_about_task_adherence
+
+# When task seems complete
+
+think_about_whether_you_are_done
+</example>
+</concept>
 </thinking>

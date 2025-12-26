@@ -46,7 +46,9 @@ Provide structured workflow for task execution through delegation to specialized
 </phase>
 </workflow>
 
-<agents>
+<concept name="agent_groups">
+<description>Specialized sub-agents organized by execution model</description>
+<example>
 <group name="quality_assurance" execution="parallel">
 <agent name="quality">Syntax, type, format verification</agent>
 <agent name="security">Vulnerability detection</agent>
@@ -59,96 +61,138 @@ Provide structured workflow for task execution through delegation to specialized
 <group name="review" execution="sequential_after_implementation">
 <agent name="review">Post-implementation review</agent>
 </group>
-</agents>
+</example>
+</concept>
 
-<delegation>
-<requirement>Specific scope and expected deliverables</requirement>
-<requirement>Target file paths</requirement>
-<requirement>Serena MCP usage: find_symbol, get_symbols_overview, search_for_pattern</requirement>
-<requirement>Context7 MCP usage for library verification</requirement>
-<requirement>Reference implementations with specific paths</requirement>
-<requirement>Memory check: list_memories for patterns</requirement>
-</delegation>
+<concept name="delegation_requirements">
+<description>Essential information to provide when delegating to sub-agents</description>
+<example>
+- Specific scope and expected deliverables
+- Target file paths
+- Serena MCP usage: find_symbol, get_symbols_overview, search_for_pattern
+- Context7 MCP usage for library verification
+- Reference implementations with specific paths
+- Memory check: list_memories for patterns
+</example>
+</concept>
 
-<tools>
-<preference order="1">Basic tools (Read/Edit/Write) when sufficient</preference>
-<preference order="2">Serena MCP for semantic operations</preference>
-<preference order="3">Context7 for library documentation</preference>
-<preference order="4">Codex MCP only for code generation/modification</preference>
-<prohibited tool="codex">
-<task>Research/analysis - use Explore agent, Serena MCP</task>
-<task>Quality verification - use quality agent</task>
-<task>Security verification - use security agent</task>
-<task>Test creation - use test agent</task>
-<task>Documentation - use docs agent</task>
-<task>Code review - use review agent</task>
-</prohibited>
-</tools>
+<concept name="tool_preference">
+<description>Tool selection hierarchy for task execution</description>
+<example>
+Priority 1: Basic tools (Read/Edit/Write) when sufficient
+Priority 2: Serena MCP for semantic operations
+Priority 3: Context7 for library documentation
+Priority 4: Codex MCP only for code generation/modification
 
-<code_review>
-<phase name="initial_scan">
-<description>Quick pass for obvious issues</description>
-<check>Syntax errors and typos</check>
-<check>Missing imports or dependencies</check>
-<check>Obvious logic errors</check>
-<check>Code style violations</check>
-</phase>
+Prohibited Codex usage:
 
-<phase name="deep_analysis">
-<description>Line-by-line review of changed code</description>
-<check>Algorithm correctness</check>
-<check>Edge case handling</check>
-<check>Error handling completeness</check>
-<check>Resource management</check>
-</phase>
+- Research/analysis - use Explore agent, Serena MCP
+- Quality verification - use quality agent
+- Security verification - use security agent
+- Test creation - use test agent
+- Documentation - use docs agent
+- Code review - use review agent
+  </example>
+  </concept>
 
-<phase name="context_evaluation">
-<description>Impact on related code</description>
-<check>Breaking changes to public APIs</check>
-<check>Side effects on existing functionality</check>
-<check>Dependency compatibility</check>
-</phase>
+<concept name="code_review_phases">
+<description>Systematic code review process</description>
+<example>
+Phase 1 - Initial Scan:
+- Syntax errors and typos
+- Missing imports or dependencies
+- Obvious logic errors
+- Code style violations
 
-<phase name="standards_compliance">
-<description>Compare against project and language standards</description>
-<check>Naming conventions</check>
-<check>Documentation requirements</check>
-<check>Test coverage</check>
-</phase>
-</code_review>
+Phase 2 - Deep Analysis:
 
-<quality_criteria>
-<criterion name="correctness">
-<description>Code does what it's supposed to do</description>
-<checks>Logic matches requirements, edge cases handled, error conditions covered</checks>
-</criterion>
-<criterion name="security">
-<description>No security vulnerabilities introduced</description>
-<checks>Input validation, authentication/authorization, data sanitization, secrets handling</checks>
-</criterion>
-<criterion name="performance">
-<description>No significant performance degradation</description>
-<checks>Algorithm efficiency, resource usage, memory leaks, N+1 queries</checks>
-</criterion>
-<criterion name="maintainability">
-<description>Code is easy to understand and modify</description>
-<checks>Clear naming, appropriate comments, single responsibility, DRY principle</checks>
-</criterion>
-<criterion name="testability">
-<description>Code can be effectively tested</description>
-<checks>Test coverage adequate, tests meaningful, edge cases tested</checks>
-</criterion>
-</quality_criteria>
+- Algorithm correctness
+- Edge case handling
+- Error handling completeness
+- Resource management
 
-<feedback_categories>
-<category name="critical">Must fix before merge (security vulnerabilities, data corruption risks, breaking changes)</category>
-<category name="important">Should fix before merge (logic errors, missing error handling, performance issues)</category>
-<category name="suggestion">Nice to have improvements (code style, refactoring opportunities, documentation)</category>
-<category name="positive">What was done well (good patterns, clever solutions, thorough testing)</category>
-</feedback_categories>
+Phase 3 - Context Evaluation:
 
-<output>
-<format>
+- Breaking changes to public APIs
+- Side effects on existing functionality
+- Dependency compatibility
+
+Phase 4 - Standards Compliance:
+
+- Naming conventions
+- Documentation requirements
+- Test coverage
+  </example>
+  </concept>
+
+<concept name="quality_criteria">
+<description>Evaluation criteria for code quality</description>
+<example>
+Correctness:
+- Logic matches requirements
+- Edge cases handled
+- Error conditions covered
+
+Security:
+
+- Input validation
+- Authentication/authorization
+- Data sanitization
+- Secrets handling
+
+Performance:
+
+- Algorithm efficiency
+- Resource usage
+- Memory leaks
+- N+1 queries
+
+Maintainability:
+
+- Clear naming
+- Appropriate comments
+- Single responsibility
+- DRY principle
+
+Testability:
+
+- Test coverage adequate
+- Tests meaningful
+- Edge cases tested
+  </example>
+  </concept>
+
+<concept name="feedback_categories">
+<description>Categorization of review feedback by priority</description>
+<example>
+Critical: Must fix before merge
+- Security vulnerabilities
+- Data corruption risks
+- Breaking changes
+
+Important: Should fix before merge
+
+- Logic errors
+- Missing error handling
+- Performance issues
+
+Suggestion: Nice to have improvements
+
+- Code style
+- Refactoring opportunities
+- Documentation
+
+Positive: What was done well
+
+- Good patterns
+- Clever solutions
+- Thorough testing
+  </example>
+  </concept>
+
+<concept name="review_output_format">
+<description>Standard format for code review results</description>
+<example>
 ## Summary
 Overall assessment and recommendation
 
@@ -171,23 +215,55 @@ Good practices observed
 ## Questions
 
 Clarifications needed
-</format>
-</output>
+</example>
+</concept>
 
-<rules>
+<rules priority="critical">
 <rule>Execute independent tasks in parallel</rule>
-<rule>quality + security: Concurrent checks</rule>
-<rule>test + docs: Simultaneous creation when independent</rule>
 <rule>Never parallelize tasks with data dependencies</rule>
 <rule>Verify sub-agent outputs before integration</rule>
 <rule>Run quality checks after changes</rule>
+</rules>
+
+<rules priority="standard">
+<rule>quality + security: Concurrent checks</rule>
+<rule>test + docs: Simultaneous creation when independent</rule>
 <rule>Ensure no regression in existing functionality</rule>
 <rule>Confirm all acceptance criteria met</rule>
 </rules>
 
+<best_practices>
+<practice priority="critical">Analyze task dependencies before execution to determine parallel vs sequential execution model</practice>
+<practice priority="critical">Provide comprehensive context to sub-agents including file paths, tool usage, and reference implementations</practice>
+<practice priority="critical">Systematically review all phases: initial scan, deep analysis, context evaluation, standards compliance</practice>
+<practice priority="high">Balance critical feedback with positive observations of good practices</practice>
+<practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
+<practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
+</best_practices>
+
 <anti_patterns>
-<avoid>Nitpicking on style when functionality is broken</avoid>
-<avoid>Approving without thorough review</avoid>
-<avoid>Focusing only on negatives</avoid>
-<avoid>Vague feedback without specific suggestions</avoid>
+<avoid name="nitpicking_style">
+<description>Focusing on code style issues when functionality is broken</description>
+<instead>Address critical and important issues first, style suggestions last</instead>
+</avoid>
+<avoid name="rubber_stamping">
+<description>Approving changes without thorough review</description>
+<instead>Systematically review all phases: scan, deep analysis, context, standards</instead>
+</avoid>
+<avoid name="only_negatives">
+<description>Providing only critical feedback without acknowledging good work</description>
+<instead>Balance feedback with positive observations of good practices</instead>
+</avoid>
+<avoid name="vague_feedback">
+<description>Giving feedback without specific, actionable suggestions</description>
+<instead>Provide file:line references and concrete improvement suggestions</instead>
+</avoid>
+<avoid name="sequential_when_parallel">
+<description>Executing independent tasks sequentially</description>
+<instead>Identify and execute independent tasks in parallel for efficiency</instead>
+</avoid>
+<avoid name="parallel_when_dependent">
+<description>Attempting to parallelize tasks with data dependencies</description>
+<instead>Analyze dependencies and execute dependent tasks sequentially</instead>
+</avoid>
 </anti_patterns>

@@ -12,87 +12,171 @@ Provide patterns for effective use of Context7 MCP for retrieving up-to-date lib
 <tool name="resolve-library-id">
 <description>Resolve package name to Context7-compatible library ID</description>
 <param name="libraryName">Library name to search for</param>
-<output>List of matching libraries with IDs, trust scores, snippet counts</output>
-<note>Must call before get-library-docs unless ID is known</note>
+<use_case>Must call before get-library-docs unless ID is known</use_case>
+<note>Returns list of matching libraries with IDs, trust scores, snippet counts</note>
 </tool>
+
 <tool name="get-library-docs">
 <description>Fetch documentation for a specific library</description>
 <param name="context7CompatibleLibraryID">Library ID from resolve-library-id</param>
 <param name="topic">Optional topic to focus on (e.g., "hooks", "routing")</param>
 <param name="tokens">Max tokens to retrieve (default: 5000)</param>
-<output>Documentation snippets with code examples</output>
+<use_case>Retrieve up-to-date documentation snippets with code examples</use_case>
 </tool>
 </tools>
 
 <workflow>
 <phase name="resolve">
 <step>Call resolve-library-id with library name</step>
-<example>resolve-library-id libraryName="react"</example>
+<example>
+resolve-library-id libraryName="react"
+</example>
 </phase>
+
 <phase name="select">
 <criterion>Name similarity to query</criterion>
 <criterion>Trust score (7-10 preferred)</criterion>
 <criterion>Code snippet count (higher is better)</criterion>
 <criterion>Description relevance</criterion>
 </phase>
+
 <phase name="fetch">
 <step>Call get-library-docs with selected ID</step>
-<example>get-library-docs context7CompatibleLibraryID="/facebook/react" topic="hooks"</example>
+<example>
+get-library-docs context7CompatibleLibraryID="/facebook/react" topic="hooks"
+</example>
 </phase>
 </workflow>
 
-<libraries>
-<library name="React" id="/facebook/react" />
-<library name="Next.js" id="/vercel/next.js" />
-<library name="TypeScript" id="/microsoft/typescript" />
-<library name="Node.js" id="/nodejs/node" />
-<library name="Express" id="/expressjs/express" />
-<library name="NixOS/nixpkgs" id="/nixos/nixpkgs" />
-<library name="Home Manager" id="/nix-community/home-manager" />
-</libraries>
+<concept name="library_identifiers">
+<description>Common Context7-compatible library IDs for frequently used packages</description>
+<example>
+React: /facebook/react
+Next.js: /vercel/next.js
+TypeScript: /microsoft/typescript
+Node.js: /nodejs/node
+Express: /expressjs/express
+NixOS/nixpkgs: /nixos/nixpkgs
+Home Manager: /nix-community/home-manager
+</example>
+</concept>
 
-<patterns>
+<concept name="token_allocation">
+<description>Recommended token limits based on query type</description>
+<example>
+Quick lookup (specific API/function): 2000-3000 tokens
+Standard queries: 5000 tokens (default)
+Comprehensive topics: 8000-10000 tokens
+</example>
+</concept>
+
 <pattern name="specific_feature">
-<description>Use topic to narrow documentation focus</description>
-<example>topic="authentication" for auth-related docs</example>
-<example>topic="hooks" for React hooks documentation</example>
+<description>Use topic parameter to narrow documentation focus and reduce token usage</description>
+<example>
+# For authentication-related documentation
+topic="authentication"
+
+# For React hooks documentation
+
+topic="hooks"
+
+# For routing documentation
+
+topic="routing"
+</example>
 </pattern>
-<pattern name="getting_started">Omit topic for general overview</pattern>
+
+<pattern name="getting_started">
+<description>Omit topic parameter for general overview and getting started documentation</description>
+<example>
+get-library-docs context7CompatibleLibraryID="/facebook/react"
+</example>
+</pattern>
+
 <pattern name="api_reference">
-<description>Use topic="api" or specific API name</description>
-<example>topic="useState" for specific hook</example>
+<description>Use topic parameter with specific API names for focused reference documentation</description>
+<example>
+# For specific React hook
+topic="useState"
+
+# For specific Next.js API
+
+topic="getServerSideProps"
+
+# For specific TypeScript utility type
+
+topic="Partial"
+</example>
 </pattern>
-</patterns>
 
-<tokens>
-<recommendation name="quick_lookup" tokens="2000-3000">For specific API or function documentation</recommendation>
-<recommendation name="standard" tokens="5000">Default for most queries</recommendation>
-<recommendation name="comprehensive" tokens="8000-10000">For complex topics requiring extensive context</recommendation>
-</tokens>
+<pattern name="verify_usage">
+<description>Verify codebase usage against latest documentation by combining Serena and Context7</description>
+<example>
+# 1. Use Serena to find current library usage in codebase
+find_symbol name_path_pattern="useState"
 
-<rules>
-<rule>Always resolve library ID before fetching docs</rule>
-<rule>Use specific topics to reduce token usage</rule>
-<rule>Prefer high trust score libraries</rule>
-<rule>Check snippet count for documentation quality</rule>
-<rule>Use versioned IDs when available for specific versions</rule>
+# 2. Use Context7 to get latest documentation
+
+get-library-docs context7CompatibleLibraryID="/facebook/react" topic="useState"
+
+# 3. Compare current usage with documented best practices
+
+</example>
+</pattern>
+
+<pattern name="update_dependencies">
+<description>Plan dependency updates with API migration by checking latest documentation</description>
+<example>
+# 1. Use Context7 to check latest API changes
+get-library-docs context7CompatibleLibraryID="/vercel/next.js" topic="migration"
+
+# 2. Use Serena to find all usages of changed APIs
+
+find_referencing_symbols name_path="getStaticProps"
+
+# 3. Plan migration based on documentation
+
+</example>
+</pattern>
+
+<best_practices>
+<practice priority="critical">Always resolve library ID before fetching documentation</practice>
+<practice priority="critical">Prefer libraries with trust scores 7-10 for better documentation quality</practice>
+<practice priority="high">Use specific topics to reduce token usage and increase relevance</practice>
+<practice priority="high">Check snippet count as indicator of documentation completeness</practice>
+<practice priority="medium">Use versioned IDs when available for specific version documentation</practice>
+</best_practices>
+
+<anti_patterns>
+<avoid name="skipping_resolution">
+<description>Calling get-library-docs without resolving library ID first</description>
+<instead>Always call resolve-library-id to get the correct Context7-compatible library ID</instead>
+</avoid>
+
+<avoid name="excessive_tokens">
+<description>Requesting maximum tokens for simple queries</description>
+<instead>Use specific topics and appropriate token limits (2000-3000 for quick lookups, 5000 for standard queries)</instead>
+</avoid>
+
+<avoid name="ignoring_trust_scores">
+<description>Using libraries with low trust scores or snippet counts</description>
+<instead>Prefer libraries with trust scores 7-10 and higher snippet counts for better documentation quality</instead>
+</avoid>
+
+<avoid name="wrong_library_name">
+<description>Using incorrect or outdated library names (e.g., "react-query" vs "tanstack/query")</description>
+<instead>Try alternative names or broader search terms if library not found</instead>
+</avoid>
+</anti_patterns>
+
+<rules priority="critical">
+<rule>Always resolve library ID before fetching documentation</rule>
+<rule>Verify trust score is 7 or higher before using library documentation</rule>
 </rules>
 
-<integration>
-<pattern name="verify_usage">
-<step>Use Serena to find how library is currently used in codebase</step>
-<step>Use Context7 to get latest documentation</step>
-<step>Compare current usage with documented best practices</step>
-</pattern>
-<pattern name="update_dependencies">
-<step>Use Context7 to check latest API changes</step>
-<step>Use Serena to find all usages of changed APIs</step>
-<step>Plan migration based on documentation</step>
-</pattern>
-</integration>
-
-<errors>
-<case name="library_not_found">Try alternative names or broader search terms (e.g., "react-query" vs "tanstack/query")</case>
-<case name="low_snippet_count">Consider using alternative library ID or broader topic</case>
-<case name="version_mismatch">Use versioned library ID format: /org/project/version</case>
-</errors>
+<rules priority="standard">
+<rule>Use specific topics to reduce token usage</rule>
+<rule>Check snippet count for documentation quality indicators</rule>
+<rule>Use versioned IDs when available for specific versions</rule>
+<rule>Combine with Serena for codebase verification workflows</rule>
+</rules>

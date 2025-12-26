@@ -10,62 +10,89 @@ Provide comprehensive patterns for Go language development, modules, testing, an
 
 <go_language>
 <naming_conventions>
-<convention name="packages">
-Lowercase, single-word names. No underscores or mixedCaps.
-<example>package httputil</example>
-<avoid>package http_util, package httpUtil</avoid>
-</convention>
+<pattern name="packages">
+<description>Lowercase, single-word names. No underscores or mixedCaps.</description>
+<example>
+package httputil
+</example>
+</pattern>
 
-<convention name="exported">
-PascalCase for exported (public) identifiers.
-<example>func ReadFile(), type Handler, var MaxRetries</example>
-</convention>
+<pattern name="exported">
+<description>PascalCase for exported (public) identifiers.</description>
+<example>
+func ReadFile()
+type Handler
+var MaxRetries
+</example>
+</pattern>
 
-<convention name="unexported">
-camelCase for unexported (private) identifiers.
-<example>func parseConfig(), type handler, var maxRetries</example>
-</convention>
+<pattern name="unexported">
+<description>camelCase for unexported (private) identifiers.</description>
+<example>
+func parseConfig()
+type handler
+var maxRetries
+</example>
+</pattern>
 
-<convention name="interfaces">
-Single-method interfaces: method name + "er" suffix.
-<example>Reader, Writer, Closer, Stringer, Handler</example>
-</convention>
+<pattern name="interfaces">
+<description>Single-method interfaces: method name + "er" suffix.</description>
+<example>
+Reader, Writer, Closer, Stringer, Handler
+</example>
+</pattern>
 
-<convention name="acronyms">
-Keep acronyms uppercase: URL, HTTP, ID, API.
-<example>func ServeHTTP(), type HTTPClient, var userID</example>
-</convention>
+<pattern name="acronyms">
+<description>Keep acronyms uppercase: URL, HTTP, ID, API.</description>
+<example>
+func ServeHTTP()
+type HTTPClient
+var userID
+</example>
+</pattern>
 
-<convention name="getters">
-No "Get" prefix for getters.
-<example>func (u *User) Name() string // not GetName()</example>
-</convention>
+<pattern name="getters">
+<description>No "Get" prefix for getters.</description>
+<example>
+func (u *User) Name() string // not GetName()
+</example>
+</pattern>
 </naming_conventions>
 
 <formatting>
+<rules priority="standard">
 <rule>Use gofmt/goimports - no manual formatting debates</rule>
 <rule>Tabs for indentation, spaces for alignment</rule>
 <rule>No semicolons except in for loops and multi-statement lines</rule>
 <rule>Opening brace on same line as declaration</rule>
+</rules>
 </formatting>
 
 <type_system>
 <pattern name="zero_values">
-Zero values are meaningful: 0, "", nil, false.
-<example>var buf bytes.Buffer // ready to use, no initialization needed</example>
+<description>Zero values are meaningful: 0, "", nil, false.</description>
+<example>
+var buf bytes.Buffer // ready to use, no initialization needed
+</example>
 </pattern>
 
 <pattern name="type_assertion">
-<safe>value, ok := x.(Type)</safe>
-<unsafe>value := x.(Type) // panics if wrong type</unsafe>
+<description>Safe type assertion with ok pattern vs unsafe panic.</description>
+<example>
+value, ok := x.(Type) // safe
+value := x.(Type) // panics if wrong type
+</example>
 </pattern>
 
 <pattern name="type_switch">
+<description>Type switch for handling multiple types.</description>
+<example>
 switch v := x.(type) {
 case string: // v is string
 case int:    // v is int
 default:     // v is interface{}
 }
+</example>
 </pattern>
 </type_system>
 </go_language>
@@ -78,8 +105,8 @@ default:     // v is interface{}
 <principle>Add context when propagating errors</principle>
 </principles>
 
-<patterns>
 <pattern name="basic_check">
+<description>Basic error checking pattern with context wrapping.</description>
 <example>
 result, err := doSomething()
 if err != nil {
@@ -106,6 +133,7 @@ var ErrInvalidInput = errors.New("invalid input")
 </pattern>
 
 <pattern name="custom_error_type">
+<description>Define custom error types implementing the error interface for structured error information.</description>
 <example>
 type ValidationError struct {
     Field   string
@@ -119,6 +147,7 @@ return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 </pattern>
 
 <pattern name="error_inspection">
+<description>Inspect and unwrap errors using errors.Is and errors.As for type-safe error handling.</description>
 <example>
 // Check for specific error
 if errors.Is(err, ErrNotFound) { ... }
@@ -137,13 +166,6 @@ log.Printf("field: %s", valErr.Field)
 err := errors.Join(err1, err2, err3)
 </example>
 </pattern>
-</patterns>
-
-<anti*patterns>
-<avoid>if err != nil { return err } // loses context</avoid>
-<avoid>panic() for recoverable errors</avoid>
-<avoid>* = riskyOperation() // ignoring errors</avoid>
-</anti_patterns>
 </error_handling>
 
 <interfaces>
@@ -162,8 +184,8 @@ err := errors.Join(err1, err2, err3)
 <interface name="fmt.Stringer">String() string</interface>
 </common_interfaces>
 
-<patterns>
 <pattern name="interface_definition">
+<description>Define interfaces with method signatures.</description>
 <example>
 type Handler interface {
     Handle(ctx context.Context, req Request) (Response, error)
@@ -172,6 +194,7 @@ type Handler interface {
 </pattern>
 
 <pattern name="interface_composition">
+<description>Compose larger interfaces from smaller ones.</description>
 <example>
 type ReadWriteCloser interface {
     io.Reader
@@ -182,18 +205,22 @@ type ReadWriteCloser interface {
 </pattern>
 
 <pattern name="empty_interface">
-<description>interface{} or any (Go 1.18+) accepts all types</description>
-<warning>Avoid when possible - loses type safety</warning>
+<description>interface{} or any (Go 1.18+) accepts all types. Avoid when possible - loses type safety.</description>
+<example>
+func process(data any) { ... }
+</example>
 </pattern>
-</patterns>
 </interfaces>
 
 <modules>
-<go_mod_structure>
+<pattern name="go_mod_structure">
+<description>Standard go.mod file structure with module, go version, toolchain, and dependencies.</description>
 <example>
 module github.com/user/project
 
-go 1.21
+go 1.23
+
+toolchain go1.23.0
 
 require (
 github.com/pkg/errors v0.9.1
@@ -204,30 +231,65 @@ require (
 golang.org/x/sys v0.10.0 // indirect
 )
 </example>
-</go_mod_structure>
+</pattern>
 
 <commands>
-<command name="go mod init">Initialize new module</command>
-<command name="go mod tidy">Add missing, remove unused dependencies</command>
-<command name="go get pkg@version">Add or update dependency</command>
-<command name="go mod download">Download dependencies to cache</command>
-<command name="go mod vendor">Create vendor directory</command>
-<command name="go mod verify">Verify dependencies</command>
+<tool name="go mod init">
+<description>Initialize new module</description>
+<use_case>Start a new Go project with module support</use_case>
+</tool>
+<tool name="go mod tidy">
+<description>Add missing, remove unused dependencies</description>
+<use_case>Clean up go.mod and go.sum files</use_case>
+</tool>
+<tool name="go get">
+<description>Add or update dependency</description>
+<param name="pkg@version">Package name and optional version</param>
+<use_case>Install or update a specific package version</use_case>
+</tool>
+<tool name="go mod download">
+<description>Download dependencies to cache</description>
+<use_case>Pre-download modules for offline work</use_case>
+</tool>
+<tool name="go mod vendor">
+<description>Create vendor directory</description>
+<use_case>Copy dependencies into vendor/ for vendoring</use_case>
+</tool>
+<tool name="go mod verify">
+<description>Verify dependencies</description>
+<use_case>Check that downloaded modules haven't been modified</use_case>
+</tool>
 </commands>
 
+<pattern name="toolchain_directive">
+<description>Suggest specific Go toolchain version (Go 1.21+). Used when module requires newer toolchain than default.</description>
+<example>
+toolchain go1.23.0
+</example>
+</pattern>
+
 <versioning>
-<pattern name="semantic_import">v0.x.x and v1.x.x: no path suffix</pattern>
-<pattern name="v2_plus">v2+: include version in import path</pattern>
-<example>import "github.com/user/project/v2"</example>
+<pattern name="semantic_import">
+<description>v0.x.x and v1.x.x: no path suffix.</description>
+<example>
+import "github.com/user/project"
+</example>
+</pattern>
+<pattern name="v2_plus">
+<description>v2+: include version in import path.</description>
+<example>
+import "github.com/user/project/v2"
+</example>
+</pattern>
 </versioning>
 
-<replace_directive>
-<description>Override module location for local development</description>
+<pattern name="replace_directive">
+<description>Override module location for local development.</description>
 <example>
 replace github.com/user/lib => ../lib
 replace github.com/user/lib v1.0.0 => ./local-lib
 </example>
-</replace_directive>
+</pattern>
 </modules>
 
 <project_structure>
@@ -241,31 +303,31 @@ replace github.com/user/lib v1.0.0 => ./local-lib
 <directory name="testdata/">Test fixtures</directory>
 </standard_layout>
 
-<patterns>
-<pattern name="main_package">
-cmd/myapp/main.go should be minimal - call into internal packages
-</pattern>
-
-<pattern name="internal_protection">
-internal/ packages cannot be imported from outside parent module
-</pattern>
-
-<pattern name="one_package_per_directory">
-Each directory = one package (except _test packages)
-</pattern>
-</patterns>
+<best_practices>
+<practice priority="critical">cmd/myapp/main.go should be minimal - call into internal packages</practice>
+<practice priority="critical">internal/ packages cannot be imported from outside parent module</practice>
+<practice priority="high">Each directory = one package (except \_test packages)</practice>
+</best_practices>
 </project_structure>
 
 <testing>
 <file_naming>
-<pattern>foo.go → foo_test.go</pattern>
-<pattern>Test functions: func TestXxx(t *testing.T)</pattern>
-<pattern>Benchmark functions: func BenchmarkXxx(b *testing.B)</pattern>
-<pattern>Example functions: func ExampleXxx()</pattern>
+<pattern name="test_files">
+<description>foo.go → foo_test.go</description>
+</pattern>
+<pattern name="test_functions">
+<description>Test functions: func TestXxx(t *testing.T)</description>
+</pattern>
+<pattern name="benchmark_functions">
+<description>Benchmark functions: func BenchmarkXxx(b *testing.B)</description>
+</pattern>
+<pattern name="example_functions">
+<description>Example functions: func ExampleXxx()</description>
+</pattern>
 </file_naming>
 
-<patterns>
 <pattern name="table_driven_tests">
+<description>Table-driven tests for comprehensive test coverage with multiple test cases.</description>
 <example>
 func TestAdd(t *testing.T) {
     tests := []struct {
@@ -289,6 +351,7 @@ func TestAdd(t *testing.T) {
 </pattern>
 
 <pattern name="test_helpers">
+<description>Test helper functions with t.Helper() and t.Cleanup() for better test organization.</description>
 <example>
 func setupTestDB(t *testing.T) *DB {
     t.Helper()
@@ -300,31 +363,69 @@ func setupTestDB(t *testing.T) *DB {
 </pattern>
 
 <pattern name="testdata_directory">
-testdata/ is ignored by go build, used for test fixtures
+<description>testdata/ directory is ignored by go build and used for test fixtures.</description>
+<example>
+mypackage/
+├── main.go
+├── main_test.go
+└── testdata/
+    ├── input.json
+    └── expected.txt
+</example>
 </pattern>
-</patterns>
 
 <commands>
-<command name="go test">Run tests in current package</command>
-<command name="go test ./...">Run all tests recursively</command>
-<command name="go test -v">Verbose output</command>
-<command name="go test -run TestName">Run specific test</command>
-<command name="go test -cover">Show coverage percentage</command>
-<command name="go test -coverprofile=c.out">Generate coverage profile</command>
-<command name="go test -bench=.">Run benchmarks</command>
-<command name="go test -race">Enable race detector</command>
+<tool name="go test">
+<description>Run tests in current package</description>
+<use_case>Execute tests for the current directory</use_case>
+</tool>
+<tool name="go test ./...">
+<description>Run all tests recursively</description>
+<use_case>Test entire project including subpackages</use_case>
+</tool>
+<tool name="go test -v">
+<description>Verbose output</description>
+<use_case>See detailed test execution output</use_case>
+</tool>
+<tool name="go test -run">
+<description>Run specific test</description>
+<param name="TestName">Name pattern to match</param>
+<use_case>Run only tests matching the pattern</use_case>
+</tool>
+<tool name="go test -cover">
+<description>Show coverage percentage</description>
+<use_case>Get quick coverage summary</use_case>
+</tool>
+<tool name="go test -coverprofile">
+<description>Generate coverage profile</description>
+<param name="c.out">Output file path</param>
+<use_case>Create detailed coverage report for analysis</use_case>
+</tool>
+<tool name="go test -bench">
+<description>Run benchmarks</description>
+<param name=".">Pattern to match (. for all)</param>
+<use_case>Execute performance benchmarks</use_case>
+</tool>
+<tool name="go test -race">
+<description>Enable race detector</description>
+<use_case>Detect data races during test execution</use_case>
+</tool>
 </commands>
 </testing>
 
 <concurrency>
 <goroutines>
 <pattern name="launch">
+<description>Launch a goroutine for concurrent work.</description>
+<example>
 go func() {
     // concurrent work
 }()
+</example>
 </pattern>
 
 <pattern name="with_waitgroup">
+<description>Use sync.WaitGroup to wait for multiple goroutines to complete.</description>
 <example>
 var wg sync.WaitGroup
 for _, item := range items {
@@ -340,12 +441,36 @@ wg.Wait()
 </goroutines>
 
 <channels>
-<pattern name="unbuffered">ch := make(chan int) // synchronous</pattern>
-<pattern name="buffered">ch := make(chan int, 10) // async up to buffer size</pattern>
-<pattern name="receive_only">func consumer(ch <-chan int)</pattern>
-<pattern name="send_only">func producer(ch chan<- int)</pattern>
+<pattern name="unbuffered">
+<description>Unbuffered channels provide synchronous communication.</description>
+<example>
+ch := make(chan int)
+</example>
+</pattern>
+
+<pattern name="buffered">
+<description>Buffered channels allow asynchronous communication up to buffer size.</description>
+<example>
+ch := make(chan int, 10)
+</example>
+</pattern>
+
+<pattern name="receive_only">
+<description>Receive-only channel parameter.</description>
+<example>
+func consumer(ch <-chan int)
+</example>
+</pattern>
+
+<pattern name="send_only">
+<description>Send-only channel parameter.</description>
+<example>
+func producer(ch chan<- int)
+</example>
+</pattern>
 
 <pattern name="select">
+<description>Select statement for multiplexing channel operations.</description>
 <example>
 select {
 case msg := <-ch1:
@@ -361,13 +486,16 @@ default:
 </pattern>
 
 <pattern name="close_channel">
-close(ch) // signal no more values
+<description>Closing channels signals no more values will be sent.</description>
+<example>
+close(ch)
 for v := range ch { } // receive until closed
+</example>
 </pattern>
 </channels>
 
-<context>
-<description>Use context.Context for cancellation and timeouts</description>
+<pattern name="context_usage">
+<description>Use context.Context for cancellation and timeouts.</description>
 <example>
 ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 defer cancel()
@@ -379,35 +507,132 @@ case <-ctx.Done():
 return nil, ctx.Err()
 }
 </example>
-</context>
+</pattern>
 
 <sync_package>
-<type name="sync.Mutex">Mutual exclusion lock</type>
-<type name="sync.RWMutex">Read-write lock</type>
-<type name="sync.Once">Execute exactly once</type>
-<type name="sync.WaitGroup">Wait for goroutine completion</type>
-<type name="sync.Map">Concurrent map (specialized use cases)</type>
+<concept name="sync.Mutex">
+<description>Mutual exclusion lock</description>
+</concept>
+<concept name="sync.RWMutex">
+<description>Read-write lock</description>
+</concept>
+<concept name="sync.Once">
+<description>Execute exactly once</description>
+</concept>
+<concept name="sync.WaitGroup">
+<description>Wait for goroutine completion</description>
+</concept>
+<concept name="sync.Map">
+<description>Concurrent map (specialized use cases)</description>
+</concept>
 </sync_package>
 </concurrency>
 
+<best_practices>
+<practice priority="high">Use gofmt/goimports for consistent code formatting</practice>
+<practice priority="high">Handle errors explicitly at each call site</practice>
+<practice priority="high">Accept interfaces, return concrete types</practice>
+<practice priority="high">Keep interfaces small (1-3 methods)</practice>
+<practice priority="high">Use context.Context for cancellation and timeouts</practice>
+<practice priority="medium">Prefer table-driven tests for comprehensive coverage</practice>
+<practice priority="medium">Use t.Helper() in test helper functions</practice>
+<practice priority="medium">Run tests with -race flag to detect data races</practice>
+<practice priority="medium">Define interfaces where they are used, not implemented</practice>
+<practice priority="medium">Use go mod tidy regularly to maintain clean dependencies</practice>
+</best_practices>
+
 <anti_patterns>
-<avoid name="init_overuse">Prefer explicit initialization over init()</avoid>
-<avoid name="global_state">Minimize package-level variables</avoid>
-<avoid name="interface_pollution">Don't define interfaces prematurely</avoid>
-<avoid name="naked_returns">Avoid in functions longer than a few lines</avoid>
-<avoid name="panic_for_errors">Use panic only for unrecoverable situations</avoid>
-<avoid name="goroutine_leak">Always ensure goroutines can exit</avoid>
-<avoid name="data_race">Use -race flag during development</avoid>
-<avoid name="empty_interface_overuse">Prefer concrete types or small interfaces</avoid>
+<avoid name="init_overuse">
+<description>Overusing init() functions makes code harder to test and reason about.</description>
+<instead>Prefer explicit initialization functions that can be called with parameters.</instead>
+</avoid>
+<avoid name="global_state">
+<description>Package-level mutable variables create hidden dependencies and concurrency issues.</description>
+<instead>Pass dependencies explicitly through function parameters or struct fields.</instead>
+</avoid>
+<avoid name="interface_pollution">
+<description>Defining interfaces prematurely adds unnecessary abstraction.</description>
+<instead>Define interfaces when you have multiple implementations or need to decouple packages.</instead>
+</avoid>
+<avoid name="naked_returns">
+<description>Naked returns in long functions reduce code clarity.</description>
+<instead>Use explicit return statements for functions longer than a few lines.</instead>
+</avoid>
+<avoid name="panic_for_errors">
+<description>Using panic for recoverable errors violates Go's error handling philosophy.</description>
+<instead>Return errors as values and handle them explicitly at each call site.</instead>
+</avoid>
+<avoid name="goroutine_leak">
+<description>Goroutines that never exit waste resources and can cause memory leaks.</description>
+<instead>Use context.Context or done channels to ensure goroutines can be cancelled.</instead>
+</avoid>
+<avoid name="data_race">
+<description>Data races lead to unpredictable behavior and bugs.</description>
+<instead>Use sync primitives (Mutex, RWMutex) or channels, and always run tests with -race flag.</instead>
+</avoid>
+<avoid name="empty_interface_overuse">
+<description>Overusing interface{}/any loses type safety and requires type assertions.</description>
+<instead>Use concrete types or small, focused interfaces when possible.</instead>
+</avoid>
 </anti_patterns>
 
+<context7_integration>
+<description>Use Context7 MCP for up-to-date Go documentation</description>
+
+<go_libraries>
+<library name="Go Website" id="/golang/website" trust="8.3" />
+<library name="Go Tools" id="/golang/tools" trust="8.3" />
+</go_libraries>
+
+<usage_patterns>
+<pattern name="module_reference">
+<description>Retrieve Go module documentation from Context7.</description>
+<example>
+get-library-docs context7CompatibleLibraryID="/golang/website" topic="go.mod modules"
+</example>
+</pattern>
+</usage_patterns>
+</context7_integration>
+
 <build_commands>
-<command name="go build">Compile package</command>
-<command name="go build -o name">Specify output name</command>
-<command name="go install">Compile and install to GOPATH/bin</command>
-<command name="go run main.go">Compile and run</command>
-<command name="go fmt ./...">Format all code</command>
-<command name="go vet ./...">Static analysis</command>
-<command name="go generate">Run code generators</command>
-<command name="GOOS=linux GOARCH=amd64 go build">Cross-compile</command>
+<tool name="go build">
+<description>Compile package</description>
+<use_case>Build executable from current package</use_case>
+</tool>
+<tool name="go build -o">
+<description>Specify output name</description>
+
+<param name="name">Output binary name</param>
+<use_case>Build with custom binary name</use_case>
+</tool>
+<tool name="go install">
+<description>Compile and install to GOPATH/bin</description>
+<use_case>Install package for global use</use_case>
+</tool>
+<tool name="go run">
+<description>Compile and run</description>
+<param name="main.go">Go file to execute</param>
+<use_case>Quick compile and execute for development</use_case>
+</tool>
+<tool name="go fmt">
+<description>Format all code</description>
+<param name="./...">All packages recursively</param>
+<use_case>Standardize code formatting</use_case>
+</tool>
+<tool name="go vet">
+<description>Static analysis</description>
+<param name="./...">All packages recursively</param>
+<use_case>Detect suspicious code constructs</use_case>
+</tool>
+<tool name="go generate">
+<description>Run code generators</description>
+<use_case>Execute //go:generate directives</use_case>
+</tool>
+<tool name="cross-compile">
+<description>Cross-compile for different platforms</description>
+<example>
+GOOS=linux GOARCH=amd64 go build
+</example>
+<use_case>Build binaries for different operating systems and architectures</use_case>
+</tool>
 </build_commands>

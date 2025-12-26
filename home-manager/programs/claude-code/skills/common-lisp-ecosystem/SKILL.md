@@ -10,23 +10,19 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
 
 <common_lisp_fundamentals>
 <concept name="s_expressions">
-Code and data share the same syntax (homoiconicity).
-Enables powerful macro systems for code transformation.
+<description>Code and data share the same syntax (homoiconicity). Enables powerful macro systems for code transformation.</description>
 </concept>
 
 <concept name="symbols">
-First-class named objects used for identifiers.
-Interned in packages, can have value, function, and property list.
+<description>First-class named objects used for identifiers. Interned in packages, can have value, function, and property list.</description>
 </concept>
 
 <concept name="multiple_values">
-Functions can return multiple values.
-<pattern name="return">values, multiple-value-bind, multiple-value-list</pattern>
+<description>Functions can return multiple values using values, multiple-value-bind, multiple-value-list.</description>
 </concept>
 
 <concept name="dynamic_binding">
-Special variables with dynamic scope using defvar/defparameter.
-Convention: *earmuffs* for special variables.
+<description>Special variables with dynamic scope using defvar/defparameter. Convention: *earmuffs* for special variables.</description>
 </concept>
 </common_lisp_fundamentals>
 
@@ -34,16 +30,17 @@ Convention: *earmuffs* for special variables.
 <description>Common Lisp Object System - Generic functions and multiple dispatch</description>
 
 <pattern name="defclass">
+<description>Define a class with slots. Slot options: :initarg, :initform, :accessor, :reader, :writer, :type, :documentation.</description>
 <example>
 (defclass person ()
   ((name :initarg :name :accessor person-name)
    (age :initarg :age :accessor person-age))
   (:documentation "Represents a person."))
 </example>
-<slot_options>:initarg, :initform, :accessor, :reader, :writer, :type, :documentation</slot_options>
 </pattern>
 
 <pattern name="defgeneric_defmethod">
+<description>Define generic functions with multiple method implementations.</description>
 <example>
 (defgeneric greet (entity)
   (:documentation "Greet an entity."))
@@ -54,7 +51,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="method_combination">
-<qualifiers>:before, :after, :around</qualifiers>
+<description>Method qualifiers (:before, :after, :around) for aspect-oriented programming.</description>
 <example>
 (defmethod greet :before ((p person))
   (format t "Preparing to greet...~%"))
@@ -67,11 +64,11 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="multiple_inheritance">
+<description>Classes can inherit from multiple parent classes. Uses C3 linearization for method resolution order.</description>
 <example>
 (defclass employee (person job-holder)
   ((employee-id :initarg :id :accessor employee-id)))
 </example>
-<note>C3 linearization for method resolution order</note>
 </pattern>
 </clos>
 
@@ -119,6 +116,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="define_condition">
+<description>Define custom condition types for structured error handling.</description>
 <example>
 (define-condition invalid-input (error)
   ((value :initarg :value :reader invalid-input-value))
@@ -131,6 +129,7 @@ Convention: *earmuffs* for special variables.
 
 <packages>
 <pattern name="defpackage">
+<description>Define packages with explicit dependencies and exports.</description>
 <example>
 (defpackage #:my-project
   (:use #:cl)
@@ -141,6 +140,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="package_local_nicknames">
+<description>Define local package nicknames for shorter, clearer references.</description>
 <example>
 (defpackage #:my-project
   (:use #:cl)
@@ -148,19 +148,13 @@ Convention: *earmuffs* for special variables.
                     (#:s #:serapeum)))
 </example>
 </pattern>
-
-<best_practices>
-<practice>Use #: for uninterned symbols in defpackage</practice>
-<practice>Export only the public API</practice>
-<practice>Use package-local-nicknames for shorter references</practice>
-<practice>Avoid :use except for :cl</practice>
-</best_practices>
 </packages>
 
 <asdf>
 <description>Another System Definition Facility - Build system for Common Lisp</description>
 
 <pattern name="basic_defsystem">
+<description>Basic ASDF system definition with metadata and component dependencies.</description>
 <example>
 (defsystem "my-project"
   :description "My project description"
@@ -175,6 +169,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="module_organization">
+<description>Organize system components into modules for better structure.</description>
 <example>
 (defsystem "my-project"
   :components
@@ -188,7 +183,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="package_inferred_system">
-<description>Infer dependencies from defpackage forms</description>
+<description>Infer dependencies from defpackage forms for modern, maintainable systems.</description>
 <example>
 (defsystem "my-project"
   :class :package-inferred-system
@@ -202,6 +197,7 @@ Convention: *earmuffs* for special variables.
 </pattern>
 
 <pattern name="test_system">
+<description>Define test system with automatic test execution using test-op.</description>
 <example>
 (defsystem "my-project/test"
   :depends-on ("my-project" "fiveam")
@@ -212,7 +208,9 @@ Convention: *earmuffs* for special variables.
 </example>
 </pattern>
 
-<project_structure>
+<pattern name="project_structure">
+<description>Recommended directory layout for Common Lisp projects.</description>
+<example>
 my-project/
 ├── my-project.asd
 ├── src/
@@ -221,13 +219,15 @@ my-project/
 │ └── main.lisp
 └── tests/
 └── test-suite.lisp
-</project_structure>
+</example>
+</pattern>
 </asdf>
 
 <sbcl>
 <description>Steel Bank Common Lisp - High-performance implementation</description>
 
 <pattern name="save_executable">
+<description>Create standalone executable with SBCL.</description>
 <example>
 (defun main ()
   (format t "Hello, World!~%")
@@ -241,6 +241,7 @@ my-project/
 </pattern>
 
 <pattern name="threading">
+<description>SBCL threading support with make-thread and mutex synchronization.</description>
 <example>
 (defvar *result* nil)
 
@@ -258,6 +259,7 @@ my-project/
 </pattern>
 
 <pattern name="foreign_function">
+<description>Call C functions from SBCL using sb-alien interface.</description>
 <example>
 (sb-alien:define-alien-routine "strlen" sb-alien:int
   (str sb-alien:c-string))
@@ -266,29 +268,39 @@ my-project/
 </example>
 </pattern>
 
-<optimization>
+<pattern name="optimization">
+<description>Use declarations for type information and optimization settings. Options: type, ftype, inline, optimize.</description>
 <example>
 (defun fast-add (x y)
   (declare (type fixnum x y)
            (optimize (speed 3) (safety 0)))
   (the fixnum (+ x y)))
 </example>
-<declaration_options>type, ftype, inline, optimize</declaration_options>
-</optimization>
+</pattern>
 
-<extensions>
-<item name="sb-ext:*posix-argv*">Command-line arguments</item>
-<item name="sb-ext:run-program">Execute external programs</item>
-<item name="sb-ext:gc">Trigger garbage collection</item>
-<item name="sb-posix">POSIX interface</item>
-<item name="sb-bsd-sockets">Network sockets</item>
-</extensions>
+<pattern name="sbcl_extensions">
+<description>SBCL-specific extensions for system interaction and performance tuning.</description>
+<example>
+;; Command-line arguments
+sb-ext:*posix-argv*
+
+;; Execute external programs
+(sb-ext:run-program "/bin/ls" '("-l"))
+
+;; Trigger garbage collection
+(sb-ext:gc)
+
+;; POSIX interface: sb-posix
+;; Network sockets: sb-bsd-sockets
+</example>
+</pattern>
 </sbcl>
 
 <coalton>
 <description>Statically typed functional programming on Common Lisp</description>
 
 <pattern name="basic_types">
+<description>Define algebraic data types in Coalton with type-safe operations.</description>
 <example>
 (coalton-toplevel
   (define-type (Maybe a)
@@ -304,6 +316,7 @@ None
 </pattern>
 
 <pattern name="type_classes">
+<description>Define type classes for polymorphic behavior in Coalton.</description>
 <example>
 (coalton-toplevel
   (define-class (Printable a)
@@ -315,35 +328,73 @@ None
 </example>
 </pattern>
 
-<integration>
-<note>Coalton compiles to efficient Common Lisp code</note>
-<note>Interoperable with regular CL code</note>
+<pattern name="coalton_integration">
+<description>Coalton compiles to efficient Common Lisp code and is interoperable with regular CL.</description>
 <note>Use coalton-toplevel for type-safe code sections</note>
-</integration>
+<note>Coalton functions can call CL functions and vice versa</note>
+<note>Provides Hindley-Milner type inference with type classes</note>
+</pattern>
 </coalton>
 
 <context7_libraries>
-<library name="Common Lisp Docs" id="/lisp-docs/lisp-docs.github.io" trust="4.7" snippets="580" />
-<library name="ASDF" id="/websites/asdf_common-lisp_dev" trust="7.5" snippets="190" />
-<library name="SBCL" id="/sbcl/sbcl" trust="8.0" snippets="86" />
-<library name="CFFI" id="/websites/cffi_common-lisp_dev" trust="7.5" snippets="198" />
-<library name="FiveAM" id="/websites/fiveam_common-lisp_dev" trust="7.5" snippets="164" />
-<library name="Coalton" id="/coalton-lang/coalton" trust="6.6" snippets="568" />
+<description>Available Context7 documentation libraries for Common Lisp ecosystem.</description>
 
-<usage>
-Use resolve-library-id then get-library-docs for latest documentation.
+<tool name="context7_common_lisp_docs">
+<description>Common Lisp Docs - General Common Lisp documentation</description>
+<param name="library_id">/lisp-docs/lisp-docs.github.io</param>
+<param name="trust_score">4.7</param>
+<param name="snippets">580</param>
+</tool>
+
+<tool name="context7_asdf">
+<description>ASDF - Another System Definition Facility documentation</description>
+<param name="library_id">/websites/asdf_common-lisp_dev</param>
+<param name="trust_score">7.5</param>
+<param name="snippets">190</param>
+</tool>
+
+<tool name="context7_sbcl">
+<description>SBCL - Steel Bank Common Lisp documentation</description>
+<param name="library_id">/sbcl/sbcl</param>
+<param name="trust_score">8.0</param>
+<param name="snippets">86</param>
+</tool>
+
+<tool name="context7_cffi">
+<description>CFFI - Common Foreign Function Interface documentation</description>
+<param name="library_id">/websites/cffi_common-lisp_dev</param>
+<param name="trust_score">7.5</param>
+<param name="snippets">198</param>
+</tool>
+
+<tool name="context7_fiveam">
+<description>FiveAM - Testing framework documentation</description>
+<param name="library_id">/websites/fiveam_common-lisp_dev</param>
+<param name="trust_score">7.5</param>
+<param name="snippets">164</param>
+</tool>
+
+<tool name="context7_coalton">
+<description>Coalton - Statically typed functional programming documentation</description>
+<param name="library_id">/coalton-lang/coalton</param>
+<param name="trust_score">6.6</param>
+<param name="snippets">568</param>
+</tool>
+
+<pattern name="retrieve_documentation">
+<description>Use resolve-library-id then get-library-docs for latest documentation.</description>
 <example>
 ;; Get ASDF documentation
 mcp__context7__get-library-docs
   context7CompatibleLibraryID="/websites/asdf_common-lisp_dev"
   topic="defsystem"
 </example>
-</usage>
+</pattern>
 </context7_libraries>
 
 <common_patterns>
 <pattern name="with_macro">
-<description>Resource management with unwind-protect</description>
+<description>Resource management with unwind-protect for cleanup.</description>
 <example>
 (defmacro with-open-socket ((var host port) &body body)
 `(let ((,var (make-socket ,host ,port)))
@@ -354,6 +405,7 @@ mcp__context7__get-library-docs
 </pattern>
 
 <pattern name="loop_macro">
+<description>Loop macro for iteration with collection, filtering, and accumulation.</description>
 <example>
 (loop for item in list
       for i from 0
@@ -364,18 +416,14 @@ mcp__context7__get-library-docs
 </pattern>
 
 <pattern name="format_directives">
-<common_directives>
-~a - aesthetic (princ)
-~s - standard (prin1)
-~d - decimal integer
-~f - floating point
-~% - newline
-~{ ~} - iteration
-~[ ~] - conditional
-</common_directives>
+<description>Common format directives: ~a (aesthetic), ~s (standard), ~d (decimal), ~f (float), ~% (newline), ~{~} (iteration), ~[~] (conditional).</description>
+<example>
+(format t "~a is ~d years old~%" name age)
+</example>
 </pattern>
 
 <pattern name="documentation">
+<description>Document functions with docstrings explaining purpose and parameters.</description>
 <example>
 (defun my-function (arg)
   "Docstring describing the function.
@@ -385,22 +433,71 @@ ARG is the argument description."
 </pattern>
 </common_patterns>
 
-<best_practices>
-<practice>Use _earmuffs_ for special variables</practice>
-<practice>Use +plus-signs+ for constants</practice>
-<practice>Prefer functional style, minimize mutation</practice>
-<practice>Use appropriate condition types, not just error</practice>
-<practice>Provide restarts for recoverable situations</practice>
-<practice>Document exported symbols</practice>
-<practice>Use check-type for argument validation</practice>
-<practice>Prefer ASDF package-inferred-system for new projects</practice>
+<best*practices>
+<practice priority="high">Use \_earmuffs* for special variables</practice>
+<practice priority="high">Use +plus-signs+ for constants</practice>
+<practice priority="high">Prefer functional style, minimize mutation</practice>
+<practice priority="high">Provide restarts for recoverable situations</practice>
+<practice priority="high">Document exported symbols</practice>
+<practice priority="medium">Use appropriate condition types, not just error</practice>
+<practice priority="medium">Use check-type for argument validation</practice>
+<practice priority="medium">Prefer ASDF package-inferred-system for new projects</practice>
+<practice priority="medium">Consider Qlot for per-project dependency management</practice>
+<practice priority="medium">Use Roswell for portable script execution</practice>
 </best_practices>
 
+<modern_tooling>
+<tool name="qlot">
+<description>Per-project dependency manager (like bundler/npm)</description>
+<use_case>Install dependencies from qlfile</use_case>
+<use_case>Run commands with project dependencies</use_case>
+<example>
+qlot install
+qlot exec ros run
+</example>
+</tool>
+
+<tool name="roswell">
+<description>Lisp implementation manager and script runner</description>
+<use_case>Install Lisp implementations or libraries</use_case>
+<use_case>Start REPL with specified implementation</use_case>
+<use_case>Build standalone executable</use_case>
+<example>
+ros install sbcl
+ros run
+ros build myapp.ros
+</example>
+</tool>
+</modern_tooling>
+
 <anti_patterns>
-<avoid name="global_state">Minimize global mutable state</avoid>
-<avoid name="bare_use">Avoid :use except for :cl in defpackage</avoid>
-<avoid name="ignore_conditions">Handle conditions appropriately</avoid>
-<avoid name="deep_nesting">Refactor deeply nested code</avoid>
-<avoid name="eval_usage">Avoid eval in application code</avoid>
-<avoid name="read_macros_overuse">Use reader macros sparingly</avoid>
+<avoid name="global_state">
+<description>Global mutable state makes code harder to test and reason about.</description>
+<instead>Pass state explicitly or use closures to encapsulate mutable state.</instead>
+</avoid>
+
+<avoid name="bare_use">
+<description>Using :use for packages other than :cl creates namespace pollution.</description>
+<instead>Use :import-from or package-local-nicknames for clearer dependencies.</instead>
+</avoid>
+
+<avoid name="ignore_conditions">
+<description>Ignoring conditions loses error context and recovery opportunities.</description>
+<instead>Handle conditions with handler-case or handler-bind, and provide appropriate restarts.</instead>
+</avoid>
+
+<avoid name="deep_nesting">
+<description>Deeply nested code reduces readability and maintainability.</description>
+<instead>Extract helper functions and use early returns to reduce nesting depth.</instead>
+</avoid>
+
+<avoid name="eval_usage">
+<description>Using eval in application code is slow and defeats compile-time optimization.</description>
+<instead>Use macros for compile-time code generation or first-class functions for runtime dispatch.</instead>
+</avoid>
+
+<avoid name="read_macros_overuse">
+<description>Custom reader macros make code harder to read for others.</description>
+<instead>Use reader macros sparingly and document them clearly when necessary.</instead>
+</avoid>
 </anti_patterns>

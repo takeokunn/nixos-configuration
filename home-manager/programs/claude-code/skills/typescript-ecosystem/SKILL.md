@@ -10,7 +10,12 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 
 <tsconfig>
 <recommended_base>
-<description>Node.js 22+ recommended configuration</description>
+<description>Node.js version-specific recommended configurations</description>
+<mapping>
+<version node="22" lts="true" target="ES2023">Current LTS - use ES2023 for stable features</version>
+<version node="24" upcoming="true" target="ES2024">Upcoming - use ES2024 for latest features</version>
+</mapping>
+<version node="22" lts="true">
 <config>
 {
   "compilerOptions": {
@@ -31,6 +36,31 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   "exclude": ["node_modules", "dist"]
 }
 </config>
+<note>Node.js 22 LTS - use ES2023 target/lib for stable features</note>
+</version>
+<version node="24" upcoming="true">
+<config>
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+</config>
+<note>Node.js 24 (upcoming) - use ES2024 target/lib for latest features</note>
+</version>
 </recommended_base>
 
 <strict_options>
@@ -51,32 +81,32 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 <module_resolution>
 <pattern name="nodenext">
 <description>Modern Node.js ESM resolution (recommended)</description>
-<config>
+<example>
 {
 "compilerOptions": {
 "module": "nodenext",
 "moduleResolution": "nodenext"
 }
 }
-</config>
+</example>
 <note>Requires "type": "module" in package.json</note>
 </pattern>
 
 <pattern name="bundler">
 <description>For projects using bundlers (Vite, esbuild, webpack)</description>
-<config>
+<example>
 {
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "bundler"
   }
 }
-</config>
+</example>
 </pattern>
 
 <pattern name="path_aliases">
 <description>Import path aliases</description>
-<config>
+<example>
 {
   "compilerOptions": {
     "baseUrl": ".",
@@ -86,14 +116,15 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
     }
   }
 }
-</config>
-<warning>baseUrl is deprecated in TS 7.0; prefer paths without baseUrl</warning>
+</example>
+<warning>baseUrl: deprecated in TS 6.0, removed in TS 7.0; prefer paths without baseUrl</warning>
+<warning>moduleResolution: "node" (alias "node10"): deprecated in TS 5.x; use "nodenext" or "bundler"</warning>
 </pattern>
 </module_resolution>
 
 <project_references>
 <description>Monorepo and incremental builds</description>
-<config>
+<example>
 {
 "compilerOptions": {
 "composite": true,
@@ -105,8 +136,8 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 { "path": "../core" }
 ]
 }
-</config>
-<command>tsc --build for incremental compilation</command>
+</example>
+<note>Use tsc --build for incremental compilation</note>
 </project_references>
 </tsconfig>
 
@@ -128,6 +159,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 
 <generics>
 <pattern name="basic">
+<description>Basic generic function</description>
 <example>
 function identity&lt;T&gt;(arg: T): T {
   return arg;
@@ -136,6 +168,7 @@ function identity&lt;T&gt;(arg: T): T {
 </pattern>
 
 <pattern name="constraints">
+<description>Generic with type constraints</description>
 <example>
 function getProperty&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
   return obj[key];
@@ -144,6 +177,7 @@ function getProperty&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
 </pattern>
 
 <pattern name="default_type">
+<description>Generic with default type parameter</description>
 <example>
 interface Container&lt;T = string&gt; {
   value: T;
@@ -152,6 +186,7 @@ interface Container&lt;T = string&gt; {
 </pattern>
 
 <pattern name="multiple_constraints">
+<description>Multiple generic parameters with constraints</description>
 <example>
 function merge&lt;T extends object, U extends object&gt;(a: T, b: U): T &amp; U {
   return { ...a, ...b };
@@ -162,7 +197,7 @@ function merge&lt;T extends object, U extends object&gt;(a: T, b: U): T &amp; U 
 
 <conditional_types>
 <pattern name="basic">
-<syntax>T extends U ? X : Y</syntax>
+<description>Basic conditional type</description>
 <example>
 type IsString&lt;T&gt; = T extends string ? true : false;
 </example>
@@ -187,6 +222,7 @@ type ToArray&lt;T&gt; = T extends any ? T[] : never;
 
 <mapped_types>
 <pattern name="basic">
+<description>Basic mapped type</description>
 <example>
 type Readonly&lt;T&gt; = {
 readonly [P in keyof T]: T[P];
@@ -195,6 +231,7 @@ readonly [P in keyof T]: T[P];
 </pattern>
 
 <pattern name="key_remapping">
+<description>Map keys with renaming</description>
 <example>
 type Getters&lt;T&gt; = {
   [K in keyof T as `get${Capitalize&lt;string &amp; K&gt;}`]: () =&gt; T[K];
@@ -203,6 +240,7 @@ type Getters&lt;T&gt; = {
 </pattern>
 
 <pattern name="filtering">
+<description>Filter properties by type</description>
 <example>
 type OnlyStrings&lt;T&gt; = {
   [K in keyof T as T[K] extends string ? K : never]: T[K];
@@ -213,6 +251,7 @@ type OnlyStrings&lt;T&gt; = {
 
 <template_literal_types>
 <pattern name="basic">
+<description>Template literal type construction</description>
 <example>
 type EventName = `on${Capitalize&lt;string&gt;}`;
 type Locale = `${Language}-${Country}`;
@@ -220,6 +259,7 @@ type Locale = `${Language}-${Country}`;
 </pattern>
 
 <pattern name="inference">
+<description>Extract parameters from template literals</description>
 <example>
 type ExtractRouteParams&lt;T&gt; = T extends `${string}:${infer Param}/${infer Rest}`
   ? Param | ExtractRouteParams&lt;Rest&gt;
@@ -232,6 +272,7 @@ type ExtractRouteParams&lt;T&gt; = T extends `${string}:${infer Param}/${infer R
 
 <type_guards>
 <pattern name="typeof">
+<description>Built-in typeof type guard</description>
 <example>
 function process(value: string | number) {
 if (typeof value === "string") {
@@ -243,6 +284,7 @@ return value.toFixed(2);
 </pattern>
 
 <pattern name="instanceof">
+<description>Built-in instanceof type guard</description>
 <example>
 function handle(error: Error | string) {
   if (error instanceof Error) {
@@ -254,6 +296,7 @@ function handle(error: Error | string) {
 </pattern>
 
 <pattern name="custom">
+<description>Custom type guard function</description>
 <example>
 interface Cat { meow(): void; }
 interface Dog { bark(): void; }
@@ -265,6 +308,7 @@ return (pet as Cat).meow !== undefined;
 </pattern>
 
 <pattern name="in_operator">
+<description>Property existence type guard</description>
 <example>
 function move(animal: Fish | Bird) {
   if ("swim" in animal) {
@@ -278,6 +322,7 @@ function move(animal: Fish | Bird) {
 </type_guards>
 
 <branded_types>
+<pattern name="branded_primitives">
 <description>Nominal typing via branding</description>
 <example>
 type UserId = string &amp; { readonly **brand: unique symbol };
@@ -287,10 +332,12 @@ function createUserId(id: string): UserId {
 return id as UserId;
 }
 </example>
-<use_case>Prevent mixing similar primitive types</use_case>
+<note>Prevent mixing similar primitive types</note>
+</pattern>
 </branded_types>
 
 <satisfies_operator>
+<pattern name="type_checking_without_widening">
 <description>Type checking without widening</description>
 <example>
 const config = {
@@ -299,6 +346,7 @@ timeout: 3000,
 } satisfies Record&lt;string, string | number&gt;;
 // config.endpoint is inferred as "/api" (literal), not string
 </example>
+</pattern>
 </satisfies_operator>
 </type_patterns>
 
@@ -322,6 +370,7 @@ return { success: false, error: e as Error };
 </pattern>
 
 <pattern name="custom_errors">
+<description>Custom error classes with additional context</description>
 <example>
 class ValidationError extends Error {
   constructor(
@@ -350,6 +399,7 @@ try {
 
 <async_patterns>
 <pattern name="promise_all">
+<description>Parallel promise execution</description>
 <example>
 const [users, posts] = await Promise.all([
 fetchUsers(),
@@ -374,6 +424,7 @@ const successful = results
 </pattern>
 
 <pattern name="async_iterator">
+<description>Async generator for pagination</description>
 <example>
 async function* paginate&lt;T&gt;(fetchPage: (page: number) =&gt; Promise&lt;T[]&gt;) {
   let page = 0;
@@ -391,12 +442,13 @@ console.log(item);
 </pattern>
 </async_patterns>
 
-<module_patterns>
+<module*patterns>
 <pattern name="esm_exports">
+<description>ES module export patterns</description>
 <example>
 // Named exports
 export const helper = () =&gt; {};
-export type Config = { /_ ... _/ };
+export type Config = { /* ... \_/ };
 
 // Default export
 export default class Service {}
@@ -419,6 +471,7 @@ export type { ButtonProps, InputProps } from "./types.js";
 </pattern>
 
 <pattern name="dynamic_import">
+<description>Code splitting with dynamic imports</description>
 <example>
 const module = await import("./heavy-module.js");
 module.doSomething();
@@ -429,7 +482,7 @@ module.doSomething();
 
 <tooling>
 <eslint>
-<recommended_config>
+<pattern name="recommended_config">
 <description>ESLint with TypeScript (flat config)</description>
 <example>
 // eslint.config.js
@@ -449,7 +502,8 @@ tsconfigRootDir: import.meta.dirname,
 }
 );
 </example>
-</recommended_config>
+<note>import.meta.dirname requires Node.js 20.11+ or 21.2+ (not available in Node.js 18 LTS)</note>
+</pattern>
 
 <key_rules>
 <rule name="@typescript-eslint/no-explicit-any">Prefer unknown over any</rule>
@@ -461,7 +515,9 @@ tsconfigRootDir: import.meta.dirname,
 </eslint>
 
 <prettier>
-<config>
+<pattern name="recommended_config">
+<description>Prettier configuration for TypeScript</description>
+<example>
 {
   "semi": true,
   "singleQuote": false,
@@ -469,13 +525,15 @@ tsconfigRootDir: import.meta.dirname,
   "trailingComma": "es5",
   "printWidth": 100
 }
-</config>
+</example>
+</pattern>
 </prettier>
 
 <testing>
 <vitest>
+<pattern name="config">
 <description>Modern, fast test runner</description>
-<config>
+<example>
 // vitest.config.ts
 import { defineConfig } from "vitest/config";
 
@@ -489,11 +547,14 @@ reporter: ["text", "json", "html"],
 },
 },
 });
-</config>
+</example>
+</pattern>
 </vitest>
 
 <jest>
-<config>
+<pattern name="config">
+<description>Jest configuration for TypeScript</description>
+<example>
 // jest.config.ts
 import type { Config } from "jest";
 
@@ -507,31 +568,34 @@ moduleNameMapper: {
 };
 
 export default config;
-</config>
+</example>
+</pattern>
 </jest>
 </testing>
 
 <build_tools>
 <tsc>
-<commands>
-<command name="tsc">Compile TypeScript</command>
-<command name="tsc --build">Incremental build (monorepo)</command>
-<command name="tsc --noEmit">Type check only</command>
-<command name="tsc --watch">Watch mode</command>
-</commands>
+<tool name="tsc">
+<description>TypeScript compiler commands</description>
+<use_case name="compile">tsc - Compile TypeScript</use_case>
+<use_case name="build">tsc --build - Incremental build (monorepo)</use_case>
+<use_case name="check">tsc --noEmit - Type check only</use_case>
+<use_case name="watch">tsc --watch - Watch mode</use_case>
+</tool>
 </tsc>
 
 <tsx>
+<tool name="tsx">
 <description>TypeScript execution with esbuild</description>
-<commands>
-<command name="tsx src/index.ts">Run TypeScript directly</command>
-<command name="tsx watch src/index.ts">Watch mode</command>
-</commands>
+<use_case name="run">tsx src/index.ts - Run TypeScript directly</use_case>
+<use_case name="watch">tsx watch src/index.ts - Watch mode</use_case>
+</tool>
 </tsx>
 
 <tsup>
+<pattern name="config">
 <description>Bundle TypeScript libraries</description>
-<config>
+<example>
 // tsup.config.ts
 import { defineConfig } from "tsup";
 
@@ -542,7 +606,8 @@ dts: true,
 clean: true,
 sourcemap: true,
 });
-</config>
+</example>
+</pattern>
 </tsup>
 </build_tools>
 </tooling>
@@ -617,14 +682,14 @@ type Status = (typeof Status)[keyof typeof Status];
 </anti_patterns>
 
 <best_practices>
-<practice>Enable strict mode in all projects</practice>
-<practice>Use noUncheckedIndexedAccess for safer array/object access</practice>
-<practice>Prefer 'unknown' over 'any' for unknown types</practice>
-<practice>Use 'satisfies' to check types without widening</practice>
-<practice>Create branded types for domain primitives</practice>
-<practice>Use Result types for error handling over exceptions</practice>
-<practice>Keep type definitions close to usage</practice>
-<practice>Export types separately with 'export type'</practice>
-<practice>Use 'const' assertions for literal types</practice>
-<practice>Prefer interfaces for public APIs, types for unions/utilities</practice>
+<practice priority="critical">Enable strict mode in all projects</practice>
+<practice priority="critical">Use noUncheckedIndexedAccess for safer array/object access</practice>
+<practice priority="high">Prefer 'unknown' over 'any' for unknown types</practice>
+<practice priority="high">Use 'satisfies' to check types without widening</practice>
+<practice priority="high">Create branded types for domain primitives</practice>
+<practice priority="medium">Use Result types for error handling over exceptions</practice>
+<practice priority="medium">Keep type definitions close to usage</practice>
+<practice priority="medium">Export types separately with 'export type'</practice>
+<practice priority="medium">Use 'const' assertions for literal types</practice>
+<practice priority="medium">Prefer interfaces for public APIs, types for unions/utilities</practice>
 </best_practices>

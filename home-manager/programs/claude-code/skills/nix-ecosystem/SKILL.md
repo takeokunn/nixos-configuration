@@ -12,19 +12,44 @@ Provide comprehensive patterns for Nix language, flakes, and Home Manager config
 <fundamentals>
 <concept name="lazy_evaluation">
 <description>Nix is lazily evaluated. Expressions are only computed when needed.</description>
-<use>Conditional includes and optional dependencies</use>
+<example>
+
+# Only evaluates needed attributes
+
+let
+expensive = builtins.trace "Computing expensive" (1 + 1);
+in
+{ a = 1; b = expensive; }.a # Does not compute expensive
+</example>
 </concept>
 
 <concept name="pure_functions">
 <description>All Nix functions are pure. Same inputs always produce same outputs.</description>
-<use>Avoid side effects; use derivations for build actions</use>
+<example>
+# Pure function - always returns same result for same input
+double = x: x * 2;
+
+# Avoid side effects; use derivations for build actions
+
+buildResult = pkgs.stdenv.mkDerivation { ... };
+</example>
 </concept>
 
 <concept name="attribute_sets">
 <description>Primary data structure in Nix</description>
-<pattern name="definition">{ attr1 = value1; attr2 = value2; }</pattern>
-<pattern name="access">set.attr or set."attr-with-dashes"</pattern>
-<pattern name="recursive">rec { a = 1; b = a + 1; }</pattern>
+<example>
+# Basic attribute set
+{ attr1 = value1; attr2 = value2; }
+
+# Access patterns
+
+set.attr
+set."attr-with-dashes"
+
+# Recursive attribute set
+
+rec { a = 1; b = a + 1; }
+</example>
 </concept>
 </fundamentals>
 
@@ -42,13 +67,17 @@ in
 
 <pattern name="with">
 <description>Bring attribute set into scope</description>
-<example>with pkgs; [ git vim tmux ]</example>
+<example>
+with pkgs; [ git vim tmux ]
+</example>
 <warning>Avoid nested with; prefer explicit references for clarity</warning>
 </pattern>
 
 <pattern name="inherit">
 <description>Copy attributes from another set</description>
-<example>{ inherit (pkgs) git vim; inherit name version; }</example>
+<example>
+{ inherit (pkgs) git vim; inherit name version; }
+</example>
 </pattern>
 
 <pattern name="overlay">
@@ -62,56 +91,114 @@ final: prev: {
 
 <pattern name="callPackage">
 <description>Dependency injection pattern</description>
-<example>myPackage = pkgs.callPackage ./package.nix { };</example>
+<example>
+myPackage = pkgs.callPackage ./package.nix { };
+</example>
 </pattern>
-</patterns>
 
-<derivations>
 <pattern name="mkDerivation">
 <description>Standard package builder</description>
-<required>pname, version, src</required>
-<phases>unpackPhase, patchPhase, configurePhase, buildPhase, installPhase</phases>
+<example>
+pkgs.stdenv.mkDerivation {
+  pname = "mypackage";
+  version = "1.0.0";
+  src = fetchFromGitHub { ... };
+
+nativeBuildInputs = [ pkgs.cmake ];
+buildInputs = [ pkgs.openssl ];
+
+installPhase = ''
+mkdir -p $out/bin
+cp mypackage $out/bin/
+'';
+}
+</example>
+<note>Required attributes: pname, version, src</note>
+<note>Standard phases: unpackPhase, patchPhase, configurePhase, buildPhase, installPhase</note>
 </pattern>
 
 <pattern name="build_inputs">
-<item name="nativeBuildInputs">Tools run at build time (compilers, build tools)</item>
-<item name="buildInputs">Libraries linked at runtime</item>
-</pattern>
-</derivations>
+<description>Dependency specification in derivations</description>
+<example>
+{
+  # Tools run at build time (compilers, build tools)
+  nativeBuildInputs = [ cmake pkg-config ];
 
-<modules>
+# Libraries linked at runtime
+
+buildInputs = [ openssl zlib ];
+}
+</example>
+</pattern>
+
 <pattern name="options_config">
 <description>NixOS/Home Manager module structure</description>
-<structure>
+<example>
 { config, lib, pkgs, ... }:
 {
-  options.myModule = { ... };
-  config = lib.mkIf config.myModule.enable { ... };
+  options.myModule = {
+    enable = lib.mkEnableOption "my module";
+    setting = lib.mkOption {
+      type = lib.types.str;
+      default = "value";
+      description = "A setting";
+    };
+  };
+
+config = lib.mkIf config.myModule.enable { # configuration when enabled
+};
 }
-</structure>
+</example>
 </pattern>
 
 <pattern name="mkOption">
-<attributes>type, default, description, example</attributes>
-<common_types>lib.types.bool, lib.types.str, lib.types.listOf, lib.types.attrsOf</common_types>
+<description>Define module options with types and defaults</description>
+<example>
+options.myOption = lib.mkOption {
+  type = lib.types.bool;
+  default = false;
+  description = "Enable my feature";
+  example = true;
+};
+</example>
+<note>Common types: lib.types.bool, lib.types.str, lib.types.listOf, lib.types.attrsOf</note>
 </pattern>
 
 <pattern name="mkEnableOption">
 <description>Shorthand for boolean enable option</description>
-<example>enable = lib.mkEnableOption "my service";</example>
+<example>
+enable = lib.mkEnableOption "my service";
+</example>
 </pattern>
-</modules>
+</patterns>
 
 <anti_patterns>
-<avoid name="impure_paths">Use fetchurl/fetchFromGitHub instead of direct paths</avoid>
-<avoid name="nested_with">Prefer explicit attribute access for clarity</avoid>
-<avoid name="rec_overuse">Use let-in for complex recursive definitions</avoid>
-<avoid name="string_interpolation_abuse">Use lib functions for path manipulation</avoid>
+<avoid name="impure_paths">
+<description>Directly referencing absolute paths breaks reproducibility</description>
+<instead>Use fetchurl, fetchFromGitHub, or relative paths within the repository</instead>
+</avoid>
+
+<avoid name="nested_with">
+<description>Multiple nested with statements reduce code clarity</description>
+<instead>Prefer explicit attribute access (pkgs.git) for better readability</instead>
+</avoid>
+
+<avoid name="rec_overuse">
+<description>Recursive attribute sets can be hard to understand and maintain</description>
+<instead>Use let-in for complex recursive definitions</instead>
+</avoid>
+
+<avoid name="string_interpolation_abuse">
+<description>Using string interpolation for path operations is error-prone</description>
+<instead>Use lib functions for path manipulation (lib.concatStringsSep, builtins.path)</instead>
+</avoid>
 </anti_patterns>
 </nix_language>
 
 <flakes>
-<structure>
+<concept name="flake_structure">
+<description>Basic structure of a flake.nix file</description>
+<example>
 {
   description = "Project description";
 
@@ -122,27 +209,102 @@ nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 outputs = { self, nixpkgs, ... }@inputs: { # output attributes
 };
 }
-</structure>
+</example>
+</concept>
 
 <outputs>
-<output name="packages">Derivations for nix build</output>
-<output name="devShells">Development environments for nix develop</output>
-<output name="apps">Runnable applications for nix run</output>
-<output name="overlays">Nixpkgs overlays</output>
-<output name="nixosModules">NixOS modules</output>
-<output name="homeManagerModules">Home Manager modules</output>
-<output name="nixosConfigurations">Full NixOS system configurations</output>
-<output name="homeConfigurations">Home Manager configurations</output>
+<concept name="packages">
+<description>Derivations for nix build</description>
+<example>
+packages.x86_64-linux.default = pkgs.hello;
+</example>
+</concept>
+
+<concept name="devShells">
+<description>Development environments for nix develop</description>
+<example>
+devShells.x86_64-linux.default = pkgs.mkShell {
+  packages = [ pkgs.nodejs ];
+};
+</example>
+</concept>
+
+<concept name="apps">
+<description>Runnable applications for nix run</description>
+<example>
+apps.x86_64-linux.default = {
+  type = "app";
+  program = "${pkgs.hello}/bin/hello";
+};
+</example>
+</concept>
+
+<concept name="overlays">
+<description>Nixpkgs overlays</description>
+<example>
+overlays.default = final: prev: {
+  myPackage = prev.callPackage ./myPackage.nix { };
+};
+</example>
+</concept>
+
+<concept name="nixosModules">
+<description>NixOS modules</description>
+<example>
+nixosModules.default = { config, lib, pkgs, ... }: {
+  options.services.myService = { ... };
+  config = { ... };
+};
+</example>
+</concept>
+
+<concept name="homeManagerModules">
+<description>Home Manager modules</description>
+<example>
+homeManagerModules.default = { config, lib, pkgs, ... }: {
+  options.programs.myProgram = { ... };
+  config = { ... };
+};
+</example>
+</concept>
+
+<concept name="nixosConfigurations">
+<description>Full NixOS system configurations</description>
+<example>
+nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
+  system = "x86_64-linux";
+  modules = [ ./configuration.nix ];
+};
+</example>
+</concept>
+
+<concept name="homeConfigurations">
+<description>Home Manager configurations</description>
+<example>
+homeConfigurations."user@host" = home-manager.lib.homeManagerConfiguration {
+  pkgs = nixpkgs.legacyPackages.x86_64-linux;
+  modules = [ ./home.nix ];
+};
+</example>
+</concept>
 </outputs>
 
-<inputs>
-<pattern name="github">
-<example>nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";</example>
-<variants>github:owner/repo, github:owner/repo/branch, github:owner/repo/rev</variants>
+<patterns>
+<pattern name="github_input">
+<description>Reference GitHub repositories as flake inputs</description>
+<example>
+inputs = {
+  nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  # Specific branch
+  stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+  # Specific revision
+  pinned.url = "github:owner/repo/abc123def";
+};
+</example>
 </pattern>
 
 <pattern name="follows">
-<description>Share input between flakes</description>
+<description>Share input between flakes to avoid duplication</description>
 <example>
 home-manager = {
   url = "github:nix-community/home-manager";
@@ -152,7 +314,7 @@ home-manager = {
 </pattern>
 
 <pattern name="flake_false">
-<description>Non-flake inputs</description>
+<description>Non-flake inputs for legacy repositories</description>
 <example>
 my-source = {
   url = "github:owner/repo";
@@ -160,27 +322,25 @@ my-source = {
 };
 </example>
 </pattern>
-</inputs>
 
-<output_patterns>
 <pattern name="per_system">
 <description>Generate outputs for multiple systems</description>
 <example>
 outputs = { self, nixpkgs, ... }:
 let
-systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-forAllSystems = nixpkgs.lib.genAttrs systems;
+  systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+  forAllSystems = nixpkgs.lib.genAttrs systems;
 in {
-packages = forAllSystems (system:
-let pkgs = nixpkgs.legacyPackages.${system};
-in { default = pkgs.hello; }
-);
+  packages = forAllSystems (system:
+    let pkgs = nixpkgs.legacyPackages.${system};
+    in { default = pkgs.hello; }
+  );
 };
 </example>
 </pattern>
 
 <pattern name="devShell">
-<description>Development environment</description>
+<description>Development environment with packages and hooks</description>
 <example>
 devShells.default = pkgs.mkShell {
   packages = with pkgs; [ nodejs yarn ];
@@ -190,19 +350,35 @@ devShells.default = pkgs.mkShell {
 };
 </example>
 </pattern>
-</output_patterns>
+</patterns>
 
-<commands>
-<command name="nix flake update">Update all inputs</command>
-<command name="nix flake update input-name">Update specific input</command>
-<command name="nix flake show">Show flake outputs</command>
-<command name="nix flake check">Validate flake</command>
-</commands>
+<tools>
+<tool name="nix flake update">
+<description>Update all inputs to their latest versions</description>
+<use_case>Regular dependency updates</use_case>
+</tool>
+
+<tool name="nix flake update input-name">
+<description>Update a specific input</description>
+<use_case>Selective updates to test compatibility</use_case>
+</tool>
+
+<tool name="nix flake show">
+<description>Display all flake outputs</description>
+<use_case>Exploring available packages and configurations</use_case>
+</tool>
+
+<tool name="nix flake check">
+<description>Validate flake and run checks</description>
+<use_case>CI/CD validation, pre-commit checks</use_case>
+</tool>
+</tools>
 </flakes>
 
 <home_manager>
-<module_structure>
-<standard>
+<concept name="module_structure">
+<description>Standard Home Manager module structure</description>
+<example>
 { config, pkgs, lib, ... }:
 {
 options.custom.feature = {
@@ -212,64 +388,91 @@ enable = lib.mkEnableOption "feature description";
 config = lib.mkIf config.custom.feature.enable { # configuration when enabled
 };
 }
-</standard>
+</example>
+</concept>
 
-<file_organization>
-<pattern name="by_program">home-manager/programs/git.nix</pattern>
-<pattern name="by_category">home-manager/development/default.nix</pattern>
-<pattern name="imports">Use imports = [ ./module1.nix ./module2.nix ];</pattern>
-</file_organization>
-</module_structure>
+<patterns>
+<pattern name="by_program">
+<description>Organize modules by program name</description>
+<example>
+home-manager/programs/git.nix
+home-manager/programs/neovim.nix
+home-manager/programs/tmux.nix
+</example>
+</pattern>
 
-<programs>
-<pattern name="basic_enable">programs.git.enable = true;</pattern>
+<pattern name="by_category">
+<description>Organize modules by category</description>
+<example>
+home-manager/development/default.nix
+home-manager/shell/default.nix
+home-manager/editors/default.nix
+</example>
+</pattern>
+
+<pattern name="imports">
+<description>Import multiple modules</description>
+<example>
+imports = [
+  ./programs/git.nix
+  ./programs/neovim.nix
+  ./shell/fish.nix
+];
+</example>
+</pattern>
+
+<pattern name="basic_enable">
+<description>Enable a program with defaults</description>
+<example>
+programs.git.enable = true;
+</example>
+</pattern>
 
 <pattern name="with_options">
+<description>Enable and configure a program</description>
+<example>
 programs.git = {
   enable = true;
   userName = "name";
   userEmail = "email";
-  extraConfig = { ... };
+  extraConfig = {
+    core.editor = "nvim";
+    init.defaultBranch = "main";
+  };
 };
+</example>
 </pattern>
 
 <pattern name="package_override">
+<description>Use alternative package version</description>
+<example>
 programs.git = {
   enable = true;
   package = pkgs.gitFull;
 };
+</example>
 </pattern>
-</programs>
 
-<common_modules>
-<module name="programs.git">enable, userName, userEmail, signing, aliases, extraConfig</module>
-<module name="programs.neovim">enable, viAlias, vimAlias, plugins, extraConfig, extraLuaConfig</module>
-<module name="programs.fish">enable, shellInit, shellAliases, functions, plugins</module>
-<module name="programs.tmux">enable, terminal, keyMode, plugins, extraConfig</module>
-<module name="programs.direnv">enable, nix-direnv.enable, enableBashIntegration</module>
-</common_modules>
-
-<file_management>
 <pattern name="home.file">
 <description>Manage dotfiles directly</description>
 <example>
 home.file.".config/app/config" = {
-source = ./config;
-
-# or
-
-text = "content";
+  source = ./config;
+  # or
+  text = ''
+    key = value
+  '';
 };
 </example>
 </pattern>
 
 <pattern name="xdg.configFile">
 <description>XDG config directory files</description>
-<example>xdg.configFile."app/config".source = ./config;</example>
+<example>
+xdg.configFile."app/config".source = ./config;
+</example>
 </pattern>
-</file_management>
 
-<session>
 <pattern name="home.sessionVariables">
 <description>Environment variables for login shells</description>
 <example>
@@ -281,22 +484,160 @@ home.sessionVariables = {
 </pattern>
 
 <pattern name="home.sessionPath">
-<description>Add to PATH</description>
-<example>home.sessionPath = [ "$HOME/.local/bin" ];</example>
+<description>Add directories to PATH</description>
+<example>
+home.sessionPath = [ "$HOME/.local/bin" ];
+</example>
 </pattern>
-</session>
+</patterns>
 
-<rules>
-<rule>Use programs.* when available instead of manual configuration</rule>
-<rule>Group related configurations in separate modules</rule>
-<rule>Use lib.mkIf for conditional configuration</rule>
-<rule>Prefer xdg.configFile over home.file for XDG-compliant apps</rule>
-<rule>Use home.packages for additional packages not configured via programs.*</rule>
-</rules>
+<common_modules>
+<concept name="programs.git">
+<description>Git version control configuration</description>
+<example>
+programs.git = {
+enable = true;
+userName = "Your Name";
+userEmail = "email@example.com";
+signing = {
+key = "KEY_ID";
+signByDefault = true;
+};
+aliases = {
+co = "checkout";
+st = "status";
+};
+extraConfig = {
+core.editor = "nvim";
+};
+};
+</example>
+</concept>
+
+<concept name="programs.neovim">
+<description>Neovim editor configuration</description>
+<example>
+programs.neovim = {
+  enable = true;
+  viAlias = true;
+  vimAlias = true;
+  plugins = with pkgs.vimPlugins; [
+    vim-commentary
+    vim-surround
+  ];
+  extraConfig = ''
+    set number
+    set relativenumber
+  '';
+  extraLuaConfig = ''
+    vim.opt.expandtab = true
+  '';
+};
+</example>
+</concept>
+
+<concept name="programs.fish">
+<description>Fish shell configuration</description>
+<example>
+programs.fish = {
+  enable = true;
+  shellInit = ''
+    set -g fish_greeting
+  '';
+  shellAliases = {
+    ll = "ls -lah";
+  };
+  functions = {
+    gitignore = "curl -sL https://www.gitignore.io/api/$argv";
+  };
+  plugins = [
+    { name = "z"; src = pkgs.fishPlugins.z.src; }
+  ];
+};
+</example>
+</concept>
+
+<concept name="programs.tmux">
+<description>Terminal multiplexer configuration</description>
+<example>
+programs.tmux = {
+  enable = true;
+  terminal = "screen-256color";
+  keyMode = "vi";
+  plugins = with pkgs.tmuxPlugins; [
+    sensible
+    yank
+  ];
+  extraConfig = ''
+    set -g mouse on
+  '';
+};
+</example>
+</concept>
+
+<concept name="programs.direnv">
+<description>Directory-specific environment loader</description>
+<example>
+programs.direnv = {
+  enable = true;
+  nix-direnv.enable = true;
+  enableBashIntegration = true;
+  enableZshIntegration = true;
+};
+</example>
+</concept>
+</common_modules>
+
+<best_practices>
+<practice priority="critical">
+Use programs.\* when available instead of manual configuration
+</practice>
+
+<practice priority="critical">
+Set home.stateVersion to your initial HM version and do not change after initial setup unless migrating
+</practice>
+
+<practice priority="high">
+Group related configurations in separate modules for maintainability
+</practice>
+
+<practice priority="high">
+Use lib.mkIf for conditional configuration
+</practice>
+
+<practice priority="medium">
+Prefer xdg.configFile over home.file for XDG-compliant apps
+</practice>
+
+<practice priority="medium">
+Use home.packages for additional packages not configured via programs.*
+</practice>
+</best_practices>
+
+<concept name="state_version">
+<description>Track Home Manager state version for compatibility</description>
+<example>
+home.stateVersion = "24.11"; # Current stable. 25.05 (upcoming).
+</example>
+<warning>Do not change after initial setup unless migrating</warning>
+</concept>
+
+<concept name="minimal_mode">
+<description>HM 24.11+ (25.05 upcoming) supports minimal mode for faster evaluation</description>
+<example>
+imports = [
+  "${modulesPath}/programs/fzf.nix"
+];
+</example>
+<note>Advanced users optimizing evaluation time</note>
+</concept>
 </home_manager>
 
 <nixos>
+<patterns>
 <pattern name="basic">
+<description>Basic NixOS configuration with Home Manager</description>
+<example>
 nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   modules = [
@@ -305,22 +646,31 @@ nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
   ];
   specialArgs = { inherit inputs; };
 };
+</example>
 </pattern>
 
 <pattern name="standalone_home_manager">
+<description>Standalone Home Manager without NixOS</description>
+<example>
 homeConfigurations."user@host" = home-manager.lib.homeManagerConfiguration {
   pkgs = nixpkgs.legacyPackages.x86_64-linux;
   modules = [ ./home.nix ];
   extraSpecialArgs = { inherit inputs; };
 };
+</example>
 </pattern>
 
 <pattern name="as_nixos_module">
-home-manager.nixosModules.home-manager
+<description>Home Manager as a NixOS module</description>
+<example>
 {
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.users.username = import ./home.nix;
+  imports = [ home-manager.nixosModules.home-manager ];
+
+home-manager.useGlobalPkgs = true;
+home-manager.useUserPackages = true;
+home-manager.users.username = import ./home.nix;
 }
+</example>
 </pattern>
+</patterns>
 </nixos>
