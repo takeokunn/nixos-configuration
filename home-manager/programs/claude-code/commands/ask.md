@@ -47,32 +47,16 @@ Provide accurate, evidence-based answers to project questions through fact-based
 
 <output>
 <format>
-## Question
-Restate the user's question for confirmation
-
-## Investigation
-
-Evidence-based findings with file:line references
-
+<question>Restate the user's question for confirmation</question>
+<investigation>Evidence-based findings with file:line references
 - Source 1: `path/to/file.ts:42` - finding
-- Source 2: `path/to/other.ts:15` - finding
-
-## Conclusion
-
-Direct answer based on evidence
-
-## Metrics
-
+- Source 2: `path/to/other.ts:15` - finding</investigation>
+<conclusion>Direct answer based on evidence</conclusion>
+<metrics>
 - Confidence: 0-100 (based on evidence quality)
-- Evidence Coverage: 0-100 (how much relevant code was examined)
-
-## Recommendations
-
-Optional: Suggested actions without implementation
-
-## Unclear Points
-
-Information gaps that would improve the answer
+- Evidence Coverage: 0-100 (how much relevant code was examined)</metrics>
+<recommendations>Optional: Suggested actions without implementation</recommendations>
+<unclear_points>Information gaps that would improve the answer</unclear_points>
 </format>
 </output>
 

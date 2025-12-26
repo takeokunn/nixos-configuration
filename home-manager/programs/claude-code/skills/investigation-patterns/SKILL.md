@@ -219,65 +219,29 @@ Identify divergence from expected behavior
 <concept name="investigation_output">
 <description>Standard format for investigation results</description>
 <example>
-## Question
-Restate the question for confirmation
-
-## Investigation
-
-Evidence-based findings with file:line references
-
+<question>Restate the question for confirmation</question>
+<investigation>Evidence-based findings with file:line references
 - Source 1: `path/to/file.ts:42` - finding description
-- Source 2: `path/to/other.ts:15` - finding description
-
-## Conclusion
-
-Direct answer based on evidence
-
-## Metrics
-
+- Source 2: `path/to/other.ts:15` - finding description</investigation>
+<conclusion>Direct answer based on evidence</conclusion>
+<metrics>
 - Confidence: 0-100
-- Evidence Coverage: 0-100
-
-## Recommendations
-
-Suggested actions without implementation
-
-## Unclear Points
-
-Information gaps that would improve the answer
+- Evidence Coverage: 0-100</metrics>
+<recommendations>Suggested actions without implementation</recommendations>
+<unclear_points>Information gaps that would improve the answer</unclear_points>
 </example>
 </concept>
 
 <concept name="debugging_output">
 <description>Standard format for debugging results</description>
 <example>
-## Problem Statement
-
-Clear description of the issue
-
-## Reproduction Steps
-
-How to reproduce
-
-## Investigation
-
-Evidence collected with file:line references
-
-## Root Cause
-
-Identified cause with supporting evidence
-
-## Solution
-
-Proposed fix with rationale
-
-## Verification
-
-How to verify the fix works
-
-## Prevention
-
-How to prevent recurrence
+<problem_statement>Clear description of the issue</problem_statement>
+<reproduction_steps>How to reproduce</reproduction_steps>
+<investigation>Evidence collected with file:line references</investigation>
+<root_cause>Identified cause with supporting evidence</root_cause>
+<solution>Proposed fix with rationale</solution>
+<verification>How to verify the fix works</verification>
+<prevention>How to prevent recurrence</prevention>
 </example>
 </concept>
 </concepts>

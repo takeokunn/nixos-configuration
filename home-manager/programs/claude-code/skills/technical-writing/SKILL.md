@@ -182,33 +182,24 @@ Provide structured patterns for writing technical blogs and articles that effect
 
 <output>
 <format>
-## Article Plan
-
+<article_plan>
 - Type: [tutorial/concept/comparison/case_study/opinion]
 - Audience: [beginner/intermediate/advanced developers]
 - Core message: [one sentence]
 - Language: [en/ja/both]
-- Target length: [word count]
-
-## Outline
-
-[Section headings with key points]
-
-## Draft
-
-[Article content]
-
-## Edit Checklist
-
+- Target length: [word count]</article_plan>
+<outline>[Section headings with key points]</outline>
+<draft>[Article content]</draft>
+<edit_checklist>
 - [ ] Hook is compelling
 - [ ] Each section has one clear purpose
 - [ ] Code examples tested and working
 - [ ] Technical claims verified
 - [ ] Read aloud for flow
 - [ ] Trimmed unnecessary words
-- [ ] Title and headings optimized
-      </format>
-      </output>
+- [ ] Title and headings optimized</edit_checklist>
+</format>
+</output>
 
 <title_patterns>
 <pattern name="how_to">

@@ -200,19 +200,19 @@ The server can be started by running the following command.
 
 Brief one-line description of what the project does.
 
-## Features
+<features>
 
 - Feature 1
 - Feature 2
 - Feature 3
 
-## Quick Start
+<quick start>
 
 ```bash
 npm install package-name
 ```
 
-## Basic Usage
+<basic usage>
 
 ```typescript
 import { example } from "package-name";
@@ -221,15 +221,15 @@ const result = example();
 console.log(result);
 ```
 
-## Documentation
+<documentation>
 
 See [full documentation](link) for detailed guides.
 
-## Contributing
+<contributing>
 
 Contributions welcome! See [CONTRIBUTING.md](link).
 
-## License
+<license>
 
 MIT
 </example>
@@ -240,7 +240,7 @@ MIT
 <example>
 # API Reference
 
-## Authentication
+<authentication>
 
 All requests require an API key in the Authorization header:
 
@@ -248,15 +248,15 @@ All requests require an API key in the Authorization header:
 Authorization: Bearer YOUR_API_KEY
 ```
 
-## Base URL
+<base url>
 
 ```
 https://api.example.com/v1
 ```
 
-## Endpoints
+<endpoints>
 
-### GET /users
+<get_users>
 
 Retrieve a list of users.
 
@@ -289,17 +289,17 @@ Retrieve a list of users.
 <example>
 # Feature Name Design Document
 
-## Summary
+<summary>
 
 **Problem:** Brief description of the problem being solved
 **Solution:** High-level approach
 **Scope:** What's included and what's not
 
-## Background
+<background>
 
 Context and motivation for this design.
 
-## Goals and Non-Goals
+<goals and non-goals>
 
 **Goals:**
 
@@ -311,44 +311,44 @@ Context and motivation for this design.
 - What we're explicitly not doing
 - Future considerations
 
-## Technical Design
+<technical design>
 
-### Architecture
+<architecture>
 
 [Diagram or description of system architecture]
 
-### Data Flow
+<data flow>
 
 1. User action
 2. System processing
 3. Response
 
-### Components
+<components>
 
 **Component A:** Responsible for X
 **Component B:** Responsible for Y
 
-## Alternatives Considered
+<alternatives considered>
 
-### Alternative 1
+<alternative 1>
 
 Pros: ...
 Cons: ...
 Decision: Not chosen because...
 
-## Security Considerations
+<security considerations>
 
 - Data encryption at rest and in transit
 - Authentication and authorization
 - Input validation
 
-## Testing Strategy
+<testing strategy>
 
 - Unit tests for component logic
 - Integration tests for API contracts
 - E2E tests for critical user flows
 
-## Rollout Plan
+<rollout plan>
 
 1. Phase 1: Internal testing
 2. Phase 2: Beta release (10% of users)
@@ -361,17 +361,17 @@ Decision: Not chosen because...
 <example>
 # User Guide
 
-## Getting Started
+<getting started>
 
 Welcome! This guide will help you get started with [Product Name].
 
-## Core Concepts
+<core concepts>
 
 **Workspace:** A container for your projects
 **Project:** A collection of related items
 **Item:** The basic unit of work
 
-## Creating Your First Project
+<creating your first project>
 
 1. Click the "New Project" button
 2. Enter a project name
@@ -380,19 +380,19 @@ Welcome! This guide will help you get started with [Product Name].
 
 You'll see your new project in the sidebar.
 
-## Troubleshooting
+<troubleshooting>
 
-### I can't log in
+<troubleshooting_login>
 
 1. Check your email address is correct
 2. Click "Forgot Password" to reset
 3. Contact support if the issue persists
 
-### My data isn't saving
+<troubleshooting_data>
 
 Ensure you have a stable internet connection. The app auto-saves every 30 seconds.
 
-## Glossary
+<glossary>
 
 **Term:** Definition
 **Another Term:** Another definition
@@ -401,21 +401,21 @@ Ensure you have a stable internet connection. The app auto-saves every 30 second
 
 <output>
 <format>
-## Document Plan
+<document plan>
 
 - Type: [readme/api_spec/design_doc/user_guide]
 - Audience: [developer/team/end_user]
 - Language: [en/ja/both]
 
-## Structure
+<structure>
 
 [Proposed sections based on document type]
 
-## Content
+<content>
 
 [Actual documentation content]
 
-## Review Checklist
+<review checklist>
 
 - [ ] Technical accuracy verified
 - [ ] Code examples tested

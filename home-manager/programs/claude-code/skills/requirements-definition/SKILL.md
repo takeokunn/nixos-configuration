@@ -38,59 +38,41 @@ Provide structured methodology for requirements definition, ensuring comprehensi
 
 <output>
 <format>
-## Summary
+<summary>
 - One-sentence request description
 - Background and context
-- Expected outcomes
-
-## Current State
-
+- Expected outcomes</summary>
+<current_state>
 - Existing system description
 - Technology stack
-- Relevant patterns and conventions
-
-## Functional Requirements
-
-Format: FR-XXX (FR-001, FR-002, ...)
-
+- Relevant patterns and conventions</current_state>
+<functional_requirements>Format: FR-XXX (FR-001, FR-002, ...)
 - Priority: mandatory or optional
-- Clear acceptance criteria
-
-## Non-Functional Requirements
-
+- Clear acceptance criteria</functional_requirements>
+<non_functional_requirements>
 - Performance: response time, throughput
 - Security: authentication, authorization, data protection
-- Maintainability: code quality, documentation
-
-## Technical Specifications
-
+- Maintainability: code quality, documentation</non_functional_requirements>
+<technical_specifications>
 - Design policies and patterns
 - Impact scope analysis
-- Key design decisions with rationale
-
-## Metrics
-
+- Key design decisions with rationale</technical_specifications>
+<metrics>
 - Feasibility (0-100): Technical achievability
-- Objectivity (0-100): Evidence-based specification
-
-## Constraints
-
+- Objectivity (0-100): Evidence-based specification</metrics>
+<constraints>
 - Technical constraints: platform, language, framework
-- Operational constraints: deployment, maintenance
-
-## Test Requirements
-
+- Operational constraints: deployment, maintenance</constraints>
+<test_requirements>
 - Unit test coverage expectations
 - Integration test scenarios
-- Acceptance criteria verification
-
-## Task Breakdown
-
+- Acceptance criteria verification</test_requirements>
+<task_breakdown>
 - Dependency graph: task dependencies and execution order
 - Phased tasks: files to modify/create, overview of changes, dependencies
-- Execute handoff: key decisions, reference implementations, constraints
-  </format>
-  </output>
+- Execute handoff: key decisions, reference implementations, constraints</task_breakdown>
+</format>
+</output>
 
 <rules priority="critical">
 <rule>Never proceed without clear answers to critical questions (score >= 15)</rule>

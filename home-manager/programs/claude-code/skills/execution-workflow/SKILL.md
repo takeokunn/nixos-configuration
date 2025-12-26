@@ -193,28 +193,12 @@ Positive: What was done well
 <concept name="review_output_format">
 <description>Standard format for code review results</description>
 <example>
-## Summary
-Overall assessment and recommendation
-
-## Critical Issues
-
-Must-fix items with file:line references
-
-## Important Issues
-
-Should-fix items
-
-## Suggestions
-
-Optional improvements
-
-## Positive Feedback
-
-Good practices observed
-
-## Questions
-
-Clarifications needed
+<summary>Overall assessment and recommendation</summary>
+<critical_issues>Must-fix items with file:line references</critical_issues>
+<important_issues>Should-fix items</important_issues>
+<suggestions>Optional improvements</suggestions>
+<positive_feedback>Good practices observed</positive_feedback>
+<questions>Clarifications needed</questions>
 </example>
 </concept>
 

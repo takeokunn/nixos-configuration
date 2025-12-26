@@ -69,58 +69,24 @@ Conduct detailed requirements definition before implementation, clarifying techn
 
 <output>
 <format>
-## Requirements Document
-
-### Summary
-
-One-sentence request, background, expected outcomes
-
-### Current State
-
-Existing system, tech stack
-
-### Functional Requirements
-
-FR-001 format (mandatory/optional)
-
-### Non-functional Requirements
-
-Performance, security, maintainability
-
-### Technical Specifications
-
-Design policies, impact scope, decisions
-
-### Metrics
-
+<requirements_document>
+<summary>One-sentence request, background, expected outcomes</summary>
+<current_state>Existing system, tech stack</current_state>
+<functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
+<non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
+<technical_specifications>Design policies, impact scope, decisions</technical_specifications>
+<metrics>
 - Feasibility: 0-100
-- Objectivity: 0-100
-
-### Constraints
-
-Technical, operational
-
-### Test Requirements
-
-Unit, integration, acceptance criteria
-
-### Outstanding Issues
-
-Unresolved questions
-
-## Task Breakdown
-
-### Dependency Graph
-
-Task dependencies visualization
-
-### Phased Tasks
-
-Files, overview, dependencies per phase
-
-### Execute Handoff
-
-Decisions, references, constraints
+- Objectivity: 0-100</metrics>
+<constraints>Technical, operational</constraints>
+<test_requirements>Unit, integration, acceptance criteria</test_requirements>
+<outstanding_issues>Unresolved questions</outstanding_issues>
+</requirements_document>
+<task_breakdown>
+<dependency_graph>Task dependencies visualization</dependency_graph>
+<phased_tasks>Files, overview, dependencies per phase</phased_tasks>
+<execute_handoff>Decisions, references, constraints</execute_handoff>
+</task_breakdown>
 </format>
 </output>
 
