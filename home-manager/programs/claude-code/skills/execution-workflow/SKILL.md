@@ -8,199 +8,182 @@ version: 0.2.0
 Provide structured workflow for task execution through delegation to specialized sub-agents, and comprehensive code review standards.
 </purpose>
 
-<execution_phases>
-<phase id="1" name="analyze">
-Understand requirements and identify scope.
-<action>Parse task description for key objectives</action>
-<action>Identify affected files and components</action>
-<action>Check Serena memories for existing patterns</action>
+<workflow>
+<phase name="analyze">
+<description>Understand requirements and identify scope</description>
+<step>Parse task description for key objectives</step>
+<step>Identify affected files and components</step>
+<step>Check Serena memories for existing patterns</step>
 </phase>
 
-<phase id="2" name="break_down">
-Split into manageable units.
-<action>Identify atomic tasks</action>
-<action>Estimate complexity of each task</action>
-<action>Assign to appropriate sub-agents</action>
+<phase name="break_down">
+<description>Split into manageable units</description>
+<step>Identify atomic tasks</step>
+<step>Estimate complexity of each task</step>
+<step>Assign to appropriate sub-agents</step>
 </phase>
 
-<phase id="3" name="organize">
-Identify parallel vs sequential execution.
-<action>Map task dependencies</action>
-<action>Group independent tasks for parallel execution</action>
-<action>Order dependent tasks sequentially</action>
+<phase name="organize">
+<description>Identify parallel vs sequential execution</description>
+<step>Map task dependencies</step>
+<step>Group independent tasks for parallel execution</step>
+<step>Order dependent tasks sequentially</step>
 </phase>
 
-<phase id="4" name="delegate">
-Assign to sub-agents with detailed instructions.
-<action>Provide specific scope and expected deliverables</action>
-<action>Include target file paths</action>
-<action>Specify MCP tool usage instructions</action>
-<action>Reference existing implementations</action>
+<phase name="delegate">
+<description>Assign to sub-agents with detailed instructions</description>
+<step>Provide specific scope and expected deliverables</step>
+<step>Include target file paths</step>
+<step>Specify MCP tool usage instructions</step>
+<step>Reference existing implementations</step>
 </phase>
 
-<phase id="5" name="integrate">
-Verify and combine results.
-<action>Review sub-agent outputs</action>
-<action>Resolve conflicts between outputs</action>
-<action>Ensure consistency across changes</action>
+<phase name="integrate">
+<description>Verify and combine results</description>
+<step>Review sub-agent outputs</step>
+<step>Resolve conflicts between outputs</step>
+<step>Ensure consistency across changes</step>
 </phase>
-</execution_phases>
+</workflow>
 
-<agent_delegation>
-<phase name="quality_assurance">
+<agents>
+<group name="quality_assurance" execution="parallel">
 <agent name="quality">Syntax, type, format verification</agent>
 <agent name="security">Vulnerability detection</agent>
-<execution>Parallel - no dependencies</execution>
-</phase>
-
-<phase name="implementation">
+</group>
+<group name="implementation" execution="parallel_if_independent">
 <agent name="test">Test creation, coverage</agent>
 <agent name="refactor">Refactoring, tech debt</agent>
 <agent name="docs">Documentation updates</agent>
-<execution>Can run in parallel if independent</execution>
-</phase>
-
-<phase name="review">
+</group>
+<group name="review" execution="sequential_after_implementation">
 <agent name="review">Post-implementation review</agent>
-<execution>Sequential - after implementation</execution>
-</phase>
-</agent_delegation>
+</group>
+</agents>
 
-<delegation_instructions>
-Each delegation must include:
-<item>Specific scope and expected deliverables</item>
-<item>Target file paths</item>
-<item>Serena MCP usage: `find_symbol`, `get_symbols_overview`, `search_for_pattern`</item>
-<item>Context7 MCP usage for library verification</item>
-<item>Reference implementations with specific paths</item>
-<item>Memory check: `list_memories` for patterns</item>
-</delegation_instructions>
+<delegation>
+<requirement>Specific scope and expected deliverables</requirement>
+<requirement>Target file paths</requirement>
+<requirement>Serena MCP usage: find_symbol, get_symbols_overview, search_for_pattern</requirement>
+<requirement>Context7 MCP usage for library verification</requirement>
+<requirement>Reference implementations with specific paths</requirement>
+<requirement>Memory check: list_memories for patterns</requirement>
+</delegation>
 
-<parallel_execution>
-<rule>Execute independent tasks in parallel</rule>
-<rule>quality + security: Concurrent checks</rule>
-<rule>test + docs: Simultaneous creation when independent</rule>
-<rule>Never parallelize tasks with data dependencies</rule>
-</parallel_execution>
-
-<tool_usage>
+<tools>
 <preference order="1">Basic tools (Read/Edit/Write) when sufficient</preference>
 <preference order="2">Serena MCP for semantic operations</preference>
 <preference order="3">Context7 for library documentation</preference>
 <preference order="4">Codex MCP only for code generation/modification</preference>
-
-<codex_prohibited>
+<prohibited tool="codex">
 <task>Research/analysis - use Explore agent, Serena MCP</task>
 <task>Quality verification - use quality agent</task>
 <task>Security verification - use security agent</task>
 <task>Test creation - use test agent</task>
 <task>Documentation - use docs agent</task>
 <task>Code review - use review agent</task>
-</codex_prohibited>
-</tool_usage>
+</prohibited>
+</tools>
 
 <code_review>
-<review_process>
-<phase id="1" name="initial_scan">
-Quick pass for obvious issues.
+<phase name="initial_scan">
+<description>Quick pass for obvious issues</description>
 <check>Syntax errors and typos</check>
 <check>Missing imports or dependencies</check>
 <check>Obvious logic errors</check>
 <check>Code style violations</check>
 </phase>
 
-<phase id="2" name="deep_analysis">
-Line-by-line review of changed code.
+<phase name="deep_analysis">
+<description>Line-by-line review of changed code</description>
 <check>Algorithm correctness</check>
 <check>Edge case handling</check>
 <check>Error handling completeness</check>
 <check>Resource management</check>
 </phase>
 
-<phase id="3" name="context_evaluation">
-Impact on related code.
+<phase name="context_evaluation">
+<description>Impact on related code</description>
 <check>Breaking changes to public APIs</check>
 <check>Side effects on existing functionality</check>
 <check>Dependency compatibility</check>
 </phase>
 
-<phase id="4" name="standards_compliance">
-Compare against project and language standards.
+<phase name="standards_compliance">
+<description>Compare against project and language standards</description>
 <check>Naming conventions</check>
 <check>Documentation requirements</check>
 <check>Test coverage</check>
 </phase>
-</review_process>
+</code_review>
 
 <quality_criteria>
 <criterion name="correctness">
 <description>Code does what it's supposed to do</description>
 <checks>Logic matches requirements, edge cases handled, error conditions covered</checks>
 </criterion>
-
 <criterion name="security">
 <description>No security vulnerabilities introduced</description>
 <checks>Input validation, authentication/authorization, data sanitization, secrets handling</checks>
 </criterion>
-
 <criterion name="performance">
 <description>No significant performance degradation</description>
 <checks>Algorithm efficiency, resource usage, memory leaks, N+1 queries</checks>
 </criterion>
-
 <criterion name="maintainability">
 <description>Code is easy to understand and modify</description>
 <checks>Clear naming, appropriate comments, single responsibility, DRY principle</checks>
 </criterion>
-
 <criterion name="testability">
 <description>Code can be effectively tested</description>
 <checks>Test coverage adequate, tests meaningful, edge cases tested</checks>
 </criterion>
 </quality_criteria>
 
-<feedback_format>
-<category name="critical">
-Must fix before merge.
-<examples>Security vulnerabilities, data corruption risks, breaking changes</examples>
-</category>
+<feedback_categories>
+<category name="critical">Must fix before merge (security vulnerabilities, data corruption risks, breaking changes)</category>
+<category name="important">Should fix before merge (logic errors, missing error handling, performance issues)</category>
+<category name="suggestion">Nice to have improvements (code style, refactoring opportunities, documentation)</category>
+<category name="positive">What was done well (good patterns, clever solutions, thorough testing)</category>
+</feedback_categories>
 
-<category name="important">
-Should fix before merge.
-<examples>Logic errors, missing error handling, performance issues</examples>
-</category>
+<output>
+<format>
+## Summary
+Overall assessment and recommendation
 
-<category name="suggestion">
-Nice to have improvements.
-<examples>Code style, refactoring opportunities, documentation</examples>
-</category>
+## Critical Issues
+Must-fix items with file:line references
 
-<category name="positive">
-What was done well.
-<examples>Good patterns, clever solutions, thorough testing</examples>
-</category>
-</feedback_format>
+## Important Issues
+Should-fix items
 
-<review_output>
-<section name="summary">Overall assessment and recommendation</section>
-<section name="critical_issues">Must-fix items with file:line references</section>
-<section name="important_issues">Should-fix items</section>
-<section name="suggestions">Optional improvements</section>
-<section name="positive_feedback">Good practices observed</section>
-<section name="questions">Clarifications needed</section>
-</review_output>
+## Suggestions
+Optional improvements
 
-<review_anti_patterns>
+## Positive Feedback
+Good practices observed
+
+## Questions
+Clarifications needed
+</format>
+</output>
+
+<rules>
+<rule>Execute independent tasks in parallel</rule>
+<rule>quality + security: Concurrent checks</rule>
+<rule>test + docs: Simultaneous creation when independent</rule>
+<rule>Never parallelize tasks with data dependencies</rule>
+<rule>Verify sub-agent outputs before integration</rule>
+<rule>Run quality checks after changes</rule>
+<rule>Ensure no regression in existing functionality</rule>
+<rule>Confirm all acceptance criteria met</rule>
+</rules>
+
+<anti_patterns>
 <avoid>Nitpicking on style when functionality is broken</avoid>
 <avoid>Approving without thorough review</avoid>
 <avoid>Focusing only on negatives</avoid>
 <avoid>Vague feedback without specific suggestions</avoid>
-</review_anti_patterns>
-</code_review>
+</anti_patterns>
 
-<verification>
-<step>Verify sub-agent outputs before integration</step>
-<step>Run quality checks after changes</step>
-<step>Ensure no regression in existing functionality</step>
-<step>Confirm all acceptance criteria met</step>
-</verification>

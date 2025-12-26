@@ -8,99 +8,78 @@ version: 0.1.0
 Provide structured methodology for requirements definition, ensuring comprehensive specification before implementation.
 </purpose>
 
-<methodology>
-<investigation_phases>
-<phase id="1" name="structure">
-Use Glob/LS for directory structure, Serena `get_symbols_overview` for symbol analysis.
+<workflow>
+<phase name="investigate">
+<step tool="Glob/LS">Directory structure analysis</step>
+<step tool="get_symbols_overview">Symbol analysis via Serena</step>
+<step tool="Grep/find_symbol">Keyword search</step>
+<step tool="find_referencing_symbols">Dependency mapping</step>
+<step tool="Read">Specific content details</step>
+<step tool="Context7">Latest API documentation and best practices</step>
 </phase>
-<phase id="2" name="keywords">
-Use Grep/Serena `find_symbol` for keyword search, `find_referencing_symbols` for dependency mapping.
-</phase>
-<phase id="3" name="details">
-Use Read for specific content, Context7 for latest API documentation and best practices.
-</phase>
-</investigation_phases>
 
-<question_scoring>
-Score each question by these criteria (1-5 each):
+<phase name="question_scoring">
+<description>Score each question by these criteria (1-5 each)</description>
 <criterion name="design_branching">How much does the answer affect design direction?</criterion>
 <criterion name="irreversibility">How difficult to change after implementation?</criterion>
 <criterion name="investigation_impossibility">Cannot be determined through code investigation alone?</criterion>
 <criterion name="effort_impact">How much does it affect implementation effort?</criterion>
+<note>Present high-score questions first. Do not proceed without clear answers to critical questions (score >= 15)</note>
+</phase>
 
-Present high-score questions first. Do not proceed without clear answers to critical questions (score >= 15).
-</question_scoring>
-
-<question_classification>
+<phase name="question_classification">
 <type name="spec_confirmation">Confirming existing behavior or constraints</type>
 <type name="design_choice">Choosing between valid alternatives</type>
 <type name="constraint">Technical or business limitations</type>
 <type name="scope">Boundaries of implementation</type>
 <type name="priority">Order and importance of features</type>
-</question_classification>
-</methodology>
+</phase>
+</workflow>
 
-<document_format>
-<section name="summary">
-<item>One-sentence request description</item>
-<item>Background and context</item>
-<item>Expected outcomes</item>
-</section>
+<output>
+<format>
+## Summary
+- One-sentence request description
+- Background and context
+- Expected outcomes
 
-<section name="current_state">
-<item>Existing system description</item>
-<item>Technology stack</item>
-<item>Relevant patterns and conventions</item>
-</section>
+## Current State
+- Existing system description
+- Technology stack
+- Relevant patterns and conventions
 
-<section name="functional_requirements">
-Format: FR-XXX
-<item>Unique identifier (FR-001, FR-002, ...)</item>
-<item>Priority: mandatory or optional</item>
-<item>Clear acceptance criteria</item>
-</section>
+## Functional Requirements
+Format: FR-XXX (FR-001, FR-002, ...)
+- Priority: mandatory or optional
+- Clear acceptance criteria
 
-<section name="non_functional_requirements">
-<item>Performance: response time, throughput</item>
-<item>Security: authentication, authorization, data protection</item>
-<item>Maintainability: code quality, documentation</item>
-</section>
+## Non-Functional Requirements
+- Performance: response time, throughput
+- Security: authentication, authorization, data protection
+- Maintainability: code quality, documentation
 
-<section name="technical_specifications">
-<item>Design policies and patterns</item>
-<item>Impact scope analysis</item>
-<item>Key design decisions with rationale</item>
-</section>
+## Technical Specifications
+- Design policies and patterns
+- Impact scope analysis
+- Key design decisions with rationale
 
-<section name="metrics">
-<item>Feasibility (0-100): Technical achievability</item>
-<item>Objectivity (0-100): Evidence-based specification</item>
-</section>
+## Metrics
+- Feasibility (0-100): Technical achievability
+- Objectivity (0-100): Evidence-based specification
 
-<section name="constraints">
-<item>Technical constraints: platform, language, framework</item>
-<item>Operational constraints: deployment, maintenance</item>
-</section>
+## Constraints
+- Technical constraints: platform, language, framework
+- Operational constraints: deployment, maintenance
 
-<section name="test_requirements">
-<item>Unit test coverage expectations</item>
-<item>Integration test scenarios</item>
-<item>Acceptance criteria verification</item>
-</section>
-</document_format>
+## Test Requirements
+- Unit test coverage expectations
+- Integration test scenarios
+- Acceptance criteria verification
 
-<task_breakdown>
-<component name="dependency_graph">
-Identify task dependencies and execution order.
-</component>
-<component name="phased_tasks">
-<item>Files to modify or create</item>
-<item>Overview of changes</item>
-<item>Dependencies between tasks</item>
-</component>
-<component name="execute_handoff">
-<item>Key decisions made</item>
-<item>Reference implementations</item>
-<item>Constraints to observe</item>
-</component>
-</task_breakdown>
+## Task Breakdown
+- Dependency graph: task dependencies and execution order
+- Phased tasks: files to modify/create, overview of changes, dependencies
+- Execute handoff: key decisions, reference implementations, constraints
+</format>
+</output>
+

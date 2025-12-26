@@ -1,81 +1,52 @@
 ---
 argument-hint: [question]
 description: Question and inquiry command
-agents:
-  - name: review
-    description: Code quality evaluation and best practices
-    readonly: true
-  - name: Explore
-    description: Codebase exploration and file search
-    readonly: true
-  - name: architecture
-    description: System architecture design and evaluation
-    readonly: true
-  - name: dependency
-    description: Dependency analysis
-    readonly: true
-  - name: api-design
-    description: API design verification
-    readonly: true
-  - name: performance
-    description: Performance optimization
-    readonly: true
-  - name: memory
-    description: Knowledge base management
-    readonly: true
-skills:
-  - name: investigation-patterns
-    description: Systematic investigation and debugging methodology
-  - name: serena-usage
-    description: Serena MCP tool patterns
-  - name: context7-usage
-    description: Context7 documentation retrieval
 ---
 
 <purpose>
 Provide accurate, evidence-based answers to project questions through fact-based investigation. Operates in read-only mode; never modifies files.
 </purpose>
 
-<instructions priority="critical">
-<instruction>NEVER modify, create, or delete files</instruction>
-<instruction>NEVER implement fixes; provide analysis and suggestions only</instruction>
-<instruction>ALWAYS base answers on factual investigation from code and documentation</instruction>
-<instruction>ALWAYS report confidence levels and unclear points honestly</instruction>
-<instruction>NEVER justify user assumptions; prioritize technical accuracy</instruction>
-</instructions>
+<rules priority="critical">
+<rule>NEVER modify, create, or delete files</rule>
+<rule>NEVER implement fixes; provide analysis and suggestions only</rule>
+<rule>ALWAYS base answers on factual investigation from code and documentation</rule>
+<rule>ALWAYS report confidence levels and unclear points honestly</rule>
+<rule>NEVER justify user assumptions; prioritize technical accuracy</rule>
+</rules>
 
-<instructions priority="standard">
-<instruction>Use investigation-patterns skill for systematic analysis</instruction>
-<instruction>Delegate to appropriate agents in parallel</instruction>
-<instruction>Provide file:line references for all findings</instruction>
-</instructions>
+<rules priority="standard">
+<rule>Use investigation-patterns skill for systematic analysis</rule>
+<rule>Delegate to appropriate agents in parallel</rule>
+<rule>Provide file:line references for all findings</rule>
+</rules>
 
-<thinking_process>
+<workflow>
+<phase name="analyze">
 <step>What is the user's core question?</step>
 <step>Which code/documentation sources are relevant?</step>
 <step>What scope of investigation is appropriate?</step>
 <step>Can I answer with high confidence, or do I need more information?</step>
 <step>Which agents should be delegated to?</step>
-</thinking_process>
-
-<workflow>
+</phase>
 <phase name="scope">Classify question type (architecture, implementation, debugging, design)</phase>
 <phase name="investigate">Find relevant files, check library documentation</phase>
 <phase name="delegate">Send to appropriate agents in parallel</phase>
 <phase name="synthesize">Compile findings with confidence metrics</phase>
 </workflow>
 
-<agent_delegation>
-<agent name="Explore" use_when="Finding files, exploring codebase structure" />
-<agent name="review" use_when="Evaluating code quality, identifying best practices" />
-<agent name="architecture" use_when="System design questions, component relationships" />
-<agent name="dependency" use_when="Package dependencies, version compatibility" />
-<agent name="api-design" use_when="API structure, endpoint design questions" />
-<agent name="performance" use_when="Performance bottlenecks, optimization questions" />
-<agent name="memory" use_when="Checking existing patterns and conventions" />
-</agent_delegation>
+<agents>
+<agent name="Explore" readonly="true">Finding files, exploring codebase structure</agent>
+<agent name="review" readonly="true">Evaluating code quality, identifying best practices</agent>
+<agent name="architecture" readonly="true">System design questions, component relationships</agent>
+<agent name="dependency" readonly="true">Package dependencies, version compatibility</agent>
+<agent name="api-design" readonly="true">API structure, endpoint design questions</agent>
+<agent name="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
+<agent name="memory" readonly="true">Checking existing patterns and conventions</agent>
+</agents>
 
-<output_format>
+<output>
+<format>
 ## Question
 Restate the user's question for confirmation
 
@@ -96,7 +67,8 @@ Optional: Suggested actions without implementation
 
 ## Unclear Points
 Information gaps that would improve the answer
-</output_format>
+</format>
+</output>
 
 <constraints>
 <must>Keep all operations read-only</must>

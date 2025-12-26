@@ -1,114 +1,73 @@
 ---
 description: Review command for Claude Code's recent work
-modes:
-  - name: define
-    description: Comprehensive review of /define execution plan
-    agents:
-      - name: plan
-        description: Execution plan review
-      - name: estimation
-        description: Estimation validity review
-  - name: execute
-    description: Comprehensive review of /execute work
-    agents:
-      - name: quality
-        description: Code quality review
-      - name: security
-        description: Security review
-      - name: design
-        description: Architecture consistency review
-      - name: docs
-        description: Documentation quality review
-      - name: performance
-        description: Performance review
-      - name: test
-        description: Test coverage review
-      - name: accessibility
-        description: Accessibility review
-      - name: error-handling
-        description: Error handling review
-  - name: general
-    description: Review of Claude Code's recent work
-    agents:
-      - name: review
-        description: Comprehensive work review
-      - name: complexity
-        description: Code complexity review
-      - name: memory
-        description: Consistency check with existing patterns
-skills:
-  - name: execution-workflow
-    description: Code review methodology
-  - name: serena-usage
-    description: Serena MCP tool patterns
-  - name: context7-usage
-    description: Context7 documentation retrieval
 ---
 
 <purpose>
 Multi-faceted review of Claude Code's work within the same session, automatically selecting appropriate review mode and executing efficiently in parallel.
 </purpose>
 
-<instructions priority="critical">
-<instruction>Launch all Task tools simultaneously in one message (timeout avoidance)</instruction>
-<instruction>Auto-select mode based on previous command</instruction>
-<instruction>Review only changed code in execute mode, not existing issues</instruction>
-<instruction>Provide concrete fix proposals, not abstract theories</instruction>
-</instructions>
+<rules priority="critical">
+<rule>Launch all Task tools simultaneously in one message (timeout avoidance)</rule>
+<rule>Auto-select mode based on previous command</rule>
+<rule>Review only changed code in execute mode, not existing issues</rule>
+<rule>Provide concrete fix proposals, not abstract theories</rule>
+</rules>
 
-<instructions priority="standard">
-<instruction>Use execution-workflow skill for code review methodology</instruction>
-<instruction>Check Serena memories for existing patterns</instruction>
-<instruction>Target session operations, not git diff</instruction>
-</instructions>
+<rules priority="standard">
+<rule>Use execution-workflow skill for code review methodology</rule>
+<rule>Check Serena memories for existing patterns</rule>
+<rule>Target session operations, not git diff</rule>
+</rules>
 
-<thinking_process>
+<workflow>
+<phase name="analyze">
 <step>What was the previous command? (/define, /execute, other)</step>
 <step>What files/work need to be reviewed?</step>
 <step>Which agents should run in parallel?</step>
 <step>What metrics are relevant for this mode?</step>
-</thinking_process>
-
-<mode_selection>
-<mode condition="After /define" name="define" description="Execution plan feedback" />
-<mode condition="After /execute" name="execute" description="Work content feedback" />
-<mode condition="Other" name="general" description="Recent work feedback" />
-</mode_selection>
+</phase>
+<phase name="mode_selection">
+<mode condition="After /define">Execution plan feedback</mode>
+<mode condition="After /execute">Work content feedback</mode>
+<mode condition="Other">Recent work feedback</mode>
+</phase>
+<phase name="execute">Launch all agents in parallel</phase>
+<phase name="synthesize">Compile feedback with metrics</phase>
+</workflow>
 
 <modes>
 <mode name="define">
 <target>Execution plan from conversation history</target>
-<aspects>
-<aspect>Step granularity</aspect>
-<aspect>Dependencies and sequencing</aspect>
-<aspect>Risk identification</aspect>
-<aspect>Completeness</aspect>
-<aspect>Feasibility</aspect>
-</aspects>
+<aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
+<agents>
+<agent name="plan">Execution plan review</agent>
+<agent name="estimation">Estimation validity review</agent>
+</agents>
 </mode>
-
 <mode name="execute">
 <target>Files modified via Edit/Write tools</target>
 <agents>
-<agent name="quality" aspects="Naming, DRY, readability" />
-<agent name="security" aspects="OWASP Top 10, input validation, auth" />
-<agent name="design" aspects="Architecture consistency, patterns" />
-<agent name="docs" aspects="Accuracy, structure, completeness" />
+<agent name="quality">Naming, DRY, readability</agent>
+<agent name="security">OWASP Top 10, input validation, auth</agent>
+<agent name="design">Architecture consistency, patterns</agent>
+<agent name="docs">Accuracy, structure, completeness</agent>
+<agent name="performance">Performance review</agent>
+<agent name="test">Test coverage review</agent>
 </agents>
-<execution>4 agents in parallel</execution>
+<execution>All agents in parallel</execution>
 </mode>
-
 <mode name="general">
 <target>Recent Claude Code work</target>
-<review_by_type>
-<type name="research" aspects="Comprehensiveness, accuracy" />
-<type name="documentation" aspects="Accuracy, readability" />
-<type name="code" aspects="Quality, security, consistency" />
-</review_by_type>
+<agents>
+<agent name="review">Comprehensive work review</agent>
+<agent name="complexity">Code complexity review</agent>
+<agent name="memory">Consistency check with existing patterns</agent>
+</agents>
 </mode>
 </modes>
 
-<output_format>
+<output>
+<format>
 ## {Mode} Feedback Results
 
 ### Evaluation Scores
@@ -135,7 +94,8 @@ Fix Recommended
 - [High] Action
 - [Medium] Action
 - [Low] Action
-</output_format>
+</format>
+</output>
 
 <constraints>
 <must>Launch all agents simultaneously (no sequential execution)</must>

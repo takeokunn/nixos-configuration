@@ -31,7 +31,7 @@ Provide testing patterns and strategies for comprehensive test coverage and main
 </type>
 </test_types>
 
-<test_structure>
+<patterns>
 <pattern name="arrange_act_assert">
 <phase name="arrange">Set up test data and preconditions</phase>
 <phase name="act">Execute the code under test</phase>
@@ -43,46 +43,42 @@ Provide testing patterns and strategies for comprehensive test coverage and main
 <phase name="when">Action or trigger</phase>
 <phase name="then">Expected outcome</phase>
 </pattern>
-</test_structure>
+</patterns>
 
-<naming_conventions>
+<naming>
 <convention name="descriptive">
-test_[method]_[scenario]_[expected_result]
+<format>test_[method]_[scenario]_[expected_result]</format>
 <example>test_calculateTotal_withEmptyCart_returnsZero</example>
 </convention>
 
 <convention name="should">
-[method]_should_[expected_behavior]_when_[condition]
+<format>[method]_should_[expected_behavior]_when_[condition]</format>
 <example>calculateTotal_should_returnZero_when_cartIsEmpty</example>
 </convention>
-</naming_conventions>
+</naming>
 
-<coverage_strategy>
-<category name="happy_path">
-Test the normal, expected flow.
-<priority>High - must have</priority>
+<coverage>
+<category name="happy_path" priority="high">
+<description>Test the normal, expected flow</description>
 </category>
 
-<category name="edge_cases">
-Test boundary conditions.
+<category name="edge_cases" priority="high">
+<description>Test boundary conditions</description>
 <examples>Empty inputs, maximum values, null values</examples>
-<priority>High - must have</priority>
 </category>
 
-<category name="error_cases">
-Test error handling paths.
+<category name="error_cases" priority="high">
+<description>Test error handling paths</description>
 <examples>Invalid inputs, network failures, permission errors</examples>
-<priority>High - must have</priority>
 </category>
 
-<category name="corner_cases">
-Test unusual combinations.
+<category name="corner_cases" priority="medium">
+<description>Test unusual combinations</description>
 <examples>Concurrent access, timezone edge cases</examples>
-<priority>Medium - should have</priority>
 </category>
-</coverage_strategy>
+</coverage>
 
-<mocking_patterns>
+<mocking>
 <pattern name="stub">
 <description>Provide canned responses</description>
 <use_case>Replace slow/unreliable dependencies</use_case>
@@ -102,58 +98,42 @@ Test unusual combinations.
 <description>Working implementation for testing</description>
 <use_case>In-memory database, fake file system</use_case>
 </pattern>
-</mocking_patterns>
+</mocking>
 
-<test_organization>
+<organization>
 <principle name="isolation">
-Each test should be independent.
+<description>Each test should be independent</description>
 <action>Reset state between tests</action>
 <action>Avoid test order dependencies</action>
 </principle>
 
 <principle name="readability">
-Tests serve as documentation.
+<description>Tests serve as documentation</description>
 <action>Clear naming</action>
 <action>Minimal setup per test</action>
 <action>One assertion per concept</action>
 </principle>
 
 <principle name="maintainability">
-Tests should be easy to update.
+<description>Tests should be easy to update</description>
 <action>Use test fixtures and factories</action>
 <action>Avoid magic numbers</action>
 <action>Extract common setup</action>
 </principle>
-</test_organization>
+</organization>
 
-<anti_patterns>
-<avoid name="testing_implementation">
-Test behavior, not implementation details.
-</avoid>
-
-<avoid name="excessive_mocking">
-Too many mocks indicate poor design.
-</avoid>
-
-<avoid name="flaky_tests">
-Tests that sometimes pass/fail erode trust.
-</avoid>
-
-<avoid name="slow_tests">
-Slow tests discourage running them.
-</avoid>
-
-<avoid name="test_interdependence">
-Tests that depend on other tests' state.
-</avoid>
-</anti_patterns>
-
-<coverage_metrics>
+<metrics>
 <metric name="line_coverage">Percentage of lines executed</metric>
 <metric name="branch_coverage">Percentage of branches taken</metric>
 <metric name="function_coverage">Percentage of functions called</metric>
-<guidance>
-Aim for high coverage but prioritize meaningful tests over coverage numbers.
-80%+ coverage is a good target for critical code.
-</guidance>
-</coverage_metrics>
+<guidance>Aim for high coverage but prioritize meaningful tests over coverage numbers. 80%+ coverage is a good target for critical code.</guidance>
+</metrics>
+
+<anti_patterns>
+<avoid name="testing_implementation">Test behavior, not implementation details</avoid>
+<avoid name="excessive_mocking">Too many mocks indicate poor design</avoid>
+<avoid name="flaky_tests">Tests that sometimes pass/fail erode trust</avoid>
+<avoid name="slow_tests">Slow tests discourage running them</avoid>
+<avoid name="test_interdependence">Tests that depend on other tests' state</avoid>
+</anti_patterns>
+

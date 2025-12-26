@@ -11,24 +11,24 @@ Provide comprehensive patterns for Nix language, flakes, and Home Manager config
 <nix_language>
 <fundamentals>
 <concept name="lazy_evaluation">
-Nix is lazily evaluated. Expressions are only computed when needed.
-Use this for conditional includes and optional dependencies.
+<description>Nix is lazily evaluated. Expressions are only computed when needed.</description>
+<use>Conditional includes and optional dependencies</use>
 </concept>
 
 <concept name="pure_functions">
-All Nix functions are pure. Same inputs always produce same outputs.
-Avoid side effects; use derivations for build actions.
+<description>All Nix functions are pure. Same inputs always produce same outputs.</description>
+<use>Avoid side effects; use derivations for build actions</use>
 </concept>
 
 <concept name="attribute_sets">
-Primary data structure in Nix.
+<description>Primary data structure in Nix</description>
 <pattern name="definition">{ attr1 = value1; attr2 = value2; }</pattern>
 <pattern name="access">set.attr or set."attr-with-dashes"</pattern>
 <pattern name="recursive">rec { a = 1; b = a + 1; }</pattern>
 </concept>
 </fundamentals>
 
-<common_patterns>
+<patterns>
 <pattern name="let_in">
 <description>Local bindings for complex expressions</description>
 <example>
@@ -64,22 +64,22 @@ final: prev: {
 <description>Dependency injection pattern</description>
 <example>myPackage = pkgs.callPackage ./package.nix { };</example>
 </pattern>
-</common_patterns>
+</patterns>
 
-<derivation_patterns>
+<derivations>
 <pattern name="mkDerivation">
 <description>Standard package builder</description>
 <required>pname, version, src</required>
 <phases>unpackPhase, patchPhase, configurePhase, buildPhase, installPhase</phases>
 </pattern>
 
-<pattern name="buildInputs_vs_nativeBuildInputs">
+<pattern name="build_inputs">
 <item name="nativeBuildInputs">Tools run at build time (compilers, build tools)</item>
 <item name="buildInputs">Libraries linked at runtime</item>
 </pattern>
-</derivation_patterns>
+</derivations>
 
-<module_patterns>
+<modules>
 <pattern name="options_config">
 <description>NixOS/Home Manager module structure</description>
 <structure>
@@ -100,7 +100,7 @@ final: prev: {
 <description>Shorthand for boolean enable option</description>
 <example>enable = lib.mkEnableOption "my service";</example>
 </pattern>
-</module_patterns>
+</modules>
 
 <anti_patterns>
 <avoid name="impure_paths">Use fetchurl/fetchFromGitHub instead of direct paths</avoid>
@@ -111,7 +111,7 @@ final: prev: {
 </nix_language>
 
 <flakes>
-<basic_structure>
+<structure>
 {
   description = "Project description";
 
@@ -123,9 +123,9 @@ final: prev: {
     # output attributes
   };
 }
-</basic_structure>
+</structure>
 
-<common_outputs>
+<outputs>
 <output name="packages">Derivations for nix build</output>
 <output name="devShells">Development environments for nix develop</output>
 <output name="apps">Runnable applications for nix run</output>
@@ -134,9 +134,9 @@ final: prev: {
 <output name="homeManagerModules">Home Manager modules</output>
 <output name="nixosConfigurations">Full NixOS system configurations</output>
 <output name="homeConfigurations">Home Manager configurations</output>
-</common_outputs>
+</outputs>
 
-<input_patterns>
+<inputs>
 <pattern name="github">
 <example>nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";</example>
 <variants>github:owner/repo, github:owner/repo/branch, github:owner/repo/rev</variants>
@@ -161,7 +161,7 @@ my-source = {
 };
 </example>
 </pattern>
-</input_patterns>
+</inputs>
 
 <output_patterns>
 <pattern name="per_system">
@@ -203,7 +203,7 @@ devShells.default = pkgs.mkShell {
 
 <home_manager>
 <module_structure>
-<standard_structure>
+<standard>
 { config, pkgs, lib, ... }:
 {
   options.custom.feature = {
@@ -214,7 +214,7 @@ devShells.default = pkgs.mkShell {
     # configuration when enabled
   };
 }
-</standard_structure>
+</standard>
 
 <file_organization>
 <pattern name="by_program">home-manager/programs/git.nix</pattern>
@@ -223,10 +223,8 @@ devShells.default = pkgs.mkShell {
 </file_organization>
 </module_structure>
 
-<programs_configuration>
-<pattern name="basic_enable">
-programs.git.enable = true;
-</pattern>
+<programs>
+<pattern name="basic_enable">programs.git.enable = true;</pattern>
 
 <pattern name="with_options">
 programs.git = {
@@ -243,7 +241,7 @@ programs.git = {
   package = pkgs.gitFull;
 };
 </pattern>
-</programs_configuration>
+</programs>
 
 <common_modules>
 <module name="programs.git">enable, userName, userEmail, signing, aliases, extraConfig</module>
@@ -271,7 +269,7 @@ home.file.".config/app/config" = {
 </pattern>
 </file_management>
 
-<session_variables>
+<session>
 <pattern name="home.sessionVariables">
 <description>Environment variables for login shells</description>
 <example>
@@ -286,18 +284,18 @@ home.sessionVariables = {
 <description>Add to PATH</description>
 <example>home.sessionPath = [ "$HOME/.local/bin" ];</example>
 </pattern>
-</session_variables>
+</session>
 
-<best_practices>
-<practice>Use programs.* when available instead of manual configuration</practice>
-<practice>Group related configurations in separate modules</practice>
-<practice>Use lib.mkIf for conditional configuration</practice>
-<practice>Prefer xdg.configFile over home.file for XDG-compliant apps</practice>
-<practice>Use home.packages for additional packages not configured via programs.*</practice>
-</best_practices>
+<rules>
+<rule>Use programs.* when available instead of manual configuration</rule>
+<rule>Group related configurations in separate modules</rule>
+<rule>Use lib.mkIf for conditional configuration</rule>
+<rule>Prefer xdg.configFile over home.file for XDG-compliant apps</rule>
+<rule>Use home.packages for additional packages not configured via programs.*</rule>
+</rules>
 </home_manager>
 
-<nixos_configuration>
+<nixos>
 <pattern name="basic">
 nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
@@ -325,4 +323,5 @@ home-manager.nixosModules.home-manager
   home-manager.users.username = import ./home.nix;
 }
 </pattern>
-</nixos_configuration>
+</nixos>
+
