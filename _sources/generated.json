@@ -265,12 +265,12 @@
       "name": null,
       "owner": "ahyatt",
       "repo": "llm",
-      "rev": "0.28.2",
-      "sha256": "sha256-auVcj9sOZpqtfXRkaK72e1QgKp/t3+K+vjX0OmgtASs=",
+      "rev": "0.28.4",
+      "sha256": "sha256-ZlGcWey3qAiZ6nULRYt8M6fSYGOyVP1jcPfq1rYoyJM=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "0.28.2"
+    "version": "0.28.4"
   },
   "emacs-mu4e-dashboard": {
     "cargoLocks": null,
@@ -1009,7 +1009,7 @@
   },
   "vimdoc-ja": {
     "cargoLocks": null,
-    "date": "2025-12-26",
+    "date": "2025-12-27",
     "extract": null,
     "name": "vimdoc-ja",
     "passthru": null,
@@ -1021,11 +1021,11 @@
       "name": null,
       "owner": "vim-jp",
       "repo": "vimdoc-ja",
-      "rev": "1a5dd8e9d0e9ac49842e831f0824cafb9ccbe4d3",
-      "sha256": "sha256-IZpngZraZ98OoaHBO/ZMFd0KHVh9iFai2QeO+CYztSk=",
+      "rev": "81fdcad027d511d32ae8664c8e4976bf91647334",
+      "sha256": "sha256-E+i7wK6MfRAsW9vDX0AdS2NzxKNU8+aX9DNg+cOVWW8=",
       "sparseCheckout": [],
       "type": "github"
     },
-    "version": "1a5dd8e9d0e9ac49842e831f0824cafb9ccbe4d3"
+    "version": "81fdcad027d511d32ae8664c8e4976bf91647334"
   }
 }
