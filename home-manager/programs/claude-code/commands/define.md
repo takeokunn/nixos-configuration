@@ -38,6 +38,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <phase name="user_interview">
 <step>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</step>
 <step>Classify: spec confirmation, design choice, constraint, scope, priority</step>
+<step>Use AskUserQuestion tool for all user interactions with structured options</step>
 <step>Present high-score questions first; do not proceed without clear answers</step>
 </phase>
 <phase name="re_investigation">
@@ -101,8 +102,10 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <constraints>
 <must>Keep all operations read-only</must>
 <must>Delegate detailed investigation to sub-agents</must>
+<must>Use AskUserQuestion tool for structured user interactions</must>
 <must>Present questions before making assumptions</must>
 <avoid>Implementing or modifying code</avoid>
 <avoid>Justifying user requests over technical validity</avoid>
 <avoid>Proceeding without clear answers to critical questions</avoid>
+<avoid>Using plain text output for questions instead of AskUserQuestion tool</avoid>
 </constraints>
