@@ -38,7 +38,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <phase name="user_interview">
 <step>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</step>
 <step>Classify: spec confirmation, design choice, constraint, scope, priority</step>
-<step>Use AskUserQuestion tool for all user interactions with structured options</step>
+<step>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</step>
+<step>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</step>
 <step>Present high-score questions first; do not proceed without clear answers</step>
 </phase>
 <phase name="re_investigation">
@@ -73,6 +74,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <requirement>Scope overview</requirement>
 <requirement>Target file paths</requirement>
 <requirement>Explicit edit prohibition</requirement>
+<requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
 
 <output>
