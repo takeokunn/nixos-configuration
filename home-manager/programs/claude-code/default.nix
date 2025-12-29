@@ -12,7 +12,7 @@
       theme = "dark";
       autoUpdates = false;
       includeCoAuthoredBy = false;
-      autoCompactEnabled = false;
+      autoCompactEnabled = true;
       enableAllProjectMcpServers = true;
       feedbackSurveyState.lastShownTime = 1754089004345;
       outputStyle = "Explanatory";
