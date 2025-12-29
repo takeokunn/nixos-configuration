@@ -65,11 +65,4 @@
       inactive_border_color = "#6272a4";
     };
   };
-
-  xdg.configFile = {
-    ".config/kitty/emacsclient_transparent.conf".text = ''
-      include ~/.config/kitty/kitty.conf
-      background_opacity 0.8
-    '';
-  };
 }
