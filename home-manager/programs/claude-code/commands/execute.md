@@ -29,10 +29,22 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <step>What dependencies exist between tasks?</step>
 <step>What verification is needed?</step>
 </phase>
-<phase name="break_down">Split into manageable units</phase>
-<phase name="organize">Identify parallel vs sequential tasks</phase>
-<phase name="delegate">Assign with detailed instructions</phase>
-<phase name="integrate">Verify and combine results</phase>
+<phase name="decompose">
+<step>Split into manageable units</step>
+<step>Identify task boundaries</step>
+</phase>
+<phase name="structure">
+<step>Identify parallel vs sequential tasks</step>
+<step>Define task dependencies</step>
+</phase>
+<phase name="assign">
+<step>Delegate tasks with detailed instructions</step>
+<step>Provide context and constraints</step>
+</phase>
+<phase name="consolidate">
+<step>Verify sub-agent outputs</step>
+<step>Combine results</step>
+</phase>
 </workflow>
 
 <agents>

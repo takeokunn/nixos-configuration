@@ -46,9 +46,10 @@ Provide structured workflow for task execution through delegation to specialized
 </phase>
 </workflow>
 
-<concept name="agent_groups">
+<tools>
+<tool name="agent_groups">
 <description>Specialized sub-agents organized by execution model</description>
-<example>
+<usage>
 <group name="quality_assurance" execution="parallel">
 <agent name="quality">Syntax, type, format verification</agent>
 <agent name="security">Vulnerability detection</agent>
@@ -61,24 +62,24 @@ Provide structured workflow for task execution through delegation to specialized
 <group name="review" execution="sequential_after_implementation">
 <agent name="review">Post-implementation review</agent>
 </group>
-</example>
-</concept>
+</usage>
+</tool>
 
-<concept name="delegation_requirements">
+<tool name="delegation">
 <description>Essential information to provide when delegating to sub-agents</description>
-<example>
+<usage>
 - Specific scope and expected deliverables
 - Target file paths
 - Serena MCP usage: find_symbol, get_symbols_overview, search_for_pattern
 - Context7 MCP usage for library verification
 - Reference implementations with specific paths
 - Memory check: list_memories for patterns
-</example>
-</concept>
+</usage>
+</tool>
 
-<concept name="tool_preference">
+<tool name="tool_selection">
 <description>Tool selection hierarchy for task execution</description>
-<example>
+<usage>
 Priority 1: Basic tools (Read/Edit/Write) when sufficient
 Priority 2: Serena MCP for semantic operations
 Priority 3: Context7 for library documentation
@@ -92,10 +93,12 @@ Prohibited Codex usage:
 - Test creation - use test agent
 - Documentation - use docs agent
 - Code review - use review agent
-  </example>
-  </concept>
+  </usage>
+  </tool>
+  </tools>
 
-<concept name="code_review_phases">
+<patterns>
+<pattern name="code_review_phases">
 <description>Systematic code review process</description>
 <example>
 Phase 1 - Initial Scan:
@@ -123,9 +126,9 @@ Phase 4 - Standards Compliance:
 - Documentation requirements
 - Test coverage
   </example>
-  </concept>
+  </pattern>
 
-<concept name="quality_criteria">
+<pattern name="quality_criteria">
 <description>Evaluation criteria for code quality</description>
 <example>
 Correctness:
@@ -160,9 +163,9 @@ Testability:
 - Tests meaningful
 - Edge cases tested
   </example>
-  </concept>
+  </pattern>
 
-<concept name="feedback_categories">
+<pattern name="feedback_categories">
 <description>Categorization of review feedback by priority</description>
 <example>
 Critical: Must fix before merge
@@ -188,9 +191,9 @@ Positive: What was done well
 - Clever solutions
 - Thorough testing
   </example>
-  </concept>
+  </pattern>
 
-<concept name="review_output_format">
+<pattern name="review_output_format">
 <description>Standard format for code review results</description>
 <example>
 <summary>Overall assessment and recommendation</summary>
@@ -200,7 +203,8 @@ Positive: What was done well
 <positive_feedback>Good practices observed</positive_feedback>
 <questions>Clarifications needed</questions>
 </example>
-</concept>
+</pattern>
+</patterns>
 
 <rules priority="critical">
 <rule>Execute independent tasks in parallel</rule>

@@ -4,12 +4,14 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 
 <rules priority="critical">
 <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
-<rule>Always check Serena memories before implementation with `list_memories` and `read_memory`</rule>
+<rule>Always check Serena memories before implementation with list_memories and read_memory</rule>
 <rule>Use symbol-level operations over reading entire files</rule>
-<rule>Use `perl` for all text processing; never use `sed` or `awk`</rule>
+<rule>Use perl for all text processing; never use sed or awk</rule>
+<rule>Always output in English</rule>
 </rules>
 
 <rules priority="standard">
+<rule>Use gh command for all GitHub operations (PRs, issues, repos)</rule>
 <rule>Use Context7 MCP to verify latest library documentation</rule>
 <rule>Check existing code/patterns before implementing new features</rule>
 <rule>Only perform Git operations when explicitly requested by user</rule>
@@ -49,8 +51,9 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 
 <constraints>
 <must>Check memories before implementation</must>
-<must>Use perl for text processing (e.g., `perl -pi -e 's/old/new/g' file.txt`)</must>
+<must>Use perl for text processing (e.g., perl -pi -e 's/old/new/g' file.txt)</must>
 <must>Request permission before config file changes</must>
+<must>Output all text in English</must>
 <avoid>Reading entire files when symbol operations suffice</avoid>
 <avoid>Using sed or awk for text processing</avoid>
 <avoid>Git operations without explicit user request</avoid>

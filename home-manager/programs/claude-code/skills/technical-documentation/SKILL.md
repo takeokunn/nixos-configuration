@@ -8,12 +8,22 @@ version: 0.1.0
 Provide structured patterns for creating technical documentation including README, design documents, API specifications, and user guides for diverse audiences.
 </purpose>
 
-<document_types>
-<type name="readme">
-<description>Project introduction and quick start guide</description>
-<audience>Developers, contributors, users</audience>
-<structure>
+<tools>
+<tool>Write - Create new documentation files</tool>
+<tool>Edit - Update existing documentation</tool>
+<tool>Read - Review existing documentation and code</tool>
+<tool>Grep - Search for patterns across documentation</tool>
+<tool>Glob - Find related documentation files</tool>
+</tools>
 
+<patterns>
+<pattern name="readme_document_type">
+<description>Project introduction and quick start guide</description>
+<context>
+<audience>Developers, contributors, users</audience>
+<when_to_use>Creating or updating main project documentation</when_to_use>
+</context>
+<structure>
 <section>Project title and badges</section>
 <section>One-line description</section>
 <section>Key features (3-5 bullet points)</section>
@@ -22,11 +32,14 @@ Provide structured patterns for creating technical documentation including READM
 <section>Documentation links</section>
 <section>Contributing / License</section>
 </structure>
-</type>
+</pattern>
 
-<type name="api_specification">
+<pattern name="api_specification_document_type">
 <description>API reference documentation</description>
+<context>
 <audience>Developers integrating with the API</audience>
+<when_to_use>Documenting REST APIs, GraphQL schemas, or SDK interfaces</when_to_use>
+</context>
 <structure>
 <section>Overview and authentication</section>
 <section>Base URL and versioning</section>
@@ -35,11 +48,14 @@ Provide structured patterns for creating technical documentation including READM
 <section>Rate limits</section>
 <section>Examples (curl, language-specific)</section>
 </structure>
-</type>
+</pattern>
 
-<type name="design_document">
+<pattern name="design_document_type">
 <description>Technical design and architecture documentation</description>
+<context>
 <audience>Team members, reviewers, future maintainers</audience>
+<when_to_use>Proposing new features, architectural changes, or major refactors</when_to_use>
+</context>
 <structure>
 <section>Summary (problem, solution, scope)</section>
 <section>Background and motivation</section>
@@ -50,11 +66,14 @@ Provide structured patterns for creating technical documentation including READM
 <section>Testing strategy</section>
 <section>Rollout plan</section>
 </structure>
-</type>
+</pattern>
 
-<type name="user_guide">
+<pattern name="user_guide_document_type">
 <description>End-user facing documentation</description>
+<context>
 <audience>Non-technical users, administrators</audience>
+<when_to_use>Creating help documentation, tutorials, or product guides</when_to_use>
+</context>
 <structure>
 <section>Getting started</section>
 <section>Core concepts</section>
@@ -63,133 +82,7 @@ Provide structured patterns for creating technical documentation including READM
 <section>Troubleshooting / FAQ</section>
 <section>Glossary</section>
 </structure>
-</type>
-</document_types>
-
-<best_practices>
-<practice priority="critical">
-<description>Audience-first approach - Write for your specific audience's knowledge level</description>
-<example>
-Developers: Assume technical background, focus on implementation details
-Team members: Balance context with technical depth
-End users: Avoid jargon, use step-by-step instructions
-</example>
-</practice>
-
-<practice priority="critical">
-<description>Progressive disclosure - Start with essentials, reveal complexity gradually</description>
-<example>
-1. Quick start for immediate value
-2. Common use cases
-3. Advanced configuration
-4. Edge cases and troubleshooting
-</example>
-</practice>
-
-<practice priority="high">
-<description>Make content scannable to enable quick information retrieval</description>
-<example>
-- Use descriptive headings
-- Use bullet points for lists
-- Include code blocks with syntax highlighting
-- Use tables for structured data
-- Use bold for key terms (sparingly)
-</example>
-</practice>
-
-<practice priority="high">
-<description>Example-driven documentation - Show, don't just tell</description>
-<example>
-- Include working code examples
-- Show expected output
-- Provide copy-pasteable commands
-</example>
-</practice>
-
-<practice priority="medium">
-<description>Active voice and present tense for clarity</description>
-<example>
-Good: Run this command to start the server.
-Bad: The server can be started by running the following command.
-</example>
-</practice>
-
-<practice priority="medium">
-<description>Test all code examples before publishing</description>
-<example>
-Always verify that code examples compile and run correctly
-Include expected output
-Test edge cases mentioned in documentation
-</example>
-</practice>
-</best_practices>
-
-<language_guidelines>
-<english>
-
-<style>Active voice, present tense</style>
-
-<tone>Professional but approachable</tone>
-<avoid>Unnecessarily complex words, idioms that don't translate</avoid>
-<example>
-
-<good_example>Good</good_example>
-
-Run this command to start the server.
-
-<bad_example>Bad</bad_example>
-
-The server can be started by running the following command.
-</example>
-</english>
-
-<japanese>
-<style>です・ます調 (polite form) for user docs, である調 for technical specs</style>
-<tone>丁寧だが簡潔</tone>
-<avoid>過度なカタカナ語、曖昧な表現</avoid>
-<example>
-<good_example>Good</good_example>
-以下のコマンドでサーバーを起動します。
-
-<bad_example>Bad</bad_example>
-
-サーバーの起動については、下記コマンドを実行することで可能となります。
-</example>
-</japanese>
-
-<bilingual>
-<rule>Maintain parallel structure between languages</rule>
-<rule>Keep code examples identical, translate only prose</rule>
-<rule>Use consistent terminology (create glossary if needed)</rule>
-</bilingual>
-</language_guidelines>
-
-<workflow>
-<phase name="plan">
-<step>Identify document type and audience</step>
-<step>Outline key sections</step>
-<step>Gather technical details</step>
-</phase>
-
-<phase name="draft">
-<step>Write in order: overview → details → examples</step>
-<step>Include all code examples (test them)</step>
-<step>Mark TODOs for uncertain parts</step>
-</phase>
-
-<phase name="review">
-<step>Verify technical accuracy</step>
-<step>Check all links and code examples work</step>
-<step>Review for audience appropriateness</step>
-<step>Proofread for grammar and typos</step>
-</phase>
-
-<phase name="maintain">
-<step>Update when code changes</step>
-<step>Review periodically for accuracy</step>
-<step>Track user feedback</step>
-</phase>
-</workflow>
+</pattern>
 
 <pattern name="readme_structure">
 <description>Standard structure for README documentation</description>
@@ -398,6 +291,132 @@ Ensure you have a stable internet connection. The app auto-saves every 30 second
 **Another Term:** Another definition
 </example>
 </pattern>
+</patterns>
+
+<best_practices>
+<practice priority="critical">
+<description>Audience-first approach - Write for your specific audience's knowledge level</description>
+<example>
+Developers: Assume technical background, focus on implementation details
+Team members: Balance context with technical depth
+End users: Avoid jargon, use step-by-step instructions
+</example>
+</practice>
+
+<practice priority="critical">
+<description>Progressive disclosure - Start with essentials, reveal complexity gradually</description>
+<example>
+1. Quick start for immediate value
+2. Common use cases
+3. Advanced configuration
+4. Edge cases and troubleshooting
+</example>
+</practice>
+
+<practice priority="high">
+<description>Make content scannable to enable quick information retrieval</description>
+<example>
+- Use descriptive headings
+- Use bullet points for lists
+- Include code blocks with syntax highlighting
+- Use tables for structured data
+- Use bold for key terms (sparingly)
+</example>
+</practice>
+
+<practice priority="high">
+<description>Example-driven documentation - Show, don't just tell</description>
+<example>
+- Include working code examples
+- Show expected output
+- Provide copy-pasteable commands
+</example>
+</practice>
+
+<practice priority="medium">
+<description>Active voice and present tense for clarity</description>
+<example>
+Good: Run this command to start the server.
+Bad: The server can be started by running the following command.
+</example>
+</practice>
+
+<practice priority="medium">
+<description>Test all code examples before publishing</description>
+<example>
+Always verify that code examples compile and run correctly
+Include expected output
+Test edge cases mentioned in documentation
+</example>
+</practice>
+</best_practices>
+
+<language_guidelines>
+<english>
+
+<style>Active voice, present tense</style>
+
+<tone>Professional but approachable</tone>
+<avoid>Unnecessarily complex words, idioms that don't translate</avoid>
+<example>
+
+<good_example>Good</good_example>
+
+Run this command to start the server.
+
+<bad_example>Bad</bad_example>
+
+The server can be started by running the following command.
+</example>
+</english>
+
+<japanese>
+<style>です・ます調 (polite form) for user docs, である調 for technical specs</style>
+<tone>丁寧だが簡潔</tone>
+<avoid>過度なカタカナ語、曖昧な表現</avoid>
+<example>
+<good_example>Good</good_example>
+以下のコマンドでサーバーを起動します。
+
+<bad_example>Bad</bad_example>
+
+サーバーの起動については、下記コマンドを実行することで可能となります。
+</example>
+</japanese>
+
+<bilingual>
+<rule>Maintain parallel structure between languages</rule>
+<rule>Keep code examples identical, translate only prose</rule>
+<rule>Use consistent terminology (create glossary if needed)</rule>
+</bilingual>
+</language_guidelines>
+
+<workflow>
+<phase name="plan">
+<step>Identify document type and audience</step>
+<step>Outline key sections</step>
+<step>Gather technical details</step>
+</phase>
+
+<phase name="draft">
+<step>Write in order: overview → details → examples</step>
+<step>Include all code examples (test them)</step>
+<step>Mark TODOs for uncertain parts</step>
+</phase>
+
+<phase name="review">
+<step>Verify technical accuracy</step>
+<step>Check all links and code examples work</step>
+<step>Review for audience appropriateness</step>
+<step>Proofread for grammar and typos</step>
+</phase>
+
+<phase name="maintain">
+<step>Update when code changes</step>
+<step>Review periodically for accuracy</step>
+<step>Track user feedback</step>
+</phase>
+</workflow>
 
 <output>
 <format>

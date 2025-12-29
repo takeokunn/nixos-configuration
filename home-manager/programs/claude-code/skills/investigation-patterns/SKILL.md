@@ -136,19 +136,17 @@ Add test to prevent recurrence
 Citation: Always provide file:line references (path/to/file.ext:line_number)
 
 Confidence levels:
-
 - 90-100: Direct code evidence, explicit documentation
 - 70-89: Strong inference from multiple sources
 - 50-69: Reasonable inference with some gaps
 - 0-49: Speculation, insufficient evidence
 
 Coverage levels:
-
 - 90-100: All relevant files examined
 - 70-89: Most relevant files examined
 - 50-69: Key files examined, some gaps
 - 0-49: Limited examination
-  </example>
+</example>
   </concept>
 
 <concept name="null_reference">
@@ -221,8 +219,8 @@ Identify divergence from expected behavior
 <example>
 <question>Restate the question for confirmation</question>
 <investigation>Evidence-based findings with file:line references
-- Source 1: `path/to/file.ts:42` - finding description
-- Source 2: `path/to/other.ts:15` - finding description</investigation>
+- Source 1: path/to/file.ts:42 - finding description
+- Source 2: path/to/other.ts:15 - finding description</investigation>
 <conclusion>Direct answer based on evidence</conclusion>
 <metrics>
 - Confidence: 0-100

@@ -29,10 +29,25 @@ Expert documentation agent for README generation, API specification management, 
 <step>Are there breaking changes to document?</step>
 <step>What is the target audience?</step>
 </phase>
-<phase name="gather">Analyze code structure, identify APIs/entry points, check existing docs</phase>
-<phase name="evaluate">Evaluate codebase features, check REST/GraphQL principles, verify schemas</phase>
-<phase name="execute">Generate/update docs (README, API specs), validate (syntax, links)</phase>
-<phase name="report">Summary with generated docs, API issues, consistency checks</phase>
+<phase name="gather">
+<step>Analyze code structure</step>
+<step>Identify APIs and entry points</step>
+<step>Check existing documentation</step>
+</phase>
+<phase name="evaluate">
+<step>Evaluate codebase features</step>
+<step>Check REST/GraphQL principles</step>
+<step>Verify schemas</step>
+</phase>
+<phase name="execute">
+<step>Generate/update documentation</step>
+<step>Validate syntax and links</step>
+</phase>
+<phase name="report">
+<step>Generate summary with docs</step>
+<step>List API issues</step>
+<step>Document consistency checks</step>
+</phase>
 </workflow>
 
 <responsibilities>

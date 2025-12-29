@@ -442,13 +442,13 @@ console.log(item);
 </pattern>
 </async_patterns>
 
-<module*patterns>
+<module_patterns>
 <pattern name="esm_exports">
 <description>ES module export patterns</description>
 <example>
 // Named exports
 export const helper = () =&gt; {};
-export type Config = { /* ... \_/ };
+export type Config = { /\* ... \_/ };
 
 // Default export
 export default class Service {}

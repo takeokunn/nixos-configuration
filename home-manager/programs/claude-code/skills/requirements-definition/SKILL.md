@@ -8,33 +8,131 @@ version: 0.1.0
 Provide structured methodology for requirements definition, ensuring comprehensive specification before implementation.
 </purpose>
 
-<workflow>
-<phase name="investigate">
-<step tool="Glob/LS">Directory structure analysis</step>
-<step tool="get_symbols_overview">Symbol analysis via Serena</step>
-<step tool="Grep/find_symbol">Keyword search</step>
-<step tool="find_referencing_symbols">Dependency mapping</step>
-<step tool="Read">Specific content details</step>
-<step tool="Context7">Latest API documentation and best practices</step>
-</phase>
+<tools>
+<tool name="Glob">Directory structure analysis</tool>
+<tool name="get_symbols_overview">Symbol analysis via Serena</tool>
+<tool name="Grep">Keyword search</tool>
+<tool name="find_symbol">Symbol search via Serena</tool>
+<tool name="find_referencing_symbols">Dependency mapping via Serena</tool>
+<tool name="Read">Specific content details</tool>
+<tool name="Context7">Latest API documentation and best practices</tool>
+</tools>
 
-<phase name="question_scoring">
-<description>Score each question by these criteria (1-5 each)</description>
+<patterns>
+<pattern name="investigation_workflow">
+<description>Sequential investigation process for gathering requirements context</description>
+<steps>
+<step>Directory structure analysis using Glob</step>
+<step>Symbol analysis using get_symbols_overview</step>
+<step>Keyword search using Grep or find_symbol</step>
+<step>Dependency mapping using find_referencing_symbols</step>
+<step>Specific content details using Read</step>
+<step>Latest API documentation using Context7</step>
+</steps>
+</pattern>
+
+<pattern name="question_scoring">
+<description>Score each question by these criteria (1-5 each) to prioritize requirement clarification</description>
+<criteria>
 <criterion name="design_branching">How much does the answer affect design direction?</criterion>
 <criterion name="irreversibility">How difficult to change after implementation?</criterion>
 <criterion name="investigation_impossibility">Cannot be determined through code investigation alone?</criterion>
 <criterion name="effort_impact">How much does it affect implementation effort?</criterion>
+</criteria>
 <note>Present high-score questions first. Do not proceed without clear answers to critical questions (score >= 15)</note>
-</phase>
+<example>
+Question: "Should we use TypeScript's strict mode?"
+- Design Branching: 5 (affects all type decisions)
+- Irreversibility: 4 (hard to change later)
+- Investigation Impossibility: 3 (requires policy decision)
+- Effort Impact: 4 (affects development effort)
+Total: 16 (critical - must answer before proceeding)
+</example>
+</pattern>
 
-<phase name="question_classification">
+<pattern name="question_classification">
+<description>Categories of questions that arise during requirements definition</description>
+<types>
 <type name="spec_confirmation">Confirming existing behavior or constraints</type>
 <type name="design_choice">Choosing between valid alternatives</type>
 <type name="constraint">Technical or business limitations</type>
 <type name="scope">Boundaries of implementation</type>
 <type name="priority">Order and importance of features</type>
-</phase>
-</workflow>
+</types>
+<example>
+- Spec Confirmation: "Does the API return null or empty array for no results?"
+- Design Choice: "Should we use REST or GraphQL?"
+- Constraint: "Must support IE11 browsers?"
+- Scope: "Should admin features be included in v1?"
+- Priority: "Which feature should be implemented first?"
+</example>
+</pattern>
+
+<pattern name="functional_requirements">
+<description>Format functional requirements with clear identifiers and acceptance criteria</description>
+<example>
+FR-001: User Authentication
+Priority: mandatory
+- Users must be able to log in with email and password
+- Session must expire after 24 hours of inactivity
+- Failed login attempts must be rate-limited (max 5 per hour)
+</example>
+</pattern>
+
+<pattern name="non_functional_requirements">
+<description>Specify measurable non-functional requirements across key dimensions</description>
+<example>
+Performance:
+- API response time < 200ms for 95th percentile
+- Support 1000 concurrent users
+
+Security:
+
+- All data encrypted at rest using AES-256
+- JWT tokens for authentication
+
+Maintainability:
+
+- Test coverage >= 80%
+- Documentation for all public APIs
+  </example>
+  </pattern>
+
+<pattern name="technical_specifications">
+<description>Document design policies, patterns, and key decisions with rationale</description>
+<example>
+Design Decision: Use React Query for data fetching
+Rationale:
+- Built-in caching reduces API calls
+- Automatic background refetching
+- TypeScript support
+- Widely adopted in existing codebase
+
+Impact Scope:
+
+- All components making API calls
+- Testing utilities need to mock React Query
+  </example>
+  </pattern>
+
+<pattern name="requirement_quality_metrics">
+<description>Quantitative measures of requirement quality</description>
+<example>
+Feasibility (0-100): Technical achievability given constraints
+- 90-100: Straightforward with existing tools
+- 70-89: Requires some research or new libraries
+- 50-69: Significant technical challenges
+- Below 50: May need architecture changes
+
+Objectivity (0-100): Evidence-based vs. assumption-based
+
+- 90-100: All requirements verified through investigation
+- 70-89: Most requirements verified, some assumptions documented
+- 50-69: Mix of verification and assumptions
+- Below 50: Mostly assumptions, needs more investigation
+  </example>
+  </pattern>
+  </patterns>
 
 <output>
 <format>
@@ -120,104 +218,3 @@ Provide structured methodology for requirements definition, ensuring comprehensi
 <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
 </avoid>
 </anti_patterns>
-
-<pattern name="scoring_questions">
-<description>Use 4-criteria scoring system to prioritize requirement questions</description>
-<example>
-Question: "Should we use TypeScript's strict mode?"
-- Design Branching: 5 (affects all type decisions)
-- Irreversibility: 4 (hard to change later)
-- Investigation Impossibility: 3 (requires policy decision)
-- Effort Impact: 4 (affects development effort)
-Total: 16 (critical - must answer before proceeding)
-</example>
-<note>Present questions with score >= 15 first; do not proceed without clear answers</note>
-</pattern>
-
-<pattern name="functional_requirements">
-<description>Format functional requirements with clear identifiers and acceptance criteria</description>
-<example>
-FR-001: User Authentication
-Priority: mandatory
-- Users must be able to log in with email and password
-- Session must expire after 24 hours of inactivity
-- Failed login attempts must be rate-limited (max 5 per hour)
-</example>
-</pattern>
-
-<pattern name="non_functional_requirements">
-<description>Specify measurable non-functional requirements across key dimensions</description>
-<example>
-Performance:
-- API response time < 200ms for 95th percentile
-- Support 1000 concurrent users
-
-Security:
-
-- All data encrypted at rest using AES-256
-- JWT tokens for authentication
-
-Maintainability:
-
-- Test coverage >= 80%
-- Documentation for all public APIs
-  </example>
-  </pattern>
-
-<pattern name="technical_specifications">
-<description>Document design policies, patterns, and key decisions with rationale</description>
-<example>
-Design Decision: Use React Query for data fetching
-Rationale:
-- Built-in caching reduces API calls
-- Automatic background refetching
-- TypeScript support
-- Widely adopted in existing codebase
-
-Impact Scope:
-
-- All components making API calls
-- Testing utilities need to mock React Query
-  </example>
-  </pattern>
-
-<concept name="question_scoring_criteria">
-<description>Four criteria for prioritizing requirement questions, scored 1-5 each</description>
-<example>
-1. Design Branching (1-5): How much does the answer affect design direction?
-2. Irreversibility (1-5): How difficult to change after implementation?
-3. Investigation Impossibility (1-5): Cannot be determined through code investigation?
-4. Effort Impact (1-5): How much does it affect implementation effort?
-
-Critical questions: Total score >= 15
-</example>
-</concept>
-
-<concept name="requirement_types">
-<description>Categories of questions that arise during requirements definition</description>
-<example>
-- Spec Confirmation: "Does the API return null or empty array for no results?"
-- Design Choice: "Should we use REST or GraphQL?"
-- Constraint: "Must support IE11 browsers?"
-- Scope: "Should admin features be included in v1?"
-- Priority: "Which feature should be implemented first?"
-</example>
-</concept>
-
-<concept name="metrics">
-<description>Quantitative measures of requirement quality</description>
-<example>
-Feasibility (0-100): Technical achievability given constraints
-- 90-100: Straightforward with existing tools
-- 70-89: Requires some research or new libraries
-- 50-69: Significant technical challenges
-- Below 50: May need architecture changes
-
-Objectivity (0-100): Evidence-based vs. assumption-based
-
-- 90-100: All requirements verified through investigation
-- 70-89: Most requirements verified, some assumptions documented
-- 50-69: Mix of verification and assumptions
-- Below 50: Mostly assumptions, needs more investigation
-  </example>
-  </concept>

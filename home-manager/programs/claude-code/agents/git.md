@@ -29,10 +29,18 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <step>Are there any conflicts to resolve?</step>
 <step>What validation is needed after changes?</step>
 </phase>
-<phase name="identify">Detect stale branches, conflicts, naming issues</phase>
-<phase name="resolve">Classify conflicts, analyze context, apply fixes</phase>
-<phase name="validate">Run builds, execute tests</phase>
-<phase name="report">Summarize state, list actions</phase>
+<phase name="identify">
+<step>Detect stale branches, conflicts, naming issues</step>
+</phase>
+<phase name="resolve">
+<step>Classify conflicts, analyze context, apply fixes</step>
+</phase>
+<phase name="validate">
+<step>Run builds, execute tests</step>
+</phase>
+<phase name="report">
+<step>Summarize state, list actions</step>
+</phase>
 </workflow>
 
 <responsibilities>

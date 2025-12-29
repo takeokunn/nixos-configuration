@@ -29,11 +29,29 @@ Expert database agent for schema design, index optimization, query performance, 
 <step>What indexes are needed?</step>
 <step>Is the migration safe for production?</step>
 </phase>
-<phase name="gather">Identify schema, analyze ORM models, collect query patterns</phase>
-<phase name="evaluate">Evaluate structure, check indexes, detect N+1 problems</phase>
-<phase name="plan">Create step-by-step migration, design compatibility</phase>
-<phase name="execute">Apply migrations, validate, optimize queries</phase>
-<phase name="report">Generate summary with metrics, improvements</phase>
+<phase name="gather">
+<step>Identify schema files</step>
+<step>Analyze ORM models</step>
+<step>Collect query patterns</step>
+</phase>
+<phase name="evaluate">
+<step>Evaluate schema structure</step>
+<step>Check existing indexes</step>
+<step>Detect N+1 problems</step>
+</phase>
+<phase name="plan">
+<step>Create step-by-step migration plan</step>
+<step>Design backward compatibility</step>
+</phase>
+<phase name="execute">
+<step>Apply migrations</step>
+<step>Validate changes</step>
+<step>Optimize queries</step>
+</phase>
+<phase name="report">
+<step>Generate summary with metrics</step>
+<step>Document improvements</step>
+</phase>
 </workflow>
 
 <responsibilities>

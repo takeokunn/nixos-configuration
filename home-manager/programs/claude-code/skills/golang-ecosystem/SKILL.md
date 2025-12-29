@@ -140,7 +140,7 @@ type ValidationError struct {
     Message string
 }
 
-func (e \*ValidationError) Error() string {
+func (e *ValidationError) Error() string {
 return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 }
 </example>
@@ -153,7 +153,7 @@ return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 if errors.Is(err, ErrNotFound) { ... }
 
 // Extract custom error type
-var valErr \*ValidationError
+var valErr *ValidationError
 if errors.As(err, &valErr) {
 log.Printf("field: %s", valErr.Field)
 }
@@ -244,7 +244,7 @@ golang.org/x/sys v0.10.0 // indirect
 </tool>
 <tool name="go get">
 <description>Add or update dependency</description>
-<param name="pkg@version">Package name and optional version</param>
+<param name="package-name@version">Package name and optional version</param>
 <use_case>Install or update a specific package version</use_case>
 </tool>
 <tool name="go mod download">

@@ -8,12 +8,20 @@ version: 0.1.0
 Provide structured patterns for writing technical blogs and articles that effectively communicate technical concepts to external audiences.
 </purpose>
 
-<article_types>
-<type name="tutorial">
+<tools>
+<tool>Write</tool>
+<tool>Read</tool>
+<tool>Edit</tool>
+<tool>WebSearch</tool>
+<tool>mcp__context7__resolve-library-id</tool>
+<tool>mcp__context7__get-library-docs</tool>
+</tools>
+
+<patterns>
+<pattern name="tutorial">
 <description>Step-by-step guide to accomplish a specific task</description>
 <audience>Developers learning a new skill</audience>
 <structure>
-
 <section>Problem statement / What you'll learn</section>
 <section>Prerequisites</section>
 <section>Step-by-step instructions</section>
@@ -22,9 +30,9 @@ Provide structured patterns for writing technical blogs and articles that effect
 <section>Next steps / Further reading</section>
 </structure>
 <length>1500-3000 words</length>
-</type>
+</pattern>
 
-<type name="concept_explanation">
+<pattern name="concept_explanation">
 <description>Deep dive into a technical concept</description>
 <audience>Developers seeking understanding</audience>
 <structure>
@@ -36,9 +44,9 @@ Provide structured patterns for writing technical blogs and articles that effect
 <section>When to use / When to avoid</section>
 </structure>
 <length>1000-2500 words</length>
-</type>
+</pattern>
 
-<type name="comparison">
+<pattern name="comparison">
 <description>Compare technologies, approaches, or tools</description>
 <audience>Developers making technical decisions</audience>
 <structure>
@@ -50,9 +58,9 @@ Provide structured patterns for writing technical blogs and articles that effect
 <section>Conclusion with clear guidance</section>
 </structure>
 <length>1500-2500 words</length>
-</type>
+</pattern>
 
-<type name="case_study">
+<pattern name="case_study">
 <description>Real-world implementation story</description>
 <audience>Developers and technical leaders</audience>
 <structure>
@@ -64,9 +72,9 @@ Provide structured patterns for writing technical blogs and articles that effect
 <section>Recommendations</section>
 </structure>
 <length>1500-3000 words</length>
-</type>
+</pattern>
 
-<type name="opinion_piece">
+<pattern name="opinion_piece">
 <description>Technical opinion or best practices</description>
 <audience>Experienced developers</audience>
 <structure>
@@ -77,8 +85,8 @@ Provide structured patterns for writing technical blogs and articles that effect
 <section>Call to action</section>
 </structure>
 <length>800-1500 words</length>
-</type>
-</article_types>
+</pattern>
+</patterns>
 
 <writing_principles>
 <principle name="hook_early">

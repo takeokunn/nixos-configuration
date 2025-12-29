@@ -32,7 +32,7 @@ Provide comprehensive patterns for Rust language, Cargo project management, and 
 <pattern name="explicit">
 <description>Explicit lifetime annotations for complex cases</description>
 <example>
-fn foo&lt;'a&gt;(x: &'a str) -> &'a str {
+fn foo<'a>(x: &'a str) -> &'a str {
   x
 }
 </example>
@@ -71,13 +71,13 @@ struct MyType {
 
 <error_handling>
 <pattern name="Result">
-<description>Recoverable errors with Result&lt;T, E&gt;</description>
+<description>Recoverable errors with Result with T and E type parameters</description>
 <operators>? for early return on Err</operators>
 <combinators>map, and_then, unwrap_or, unwrap_or_else</combinators>
 </pattern>
 
 <pattern name="Option">
-<description>Optional values with Option&lt;T&gt;</description>
+<description>Optional values with Option with T type parameter</description>
 <operators>? for early return on None</operators>
 <combinators>map, and_then, unwrap_or, unwrap_or_default</combinators>
 </pattern>
@@ -137,7 +137,7 @@ struct UserId(u64);
 </avoid>
 
 <avoid name="arc_mutex_overuse">
-<description>Defaulting to Arc&lt;Mutex&lt;T&gt;&gt; for concurrency</description>
+<description>Defaulting to Arc with Mutex with T for concurrency</description>
 <instead>Consider channels or ownership patterns first</instead>
 </avoid>
 </anti_patterns>
@@ -210,7 +210,7 @@ debug = true
 <workspace>
 <root_cargo_toml>
 [workspace]
-resolver = "2"  # Current default for edition 2021; resolver "3" (upcoming, requires Edition 2024)
+resolver = "2"  # Current default for edition 2021; resolver 3 (upcoming, requires Edition 2024)
 members = ["crate-a", "crate-b"]
 
 [workspace.package]

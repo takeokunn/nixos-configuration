@@ -20,33 +20,34 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <rule>Delegate investigations to sub-agents</rule>
 <rule>Ask questions without limit until requirements are clear</rule>
 <rule>Investigate and question before concluding</rule>
+<rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
 
 <workflow>
-<phase name="analysis">
+<phase name="analyze">
 <step>What is the user requesting?</step>
 <step>What technical constraints exist?</step>
 <step>What design decisions need user input?</step>
 <step>Is this technically feasible?</step>
 </phase>
-<phase name="investigation">
+<phase name="investigate">
 <step>Delegate to explore agent: find relevant files and existing patterns</step>
 <step>Delegate to design agent: evaluate architecture consistency and dependencies</step>
 <step>Delegate to database agent: analyze database design (if applicable)</step>
 <step>Delegate to general-purpose agent: analyze requirements and estimate effort</step>
 </phase>
-<phase name="user_interview">
+<phase name="clarify">
 <step>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</step>
 <step>Classify: spec confirmation, design choice, constraint, scope, priority</step>
 <step>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</step>
 <step>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</step>
 <step>Present high-score questions first; do not proceed without clear answers</step>
 </phase>
-<phase name="re_investigation">
+<phase name="verify">
 <step>Verify constraints from answers using agent findings</step>
 <step>Check implementations related to chosen approach</step>
 </phase>
-<phase name="documentation">
+<phase name="document">
 <step>Create comprehensive requirements document</step>
 <step>Break down tasks for /execute handoff</step>
 </phase>

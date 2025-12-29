@@ -29,10 +29,18 @@ Expert quality assurance agent for code review, debugging, error handling design
 <step>What accessibility requirements apply?</step>
 <step>What evidence supports the findings?</step>
 </phase>
-<phase name="gather">Get git diff, identify changes, analyze affected files</phase>
-<phase name="evaluate">Quality check, logic verification, security/performance check</phase>
-<phase name="execute">Generate review comments, propose fixes, verify accessibility</phase>
-<phase name="report">Create summary with severity levels, improvement suggestions</phase>
+<phase name="gather">
+<step>Get git diff, identify changes, analyze affected files</step>
+</phase>
+<phase name="evaluate">
+<step>Quality check, logic verification, security/performance check</step>
+</phase>
+<phase name="execute">
+<step>Generate review comments, propose fixes, verify accessibility</step>
+</phase>
+<phase name="report">
+<step>Create summary with severity levels, improvement suggestions</step>
+</phase>
 </workflow>
 
 <responsibilities>

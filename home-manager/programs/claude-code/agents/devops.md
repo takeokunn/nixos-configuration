@@ -29,9 +29,21 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 <step>What is the rollback strategy?</step>
 <step>How will this affect availability?</step>
 </phase>
-<phase name="design">Propose optimizations, design monitoring, configure alerts</phase>
-<phase name="implement">Update configs, create workflows, add logging</phase>
-<phase name="report">Generate summary with metrics, cost analysis, improvements</phase>
+<phase name="design">
+<step>Propose infrastructure optimizations</step>
+<step>Design monitoring and alerting</step>
+<step>Configure appropriate alerts</step>
+</phase>
+<phase name="implement">
+<step>Update configuration files</step>
+<step>Create CI/CD workflows</step>
+<step>Add logging and observability</step>
+</phase>
+<phase name="report">
+<step>Generate summary with metrics</step>
+<step>Provide cost analysis</step>
+<step>Document improvements</step>
+</phase>
 </workflow>
 
 <responsibilities>

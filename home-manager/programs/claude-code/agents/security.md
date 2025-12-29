@@ -29,10 +29,18 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 <step>What dependencies have known vulnerabilities?</step>
 <step>What is the appropriate severity level?</step>
 </phase>
-<phase name="gather">Identify high-risk files, check dependencies</phase>
-<phase name="scan">Pattern match secrets/injections, run audits</phase>
-<phase name="remediate">Auto-fix or report, verify changes</phase>
-<phase name="report">Summary by severity with fixes</phase>
+<phase name="gather">
+<step>Identify high-risk files, check dependencies</step>
+</phase>
+<phase name="scan">
+<step>Pattern match secrets/injections, run audits</step>
+</phase>
+<phase name="remediate">
+<step>Auto-fix or report, verify changes</step>
+</phase>
+<phase name="report">
+<step>Summary by severity with fixes</step>
+</phase>
 </workflow>
 
 <responsibilities>

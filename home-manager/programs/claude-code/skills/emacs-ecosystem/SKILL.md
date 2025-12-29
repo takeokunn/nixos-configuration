@@ -119,7 +119,7 @@ collect (transform item))
 </pattern>
 
 <pattern name="macros">
-<description>Define macros with defmacro. Use backquote (`) for templates, comma (,) for evaluation</description>
+<description>Define macros with defmacro. Use backquote for templates, comma for evaluation</description>
 <example>
 (defmacro with-temp-message (msg &rest body)
 "Execute BODY with MSG displayed temporarily."
@@ -132,11 +132,11 @@ collect (transform item))
 </pattern>
 </elisp_fundamentals>
 
-<configuration*patterns>
+<configuration_patterns>
 <pattern name="init_el_structure">
 <description>Modern init.el organization</description>
 <example>
-;;; init.el --- Emacs configuration -*- lexical-binding: t; -\_-
+;;; init.el --- Emacs configuration -\*- lexical-binding: t; -\_-
 
 ;;; Commentary:
 ;; Personal Emacs configuration
@@ -274,20 +274,28 @@ Keywords:
 </pattern>
 </configuration_patterns>
 
-<package_management>
-<tool name="package_el">
-<description>Built-in package manager</description>
-<use_case>
-Commands:
+<tools>
+<tool name="package.el">
+<description>Built-in package manager for Emacs</description>
+<example>
+;; Commands:
+;; - package-install - Install a package
+;; - package-delete - Remove a package
+;; - package-refresh-contents - Update package list
+;; - package-list-packages - Browse packages
 
-- package-install - Install a package
-- package-delete - Remove a package
-- package-refresh-contents - Update package list
-- package-list-packages - Browse packages
-  </use_case>
-  </tool>
+(require 'package)
+(setq package-archives
+'(("melpa" . "https://melpa.org/packages/")
+("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
 
-<tool name="straight_el">
+;; Install a package
+(package-install 'magit)
+</example>
+</tool>
+
+<tool name="straight.el">
 <description>Functional package manager with Git integration</description>
 <example>
 ;; Bootstrap
@@ -329,7 +337,7 @@ user-emacs-directory)))
 :ensure t)
 </example>
 </tool>
-</package_management>
+</tools>
 
 <org_mode>
 <description>Outline-based notes, planning, and authoring</description>
@@ -611,8 +619,8 @@ user-emacs-directory)))
 </common_queries>
 </context7_integration>
 
-<best*practices>
-<practice priority="critical">Enable lexical-binding in all Elisp files: -*- lexical-binding: t; -\_-</practice>
+<best_practices>
+<practice priority="critical">Enable lexical-binding in all Elisp files: -\*- lexical-binding: t; -\_-</practice>
 <practice priority="high">Use #'function-name for function references (enables byte-compiler warnings)</practice>
 <practice priority="high">Document functions with docstrings</practice>
 <practice priority="high">Namespace all symbols with package prefix</practice>

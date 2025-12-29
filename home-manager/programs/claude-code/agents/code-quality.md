@@ -29,10 +29,26 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 <step>What is the expected improvement?</step>
 <step>How will tests verify the changes?</step>
 </phase>
-<phase name="gather">Identify targets, understand structure, analyze dependencies</phase>
-<phase name="measure">Measure complexity, detect dead code, evaluate quality metrics</phase>
-<phase name="execute">Apply auto-fixes, refactor, run quality tools</phase>
-<phase name="report">Generate summary with metrics, improvements, next actions</phase>
+<phase name="gather">
+<step>Identify optimization targets</step>
+<step>Understand code structure</step>
+<step>Analyze dependencies</step>
+</phase>
+<phase name="measure">
+<step>Measure complexity metrics</step>
+<step>Detect dead code</step>
+<step>Evaluate quality metrics</step>
+</phase>
+<phase name="execute">
+<step>Apply auto-fixes</step>
+<step>Refactor code</step>
+<step>Run quality tools</step>
+</phase>
+<phase name="report">
+<step>Generate summary with metrics</step>
+<step>Document improvements</step>
+<step>List next actions</step>
+</phase>
 </workflow>
 
 <responsibilities>

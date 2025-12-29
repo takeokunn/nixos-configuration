@@ -124,9 +124,8 @@ cp mypackage $out/bin/
   # Tools run at build time (compilers, build tools)
   nativeBuildInputs = [ cmake pkg-config ];
 
-<note>Libraries linked at runtime</note>
-
-buildInputs = [ openssl zlib ];
+  # Libraries linked at runtime
+  buildInputs = [ openssl zlib ];
 }
 </example>
 </pattern>
@@ -145,8 +144,9 @@ buildInputs = [ openssl zlib ];
     };
   };
 
-config = lib.mkIf config.myModule.enable { # configuration when enabled
-};
+  config = lib.mkIf config.myModule.enable {
+    # configuration when enabled
+  };
 }
 </example>
 </pattern>
@@ -202,12 +202,13 @@ enable = lib.mkEnableOption "my service";
 {
   description = "Project description";
 
-inputs = {
-nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-};
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
 
-outputs = { self, nixpkgs, ... }@inputs: { # output attributes
-};
+  outputs = { self, nixpkgs, ... }@inputs: {
+    # output attributes
+  };
 }
 </example>
 </concept>
@@ -381,12 +382,13 @@ devShells.default = pkgs.mkShell {
 <example>
 { config, pkgs, lib, ... }:
 {
-options.custom.feature = {
-enable = lib.mkEnableOption "feature description";
-};
+  options.custom.feature = {
+    enable = lib.mkEnableOption "feature description";
+  };
 
-config = lib.mkIf config.custom.feature.enable { # configuration when enabled
-};
+  config = lib.mkIf config.custom.feature.enable {
+    # configuration when enabled
+  };
 }
 </example>
 </concept>
@@ -496,20 +498,20 @@ home.sessionPath = [ "$HOME/.local/bin" ];
 <description>Git version control configuration</description>
 <example>
 programs.git = {
-enable = true;
-userName = "Your Name";
-userEmail = "email@example.com";
-signing = {
-key = "KEY_ID";
-signByDefault = true;
-};
-aliases = {
-co = "checkout";
-st = "status";
-};
-extraConfig = {
-core.editor = "nvim";
-};
+  enable = true;
+  userName = "Your Name";
+  userEmail = "email@example.com";
+  signing = {
+    key = "KEY_ID";
+    signByDefault = true;
+  };
+  aliases = {
+    co = "checkout";
+    st = "status";
+  };
+  extraConfig = {
+    core.editor = "nvim";
+  };
 };
 </example>
 </concept>
@@ -590,7 +592,7 @@ programs.direnv = {
 
 <best_practices>
 <practice priority="critical">
-Use programs.\* when available instead of manual configuration
+Use programs.* when available instead of manual configuration
 </practice>
 
 <practice priority="critical">

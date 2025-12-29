@@ -29,10 +29,25 @@ Expert system design agent for architecture evaluation, requirements definition,
 <step>What requirements need clarification?</step>
 <step>What is the appropriate estimation approach?</step>
 </phase>
-<phase name="structure">Structure, patterns, existing decisions</phase>
-<phase name="verify">Dependencies, violations, quality</phase>
-<phase name="plan">Requirements, tasks, estimates</phase>
-<phase name="report">Summary with metrics</phase>
+<phase name="gather">
+<step>Analyze code structure</step>
+<step>Identify architecture patterns</step>
+<step>Review existing ADRs</step>
+</phase>
+<phase name="verify">
+<step>Check dependencies</step>
+<step>Detect violations</step>
+<step>Evaluate quality</step>
+</phase>
+<phase name="plan">
+<step>Define requirements</step>
+<step>Decompose tasks</step>
+<step>Estimate effort</step>
+</phase>
+<phase name="report">
+<step>Generate summary with metrics</step>
+<step>Document decisions</step>
+</phase>
 </workflow>
 
 <responsibilities>

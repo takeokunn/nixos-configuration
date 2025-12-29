@@ -21,9 +21,18 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <step>Was a specific file path provided?</step>
 <step>What content should be included/excluded?</step>
 </phase>
-<phase name="retrieve">Get previous command results</phase>
-<phase name="determine">Select output filename</phase>
-<phase name="output">Write file using Write/Edit tool</phase>
+<phase name="gather">
+<step>Retrieve previous command results</step>
+<step>Collect relevant context</step>
+</phase>
+<phase name="determine">
+<step>Determine output filename based on command type</step>
+<step>Check if user specified file path</step>
+</phase>
+<phase name="execute">
+<step>Write file using Write/Edit tool</step>
+<step>Verify output format</step>
+</phase>
 </workflow>
 
 <agents>

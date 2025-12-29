@@ -30,19 +30,17 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <step>What logs are available?</step>
 <step>What is the error context? (before, during, after)</step>
 </phase>
-<phase name="investigate_error">
+<phase name="investigate">
 <step>Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
 <step>Delegate to explore agent: find error location and related code paths</step>
 <step>Delegate to general-purpose agent: analyze logs and dependencies</step>
+<step>Analyze error location details from agent findings</step>
+<step>Review dependencies and imports</step>
+<step>Check config files and recent changes</step>
 </phase>
-<phase name="investigate_code">
-<step>Error location details from agent findings</step>
-<step>Dependencies/imports analysis</step>
-<step>Config files and recent changes</step>
-</phase>
-<phase name="investigate_environment">
-<step>Runtime (OS, versions, env vars)</step>
-<step>Resources (disk, memory, network)</step>
+<phase name="gather">
+<step>Collect runtime info (OS, versions, env vars)</step>
+<step>Check resources (disk, memory, network)</step>
 </phase>
 <phase name="report">
 <step>Compile agent findings with confidence metrics</step>

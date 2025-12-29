@@ -26,13 +26,20 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <step>Which agents should run in parallel?</step>
 <step>What metrics are relevant for this mode?</step>
 </phase>
-<phase name="mode_selection">
-<mode condition="After /define">Execution plan feedback</mode>
-<mode condition="After /execute">Work content feedback</mode>
-<mode condition="Other">Recent work feedback</mode>
+<phase name="select">
+<step>Determine mode based on previous command</step>
+<step>After /define: Execution plan feedback</step>
+<step>After /execute: Work content feedback</step>
+<step>Other: Recent work feedback</step>
 </phase>
-<phase name="execute">Launch all agents in parallel</phase>
-<phase name="synthesize">Compile feedback with metrics</phase>
+<phase name="execute">
+<step>Launch all agents in parallel</step>
+<step>Collect agent results</step>
+</phase>
+<phase name="synthesize">
+<step>Compile feedback with metrics</step>
+<step>Generate actionable recommendations</step>
+</phase>
 </workflow>
 
 <modes>
