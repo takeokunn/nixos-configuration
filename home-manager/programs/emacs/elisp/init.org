@@ -2329,9 +2329,11 @@
     (setopt lsp-solargraph-autoformat t)
     (setopt lsp-solargraph-multi-root nil))
 
-  (with-eval-after-load 'lsp-nil
-    ;; config
-    (setopt lsp-nix-nil-max-mem 100000))
+  (with-eval-after-load 'lsp-nix
+    ;; use nixd instead of nil
+    (setopt lsp-disabled-clients '(nix-nil))
+    (setopt lsp-nix-nixd-server-path "nixd")
+    (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"]))
 
   (with-eval-after-load 'lsp-copilot
     ;; config
