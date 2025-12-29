@@ -29,39 +29,42 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <step>Where does it occur? (file, line, function)</step>
 <step>What logs are available?</step>
 <step>What is the error context? (before, during, after)</step>
-<step>Are there similar past issues in memory?</step>
 </phase>
-<phase name="analyze_error">
-<step>Error type identification</step>
-<step>Location identification (file, line, function)</step>
-<step>Stack trace analysis</step>
-<step>Timestamp verification</step>
-</phase>
-<phase name="investigate_logs" priority="critical">
-<step>Application logs</step>
-<step>System logs (if needed)</step>
-<step>Error context (pre-error flow, details, post-error impact)</step>
+<phase name="investigate_error">
+<step>Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
+<step>Delegate to explore agent: find error location and related code paths</step>
+<step>Delegate to general-purpose agent: analyze logs and dependencies</step>
 </phase>
 <phase name="investigate_code">
-<step>Error location details</step>
-<step>Dependencies/imports</step>
-<step>Config files</step>
-<step>Recent changes</step>
+<step>Error location details from agent findings</step>
+<step>Dependencies/imports analysis</step>
+<step>Config files and recent changes</step>
 </phase>
 <phase name="investigate_environment">
 <step>Runtime (OS, versions, env vars)</step>
 <step>Resources (disk, memory, network)</step>
 </phase>
-<phase name="report">Report findings with confidence metrics</phase>
+<phase name="report">
+<step>Compile agent findings with confidence metrics</step>
+<step>Identify root cause with supporting evidence</step>
+</phase>
 </workflow>
 
 <agents>
-<agent name="debug" readonly="true">Error tracking, stack trace, log analysis</agent>
-<agent name="observability" readonly="true">Log analysis support</agent>
-<agent name="error-handling" readonly="true">Error handling patterns</agent>
-<agent name="dependency" readonly="true">Dependency-related errors</agent>
-<agent name="memory" readonly="true">Past troubleshooting records</agent>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
+<agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
+<agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
 </agents>
+
+<parallel_execution>
+<group name="error_analysis" execution="parallel">
+<agent>quality-assurance</agent>
+<agent>explore</agent>
+</group>
+<group name="context_gathering" execution="parallel">
+<agent>general-purpose</agent>
+</group>
+</parallel_execution>
 
 <delegation>
 <requirement>Full error message/stack trace</requirement>

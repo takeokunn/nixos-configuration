@@ -131,9 +131,6 @@
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {
           context7.enable = true;
-          playwright.enable = true;
-          terraform.enable = true;
-          nixos.enable = true;
           codex.enable = true;
           serena = {
             enable = true;

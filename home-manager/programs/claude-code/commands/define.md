@@ -25,15 +25,15 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <workflow>
 <phase name="analysis">
 <step>What is the user requesting?</step>
-<step>What existing code/patterns are relevant?</step>
 <step>What technical constraints exist?</step>
 <step>What design decisions need user input?</step>
 <step>Is this technically feasible?</step>
 </phase>
 <phase name="investigation">
-<step>Glob/LS for structure, Serena `get_symbols_overview` for symbols</step>
-<step>Grep/Serena `find_symbol` for keywords, `find_referencing_symbols` for dependencies</step>
-<step>Read for details, Context7 for latest APIs/best practices</step>
+<step>Delegate to explore agent: find relevant files and existing patterns</step>
+<step>Delegate to design agent: evaluate architecture consistency and dependencies</step>
+<step>Delegate to database agent: analyze database design (if applicable)</step>
+<step>Delegate to general-purpose agent: analyze requirements and estimate effort</step>
 </phase>
 <phase name="user_interview">
 <step>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</step>
@@ -41,7 +41,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <step>Present high-score questions first; do not proceed without clear answers</step>
 </phase>
 <phase name="re_investigation">
-<step>Verify constraints from answers</step>
+<step>Verify constraints from answers using agent findings</step>
 <step>Check implementations related to chosen approach</step>
 </phase>
 <phase name="documentation">
@@ -51,15 +51,22 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </workflow>
 
 <agents>
-<agent name="requirement" readonly="true">Ambiguity detection, use case extraction, acceptance criteria</agent>
-<agent name="design" readonly="true">Architecture consistency, dependency analysis</agent>
-<agent name="architecture" readonly="true">System architecture design and evaluation</agent>
-<agent name="api-design" readonly="true">API design verification</agent>
-<agent name="database" readonly="true">Database design and optimization</agent>
-<agent name="estimation" readonly="true">Task estimation and planning</agent>
-<agent name="dependency" readonly="true">Dependency analysis</agent>
-<agent name="memory" readonly="true">Pattern/convention reference</agent>
+<agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>
+<agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
+<agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
+<agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
 </agents>
+
+<parallel_execution>
+<group name="investigation" execution="parallel">
+<agent>explore</agent>
+<agent>design</agent>
+<agent>database</agent>
+</group>
+<group name="analysis" execution="parallel">
+<agent>general-purpose</agent>
+</group>
+</parallel_execution>
 
 <delegation>
 <requirement>Scope overview</requirement>

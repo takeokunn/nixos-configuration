@@ -26,24 +26,39 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <step>What is the user's core question?</step>
 <step>Which code/documentation sources are relevant?</step>
 <step>What scope of investigation is appropriate?</step>
-<step>Can I answer with high confidence, or do I need more information?</step>
-<step>Which agents should be delegated to?</step>
+<step>Classify question type (architecture, implementation, debugging, design)</step>
 </phase>
-<phase name="scope">Classify question type (architecture, implementation, debugging, design)</phase>
-<phase name="investigate">Find relevant files, check library documentation</phase>
-<phase name="delegate">Send to appropriate agents in parallel</phase>
-<phase name="synthesize">Compile findings with confidence metrics</phase>
+<phase name="investigate">
+<step>Delegate to explore agent: find relevant files and codebase structure</step>
+<step>Delegate to design agent: evaluate architecture and component relationships</step>
+<step>Delegate to performance agent: identify performance-related aspects (if applicable)</step>
+</phase>
+<phase name="synthesize">
+<step>Delegate to quality-assurance agent: evaluate code quality findings</step>
+<step>Delegate to code-quality agent: analyze complexity metrics</step>
+<step>Compile agent findings with confidence metrics</step>
+</phase>
 </workflow>
 
 <agents>
-<agent name="Explore" readonly="true">Finding files, exploring codebase structure</agent>
-<agent name="review" readonly="true">Evaluating code quality, identifying best practices</agent>
-<agent name="architecture" readonly="true">System design questions, component relationships</agent>
-<agent name="dependency" readonly="true">Package dependencies, version compatibility</agent>
-<agent name="api-design" readonly="true">API structure, endpoint design questions</agent>
-<agent name="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
-<agent name="memory" readonly="true">Checking existing patterns and conventions</agent>
+<agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
+<agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
+<agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
+<agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
 </agents>
+
+<parallel_execution>
+<group name="investigation" execution="parallel">
+<agent>explore</agent>
+<agent>design</agent>
+<agent>performance</agent>
+</group>
+<group name="synthesis" execution="parallel">
+<agent>quality-assurance</agent>
+<agent>code-quality</agent>
+</group>
+</parallel_execution>
 
 <output>
 <format>
