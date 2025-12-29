@@ -140,7 +140,7 @@ type ValidationError struct {
     Message string
 }
 
-func (e *ValidationError) Error() string {
+func (e \*ValidationError) Error() string {
 return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 }
 </example>
@@ -153,7 +153,7 @@ return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
 if errors.Is(err, ErrNotFound) { ... }
 
 // Extract custom error type
-var valErr *ValidationError
+var valErr \*ValidationError
 if errors.As(err, &valErr) {
 log.Printf("field: %s", valErr.Field)
 }

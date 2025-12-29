@@ -136,17 +136,19 @@ Add test to prevent recurrence
 Citation: Always provide file:line references (path/to/file.ext:line_number)
 
 Confidence levels:
+
 - 90-100: Direct code evidence, explicit documentation
 - 70-89: Strong inference from multiple sources
 - 50-69: Reasonable inference with some gaps
 - 0-49: Speculation, insufficient evidence
 
 Coverage levels:
+
 - 90-100: All relevant files examined
 - 70-89: Most relevant files examined
 - 50-69: Key files examined, some gaps
 - 0-49: Limited examination
-</example>
+  </example>
   </concept>
 
 <concept name="null_reference">

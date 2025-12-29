@@ -46,7 +46,7 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
   (:documentation "Greet an entity."))
 
 (defmethod greet ((p person))
-  (format t "Hello, ~a!~%" (person-name p)))
+(format t "Hello, ~a!~%" (person-name p)))
 </example>
 </pattern>
 
@@ -57,9 +57,9 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
   (format t "Preparing to greet...~%"))
 
 (defmethod greet :around ((p person))
-  (format t "[Start]~%")
-  (call-next-method)
-  (format t "[End]~%"))
+(format t "[Start]~%")
+(call-next-method)
+(format t "[End]~%"))
 </example>
 </pattern>
 
@@ -191,8 +191,8 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
 
 ;; In my-project/main.lisp:
 (defpackage #:my-project/main
-  (:use #:cl)
-  (:import-from #:my-project/utils #:helper))
+(:use #:cl)
+(:import-from #:my-project/utils #:helper))
 </example>
 </pattern>
 
@@ -234,9 +234,9 @@ my-project/
   (sb-ext:exit :code 0))
 
 (sb-ext:save-lisp-and-die "my-app"
-  :toplevel #'main
-  :executable t
-  :compression t)
+:toplevel #'main
+:executable t
+:compression t)
 </example>
 </pattern>
 
@@ -246,15 +246,15 @@ my-project/
 (defvar *result* nil)
 
 (let ((thread (sb-thread:make-thread
-               (lambda ()
-                 (setf *result* (heavy-computation)))
-               :name "worker")))
-  (sb-thread:join-thread thread))
+(lambda ()
+(setf _result_ (heavy-computation)))
+:name "worker")))
+(sb-thread:join-thread thread))
 
 ;; Mutex
-(defvar *lock* (sb-thread:make-mutex))
-(sb-thread:with-mutex (*lock*)
-  (critical-section))
+(defvar _lock_ (sb-thread:make-mutex))
+(sb-thread:with-mutex (_lock_)
+(critical-section))
 </example>
 </pattern>
 
@@ -307,11 +307,11 @@ sb-ext:*posix-argv*
     None
     (Some a))
 
-  (declare safe-div (Integer -> Integer -> (Maybe Integer)))
-  (define (safe-div x y)
-    (if (== y 0)
-        None
-        (Some (/ x y)))))
+(declare safe-div (Integer -> Integer -> (Maybe Integer)))
+(define (safe-div x y)
+(if (== y 0)
+None
+(Some (/ x y)))))
 </example>
 </pattern>
 
@@ -322,9 +322,9 @@ sb-ext:*posix-argv*
   (define-class (Printable a)
     (print-it (a -> String)))
 
-  (define-instance (Printable Integer)
-    (define (print-it x)
-      (into x))))
+(define-instance (Printable Integer)
+(define (print-it x)
+(into x))))
 </example>
 </pattern>
 
@@ -397,10 +397,10 @@ mcp__context7__get-library-docs
 <description>Resource management with unwind-protect for cleanup.</description>
 <example>
 (defmacro with-open-socket ((var host port) &body body)
-  `(let ((,var (make-socket ,host ,port)))
-     (unwind-protect
-          (progn ,@body)
-       (close-socket ,var))))
+`(let ((,var (make-socket ,host ,port)))
+(unwind-protect
+(progn ,@body)
+(close-socket ,var))))
 </example>
 </pattern>
 
@@ -434,7 +434,7 @@ ARG is the argument description."
 </common_patterns>
 
 <best_practices>
-<practice priority="high">Use *earmuffs* for special variables</practice>
+<practice priority="high">Use _earmuffs_ for special variables</practice>
 <practice priority="high">Use +plus-signs+ for constants</practice>
 <practice priority="high">Prefer functional style, minimize mutation</practice>
 <practice priority="high">Provide restarts for recoverable situations</practice>
