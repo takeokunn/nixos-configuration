@@ -1,17 +1,15 @@
 { pkgs, customPackages }:
 {
-  plugins.gitsigns = {
-    enable = true;
-    settings = {
-    };
-  };
+  # mini.diff and mini.git are configured in ui/mini.nix
+  # Keep neogit and diffview for advanced git UI
 
   plugins.neogit = {
     enable = true;
     settings = {
       integrations = {
         diffview = true;
-        telescope = true;
+        # mini.pick integration instead of telescope
+        mini_pick = true;
       };
     };
   };

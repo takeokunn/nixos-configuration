@@ -1,20 +1,14 @@
 # ════════════════════════════════════════════════════════════════════════════════
-# Editing Options
+# Backup & Undo Options
 # ════════════════════════════════════════════════════════════════════════════════
-# Core text editing behavior: encoding, indentation, and backspace handling.
-# Clipboard and backup settings are in their respective files.
+# Options for backup files, swap files, and persistent undo.
 # ════════════════════════════════════════════════════════════════════════════════
 
 {
-  # Character encoding (UTF-8 primary, with Japanese fallbacks)
-  encoding = "utf-8";
-  fileencodings = "utf-8,euc-jp,cp932";
+  # Disable swap files (rely on git and undo history instead)
+  swapfile = false;
 
-  # Backspace behavior: allow backspace over indent, line breaks, and insert start
-  backspace = "indent,eol,start";
-
-  # Indentation: 2 spaces, expand tabs to spaces
-  tabstop = 2;
-  shiftwidth = 2;
-  expandtab = true;
+  # Enable persistent undo (survives vim restarts)
+  undofile = true;
+  undolevels = 10000;
 }

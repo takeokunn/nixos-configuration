@@ -1,9 +1,6 @@
 { pkgs }:
 {
-  plugins.hop = {
-    enable = true;
-  };
-
+  # Undotree - no mini.nvim equivalent, keep it
   plugins.undotree = {
     enable = true;
     settings = {
@@ -11,41 +8,7 @@
     };
   };
 
-  plugins.vim-sandwich = {
-    enable = true;
-    skipSpace = true;
-  };
-
-  plugins.luasnip = {
-    enable = true;
-    filetypeExtend = {
-      typescript = [ "javascript" ];
-      typescriptreact = [
-        "typescript"
-        "javascript"
-      ];
-    };
-  };
-
-  # Lua製の自動ペアリングプラグイン
-  plugins.nvim-autopairs = {
-    enable = true;
-    settings = {
-      check_ts = true;
-      ts_config = {
-        lua = [
-          "string"
-          "source"
-        ];
-        javascript = [
-          "string"
-          "template_string"
-        ];
-      };
-    };
-  };
-
-  # Lua製のレインボー括弧プラグイン
+  # Rainbow delimiters - no mini.nvim equivalent, keep it
   plugins.rainbow-delimiters = {
     enable = true;
   };
@@ -63,12 +26,6 @@
   };
 
   keymaps = [
-    # hop
-    {
-      mode = "n";
-      key = "f";
-      action = "<Cmd>HopChar1<CR>";
-    }
     # undotree
     {
       mode = "n";

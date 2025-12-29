@@ -9,6 +9,7 @@ let
   keymaps = baseKeymaps ++ (plugins.keymaps or [ ]);
   globals = basicGlobals // (plugins.globals or { });
   userCommands = plugins.userCommands or { };
+  extraConfigLua = plugins.extraConfigLua or "";
 in
 {
   programs.nixvim = {
@@ -17,6 +18,7 @@ in
       keymaps
       globals
       userCommands
+      extraConfigLua
       ;
     inherit (plugins) plugins extraPlugins;
 
@@ -39,15 +41,5 @@ in
       pbcopy.enable = pkgs.stdenv.isDarwin;
       wl-copy.enable = pkgs.stdenv.isLinux;
     };
-
-    _module.args = {
-      inherit customPackages;
-    };
-
-    imports = [
-      ./modules/vim-sandwich.nix
-      ./modules/skkeleton.nix
-      ./modules/oil-git-status.nix
-    ];
   };
 }

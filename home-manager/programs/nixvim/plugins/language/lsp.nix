@@ -1,26 +1,7 @@
 { pkgs }:
 {
-  plugins.cmp = {
-    enable = true;
-    settings = {
-      snippet.expand.__raw = "function(args) vim.fn['vsnip#anonymous'](args.body) end";
-      sources = [
-        { name = "nvim_lsp"; }
-        { name = "luasnip"; }
-        { name = "path"; }
-      ];
-      mapping = {
-        "<C-p>".__raw = "cmp.mapping.select_prev_item()";
-        "<C-n>".__raw = "cmp.mapping.select_next_item()";
-        "<C-l>".__raw = "cmp.mapping.complete()";
-        "<C-e>".__raw = "cmp.mapping.abort()";
-        "<CR>".__raw = "cmp.mapping.confirm({ select = true })";
-      };
-      experimental = {
-        ghost_text = true;
-      };
-    };
-  };
+  # mini.completion is configured in ui/mini.nix
+  # Just keep LSP and lspsaga here
 
   plugins.lsp = {
     enable = true;

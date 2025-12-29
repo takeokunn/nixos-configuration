@@ -2312,7 +2312,6 @@
 
   (with-eval-after-load 'lsp-javascript
     ;; for tsgo (typescript-go)
-    (setopt lsp-disabled-clients '(ts-ls))
     (setopt lsp-typescript-references-code-lens-enabled t)
     (setopt lsp-typescript-implementations-code-lens-enabled t)
     (setopt lsp-javascript-display-return-type-hints t)
