@@ -4664,6 +4664,24 @@ in
     bypassCache = true;
     reconstructLock = true;
   };
+  "@github/copilot-language-server-darwin-arm64" = nodeEnv.buildNodePackage {
+    name = "_at_github_slash_copilot-language-server-darwin-arm64";
+    packageName = "@github/copilot-language-server-darwin-arm64";
+    version = "1.406.0";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-arm64/-/copilot-language-server-darwin-arm64-1.406.0.tgz";
+      sha512 = "x8E0cmuLShhzUQCZV8TgOPzxNaz3nKEeo4J8Dv6jDCbeAzmu6fIpUPL+Tz6K0nJlN1rYA9iolyr71glHXGbbNQ==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Copilot Language Server binary for darwin-arm64";
+      homepage = "https://github.com/github/copilot-language-server-release";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";

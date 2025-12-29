@@ -1,21 +1,24 @@
 { pkgs, nodePkgs }:
 let
-  platforms = {
-    "x86_64-linux" = "linux-amd64";
-    "aarch64-linux" = "linux-aarch64";
-    "x86_64-darwin" = "darwin-amd64";
-    "aarch64-darwin" = "darwin-arm64";
+  platformPackages = {
+    "x86_64-linux" = "@github/copilot-language-server-linux-x64";
+    "aarch64-linux" = "@github/copilot-language-server-linux-arm64";
+    "x86_64-darwin" = "@github/copilot-language-server-darwin-x64";
+    "aarch64-darwin" = "@github/copilot-language-server-darwin-arm64";
   };
-  platform = builtins.getAttr pkgs.stdenv.hostPlatform.system platforms;
+  platformPkg = nodePkgs.${platformPackages.${pkgs.stdenv.hostPlatform.system}};
 in
 {
-  home.packages = [ nodePkgs."@github/copilot-language-server" ];
+  home.packages = [
+    nodePkgs."@github/copilot-language-server"
+    platformPkg
+  ];
 
   programs.fish = {
     interactiveShellInit = ''
-      set -gx COPILOT_LANGUAGE_SERVER_PATH ${
-        nodePkgs."@github/copilot-language-server"
-      }/lib/node_modules/@github/copilot-language-server/native/${platform}/copilot-language-server
+      set -gx COPILOT_LANGUAGE_SERVER_PATH ${platformPkg}/lib/node_modules/${
+        platformPackages.${pkgs.stdenv.hostPlatform.system}
+      }/copilot-language-server
     '';
   };
 }

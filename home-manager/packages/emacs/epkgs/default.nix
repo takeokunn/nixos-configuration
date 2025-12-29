@@ -1,7 +1,7 @@
 { pkgs, sources }:
 epkgs:
 let
-  ai = import ./packages/ai { inherit epkgs; };
+  ai = import ./packages/ai { inherit epkgs pkgs sources; };
   awesome = import ./packages/awesome { inherit epkgs pkgs sources; };
   buffer = import ./packages/buffer { inherit epkgs; };
   client = import ./packages/client { inherit epkgs pkgs sources; };
