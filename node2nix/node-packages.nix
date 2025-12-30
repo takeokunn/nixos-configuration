@@ -3540,13 +3540,13 @@ let
         sha512 = "m7KOje7jZxrmutanlkS1daj1dS6z6BgslzOXmcSEpIlCxM3VJH7lG5QLeck/6hgF6F4crFf01UtQmNsJfweTAw==";
       };
     };
-    "qs-6.14.0" = {
+    "qs-6.14.1" = {
       name = "qs";
       packageName = "qs";
-      version = "6.14.0";
+      version = "6.14.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/qs/-/qs-6.14.0.tgz";
-        sha512 = "YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==";
+        url = "https://registry.npmjs.org/qs/-/qs-6.14.1.tgz";
+        sha512 = "4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==";
       };
     };
     "quick-lru-5.1.1" = {
@@ -4682,6 +4682,60 @@ in
     bypassCache = true;
     reconstructLock = true;
   };
+  "@github/copilot-language-server-darwin-x64" = nodeEnv.buildNodePackage {
+    name = "_at_github_slash_copilot-language-server-darwin-x64";
+    packageName = "@github/copilot-language-server-darwin-x64";
+    version = "1.406.0";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-x64/-/copilot-language-server-darwin-x64-1.406.0.tgz";
+      sha512 = "Sv9Yib5aHLlGzLFiskUMexWG6u2ZNTqH4At+ECfkJCT5IDlIQVftyqtvIA+YEttxIaUpq7tgS/9IJscM+yfL4g==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Copilot Language Server binary for darwin-x64";
+      homepage = "https://github.com/github/copilot-language-server-release";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  "@github/copilot-language-server-linux-x64" = nodeEnv.buildNodePackage {
+    name = "_at_github_slash_copilot-language-server-linux-x64";
+    packageName = "@github/copilot-language-server-linux-x64";
+    version = "1.406.0";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-x64/-/copilot-language-server-linux-x64-1.406.0.tgz";
+      sha512 = "3DIE324Qu+bNfq0AzMH6SfSNngUqbNzS9M4B11iib/UWCVlVPCEAgW5TRRU8lWxyYzUdBNO4BGXSk/OXsvGj5Q==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Copilot Language Server binary for linux-x64";
+      homepage = "https://github.com/github/copilot-language-server-release";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  "@github/copilot-language-server-linux-arm64" = nodeEnv.buildNodePackage {
+    name = "_at_github_slash_copilot-language-server-linux-arm64";
+    packageName = "@github/copilot-language-server-linux-arm64";
+    version = "1.406.0";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-arm64/-/copilot-language-server-linux-arm64-1.406.0.tgz";
+      sha512 = "I4N+j6BsNSJ4JGX4sBmXNRD3ZbXmuYXb20lGgn3rubCfnjHyyQnv99i3Z/LWV3rqYvyYxZYExfE+7nwKaEhPzw==";
+    };
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "Copilot Language Server binary for linux-arm64";
+      homepage = "https://github.com/github/copilot-language-server-release";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
@@ -5358,7 +5412,7 @@ in
       sources."proxy-addr-2.0.7"
       sources."pump-3.0.3"
       sources."pumpify-2.0.1"
-      sources."qs-6.14.0"
+      sources."qs-6.14.1"
       sources."quick-lru-5.1.1"
       sources."range-parser-1.2.1"
       (

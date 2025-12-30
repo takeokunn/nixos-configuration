@@ -11,10 +11,6 @@
 | Thinkpad X13Gen2 | X13Gen2     | NixOS   | x86_64-linux   | ○      |
 | Android OPPO-A79 | OPPO-A79    | Android | aarch64-linux  | △      |
 
-- ◎ :: メイン
-- ○ :: 動作確認済
-- △ :: 実験中
-
 ** Usage
 *** for Attm-M4-Max
 #+begin_src shell

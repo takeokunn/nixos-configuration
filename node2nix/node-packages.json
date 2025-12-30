@@ -1,6 +1,9 @@
 [
   "@github/copilot-language-server",
   "@github/copilot-language-server-darwin-arm64",
+  "@github/copilot-language-server-darwin-x64",
+  "@github/copilot-language-server-linux-x64",
+  "@github/copilot-language-server-linux-arm64",
   "@anthropic-ai/claude-code",
   "ccusage",
   "@google/gemini-cli",
