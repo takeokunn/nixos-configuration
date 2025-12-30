@@ -41,6 +41,7 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </agents>
 
 <file_mapping>
+<default_output_dir>project root</default_output_dir>
 <mapping command="/define" output="EXECUTION.md" />
 <mapping command="/ask" output="RESEARCH.md" />
 <mapping command="/bug" output="RESEARCH.md" />
