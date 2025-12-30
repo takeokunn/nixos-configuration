@@ -125,6 +125,7 @@
       context7-usage = builtins.readFile ./skills/context7-usage/SKILL.md;
       technical-documentation = builtins.readFile ./skills/technical-documentation/SKILL.md;
       technical-writing = builtins.readFile ./skills/technical-writing/SKILL.md;
+      aws-ecosystem = builtins.readFile ./skills/aws-ecosystem/SKILL.md;
     };
 
     mcpServers =
