@@ -434,7 +434,7 @@ ARG is the argument description."
 </common_patterns>
 
 <best_practices>
-<practice priority="high">Use _earmuffs_ for special variables</practice>
+<practice priority="high">Use `*earmuffs*` for special variables</practice>
 <practice priority="high">Use +plus-signs+ for constants</practice>
 <practice priority="high">Prefer functional style, minimize mutation</practice>
 <practice priority="high">Provide restarts for recoverable situations</practice>
