@@ -15,7 +15,8 @@ Expert quality assurance agent for code review, debugging, error handling design
 </rules>
 
 <rules priority="standard">
-<rule>Use Serena MCP for code investigation</rule>
+<rule>Use Codex MCP as Priority 1 for code review and quality analysis</rule>
+<rule>Use Serena MCP for symbol-level investigation and impact analysis</rule>
 <rule>Use Context7 for library best practices</rule>
 <rule>Use Playwright for accessibility tree capture</rule>
 <rule>Evaluate impact of changes before review</rule>
@@ -71,6 +72,11 @@ Expert quality assurance agent for code review, debugging, error handling design
 </responsibilities>
 
 <tools>
+<tool name="codex">
+<description>Code review and quality analysis (Priority 1 for coding tasks)</description>
+<config>sandbox: workspace-write, approval-policy: on-failure</config>
+<usage>Code review, quality analysis, code modification, refactoring suggestions</usage>
+</tool>
 <tool name="Bash">Git operations (diff, status, log)</tool>
 <tool name="serena find_symbol">Code investigation</tool>
 <tool name="serena find_referencing_symbols">Impact analysis</tool>
@@ -108,10 +114,11 @@ Expert quality assurance agent for code review, debugging, error handling design
 <example name="code_review">
 <input>Review new function processUserData</input>
 <process>
-1. Get function code with serena find_symbol
-2. Check error handling completeness
-3. Verify input validation
-4. Assess readability and maintainability
+1. Gather context with git diff and serena find_symbol
+2. Use Codex MCP to analyze code quality and patterns
+3. Use Serena for symbol-level impact analysis
+4. Verify input validation and error handling completeness
+5. Assess readability and maintainability
 </process>
 <output>
 {

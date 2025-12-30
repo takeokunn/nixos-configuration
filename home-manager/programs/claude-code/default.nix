@@ -62,6 +62,8 @@
         DISABLE_MICROCOMPACT = "1";
         DISABLE_NON_ESSENTIAL_MODEL_CALLS = "1";
         DISABLE_TELEMETRY = "1";
+        ENABLE_EXPERIMENTAL_MCP_CLI = "false";
+        ENABLE_TOOL_SEARCH = "true";
       };
 
       statusLine = {

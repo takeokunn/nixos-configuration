@@ -54,6 +54,10 @@
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
+    mac-app-util = {
+      url = "github:hraban/mac-app-util";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

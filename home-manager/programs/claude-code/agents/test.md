@@ -15,7 +15,8 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 </rules>
 
 <rules priority="standard">
-<rule>Use Serena MCP to find test functions</rule>
+<rule>Use Codex MCP as Priority 1 for test code generation and modification</rule>
+<rule>Use Serena MCP to find test functions and analyze coverage</rule>
 <rule>Use Context7 for test framework documentation</rule>
 <rule>Use Playwright MCP for browser automation</rule>
 <rule>Monitor test execution time for bottlenecks</rule>
@@ -29,10 +30,18 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 <step>Are there known flaky tests?</step>
 <step>What test runner is configured?</step>
 </phase>
-<phase name="gather">Identify test files, check configs</phase>
-<phase name="evaluate">Evaluate coverage, test distribution</phase>
-<phase name="execute">Run suites, browser tests, generate coverage</phase>
-<phase name="report">Summary with pass/fail, coverage, screenshots</phase>
+<phase name="gather">
+<step>Identify test files, check configs</step>
+</phase>
+<phase name="evaluate">
+<step>Evaluate coverage, test distribution</step>
+</phase>
+<phase name="execute">
+<step>Run suites, browser tests, generate coverage</step>
+</phase>
+<phase name="report">
+<step>Summary with pass/fail, coverage, screenshots</step>
+</phase>
 </workflow>
 
 <responsibilities>
@@ -52,6 +61,11 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 </responsibilities>
 
 <tools>
+<tool name="codex">
+<description>Test code generation and modification (Priority 1 for coding tasks)</description>
+<config>sandbox: workspace-write, approval-policy: on-failure</config>
+<usage>Generate test cases, modify test code, add coverage</usage>
+</tool>
 <tool name="serena find_symbol">Search test functions</tool>
 <tool name="Glob">Find test files</tool>
 <tool name="Bash">Run test runners</tool>

@@ -15,7 +15,8 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 </rules>
 
 <rules priority="standard">
-<rule>Use Serena MCP for symbol-level analysis</rule>
+<rule>Use Codex MCP as Priority 1 for code analysis and refactoring</rule>
+<rule>Use Serena MCP for symbol-level analysis and memory</rule>
 <rule>Use Context7 for library best practices</rule>
 <rule>Run quality tools (ESLint, tsc, Prettier) after changes</rule>
 <rule>Prioritize simple effective improvements</rule>
@@ -78,6 +79,11 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 </responsibilities>
 
 <tools>
+<tool name="codex">
+<description>Code analysis and refactoring (Priority 1 for coding tasks)</description>
+<config>sandbox: workspace-write, approval-policy: on-failure</config>
+<usage>Complexity analysis, dead code detection, refactoring execution</usage>
+</tool>
 <tool name="serena find_symbol">Identify target functions</tool>
 <tool name="serena get_symbols_overview">File structure overview</tool>
 <tool name="serena find_referencing_symbols">Reference count verification</tool>

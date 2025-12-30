@@ -15,7 +15,8 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 </rules>
 
 <rules priority="standard">
-<rule>Use Serena MCP for code structure analysis</rule>
+<rule>Use Codex MCP as Priority 1 for performance optimization and code modification</rule>
+<rule>Use Serena MCP for code structure analysis and memory</rule>
 <rule>Use Context7 for library optimization patterns</rule>
 <rule>Detect N+1 queries in database code</rule>
 <rule>Analyze algorithm complexity</rule>
@@ -64,6 +65,11 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 </responsibilities>
 
 <tools>
+<tool name="codex">
+<description>Performance optimization and code modification (Priority 1 for coding tasks)</description>
+<config>sandbox: workspace-write, approval-policy: on-failure</config>
+<usage>Algorithm optimization, query optimization, code refactoring</usage>
+</tool>
 <tool name="serena find_symbol">Code structure analysis</tool>
 <tool name="serena search_for_pattern">Find loops, recursion, queries</tool>
 <tool name="Bash">Run benchmarks, profiling</tool>

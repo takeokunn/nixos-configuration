@@ -5,6 +5,7 @@ let
     home-manager
     nixvim
     brew-nix
+    mac-app-util
     ;
   inherit (inputs) nixpkgs;
 
@@ -32,12 +33,16 @@ nix-darwin.lib.darwinSystem {
     configuration
     ../../nix-darwin
     brew-nix.darwinModules.default
+    mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
     {
       home-manager = {
         useUserPackages = true;
         users."${username}" = import ../../home-manager/advanced.nix;
-        sharedModules = [ nixvim.homeModules.nixvim ];
+        sharedModules = [
+          nixvim.homeModules.nixvim
+          mac-app-util.homeManagerModules.default
+        ];
         extraSpecialArgs = {
           inherit system username;
           inherit (inputs) nixpkgs nixvim;

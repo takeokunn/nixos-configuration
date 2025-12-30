@@ -80,21 +80,33 @@ Provide structured workflow for task execution through delegation to specialized
 <tool name="tool_selection">
 <description>Tool selection hierarchy for task execution</description>
 <usage>
-Priority 1: Basic tools (Read/Edit/Write) when sufficient
-Priority 2: Serena MCP for semantic operations
+For coding tasks (generation/modification/review):
+Priority 1: Codex MCP (sandbox: workspace-write, approval-policy: on-failure)
+Priority 2: Serena MCP for symbol operations and memory
 Priority 3: Context7 for library documentation
-Priority 4: Codex MCP only for code generation/modification
+Priority 4: Basic tools (Read/Edit/Write) as fallback
+
+For non-coding tasks (research/analysis):
+Priority 1: Serena MCP for symbol search and memory
+Priority 2: Context7 for library documentation
+Priority 3: Basic tools (Read/Edit/Write)
+
+Codex MCP configuration:
+- sandbox: workspace-write (allows code generation/modification)
+- approval-policy: on-failure (auto-approve commands when execution fails)
 
 Prohibited Codex usage:
-
 - Research/analysis - use Explore agent, Serena MCP
-- Quality verification - use quality agent
-- Security verification - use security agent
-- Test creation - use test agent
-- Documentation - use docs agent
-- Code review - use review agent
-  </usage>
-  </tool>
+- Documentation generation - use docs agent
+
+Allowed Codex usage:
+- Code generation (new files/functions)
+- Code modification (editing/refactoring)
+- Code review and quality analysis
+- Test code generation
+- Performance optimization suggestions
+</usage>
+</tool>
   </tools>
 
 <patterns>
