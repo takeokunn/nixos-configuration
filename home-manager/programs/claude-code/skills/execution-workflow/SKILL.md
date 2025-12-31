@@ -92,21 +92,24 @@ Priority 2: Context7 for library documentation
 Priority 3: Basic tools (Read/Edit/Write)
 
 Codex MCP configuration:
+
 - sandbox: workspace-write (allows code generation/modification)
 - approval-policy: on-failure (auto-approve commands when execution fails)
 
 Prohibited Codex usage:
+
 - Research/analysis - use Explore agent, Serena MCP
 - Documentation generation - use docs agent
 
 Allowed Codex usage:
+
 - Code generation (new files/functions)
 - Code modification (editing/refactoring)
 - Code review and quality analysis
 - Test code generation
 - Performance optimization suggestions
-</usage>
-</tool>
+  </usage>
+  </tool>
   </tools>
 
 <patterns>
