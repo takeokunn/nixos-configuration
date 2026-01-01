@@ -2,6 +2,15 @@
 [
   (import emacs-overlay)
   (final: prev: {
+    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+      (python-final: python-prev: {
+        mcp = python-prev.mcp.overrideAttrs (oldAttrs: {
+          # Skip the broken postPatch from nixpkgs - upstream mcp v1.25.0 has
+          # removed time.sleep(0.1) from several test files that nixpkgs tries to patch
+          postPatch = "";
+        });
+      })
+    ];
     arto = prev.stdenv.mkDerivation rec {
       pname = "arto";
       version = "0.3.3";

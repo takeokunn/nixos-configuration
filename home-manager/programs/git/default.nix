@@ -29,6 +29,7 @@
       ".pre-commit-config.yaml"
       ".markdown-preview.html"
       ".serena/"
+      ".cache/"
       "**/.claude/settings.local.json"
     ];
 
