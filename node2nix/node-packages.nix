@@ -3189,13 +3189,13 @@ let
         sha512 = "V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==";
       };
     };
-    "normalize-url-8.1.0" = {
+    "normalize-url-8.1.1" = {
       name = "normalize-url";
       packageName = "normalize-url";
-      version = "8.1.0";
+      version = "8.1.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/normalize-url/-/normalize-url-8.1.0.tgz";
-        sha512 = "X06Mfd/5aKsRHc0O0J5CUedwnPmnDtLF2+nq+KN9KSDlJHkPuh0JUviWjEWMe0SW/9TDdSLVPuk7L5gGTIA1/w==";
+        url = "https://registry.npmjs.org/normalize-url/-/normalize-url-8.1.1.tgz";
+        sha512 = "JYc0DPlpGWB40kH5g07gGTrYuMqV653k3uBKY6uITPWds3M0ov3GaWGp9lbE3Bzngx8+XkfzgvASb9vk9JDFXQ==";
       };
     };
     "npm-run-path-6.0.0" = {
@@ -5368,7 +5368,7 @@ in
       sources."node-fetch-3.3.2"
       sources."node-gyp-build-4.8.4"
       sources."normalize-package-data-6.0.2"
-      sources."normalize-url-8.1.0"
+      sources."normalize-url-8.1.1"
       (
         sources."npm-run-path-6.0.0"
         // {
