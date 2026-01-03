@@ -21,7 +21,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 
 <workflow>
 <phase name="analyze">
-<step>What was the previous command? (/define, /execute, other)</step>
+<step>What was the previous command? (/define, /execute, /bug, /ask, other)</step>
 <step>What files/work need to be reviewed?</step>
 <step>Which agents should run in parallel?</step>
 <step>What metrics are relevant for this mode?</step>
@@ -30,6 +30,8 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <step>Determine mode based on previous command</step>
 <step>After /define: Execution plan feedback</step>
 <step>After /execute: Work content feedback</step>
+<step>After /bug: Investigation quality feedback</step>
+<step>After /ask: Answer accuracy feedback</step>
 <step>Other: Recent work feedback</step>
 </phase>
 <phase name="execute">
@@ -47,29 +49,54 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <target>Execution plan from conversation history</target>
 <aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
 <agents>
-<agent name="plan">Execution plan review</agent>
-<agent name="estimation">Estimation validity review</agent>
+<agent name="plan" subagent_type="Plan" readonly="true">Execution plan review</agent>
+<agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
 </agents>
+<execution>All agents in parallel</execution>
 </mode>
 <mode name="execute">
 <target>Files modified via Edit/Write tools</target>
 <agents>
-<agent name="quality">Naming, DRY, readability</agent>
-<agent name="security">OWASP Top 10, input validation, auth</agent>
-<agent name="design">Architecture consistency, patterns</agent>
-<agent name="docs">Accuracy, structure, completeness</agent>
-<agent name="performance">Performance review</agent>
-<agent name="test">Test coverage review</agent>
+<agent name="quality" subagent_type="quality-assurance" readonly="true">Naming, DRY, readability</agent>
+<agent name="security" subagent_type="security" readonly="true">OWASP Top 10, input validation, auth</agent>
+<agent name="design" subagent_type="design" readonly="true">Architecture consistency, patterns</agent>
+<agent name="docs" subagent_type="docs" readonly="true">Accuracy, structure, completeness</agent>
+<agent name="performance" subagent_type="performance" readonly="true">Performance review</agent>
+<agent name="test" subagent_type="test" readonly="true">Test coverage review</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
 <mode name="general">
 <target>Recent Claude Code work</target>
 <agents>
-<agent name="review">Comprehensive work review</agent>
-<agent name="complexity">Code complexity review</agent>
-<agent name="memory">Consistency check with existing patterns</agent>
+<agent name="review" subagent_type="quality-assurance" readonly="true">Comprehensive work review</agent>
+<agent name="complexity" subagent_type="code-quality" readonly="true">Code complexity review</agent>
+<agent name="memory" subagent_type="general-purpose" readonly="true">Consistency check with existing patterns</agent>
 </agents>
+<execution>All agents in parallel</execution>
+</mode>
+<mode name="bug">
+<target>Investigation results from conversation history</target>
+<aspects>Evidence collection, hypothesis validity, root cause accuracy, log utilization</aspects>
+<metrics>Confidence (0-100), Log Utilization (0-100), Objectivity (0-100)</metrics>
+<agents>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Investigation methodology evaluation</agent>
+<agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis and dependency investigation evaluation</agent>
+<agent name="explore" subagent_type="explore" readonly="true">Code path coverage evaluation</agent>
+</agents>
+<execution>All agents in parallel</execution>
+</mode>
+<mode name="ask">
+<target>Answer and evidence from conversation history</target>
+<aspects>Evidence citation quality, conclusion validity, reference accuracy, confidence calibration</aspects>
+<metrics>Confidence (0-100), Evidence Coverage (0-100)</metrics>
+<note>Subset of ask.md agents focused on answer evaluation; design/performance agents omitted as they evaluate questions, not answers</note>
+<agents>
+<agent name="explore" subagent_type="explore" readonly="true">Evidence gathering evaluation</agent>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Answer accuracy assessment</agent>
+<agent name="code-quality" subagent_type="code-quality" readonly="true">Reference precision and conclusion validity</agent>
+</agents>
+<execution>All agents in parallel</execution>
 </mode>
 </modes>
 

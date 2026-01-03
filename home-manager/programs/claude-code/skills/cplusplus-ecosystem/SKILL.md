@@ -14,7 +14,7 @@ Provide comprehensive patterns for Modern C++ (C++11-23) language, CMake build s
 <description>Transfer ownership of resources without copying. Introduced in C++11.</description>
 <example>
 std::vector&lt;int&gt; v1 = {1, 2, 3};
-std::vector&lt;int&gt; v2 = std::move(v1);  // v1 is now empty
+std::vector&lt;int&gt; v2 = std::move(v1); // v1 is now empty
 </example>
 <use>Use std::move for expensive-to-copy objects when ownership transfer is intended</use>
 </concept>
@@ -101,13 +101,13 @@ int main() { return add(1, 2); }
 #include &lt;coroutine&gt;
 
 generator&lt;int&gt; range(int start, int end) {
-    for (int i = start; i &lt; end; ++i) {
-        co_yield i;
-    }
+for (int i = start; i &lt; end; ++i) {
+co_yield i;
+}
 }
 
 task&lt;int&gt; async_compute() {
-    co_return co_await some_async_operation();
+co_return co_await some_async_operation();
 }
 </example>
 <note>Requires coroutine library (cppcoro, libcoro, or custom promise types)</note>
@@ -164,8 +164,8 @@ std::mutex mtx;
 std::lock_guard&lt;std::mutex&gt; lock(mtx);  // RAII lock
 
 std::shared_mutex rw_mtx;
-std::shared_lock&lt;std::shared_mutex&gt; read_lock(rw_mtx);   // multiple readers
-std::unique_lock&lt;std::shared_mutex&gt; write_lock(rw_mtx);  // exclusive writer
+std::shared_lock&lt;std::shared_mutex&gt; read_lock(rw_mtx); // multiple readers
+std::unique_lock&lt;std::shared_mutex&gt; write_lock(rw_mtx); // exclusive writer
 </example>
 </concept>
 
@@ -192,8 +192,8 @@ cv.wait(lock, []{ return ready; });
 
 // Notifying thread
 {
-    std::lock_guard&lt;std::mutex&gt; lock(mtx);
-    ready = true;
+std::lock_guard&lt;std::mutex&gt; lock(mtx);
+ready = true;
 }
 cv.notify_one();
 </example>
@@ -271,7 +271,7 @@ public:
 
 // source
 class Widget::Impl {
-    // implementation details
+// implementation details
 };
 </example>
 <use_case>Reducing compile times, ABI stability, hiding implementation</use_case>
@@ -290,7 +290,7 @@ public:
 
 class Derived : public Base&lt;Derived&gt; {
 public:
-    void implementation() { /* ... */ }
+void implementation() { /_ ... _/ }
 };
 </example>
 <use_case>Static polymorphism, mixin classes, compile-time polymorphism</use_case>
@@ -455,7 +455,7 @@ target_compile_options(project_warnings INTERFACE
 
 <clang_tidy>
 <description>Static analysis and linting tool</description>
-<usage>clang-tidy src/*.cpp -- -std=c++20</usage>
+<usage>clang-tidy src/\*.cpp -- -std=c++20</usage>
 
 <configuration>
 <file_reference>.clang-tidy</file_reference>
@@ -469,17 +469,18 @@ Checks: >
   readability-*,
   -modernize-use-trailing-return-type
 
-WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
+WarningsAsErrors: '_'
+HeaderFilterRegex: '._'
 
 CheckOptions:
-  - key: readability-identifier-naming.ClassCase
-    value: CamelCase
-  - key: readability-identifier-naming.FunctionCase
-    value: camelBack
-  - key: readability-identifier-naming.VariableCase
-    value: lower_case
-</configuration>
+
+- key: readability-identifier-naming.ClassCase
+  value: CamelCase
+- key: readability-identifier-naming.FunctionCase
+  value: camelBack
+- key: readability-identifier-naming.VariableCase
+  value: lower_case
+  </configuration>
 
 <common_checks>
 <check name="modernize-use-nullptr">Replace NULL with nullptr</check>
@@ -494,7 +495,7 @@ CheckOptions:
 
 <clang_format>
 <description>Code formatting tool</description>
-<usage>clang-format -i src/*.cpp include/*.hpp</usage>
+<usage>clang-format -i src/_.cpp include/_.hpp</usage>
 
 <configuration>
 <file_reference>.clang-format</file_reference>
@@ -552,14 +553,16 @@ target_link_options(myapp PRIVATE -fsanitize=undefined)
 </sanitizer>
 
 <cmake_preset>
+
 # CMakePresets.json sanitizer configuration
+
 {
-  "configurePresets": [{
-    "name": "sanitize",
-    "cacheVariables": {
-      "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer"
-    }
-  }]
+"configurePresets": [{
+"name": "sanitize",
+"cacheVariables": {
+"CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer"
+}
+}]
 }
 </cmake_preset>
 </sanitizers>
@@ -583,22 +586,22 @@ gtest_discover_tests(tests)
 #include &lt;gtest/gtest.h&gt;
 
 TEST(MyTest, BasicAssertion) {
-    EXPECT_EQ(1 + 1, 2);
+EXPECT_EQ(1 + 1, 2);
 }
 
 TEST(MyTest, StringComparison) {
-    std::string s = "hello";
-    EXPECT_STREQ(s.c_str(), "hello");
+std::string s = "hello";
+EXPECT_STREQ(s.c_str(), "hello");
 }
 
 class MyFixture : public ::testing::Test {
 protected:
-    void SetUp() override { /* setup */ }
-    void TearDown() override { /* cleanup */ }
+void SetUp() override { /_ setup _/ }
+void TearDown() override { /_ cleanup _/ }
 };
 
 TEST_F(MyFixture, FixtureTest) {
-    EXPECT_TRUE(true);
+EXPECT_TRUE(true);
 }
 </example>
 </googletest>
@@ -620,12 +623,12 @@ catch_discover_tests(tests)
 #include &lt;catch2/catch_test_macros.hpp&gt;
 
 TEST_CASE("Basic arithmetic", "[math]") {
-    REQUIRE(1 + 1 == 2);
-    CHECK(2 * 2 == 4);
+REQUIRE(1 + 1 == 2);
+CHECK(2 \* 2 == 4);
 }
 
 TEST_CASE("String operations", "[string]") {
-    std::string s = "hello";
+std::string s = "hello";
 
     SECTION("length") {
         REQUIRE(s.length() == 5);
@@ -634,6 +637,7 @@ TEST_CASE("String operations", "[string]") {
     SECTION("comparison") {
         REQUIRE(s == "hello");
     }
+
 }
 </example>
 </catch2>

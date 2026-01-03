@@ -48,23 +48,23 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </workflow>
 
 <agents>
-<agent name="quality" readonly="false">Syntax, type, format verification</agent>
-<agent name="security" readonly="false">Vulnerability detection</agent>
-<agent name="test" readonly="false">Test creation, coverage</agent>
-<agent name="refactor" readonly="false">Refactoring, tech debt</agent>
-<agent name="docs" readonly="false">Documentation updates</agent>
-<agent name="review" readonly="false">Post-implementation review</agent>
-<agent name="debug" readonly="false">Debug support</agent>
-<agent name="performance" readonly="false">Performance optimization</agent>
-<agent name="clean" readonly="false">Dead code elimination</agent>
-<agent name="error-handling" readonly="false">Error handling patterns</agent>
-<agent name="migration" readonly="false">Migration planning and execution</agent>
-<agent name="database" readonly="false">Database design and optimization</agent>
-<agent name="infrastructure" readonly="false">Infrastructure design</agent>
-<agent name="ci-cd" readonly="false">CI/CD pipeline design</agent>
-<agent name="observability" readonly="false">Logging, monitoring, tracing</agent>
-<agent name="git" readonly="false">Git workflow design</agent>
-<agent name="memory" readonly="false">Knowledge base management</agent>
+<agent name="quality" subagent_type="quality-assurance" readonly="false">Syntax, type, format verification</agent>
+<agent name="security" subagent_type="security" readonly="false">Vulnerability detection</agent>
+<agent name="test" subagent_type="test" readonly="false">Test creation, coverage</agent>
+<agent name="refactor" subagent_type="general-purpose" readonly="false">Refactoring, tech debt</agent>
+<agent name="docs" subagent_type="docs" readonly="false">Documentation updates</agent>
+<agent name="review" subagent_type="quality-assurance" readonly="false">Post-implementation review</agent>
+<agent name="debug" subagent_type="general-purpose" readonly="false">Debug support</agent>
+<agent name="performance" subagent_type="performance" readonly="false">Performance optimization</agent>
+<agent name="clean" subagent_type="code-quality" readonly="false">Dead code elimination</agent>
+<agent name="error-handling" subagent_type="general-purpose" readonly="false">Error handling patterns</agent>
+<agent name="migration" subagent_type="general-purpose" readonly="false">Migration planning and execution</agent>
+<agent name="database" subagent_type="database" readonly="false">Database design and optimization</agent>
+<agent name="infrastructure" subagent_type="devops" readonly="false">Infrastructure design</agent>
+<agent name="ci-cd" subagent_type="devops" readonly="false">CI/CD pipeline design</agent>
+<agent name="observability" subagent_type="devops" readonly="false">Logging, monitoring, tracing</agent>
+<agent name="git" subagent_type="git" readonly="false">Git workflow design</agent>
+<agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base management</agent>
 </agents>
 
 <parallel_execution>

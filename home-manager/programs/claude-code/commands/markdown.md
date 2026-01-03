@@ -36,9 +36,27 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </workflow>
 
 <agents>
-<agent name="docs" readonly="false">Documentation management</agent>
-<agent name="memory" readonly="false">Knowledge base recording to Serena memory</agent>
+<agent name="docs" subagent_type="docs" readonly="false">Documentation management</agent>
+<agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base recording to Serena memory</agent>
 </agents>
+
+<parallel_execution>
+<group name="output" execution="sequential">
+<agent>docs</agent>
+<agent>memory</agent>
+</group>
+<note>Sequential execution: docs creates file, then memory records if needed</note>
+</parallel_execution>
+
+<output>
+<format>
+<markdown_file>
+<header>Title based on command output</header>
+<content>Cleaned, formatted output from previous command</content>
+<footer>Optional: Related references</footer>
+</markdown_file>
+</format>
+</output>
 
 <file_mapping>
 <default_output_dir>project root</default_output_dir>
