@@ -2,7 +2,11 @@
   description = "takeokunn's nix configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Using a temporary overlay for ECL C23 fix until nixpkgs updates
+    # See: https://gitlab.com/embeddable-common-lisp/ecl/-/issues/775
+    nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    };
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -57,6 +61,7 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.cl-nix-lite.inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 

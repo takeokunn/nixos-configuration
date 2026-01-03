@@ -5,16 +5,21 @@ let
     home-manager
     nixvim
     brew-nix
-    mac-app-util
+    # mac-app-util temporarily disabled - ECL C23 build failure
+    # See: https://gitlab.com/embeddable-common-lisp/ecl/-/issues/775
+    # mac-app-util
+    emacs-overlay
     ;
   inherit (inputs) nixpkgs;
 
   username = "take";
   system = "aarch64-darwin";
 
+  advancedOverlay = import ../../home-manager/overlay/advanced.nix { inherit emacs-overlay; };
+
   pkgs = import nixpkgs {
     inherit system;
-    overlays = [ brew-nix.overlays.default ];
+    overlays = advancedOverlay ++ [ brew-nix.overlays.default ];
   };
 
   configuration =
@@ -33,7 +38,7 @@ nix-darwin.lib.darwinSystem {
     configuration
     ../../nix-darwin
     brew-nix.darwinModules.default
-    mac-app-util.darwinModules.default
+    # mac-app-util.darwinModules.default  # Temporarily disabled
     home-manager.darwinModules.home-manager
     {
       home-manager = {
@@ -41,7 +46,7 @@ nix-darwin.lib.darwinSystem {
         users."${username}" = import ../../home-manager/advanced.nix;
         sharedModules = [
           nixvim.homeModules.nixvim
-          mac-app-util.homeManagerModules.default
+          # mac-app-util.homeManagerModules.default  # Temporarily disabled
         ];
         extraSpecialArgs = {
           inherit system username;
