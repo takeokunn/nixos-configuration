@@ -128,6 +128,7 @@
       technical-documentation = builtins.readFile ./skills/technical-documentation/SKILL.md;
       technical-writing = builtins.readFile ./skills/technical-writing/SKILL.md;
       aws-ecosystem = builtins.readFile ./skills/aws-ecosystem/SKILL.md;
+      cplusplus-ecosystem = builtins.readFile ./skills/cplusplus-ecosystem/SKILL.md;
     };
 
     mcpServers =
