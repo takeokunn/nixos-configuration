@@ -16,6 +16,7 @@
       "font-sketchybar-app-font"
       "google-chrome"
       "sf-symbols"
+      "element"
     ];
   };
 }

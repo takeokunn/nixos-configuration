@@ -16,6 +16,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <rule>Check existing code/patterns before implementing new features</rule>
 <rule>Only perform Git operations when explicitly requested by user</rule>
 <rule>Require permission before modifying config files</rule>
+<rule>Use run_in_background for independent long-running tasks</rule>
 </rules>
 
 <workflow>

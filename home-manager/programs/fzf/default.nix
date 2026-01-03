@@ -12,7 +12,6 @@
 
     fileWidgetOptions = [ "--preview 'bat --color=always --style=plain {}'" ];
     changeDirWidgetOptions = [ "--preview 'eza --tree --level=2 --color=always {}'" ];
-    historyWidgetOptions = [ "--reverse" ];
 
     defaultOptions = [ "--highlight-line" ];
 
