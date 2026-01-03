@@ -12,13 +12,13 @@
 
 let
   sources = {
-    "@alcalzone/ansi-tokenize-0.2.2" = {
+    "@alcalzone/ansi-tokenize-0.2.3" = {
       name = "_at_alcalzone_slash_ansi-tokenize";
       packageName = "@alcalzone/ansi-tokenize";
-      version = "0.2.2";
+      version = "0.2.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@alcalzone/ansi-tokenize/-/ansi-tokenize-0.2.2.tgz";
-        sha512 = "mkOh+Wwawzuf5wa30bvc4nA+Qb6DIrGWgBhRR/Pw4T9nsgYait8izvXkNyU78D6Wcu3Z+KUdwCmLCxlWjEotYA==";
+        url = "https://registry.npmjs.org/@alcalzone/ansi-tokenize/-/ansi-tokenize-0.2.3.tgz";
+        sha512 = "jsElTJ0sQ4wHRz+C45tfect76BwbTbgkgKByOzpCN9xG61N5V6u/glvg1CsNJhq2xJIFpKHSwG3D2wPPuEYOrQ==";
       };
     };
     "@babel/code-frame-7.27.1" = {
@@ -4781,7 +4781,7 @@ in
       sha512 = "k9uoWCt0mhwlCc+JNwQ6VxOBmYQm2pEg4rO9nu3ueWBNok2tFScCd+iEkpeK8eEOIwk153/ZoBNvuUo3sAV98g==";
     };
     dependencies = [
-      sources."@alcalzone/ansi-tokenize-0.2.2"
+      sources."@alcalzone/ansi-tokenize-0.2.3"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.28.5"
       sources."@cfworker/json-schema-4.1.1"
