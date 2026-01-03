@@ -10,6 +10,12 @@ Provide comprehensive patterns for Modern C++ (C++11-23) language, CMake build s
 
 <cplusplus_language>
 <modern_features>
+<decision_tree name="when_to_use">
+<question>Are you working with modern C++ features like smart pointers, move semantics, or ranges?</question>
+<if_yes>Apply modern C++ patterns for safer, more efficient code</if_yes>
+<if_no>Consider refactoring legacy code to modern C++ standards</if_no>
+</decision_tree>
+
 <concept name="move_semantics">
 <description>Transfer ownership of resources without copying. Introduced in C++11.</description>
 <example>
@@ -146,6 +152,12 @@ std::visit([](auto&amp;&amp; val) { std::cout &lt;&lt; val; }, data);
 </modern_features>
 
 <concurrency>
+<decision_tree name="when_to_use">
+<question>Do you need concurrent or parallel execution?</question>
+<if_yes>Use std::thread for explicit control, std::async for task-based parallelism, or atomics for lock-free synchronization</if_yes>
+<if_no>Use single-threaded sequential execution for simplicity</if_no>
+</decision_tree>
+
 <concept name="threads">
 <description>Thread creation and management</description>
 <example>
@@ -353,6 +365,12 @@ public:
 </cplusplus_language>
 
 <cmake>
+<decision_tree name="when_to_use">
+<question>Are you building a C++ project with dependencies and multiple targets?</question>
+<if_yes>Use CMake for cross-platform, modern build configuration</if_yes>
+<if_no>Use simple Makefile for single-file projects or prototypes</if_no>
+</decision_tree>
+
 <project_structure>
 <standard_layout>
 .
@@ -569,6 +587,12 @@ target_link_options(myapp PRIVATE -fsanitize=undefined)
 </toolchain>
 
 <testing>
+<decision_tree name="when_to_use">
+<question>Do you need unit testing for C++ code?</question>
+<if_yes>Use GoogleTest for comprehensive testing features or Catch2 for header-only simplicity</if_yes>
+<if_no>Consider adding tests to improve code quality and maintainability</if_no>
+</decision_tree>
+
 <googletest>
 <description>Google Test framework</description>
 <cmake_integration>
@@ -683,3 +707,66 @@ std::string s = "hello";
 <practice priority="standard">Document public API with Doxygen comments</practice>
 <practice priority="standard">Write unit tests alongside implementation</practice>
 </best_practices>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand C++ code requirements</objective>
+<step>1. Check CMakeLists.txt for build configuration</step>
+<step>2. Review existing code patterns and standards</step>
+<step>3. Identify memory management requirements</step>
+</phase>
+<phase name="implement">
+<objective>Write modern, safe C++ code</objective>
+<step>1. Use RAII and smart pointers</step>
+<step>2. Follow C++ Core Guidelines</step>
+<step>3. Prefer standard library over raw implementations</step>
+</phase>
+<phase name="validate">
+<objective>Verify C++ code correctness</objective>
+<step>1. Build with warnings enabled</step>
+<step>2. Run static analysis tools</step>
+<step>3. Execute tests with sanitizers</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Compiler warning about unused variable</example>
+<action>Fix warning, maintain clean build</action>
+</level>
+<level severity="medium">
+<example>Compilation error</example>
+<action>Fix error, verify with full build</action>
+</level>
+<level severity="high">
+<example>Memory leak or undefined behavior detected</example>
+<action>Stop, require safe memory management</action>
+</level>
+<level severity="critical">
+<example>Buffer overflow or security vulnerability</example>
+<action>Block operation, require immediate fix</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Use smart pointers for memory management</must>
+<must>Enable compiler warnings (-Wall -Wextra)</must>
+<must>Follow C++ Core Guidelines</must>
+<avoid>Raw pointers for ownership</avoid>
+<avoid>Manual memory management when smart pointers suffice</avoid>
+<avoid>Undefined behavior</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Architecture design for C++ class hierarchies and template metaprogramming</agent>
+<agent name="docs">Doxygen documentation and API reference generation</agent>
+<agent name="execute">CMake configuration and C++ implementation tasks</agent>
+<agent name="bug">Debugging memory leaks, segfaults, and undefined behavior</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for C++ code navigation and refactoring</skill>
+<skill name="context7-usage">C++ documentation via /websites/cppreference_com and CMake docs via /Kitware/CMake</skill>
+<skill name="investigation-patterns">Debugging with sanitizers, valgrind, and gdb</skill>
+<skill name="technical-documentation">Creating library documentation with Doxygen</skill>
+</related_skills>

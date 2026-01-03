@@ -122,6 +122,11 @@ if err != nil {
     return fmt.Errorf("processing user %s: %w", userID, err)
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Do callers need to inspect or unwrap the error?</question>
+<if_yes>Use %w to wrap errors for errors.Is and errors.As</if_yes>
+<if_no>Use %v to format error without wrapping</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="sentinel_errors">
@@ -191,6 +196,11 @@ type Handler interface {
     Handle(ctx context.Context, req Request) (Response, error)
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Do you have multiple implementations or need to decouple packages?</question>
+<if_yes>Define interface where it is used for abstraction</if_yes>
+<if_no>Use concrete types until abstraction is needed</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="interface_composition">
@@ -348,6 +358,11 @@ func TestAdd(t *testing.T) {
     }
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Do you need to test same logic with multiple inputs and outputs?</question>
+<if_yes>Use table-driven tests for comprehensive coverage</if_yes>
+<if_no>Write simple individual test functions</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="test_helpers">
@@ -636,3 +651,64 @@ GOOS=linux GOARCH=amd64 go build
 <use_case>Build binaries for different operating systems and architectures</use_case>
 </tool>
 </build_commands>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand Go code requirements</objective>
+<step>1. Check go.mod for module and dependencies</step>
+<step>2. Review existing code patterns in project</step>
+<step>3. Identify interface and struct designs</step>
+</phase>
+<phase name="implement">
+<objective>Write idiomatic Go code</objective>
+<step>1. Follow Go naming conventions</step>
+<step>2. Use interfaces for abstraction</step>
+<step>3. Handle errors explicitly</step>
+</phase>
+<phase name="validate">
+<objective>Verify Go code correctness</objective>
+<step>1. Run go build for compilation</step>
+<step>2. Run go vet for static analysis</step>
+<step>3. Run go test for testing</step>
+</phase>
+</workflow>
+
+<related_agents>
+<agent name="design">Project architecture, interface design, and package structure planning</agent>
+<agent name="execute">Go implementation with proper error handling and concurrency patterns</agent>
+<agent name="code-quality">Run go vet, go fmt, and ensure idiomatic Go code</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Navigate Go packages and symbol definitions efficiently</skill>
+<skill name="context7-usage">Access latest Go standard library and toolchain documentation</skill>
+<skill name="investigation-patterns">Debug goroutine leaks, race conditions, and performance issues</skill>
+</related_skills>
+
+<error_escalation>
+<level severity="low">
+<example>Golint style warning</example>
+<action>Fix style issue, maintain idiomatic code</action>
+</level>
+<level severity="medium">
+<example>Compilation error</example>
+<action>Fix error, verify with go build</action>
+</level>
+<level severity="high">
+<example>Breaking change in exported API</example>
+<action>Stop, present migration options to user</action>
+</level>
+<level severity="critical">
+<example>Data race or unsafe memory operation</example>
+<action>Block operation, require safe implementation</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Handle all errors explicitly</must>
+<must>Follow Go naming conventions (exported vs unexported)</must>
+<must>Use interfaces for testability</must>
+<avoid>Ignoring returned errors</avoid>
+<avoid>Using init() without strong justification</avoid>
+<avoid>Overusing global variables</avoid>
+</constraints>

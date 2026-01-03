@@ -62,6 +62,12 @@ aws_secret_access_key = ...
 </cli_configuration>
 
 <authentication>
+<decision_tree name="when_to_use">
+<question>Are you authenticating for human access or programmatic access?</question>
+<if_yes>Human: Use SSO for temporary credentials; Programmatic: Use IAM roles or OIDC federation</if_yes>
+<if_no>Never use long-term access keys in production</if_no>
+</decision_tree>
+
 <sso>
 <description>AWS IAM Identity Center (SSO) authentication (2025 recommended)</description>
 <example>
@@ -174,6 +180,12 @@ aws sts get-caller-identity
 </authentication>
 
 <output_filtering>
+<decision_tree name="when_to_use">
+<question>Do you need to filter or transform AWS CLI output?</question>
+<if_yes>Use --query for AWS-native filtering or pipe to jq for complex transformations</if_yes>
+<if_no>Use default JSON output for full response data</if_no>
+</decision_tree>
+
 <output_formats>
 <format name="json">Default, machine-readable (--output json)</format>
 <format name="text">Tab-delimited, scriptable (--output text)</format>
@@ -372,6 +384,12 @@ aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --out
 </best_practices>
 
 <terraform>
+<decision_tree name="when_to_use">
+<question>Are you managing AWS infrastructure as code?</question>
+<if_yes>Use Terraform for declarative, version-controlled infrastructure</if_yes>
+<if_no>Use AWS CLI for one-off operations or AWS Console for exploration</if_no>
+</decision_tree>
+
 <provider_configuration>
 <pattern name="basic">
 <description>Basic AWS provider configuration</description>
@@ -908,3 +926,66 @@ single_nat_gateway = true
 </tool>
 </context7_integration>
 </terraform>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand AWS infrastructure requirements</objective>
+<step>1. Identify target AWS services and regions</step>
+<step>2. Review existing infrastructure patterns</step>
+<step>3. Check IAM permissions and policies</step>
+</phase>
+<phase name="implement">
+<objective>Implement AWS resources safely</objective>
+<step>1. Use Terraform for infrastructure as code</step>
+<step>2. Follow least-privilege IAM principles</step>
+<step>3. Tag resources appropriately</step>
+</phase>
+<phase name="validate">
+<objective>Verify AWS configuration correctness</objective>
+<step>1. Run terraform plan to preview changes</step>
+<step>2. Verify security group rules</step>
+<step>3. Test access and connectivity</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Minor tagging inconsistency</example>
+<action>Fix tags, follow naming conventions</action>
+</level>
+<level severity="medium">
+<example>IAM policy too permissive</example>
+<action>Restrict permissions, apply least privilege</action>
+</level>
+<level severity="high">
+<example>Security group allows unrestricted access</example>
+<action>Stop, require security review before proceeding</action>
+</level>
+<level severity="critical">
+<example>Potential data exposure or credential leak</example>
+<action>Block operation, require immediate remediation</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Use Terraform for infrastructure management</must>
+<must>Follow least-privilege IAM principles</must>
+<must>Enable encryption at rest and in transit</must>
+<avoid>Hardcoding credentials in code</avoid>
+<avoid>Overly permissive security groups</avoid>
+<avoid>Untagged resources</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Architecture design for AWS infrastructure and service integration</agent>
+<agent name="docs">CloudFormation and Terraform documentation generation</agent>
+<agent name="execute">AWS CLI operations and Terraform deployment tasks</agent>
+<agent name="bug">Debugging AWS API errors and Terraform state issues</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for Terraform code navigation</skill>
+<skill name="context7-usage">Terraform AWS Provider documentation via /hashicorp/terraform-provider-aws</skill>
+<skill name="investigation-patterns">Debugging authentication failures and service quota issues</skill>
+<skill name="technical-documentation">Creating infrastructure documentation and runbooks</skill>
+</related_skills>

@@ -74,6 +74,11 @@ struct MyType {
 <description>Recoverable errors with Result with T and E type parameters</description>
 <operators>? for early return on Err</operators>
 <combinators>map, and_then, unwrap_or, unwrap_or_else</combinators>
+<decision_tree name="when_to_use">
+<question>Is this a recoverable error that callers should handle?</question>
+<if_yes>Return Result type with appropriate error variant</if_yes>
+<if_no>Use panic only for unrecoverable programming errors</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="Option">
@@ -105,6 +110,11 @@ MyStruct::builder()
 .field2(value2)
 .build()
 </example>
+<decision_tree name="when_to_use">
+<question>Does the struct have many optional fields or complex construction logic?</question>
+<if_yes>Implement builder pattern for ergonomic construction</if_yes>
+<if_no>Use simple constructor function or Default trait</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="newtype">
@@ -232,6 +242,12 @@ edition.workspace = true
 [dependencies]
 serde.workspace = true
 </member_inheritance>
+
+<decision_tree name="when_to_use">
+<question>Do you have multiple related crates in one repository?</question>
+<if_yes>Use workspace to share dependencies and build configuration</if_yes>
+<if_no>Single crate project without workspace structure</if_no>
+</decision_tree>
 </workspace>
 
 <commands>
@@ -368,3 +384,64 @@ fail-fast = false
 <practice priority="medium">Use integration tests in tests/ for API testing</practice>
 <practice priority="medium">Set rust-version in Cargo.toml for MSRV</practice>
 </best_practices>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand Rust code requirements</objective>
+<step>1. Check Cargo.toml for crate configuration</step>
+<step>2. Review existing patterns and traits</step>
+<step>3. Identify ownership and lifetime requirements</step>
+</phase>
+<phase name="implement">
+<objective>Write safe, idiomatic Rust code</objective>
+<step>1. Design with ownership in mind</step>
+<step>2. Use Result/Option for error handling</step>
+<step>3. Follow Rust API guidelines</step>
+</phase>
+<phase name="validate">
+<objective>Verify Rust code correctness</objective>
+<step>1. Run cargo check for quick validation</step>
+<step>2. Run cargo clippy for lints</step>
+<step>3. Run cargo test for testing</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Clippy warning about style</example>
+<action>Fix warning, maintain idiomatic code</action>
+</level>
+<level severity="medium">
+<example>Borrow checker error</example>
+<action>Redesign ownership, avoid unsafe unless necessary</action>
+</level>
+<level severity="high">
+<example>Breaking change in public API</example>
+<action>Stop, present migration options to user</action>
+</level>
+<level severity="critical">
+<example>Unsafe code without proper justification</example>
+<action>Block operation, require safe alternatives</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Prefer safe Rust over unsafe blocks</must>
+<must>Use Result and Option for error handling</must>
+<must>Follow Rust API guidelines for public APIs</must>
+<avoid>Using unwrap() in library code</avoid>
+<avoid>Unnecessary Clone implementations</avoid>
+<avoid>Unsafe code without safety documentation</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Ownership architecture, trait design, and type system modeling</agent>
+<agent name="execute">Rust implementation with proper lifetime management and error handling</agent>
+<agent name="code-quality">Run cargo clippy, cargo fmt, and enforce Rust idioms</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Navigate trait implementations and module hierarchies</skill>
+<skill name="context7-usage">Fetch Rust book, cargo, and clippy documentation</skill>
+<skill name="investigation-patterns">Debug borrow checker errors, lifetime issues, and performance bottlenecks</skill>
+</related_skills>

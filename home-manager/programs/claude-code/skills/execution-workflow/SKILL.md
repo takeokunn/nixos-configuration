@@ -46,6 +46,55 @@ Provide structured workflow for task execution through delegation to specialized
 </phase>
 </workflow>
 
+<workflow>
+<phase name="plan">
+<objective>Plan task execution strategy</objective>
+<step>1. Identify tasks and dependencies</step>
+<step>2. Determine parallel vs sequential execution</step>
+<step>3. Assign appropriate sub-agents</step>
+</phase>
+<phase name="delegate">
+<objective>Delegate to specialized agents</objective>
+<step>1. Provide clear scope and deliverables</step>
+<step>2. Include target file paths</step>
+<step>3. Set explicit constraints</step>
+</phase>
+<phase name="consolidate">
+<objective>Verify and combine results</objective>
+<step>1. Verify sub-agent outputs</step>
+<step>2. Handle failures gracefully</step>
+<step>3. Synthesize final result</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Sub-agent returns partial results</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Sub-agent task fails</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Critical task cannot be completed</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Sub-agent introduces breaking change</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Delegate detailed work to sub-agents</must>
+<must>Execute independent tasks in parallel</must>
+<must>Verify outputs before integration</must>
+<avoid>Implementing detailed logic directly</avoid>
+<avoid>Sequential execution of independent tasks</avoid>
+<avoid>Skipping verification of sub-agent outputs</avoid>
+</constraints>
+
 <tools>
 <tool name="agent_groups">
 <description>Specialized sub-agents organized by execution model</description>
@@ -115,6 +164,11 @@ Allowed Codex usage:
 <patterns>
 <pattern name="code_review_phases">
 <description>Systematic code review process</description>
+<decision_tree name="when_to_use">
+<question>Has code been modified or newly created?</question>
+<if_yes>Apply code review phases systematically to ensure quality</if_yes>
+<if_no>Skip review and proceed to next task</if_no>
+</decision_tree>
 <example>
 Phase 1 - Initial Scan:
 - Syntax errors and typos
@@ -145,6 +199,11 @@ Phase 4 - Standards Compliance:
 
 <pattern name="quality_criteria">
 <description>Evaluation criteria for code quality</description>
+<decision_tree name="when_to_use">
+<question>Is this a code review or quality assessment task?</question>
+<if_yes>Apply quality criteria across all dimensions</if_yes>
+<if_no>Focus on implementation patterns instead</if_no>
+</decision_tree>
 <example>
 Correctness:
 - Logic matches requirements
@@ -182,6 +241,11 @@ Testability:
 
 <pattern name="feedback_categories">
 <description>Categorization of review feedback by priority</description>
+<decision_tree name="when_to_use">
+<question>Have you identified issues during code review?</question>
+<if_yes>Apply feedback categories to prioritize by severity</if_yes>
+<if_no>Continue code review phases</if_no>
+</decision_tree>
 <example>
 Critical: Must fix before merge
 - Security vulnerabilities
@@ -210,6 +274,11 @@ Positive: What was done well
 
 <pattern name="review_output_format">
 <description>Standard format for code review results</description>
+<decision_tree name="when_to_use">
+<question>Is it time to communicate code review findings?</question>
+<if_yes>Apply review output format for structured communication</if_yes>
+<if_no>Continue analyzing code through review phases</if_no>
+</decision_tree>
 <example>
 <summary>Overall assessment and recommendation</summary>
 <critical_issues>Must-fix items with file:line references</critical_issues>
@@ -243,6 +312,18 @@ Positive: What was done well
 <practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
 <practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
 </best_practices>
+
+<related_agents>
+<agent name="execute">Primary agent for implementing features with sub-agent delegation</agent>
+<agent name="feedback">Use for post-implementation code review and quality assessment</agent>
+<agent name="bug">Delegate debugging tasks when critical issues are identified during review</agent>
+</related_agents>
+
+<related_skills>
+<skill name="requirements-definition">Use before execution to clarify implementation scope</skill>
+<skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
+<skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
+</related_skills>
 
 <anti_patterns>
 <avoid name="nitpicking_style">

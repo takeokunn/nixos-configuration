@@ -25,26 +25,46 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 
 <workflow>
 <phase name="analyze">
-<step>What type of error is this? (syntax, runtime, logic)</step>
-<step>Where does it occur? (file, line, function)</step>
-<step>What logs are available?</step>
-<step>What is the error context? (before, during, after)</step>
+<objective>Classify error type and establish investigation scope</objective>
+<step>1. What type of error is this? (syntax, runtime, logic)</step>
+<step>2. Where does it occur? (file, line, function)</step>
+<step>3. What logs are available?</step>
+<step>4. What is the error context? (before, during, after)</step>
 </phase>
 <phase name="investigate">
-<step>Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
-<step>Delegate to explore agent: find error location and related code paths</step>
-<step>Delegate to general-purpose agent: analyze logs and dependencies</step>
-<step>Analyze error location details from agent findings</step>
-<step>Review dependencies and imports</step>
-<step>Check config files and recent changes</step>
+<objective>Delegate parallel investigations to specialized agents</objective>
+<step>1. Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
+<step>2. Delegate to explore agent: find error location and related code paths</step>
+<step>3. Delegate to general-purpose agent: analyze logs and dependencies</step>
+<step>4. Analyze error location details from agent findings</step>
+<step>5. Review dependencies and imports</step>
+<step>6. Check config files and recent changes</step>
 </phase>
+<reflection_checkpoint id="investigation_quality">
+<question>Have I built a complete evidence chain from symptom to cause?</question>
+<question>Can I explain the error mechanism with concrete evidence?</question>
+<threshold>If confidence less than 70, continue investigation or flag uncertainty</threshold>
+</reflection_checkpoint>
 <phase name="gather">
-<step>Collect runtime info (OS, versions, env vars)</step>
-<step>Check resources (disk, memory, network)</step>
+<objective>Collect environmental context and runtime conditions</objective>
+<step>1. Collect runtime info (OS, versions, env vars)</step>
+<step>2. Check resources (disk, memory, network)</step>
+</phase>
+<reflection_checkpoint id="analysis_quality">
+<question>Have I gathered sufficient evidence to proceed?</question>
+<question>Are there gaps in my understanding?</question>
+<threshold>If confidence less than 70, seek more evidence or ask user</threshold>
+</reflection_checkpoint>
+<phase name="failure_handling">
+<objective>Handle investigation failures gracefully</objective>
+<step>1. If tool call fails: Log error, attempt alternative approach</step>
+<step>2. If data unavailable: Document gap, proceed with partial analysis</step>
+<step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
 </phase>
 <phase name="report">
-<step>Compile agent findings with confidence metrics</step>
-<step>Identify root cause with supporting evidence</step>
+<objective>Synthesize findings into actionable root cause analysis</objective>
+<step>1. Compile agent findings with confidence metrics</step>
+<step>2. Identify root cause with supporting evidence</step>
 </phase>
 </workflow>
 
@@ -54,15 +74,102 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
 </agents>
 
-<parallel_execution>
-<group name="error_analysis" execution="parallel">
+<execution_graph>
+<parallel_group id="error_analysis" depends_on="none">
 <agent>quality-assurance</agent>
 <agent>explore</agent>
-</group>
-<group name="context_gathering" execution="parallel">
+</parallel_group>
+<parallel_group id="context_gathering" depends_on="none">
 <agent>general-purpose</agent>
-</group>
-</parallel_execution>
+</parallel_group>
+<sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
+<agent>review</agent>
+<reason>Requires findings from both error analysis and context gathering</reason>
+</sequential_phase>
+</execution_graph>
+
+<parallelization>
+<capability>
+<parallel_safe>true</parallel_safe>
+<read_only>true</read_only>
+<modifies_state>none</modifies_state>
+</capability>
+<execution_strategy>
+<max_parallel_agents>3</max_parallel_agents>
+<timeout_per_agent>180000</timeout_per_agent>
+</execution_strategy>
+</parallelization>
+
+<decision_criteria>
+<criterion name="confidence_calculation">
+<factor name="root_cause_certainty" weight="0.5">
+<score range="90-100">Root cause confirmed with reproduction</score>
+<score range="70-89">Likely root cause identified</score>
+<score range="50-69">Possible causes identified</score>
+<score range="0-49">Root cause unclear</score>
+</factor>
+<factor name="evidence_chain" weight="0.3">
+<score range="90-100">Complete evidence chain from symptom to cause</score>
+<score range="70-89">Strong evidence trail</score>
+<score range="50-69">Partial evidence</score>
+<score range="0-49">Weak evidence</score>
+</factor>
+<factor name="fix_viability" weight="0.2">
+<score range="90-100">Clear, tested fix available</score>
+<score range="70-89">Fix approach defined</score>
+<score range="50-69">Possible fix identified</score>
+<score range="0-49">No clear fix</score>
+</factor>
+</criterion>
+<validation_tests>
+<test name="confirmed_root_cause">
+<input>root_cause_certainty=95, evidence_chain=90, fix_viability=95</input>
+<calculation>(95*0.5)+(90*0.3)+(95*0.2) = 47.5+27+19 = 93.5</calculation>
+<expected_status>success</expected_status>
+<reasoning>Reproduced root cause with tested fix yields high confidence</reasoning>
+</test>
+<test name="boundary_warning_79">
+<input>root_cause_certainty=80, evidence_chain=75, fix_viability=80</input>
+<calculation>(80*0.5)+(75*0.3)+(80*0.2) = 40+22.5+16 = 78.5</calculation>
+<expected_status>warning</expected_status>
+<reasoning>Likely cause without complete evidence results in 78.5, triggers warning</reasoning>
+</test>
+<test name="boundary_success_80">
+<input>root_cause_certainty=85, evidence_chain=75, fix_viability=75</input>
+<calculation>(85*0.5)+(75*0.3)+(75*0.2) = 42.5+22.5+15 = 80</calculation>
+<expected_status>success</expected_status>
+<reasoning>Weighted average exactly 80, meets success threshold</reasoning>
+</test>
+<test name="unclear_cause">
+<input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>
+<calculation>(45*0.5)+(50*0.3)+(40*0.2) = 22.5+15+8 = 45.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Unclear root cause with weak evidence results in 45.5, triggers error</reasoning>
+</test>
+</validation_tests>
+</decision_criteria>
+
+<enforcement>
+<mandatory_behaviors>
+<behavior id="BUG-B001" priority="critical">
+<trigger>Before concluding root cause</trigger>
+<action>Build evidence chain from symptom to cause</action>
+<verification>Evidence chain in output</verification>
+</behavior>
+<behavior id="BUG-B002" priority="critical">
+<trigger>When proposing fix</trigger>
+<action>Identify all affected code paths</action>
+<verification>Impact analysis in output</verification>
+</behavior>
+</mandatory_behaviors>
+<prohibited_behaviors>
+<behavior id="BUG-P001" priority="critical">
+<trigger>Always</trigger>
+<action>Concluding without evidence</action>
+<response>Block conclusion, require investigation</response>
+</behavior>
+</prohibited_behaviors>
+</enforcement>
 
 <delegation>
 <requirement>Full error message/stack trace</requirement>
@@ -89,6 +196,37 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <further_investigation>Unclear points, next steps</further_investigation>
 </format>
 </output>
+
+<error_escalation>
+<level severity="low">
+<example>Minor log warning without impact</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Unclear error context or missing stack trace</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>System crash or data corruption detected</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Security breach or critical data loss risk</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<related_agents>
+<agent name="ask">When investigation reveals architectural questions</agent>
+<agent name="define">When bug fix requires requirements specification</agent>
+<agent name="execute">When ready to implement fix after investigation</agent>
+</related_agents>
+
+<related_skills>
+<skill name="investigation-patterns">Core debugging methodology</skill>
+<skill name="serena-usage">Navigate error locations efficiently</skill>
+<skill name="testing-patterns">Understand test failures and coverage gaps</skill>
+</related_skills>
 
 <constraints>
 <must>Keep all operations read-only</must>

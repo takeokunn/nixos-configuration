@@ -11,6 +11,11 @@ Provide systematic patterns for codebase investigation and debugging, ensuring e
 <patterns>
 <pattern name="scope_classification">
 <description>Classify the question type to determine investigation approach</description>
+<decision_tree name="when_to_use">
+<question>Does the question require understanding codebase structure or behavior?</question>
+<if_yes>Apply scope classification to determine investigation depth and tools</if_yes>
+<if_no>Consider requirements-definition skill for unclear requirements</if_no>
+</decision_tree>
 <example>
 Architecture: System design, component relationships
 Implementation: Specific code behavior, algorithm details
@@ -21,6 +26,11 @@ Design: Pattern usage, code organization
 
 <pattern name="source_identification">
 <description>Identify relevant sources for investigation</description>
+<decision_tree name="when_to_use">
+<question>Is the codebase large or unfamiliar?</question>
+<if_yes>Apply source identification to locate relevant evidence efficiently</if_yes>
+<if_no>Directly examine known sources</if_no>
+</decision_tree>
 <example>
 Code: Use Serena for symbol search and dependency analysis
 Documentation: Check inline comments, README, API docs
@@ -31,6 +41,11 @@ External: Context7 for library documentation
 
 <pattern name="evidence_collection">
 <description>Collect evidence systematically using appropriate tools</description>
+<decision_tree name="when_to_use">
+<question>Do you have specific symbols or patterns to investigate?</question>
+<if_yes>Apply evidence collection with symbol-level tools</if_yes>
+<if_no>Start with source identification to locate relevant areas</if_no>
+</decision_tree>
 <example>
 find_symbol: Locate specific symbols by name
 get_symbols_overview: Understand file structure
@@ -41,6 +56,11 @@ search_for_pattern: Find patterns across codebase
 
 <pattern name="synthesis">
 <description>Synthesize findings with confidence metrics</description>
+<decision_tree name="when_to_use">
+<question>Have you collected sufficient evidence from multiple sources?</question>
+<if_yes>Apply synthesis to combine findings with confidence metrics</if_yes>
+<if_no>Continue evidence collection to increase coverage</if_no>
+</decision_tree>
 <example>
 Combine evidence from multiple sources
 Rate confidence based on evidence quality (0-100)
@@ -51,6 +71,11 @@ Identify and document information gaps
 
 <pattern name="reproduce">
 <description>Confirm the issue is reproducible</description>
+<decision_tree name="when_to_use">
+<question>Is this a bug or unexpected behavior investigation?</question>
+<if_yes>Apply reproduce pattern to confirm issue before debugging</if_yes>
+<if_no>Use other investigation patterns for analysis tasks</if_no>
+</decision_tree>
 <example>
 Gather exact steps to reproduce
 Identify environment conditions
@@ -60,6 +85,11 @@ Determine consistency (always/sometimes fails)
 
 <pattern name="isolate">
 <description>Narrow down the problem scope</description>
+<decision_tree name="when_to_use">
+<question>Is the bug reproducible but involves many components?</question>
+<if_yes>Apply isolate pattern to narrow down the problem scope</if_yes>
+<if_no>Proceed to investigate pattern if scope is clear</if_no>
+</decision_tree>
 <example>
 Identify when issue started (git bisect if needed)
 Remove unrelated components
@@ -69,6 +99,11 @@ Create minimal reproduction case
 
 <pattern name="investigate">
 <description>Collect evidence systematically for debugging</description>
+<decision_tree name="when_to_use">
+<question>Has the issue been reproduced and isolated?</question>
+<if_yes>Apply investigate pattern to collect debugging evidence</if_yes>
+<if_no>Complete reproduce and isolate patterns first</if_no>
+</decision_tree>
 <example>
 Examine error messages and stack traces
 Check logs at relevant timestamps
@@ -79,6 +114,11 @@ Trace data flow through the system
 
 <pattern name="hypothesize">
 <description>Form and test hypotheses</description>
+<decision_tree name="when_to_use">
+<question>Have you collected sufficient debugging evidence?</question>
+<if_yes>Apply hypothesize pattern to form and test root cause theories</if_yes>
+<if_no>Continue investigate pattern to gather more evidence</if_no>
+</decision_tree>
 <example>
 List possible causes
 Rank by likelihood
@@ -88,6 +128,11 @@ Design tests to confirm/refute each
 
 <pattern name="fix">
 <description>Implement and verify solution</description>
+<decision_tree name="when_to_use">
+<question>Has a hypothesis been confirmed as the root cause?</question>
+<if_yes>Apply fix pattern to implement and verify solution</if_yes>
+<if_no>Continue hypothesize pattern to test other theories</if_no>
+</decision_tree>
 <example>
 Make minimal targeted change
 Verify fix resolves the issue
@@ -96,6 +141,55 @@ Add test to prevent recurrence
 </example>
 </pattern>
 </patterns>
+
+<workflow>
+<phase name="observe">
+<objective>Gather initial observations</objective>
+<step>1. Document the symptom or question clearly</step>
+<step>2. Identify relevant entry points for investigation</step>
+<step>3. Form initial hypotheses</step>
+</phase>
+<phase name="investigate">
+<objective>Systematically explore evidence</objective>
+<step>1. Use Serena tools to trace code paths</step>
+<step>2. Build evidence chain from symptom to cause</step>
+<step>3. Validate or invalidate hypotheses</step>
+</phase>
+<phase name="conclude">
+<objective>Form evidence-based conclusions</objective>
+<step>1. Synthesize findings into coherent explanation</step>
+<step>2. Rate confidence based on evidence quality</step>
+<step>3. Document for future reference</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Evidence trail incomplete</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Conflicting evidence found</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Root cause cannot be determined</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Investigation reveals security issue</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Build evidence chains before conclusions</must>
+<must>Cite specific file:line references</must>
+<must>State confidence levels explicitly</must>
+<avoid>Speculation without evidence</avoid>
+<avoid>Confirmation bias in hypothesis testing</avoid>
+<avoid>Concluding without exploring alternatives</avoid>
+</constraints>
 
 <tools>
 <tool name="find_symbol">
@@ -245,6 +339,18 @@ Identify divergence from expected behavior
 </example>
 </concept>
 </concepts>
+
+<related_agents>
+<agent name="bug">Use for root cause investigation when user reports bugs or errors</agent>
+<agent name="ask">Use for answering questions about codebase architecture and implementation</agent>
+<agent name="execute">Delegate to after investigation confirms implementation approach</agent>
+</related_agents>
+
+<related_skills>
+<skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
+<skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
+<skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
+</related_skills>
 
 <anti_patterns>
 <avoid name="speculation">

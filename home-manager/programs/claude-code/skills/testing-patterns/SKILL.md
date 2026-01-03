@@ -31,6 +31,11 @@ Provide testing patterns and strategies for comprehensive test coverage and main
 
 <pattern name="arrange_act_assert">
 <description>Three-phase test structure for clear test organization</description>
+<decision_tree name="when_to_use">
+<question>Are you writing unit or integration tests?</question>
+<if_yes>Apply arrange-act-assert pattern for clear test structure</if_yes>
+<if_no>Consider given-when-then for BDD-style tests</if_no>
+</decision_tree>
 <example>
 <test_phase>Arrange: Set up test data and preconditions</test_phase>
 user = User.new(name: "John")
@@ -49,6 +54,11 @@ assert_equal 0, total
 
 <pattern name="given_when_then">
 <description>BDD-style test structure focusing on behavior</description>
+<decision_tree name="when_to_use">
+<question>Is the test focused on business behavior rather than technical implementation?</question>
+<if_yes>Apply given-when-then pattern for BDD-style tests</if_yes>
+<if_no>Use arrange-act-assert for technical unit tests</if_no>
+</decision_tree>
 <example>
 <bdd_step>Given: Initial context (preconditions)</bdd_step>
 given_a_user_with_an_empty_cart
@@ -66,6 +76,11 @@ then_the_total_should_be_zero
 
 <pattern name="stub">
 <description>Provide canned responses for dependencies</description>
+<decision_tree name="when_to_use">
+<question>Does the test need dependency responses but not interaction verification?</question>
+<if_yes>Apply stub pattern for canned responses</if_yes>
+<if_no>Use mock if interaction verification is needed</if_no>
+</decision_tree>
 <example>
 api_client = stub(
   fetch_user: { id: 1, name: "John" }
@@ -76,6 +91,11 @@ api_client = stub(
 
 <pattern name="mock">
 <description>Verify interactions occurred with dependencies</description>
+<decision_tree name="when_to_use">
+<question>Does the test need to verify specific interactions occurred?</question>
+<if_yes>Apply mock pattern to verify method calls and arguments</if_yes>
+<if_no>Use stub if only canned responses are needed</if_no>
+</decision_tree>
 <example>
 email_service = mock()
 email_service.expect(:send_email, args: ["user@example.com", "Welcome"])
@@ -87,6 +107,11 @@ email_service.verify
 
 <pattern name="spy">
 <description>Record calls while using real implementation</description>
+<decision_tree name="when_to_use">
+<question>Does the test need real behavior plus interaction verification?</question>
+<if_yes>Apply spy pattern to record calls while using real implementation</if_yes>
+<if_no>Use stub for canned responses or mock for behavior replacement</if_no>
+</decision_tree>
 <example>
 logger = spy(Logger.new)
 service.process(logger)
@@ -97,6 +122,11 @@ assert_called logger, :log, with: "Processing complete"
 
 <pattern name="fake">
 <description>Working implementation suitable for testing</description>
+<decision_tree name="when_to_use">
+<question>Does the test need a simplified but working implementation?</question>
+<if_yes>Apply fake pattern for lightweight working implementation</if_yes>
+<if_no>Use stub for simple canned responses</if_no>
+</decision_tree>
 <example>
 class FakeDatabase
   def initialize
@@ -117,6 +147,11 @@ end
 
 <pattern name="descriptive_naming">
 <description>Test names that clearly describe scenario and outcome</description>
+<decision_tree name="when_to_use">
+<question>Is this a technical unit test for a specific method?</question>
+<if_yes>Apply descriptive naming with method-scenario-result format</if_yes>
+<if_no>Consider should naming for BDD-style tests</if_no>
+</decision_tree>
 <example>
 test_calculateTotal_withEmptyCart_returnsZero
 test_calculateTotal_withMultipleItems_returnsSumOfPrices
@@ -127,6 +162,11 @@ test_calculateTotal_withDiscount_appliesDiscountCorrectly
 
 <pattern name="should_naming">
 <description>BDD-style naming that reads like natural language</description>
+<decision_tree name="when_to_use">
+<question>Is this a behavior-focused test readable by non-technical stakeholders?</question>
+<if_yes>Apply should naming for natural language readability</if_yes>
+<if_no>Use descriptive naming for technical unit tests</if_no>
+</decision_tree>
 <example>
 calculateTotal_should_returnZero_when_cartIsEmpty
 calculateTotal_should_applyDiscount_when_couponIsValid
@@ -280,6 +320,18 @@ Concurrent access, timezone edge cases, leap years, DST transitions
 <rule>Focus on testing behavior, not achieving coverage metrics</rule>
 </rules>
 
+<related_agents>
+<agent name="execute">Primary agent for implementing tests alongside feature code</agent>
+<agent name="feedback">Use for reviewing test quality and coverage</agent>
+<agent name="bug">Delegate to when tests reveal unexpected failures</agent>
+</related_agents>
+
+<related_skills>
+<skill name="requirements-definition">Use to define test requirements and acceptance criteria</skill>
+<skill name="execution-workflow">Use to implement tests as part of feature development workflow</skill>
+<skill name="investigation-patterns">Use when debugging test failures or flaky tests</skill>
+</related_skills>
+
 <anti_patterns>
 <avoid name="testing_implementation">
 <description>Testing implementation details instead of behavior</description>
@@ -306,3 +358,52 @@ Concurrent access, timezone edge cases, leap years, DST transitions
 <instead>Make each test independent with proper setup/teardown and isolated state. Each test should create its own test data.</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="analyze">
+<objective>Analyze testing requirements</objective>
+<step>1. Identify code to be tested</step>
+<step>2. Review existing test patterns in project</step>
+<step>3. Determine appropriate test types</step>
+</phase>
+<phase name="design">
+<objective>Design test strategy</objective>
+<step>1. Identify test scenarios and edge cases</step>
+<step>2. Plan unit, integration, and e2e coverage</step>
+<step>3. Design mocking strategy</step>
+</phase>
+<phase name="implement">
+<objective>Implement and verify tests</objective>
+<step>1. Write tests following project patterns</step>
+<step>2. Run tests to verify they pass</step>
+<step>3. Verify coverage meets requirements</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Minor coverage gap in non-critical path</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Test flakiness detected</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Critical path lacks test coverage</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Tests reveal security vulnerability</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Follow project test patterns</must>
+<must>Run tests after creation</must>
+<must>Cover critical paths first</must>
+<avoid>Creating tests without understanding implementation</avoid>
+<avoid>Writing flaky or non-deterministic tests</avoid>
+<avoid>Ignoring existing test conventions</avoid>
+</constraints>

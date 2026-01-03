@@ -21,6 +21,11 @@ Provide structured methodology for requirements definition, ensuring comprehensi
 <patterns>
 <pattern name="investigation_workflow">
 <description>Sequential investigation process for gathering requirements context</description>
+<decision_tree name="when_to_use">
+<question>Is the current system state unclear or unknown?</question>
+<if_yes>Apply investigation workflow to gather context before requirements definition</if_yes>
+<if_no>Proceed directly to functional requirements if context is clear</if_no>
+</decision_tree>
 <steps>
 <step>Directory structure analysis using Glob</step>
 <step>Symbol analysis using get_symbols_overview</step>
@@ -33,6 +38,11 @@ Provide structured methodology for requirements definition, ensuring comprehensi
 
 <pattern name="question_scoring">
 <description>Score each question by these criteria (1-5 each) to prioritize requirement clarification</description>
+<decision_tree name="when_to_use">
+<question>Have unclear or ambiguous requirements been identified?</question>
+<if_yes>Apply question scoring to prioritize critical clarifications</if_yes>
+<if_no>Proceed with documenting clear requirements</if_no>
+</decision_tree>
 <criteria>
 <criterion name="design_branching">How much does the answer affect design direction?</criterion>
 <criterion name="irreversibility">How difficult to change after implementation?</criterion>
@@ -52,6 +62,11 @@ Total: 16 (critical - must answer before proceeding)
 
 <pattern name="question_classification">
 <description>Categories of questions that arise during requirements definition</description>
+<decision_tree name="when_to_use">
+<question>Do you need to categorize questions for stakeholder communication?</question>
+<if_yes>Apply question classification to organize by type</if_yes>
+<if_no>Use question scoring to prioritize by impact</if_no>
+</decision_tree>
 <types>
 <type name="spec_confirmation">Confirming existing behavior or constraints</type>
 <type name="design_choice">Choosing between valid alternatives</type>
@@ -70,6 +85,11 @@ Total: 16 (critical - must answer before proceeding)
 
 <pattern name="functional_requirements">
 <description>Format functional requirements with clear identifiers and acceptance criteria</description>
+<decision_tree name="when_to_use">
+<question>Are feature behaviors and capabilities clearly defined?</question>
+<if_yes>Apply functional requirements format with acceptance criteria</if_yes>
+<if_no>Use question scoring to clarify unclear behaviors first</if_no>
+</decision_tree>
 <example>
 FR-001: User Authentication
 Priority: mandatory
@@ -81,6 +101,11 @@ Priority: mandatory
 
 <pattern name="non_functional_requirements">
 <description>Specify measurable non-functional requirements across key dimensions</description>
+<decision_tree name="when_to_use">
+<question>Are quality attributes and constraints important for this feature?</question>
+<if_yes>Apply non-functional requirements with measurable targets</if_yes>
+<if_no>Focus on functional requirements only</if_no>
+</decision_tree>
 <example>
 Performance:
 - API response time < 200ms for 95th percentile
@@ -100,6 +125,11 @@ Maintainability:
 
 <pattern name="technical_specifications">
 <description>Document design policies, patterns, and key decisions with rationale</description>
+<decision_tree name="when_to_use">
+<question>Have key technical decisions been made or identified?</question>
+<if_yes>Apply technical specifications pattern with rationale and impact analysis</if_yes>
+<if_no>Continue requirements gathering to identify decision points</if_no>
+</decision_tree>
 <example>
 Design Decision: Use React Query for data fetching
 Rationale:
@@ -117,6 +147,11 @@ Impact Scope:
 
 <pattern name="requirement_quality_metrics">
 <description>Quantitative measures of requirement quality</description>
+<decision_tree name="when_to_use">
+<question>Are all requirements documented and ready for handoff?</question>
+<if_yes>Apply quality metrics to assess requirement completeness</if_yes>
+<if_no>Continue requirements definition until complete</if_no>
+</decision_tree>
 <example>
 Feasibility (0-100): Technical achievability given constraints
 - 90-100: Straightforward with existing tools
@@ -195,6 +230,67 @@ Objectivity (0-100): Evidence-based vs. assumption-based
 <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
 <practice priority="medium">Create dependency graphs showing task execution order</practice>
 </best_practices>
+
+<workflow>
+<phase name="gather">
+<objective>Gather requirement information</objective>
+<step>1. Understand user request and context</step>
+<step>2. Investigate existing codebase patterns</step>
+<step>3. Identify stakeholders and constraints</step>
+</phase>
+<phase name="clarify">
+<objective>Clarify ambiguous requirements</objective>
+<step>1. Score questions by impact (design, irreversibility, effort)</step>
+<step>2. Use AskUserQuestion for structured decisions</step>
+<step>3. Document answers and implications</step>
+</phase>
+<phase name="document">
+<objective>Document requirements formally</objective>
+<step>1. Write functional requirements (FR-XXX format)</step>
+<step>2. Write non-functional requirements</step>
+<step>3. Define acceptance criteria</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Minor ambiguity in non-critical detail</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Unclear requirement affecting scope</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Technically infeasible requirement</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Requirement violates security or ethics</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Investigate before concluding</must>
+<must>Ask questions before making assumptions</must>
+<must>Include (Recommended) option in AskUserQuestion</must>
+<avoid>Proceeding without answering critical questions</avoid>
+<avoid>Justifying user preferences over technical validity</avoid>
+<avoid>Documenting requirements without evidence</avoid>
+</constraints>
+
+<related_agents>
+<agent name="define">Primary agent for requirements definition and specification design</agent>
+<agent name="ask">Use for investigating current system state before requirements definition</agent>
+<agent name="execute">Delegate to after requirements are fully defined and approved</agent>
+</related_agents>
+
+<related_skills>
+<skill name="investigation-patterns">Use to understand current system state before requirements definition</skill>
+<skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
+<skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
+</related_skills>
 
 <anti_patterns>
 <avoid name="vague_requirements">

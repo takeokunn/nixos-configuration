@@ -48,6 +48,11 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
 (defmethod greet ((p person))
 (format t "Hello, ~a!~%" (person-name p)))
 </example>
+<decision_tree name="when_to_use">
+<question>Do you need polymorphic behavior based on multiple types?</question>
+<if_yes>Use defgeneric and defmethod for multiple dispatch</if_yes>
+<if_no>Use regular functions for single implementation</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="method_combination">
@@ -113,6 +118,11 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
       :report "Skip this entry"
       nil)))
 </example>
+<decision_tree name="when_to_use">
+<question>Can the error be recovered interactively or programmatically?</question>
+<if_yes>Provide restarts for different recovery strategies</if_yes>
+<if_no>Use handler-case for simple error handling</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="define_condition">
@@ -194,6 +204,11 @@ Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SB
 (:use #:cl)
 (:import-from #:my-project/utils #:helper))
 </example>
+<decision_tree name="when_to_use">
+<question>Do you want automatic dependency inference from package definitions?</question>
+<if_yes>Use package-inferred-system for modern projects</if_yes>
+<if_no>Use traditional defsystem with explicit component dependencies</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="test_system">
@@ -501,3 +516,64 @@ ros build myapp.ros
 <instead>Use reader macros sparingly and document them clearly when necessary.</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand Lisp code requirements</objective>
+<step>1. Check ASDF system definition</step>
+<step>2. Review existing macros and patterns</step>
+<step>3. Identify CLOS class hierarchies</step>
+</phase>
+<phase name="implement">
+<objective>Write idiomatic Common Lisp code</objective>
+<step>1. Use appropriate abstraction level</step>
+<step>2. Follow condition system for errors</step>
+<step>3. Design reusable macros carefully</step>
+</phase>
+<phase name="validate">
+<objective>Verify Lisp code correctness</objective>
+<step>1. Load system with ASDF</step>
+<step>2. Run tests with appropriate framework</step>
+<step>3. Check for compilation warnings</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Style inconsistency</example>
+<action>Fix formatting, follow project conventions</action>
+</level>
+<level severity="medium">
+<example>Compilation warning or type error</example>
+<action>Fix issue, add type declarations if needed</action>
+</level>
+<level severity="high">
+<example>Macro expansion error</example>
+<action>Debug with macroexpand, present options to user</action>
+</level>
+<level severity="critical">
+<example>Reader macro conflict</example>
+<action>Block operation, require careful namespace management</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Use ASDF for system definition</must>
+<must>Follow condition system for error handling</must>
+<must>Document macros with clear examples</must>
+<avoid>Overly complex macros without documentation</avoid>
+<avoid>Global state without clear lifecycle</avoid>
+<avoid>Reader macros without namespace isolation</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">CLOS hierarchy design, system architecture, and package structure planning</agent>
+<agent name="execute">Common Lisp implementation with proper condition handling and ASDF systems</agent>
+<agent name="code-quality">Ensure idiomatic Common Lisp patterns and proper documentation</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Navigate CLOS hierarchies, generic functions, and symbol definitions</skill>
+<skill name="context7-usage">Access ASDF, SBCL, and Common Lisp library documentation</skill>
+<skill name="investigation-patterns">Debug condition handling, macro expansion, and SBCL-specific issues</skill>
+</related_skills>

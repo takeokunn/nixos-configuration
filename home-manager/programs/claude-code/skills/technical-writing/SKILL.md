@@ -20,6 +20,11 @@ Provide structured patterns for writing technical blogs and articles that effect
 <patterns>
 <pattern name="tutorial">
 <description>Step-by-step guide to accomplish a specific task</description>
+<decision_tree name="when_to_use">
+<question>Are you teaching readers how to accomplish a specific task?</question>
+<if_yes>Create tutorial with step-by-step instructions and working examples</if_yes>
+<if_no>Consider concept explanation for understanding or comparison for decision-making</if_no>
+</decision_tree>
 <audience>Developers learning a new skill</audience>
 <structure>
 <section>Problem statement / What you'll learn</section>
@@ -34,6 +39,11 @@ Provide structured patterns for writing technical blogs and articles that effect
 
 <pattern name="concept_explanation">
 <description>Deep dive into a technical concept</description>
+<decision_tree name="when_to_use">
+<question>Are you explaining a complex concept for deeper understanding?</question>
+<if_yes>Create concept explanation with examples and misconceptions</if_yes>
+<if_no>Use tutorial for task-based learning or opinion piece for best practices</if_no>
+</decision_tree>
 <audience>Developers seeking understanding</audience>
 <structure>
 <section>Hook / Why this matters</section>
@@ -48,6 +58,11 @@ Provide structured patterns for writing technical blogs and articles that effect
 
 <pattern name="comparison">
 <description>Compare technologies, approaches, or tools</description>
+<decision_tree name="when_to_use">
+<question>Are you helping readers choose between multiple options?</question>
+<if_yes>Create comparison with feature analysis and use case recommendations</if_yes>
+<if_no>Use tutorial for implementation or concept explanation for understanding</if_no>
+</decision_tree>
 <audience>Developers making technical decisions</audience>
 <structure>
 <section>Context and criteria</section>
@@ -62,6 +77,11 @@ Provide structured patterns for writing technical blogs and articles that effect
 
 <pattern name="case_study">
 <description>Real-world implementation story</description>
+<decision_tree name="when_to_use">
+<question>Are you sharing a real-world implementation experience?</question>
+<if_yes>Create case study with challenge, solution, and lessons learned</if_yes>
+<if_no>Use tutorial for general how-to or opinion piece for best practices</if_no>
+</decision_tree>
 <audience>Developers and technical leaders</audience>
 <structure>
 <section>Background and challenge</section>
@@ -305,3 +325,66 @@ Provide structured patterns for writing technical blogs and articles that effect
 <instead>Start with a hook that captures attention immediately</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="plan">
+<objective>Plan the technical content</objective>
+<step>1. Define target audience and goals</step>
+<step>2. Research topic thoroughly</step>
+<step>3. Create outline structure</step>
+</phase>
+<phase name="write">
+<objective>Write clear technical content</objective>
+<step>1. Write with audience in mind</step>
+<step>2. Use clear, concise language</step>
+<step>3. Include relevant examples and visuals</step>
+</phase>
+<phase name="review">
+<objective>Ensure content quality</objective>
+<step>1. Check technical accuracy</step>
+<step>2. Review for readability</step>
+<step>3. Verify all examples work</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Grammar or style issue</example>
+<action>Fix issue, follow style guide</action>
+</level>
+<level severity="medium">
+<example>Technical inaccuracy in example</example>
+<action>Verify and correct example</action>
+</level>
+<level severity="high">
+<example>Misleading or incorrect technical claim</example>
+<action>Stop, verify claim before publishing</action>
+</level>
+<level severity="critical">
+<example>Content could cause harm if followed</example>
+<action>Block publication, require expert review</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Verify all technical claims</must>
+<must>Test all code examples</must>
+<must>Write for target audience level</must>
+<avoid>Jargon without explanation</avoid>
+<avoid>Untested code examples</avoid>
+<avoid>Overly complex explanations</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Article structure and outline planning</agent>
+<agent name="docs">Code example extraction and technical accuracy verification</agent>
+<agent name="execute">Publishing workflow and platform-specific formatting</agent>
+<agent name="bug">Fixing broken examples, outdated information, and technical errors</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for extracting code examples from projects</skill>
+<skill name="context7-usage">Library documentation lookup for accurate technical references</skill>
+<skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
+<skill name="technical-documentation">Creating reference documentation from blog content</skill>
+</related_skills>

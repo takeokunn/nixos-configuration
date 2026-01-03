@@ -168,6 +168,11 @@ collect (transform item))
 
 <pattern name="use_package">
 <description>Declarative package configuration with use-package keywords</description>
+<decision_tree name="when_to_use">
+<question>Does the package need lazy loading or declarative configuration?</question>
+<if_yes>Use use-package for clean, maintainable configuration</if_yes>
+<if_no>Use require for simple packages with no configuration needs</if_no>
+</decision_tree>
 <example>
 (use-package company
 :ensure t
@@ -341,6 +346,11 @@ user-emacs-directory)))
 
 <org_mode>
 <description>Outline-based notes, planning, and authoring</description>
+<decision_tree name="when_to_use">
+<question>Is this task related to note-taking, task management, or literate programming?</question>
+<if_yes>Use org-mode for structured, searchable content with rich features</if_yes>
+<if_no>Consider markdown-mode for simpler text editing needs</if_no>
+</decision_tree>
 
 <pattern name="capture">
 <description>Org-mode capture templates for quick note-taking</description>
@@ -476,6 +486,12 @@ user-emacs-directory)))
 </magit>
 
 <lsp_integration>
+<decision_tree name="when_to_use">
+<question>Do you need LSP features like completion, go-to-definition, and diagnostics?</question>
+<if_yes>Use eglot for built-in simplicity or lsp-mode for rich features</if_yes>
+<if_no>Use basic major modes without LSP overhead</if_no>
+</decision_tree>
+
 <pattern name="eglot">
 <description>Built-in LSP client (Emacs 29+)</description>
 <example>
@@ -682,3 +698,66 @@ user-emacs-directory)))
 <instead>Keep early-init.el minimal (frame settings, package setup)</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand Emacs Lisp requirements</objective>
+<step>1. Check package dependencies and autoloads</step>
+<step>2. Review existing configuration patterns</step>
+<step>3. Identify hook and advice usage</step>
+</phase>
+<phase name="implement">
+<objective>Write idiomatic Emacs Lisp code</objective>
+<step>1. Use lexical binding</step>
+<step>2. Follow Emacs Lisp conventions</step>
+<step>3. Provide appropriate customization options</step>
+</phase>
+<phase name="validate">
+<objective>Verify Emacs Lisp correctness</objective>
+<step>1. Byte-compile without warnings</step>
+<step>2. Test in clean Emacs instance</step>
+<step>3. Verify keybindings don't conflict</step>
+</phase>
+</workflow>
+
+<related_agents>
+<agent name="design">Architecture analysis for elisp package structure</agent>
+<agent name="docs">Docstring and commentary generation</agent>
+<agent name="execute">Elisp implementation and configuration tasks</agent>
+<agent name="bug">Debugging elisp errors and hook issues</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for elisp code navigation</skill>
+<skill name="context7-usage">Emacs documentation lookup via /websites/emacsdocs</skill>
+<skill name="investigation-patterns">Debugging package conflicts and performance issues</skill>
+<skill name="technical-documentation">Creating package documentation and README files</skill>
+</related_skills>
+
+<error_escalation>
+<level severity="low">
+<example>Byte-compilation warning</example>
+<action>Fix warning, ensure clean compilation</action>
+</level>
+<level severity="medium">
+<example>Configuration error on startup</example>
+<action>Debug with --debug-init, fix issue</action>
+</level>
+<level severity="high">
+<example>Package conflict or version mismatch</example>
+<action>Stop, present resolution options to user</action>
+</level>
+<level severity="critical">
+<example>Emacs becomes unusable</example>
+<action>Provide recovery steps, require user action</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Use lexical-binding: t in all files</must>
+<must>Provide customization via defcustom</must>
+<must>Follow Emacs Lisp naming conventions</must>
+<avoid>Dynamic binding without justification</avoid>
+<avoid>Overriding standard keybindings silently</avoid>
+<avoid>Blocking operations in hooks</avoid>
+</constraints>

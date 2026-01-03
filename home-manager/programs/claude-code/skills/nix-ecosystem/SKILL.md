@@ -87,6 +87,11 @@ final: prev: {
   myPackage = prev.myPackage.override { ... };
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Do you need to modify existing packages or add new ones globally?</question>
+<if_yes>Use overlays to extend nixpkgs</if_yes>
+<if_no>Use local package definitions with callPackage</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="callPackage">
@@ -337,6 +342,11 @@ in {
   );
 };
 </example>
+<decision_tree name="when_to_use">
+<question>Does your flake need to support multiple platforms?</question>
+<if_yes>Use per-system pattern with genAttrs or flake-utils</if_yes>
+<if_no>Define outputs for single system directly</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="devShell">
@@ -441,6 +451,11 @@ programs.git = {
   };
 };
 </example>
+<decision_tree name="when_to_use">
+<question>Does Home Manager provide built-in module for this program?</question>
+<if_yes>Use programs.* with configuration options</if_yes>
+<if_no>Use home.file or xdg.configFile for manual configuration</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="package_override">
@@ -632,6 +647,67 @@ imports = [
 <note>Advanced users optimizing evaluation time</note>
 </concept>
 </home_manager>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand Nix expression requirements</objective>
+<step>1. Identify target: flake, module, derivation, or expression</step>
+<step>2. Check existing patterns in project</step>
+<step>3. Consult Serena memories for conventions</step>
+</phase>
+<phase name="implement">
+<objective>Write idiomatic Nix code</objective>
+<step>1. Follow patterns from decision trees</step>
+<step>2. Use appropriate lib functions</step>
+<step>3. Apply best practices for target type</step>
+</phase>
+<phase name="validate">
+<objective>Verify Nix expression correctness</objective>
+<step>1. Check syntax with nix flake check</step>
+<step>2. Verify evaluation with nix eval</step>
+<step>3. Test build with nix build</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Style inconsistency in Nix expression</example>
+<action>Note issue, suggest formatting</action>
+</level>
+<level severity="medium">
+<example>Evaluation error or type mismatch</example>
+<action>Debug with --show-trace, fix expression</action>
+</level>
+<level severity="high">
+<example>Build failure in derivation</example>
+<action>Analyze build log, present options to user</action>
+</level>
+<level severity="critical">
+<example>Impure expression breaking reproducibility</example>
+<action>Block operation, require pure alternatives</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Use lib functions for complex operations</must>
+<must>Follow project's existing Nix patterns</must>
+<must>Maintain reproducibility in all expressions</must>
+<avoid>Impure paths and absolute references</avoid>
+<avoid>Nested with statements</avoid>
+<avoid>Overusing rec for attribute sets</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Architecture and module dependency analysis for Nix configurations</agent>
+<agent name="execute">Implementation of flake outputs, Home Manager modules, and NixOS configurations</agent>
+<agent name="code-quality">Nix expression validation, formatting, and best practices enforcement</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for navigating Nix expressions and module definitions</skill>
+<skill name="context7-usage">Fetch latest nixpkgs and Home Manager documentation</skill>
+<skill name="investigation-patterns">Debug evaluation errors and understand derivation failures</skill>
+</related_skills>
 
 <nixos>
 <patterns>

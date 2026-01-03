@@ -119,6 +119,11 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 </example>
 <warning>baseUrl: deprecated in TS 6.0, removed in TS 7.0; prefer paths without baseUrl</warning>
 <warning>moduleResolution: "node" (alias "node10"): deprecated in TS 5.x; use "nodenext" or "bundler"</warning>
+<decision_tree name="when_to_use">
+<question>Are you using a bundler or working with Node.js modules?</question>
+<if_yes>Configure appropriate moduleResolution: bundler for bundlers, nodenext for Node.js</if_yes>
+<if_no>Stick with default module resolution for simple projects</if_no>
+</decision_tree>
 </pattern>
 </module_resolution>
 
@@ -305,6 +310,11 @@ function isCat(pet: Cat | Dog): pet is Cat {
 return (pet as Cat).meow !== undefined;
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Does TypeScript need help narrowing union types?</question>
+<if_yes>Implement custom type guard with is predicate</if_yes>
+<if_no>Use built-in typeof or instanceof guards</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="in_operator">
@@ -367,6 +377,11 @@ return { success: false, error: e as Error };
 }
 }
 </example>
+<decision_tree name="when_to_use">
+<question>Do you need explicit error handling without exceptions?</question>
+<if_yes>Use Result type for functional error handling</if_yes>
+<if_no>Use try-catch for traditional exception handling</if_no>
+</decision_tree>
 </pattern>
 
 <pattern name="custom_errors">
@@ -693,3 +708,64 @@ type Status = (typeof Status)[keyof typeof Status];
 <practice priority="medium">Use 'const' assertions for literal types</practice>
 <practice priority="medium">Prefer interfaces for public APIs, types for unions/utilities</practice>
 </best_practices>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand TypeScript code requirements</objective>
+<step>1. Check tsconfig.json for project settings</step>
+<step>2. Review existing type patterns in project</step>
+<step>3. Identify type dependencies and imports</step>
+</phase>
+<phase name="implement">
+<objective>Write type-safe TypeScript code</objective>
+<step>1. Define types before implementation</step>
+<step>2. Use strict type checking features</step>
+<step>3. Follow project naming conventions</step>
+</phase>
+<phase name="validate">
+<objective>Verify TypeScript correctness</objective>
+<step>1. Run tsc --noEmit for type checking</step>
+<step>2. Check with ESLint for style issues</step>
+<step>3. Verify tests pass</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Minor type inference issue</example>
+<action>Add explicit type annotation</action>
+</level>
+<level severity="medium">
+<example>Type error in implementation</example>
+<action>Fix type, verify with tsc</action>
+</level>
+<level severity="high">
+<example>Breaking type change in public API</example>
+<action>Stop, present migration options to user</action>
+</level>
+<level severity="critical">
+<example>Type safety bypass with any or type assertion</example>
+<action>Block operation, require proper typing</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Enable strict mode in tsconfig.json</must>
+<must>Define explicit types for public APIs</must>
+<must>Use type guards for runtime type checking</must>
+<avoid>Using any type without justification</avoid>
+<avoid>Type assertions without validation</avoid>
+<avoid>Ignoring TypeScript errors with ts-ignore</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">API design, type system architecture, and module structure planning</agent>
+<agent name="execute">TypeScript implementation with strict type checking and configuration setup</agent>
+<agent name="code-quality">ESLint validation, type safety checks, and best practices enforcement</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol-level navigation for type definitions and interfaces</skill>
+<skill name="context7-usage">Fetch latest TypeScript compiler and tooling documentation</skill>
+<skill name="investigation-patterns">Debug type errors and investigate compilation issues</skill>
+</related_skills>

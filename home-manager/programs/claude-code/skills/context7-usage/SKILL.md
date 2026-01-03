@@ -26,27 +26,42 @@ Provide patterns for effective use of Context7 MCP for retrieving up-to-date lib
 </tools>
 
 <workflow>
+<phase name="identify">
+<objective>Identify documentation needs</objective>
+<step>1. Determine which library needs documentation</step>
+<step>2. Check if library ID is known or needs resolution</step>
+</phase>
 <phase name="resolve">
-<step>Call resolve-library-id with library name</step>
-<example>
-resolve-library-id libraryName="react"
-</example>
+<objective>Resolve library identifier</objective>
+<step>1. Use resolve-library-id to find the library</step>
+<step>2. Verify the resolved ID matches intended library</step>
 </phase>
-
-<phase name="select">
-<criterion>Name similarity to query</criterion>
-<criterion>Trust score (7-10 preferred)</criterion>
-<criterion>Code snippet count (higher is better)</criterion>
-<criterion>Description relevance</criterion>
-</phase>
-
 <phase name="fetch">
-<step>Call get-library-docs with selected ID</step>
-<example>
-get-library-docs context7CompatibleLibraryID="/facebook/react" topic="hooks"
-</example>
+<objective>Fetch relevant documentation</objective>
+<step>1. Use get-library-docs with resolved ID</step>
+<step>2. Specify topic if known for focused results</step>
+<step>3. Adjust tokens parameter for detail level</step>
 </phase>
 </workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Library not found with exact name</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Documentation not available for topic</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Context7 service unavailable</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Conflicting documentation versions</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
 
 <concept name="library_identifiers">
 <description>Common Context7-compatible library IDs for frequently used packages</description>
@@ -139,6 +154,16 @@ find_referencing_symbols name_path="getStaticProps"
 </example>
 </pattern>
 
+<decision_tree name="tool_selection">
+<question>What type of operation is needed?</question>
+<branch condition="Library name unknown">Use resolve-library-id to find library</branch>
+<branch condition="Library ID known">Use get-library-docs directly</branch>
+<branch condition="Specific API/feature">Use get-library-docs with topic parameter</branch>
+<branch condition="General overview">Use get-library-docs without topic</branch>
+<branch condition="Quick lookup">Use get-library-docs with 2000-3000 tokens</branch>
+<branch condition="Comprehensive search">Use get-library-docs with 8000-10000 tokens</branch>
+</decision_tree>
+
 <best_practices>
 <practice priority="critical">Always resolve library ID before fetching documentation</practice>
 <practice priority="critical">Prefer libraries with trust scores 7-10 for better documentation quality</practice>
@@ -169,6 +194,14 @@ find_referencing_symbols name_path="getStaticProps"
 </avoid>
 </anti_patterns>
 
+<constraints>
+<must>Verify library ID before fetching documentation</must>
+<must>Specify topic when known for focused results</must>
+<must>Check documentation version matches project requirements</must>
+<avoid>Fetching documentation without verifying library identity</avoid>
+<avoid>Using outdated documentation for current implementations</avoid>
+</constraints>
+
 <rules priority="critical">
 <rule>Always resolve library ID before fetching documentation</rule>
 <rule>Verify trust score is 7 or higher before using library documentation</rule>
@@ -180,3 +213,19 @@ find_referencing_symbols name_path="getStaticProps"
 <rule>Use versioned IDs when available for specific versions</rule>
 <rule>Combine with Serena for codebase verification workflows</rule>
 </rules>
+
+<related_agents>
+<agent name="design">Uses Context7 for architecture documentation and API design</agent>
+<agent name="execute">Uses Context7 to verify latest library patterns before implementation</agent>
+<agent name="bug">Uses Context7 to check for known issues and migration guides</agent>
+<agent name="ask">Uses Context7 to answer library-specific questions</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Combines with Context7 for codebase verification workflows</skill>
+<skill name="investigation-patterns">Uses Context7 for documentation research</skill>
+<skill name="nix-ecosystem">Uses Context7 for NixOS and Home Manager documentation</skill>
+<skill name="typescript-ecosystem">Uses Context7 for TypeScript and framework documentation</skill>
+<skill name="golang-ecosystem">Uses Context7 for Go library documentation</skill>
+<skill name="rust-ecosystem">Uses Context7 for Rust crate documentation</skill>
+</related_skills>

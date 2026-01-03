@@ -22,7 +22,6 @@
     xremap = {
       url = "github:xremap/nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
     nix-darwin = {
       url = "github:LnL7/nix-darwin";

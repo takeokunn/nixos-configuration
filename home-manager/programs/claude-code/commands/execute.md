@@ -23,27 +23,53 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 
 <workflow>
 <phase name="analyze">
-<step>What tasks need to be done?</step>
-<step>Which sub-agents are best suited?</step>
-<step>Which tasks can run in parallel?</step>
-<step>What dependencies exist between tasks?</step>
-<step>What verification is needed?</step>
+<objective>Understand the task scope and identify required resources</objective>
+<step order="1">What tasks need to be done?</step>
+<step order="2">Which sub-agents are best suited?</step>
+<step order="3">Which tasks can run in parallel?</step>
+<step order="4">What dependencies exist between tasks?</step>
+<step order="5">What verification is needed?</step>
 </phase>
 <phase name="decompose">
-<step>Split into manageable units</step>
-<step>Identify task boundaries</step>
+<objective>Break down complex tasks into manageable units</objective>
+<step order="1">Split into manageable units</step>
+<step order="2">Identify task boundaries</step>
 </phase>
 <phase name="structure">
-<step>Identify parallel vs sequential tasks</step>
-<step>Define task dependencies</step>
+<objective>Organize tasks for optimal execution</objective>
+<step order="1">Identify parallel vs sequential tasks</step>
+<step order="2">Define task dependencies</step>
 </phase>
+<reflection_checkpoint id="analysis_quality">
+<question>Have I gathered sufficient evidence to proceed?</question>
+<question>Are there gaps in my understanding?</question>
+<threshold>If confidence less than 70, seek more evidence or ask user</threshold>
+</reflection_checkpoint>
 <phase name="assign">
-<step>Delegate tasks with detailed instructions</step>
-<step>Provide context and constraints</step>
+<objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
+<step order="1">Delegate tasks with detailed instructions</step>
+<step order="2">Provide context and constraints</step>
+</phase>
+<reflection_checkpoint id="assignment_complete" after="assign">
+<questions>
+<question weight="0.4">Have all tasks been properly delegated?</question>
+<question weight="0.3">Are the sub-agent instructions clear?</question>
+<question weight="0.3">Are dependencies between tasks handled?</question>
+</questions>
+<threshold min="70" action="proceed">
+<below_threshold>Refine task assignments or ask user</below_threshold>
+</threshold>
+</reflection_checkpoint>
+<phase name="failure_handling">
+<objective>Handle errors and edge cases gracefully</objective>
+<step order="1">If tool call fails: Log error, attempt alternative approach</step>
+<step order="2">If data unavailable: Document gap, proceed with partial analysis</step>
+<step order="3">If contradictory evidence: Flag uncertainty, request user clarification</step>
 </phase>
 <phase name="consolidate">
-<step>Verify sub-agent outputs</step>
-<step>Combine results</step>
+<objective>Integrate sub-agent outputs into cohesive result</objective>
+<step order="1">Verify sub-agent outputs</step>
+<step order="2">Combine results</step>
 </phase>
 </workflow>
 
@@ -67,11 +93,20 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base management</agent>
 </agents>
 
-<parallel_execution>
-<group name="quality_assurance">quality + security (no dependencies)</group>
-<group name="implementation">test + docs (if independent)</group>
-<note>review: Sequential - after implementation</note>
-</parallel_execution>
+<execution_graph>
+<parallel_group id="quality_assurance" depends_on="none">
+<agent>quality</agent>
+<agent>security</agent>
+</parallel_group>
+<parallel_group id="implementation" depends_on="none">
+<agent>test</agent>
+<agent>docs</agent>
+</parallel_group>
+<sequential_phase id="review_phase" depends_on="quality_assurance,implementation">
+<agent>review</agent>
+<reason>Requires completion of quality checks and implementation</reason>
+</sequential_phase>
+</execution_graph>
 
 <delegation>
 <requirement>Specific scope and expected deliverables</requirement>
@@ -95,6 +130,120 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <rule>Separate phases: research → design → implementation</rule>
 <rule>No multi-file edits in single call</rule>
 </codex_usage>
+
+<parallelization>
+<capability>
+<parallel_safe>true</parallel_safe>
+<read_only>false</read_only>
+<modifies_state>local</modifies_state>
+</capability>
+<execution_strategy>
+<max_parallel_agents>4</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
+</parallelization>
+
+<decision_criteria>
+<criterion name="confidence_calculation">
+<factor name="task_clarity" weight="0.3">
+<score range="90-100">Clear requirements with acceptance criteria</score>
+<score range="70-89">Clear requirements</score>
+<score range="50-69">Some ambiguity</score>
+<score range="0-49">Unclear requirements</score>
+</factor>
+<factor name="implementation_quality" weight="0.4">
+<score range="90-100">All tests pass, code reviewed</score>
+<score range="70-89">Tests pass</score>
+<score range="50-69">Some issues remain</score>
+<score range="0-49">Major issues</score>
+</factor>
+<factor name="verification_completeness" weight="0.3">
+<score range="90-100">Full verification by sub-agents</score>
+<score range="70-89">Core verification done</score>
+<score range="50-69">Partial verification</score>
+<score range="0-49">Minimal verification</score>
+</factor>
+</criterion>
+<validation_tests>
+<test name="fully_verified">
+<input>task_clarity=95, implementation_quality=90, verification_completeness=95</input>
+<calculation>(95*0.3)+(90*0.4)+(95*0.3) = 28.5+36+28.5 = 93</calculation>
+<expected_status>success</expected_status>
+<reasoning>Clear requirements with tested code and full verification yields high confidence</reasoning>
+</test>
+<test name="boundary_warning_79">
+<input>task_clarity=80, implementation_quality=75, verification_completeness=85</input>
+<calculation>(80*0.3)+(75*0.4)+(85*0.3) = 24+30+25.5 = 79.5</calculation>
+<expected_status>warning</expected_status>
+<reasoning>Tests pass but some issues remain results in 79.5, triggers warning</reasoning>
+</test>
+<test name="boundary_success_80">
+<input>task_clarity=85, implementation_quality=75, verification_completeness=85</input>
+<calculation>(85*0.3)+(75*0.4)+(85*0.3) = 25.5+30+25.5 = 81</calculation>
+<expected_status>success</expected_status>
+<reasoning>Weighted average 81 meets success threshold</reasoning>
+</test>
+<test name="major_issues">
+<input>task_clarity=50, implementation_quality=45, verification_completeness=50</input>
+<calculation>(50*0.3)+(45*0.4)+(50*0.3) = 15+18+15 = 48</calculation>
+<expected_status>error</expected_status>
+<reasoning>Unclear requirements with major issues results in 48, triggers error</reasoning>
+</test>
+</validation_tests>
+</decision_criteria>
+
+<enforcement>
+<mandatory_behaviors>
+<behavior id="EXEC-B001" priority="critical">
+<trigger>Before implementation</trigger>
+<action>Check Serena memories for existing patterns</action>
+<verification>Pattern check in output</verification>
+</behavior>
+<behavior id="EXEC-B002" priority="critical">
+<trigger>After implementation</trigger>
+<action>Delegate verification to quality and security agents</action>
+<verification>Agent reports in output</verification>
+</behavior>
+</mandatory_behaviors>
+<prohibited_behaviors>
+<behavior id="EXEC-P001" priority="critical">
+<trigger>Always</trigger>
+<action>Implementing without sub-agent delegation</action>
+<response>Block operation, delegate to specialized agents</response>
+</behavior>
+</prohibited_behaviors>
+</enforcement>
+
+<error_escalation>
+<level severity="low">
+<example>Minor code style inconsistency</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Test failure or unclear implementation approach</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Breaking change or major implementation blocker</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Security vulnerability or data loss risk</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<related_agents>
+<agent name="define">When implementation reveals unclear requirements</agent>
+<agent name="bug">When implementation encounters unexpected errors</agent>
+<agent name="feedback">Review work after execution completion</agent>
+</related_agents>
+
+<related_skills>
+<skill name="execution-workflow">Core delegation and orchestration patterns</skill>
+<skill name="serena-usage">Check memories for existing patterns before implementation</skill>
+<skill name="testing-patterns">Ensure proper test coverage</skill>
+</related_skills>
 
 <constraints>
 <must>Delegate detailed work to sub-agents</must>

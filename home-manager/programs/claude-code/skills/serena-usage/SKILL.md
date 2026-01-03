@@ -231,6 +231,19 @@ read_memory "typescript-patterns" # Load relevant patterns
 write_memory "api-client-pattern" "HTTP client pattern using fetch with retry logic..."
 </example>
 </pattern>
+
+<decision_tree name="tool_selection">
+<question>What type of operation is needed?</question>
+<branch condition="Symbol lookup">Use find_symbol with name_path_pattern</branch>
+<branch condition="File structure overview">Use get_symbols_overview with appropriate depth</branch>
+<branch condition="Find references">Use find_referencing_symbols</branch>
+<branch condition="Pattern search">Use search_for_pattern with regex</branch>
+<branch condition="Refactor symbol">Use replace_symbol_body</branch>
+<branch condition="Rename symbol">Use rename_symbol for consistent updates</branch>
+<branch condition="Add code">Use insert_before_symbol or insert_after_symbol</branch>
+<branch condition="Check patterns">Use list_memories then read_memory</branch>
+<branch condition="Record patterns">Use write_memory</branch>
+</decision_tree>
 </patterns>
 
 <anti_patterns>
@@ -260,6 +273,27 @@ write_memory "api-client-pattern" "HTTP client pattern using fetch with retry lo
 </avoid>
 </anti_patterns>
 
+<workflow>
+<phase name="prepare">
+<objective>Prepare for effective Serena tool usage</objective>
+<step>1. Check list_memories for existing patterns</step>
+<step>2. Identify target symbols or files</step>
+<step>3. Choose appropriate tool based on decision_tree</step>
+</phase>
+<phase name="execute">
+<objective>Execute Serena operations efficiently</objective>
+<step>1. Start with get_symbols_overview for file structure</step>
+<step>2. Use find_symbol with include_body for details</step>
+<step>3. Use find_referencing_symbols for dependencies</step>
+</phase>
+<phase name="verify">
+<objective>Verify results and record patterns</objective>
+<step>1. Call think_about_collected_information after searches</step>
+<step>2. Record new patterns with write_memory</step>
+<step>3. Call think_about_whether_you_are_done when complete</step>
+</phase>
+</workflow>
+
 <best_practices>
 <practice priority="critical">Always check memories with list_memories and read_memory before implementing new features</practice>
 <practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files</practice>
@@ -283,3 +317,52 @@ write_memory "api-client-pattern" "HTTP client pattern using fetch with retry lo
 <rule>Record new patterns with write_memory</rule>
 <rule>Call think_about_whether_you_are_done when task appears complete</rule>
 </rules>
+
+<related_agents>
+<agent name="design">Uses Serena for architecture analysis and pattern discovery</agent>
+<agent name="code-quality">Uses Serena for complexity analysis and refactoring</agent>
+<agent name="bug">Uses Serena for tracing dependencies and impact analysis</agent>
+<agent name="execute">Uses Serena for symbol-level operations and memory management</agent>
+<agent name="security">Uses Serena for vulnerability detection and security pattern analysis</agent>
+<agent name="database">Uses Serena for schema analysis and query optimization</agent>
+<agent name="performance">Uses Serena for performance bottleneck identification and optimization</agent>
+<agent name="test">Uses Serena for test coverage analysis and test generation</agent>
+</related_agents>
+
+<error_escalation>
+<level severity="low">
+<example>Symbol not found with exact match</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Memory file not found</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Conflicting information in memories</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Memory corruption or invalid state</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<related_skills>
+<skill name="investigation-patterns">Investigation methodology using Serena tools</skill>
+<skill name="nix-ecosystem">Nix patterns stored in Serena memories</skill>
+<skill name="typescript-ecosystem">TypeScript patterns stored in Serena memories</skill>
+<skill name="golang-ecosystem">Go patterns stored in Serena memories</skill>
+<skill name="rust-ecosystem">Rust patterns stored in Serena memories</skill>
+<skill name="common-lisp-ecosystem">Common Lisp patterns stored in Serena memories</skill>
+<skill name="emacs-ecosystem">Emacs patterns stored in Serena memories</skill>
+</related_skills>
+
+<constraints>
+<must>Check memories before implementing new features</must>
+<must>Use symbol operations over reading entire files</must>
+<must>Restrict searches by relative_path when scope is known</must>
+<avoid>Reading entire files when symbol operations suffice</avoid>
+<avoid>Unscoped searches across entire codebase</avoid>
+<avoid>Ignoring existing memory patterns</avoid>
+</constraints>

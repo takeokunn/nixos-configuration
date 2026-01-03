@@ -19,6 +19,11 @@ Provide structured patterns for creating technical documentation including READM
 <patterns>
 <pattern name="readme_document_type">
 <description>Project introduction and quick start guide</description>
+<decision_tree name="when_to_use">
+<question>Is this the main entry point for project documentation?</question>
+<if_yes>Create README with quick start and overview</if_yes>
+<if_no>Consider using design doc for detailed architecture or user guide for end-user documentation</if_no>
+</decision_tree>
 <context>
 <audience>Developers, contributors, users</audience>
 <when_to_use>Creating or updating main project documentation</when_to_use>
@@ -36,6 +41,11 @@ Provide structured patterns for creating technical documentation including READM
 
 <pattern name="api_specification_document_type">
 <description>API reference documentation</description>
+<decision_tree name="when_to_use">
+<question>Are you documenting API endpoints or SDK interfaces?</question>
+<if_yes>Create API specification with authentication, endpoints, and examples</if_yes>
+<if_no>Use README for library usage or design doc for internal architecture</if_no>
+</decision_tree>
 <context>
 <audience>Developers integrating with the API</audience>
 <when_to_use>Documenting REST APIs, GraphQL schemas, or SDK interfaces</when_to_use>
@@ -52,6 +62,11 @@ Provide structured patterns for creating technical documentation including READM
 
 <pattern name="design_document_type">
 <description>Technical design and architecture documentation</description>
+<decision_tree name="when_to_use">
+<question>Are you proposing a major feature or architectural change?</question>
+<if_yes>Create design document with technical details, alternatives, and rollout plan</if_yes>
+<if_no>Use inline code comments for small changes or README for usage instructions</if_no>
+</decision_tree>
 <context>
 <audience>Team members, reviewers, future maintainers</audience>
 <when_to_use>Proposing new features, architectural changes, or major refactors</when_to_use>
@@ -70,6 +85,11 @@ Provide structured patterns for creating technical documentation including READM
 
 <pattern name="user_guide_document_type">
 <description>End-user facing documentation</description>
+<decision_tree name="when_to_use">
+<question>Is your audience non-technical end users?</question>
+<if_yes>Create user guide with step-by-step tutorials and troubleshooting</if_yes>
+<if_no>Use API docs for developers or README for contributors</if_no>
+</decision_tree>
 <context>
 <audience>Non-technical users, administrators</audience>
 <when_to_use>Creating help documentation, tutorials, or product guides</when_to_use>
@@ -485,3 +505,66 @@ The server can be started by running the following command.
 <instead>Provide specific, numbered steps with expected outcomes</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="analyze">
+<objective>Understand documentation requirements</objective>
+<step>1. Identify target audience and purpose</step>
+<step>2. Review existing documentation</step>
+<step>3. Determine document type (API, design, user guide)</step>
+</phase>
+<phase name="create">
+<objective>Write clear, accurate documentation</objective>
+<step>1. Structure content logically</step>
+<step>2. Include code examples where appropriate</step>
+<step>3. Verify accuracy against implementation</step>
+</phase>
+<phase name="validate">
+<objective>Ensure documentation quality</objective>
+<step>1. Check for technical accuracy</step>
+<step>2. Verify examples are runnable</step>
+<step>3. Review for clarity and completeness</step>
+</phase>
+</workflow>
+
+<error_escalation>
+<level severity="low">
+<example>Minor formatting inconsistency</example>
+<action>Fix formatting, follow style guide</action>
+</level>
+<level severity="medium">
+<example>Outdated information detected</example>
+<action>Update content, verify with code</action>
+</level>
+<level severity="high">
+<example>Incorrect technical information</example>
+<action>Stop, verify with implementation before publishing</action>
+</level>
+<level severity="critical">
+<example>Security-sensitive information exposed</example>
+<action>Block publication, require security review</action>
+</level>
+</error_escalation>
+
+<constraints>
+<must>Verify accuracy against actual implementation</must>
+<must>Include runnable code examples</must>
+<must>Follow project documentation style</must>
+<avoid>Documenting without reading code</avoid>
+<avoid>Adding timestamps to documents</avoid>
+<avoid>Duplicating information unnecessarily</avoid>
+</constraints>
+
+<related_agents>
+<agent name="design">Requirements analysis and documentation structure planning</agent>
+<agent name="docs">Technical documentation writing and generation</agent>
+<agent name="execute">Documentation deployment and publishing tasks</agent>
+<agent name="bug">Fixing broken links, outdated examples, and documentation inconsistencies</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Symbol operations for extracting code examples and API signatures</skill>
+<skill name="context7-usage">Library documentation lookup for accurate API references</skill>
+<skill name="investigation-patterns">Analyzing codebases to understand features for documentation</skill>
+<skill name="technical-writing">Creating blog posts and tutorials from documentation</skill>
+</related_skills>
