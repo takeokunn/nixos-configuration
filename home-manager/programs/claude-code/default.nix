@@ -92,6 +92,7 @@
       design = builtins.readFile ./agents/design.md;
       devops = builtins.readFile ./agents/devops.md;
       docs = builtins.readFile ./agents/docs.md;
+      fact-check = builtins.readFile ./agents/fact-check.md;
       git = builtins.readFile ./agents/git.md;
       performance = builtins.readFile ./agents/performance.md;
       quality-assurance = builtins.readFile ./agents/quality-assurance.md;
@@ -116,6 +117,7 @@
       requirements-definition = builtins.readFile ./skills/requirements-definition/SKILL.md;
       investigation-patterns = builtins.readFile ./skills/investigation-patterns/SKILL.md;
       execution-workflow = builtins.readFile ./skills/execution-workflow/SKILL.md;
+      fact-check = builtins.readFile ./skills/fact-check/SKILL.md;
       nix-ecosystem = builtins.readFile ./skills/nix-ecosystem/SKILL.md;
       typescript-ecosystem = builtins.readFile ./skills/typescript-ecosystem/SKILL.md;
       golang-ecosystem = builtins.readFile ./skills/golang-ecosystem/SKILL.md;

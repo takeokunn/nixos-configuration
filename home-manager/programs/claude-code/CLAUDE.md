@@ -113,6 +113,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <skill name="context7-usage">Context7 MCP documentation retrieval</skill>
 <skill name="investigation-patterns">Evidence-based code analysis and debugging</skill>
 <skill name="execution-workflow">Task delegation and code review</skill>
+<skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 <skill name="nix-ecosystem">Nix language, flakes, and Home Manager patterns</skill>
 <skill name="typescript-ecosystem">TypeScript language, tsconfig, type patterns</skill>
 <skill name="golang-ecosystem">Go language, modules, and toolchain patterns</skill>

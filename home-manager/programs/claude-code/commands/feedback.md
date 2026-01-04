@@ -133,6 +133,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <agents>
 <agent name="plan" subagent_type="Plan" readonly="true">Execution plan review</agent>
 <agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
@@ -145,6 +146,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <agent name="docs" subagent_type="docs" readonly="true">Accuracy, structure, completeness</agent>
 <agent name="performance" subagent_type="performance" readonly="true">Performance review</agent>
 <agent name="test" subagent_type="test" readonly="true">Test coverage review</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
@@ -154,6 +156,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <agent name="review" subagent_type="quality-assurance" readonly="true">Comprehensive work review</agent>
 <agent name="complexity" subagent_type="code-quality" readonly="true">Code complexity review</agent>
 <agent name="memory" subagent_type="general-purpose" readonly="true">Consistency check with existing patterns</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
@@ -165,6 +168,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Investigation methodology evaluation</agent>
 <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis and dependency investigation evaluation</agent>
 <agent name="explore" subagent_type="explore" readonly="true">Code path coverage evaluation</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
@@ -177,6 +181,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <agent name="explore" subagent_type="explore" readonly="true">Evidence gathering evaluation</agent>
 <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Answer accuracy assessment</agent>
 <agent name="code-quality" subagent_type="code-quality" readonly="true">Reference precision and conclusion validity</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification</agent>
 </agents>
 <execution>All agents in parallel</execution>
 </mode>
@@ -198,6 +203,17 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 - Problem: Description
 - Recommendation: Proposal</warning>
 <good_practice>[Category] Commendable aspects</good_practice>
+<fact_check_results>
+<verified_claims>Claims confirmed against external sources (Context7, WebSearch)</verified_claims>
+<flagged_claims>Claims with verification confidence below 80
+- Claim: {claim}
+- Source referenced: {source}
+- Verification result: {result}
+- Confidence: {XX}/100
+- Evidence: {evidence}
+- Recommendation: {correction}</flagged_claims>
+<unverifiable_claims>Claims that could not be checked due to unavailable sources</unverifiable_claims>
+</fact_check_results>
 <recommended_actions>
 - [High] Action
 - [Medium] Action
@@ -258,6 +274,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <skill name="execution-workflow">Understanding work review methodology</skill>
 <skill name="investigation-patterns">Evaluating evidence quality in investigations</skill>
 <skill name="testing-patterns">Assessing test coverage and quality</skill>
+<skill name="fact-check">Verifying external source claims</skill>
 </related_skills>
 
 <constraints>
