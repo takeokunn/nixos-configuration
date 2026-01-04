@@ -21,7 +21,7 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <modifies_state>local</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>2</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -47,6 +47,38 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <score range="0-49">Incomplete</score>
 </factor>
 </criterion>
+<validation_tests>
+<test name="clear_delegation">
+<input>content_accuracy=95, structure_quality=90, completeness=95</input>
+<calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
+<expected_status>success</expected_status>
+<reasoning>Verified content with clear structure yields high confidence</reasoning>
+</test>
+<test name="boundary_warning_79">
+<input>content_accuracy=80, structure_quality=75, completeness=80</input>
+<calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
+<expected_status>warning</expected_status>
+<reasoning>Core content verified but some structural issues results in 78.5, triggers warning</reasoning>
+</test>
+<test name="boundary_success_80">
+<input>content_accuracy=85, structure_quality=75, completeness=80</input>
+<calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
+<expected_status>success</expected_status>
+<reasoning>Weighted average 80.5, meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>content_accuracy=60, structure_quality=55, completeness=60</input>
+<calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
+</test>
+<test name="unverified_content">
+<input>content_accuracy=50, structure_quality=55, completeness=45</input>
+<calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
+<expected_status>error</expected_status>
+<reasoning>Unverified content with poor structure results in 50, triggers error</reasoning>
+</test>
+</validation_tests>
 </decision_criteria>
 
 <enforcement>

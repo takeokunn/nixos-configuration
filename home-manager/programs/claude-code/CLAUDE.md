@@ -144,12 +144,12 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <modifies_state>orchestration</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>4</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 <parallel_groups>
 <group id="investigation" agents="explore,design,database,performance" independent="true"/>
 <group id="quality" agents="code-quality,security,test" independent="true"/>
-<group id="review" agents="quality-assurance,docs" independent="true"/>
+<group id="review" agents="quality-assurance,docs,fact-check" independent="true"/>
 </parallel_groups>
 </execution_strategy>
 </parallelization>
@@ -194,7 +194,13 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <expected_status>success</expected_status>
 <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
 </test>
-<test name="unclear_task">
+<test name="boundary_error_59">
+<input>task_understanding=60, agent_selection=55, context_availability=60</input>
+<calculation>(60*0.3)+(55*0.3)+(60*0.4) = 18+16.5+24 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
+</test>
+<test name="unclear_delegation">
 <input>task_understanding=50, agent_selection=55, context_availability=45</input>
 <calculation>(50*0.3)+(55*0.3)+(45*0.4) = 15+16.5+18 = 49.5</calculation>
 <expected_status>error</expected_status>

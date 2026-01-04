@@ -8,6 +8,20 @@ version: 0.2.0
 Provide systematic patterns for codebase investigation and debugging, ensuring evidence-based analysis with proper confidence assessment.
 </purpose>
 
+<rules priority="critical">
+<rule>Always provide file:line references for all findings using format path/to/file.ext:line_number</rule>
+<rule>Rate confidence and coverage metrics for all investigation results</rule>
+<rule>Complete investigation before proposing solutions</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use Serena symbol tools before reading entire files</rule>
+<rule>Independently verify claims rather than confirming assumptions</rule>
+<rule>Document information gaps and unclear points</rule>
+<rule>Check multiple sources to increase confidence</rule>
+<rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
+</rules>
+
 <patterns>
 <pattern name="scope_classification">
 <description>Classify the question type to determine investigation approach</description>
@@ -347,7 +361,9 @@ Identify divergence from expected behavior
 </related_agents>
 
 <related_skills>
+<skill name="serena-usage">Use for memory operations and symbol-level code navigation</skill>
 <skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
+<skill name="fact-check">Use to verify external documentation and library behavior</skill>
 <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
 <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
 </related_skills>

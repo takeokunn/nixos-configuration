@@ -191,7 +191,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>4</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -235,6 +235,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
 <expected_status>success</expected_status>
 <reasoning>Weighted average 80.5 meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>requirement_clarity=60, technical_feasibility=55, stakeholder_alignment=60</input>
+<calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
 </test>
 <test name="ambiguous_requirements">
 <input>requirement_clarity=50, technical_feasibility=55, stakeholder_alignment=45</input>

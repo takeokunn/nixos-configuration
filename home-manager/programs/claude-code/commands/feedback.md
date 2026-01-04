@@ -26,7 +26,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>2</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -116,6 +116,12 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
 <expected_status>success</expected_status>
 <reasoning>Weighted average 80.5 meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>review_depth=60, feedback_actionability=55, issue_prioritization=60</input>
+<calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
 </test>
 <test name="superficial_review">
 <input>review_depth=50, feedback_actionability=45, issue_prioritization=50</input>

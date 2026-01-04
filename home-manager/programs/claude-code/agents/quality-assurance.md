@@ -175,17 +175,17 @@ Expert quality assurance agent for code review, debugging, error handling design
 <expected_status>success</expected_status>
 <reasoning>Weighted average 80.5 meets success threshold</reasoning>
 </test>
-<test name="boundary_warning_60">
-<input>review_coverage=60, issue_detection=60, feedback_quality=60</input>
-<calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-<expected_status>warning</expected_status>
-<reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-</test>
 <test name="boundary_error_59">
 <input>review_coverage=55, issue_detection=60, feedback_quality=65</input>
 <calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
+</test>
+<test name="incomplete_review">
+<input>review_coverage=40, issue_detection=45, feedback_quality=50</input>
+<calculation>(40*0.4)+(45*0.3)+(50*0.3) = 16+13.5+15 = 44.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Minimal review with unclear findings results in 44.5, triggers error</reasoning>
 </test>
 </validation_tests>
 </decision_criteria>

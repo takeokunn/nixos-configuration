@@ -87,7 +87,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>3</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -131,6 +131,12 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 40+24+16 = 80</calculation>
 <expected_status>success</expected_status>
 <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>evidence_quality=60, answer_completeness=55, source_verification=60</input>
+<calculation>(60*0.5)+(55*0.3)+(60*0.2) = 30+16.5+12 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
 </test>
 <test name="speculation_only">
 <input>evidence_quality=45, answer_completeness=55, source_verification=40</input>

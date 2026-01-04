@@ -95,7 +95,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>3</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -139,6 +139,12 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <calculation>(85*0.5)+(75*0.3)+(75*0.2) = 42.5+22.5+15 = 80</calculation>
 <expected_status>success</expected_status>
 <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>root_cause_certainty=60, evidence_chain=55, fix_viability=60</input>
+<calculation>(60*0.5)+(55*0.3)+(60*0.2) = 30+16.5+12 = 58.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
 </test>
 <test name="unclear_cause">
 <input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>

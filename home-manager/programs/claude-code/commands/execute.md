@@ -138,7 +138,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <modifies_state>local</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>4</max_parallel_agents>
+<max_parallel_agents>10</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -182,6 +182,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <calculation>(85*0.3)+(75*0.4)+(85*0.3) = 25.5+30+25.5 = 81</calculation>
 <expected_status>success</expected_status>
 <reasoning>Weighted average 81 meets success threshold</reasoning>
+</test>
+<test name="boundary_error_59">
+<input>task_clarity=65, implementation_quality=55, verification_completeness=60</input>
+<calculation>(65*0.3)+(55*0.4)+(60*0.3) = 19.5+22+18 = 59.5</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>
 <test name="major_issues">
 <input>task_clarity=50, implementation_quality=45, verification_completeness=50</input>

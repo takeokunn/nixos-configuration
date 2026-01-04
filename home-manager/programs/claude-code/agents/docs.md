@@ -154,17 +154,17 @@ Expert documentation agent for README generation, API specification management, 
 <expected_status>success</expected_status>
 <reasoning>Weighted average 80.5 meets success threshold</reasoning>
 </test>
-<test name="boundary_warning_60">
-<input>code_understanding=60, documentation_completeness=60, accuracy=60</input>
-<calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-<expected_status>warning</expected_status>
-<reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-</test>
 <test name="boundary_error_59">
 <input>code_understanding=55, documentation_completeness=60, accuracy=65</input>
 <calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
+</test>
+<test name="incomplete_documentation">
+<input>code_understanding=45, documentation_completeness=50, accuracy=40</input>
+<calculation>(45*0.4)+(50*0.3)+(40*0.3) = 18+15+12 = 45</calculation>
+<expected_status>error</expected_status>
+<reasoning>Superficial understanding with minimal documentation yields low confidence</reasoning>
 </test>
 </validation_tests>
 </decision_criteria>

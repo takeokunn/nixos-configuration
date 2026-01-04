@@ -237,6 +237,12 @@ Expert system design agent for architecture evaluation, requirements definition,
 <expected_status>success</expected_status>
 <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
 </test>
+<test name="boundary_error_59">
+<input>architecture_coverage=60, pattern_match=60, estimation_basis=58</input>
+<calculation>(60*0.4)+(60*0.3)+(58*0.3) = 24+18+17.4 = 59.4</calculation>
+<expected_status>error</expected_status>
+<reasoning>Weighted average 59.4 is below 60, triggers error</reasoning>
+</test>
 <test name="ambiguous_pattern">
 <input>architecture_coverage=60, pattern_match=50, estimation_basis=55</input>
 <calculation>(60*0.4)+(50*0.3)+(55*0.3) = 24+15+16.5 = 55.5</calculation>

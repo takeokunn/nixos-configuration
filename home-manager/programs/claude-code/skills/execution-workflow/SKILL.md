@@ -46,27 +46,6 @@ Provide structured workflow for task execution through delegation to specialized
 </phase>
 </workflow>
 
-<workflow>
-<phase name="plan">
-<objective>Plan task execution strategy</objective>
-<step>1. Identify tasks and dependencies</step>
-<step>2. Determine parallel vs sequential execution</step>
-<step>3. Assign appropriate sub-agents</step>
-</phase>
-<phase name="delegate">
-<objective>Delegate to specialized agents</objective>
-<step>1. Provide clear scope and deliverables</step>
-<step>2. Include target file paths</step>
-<step>3. Set explicit constraints</step>
-</phase>
-<phase name="consolidate">
-<objective>Verify and combine results</objective>
-<step>1. Verify sub-agent outputs</step>
-<step>2. Handle failures gracefully</step>
-<step>3. Synthesize final result</step>
-</phase>
-</workflow>
-
 <error_escalation>
 <level severity="low">
 <example>Sub-agent returns partial results</example>
@@ -320,7 +299,7 @@ Positive: What was done well
 </related_agents>
 
 <related_skills>
-<skill name="requirements-definition">Use before execution to clarify implementation scope</skill>
+<skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
 <skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
 <skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
 </related_skills>
