@@ -1,12 +1,25 @@
 ---
 name: Rust Ecosystem
 description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Provides comprehensive Rust ecosystem patterns and best practices.
-version: 0.1.0
 ---
 
 <purpose>
 Provide comprehensive patterns for Rust language, Cargo project management, and toolchain configuration.
 </purpose>
+
+<tools>
+<tool>Read - Analyze Cargo.toml and Rust source files</tool>
+<tool>Edit - Modify Rust code and Cargo configuration</tool>
+<tool>Bash - Run cargo build, cargo test, cargo clippy commands</tool>
+<tool>mcp__context7__get-library-docs - Fetch latest Rust documentation</tool>
+</tools>
+
+<concepts>
+<concept name="ownership">Each value has one owner; when owner goes out of scope, value is dropped</concept>
+<concept name="borrowing">Immutable (&T) allows multiple borrows; mutable (&mut T) allows exactly one; cannot mix</concept>
+<concept name="result_option">Result for recoverable errors (Ok/Err), Option for optional values (Some/None); use ? for propagation</concept>
+<concept name="traits">Define behavior with traits; use derive for common implementations (Debug, Clone, PartialEq)</concept>
+</concepts>
 
 <rust_language>
 <ownership_borrowing>
@@ -384,6 +397,19 @@ fail-fast = false
 <practice priority="medium">Use integration tests in tests/ for API testing</practice>
 <practice priority="medium">Set rust-version in Cargo.toml for MSRV</practice>
 </best_practices>
+
+<rules priority="critical">
+<rule>Run cargo clippy before committing; fix all warnings</rule>
+<rule>Prefer safe Rust over unsafe blocks; document safety invariants when unsafe is needed</rule>
+<rule>Use Result and Option types; never unwrap() in library code</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use cargo fmt for consistent formatting</rule>
+<rule>Prefer &str over String for function parameters</rule>
+<rule>Write unit tests in same file, integration tests in tests/ directory</rule>
+<rule>Use cargo check for fast iteration during development</rule>
+</rules>
 
 <workflow>
 <phase name="analyze">

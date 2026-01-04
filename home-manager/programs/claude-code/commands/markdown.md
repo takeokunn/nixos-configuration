@@ -21,7 +21,7 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <modifies_state>local</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
+<max_parallel_agents>16</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -74,34 +74,12 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </test>
 <test name="unverified_content">
 <input>content_accuracy=50, structure_quality=55, completeness=45</input>
-<calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
+<calculation>(50*0.4)+(55*0.3)+(45\*0.3) = 20+16.5+13.5 = 50</calculation>
 <expected_status>error</expected_status>
 <reasoning>Unverified content with poor structure results in 50, triggers error</reasoning>
 </test>
 </validation_tests>
 </decision_criteria>
-
-<enforcement>
-<mandatory_behaviors>
-<behavior id="MD-B001" priority="critical">
-<trigger>Before writing documentation</trigger>
-<action>Understand the source material</action>
-<verification>Source analysis in output</verification>
-</behavior>
-<behavior id="MD-B002" priority="critical">
-<trigger>When including code examples</trigger>
-<action>Verify examples are correct and runnable</action>
-<verification>Example validation noted</verification>
-</behavior>
-</mandatory_behaviors>
-<prohibited_behaviors>
-<behavior id="MD-P001" priority="critical">
-<trigger>Always</trigger>
-<action>Adding timestamps to documents</action>
-<response>Block operation, timestamps are prohibited</response>
-</behavior>
-</prohibited_behaviors>
-</enforcement>
 
 <workflow>
 <phase name="analyze">
@@ -170,14 +148,27 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </format>
 </output>
 
-<file_mapping>
-<default_output_dir>project root</default_output_dir>
-<mapping command="/define" output="EXECUTION.md" />
-<mapping command="/ask" output="RESEARCH.md" />
-<mapping command="/bug" output="RESEARCH.md" />
-<mapping command="other" output="MEMO.md" />
-<note>User-specified file path takes precedence</note>
-</file_mapping>
+<enforcement>
+<mandatory_behaviors>
+<behavior id="MD-B001" priority="critical">
+<trigger>Before writing documentation</trigger>
+<action>Understand the source material</action>
+<verification>Source analysis in output</verification>
+</behavior>
+<behavior id="MD-B002" priority="critical">
+<trigger>When including code examples</trigger>
+<action>Verify examples are correct and runnable</action>
+<verification>Example validation noted</verification>
+</behavior>
+</mandatory_behaviors>
+<prohibited_behaviors>
+<behavior id="MD-P001" priority="critical">
+<trigger>Always</trigger>
+<action>Adding timestamps to documents</action>
+<response>Block operation, timestamps are prohibited</response>
+</behavior>
+</prohibited_behaviors>
+</enforcement>
 
 <error_escalation>
 <level severity="low">
@@ -198,16 +189,25 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="define">Primary source for EXECUTION.md output</agent>
-<agent name="ask">Primary source for RESEARCH.md output</agent>
-<agent name="bug">Primary source for RESEARCH.md output</agent>
-</related_agents>
+<related_commands>
+<command name="define">Primary source for EXECUTION.md output</command>
+<command name="ask">Primary source for RESEARCH.md output</command>
+<command name="bug">Primary source for RESEARCH.md output</command>
+</related_commands>
 
 <related_skills>
 <skill name="technical-documentation">Formatting and structuring markdown output</skill>
 <skill name="serena-usage">Recording knowledge to memory when appropriate</skill>
 </related_skills>
+
+<file_mapping>
+<default_output_dir>project root</default_output_dir>
+<mapping command="/define" output="EXECUTION.md" />
+<mapping command="/ask" output="RESEARCH.md" />
+<mapping command="/bug" output="RESEARCH.md" />
+<mapping command="other" output="MEMO.md" />
+<note>User-specified file path takes precedence</note>
+</file_mapping>
 
 <constraints>
 <must>Use context-appropriate filename</must>

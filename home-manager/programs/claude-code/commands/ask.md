@@ -21,6 +21,18 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <rule>Provide file:line references for all findings</rule>
 </rules>
 
+<parallelization>
+<capability>
+<parallel_safe>true</parallel_safe>
+<read_only>true</read_only>
+<modifies_state>none</modifies_state>
+</capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>180000</timeout_per_agent>
+</execution_strategy>
+</parallelization>
+
 <workflow>
 <phase name="analyze">
 <objective>Understand the question and determine investigation scope</objective>
@@ -59,38 +71,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
 </phase>
 </workflow>
-
-<agents>
-<agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
-<agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
-<agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
-<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
-<agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
-</agents>
-
-<execution_graph>
-<parallel_group id="investigation" depends_on="none">
-<agent>explore</agent>
-<agent>design</agent>
-<agent>performance</agent>
-</parallel_group>
-<parallel_group id="synthesis" depends_on="investigation">
-<agent>quality-assurance</agent>
-<agent>code-quality</agent>
-</parallel_group>
-</execution_graph>
-
-<parallelization>
-<capability>
-<parallel_safe>true</parallel_safe>
-<read_only>true</read_only>
-<modifies_state>none</modifies_state>
-</capability>
-<execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
-<timeout_per_agent>180000</timeout_per_agent>
-</execution_strategy>
-</parallelization>
 
 <decision_criteria>
 <criterion name="confidence_calculation">
@@ -140,12 +120,47 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </test>
 <test name="speculation_only">
 <input>evidence_quality=45, answer_completeness=55, source_verification=40</input>
-<calculation>(45*0.5)+(55*0.3)+(40*0.2) = 22.5+16.5+8 = 47</calculation>
+<calculation>(45*0.5)+(55*0.3)+(40\*0.2) = 22.5+16.5+8 = 47</calculation>
 <expected_status>error</expected_status>
 <reasoning>Speculation without verified sources results in 47, triggers error</reasoning>
 </test>
 </validation_tests>
 </decision_criteria>
+
+<agents>
+<agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
+<agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
+<agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
+<agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
+</agents>
+
+<execution_graph>
+<parallel_group id="investigation" depends_on="none">
+<agent>explore</agent>
+<agent>design</agent>
+<agent>performance</agent>
+</parallel_group>
+<parallel_group id="synthesis" depends_on="investigation">
+<agent>quality-assurance</agent>
+<agent>code-quality</agent>
+</parallel_group>
+</execution_graph>
+
+<output>
+<format>
+<question>Restate the user's question for confirmation</question>
+<investigation>Evidence-based findings with file:line references
+- Source 1: `path/to/file.ts:42` - finding
+- Source 2: `path/to/other.ts:15` - finding</investigation>
+<conclusion>Direct answer based on evidence</conclusion>
+<metrics>
+- Confidence: 0-100 (based on evidence quality)
+- Evidence Coverage: 0-100 (how much relevant code was examined)</metrics>
+<recommendations>Optional: Suggested actions without implementation</recommendations>
+<unclear_points>Information gaps that would improve the answer</unclear_points>
+</format>
+</output>
 
 <enforcement>
 <mandatory_behaviors>
@@ -169,21 +184,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </prohibited_behaviors>
 </enforcement>
 
-<output>
-<format>
-<question>Restate the user's question for confirmation</question>
-<investigation>Evidence-based findings with file:line references
-- Source 1: `path/to/file.ts:42` - finding
-- Source 2: `path/to/other.ts:15` - finding</investigation>
-<conclusion>Direct answer based on evidence</conclusion>
-<metrics>
-- Confidence: 0-100 (based on evidence quality)
-- Evidence Coverage: 0-100 (how much relevant code was examined)</metrics>
-<recommendations>Optional: Suggested actions without implementation</recommendations>
-<unclear_points>Information gaps that would improve the answer</unclear_points>
-</format>
-</output>
-
 <error_escalation>
 <level severity="low">
 <example>Minor inconsistency in documentation or comments</example>
@@ -203,11 +203,11 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="bug">When investigating error-related questions</agent>
-<agent name="define">When question requires requirements clarification</agent>
-<agent name="execute">When answer leads to implementation needs</agent>
-</related_agents>
+<related_commands>
+<command name="bug">When investigating error-related questions</command>
+<command name="define">When question requires requirements clarification</command>
+<command name="execute">When answer leads to implementation needs</command>
+</related_commands>
 
 <related_skills>
 <skill name="investigation-patterns">Core skill for systematic evidence-based analysis</skill>

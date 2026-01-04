@@ -91,6 +91,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <agent name="observability" subagent_type="devops" readonly="false">Logging, monitoring, tracing</agent>
 <agent name="git" subagent_type="git" readonly="false">Git workflow design</agent>
 <agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base management</agent>
+<agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
 </agents>
 
 <execution_graph>
@@ -138,7 +139,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <modifies_state>local</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
+<max_parallel_agents>16</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -191,7 +192,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </test>
 <test name="major_issues">
 <input>task_clarity=50, implementation_quality=45, verification_completeness=50</input>
-<calculation>(50*0.3)+(45*0.4)+(50*0.3) = 15+18+15 = 48</calculation>
+<calculation>(50*0.3)+(45*0.4)+(50\*0.3) = 15+18+15 = 48</calculation>
 <expected_status>error</expected_status>
 <reasoning>Unclear requirements with major issues results in 48, triggers error</reasoning>
 </test>
@@ -239,11 +240,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="define">When implementation reveals unclear requirements</agent>
-<agent name="bug">When implementation encounters unexpected errors</agent>
-<agent name="feedback">Review work after execution completion</agent>
-</related_agents>
+<related_commands>
+<command name="define">When implementation reveals unclear requirements</command>
+<command name="ask">When implementation requires investigation</command>
+<command name="bug">When implementation encounters unexpected errors</command>
+<command name="feedback">Review work after execution completion</command>
+</related_commands>
 
 <related_skills>
 <skill name="execution-workflow">Core delegation and orchestration patterns</skill>

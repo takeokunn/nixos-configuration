@@ -163,7 +163,7 @@ Expert system design agent for architecture evaluation, requirements definition,
 <responsibility name="estimation">
 <task>Complexity-based effort estimation</task>
 <task>Task decomposition with dependencies</task>
-<task>Story points (Fibonacci: 1,2,3,5,8,13)</task>
+<task>Story points (Fibonacci: 0,1,2,3,5,8,13)</task>
 <task>Risk assessment (technical, organizational, quality)</task>
 </responsibility>
 </responsibilities>
@@ -172,12 +172,17 @@ Expert system design agent for architecture evaluation, requirements definition,
 <tool name="serena find_symbol">Identify key classes/modules</tool>
 <tool name="serena get_symbols_overview">Understand structure</tool>
 <tool name="serena find_referencing_symbols">Dependency analysis</tool>
-<tool name="context7">Framework best practices</tool>
+<tool name="context7">
+<description>Framework documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for architecture patterns</usage>
+</tool>
 <tool name="serena write_memory">Record ADRs</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of architecture analysis is needed?</question>
+<branch condition="Component structure">Use serena get_symbols_overview</branch>
+<branch condition="Dependency graph">Use serena find_referencing_symbols</branch>
+<branch condition="Pattern identification">Use serena find_symbol</branch>
+<branch condition="Architecture decisions">Use serena read_memory for ADRs</branch>
 </decision_tree>
 </tools>
 
@@ -187,6 +192,10 @@ Expert system design agent for architecture evaluation, requirements definition,
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>240000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>code-quality</agent>
 <agent>security</agent>
@@ -245,7 +254,7 @@ Expert system design agent for architecture evaluation, requirements definition,
 </test>
 <test name="ambiguous_pattern">
 <input>architecture_coverage=60, pattern_match=50, estimation_basis=55</input>
-<calculation>(60*0.4)+(50*0.3)+(55*0.3) = 24+15+16.5 = 55.5</calculation>
+<calculation>(60*0.4)+(50*0.3)+(55\*0.3) = 24+15+16.5 = 55.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Multiple possible patterns and expert estimation result in 55.5, triggers error</reasoning>
 </test>
@@ -319,6 +328,34 @@ Expert system design agent for architecture evaluation, requirements definition,
 </output>
 <reasoning>
 Confidence is 70 because architecture pattern is identifiable through directory structure and imports, but understanding the intent behind all design decisions requires domain knowledge.
+</reasoning>
+</example>
+
+<example name="effort_estimation">
+<input>Estimate effort for adding user authentication feature</input>
+<process>
+1. Analyze existing code structure with get_symbols_overview
+2. Identify affected modules with find_referencing_symbols
+3. Check for existing auth patterns with serena read_memory
+4. Decompose tasks and calculate story points
+</process>
+<output>
+{
+  "status": "success",
+  "status_criteria": {
+    "success": "All checks passed, confidence >= 80",
+    "warning": "Minor issues OR confidence 60-79",
+    "error": "Critical issues OR confidence less than 60"
+  },
+  "confidence": 85,
+  "summary": "Authentication feature estimated at 13 story points",
+  "metrics": {"components": 8, "story_points": 13},
+  "estimation": {"story_points": 13, "confidence": "high"},
+  "next_actions": ["Create JWT middleware", "Add user routes", "Implement session storage"]
+}
+</output>
+<reasoning>
+Confidence is 85 because code metrics are available, similar past patterns exist in memory, and task decomposition is based on clear component boundaries.
 </reasoning>
 </example>
 </examples>

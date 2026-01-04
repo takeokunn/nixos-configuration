@@ -1,12 +1,25 @@
 ---
 name: Common Lisp Ecosystem
 description: This skill should be used when the user asks to "write common lisp", "CLOS", "ASDF", "defpackage", "defsystem", or works with Common Lisp, SBCL, or Coalton. Provides comprehensive Common Lisp ecosystem patterns and best practices.
-version: 0.1.0
 ---
 
 <purpose>
 Provide comprehensive patterns for Common Lisp, CLOS, ASDF system definition, SBCL-specific features, and Coalton integration.
 </purpose>
+
+<tools>
+<tool>Read - Analyze ASDF system definitions and Lisp source files</tool>
+<tool>Edit - Modify Common Lisp code and system definitions</tool>
+<tool>Bash - Run SBCL, Roswell, Qlot commands</tool>
+<tool>mcp__context7__get-library-docs - Fetch ASDF, SBCL, and library documentation</tool>
+</tools>
+
+<concepts>
+<concept name="s_expressions">Homoiconic syntax: code and data share the same structure, enabling powerful macro systems</concept>
+<concept name="clos">Generic functions with multiple dispatch; method combination (:before, :after, :around)</concept>
+<concept name="conditions">Handler-case for catching, restart-case for recovery points; more powerful than exceptions</concept>
+<concept name="packages">Namespace management with defpackage; use :import-from or local-nicknames over bare :use</concept>
+</concepts>
 
 <common_lisp_fundamentals>
 <concept name="s_expressions">
@@ -460,6 +473,19 @@ ARG is the argument description."
 <practice priority="medium">Consider Qlot for per-project dependency management</practice>
 <practice priority="medium">Use Roswell for portable script execution</practice>
 </best_practices>
+
+<rules priority="critical">
+<rule>Use ASDF for all system definitions; never load files directly</rule>
+<rule>Provide restarts for recoverable error conditions</rule>
+<rule>Document all exported symbols with docstrings</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use *earmuffs* for special variables, +plus-signs+ for constants</rule>
+<rule>Prefer :import-from over bare :use for clear dependencies</rule>
+<rule>Use check-type for argument validation at function boundaries</rule>
+<rule>Consider package-inferred-system for new projects</rule>
+</rules>
 
 <modern_tooling>
 <tool name="qlot">

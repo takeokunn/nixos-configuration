@@ -111,12 +111,17 @@ Expert quality assurance agent for code review, debugging, error handling design
 <tool name="serena find_symbol">Code investigation</tool>
 <tool name="serena find_referencing_symbols">Impact analysis</tool>
 <tool name="serena search_for_pattern">Search error handling patterns</tool>
-<tool name="context7">Verify library best practices</tool>
+<tool name="context7">
+<description>Library documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for best practices</usage>
+</tool>
 <tool name="playwright browser_snapshot">Capture accessibility tree</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of quality analysis is needed?</question>
+<branch condition="Code investigation">Use serena find_symbol</branch>
+<branch condition="Impact analysis">Use serena find_referencing_symbols</branch>
+<branch condition="Error pattern search">Use serena search_for_pattern</branch>
+<branch condition="Accessibility verification">Use playwright browser_snapshot</branch>
 </decision_tree>
 </tools>
 
@@ -126,6 +131,10 @@ Expert quality assurance agent for code review, debugging, error handling design
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>240000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>security</agent>
@@ -183,7 +192,7 @@ Expert quality assurance agent for code review, debugging, error handling design
 </test>
 <test name="incomplete_review">
 <input>review_coverage=40, issue_detection=45, feedback_quality=50</input>
-<calculation>(40*0.4)+(45*0.3)+(50*0.3) = 16+13.5+15 = 44.5</calculation>
+<calculation>(40*0.4)+(45*0.3)+(50\*0.3) = 16+13.5+15 = 44.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Minimal review with unclear findings results in 44.5, triggers error</reasoning>
 </test>

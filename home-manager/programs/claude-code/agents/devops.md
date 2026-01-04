@@ -94,12 +94,17 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 <tool name="Bash">CLI commands (terraform, kubectl, gh)</tool>
 <tool name="terraform search_providers">Provider documentation</tool>
 <tool name="terraform get_module_details">Reusable module info</tool>
-<tool name="context7">Kubernetes/Helm best practices</tool>
+<tool name="context7">
+<description>Infrastructure documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for Kubernetes, Helm, Terraform</usage>
+</tool>
 <tool name="serena search_for_pattern">Search log/metrics patterns</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of infrastructure analysis is needed?</question>
+<branch condition="IaC file discovery">Use Glob for **/*.tf, **/.github/workflows/*.yml</branch>
+<branch condition="Terraform operations">Use Bash with terraform CLI</branch>
+<branch condition="Kubernetes operations">Use Bash with kubectl CLI</branch>
+<branch condition="Log pattern analysis">Use serena search_for_pattern</branch>
 </decision_tree>
 </tools>
 
@@ -109,6 +114,10 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>security</agent>
@@ -167,7 +176,7 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 </test>
 <test name="boundary_error_59">
 <input>infrastructure_coverage=55, pipeline_quality=60, observability=65</input>
-<calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
+<calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>

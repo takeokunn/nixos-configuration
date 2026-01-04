@@ -94,6 +94,24 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <output>Consolidated result</output>
 </step>
 </phase>
+<phase name="cross_validation">
+<objective>Validate outputs through cross-agent verification</objective>
+<step order="1">
+<action>For critical tasks, delegate same analysis to 2+ agents</action>
+<tool>Task tool with multiple agents</tool>
+<output>Multiple agent outputs for comparison</output>
+</step>
+<step order="2">
+<action>Delegate outputs to validator agent for comparison</action>
+<tool>Task tool with validator agent</tool>
+<output>Cross-validation report</output>
+</step>
+<step order="3">
+<action>If contradictions detected, request additional investigation or user input</action>
+<tool>AskUserQuestion or additional agents</tool>
+<output>Resolved contradictions or user decision</output>
+</step>
+</phase>
 <phase name="failure_handling">
 <objective>Handle errors and edge cases gracefully</objective>
 <step order="1">
@@ -119,13 +137,16 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <skill name="golang-ecosystem">Go language, modules, and toolchain patterns</skill>
 <skill name="rust-ecosystem">Rust language, Cargo, and toolchain patterns</skill>
 <skill name="common-lisp-ecosystem">Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns</skill>
-<skill name="emacs-ecosystem">Emacs Lisp, configuration, org-mode, Magit, LSP patterns</skill>
+<skill name="emacs-ecosystem">Emacs Lisp, configuration, Magit, LSP patterns</skill>
+<skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
 <skill name="aws-ecosystem">AWS CLI and Terraform AWS Provider patterns</skill>
 <skill name="requirements-definition">Requirements specification methodology</skill>
 <skill name="testing-patterns">Test strategy and patterns</skill>
 <skill name="technical-documentation">README, API docs, design docs, user guides</skill>
 <skill name="technical-writing">Technical blogs and articles</skill>
 <skill name="cplusplus-ecosystem">C++ language, CMake, and modern C++ patterns</skill>
+<skill name="c-ecosystem">C language (C11/C17/C23), memory management, CLI development patterns</skill>
+<skill name="php-ecosystem">PHP 8.3+, PSR standards, Composer, PHPStan, and modern PHP patterns</skill>
 </skills>
 
 <decision_tree name="agent_selection">
@@ -144,14 +165,48 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <modifies_state>orchestration</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
+<max_parallel_agents>16</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 <parallel_groups>
 <group id="investigation" agents="explore,design,database,performance" independent="true"/>
 <group id="quality" agents="code-quality,security,test" independent="true"/>
 <group id="review" agents="quality-assurance,docs,fact-check" independent="true"/>
+<group id="validation" agents="validator" independent="false" depends_on="investigation,quality,review"/>
 </parallel_groups>
 </execution_strategy>
+<retry_policy>
+<max_retries>2</max_retries>
+<retry_conditions>
+<condition>Agent timeout</condition>
+<condition>Partial results returned</condition>
+<condition>Confidence score below 60</condition>
+</retry_conditions>
+<fallback_strategy>
+<action>Use alternative agent from same parallel group</action>
+</fallback_strategy>
+</retry_policy>
+<consensus_mechanism>
+<strategy>weighted_majority</strategy>
+<weights>
+<agent name="explore" weight="1.0"/>
+<agent name="design" weight="1.2"/>
+<agent name="database" weight="1.2"/>
+<agent name="performance" weight="1.2"/>
+<agent name="code-quality" weight="1.1"/>
+<agent name="security" weight="1.5"/>
+<agent name="test" weight="1.1"/>
+<agent name="docs" weight="1.0"/>
+<agent name="quality-assurance" weight="1.3"/>
+<agent name="fact-check" weight="1.4"/>
+<agent name="devops" weight="1.1"/>
+<agent name="validator" weight="2.0"/>
+</weights>
+<threshold>0.7</threshold>
+<on_disagreement>
+<action>Flag for user review</action>
+<action>Request additional investigation</action>
+</on_disagreement>
+</consensus_mechanism>
 </parallelization>
 
 <decision_criteria>
@@ -202,7 +257,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 </test>
 <test name="unclear_delegation">
 <input>task_understanding=50, agent_selection=55, context_availability=45</input>
-<calculation>(50*0.3)+(55*0.3)+(45*0.4) = 15+16.5+18 = 49.5</calculation>
+<calculation>(50*0.3)+(55*0.3)+(45\*0.4) = 15+16.5+18 = 49.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Ambiguous request with no matching agent and no context results in 49.5, triggers error</reasoning>
 </test>
@@ -266,6 +321,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 </error_escalation>
 
 <related_agents>
+<agent name="explore">Fast codebase exploration and file discovery</agent>
 <agent name="design">Architecture evaluation and dependency analysis</agent>
 <agent name="code-quality">Complexity analysis and refactoring recommendations</agent>
 <agent name="security">Vulnerability detection and remediation</agent>
@@ -276,6 +332,8 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <agent name="devops">CI/CD and infrastructure design</agent>
 <agent name="git">Git workflow and branching strategy</agent>
 <agent name="quality-assurance">Code review and quality evaluation</agent>
+<agent name="fact-check">External source verification and fact-checking</agent>
+<agent name="validator">Cross-validation and consensus verification</agent>
 </related_agents>
 
 <constraints>

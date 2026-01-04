@@ -1,7 +1,6 @@
 ---
 name: C++ Ecosystem
 description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++11-23) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
-version: 1.0.0
 ---
 
 <purpose>
@@ -371,21 +370,21 @@ public:
 <if_no>Use simple Makefile for single-file projects or prototypes</if_no>
 </decision_tree>
 
-<project_structure>
+<project*structure>
 <standard_layout>
 .
 ├── CMakeLists.txt
 ├── cmake/
-│   └── modules/
+│ └── modules/
 ├── src/
-│   ├── CMakeLists.txt
-│   ├── main.cpp
-│   └── lib/
+│ ├── CMakeLists.txt
+│ ├── main.cpp
+│ └── lib/
 ├── include/
-│   └── project/
+│ └── project/
 ├── tests/
-│   ├── CMakeLists.txt
-│   └── test_*.cpp
+│ ├── CMakeLists.txt
+│ └── test*\*.cpp
 └── build/
 </standard_layout>
 </project_structure>
@@ -511,9 +510,9 @@ CheckOptions:
 </common_checks>
 </clang_tidy>
 
-<clang_format>
+<clang*format>
 <description>Code formatting tool</description>
-<usage>clang-format -i src/_.cpp include/_.hpp</usage>
+<usage>clang-format -i src/*.cpp include/\_.hpp</usage>
 
 <configuration>
 <file_reference>.clang-format</file_reference>

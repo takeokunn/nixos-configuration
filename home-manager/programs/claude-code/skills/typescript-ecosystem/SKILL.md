@@ -1,12 +1,25 @@
 ---
 name: TypeScript Ecosystem
 description: This skill should be used when the user asks to "write typescript", "typescript config", "tsconfig", "type definition", "generics", "utility types", or works with TypeScript language patterns and configuration. Provides comprehensive TypeScript ecosystem patterns and best practices.
-version: 0.1.0
 ---
 
 <purpose>
 Provide comprehensive patterns for TypeScript language, configuration, type system, and tooling integration.
 </purpose>
+
+<tools>
+<tool>Read - Analyze tsconfig.json and TypeScript source files</tool>
+<tool>Edit - Modify TypeScript configurations and source code</tool>
+<tool>Bash - Run tsc, tsx, eslint, and build commands</tool>
+<tool>mcp__context7__get-library-docs - Fetch latest TypeScript documentation</tool>
+</tools>
+
+<concepts>
+<concept name="strict_mode">Enable all strict checking options (strict: true) for maximum type safety</concept>
+<concept name="module_resolution">nodenext for ESM Node.js, bundler for Vite/esbuild/webpack projects</concept>
+<concept name="utility_types">Built-in generic types: Partial, Required, Pick, Omit, Record, Extract, Exclude, ReturnType</concept>
+<concept name="type_narrowing">Use type guards (typeof, instanceof, in, custom predicates) to safely narrow union types</concept>
+</concepts>
 
 <tsconfig>
 <recommended_base>
@@ -708,6 +721,19 @@ type Status = (typeof Status)[keyof typeof Status];
 <practice priority="medium">Use 'const' assertions for literal types</practice>
 <practice priority="medium">Prefer interfaces for public APIs, types for unions/utilities</practice>
 </best_practices>
+
+<rules priority="critical">
+<rule>Enable strict mode in all TypeScript projects</rule>
+<rule>Never use any without documented justification; prefer unknown</rule>
+<rule>Run tsc --noEmit before committing to catch type errors</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use noUncheckedIndexedAccess for safer array/object access</rule>
+<rule>Export types separately with 'export type' for clarity</rule>
+<rule>Define types before implementation for better design</rule>
+<rule>Use satisfies operator to check types without widening</rule>
+</rules>
 
 <workflow>
 <phase name="analyze">

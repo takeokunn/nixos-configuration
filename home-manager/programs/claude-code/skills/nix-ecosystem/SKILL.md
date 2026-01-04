@@ -1,7 +1,6 @@
 ---
 name: Nix Ecosystem
 description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
-version: 0.1.0
 ---
 
 <purpose>

@@ -1,7 +1,6 @@
 ---
 name: Technical Writing
 description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese.
-version: 0.1.0
 ---
 
 <purpose>
@@ -16,6 +15,13 @@ Provide structured patterns for writing technical blogs and articles that effect
 <tool>mcp__context7__resolve-library-id</tool>
 <tool>mcp__context7__get-library-docs</tool>
 </tools>
+
+<concepts>
+<concept name="article_types">Five types: tutorial (task-based), concept explanation (deep understanding), comparison (decision help), case study (real-world story), opinion piece (best practices)</concept>
+<concept name="hook_principle">Capture attention in the first paragraph using problem statement, surprising fact, or relatable story</concept>
+<concept name="inverted_pyramid">Lead with conclusion, most important information first, details follow</concept>
+<concept name="show_dont_tell">Demonstrate with working code, diagrams, and before/after comparisons rather than abstract description</concept>
+</concepts>
 
 <patterns>
 <pattern name="tutorial">
@@ -326,26 +332,18 @@ Provide structured patterns for writing technical blogs and articles that effect
 </avoid>
 </anti_patterns>
 
-<workflow>
-<phase name="plan">
-<objective>Plan the technical content</objective>
-<step>1. Define target audience and goals</step>
-<step>2. Research topic thoroughly</step>
-<step>3. Create outline structure</step>
-</phase>
-<phase name="write">
-<objective>Write clear technical content</objective>
-<step>1. Write with audience in mind</step>
-<step>2. Use clear, concise language</step>
-<step>3. Include relevant examples and visuals</step>
-</phase>
-<phase name="review">
-<objective>Ensure content quality</objective>
-<step>1. Check technical accuracy</step>
-<step>2. Review for readability</step>
-<step>3. Verify all examples work</step>
-</phase>
-</workflow>
+<rules priority="critical">
+<rule>Test all code examples compile and run before publishing</rule>
+<rule>Verify all technical claims with sources or benchmarks</rule>
+<rule>Start with a compelling hook, never generic openings like "In this article..."</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Explain code context before or after each snippet</rule>
+<rule>Use inverted pyramid: most important point first</rule>
+<rule>Break long code blocks with explanations</rule>
+<rule>Ensure title accurately reflects content scope</rule>
+</rules>
 
 <error_escalation>
 <level severity="low">

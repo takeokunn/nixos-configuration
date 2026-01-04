@@ -1,7 +1,6 @@
 ---
 name: Technical Documentation
 description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Provides comprehensive documentation patterns for developers, teams, and end-users in both English and Japanese.
-version: 0.1.0
 ---
 
 <purpose>
@@ -15,6 +14,13 @@ Provide structured patterns for creating technical documentation including READM
 <tool>Grep - Search for patterns across documentation</tool>
 <tool>Glob - Find related documentation files</tool>
 </tools>
+
+<concepts>
+<concept name="document_types">Four primary types: README (project intro), API spec (endpoints/interfaces), design doc (architecture decisions), user guide (end-user tutorials)</concept>
+<concept name="audience_levels">Developer (technical depth), team member (context + depth), end user (no jargon, step-by-step)</concept>
+<concept name="progressive_disclosure">Start with quick start, then common cases, then advanced config, finally edge cases</concept>
+<concept name="documentation_lifecycle">Plan (outline) → Draft (write + examples) → Review (verify accuracy) → Maintain (update with code)</concept>
+</concepts>
 
 <patterns>
 <pattern name="readme_document_type">
@@ -506,26 +512,18 @@ The server can be started by running the following command.
 </avoid>
 </anti_patterns>
 
-<workflow>
-<phase name="analyze">
-<objective>Understand documentation requirements</objective>
-<step>1. Identify target audience and purpose</step>
-<step>2. Review existing documentation</step>
-<step>3. Determine document type (API, design, user guide)</step>
-</phase>
-<phase name="create">
-<objective>Write clear, accurate documentation</objective>
-<step>1. Structure content logically</step>
-<step>2. Include code examples where appropriate</step>
-<step>3. Verify accuracy against implementation</step>
-</phase>
-<phase name="validate">
-<objective>Ensure documentation quality</objective>
-<step>1. Check for technical accuracy</step>
-<step>2. Verify examples are runnable</step>
-<step>3. Review for clarity and completeness</step>
-</phase>
-</workflow>
+<rules priority="critical">
+<rule>Verify all code examples compile and run before including in documentation</rule>
+<rule>Match documentation structure to audience knowledge level</rule>
+<rule>Never publish documentation with placeholder content or TODOs</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use active voice and present tense for instructions</rule>
+<rule>Include expected output for all code examples</rule>
+<rule>Define technical terms on first use or link to glossary</rule>
+<rule>Keep README under 500 lines; link to detailed docs for more</rule>
+</rules>
 
 <error_escalation>
 <level severity="low">

@@ -1,7 +1,6 @@
 ---
 name: AWS Ecosystem
 description: This skill should be used when the user asks to "aws cli", "aws configure", "aws sso", "aws sts", "terraform aws", or works with AWS CLI and Terraform AWS Provider patterns. Provides comprehensive AWS ecosystem patterns and best practices.
-version: 0.2.0
 ---
 
 <purpose>
@@ -395,12 +394,12 @@ aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --out
 <description>Basic AWS provider configuration</description>
 <example>
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
+required_providers {
+aws = {
+source = "hashicorp/aws"
+version = "~> 5.0"
+}
+}
 }
 
 provider "aws" {

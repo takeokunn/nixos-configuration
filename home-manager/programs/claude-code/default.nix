@@ -92,12 +92,14 @@
       design = builtins.readFile ./agents/design.md;
       devops = builtins.readFile ./agents/devops.md;
       docs = builtins.readFile ./agents/docs.md;
+      explore = builtins.readFile ./agents/explore.md;
       fact-check = builtins.readFile ./agents/fact-check.md;
       git = builtins.readFile ./agents/git.md;
       performance = builtins.readFile ./agents/performance.md;
       quality-assurance = builtins.readFile ./agents/quality-assurance.md;
       security = builtins.readFile ./agents/security.md;
       test = builtins.readFile ./agents/test.md;
+      validator = builtins.readFile ./agents/validator.md;
     };
 
     commands = {
@@ -124,6 +126,7 @@
       rust-ecosystem = builtins.readFile ./skills/rust-ecosystem/SKILL.md;
       common-lisp-ecosystem = builtins.readFile ./skills/common-lisp-ecosystem/SKILL.md;
       emacs-ecosystem = builtins.readFile ./skills/emacs-ecosystem/SKILL.md;
+      org-ecosystem = builtins.readFile ./skills/org-ecosystem/SKILL.md;
       testing-patterns = builtins.readFile ./skills/testing-patterns/SKILL.md;
       serena-usage = builtins.readFile ./skills/serena-usage/SKILL.md;
       context7-usage = builtins.readFile ./skills/context7-usage/SKILL.md;
@@ -131,6 +134,7 @@
       technical-writing = builtins.readFile ./skills/technical-writing/SKILL.md;
       aws-ecosystem = builtins.readFile ./skills/aws-ecosystem/SKILL.md;
       cplusplus-ecosystem = builtins.readFile ./skills/cplusplus-ecosystem/SKILL.md;
+      sql-ecosystem = builtins.readFile ./skills/sql-ecosystem/SKILL.md;
     };
 
     mcpServers =

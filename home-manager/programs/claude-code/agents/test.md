@@ -105,14 +105,19 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 <tool name="serena find_symbol">Search test functions</tool>
 <tool name="Glob">Find test files</tool>
 <tool name="Bash">Run test runners</tool>
-<tool name="context7">Test framework specs</tool>
+<tool name="context7">
+<description>Test framework documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for Jest, Vitest, Playwright</usage>
+</tool>
 <tool name="browser_navigate">E2E navigation</tool>
 <tool name="browser_snapshot">Accessibility tree</tool>
 <tool name="browser_click/type">User interactions</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of test analysis is needed?</question>
+<branch condition="Test file discovery">Use Glob for **/*.test.*, **/*.spec.*</branch>
+<branch condition="Test function search">Use serena find_symbol</branch>
+<branch condition="Test execution">Use Bash with test runner</branch>
+<branch condition="Browser automation">Use playwright browser_navigate, browser_click</branch>
 </decision_tree>
 </tools>
 
@@ -122,14 +127,17 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 <read_only>false</read_only>
 <modifies_state>local</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>security</agent>
 <agent>docs</agent>
 <agent>code-quality</agent>
 </safe_with>
-<conflicts_with>
-</conflicts_with>
+<conflicts_with />
 </parallelization>
 
 <decision_criteria>
@@ -180,7 +188,7 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 </test>
 <test name="boundary_error_59">
 <input>coverage_completeness=55, test_quality=60, execution_reliability=65</input>
-<calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
+<calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>
@@ -255,6 +263,34 @@ Expert test agent for unit/integration/E2E testing, coverage analysis, flaky tes
 Confidence is 90 because test files are clearly identifiable, test runner produces definitive pass/fail results, and coverage metrics are precise.
 </reasoning>
 </example>
+
+<example name="e2e_test">
+<input>Run E2E test for login flow</input>
+<process>
+1. Navigate to login page with browser_navigate
+2. Fill credentials with browser_type
+3. Click submit with browser_click
+4. Verify redirect and capture screenshot
+</process>
+<output>
+{
+  "status": "success",
+  "status_criteria": {
+    "success": "All checks passed, confidence >= 80",
+    "warning": "Minor issues OR confidence 60-79",
+    "error": "Critical issues OR confidence less than 60"
+  },
+  "confidence": 85,
+  "summary": "Login flow E2E test passed",
+  "metrics": {"total": 1, "passed": 1, "failed": 0, "coverage": "N/A"},
+  "screenshots": ["/tmp/login-success.png"],
+  "next_actions": ["Add logout flow test", "Add error case tests"]
+}
+</output>
+<reasoning>
+Confidence is 85 because browser automation produces definitive results, screenshots provide visual verification, and Playwright selectors are robust with data-testid.
+</reasoning>
+</example>
 </examples>
 
 <error_codes>
@@ -292,8 +328,8 @@ Confidence is 90 because test files are clearly identifiable, test runner produc
 </related_agents>
 
 <related_skills>
-<skill name="testing-patterns">Essential for E2E testing and browser automation</skill>
-<skill name="testing-patterns">Critical for identifying gaps in test coverage</skill>
+<skill name="testing-patterns">Essential for E2E testing, browser automation, and coverage analysis</skill>
+<skill name="serena-usage">Critical for test function discovery and pattern analysis</skill>
 </related_skills>
 
 <constraints>

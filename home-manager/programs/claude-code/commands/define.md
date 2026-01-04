@@ -164,6 +164,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
 <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
 <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
+<agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
 </agents>
 
 <execution_graph>
@@ -191,7 +192,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
+<max_parallel_agents>16</max_parallel_agents>
 <timeout_per_agent>300000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -244,7 +245,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </test>
 <test name="ambiguous_requirements">
 <input>requirement_clarity=50, technical_feasibility=55, stakeholder_alignment=45</input>
-<calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
+<calculation>(50*0.4)+(55*0.3)+(45\*0.3) = 20+16.5+13.5 = 50</calculation>
 <expected_status>error</expected_status>
 <reasoning>Many unclear requirements with unanswered questions results in 50, triggers error</reasoning>
 </test>
@@ -321,11 +322,11 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="ask">When requirements raise technical questions</agent>
-<agent name="bug">When defining fix requirements for known issues</agent>
-<agent name="execute">Handoff point after requirements are defined</agent>
-</related_agents>
+<related_commands>
+<command name="ask">When requirements raise technical questions</command>
+<command name="bug">When defining fix requirements for known issues</command>
+<command name="execute">Handoff point after requirements are defined</command>
+</related_commands>
 
 <related_skills>
 <skill name="requirements-definition">Core methodology for specification</skill>

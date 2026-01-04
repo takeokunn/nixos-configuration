@@ -1,144 +1,24 @@
 ---
 name: Execution Workflow
 description: This skill should be used when the user asks to "execute task", "implement feature", "delegate work", "run workflow", "review code", "code quality check", or needs task orchestration and code review guidance. Provides execution, delegation, and code review patterns.
-version: 0.2.0
 ---
 
 <purpose>
 Provide structured workflow for task execution through delegation to specialized sub-agents, and comprehensive code review standards.
 </purpose>
 
-<workflow>
-<phase name="analyze">
-<description>Understand requirements and identify scope</description>
-<step>Parse task description for key objectives</step>
-<step>Identify affected files and components</step>
-<step>Check Serena memories for existing patterns</step>
-</phase>
-
-<phase name="break_down">
-<description>Split into manageable units</description>
-<step>Identify atomic tasks</step>
-<step>Estimate complexity of each task</step>
-<step>Assign to appropriate sub-agents</step>
-</phase>
-
-<phase name="organize">
-<description>Identify parallel vs sequential execution</description>
-<step>Map task dependencies</step>
-<step>Group independent tasks for parallel execution</step>
-<step>Order dependent tasks sequentially</step>
-</phase>
-
-<phase name="delegate">
-<description>Assign to sub-agents with detailed instructions</description>
-<step>Provide specific scope and expected deliverables</step>
-<step>Include target file paths</step>
-<step>Specify MCP tool usage instructions</step>
-<step>Reference existing implementations</step>
-</phase>
-
-<phase name="integrate">
-<description>Verify and combine results</description>
-<step>Review sub-agent outputs</step>
-<step>Resolve conflicts between outputs</step>
-<step>Ensure consistency across changes</step>
-</phase>
-</workflow>
-
-<error_escalation>
-<level severity="low">
-<example>Sub-agent returns partial results</example>
-<action>Note in report, proceed</action>
-</level>
-<level severity="medium">
-<example>Sub-agent task fails</example>
-<action>Document issue, use AskUserQuestion for clarification</action>
-</level>
-<level severity="high">
-<example>Critical task cannot be completed</example>
-<action>STOP, present options to user</action>
-</level>
-<level severity="critical">
-<example>Sub-agent introduces breaking change</example>
-<action>BLOCK operation, require explicit user acknowledgment</action>
-</level>
-</error_escalation>
-
-<constraints>
-<must>Delegate detailed work to sub-agents</must>
-<must>Execute independent tasks in parallel</must>
-<must>Verify outputs before integration</must>
-<avoid>Implementing detailed logic directly</avoid>
-<avoid>Sequential execution of independent tasks</avoid>
-<avoid>Skipping verification of sub-agent outputs</avoid>
-</constraints>
-
 <tools>
-<tool name="agent_groups">
-<description>Specialized sub-agents organized by execution model</description>
-<usage>
-<group name="quality_assurance" execution="parallel">
-<agent name="quality">Syntax, type, format verification</agent>
-<agent name="security">Vulnerability detection</agent>
-</group>
-<group name="implementation" execution="parallel_if_independent">
-<agent name="test">Test creation, coverage</agent>
-<agent name="refactor">Refactoring, tech debt</agent>
-<agent name="docs">Documentation updates</agent>
-</group>
-<group name="review" execution="sequential_after_implementation">
-<agent name="review">Post-implementation review</agent>
-</group>
-</usage>
-</tool>
+<tool name="agent_groups">Specialized sub-agents: quality_assurance (quality, security - parallel), implementation (test, refactor, docs - parallel if independent), review (sequential after implementation)</tool>
+<tool name="delegation">Provide scope, file paths, Serena/Context7 tool instructions, reference implementations, memory checks</tool>
+<tool name="tool_selection">Coding: Codex MCP → Serena MCP → Context7 → Basic tools; Non-coding: Serena MCP → Context7 → Basic tools</tool>
+</tools>
 
-<tool name="delegation">
-<description>Essential information to provide when delegating to sub-agents</description>
-<usage>
-- Specific scope and expected deliverables
-- Target file paths
-- Serena MCP usage: find_symbol, get_symbols_overview, search_for_pattern
-- Context7 MCP usage for library verification
-- Reference implementations with specific paths
-- Memory check: list_memories for patterns
-</usage>
-</tool>
-
-<tool name="tool_selection">
-<description>Tool selection hierarchy for task execution</description>
-<usage>
-For coding tasks (generation/modification/review):
-Priority 1: Codex MCP (sandbox: workspace-write, approval-policy: on-failure)
-Priority 2: Serena MCP for symbol operations and memory
-Priority 3: Context7 for library documentation
-Priority 4: Basic tools (Read/Edit/Write) as fallback
-
-For non-coding tasks (research/analysis):
-Priority 1: Serena MCP for symbol search and memory
-Priority 2: Context7 for library documentation
-Priority 3: Basic tools (Read/Edit/Write)
-
-Codex MCP configuration:
-
-- sandbox: workspace-write (allows code generation/modification)
-- approval-policy: on-failure (auto-approve commands when execution fails)
-
-Prohibited Codex usage:
-
-- Research/analysis - use Explore agent, Serena MCP
-- Documentation generation - use docs agent
-
-Allowed Codex usage:
-
-- Code generation (new files/functions)
-- Code modification (editing/refactoring)
-- Code review and quality analysis
-- Test code generation
-- Performance optimization suggestions
-  </usage>
-  </tool>
-  </tools>
+<concepts>
+<concept name="parallel_execution">Execute independent tasks concurrently; quality+security can run in parallel, test+docs can run in parallel when independent</concept>
+<concept name="sequential_dependencies">Tasks with data dependencies must run in order; verify outputs before dependent tasks start</concept>
+<concept name="delegation_context">Sub-agents need: specific scope, file paths, tool usage instructions, reference implementations, memory patterns</concept>
+<concept name="review_phases">Four phases: Initial scan (syntax), Deep analysis (logic), Context evaluation (impact), Standards compliance (naming/docs)</concept>
+</concepts>
 
 <patterns>
 <pattern name="code_review_phases">
@@ -269,41 +149,6 @@ Positive: What was done well
 </pattern>
 </patterns>
 
-<rules priority="critical">
-<rule>Execute independent tasks in parallel</rule>
-<rule>Never parallelize tasks with data dependencies</rule>
-<rule>Verify sub-agent outputs before integration</rule>
-<rule>Run quality checks after changes</rule>
-</rules>
-
-<rules priority="standard">
-<rule>quality + security: Concurrent checks</rule>
-<rule>test + docs: Simultaneous creation when independent</rule>
-<rule>Ensure no regression in existing functionality</rule>
-<rule>Confirm all acceptance criteria met</rule>
-</rules>
-
-<best_practices>
-<practice priority="critical">Analyze task dependencies before execution to determine parallel vs sequential execution model</practice>
-<practice priority="critical">Provide comprehensive context to sub-agents including file paths, tool usage, and reference implementations</practice>
-<practice priority="critical">Systematically review all phases: initial scan, deep analysis, context evaluation, standards compliance</practice>
-<practice priority="high">Balance critical feedback with positive observations of good practices</practice>
-<practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
-<practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
-</best_practices>
-
-<related_agents>
-<agent name="execute">Primary agent for implementing features with sub-agent delegation</agent>
-<agent name="feedback">Use for post-implementation code review and quality assessment</agent>
-<agent name="bug">Delegate debugging tasks when critical issues are identified during review</agent>
-</related_agents>
-
-<related_skills>
-<skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
-<skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
-<skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
-</related_skills>
-
 <anti_patterns>
 <avoid name="nitpicking_style">
 <description>Focusing on code style issues when functionality is broken</description>
@@ -330,3 +175,100 @@ Positive: What was done well
 <instead>Analyze dependencies and execute dependent tasks sequentially</instead>
 </avoid>
 </anti_patterns>
+
+<workflow>
+<phase name="analyze">
+<description>Understand requirements and identify scope</description>
+<step>Parse task description for key objectives</step>
+<step>Identify affected files and components</step>
+<step>Check Serena memories for existing patterns</step>
+</phase>
+<phase name="break_down">
+<description>Split into manageable units</description>
+<step>Identify atomic tasks</step>
+<step>Estimate complexity of each task</step>
+<step>Assign to appropriate sub-agents</step>
+</phase>
+<phase name="organize">
+<description>Identify parallel vs sequential execution</description>
+<step>Map task dependencies</step>
+<step>Group independent tasks for parallel execution</step>
+<step>Order dependent tasks sequentially</step>
+</phase>
+<phase name="delegate">
+<description>Assign to sub-agents with detailed instructions</description>
+<step>Provide specific scope and expected deliverables</step>
+<step>Include target file paths</step>
+<step>Specify MCP tool usage instructions</step>
+<step>Reference existing implementations</step>
+</phase>
+<phase name="integrate">
+<description>Verify and combine results</description>
+<step>Review sub-agent outputs</step>
+<step>Resolve conflicts between outputs</step>
+<step>Ensure consistency across changes</step>
+</phase>
+</workflow>
+
+<best_practices>
+<practice priority="critical">Analyze task dependencies before execution to determine parallel vs sequential execution model</practice>
+<practice priority="critical">Provide comprehensive context to sub-agents including file paths, tool usage, and reference implementations</practice>
+<practice priority="critical">Systematically review all phases: initial scan, deep analysis, context evaluation, standards compliance</practice>
+<practice priority="high">Balance critical feedback with positive observations of good practices</practice>
+<practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
+<practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
+</best_practices>
+
+<rules priority="critical">
+<rule>Execute independent tasks in parallel</rule>
+<rule>Never parallelize tasks with data dependencies</rule>
+<rule>Verify sub-agent outputs before integration</rule>
+<rule>Run quality checks after changes</rule>
+</rules>
+
+<rules priority="standard">
+<rule>quality + security: Concurrent checks</rule>
+<rule>test + docs: Simultaneous creation when independent</rule>
+<rule>Ensure no regression in existing functionality</rule>
+<rule>Confirm all acceptance criteria met</rule>
+</rules>
+
+<error_escalation>
+<level severity="low">
+<example>Sub-agent returns partial results</example>
+<action>Note in report, proceed</action>
+</level>
+<level severity="medium">
+<example>Sub-agent task fails</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Critical task cannot be completed</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Sub-agent introduces breaking change</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
+
+<related_agents>
+<agent name="execute">Primary agent for implementing features with sub-agent delegation</agent>
+<agent name="feedback">Use for post-implementation code review and quality assessment</agent>
+<agent name="bug">Delegate debugging tasks when critical issues are identified during review</agent>
+</related_agents>
+
+<related_skills>
+<skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
+<skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
+<skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
+</related_skills>
+
+<constraints>
+<must>Delegate detailed work to sub-agents</must>
+<must>Execute independent tasks in parallel</must>
+<must>Verify outputs before integration</must>
+<avoid>Implementing detailed logic directly</avoid>
+<avoid>Sequential execution of independent tasks</avoid>
+<avoid>Skipping verification of sub-agent outputs</avoid>
+</constraints>

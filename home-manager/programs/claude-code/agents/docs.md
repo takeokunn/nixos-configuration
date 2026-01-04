@@ -91,12 +91,17 @@ Expert documentation agent for README generation, API specification management, 
 <tool name="serena find_symbol">Locate routers, controllers, handlers</tool>
 <tool name="serena get_symbols_overview">Understand structure</tool>
 <tool name="serena find_referencing_symbols">Dependency analysis</tool>
-<tool name="context7">Framework best practices (Express, FastAPI)</tool>
+<tool name="context7">
+<description>Framework documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for Express, FastAPI, NestJS</usage>
+</tool>
 <tool name="Write/Edit">Create/update docs</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of documentation analysis is needed?</question>
+<branch condition="API endpoint discovery">Use serena find_symbol for routers/controllers</branch>
+<branch condition="Code structure">Use serena get_symbols_overview</branch>
+<branch condition="Dependency tracking">Use serena find_referencing_symbols</branch>
+<branch condition="Framework patterns">Use context7 for Express, FastAPI docs</branch>
 </decision_tree>
 </tools>
 
@@ -106,6 +111,10 @@ Expert documentation agent for README generation, API specification management, 
 <read_only>false</read_only>
 <modifies_state>local</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>test</agent>
@@ -162,7 +171,7 @@ Expert documentation agent for README generation, API specification management, 
 </test>
 <test name="incomplete_documentation">
 <input>code_understanding=45, documentation_completeness=50, accuracy=40</input>
-<calculation>(45*0.4)+(50*0.3)+(40*0.3) = 18+15+12 = 45</calculation>
+<calculation>(45*0.4)+(50*0.3)+(40\*0.3) = 18+15+12 = 45</calculation>
 <expected_status>error</expected_status>
 <reasoning>Superficial understanding with minimal documentation yields low confidence</reasoning>
 </test>

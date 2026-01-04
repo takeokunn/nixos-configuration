@@ -125,6 +125,10 @@ Expert fact verification agent for validating claims against authoritative exter
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>180000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>quality-assurance</agent>
 <agent>security</agent>

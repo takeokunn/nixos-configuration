@@ -97,11 +97,16 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 <tool name="serena find_symbol">Locate auth code</tool>
 <tool name="Grep">Vulnerability scanning</tool>
 <tool name="Bash">Run audit tools</tool>
-<tool name="context7">Verify secure library usage</tool>
+<tool name="context7">
+<description>Security documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for secure versions</usage>
+</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of security analysis is needed?</question>
+<branch condition="Secret/injection pattern detection">Use serena search_for_pattern</branch>
+<branch condition="Auth code location">Use serena find_symbol</branch>
+<branch condition="Dependency audit">Use Bash with npm audit, cargo audit</branch>
+<branch condition="Secure library versions">Use context7 for version verification</branch>
 </decision_tree>
 </tools>
 
@@ -111,6 +116,10 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>code-quality</agent>
 <agent>design</agent>
@@ -168,7 +177,7 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 </test>
 <test name="boundary_error_59">
 <input>scan_coverage=55, vulnerability_certainty=60, remediation_clarity=65</input>
-<calculation>(55*0.4)+(60*0.4)+(65*0.2) = 22+24+13 = 59</calculation>
+<calculation>(55*0.4)+(60*0.4)+(65\*0.2) = 22+24+13 = 59</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59 is below 60, triggers error</reasoning>
 </test>
@@ -240,6 +249,34 @@ Expert security agent for vulnerability detection, remediation, and dependency m
 </output>
 <reasoning>
 Confidence is 90 because secret patterns are well-defined and detectable, context analysis can distinguish real secrets from placeholders, and fix is straightforward.
+</reasoning>
+</example>
+
+<example name="dependency_audit">
+<input>Audit npm dependencies for vulnerabilities</input>
+<process>
+1. Run npm audit with Bash
+2. Parse vulnerability report
+3. Check for fixed versions with context7
+4. Prioritize critical CVEs
+</process>
+<output>
+{
+  "status": "error",
+  "status_criteria": {
+    "success": "All checks passed, confidence >= 80",
+    "warning": "Minor issues OR confidence 60-79",
+    "error": "Critical issues OR confidence less than 60"
+  },
+  "confidence": 95,
+  "summary": "3 critical vulnerabilities in dependencies",
+  "metrics": {"files": 1, "vulnerabilities": 5, "security_score": 45},
+  "vulnerabilities": {"critical": ["lodash@4.17.15 - Prototype Pollution"], "high": ["axios@0.19.0 - SSRF"], "medium": [], "low": []},
+  "next_actions": ["Update lodash to 4.17.21", "Update axios to 0.21.1"]
+}
+</output>
+<reasoning>
+Confidence is 95 because npm audit provides definitive CVE data, version fixes are documented in advisory database, and remediation is straightforward package updates.
 </reasoning>
 </example>
 </examples>

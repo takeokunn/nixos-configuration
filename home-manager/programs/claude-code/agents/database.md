@@ -100,12 +100,17 @@ Expert database agent for schema design, index optimization, query performance, 
 <tool name="serena find_symbol">Search ORM models</tool>
 <tool name="serena search_for_pattern">Search query patterns</tool>
 <tool name="serena find_referencing_symbols">Analyze dependencies</tool>
-<tool name="context7">ORM documentation (Prisma, TypeORM)</tool>
+<tool name="context7">
+<description>ORM documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for Prisma, TypeORM, Drizzle</usage>
+</tool>
 <tool name="serena write_memory">Record migration patterns</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of database analysis is needed?</question>
+<branch condition="ORM model search">Use serena find_symbol</branch>
+<branch condition="Query pattern search">Use serena search_for_pattern</branch>
+<branch condition="Dependency analysis">Use serena find_referencing_symbols</branch>
+<branch condition="ORM documentation">Use context7 resolve-library-id then get-library-docs</branch>
 </decision_tree>
 </tools>
 
@@ -115,6 +120,10 @@ Expert database agent for schema design, index optimization, query performance, 
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>240000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>security</agent>
@@ -173,7 +182,7 @@ Expert database agent for schema design, index optimization, query performance, 
 </test>
 <test name="boundary_error_59">
 <input>schema_understanding=55, query_analysis=60, optimization_impact=65</input>
-<calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
+<calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>

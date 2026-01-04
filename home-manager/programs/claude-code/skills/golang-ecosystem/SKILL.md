@@ -1,12 +1,26 @@
 ---
 name: Go Ecosystem
 description: This skill should be used when the user asks to "write go", "golang", "go.mod", "go module", "go test", "go build", or works with Go language development. Provides comprehensive Go ecosystem patterns and best practices.
-version: 0.1.0
+version: 0.2.0
 ---
 
 <purpose>
 Provide comprehensive patterns for Go language development, modules, testing, and idiomatic coding practices.
 </purpose>
+
+<tools>
+<tool>Read - Analyze go.mod and Go source files</tool>
+<tool>Edit - Modify Go code and module configuration</tool>
+<tool>Bash - Run go build, go test, go mod commands</tool>
+<tool>mcp__context7__get-library-docs - Fetch latest Go documentation</tool>
+</tools>
+
+<concepts>
+<concept name="error_values">Errors are values, not exceptions; handle explicitly at each call site with if err != nil</concept>
+<concept name="interfaces">Accept interfaces, return concrete types; define interfaces where used, not implemented</concept>
+<concept name="goroutines_channels">Use goroutines for concurrency, channels for communication, context.Context for cancellation</concept>
+<concept name="zero_values">Zero values are meaningful (0, "", nil, false); design types so zero value is useful</concept>
+</concepts>
 
 <go_language>
 <naming_conventions>
@@ -555,6 +569,19 @@ return nil, ctx.Err()
 <practice priority="medium">Define interfaces where they are used, not implemented</practice>
 <practice priority="medium">Use go mod tidy regularly to maintain clean dependencies</practice>
 </best_practices>
+
+<rules priority="critical">
+<rule>Handle all errors explicitly; never ignore returned errors</rule>
+<rule>Run go vet and go test before committing</rule>
+<rule>Use context.Context for cancellation and timeouts in concurrent code</rule>
+</rules>
+
+<rules priority="standard">
+<rule>Use gofmt/goimports for consistent formatting</rule>
+<rule>Follow Go naming conventions (exported vs unexported)</rule>
+<rule>Prefer table-driven tests for comprehensive coverage</rule>
+<rule>Run tests with -race flag to detect data races</rule>
+</rules>
 
 <anti_patterns>
 <avoid name="init_overuse">

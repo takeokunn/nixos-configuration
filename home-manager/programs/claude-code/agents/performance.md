@@ -99,11 +99,16 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 <tool name="serena find_symbol">Code structure analysis</tool>
 <tool name="serena search_for_pattern">Find loops, recursion, queries</tool>
 <tool name="Bash">Run benchmarks, profiling</tool>
-<tool name="context7">Library optimization patterns</tool>
+<tool name="context7">
+<description>Library documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for optimization patterns</usage>
+</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of performance analysis is needed?</question>
+<branch condition="Code structure analysis">Use serena find_symbol</branch>
+<branch condition="Loop/recursion detection">Use serena search_for_pattern</branch>
+<branch condition="Benchmark execution">Use Bash with profiling tools</branch>
+<branch condition="Code optimization">Use codex with sandbox configuration</branch>
 </decision_tree>
 </tools>
 
@@ -113,6 +118,10 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 <read_only>true</read_only>
 <modifies_state>none</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>code-quality</agent>
 <agent>design</agent>
@@ -170,7 +179,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 </test>
 <test name="boundary_error_59">
 <input>profiling_depth=55, bottleneck_identification=60, optimization_impact=65</input>
-<calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
+<calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>
@@ -244,6 +253,34 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 Confidence is 85 because algorithm complexity analysis is definitive (O(n²) vs O(n)), Set-based solution is well-established, and profiling data confirms the bottleneck.
 </reasoning>
 </example>
+
+<example name="n_plus_one_detection">
+<input>Profile database queries in user listing endpoint</input>
+<process>
+1. Search for query patterns with serena search_for_pattern
+2. Identify loops with database calls
+3. Measure query count before and after optimization
+4. Propose eager loading solution
+</process>
+<output>
+{
+  "status": "warning",
+  "status_criteria": {
+    "success": "All checks passed, confidence >= 80",
+    "warning": "Minor issues OR confidence 60-79",
+    "error": "Critical issues OR confidence less than 60"
+  },
+  "confidence": 80,
+  "summary": "N+1 query detected: 101 queries reduced to 2",
+  "metrics": {"queries_before": 101, "queries_after": 2, "improvement": "98%"},
+  "recommendations": [{"type": "eager_loading", "severity": "high", "estimated_improvement": "98%"}],
+  "next_actions": ["Add relations option to findMany", "Add integration test"]
+}
+</output>
+<reasoning>
+Confidence is 80 because N+1 pattern is clearly identifiable through code analysis, query reduction is measurable, and eager loading is a well-established solution.
+</reasoning>
+</example>
 </examples>
 
 <error_codes>
@@ -279,8 +316,8 @@ Confidence is 85 because algorithm complexity analysis is definitive (O(n²) vs 
 </related_agents>
 
 <related_skills>
-<skill name="investigation-patterns">Essential for complexity analysis and optimization</skill>
-<skill name="investigation-patterns">Critical for identifying actual bottlenecks</skill>
+<skill name="investigation-patterns">Essential for complexity analysis and bottleneck identification</skill>
+<skill name="serena-usage">Critical for code structure analysis and pattern detection</skill>
 </related_skills>
 
 <constraints>

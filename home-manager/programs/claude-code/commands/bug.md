@@ -23,6 +23,18 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <rule>Track occurrence path chronologically</rule>
 </rules>
 
+<parallelization>
+<capability>
+<parallel_safe>true</parallel_safe>
+<read_only>true</read_only>
+<modifies_state>none</modifies_state>
+</capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>180000</timeout_per_agent>
+</execution_strategy>
+</parallelization>
+
 <workflow>
 <phase name="analyze">
 <objective>Classify error type and establish investigation scope</objective>
@@ -67,38 +79,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <step>2. Identify root cause with supporting evidence</step>
 </phase>
 </workflow>
-
-<agents>
-<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
-<agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
-<agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
-</agents>
-
-<execution_graph>
-<parallel_group id="error_analysis" depends_on="none">
-<agent>quality-assurance</agent>
-<agent>explore</agent>
-</parallel_group>
-<parallel_group id="context_gathering" depends_on="none">
-<agent>general-purpose</agent>
-</parallel_group>
-<sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
-<agent>review</agent>
-<reason>Requires findings from both error analysis and context gathering</reason>
-</sequential_phase>
-</execution_graph>
-
-<parallelization>
-<capability>
-<parallel_safe>true</parallel_safe>
-<read_only>true</read_only>
-<modifies_state>none</modifies_state>
-</capability>
-<execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
-<timeout_per_agent>180000</timeout_per_agent>
-</execution_strategy>
-</parallelization>
 
 <decision_criteria>
 <criterion name="confidence_calculation">
@@ -148,34 +128,32 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </test>
 <test name="unclear_cause">
 <input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>
-<calculation>(45*0.5)+(50*0.3)+(40*0.2) = 22.5+15+8 = 45.5</calculation>
+<calculation>(45*0.5)+(50*0.3)+(40\*0.2) = 22.5+15+8 = 45.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Unclear root cause with weak evidence results in 45.5, triggers error</reasoning>
 </test>
 </validation_tests>
 </decision_criteria>
 
-<enforcement>
-<mandatory_behaviors>
-<behavior id="BUG-B001" priority="critical">
-<trigger>Before concluding root cause</trigger>
-<action>Build evidence chain from symptom to cause</action>
-<verification>Evidence chain in output</verification>
-</behavior>
-<behavior id="BUG-B002" priority="critical">
-<trigger>When proposing fix</trigger>
-<action>Identify all affected code paths</action>
-<verification>Impact analysis in output</verification>
-</behavior>
-</mandatory_behaviors>
-<prohibited_behaviors>
-<behavior id="BUG-P001" priority="critical">
-<trigger>Always</trigger>
-<action>Concluding without evidence</action>
-<response>Block conclusion, require investigation</response>
-</behavior>
-</prohibited_behaviors>
-</enforcement>
+<agents>
+<agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
+<agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
+<agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
+</agents>
+
+<execution_graph>
+<parallel_group id="error_analysis" depends_on="none">
+<agent>quality-assurance</agent>
+<agent>explore</agent>
+</parallel_group>
+<parallel_group id="context_gathering" depends_on="none">
+<agent>general-purpose</agent>
+</parallel_group>
+<sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
+<agent>quality-assurance</agent>
+<reason>Requires findings from both error analysis and context gathering</reason>
+</sequential_phase>
+</execution_graph>
 
 <delegation>
 <requirement>Full error message/stack trace</requirement>
@@ -203,6 +181,28 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </format>
 </output>
 
+<enforcement>
+<mandatory_behaviors>
+<behavior id="BUG-B001" priority="critical">
+<trigger>Before concluding root cause</trigger>
+<action>Build evidence chain from symptom to cause</action>
+<verification>Evidence chain in output</verification>
+</behavior>
+<behavior id="BUG-B002" priority="critical">
+<trigger>When proposing fix</trigger>
+<action>Identify all affected code paths</action>
+<verification>Impact analysis in output</verification>
+</behavior>
+</mandatory_behaviors>
+<prohibited_behaviors>
+<behavior id="BUG-P001" priority="critical">
+<trigger>Always</trigger>
+<action>Concluding without evidence</action>
+<response>Block conclusion, require investigation</response>
+</behavior>
+</prohibited_behaviors>
+</enforcement>
+
 <error_escalation>
 <level severity="low">
 <example>Minor log warning without impact</example>
@@ -222,11 +222,11 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="ask">When investigation reveals architectural questions</agent>
-<agent name="define">When bug fix requires requirements specification</agent>
-<agent name="execute">When ready to implement fix after investigation</agent>
-</related_agents>
+<related_commands>
+<command name="ask">When investigation reveals architectural questions</command>
+<command name="define">When bug fix requires requirements specification</command>
+<command name="execute">When ready to implement fix after investigation</command>
+</related_commands>
 
 <related_skills>
 <skill name="investigation-patterns">Core debugging methodology</skill>

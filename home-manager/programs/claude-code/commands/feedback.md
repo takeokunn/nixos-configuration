@@ -1,4 +1,5 @@
 ---
+argument-hint: [previous-command]
 description: Review command for Claude Code's recent work
 ---
 
@@ -26,7 +27,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <modifies_state>none</modifies_state>
 </capability>
 <execution_strategy>
-<max_parallel_agents>10</max_parallel_agents>
+<max_parallel_agents>16</max_parallel_agents>
 <timeout_per_agent>180000</timeout_per_agent>
 </execution_strategy>
 </parallelization>
@@ -125,7 +126,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 </test>
 <test name="superficial_review">
 <input>review_depth=50, feedback_actionability=45, issue_prioritization=50</input>
-<calculation>(50*0.4)+(45*0.3)+(50*0.3) = 20+13.5+15 = 48.5</calculation>
+<calculation>(50*0.4)+(45*0.3)+(50\*0.3) = 20+13.5+15 = 48.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Surface level review with vague feedback results in 48.5, triggers error</reasoning>
 </test>
@@ -269,12 +270,12 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 </level>
 </error_escalation>
 
-<related_agents>
-<agent name="execute">Primary target for feedback after implementation</agent>
-<agent name="define">Feedback on execution plans</agent>
-<agent name="bug">Feedback on investigation quality</agent>
-<agent name="ask">Feedback on answer accuracy</agent>
-</related_agents>
+<related_commands>
+<command name="execute">Primary target for feedback after implementation</command>
+<command name="define">Feedback on execution plans</command>
+<command name="bug">Feedback on investigation quality</command>
+<command name="ask">Feedback on answer accuracy</command>
+</related_commands>
 
 <related_skills>
 <skill name="execution-workflow">Understanding work review methodology</skill>

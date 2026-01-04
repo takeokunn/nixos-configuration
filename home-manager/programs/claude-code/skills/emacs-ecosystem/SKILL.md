@@ -1,11 +1,10 @@
 ---
 name: Emacs Ecosystem
-description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", "org-mode", or "magit". Provides comprehensive Emacs ecosystem patterns and best practices.
-version: 0.1.0
+description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", or "magit". Provides comprehensive Emacs ecosystem patterns and best practices. For org-mode, use org-ecosystem skill.
 ---
 
 <purpose>
-Provide comprehensive patterns for Emacs Lisp, configuration management, package systems, and major packages including org-mode, Magit, and LSP integration.
+Provide comprehensive patterns for Emacs Lisp, configuration management, package systems, and major packages including Magit and LSP integration. For org-mode patterns, see org-ecosystem skill.
 </purpose>
 
 <elisp_fundamentals>
@@ -344,98 +343,6 @@ user-emacs-directory)))
 </tool>
 </tools>
 
-<org_mode>
-<description>Outline-based notes, planning, and authoring</description>
-<decision_tree name="when_to_use">
-<question>Is this task related to note-taking, task management, or literate programming?</question>
-<if_yes>Use org-mode for structured, searchable content with rich features</if_yes>
-<if_no>Consider markdown-mode for simpler text editing needs</if_no>
-</decision_tree>
-
-<pattern name="capture">
-<description>Org-mode capture templates for quick note-taking</description>
-<example>
-(setq org-capture-templates
-'(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
-"* TODO %?\n  %i\n  %a")
-("n" "Note" entry (file "~/org/notes.org")
-"* %? :note:\n  %U\n  %i")
-("j" "Journal" entry (file+datetree "~/org/journal.org")
-"* %?\n  %U")))
-
-(global-set-key (kbd "C-c c") #'org-capture)
-</example>
-</pattern>
-
-<pattern name="agenda">
-<description>Org-mode agenda configuration and custom commands</description>
-<example>
-(setq org-agenda-files '("~/org/"))
-
-(setq org-agenda-custom-commands
-'(("w" "Weekly review"
-((agenda "" ((org-agenda-span 7)))
-(todo "TODO")
-(todo "WAITING")))
-("p" "Projects" tags "project")))
-
-(global-set-key (kbd "C-c a") #'org-agenda)
-</example>
-</pattern>
-
-<pattern name="todo_keywords">
-<description>Org-mode TODO keyword sequences and faces</description>
-<example>
-(setq org-todo-keywords
-'((sequence "TODO(t)" "NEXT(n)" "WAITING(w@/!)" "|"
-"DONE(d!)" "CANCELLED(c@)")))
-
-(setq org-todo-keyword-faces
-'(("TODO" . org-warning)
-("NEXT" . "yellow")
-("WAITING" . "orange")
-("CANCELLED" . "gray")))
-</example>
-</pattern>
-
-<pattern name="babel">
-<description>Literate programming with code blocks</description>
-<example>
-(org-babel-do-load-languages
-'org-babel-load-languages
-'((emacs-lisp . t)
-(python . t)
-(shell . t)
-(js . t)))
-
-(setq org-confirm-babel-evaluate nil) ; Disable confirmation
-(setq org-src-preserve-indentation t)
-</example>
-</pattern>
-
-<pattern name="export">
-<description>Org-mode export configuration for HTML, LaTeX, Markdown</description>
-<example>
-(require 'ox-html)
-(require 'ox-latex)
-(require 'ox-md)
-
-(setq org-export-with-toc t)
-(setq org-export-with-section-numbers nil)
-(setq org-html-validation-link nil)
-</example>
-</pattern>
-
-<pattern name="properties">
-<description>Org-mode property manipulation functions</description>
-<example>
-(org-entry-get nil "PROPERTY")
-(org-entry-put nil "PROPERTY" "value")
-(org-entry-get-multivalued-property nil "TAGS")
-</example>
-</pattern>
-</org_mode>
-
 <magit>
 <description>Git porcelain for Emacs</description>
 
@@ -728,6 +635,7 @@ user-emacs-directory)))
 </related_agents>
 
 <related_skills>
+<skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
 <skill name="serena-usage">Symbol operations for elisp code navigation</skill>
 <skill name="context7-usage">Emacs documentation lookup via /websites/emacsdocs</skill>
 <skill name="investigation-patterns">Debugging package conflicts and performance issues</skill>

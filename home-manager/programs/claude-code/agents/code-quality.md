@@ -182,11 +182,16 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 <tool name="serena find_referencing_symbols">Reference count verification</tool>
 <tool name="serena search_for_pattern">Search control structures, duplicates</tool>
 <tool name="Bash">Run quality tools</tool>
-<tool name="context7">Library version/usage verification</tool>
+<tool name="context7">
+<description>Library documentation via Context7 MCP</description>
+<usage>resolve-library-id then get-library-docs for best practices</usage>
+</tool>
 <decision_tree name="tool_selection">
 <question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<branch condition="Symbol structure analysis">Use serena get_symbols_overview</branch>
+<branch condition="Reference counting">Use serena find_referencing_symbols</branch>
+<branch condition="Pattern search (duplicates, loops)">Use serena search_for_pattern</branch>
+<branch condition="Code modification">Use codex with sandbox configuration</branch>
 </decision_tree>
 </tools>
 
@@ -196,15 +201,17 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 <read_only>false</read_only>
 <modifies_state>local</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>16</max_parallel_agents>
+<timeout_per_agent>240000</timeout_per_agent>
+</execution_strategy>
 <safe_with>
 <agent>design</agent>
 <agent>security</agent>
 <agent>performance</agent>
 <agent>test</agent>
 </safe_with>
-<conflicts_with>
-<agent reason="Both may refactor same files">refactor</agent>
-</conflicts_with>
+<conflicts_with />
 </parallelization>
 
 <decision_criteria>
@@ -255,7 +262,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 </test>
 <test name="boundary_error_59">
 <input>evidence_coverage=55, metric_reliability=60, refactoring_safety=65</input>
-<calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
+<calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
 </test>

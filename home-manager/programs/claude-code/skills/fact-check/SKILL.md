@@ -1,7 +1,6 @@
 ---
 name: Fact Check
 description: This skill should be used when the user asks to "verify claims", "fact check", "validate documentation", "check sources", or needs verification of external source references. Provides patterns for systematic fact verification using Context7 and WebSearch.
-version: 0.1.0
 ---
 
 <purpose>

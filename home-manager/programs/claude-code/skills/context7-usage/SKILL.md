@@ -1,7 +1,6 @@
 ---
 name: Context7 Usage
 description: This skill should be used when the user asks to "check documentation", "latest API", "library docs", "context7", or needs up-to-date library documentation. Provides Context7 MCP usage patterns.
-version: 0.1.0
 ---
 
 <purpose>
@@ -25,66 +24,14 @@ Provide patterns for effective use of Context7 MCP for retrieving up-to-date lib
 </tool>
 </tools>
 
-<workflow>
-<phase name="identify">
-<objective>Identify documentation needs</objective>
-<step>1. Determine which library needs documentation</step>
-<step>2. Check if library ID is known or needs resolution</step>
-</phase>
-<phase name="resolve">
-<objective>Resolve library identifier</objective>
-<step>1. Use resolve-library-id to find the library</step>
-<step>2. Verify the resolved ID matches intended library</step>
-</phase>
-<phase name="fetch">
-<objective>Fetch relevant documentation</objective>
-<step>1. Use get-library-docs with resolved ID</step>
-<step>2. Specify topic if known for focused results</step>
-<step>3. Adjust tokens parameter for detail level</step>
-</phase>
-</workflow>
+<concepts>
+<concept name="library_identifiers">Common Context7-compatible library IDs: React=/facebook/react, Next.js=/vercel/next.js, TypeScript=/microsoft/typescript, NixOS=/nixos/nixpkgs, Home Manager=/nix-community/home-manager</concept>
+<concept name="token_allocation">Quick lookup: 2000-3000 tokens; Standard queries: 5000 (default); Comprehensive topics: 8000-10000 tokens</concept>
+<concept name="trust_score">Quality indicator (1-10); prefer libraries with scores 7+ for reliable documentation</concept>
+<concept name="snippet_count">Indicator of documentation completeness; higher counts suggest more comprehensive coverage</concept>
+</concepts>
 
-<error_escalation>
-<level severity="low">
-<example>Library not found with exact name</example>
-<action>Note in report, proceed</action>
-</level>
-<level severity="medium">
-<example>Documentation not available for topic</example>
-<action>Document issue, use AskUserQuestion for clarification</action>
-</level>
-<level severity="high">
-<example>Context7 service unavailable</example>
-<action>STOP, present options to user</action>
-</level>
-<level severity="critical">
-<example>Conflicting documentation versions</example>
-<action>BLOCK operation, require explicit user acknowledgment</action>
-</level>
-</error_escalation>
-
-<concept name="library_identifiers">
-<description>Common Context7-compatible library IDs for frequently used packages</description>
-<example>
-React: /facebook/react
-Next.js: /vercel/next.js
-TypeScript: /microsoft/typescript
-Node.js: /nodejs/node
-Express: /expressjs/express
-NixOS/nixpkgs: /nixos/nixpkgs
-Home Manager: /nix-community/home-manager
-</example>
-</concept>
-
-<concept name="token_allocation">
-<description>Recommended token limits based on query type</description>
-<example>
-Quick lookup (specific API/function): 2000-3000 tokens
-Standard queries: 5000 tokens (default)
-Comprehensive topics: 8000-10000 tokens
-</example>
-</concept>
-
+<patterns>
 <pattern name="specific_feature">
 <description>Use topic parameter to narrow documentation focus and reduce token usage</description>
 <example>
@@ -163,6 +110,45 @@ find_referencing_symbols name_path="getStaticProps"
 <branch condition="Quick lookup">Use get-library-docs with 2000-3000 tokens</branch>
 <branch condition="Comprehensive search">Use get-library-docs with 8000-10000 tokens</branch>
 </decision_tree>
+</patterns>
+
+<anti_patterns>
+<avoid name="skipping_resolution">
+<description>Calling get-library-docs without resolving library ID first</description>
+<instead>Always call resolve-library-id to get the correct Context7-compatible library ID</instead>
+</avoid>
+<avoid name="excessive_tokens">
+<description>Requesting maximum tokens for simple queries</description>
+<instead>Use specific topics and appropriate token limits (2000-3000 for quick lookups, 5000 for standard queries)</instead>
+</avoid>
+<avoid name="ignoring_trust_scores">
+<description>Using libraries with low trust scores or snippet counts</description>
+<instead>Prefer libraries with trust scores 7-10 and higher snippet counts for better documentation quality</instead>
+</avoid>
+<avoid name="wrong_library_name">
+<description>Using incorrect or outdated library names (e.g., "react-query" vs "tanstack/query")</description>
+<instead>Try alternative names or broader search terms if library not found</instead>
+</avoid>
+</anti_patterns>
+
+<workflow>
+<phase name="identify">
+<objective>Identify documentation needs</objective>
+<step>1. Determine which library needs documentation</step>
+<step>2. Check if library ID is known or needs resolution</step>
+</phase>
+<phase name="resolve">
+<objective>Resolve library identifier</objective>
+<step>1. Use resolve-library-id to find the library</step>
+<step>2. Verify the resolved ID matches intended library</step>
+</phase>
+<phase name="fetch">
+<objective>Fetch relevant documentation</objective>
+<step>1. Use get-library-docs with resolved ID</step>
+<step>2. Specify topic if known for focused results</step>
+<step>3. Adjust tokens parameter for detail level</step>
+</phase>
+</workflow>
 
 <best_practices>
 <practice priority="critical">Always resolve library ID before fetching documentation</practice>
@@ -171,36 +157,6 @@ find_referencing_symbols name_path="getStaticProps"
 <practice priority="high">Check snippet count as indicator of documentation completeness</practice>
 <practice priority="medium">Use versioned IDs when available for specific version documentation</practice>
 </best_practices>
-
-<anti_patterns>
-<avoid name="skipping_resolution">
-<description>Calling get-library-docs without resolving library ID first</description>
-<instead>Always call resolve-library-id to get the correct Context7-compatible library ID</instead>
-</avoid>
-
-<avoid name="excessive_tokens">
-<description>Requesting maximum tokens for simple queries</description>
-<instead>Use specific topics and appropriate token limits (2000-3000 for quick lookups, 5000 for standard queries)</instead>
-</avoid>
-
-<avoid name="ignoring_trust_scores">
-<description>Using libraries with low trust scores or snippet counts</description>
-<instead>Prefer libraries with trust scores 7-10 and higher snippet counts for better documentation quality</instead>
-</avoid>
-
-<avoid name="wrong_library_name">
-<description>Using incorrect or outdated library names (e.g., "react-query" vs "tanstack/query")</description>
-<instead>Try alternative names or broader search terms if library not found</instead>
-</avoid>
-</anti_patterns>
-
-<constraints>
-<must>Verify library ID before fetching documentation</must>
-<must>Specify topic when known for focused results</must>
-<must>Check documentation version matches project requirements</must>
-<avoid>Fetching documentation without verifying library identity</avoid>
-<avoid>Using outdated documentation for current implementations</avoid>
-</constraints>
 
 <rules priority="critical">
 <rule>Always resolve library ID before fetching documentation</rule>
@@ -213,6 +169,25 @@ find_referencing_symbols name_path="getStaticProps"
 <rule>Use versioned IDs when available for specific versions</rule>
 <rule>Combine with Serena for codebase verification workflows</rule>
 </rules>
+
+<error_escalation>
+<level severity="low">
+<example>Library not found with exact name</example>
+<action>Note in report, try alternative names, proceed</action>
+</level>
+<level severity="medium">
+<example>Documentation not available for topic</example>
+<action>Document issue, use AskUserQuestion for clarification</action>
+</level>
+<level severity="high">
+<example>Context7 service unavailable</example>
+<action>STOP, present options to user</action>
+</level>
+<level severity="critical">
+<example>Conflicting documentation versions</example>
+<action>BLOCK operation, require explicit user acknowledgment</action>
+</level>
+</error_escalation>
 
 <related_agents>
 <agent name="design">Uses Context7 for architecture documentation and API design</agent>
@@ -229,3 +204,11 @@ find_referencing_symbols name_path="getStaticProps"
 <skill name="golang-ecosystem">Uses Context7 for Go library documentation</skill>
 <skill name="rust-ecosystem">Uses Context7 for Rust crate documentation</skill>
 </related_skills>
+
+<constraints>
+<must>Verify library ID before fetching documentation</must>
+<must>Specify topic when known for focused results</must>
+<must>Check documentation version matches project requirements</must>
+<avoid>Fetching documentation without verifying library identity</avoid>
+<avoid>Using outdated documentation for current implementations</avoid>
+</constraints>

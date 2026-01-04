@@ -1,7 +1,6 @@
 ---
 name: Testing Patterns
 description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs testing guidance. Provides testing methodology and patterns.
-version: 0.1.0
 ---
 
 <purpose>

@@ -97,9 +97,11 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <tool name="serena get_symbols_overview">Understand code structure</tool>
 <tool name="serena find_referencing_symbols">Check dependencies</tool>
 <decision_tree name="tool_selection">
-<question>What type of analysis is needed?</question>
-<if_yes>Use appropriate Serena tool</if_yes>
-<if_no>Fall back to basic Read/Grep</if_no>
+<question>What type of Git analysis is needed?</question>
+<branch condition="Branch/commit status">Use Bash with git log, status, branch</branch>
+<branch condition="Conflict detection">Use Grep for conflict markers</branch>
+<branch condition="Code context for conflicts">Use serena get_symbols_overview</branch>
+<branch condition="Dependency verification">Use serena find_referencing_symbols</branch>
 </decision_tree>
 </tools>
 
@@ -109,6 +111,10 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <read_only>false</read_only>
 <modifies_state>global</modifies_state>
 </capability>
+<execution_strategy>
+<max_parallel_agents>1</max_parallel_agents>
+<timeout_per_agent>300000</timeout_per_agent>
+</execution_strategy>
 <safe_with />
 <conflicts_with>
 <agent reason="Git state is global">all</agent>
@@ -163,7 +169,7 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 </test>
 <test name="boundary_error_59">
 <input>branch_understanding=55, operation_safety=60, workflow_compliance=65</input>
-<calculation>(55*0.4)+(60*0.4)+(65*0.2) = 22+24+13 = 59</calculation>
+<calculation>(55*0.4)+(60*0.4)+(65\*0.2) = 22+24+13 = 59</calculation>
 <expected_status>error</expected_status>
 <reasoning>Weighted average 59 is below 60, triggers error</reasoning>
 </test>

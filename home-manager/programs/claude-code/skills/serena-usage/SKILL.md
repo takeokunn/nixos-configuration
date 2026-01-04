@@ -1,7 +1,6 @@
 ---
 name: Serena Usage
 description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", or needs Serena MCP guidance. Provides Serena tool usage patterns.
-version: 0.1.0
 ---
 
 <purpose>
