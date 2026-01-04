@@ -624,13 +624,13 @@ gcc -fsanitize=undefined -g -o myapp myapp.c
 </sanitizer>
 </sanitizers>
 
-<static_analysis>
+<static*analysis>
 <tool name="clang-tidy">
 <description>Clang-based linter and static analyzer</description>
-<usage>clang-tidy src/_.c -- -std=c11</usage>
+<usage>clang-tidy src/*.c -- -std=c11</usage>
 <configuration>
-<file_reference>.clang-tidy</file_reference>
-Checks: > -_,
+<file*reference>.clang-tidy</file_reference>
+Checks: > -*,
 bugprone-_,
 clang-analyzer-_,
 misc-_,
