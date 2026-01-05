@@ -35,6 +35,7 @@ with pkgs;
   brewCasks.sublime-text
   brewCasks.ngrok
   brewCasks.clickup
+  brewCasks.slite
 
   # custom macOS apps
   arto
