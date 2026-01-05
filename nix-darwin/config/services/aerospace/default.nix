@@ -150,11 +150,7 @@
           run = [ "move-node-to-workspace 4" ];
         }
         {
-          "if".app-id = "com.obsproject.obs-studio";
-          run = [ "move-node-to-workspace 7" ];
-        }
-        {
-          "if".app-id = "com.github.tattn.VCam";
+          "if".app-id = "com.slite.desktop";
           run = [ "move-node-to-workspace 7" ];
         }
         {
@@ -162,15 +158,11 @@
           run = [ "move-node-to-workspace 8" ];
         }
         {
-          "if".app-id = "com.anthropic.claudefordesktop";
-          run = [ "move-node-to-workspace 9" ];
-        }
-        {
-          "if".app-id = "com.openai.chat";
-          run = [ "move-node-to-workspace 9" ];
-        }
-        {
           "if".app-id = "com.clickup.desktop-app";
+          run = [ "move-node-to-workspace 8" ];
+        }
+        {
+          "if".app-id = "com.google.Chrome.app.caidcmannjgahlnbpmidmiecjcoiiigg";
           run = [ "move-node-to-workspace 9" ];
         }
         {
