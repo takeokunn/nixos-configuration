@@ -3,6 +3,7 @@ with pkgs;
 [
   # for terminal tools
   devenv
+  dasel
   unixtools.watch
 
   # for git
@@ -10,9 +11,4 @@ with pkgs;
 
   # for nix
   nix-output-monitor
-]
-++ lib.optionals stdenv.isDarwin [
-  # for macOS (former brews)
-  pinentry_mac
-  terminal-notifier
 ]

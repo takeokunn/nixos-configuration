@@ -17,7 +17,6 @@ with pkgs;
   lazydocker
 
   # for ai
-  # nodePkgs."@google/gemini-cli"
   nodePkgs."ccusage"
 
   # for web service
@@ -36,7 +35,10 @@ with pkgs;
   brewCasks.ngrok
   brewCasks.clickup
   brewCasks.slite
+  brewCasks.element
 
   # custom macOS apps
   arto
+  pinentry_mac
+  terminal-notifier
 ]
