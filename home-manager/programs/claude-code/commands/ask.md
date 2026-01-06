@@ -127,7 +127,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </test>
 <test name="speculation_only">
 <input>evidence_quality=45, answer_completeness=55, source_verification=40</input>
-<calculation>(45*0.5)+(55*0.3)+(40*0.2) = 22.5+16.5+8 = 47</calculation>
+<calculation>(45*0.5)+(55*0.3)+(40\*0.2) = 22.5+16.5+8 = 47</calculation>
 <expected_status>error</expected_status>
 <reasoning>Speculation without verified sources results in 47, triggers error</reasoning>
 </test>

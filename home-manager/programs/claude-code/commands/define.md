@@ -270,7 +270,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </test>
 <test name="ambiguous_requirements">
 <input>requirement_clarity=50, technical_feasibility=55, stakeholder_alignment=45</input>
-<calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
+<calculation>(50*0.4)+(55*0.3)+(45\*0.3) = 20+16.5+13.5 = 50</calculation>
 <expected_status>error</expected_status>
 <reasoning>Many unclear requirements with unanswered questions results in 50, triggers error</reasoning>
 </test>

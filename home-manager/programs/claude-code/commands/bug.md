@@ -135,7 +135,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </test>
 <test name="unclear_cause">
 <input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>
-<calculation>(45*0.5)+(50*0.3)+(40*0.2) = 22.5+15+8 = 45.5</calculation>
+<calculation>(45*0.5)+(50*0.3)+(40\*0.2) = 22.5+15+8 = 45.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Unclear root cause with weak evidence results in 45.5, triggers error</reasoning>
 </test>

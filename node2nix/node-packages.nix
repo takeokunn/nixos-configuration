@@ -4269,13 +4269,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-7.16.0" = {
+    "undici-7.18.0" = {
       name = "undici";
       packageName = "undici";
-      version = "7.16.0";
+      version = "7.18.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-7.16.0.tgz";
-        sha512 = "QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.18.0.tgz";
+        sha512 = "CfPufgPFHCYu0W4h1NiKW9+tNJ39o3kWm7Cm29ET1enSJx+AERfz7A2wAr26aY0SZbYzZlTBQtcHy15o60VZfQ==";
       };
     };
     "undici-types-7.16.0" = {
@@ -4530,13 +4530,13 @@ let
         sha512 = "+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==";
       };
     };
-    "ws-8.18.3" = {
+    "ws-8.19.0" = {
       name = "ws";
       packageName = "ws";
-      version = "8.18.3";
+      version = "8.19.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/ws/-/ws-8.18.3.tgz";
-        sha512 = "PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==";
+        url = "https://registry.npmjs.org/ws/-/ws-8.19.0.tgz";
+        sha512 = "blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==";
       };
     };
     "wsl-utils-0.1.0" = {
@@ -5567,7 +5567,7 @@ in
           ];
         }
       )
-      sources."undici-7.16.0"
+      sources."undici-7.18.0"
       sources."undici-types-7.16.0"
       sources."unicorn-magic-0.3.0"
       sources."universalify-2.0.1"
@@ -5614,7 +5614,7 @@ in
         }
       )
       sources."wrappy-1.0.2"
-      sources."ws-8.18.3"
+      sources."ws-8.19.0"
       sources."wsl-utils-0.1.0"
       sources."xdg-basedir-5.1.0"
       sources."y18n-5.0.8"
