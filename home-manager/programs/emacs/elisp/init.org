@@ -7328,6 +7328,14 @@ With prefix argument ARG, include line number as #L<line>."
       (kill-new result)
       (message "Copied to clipboard: %s" result)))
 #+end_src
+** my/open-projectile-github-url
+#+begin_src emacs-lisp
+  (defun my/open-projectile-github-url ()
+    "Open the GitHub URL of the current line in the browser."
+    (interactive)
+    (my/copy-projectile-github-url)
+    (browse-url (current-kill 0)))
+#+end_src
 * Footer
 :PROPERTIES:
 :CUSTOM_ID: footer
