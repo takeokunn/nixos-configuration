@@ -2332,7 +2332,17 @@
     ;; use nixd instead of nil
     (setopt lsp-disabled-clients '(nix-nil))
     (setopt lsp-nix-nixd-server-path "nixd")
-    (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"]))
+    (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"])
+    ;; nixd completion configuration
+    (let ((flake-path (concat "builtins.getFlake \""
+                              (string-trim (shell-command-to-string "ghq root"))
+                              "/github.com/takeokunn/nixos-configuration\"")))
+      (setopt lsp-nix-nixd-nixpkgs-expr
+              (format "import (%s).inputs.nixpkgs { }" flake-path))
+      (setopt lsp-nix-nixd-nixos-options-expr
+              (format "(%s).darwinConfigurations.Attm-M4-Max.options" flake-path))
+      (setopt lsp-nix-nixd-home-manager-options-expr
+              (format "(%s).darwinConfigurations.Attm-M4-Max.options.home-manager.users.type.getSubOptions []" flake-path))))
 
   (with-eval-after-load 'lsp-copilot
     ;; config
@@ -7114,20 +7124,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (mark-whole-buffer)
       (copy-region-as-kill (region-beginning) (region-end))))
 #+end_src
-** my/ghq-get
-:PROPERTIES:
-:CUSTOM_ID: my-ghq-get
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (defun my/ghq-get ()
-    (interactive)
-    (let ((url (read-string "url > ")))
-      (message
-       (shell-command-to-string
-        (mapconcat #'shell-quote-argument
-                   (list "ghq" "get" url)
-                   " ")))))
-#+end_src
 ** my/gh-browse
 :PROPERTIES:
 :CUSTOM_ID: my-gh-browse
@@ -7211,18 +7207,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
         (setq my/kill-emacs-keybind-p t)
         (keymap-global-set "C-x C-c" 'save-buffers-kill-emacs))))
 #+end_src
-** my/get-class-name-by-file-name
-:PROPERTIES:
-:CUSTOM_ID: my-get-class-name-by-file-name
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (defun my/get-class-name-by-file-name ()
-    (interactive)
-    (insert
-     (file-name-nondirectory
-      (file-name-sans-extension (or (buffer-file-name)
-                                    (buffer-name (current-buffer)))))))
-#+end_src
 ** my/insert-clipboard
 :PROPERTIES:
 :CUSTOM_ID: my-insert-clipboard
@@ -7231,15 +7215,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (defun my/insert-clipboard (arg)
     (interactive "sstring: ")
     (kill-new arg))
-#+end_src
-** my/actionlint
-:PROPERTIES:
-:CUSTOM_ID: my-actionlint
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (defun my/actionlint ()
-    (interactive)
-    (shell-command-to-string "actionlint"))
 #+end_src
 ** my/build-info
 :PROPERTIES:
@@ -7265,16 +7240,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (insert (format "Features:\t%s\n" system-configuration-features))
       (view-mode)))
 #+end_src
-** my/current-ip-address
-:PROPERTIES:
-:CUSTOM_ID: my-current-ip-address
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (defun my/current-ip-address ()
-    (interactive)
-    (insert
-     (shell-command-to-string "curl -s ifconfig.me")))
-#+end_src
 ** my/today
 :PROPERTIES:
 :CUSTOM_ID: my-today
@@ -7287,7 +7252,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
       (if iso-format "%Y-%m-%dT%T%z" "%Y-%m-%d %a")
       (current-time))))
 #+end_src
-** my/subword
+** my/delete-forward-block
 :PROPERTIES:
 :CUSTOM_ID: my-subword
 :END:
@@ -7316,29 +7281,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (interactive)
     (let ((date (org-read-date nil nil nil "日付を選択してください:")))
       (insert (format-time-string "%Y/%m/%d %a" (org-time-string-to-time date)))))
-#+end_src
-** my/copy-claude-file-to-private
-:PROPERTIES:
-:CUSTOM_ID: my-copy-claude-file-to-private
-:END:
-#+begin_src emacs-lisp
-  (defun my/copy-claude-file-to-private ()
-    "Copy current claude output file to private repository."
-    (interactive)
-    (let* ((file-path (buffer-file-name))
-           (file-name (file-name-nondirectory file-path))
-           (repo-name (projectile-project-name))
-           (file-base (file-name-sans-extension file-name)))
-      (if (and file-path repo-name)
-          (let ((target-dir (expand-file-name (concat "~/ghq/github.com/takeokunn/private/claude/outputs/" repo-name)))
-                (target-file file-name))
-            ;; ディレクトリが存在しない場合は作成
-            (unless (file-directory-p target-dir)
-              (make-directory target-dir t))
-            ;; ファイルをコピー
-            (copy-file file-path (expand-file-name target-file target-dir) t)
-            (message "Copied %s to %s/%s" file-name target-dir target-file))
-        (message "Could not determine project name or file path"))))
 #+end_src
 ** my/copy-projectile-github-url
 :PROPERTIES:
@@ -7375,57 +7317,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 :CUSTOM_ID: my-copy-projectile-relative-path
 :END:
 #+begin_src emacs-lisp
-  (defun my/copy-projectile-relative-path ()
-    (interactive)
-    (let ((url (string-remove-prefix (projectile-project-root) buffer-file-name)))
-      (kill-new url)
-      (message "Copied to clipboard: %s" url)))
-#+end_src
-** my/projectile-php-open-corresponding-test
-:PROPERTIES:
-:CUSTOM_ID: my-projectile-php-open-corresponding-test
-:END:
-#+begin_src emacs-lisp
-  (defun my/generate-core-test-path (relative-path)
-    "Given a Core app relative path, generate the corresponding test path."
-    (let* ((parts (split-string relative-path "/"))
-           (domain-path (cl-subseq parts 1 (1- (length parts)))) ;; skip Core, keep middle
-           (file-name (file-name-base (car (last parts))))
-           (test-path (append '("Core" "Unit") domain-path))
-           (test-file (concat (mapconcat #'identity test-path "/") "/" file-name "Test.php")))
-      test-file))
-
-  (defun my/generate-ecplatform-test-path (relative-path)
-    "Given an ECPlatforms app relative path, generate the corresponding test path."
-    (let* ((parts (split-string relative-path "/"))
-           (platform (car parts))
-           (domain-path (cl-subseq parts 1 (1- (length parts)))) ;; middle part
-           (file-name (file-name-base (car (last parts))))
-           (test-path (append (list "ECPlatforms" platform) '("Unit") domain-path))
-           (test-file (concat (mapconcat #'identity test-path "/") "/" file-name "Test.php")))
-      test-file))
-
-  (defun my/projectile-php-open-corresponding-test ()
-    "Open corresponding PHPUnit test file from app/ using specific Core/ECPlatforms rules."
-    (interactive)
-    (let* ((file (buffer-file-name))
-           (project-root (projectile-project-root))
-           (app-root (expand-file-name "app/" project-root))
-           (test-root (expand-file-name "tests/" project-root)))
-      (if (and file (string-prefix-p app-root file))
-          (let* ((relative (file-relative-name file app-root))
-                 (parts (split-string relative "/"))
-                 (subdir (car parts))
-                 (test-file
-                  (cond
-                   ((string= subdir "Core") (my/generate-core-test-path relative))
-                   ((string= subdir "ECPlatforms") (my/generate-ecplatform-test-path (mapconcat #'identity (cdr parts) "/")))
-                   (t (user-error "Unknown app type: %s" subdir))))
-                 (full-path (expand-file-name test-file test-root)))
-            (if (file-exists-p full-path)
-                (find-file full-path)
-              (message "Test file not found: %s" full-path)))
-        (message "Not in app/ directory."))))
+  (defun my/copy-projectile-relative-path (arg)
+    "Copy the project-relative path to kill-ring.
+With prefix argument ARG, include line number as #L<line>."
+    (interactive "P")
+    (let* ((relative-path (string-remove-prefix (projectile-project-root) buffer-file-name))
+           (result (if arg
+                       (format "%s#L%d" relative-path (line-number-at-pos))
+                     relative-path)))
+      (kill-new result)
+      (message "Copied to clipboard: %s" result)))
 #+end_src
 * Footer
 :PROPERTIES:
