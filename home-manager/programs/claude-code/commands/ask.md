@@ -46,6 +46,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <step>1. Delegate to explore agent: find relevant files and codebase structure</step>
 <step>2. Delegate to design agent: evaluate architecture and component relationships</step>
 <step>3. Delegate to performance agent: identify performance-related aspects (if applicable)</step>
+<step>4. Delegate to fact-check agent: verify external references in question context</step>
 </phase>
 <reflection_checkpoint id="investigation_quality">
 <question>Have I gathered sufficient evidence from investigation?</question>
@@ -69,6 +70,12 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <step>1. If tool call fails: Log error, attempt alternative approach</step>
 <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
 <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
+</phase>
+<phase name="self_evaluate">
+<objective>Brief quality assessment of answer output</objective>
+<step>1. Calculate confidence using decision_criteria: evidence_quality (50%), answer_completeness (30%), source_verification (20%)</step>
+<step>2. Identify top 1-2 critical issues if confidence below 80 or gaps detected</step>
+<step>3. Append self_feedback section to output</step>
 </phase>
 </workflow>
 
@@ -120,7 +127,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </test>
 <test name="speculation_only">
 <input>evidence_quality=45, answer_completeness=55, source_verification=40</input>
-<calculation>(45*0.5)+(55*0.3)+(40\*0.2) = 22.5+16.5+8 = 47</calculation>
+<calculation>(45*0.5)+(55*0.3)+(40*0.2) = 22.5+16.5+8 = 47</calculation>
 <expected_status>error</expected_status>
 <reasoning>Speculation without verified sources results in 47, triggers error</reasoning>
 </test>
@@ -133,6 +140,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
 <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
 <agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
@@ -140,6 +148,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <agent>explore</agent>
 <agent>design</agent>
 <agent>performance</agent>
+<agent>fact-check</agent>
 </parallel_group>
 <parallel_group id="synthesis" depends_on="investigation">
 <agent>quality-assurance</agent>
@@ -159,6 +168,13 @@ Provide accurate, evidence-based answers to project questions through fact-based
 - Evidence Coverage: 0-100 (how much relevant code was examined)</metrics>
 <recommendations>Optional: Suggested actions without implementation</recommendations>
 <unclear_points>Information gaps that would improve the answer</unclear_points>
+<self_feedback>
+<confidence>XX/100 (based on evidence_quality)</confidence>
+<issues>
+- [Critical] Issue description (if any, max 2 total)
+- [Warning] Issue description (if any)
+</issues>
+</self_feedback>
 </format>
 </output>
 
@@ -213,6 +229,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <skill name="investigation-patterns">Core skill for systematic evidence-based analysis</skill>
 <skill name="serena-usage">Symbol-level search for efficient code navigation</skill>
 <skill name="context7-usage">Verify library documentation for accuracy</skill>
+<skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
 
 <constraints>

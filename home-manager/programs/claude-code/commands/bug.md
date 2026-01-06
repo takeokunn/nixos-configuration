@@ -48,9 +48,10 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <step>1. Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
 <step>2. Delegate to explore agent: find error location and related code paths</step>
 <step>3. Delegate to general-purpose agent: analyze logs and dependencies</step>
-<step>4. Analyze error location details from agent findings</step>
-<step>5. Review dependencies and imports</step>
-<step>6. Check config files and recent changes</step>
+<step>4. Delegate to fact-check agent: verify external documentation references in error context</step>
+<step>5. Analyze error location details from agent findings</step>
+<step>6. Review dependencies and imports</step>
+<step>7. Check config files and recent changes</step>
 </phase>
 <reflection_checkpoint id="investigation_quality">
 <question>Have I built a complete evidence chain from symptom to cause?</question>
@@ -77,6 +78,12 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <objective>Synthesize findings into actionable root cause analysis</objective>
 <step>1. Compile agent findings with confidence metrics</step>
 <step>2. Identify root cause with supporting evidence</step>
+</phase>
+<phase name="self_evaluate">
+<objective>Brief quality assessment of investigation output</objective>
+<step>1. Calculate confidence using decision_criteria: root_cause_certainty (50%), evidence_chain (30%), fix_viability (20%)</step>
+<step>2. Identify top 1-2 critical issues if confidence below 80 or evidence gaps detected</step>
+<step>3. Append self_feedback section to output</step>
 </phase>
 </workflow>
 
@@ -128,7 +135,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </test>
 <test name="unclear_cause">
 <input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>
-<calculation>(45*0.5)+(50*0.3)+(40\*0.2) = 22.5+15+8 = 45.5</calculation>
+<calculation>(45*0.5)+(50*0.3)+(40*0.2) = 22.5+15+8 = 45.5</calculation>
 <expected_status>error</expected_status>
 <reasoning>Unclear root cause with weak evidence results in 45.5, triggers error</reasoning>
 </test>
@@ -139,12 +146,14 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
 <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
 <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
 <parallel_group id="error_analysis" depends_on="none">
 <agent>quality-assurance</agent>
 <agent>explore</agent>
+<agent>fact-check</agent>
 </parallel_group>
 <parallel_group id="context_gathering" depends_on="none">
 <agent>general-purpose</agent>
@@ -178,6 +187,13 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <impact>Scope, similar errors</impact>
 <recommendations>Fix suggestions (no implementation), prevention</recommendations>
 <further_investigation>Unclear points, next steps</further_investigation>
+<self_feedback>
+<confidence>XX/100 (based on root_cause_certainty)</confidence>
+<issues>
+- [Critical] Issue description (if any, max 2 total)
+- [Warning] Issue description (if any)
+</issues>
+</self_feedback>
 </format>
 </output>
 
@@ -232,6 +248,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <skill name="investigation-patterns">Core debugging methodology</skill>
 <skill name="serena-usage">Navigate error locations efficiently</skill>
 <skill name="testing-patterns">Understand test failures and coverage gaps</skill>
+<skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
 
 <constraints>

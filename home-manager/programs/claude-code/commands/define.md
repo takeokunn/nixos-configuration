@@ -69,6 +69,11 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <tool>Sub-agent delegation</tool>
 <output>Effort estimation, risk analysis</output>
 </step>
+<step number="5">
+<action>Delegate to fact-check agent: verify external documentation and standard references</action>
+<tool>Sub-agent delegation</tool>
+<output>Verification report, flagged claims</output>
+</step>
 </phase>
 <reflection_checkpoint id="investigation_complete" after="investigate">
 <questions>
@@ -157,6 +162,24 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <output>Phased task list with dependencies</output>
 </step>
 </phase>
+<phase name="self_evaluate">
+<objective>Brief quality assessment of requirements output</objective>
+<step number="1">
+<action>Calculate confidence using decision_criteria: requirement_clarity (40%), technical_feasibility (30%), stakeholder_alignment (30%)</action>
+<tool>Decision criteria evaluation</tool>
+<output>Confidence score</output>
+</step>
+<step number="2">
+<action>Identify top 1-2 critical issues if confidence below 80 or requirement gaps detected</action>
+<tool>Gap analysis</tool>
+<output>Issue list</output>
+</step>
+<step number="3">
+<action>Append self_feedback section to output</action>
+<tool>Output formatting</tool>
+<output>Self-feedback section</output>
+</step>
+</phase>
 </workflow>
 
 <agents>
@@ -165,6 +188,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
 <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
 <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
+<agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
@@ -172,6 +196,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <agent>explore</agent>
 <agent>design</agent>
 <agent>database</agent>
+<agent>fact-check</agent>
 </parallel_group>
 <parallel_group id="analysis" depends_on="investigation">
 <agent>general-purpose</agent>
@@ -245,7 +270,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </test>
 <test name="ambiguous_requirements">
 <input>requirement_clarity=50, technical_feasibility=55, stakeholder_alignment=45</input>
-<calculation>(50*0.4)+(55*0.3)+(45\*0.3) = 20+16.5+13.5 = 50</calculation>
+<calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
 <expected_status>error</expected_status>
 <reasoning>Many unclear requirements with unanswered questions results in 50, triggers error</reasoning>
 </test>
@@ -300,6 +325,13 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
 <execute_handoff>Decisions, references, constraints</execute_handoff>
 </task_breakdown>
+<self_feedback>
+<confidence>XX/100 (based on requirement_clarity)</confidence>
+<issues>
+- [Critical] Issue description (if any, max 2 total)
+- [Warning] Issue description (if any)
+</issues>
+</self_feedback>
 </format>
 </output>
 
@@ -332,6 +364,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <skill name="requirements-definition">Core methodology for specification</skill>
 <skill name="investigation-patterns">Evidence gathering for feasibility</skill>
 <skill name="serena-usage">Check existing patterns and memories</skill>
+<skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
 
 <constraints>
