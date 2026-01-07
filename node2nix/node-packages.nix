@@ -12,6 +12,15 @@
 
 let
   sources = {
+    "@agentclientprotocol/sdk-0.11.0" = {
+      name = "_at_agentclientprotocol_slash_sdk";
+      packageName = "@agentclientprotocol/sdk";
+      version = "0.11.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@agentclientprotocol/sdk/-/sdk-0.11.0.tgz";
+        sha512 = "hngnMwQ13DCC7oEr0BUnrx+vTDFf/ToCLhF0YcCMWRs+v4X60rKQyAENsx0PdbQF21jC1VjMFkh2+vwNBLh6fQ==";
+      };
+    };
     "@alcalzone/ansi-tokenize-0.2.3" = {
       name = "_at_alcalzone_slash_ansi-tokenize";
       packageName = "@alcalzone/ansi-tokenize";
@@ -129,13 +138,13 @@ let
         sha512 = "Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==";
       };
     };
-    "@google/gemini-cli-core-0.22.5" = {
+    "@google/gemini-cli-core-0.23.0" = {
       name = "_at_google_slash_gemini-cli-core";
       packageName = "@google/gemini-cli-core";
-      version = "0.22.5";
+      version = "0.23.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.22.5.tgz";
-        sha512 = "hUgiZsreizvFBlLx44HZnbxZv/AsG9Tzb77rc936tEiCqU3b5EtpWjHwqnO2Z++c8IJZrQ2SYNja9O7oBLaNBA==";
+        url = "https://registry.npmjs.org/@google/gemini-cli-core/-/gemini-cli-core-0.23.0.tgz";
+        sha512 = "46ZOF1LzQqs7e41MKts+P45GgquJfap3c82yqpB6X6XM+/S+QmiYzp0gm8zxtm8Ri7FP6lLFMPH0AmdU7anyww==";
       };
     };
     "@google/genai-1.30.0" = {
@@ -4269,13 +4278,13 @@ let
         sha512 = "OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==";
       };
     };
-    "undici-7.18.0" = {
+    "undici-7.18.2" = {
       name = "undici";
       packageName = "undici";
-      version = "7.18.0";
+      version = "7.18.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/undici/-/undici-7.18.0.tgz";
-        sha512 = "CfPufgPFHCYu0W4h1NiKW9+tNJ39o3kWm7Cm29ET1enSJx+AERfz7A2wAr26aY0SZbYzZlTBQtcHy15o60VZfQ==";
+        url = "https://registry.npmjs.org/undici/-/undici-7.18.2.tgz";
+        sha512 = "y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==";
       };
     };
     "undici-types-7.16.0" = {
@@ -4775,12 +4784,13 @@ in
   "@google/gemini-cli" = nodeEnv.buildNodePackage {
     name = "_at_google_slash_gemini-cli";
     packageName = "@google/gemini-cli";
-    version = "0.22.5";
+    version = "0.23.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.22.5.tgz";
-      sha512 = "k9uoWCt0mhwlCc+JNwQ6VxOBmYQm2pEg4rO9nu3ueWBNok2tFScCd+iEkpeK8eEOIwk153/ZoBNvuUo3sAV98g==";
+      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.23.0.tgz";
+      sha512 = "2gCo9kTYVEZXhEi0uepBsjLyaq74N28L2c2gHL/VRt9pdpsjp6KGuq+ZjN7IUu7877txCNJpXwGZ5Fs0YLFFpw==";
     };
     dependencies = [
+      sources."@agentclientprotocol/sdk-0.11.0"
       sources."@alcalzone/ansi-tokenize-0.2.3"
       sources."@babel/code-frame-7.27.1"
       sources."@babel/helper-validator-identifier-7.28.5"
@@ -4859,7 +4869,7 @@ in
       sources."@google-cloud/projectify-4.0.0"
       sources."@google-cloud/promisify-4.0.0"
       (
-        sources."@google/gemini-cli-core-0.22.5"
+        sources."@google/gemini-cli-core-0.23.0"
         // {
           dependencies = [
             sources."gaxios-6.7.1"
@@ -5567,7 +5577,7 @@ in
           ];
         }
       )
-      sources."undici-7.18.0"
+      sources."undici-7.18.2"
       sources."undici-types-7.16.0"
       sources."unicorn-magic-0.3.0"
       sources."universalify-2.0.1"
@@ -5651,14 +5661,14 @@ in
   "@openai/codex" = nodeEnv.buildNodePackage {
     name = "_at_openai_slash_codex";
     packageName = "@openai/codex";
-    version = "0.77.0";
+    version = "0.79.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.77.0.tgz";
-      sha512 = "1Z3tuJsePfQvBELmTT3Dpzm4GheQn0t4H8RtdZnYVBdj1vA2Hi6eGCrOHXxPSfXRKDrSZ4VvALcQmZpFmYsaHA==";
+      url = "https://registry.npmjs.org/@openai/codex/-/codex-0.79.0.tgz";
+      sha512 = "9qL1H9+DyNwPexchcl620rJc+sf0m1BlbSFa6tnsrfoR6n6cdxl+7Vi8ZSWmFEGWqRyQJMW8PKcpyt6hbv72mg==";
     };
     buildInputs = globalBuildInputs;
     meta = {
-      description = "<p align=\"center\"><code>npm i -g @openai/codex</code><br />or <code>brew install --cask codex</code></p>";
+      description = "<p align=\"center\"><code>npm i -g @openai/codex</code><br />or <code>brew install --cask codex</code></p> <p align=\"center\"><strong>Codex CLI</strong> is a coding agent from OpenAI that runs locally on your computer. <p align=\"center\">   <img src=\"./.githu";
       homepage = "https://github.com/openai/codex#readme";
       license = "Apache-2.0";
     };

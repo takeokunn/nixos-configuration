@@ -151,13 +151,13 @@
   };
   emacs-llm = {
     pname = "emacs-llm";
-    version = "0.28.4";
+    version = "0.28.5";
     src = fetchFromGitHub {
       owner = "ahyatt";
       repo = "llm";
-      rev = "0.28.4";
+      rev = "0.28.5";
       fetchSubmodules = false;
-      sha256 = "sha256-ZlGcWey3qAiZ6nULRYt8M6fSYGOyVP1jcPfq1rYoyJM=";
+      sha256 = "sha256-WPxh0A+SubNegcQduPvXSGVuCSc7XrljWgE1DAtmm5E=";
     };
   };
   emacs-mu4e-dashboard = {
@@ -581,14 +581,14 @@
   };
   vimdoc-ja = {
     pname = "vimdoc-ja";
-    version = "6bd30665b5d023cfd735fd12ec232716b8b6cd7b";
+    version = "331bf689cc51aeb4a933ecbb4105ec34cb2499e1";
     src = fetchFromGitHub {
       owner = "vim-jp";
       repo = "vimdoc-ja";
-      rev = "6bd30665b5d023cfd735fd12ec232716b8b6cd7b";
+      rev = "331bf689cc51aeb4a933ecbb4105ec34cb2499e1";
       fetchSubmodules = false;
-      sha256 = "sha256-t+OXWqa2k6Y78O5IFuUq+S0VXwCDAhuEsB9RwPVozZA=";
+      sha256 = "sha256-lRDeJXC5mqxXHQ3uBvK9ZwElyTyfROFjrjPPjFZksjg=";
     };
-    date = "2025-12-30";
+    date = "2026-01-06";
   };
 }
