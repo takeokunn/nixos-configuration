@@ -2514,13 +2514,13 @@ let
         sha512 = "4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==";
       };
     };
-    "iconv-lite-0.7.1" = {
+    "iconv-lite-0.7.2" = {
       name = "iconv-lite";
       packageName = "iconv-lite";
-      version = "0.7.1";
+      version = "0.7.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.7.1.tgz";
-        sha512 = "2Tth85cXwGFHfvRgZWszZSvdo+0Xsqmw8k8ZwxScfcBneNUraK+dxRxRm24nszx80Y0TVio8kKLt5sLE7ZCLlw==";
+        url = "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.7.2.tgz";
+        sha512 = "im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==";
       };
     };
     "ignore-7.0.5" = {
@@ -4653,10 +4653,10 @@ in
   "@github/copilot-language-server" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server";
     packageName = "@github/copilot-language-server";
-    version = "1.406.0";
+    version = "1.408.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.406.0.tgz";
-      sha512 = "yzWayzR707xuAMGS77c3G7jv0z1F1hx7Aesvp0+qBbxUJHVsrSMjUImJMIL/vWJ+kfo49rfjiTTksaxjUk1ujw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server/-/copilot-language-server-1.408.0.tgz";
+      sha512 = "VJMTy9lrnwR81TOhF75t/+sob0IRHUdTIfRY6XbBrGrRbBdsSV39pD/7rFcCSACOwchV8+QRh/tdKIU8FRhz8g==";
     };
     dependencies = [
       sources."vscode-jsonrpc-8.2.0"
@@ -4676,10 +4676,10 @@ in
   "@github/copilot-language-server-darwin-arm64" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server-darwin-arm64";
     packageName = "@github/copilot-language-server-darwin-arm64";
-    version = "1.406.0";
+    version = "1.408.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-arm64/-/copilot-language-server-darwin-arm64-1.406.0.tgz";
-      sha512 = "x8E0cmuLShhzUQCZV8TgOPzxNaz3nKEeo4J8Dv6jDCbeAzmu6fIpUPL+Tz6K0nJlN1rYA9iolyr71glHXGbbNQ==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-arm64/-/copilot-language-server-darwin-arm64-1.408.0.tgz";
+      sha512 = "K3tDkXsVNOdvPrWN+Q4uE2Tbje2uNHu/8Ff+i5PusDGLD5XA+TN/artkMYSdui049WQcC1P5nj5ucGmhms2HUA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4694,10 +4694,10 @@ in
   "@github/copilot-language-server-darwin-x64" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server-darwin-x64";
     packageName = "@github/copilot-language-server-darwin-x64";
-    version = "1.406.0";
+    version = "1.408.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-x64/-/copilot-language-server-darwin-x64-1.406.0.tgz";
-      sha512 = "Sv9Yib5aHLlGzLFiskUMexWG6u2ZNTqH4At+ECfkJCT5IDlIQVftyqtvIA+YEttxIaUpq7tgS/9IJscM+yfL4g==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server-darwin-x64/-/copilot-language-server-darwin-x64-1.408.0.tgz";
+      sha512 = "a0Oc8afR5wIFXpcfem+Os1mUw7IWsOuQj6dSuv0JZ4M3+a3R23YWYWD7t8Zqm1na/tGZta2+9bHwxJcWpxpTIQ==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4712,10 +4712,10 @@ in
   "@github/copilot-language-server-linux-x64" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server-linux-x64";
     packageName = "@github/copilot-language-server-linux-x64";
-    version = "1.406.0";
+    version = "1.408.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-x64/-/copilot-language-server-linux-x64-1.406.0.tgz";
-      sha512 = "3DIE324Qu+bNfq0AzMH6SfSNngUqbNzS9M4B11iib/UWCVlVPCEAgW5TRRU8lWxyYzUdBNO4BGXSk/OXsvGj5Q==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-x64/-/copilot-language-server-linux-x64-1.408.0.tgz";
+      sha512 = "Ba97obTk6z0H8gvRK6Y9ZCbO3kUIFRN5iUA7kQox3DVZ3HZ9HLfstpRgWHMZQj540pPT9LVBPrM8Yf/fNvjUIA==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4730,10 +4730,10 @@ in
   "@github/copilot-language-server-linux-arm64" = nodeEnv.buildNodePackage {
     name = "_at_github_slash_copilot-language-server-linux-arm64";
     packageName = "@github/copilot-language-server-linux-arm64";
-    version = "1.406.0";
+    version = "1.408.0";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-arm64/-/copilot-language-server-linux-arm64-1.406.0.tgz";
-      sha512 = "I4N+j6BsNSJ4JGX4sBmXNRD3ZbXmuYXb20lGgn3rubCfnjHyyQnv99i3Z/LWV3rqYvyYxZYExfE+7nwKaEhPzw==";
+      url = "https://registry.npmjs.org/@github/copilot-language-server-linux-arm64/-/copilot-language-server-linux-arm64-1.408.0.tgz";
+      sha512 = "vJeycpmXtCAP4ZFjeS5rP+9moTpMO7Q6KYRCvgdck8Nz0vCEPdB6SklIzKNpgvoCUYHn4wo+kwkDYruVhz3n8A==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -4748,10 +4748,10 @@ in
   "@anthropic-ai/claude-code" = nodeEnv.buildNodePackage {
     name = "_at_anthropic-ai_slash_claude-code";
     packageName = "@anthropic-ai/claude-code";
-    version = "2.1.1";
+    version = "2.1.2";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.1.tgz";
-      sha512 = "pZReZIcb4ZFNOlZaAeQxm5O0cTrz6YJeb1kpugqbBjIQC6vVavT1nGSw/9Dk+ti+QEMXap0ibXa1T5i4NgXeqg==";
+      url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.2.tgz";
+      sha512 = "3hrHlSMkEbIjuDPLtwtZJeodP+KYNrPAB1yhnjyfpI522r7ug7jQypfdzUxfoREbxfvsJgKJhmlkOq+K3UJBRw==";
     };
     buildInputs = globalBuildInputs;
     meta = {
@@ -5036,7 +5036,7 @@ in
         sources."body-parser-2.2.2"
         // {
           dependencies = [
-            sources."iconv-lite-0.7.1"
+            sources."iconv-lite-0.7.2"
           ];
         }
       )
@@ -5429,7 +5429,7 @@ in
         sources."raw-body-3.0.2"
         // {
           dependencies = [
-            sources."iconv-lite-0.7.1"
+            sources."iconv-lite-0.7.2"
           ];
         }
       )
