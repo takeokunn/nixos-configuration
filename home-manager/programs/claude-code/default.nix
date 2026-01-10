@@ -72,18 +72,6 @@
         padding = 0;
       };
 
-      hooks = {
-        Stop = [
-          {
-            hooks = [
-              {
-                type = "command";
-                command = "terminal-notifier -message 'ClaudeCodeのタスクが完了しました！' -title 'Claude Code' -sound Blow";
-              }
-            ];
-          }
-        ];
-      };
     };
 
     agents = {
