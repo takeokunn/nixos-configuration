@@ -2266,6 +2266,7 @@
 
     ;; advice
     (advice-add 'lsp-rename :around #'my/advice-disable-buffer-readonly)
+    (advice-add 'lsp-execute-code-action :around #'my/advice-disable-buffer-readonly)
 
     ;; ignore path
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]vendor")
