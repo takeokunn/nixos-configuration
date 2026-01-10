@@ -1,4 +1,3 @@
-{ pkgs }:
 {
   home.file.".config/git/message".source = ./message;
 
@@ -31,6 +30,7 @@
       ".serena/"
       ".cache/"
       "**/.claude/settings.local.json"
+      "coverage.out"
     ];
 
     signing = {

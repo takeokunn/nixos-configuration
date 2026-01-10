@@ -15,7 +15,7 @@ let
   doggo = import ./doggo;
   gh = import ./gh;
   gh-dash = import ./gh-dash;
-  git = import ./git { inherit pkgs; };
+  git = import ./git;
   lnav = import ./lnav { inherit pkgs; };
   mu = import ./mu { inherit pkgs; };
   nix-index = import ./nix-index;
