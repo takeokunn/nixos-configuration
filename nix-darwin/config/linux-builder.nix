@@ -3,8 +3,12 @@
   nix.linux-builder = {
     enable = true;
     ephemeral = false;
-    systems = [ "aarch64-linux" ];
+    systems = [
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
     config = {
+      boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
       virtualisation = {
         cores = 6;
         memorySize = lib.mkForce (1024 * 16);
