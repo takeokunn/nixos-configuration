@@ -133,7 +133,7 @@ let
   # allowlistをTOML形式に変換
   allowlistToToml =
     al:
-    lib.filterAttrs (n: v: v != null && v != [ ] && v != "") {
+    lib.filterAttrs (_: v: v != null && v != [ ] && v != "") {
       inherit (al) description regexTarget condition;
       inherit (al)
         regexes

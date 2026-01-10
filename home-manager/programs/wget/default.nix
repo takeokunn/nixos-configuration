@@ -1,5 +1,4 @@
-{ pkgs }:
-{
+_: {
   programs.wget = {
     enable = true;
     checkCertificate = "off";

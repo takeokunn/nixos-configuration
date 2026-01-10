@@ -1,5 +1,4 @@
-{ pkgs }:
-{
+_: {
   # mini.completion is configured in ui/mini.nix
   # Just keep LSP and lspsaga here
 

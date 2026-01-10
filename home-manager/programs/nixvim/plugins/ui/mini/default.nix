@@ -10,14 +10,14 @@
 #   - completion.nix: Completion, hipatterns, cursorword, trailspace, bufremove, bracketed, map, misc, snippets
 # ════════════════════════════════════════════════════════════════════════════════
 
-{ pkgs }:
+_:
 let
   # Import all domain modules
-  ui = import ./ui.nix { inherit pkgs; };
-  editing = import ./editing.nix { inherit pkgs; };
-  navigation = import ./navigation.nix { inherit pkgs; };
-  git = import ./git.nix { inherit pkgs; };
-  completion = import ./completion.nix { inherit pkgs; };
+  ui = import ./ui.nix { };
+  editing = import ./editing.nix { };
+  navigation = import ./navigation.nix { };
+  git = import ./git.nix { };
+  completion = import ./completion.nix { };
 
   allModules = [
     ui
@@ -26,10 +26,6 @@ let
     git
     completion
   ];
-
-  # Deep merge for plugins.mini.modules
-  mergeModules =
-    modules: builtins.foldl' (acc: m: acc // (m.plugins.mini.modules or { })) { } modules;
 
   # Merge all modules using functional fold pattern
   merged =

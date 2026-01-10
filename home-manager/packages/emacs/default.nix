@@ -4,7 +4,7 @@
   sources,
 }:
 let
-  override = final: prev: {
+  override = _: _: {
   };
 in
 {

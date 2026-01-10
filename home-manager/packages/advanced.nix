@@ -40,5 +40,4 @@ with pkgs;
   # custom macOS apps
   arto
   pinentry_mac
-  terminal-notifier
 ]

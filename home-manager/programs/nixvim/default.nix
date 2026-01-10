@@ -1,7 +1,7 @@
 { pkgs, sources }:
 let
   customPackages = import ./packages { inherit pkgs sources; };
-  plugins = import ./plugins { inherit pkgs sources customPackages; };
+  plugins = import ./plugins { inherit pkgs customPackages; };
   opts = import ./opts;
   baseKeymaps = import ./keymaps;
   basicGlobals = import ./globals;

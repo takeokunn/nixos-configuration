@@ -1,8 +1,4 @@
-{
-  pkgs,
-  customPackages,
-}:
-{
+_: {
   plugins.ts-autotag = {
     enable = true;
   };

@@ -1,4 +1,4 @@
-{ epkgs, pkgs }:
+{ epkgs }:
 let
   grammars = epkgs.treesit-grammars;
   nonBrokenGrammars = grammars.with-grammars (

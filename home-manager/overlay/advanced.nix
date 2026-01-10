@@ -5,7 +5,7 @@
     # ECL 24.5.10 doesn't build with C23/clang - use develop branch with full C23 fixes
     # See: https://gitlab.com/embeddable-common-lisp/ecl/-/issues/775
     # and: https://bugs.debian.org/1115924
-    ecl = prev.ecl.overrideAttrs (oldAttrs: {
+    ecl = prev.ecl.overrideAttrs (_: {
       version = "24.5.10-unstable-2026-01-03";
       src = prev.fetchFromGitLab {
         owner = "embeddable-common-lisp";
@@ -19,8 +19,8 @@
     # Override SBCL to use the fixed ECL for bootstrapping
     sbcl = prev.sbcl.override { ecl = final.ecl; };
     pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-      (python-final: python-prev: {
-        mcp = python-prev.mcp.overrideAttrs (oldAttrs: {
+      (_: python-prev: {
+        mcp = python-prev.mcp.overrideAttrs (_: {
           # Skip the broken postPatch from nixpkgs - upstream mcp v1.25.0 has
           # removed time.sleep(0.1) from several test files that nixpkgs tries to patch
           postPatch = "";

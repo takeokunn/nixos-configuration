@@ -5,7 +5,7 @@
 # files (oil replacement), visits (harpoon replacement), and sessions.
 # ════════════════════════════════════════════════════════════════════════════════
 
-{ pkgs }:
+_:
 let
   utils = import ./utils.nix;
   inherit (utils) mkPickKeymap mkExtraPickKeymap mkMiniKeymap;

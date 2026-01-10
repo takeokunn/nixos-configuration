@@ -1,4 +1,4 @@
-{ pkgs, sources }:
+{ sources }:
 {
   xdg.configFile = {
     # completions

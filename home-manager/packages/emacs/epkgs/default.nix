@@ -6,7 +6,7 @@ let
   buffer = import ./packages/buffer { inherit epkgs; };
   client = import ./packages/client { inherit epkgs pkgs sources; };
   coding = import ./packages/coding { inherit epkgs pkgs sources; };
-  cursor = import ./packages/cursor { inherit epkgs pkgs; };
+  cursor = import ./packages/cursor { inherit epkgs; };
   dired = import ./packages/dired { inherit epkgs; };
   elfeed = import ./packages/elfeed { inherit epkgs; };
   eshell = import ./packages/eshell { inherit epkgs pkgs sources; };
@@ -22,7 +22,7 @@ let
   remote_access = import ./packages/remote_access { inherit epkgs pkgs sources; };
   themes = import ./packages/themes { inherit epkgs; };
   search = import ./packages/search { inherit epkgs; };
-  tree-sitter = import ./packages/tree-sitter { inherit epkgs pkgs; };
+  tree-sitter = import ./packages/tree-sitter { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
 in
 ai

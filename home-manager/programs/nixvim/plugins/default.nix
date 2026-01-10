@@ -30,7 +30,6 @@
 
 {
   pkgs,
-  sources,
   customPackages,
 }:
 let
@@ -44,26 +43,26 @@ let
   # Language Plugins
   # ════════════════════════════════════════════════════════════════════════════
   # Language servers, treesitter, and language-specific tooling
-  languageLsp = import ./language/lsp.nix { inherit pkgs; };
+  languageLsp = import ./language/lsp.nix { };
   languageTreesitter = import ./language/treesitter.nix { inherit pkgs; };
   languageJapanese = import ./language/japanese.nix { inherit pkgs customPackages; };
   languageMarkdown = import ./language/markdown.nix { inherit pkgs customPackages; };
-  languageRust = import ./language/rust.nix { inherit pkgs customPackages; };
-  languageWeb = import ./language/web.nix { inherit pkgs customPackages; };
+  languageRust = import ./language/rust.nix { };
+  languageWeb = import ./language/web.nix { };
 
   # ════════════════════════════════════════════════════════════════════════════
   # Tools Plugins
   # ════════════════════════════════════════════════════════════════════════════
   # Git workflows (neogit, diffview) and miscellaneous utilities
-  toolsGit = import ./tools/git.nix { inherit pkgs customPackages; };
+  toolsGit = import ./tools/git.nix { };
   toolsMisc = import ./tools/misc.nix { inherit pkgs; };
 
   # ════════════════════════════════════════════════════════════════════════════
   # UI Plugins
   # ════════════════════════════════════════════════════════════════════════════
   # mini.nvim ecosystem (26 modules) and complementary UI (trouble, aerial)
-  uiMini = import ./ui/mini { inherit pkgs; };
-  uiNavigation = import ./ui/navigation.nix { inherit pkgs; };
+  uiMini = import ./ui/mini { };
+  uiNavigation = import ./ui/navigation.nix { };
 
   # ════════════════════════════════════════════════════════════════════════════
   # Module Aggregation

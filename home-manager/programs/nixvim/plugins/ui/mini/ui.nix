@@ -5,8 +5,7 @@
 # indentscope, and clue (which-key replacement).
 # ════════════════════════════════════════════════════════════════════════════════
 
-{ pkgs }:
-{
+_: {
   # Disable web-devicons in favor of mini.icons
   plugins.web-devicons.enable = false;
 

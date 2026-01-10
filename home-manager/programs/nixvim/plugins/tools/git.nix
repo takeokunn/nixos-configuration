@@ -1,5 +1,4 @@
-{ pkgs, customPackages }:
-{
+_: {
   # mini.diff and mini.git are configured in ui/mini.nix
   # Keep neogit and diffview for advanced git UI
 

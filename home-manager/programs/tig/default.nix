@@ -1,4 +1,4 @@
-{ pkgs, sources }:
+{ sources }:
 {
   home.file = {
     ".tig/dracula/".source = sources.dracula-tig.src;

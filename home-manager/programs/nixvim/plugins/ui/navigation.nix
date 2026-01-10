@@ -1,5 +1,4 @@
-{ pkgs }:
-{
+_: {
   # mini.clue is configured in ui/mini.nix (replaces which-key)
   # Keep trouble and aerial - no direct mini.nvim equivalent
 

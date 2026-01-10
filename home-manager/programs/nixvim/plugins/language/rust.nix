@@ -1,8 +1,4 @@
-{
-  pkgs,
-  customPackages,
-}:
-{
+_: {
   plugins.rustaceanvim = {
     enable = true;
   };

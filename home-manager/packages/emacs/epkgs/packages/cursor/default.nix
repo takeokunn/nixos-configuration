@@ -1,4 +1,4 @@
-{ pkgs, epkgs }:
+{ epkgs }:
 with epkgs;
 [
   avy

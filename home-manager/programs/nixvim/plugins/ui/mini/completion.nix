@@ -5,7 +5,7 @@
 # (TODO highlighting), cursorword, trailspace, bufremove, bracketed, map, misc, snippets.
 # ════════════════════════════════════════════════════════════════════════════════
 
-{ pkgs }:
+_:
 let
   utils = import ./utils.nix;
   inherit (utils) mkMiniKeymap;

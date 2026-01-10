@@ -1,5 +1,4 @@
-{ config }:
-{
+_: {
   networking = {
     hostName = "nixos";
     networkmanager = {

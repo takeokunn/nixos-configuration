@@ -1,4 +1,9 @@
-{ pkgs, lib, username, ... }:
+{
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 let
   fonts = import ./config/fonts.nix { inherit pkgs; };
   homebrew = import ./config/homebrew.nix;
@@ -7,7 +12,7 @@ let
   nix = import ./config/nix.nix;
   security = import ./config/security.nix;
   services = import ./config/services;
-  system = import ./config/system.nix { inherit pkgs username; };
+  system = import ./config/system.nix { inherit username; };
   time = import ./config/time.nix;
   keyboard = import ./config/keyboard.nix;
   startup = import ./config/startup.nix;

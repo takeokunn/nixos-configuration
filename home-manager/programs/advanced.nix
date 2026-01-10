@@ -2,7 +2,6 @@
   pkgs,
   nodePkgs,
   mcp-servers-nix,
-  sources,
   org-babel,
   emacsPkg,
 }:
