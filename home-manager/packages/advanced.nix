@@ -1,4 +1,8 @@
-{ pkgs, nodePkgs, artoPkg }:
+{
+  pkgs,
+  nodePkgs,
+  artoPkg,
+}:
 with pkgs;
 [
   # for http

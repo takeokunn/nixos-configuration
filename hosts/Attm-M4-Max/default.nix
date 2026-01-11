@@ -50,7 +50,12 @@ nix-darwin.lib.darwinSystem {
           inherit system username;
           inherit (inputs) nixpkgs nixvim;
           inherit (inputs) mcp-servers-nix;
-          inherit (inputs) emacs-overlay org-babel brew-nix arto;
+          inherit (inputs)
+            emacs-overlay
+            org-babel
+            brew-nix
+            arto
+            ;
         };
       };
     }
