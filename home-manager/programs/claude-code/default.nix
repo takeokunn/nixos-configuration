@@ -95,8 +95,9 @@
       bug = builtins.readFile ./commands/bug.md;
       define = builtins.readFile ./commands/define.md;
       execute = builtins.readFile ./commands/execute.md;
-      markdown = builtins.readFile ./commands/markdown.md;
       feedback = builtins.readFile ./commands/feedback.md;
+      markdown = builtins.readFile ./commands/markdown.md;
+      upstream = builtins.readFile ./commands/upstream.md;
     };
 
     hooks = {
@@ -123,6 +124,9 @@
       aws-ecosystem = builtins.readFile ./skills/aws-ecosystem/SKILL.md;
       cplusplus-ecosystem = builtins.readFile ./skills/cplusplus-ecosystem/SKILL.md;
       sql-ecosystem = builtins.readFile ./skills/sql-ecosystem/SKILL.md;
+      c-ecosystem = builtins.readFile ./skills/c-ecosystem/SKILL.md;
+      php-ecosystem = builtins.readFile ./skills/php-ecosystem/SKILL.md;
+      swift-ecosystem = builtins.readFile ./skills/swift-ecosystem/SKILL.md;
     };
 
     mcpServers =

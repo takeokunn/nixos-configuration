@@ -147,6 +147,8 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <skill name="cplusplus-ecosystem">C++ language, CMake, and modern C++ patterns</skill>
 <skill name="c-ecosystem">C language (C11/C17/C23), memory management, CLI development patterns</skill>
 <skill name="php-ecosystem">PHP 8.3+, PSR standards, Composer, PHPStan, and modern PHP patterns</skill>
+<skill name="sql-ecosystem">SQL dialect patterns, query optimization, and database schema design</skill>
+<skill name="swift-ecosystem">Swift language, SPM, SwiftLint, SwiftFormat, and cross-platform patterns</skill>
 </skills>
 
 <decision_tree name="agent_selection">
@@ -156,6 +158,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <branch condition="Investigation or debugging">Use /bug or /ask command</branch>
 <branch condition="Code review">Use /feedback command</branch>
 <branch condition="Documentation">Use /markdown command</branch>
+<branch condition="Upstream PR preparation">Use /upstream command</branch>
 </decision_tree>
 
 <parallelization>

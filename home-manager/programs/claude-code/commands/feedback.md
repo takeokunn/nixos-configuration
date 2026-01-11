@@ -275,6 +275,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <command name="define">Feedback on execution plans</command>
 <command name="bug">Feedback on investigation quality</command>
 <command name="ask">Feedback on answer accuracy</command>
+<command name="upstream">Review before submitting upstream PR</command>
 </related_commands>
 
 <related_skills>

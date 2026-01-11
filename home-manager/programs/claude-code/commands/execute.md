@@ -245,6 +245,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <command name="ask">When implementation requires investigation</command>
 <command name="bug">When implementation encounters unexpected errors</command>
 <command name="feedback">Review work after execution completion</command>
+<command name="upstream">When preparing changes for upstream OSS contribution</command>
 </related_commands>
 
 <related_skills>
