@@ -29,10 +29,9 @@ jobs:
           export LANG=en_US.UTF-8
           export LC_ALL=en_US.UTF-8
           nix run nixpkgs#nvfetcher
-      - name: Run node2nix
+      - name: Update npm packages
         run: |
-          cd node2nix/
-          nix-shell -p nodePackages.node2nix --command "node2nix -i ./node-packages.json -o node-packages.nix"
+          nix-shell -p nodejs perl --command "bash home-manager/packages/node/update.sh" || true
       - name: Run flake update
         run: nix flake update
       - name: Run fmt
