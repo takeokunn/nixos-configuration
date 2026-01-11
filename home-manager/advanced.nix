@@ -5,6 +5,7 @@
   emacs-overlay,
   mcp-servers-nix,
   brew-nix,
+  arto,
   ...
 }:
 let
@@ -17,6 +18,7 @@ let
   basicOverlay = import ./overlay/basic.nix;
   advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
   brewNixOverlay = if isDarwin then [ brew-nix.overlays.default ] else [ ];
+  artoPkg = if isDarwin then arto.packages.${system}.default else null;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
@@ -27,7 +29,7 @@ let
     inherit pkgs;
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
-  advancedPkgs = import ./packages/advanced.nix { inherit pkgs nodePkgs; };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs nodePkgs artoPkg; };
 
   # emacs package
   emacs = import ./packages/emacs {

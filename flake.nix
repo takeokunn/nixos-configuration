@@ -62,6 +62,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.cl-nix-lite.inputs.nixpkgs.follows = "nixpkgs";
     };
+    arto = {
+      url = "github:arto-app/Arto";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

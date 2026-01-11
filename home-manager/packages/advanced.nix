@@ -1,4 +1,4 @@
-{ pkgs, nodePkgs }:
+{ pkgs, nodePkgs, artoPkg }:
 with pkgs;
 [
   # for http
@@ -38,6 +38,6 @@ with pkgs;
   brewCasks.element
 
   # custom macOS apps
-  arto
+  artoPkg
   pinentry_mac
 ]
