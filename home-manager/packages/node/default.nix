@@ -140,7 +140,7 @@ in
     npmName = "@github/copilot-language-server";
     version = copilotVersion;
     hash = "sha256-7+A2rGqf8/TNRrDaPaHWWGayGk0O4IGlF6LoeQi1Mfg=";
-    npmDepsHash = "sha256-m092wyoOnnKn3BELeAFc4Ca+yT6xJFEXr2a2ZmM3CF4=";
+    npmDepsHash = "sha256-m6wj8PpHNbl3p4XH0WevPcHcPlmVJZFBcAjfn37+It0=";
     npmFlags = [ "--omit=optional" ];
     description = "GitHub Copilot Language Server";
     homepage = "https://github.com/github/copilot";
