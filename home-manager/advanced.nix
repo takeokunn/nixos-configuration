@@ -25,7 +25,7 @@ let
     overlays =
       basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
-  nodePkgs = pkgs.callPackage ../node2nix {
+  nodePkgs = import ./packages/node {
     inherit pkgs;
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
@@ -62,6 +62,8 @@ let
 in
 {
   imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+
+  nixpkgs.config.allowUnfree = true;
 
   home.stateVersion = "24.11";
   home.enableNixpkgsReleaseCheck = false;
