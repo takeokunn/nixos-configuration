@@ -24,8 +24,7 @@
 :CUSTOM_ID: see-also
 :END:
 - [[./early-init][early-init.org]]
-- [[./yasnippets][yasnippets.org]]
-- [[./elfeed][elfeed.org]]
+- [[./yasnippet][yasnippet.org]]
 * Header
 :PROPERTIES:
 :CUSTOM_ID: header
