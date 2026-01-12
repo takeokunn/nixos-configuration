@@ -46,9 +46,9 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define a class with slots. Slot options: :initarg, :initform, :accessor, :reader, :writer, :type, :documentation.</description>
     <example>
       (defclass person ()
-      ((name :initarg :name :accessor person-name)
-      (age :initarg :age :accessor person-age))
-      (:documentation "Represents a person."))
+        ((name :initarg :name :accessor person-name)
+         (age :initarg :age :accessor person-age))
+        (:documentation "Represents a person."))
     </example>
   </pattern>
 
@@ -56,10 +56,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define generic functions with multiple method implementations.</description>
     <example>
       (defgeneric greet (entity)
-      (:documentation "Greet an entity."))
+        (:documentation "Greet an entity."))
 
       (defmethod greet ((p person))
-      (format t "Hello, ~a!~%" (person-name p)))
+        (format t "Hello, ~a!~%" (person-name p)))
     </example>
     <decision_tree name="when_to_use">
       <question>Do you need polymorphic behavior based on multiple types?</question>
@@ -72,12 +72,12 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Method qualifiers (:before, :after, :around) for aspect-oriented programming.</description>
     <example>
       (defmethod greet :before ((p person))
-      (format t "Preparing to greet...~%"))
+        (format t "Preparing to greet...~%"))
 
       (defmethod greet :around ((p person))
-      (format t "[Start]~%")
-      (call-next-method)
-      (format t "[End]~%"))
+        (format t "[Start]~%")
+        (call-next-method)
+        (format t "[End]~%"))
     </example>
   </pattern>
 
@@ -85,7 +85,7 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Classes can inherit from multiple parent classes. Uses C3 linearization for method resolution order.</description>
     <example>
       (defclass employee (person job-holder)
-      ((employee-id :initarg :id :accessor employee-id)))
+        ((employee-id :initarg :id :accessor employee-id)))
     </example>
   </pattern>
 </clos>
@@ -97,10 +97,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Handle conditions similar to try-catch</description>
     <example>
       (handler-case
-      (/ 1 0)
-      (division-by-zero (c)
-      (format t "Caught: ~a~%" c)
-      0))
+          (/ 1 0)
+        (division-by-zero (c)
+          (format t "Caught: ~a~%" c)
+          0))
     </example>
   </pattern>
 
@@ -108,12 +108,12 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Handle conditions without unwinding stack</description>
     <example>
       (handler-bind
-      ((error #'(lambda (c)
-      (format t "Error occurred: ~a~%" c)
-      (invoke-restart 'use-value 0))))
-      (restart-case
-      (error "Something went wrong")
-      (use-value (v) v)))
+          ((error #'(lambda (c)
+                      (format t "Error occurred: ~a~%" c)
+                      (invoke-restart 'use-value 0))))
+        (restart-case
+            (error "Something went wrong")
+          (use-value (v) v)))
     </example>
   </pattern>
 
@@ -121,15 +121,15 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define recovery points</description>
     <example>
       (defun parse-entry (entry)
-      (restart-case
-      (parse-integer entry)
-      (use-value (v)
-      :report "Use a different value"
-      :interactive (lambda () (list (read)))
-      v)
-      (skip-entry ()
-      :report "Skip this entry"
-      nil)))
+        (restart-case
+            (parse-integer entry)
+          (use-value (v)
+            :report "Use a different value"
+            :interactive (lambda () (list (read)))
+            v)
+          (skip-entry ()
+            :report "Skip this entry"
+            nil)))
     </example>
     <decision_tree name="when_to_use">
       <question>Can the error be recovered interactively or programmatically?</question>
@@ -142,10 +142,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define custom condition types for structured error handling.</description>
     <example>
       (define-condition invalid-input (error)
-      ((value :initarg :value :reader invalid-input-value))
-      (:report (lambda (c stream)
-      (format stream "Invalid input: ~a"
-      (invalid-input-value c)))))
+        ((value :initarg :value :reader invalid-input-value))
+        (:report (lambda (c stream)
+                   (format stream "Invalid input: ~a"
+                           (invalid-input-value c)))))
     </example>
   </pattern>
 </conditions>
@@ -155,10 +155,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define packages with explicit dependencies and exports.</description>
     <example>
       (defpackage #:my-project
-      (:use #:cl)
-      (:import-from #:alexandria #:when-let #:if-let)
-      (:export #:main
-      #:process-data))
+        (:use #:cl)
+        (:import-from #:alexandria #:when-let #:if-let)
+        (:export #:main
+                 #:process-data))
     </example>
   </pattern>
 
@@ -166,9 +166,9 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define local package nicknames for shorter, clearer references.</description>
     <example>
       (defpackage #:my-project
-      (:use #:cl)
-      (:local-nicknames (#:a #:alexandria)
-      (#:s #:serapeum)))
+        (:use #:cl)
+        (:local-nicknames (#:a #:alexandria)
+                          (#:s #:serapeum)))
     </example>
   </pattern>
 </packages>
@@ -180,14 +180,14 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Basic ASDF system definition with metadata and component dependencies.</description>
     <example>
       (defsystem "my-project"
-      :description "My project description"
-      :version "0.1.0"
-      :author "Author Name"
-      :license "MIT"
-      :depends-on ("alexandria" "cl-ppcre")
-      :components ((:file "package")
-      (:file "utils" :depends-on ("package"))
-      (:file "main" :depends-on ("utils"))))
+        :description "My project description"
+        :version "0.1.0"
+        :author "Author Name"
+        :license "MIT"
+        :depends-on ("alexandria" "cl-ppcre")
+        :components ((:file "package")
+                     (:file "utils" :depends-on ("package"))
+                     (:file "main" :depends-on ("utils"))))
     </example>
   </pattern>
 
@@ -195,13 +195,13 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Organize system components into modules for better structure.</description>
     <example>
       (defsystem "my-project"
-      :components
-      ((:module "src"
-      :components ((:file "package")
-      (:file "core" :depends-on ("package"))))
-      (:module "tests"
-      :depends-on ("src")
-      :components ((:file "test-suite")))))
+        :components
+        ((:module "src"
+          :components ((:file "package")
+                       (:file "core" :depends-on ("package"))))
+         (:module "tests"
+          :depends-on ("src")
+          :components ((:file "test-suite")))))
     </example>
   </pattern>
 
@@ -209,13 +209,13 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Infer dependencies from defpackage forms for modern, maintainable systems.</description>
     <example>
       (defsystem "my-project"
-      :class :package-inferred-system
-      :depends-on ("my-project/main"))
+        :class :package-inferred-system
+        :depends-on ("my-project/main"))
 
       ;; In my-project/main.lisp:
       (defpackage #:my-project/main
-      (:use #:cl)
-      (:import-from #:my-project/utils #:helper))
+        (:use #:cl)
+        (:import-from #:my-project/utils #:helper))
     </example>
     <decision_tree name="when_to_use">
       <question>Do you want automatic dependency inference from package definitions?</question>
@@ -228,11 +228,11 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define test system with automatic test execution using test-op.</description>
     <example>
       (defsystem "my-project/test"
-      :depends-on ("my-project" "fiveam")
-      :components ((:file "tests"))
-      :perform (test-op (o s)
-      (uiop:symbol-call :fiveam '#:run!
-      (uiop:find-symbol* '#:my-test-suite :my-project/test))))
+        :depends-on ("my-project" "fiveam")
+        :components ((:file "tests"))
+        :perform (test-op (o s)
+                   (uiop:symbol-call :fiveam '#:run!
+                     (uiop:find-symbol* '#:my-test-suite :my-project/test))))
     </example>
   </pattern>
 
@@ -242,11 +242,11 @@ description: This skill should be used when the user asks to "write common lisp"
       my-project/
       ├── my-project.asd
       ├── src/
-      │ ├── package.lisp
-      │ ├── utils.lisp
-      │ └── main.lisp
+      │   ├── package.lisp
+      │   ├── utils.lisp
+      │   └── main.lisp
       └── tests/
-      └── test-suite.lisp
+          └── test-suite.lisp
     </example>
   </pattern>
 </asdf>
@@ -258,13 +258,13 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Create standalone executable with SBCL.</description>
     <example>
       (defun main ()
-      (format t "Hello, World!~%")
-      (sb-ext:exit :code 0))
+        (format t "Hello, World!~%")
+        (sb-ext:exit :code 0))
 
       (sb-ext:save-lisp-and-die "my-app"
-      :toplevel #'main
-      :executable t
-      :compression t)
+        :toplevel #'main
+        :executable t
+        :compression t)
     </example>
   </pattern>
 
@@ -274,15 +274,15 @@ description: This skill should be used when the user asks to "write common lisp"
       (defvar *result* nil)
 
       (let ((thread (sb-thread:make-thread
-      (lambda ()
-      (setf _result_ (heavy-computation)))
-      :name "worker")))
-      (sb-thread:join-thread thread))
+                      (lambda ()
+                        (setf _result_ (heavy-computation)))
+                      :name "worker")))
+        (sb-thread:join-thread thread))
 
       ;; Mutex
       (defvar _lock_ (sb-thread:make-mutex))
       (sb-thread:with-mutex (_lock_)
-      (critical-section))
+        (critical-section))
     </example>
   </pattern>
 
@@ -290,7 +290,7 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Call C functions from SBCL using sb-alien interface.</description>
     <example>
       (sb-alien:define-alien-routine "strlen" sb-alien:int
-      (str sb-alien:c-string))
+        (str sb-alien:c-string))
 
       (strlen "hello") ; => 5
     </example>
@@ -300,9 +300,9 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Use declarations for type information and optimization settings. Options: type, ftype, inline, optimize.</description>
     <example>
       (defun fast-add (x y)
-      (declare (type fixnum x y)
-      (optimize (speed 3) (safety 0)))
-      (the fixnum (+ x y)))
+        (declare (type fixnum x y)
+                 (optimize (speed 3) (safety 0)))
+        (the fixnum (+ x y)))
     </example>
   </pattern>
 
@@ -331,15 +331,15 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define algebraic data types in Coalton with type-safe operations.</description>
     <example>
       (coalton-toplevel
-      (define-type (Maybe a)
-      None
-      (Some a))
+        (define-type (Maybe a)
+          None
+          (Some a))
 
-      (declare safe-div (Integer -> Integer -> (Maybe Integer)))
-      (define (safe-div x y)
-      (if (== y 0)
-      None
-      (Some (/ x y)))))
+        (declare safe-div (Integer -> Integer -> (Maybe Integer)))
+        (define (safe-div x y)
+          (if (== y 0)
+              None
+              (Some (/ x y)))))
     </example>
   </pattern>
 
@@ -347,12 +347,12 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Define type classes for polymorphic behavior in Coalton.</description>
     <example>
       (coalton-toplevel
-      (define-class (Printable a)
-      (print-it (a -> String)))
+        (define-class (Printable a)
+          (print-it (a -> String)))
 
-      (define-instance (Printable Integer)
-      (define (print-it x)
-      (into x))))
+        (define-instance (Printable Integer)
+          (define (print-it x)
+            (into x))))
     </example>
   </pattern>
 
@@ -414,8 +414,8 @@ description: This skill should be used when the user asks to "write common lisp"
     <example>
       ;; Get ASDF documentation
       mcp__context7__get-library-docs
-      context7CompatibleLibraryID="/websites/asdf_common-lisp_dev"
-      topic="defsystem"
+        context7CompatibleLibraryID="/websites/asdf_common-lisp_dev"
+        topic="defsystem"
     </example>
   </pattern>
 </context7_libraries>
@@ -425,10 +425,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Resource management with unwind-protect for cleanup.</description>
     <example>
       (defmacro with-open-socket ((var host port) &body body)
-      `(let ((,var (make-socket ,host ,port)))
-      (unwind-protect
-      (progn ,@body)
-      (close-socket ,var))))
+        `(let ((,var (make-socket ,host ,port)))
+           (unwind-protect
+               (progn ,@body)
+             (close-socket ,var))))
     </example>
   </pattern>
 
@@ -436,10 +436,10 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Loop macro for iteration with collection, filtering, and accumulation.</description>
     <example>
       (loop for item in list
-      for i from 0
-      when (evenp i)
-      collect item into evens
-      finally (return evens))
+            for i from 0
+            when (evenp i)
+              collect item into evens
+            finally (return evens))
     </example>
   </pattern>
 
@@ -454,9 +454,9 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Document functions with docstrings explaining purpose and parameters.</description>
     <example>
       (defun my-function (arg)
-      "Docstring describing the function.
-      ARG is the argument description."
-      (process arg))
+        "Docstring describing the function.
+         ARG is the argument description."
+        (process arg))
     </example>
   </pattern>
 </common_patterns>

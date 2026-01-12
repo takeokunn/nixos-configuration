@@ -44,8 +44,8 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Define functions with defun</description>
     <example>
       (defun my-function (arg1 arg2)
-      "Docstring describing the function."
-      (+ arg1 arg2))
+        "Docstring describing the function."
+        (+ arg1 arg2))
     </example>
   </pattern>
 
@@ -53,12 +53,12 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Local variable binding with let and let*</description>
     <example>
       (let ((x 1)
-      (y 2))
-      (+ x y))
+            (y 2))
+        (+ x y))
 
       (let\* ((x 1)
-      (y (+ x 1))) ; y can reference x
-      y)
+              (y (+ x 1))) ; y can reference x
+        y)
     </example>
   </pattern>
 
@@ -66,24 +66,24 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Conditional forms: if, when, unless, cond, pcase</description>
     <example>
       (if condition
-      then-form
-      else-form)
+          then-form
+        else-form)
 
       (when condition
-      body-forms...)
+        body-forms...)
 
       (unless condition
-      body-forms...)
+        body-forms...)
 
       (cond
-      (condition1 result1)
-      (condition2 result2)
-      (t default-result))
+        (condition1 result1)
+        (condition2 result2)
+        (t default-result))
 
       (pcase value
-      ('symbol (handle-symbol))
-      ((pred stringp) (handle-string))
-      (\_ (handle-default)))
+        ('symbol (handle-symbol))
+        ((pred stringp) (handle-string))
+        (\_ (handle-default)))
     </example>
   </pattern>
 
@@ -91,13 +91,13 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Iteration patterns: dolist, dotimes, cl-loop, seq functions</description>
     <example>
       (dolist (item list)
-      (process item))
+        (process item))
 
       (dotimes (i 10)
-      (process i))
+        (process i))
 
       (cl-loop for item in list
-      collect (transform item))
+               collect (transform item))
 
       (seq-map #'transform sequence)
       (seq-filter #'predicate sequence)
@@ -120,13 +120,13 @@ description: This skill should be used when the user asks to "write elisp", "ema
   <pattern name="macros">
     <description>Define macros with defmacro. Use backquote for templates, comma for evaluation</description>
     <example>
-      (defmacro with-temp-message (msg &rest body)
-      "Execute BODY with MSG displayed temporarily."
-      `(let ((message-log-max nil))
-      (message "%s" ,msg)
-      (unwind-protect
-      (progn ,@body)
-      (message nil))))
+      (defmacro with-temp-message (msg &amp;rest body)
+        "Execute BODY with MSG displayed temporarily."
+        `(let ((message-log-max nil))
+           (message "%s" ,msg)
+           (unwind-protect
+               (progn ,@body)
+             (message nil))))
     </example>
   </pattern>
 </elisp_fundamentals>
@@ -145,18 +145,18 @@ description: This skill should be used when the user asks to "write elisp", "ema
       ;; Bootstrap package manager
       (require 'package)
       (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-      ("gnu" . "https://elpa.gnu.org/packages/")
-      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+            '(("melpa" . "https://melpa.org/packages/")
+              ("gnu" . "https://elpa.gnu.org/packages/")
+              ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
       (package-initialize)
 
       ;; Install use-package if not present
       (unless (package-installed-p 'use-package)
-      (package-refresh-contents)
-      (package-install 'use-package))
+        (package-refresh-contents)
+        (package-install 'use-package))
 
       (eval-when-compile
-      (require 'use-package))
+        (require 'use-package))
 
       ;; Configuration sections...
 
@@ -174,17 +174,17 @@ description: This skill should be used when the user asks to "write elisp", "ema
     </decision_tree>
     <example>
       (use-package company
-      :ensure t
-      :defer t
-      :hook (prog-mode . company-mode)
-      :bind (:map company-active-map
-      ("C-n" . company-select-next)
-      ("C-p" . company-select-previous))
-      :custom
-      (company-idle-delay 0.2)
-      (company-minimum-prefix-length 2)
-      :config
-      (setq company-backends '(company-capf)))
+        :ensure t
+        :defer t
+        :hook (prog-mode . company-mode)
+        :bind (:map company-active-map
+                    ("C-n" . company-select-next)
+                    ("C-p" . company-select-previous))
+        :custom
+        (company-idle-delay 0.2)
+        (company-minimum-prefix-length 2)
+        :config
+        (setq company-backends '(company-capf)))
     </example>
     <note>
       Keywords:
@@ -212,12 +212,12 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
       ;; With use-package
       (use-package magit
-      :bind (("C-x g" . magit-status)
-      ("C-x M-g" . magit-dispatch)))
+        :bind (("C-x g" . magit-status)
+               ("C-x M-g" . magit-dispatch)))
 
       ;; Keymap definition
       (defvar my-prefix-map (make-sparse-keymap)
-      "Keymap for my custom commands.")
+        "Keymap for my custom commands.")
       (global-set-key (kbd "C-c m") my-prefix-map)
       (define-key my-prefix-map (kbd "f") #'find-file)
     </example>
@@ -234,21 +234,21 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
       ;; Lambda in hook (discouraged for removability)
       (add-hook 'after-save-hook
-      (lambda () (message "Saved!")))
+                (lambda () (message "Saved!")))
 
       ;; With use-package
       (use-package flycheck
-      :hook (prog-mode . flycheck-mode))
+        :hook (prog-mode . flycheck-mode))
     </example>
   </pattern>
 
   <pattern name="advice">
     <description>Modify existing functions with advice-add and advice-remove</description>
     <example>
-      (defun my-after-save-message (orig-fun &rest args)
-      "Show message after save."
-      (apply orig-fun args)
-      (message "Buffer saved at %s" (current-time-string)))
+      (defun my-after-save-message (orig-fun &amp;rest args)
+        "Show message after save."
+        (apply orig-fun args)
+        (message "Buffer saved at %s" (current-time-string)))
 
       (advice-add 'save-buffer :around #'my-after-save-message)
 
@@ -261,19 +261,19 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Define customizable variables with defgroup and defcustom</description>
     <example>
       (defgroup my-package nil
-      "My package customization."
-      :group 'convenience
-      :prefix "my-package-")
+        "My package customization."
+        :group 'convenience
+        :prefix "my-package-")
 
       (defcustom my-package-option t
-      "Enable my-package option."
-      :type 'boolean
-      :group 'my-package)
+        "Enable my-package option."
+        :type 'boolean
+        :group 'my-package)
 
       (defcustom my-package-list '("a" "b")
-      "List of strings."
-      :type '(repeat string)
-      :group 'my-package)
+        "List of strings."
+        :type '(repeat string)
+        :group 'my-package)
     </example>
   </pattern>
 </configuration_patterns>
@@ -290,8 +290,8 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
       (require 'package)
       (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-      ("gnu" . "https://elpa.gnu.org/packages/")))
+            '(("melpa" . "https://melpa.org/packages/")
+              ("gnu" . "https://elpa.gnu.org/packages/")))
       (package-initialize)
 
       ;; Install a package
@@ -305,15 +305,15 @@ description: This skill should be used when the user asks to "write elisp", "ema
       ;; Bootstrap
       (defvar bootstrap-version)
       (let ((bootstrap-file
-      (expand-file-name "straight/repos/straight.el/bootstrap.el"
-      user-emacs-directory)))
-      (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-      (url-retrieve-synchronously
-      "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el")
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-      (load bootstrap-file nil 'nomessage))
+             (expand-file-name "straight/repos/straight.el/bootstrap.el"
+                               user-emacs-directory)))
+        (unless (file-exists-p bootstrap-file)
+          (with-current-buffer
+              (url-retrieve-synchronously
+               "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el")
+            (goto-char (point-max))
+            (eval-print-last-sexp)))
+        (load bootstrap-file nil 'nomessage))
 
       ;; Use with use-package
       (straight-use-package 'use-package)
@@ -321,7 +321,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
       ;; Install package
       (use-package magit
-      :straight t)
+        :straight t)
     </example>
   </tool>
 
@@ -335,10 +335,10 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
       ;; Use with use-package
       (elpaca elpaca-use-package
-      (elpaca-use-package-mode))
+        (elpaca-use-package-mode))
 
       (use-package magit
-      :ensure t)
+        :ensure t)
     </example>
   </tool>
 </tools>
@@ -350,10 +350,10 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Basic Magit setup with use-package</description>
     <example>
       (use-package magit
-      :ensure t
-      :bind (("C-x g" . magit-status)
-      ("C-x M-g" . magit-dispatch)
-      ("C-c M-g" . magit-file-dispatch)))
+        :ensure t
+        :bind (("C-x g" . magit-status)
+               ("C-x M-g" . magit-dispatch)
+               ("C-c M-g" . magit-file-dispatch)))
     </example>
   </pattern>
 
@@ -377,7 +377,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <example>
       (setq magit-save-repository-buffers 'dontask)
       (setq magit-display-buffer-function
-      #'magit-display-buffer-same-window-except-diff-v1)
+            #'magit-display-buffer-same-window-except-diff-v1)
       (setq magit-diff-refine-hunk 'all)
     </example>
   </pattern>
@@ -386,8 +386,8 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>GitHub/GitLab integration with Forge</description>
     <example>
       (use-package forge
-      :after magit
-      :ensure t)
+        :after magit
+        :ensure t)
     </example>
   </pattern>
 </magit>
@@ -403,17 +403,17 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Built-in LSP client (Emacs 29+)</description>
     <example>
       (use-package eglot
-      :ensure nil ; built-in
-      :hook ((python-mode . eglot-ensure)
-      (typescript-mode . eglot-ensure)
-      (rust-mode . eglot-ensure))
-      :config
-      (setq eglot-autoshutdown t)
-      (setq eglot-events-buffer-size 0))
+        :ensure nil ; built-in
+        :hook ((python-mode . eglot-ensure)
+               (typescript-mode . eglot-ensure)
+               (rust-mode . eglot-ensure))
+        :config
+        (setq eglot-autoshutdown t)
+        (setq eglot-events-buffer-size 0))
 
       ;; Custom server configuration
       (add-to-list 'eglot-server-programs
-      '(rust-mode . ("rust-analyzer")))
+                   '(rust-mode . ("rust-analyzer")))
     </example>
   </pattern>
 
@@ -421,23 +421,23 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Feature-rich LSP client with lsp-mode and lsp-ui</description>
     <example>
       (use-package lsp-mode
-      :ensure t
-      :hook ((python-mode . lsp-deferred)
-      (typescript-mode . lsp-deferred))
-      :commands (lsp lsp-deferred)
-      :custom
-      (lsp-keymap-prefix "C-c l")
-      (lsp-idle-delay 0.5)
-      (lsp-log-io nil)
-      :config
-      (lsp-enable-which-key-integration t))
+        :ensure t
+        :hook ((python-mode . lsp-deferred)
+               (typescript-mode . lsp-deferred))
+        :commands (lsp lsp-deferred)
+        :custom
+        (lsp-keymap-prefix "C-c l")
+        (lsp-idle-delay 0.5)
+        (lsp-log-io nil)
+        :config
+        (lsp-enable-which-key-integration t))
 
       (use-package lsp-ui
-      :ensure t
-      :hook (lsp-mode . lsp-ui-mode)
-      :custom
-      (lsp-ui-doc-enable t)
-      (lsp-ui-sideline-enable t))
+        :ensure t
+        :hook (lsp-mode . lsp-ui-mode)
+        :custom
+        (lsp-ui-doc-enable t)
+        (lsp-ui-sideline-enable t))
     </example>
   </pattern>
 
@@ -446,19 +446,19 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <example>
       ;; With corfu (modern)
       (use-package corfu
-      :ensure t
-      :custom
-      (corfu-auto t)
-      (corfu-cycle t)
-      :init
-      (global-corfu-mode))
+        :ensure t
+        :custom
+        (corfu-auto t)
+        (corfu-cycle t)
+        :init
+        (global-corfu-mode))
 
       ;; With company (traditional)
       (use-package company
-      :ensure t
-      :hook (after-init . global-company-mode)
-      :custom
-      (company-idle-delay 0.2))
+        :ensure t
+        :hook (after-init . global-company-mode)
+        :custom
+        (company-idle-delay 0.2))
     </example>
   </pattern>
 </lsp_integration>
@@ -468,23 +468,23 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Vertical completion UI with orderless, marginalia, and consult</description>
     <example>
       (use-package vertico
-      :ensure t
-      :init (vertico-mode))
+        :ensure t
+        :init (vertico-mode))
 
       (use-package orderless
-      :ensure t
-      :custom
-      (completion-styles '(orderless basic)))
+        :ensure t
+        :custom
+        (completion-styles '(orderless basic)))
 
       (use-package marginalia
-      :ensure t
-      :init (marginalia-mode))
+        :ensure t
+        :init (marginalia-mode))
 
       (use-package consult
-      :ensure t
-      :bind (("C-s" . consult-line)
-      ("C-x b" . consult-buffer)
-      ("M-g g" . consult-goto-line)))
+        :ensure t
+        :bind (("C-s" . consult-line)
+               ("C-x b" . consult-buffer)
+               ("M-g g" . consult-goto-line)))
     </example>
   </tool>
 
@@ -492,9 +492,9 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Display available keybindings</description>
     <example>
       (use-package which-key
-      :ensure t
-      :diminish
-      :init (which-key-mode))
+        :ensure t
+        :diminish
+        :init (which-key-mode))
     </example>
   </tool>
 
@@ -502,19 +502,19 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Tree-sitter integration (Emacs 29+)</description>
     <example>
       (setq treesit-language-source-alist
-      '((python "https://github.com/tree-sitter/tree-sitter-python")
-      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-      (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
-      "master" "typescript/src")))
+            '((python "https://github.com/tree-sitter/tree-sitter-python")
+              (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+              (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
+                          "master" "typescript/src")))
 
       ;; Install grammars
       (mapc #'treesit-install-language-grammar
-      (mapcar #'car treesit-language-source-alist))
+            (mapcar #'car treesit-language-source-alist))
 
       ;; Remap modes
       (setq major-mode-remap-alist
-      '((python-mode . python-ts-mode)
-      (javascript-mode . js-ts-mode)))
+            '((python-mode . python-ts-mode)
+              (javascript-mode . js-ts-mode)))
     </example>
   </tool>
 </modern_packages>

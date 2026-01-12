@@ -68,24 +68,22 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Table creation with constraints</description>
       <example>
         CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(100) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) NOT NULL UNIQUE,
+          name VARCHAR(100) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-        CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
-
+          CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
         );
 
         CREATE TABLE orders (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        total DECIMAL(10, 2) NOT NULL,
-        status VARCHAR(20) DEFAULT 'pending',
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          total DECIMAL(10, 2) NOT NULL,
+          status VARCHAR(20) DEFAULT 'pending',
 
-        CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
+          CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
       </example>
     </pattern>
@@ -168,9 +166,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
         -- Multi-row insert
         INSERT INTO users (email, name) VALUES
-        ('user1@example.com', 'User One'),
-        ('user2@example.com', 'User Two'),
-        ('user3@example.com', 'User Three');
+          ('user1@example.com', 'User One'),
+          ('user2@example.com', 'User Two'),
+          ('user3@example.com', 'User Three');
 
         -- Insert with returning (PostgreSQL)
         INSERT INTO users (email, name)
@@ -236,38 +234,38 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- PostgreSQL with psycopg2/psycopg3 (Python)
         cursor.execute(
-        "SELECT * FROM users WHERE email = %s AND status = %s",
-        (user_email, status)
+          "SELECT * FROM users WHERE email = %s AND status = %s",
+          (user_email, status)
         )
 
         -- PostgreSQL with pg (Node.js)
         client.query(
-        'SELECT \* FROM users WHERE email = $1 AND status = $2',
-        [userEmail, status]
+          'SELECT \* FROM users WHERE email = $1 AND status = $2',
+          [userEmail, status]
         )
 
         -- MySQL with mysql-connector (Python)
         cursor.execute(
-        "SELECT \* FROM users WHERE email = %s AND status = %s",
-        (user_email, status)
+          "SELECT \* FROM users WHERE email = %s AND status = %s",
+          (user_email, status)
         )
 
         -- MySQL with mysql2 (Node.js)
         connection.execute(
-        'SELECT \* FROM users WHERE email = ? AND status = ?',
-        [userEmail, status]
+          'SELECT \* FROM users WHERE email = ? AND status = ?',
+          [userEmail, status]
         )
 
         -- SQLite with sqlite3 (Python)
         cursor.execute(
-        "SELECT \* FROM users WHERE email = ? AND status = ?",
-        (user_email, status)
+          "SELECT \* FROM users WHERE email = ? AND status = ?",
+          (user_email, status)
         )
 
         -- Go with database/sql
         db.Query(
-        "SELECT _ FROM users WHERE email = $1 AND status = $2",
-        userEmail, status
+          "SELECT _ FROM users WHERE email = $1 AND status = $2",
+          userEmail, status
         )
       </example>
       <warning>NEVER use string concatenation or template literals with user input - this enables SQL injection attacks</warning>
@@ -292,8 +290,8 @@ description: This skill should be used when working with SQL databases, "SELECT"
         -- Python: escaped = user*input.replace('%', '\\%').replace('*', '\\\_')
         -- Then use parameterized query:
         cursor.execute(
-        "SELECT \* FROM products WHERE name LIKE %s",
-        ('%' + escaped_input + '%',)
+          "SELECT \* FROM products WHERE name LIKE %s",
+          ('%' + escaped_input + '%',)
         )
 
         -- PostgreSQL: Use ESCAPE clause explicitly
@@ -317,9 +315,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
         ALLOWED_TABLES = {'users', 'products', 'orders'}
 
         if column_name not in ALLOWED_COLUMNS:
-        raise ValueError(f"Invalid column: {column_name}")
+          raise ValueError(f"Invalid column: {column_name}")
         if table_name not in ALLOWED_TABLES:
-        raise ValueError(f"Invalid table: {table_name}")
+          raise ValueError(f"Invalid table: {table_name}")
 
         -- PostgreSQL: Use quote_ident() for identifiers
         SELECT quote_ident($1) FROM quote_ident($2);
@@ -433,7 +431,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Subquery returning single value</description>
       <example>
         SELECT name,
-        (SELECT AVG(total) FROM orders) as avg_order_total
+          (SELECT AVG(total) FROM orders) as avg_order_total
         FROM users;
       </example>
     </pattern>
@@ -452,8 +450,8 @@ description: This skill should be used when working with SQL databases, "SELECT"
         -- More efficient than IN for large datasets
         SELECT * FROM users u
         WHERE EXISTS (
-        SELECT 1 FROM orders o
-        WHERE o.user_id = u.id AND o.total > 1000
+          SELECT 1 FROM orders o
+          WHERE o.user_id = u.id AND o.total > 1000
         );
       </example>
       <note>EXISTS stops at first match; more efficient than IN for existence checks</note>
@@ -463,7 +461,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Subquery referencing outer query</description>
       <example>
         SELECT u.name,
-        (SELECT MAX(o.total) FROM orders o WHERE o.user_id = u.id) as max_order
+          (SELECT MAX(o.total) FROM orders o WHERE o.user_id = u.id) as max_order
         FROM users u;
       </example>
       <warning>Executes once per outer row; consider JOIN for performance</warning>
@@ -474,10 +472,10 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         SELECT user_stats.name, user_stats.total_spent
         FROM (
-        SELECT u.name, SUM(o.total) as total_spent
-        FROM users u
-        JOIN orders o ON u.id = o.user_id
-        GROUP BY u.id, u.name
+          SELECT u.name, SUM(o.total) as total_spent
+          FROM users u
+          JOIN orders o ON u.id = o.user_id
+          GROUP BY u.id, u.name
         ) AS user_stats
         WHERE user_stats.total_spent > 10000;
       </example>
@@ -489,9 +487,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Common Table Expression for readable queries</description>
       <example>
         WITH active_users AS (
-        SELECT id, name, email
-        FROM users
-        WHERE active = true
+          SELECT id, name, email
+          FROM users
+          WHERE active = true
         )
         SELECT au.name, COUNT(o.id) as order_count
         FROM active_users au
@@ -505,14 +503,14 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Chain multiple CTEs</description>
       <example>
         WITH
-        active_users AS (
-        SELECT id, name FROM users WHERE active = true
-        ),
-        user_orders AS (
-        SELECT user_id, SUM(total) as total_spent
-        FROM orders
-        GROUP BY user_id
-        )
+          active_users AS (
+            SELECT id, name FROM users WHERE active = true
+          ),
+          user_orders AS (
+            SELECT user_id, SUM(total) as total_spent
+            FROM orders
+            GROUP BY user_id
+          )
         SELECT au.name, COALESCE(uo.total_spent, 0) as total_spent
         FROM active_users au
         LEFT JOIN user_orders uo ON au.id = uo.user_id
@@ -525,18 +523,17 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Traverse org hierarchy
         WITH RECURSIVE org_tree AS (
-        -- Base case: top-level managers
-        SELECT id, name, manager_id, 1 as level
-        FROM employees
-        WHERE manager_id IS NULL
+          -- Base case: top-level managers
+          SELECT id, name, manager_id, 1 as level
+          FROM employees
+          WHERE manager_id IS NULL
 
-        UNION ALL
+          UNION ALL
 
-        -- Recursive case: subordinates
-        SELECT e.id, e.name, e.manager_id, ot.level + 1
-        FROM employees e
-        INNER JOIN org_tree ot ON e.manager_id = ot.id
-
+          -- Recursive case: subordinates
+          SELECT e.id, e.name, e.manager_id, ot.level + 1
+          FROM employees e
+          INNER JOIN org_tree ot ON e.manager_id = ot.id
         )
         SELECT \* FROM org_tree ORDER BY level, name;
       </example>
@@ -549,16 +546,16 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Assign unique sequential numbers</description>
       <example>
         SELECT
-        name,
-        total,
-        ROW_NUMBER() OVER (ORDER BY total DESC) as rank
+          name,
+          total,
+          ROW_NUMBER() OVER (ORDER BY total DESC) as rank
         FROM orders;
 
         -- Partition by user
         SELECT
-        user_id,
-        total,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) as order_num
+          user_id,
+          total,
+          ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) as order_num
         FROM orders;
       </example>
       <use_case>Pagination, deduplication, ranking</use_case>
@@ -568,10 +565,10 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Ranking with tie handling</description>
       <example>
         SELECT
-        name,
-        score,
-        RANK() OVER (ORDER BY score DESC) as rank,        -- gaps after ties
-        DENSE_RANK() OVER (ORDER BY score DESC) as dense  -- no gaps
+          name,
+          score,
+          RANK() OVER (ORDER BY score DESC) as rank,        -- gaps after ties
+          DENSE_RANK() OVER (ORDER BY score DESC) as dense  -- no gaps
         FROM players;
         -- Score 100: RANK=1, DENSE_RANK=1
         -- Score 100: RANK=1, DENSE_RANK=1
@@ -583,11 +580,11 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Access adjacent rows</description>
       <example>
         SELECT
-        date,
-        revenue,
-        LAG(revenue, 1) OVER (ORDER BY date) as prev_day_revenue,
-        LEAD(revenue, 1) OVER (ORDER BY date) as next_day_revenue,
-        revenue - LAG(revenue, 1) OVER (ORDER BY date) as daily_change
+          date,
+          revenue,
+          LAG(revenue, 1) OVER (ORDER BY date) as prev_day_revenue,
+          LEAD(revenue, 1) OVER (ORDER BY date) as next_day_revenue,
+          revenue - LAG(revenue, 1) OVER (ORDER BY date) as daily_change
         FROM daily_sales;
       </example>
       <use_case>Time series analysis, trend detection</use_case>
@@ -597,10 +594,10 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Cumulative calculations</description>
       <example>
         SELECT
-        date,
-        revenue,
-        SUM(revenue) OVER (ORDER BY date) as cumulative_revenue,
-        AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as moving_avg_7d
+          date,
+          revenue,
+          SUM(revenue) OVER (ORDER BY date) as cumulative_revenue,
+          AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as moving_avg_7d
         FROM daily_sales;
       </example>
     </pattern>
@@ -609,15 +606,15 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Get first/last values in window</description>
       <example>
         SELECT
-        user_id,
-        order_date,
-        total,
-        FIRST_VALUE(total) OVER (PARTITION BY user_id ORDER BY order_date) as first_order,
-        LAST_VALUE(total) OVER (
-        PARTITION BY user_id
-        ORDER BY order_date
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) as last_order
+          user_id,
+          order_date,
+          total,
+          FIRST_VALUE(total) OVER (PARTITION BY user_id ORDER BY order_date) as first_order,
+          LAST_VALUE(total) OVER (
+            PARTITION BY user_id
+            ORDER BY order_date
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) as last_order
         FROM orders;
       </example>
       <note>LAST_VALUE requires explicit frame; default frame ends at current row</note>
@@ -627,9 +624,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Divide rows into buckets</description>
       <example>
         SELECT
-        name,
-        score,
-        NTILE(4) OVER (ORDER BY score DESC) as quartile
+          name,
+          score,
+          NTILE(4) OVER (ORDER BY score DESC) as quartile
         FROM students;
       </example>
       <use_case>Percentile analysis, distribution grouping</use_case>
@@ -641,12 +638,12 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Aggregate data by groups</description>
       <example>
         SELECT
-        status,
-        COUNT(*) as count,
-        SUM(total) as sum,
-        AVG(total) as avg,
-        MIN(total) as min,
-        MAX(total) as max
+          status,
+          COUNT(*) as count,
+          SUM(total) as sum,
+          AVG(total) as avg,
+          MIN(total) as min,
+          MAX(total) as max
         FROM orders
         GROUP BY status;
       </example>
@@ -667,15 +664,15 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Multiple grouping levels in single query (PostgreSQL, MySQL 8+)</description>
       <example>
         SELECT
-        COALESCE(category, 'All Categories') as category,
-        COALESCE(region, 'All Regions') as region,
-        SUM(sales) as total_sales
+          COALESCE(category, 'All Categories') as category,
+          COALESCE(region, 'All Regions') as region,
+          SUM(sales) as total_sales
         FROM sales_data
         GROUP BY GROUPING SETS (
-        (category, region),
-        (category),
-        (region),
-        ()
+          (category, region),
+          (category),
+          (region),
+          ()
         );
       </example>
     </pattern>
@@ -684,9 +681,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Hierarchical aggregation</description>
       <example>
         SELECT
-        year,
-        quarter,
-        SUM(revenue) as revenue
+          year,
+          quarter,
+          SUM(revenue) as revenue
         FROM sales
         GROUP BY ROLLUP (year, quarter);
         -- Produces: (year, quarter), (year), ()
@@ -702,15 +699,15 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Violation: comma-separated values
         CREATE TABLE bad_orders (
-        id INTEGER,
-        products TEXT -- 'apple,banana,orange'
+          id INTEGER,
+          products TEXT -- 'apple,banana,orange'
         );
 
         -- 1NF compliant: separate rows
         CREATE TABLE order_items (
-        order_id INTEGER,
-        product_id INTEGER,
-        PRIMARY KEY (order_id, product_id)
+          order_id INTEGER,
+          product_id INTEGER,
+          PRIMARY KEY (order_id, product_id)
         );
       </example>
     </concept>
@@ -720,23 +717,23 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Violation: product_name depends only on product_id
         CREATE TABLE bad_order_items (
-        order_id INTEGER,
-        product_id INTEGER,
-        product_name TEXT,  -- partial dependency
-        quantity INTEGER,
-        PRIMARY KEY (order_id, product_id)
+          order_id INTEGER,
+          product_id INTEGER,
+          product_name TEXT,  -- partial dependency
+          quantity INTEGER,
+          PRIMARY KEY (order_id, product_id)
         );
 
         -- 2NF compliant: separate product table
         CREATE TABLE products (
-        id INTEGER PRIMARY KEY,
-        name TEXT
+          id INTEGER PRIMARY KEY,
+          name TEXT
         );
         CREATE TABLE order_items (
-        order_id INTEGER,
-        product_id INTEGER REFERENCES products(id),
-        quantity INTEGER,
-        PRIMARY KEY (order_id, product_id)
+          order_id INTEGER,
+          product_id INTEGER REFERENCES products(id),
+          quantity INTEGER,
+          PRIMARY KEY (order_id, product_id)
         );
       </example>
     </concept>
@@ -746,21 +743,21 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Violation: city depends on zip_code, not directly on user
         CREATE TABLE bad_users (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        zip_code TEXT,
-        city TEXT  -- transitive: user -> zip_code -> city
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          zip_code TEXT,
+          city TEXT  -- transitive: user -> zip_code -> city
         );
 
         -- 3NF compliant: separate locations
         CREATE TABLE locations (
-        zip_code TEXT PRIMARY KEY,
-        city TEXT
+          zip_code TEXT PRIMARY KEY,
+          city TEXT
         );
         CREATE TABLE users (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        zip_code TEXT REFERENCES locations(zip_code)
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          zip_code TEXT REFERENCES locations(zip_code)
         );
       </example>
     </concept>
@@ -779,9 +776,9 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Use auto-generated IDs as primary keys</description>
       <example>
         CREATE TABLE users (
-        id SERIAL PRIMARY KEY,  -- PostgreSQL
-        -- id INT AUTO_INCREMENT PRIMARY KEY,  -- MySQL
-        email VARCHAR(255) UNIQUE NOT NULL
+          id SERIAL PRIMARY KEY,  -- PostgreSQL
+          -- id INT AUTO_INCREMENT PRIMARY KEY,  -- MySQL
+          email VARCHAR(255) UNIQUE NOT NULL
         );
       </example>
       <note>Prefer surrogate keys for stability; natural keys can change</note>
@@ -791,12 +788,11 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Mark records as deleted instead of removing</description>
       <example>
         CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL,
-        deleted_at TIMESTAMP NULL,
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) NOT NULL,
+          deleted_at TIMESTAMP NULL,
 
-        CONSTRAINT unique_active_email UNIQUE (email) WHERE deleted_at IS NULL
-
+          CONSTRAINT unique_active_email UNIQUE (email) WHERE deleted_at IS NULL
         );
 
         -- Query active records
@@ -809,29 +805,28 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Track record creation and modification</description>
       <example>
         CREATE TABLE orders (
-        id SERIAL PRIMARY KEY,
-        -- business columns...
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        created_by INTEGER REFERENCES users(id),
-        updated_by INTEGER REFERENCES users(id)
+          id SERIAL PRIMARY KEY,
+          -- business columns...
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          created_by INTEGER REFERENCES users(id),
+          updated_by INTEGER REFERENCES users(id)
         );
 
         -- Auto-update trigger (PostgreSQL)
         CREATE OR REPLACE FUNCTION update_updated_at()
         RETURNS TRIGGER AS $$
         BEGIN
-        NEW.updated_at = CURRENT_TIMESTAMP;
-        RETURN NEW;
+          NEW.updated_at = CURRENT_TIMESTAMP;
+          RETURN NEW;
         END;
-
         $$
         LANGUAGE plpgsql;
 
         CREATE TRIGGER orders_updated_at
-        BEFORE UPDATE ON orders
-        FOR EACH ROW
-        EXECUTE FUNCTION update_updated_at();
+          BEFORE UPDATE ON orders
+          FOR EACH ROW
+          EXECUTE FUNCTION update_updated_at();
       </example>
     </pattern>
 
@@ -840,12 +835,12 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Comments can belong to posts or videos
         CREATE TABLE comments (
-        id SERIAL PRIMARY KEY,
-        content TEXT,
-        commentable_type VARCHAR(50) NOT NULL,  -- 'post' or 'video'
-        commentable_id INTEGER NOT NULL,
+          id SERIAL PRIMARY KEY,
+          content TEXT,
+          commentable_type VARCHAR(50) NOT NULL,  -- 'post' or 'video'
+          commentable_id INTEGER NOT NULL,
 
-        INDEX idx_commentable (commentable_type, commentable_id)
+          INDEX idx_commentable (commentable_type, commentable_id)
         );
       </example>
       <warning>Cannot enforce FK constraint; validate at application level</warning>
@@ -855,17 +850,17 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Reference table for enumerated values</description>
       <example>
         CREATE TABLE order_statuses (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(50) UNIQUE NOT NULL,
-        description TEXT
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(50) UNIQUE NOT NULL,
+          description TEXT
         );
 
         INSERT INTO order_statuses (name) VALUES
-        ('pending'), ('processing'), ('shipped'), ('delivered'), ('cancelled');
+          ('pending'), ('processing'), ('shipped'), ('delivered'), ('cancelled');
 
         CREATE TABLE orders (
-        id SERIAL PRIMARY KEY,
-        status_id INTEGER REFERENCES order_statuses(id)
+          id SERIAL PRIMARY KEY,
+          status_id INTEGER REFERENCES order_statuses(id)
         );
       </example>
       <note>Prefer over ENUM for flexibility; easier to add/modify values</note>
@@ -878,10 +873,10 @@ description: This skill should be used when working with SQL databases, "SELECT"
         CREATE TABLE roles (id SERIAL PRIMARY KEY, name TEXT);
 
         CREATE TABLE user_roles (
-        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
-        granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (user_id, role_id)
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
+          granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_id, role_id)
         );
       </example>
     </pattern>
@@ -962,7 +957,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
         -- Only index recent orders
         CREATE INDEX idx_recent_orders ON orders(created_at)
-        WHERE created_at > '2024-01-01';
+          WHERE created_at > '2024-01-01';
       </example>
       <use_case>When queries always filter by same condition</use_case>
     </pattern>
@@ -1002,14 +997,14 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
         -- Good: batch insert
         INSERT INTO logs (message) VALUES
-        ('log1'), ('log2'), ('log3');
+          ('log1'), ('log2'), ('log3');
 
         -- Good: batch update with CASE
         UPDATE products
         SET price = CASE id
-        WHEN 1 THEN 10.00
-        WHEN 2 THEN 20.00
-        WHEN 3 THEN 30.00
+          WHEN 1 THEN 10.00
+          WHEN 2 THEN 20.00
+          WHEN 3 THEN 30.00
         END
         WHERE id IN (1, 2, 3);
       </example>
@@ -1240,13 +1235,13 @@ description: This skill should be used when working with SQL databases, "SELECT"
         -- Application code pattern (pseudocode)
         max_retries = 3
         for attempt in range(max_retries):
-        try:
-        execute_transaction()
-        break
-        except DeadlockError:
-        if attempt == max_retries - 1:
-        raise
-        sleep(random_backoff())
+          try:
+            execute_transaction()
+            break
+          except DeadlockError:
+            if attempt == max_retries - 1:
+              raise
+            sleep(random_backoff())
       </example>
     </pattern>
   </deadlock_prevention>
@@ -1275,8 +1270,8 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
         -- +migrate Up
         CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) NOT NULL
         );
 
         -- +migrate Down
@@ -1289,8 +1284,8 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- Use IF NOT EXISTS / IF EXISTS
         CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) NOT NULL
         );
 
         CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -1378,28 +1373,26 @@ description: This skill should be used when working with SQL databases, "SELECT"
         -- Process in batches of 1000
         DO
         $$
-
         DECLARE
-        batch_size INTEGER := 1000;
-        rows_updated INTEGER;
+          batch_size INTEGER := 1000;
+          rows_updated INTEGER;
         BEGIN
-        LOOP
-        UPDATE users
-        SET email_normalized = LOWER(email)
-        WHERE email_normalized IS NULL
-        AND id IN (
-        SELECT id FROM users
-        WHERE email_normalized IS NULL
-        LIMIT batch_size
-        );
+          LOOP
+            UPDATE users
+            SET email_normalized = LOWER(email)
+            WHERE email_normalized IS NULL
+              AND id IN (
+                SELECT id FROM users
+                WHERE email_normalized IS NULL
+                LIMIT batch_size
+              );
 
-        GET DIAGNOSTICS rows_updated = ROW_COUNT;
-        EXIT WHEN rows_updated = 0;
+            GET DIAGNOSTICS rows_updated = ROW_COUNT;
+            EXIT WHEN rows_updated = 0;
 
-        COMMIT;
-        PERFORM pg_sleep(0.1);  -- Reduce load
-        END LOOP;
-
+            COMMIT;
+            PERFORM pg_sleep(0.1);  -- Reduce load
+          END LOOP;
         END $$;
       </example>
     </pattern>
@@ -1408,7 +1401,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <description>Use cursor for very large tables</description>
       <example>
         DECLARE batch_cursor CURSOR FOR
-        SELECT id FROM users WHERE new_column IS NULL;
+          SELECT id FROM users WHERE new_column IS NULL;
 
         FETCH 1000 FROM batch_cursor;
         -- Process batch
@@ -1461,7 +1454,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
     <example>
       -- Bad: N+1 queries
       for user in users:
-      orders = query("SELECT * FROM orders WHERE user_id = ?", user.id)
+        orders = query("SELECT * FROM orders WHERE user_id = ?", user.id)
     </example>
     <instead>Use JOIN or IN clause to fetch all data in single query</instead>
   </avoid>

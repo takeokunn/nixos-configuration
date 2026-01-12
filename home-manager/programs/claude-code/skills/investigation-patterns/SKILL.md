@@ -330,72 +330,72 @@ description: This skill should be used when the user asks to "investigate code",
       <investigation>Evidence-based findings with file:line references
         - Source 1: path/to/file.ts:42 - finding description
         - Source 2: path/to/other.ts:15 - finding description</investigation>
-        <conclusion>Direct answer based on evidence</conclusion>
-        <metrics>
-          - Confidence: 0-100
-          - Evidence Coverage: 0-100</metrics>
-          <recommendations>Suggested actions without implementation</recommendations>
-          <unclear_points>Information gaps that would improve the answer</unclear_points>
-        </example>
-      </concept>
+      <conclusion>Direct answer based on evidence</conclusion>
+      <metrics>
+        - Confidence: 0-100
+        - Evidence Coverage: 0-100</metrics>
+      <recommendations>Suggested actions without implementation</recommendations>
+      <unclear_points>Information gaps that would improve the answer</unclear_points>
+    </example>
+  </concept>
 
-      <concept name="debugging_output">
-        <description>Standard format for debugging results</description>
-        <example>
-          <problem_statement>Clear description of the issue</problem_statement>
-          <reproduction_steps>How to reproduce</reproduction_steps>
-          <investigation>Evidence collected with file:line references</investigation>
-          <root_cause>Identified cause with supporting evidence</root_cause>
-          <solution>Proposed fix with rationale</solution>
-          <verification>How to verify the fix works</verification>
-          <prevention>How to prevent recurrence</prevention>
-        </example>
-      </concept>
-    </concepts>
+  <concept name="debugging_output">
+    <description>Standard format for debugging results</description>
+    <example>
+      <problem_statement>Clear description of the issue</problem_statement>
+      <reproduction_steps>How to reproduce</reproduction_steps>
+      <investigation>Evidence collected with file:line references</investigation>
+      <root_cause>Identified cause with supporting evidence</root_cause>
+      <solution>Proposed fix with rationale</solution>
+      <verification>How to verify the fix works</verification>
+      <prevention>How to prevent recurrence</prevention>
+    </example>
+  </concept>
+</concepts>
 
-    <related_agents>
-      <agent name="bug">Use for root cause investigation when user reports bugs or errors</agent>
-      <agent name="ask">Use for answering questions about codebase architecture and implementation</agent>
-      <agent name="execute">Delegate to after investigation confirms implementation approach</agent>
-    </related_agents>
+<related_agents>
+  <agent name="bug">Use for root cause investigation when user reports bugs or errors</agent>
+  <agent name="ask">Use for answering questions about codebase architecture and implementation</agent>
+  <agent name="execute">Delegate to after investigation confirms implementation approach</agent>
+</related_agents>
 
-    <related_skills>
-      <skill name="serena-usage">Use for memory operations and symbol-level code navigation</skill>
-      <skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
-      <skill name="fact-check">Use to verify external documentation and library behavior</skill>
-      <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
-      <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
-    </related_skills>
+<related_skills>
+  <skill name="serena-usage">Use for memory operations and symbol-level code navigation</skill>
+  <skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
+  <skill name="fact-check">Use to verify external documentation and library behavior</skill>
+  <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
+  <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
+</related_skills>
 
-    <anti_patterns>
-      <avoid name="speculation">
-        <description>Guessing or making claims when evidence is insufficient</description>
-        <instead>Clearly state confidence levels and information gaps; request additional context if needed</instead>
-      </avoid>
+<anti_patterns>
+  <avoid name="speculation">
+    <description>Guessing or making claims when evidence is insufficient</description>
+    <instead>Clearly state confidence levels and information gaps; request additional context if needed</instead>
+  </avoid>
 
-      <avoid name="confirming_assumptions">
-        <description>Confirming user assumptions without independent verification</description>
-        <instead>Independently verify claims by examining code and collecting evidence</instead>
-      </avoid>
+  <avoid name="confirming_assumptions">
+    <description>Confirming user assumptions without independent verification</description>
+    <instead>Independently verify claims by examining code and collecting evidence</instead>
+  </avoid>
 
-      <avoid name="uncited_claims">
-        <description>Making claims without file:line references</description>
-        <instead>Always provide file:line citations for findings using format path/to/file.ext:line_number</instead>
-      </avoid>
+  <avoid name="uncited_claims">
+    <description>Making claims without file:line references</description>
+    <instead>Always provide file:line citations for findings using format path/to/file.ext:line_number</instead>
+  </avoid>
 
-      <avoid name="premature_implementation">
-        <description>Implementing fixes instead of completing analysis</description>
-        <instead>Focus on investigation and analysis; provide recommendations without implementation</instead>
-      </avoid>
-    </anti_patterns>
+  <avoid name="premature_implementation">
+    <description>Implementing fixes instead of completing analysis</description>
+    <instead>Focus on investigation and analysis; provide recommendations without implementation</instead>
+  </avoid>
+</anti_patterns>
 
-    <best_practices>
-      <practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
-      <practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
-      <practice priority="critical">Complete investigation before proposing solutions</practice>
-      <practice priority="high">Use Serena symbol tools before reading entire files</practice>
-      <practice priority="high">Independently verify claims rather than confirming assumptions</practice>
-      <practice priority="high">Document information gaps and unclear points</practice>
-      <practice priority="medium">Check multiple sources to increase confidence</practice>
-      <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
-    </best_practices>
+<best_practices>
+  <practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
+  <practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
+  <practice priority="critical">Complete investigation before proposing solutions</practice>
+  <practice priority="high">Use Serena symbol tools before reading entire files</practice>
+  <practice priority="high">Independently verify claims rather than confirming assumptions</practice>
+  <practice priority="high">Document information gaps and unclear points</practice>
+  <practice priority="medium">Check multiple sources to increase confidence</practice>
+  <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
+</best_practices>

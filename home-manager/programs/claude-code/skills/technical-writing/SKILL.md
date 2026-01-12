@@ -152,9 +152,7 @@ description: This skill should be used when the user asks to "write blog post", 
 
 <language_guidelines>
   <english>
-
     <style>Conversational but professional</style>
-
     <tone>Confident, helpful, peer-to-peer</tone>
     <voice>First person ("I found that...") or second person ("You can...")</voice>
     <sentence_length>Vary between short and medium</sentence_length>
@@ -222,167 +220,167 @@ description: This skill should be used when the user asks to "write blog post", 
       - Core message: [one sentence]
       - Language: [en/ja/both]
       - Target length: [word count]</article_plan>
-      <outline>[Section headings with key points]</outline>
-      <draft>[Article content]</draft>
-      <edit_checklist>
-        - [ ] Hook is compelling
-        - [ ] Each section has one clear purpose
-        - [ ] Code examples tested and working
-        - [ ] Technical claims verified
-        - [ ] Read aloud for flow
-        - [ ] Trimmed unnecessary words
-        - [ ] Title and headings optimized</edit_checklist>
-      </format>
-    </output>
+    <outline>[Section headings with key points]</outline>
+    <draft>[Article content]</draft>
+    <edit_checklist>
+      - [ ] Hook is compelling
+      - [ ] Each section has one clear purpose
+      - [ ] Code examples tested and working
+      - [ ] Technical claims verified
+      - [ ] Read aloud for flow
+      - [ ] Trimmed unnecessary words
+      - [ ] Title and headings optimized</edit_checklist>
+  </format>
+</output>
 
-    <title_patterns>
-      <pattern name="how_to">
-        <description>How to [achieve result] with [tool/technique]</description>
-        <example>How to Implement Rate Limiting with Redis</example>
-      </pattern>
-      <pattern name="number_list">
-        <description>[N] [Things] Every Developer Should Know About [Topic]</description>
-        <example>5 Things Every Developer Should Know About TypeScript Generics</example>
-      </pattern>
-      <pattern name="comparison">
-        <description>[A] vs [B]: Which Should You Choose in [Year]?</description>
-        <example>REST vs GraphQL: Which Should You Choose in 2025?</example>
-      </pattern>
-      <pattern name="problem_solution">
-        <description>Solving [Problem] with [Solution]</description>
-        <example>Solving N+1 Queries with DataLoader</example>
-      </pattern>
-      <pattern name="deep_dive">
-        <description>Understanding [Concept]: A Deep Dive</description>
-        <example>Understanding React Reconciliation: A Deep Dive</example>
-      </pattern>
-      <pattern name="lessons">
-        <description>What I Learned [Building/Using] [Thing]</description>
-        <example>What I Learned Building a Real-Time Collaboration System</example>
-      </pattern>
-    </title_patterns>
+<title_patterns>
+  <pattern name="how_to">
+    <description>How to [achieve result] with [tool/technique]</description>
+    <example>How to Implement Rate Limiting with Redis</example>
+  </pattern>
+  <pattern name="number_list">
+    <description>[N] [Things] Every Developer Should Know About [Topic]</description>
+    <example>5 Things Every Developer Should Know About TypeScript Generics</example>
+  </pattern>
+  <pattern name="comparison">
+    <description>[A] vs [B]: Which Should You Choose in [Year]?</description>
+    <example>REST vs GraphQL: Which Should You Choose in 2025?</example>
+  </pattern>
+  <pattern name="problem_solution">
+    <description>Solving [Problem] with [Solution]</description>
+    <example>Solving N+1 Queries with DataLoader</example>
+  </pattern>
+  <pattern name="deep_dive">
+    <description>Understanding [Concept]: A Deep Dive</description>
+    <example>Understanding React Reconciliation: A Deep Dive</example>
+  </pattern>
+  <pattern name="lessons">
+    <description>What I Learned [Building/Using] [Thing]</description>
+    <example>What I Learned Building a Real-Time Collaboration System</example>
+  </pattern>
+</title_patterns>
 
-    <best_practices>
-      <practice priority="critical">
-        <description>Start with a compelling hook in the first paragraph</description>
-        <technique>Use a problem the reader faces, a surprising fact, or a brief relatable story</technique>
-      </practice>
-      <practice priority="critical">
-        <description>Put the most important point first using inverted pyramid structure</description>
-        <technique>Lead with the conclusion, provide TL;DR for long articles</technique>
-      </practice>
-      <practice priority="critical">
-        <description>Test all code examples before publishing</description>
-        <technique>Verify code compiles, runs, and produces expected output</technique>
-      </practice>
-      <practice priority="high">
-        <description>Explain code context before or after each snippet</description>
-        <technique>Describe what the code does and why it's written that way</technique>
-      </practice>
-      <practice priority="high">
-        <description>Support claims with evidence</description>
-        <technique>Include benchmarks, examples, or reasoned arguments for technical claims</technique>
-      </practice>
-      <practice priority="high">
-        <description>Each section should have one clear purpose</description>
-        <technique>Split sections covering multiple ideas, use headings that summarize the key point</technique>
-      </practice>
-      <practice priority="medium">
-        <description>Use diagrams for architectural concepts</description>
-        <technique>Include visual representations to complement text explanations</technique>
-      </practice>
-      <practice priority="medium">
-        <description>Vary sentence length for readability</description>
-        <technique>Mix short and medium sentences to maintain reader engagement</technique>
-      </practice>
-      <practice priority="medium">
-        <description>Adapt style to language conventions</description>
-        <technique>Use conversational but professional tone in English, です・ます調 in Japanese technical articles</technique>
-      </practice>
-    </best_practices>
+<best_practices>
+  <practice priority="critical">
+    <description>Start with a compelling hook in the first paragraph</description>
+    <technique>Use a problem the reader faces, a surprising fact, or a brief relatable story</technique>
+  </practice>
+  <practice priority="critical">
+    <description>Put the most important point first using inverted pyramid structure</description>
+    <technique>Lead with the conclusion, provide TL;DR for long articles</technique>
+  </practice>
+  <practice priority="critical">
+    <description>Test all code examples before publishing</description>
+    <technique>Verify code compiles, runs, and produces expected output</technique>
+  </practice>
+  <practice priority="high">
+    <description>Explain code context before or after each snippet</description>
+    <technique>Describe what the code does and why it's written that way</technique>
+  </practice>
+  <practice priority="high">
+    <description>Support claims with evidence</description>
+    <technique>Include benchmarks, examples, or reasoned arguments for technical claims</technique>
+  </practice>
+  <practice priority="high">
+    <description>Each section should have one clear purpose</description>
+    <technique>Split sections covering multiple ideas, use headings that summarize the key point</technique>
+  </practice>
+  <practice priority="medium">
+    <description>Use diagrams for architectural concepts</description>
+    <technique>Include visual representations to complement text explanations</technique>
+  </practice>
+  <practice priority="medium">
+    <description>Vary sentence length for readability</description>
+    <technique>Mix short and medium sentences to maintain reader engagement</technique>
+  </practice>
+  <practice priority="medium">
+    <description>Adapt style to language conventions</description>
+    <technique>Use conversational but professional tone in English, です・ます調 in Japanese technical articles</technique>
+  </practice>
+</best_practices>
 
-    <anti_patterns>
-      <avoid name="burying_the_lede">
-        <description>Hiding the main point deep in the article</description>
-        <instead>Put the most important point first, use inverted pyramid structure</instead>
-      </avoid>
-      <avoid name="assuming_motivation">
-        <description>Not explaining why the topic matters</description>
-        <instead>Explain why the reader should care early in the article</instead>
-      </avoid>
-      <avoid name="code_without_context">
-        <description>Showing code without explaining its purpose</description>
-        <instead>Explain what code does and why before or after the snippet</instead>
-      </avoid>
-      <avoid name="unsubstantiated_claims">
-        <description>Making claims like "X is the best" without evidence</description>
-        <instead>Support claims with benchmarks, examples, or reasoned arguments</instead>
-      </avoid>
-      <avoid name="clickbait_disappointment">
-        <description>Title promises more than content delivers</description>
-        <instead>Ensure title accurately reflects content and scope</instead>
-      </avoid>
-      <avoid name="wall_of_code">
-        <description>Long code blocks without explanation</description>
-        <instead>Break up code with explanations, highlight key lines, add comments</instead>
-      </avoid>
-      <avoid name="generic_introductions">
-        <description>Starting with "In this article..." or similar phrases</description>
-        <instead>Start with a hook that captures attention immediately</instead>
-      </avoid>
-    </anti_patterns>
+<anti_patterns>
+  <avoid name="burying_the_lede">
+    <description>Hiding the main point deep in the article</description>
+    <instead>Put the most important point first, use inverted pyramid structure</instead>
+  </avoid>
+  <avoid name="assuming_motivation">
+    <description>Not explaining why the topic matters</description>
+    <instead>Explain why the reader should care early in the article</instead>
+  </avoid>
+  <avoid name="code_without_context">
+    <description>Showing code without explaining its purpose</description>
+    <instead>Explain what code does and why before or after the snippet</instead>
+  </avoid>
+  <avoid name="unsubstantiated_claims">
+    <description>Making claims like "X is the best" without evidence</description>
+    <instead>Support claims with benchmarks, examples, or reasoned arguments</instead>
+  </avoid>
+  <avoid name="clickbait_disappointment">
+    <description>Title promises more than content delivers</description>
+    <instead>Ensure title accurately reflects content and scope</instead>
+  </avoid>
+  <avoid name="wall_of_code">
+    <description>Long code blocks without explanation</description>
+    <instead>Break up code with explanations, highlight key lines, add comments</instead>
+  </avoid>
+  <avoid name="generic_introductions">
+    <description>Starting with "In this article..." or similar phrases</description>
+    <instead>Start with a hook that captures attention immediately</instead>
+  </avoid>
+</anti_patterns>
 
-    <rules priority="critical">
-      <rule>Test all code examples compile and run before publishing</rule>
-      <rule>Verify all technical claims with sources or benchmarks</rule>
-      <rule>Start with a compelling hook, never generic openings like "In this article..."</rule>
-    </rules>
+<rules priority="critical">
+  <rule>Test all code examples compile and run before publishing</rule>
+  <rule>Verify all technical claims with sources or benchmarks</rule>
+  <rule>Start with a compelling hook, never generic openings like "In this article..."</rule>
+</rules>
 
-    <rules priority="standard">
-      <rule>Explain code context before or after each snippet</rule>
-      <rule>Use inverted pyramid: most important point first</rule>
-      <rule>Break long code blocks with explanations</rule>
-      <rule>Ensure title accurately reflects content scope</rule>
-    </rules>
+<rules priority="standard">
+  <rule>Explain code context before or after each snippet</rule>
+  <rule>Use inverted pyramid: most important point first</rule>
+  <rule>Break long code blocks with explanations</rule>
+  <rule>Ensure title accurately reflects content scope</rule>
+</rules>
 
-    <error_escalation>
-      <level severity="low">
-        <example>Grammar or style issue</example>
-        <action>Fix issue, follow style guide</action>
-      </level>
-      <level severity="medium">
-        <example>Technical inaccuracy in example</example>
-        <action>Verify and correct example</action>
-      </level>
-      <level severity="high">
-        <example>Misleading or incorrect technical claim</example>
-        <action>Stop, verify claim before publishing</action>
-      </level>
-      <level severity="critical">
-        <example>Content could cause harm if followed</example>
-        <action>Block publication, require expert review</action>
-      </level>
-    </error_escalation>
+<error_escalation>
+  <level severity="low">
+    <example>Grammar or style issue</example>
+    <action>Fix issue, follow style guide</action>
+  </level>
+  <level severity="medium">
+    <example>Technical inaccuracy in example</example>
+    <action>Verify and correct example</action>
+  </level>
+  <level severity="high">
+    <example>Misleading or incorrect technical claim</example>
+    <action>Stop, verify claim before publishing</action>
+  </level>
+  <level severity="critical">
+    <example>Content could cause harm if followed</example>
+    <action>Block publication, require expert review</action>
+  </level>
+</error_escalation>
 
-    <constraints>
-      <must>Verify all technical claims</must>
-      <must>Test all code examples</must>
-      <must>Write for target audience level</must>
-      <avoid>Jargon without explanation</avoid>
-      <avoid>Untested code examples</avoid>
-      <avoid>Overly complex explanations</avoid>
-    </constraints>
+<constraints>
+  <must>Verify all technical claims</must>
+  <must>Test all code examples</must>
+  <must>Write for target audience level</must>
+  <avoid>Jargon without explanation</avoid>
+  <avoid>Untested code examples</avoid>
+  <avoid>Overly complex explanations</avoid>
+</constraints>
 
-    <related_agents>
-      <agent name="design">Article structure and outline planning</agent>
-      <agent name="docs">Code example extraction and technical accuracy verification</agent>
-      <agent name="execute">Publishing workflow and platform-specific formatting</agent>
-      <agent name="bug">Fixing broken examples, outdated information, and technical errors</agent>
-    </related_agents>
+<related_agents>
+  <agent name="design">Article structure and outline planning</agent>
+  <agent name="docs">Code example extraction and technical accuracy verification</agent>
+  <agent name="execute">Publishing workflow and platform-specific formatting</agent>
+  <agent name="bug">Fixing broken examples, outdated information, and technical errors</agent>
+</related_agents>
 
-    <related_skills>
-      <skill name="serena-usage">Symbol operations for extracting code examples from projects</skill>
-      <skill name="context7-usage">Library documentation lookup for accurate technical references</skill>
-      <skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
-      <skill name="technical-documentation">Creating reference documentation from blog content</skill>
-    </related_skills>
+<related_skills>
+  <skill name="serena-usage">Symbol operations for extracting code examples from projects</skill>
+  <skill name="context7-usage">Library documentation lookup for accurate technical references</skill>
+  <skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
+  <skill name="technical-documentation">Creating reference documentation from blog content</skill>
+</related_skills>

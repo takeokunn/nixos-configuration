@@ -82,7 +82,7 @@ description: This skill should be used when the user asks to "write tests", "tes
   </decision_tree>
   <example>
     api_client = stub(
-    fetch_user: { id: 1, name: "John" }
+      fetch_user: { id: 1, name: "John" }
     )
   </example>
   <use_case>Replace slow/unreliable dependencies</use_case>
@@ -128,17 +128,17 @@ description: This skill should be used when the user asks to "write tests", "tes
   </decision_tree>
   <example>
     class FakeDatabase
-    def initialize
-    @data = {}
-    end
+      def initialize
+        @data = {}
+      end
 
-    def save(key, value)
-    @data[key] = value
-    end
+      def save(key, value)
+        @data[key] = value
+      end
 
-    def find(key)
-    @data[key]
-    end
+      def find(key)
+        @data[key]
+      end
     end
   </example>
   <use_case>In-memory database, fake file system</use_case>
@@ -207,12 +207,12 @@ description: This skill should be used when the user asks to "write tests", "tes
     <example>
       <note>Use setup/teardown to reset state</note>
       def setup
-      @database = TestDatabase.new
-      @service = UserService.new(@database)
+        @database = TestDatabase.new
+        @service = UserService.new(@database)
       end
 
       def teardown
-      @database.clear
+        @database.clear
       end
     </example>
   </practice>
@@ -236,17 +236,17 @@ description: This skill should be used when the user asks to "write tests", "tes
     <example>
       <note>Good: Single concept</note>
       test_userCreation_setsDefaultRole
-      user = create_user
-      assert_equal "member", user.role
+        user = create_user
+        assert_equal "member", user.role
       end
 
       <note>Avoid: Multiple unrelated assertions</note>
 
       test_userCreation
-      user = create_user
-      assert_equal "member", user.role
-      assert_not_nil user.email
-      assert_true user.active
+        user = create_user
+        assert_equal "member", user.role
+        assert_not_nil user.email
+        assert_true user.active
       end
     </example>
   </practice>
@@ -257,12 +257,12 @@ description: This skill should be used when the user asks to "write tests", "tes
     <example>
       <note>Create reusable test data</note>
       def create_test_user(overrides = {})
-      defaults = {
-      name: "Test User",
-      email: "test@example.com",
-      role: "member"
-      }
-      User.new(defaults.merge(overrides))
+        defaults = {
+          name: "Test User",
+          email: "test@example.com",
+          role: "member"
+        }
+        User.new(defaults.merge(overrides))
       end
     </example>
   </practice>
@@ -275,15 +275,15 @@ description: This skill should be used when the user asks to "write tests", "tes
       VALID_USER_AGE = 25
       MINIMUM_AGE = 18
       test_userValidation_withValidAge_succeeds
-      user = User.new(age: VALID_USER_AGE)
-      assert user.valid?
+        user = User.new(age: VALID_USER_AGE)
+        assert user.valid?
       end
 
       <bad_example>Bad</bad_example>
 
       test_userValidation_withValidAge_succeeds
-      user = User.new(age: 25)
-      assert user.valid?
+        user = User.new(age: 25)
+        assert user.valid?
       end
     </example>
   </practice>

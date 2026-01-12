@@ -4,7 +4,7 @@ description: This skill should be used when the user asks to "write typescript",
 ---
 
 <purpose>
-  Provide comprehensive patterns for TypeScript language, configuration, type system, and tooling integration.
+Provide comprehensive patterns for TypeScript language, configuration, type system, and tooling integration.
 </purpose>
 
 <tools>
@@ -77,7 +77,6 @@ description: This skill should be used when the user asks to "write typescript",
   </recommended_base>
 
   <strict_options>
-
     <option name="strict">Enables all strict type-checking options</option>
     <option name="strictNullChecks">null and undefined handled explicitly</option>
     <option name="strictFunctionTypes">Stricter function type checking</option>

@@ -19,6 +19,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <rule>Check Serena memories for existing contribution patterns</rule>
   <rule>Provide structured checklist output with actionable items</rule>
   <rule>Include local verification commands in output</rule>
+  <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
 
 <parallelization>
@@ -44,60 +45,78 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <phase name="preflight">
     <objective>Verify environment and detect upstream repository</objective>
     <step order="1">
+      <action>Check Serena memories for contribution patterns of upstream repo</action>
+      <tool>Serena list_memories, read_memory</tool>
+      <output>Relevant patterns and past contribution experiences</output>
+    </step>
+    <step order="2">
       <action>Verify gh CLI authentication status</action>
       <tool>Bash: gh auth status</tool>
       <output>Authentication confirmation or error</output>
     </step>
-    <step order="2">
+    <step order="3">
       <action>Detect upstream repository from git remotes</action>
       <tool>Bash: git remote -v</tool>
       <output>Upstream URL (prefer upstream remote, fallback to origin)</output>
     </step>
-    <step order="3">
+    <step order="4">
       <action>If multiple remotes or detection confidence below 80, ask user</action>
       <tool>AskUserQuestion</tool>
       <output>Confirmed upstream URL</output>
     </step>
-    <step order="4">
+    <step order="5">
       <action>Get current branch and pending changes</action>
       <tool>Bash: git status, git diff</tool>
       <output>Branch name, change summary</output>
     </step>
+    <step order="6">
+      <action>Compare local branch with upstream default branch</action>
+      <tool>Bash: git diff upstream/main...HEAD --stat</tool>
+      <output>Summary of divergent changes</output>
+    </step>
   </phase>
-  <reflection_checkpoint id="preflight_complete">
-    <question>Is gh CLI authenticated?</question>
-    <question>Is upstream repository clearly identified?</question>
-    <question>Are there changes to review?</question>
-    <threshold>If any check fails, stop and report to user</threshold>
+  <reflection_checkpoint id="preflight_complete" after="preflight">
+    <questions>
+      <question weight="0.4">Is gh CLI authenticated?</question>
+      <question weight="0.3">Is upstream repository clearly identified?</question>
+      <question weight="0.3">Are there changes to review?</question>
+    </questions>
+    <threshold min="70" action="stop">
+      <below_threshold>Stop and report to user</below_threshold>
+    </threshold>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect all necessary information in parallel</objective>
     <step order="1">
       <action>Fetch CONTRIBUTING.md from upstream</action>
-      <tool>WebFetch with fallback: root, .github/, docs/</tool>
+      <tool>guidelines agent (WebFetch with fallback: root, .github/, docs/)</tool>
       <output>Contribution guidelines content</output>
     </step>
     <step order="2">
       <action>Analyze code changes against upstream patterns</action>
-      <tool>quality-assurance agent</tool>
+      <tool>changes agent (quality-assurance)</tool>
       <output>Code quality assessment</output>
     </step>
     <step order="3">
       <action>Evaluate test coverage and appropriateness</action>
-      <tool>test agent</tool>
+      <tool>tests agent</tool>
       <output>Test evaluation report</output>
     </step>
     <step order="4">
       <action>Fetch author's past PRs to upstream</action>
-      <tool>gh pr list --author @me --repo upstream --state all --limit 20</tool>
+      <tool>history agent (gh pr list --author @me --repo upstream --state all --limit 20)</tool>
       <output>Past PR feedback patterns</output>
     </step>
   </phase>
-  <reflection_checkpoint id="gather_complete">
-    <question>Were contribution guidelines successfully fetched?</question>
-    <question>Have code changes been analyzed?</question>
-    <question>Has past PR history been retrieved?</question>
-    <threshold>If confidence less than 70, document gaps and proceed with available data</threshold>
+  <reflection_checkpoint id="gather_complete" after="gather">
+    <questions>
+      <question weight="0.4">Were contribution guidelines successfully fetched?</question>
+      <question weight="0.3">Have code changes been analyzed?</question>
+      <question weight="0.3">Has past PR history been retrieved?</question>
+    </questions>
+    <threshold min="70" action="proceed">
+      <below_threshold>Document gaps and proceed with available data</below_threshold>
+    </threshold>
   </reflection_checkpoint>
   <phase name="synthesize">
     <objective>Generate PR metadata and verification steps</objective>
@@ -120,16 +139,21 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <phase name="self_evaluate">
     <objective>Brief quality assessment of review output</objective>
     <step order="1">
+      <action>Cross-validate guideline compliance with code review findings</action>
+      <tool>validator agent</tool>
+      <output>Validation report with consistency check</output>
+    </step>
+    <step order="2">
       <action>Calculate confidence using decision_criteria: guideline_compliance (40%), code_quality (30%), test_coverage (30%)</action>
       <tool>Decision criteria evaluation</tool>
       <output>Confidence score</output>
     </step>
-    <step order="2">
+    <step order="3">
       <action>Identify top 1-2 critical issues if confidence below 80 or review gaps detected</action>
       <tool>Gap analysis</tool>
       <output>Issue list</output>
     </step>
-    <step order="3">
+    <step order="4">
       <action>Append self_feedback section to output</action>
       <tool>Output formatting</tool>
       <output>Self-feedback section</output>
@@ -145,6 +169,15 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </step>
     <step order="3">
       <action>If upstream detection ambiguous: ask user to specify</action>
+    </step>
+    <step order="4">
+      <action>If WebFetch timeout or network unavailable: retry once, then note in report</action>
+    </step>
+    <step order="5">
+      <action>If no changes detected (clean working tree): report to user, exit gracefully</action>
+    </step>
+    <step order="6">
+      <action>If agent timeout: retry once with reduced scope, proceed with partial data</action>
     </step>
   </phase>
 </workflow>
@@ -211,6 +244,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <agent name="history" subagent_type="general-purpose" readonly="true">Analyze author past PR feedback patterns via gh CLI</agent>
   <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description</agent>
   <agent name="verify" subagent_type="devops" readonly="true">Determine local verification commands</agent>
+  <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
 </agents>
 
 <execution_graph>
@@ -224,9 +258,26 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     <agent>metadata</agent>
     <agent>verify</agent>
   </parallel_group>
+  <sequential_phase id="validation" depends_on="post_gather">
+    <agent>validator</agent>
+    <reason>Cross-validate all findings before final output</reason>
+  </sequential_phase>
 </execution_graph>
 
+<delegation>
+  <requirement>Upstream repository URL or detection</requirement>
+  <requirement>Current branch and pending changes</requirement>
+  <requirement>Contribution guidelines (if available)</requirement>
+  <requirement>Explicit no-modification prohibition</requirement>
+  <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
+</delegation>
+
 <output>
+  <status_criteria>
+    <status name="ready">Confidence score >= 80, no critical issues</status>
+    <status name="needs_work">Confidence score 60-79, or has warning-level issues</status>
+    <status name="blocked">Confidence score below 60, or has critical issues</status>
+  </status_criteria>
   <format>
     <upstream_review>
       <summary>
@@ -269,8 +320,8 @@ Suggested PR description with sections per upstream template
       <self_feedback>
         <confidence>XX/100 (based on guideline_compliance, code_quality, test_coverage)</confidence>
         <issues>
-- [Critical] Issue description (if any, max 2 total)
-- [Warning] Issue description (if any)
+          <issue severity="critical">Issue description (if any, max 2 total)</issue>
+          <issue severity="warning">Issue description (if any)</issue>
         </issues>
       </self_feedback>
     </upstream_review>

@@ -643,7 +643,6 @@ version: 0.2.0
   </tool>
   <tool name="go build -o">
     <description>Specify output name</description>
-
     <param name="name">Output binary name</param>
     <use_case>Build with custom binary name</use_case>
   </tool>

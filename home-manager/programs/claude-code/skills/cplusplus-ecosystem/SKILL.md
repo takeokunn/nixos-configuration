@@ -106,13 +106,13 @@ description: This skill should be used when working with C++ projects, CMakeList
         #include &lt;coroutine&gt;
 
         generator&lt;int&gt; range(int start, int end) {
-        for (int i = start; i &lt; end; ++i) {
-        co_yield i;
-        }
+          for (int i = start; i &lt; end; ++i) {
+            co_yield i;
+          }
         }
 
         task&lt;int&gt; async_compute() {
-        co_return co_await some_async_operation();
+          co_return co_await some_async_operation();
         }
       </example>
       <note>Requires coroutine library (cppcoro, libcoro, or custom promise types)</note>
@@ -122,8 +122,8 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>C++20 spaceship operator for simplified comparisons</description>
       <example>
         struct Point {
-        int x, y;
-        auto operator&lt;=&gt;(const Point&amp;) const = default;
+          int x, y;
+          auto operator&lt;=&gt;(const Point&amp;) const = default;
         };
 
         // Automatically generates ==, !=, &lt;, &gt;, &lt;=, &gt;=
@@ -139,9 +139,9 @@ description: This skill should be used when working with C++ projects, CMakeList
       </types>
       <example>
         std::optional&lt;int&gt; find_value(const std::vector&lt;int&gt;&amp; v, int target) {
-        auto it = std::find(v.begin(), v.end(), target);
-        if (it != v.end()) return *it;
-        return std::nullopt;
+          auto it = std::find(v.begin(), v.end(), target);
+          if (it != v.end()) return *it;
+          return std::nullopt;
         }
 
         std::variant&lt;int, std::string, double&gt; data = 42;
@@ -203,8 +203,8 @@ description: This skill should be used when working with C++ projects, CMakeList
 
         // Notifying thread
         {
-        std::lock_guard&lt;std::mutex&gt; lock(mtx);
-        ready = true;
+          std::lock_guard&lt;std::mutex&gt; lock(mtx);
+          ready = true;
         }
         cv.notify_one();
       </example>
@@ -227,12 +227,12 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>Resource Acquisition Is Initialization - bind resource lifetime to object lifetime</description>
       <example>
         class FileHandle {
-        FILE* file_;
+          FILE* file_;
         public:
-        explicit FileHandle(const char* path) : file_(fopen(path, "r")) {}
-        ~FileHandle() { if (file_) fclose(file_); }
-        FileHandle(const FileHandle&amp;) = delete;
-        FileHandle&amp; operator=(const FileHandle&amp;) = delete;
+          explicit FileHandle(const char* path) : file_(fopen(path, "r")) {}
+          ~FileHandle() { if (file_) fclose(file_); }
+          FileHandle(const FileHandle&amp;) = delete;
+          FileHandle&amp; operator=(const FileHandle&amp;) = delete;
         };
       </example>
       <use_case>Managing resources: files, sockets, locks, memory</use_case>
@@ -242,9 +242,9 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>Prefer classes that do not define special member functions</description>
       <example>
         class Person {
-        std::string name_;
-        std::vector&lt;std::string&gt; addresses_;
-        // No destructor, copy/move constructors, or assignment operators needed
+          std::string name_;
+          std::vector&lt;std::string&gt; addresses_;
+          // No destructor, copy/move constructors, or assignment operators needed
         };
       </example>
       <use_case>Use smart pointers and standard containers; let compiler generate defaults</use_case>
@@ -254,14 +254,14 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>If you define one of destructor, copy/move constructor, or copy/move assignment, define all five</description>
       <example>
         class Resource {
-        int* data_;
+          int* data_;
         public:
-        Resource();
-        ~Resource();
-        Resource(const Resource&amp;);
-        Resource(Resource&amp;&amp;) noexcept;
-        Resource&amp; operator=(const Resource&amp;);
-        Resource&amp; operator=(Resource&amp;&amp;) noexcept;
+          Resource();
+          ~Resource();
+          Resource(const Resource&amp;);
+          Resource(Resource&amp;&amp;) noexcept;
+          Resource&amp; operator=(const Resource&amp;);
+          Resource&amp; operator=(Resource&amp;&amp;) noexcept;
         };
       </example>
       <use_case>Classes managing raw resources directly</use_case>
@@ -272,17 +272,17 @@ description: This skill should be used when working with C++ projects, CMakeList
       <example>
         // header
         class Widget {
-        class Impl;
-        std::unique_ptr&lt;Impl&gt; pimpl_;
+          class Impl;
+          std::unique_ptr&lt;Impl&gt; pimpl_;
         public:
-        Widget();
-        ~Widget();
-        void doSomething();
+          Widget();
+          ~Widget();
+          void doSomething();
         };
 
         // source
         class Widget::Impl {
-        // implementation details
+          // implementation details
         };
       </example>
       <use_case>Reducing compile times, ABI stability, hiding implementation</use_case>
@@ -294,14 +294,14 @@ description: This skill should be used when working with C++ projects, CMakeList
         template&lt;typename Derived&gt;
         class Base {
         public:
-        void interface() {
-        static_cast&lt;Derived*&gt;(this)-&gt;implementation();
-        }
+          void interface() {
+            static_cast&lt;Derived*&gt;(this)-&gt;implementation();
+          }
         };
 
         class Derived : public Base&lt;Derived&gt; {
         public:
-        void implementation() { /_ ... _/ }
+          void implementation() { /_ ... _/ }
         };
       </example>
       <use_case>Static polymorphism, mixin classes, compile-time polymorphism</use_case>
@@ -311,19 +311,19 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>Hide concrete types behind a uniform interface</description>
       <example>
         class AnyCallable {
-        struct Concept {
-        virtual ~Concept() = default;
-        virtual void call() = 0;
-        };
-        template&lt;typename T&gt;
-        struct Model : Concept {
-        T obj_;
-        void call() override { obj_(); }
-        };
-        std::unique_ptr&lt;Concept&gt; ptr_;
+          struct Concept {
+            virtual ~Concept() = default;
+            virtual void call() = 0;
+          };
+          template&lt;typename T&gt;
+          struct Model : Concept {
+            T obj_;
+            void call() override { obj_(); }
+          };
+          std::unique_ptr&lt;Concept&gt; ptr_;
         public:
-        template&lt;typename T&gt;
-        AnyCallable(T obj) : ptr_(std::make_unique&lt;Model&lt;T&gt;&gt;(std::move(obj))) {}
+          template&lt;typename T&gt;
+          AnyCallable(T obj) : ptr_(std::make_unique&lt;Model&lt;T&gt;&gt;(std::move(obj))) {}
         };
       </example>
       <use_case>std::function, std::any, runtime polymorphism without inheritance</use_case>
@@ -370,7 +370,7 @@ description: This skill should be used when working with C++ projects, CMakeList
     <if_no>Use simple Makefile for single-file projects or prototypes</if_no>
   </decision_tree>
 
-  <project*structure>
+  <project_structure>
     <standard_layout>
       .
       ├── CMakeLists.txt
@@ -384,7 +384,7 @@ description: This skill should be used when working with C++ projects, CMakeList
       │ └── project/
       ├── tests/
       │ ├── CMakeLists.txt
-      │ └── test*\*.cpp
+      │ └── test_*.cpp
       └── build/
     </standard_layout>
   </project_structure>
@@ -425,12 +425,12 @@ description: This skill should be used when working with C++ projects, CMakeList
       <example>
         add_library(project_warnings INTERFACE)
         target_compile_options(project_warnings INTERFACE
-        $&lt;$&lt;CXX_COMPILER_ID:GNU,Clang&gt;:
-        -Wall -Wextra -Wpedantic -Werror
-        -Wshadow -Wnon-virtual-dtor -Wold-style-cast
-        -Wcast-align -Wunused -Woverloaded-virtual
-        -Wconversion -Wsign-conversion -Wnull-dereference
-        &gt;
+          $&lt;$&lt;CXX_COMPILER_ID:GNU,Clang&gt;:
+            -Wall -Wextra -Wpedantic -Werror
+            -Wshadow -Wnon-virtual-dtor -Wold-style-cast
+            -Wcast-align -Wunused -Woverloaded-virtual
+            -Wconversion -Wsign-conversion -Wnull-dereference
+          &gt;
         )
       </example>
     </pattern>
@@ -472,31 +472,30 @@ description: This skill should be used when working with C++ projects, CMakeList
 
   <clang_tidy>
     <description>Static analysis and linting tool</description>
-    <usage>clang-tidy src/\*.cpp -- -std=c++20</usage>
+    <usage>clang-tidy src/*.cpp -- -std=c++20</usage>
 
     <configuration>
       <file_reference>.clang-tidy</file_reference>
       Checks: >
-      -*,
-      bugprone-*,
-      clang-analyzer-*,
-      cppcoreguidelines-*,
-      modernize-*,
-      performance-*,
-      readability-*,
-      -modernize-use-trailing-return-type
+        -*,
+        bugprone-*,
+        clang-analyzer-*,
+        cppcoreguidelines-*,
+        modernize-*,
+        performance-*,
+        readability-*,
+        -modernize-use-trailing-return-type
 
       WarningsAsErrors: '_'
       HeaderFilterRegex: '._'
 
       CheckOptions:
-
-      - key: readability-identifier-naming.ClassCase
-      value: CamelCase
-      - key: readability-identifier-naming.FunctionCase
-      value: camelBack
-      - key: readability-identifier-naming.VariableCase
-      value: lower_case
+        - key: readability-identifier-naming.ClassCase
+          value: CamelCase
+        - key: readability-identifier-naming.FunctionCase
+          value: camelBack
+        - key: readability-identifier-naming.VariableCase
+          value: lower_case
     </configuration>
 
     <common_checks>
@@ -510,9 +509,9 @@ description: This skill should be used when working with C++ projects, CMakeList
     </common_checks>
   </clang_tidy>
 
-  <clang*format>
+  <clang_format>
     <description>Code formatting tool</description>
-    <usage>clang-format -i src/*.cpp include/\_.hpp</usage>
+    <usage>clang-format -i src/*.cpp include/*.hpp</usage>
 
     <configuration>
       <file_reference>.clang-format</file_reference>
@@ -527,10 +526,10 @@ description: This skill should be used when working with C++ projects, CMakeList
       BreakBeforeBraces: Attach
       IncludeBlocks: Regroup
       IncludeCategories:
-      - Regex: '^<.*>'
-      Priority: 1
-      - Regex: '^".*"'
-      Priority: 2
+        - Regex: '^<.*>'
+          Priority: 1
+        - Regex: '^".*"'
+          Priority: 2
       PointerAlignment: Left
       SortIncludes: CaseSensitive
     </configuration>
@@ -570,16 +569,14 @@ description: This skill should be used when working with C++ projects, CMakeList
     </sanitizer>
 
     <cmake_preset>
-
       # CMakePresets.json sanitizer configuration
-
       {
-      "configurePresets": [{
-      "name": "sanitize",
-      "cacheVariables": {
-      "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer"
-      }
-      }]
+        "configurePresets": [{
+          "name": "sanitize",
+          "cacheVariables": {
+            "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer"
+          }
+        }]
       }
     </cmake_preset>
   </sanitizers>
@@ -609,22 +606,22 @@ description: This skill should be used when working with C++ projects, CMakeList
       #include &lt;gtest/gtest.h&gt;
 
       TEST(MyTest, BasicAssertion) {
-      EXPECT_EQ(1 + 1, 2);
+        EXPECT_EQ(1 + 1, 2);
       }
 
       TEST(MyTest, StringComparison) {
-      std::string s = "hello";
-      EXPECT_STREQ(s.c_str(), "hello");
+        std::string s = "hello";
+        EXPECT_STREQ(s.c_str(), "hello");
       }
 
       class MyFixture : public ::testing::Test {
       protected:
-      void SetUp() override { /_ setup _/ }
-      void TearDown() override { /_ cleanup _/ }
+        void SetUp() override { /_ setup _/ }
+        void TearDown() override { /_ cleanup _/ }
       };
 
       TEST_F(MyFixture, FixtureTest) {
-      EXPECT_TRUE(true);
+        EXPECT_TRUE(true);
       }
     </example>
   </googletest>
@@ -646,21 +643,20 @@ description: This skill should be used when working with C++ projects, CMakeList
       #include &lt;catch2/catch_test_macros.hpp&gt;
 
       TEST_CASE("Basic arithmetic", "[math]") {
-      REQUIRE(1 + 1 == 2);
-      CHECK(2 \* 2 == 4);
+        REQUIRE(1 + 1 == 2);
+        CHECK(2 * 2 == 4);
       }
 
       TEST_CASE("String operations", "[string]") {
-      std::string s = "hello";
+        std::string s = "hello";
 
-      SECTION("length") {
-      REQUIRE(s.length() == 5);
-      }
+        SECTION("length") {
+          REQUIRE(s.length() == 5);
+        }
 
-      SECTION("comparison") {
-      REQUIRE(s == "hello");
-      }
-
+        SECTION("comparison") {
+          REQUIRE(s == "hello");
+        }
       }
     </example>
   </catch2>

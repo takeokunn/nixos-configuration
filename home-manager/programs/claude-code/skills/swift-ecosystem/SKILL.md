@@ -40,7 +40,7 @@ version: 0.1.0
         <example>
           // if-let binding
           if let value = optionalValue {
-          use(value)
+            use(value)
           }
 
           // guard-let for early exit
@@ -65,17 +65,17 @@ version: 0.1.0
         <description>Prefer composition with protocols over class inheritance</description>
         <example>
           protocol Identifiable {
-          var id: String { get }
+            var id: String { get }
           }
 
           protocol Timestamped {
-          var createdAt: Date { get }
+            var createdAt: Date { get }
           }
 
           struct User: Identifiable, Timestamped {
-          let id: String
-          let createdAt: Date
-          let name: String
+            let id: String
+            let createdAt: Date
+            let name: String
           }
         </example>
       </pattern>
@@ -83,13 +83,13 @@ version: 0.1.0
         <description>Provide default implementations via extensions</description>
         <example>
           protocol Describable {
-          var description: String { get }
+            var description: String { get }
           }
 
           extension Describable {
-          var description: String {
-          String(describing: self)
-          }
+            var description: String {
+              String(describing: self)
+            }
           }
         </example>
       </pattern>
@@ -100,14 +100,30 @@ version: 0.1.0
       <pattern name="generic_constraints">
         <example>
           func process&lt;T: Codable &amp; Sendable&gt;(_ item: T) -&gt; Data {
-          try! JSONEncoder().encode(item)
+            try! JSONEncoder().encode(item)
           }
 
           func compare&lt;T&gt;(_ a: T, _ b: T) -&gt; Bool where T: Comparable {
-          a &lt; b
+            a &lt; b
           }
         </example>
       </pattern>
+    </concept>
+
+    <concept name="noncopyable">
+      <description>Types with unique ownership using ~Copyable (Swift 6+)</description>
+      <example>
+        struct UniqueResource: ~Copyable {
+          consuming func release() { /* takes ownership */ }
+        }
+
+        func process(borrowing data: SomeData) { /* read-only */ }
+        func consume(consuming data: SomeData) { /* takes ownership */ }
+      </example>
+      <rules priority="critical">
+        <rule>Use for resources requiring unique ownership (file handles, locks)</rule>
+        <rule>Mark methods with borrowing/consuming for explicit ownership</rule>
+      </rules>
     </concept>
   </type_system>
 
@@ -116,24 +132,24 @@ version: 0.1.0
       <description>Use throws for recoverable errors</description>
       <example>
         enum ParseError: Error {
-        case invalidFormat
-        case missingField(String)
+          case invalidFormat
+          case missingField(String)
         }
 
-        func parse(\_ input: String) throws -&gt; Config {
-        guard !input.isEmpty else {
-        throw ParseError.invalidFormat
-        }
-        // parsing logic
+        func parse(_input: String) throws -&gt; Config {
+          guard !input.isEmpty else {
+            throw ParseError.invalidFormat
+          }
+          // parsing logic
         }
 
         // Calling
         do {
-        let config = try parse(input)
+          let config = try parse(input)
         } catch ParseError.invalidFormat {
-        // handle specific error
+          // handle specific error
         } catch {
-        // handle other errors
+          // handle other errors
         }
       </example>
     </pattern>
@@ -142,27 +158,38 @@ version: 0.1.0
       <description>Use Result for async error handling or when throws is inconvenient</description>
       <example>
         func fetch(url: URL) -&gt; Result&lt;Data, NetworkError&gt; {
-        // implementation
+          // implementation
         }
 
         switch fetch(url: someURL) {
         case .success(let data):
-        process(data)
+          process(data)
         case .failure(let error):
-        handle(error)
+          handle(error)
         }
       </example>
     </pattern>
 
-    <decision_tree name="error_handling_choice">
-      <question>Is this synchronous code with recoverable errors?</question>
-      <if_yes>Use throws with do-catch</if_yes>
-      <if_no>
-        <question>Do you need to store or pass the error?</question>
-        <if_yes>Use Result type</if_yes>
-        <if_no>Use Optional for simple absence</if_no>
-      </if_no>
-    </decision_tree>
+    <pattern name="typed_throws">
+      <description>Specify exact error type in function signature (Swift 6+)</description>
+      <example>
+        func parse(_ input: String) throws(ParseError) -&gt; Config {
+          guard !input.isEmpty else { throw ParseError.invalidFormat }
+          // parsing logic
+        }
+
+        // Caller knows exactly which errors to handle
+        do {
+          let config = try parse(input)
+        } catch {
+          // error is typed as ParseError, not any Error
+          switch error {
+          case .invalidFormat: handleInvalidFormat()
+          case .missingField(let name): handleMissing(name)
+          }
+        }
+      </example>
+    </pattern>
   </error_handling>
 
   <concurrency>
@@ -170,17 +197,17 @@ version: 0.1.0
       <description>Structured concurrency with async/await (Swift 5.5+)</description>
       <example>
         func fetchData() async throws -&gt; Data {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        return data
+          let (data, _) = try await URLSession.shared.data(from: url)
+          return data
         }
 
         // Calling
         Task {
-        do {
-        let data = try await fetchData()
-        } catch {
-        // handle error
-        }
+          do {
+            let data = try await fetchData()
+          } catch {
+            // handle error
+          }
         }
       </example>
     </pattern>
@@ -189,16 +216,15 @@ version: 0.1.0
       <description>Thread-safe mutable state with actors</description>
       <example>
         actor Counter {
-        private var value = 0
+          private var value = 0
 
-        func increment() {
-        value += 1
-        }
+          func increment() {
+            value += 1
+          }
 
-        func getValue() -&gt; Int {
-        value
-        }
-
+          func getValue() -&gt; Int {
+            value
+          }
         }
 
         let counter = Counter()
@@ -212,16 +238,16 @@ version: 0.1.0
       <example>
         // Implicitly Sendable (value types with Sendable properties)
         struct Config: Sendable {
-        let timeout: Int
-        let retries: Int
+          let timeout: Int
+          let retries: Int
         }
 
         // Explicitly mark as Sendable
         final class ImmutableCache: Sendable {
-        let data: [String: String]
-        init(data: [String: String]) {
-        self.data = data
-        }
+          let data: [String: String]
+          init(data: [String: String]) {
+            self.data = data
+          }
         }
       </example>
     </pattern>
@@ -230,14 +256,14 @@ version: 0.1.0
       <description>Parallel execution with structured concurrency</description>
       <example>
         func processAll(_ items: [Item]) async throws -&gt; [Result] {
-        try await withThrowingTaskGroup(of: Result.self) { group in
-        for item in items {
-        group.addTask {
-        try await process(item)
-        }
-        }
-        return try await group.reduce(into: []) { $0.append($1) }
-        }
+          try await withThrowingTaskGroup(of: Result.self) { group in
+            for item in items {
+              group.addTask {
+                try await process(item)
+              }
+            }
+            return try await group.reduce(into: []) { $0.append($1) }
+          }
         }
       </example>
     </pattern>
@@ -249,30 +275,68 @@ version: 0.1.0
     </rules>
   </concurrency>
 
+  <memory_management>
+    <pattern name="weak_references">
+      <description>Prevent retain cycles in closures and delegates</description>
+      <example>
+        class Controller {
+          var onComplete: (() -&gt; Void)?
+
+          func setup() {
+            service.fetch { [weak self] result in
+              self?.handleResult(result)
+            }
+          }
+        }
+      </example>
+    </pattern>
+
+    <pattern name="unowned_references">
+      <description>Non-optional weak reference when lifetime is guaranteed</description>
+      <example>
+        class Parent {
+          var child: Child?
+        }
+
+        class Child {
+          unowned let parent: Parent
+
+          init(parent: Parent) {
+            self.parent = parent
+          }
+        }
+      </example>
+    </pattern>
+
+    <rules priority="critical">
+      <rule>Always use [weak self] in escaping closures unless self lifetime is guaranteed</rule>
+      <rule>Use unowned only when you can guarantee the referenced object outlives the closure</rule>
+    </rules>
+  </memory_management>
+
   <common_patterns>
     <pattern name="builder">
       <description>Fluent API for complex object construction</description>
       <example>
         struct RequestBuilder {
-        private var method: String = "GET"
-        private var headers: [String: String] = [:]
+          private var method: String = "GET"
+          private var headers: [String: String] = [:]
 
-        func method(_ m: String) -&gt; RequestBuilder {
-        var copy = self
-        copy.method = m
-        return copy
-        }
+          func method(_ m: String) -&gt; RequestBuilder {
+            var copy = self
+            copy.method = m
+            return copy
+          }
 
-        func header(_ key: String, _ value: String) -&gt; RequestBuilder {
-        var copy = self
-        copy.headers[key] = value
-        return copy
-        }
+          func header(_ key: String, _ value: String) -&gt; RequestBuilder {
+            var copy = self
+            copy.headers[key] = value
+            return copy
+          }
 
-        func build() -&gt; Request {
-        Request(method: method, headers: headers)
-        }
-
+          func build() -&gt; Request {
+            Request(method: method, headers: headers)
+          }
         }
       </example>
     </pattern>
@@ -282,13 +346,13 @@ version: 0.1.0
       <example>
         @resultBuilder
         struct ArrayBuilder&lt;Element&gt; {
-        static func buildBlock(_ components: Element...) -&gt; [Element] {
-        components
-        }
+          static func buildBlock(_ components: Element...) -&gt; [Element] {
+            components
+          }
         }
 
-        func buildArray&lt;T&gt;(@ArrayBuilder&lt;T&gt; \_ content: () -&gt; [T]) -&gt; [T] {
-        content()
+        func buildArray&lt;T&gt;(@ArrayBuilder&lt;T&gt; _content: () -&gt; [T]) -&gt; [T] {
+          content()
         }
       </example>
     </pattern>
@@ -298,23 +362,22 @@ version: 0.1.0
       <example>
         @propertyWrapper
         struct Clamped&lt;Value: Comparable&gt; {
-        private var value: Value
-        private let range: ClosedRange&lt;Value&gt;
+          private var value: Value
+          private let range: ClosedRange&lt;Value&gt;
 
-        var wrappedValue: Value {
-        get { value }
-        set { value = min(max(newValue, range.lowerBound), range.upperBound) }
-        }
+          var wrappedValue: Value {
+            get { value }
+            set { value = min(max(newValue, range.lowerBound), range.upperBound) }
+          }
 
-        init(wrappedValue: Value, _ range: ClosedRange&lt;Value&gt;) {
-        self.range = range
-        self.value = min(max(wrappedValue, range.lowerBound), range.upperBound)
-        }
-
+          init(wrappedValue: Value, _ range: ClosedRange&lt;Value&gt;) {
+            self.range = range
+            self.value = min(max(wrappedValue, range.lowerBound), range.upperBound)
+          }
         }
 
         struct Volume {
-        @Clamped(0...100) var level: Int = 50
+          @Clamped(0...100) var level: Int = 50
         }
       </example>
     </pattern>
@@ -348,6 +411,38 @@ version: 0.1.0
   </anti_patterns>
 </swift_language>
 
+<patterns>
+  <decision_tree name="error_handling_choice">
+    <question>Is this synchronous code with recoverable errors?</question>
+    <branch condition="Yes, synchronous with recoverable errors">Use throws with do-catch</branch>
+    <branch condition="Need to store or pass the error">Use Result type</branch>
+    <branch condition="Simple absence without error details">Use Optional</branch>
+    <branch condition="Swift 6+ with specific error type">Use typed throws</branch>
+  </decision_tree>
+
+  <decision_tree name="package_type">
+    <question>What are you building?</question>
+    <branch condition="Reusable code for other packages">Library (.library product)</branch>
+    <branch condition="Command-line tool">Executable (.executable product)</branch>
+    <branch condition="Both library and CLI">Multiple products with shared target</branch>
+  </decision_tree>
+
+  <decision_tree name="reference_type_choice">
+    <question>What is the relationship between objects?</question>
+    <branch condition="Parent to child">Use strong reference</branch>
+    <branch condition="Child to parent or delegate">Use weak reference</branch>
+    <branch condition="Guaranteed lifetime">Use unowned reference</branch>
+  </decision_tree>
+
+  <decision_tree name="type_choice">
+    <question>What kind of type do you need?</question>
+    <branch condition="Data without identity">Use struct (value type)</branch>
+    <branch condition="Shared mutable state">Use class (reference type) or actor</branch>
+    <branch condition="Fixed set of cases">Use enum with associated values</branch>
+    <branch condition="Unique ownership required">Use ~Copyable struct (Swift 6+)</branch>
+  </decision_tree>
+</patterns>
+
 <swift_package_manager>
   <project_structure>
     <standard_layout>
@@ -363,8 +458,8 @@ version: 0.1.0
       │ └── MyLibraryTests/
       │ └── MyLibraryTests.swift
       └── Plugins/
-      └── MyPlugin/
-      └── plugin.swift
+        └── MyPlugin/
+          └── plugin.swift
     </standard_layout>
 
     <module_organization>
@@ -385,43 +480,43 @@ version: 0.1.0
       // For cross-platform (macOS + Linux), omit platforms array entirely
       // Only specify platforms when using platform-specific APIs
       let package = Package(
-      name: "MyPackage",
-      platforms: [
-      .macOS(.v14)
-      ],
-      products: [
-      .library(
-      name: "MyLibrary",
-      targets: ["MyLibrary"]
-      ),
-      .executable(
-      name: "my-cli",
-      targets: ["MyCLI"]
-      )
-      ],
-      dependencies: [
-      .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
-      .package(url: "https://github.com/apple/swift-log", from: "1.5.0")
-      ],
-      targets: [
-      .target(
-      name: "MyLibrary",
-      dependencies: [
-      .product(name: "Logging", package: "swift-log")
-      ]
-      ),
-      .executableTarget(
-      name: "MyCLI",
-      dependencies: [
-      "MyLibrary",
-      .product(name: "ArgumentParser", package: "swift-argument-parser")
-      ]
-      ),
-      .testTarget(
-      name: "MyLibraryTests",
-      dependencies: ["MyLibrary"]
-      )
-      ]
+        name: "MyPackage",
+        platforms: [
+          .macOS(.v14)
+        ],
+        products: [
+          .library(
+            name: "MyLibrary",
+            targets: ["MyLibrary"]
+          ),
+          .executable(
+            name: "my-cli",
+            targets: ["MyCLI"]
+          )
+        ],
+        dependencies: [
+          .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
+          .package(url: "https://github.com/apple/swift-log", from: "1.6.0")
+        ],
+        targets: [
+          .target(
+            name: "MyLibrary",
+            dependencies: [
+              .product(name: "Logging", package: "swift-log")
+            ]
+          ),
+          .executableTarget(
+            name: "MyCLI",
+            dependencies: [
+              "MyLibrary",
+              .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ]
+          ),
+          .testTarget(
+            name: "MyLibraryTests",
+            dependencies: ["MyLibrary"]
+          )
+        ]
       )
     </basic_structure>
 
@@ -443,12 +538,12 @@ version: 0.1.0
 
     <swift_settings>
       .target(
-      name: "MyTarget",
-      swiftSettings: [
-      .enableUpcomingFeature("StrictConcurrency"),
-      .enableExperimentalFeature("AccessLevelOnImport"),
-      .unsafeFlags(["-warnings-as-errors"], .when(configuration: .release))
-      ]
+        name: "MyTarget",
+        swiftSettings: [
+          .enableUpcomingFeature("StrictConcurrency"),
+          .enableExperimentalFeature("AccessLevelOnImport"),
+          .unsafeFlags(["-warnings-as-errors"], .when(configuration: .release))
+        ]
       )
     </swift_settings>
   </package_swift>
@@ -466,13 +561,6 @@ version: 0.1.0
     <command name="swift package init --type executable">Create new CLI package</command>
     <command name="swift package clean">Clean build artifacts</command>
   </commands>
-
-  <decision_tree name="package_type">
-    <question>What are you building?</question>
-    <branch condition="Reusable code for other packages">Library (.library product)</branch>
-    <branch condition="Command-line tool">Executable (.executable product)</branch>
-    <branch condition="Both library and CLI">Multiple products with shared target</branch>
-  </decision_tree>
 </swift_package_manager>
 
 <toolchain>
@@ -483,36 +571,33 @@ version: 0.1.0
     <configuration>
       <file_reference>.swiftlint.yml</file_reference>
       disabled_rules:
-      - trailing_whitespace
-      - line_length
+        - trailing_whitespace
+        - line_length
 
       opt_in_rules:
-
-      - empty_count
-      - closure_spacing
-      - force_unwrapping
+        - empty_count
+        - closure_spacing
+        - force_unwrapping
 
       included:
-
-      - Sources
-      - Tests
+        - Sources
+        - Tests
 
       excluded:
-
-      - .build
-      - Packages
+        - .build
+        - Packages
 
       line_length:
-      warning: 120
-      error: 200
+        warning: 120
+        error: 200
 
       type_body_length:
-      warning: 300
-      error: 500
+        warning: 300
+        error: 500
 
       file_length:
-      warning: 500
-      error: 1000
+        warning: 500
+        error: 1000
     </configuration>
 
     <common_rules>
@@ -545,7 +630,6 @@ version: 0.1.0
     </configuration>
 
     <common_options>
-
       <option name="--swiftversion">Target Swift version</option>
       <option name="--indent">Indentation width (default: 4)</option>
       <option name="--maxwidth">Maximum line width</option>
@@ -580,13 +664,13 @@ version: 0.1.0
         import Testing
 
         @Test func addition() {
-        #expect(1 + 1 == 2)
+          #expect(1 + 1 == 2)
         }
 
         @Test("Descriptive name")
         func subtraction() throws {
-        let result = try compute()
-        #expect(result &gt; 0)
+          let result = try compute()
+          #expect(result &gt; 0)
         }
       </example>
     </tool>
@@ -603,6 +687,77 @@ version: 0.1.0
   </other_tools>
 </toolchain>
 
+<testing>
+  <swift_testing>
+    <description>Modern testing framework with Swift 6 macros</description>
+
+    <pattern name="basic_test">
+      <example>
+        import Testing
+
+        @Test func addition() {
+          #expect(1 + 1 == 2)
+        }
+
+        @Test("Descriptive name")
+        func subtraction() throws {
+          let result = try compute()
+          #expect(result &gt; 0)
+        }
+      </example>
+    </pattern>
+
+    <pattern name="parameterized_test">
+      <example>
+        @Test(arguments: [1, 2, 3])
+        func multipleInputs(value: Int) {
+          #expect(value &gt; 0)
+        }
+      </example>
+    </pattern>
+
+    <pattern name="test_suite">
+      <example>
+        @Suite("Calculator Tests")
+        struct CalculatorTests {
+          @Test func add() { #expect(1 + 1 == 2) }
+          @Test func multiply() { #expect(2 * 3 == 6) }
+        }
+      </example>
+    </pattern>
+
+    <pattern name="async_test">
+      <example>
+        @Test func fetchData() async throws {
+          let data = try await service.fetch()
+          #expect(!data.isEmpty)
+        }
+      </example>
+    </pattern>
+
+    <note>swift-testing does not yet support performance testing or UI testing</note>
+  </swift_testing>
+
+  <xctest>
+    <description>Legacy testing framework for existing codebases</description>
+
+    <migration>
+      <step>Replace XCTAssert with #expect</step>
+      <step>Replace XCTAssertEqual with #expect(a == b)</step>
+      <step>Replace XCTestCase class with @Test functions</step>
+      <step>Use @Suite for test grouping</step>
+    </migration>
+  </xctest>
+
+  <best_practices>
+    <practice>Use swift-testing for new test code</practice>
+    <practice>Organize tests in Tests/ directory with TestTarget suffix</practice>
+    <practice>Use @Test for individual test functions</practice>
+    <practice>Use @Suite for grouping related tests</practice>
+    <practice>Use parameterized tests for testing multiple inputs</practice>
+  </best_practices>
+</testing>
+
 <context7_integration>
   <description>Use Context7 MCP for up-to-date Swift documentation</description>
 
@@ -612,7 +767,7 @@ version: 0.1.0
     <library name="Swift Log" id="/apple/swift-log" />
     <library name="SwiftFormat" id="/nicklockwood/swiftformat" />
     <library name="Alamofire" id="/alamofire/alamofire" />
-    <library name="Vapor" id="/vapor/docs" />
+    <library name="Vapor" id="/vapor/vapor" />
     <library name="GRDB.swift" id="/groue/grdb.swift" />
     <library name="Kingfisher" id="/onevcat/kingfisher" />
     <library name="RxSwift" id="/reactivex/rxswift" />

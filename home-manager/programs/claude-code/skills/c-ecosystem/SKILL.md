@@ -4,7 +4,7 @@ description: This skill should be used when working with C projects, "C11", "C17
 ---
 
 <purpose>
-  Provide comprehensive patterns for Modern C language (C11/C17/C23), memory management, toolchain configuration, and CLI tool development.
+Provide comprehensive patterns for Modern C language (C11/C17/C23), memory management, toolchain configuration, and CLI tool development.
 </purpose>
 
 <c_language>
@@ -60,22 +60,22 @@ description: This skill should be used when working with C projects, "C11", "C17
         <type name="ptrdiff_t">Signed pointer difference type</type>
       </types>
       <example>
-        #include &lt;stdint.h&gt;
-        #include &lt;stddef.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
 
-        uint32_t compute_hash(const uint8_t \*data, size_t len);
+uint32_t compute_hash(const uint8_t \*data, size_t len);
       </example>
     </concept>
 
     <concept name="type_generic_selection">
       <description>_Generic for type-based dispatch (C11)</description>
       <example>
-        #define print_value(x) _Generic((x), \
-        int: print_int, \
-        double: print_double, \
-        char *: print_string, \
-        default: print_unknown \
-        )(x)
+#define print_value(x) _Generic((x), \
+int: print_int, \
+double: print_double, \
+char *: print_string, \
+default: print_unknown \
+)(x)
       </example>
       <use_case>Implement type-safe generic interfaces without void pointers</use_case>
     </concept>
@@ -83,29 +83,29 @@ description: This skill should be used when working with C projects, "C11", "C17
     <concept name="compound_literals">
       <description>Anonymous compound literals for in-place struct/array creation</description>
       <example>
-        struct point { int x, y; };
-        void draw(struct point p);
+struct point { int x, y; };
+void draw(struct point p);
 
-        draw((struct point){.x = 10, .y = 20});
+draw((struct point){.x = 10, .y = 20});
 
-        int \*arr = (int[]){1, 2, 3, 4, 5};
+int \*arr = (int[]){1, 2, 3, 4, 5};
       </example>
     </concept>
 
     <concept name="designated_initializers">
       <description>Named field initialization for structs and arrays</description>
       <example>
-        struct config {
-        int timeout;
-        bool verbose;
-        const char *name;
-        };
+struct config {
+int timeout;
+bool verbose;
+const char *name;
+};
 
-        struct config cfg = {
-        .name = "myapp",
-        .timeout = 30,
-        .verbose = true,
-        };
+struct config cfg = {
+.name = "myapp",
+.timeout = 30,
+.verbose = true,
+};
       </example>
     </concept>
   </type_system>
@@ -120,26 +120,26 @@ description: This skill should be used when working with C projects, "C11", "C17
     <concept name="atomics">
       <description>Lock-free atomic operations (C11)</description>
       <example>
-        #include &lt;stdatomic.h&gt;
+#include &lt;stdatomic.h&gt;
 
-        \_Atomic int counter = 0;
+\_Atomic int counter = 0;
 
-        void increment(void) {
-        atomic_fetch_add(&amp;counter, 1);
-        }
+void increment(void) {
+atomic_fetch_add(&amp;counter, 1);
+}
 
-        int get_count(void) {
-        return atomic_load(&amp;counter);
-        }
+int get_count(void) {
+return atomic_load(&amp;counter);
+}
       </example>
     </concept>
 
     <concept name="thread_local">
       <description>Thread-local storage (C11)</description>
       <example>
-        #include &lt;threads.h&gt;
+#include &lt;threads.h&gt;
 
-        \_Thread_local int errno_local;
+\_Thread_local int errno_local;
       </example>
     </concept>
   </concurrency>
@@ -210,20 +210,20 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="basic_allocation">
     <description>Standard malloc/calloc/realloc/free patterns</description>
     <example>
-      #include &lt;stdlib.h&gt;
-      #include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
 
-      char *duplicate_string(const char *src) {
-      if (!src) return NULL;
+char *duplicate_string(const char *src) {
+if (!src) return NULL;
 
-      size_t len = strlen(src) + 1;
-      char *dst = malloc(len);
-      if (!dst) return NULL;
+size_t len = strlen(src) + 1;
+char *dst = malloc(len);
+if (!dst) return NULL;
 
-      memcpy(dst, src, len);
-      return dst;
+memcpy(dst, src, len);
+return dst;
 
-      }
+}
     </example>
     <rules priority="critical">
       <rule>Always check malloc/calloc/realloc return value for NULL</rule>
@@ -236,35 +236,35 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="arena_allocator">
     <description>Bulk allocation with single-point deallocation</description>
     <example>
-      typedef struct {
-      char *base;
-      size_t size;
-      size_t offset;
-      } Arena;
+typedef struct {
+char *base;
+size_t size;
+size_t offset;
+} Arena;
 
-      Arena arena_create(size_t size) {
-      Arena a = {0};
-      a.base = malloc(size);
-      if (a.base) a.size = size;
-      return a;
-      }
+Arena arena_create(size_t size) {
+Arena a = {0};
+a.base = malloc(size);
+if (a.base) a.size = size;
+return a;
+}
 
-      void *arena_alloc(Arena *a, size_t bytes) {
-      size_t aligned = (bytes + 7) &amp; ~7; // 8-byte alignment
-      if (a-&gt;offset + aligned &gt; a-&gt;size) return NULL;
-      void \*ptr = a-&gt;base + a-&gt;offset;
-      a-&gt;offset += aligned;
-      return ptr;
-      }
+void *arena_alloc(Arena *a, size_t bytes) {
+size_t aligned = (bytes + 7) &amp; ~7; // 8-byte alignment
+if (a-&gt;offset + aligned &gt; a-&gt;size) return NULL;
+void \*ptr = a-&gt;base + a-&gt;offset;
+a-&gt;offset += aligned;
+return ptr;
+}
 
-      void arena_reset(Arena \*a) {
-      a-&gt;offset = 0;
-      }
+void arena_reset(Arena \*a) {
+a-&gt;offset = 0;
+}
 
-      void arena_destroy(Arena *a) {
-      free(a-&gt;base);
-      *a = (Arena){0};
-      }
+void arena_destroy(Arena *a) {
+free(a-&gt;base);
+*a = (Arena){0};
+}
     </example>
     <use_case>Parsing, compilers, request handling - many allocations freed together</use_case>
   </pattern>
@@ -272,53 +272,53 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="pool_allocator">
     <description>Fixed-size object allocation with O(1) alloc/free</description>
     <example>
-      typedef struct PoolBlock {
-      struct PoolBlock *next;
-      } PoolBlock;
+typedef struct PoolBlock {
+struct PoolBlock *next;
+} PoolBlock;
 
-      typedef struct {
-      PoolBlock *free_list;
-      char *memory;
-      size_t object_size;
-      size_t capacity;
-      } Pool;
+typedef struct {
+PoolBlock *free_list;
+char *memory;
+size_t object_size;
+size_t capacity;
+} Pool;
 
-      Pool pool_create(size_t object_size, size_t count) {
-      Pool p = {0};
-      size_t size = object_size &gt; sizeof(PoolBlock) ? object_size : sizeof(PoolBlock);
-      p.memory = malloc(size \* count);
-      if (!p.memory) return p;
+Pool pool_create(size_t object_size, size_t count) {
+Pool p = {0};
+size_t size = object_size &gt; sizeof(PoolBlock) ? object_size : sizeof(PoolBlock);
+p.memory = malloc(size \* count);
+if (!p.memory) return p;
 
-      p.object_size = size;
-      p.capacity = count;
+p.object_size = size;
+p.capacity = count;
 
-      // Build free list
-      for (size_t i = 0; i &lt; count; i++) {
-      PoolBlock *block = (PoolBlock *)(p.memory + i * size);
-      block-&gt;next = p.free_list;
-      p.free_list = block;
-      }
-      return p;
+// Build free list
+for (size_t i = 0; i &lt; count; i++) {
+PoolBlock *block = (PoolBlock *)(p.memory + i * size);
+block-&gt;next = p.free_list;
+p.free_list = block;
+}
+return p;
 
-      }
+}
 
-      void *pool_alloc(Pool *p) {
-      if (!p-&gt;free_list) return NULL;
-      PoolBlock \*block = p-&gt;free_list;
-      p-&gt;free_list = block-&gt;next;
-      return block;
-      }
+void *pool_alloc(Pool *p) {
+if (!p-&gt;free_list) return NULL;
+PoolBlock \*block = p-&gt;free_list;
+p-&gt;free_list = block-&gt;next;
+return block;
+}
 
-      void pool_free(Pool *p, void *ptr) {
-      PoolBlock \*block = ptr;
-      block-&gt;next = p-&gt;free_list;
-      p-&gt;free_list = block;
-      }
+void pool_free(Pool *p, void *ptr) {
+PoolBlock \*block = ptr;
+block-&gt;next = p-&gt;free_list;
+p-&gt;free_list = block;
+}
 
-      void pool_destroy(Pool *p) {
-      free(p-&gt;memory);
-      *p = (Pool){0};
-      }
+void pool_destroy(Pool *p) {
+free(p-&gt;memory);
+*p = (Pool){0};
+}
     </example>
     <use_case>Game entities, network connections, fixed-size records</use_case>
   </pattern>
@@ -326,26 +326,26 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="goto_cleanup">
     <description>Resource cleanup with goto for error handling</description>
     <example>
-      int process_file(const char *path) {
-      int result = -1;
-      FILE *fp = NULL;
-      char *buffer = NULL;
+int process_file(const char *path) {
+int result = -1;
+FILE *fp = NULL;
+char *buffer = NULL;
 
-      fp = fopen(path, "r");
-      if (!fp) goto cleanup;
+fp = fopen(path, "r");
+if (!fp) goto cleanup;
 
-      buffer = malloc(BUFFER_SIZE);
-      if (!buffer) goto cleanup;
+buffer = malloc(BUFFER_SIZE);
+if (!buffer) goto cleanup;
 
-      // ... process file ...
+// ... process file ...
 
-      result = 0;  // Success
+result = 0;  // Success
 
-      cleanup:
-      free(buffer);
-      if (fp) fclose(fp);
-      return result;
-      }
+cleanup:
+free(buffer);
+if (fp) fclose(fp);
+return result;
+}
     </example>
     <note>Single cleanup point prevents resource leaks on error paths</note>
   </pattern>
@@ -384,77 +384,77 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="getopt">
     <description>POSIX standard option parsing</description>
     <example>
-      #include &lt;unistd.h&gt;
-      #include &lt;stdio.h&gt;
-      #include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 
-      int main(int argc, char *argv[]) {
-      int verbose = 0;
-      const char *output = NULL;
-      int opt;
+int main(int argc, char *argv[]) {
+int verbose = 0;
+const char *output = NULL;
+int opt;
 
-      while ((opt = getopt(argc, argv, "vo:h")) != -1) {
-      switch (opt) {
-      case 'v':
-      verbose = 1;
-      break;
-      case 'o':
-      output = optarg;
-      break;
-      case 'h':
-      printf("Usage: %s [-v] [-o output] [file...]\n", argv[0]);
-      return 0;
-      default:
-      fprintf(stderr, "Usage: %s [-v] [-o output] [file...]\n", argv[0]);
-      return 1;
-      }
-      }
+while ((opt = getopt(argc, argv, "vo:h")) != -1) {
+switch (opt) {
+case 'v':
+verbose = 1;
+break;
+case 'o':
+output = optarg;
+break;
+case 'h':
+printf("Usage: %s [-v] [-o output] [file...]\n", argv[0]);
+return 0;
+default:
+fprintf(stderr, "Usage: %s [-v] [-o output] [file...]\n", argv[0]);
+return 1;
+}
+}
 
-      // Remaining arguments: argv[optind] to argv[argc-1]
-      for (int i = optind; i &lt; argc; i++) {
-      printf("Processing: %s\n", argv[i]);
-      }
+// Remaining arguments: argv[optind] to argv[argc-1]
+for (int i = optind; i &lt; argc; i++) {
+printf("Processing: %s\n", argv[i]);
+}
 
-      return 0;
+return 0;
 
-      }
+}
     </example>
   </pattern>
 
   <pattern name="getopt_long">
     <description>GNU extension for long options</description>
     <example>
-      #include &lt;getopt.h&gt;
-      #include &lt;stdio.h&gt;
-      #include &lt;stdlib.h&gt;
+#include &lt;getopt.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 
-      static struct option long_options[] = {
-      {"verbose", no_argument, NULL, 'v'},
-      {"output", required_argument, NULL, 'o'},
-      {"help", no_argument, NULL, 'h'},
-      {NULL, 0, NULL, 0 }
-      };
+static struct option long_options[] = {
+{"verbose", no_argument, NULL, 'v'},
+{"output", required_argument, NULL, 'o'},
+{"help", no_argument, NULL, 'h'},
+{NULL, 0, NULL, 0 }
+};
 
-      int main(int argc, char *argv[]) {
-      int verbose = 0;
-      const char *output = NULL;
-      int opt;
+int main(int argc, char *argv[]) {
+int verbose = 0;
+const char *output = NULL;
+int opt;
 
-      while ((opt = getopt_long(argc, argv, "vo:h", long_options, NULL)) != -1) {
-      switch (opt) {
-      case 'v': verbose = 1; break;
-      case 'o': output = optarg; break;
-      case 'h':
-      printf("Usage: %s [--verbose] [--output FILE] [file...]\n", argv[0]);
-      return 0;
-      default:
-      return 1;
-      }
-      }
+while ((opt = getopt_long(argc, argv, "vo:h", long_options, NULL)) != -1) {
+switch (opt) {
+case 'v': verbose = 1; break;
+case 'o': output = optarg; break;
+case 'h':
+printf("Usage: %s [--verbose] [--output FILE] [file...]\n", argv[0]);
+return 0;
+default:
+return 1;
+}
+}
 
-      return 0;
+return 0;
 
-      }
+}
     </example>
   </pattern>
 
@@ -469,61 +469,61 @@ description: This skill should be used when working with C projects, "C11", "C17
       <code value="128+N">Terminated by signal N</code>
     </codes>
     <example>
-      #include &lt;stdlib.h&gt;
-      #include &lt;sysexits.h&gt;  // EX_USAGE, EX_DATAERR, etc.
+#include &lt;stdlib.h&gt;
+#include &lt;sysexits.h&gt;  // EX_USAGE, EX_DATAERR, etc.
 
-      int main(int argc, char \*argv[]) {
-      if (argc &lt; 2) {
-      fprintf(stderr, "Usage: %s &lt;file&gt;\n", argv[0]);
-      return EX_USAGE; // 64
-      }
+int main(int argc, char \*argv[]) {
+if (argc &lt; 2) {
+fprintf(stderr, "Usage: %s &lt;file&gt;\n", argv[0]);
+return EX_USAGE; // 64
+}
 
-      FILE *fp = fopen(argv[1], "r");
-      if (!fp) {
-      perror(argv[1]);
-      return EX_NOINPUT;  // 66
-      }
+FILE *fp = fopen(argv[1], "r");
+if (!fp) {
+perror(argv[1]);
+return EX_NOINPUT;  // 66
+}
 
-      // ...
+// ...
 
-      return EXIT_SUCCESS;
+return EXIT_SUCCESS;
 
-      }
+}
     </example>
   </pattern>
 
   <pattern name="signal_handling">
     <description>Graceful signal handling for clean shutdown</description>
     <example>
-      #include &lt;signal.h&gt;
-      #include &lt;stdio.h&gt;
-      #include &lt;stdlib.h&gt;
-      #include &lt;stdatomic.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdatomic.h&gt;
 
-      static atomic_int running = 1;
+static atomic_int running = 1;
 
-      static void handle_signal(int sig) {
-      (void)sig;
-      running = 0;
-      }
+static void handle_signal(int sig) {
+(void)sig;
+running = 0;
+}
 
-      int main(void) {
-      struct sigaction sa = {0};
-      sa.sa_handler = handle_signal;
-      sigemptyset(&amp;sa.sa_mask);
-      sa.sa_flags = 0;
+int main(void) {
+struct sigaction sa = {0};
+sa.sa_handler = handle_signal;
+sigemptyset(&amp;sa.sa_mask);
+sa.sa_flags = 0;
 
-      sigaction(SIGINT, &amp;sa, NULL);
-      sigaction(SIGTERM, &amp;sa, NULL);
+sigaction(SIGINT, &amp;sa, NULL);
+sigaction(SIGTERM, &amp;sa, NULL);
 
-      while (running) {
-      // Main loop work
-      }
+while (running) {
+// Main loop work
+}
 
-      printf("Shutting down gracefully...\n");
-      return 0;
+printf("Shutting down gracefully...\n");
+return 0;
 
-      }
+}
     </example>
     <rules priority="critical">
       <rule>Use sigaction() instead of signal() for portability</rule>
@@ -535,36 +535,36 @@ description: This skill should be used when working with C projects, "C11", "C17
   <pattern name="error_reporting">
     <description>Consistent error message format</description>
     <example>
-      #include &lt;errno.h&gt;
-      #include &lt;stdarg.h&gt;
-      #include &lt;stdio.h&gt;
-      #include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
 
-      static const char \*progname = "myapp";
+static const char \*progname = "myapp";
 
-      void set_progname(const char *argv0) {
-      const char *p = strrchr(argv0, '/');
-      progname = p ? p + 1 : argv0;
-      }
+void set_progname(const char *argv0) {
+const char *p = strrchr(argv0, '/');
+progname = p ? p + 1 : argv0;
+}
 
-      void error(const char \*fmt, ...) {
-      fprintf(stderr, "%s: ", progname);
-      va_list ap;
-      va_start(ap, fmt);
-      vfprintf(stderr, fmt, ap);
-      va_end(ap);
-      fprintf(stderr, "\n");
-      }
+void error(const char \*fmt, ...) {
+fprintf(stderr, "%s: ", progname);
+va_list ap;
+va_start(ap, fmt);
+vfprintf(stderr, fmt, ap);
+va_end(ap);
+fprintf(stderr, "\n");
+}
 
-      void error_errno(const char \*fmt, ...) {
-      int saved_errno = errno;
-      fprintf(stderr, "%s: ", progname);
-      va_list ap;
-      va_start(ap, fmt);
-      vfprintf(stderr, fmt, ap);
-      va_end(ap);
-      fprintf(stderr, ": %s\n", strerror(saved_errno));
-      }
+void error_errno(const char \*fmt, ...) {
+int saved_errno = errno;
+fprintf(stderr, "%s: ", progname);
+va_list ap;
+va_start(ap, fmt);
+vfprintf(stderr, fmt, ap);
+va_end(ap);
+fprintf(stderr, ": %s\n", strerror(saved_errno));
+}
     </example>
   </pattern>
 </cli_development>
@@ -600,7 +600,7 @@ description: This skill should be used when working with C projects, "C11", "C17
       <description>Memory error detection (buffer overflow, use-after-free)</description>
       <flags>-fsanitize=address -fno-omit-frame-pointer</flags>
       <example>
-        gcc -fsanitize=address -fno-omit-frame-pointer -g -o myapp myapp.c
+gcc -fsanitize=address -fno-omit-frame-pointer -g -o myapp myapp.c
       </example>
     </sanitizer>
 
@@ -608,7 +608,7 @@ description: This skill should be used when working with C projects, "C11", "C17
       <description>Undefined behavior detection</description>
       <flags>-fsanitize=undefined</flags>
       <example>
-        gcc -fsanitize=undefined -g -o myapp myapp.c
+gcc -fsanitize=undefined -g -o myapp myapp.c
       </example>
     </sanitizer>
 
@@ -624,21 +624,21 @@ description: This skill should be used when working with C projects, "C11", "C17
     </sanitizer>
   </sanitizers>
 
-  <static*analysis>
+  <static_analysis>
     <tool name="clang-tidy">
       <description>Clang-based linter and static analyzer</description>
       <usage>clang-tidy src/*.c -- -std=c11</usage>
       <configuration>
-        <file*reference>.clang-tidy</file_reference>
-        Checks: > -*,
-        bugprone-_,
-        clang-analyzer-_,
-        misc-_,
-        performance-_,
-        readability-\*,
-        -readability-identifier-length
+        <file_reference>.clang-tidy</file_reference>
+Checks: > -*,
+bugprone-_,
+clang-analyzer-_,
+misc-_,
+performance-_,
+readability-\*,
+-readability-identifier-length
 
-        WarningsAsErrors: '\*'
+WarningsAsErrors: '\*'
       </configuration>
     </tool>
 
@@ -670,29 +670,29 @@ description: This skill should be used when working with C projects, "C11", "C17
     <framework name="Check">
       <description>Unit testing framework for C</description>
       <example>
-        #include &lt;check.h&gt;
+#include &lt;check.h&gt;
 
-        START_TEST(test_addition) {
-        ck_assert_int_eq(1 + 1, 2);
-        }
-        END_TEST
+START_TEST(test_addition) {
+ck_assert_int_eq(1 + 1, 2);
+}
+END_TEST
 
-        Suite *math_suite(void) {
-        Suite *s = suite_create("Math");
-        TCase \*tc = tcase_create("Core");
-        tcase_add_test(tc, test_addition);
-        suite_add_tcase(s, tc);
-        return s;
-        }
+Suite *math_suite(void) {
+Suite *s = suite_create("Math");
+TCase \*tc = tcase_create("Core");
+tcase_add_test(tc, test_addition);
+suite_add_tcase(s, tc);
+return s;
+}
 
-        int main(void) {
-        Suite *s = math_suite();
-        SRunner *sr = srunner_create(s);
-        srunner_run_all(sr, CK_NORMAL);
-        int failed = srunner_ntests_failed(sr);
-        srunner_free(sr);
-        return failed ? EXIT_FAILURE : EXIT_SUCCESS;
-        }
+int main(void) {
+Suite *s = math_suite();
+SRunner *sr = srunner_create(s);
+srunner_run_all(sr, CK_NORMAL);
+int failed = srunner_ntests_failed(sr);
+srunner_free(sr);
+return failed ? EXIT_FAILURE : EXIT_SUCCESS;
+}
       </example>
     </framework>
   </testing>
@@ -710,27 +710,27 @@ description: This skill should be used when working with C projects, "C11", "C17
     <pattern name="simple_makefile">
       <description>Basic Makefile for C projects</description>
       <example>
-        CC := gcc
-        CFLAGS := -std=c11 -Wall -Wextra -Wpedantic -g
-        LDFLAGS :=
-        LDLIBS :=
+CC := gcc
+CFLAGS := -std=c11 -Wall -Wextra -Wpedantic -g
+LDFLAGS :=
+LDLIBS :=
 
-        SRCS := $(wildcard src/\*.c)
-        OBJS := $(SRCS:.c=.o)
-        TARGET := myapp
+SRCS := $(wildcard src/\*.c)
+OBJS := $(SRCS:.c=.o)
+TARGET := myapp
 
-        .PHONY: all clean
+.PHONY: all clean
 
-        all: $(TARGET)
+all: $(TARGET)
 
-        $(TARGET): $(OBJS)
-        $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(TARGET): $(OBJS)
+$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-        %.o: %.c
-        $(CC) $(CFLAGS) -c -o $@ $&lt;
+%.o: %.c
+$(CC) $(CFLAGS) -c -o $@ $&lt;
 
-        clean:
-        rm -f $(OBJS) $(TARGET)
+clean:
+rm -f $(OBJS) $(TARGET)
       </example>
     </pattern>
   </make>
@@ -739,21 +739,21 @@ description: This skill should be used when working with C projects, "C11", "C17
     <pattern name="modern_cmake">
       <description>Modern CMake for C projects</description>
       <example>
-        cmake_minimum_required(VERSION 3.20)
-        project(myapp VERSION 1.0.0 LANGUAGES C)
+cmake_minimum_required(VERSION 3.20)
+project(myapp VERSION 1.0.0 LANGUAGES C)
 
-        set(CMAKE_C_STANDARD 11)
-        set(CMAKE_C_STANDARD_REQUIRED ON)
-        set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
-        add_executable(myapp src/main.c src/utils.c)
-        target_include_directories(myapp PRIVATE include)
+add_executable(myapp src/main.c src/utils.c)
+target_include_directories(myapp PRIVATE include)
 
-        target_compile_options(myapp PRIVATE
-        $&lt;$&lt;C_COMPILER_ID:GNU,Clang&gt;:
-        -Wall -Wextra -Wpedantic -Werror
-        &gt;
-        )
+target_compile_options(myapp PRIVATE
+$&lt;$&lt;C_COMPILER_ID:GNU,Clang&gt;:
+-Wall -Wextra -Wpedantic -Werror
+&gt;
+)
       </example>
       <note>For detailed CMake patterns, see cplusplus-ecosystem skill</note>
     </pattern>
@@ -763,20 +763,20 @@ description: This skill should be used when working with C projects, "C11", "C17
     <pattern name="meson_build">
       <description>Meson build for C projects</description>
       <example>
-        # meson.build
-        project('myapp', 'c',
-        version: '1.0.0',
-        default_options: [
-        'c_std=c11',
-        'warning_level=3',
-        'werror=true',
-        ]
-        )
+# meson.build
+project('myapp', 'c',
+version: '1.0.0',
+default_options: [
+'c_std=c11',
+'warning_level=3',
+'werror=true',
+]
+)
 
-        src = files('src/main.c', 'src/utils.c')
-        inc = include_directories('include')
+src = files('src/main.c', 'src/utils.c')
+inc = include_directories('include')
 
-        executable('myapp', src, include_directories: inc)
+executable('myapp', src, include_directories: inc)
       </example>
     </pattern>
   </meson>

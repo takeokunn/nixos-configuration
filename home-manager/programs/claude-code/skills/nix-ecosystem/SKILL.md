@@ -12,9 +12,7 @@ description: This skill should be used when the user asks to "write nix", "nix e
     <concept name="lazy_evaluation">
       <description>Nix is lazily evaluated. Expressions are only computed when needed.</description>
       <example>
-
         <note>Only evaluates needed attributes</note>
-
         let
         expensive = builtins.trace "Computing expensive" (1 + 1);
         in
@@ -29,7 +27,6 @@ description: This skill should be used when the user asks to "write nix", "nix e
         double = x: x * 2;
 
         <note>Avoid side effects; use derivations for build actions</note>
-
         buildResult = pkgs.stdenv.mkDerivation { ... };
       </example>
     </concept>
@@ -41,12 +38,10 @@ description: This skill should be used when the user asks to "write nix", "nix e
         { attr1 = value1; attr2 = value2; }
 
         <note>Access patterns</note>
-
         set.attr
         set."attr-with-dashes"
 
         <note>Recursive attribute set</note>
-
         rec { a = 1; b = a + 1; }
       </example>
     </concept>
@@ -129,7 +124,6 @@ description: This skill should be used when the user asks to "write nix", "nix e
         nativeBuildInputs = [ cmake pkg-config ];
 
         # Libraries linked at runtime
-
         buildInputs = [ openssl zlib ];
         }
       </example>
@@ -604,7 +598,7 @@ description: This skill should be used when the user asks to "write nix", "nix e
 
   <best_practices>
     <practice priority="critical">
-      Use programs.\* when available instead of manual configuration
+      Use programs.* when available instead of manual configuration
     </practice>
 
     <practice priority="critical">

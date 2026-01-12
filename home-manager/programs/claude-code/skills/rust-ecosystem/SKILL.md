@@ -46,7 +46,7 @@ description: This skill should be used when working with Rust projects, "Cargo.t
         <description>Explicit lifetime annotations for complex cases</description>
         <example>
           fn foo<'a>(x: &'a str) -> &'a str {
-          x
+            x
           }
         </example>
       </pattern>
@@ -75,8 +75,8 @@ description: This skill should be used when working with Rust projects, "Cargo.t
       <example>
         #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         struct MyType {
-        field1: String,
-        field2: i32,
+          field1: String,
+          field2: i32,
         }
       </example>
     </pattern>
@@ -105,10 +105,10 @@ description: This skill should be used when working with Rust projects, "Cargo.t
       <example>
         #[derive(Debug, thiserror::Error)]
         enum MyError {
-        #[error("IO error: {0}")]
-        Io(#[from] std::io::Error),
-        #[error("Parse error: {msg}")]
-        Parse { msg: String },
+          #[error("IO error: {0}")]
+          Io(#[from] std::io::Error),
+          #[error("Parse error: {msg}")]
+          Parse { msg: String },
         }
       </example>
     </pattern>
@@ -119,9 +119,9 @@ description: This skill should be used when working with Rust projects, "Cargo.t
       <description>Fluent API for complex object construction</description>
       <example>
         MyStruct::builder()
-        .field1(value1)
-        .field2(value2)
-        .build()
+          .field1(value1)
+          .field2(value2)
+          .build()
       </example>
       <decision_tree name="when_to_use">
         <question>Does the struct have many optional fields or complex construction logic?</question>

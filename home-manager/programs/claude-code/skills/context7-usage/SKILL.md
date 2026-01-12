@@ -14,7 +14,6 @@ description: This skill should be used when the user asks to "check documentatio
     <use_case>Must call before get-library-docs unless ID is known</use_case>
     <note>Returns list of matching libraries with IDs, trust scores, snippet counts</note>
   </tool>
-
   <tool name="get-library-docs">
     <description>Fetch documentation for a specific library</description>
     <param name="context7CompatibleLibraryID">Library ID from resolve-library-id</param>
@@ -39,22 +38,18 @@ description: This skill should be used when the user asks to "check documentatio
       topic="authentication"
 
       <note>For React hooks documentation</note>
-
       topic="hooks"
 
       <note>For routing documentation</note>
-
       topic="routing"
     </example>
   </pattern>
-
   <pattern name="getting_started">
     <description>Omit topic parameter for general overview and getting started documentation</description>
     <example>
       get-library-docs context7CompatibleLibraryID="/facebook/react"
     </example>
   </pattern>
-
   <pattern name="api_reference">
     <description>Use topic parameter with specific API names for focused reference documentation</description>
     <example>
@@ -62,15 +57,12 @@ description: This skill should be used when the user asks to "check documentatio
       topic="useState"
 
       <note>For specific Next.js API</note>
-
       topic="getServerSideProps"
 
       <note>For specific TypeScript utility type</note>
-
       topic="Partial"
     </example>
   </pattern>
-
   <pattern name="verify_usage">
     <description>Verify codebase usage against latest documentation by combining Serena and Context7</description>
     <example>
@@ -78,14 +70,11 @@ description: This skill should be used when the user asks to "check documentatio
       find_symbol name_path_pattern="useState"
 
       <step>2. Use Context7 to get latest documentation</step>
-
       get-library-docs context7CompatibleLibraryID="/facebook/react" topic="useState"
 
       <step>3. Compare current usage with documented best practices</step>
-
     </example>
   </pattern>
-
   <pattern name="update_dependencies">
     <description>Plan dependency updates with API migration by checking latest documentation</description>
     <example>
@@ -93,14 +82,11 @@ description: This skill should be used when the user asks to "check documentatio
       get-library-docs context7CompatibleLibraryID="/vercel/next.js" topic="migration"
 
       <step>2. Use Serena to find all usages of changed APIs</step>
-
       find_referencing_symbols name_path="getStaticProps"
 
       <step>3. Plan migration based on documentation</step>
-
     </example>
   </pattern>
-
   <decision_tree name="tool_selection">
     <question>What type of operation is needed?</question>
     <branch condition="Library name unknown">Use resolve-library-id to find library</branch>

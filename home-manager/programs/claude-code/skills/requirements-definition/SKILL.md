@@ -173,143 +173,153 @@ description: This skill should be used when the user asks to "define requirement
     <summary>
       - One-sentence request description
       - Background and context
-      - Expected outcomes</summary>
-      <current_state>
-        - Existing system description
-        - Technology stack
-        - Relevant patterns and conventions</current_state>
-        <functional_requirements>Format: FR-XXX (FR-001, FR-002, ...)
-          - Priority: mandatory or optional
-          - Clear acceptance criteria</functional_requirements>
-          <non_functional_requirements>
-            - Performance: response time, throughput
-            - Security: authentication, authorization, data protection
-            - Maintainability: code quality, documentation</non_functional_requirements>
-            <technical_specifications>
-              - Design policies and patterns
-              - Impact scope analysis
-              - Key design decisions with rationale</technical_specifications>
-              <metrics>
-                - Feasibility (0-100): Technical achievability
-                - Objectivity (0-100): Evidence-based specification</metrics>
-                <constraints>
-                  - Technical constraints: platform, language, framework
-                  - Operational constraints: deployment, maintenance</constraints>
-                  <test_requirements>
-                    - Unit test coverage expectations
-                    - Integration test scenarios
-                    - Acceptance criteria verification</test_requirements>
-                    <task_breakdown>
-                      - Dependency graph: task dependencies and execution order
-                      - Phased tasks: files to modify/create, overview of changes, dependencies
-                      - Execute handoff: key decisions, reference implementations, constraints</task_breakdown>
-                    </format>
-                  </output>
+      - Expected outcomes
+    </summary>
+    <current_state>
+      - Existing system description
+      - Technology stack
+      - Relevant patterns and conventions
+    </current_state>
+    <functional_requirements>
+      Format: FR-XXX (FR-001, FR-002, ...)
+      - Priority: mandatory or optional
+      - Clear acceptance criteria
+    </functional_requirements>
+    <non_functional_requirements>
+      - Performance: response time, throughput
+      - Security: authentication, authorization, data protection
+      - Maintainability: code quality, documentation
+    </non_functional_requirements>
+    <technical_specifications>
+      - Design policies and patterns
+      - Impact scope analysis
+      - Key design decisions with rationale
+    </technical_specifications>
+    <metrics>
+      - Feasibility (0-100): Technical achievability
+      - Objectivity (0-100): Evidence-based specification
+    </metrics>
+    <constraints>
+      - Technical constraints: platform, language, framework
+      - Operational constraints: deployment, maintenance
+    </constraints>
+    <test_requirements>
+      - Unit test coverage expectations
+      - Integration test scenarios
+      - Acceptance criteria verification
+    </test_requirements>
+    <task_breakdown>
+      - Dependency graph: task dependencies and execution order
+      - Phased tasks: files to modify/create, overview of changes, dependencies
+      - Execute handoff: key decisions, reference implementations, constraints
+    </task_breakdown>
+  </format>
+</output>
 
-                  <rules priority="critical">
-                    <rule>Never proceed without clear answers to critical questions (score >= 15)</rule>
-                    <rule>All requirements must be verifiable and measurable</rule>
-                    <rule>Distinguish mandatory from optional requirements</rule>
-                  </rules>
+<rules priority="critical">
+  <rule>Never proceed without clear answers to critical questions (score >= 15)</rule>
+  <rule>All requirements must be verifiable and measurable</rule>
+  <rule>Distinguish mandatory from optional requirements</rule>
+</rules>
 
-                  <rules priority="standard">
-                    <rule>Present high-score questions first in requirement discussions</rule>
-                    <rule>Document assumptions explicitly when requirements are unclear</rule>
-                    <rule>Include rationale for key design decisions</rule>
-                    <rule>Map requirements to test scenarios</rule>
-                  </rules>
+<rules priority="standard">
+  <rule>Present high-score questions first in requirement discussions</rule>
+  <rule>Document assumptions explicitly when requirements are unclear</rule>
+  <rule>Include rationale for key design decisions</rule>
+  <rule>Map requirements to test scenarios</rule>
+</rules>
 
-                  <best_practices>
-                    <practice priority="critical">Always investigate current state before defining requirements using Serena's symbol-level operations</practice>
-                    <practice priority="critical">Score questions using the 4-criteria scoring system and prioritize high-score questions (>= 15)</practice>
-                    <practice priority="critical">Clearly distinguish mandatory from optional requirements with explicit rationale</practice>
-                    <practice priority="high">Document all assumptions when requirements are unclear or incomplete</practice>
-                    <practice priority="high">Map each requirement to specific test scenarios for verification</practice>
-                    <practice priority="high">Include rationale for key design decisions in technical specifications</practice>
-                    <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
-                    <practice priority="medium">Create dependency graphs showing task execution order</practice>
-                  </best_practices>
+<best_practices>
+  <practice priority="critical">Always investigate current state before defining requirements using Serena's symbol-level operations</practice>
+  <practice priority="critical">Score questions using the 4-criteria scoring system and prioritize high-score questions (>= 15)</practice>
+  <practice priority="critical">Clearly distinguish mandatory from optional requirements with explicit rationale</practice>
+  <practice priority="high">Document all assumptions when requirements are unclear or incomplete</practice>
+  <practice priority="high">Map each requirement to specific test scenarios for verification</practice>
+  <practice priority="high">Include rationale for key design decisions in technical specifications</practice>
+  <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
+  <practice priority="medium">Create dependency graphs showing task execution order</practice>
+</best_practices>
 
-                  <workflow>
-                    <phase name="gather">
-                      <objective>Gather requirement information</objective>
-                      <step>1. Understand user request and context</step>
-                      <step>2. Investigate existing codebase patterns</step>
-                      <step>3. Identify stakeholders and constraints</step>
-                    </phase>
-                    <phase name="clarify">
-                      <objective>Clarify ambiguous requirements</objective>
-                      <step>1. Score questions by impact (design, irreversibility, effort)</step>
-                      <step>2. Use AskUserQuestion for structured decisions</step>
-                      <step>3. Document answers and implications</step>
-                    </phase>
-                    <phase name="document">
-                      <objective>Document requirements formally</objective>
-                      <step>1. Write functional requirements (FR-XXX format)</step>
-                      <step>2. Write non-functional requirements</step>
-                      <step>3. Define acceptance criteria</step>
-                    </phase>
-                  </workflow>
+<workflow>
+  <phase name="gather">
+    <objective>Gather requirement information</objective>
+    <step>1. Understand user request and context</step>
+    <step>2. Investigate existing codebase patterns</step>
+    <step>3. Identify stakeholders and constraints</step>
+  </phase>
+  <phase name="clarify">
+    <objective>Clarify ambiguous requirements</objective>
+    <step>1. Score questions by impact (design, irreversibility, effort)</step>
+    <step>2. Use AskUserQuestion for structured decisions</step>
+    <step>3. Document answers and implications</step>
+  </phase>
+  <phase name="document">
+    <objective>Document requirements formally</objective>
+    <step>1. Write functional requirements (FR-XXX format)</step>
+    <step>2. Write non-functional requirements</step>
+    <step>3. Define acceptance criteria</step>
+  </phase>
+</workflow>
 
-                  <error_escalation>
-                    <level severity="low">
-                      <example>Minor ambiguity in non-critical detail</example>
-                      <action>Note in report, proceed</action>
-                    </level>
-                    <level severity="medium">
-                      <example>Unclear requirement affecting scope</example>
-                      <action>Document issue, use AskUserQuestion for clarification</action>
-                    </level>
-                    <level severity="high">
-                      <example>Technically infeasible requirement</example>
-                      <action>STOP, present options to user</action>
-                    </level>
-                    <level severity="critical">
-                      <example>Requirement violates security or ethics</example>
-                      <action>BLOCK operation, require explicit user acknowledgment</action>
-                    </level>
-                  </error_escalation>
+<error_escalation>
+  <level severity="low">
+    <example>Minor ambiguity in non-critical detail</example>
+    <action>Note in report, proceed</action>
+  </level>
+  <level severity="medium">
+    <example>Unclear requirement affecting scope</example>
+    <action>Document issue, use AskUserQuestion for clarification</action>
+  </level>
+  <level severity="high">
+    <example>Technically infeasible requirement</example>
+    <action>STOP, present options to user</action>
+  </level>
+  <level severity="critical">
+    <example>Requirement violates security or ethics</example>
+    <action>BLOCK operation, require explicit user acknowledgment</action>
+  </level>
+</error_escalation>
 
-                  <constraints>
-                    <must>Investigate before concluding</must>
-                    <must>Ask questions before making assumptions</must>
-                    <must>Include (Recommended) option in AskUserQuestion</must>
-                    <avoid>Proceeding without answering critical questions</avoid>
-                    <avoid>Justifying user preferences over technical validity</avoid>
-                    <avoid>Documenting requirements without evidence</avoid>
-                  </constraints>
+<constraints>
+  <must>Investigate before concluding</must>
+  <must>Ask questions before making assumptions</must>
+  <must>Include (Recommended) option in AskUserQuestion</must>
+  <avoid>Proceeding without answering critical questions</avoid>
+  <avoid>Justifying user preferences over technical validity</avoid>
+  <avoid>Documenting requirements without evidence</avoid>
+</constraints>
 
-                  <related_agents>
-                    <agent name="define">Primary agent for requirements definition and specification design</agent>
-                    <agent name="ask">Use for investigating current system state before requirements definition</agent>
-                    <agent name="execute">Delegate to after requirements are fully defined and approved</agent>
-                  </related_agents>
+<related_agents>
+  <agent name="define">Primary agent for requirements definition and specification design</agent>
+  <agent name="ask">Use for investigating current system state before requirements definition</agent>
+  <agent name="execute">Delegate to after requirements are fully defined and approved</agent>
+</related_agents>
 
-                  <related_skills>
-                    <skill name="investigation-patterns">Use to understand current system state before requirements definition</skill>
-                    <skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
-                    <skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
-                  </related_skills>
+<related_skills>
+  <skill name="investigation-patterns">Use to understand current system state before requirements definition</skill>
+  <skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
+  <skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
+</related_skills>
 
-                  <anti_patterns>
-                    <avoid name="vague_requirements">
-                      <description>Requirements that are unclear or unmeasurable</description>
-                      <instead>Write specific, testable requirements with clear acceptance criteria</instead>
-                    </avoid>
-                    <avoid name="implementation_details">
-                      <description>Specifying implementation details instead of requirements</description>
-                      <instead>Describe what needs to be achieved, not how to implement it</instead>
-                    </avoid>
-                    <avoid name="skipping_investigation">
-                      <description>Writing requirements without investigating existing code</description>
-                      <instead>Always investigate current state before defining requirements</instead>
-                    </avoid>
-                    <avoid name="missing_constraints">
-                      <description>Not identifying technical or operational constraints</description>
-                      <instead>Explicitly document all constraints that affect implementation</instead>
-                    </avoid>
-                    <avoid name="undefined_priorities">
-                      <description>Treating all requirements as equally important</description>
-                      <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
-                    </avoid>
-                  </anti_patterns>
+<anti_patterns>
+  <avoid name="vague_requirements">
+    <description>Requirements that are unclear or unmeasurable</description>
+    <instead>Write specific, testable requirements with clear acceptance criteria</instead>
+  </avoid>
+  <avoid name="implementation_details">
+    <description>Specifying implementation details instead of requirements</description>
+    <instead>Describe what needs to be achieved, not how to implement it</instead>
+  </avoid>
+  <avoid name="skipping_investigation">
+    <description>Writing requirements without investigating existing code</description>
+    <instead>Always investigate current state before defining requirements</instead>
+  </avoid>
+  <avoid name="missing_constraints">
+    <description>Not identifying technical or operational constraints</description>
+    <instead>Explicitly document all constraints that affect implementation</instead>
+  </avoid>
+  <avoid name="undefined_priorities">
+    <description>Treating all requirements as equally important</description>
+    <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
+  </avoid>
+</anti_patterns>

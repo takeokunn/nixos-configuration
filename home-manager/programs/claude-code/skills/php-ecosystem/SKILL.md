@@ -64,7 +64,7 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         function process(string|int $value): string|null
         {
-        return is_string($value) ? $value : (string) $value;
+            return is_string($value) ? $value : (string) $value;
         }
       </example>
     </pattern>
@@ -76,7 +76,7 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         function process(Countable&amp;Iterator $collection): int
         {
-        return count($collection);
+            return count($collection);
         }
       </example>
     </pattern>
@@ -88,12 +88,12 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         function handle((Countable&amp;Iterator)|null $items): void
         {
-        if ($items === null) {
-        return;
-        }
-        foreach ($items as $item) {
-        // process
-        }
+            if ($items === null) {
+                return;
+            }
+            foreach ($items as $item) {
+                // process
+            }
         }
       </example>
     </pattern>
@@ -105,19 +105,18 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         enum Status: string
         {
-        case Draft = 'draft';
-        case Published = 'published';
-        case Archived = 'archived';
+            case Draft = 'draft';
+            case Published = 'published';
+            case Archived = 'archived';
 
-        public function label(): string
-        {
-        return match($this) {
-        self::Draft =&gt; 'Draft',
-        self::Published =&gt; 'Published',
-        self::Archived =&gt; 'Archived',
-        };
-        }
-
+            public function label(): string
+            {
+                return match($this) {
+                    self::Draft =&gt; 'Draft',
+                    self::Published =&gt; 'Published',
+                    self::Archived =&gt; 'Archived',
+                };
+            }
         }
 
         // Usage
@@ -131,19 +130,18 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         enum Suit
         {
-        case Hearts;
-        case Diamonds;
-        case Clubs;
-        case Spades;
+            case Hearts;
+            case Diamonds;
+            case Clubs;
+            case Spades;
 
-        public function color(): string
-        {
-        return match($this) {
-        self::Hearts, self::Diamonds =&gt; 'red',
-        self::Clubs, self::Spades =&gt; 'black',
-        };
-        }
-
+            public function color(): string
+            {
+                return match($this) {
+                    self::Hearts, self::Diamonds =&gt; 'red',
+                    self::Clubs, self::Spades =&gt; 'black',
+                };
+            }
         }
       </example>
     </pattern>
@@ -155,10 +153,10 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         class User
         {
-        public function __construct(
-        public readonly string $id,
-        public readonly string $email,
-        ) {}
+            public function __construct(
+                public readonly string $id,
+                public readonly string $email,
+            ) {}
         }
       </example>
     </pattern>
@@ -168,10 +166,10 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         readonly class ValueObject
         {
-        public function __construct(
-        public string $name,
-        public int $value,
-        ) {}
+            public function __construct(
+                public string $name,
+                public int $value,
+            ) {}
         }
       </example>
     </pattern>
@@ -184,26 +182,27 @@ description: This skill should be used when the user asks to "write php", "php 8
         #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_FUNCTION)]
         class Route
         {
-        public function __construct(
-        public string $path,
-        public string $method = 'GET',
-        ) {}
+            public function __construct(
+                public string $path,
+                public string $method = 'GET',
+            ) {}
         }
 
         class UserController
-        { #[Route('/users', 'GET')]
-        public function index(): array
         {
-        return [];
-        }
+            #[Route('/users', 'GET')]
+            public function index(): array
+            {
+                return [];
+            }
         }
 
         // Reading attributes via reflection
         $method = new ReflectionMethod(UserController::class, 'index');
         $attributes = $method-&gt;getAttributes(Route::class);
         foreach ($attributes as $attribute) {
-        $route = $attribute-&gt;newInstance();
-        echo $route-&gt;path; // '/users'
+            $route = $attribute-&gt;newInstance();
+            echo $route-&gt;path; // '/users'
         }
       </example>
     </pattern>
@@ -215,17 +214,16 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         class Product
         {
-        public function \_\_construct(
-        private string $name,
-        private float $price,
-        private int $quantity = 0,
-        ) {}
+            public function __construct(
+                private string $name,
+                private float $price,
+                private int $quantity = 0,
+            ) {}
 
-        public function getName(): string
-        {
-        return $this-&gt;name;
-        }
-
+            public function getName(): string
+            {
+                return $this-&gt;name;
+            }
         }
       </example>
     </pattern>
@@ -236,19 +234,19 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Pass arguments by name (PHP 8.0+)</description>
       <example>
         function createUser(
-        string $name,
-        string $email,
-        bool $active = true,
-        ?string $role = null,
+            string $name,
+            string $email,
+            bool $active = true,
+            ?string $role = null,
         ): User {
-        // ...
+            // ...
         }
 
         // Usage with named arguments
         $user = createUser(
-        email: 'user@example.com',
-        name: 'John Doe',
-        role: 'admin',
+            email: 'user@example.com',
+            name: 'John Doe',
+            role: 'admin',
         );
       </example>
       <decision_tree name="when_to_use">
@@ -265,9 +263,9 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         class Config
         {
-        public const string VERSION = '1.0.0';
-        public const int MAX_RETRIES = 3;
-        public const array ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
+            public const string VERSION = '1.0.0';
+            public const int MAX_RETRIES = 3;
+            public const array ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
         }
       </example>
     </pattern>
@@ -291,12 +289,12 @@ description: This skill should be used when the user asks to "write php", "php 8
     <example>
       // composer.json
       {
-      "autoload": {
-      "psr-4": {
-      "App\\": "src/",
-      "App\\Tests\\": "tests/"
-      }
-      }
+          "autoload": {
+              "psr-4": {
+                  "App\\": "src/",
+                  "App\\Tests\\": "tests/"
+              }
+          }
       }
 
       // File: src/Domain/User/Entity/User.php
@@ -304,7 +302,7 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class User
       {
-      // Fully qualified: App\Domain\User\Entity\User
+          // Fully qualified: App\Domain\User\Entity\User
       }
     </example>
   </psr>
@@ -317,27 +315,26 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class UserService
       {
-      public function \_\_construct(
-      private LoggerInterface $logger,
-      ) {}
+          public function __construct(
+              private LoggerInterface $logger,
+          ) {}
 
-      public function create(array $data): User
-      {
-      $this-&gt;logger-&gt;info('Creating user', ['email' =&gt; $data['email']]);
+          public function create(array $data): User
+          {
+              $this-&gt;logger-&gt;info('Creating user', ['email' =&gt; $data['email']]);
 
-      try {
-      $user = new User($data);
-      $this-&gt;logger-&gt;debug('User created', ['id' =&gt; $user-&gt;getId()]);
-      return $user;
-      } catch (\Exception $e) {
-      $this-&gt;logger-&gt;error('Failed to create user', [
-      'exception' =&gt; $e,
-      'data' =&gt; $data,
-      ]);
-      throw $e;
-      }
-      }
-
+              try {
+                  $user = new User($data);
+                  $this-&gt;logger-&gt;debug('User created', ['id' =&gt; $user-&gt;getId()]);
+                  return $user;
+              } catch (\Exception $e) {
+                  $this-&gt;logger-&gt;error('Failed to create user', [
+                      'exception' =&gt; $e,
+                      'data' =&gt; $data,
+                  ]);
+                  throw $e;
+              }
+          }
       }
     </example>
   </psr>
@@ -350,17 +347,16 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       function handleRequest(ServerRequestInterface $request): ResponseInterface
       {
-      $method = $request-&gt;getMethod();
-      $uri = $request-&gt;getUri();
-      $body = $request-&gt;getParsedBody();
-      $query = $request-&gt;getQueryParams();
+          $method = $request-&gt;getMethod();
+          $uri = $request-&gt;getUri();
+          $body = $request-&gt;getParsedBody();
+          $query = $request-&gt;getQueryParams();
 
-      // PSR-7 messages are immutable
-      $response = new Response();
-      return $response
-      -&gt;withStatus(200)
-      -&gt;withHeader('Content-Type', 'application/json');
-
+          // PSR-7 messages are immutable
+          $response = new Response();
+          return $response
+              -&gt;withStatus(200)
+              -&gt;withHeader('Content-Type', 'application/json');
       }
     </example>
   </psr>
@@ -372,15 +368,14 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class ServiceLocator
       {
-      public function \_\_construct(
-      private ContainerInterface $container,
-      ) {}
+          public function __construct(
+              private ContainerInterface $container,
+          ) {}
 
-      public function getUserService(): UserService
-      {
-      return $this-&gt;container-&gt;get(UserService::class);
-      }
-
+          public function getUserService(): UserService
+          {
+              return $this-&gt;container-&gt;get(UserService::class);
+          }
       }
     </example>
   </psr>
@@ -408,19 +403,18 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class AuthMiddleware implements MiddlewareInterface
       {
-      public function process(
-      ServerRequestInterface $request,
-      RequestHandlerInterface $handler
-      ): ResponseInterface {
-      $token = $request-&gt;getHeaderLine('Authorization');
+          public function process(
+              ServerRequestInterface $request,
+              RequestHandlerInterface $handler
+          ): ResponseInterface {
+              $token = $request-&gt;getHeaderLine('Authorization');
 
-      if (!$this-&gt;validateToken($token)) {
-      return new Response(401);
-      }
+              if (!$this-&gt;validateToken($token)) {
+                  return new Response(401);
+              }
 
-      return $handler-&gt;handle($request);
-      }
-
+              return $handler-&gt;handle($request);
+          }
       }
     </example>
   </psr>
@@ -433,21 +427,20 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class JsonResponder
       {
-      public function \_\_construct(
-      private ResponseFactoryInterface $responseFactory,
-      private StreamFactoryInterface $streamFactory,
-      ) {}
+          public function __construct(
+              private ResponseFactoryInterface $responseFactory,
+              private StreamFactoryInterface $streamFactory,
+          ) {}
 
-      public function respond(array $data, int $status = 200): ResponseInterface
-      {
-      $json = json_encode($data, JSON_THROW_ON_ERROR);
-      $body = $this-&gt;streamFactory-&gt;createStream($json);
+          public function respond(array $data, int $status = 200): ResponseInterface
+          {
+              $json = json_encode($data, JSON_THROW_ON_ERROR);
+              $body = $this-&gt;streamFactory-&gt;createStream($json);
 
-      return $this-&gt;responseFactory-&gt;createResponse($status)
-      -&gt;withHeader('Content-Type', 'application/json')
-      -&gt;withBody($body);
-      }
-
+              return $this-&gt;responseFactory-&gt;createResponse($status)
+                  -&gt;withHeader('Content-Type', 'application/json')
+                  -&gt;withBody($body);
+          }
       }
     </example>
   </psr>
@@ -460,24 +453,23 @@ description: This skill should be used when the user asks to "write php", "php 8
 
       class ApiClient
       {
-      public function \_\_construct(
-      private ClientInterface $httpClient,
-      private RequestFactoryInterface $requestFactory,
-      ) {}
+          public function __construct(
+              private ClientInterface $httpClient,
+              private RequestFactoryInterface $requestFactory,
+          ) {}
 
-      public function get(string $url): array
-      {
-      $request = $this-&gt;requestFactory-&gt;createRequest('GET', $url);
-      $response = $this-&gt;httpClient-&gt;sendRequest($request);
+          public function get(string $url): array
+          {
+              $request = $this-&gt;requestFactory-&gt;createRequest('GET', $url);
+              $response = $this-&gt;httpClient-&gt;sendRequest($request);
 
-      return json_decode(
-      $response-&gt;getBody()-&gt;getContents(),
-      true,
-      512,
-      JSON_THROW_ON_ERROR
-      );
-      }
-
+              return json_decode(
+                  $response-&gt;getBody()-&gt;getContents(),
+                  true,
+                  512,
+                  JSON_THROW_ON_ERROR
+              );
+          }
       }
     </example>
   </psr>
@@ -489,29 +481,28 @@ description: This skill should be used when the user asks to "write php", "php 8
     <example>
       readonly class Money
       {
-      public function \_\_construct(
-      public int $amount,
-      public string $currency,
-      ) {
-      if ($amount &lt; 0) {
-      throw new InvalidArgumentException('Amount cannot be negative');
-      }
-      }
+          public function __construct(
+              public int $amount,
+              public string $currency,
+          ) {
+              if ($amount &lt; 0) {
+                  throw new InvalidArgumentException('Amount cannot be negative');
+              }
+          }
 
-      public function add(Money $other): self
-      {
-      if ($this-&gt;currency !== $other-&gt;currency) {
-      throw new InvalidArgumentException('Currency mismatch');
-      }
-      return new self($this-&gt;amount + $other-&gt;amount, $this-&gt;currency);
-      }
+          public function add(Money $other): self
+          {
+              if ($this-&gt;currency !== $other-&gt;currency) {
+                  throw new InvalidArgumentException('Currency mismatch');
+              }
+              return new self($this-&gt;amount + $other-&gt;amount, $this-&gt;currency);
+          }
 
-      public function equals(Money $other): bool
-      {
-      return $this-&gt;amount === $other-&gt;amount
-      &amp;&amp; $this-&gt;currency === $other-&gt;currency;
-      }
-
+          public function equals(Money $other): bool
+          {
+              return $this-&gt;amount === $other-&gt;amount
+                  &amp;&amp; $this-&gt;currency === $other-&gt;currency;
+          }
       }
     </example>
   </pattern>
@@ -521,43 +512,42 @@ description: This skill should be used when the user asks to "write php", "php 8
     <example>
       interface UserRepositoryInterface
       {
-      public function find(UserId $id): ?User;
-      public function findByEmail(Email $email): ?User;
-      public function save(User $user): void;
-      public function remove(User $user): void;
+          public function find(UserId $id): ?User;
+          public function findByEmail(Email $email): ?User;
+          public function save(User $user): void;
+          public function remove(User $user): void;
       }
 
       class PdoUserRepository implements UserRepositoryInterface
       {
-      public function \_\_construct(
-      private PDO $pdo,
-      ) {}
+          public function __construct(
+              private PDO $pdo,
+          ) {}
 
-      public function find(UserId $id): ?User
-      {
-      $stmt = $this-&gt;pdo-&gt;prepare(
-      'SELECT * FROM users WHERE id = :id'
-      );
-      $stmt-&gt;execute(['id' =&gt; $id-&gt;toString()]);
-      $row = $stmt-&gt;fetch(PDO::FETCH_ASSOC);
+          public function find(UserId $id): ?User
+          {
+              $stmt = $this-&gt;pdo-&gt;prepare(
+                  'SELECT * FROM users WHERE id = :id'
+              );
+              $stmt-&gt;execute(['id' =&gt; $id-&gt;toString()]);
+              $row = $stmt-&gt;fetch(PDO::FETCH_ASSOC);
 
-      return $row ? $this-&gt;hydrate($row) : null;
-      }
+              return $row ? $this-&gt;hydrate($row) : null;
+          }
 
-      public function save(User $user): void
-      {
-      $stmt = $this-&gt;pdo-&gt;prepare(
-      'INSERT INTO users (id, email, name)
-      VALUES (:id, :email, :name)
-      ON DUPLICATE KEY UPDATE email = :email, name = :name'
-      );
-      $stmt-&gt;execute([
-      'id' =&gt; $user-&gt;getId()-&gt;toString(),
-      'email' =&gt; $user-&gt;getEmail()-&gt;toString(),
-      'name' =&gt; $user-&gt;getName(),
-      ]);
-      }
-
+          public function save(User $user): void
+          {
+              $stmt = $this-&gt;pdo-&gt;prepare(
+                  'INSERT INTO users (id, email, name)
+                   VALUES (:id, :email, :name)
+                   ON DUPLICATE KEY UPDATE email = :email, name = :name'
+              );
+              $stmt-&gt;execute([
+                  'id' =&gt; $user-&gt;getId()-&gt;toString(),
+                  'email' =&gt; $user-&gt;getEmail()-&gt;toString(),
+                  'name' =&gt; $user-&gt;getName(),
+              ]);
+          }
       }
     </example>
     <decision_tree name="when_to_use">
@@ -572,33 +562,32 @@ description: This skill should be used when the user asks to "write php", "php 8
     <example>
       class CreateUserHandler
       {
-      public function __construct(
-      private UserRepositoryInterface $userRepository,
-      private PasswordHasherInterface $passwordHasher,
-      private EventDispatcherInterface $eventDispatcher,
-      ) {}
+          public function __construct(
+              private UserRepositoryInterface $userRepository,
+              private PasswordHasherInterface $passwordHasher,
+              private EventDispatcherInterface $eventDispatcher,
+          ) {}
 
-      public function handle(CreateUserCommand $command): UserId
-      {
-      $email = new Email($command-&gt;email);
+          public function handle(CreateUserCommand $command): UserId
+          {
+              $email = new Email($command-&gt;email);
 
-      if ($this-&gt;userRepository-&gt;findByEmail($email) !== null) {
-      throw new UserAlreadyExistsException($email);
-      }
+              if ($this-&gt;userRepository-&gt;findByEmail($email) !== null) {
+                  throw new UserAlreadyExistsException($email);
+              }
 
-      $user = User::create(
-      UserId::generate(),
-      $email,
-      $command-&gt;name,
-      $this-&gt;passwordHasher-&gt;hash($command-&gt;password),
-      );
+              $user = User::create(
+                  UserId::generate(),
+                  $email,
+                  $command-&gt;name,
+                  $this-&gt;passwordHasher-&gt;hash($command-&gt;password),
+              );
 
-      $this-&gt;userRepository-&gt;save($user);
-      $this-&gt;eventDispatcher-&gt;dispatch(new UserCreatedEvent($user));
+              $this-&gt;userRepository-&gt;save($user);
+              $this-&gt;eventDispatcher-&gt;dispatch(new UserCreatedEvent($user));
 
-      return $user-&gt;getId();
-      }
-
+              return $user-&gt;getId();
+          }
       }
     </example>
   </pattern>
@@ -609,37 +598,36 @@ description: This skill should be used when the user asks to "write php", "php 8
       // Interface for abstraction
       interface CacheInterface
       {
-      public function get(string $key): mixed;
-      public function set(string $key, mixed $value, int $ttl = 3600): void;
+          public function get(string $key): mixed;
+          public function set(string $key, mixed $value, int $ttl = 3600): void;
       }
 
       // Concrete implementation
       class RedisCache implements CacheInterface
       {
-      public function \_\_construct(
-      private \Redis $redis,
-      ) {}
+          public function __construct(
+              private \Redis $redis,
+          ) {}
 
-      public function get(string $key): mixed
-      {
-      $value = $this-&gt;redis-&gt;get($key);
-      return $value !== false ? unserialize($value) : null;
-      }
+          public function get(string $key): mixed
+          {
+              $value = $this-&gt;redis-&gt;get($key);
+              return $value !== false ? unserialize($value) : null;
+          }
 
-      public function set(string $key, mixed $value, int $ttl = 3600): void
-      {
-      $this-&gt;redis-&gt;setex($key, $ttl, serialize($value));
-      }
-
+          public function set(string $key, mixed $value, int $ttl = 3600): void
+          {
+              $this-&gt;redis-&gt;setex($key, $ttl, serialize($value));
+          }
       }
 
       // Service depending on abstraction
       class ProductService
       {
-      public function \_\_construct(
-      private ProductRepositoryInterface $repository,
-      private CacheInterface $cache,
-      ) {}
+          public function __construct(
+              private ProductRepositoryInterface $repository,
+              private CacheInterface $cache,
+          ) {}
       }
     </example>
   </pattern>
@@ -669,15 +657,15 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Specify version requirements</description>
       <example>
         {
-        "require": {
-        "php": "^8.2",
-        "psr/log": "^3.0",
-        "guzzlehttp/guzzle": "^7.0"
-        },
-        "require-dev": {
-        "phpunit/phpunit": "^10.0 || ^11.0",
-        "phpstan/phpstan": "^1.10"
-        }
+            "require": {
+                "php": "^8.2",
+                "psr/log": "^3.0",
+                "guzzlehttp/guzzle": "^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.0 || ^11.0",
+                "phpstan/phpstan": "^1.10"
+            }
         }
       </example>
       <note>^ allows minor version updates, ~ allows patch updates only</note>
@@ -690,9 +678,9 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         my-package/
         ├── src/
-        │ └── MyClass.php
+        │   └── MyClass.php
         ├── tests/
-        │ └── MyClassTest.php
+        │   └── MyClassTest.php
         ├── composer.json
         ├── phpunit.xml.dist
         ├── phpstan.neon
@@ -706,41 +694,41 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Complete composer.json for library</description>
       <example>
         {
-        "name": "vendor/my-package",
-        "description": "My awesome PHP package",
-        "type": "library",
-        "license": "MIT",
-        "authors": [
-        {
-        "name": "Your Name",
-        "email": "you@example.com"
-        }
-        ],
-        "require": {
-        "php": "^8.2"
-        },
-        "require-dev": {
-        "phpunit/phpunit": "^11.0",
-        "phpstan/phpstan": "^1.10"
-        },
-        "autoload": {
-        "psr-4": {
-        "Vendor\\MyPackage\\": "src/"
-        }
-        },
-        "autoload-dev": {
-        "psr-4": {
-        "Vendor\\MyPackage\\Tests\\": "tests/"
-        }
-        },
-        "scripts": {
-        "test": "phpunit",
-        "analyse": "phpstan analyse",
-        "cs-fix": "php-cs-fixer fix"
-        },
-        "config": {
-        "sort-packages": true
-        }
+            "name": "vendor/my-package",
+            "description": "My awesome PHP package",
+            "type": "library",
+            "license": "MIT",
+            "authors": [
+                {
+                    "name": "Your Name",
+                    "email": "you@example.com"
+                }
+            ],
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0",
+                "phpstan/phpstan": "^1.10"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vendor\\MyPackage\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Vendor\\MyPackage\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": "phpunit",
+                "analyse": "phpstan analyse",
+                "cs-fix": "php-cs-fixer fix"
+            },
+            "config": {
+                "sort-packages": true
+            }
         }
       </example>
     </pattern>
@@ -749,18 +737,18 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Automate common tasks with Composer scripts</description>
       <example>
         {
-        "scripts": {
-        "test": "phpunit --colors=always",
-        "test:coverage": "phpunit --coverage-html coverage",
-        "analyse": "phpstan analyse --memory-limit=512M",
-        "cs-check": "php-cs-fixer fix --dry-run --diff",
-        "cs-fix": "php-cs-fixer fix",
-        "ci": [
-        "@cs-check",
-        "@analyse",
-        "@test"
-        ]
-        }
+            "scripts": {
+                "test": "phpunit --colors=always",
+                "test:coverage": "phpunit --coverage-html coverage",
+                "analyse": "phpstan analyse --memory-limit=512M",
+                "cs-check": "php-cs-fixer fix --dry-run --diff",
+                "cs-fix": "php-cs-fixer fix",
+                "ci": [
+                    "@cs-check",
+                    "@analyse",
+                    "@test"
+                ]
+            }
         }
       </example>
     </pattern>
@@ -778,38 +766,37 @@ description: This skill should be used when the user asks to "write php", "php 8
 
         class CalculatorTest extends TestCase
         {
-        private Calculator $calculator;
+            private Calculator $calculator;
 
-        protected function setUp(): void
-        {
-        $this-&gt;calculator = new Calculator();
-        }
+            protected function setUp(): void
+            {
+                $this-&gt;calculator = new Calculator();
+            }
 
-        #[Test]
-        public function itAddsNumbers(): void
-        {
-        $result = $this-&gt;calculator-&gt;add(2, 3);
+            #[Test]
+            public function itAddsNumbers(): void
+            {
+                $result = $this-&gt;calculator-&gt;add(2, 3);
 
-        $this-&gt;assertSame(5, $result);
-        }
+                $this-&gt;assertSame(5, $result);
+            }
 
-        #[Test]
-        #[DataProvider('additionProvider')]
-        public function itAddsVariousNumbers(int $a, int $b, int $expected): void
-        {
-        $this-&gt;assertSame($expected, $this-&gt;calculator-&gt;add($a, $b));
-        }
+            #[Test]
+            #[DataProvider('additionProvider')]
+            public function itAddsVariousNumbers(int $a, int $b, int $expected): void
+            {
+                $this-&gt;assertSame($expected, $this-&gt;calculator-&gt;add($a, $b));
+            }
 
-        public static function additionProvider(): array
-        {
-        return [
-        'positive numbers' =&gt; [1, 2, 3],
-        'negative numbers' =&gt; [-1, -2, -3],
-        'mixed numbers' =&gt; [-1, 2, 1],
-        'zeros' =&gt; [0, 0, 0],
-        ];
-        }
-
+            public static function additionProvider(): array
+            {
+                return [
+                    'positive numbers' =&gt; [1, 2, 3],
+                    'negative numbers' =&gt; [-1, -2, -3],
+                    'mixed numbers' =&gt; [-1, 2, 1],
+                    'zeros' =&gt; [0, 0, 0],
+                ];
+            }
         }
       </example>
     </pattern>
@@ -820,30 +807,30 @@ description: This skill should be used when the user asks to "write php", "php 8
         use PHPUnit\Framework\TestCase;
 
         class UserServiceTest extends TestCase
-        { #[Test]
-        public function itCreatesUser(): void
         {
-        // Arrange
-        $repository = $this-&gt;createMock(UserRepositoryInterface::class);
-        $repository
-        -&gt;expects($this-&gt;once())
-        -&gt;method('save')
-        -&gt;with($this-&gt;isInstanceOf(User::class));
+            #[Test]
+            public function itCreatesUser(): void
+            {
+                // Arrange
+                $repository = $this-&gt;createMock(UserRepositoryInterface::class);
+                $repository
+                    -&gt;expects($this-&gt;once())
+                    -&gt;method('save')
+                    -&gt;with($this-&gt;isInstanceOf(User::class));
 
-        $hasher = $this-&gt;createMock(PasswordHasherInterface::class);
-        $hasher
-        -&gt;method('hash')
-        -&gt;willReturn('hashed_password');
+                $hasher = $this-&gt;createMock(PasswordHasherInterface::class);
+                $hasher
+                    -&gt;method('hash')
+                    -&gt;willReturn('hashed_password');
 
-        $service = new UserService($repository, $hasher);
+                $service = new UserService($repository, $hasher);
 
-        // Act
-        $userId = $service-&gt;create('test@example.com', 'password');
+                // Act
+                $userId = $service-&gt;create('test@example.com', 'password');
 
-        // Assert
-        $this-&gt;assertInstanceOf(UserId::class, $userId);
-        }
-
+                // Assert
+                $this-&gt;assertInstanceOf(UserId::class, $userId);
+            }
         }
       </example>
     </pattern>
@@ -854,23 +841,23 @@ description: This skill should be used when the user asks to "write php", "php 8
         &lt;!-- phpunit.xml.dist --&gt;
         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
         &lt;phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-        bootstrap="vendor/autoload.php"
-        colors="true"
-        cacheDirectory=".phpunit.cache"&gt;
-        &lt;testsuites&gt;
-        &lt;testsuite name="Unit"&gt;
-        &lt;directory&gt;tests/Unit&lt;/directory&gt;
-        &lt;/testsuite&gt;
-        &lt;testsuite name="Integration"&gt;
-        &lt;directory&gt;tests/Integration&lt;/directory&gt;
-        &lt;/testsuite&gt;
-        &lt;/testsuites&gt;
-        &lt;source&gt;
-        &lt;include&gt;
-        &lt;directory&gt;src&lt;/directory&gt;
-        &lt;/include&gt;
-        &lt;/source&gt;
+                 xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+                 bootstrap="vendor/autoload.php"
+                 colors="true"
+                 cacheDirectory=".phpunit.cache"&gt;
+            &lt;testsuites&gt;
+                &lt;testsuite name="Unit"&gt;
+                    &lt;directory&gt;tests/Unit&lt;/directory&gt;
+                &lt;/testsuite&gt;
+                &lt;testsuite name="Integration"&gt;
+                    &lt;directory&gt;tests/Integration&lt;/directory&gt;
+                &lt;/testsuite&gt;
+            &lt;/testsuites&gt;
+            &lt;source&gt;
+                &lt;include&gt;
+                    &lt;directory&gt;src&lt;/directory&gt;
+                &lt;/include&gt;
+            &lt;/source&gt;
         &lt;/phpunit&gt;
       </example>
     </pattern>
@@ -884,19 +871,19 @@ description: This skill should be used when the user asks to "write php", "php 8
         use App\Calculator;
 
         beforeEach(function () {
-        $this-&gt;calculator = new Calculator();
+            $this-&gt;calculator = new Calculator();
         });
 
         test('it adds numbers', function () {
-        expect($this-&gt;calculator-&gt;add(2, 3))-&gt;toBe(5);
+            expect($this-&gt;calculator-&gt;add(2, 3))-&gt;toBe(5);
         });
 
         test('it subtracts numbers', function () {
-        expect($this-&gt;calculator-&gt;subtract(5, 3))-&gt;toBe(2);
+            expect($this-&gt;calculator-&gt;subtract(5, 3))-&gt;toBe(2);
         });
 
         it('throws on division by zero', function () {
-        $this-&gt;calculator-&gt;divide(10, 0);
+            $this-&gt;calculator-&gt;divide(10, 0);
         })-&gt;throws(DivisionByZeroError::class);
       </example>
     </pattern>
@@ -905,13 +892,13 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Pest datasets for parameterized tests</description>
       <example>
         dataset('addition', [
-        'positive' =&gt; [1, 2, 3],
-        'negative' =&gt; [-1, -2, -3],
-        'mixed' =&gt; [-1, 2, 1],
+            'positive' =&gt; [1, 2, 3],
+            'negative' =&gt; [-1, -2, -3],
+            'mixed' =&gt; [-1, 2, 1],
         ]);
 
         test('it adds numbers correctly', function (int $a, int $b, int $expected) {
-        expect($this-&gt;calculator-&gt;add($a, $b))-&gt;toBe($expected);
+            expect($this-&gt;calculator-&gt;add($a, $b))-&gt;toBe($expected);
         })-&gt;with('addition');
       </example>
     </pattern>
@@ -920,14 +907,13 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Pest expectation API</description>
       <example>
         test('user properties', function () {
-        $user = new User('john@example.com', 'John Doe');
+            $user = new User('john@example.com', 'John Doe');
 
-        expect($user)
-        -&gt;toBeInstanceOf(User::class)
-        -&gt;email-&gt;toBe('john@example.com')
-        -&gt;name-&gt;toBe('John Doe')
-        -&gt;isActive()-&gt;toBeTrue();
-
+            expect($user)
+                -&gt;toBeInstanceOf(User::class)
+                -&gt;email-&gt;toBe('john@example.com')
+                -&gt;name-&gt;toBe('John Doe')
+                -&gt;isActive()-&gt;toBeTrue();
         });
       </example>
     </pattern>
@@ -939,16 +925,17 @@ description: This skill should be used when the user asks to "write php", "php 8
     <pattern name="config">
       <description>PHPStan configuration</description>
       <example>
-
         # phpstan.neon
-
         parameters:
-        level: 8
-        paths: - src - tests
-        excludePaths: - vendor
-        checkMissingIterableValueType: true
-        checkGenericClassInNonGenericObjectType: true
-        reportUnmatchedIgnoredErrors: true
+            level: 8
+            paths:
+                - src
+                - tests
+            excludePaths:
+                - vendor
+            checkMissingIterableValueType: true
+            checkGenericClassInNonGenericObjectType: true
+            reportUnmatchedIgnoredErrors: true
       </example>
     </pattern>
 
@@ -974,25 +961,24 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Generic types with PHPStan annotations</description>
       <example>
         /**
-        * @template T
-        * @param class-string&lt;T&gt; $class
-        * @return T
-        */
+         * @template T
+         * @param class-string&lt;T&gt; $class
+         * @return T
+         */
         public function create(string $class): object
         {
-        return new $class();
+            return new $class();
         }
 
-        /\*\*
-
-        - @template T of object
-        - @param T $entity
-        - @return T
-        \*/
+        /**
+         * @template T of object
+         * @param T $entity
+         * @return T
+         */
         public function save(object $entity): object
         {
-        // persist
-        return $entity;
+            // persist
+            return $entity;
         }
       </example>
     </pattern>
@@ -1005,18 +991,18 @@ description: This skill should be used when the user asks to "write php", "php 8
         &lt;!-- psalm.xml --&gt;
         &lt;?xml version="1.0"?&gt;
         &lt;psalm
-        errorLevel="1"
-        resolveFromConfigFile="true"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="https://getpsalm.org/schema/config"
-        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+            errorLevel="1"
+            resolveFromConfigFile="true"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="https://getpsalm.org/schema/config"
+            xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
         &gt;
-        &lt;projectFiles&gt;
-        &lt;directory name="src" /&gt;
-        &lt;ignoreFiles&gt;
-        &lt;directory name="vendor" /&gt;
-        &lt;/ignoreFiles&gt;
-        &lt;/projectFiles&gt;
+            &lt;projectFiles&gt;
+                &lt;directory name="src" /&gt;
+                &lt;ignoreFiles&gt;
+                    &lt;directory name="vendor" /&gt;
+                &lt;/ignoreFiles&gt;
+            &lt;/projectFiles&gt;
         &lt;/psalm&gt;
       </example>
     </pattern>
@@ -1025,22 +1011,21 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Psalm-specific annotations</description>
       <example>
         /**
-        * @psalm-immutable
-        */
+         * @psalm-immutable
+         */
         readonly class ImmutableValue
         {
-        public function __construct(
-        public string $value,
-        ) {}
+            public function __construct(
+                public string $value,
+            ) {}
         }
 
-        /\*\*
-
-        - @psalm-assert-if-true User $user
-        \*/
+        /**
+         * @psalm-assert-if-true User $user
+         */
         function isActiveUser(?User $user): bool
         {
-        return $user !== null &amp;&amp; $user-&gt;isActive();
+            return $user !== null &amp;&amp; $user-&gt;isActive();
         }
       </example>
     </pattern>
@@ -1053,22 +1038,22 @@ description: This skill should be used when the user asks to "write php", "php 8
         &lt;?php
         // .php-cs-fixer.dist.php
         $finder = PhpCsFixer\Finder::create()
-        -&gt;in(**DIR** . '/src')
-        -&gt;in(**DIR** . '/tests');
+            -&gt;in(__DIR__ . '/src')
+            -&gt;in(__DIR__ . '/tests');
 
         return (new PhpCsFixer\Config())
-        -&gt;setRules([
-        '@PER-CS2.0' =&gt; true,
-        '@PHP82Migration' =&gt; true,
-        'strict_types' =&gt; true,
-        'declare_strict_types' =&gt; true,
-        'array_syntax' =&gt; ['syntax' =&gt; 'short'],
-        'no_unused_imports' =&gt; true,
-        'ordered_imports' =&gt; ['sort_algorithm' =&gt; 'alpha'],
-        'trailing_comma_in_multiline' =&gt; true,
-        ])
-        -&gt;setFinder($finder)
-        -&gt;setRiskyAllowed(true);
+            -&gt;setRules([
+                '@PER-CS2.0' =&gt; true,
+                '@PHP82Migration' =&gt; true,
+                'strict_types' =&gt; true,
+                'declare_strict_types' =&gt; true,
+                'array_syntax' =&gt; ['syntax' =&gt; 'short'],
+                'no_unused_imports' =&gt; true,
+                'ordered_imports' =&gt; ['sort_algorithm' =&gt; 'alpha'],
+                'trailing_comma_in_multiline' =&gt; true,
+            ])
+            -&gt;setFinder($finder)
+            -&gt;setRiskyAllowed(true);
       </example>
     </pattern>
   </php_cs_fixer>
@@ -1083,16 +1068,16 @@ description: This skill should be used when the user asks to "write php", "php 8
         use Rector\Set\ValueObject\SetList;
 
         return RectorConfig::configure()
-        -&gt;withPaths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
-        ])
-        -&gt;withSets([
-        SetList::CODE_QUALITY,
-        SetList::DEAD_CODE,
-        SetList::TYPE_DECLARATION,
-        ])
-        -&gt;withPhpSets(php83: true);
+            -&gt;withPaths([
+                __DIR__ . '/src',
+                __DIR__ . '/tests',
+            ])
+            -&gt;withSets([
+                SetList::CODE_QUALITY,
+                SetList::DEAD_CODE,
+                SetList::TYPE_DECLARATION,
+            ])
+            -&gt;withPhpSets(php83: true);
       </example>
       <note>LevelSetList (e.g., UP_TO_PHP_83) deprecated since Rector 0.19.2. Use -&gt;withPhpSets() instead.</note>
     </pattern>
@@ -1106,9 +1091,9 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         $dsn = 'mysql:host=localhost;dbname=myapp;charset=utf8mb4';
         $options = [
-        PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES =&gt; false,
+            PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES =&gt; false,
         ];
 
         $pdo = new PDO($dsn, $username, $password, $options);
@@ -1135,19 +1120,18 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>Database transactions with PDO</description>
       <example>
         try {
-        $pdo-&gt;beginTransaction();
+            $pdo-&gt;beginTransaction();
 
-        $stmt = $pdo-&gt;prepare('UPDATE accounts SET balance = balance - ? WHERE id = ?');
-        $stmt-&gt;execute([$amount, $fromAccount]);
+            $stmt = $pdo-&gt;prepare('UPDATE accounts SET balance = balance - ? WHERE id = ?');
+            $stmt-&gt;execute([$amount, $fromAccount]);
 
-        $stmt = $pdo-&gt;prepare('UPDATE accounts SET balance = balance + ? WHERE id = ?');
-        $stmt-&gt;execute([$amount, $toAccount]);
+            $stmt = $pdo-&gt;prepare('UPDATE accounts SET balance = balance + ? WHERE id = ?');
+            $stmt-&gt;execute([$amount, $toAccount]);
 
-        $pdo-&gt;commit();
-
+            $pdo-&gt;commit();
         } catch (\Exception $e) {
-        $pdo-&gt;rollBack();
-        throw $e;
+            $pdo-&gt;rollBack();
+            throw $e;
         }
       </example>
     </pattern>
@@ -1194,12 +1178,12 @@ description: This skill should be used when the user asks to "write php", "php 8
 
         // Preload commonly used classes
         $classesToPreload = [
-        App\Domain\User\User::class,
-        App\Domain\Order\Order::class,
+            App\Domain\User\User::class,
+            App\Domain\Order\Order::class,
         ];
 
         foreach ($classesToPreload as $class) {
-        class_exists($class);
+            class_exists($class);
         }
       </example>
       <config>
@@ -1221,20 +1205,20 @@ description: This skill should be used when the user asks to "write php", "php 8
       // Specific exceptions
       class EntityNotFoundException extends DomainException
       {
-      public static function forClass(string $class, string $id): self
-      {
-      return new self(sprintf('%s with id "%s" not found', $class, $id));
-      }
+          public static function forClass(string $class, string $id): self
+          {
+              return new self(sprintf('%s with id "%s" not found', $class, $id));
+          }
       }
 
       class ValidationException extends DomainException
       {
-      public function **construct(
-      string $message,
-      public readonly array $errors = [],
-      ) {
-      parent::**construct($message);
-      }
+          public function __construct(
+              string $message,
+              public readonly array $errors = [],
+          ) {
+              parent::__construct($message);
+          }
       }
 
       // Usage
@@ -1246,41 +1230,40 @@ description: This skill should be used when the user asks to "write php", "php 8
     <description>Result type for error handling without exceptions</description>
     <example>
       /**
-      * @template T
-      * @template E
-      */
+       * @template T
+       * @template E
+       */
       readonly class Result
       {
-      private function __construct(
-      private bool $success,
-      private mixed $value,
-      ) {}
+          private function __construct(
+              private bool $success,
+              private mixed $value,
+          ) {}
 
-      /** @return self&lt;T, never&gt; */
-      public static function ok(mixed $value): self
-      {
-      return new self(true, $value);
-      }
+          /** @return self&lt;T, never&gt; */
+          public static function ok(mixed $value): self
+          {
+              return new self(true, $value);
+          }
 
-      /** @return self&lt;never, E&gt; */
-      public static function error(mixed $error): self
-      {
-      return new self(false, $error);
-      }
+          /** @return self&lt;never, E&gt; */
+          public static function error(mixed $error): self
+          {
+              return new self(false, $error);
+          }
 
-      public function isSuccess(): bool { return $this-&gt;success; }
-      public function isError(): bool { return !$this-&gt;success; }
-      public function getValue(): mixed { return $this-&gt;value; }
-
+          public function isSuccess(): bool { return $this-&gt;success; }
+          public function isError(): bool { return !$this-&gt;success; }
+          public function getValue(): mixed { return $this-&gt;value; }
       }
 
       // Usage
       function divide(int $a, int $b): Result
       {
-      if ($b === 0) {
-      return Result::error('Division by zero');
-      }
-      return Result::ok($a / $b);
+          if ($b === 0) {
+              return Result::error('Division by zero');
+          }
+          return Result::ok($a / $b);
       }
     </example>
   </pattern>

@@ -146,11 +146,9 @@ description: This skill should be used when the user asks to "use serena", "sema
       think_about_collected_information
 
       <note>Before making changes</note>
-
       think_about_task_adherence
 
       <note>When task seems complete</note>
-
       think_about_whether_you_are_done
     </example>
   </concept>
