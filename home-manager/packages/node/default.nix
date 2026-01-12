@@ -90,7 +90,7 @@ let
     };
 
   # Copilot version (shared across all platform packages)
-  copilotVersion = "1.408.0";
+  copilotVersion = "1.409.0";
 in
 {
   ccusage = mkNpmPackage {
@@ -106,8 +106,8 @@ in
   "@anthropic-ai/claude-code" = mkNpmPackage {
     pname = "claude-code";
     npmName = "@anthropic-ai/claude-code";
-    version = "2.1.4";
-    hash = "sha256-+trjrFphFJ4fzTu0Ij7LlO8nR90Ri3MKhPyJAin9OS8=";
+    version = "2.1.5";
+    hash = "sha256-hJECxkGC+nkQ6YCZpSZxRbuHaeYQDs2q7L5SYKSFVFc=";
     npmDepsHash = "sha256-v9YSPu4xq5F70TkPy8GyhS8VebPIyfay1luuWG+AXn0=";
     npmFlags = [ "--omit=optional" ];
     forceEmptyCache = true;
@@ -139,7 +139,7 @@ in
     pname = "copilot-language-server";
     npmName = "@github/copilot-language-server";
     version = copilotVersion;
-    hash = "sha256-7+A2rGqf8/TNRrDaPaHWWGayGk0O4IGlF6LoeQi1Mfg=";
+    hash = "sha256-C8ThNi2YONluLh4Zgmvw+trUAc7dHv9fl+tHiyovtYc=";
     npmDepsHash = "sha256-m6wj8PpHNbl3p4XH0WevPcHcPlmVJZFBcAjfn37+It0=";
     npmFlags = [ "--omit=optional" ];
     description = "GitHub Copilot Language Server";
@@ -149,28 +149,28 @@ in
   "@github/copilot-language-server-darwin-arm64" = mkCopilotPlatformPackage {
     platform = "darwin-arm64";
     version = copilotVersion;
-    hash = "sha256-IGtWbvUkGa3X22cqaz7jFzBSB/Z0TCvjFvRkt+vxFIY=";
+    hash = "sha256-3r8NEyyuNm7HhWlTz4aabOMMPgCuWUs29oDtGTRLHs8=";
     nixPlatform = "aarch64-darwin";
   };
 
   "@github/copilot-language-server-darwin-x64" = mkCopilotPlatformPackage {
     platform = "darwin-x64";
     version = copilotVersion;
-    hash = "sha256-nuAimuEh+Mfe4iqvJiyuGTlcDCHUe9rZBqY+uogsglI=";
+    hash = "sha256-YUZQBike0gjrLDkIgWKLt7dgF2FFAYYBLLwBkGPIHZA=";
     nixPlatform = "x86_64-darwin";
   };
 
   "@github/copilot-language-server-linux-x64" = mkCopilotPlatformPackage {
     platform = "linux-x64";
     version = copilotVersion;
-    hash = "sha256-oZwP2xfv/yyfmvi26M6VsD9slK0uC/OYAmB3199mesY=";
+    hash = "sha256-UHMzhQJHWEaCf1fV6L+yIw+Su2t0Aq48leZX9sfJDoE=";
     nixPlatform = "x86_64-linux";
   };
 
   "@github/copilot-language-server-linux-arm64" = mkCopilotPlatformPackage {
     platform = "linux-arm64";
     version = copilotVersion;
-    hash = "sha256-i/J+0SDSkFsmBTgwaEHF6mU29XqSarpk7Q4R2K86cIE=";
+    hash = "sha256-GtlXVsSiRqVGTSNRD+HitqxsC+odgJyV1wCLuS98cmQ=";
     nixPlatform = "aarch64-linux";
   };
 }
