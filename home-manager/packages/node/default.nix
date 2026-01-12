@@ -108,7 +108,7 @@ in
     npmName = "@anthropic-ai/claude-code";
     version = "2.1.5";
     hash = "sha256-hJECxkGC+nkQ6YCZpSZxRbuHaeYQDs2q7L5SYKSFVFc=";
-    npmDepsHash = "sha256-v9YSPu4xq5F70TkPy8GyhS8VebPIyfay1luuWG+AXn0=";
+    npmDepsHash = "sha256-HjHBNa9gcGpo5qFb9CQvBH60qDM58WXJhClWRrzczBc=";
     npmFlags = [ "--omit=optional" ];
     forceEmptyCache = true;
     env.AUTHORIZED = "1";
@@ -140,7 +140,7 @@ in
     npmName = "@github/copilot-language-server";
     version = copilotVersion;
     hash = "sha256-C8ThNi2YONluLh4Zgmvw+trUAc7dHv9fl+tHiyovtYc=";
-    npmDepsHash = "sha256-m6wj8PpHNbl3p4XH0WevPcHcPlmVJZFBcAjfn37+It0=";
+    npmDepsHash = "sha256-UYWBNwvE9d76K4YNbEc/kqTeYZGeKzgysDYRWpuiPTM=";
     npmFlags = [ "--omit=optional" ];
     description = "GitHub Copilot Language Server";
     homepage = "https://github.com/github/copilot";

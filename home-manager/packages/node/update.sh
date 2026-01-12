@@ -48,6 +48,30 @@ get_copilot_platforms() {
   perl -ne 'print "$1\n" if /platform\s*=\s*"([^"]+)"/' "$DEFAULT_NIX"
 }
 
+# Verify and update npmDepsHash for a package (runs regardless of version change)
+verify_npm_deps_hash() {
+  local pname="$1"
+  local npm_name="$2"
+
+  echo "  Verifying npmDepsHash for $npm_name..."
+
+  # Try to build and capture hash mismatch
+  local build_output
+  build_output=$(NIXPKGS_ALLOW_UNFREE=1 nix build --impure --expr "((import <nixpkgs> {}).callPackage ./. {}).\"$npm_name\"" 2>&1 || true)
+
+  # Check if there was a hash mismatch
+  local new_deps_hash
+  new_deps_hash=$(echo "$build_output" | perl -ne 'print $1 if /got:\s+(\S+)/')
+
+  if [[ -n $new_deps_hash ]]; then
+    echo "  Updating npmDepsHash to $new_deps_hash"
+    # Use different delimiter to avoid issues with / in hash
+    perl -0777 -pi -e "s#(pname = \"$pname\".*?npmDepsHash = \")sha256-[^\"]+#\${1}$new_deps_hash#s" "$DEFAULT_NIX"
+  else
+    echo "  npmDepsHash is up to date"
+  fi
+}
+
 update_npm_package() {
   local pname="$1"
   local npm_name="$2"
@@ -73,6 +97,8 @@ update_npm_package() {
 
   if [[ $current_version == "$latest_version" ]]; then
     echo "  Already at latest version: $current_version"
+    # Still verify npmDepsHash even if version hasn't changed
+    verify_npm_deps_hash "$pname" "$npm_name"
     return
   fi
 
@@ -98,10 +124,11 @@ update_npm_package() {
 
   # Calculate new npmDepsHash
   echo "  Calculating new npmDepsHash (this may take a moment)..."
-  new_deps_hash=$(nix build --impure --expr "((import <nixpkgs> {}).callPackage ./. {}).\"$npm_name\"" 2>&1 | perl -ne 'print $1 if /got:\s+(\S+)/' || echo "")
+  new_deps_hash=$(NIXPKGS_ALLOW_UNFREE=1 nix build --impure --expr "((import <nixpkgs> {}).callPackage ./. {}).\"$npm_name\"" 2>&1 | perl -ne 'print $1 if /got:\s+(\S+)/' || echo "")
 
   if [[ -n $new_deps_hash ]]; then
-    perl -0777 -pi -e "s/(pname = \"$pname\".*?npmDepsHash = \")sha256-[^\"]+/\${1}$new_deps_hash/s" "$DEFAULT_NIX"
+    # Use different delimiter to avoid issues with / in hash
+    perl -0777 -pi -e "s#(pname = \"$pname\".*?npmDepsHash = \")sha256-[^\"]+#\${1}$new_deps_hash#s" "$DEFAULT_NIX"
   fi
 
   echo "  Updated $npm_name to $latest_version"
@@ -145,12 +172,22 @@ if [[ -n $copilot_latest && $copilot_current != "$copilot_latest" ]]; then
     regenerate_package_lock "@github/copilot-language-server" "$lock_file"
   fi
 
+  # Calculate new npmDepsHash for copilot-language-server
+  echo "  Calculating new npmDepsHash for copilot-language-server..."
+  copilot_deps_hash=$(nix build --impure --expr "((import <nixpkgs> {}).callPackage ./. {}).\"@github/copilot-language-server\"" 2>&1 | perl -ne 'print $1 if /got:\s+(\S+)/' || echo "")
+  if [[ -n $copilot_deps_hash ]]; then
+    # Use different delimiter to avoid issues with / in hash
+    perl -0777 -pi -e "s#(pname = \"copilot-language-server\".*?npmDepsHash = \")sha256-[^\"]+#\${1}$copilot_deps_hash#s" "$DEFAULT_NIX"
+  fi
+
   # Update platform-specific packages (auto-detected from default.nix)
   while read -r platform; do
     update_copilot_platform "$platform" "$copilot_latest"
   done < <(get_copilot_platforms)
 else
   echo "  Already at latest version: $copilot_current"
+  # Still verify npmDepsHash even if version hasn't changed
+  verify_npm_deps_hash "copilot-language-server" "@github/copilot-language-server"
 fi
 
 # Update individual npm packages (auto-detected from default.nix)
