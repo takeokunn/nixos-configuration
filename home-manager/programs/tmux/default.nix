@@ -43,13 +43,16 @@
       set-option -g status-position top
       set-option -g status-interval 1
 
+      # OSC 52 clipboard integration for proper UTF-8/Japanese text handling
+      set -s set-clipboard on
+
       bind-key C-g display-panes
 
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
       bind-key -T copy-mode-vi v     send-keys -X begin-selection
-      bind-key -T copy-mode-vi y     send-keys -X copy-pipe "pbcopy"
-      bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "pbcopy"
+      bind-key -T copy-mode-vi y     send-keys -X copy-selection-and-cancel
+      bind-key -T copy-mode-vi Enter send-keys -X copy-selection-and-cancel
     '';
   };
 }

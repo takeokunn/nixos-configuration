@@ -29,6 +29,8 @@
       # for env
       set -x TMPDIR /tmp
       set -x COLORTERM truecolor
+      set -gx LANG en_US.UTF-8
+      set -gx LC_ALL en_US.UTF-8
 
       # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)
       set -gx FZF_CTRL_R_COMMAND ""
@@ -67,10 +69,6 @@
       {
         name = sources.dracula-fish.pname;
         src = sources.dracula-fish.src;
-      }
-      {
-        name = sources.fish-done.pname;
-        src = sources.fish-done.src;
       }
       {
         name = sources.fish-autopair.pname;

@@ -4,6 +4,9 @@
 
     settings = {
       font_size = 13.0;
+
+      # OSC 52 clipboard support for tmux integration
+      clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
       hide_window_decorations = true;
       font_family = "HackGenNerd";
 

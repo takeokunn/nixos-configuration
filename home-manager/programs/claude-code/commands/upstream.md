@@ -131,6 +131,11 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Test and build commands</output>
     </step>
     <step order="3">
+      <action>Detect change types and generate manual QA checklist</action>
+      <tool>Analyze diff for UI components, API endpoints, integration points using detection_rules</tool>
+      <output>Change type detection (ui, api, integration) and applicable manual QA items</output>
+    </step>
+    <step order="4">
       <action>Compile checklist with all findings</action>
       <tool>Consolidate agent outputs</tool>
       <output>Structured checklist report</output>
@@ -243,7 +248,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
   <agent name="history" subagent_type="general-purpose" readonly="true">Analyze author past PR feedback patterns via gh CLI</agent>
   <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description</agent>
-  <agent name="verify" subagent_type="devops" readonly="true">Determine local verification commands</agent>
+  <agent name="verify" subagent_type="devops" readonly="true">Determine local verification commands and detect change types for manual QA checklist</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
 </agents>
 
@@ -303,15 +308,42 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       </checklist>
       <pr_metadata>
         <title>Suggested PR title following contribution guide</title>
-        <description>
-Suggested PR description with sections per upstream template
-        </description>
+        <description>Suggested PR description with sections per upstream template</description>
       </pr_metadata>
       <local_verification>
         <command purpose="lint">npm run lint</command>
         <command purpose="test">npm test</command>
         <command purpose="build">npm run build</command>
       </local_verification>
+      <manual_verification>
+        <qa_category type="ui" condition="ui_changes_detected">
+          <description>Visual and UI verification for frontend changes</description>
+          <item>Verify visual layout matches design expectations</item>
+          <item>Test responsive behavior at breakpoints (mobile/tablet/desktop)</item>
+          <item>Check dark mode and theme compatibility</item>
+          <item>Verify accessibility (keyboard navigation, screen reader)</item>
+        </qa_category>
+        <qa_category type="api" condition="api_changes_detected">
+          <description>API endpoint verification for backend changes</description>
+          <item>Verify endpoint responses with curl or Postman</item>
+          <item>Test error responses (4xx, 5xx) with invalid inputs</item>
+          <item>Verify authentication and authorization behavior</item>
+          <item>Check response payload structure matches documentation</item>
+        </qa_category>
+        <qa_category type="integration" condition="integration_changes_detected">
+          <description>Integration flow verification for cross-component changes</description>
+          <item>Test complete user flow end-to-end</item>
+          <item>Verify cross-component data flow correctness</item>
+          <item>Test state persistence across page navigation</item>
+          <item>Verify error handling propagation between components</item>
+        </qa_category>
+        <detection_rules>
+          <rule type="ui">Changes to *.css, *.scss, *.html, *.jsx, *.tsx, *.vue, *.svelte files</rule>
+          <rule type="api">Changes to **/api/**, **/routes/**, **/handlers/**, *.openapi.*, *.swagger.* files</rule>
+          <rule type="integration">Changes spanning 3+ modules or external service configurations</rule>
+        </detection_rules>
+        <empty_state>If no change types detected, omit manual_verification section or display: No manual verification required for this change type</empty_state>
+      </manual_verification>
       <recommended_actions>
         <action priority="high">Critical action before PR</action>
         <action priority="medium">Recommended improvement</action>
@@ -344,6 +376,11 @@ Suggested PR description with sections per upstream template
       <trigger>When providing PR metadata</trigger>
       <action>Follow detected contribution guidelines format</action>
       <verification>Metadata matches upstream conventions</verification>
+    </behavior>
+    <behavior id="UP-B004" priority="standard">
+      <trigger>When generating final output</trigger>
+      <action>Include manual QA checklist based on detected change types</action>
+      <verification>Manual verification section present when UI, API, or integration changes detected</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
@@ -396,6 +433,7 @@ Suggested PR description with sections per upstream template
   <must>Check CONTRIBUTING.md in all three locations</must>
   <must>Provide structured checklist output</must>
   <must>Include local verification commands</must>
+  <must>Include manual QA checklist when UI, API, or integration changes detected</must>
   <avoid>Modifying any files</avoid>
   <avoid>Creating PR automatically</avoid>
   <avoid>Proceeding without upstream confirmation when ambiguous</avoid>

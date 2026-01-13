@@ -1,6 +1,24 @@
 {
   nix = {
-    optimise.automatic = true;
+    optimise = {
+      automatic = true;
+      interval = [
+        {
+          Hour = 3;
+          Minute = 0;
+        }
+      ];
+    };
+    gc = {
+      automatic = true;
+      interval = [
+        {
+          Hour = 3;
+          Minute = 30;
+        }
+      ];
+      options = "--delete-older-than 7d";
+    };
     settings = {
       sandbox = true;
       experimental-features = "nix-command flakes";
