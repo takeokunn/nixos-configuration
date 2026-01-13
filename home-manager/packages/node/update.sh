@@ -174,7 +174,7 @@ if [[ -n $copilot_latest && $copilot_current != "$copilot_latest" ]]; then
 
   # Calculate new npmDepsHash for copilot-language-server
   echo "  Calculating new npmDepsHash for copilot-language-server..."
-  copilot_deps_hash=$(nix build --impure --expr "((import <nixpkgs> {}).callPackage ./. {}).\"@github/copilot-language-server\"" 2>&1 | perl -ne 'print $1 if /got:\s+(\S+)/' || echo "")
+  copilot_deps_hash=$(nix build --impure --expr '((import <nixpkgs> {}).callPackage ./. {})."@github/copilot-language-server"' 2>&1 | perl -ne 'print $1 if /got:\s+(\S+)/' || echo "")
   if [[ -n $copilot_deps_hash ]]; then
     # Use different delimiter to avoid issues with / in hash
     perl -0777 -pi -e "s#(pname = \"copilot-language-server\".*?npmDepsHash = \")sha256-[^\"]+#\${1}$copilot_deps_hash#s" "$DEFAULT_NIX"
