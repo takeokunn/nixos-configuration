@@ -15,7 +15,7 @@
                                      ("misc"
                                       :base-directory "./home-manager/programs/emacs/misc/"
                                       :base-extension "org"
-                                      :exclude "README.org"
+                                      :exclude "\\(README\\|mu4e-dashboard\\)\\.org"
                                       :publishing-directory "./public")
                                      ("org" :components ("elisp" "misc")))))
     (org-publish-all t)))
