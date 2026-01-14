@@ -106,7 +106,7 @@ in
   "@anthropic-ai/claude-code" = mkNpmPackage {
     pname = "claude-code";
     npmName = "@anthropic-ai/claude-code";
-    version = "2.1.6";
+    version = "2.1.7";
     hash = "sha256-M2ZLGnrvNki7B2jOh4Uq2SfSxkICh76uRIFogq+kKZ8=";
     npmDepsHash = "sha256-Y+4ZcfEJJg4/XYc3vNLw4R5OJz3FlYvgQpkB739jKAQ=";
     npmFlags = [ "--omit=optional" ];
