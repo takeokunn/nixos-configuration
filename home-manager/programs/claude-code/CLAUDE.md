@@ -149,6 +149,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <skill name="php-ecosystem">PHP 8.3+, PSR standards, Composer, PHPStan, and modern PHP patterns</skill>
   <skill name="sql-ecosystem">SQL dialect patterns, query optimization, and database schema design</skill>
   <skill name="swift-ecosystem">Swift language, SPM, SwiftLint, SwiftFormat, and cross-platform patterns</skill>
+  <skill name="haskell-ecosystem">Haskell language, GHC, Cabal/Stack, HLS, optics (lens), monad transformers (mtl), type-level patterns, and HSpec/QuickCheck testing</skill>
 </skills>
 
 <decision_tree name="agent_selection">
