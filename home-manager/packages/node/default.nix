@@ -126,7 +126,7 @@ in
   "@openai/codex" = mkNpmPackage {
     pname = "codex";
     npmName = "@openai/codex";
-    version = "0.80.0";
+    version = "0.84.0";
     hash = "sha256-fUCJChIJzocFT65XNrsRkK4V45YXckel7RD6zZh47SY=";
     npmDepsHash = "sha256-SpFBhYRwcX4jMcTBW+Gtjx9b6QRjpQFlp9xlGvT16dQ=";
     forceEmptyCache = true;
