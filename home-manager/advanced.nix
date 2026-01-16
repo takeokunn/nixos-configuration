@@ -4,6 +4,7 @@
   org-babel,
   emacs-overlay,
   mcp-servers-nix,
+  llm-agents,
   brew-nix,
   arto,
   ...
@@ -25,11 +26,9 @@ let
     overlays =
       basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
-  nodePkgs = import ./packages/node {
-    inherit pkgs;
-  };
+  llmAgentsPkgs = llm-agents.packages.${system};
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
-  advancedPkgs = import ./packages/advanced.nix { inherit pkgs nodePkgs artoPkg; };
+  advancedPkgs = import ./packages/advanced.nix { inherit pkgs llmAgentsPkgs artoPkg; };
 
   # emacs package
   emacs = import ./packages/emacs {
@@ -49,7 +48,7 @@ let
     inherit pkgs sources;
   };
   advancedPrograms = import ./programs/advanced.nix {
-    inherit pkgs nodePkgs;
+    inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg;
     inherit mcp-servers-nix;
   };

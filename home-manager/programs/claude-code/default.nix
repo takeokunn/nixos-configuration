@@ -1,12 +1,12 @@
 {
   pkgs,
   mcp-servers-nix,
-  nodePkgs,
+  llmAgentsPkgs,
 }:
 {
   programs.claude-code = {
     enable = true;
-    package = nodePkgs."@anthropic-ai/claude-code";
+    package = llmAgentsPkgs.claude-code;
     memory.source = ./CLAUDE.md;
     settings = {
       theme = "dark";
@@ -140,8 +140,6 @@
             context = "claude-code";
             enableWebDashboard = false;
           };
-          # PR #292 validation: https://github.com/natsukium/mcp-servers-nix/pull/292
-          mastra.enable = true;
         };
       }).config.settings.servers;
   };

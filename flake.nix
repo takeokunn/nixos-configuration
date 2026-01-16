@@ -2,11 +2,7 @@
   description = "takeokunn's nix configuration";
 
   inputs = {
-    # Using a temporary overlay for ECL C23 fix until nixpkgs updates
-    # See: https://gitlab.com/embeddable-common-lisp/ecl/-/issues/775
-    nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -38,8 +34,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     mcp-servers-nix = {
-      # TODO: PR検証用 - https://github.com/natsukium/mcp-servers-nix/pull/292
-      url = "path:/Users/take/ghq/github.com/takeokunn/mcp-servers-nix";
+      url = "github:natsukium/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -65,6 +60,10 @@
     };
     arto = {
       url = "github:arto-app/Arto";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -110,8 +109,6 @@
               fish_indent.enable = true;
               stylua.enable = true;
               shfmt.enable = true;
-              # jsonfmt.enable = true;
-              # prettier.enable = true;
             };
           };
         };

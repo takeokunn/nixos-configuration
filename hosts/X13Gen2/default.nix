@@ -29,8 +29,9 @@ nixpkgs.lib.nixosSystem {
         inherit (inputs) nixpkgs;
         inherit (inputs) nixvim;
         inherit (inputs) mcp-servers-nix;
+        inherit (inputs) llm-agents;
         inherit (inputs) emacs-overlay org-babel;
-        inherit (inputs) brew-nix;
+        inherit (inputs) brew-nix arto;
       };
     }
   ];

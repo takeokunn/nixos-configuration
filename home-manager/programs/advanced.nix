@@ -1,6 +1,6 @@
 {
   pkgs,
-  nodePkgs,
+  llmAgentsPkgs,
   mcp-servers-nix,
   org-babel,
   emacsPkg,
@@ -9,7 +9,7 @@ let
   awscli = import ./awscli;
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
-  claude-code = import ./claude-code { inherit pkgs nodePkgs mcp-servers-nix; };
+  claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
   emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
   doggo = import ./doggo;
   gh = import ./gh;
@@ -22,7 +22,7 @@ let
   kitty = import ./kitty;
   sketchybar = import ./sketchybar { inherit pkgs; };
   ssh = import ./ssh;
-  copilot-language-server = import ./copilot-language-server { inherit pkgs nodePkgs; };
+  copilot-language-server = import ./copilot-language-server { inherit pkgs llmAgentsPkgs; };
   nix-init = import ./nix-init;
   pandoc = import ./pandoc;
   k9s = import ./k9s;

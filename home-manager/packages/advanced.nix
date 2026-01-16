@@ -1,6 +1,6 @@
 {
   pkgs,
-  nodePkgs,
+  llmAgentsPkgs,
   artoPkg,
 }:
 with pkgs;
@@ -18,7 +18,7 @@ with pkgs;
   lazydocker
 
   # for ai
-  nodePkgs."ccusage"
+  llmAgentsPkgs.ccusage
 
   # for web service
   discord

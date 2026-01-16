@@ -50,6 +50,7 @@ nix-darwin.lib.darwinSystem {
           inherit system username;
           inherit (inputs) nixpkgs nixvim;
           inherit (inputs) mcp-servers-nix;
+          inherit (inputs) llm-agents;
           inherit (inputs)
             emacs-overlay
             org-babel
