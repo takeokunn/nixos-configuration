@@ -140,6 +140,8 @@
             context = "claude-code";
             enableWebDashboard = false;
           };
+          # PR #292 validation: https://github.com/natsukium/mcp-servers-nix/pull/292
+          mastra.enable = true;
         };
       }).config.settings.servers;
   };

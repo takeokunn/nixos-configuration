@@ -38,7 +38,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     mcp-servers-nix = {
-      url = "github:natsukium/mcp-servers-nix";
+      # TODO: PR検証用 - https://github.com/natsukium/mcp-servers-nix/pull/292
+      url = "path:/Users/take/ghq/github.com/takeokunn/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
