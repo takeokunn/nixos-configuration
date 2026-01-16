@@ -5,11 +5,8 @@
 }:
 with pkgs;
 [
-  # for http
-  xh
-
-  # for lint
-  similarity
+  # for util
+  yq
 
   # for security
   sops

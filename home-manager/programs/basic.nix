@@ -13,7 +13,6 @@ let
   fish = import ./fish { inherit sources; };
   gnupg = import ./gnupg;
   man = import ./man;
-  misc = import ./misc;
   nixvim = import ./nixvim { inherit pkgs sources; };
   password-store = import ./password-store { inherit pkgs; };
   fzf = import ./fzf;
@@ -37,7 +36,6 @@ in
   fish
   gnupg
   man
-  misc
   password-store
   nixvim
   fzf
