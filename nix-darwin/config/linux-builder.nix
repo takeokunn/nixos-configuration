@@ -9,9 +9,9 @@
     config = {
       boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
       virtualisation = {
-        cores = 16;
-        memorySize = lib.mkForce (1024 * 16);
-        diskSize = lib.mkForce (1024 * 200);
+        cores = 8;
+        memorySize = lib.mkForce (1024 * 64);
+        diskSize = lib.mkForce (1024 * 500);
       };
       nix.settings = {
         experimental-features = [
