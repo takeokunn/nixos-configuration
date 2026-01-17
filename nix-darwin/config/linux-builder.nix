@@ -9,7 +9,7 @@
     config = {
       boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
       virtualisation = {
-        cores = 6;
+        cores = 16;
         memorySize = lib.mkForce (1024 * 16);
         diskSize = lib.mkForce (1024 * 200);
       };
