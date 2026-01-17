@@ -17,6 +17,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Only perform Git operations when explicitly requested by user</rule>
   <rule>Require permission before modifying config files</rule>
   <rule>Use run_in_background for independent long-running tasks</rule>
+  <rule>When command not found, automatically retry using nix run nixpkgs#command</rule>
 </rules>
 
 <workflow>
