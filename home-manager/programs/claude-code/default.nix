@@ -3,10 +3,17 @@
   mcp-servers-nix,
   llmAgentsPkgs,
 }:
+let
+  # Override claude-code to disable version check that fails in Nix sandbox
+  # due to Bun's Intl.Segmenter ICU initialization issue on macOS
+  claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (oldAttrs: {
+    doInstallCheck = false;
+  });
+in
 {
   programs.claude-code = {
     enable = true;
-    package = llmAgentsPkgs.claude-code;
+    package = claude-code-fixed;
     memory.source = ./CLAUDE.md;
     settings = {
       theme = "dark";

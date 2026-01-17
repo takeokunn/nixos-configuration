@@ -1,8 +1,7 @@
 { lib, ... }:
 {
   nix.linux-builder = {
-    enable = false;
-    ephemeral = false;
+    enable = true;
     systems = [
       "aarch64-linux"
       "x86_64-linux"
