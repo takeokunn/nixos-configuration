@@ -33,6 +33,7 @@ let
   yazi = import ./yazi { inherit pkgs; };
   clipse = import ./clipse { inherit pkgs; };
   swww = import ./swww { inherit pkgs; };
+  waybar = import ./waybar { inherit pkgs; };
   # theming
   gtk = import ./gtk { inherit pkgs; };
   qt = import ./qt { inherit pkgs; };
@@ -65,6 +66,7 @@ in
   yazi
   clipse
   swww
+  waybar
 
   # theming
   gtk

@@ -246,6 +246,11 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         // Screen Recording
         Mod+Shift+R { spawn "wl-screenrec" "-f" "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"; }
 
+        // Notifications (mako)
+        Mod+N { spawn "makoctl" "dismiss"; }
+        Mod+Shift+N { spawn "makoctl" "dismiss" "-a"; }
+        Mod+Ctrl+N { spawn "makoctl" "restore"; }
+
         // Lock Screen
         Mod+Escape { spawn "hyprlock"; }
 

@@ -14,6 +14,7 @@ let
   cliphist = import ./cliphist { inherit pkgs; };
   wl-clip-persist = import ./wl-clip-persist { inherit pkgs; };
   easyeffects = import ./easyeffects { inherit pkgs; };
+  mako = import ./mako { inherit pkgs; };
 
   # Impermanence (Linux only)
   impermanence = import ./impermanence { inherit pkgs; };
@@ -33,6 +34,7 @@ in
   cliphist
   wl-clip-persist
   easyeffects
+  mako
 ]
 ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
   # Impermanence (Linux only)
