@@ -24,39 +24,53 @@ in
                 mountOptions = [ "umask=0077" ];
               };
             };
-            root = {
+            luks = {
               size = "100%";
+              label = "cryptroot";
               content = {
-                type = "btrfs";
-                extraArgs = [
-                  "-f"
-                  "-L"
-                  "nixos"
+                type = "luks";
+                name = "cryptroot";
+                extraOpenArgs = [
+                  "--allow-discards"
+                  "--perf-no_read_workqueue"
+                  "--perf-no_write_workqueue"
                 ];
-                subvolumes = {
-                  "@root" = {
-                    mountpoint = "/";
-                    mountOptions = defaultMountOptions;
-                  };
-                  "@home" = {
-                    mountpoint = "/home";
-                    mountOptions = defaultMountOptions;
-                  };
-                  "@nix" = {
-                    mountpoint = "/nix";
-                    mountOptions = defaultMountOptions;
-                  };
-                  "@persist" = {
-                    mountpoint = "/persist";
-                    mountOptions = defaultMountOptions;
-                  };
-                  "@log" = {
-                    mountpoint = "/var/log";
-                    mountOptions = defaultMountOptions;
-                  };
-                  "@swap" = {
-                    mountpoint = "/.swapvol";
-                    swap.swapfile.size = "8G";
+                settings = {
+                  allowDiscards = true;
+                };
+                passwordFile = "/tmp/luks-password";
+                content = {
+                  type = "btrfs";
+                  extraArgs = [
+                    "-f"
+                    "-L"
+                    "nixos"
+                  ];
+                  subvolumes = {
+                    "@root" = {
+                      mountpoint = "/";
+                      mountOptions = defaultMountOptions;
+                    };
+                    "@home" = {
+                      mountpoint = "/home";
+                      mountOptions = defaultMountOptions;
+                    };
+                    "@nix" = {
+                      mountpoint = "/nix";
+                      mountOptions = defaultMountOptions;
+                    };
+                    "@persist" = {
+                      mountpoint = "/persist";
+                      mountOptions = defaultMountOptions;
+                    };
+                    "@log" = {
+                      mountpoint = "/var/log";
+                      mountOptions = defaultMountOptions;
+                    };
+                    "@swap" = {
+                      mountpoint = "/.swapvol";
+                      swap.swapfile.size = "8G";
+                    };
                   };
                 };
               };

@@ -14,6 +14,7 @@
     packages = with pkgs; [
       alsa-utils
       pavucontrol
+      qpwgraph
       wl-clipboard
       grim
     ];

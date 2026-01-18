@@ -1,9 +1,5 @@
 { pkgs }:
 {
-  services.hyprlock = pkgs.lib.mkIf pkgs.stdenv.isLinux {
-    enable = true;
-  };
-
   programs.hyprlock = pkgs.lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     settings = {

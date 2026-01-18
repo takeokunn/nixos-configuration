@@ -5,7 +5,7 @@
     settings = {
       main = {
         font = "HackGen Console NF:size=12";
-        terminal = "foot";
+        terminal = "kitty";
         layer = "overlay";
         prompt = "❯ ";
         icon-theme = "Papirus-Dark";

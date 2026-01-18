@@ -7,10 +7,16 @@ let
   # Modern services (niri ecosystem)
   hypridle = import ./hypridle { inherit pkgs; };
   hyprlock = import ./hyprlock { inherit pkgs; };
-  wob = import ./wob { inherit pkgs; };
+  swayosd = import ./swayosd { inherit pkgs; };
   wlsunset = import ./wlsunset { inherit pkgs; };
   kanshi = import ./kanshi { inherit pkgs; };
   playerctld = import ./playerctld { inherit pkgs; };
+  cliphist = import ./cliphist { inherit pkgs; };
+  wl-clip-persist = import ./wl-clip-persist { inherit pkgs; };
+  easyeffects = import ./easyeffects { inherit pkgs; };
+
+  # Impermanence (Linux only)
+  impermanence = import ./impermanence { inherit pkgs; };
 in
 [
   emacs
@@ -20,8 +26,15 @@ in
   # Modern services (niri ecosystem)
   hypridle
   hyprlock
-  wob
+  swayosd
   wlsunset
   kanshi
   playerctld
+  cliphist
+  wl-clip-persist
+  easyeffects
+]
+++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+  # Impermanence (Linux only)
+  impermanence
 ]

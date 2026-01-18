@@ -19,7 +19,7 @@ let
   mu = import ./mu { inherit pkgs; };
   nix-index = import ./nix-index;
   offlineimap = import ./offlineimap;
-  kitty = import ./kitty;
+  kitty = import ./kitty { inherit pkgs; };
   sketchybar = import ./sketchybar { inherit pkgs; };
   ssh = import ./ssh;
   copilot-language-server = import ./copilot-language-server { inherit pkgs llmAgentsPkgs; };
@@ -29,12 +29,10 @@ let
 
   # Modern window manager (niri ecosystem)
   niri = import ./niri { inherit pkgs; };
-  foot = import ./foot { inherit pkgs; };
   fuzzel = import ./fuzzel { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };
   clipse = import ./clipse { inherit pkgs; };
   swww = import ./swww { inherit pkgs; };
-
   # theming
   gtk = import ./gtk { inherit pkgs; };
   qt = import ./qt { inherit pkgs; };
@@ -63,7 +61,6 @@ in
 
   # Modern window manager (niri ecosystem)
   niri
-  foot
   fuzzel
   yazi
   clipse

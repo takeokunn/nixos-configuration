@@ -24,3 +24,7 @@
 #+begin_src shell
   nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
+
+** Documentation
+
+- [[file:INSTALLATION.org][INSTALLATION.org]] - First installation guide for X13Gen2 (LUKS + Btrfs + Impermanence)

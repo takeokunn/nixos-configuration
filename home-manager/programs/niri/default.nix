@@ -23,6 +23,20 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         }
     }
 
+    // Native gesture support
+    gestures {
+        // Workspace switching with drag-and-drop
+        dnd-edge-workspace-switch {
+            trigger-height 50
+            delay-ms 100
+        }
+
+        // Hot corners for overview toggle
+        hot-corners {
+            top-left
+        }
+    }
+
     output "eDP-1" {
         scale 1.0
     }
@@ -58,8 +72,6 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
     }
 
     spawn-at-startup "swww-daemon"
-    spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
-    spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
     spawn-at-startup "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
     spawn-at-startup "fcitx5" "-d"
 
@@ -117,15 +129,15 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
     }
 
     binds {
-        // Terminal
-        Mod+Return { spawn "foot"; }
-        Mod+Shift+Return { spawn "foot" "-e" "tmux"; }
+        // Terminal (kitty)
+        Mod+Return { spawn "kitty"; }
+        Mod+Shift+Return { spawn "kitty" "-e" "tmux"; }
 
         // Application Launcher
         Mod+D { spawn "fuzzel"; }
 
-        // Clipboard History
-        Mod+V { spawn "foot" "--app-id" "clipse" "-e" "clipse"; }
+        // Clipboard History (clipse in kitty)
+        Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
 
         // Screenshot
         Mod+P { screenshot; }
@@ -206,7 +218,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
 
         // Column Presets
         Mod+R { switch-preset-column-width; }
-        Mod+Shift+R { reset-window-height; }
+        Mod+Alt+R { reset-window-height; }
         Mod+Ctrl+R { switch-preset-window-height; }
 
         // Maximize Column
@@ -216,20 +228,23 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         // Overview Mode
         Mod+Tab { toggle-overview; }
 
-        // Volume Control (with wob)
-        XF86AudioRaiseVolume { spawn "sh" "-c" "pamixer -i 5 && pamixer --get-volume > $XDG_RUNTIME_DIR/wob.sock"; }
-        XF86AudioLowerVolume { spawn "sh" "-c" "pamixer -d 5 && pamixer --get-volume > $XDG_RUNTIME_DIR/wob.sock"; }
-        XF86AudioMute { spawn "sh" "-c" "pamixer -t && (pamixer --get-mute && echo 0 || pamixer --get-volume) > $XDG_RUNTIME_DIR/wob.sock"; }
+        // Volume Control (with swayosd)
+        XF86AudioRaiseVolume { spawn "swayosd-client" "--output-volume" "raise"; }
+        XF86AudioLowerVolume { spawn "swayosd-client" "--output-volume" "lower"; }
+        XF86AudioMute { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
 
-        // Brightness Control (with wob)
-        XF86MonBrightnessUp { spawn "sh" "-c" "brightnessctl -q set +5% && brightnessctl -m | cut -d, -f4 | tr -d '%' > $XDG_RUNTIME_DIR/wob.sock"; }
-        XF86MonBrightnessDown { spawn "sh" "-c" "brightnessctl -q set 5%- && brightnessctl -m | cut -d, -f4 | tr -d '%' > $XDG_RUNTIME_DIR/wob.sock"; }
+        // Brightness Control (with swayosd)
+        XF86MonBrightnessUp { spawn "swayosd-client" "--brightness" "raise"; }
+        XF86MonBrightnessDown { spawn "swayosd-client" "--brightness" "lower"; }
 
         // Media Control
         XF86AudioPlay { spawn "playerctl" "play-pause"; }
         XF86AudioPause { spawn "playerctl" "play-pause"; }
         XF86AudioNext { spawn "playerctl" "next"; }
         XF86AudioPrev { spawn "playerctl" "previous"; }
+
+        // Screen Recording
+        Mod+Shift+R { spawn "wl-screenrec" "-f" "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"; }
 
         // Lock Screen
         Mod+Escape { spawn "hyprlock"; }
