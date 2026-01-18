@@ -36,7 +36,7 @@ let
     inherit (nixpkgs) lib;
     inherit pkgs nurPkgs;
   };
-  emacsPkg = emacs.emacs-unstable;
+  emacsPkg = emacs.emacs-unstable-with-widgets;
 
   # misc
   misc = import ./misc;

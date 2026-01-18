@@ -61,7 +61,6 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.cl-nix-lite.inputs.nixpkgs.follows = "nixpkgs";
     };
     arto = {
       url = "github:arto-app/Arto";
