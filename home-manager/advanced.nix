@@ -7,13 +7,14 @@
   llm-agents,
   brew-nix,
   arto,
+  nur-packages,
   ...
 }:
 let
   isDarwin = builtins.match ".*-darwin" system != null;
 
-  # nvfetcher
-  sources = pkgs.callPackage ../_sources/generated.nix { };
+  # nur-packages
+  nurPkgs = nur-packages.packages.${system};
 
   # packages
   basicOverlay = import ./overlay/basic.nix;
@@ -33,7 +34,7 @@ let
   # emacs package
   emacs = import ./packages/emacs {
     inherit (nixpkgs) lib;
-    inherit pkgs sources;
+    inherit pkgs nurPkgs;
   };
   emacsPkg = if pkgs.stdenv.isDarwin then emacs.emacs-stable else emacs.emacs-unstable;
 
@@ -45,7 +46,7 @@ let
 
   # programs
   basicPrograms = import ./programs/basic.nix {
-    inherit pkgs sources;
+    inherit pkgs nurPkgs;
   };
   advancedPrograms = import ./programs/advanced.nix {
     inherit pkgs llmAgentsPkgs;

@@ -1,10 +1,12 @@
 {
-  sources,
+  nurPkgs,
   epkgs,
   pkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  rainbow-csv = nurPkgs.emacs-rainbow-csv;
+  emacs-php-doc-block = nurPkgs.emacs-php-doc-block;
+  fish-repl = nurPkgs.emacs-fish-repl;
 in
 with epkgs;
 [
@@ -41,7 +43,7 @@ with epkgs;
   clang-format
 
   # Csv
-  packages.rainbow-csv
+  rainbow-csv
 
   # JavaScript/TypeScript
   nodejs-repl
@@ -63,7 +65,7 @@ with epkgs;
   php-runtime
   psysh
   # laravel-tinker-repl
-  packages.emacs-php-doc-block
+  emacs-php-doc-block
   phpstan
   phpunit
 
@@ -72,7 +74,7 @@ with epkgs;
   markdown-preview-mode
 
   # Fish
-  packages.fish-repl
+  fish-repl
 
   # Web
   emmet-mode

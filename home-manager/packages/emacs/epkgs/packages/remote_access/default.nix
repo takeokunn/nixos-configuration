@@ -1,11 +1,11 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  consult-tramp = nurPkgs.emacs-consult-tramp;
 in
 [
-  packages.consult-tramp
+  consult-tramp
 ]

@@ -1,10 +1,12 @@
 {
   pkgs,
   epkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  pinentry-el = epkgs.pinentry;
+  sudden-death = nurPkgs.emacs-sudden-death;
+  zalgo-mode = nurPkgs.emacs-zalgo-mode;
 in
 with epkgs;
 [
@@ -29,7 +31,7 @@ with epkgs;
   gcmh
 
   # GPG
-  packages.pinentry-el
+  pinentry-el
 
   # Help
   helpful
@@ -37,10 +39,10 @@ with epkgs;
   # Joke
   hacker-typer
   power-mode
-  packages.sudden-death
+  sudden-death
   redacted
   lorem-ipsum
-  packages.zalgo-mode
+  zalgo-mode
 
   # Minor Modes
   command-log-mode

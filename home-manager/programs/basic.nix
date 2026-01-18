@@ -1,25 +1,25 @@
 {
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  bat = import ./bat { inherit sources; };
+  bat = import ./bat { inherit nurPkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
   dust = import ./dust;
   editorconfig = import ./editorconfig { inherit pkgs; };
   eza = import ./eza;
   fd = import ./fd;
-  fish = import ./fish { inherit sources; };
+  fish = import ./fish { inherit pkgs nurPkgs; };
   gnupg = import ./gnupg;
   man = import ./man;
-  nixvim = import ./nixvim { inherit pkgs sources; };
+  nixvim = import ./nixvim { inherit pkgs nurPkgs; };
   password-store = import ./password-store { inherit pkgs; };
   fzf = import ./fzf;
   readline = import ./readline;
   ripgrep = import ./ripgrep;
   jq = import ./jq;
-  tig = import ./tig { inherit sources; };
+  tig = import ./tig { inherit nurPkgs; };
   tmux = import ./tmux { inherit pkgs; };
   vim = import ./vim { inherit pkgs; };
   wget = import ./wget { };

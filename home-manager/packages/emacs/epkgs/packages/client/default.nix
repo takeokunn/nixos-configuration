@@ -1,10 +1,10 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  mu4e-dashboard = nurPkgs.emacs-mu4e-dashboard;
 in
 with epkgs;
 [
@@ -17,5 +17,5 @@ with epkgs;
   # Mail
   mu4e
   mu4e-views
-  packages.mu4e-dashboard
+  mu4e-dashboard
 ]

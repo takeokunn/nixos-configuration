@@ -1,15 +1,12 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
-let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
-in
 with epkgs;
 [
   # copilot
-  packages.copilot
+  copilot
   copilot-chat
   ellama
 ]

@@ -1,7 +1,7 @@
-{ sources }:
+{ nurPkgs }:
 {
   home.file = {
-    ".tig/dracula/".source = sources.dracula-tig.src;
+    ".tig/dracula/config".source = "${nurPkgs.dracula-tig}/share/tig/dracula.tigrc";
   };
 
   programs.tig = {

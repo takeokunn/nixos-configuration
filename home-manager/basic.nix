@@ -1,10 +1,11 @@
 {
   system,
   nixpkgs,
+  nur-packages,
 }:
 let
-  # nvfetcher
-  sources = pkgs.callPackage ../_sources/generated.nix { };
+  # nur-packages
+  nurPkgs = nur-packages.packages.${system};
 
   # packages
   basicOverlay = import ./overlay/basic.nix;
@@ -20,7 +21,7 @@ let
 
   # programs
   basicPrograms = import ./programs/basic.nix {
-    inherit pkgs sources;
+    inherit pkgs nurPkgs;
   };
 
   # services

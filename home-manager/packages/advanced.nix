@@ -41,5 +41,4 @@ with pkgs;
 
   # custom macOS apps
   artoPkg
-  pinentry_mac
 ]

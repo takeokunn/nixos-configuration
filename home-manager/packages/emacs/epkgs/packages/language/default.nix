@@ -1,16 +1,20 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit epkgs sources; };
+  bazel-mode = epkgs.bazel;
+  direnv-mode = epkgs.direnv;
+  systemd-mode = nurPkgs.emacs-systemd-mode;
+  web-php-blade-mode = nurPkgs.emacs-web-php-blade-mode;
+  typst-mode = nurPkgs.emacs-typst-mode;
 in
 with epkgs;
 [
   ansible
   apache-mode
-  packages.bazel-mode
+  bazel-mode
   bison-mode
   cask-mode
   cfn-mode
@@ -24,7 +28,7 @@ with epkgs;
   crystal-mode
   dart-mode
   dhall-mode
-  packages.direnv-mode
+  direnv-mode
   docker-compose-mode
   dockerfile-mode
   dotenv-mode
@@ -83,18 +87,18 @@ with epkgs;
   ssh-config-mode
   swift-mode
   syslog-mode
-  packages.systemd-mode
+  systemd-mode
   terraform-mode
   toml-mode
   tmux-mode
   typescript-mode
-  packages.typst-mode
+  typst-mode
   v-mode
   vue-mode
   vimrc-mode
   wat-mode
   web-mode
-  packages.web-php-blade-mode
+  web-php-blade-mode
   wolfram-mode
   yaml-mode
   yarn-mode

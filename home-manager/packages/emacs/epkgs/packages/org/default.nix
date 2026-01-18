@@ -1,10 +1,18 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  org-view-mode = epkgs.org-view-mode;
+  org-dashboard = epkgs.org-dashboard;
+  ox-typst = epkgs.ox-typst;
+  org-volume = nurPkgs.emacs-org-volume;
+  ob-phpstan = nurPkgs.emacs-ob-phpstan;
+  ob-racket = nurPkgs.emacs-ob-racket;
+  ob-treesitter = nurPkgs.emacs-ob-treesitter;
+  ob-fish = nurPkgs.emacs-ob-fish;
+  ox-hatena = nurPkgs.emacs-ox-hatena;
 in
 with epkgs;
 [
@@ -12,10 +20,10 @@ with epkgs;
   org-journal
   org-generate
   org-pomodoro
-  packages.org-view-mode
+  org-view-mode
   org-random-todo
-  packages.org-dashboard
-  packages.org-volume
+  org-dashboard
+  org-volume
   org-ql
   org-sliced-images
   org-preview-html
@@ -42,13 +50,13 @@ with epkgs;
 
   # Org Babel
   ob-async
-  packages.ob-fish
+  ob-fish
   ob-rust
   ob-go
   ob-translate
   ob-typescript
   ob-php
-  packages.ob-phpstan
+  ob-phpstan
   ob-http
   ob-mermaid
   ob-graphql
@@ -57,8 +65,8 @@ with epkgs;
   ob-dart
   ob-deno
   ob-fsharp
-  packages.ob-treesitter
-  packages.ob-racket
+  ob-treesitter
+  ob-racket
   ob-base64
   ob-prolog
   org-nix-shell
@@ -66,10 +74,10 @@ with epkgs;
   # Org Publish
   ox-gfm
   ox-zenn
-  packages.ox-hatena
+  ox-hatena
   ox-qmd
   ox-hugo
-  packages.ox-typst
+  ox-typst
 
   # Org Roam
   org-roam

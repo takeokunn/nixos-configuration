@@ -702,6 +702,26 @@
         "type": "gitlab"
       }
     },
+    "nur-packages": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768730106,
+        "narHash": "sha256-FnpRzMAWw9rMwomcTLjuo9WbB9uKUzDuV30zEPm9meA=",
+        "owner": "takeokunn",
+        "repo": "nur-packages",
+        "rev": "eba178bb0e3d163aebc836324ff99ed37e6e8e31",
+        "type": "github"
+      },
+      "original": {
+        "owner": "takeokunn",
+        "repo": "nur-packages",
+        "type": "github"
+      }
+    },
     "org-babel": {
       "locked": {
         "lastModified": 1731256202,
@@ -735,6 +755,7 @@
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
+        "nur-packages": "nur-packages",
         "org-babel": "org-babel",
         "treefmt-nix": "treefmt-nix_4",
         "xremap": "xremap"

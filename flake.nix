@@ -66,6 +66,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nur-packages = {
+      url = "github:takeokunn/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

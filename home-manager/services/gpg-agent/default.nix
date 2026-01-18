@@ -1,6 +1,8 @@
+{ pkgs }:
 {
   services.gpg-agent = {
     enable = true;
+    pinentry.package = pkgs.pinentry-curses;
     defaultCacheTtl = 60 * 60 * 24;
     defaultCacheTtlSsh = 60 * 60 * 24;
     maxCacheTtl = 60 * 60 * 24;

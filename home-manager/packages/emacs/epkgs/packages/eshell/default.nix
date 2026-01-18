@@ -1,10 +1,10 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  eshell-multiple = nurPkgs.emacs-eshell-multiple;
 in
 with epkgs;
 [
@@ -12,7 +12,7 @@ with epkgs;
   eshell-did-you-mean
   eshell-z
   fish-completion
-  packages.eshell-multiple
+  eshell-multiple
   eshell-syntax-highlighting
   eshell-fringe-status
 ]

@@ -1,6 +1,6 @@
-{ pkgs, sources }:
+{ pkgs, nurPkgs }:
 let
-  customPackages = import ./packages { inherit pkgs sources; };
+  customPackages = import ./packages { inherit pkgs nurPkgs; };
   plugins = import ./plugins { inherit pkgs customPackages; };
   opts = import ./opts;
   baseKeymaps = import ./keymaps;

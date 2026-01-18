@@ -1,17 +1,17 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
 let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
+  explain-pause-mode = nurPkgs.emacs-explain-pause-mode;
 in
 with epkgs;
 [
   proced-narrow
   symon
   esup
-  packages.explain-pause-mode
+  explain-pause-mode
   disk-usage
   keyfreq
   uptimes

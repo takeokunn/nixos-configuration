@@ -1,17 +1,14 @@
 {
   epkgs,
   pkgs,
-  sources,
+  nurPkgs,
 }:
-let
-  packages = pkgs.callPackage ./packages.nix { inherit sources epkgs; };
-in
 with epkgs;
 [
   # check
   flycheck
   flycheck-elsa
-  packages.flycheck-projectile
+  flycheck-projectile
   flycheck-cfn
 
   # completion
@@ -48,7 +45,7 @@ with epkgs;
   origami
 
   # LSP
-  packages.eglot-booster
+  eglot-booster
   lsp-mode
   lsp-sourcekit
   ccls

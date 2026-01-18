@@ -8,5 +8,6 @@ nix-on-droid.lib.nixOnDroidConfiguration {
   pkgs = import nixpkgs { inherit system; };
   extraSpecialArgs = {
     inherit nixpkgs system;
+    inherit (inputs) nur-packages;
   };
 }

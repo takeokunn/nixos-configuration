@@ -1,20 +1,20 @@
-{ sources }:
+{ nurPkgs }:
 {
   programs.bat = {
     enable = true;
     themes = {
       dracula = {
-        src = sources.dracula-sublime.src;
+        src = "${nurPkgs.dracula-sublime}/share/sublime";
         file = "Dracula.tmTheme";
       };
     };
     syntaxes = {
       gleam = {
-        src = sources.sublime-gleam.src;
+        src = "${nurPkgs.sublime-gleam}/share/sublime";
         file = "syntax/gleam.sublime-syntax";
       };
       justfile = {
-        src = sources.sublime-justfile.src;
+        src = "${nurPkgs.sublime-justfile}/share/sublime";
         file = "Syntax/Just.sublime-syntax";
       };
     };

@@ -1,4 +1,4 @@
-{ sources }:
+{ pkgs, nurPkgs }:
 {
   xdg.configFile = {
     # completions
@@ -55,40 +55,40 @@
 
     plugins = [
       {
-        name = sources.fish-bd.pname;
-        src = sources.fish-bd.src;
+        name = pkgs.fishPlugins.fish-bd.pname;
+        src = pkgs.fishPlugins.fish-bd.src;
       }
       {
-        name = sources.fish-artisan-completion.pname;
-        src = sources.fish-artisan-completion.src;
+        name = nurPkgs.fish-artisan-completion.pname;
+        src = nurPkgs.fish-artisan-completion.src;
       }
       {
-        name = sources.fish-ghq.pname;
-        src = sources.fish-ghq.src;
+        name = nurPkgs.fish-ghq.pname;
+        src = nurPkgs.fish-ghq.src;
       }
       {
-        name = sources.dracula-fish.pname;
-        src = sources.dracula-fish.src;
+        name = nurPkgs.dracula-fish.pname;
+        src = nurPkgs.dracula-fish.src;
       }
       {
-        name = sources.fish-autopair.pname;
-        src = sources.fish-autopair.src;
+        name = pkgs.fishPlugins.autopair.pname;
+        src = pkgs.fishPlugins.autopair.src;
       }
       {
-        name = sources.fish-nix-completions.pname;
-        src = sources.fish-nix-completions.src;
+        name = nurPkgs.fish-nix-completions.pname;
+        src = nurPkgs.fish-nix-completions.src;
       }
       {
-        name = sources.fish-nix-env.pname;
-        src = sources.fish-nix-env.src;
+        name = nurPkgs.fish-nix-env.pname;
+        src = nurPkgs.fish-nix-env.src;
       }
       {
-        name = sources.fish-dart-completions.pname;
-        src = sources.fish-dart-completions.src;
+        name = nurPkgs.fish-dart-completions.pname;
+        src = nurPkgs.fish-dart-completions.src;
       }
       {
-        name = sources.fish-by-binds-yourself.pname;
-        src = sources.fish-by-binds-yourself.src;
+        name = nurPkgs.fish-by-binds-yourself.pname;
+        src = nurPkgs.fish-by-binds-yourself.src;
       }
     ];
   };

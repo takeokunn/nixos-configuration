@@ -30,6 +30,7 @@ nixpkgs.lib.nixosSystem {
         inherit (inputs) nixvim;
         inherit (inputs) mcp-servers-nix;
         inherit (inputs) llm-agents;
+        inherit (inputs) nur-packages;
         inherit (inputs) emacs-overlay org-babel;
         inherit (inputs) brew-nix arto;
       };
