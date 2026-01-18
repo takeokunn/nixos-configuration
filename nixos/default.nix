@@ -13,6 +13,7 @@ let
   i18n = import ./config/i18n.nix;
   networking = import ./config/networking.nix { inherit config; };
   nix = import ./config/nix.nix;
+  performance = import ./config/performance.nix;
   programs = import ./config/programs.nix;
   security = import ./config/security.nix { inherit username; };
   services = import ./config/services.nix { inherit pkgs username; };
@@ -33,6 +34,7 @@ in
     i18n
     networking
     nix
+    performance
     programs
     security
     services

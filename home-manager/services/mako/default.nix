@@ -3,31 +3,33 @@
   services.mako = pkgs.lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
 
-    # Appearance
-    font = "HackGen Console NF 11";
-    width = 350;
-    height = 150;
-    margin = "10";
-    padding = "12";
-    borderSize = 2;
-    borderRadius = 8;
+    settings = {
+      # Appearance
+      font = "HackGen Console NF 11";
+      width = 350;
+      height = 150;
+      margin = "10";
+      padding = "12";
+      border-size = 2;
+      border-radius = 8;
 
-    # Dracula colors
-    backgroundColor = "#282a36";
-    textColor = "#f8f8f2";
-    borderColor = "#bd93f9";
-    progressColor = "over #44475a";
+      # Dracula colors
+      background-color = "#282a36";
+      text-color = "#f8f8f2";
+      border-color = "#bd93f9";
+      progress-color = "over #44475a";
 
-    # Behavior
-    defaultTimeout = 5000;
-    layer = "overlay";
-    anchor = "top-right";
-    sort = "-time";
-    maxVisible = 5;
-    icons = true;
-    maxIconSize = 48;
-    markup = true;
-    actions = true;
+      # Behavior
+      default-timeout = 5000;
+      layer = "overlay";
+      anchor = "top-right";
+      sort = "-time";
+      max-visible = 5;
+      icons = true;
+      max-icon-size = 48;
+      markup = true;
+      actions = true;
+    };
 
     extraConfig = ''
       [urgency=low]

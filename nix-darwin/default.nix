@@ -13,10 +13,6 @@ let
   security = import ./config/security.nix;
   services = import ./config/services;
   system = import ./config/system.nix { inherit username; };
-  time = import ./config/time.nix;
-  keyboard = import ./config/keyboard.nix;
-  startup = import ./config/startup.nix;
-  power = import ./config/power.nix;
 in
 {
   imports = [
@@ -28,9 +24,5 @@ in
     security
     services
     system
-    time
-    keyboard
-    startup
-    power
   ];
 }
