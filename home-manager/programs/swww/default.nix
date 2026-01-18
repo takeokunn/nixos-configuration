@@ -1,8 +1,10 @@
 { pkgs }:
 {
-  home.packages = with pkgs; pkgs.lib.optionals pkgs.stdenv.isLinux [
-    swww
-  ];
+  home.packages =
+    with pkgs;
+    pkgs.lib.optionals pkgs.stdenv.isLinux [
+      swww
+    ];
 
   # Wallpaper script
   xdg.configFile."swww/wallpaper.sh" = pkgs.lib.mkIf pkgs.stdenv.isLinux {

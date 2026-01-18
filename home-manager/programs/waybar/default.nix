@@ -11,9 +11,17 @@
         height = 30;
         spacing = 4;
 
-        modules-left = [ "niri/workspaces" "niri/window" ];
+        modules-left = [
+          "niri/workspaces"
+          "niri/window"
+        ];
         modules-center = [ "clock" ];
-        modules-right = [ "tray" "wireplumber" "network" "battery" ];
+        modules-right = [
+          "tray"
+          "wireplumber"
+          "network"
+          "battery"
+        ];
 
         "niri/workspaces" = {
           format = "{icon}";
@@ -55,7 +63,18 @@
           format = "{icon} {capacity}%";
           format-charging = "󰂄 {capacity}%";
           format-plugged = "󰚥 {capacity}%";
-          format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
+          format-icons = [
+            "󰁺"
+            "󰁻"
+            "󰁼"
+            "󰁽"
+            "󰁾"
+            "󰁿"
+            "󰂀"
+            "󰂁"
+            "󰂂"
+            "󰁹"
+          ];
         };
 
         network = {
@@ -69,7 +88,11 @@
         wireplumber = {
           format = "{icon} {volume}%";
           format-muted = "󰝟";
-          format-icons = [ "󰕿" "󰖀" "󰕾" ];
+          format-icons = [
+            "󰕿"
+            "󰖀"
+            "󰕾"
+          ];
           on-click = "pavucontrol";
         };
 

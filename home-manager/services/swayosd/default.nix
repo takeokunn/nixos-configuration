@@ -52,7 +52,9 @@
     '';
   };
 
-  home.packages = with pkgs; pkgs.lib.optionals pkgs.stdenv.isLinux [
-    swayosd
-  ];
+  home.packages =
+    with pkgs;
+    pkgs.lib.optionals pkgs.stdenv.isLinux [
+      swayosd
+    ];
 }

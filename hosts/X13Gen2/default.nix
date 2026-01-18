@@ -1,7 +1,12 @@
 { inputs }:
 let
   inherit (inputs) nixpkgs xremap nixos-hardware;
-  inherit (inputs) home-manager disko nixvim impermanence;
+  inherit (inputs)
+    home-manager
+    disko
+    nixvim
+    impermanence
+    ;
 
   username = "take";
   system = "x86_64-linux";

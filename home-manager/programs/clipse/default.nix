@@ -1,9 +1,11 @@
 { pkgs }:
 {
-  home.packages = with pkgs; pkgs.lib.optionals pkgs.stdenv.isLinux [
-    clipse
-    cliphist
-  ];
+  home.packages =
+    with pkgs;
+    pkgs.lib.optionals pkgs.stdenv.isLinux [
+      clipse
+      cliphist
+    ];
 
   xdg.configFile."clipse/config.json" = pkgs.lib.mkIf pkgs.stdenv.isLinux {
     text = builtins.toJSON {
