@@ -4,10 +4,7 @@
     settings = {
       cores = 0;
       max-jobs = "auto";
-      sandbox = true;
-      extra-sandbox-paths = [
-        "/etc/ssl/certs"
-      ];
+      sandbox = false;
       substituters = [
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"

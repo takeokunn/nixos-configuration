@@ -20,10 +20,7 @@
       options = "--delete-older-than 7d";
     };
     settings = {
-      sandbox = true;
-      extra-sandbox-paths = [
-        "/etc/ssl/certs"
-      ];
+      sandbox = false;
       experimental-features = [
         "nix-command"
         "flakes"
