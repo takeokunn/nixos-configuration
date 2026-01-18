@@ -10,7 +10,6 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
 - External storage for backups
 
 ** Step 1: Backup (if migrating from existing system)
-
 #+begin_src shell
   # Backup /persist directory
   sudo tar -cvzf /tmp/persist-backup.tar.gz -C / persist
@@ -21,30 +20,23 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
   # Copy to external storage
   cp /tmp/*.tar.gz /mnt/external/
 #+end_src
-
 ** Step 2: Boot NixOS Installer USB
-
 #+begin_src shell
   # Set up network
   sudo systemctl start NetworkManager
   nmtui  # Connect to WiFi if needed
 #+end_src
-
 ** Step 3: Clone Configuration
-
 #+begin_src shell
   nix-shell -p git
   git clone https://github.com/takeokunn/nixos-configuration /tmp/nixos-config
   cd /tmp/nixos-config
 #+end_src
-
 ** Step 4: Create LUKS Password File
-
 #+begin_src shell
   echo "YOUR_STRONG_PASSPHRASE" > /tmp/luks-password
   chmod 600 /tmp/luks-password
 #+end_src
-
 ** Step 5: Run Disko (Partitioning & Formatting)
 
 *WARNING*: This will erase all data on the target disk.
@@ -55,15 +47,11 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
     --mode destroy,format,mount \
     /tmp/nixos-config/hosts/X13Gen2/disko-config.nix
 #+end_src
-
 ** Step 6: Install NixOS
-
 #+begin_src shell
   sudo nixos-install --flake /tmp/nixos-config#X13Gen2 --no-root-passwd
 #+end_src
-
 ** Step 7: Restore Backups (if migrating)
-
 #+begin_src shell
   # Mount backup drive
   sudo mount /dev/sdX1 /mnt/external
@@ -75,9 +63,7 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
   sudo mkdir -p /mnt/persist/home/take
   sudo tar -xvzf /mnt/external/home-backup.tar.gz -C /mnt/persist/home/
 #+end_src
-
 ** Step 8: Reboot
-
 #+begin_src shell
   sudo reboot
 #+end_src
@@ -98,11 +84,8 @@ After successful boot with passphrase, enroll TPM2 for auto-unlock:
   # Test by rebooting - should auto-unlock
   sudo reboot
 #+end_src
-
 * Architecture
-
 ** Disk Layout (X13Gen2)
-
 #+begin_example
 /dev/nvme0n1
 ├── ESP (1G, vfat) → /boot
@@ -115,7 +98,6 @@ After successful boot with passphrase, enroll TPM2 for auto-unlock:
         ├── @log     → /var/log
         └── @swap    → /.swapvol (8G swapfile)
 #+end_example
-
 ** Impermanence
 
 The root filesystem is ephemeral. On every boot:
@@ -129,28 +111,28 @@ Persistent data is stored in =/persist= and symlinked/bind-mounted:
 
 ** Persisted System Directories
 
-| Path | Purpose |
-|------+---------|
-| /etc/nixos | NixOS configuration |
-| /etc/ssh | SSH host keys |
-| /etc/NetworkManager/system-connections | WiFi passwords |
-| /var/lib/nixos | NixOS state |
-| /var/lib/systemd/coredump | Core dumps |
-| /var/lib/bluetooth | Bluetooth pairings |
-| /var/lib/alsa | Audio settings |
-| /var/lib/docker | Docker data |
-| /var/lib/libvirt | Virtual machines |
-| /var/lib/tailscale | Tailscale state |
-| /var/lib/ollama | Ollama models |
+| Path                                   | Purpose             |
+|----------------------------------------+---------------------|
+| /etc/nixos                             | NixOS configuration |
+| /etc/ssh                               | SSH host keys       |
+| /etc/NetworkManager/system-connections | WiFi passwords      |
+| /var/lib/nixos                         | NixOS state         |
+| /var/lib/systemd/coredump              | Core dumps          |
+| /var/lib/bluetooth                     | Bluetooth pairings  |
+| /var/lib/alsa                          | Audio settings      |
+| /var/lib/docker                        | Docker data         |
+| /var/lib/libvirt                       | Virtual machines    |
+| /var/lib/tailscale                     | Tailscale state     |
+| /var/lib/ollama                        | Ollama models       |
 
 ** Persisted User Directories
 
-| Path | Purpose |
-|------+---------|
-| Downloads, Documents, Pictures, Videos, Music | XDG directories |
-| ghq, Projects, src | Development |
-| .gnupg, .ssh, .password-store | Security (mode 0700) |
-| .cargo, .rustup, .npm, .go | Language toolchains |
-| .mozilla, .config/chromium | Browser profiles |
-| .config/emacs, .local/share/emacs | Emacs |
-| .config/niri, .config/waybar, .config/mako | Wayland |
+| Path                                          | Purpose              |
+|-----------------------------------------------+----------------------|
+| Downloads, Documents, Pictures, Videos, Music | XDG directories      |
+| ghq, Projects, src                            | Development          |
+| .gnupg, .ssh, .password-store                 | Security (mode 0700) |
+| .cargo, .rustup, .npm, .go                    | Language toolchains  |
+| .mozilla, .config/chromium                    | Browser profiles     |
+| .config/emacs, .local/share/emacs             | Emacs                |
+| .config/niri, .config/waybar, .config/mako    | Wayland              |
