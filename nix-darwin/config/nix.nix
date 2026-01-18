@@ -21,6 +21,9 @@
     };
     settings = {
       sandbox = true;
+      extra-sandbox-paths = [
+        "/etc/ssl/certs"
+      ];
       experimental-features = [
         "nix-command"
         "flakes"
