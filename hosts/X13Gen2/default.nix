@@ -1,7 +1,7 @@
 { inputs }:
 let
   inherit (inputs) nixpkgs xremap;
-  inherit (inputs) home-manager disko nixvim;
+  inherit (inputs) home-manager disko nixvim impermanence;
 
   username = "take";
   system = "x86_64-linux";
@@ -13,11 +13,16 @@ nixpkgs.lib.nixosSystem {
   };
 
   modules = [
+    # External modules
+    disko.nixosModules.disko
+    impermanence.nixosModules.impermanence
+    home-manager.nixosModules.home-manager
+
+    # Local configuration
     ../../nixos
     ./hardware-configuration.nix
-    # ./disko-config.nix
-    disko.nixosModules.disko
-    home-manager.nixosModules.home-manager
+    ./disko-config.nix
+    ./impermanence.nix
     {
       home-manager.useUserPackages = true;
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
@@ -26,13 +31,17 @@ nixpkgs.lib.nixosSystem {
       ];
       home-manager.extraSpecialArgs = {
         inherit system;
-        inherit (inputs) nixpkgs;
-        inherit (inputs) nixvim;
-        inherit (inputs) mcp-servers-nix;
-        inherit (inputs) llm-agents;
-        inherit (inputs) nur-packages;
-        inherit (inputs) emacs-overlay org-babel;
-        inherit (inputs) brew-nix arto;
+        inherit (inputs)
+          nixpkgs
+          nixvim
+          mcp-servers-nix
+          llm-agents
+          nur-packages
+          emacs-overlay
+          org-babel
+          brew-nix
+          arto
+          ;
       };
     }
   ];

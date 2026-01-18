@@ -1,51 +1,61 @@
 { ... }:
+let
+  defaultMountOptions = [
+    "compress=zstd:1"
+    "noatime"
+  ];
+in
 {
   disko.devices = {
     disk = {
       main = {
         type = "disk";
-        device = "/dev/nvme0n1"; # Change this to your disk device
+        device = "/dev/nvme0n1";
         content = {
           type = "gpt";
           partitions = {
             ESP = {
-              size = "512M";
+              size = "1G";
               type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
+                mountOptions = [ "umask=0077" ];
               };
             };
             root = {
               size = "100%";
               content = {
                 type = "btrfs";
-                extraArgs = [ "-f" ]; # Override existing partitions
+                extraArgs = [
+                  "-f"
+                  "-L"
+                  "nixos"
+                ];
                 subvolumes = {
-                  "/root" = {
+                  "@root" = {
                     mountpoint = "/";
-                    mountOptions = [
-                      "compress=zstd"
-                      "noatime"
-                    ];
+                    mountOptions = defaultMountOptions;
                   };
-                  "/home" = {
+                  "@home" = {
                     mountpoint = "/home";
-                    mountOptions = [
-                      "compress=zstd"
-                      "noatime"
-                    ];
+                    mountOptions = defaultMountOptions;
                   };
-                  "/nix" = {
+                  "@nix" = {
                     mountpoint = "/nix";
-                    mountOptions = [
-                      "compress=zstd"
-                      "noatime"
-                    ];
+                    mountOptions = defaultMountOptions;
                   };
-                  "/swap" = {
-                    mountpoint = "/swap";
+                  "@persist" = {
+                    mountpoint = "/persist";
+                    mountOptions = defaultMountOptions;
+                  };
+                  "@log" = {
+                    mountpoint = "/var/log";
+                    mountOptions = defaultMountOptions;
+                  };
+                  "@swap" = {
+                    mountpoint = "/.swapvol";
                     swap.swapfile.size = "8G";
                   };
                 };

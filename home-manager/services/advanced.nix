@@ -1,17 +1,27 @@
 { pkgs, emacsPkg }:
 let
-  autorandr = import ./autorandr { inherit pkgs; };
   emacs = import ./emacs { inherit pkgs emacsPkg; };
-  mako = import ./mako { inherit pkgs; };
   ollama = import ./ollama { inherit pkgs; };
   gpg-agent = import ./gpg-agent { inherit pkgs; };
-  swayidle = import ./swayidle { inherit pkgs; };
+
+  # Modern services (niri ecosystem)
+  hypridle = import ./hypridle { inherit pkgs; };
+  hyprlock = import ./hyprlock { inherit pkgs; };
+  wob = import ./wob { inherit pkgs; };
+  wlsunset = import ./wlsunset { inherit pkgs; };
+  kanshi = import ./kanshi { inherit pkgs; };
+  playerctld = import ./playerctld { inherit pkgs; };
 in
 [
-  autorandr
   emacs
-  mako
   ollama
   gpg-agent
-  swayidle
+
+  # Modern services (niri ecosystem)
+  hypridle
+  hyprlock
+  wob
+  wlsunset
+  kanshi
+  playerctld
 ]

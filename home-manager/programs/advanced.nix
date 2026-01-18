@@ -27,11 +27,13 @@ let
   pandoc = import ./pandoc;
   k9s = import ./k9s;
 
-  # for window manager
-  rofi = import ./rofi { inherit pkgs; };
-  sway = import ./sway;
-  swaylock = import ./swaylock { inherit pkgs; };
-  waybar = import ./waybar { inherit pkgs; };
+  # Modern window manager (niri ecosystem)
+  niri = import ./niri { inherit pkgs; };
+  foot = import ./foot { inherit pkgs; };
+  fuzzel = import ./fuzzel { inherit pkgs; };
+  yazi = import ./yazi { inherit pkgs; };
+  clipse = import ./clipse { inherit pkgs; };
+  swww = import ./swww { inherit pkgs; };
 
   # theming
   gtk = import ./gtk { inherit pkgs; };
@@ -59,11 +61,13 @@ in
   pandoc
   k9s
 
-  # for window manager
-  rofi
-  sway
-  swaylock
-  waybar
+  # Modern window manager (niri ecosystem)
+  niri
+  foot
+  fuzzel
+  yazi
+  clipse
+  swww
 
   # theming
   gtk
