@@ -50,7 +50,7 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
 ** Step 6: Install NixOS
 #+begin_src shell
   ulimit -n 65536
-  sudo nixos-install --flake /tmp/nixos-config#X13Gen2 --no-root-passwd
+  sudo nixos-install --flake /tmp/nixos-config#X13Gen2 --no-root-passwd --max-jobs 8
 #+end_src
 ** Step 7: Restore Backups (if migrating)
 #+begin_src shell
