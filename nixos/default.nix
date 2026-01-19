@@ -39,6 +39,9 @@ let
   # Nix
   nix = import ./config/nix.nix;
 
+  # Linker
+  linker = import ./config/linker.nix;
+
   # Shell/Programs
   shell = import ./config/shell.nix;
 
@@ -83,6 +86,8 @@ in
     sysctl
     # Nix
     nix
+    # Linker
+    linker
     # Shell/Programs
     shell
     # Users

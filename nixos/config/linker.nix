@@ -1,0 +1,4 @@
+{ ... }:
+{
+  programs.mold.enable = true;
+}
