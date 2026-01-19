@@ -63,6 +63,16 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
             off
         }
 
+        shadow {
+            on
+            softness 30
+            spread 5
+            offset x=0 y=5
+            draw-behind-window true
+            color "#00000064"
+            inactive-color "#00000040"
+        }
+
         struts {
             left 0
             right 0

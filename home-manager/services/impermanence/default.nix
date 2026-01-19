@@ -78,8 +78,8 @@
       ".config/dconf"
 
       # Wayland/niri specific
-      ".config/niri"
-      ".config/waybar"
+      # Note: .config/niri is managed by Home Manager, not persisted
+      # to prevent stale configs (e.g., duplicate waybar spawns)
       ".config/mako"
     ];
     files = [

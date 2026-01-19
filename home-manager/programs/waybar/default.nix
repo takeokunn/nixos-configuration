@@ -110,9 +110,11 @@
       }
 
       window#waybar {
-        background-color: rgba(40, 42, 54, 0.9);
+        background-color: rgba(40, 42, 54, 0.85);
         color: #f8f8f2;
-        border-bottom: 2px solid #bd93f9;
+        border-radius: 12px;
+        margin: 8px 8px 0 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
 
       #workspaces button {
