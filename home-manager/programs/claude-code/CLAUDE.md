@@ -23,6 +23,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <workflow>
   <phase name="task_analysis">
     <objective>Understand user request and plan delegation strategy</objective>
+    <step order="0">
+      <action>Activate Serena project for memory access</action>
+      <tool>Serena activate_project</tool>
+      <output>Project activated with available memories</output>
+    </step>
     <step order="1">
       <action>What is the user requesting?</action>
       <tool>Read user message, parse intent</tool>
@@ -93,6 +98,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <action>Synthesize findings into coherent result</action>
       <tool>Combine and organize outputs</tool>
       <output>Consolidated result</output>
+    </step>
+    <step order="3">
+      <action>Save significant findings to Serena memory if applicable</action>
+      <tool>Serena write_memory</tool>
+      <output>Memory saved for future sessions</output>
     </step>
   </phase>
   <phase name="cross_validation">
