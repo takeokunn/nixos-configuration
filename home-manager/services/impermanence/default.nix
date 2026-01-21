@@ -77,6 +77,9 @@
       ".local/share/mime"
       ".config/dconf"
 
+      # Audio
+      ".config/easyeffects"
+
       # Wayland/niri specific
       # Note: .config/niri is managed by Home Manager, not persisted
       # to prevent stale configs (e.g., duplicate waybar spawns)

@@ -25,6 +25,11 @@ with pkgs;
   discord
   slack
 ]
+++ lib.optionals stdenv.isLinux [
+  # for desktop environment
+  networkmanagerapplet
+  networkmanager_dmenu
+]
 ++ lib.optionals stdenv.isDarwin [
   # for macOS (brew-nix casks)
   brewCasks.keycastr

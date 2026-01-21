@@ -30,6 +30,7 @@ let
   # Modern window manager (niri ecosystem)
   niri = import ./niri { inherit pkgs; };
   fuzzel = import ./fuzzel { inherit pkgs; };
+  networkmanager-dmenu = import ./networkmanager-dmenu { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };
   clipse = import ./clipse { inherit pkgs; };
   swww = import ./swww { inherit pkgs; };
@@ -63,6 +64,7 @@ in
   # Modern window manager (niri ecosystem)
   niri
   fuzzel
+  networkmanager-dmenu
   yazi
   clipse
   swww
