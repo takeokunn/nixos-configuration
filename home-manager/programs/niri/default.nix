@@ -9,8 +9,8 @@ let
     ')
 
     if [ -z "$window_data" ]; then
-      # No window exists - spawn new TUI Emacs in Kitty (centered, 80% size)
-      XMODIFIERS=@im= ${pkgs.kitty}/bin/kitty --class "$APP_ID" -o initial_window_width=150c -o initial_window_height=40c -e ${pkgs.emacs}/bin/emacsclient -t -e '(my/scratchpad-init)' &
+      # No window exists - spawn new TUI Emacs in Kitty (centered, compact size)
+      XMODIFIERS=@im= ${pkgs.kitty}/bin/kitty --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e ${pkgs.emacs}/bin/emacsclient -t -e '(my/scratchpad-init)' &
       sleep 0.3
       # Center the newly created floating window
       ${pkgs.niri}/bin/niri msg action center-window
