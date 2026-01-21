@@ -77,6 +77,7 @@
       };
 
       commit = {
+        gpgsign = true;
         template = "~/.config/git/message";
       };
 
