@@ -70,4 +70,17 @@ in
     extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
     override = override;
   };
+
+  emacs-unstable-pgtk = pkgs.emacsWithPackagesFromUsePackage {
+    config = builtins.toFile "empty.el" "";
+    package = pkgs.emacs-unstable-pgtk.overrideAttrs (
+      old:
+      parallelBuildAttrs
+      // {
+        env = (old.env or { }) // parallelBuildAttrs.env;
+      }
+    );
+    extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+    override = override;
+  };
 }

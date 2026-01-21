@@ -45,22 +45,6 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
   sudo reboot
 #+end_src
 
-You will be prompted for your LUKS passphrase during boot.
-
-** Post-Installation: TPM2 Enrollment (Optional)
-
-After successful boot with passphrase, enroll TPM2 for auto-unlock:
-
-#+begin_src shell
-  # Enroll TPM2 key
-  sudo systemd-cryptenroll --wipe-slot=tpm2 \
-    --tpm2-device=auto \
-    --tpm2-pcrs=0+7 \
-    /dev/disk/by-partlabel/cryptroot
-
-  # Test by rebooting - should auto-unlock
-  sudo reboot
-#+end_src
 * Architecture
 ** Disk Layout (X13Gen2)
 #+begin_example

@@ -105,7 +105,7 @@
     style = ''
       * {
         font-family: "HackGen Console NF", "Font Awesome 6 Free";
-        font-size: 13px;
+        font-size: 15px;
         min-height: 0;
       }
 

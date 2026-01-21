@@ -4,7 +4,7 @@
     enable = true;
     settings = {
       main = {
-        font = "HackGen Console NF:size=12";
+        font = "HackGen Console NF:size=14";
         terminal = "kitty";
         layer = "overlay";
         prompt = "❯ ";

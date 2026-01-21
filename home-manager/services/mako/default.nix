@@ -5,7 +5,7 @@
 
     settings = {
       # Appearance
-      font = "HackGen Console NF 11";
+      font = "HackGen Console NF 14";
       width = 350;
       height = 150;
       margin = "10";

@@ -212,7 +212,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
 
         // Window Layout
         Mod+F { fullscreen-window; }
-        Mod+Shift+Space { toggle-floating; }
+        Mod+Shift+Space { toggle-window-floating; }
 
         // Column Width Adjustment
         Mod+Minus { set-column-width "-10%"; }
@@ -282,6 +282,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
     }
 
     environment {
+        TERM "dumb"
         DISPLAY ":0"
         QT_QPA_PLATFORM "wayland"
         QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
