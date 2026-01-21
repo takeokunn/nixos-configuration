@@ -11,6 +11,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">execution-workflow</skill>
   <skill use="workflow">fact-check</skill>
+  <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
   <skill use="tools">codex-usage</skill>
 </refs>
@@ -31,6 +32,12 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step>1. Activate Serena project with activate_project</step>
+    <step>2. Check list_memories for relevant patterns</step>
+    <step>3. Load applicable memories with read_memory</step>
+  </phase>
   <phase name="analyze">
     <objective>Determine review scope and appropriate mode selection</objective>
     <step>1. What was the previous command? (/define, /execute, /bug, /ask, other)</step>
@@ -58,6 +65,10 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <question>Is the feedback specific and actionable?</question>
     <question>Have I assigned priority levels to all issues?</question>
     <threshold>If confidence less than 70, gather additional context or re-run agents</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After review agents complete</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="synthesize">

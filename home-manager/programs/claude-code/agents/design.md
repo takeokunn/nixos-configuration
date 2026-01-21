@@ -103,6 +103,10 @@ Expert system design agent for architecture evaluation, requirements definition,
     <threshold min="70" action="proceed">
       <below_threshold>Gather more evidence or consult with user</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After verification phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="plan">
     <objective>Create actionable plan with effort estimates</objective>

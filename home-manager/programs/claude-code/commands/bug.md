@@ -34,6 +34,12 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step>1. Activate Serena project with activate_project</step>
+    <step>2. Check list_memories for relevant patterns</step>
+    <step>3. Load applicable memories with read_memory</step>
+  </phase>
   <phase name="analyze">
     <objective>Classify error type and establish investigation scope</objective>
     <step>1. What type of error is this? (syntax, runtime, logic)</step>
@@ -55,6 +61,10 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <question>Have I built a complete evidence chain from symptom to cause?</question>
     <question>Can I explain the error mechanism with concrete evidence?</question>
     <threshold>If confidence less than 70, continue investigation or flag uncertainty</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After investigation phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect environmental context and runtime conditions</objective>

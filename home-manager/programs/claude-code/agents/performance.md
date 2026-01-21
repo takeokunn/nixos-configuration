@@ -60,6 +60,10 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <threshold min="70" action="proceed">
       <below_threshold>Expand profiling or verify measurements</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_task_adherence</tool>
+      <trigger>Before applying optimizations</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="optimize">
     <objective>Apply optimizations and verify improvements</objective>

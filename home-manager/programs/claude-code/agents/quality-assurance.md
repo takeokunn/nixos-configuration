@@ -57,6 +57,10 @@ description: Code review and quality evaluation
     <question>Are my findings specific and actionable?</question>
     <question>Is my confidence score justified by evidence?</question>
     <threshold>If any answer is no, revisit evaluation phase</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After review evaluation completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate actionable feedback and recommendations</objective>

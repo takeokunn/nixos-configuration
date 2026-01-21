@@ -105,6 +105,10 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <threshold min="70" action="proceed">
       <below_threshold>Re-measure or ask user for guidance</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_task_adherence</tool>
+      <trigger>Before applying code improvements</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Apply code improvements and verify no regressions</objective>

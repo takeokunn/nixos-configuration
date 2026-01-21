@@ -69,6 +69,10 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
     <question>Have I found relevant matches?</question>
     <question>Should I expand or refine the search?</question>
     <threshold>If matches less than expected, try alternative patterns</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After search phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="filter">
     <objective>Narrow results to most relevant matches</objective>

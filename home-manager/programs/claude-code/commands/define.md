@@ -32,6 +32,24 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </rules>
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step number="1">
+      <action>Activate Serena project with activate_project</action>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
+    </step>
+    <step number="2">
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Serena list_memories</tool>
+      <output>Available memory list</output>
+    </step>
+    <step number="3">
+      <action>Load applicable memories with read_memory</action>
+      <tool>Serena read_memory</tool>
+      <output>Relevant patterns loaded</output>
+    </step>
+  </phase>
   <phase name="analyze">
     <objective>Understand the user's request and identify technical constraints</objective>
     <step number="1">
@@ -92,6 +110,10 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <threshold min="70" action="proceed">
       <below_threshold>Expand investigation scope or ask user</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After investigation phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="clarify">

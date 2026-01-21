@@ -32,6 +32,12 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step>1. Activate Serena project with activate_project</step>
+    <step>2. Check list_memories for relevant patterns</step>
+    <step>3. Load applicable memories with read_memory</step>
+  </phase>
   <phase name="analyze">
     <objective>Understand the question and determine investigation scope</objective>
     <step>1. What is the user's core question?</step>
@@ -51,6 +57,10 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <question>Do findings from different agents align?</question>
     <question>Are there conflicting signals that require deeper analysis?</question>
     <threshold>If confidence less than 70, expand investigation scope or seek clarification</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After investigation phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="synthesize">
     <objective>Compile and verify findings with confidence metrics</objective>

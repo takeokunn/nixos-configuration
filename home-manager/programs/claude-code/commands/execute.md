@@ -28,6 +28,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </rules>
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step order="1">Activate Serena project with activate_project</step>
+    <step order="2">Check list_memories for relevant patterns</step>
+    <step order="3">Load applicable memories with read_memory</step>
+  </phase>
   <phase name="analyze">
     <objective>Understand the task scope and identify required resources</objective>
     <step order="1">What tasks need to be done?</step>
@@ -61,6 +67,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <threshold min="70" action="proceed">
       <below_threshold>Refine task assignments or ask user</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_task_adherence</tool>
+      <trigger>Before any code modification delegation</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="consolidate">

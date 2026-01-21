@@ -10,6 +10,7 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="domain">technical-documentation</skill>
+  <skill use="tools">serena-usage</skill>
 </refs>
 
 <rules priority="critical">
@@ -45,6 +46,12 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </decision_criteria>
 
 <workflow>
+  <phase name="prepare">
+    <objective>Initialize Serena and check existing patterns</objective>
+    <step>1. Activate Serena project with activate_project</step>
+    <step>2. Check list_memories for documentation patterns</step>
+    <step>3. Load applicable memories with read_memory</step>
+  </phase>
   <phase name="analyze">
     <objective>Understand previous command output and context</objective>
     <step>1. What was the previous command?</step>
@@ -56,6 +63,10 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     <question>Have I correctly identified the previous command and its output?</question>
     <question>Do I understand what content needs to be documented?</question>
     <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After analyze phase completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Retrieve all relevant information for documentation</objective>

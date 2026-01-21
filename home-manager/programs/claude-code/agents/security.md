@@ -55,6 +55,10 @@ description: Security vulnerability detection and remediation
     <threshold min="70" action="proceed">
       <below_threshold>Expand scan scope or verify findings</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_task_adherence</tool>
+      <trigger>Before applying security fixes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="remediate">
     <objective>Provide fix recommendations and auto-fix when safe</objective>

@@ -47,6 +47,10 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
     <question>Is the planned operation safe and reversible?</question>
     <question>Do I have explicit user permission for destructive operations?</question>
     <threshold>If operation is destructive and confidence less than 90, require user confirmation</threshold>
+    <serena_validation>
+      <tool>think_about_task_adherence</tool>
+      <trigger>Before any git operation</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="resolve">
     <objective>Apply conflict resolution and workflow fixes</objective>

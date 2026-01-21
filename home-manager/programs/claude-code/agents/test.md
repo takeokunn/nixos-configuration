@@ -48,6 +48,10 @@ description: Test strategy and quality management
     <threshold min="70" action="proceed">
       <below_threshold>Gather more context or consult with user</below_threshold>
     </threshold>
+    <serena_validation>
+      <tool>think_about_collected_information</tool>
+      <trigger>After test analysis completes</trigger>
+    </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect test files, configurations, and patterns</objective>
