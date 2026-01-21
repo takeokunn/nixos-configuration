@@ -41,6 +41,9 @@
       enable_audio_bell = false;
       visual_bell_duration = 0;
 
+      # Focus reporting (disable to prevent OI escape sequences in terminal apps)
+      focus_reporting_protocol = "none";
+
       # thanks. https://github.com/dracula/kitty/blob/master/dracula.conf
       foreground = "#f8f8f2";
       background = "#282a36";

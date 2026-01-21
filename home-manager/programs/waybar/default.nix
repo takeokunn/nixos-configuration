@@ -20,7 +20,6 @@
           "cpu"
           "memory"
           "disk"
-          "temperature"
           "custom/weather"
           "mpris"
           "tray"
@@ -32,14 +31,14 @@
         "niri/workspaces" = {
           format = "{icon}";
           format-icons = {
-            active = "";
-            default = "";
+            active = "";
+            default = "";
           };
           on-click = "activate";
         };
 
         "niri/window" = {
-          format = "{}";
+          format = "󰖯 {}";
           max-length = 50;
         };
 
@@ -108,7 +107,7 @@
 
         cpu = {
           interval = 5;
-          format = " {usage}%";
+          format = "󰍛 {usage}%";
           format-icons = [
             "▁"
             "▂"
@@ -128,8 +127,8 @@
 
         memory = {
           interval = 10;
-          format = " {used:0.1f}G/{total:0.1f}G";
-          format-alt = " {percentage}%";
+          format = "󰘚 {used:0.1f}G/{total:0.1f}G";
+          format-alt = "󰘚 {percentage}%";
           states = {
             warning = 70;
             critical = 90;
@@ -149,19 +148,6 @@
           tooltip-format = "Disk: {used} / {total} ({percentage_used}%)";
         };
 
-        temperature = {
-          hwmon-path = [
-            "/sys/class/hwmon/hwmon2/temp1_input"
-            "/sys/class/hwmon/hwmon3/temp1_input"
-            "/sys/class/hwmon/hwmon1/temp1_input"
-          ];
-          critical-threshold = 80;
-          interval = 5;
-          format = " {temperatureC}°C";
-          format-critical = " {temperatureC}°C";
-          tooltip-format = "Temperature: {temperatureC}°C";
-        };
-
         "custom/weather" = {
           exec = "curl -s 'https://wttr.in/Tokyo?format=%c+%t' 2>/dev/null || echo '--'";
           interval = 1800;
@@ -173,7 +159,7 @@
           format = "{player_icon} {artist} - {title}";
           format-paused = "{status_icon} {artist} - {title}";
           player-icons = {
-            default = "▶";
+            default = "";
             spotify = "";
             firefox = "";
             mpv = "🎵";
@@ -189,7 +175,7 @@
 
     style = ''
       * {
-        font-family: "HackGen Console NF", "Font Awesome 6 Free";
+        font-family: "HackGen Console NF", "Font Awesome 7 Free";
         font-size: 17px;
         min-height: 0;
         transition: all 0.2s ease;
@@ -275,15 +261,6 @@
       }
 
       #disk.critical {
-        color: #ff5555;
-      }
-
-      #temperature {
-        padding: 0 12px;
-        color: #f8f8f2;
-      }
-
-      #temperature.critical {
         color: #ff5555;
       }
 

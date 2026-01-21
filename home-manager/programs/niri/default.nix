@@ -1,4 +1,34 @@
 { pkgs }:
+let
+  emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
+    APP_ID=FloatingEmacs
+
+    # Get window info in single IPC call
+    window_data=$(${pkgs.niri}/bin/niri msg -j windows | ${pkgs.jq}/bin/jq -r --arg id "$APP_ID" '
+      .[] | select(.app_id == $id) | "\(.id) \(.is_focused)"
+    ')
+
+    if [ -z "$window_data" ]; then
+      # No window exists - spawn new TUI Emacs in Kitty (centered, 80% size)
+      XMODIFIERS=@im= ${pkgs.kitty}/bin/kitty --class "$APP_ID" -o initial_window_width=150c -o initial_window_height=40c -e ${pkgs.emacs}/bin/emacsclient -t -e '(my/scratchpad-init)' &
+      sleep 0.3
+      # Center the newly created floating window
+      ${pkgs.niri}/bin/niri msg action center-window
+    else
+      # Parse window data
+      window_id=$(echo "$window_data" | cut -d' ' -f1)
+      is_focused=$(echo "$window_data" | cut -d' ' -f2)
+
+      if [ "$is_focused" = "true" ]; then
+        # Focused - switch to previous window (pseudo-hide)
+        ${pkgs.niri}/bin/niri msg action focus-window-previous
+      else
+        # Not focused - bring to focus
+        ${pkgs.niri}/bin/niri msg action focus-window --id "$window_id"
+      fi
+    fi
+  '';
+in
 pkgs.lib.mkIf pkgs.stdenv.isLinux {
   xdg.configFile."niri/config.kdl".text = ''
     // Niri Configuration - Modern Scrolling Tiling Compositor
@@ -83,7 +113,6 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
 
     spawn-at-startup "swww-daemon"
     spawn-at-startup "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
-    spawn-at-startup "fcitx5" "-d"
 
     prefer-no-csd
 
@@ -138,6 +167,13 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         open-floating true
     }
 
+    window-rule {
+        match app-id="FloatingEmacs"
+        open-floating true
+        default-column-width { proportion 0.8; }
+        default-window-height { proportion 0.8; }
+    }
+
     binds {
         // Terminal (kitty)
         Mod+Return { spawn "kitty"; }
@@ -148,6 +184,9 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
 
         // Clipboard History (clipse in kitty)
         Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
+
+        // Emacs Scratchpad (vime-like)
+        Mod+I { spawn "${emacsScratchpadToggle}"; }
 
         // Screenshot
         Mod+P { screenshot; }
@@ -282,7 +321,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
     }
 
     environment {
-        TERM "dumb"
+        TERM "xterm-kitty"
         DISPLAY ":0"
         QT_QPA_PLATFORM "wayland"
         QT_WAYLAND_DISABLE_WINDOWDECORATION "1"

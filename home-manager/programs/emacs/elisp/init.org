@@ -57,6 +57,25 @@
                window-system)
       `(progn ,@body)))
 #+end_src
+** when-linux
+:PROPERTIES:
+:CUSTOM_ID: when-linux
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (defmacro when-linux (&rest body)
+    (when (string= system-type "gnu/linux")
+      `(progn ,@body)))
+#+end_src
+** when-linux-not-window-system
+:PROPERTIES:
+:CUSTOM_ID: when-linux-not-window-system
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (defmacro when-linux-not-window-system (&rest body)
+    (when (and (string= system-type "gnu/linux")
+               (not window-system))
+      `(progn ,@body)))
+#+end_src
 * Boot
 :PROPERTIES:
 :CUSTOM_ID: boot
@@ -258,6 +277,24 @@
   (when-darwin-not-window-system
    (setq interprogram-cut-function #'my/paste-to-osx)
    (setq interprogram-paste-function #'my/copy-from-osx))
+#+end_src
+** [linux] clipboardに入るようにする
+:PROPERTIES:
+:CUSTOM_ID: linux-clipboard
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (defun my/copy-from-wayland ()
+    (shell-command-to-string "wl-paste -n"))
+
+  (defun my/paste-to-wayland (text)
+    (let ((process-connection-type nil))
+      (let ((proc (start-process "wl-copy" nil "wl-copy" "--trim-newline")))
+        (process-send-string proc text)
+        (process-send-eof proc))))
+
+  (when-linux-not-window-system
+   (setq interprogram-cut-function #'my/paste-to-wayland)
+   (setq interprogram-paste-function #'my/copy-from-wayland))
 #+end_src
 ** native comp
 :PROPERTIES:
@@ -1797,6 +1834,18 @@
   (with-eval-after-load 'skk
     ;; hooks
     (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
+#+end_src
+** scratchpad
+:PROPERTIES:
+:CUSTOM_ID: scratchpad
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (defun my/scratchpad-init ()
+    "Initialize scratchpad: switch to *scratch* and enable skk-mode."
+    (switch-to-buffer "*scratch*")
+    (when (fboundp 'skk-mode)
+      (skk-mode 1))
+    nil)
 #+end_src
 * Coding
 :PROPERTIES:
@@ -3879,6 +3928,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook
             #'(lambda ()
                 (advice-add 'set-fontset-font :around #'set-fontset-font:around)
+
+                ;; Set default font size to 14pt (height is in 1/10pt units)
+                (set-face-attribute 'default nil :height 140)
 
                 (when (functionp 'set-fontset-font)
                   (if (find-font (font-spec :family "Noto Sans"))
