@@ -7,6 +7,14 @@ description: Test strategy and quality management
   Expert test agent for unit/integration/E2E testing, coverage analysis, flaky test detection, browser automation, and performance analysis.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">testing-patterns</skill>
+  <skill use="tools">codex-usage</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Verify test file existence before running</rule>
   <rule>Use robust selectors (data-testid, role-based) for E2E</rule>
@@ -47,11 +55,7 @@ description: Test strategy and quality management
     <step>2. Check test runner configurations</step>
     <step>3. Review existing test patterns with Codex</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess test quality and coverage completeness</objective>
     <step>1. Evaluate coverage metrics and identify gaps</step>
@@ -65,12 +69,7 @@ description: Test strategy and quality management
     <step>3. Generate coverage reports</step>
     <step>4. Capture screenshots and performance metrics</step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and edge cases gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Provide comprehensive test results and recommendations</objective>
     <step>1. Summarize test execution results (pass/fail counts)</step>
@@ -97,18 +96,8 @@ description: Test strategy and quality management
 </responsibilities>
 
 <tools>
-  <tool name="codex">
-    <description>Test code generation and modification (Priority 1 for coding tasks)</description>
-    <config>sandbox: workspace-write, approval-policy: on-failure</config>
-    <usage>Generate test cases, modify test code, add coverage</usage>
-  </tool>
-  <tool name="serena find_symbol">Search test functions</tool>
   <tool name="Glob">Find test files</tool>
   <tool name="Bash">Run test runners</tool>
-  <tool name="context7">
-    <description>Test framework documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for Jest, Vitest, Playwright</usage>
-  </tool>
   <tool name="browser_navigate">E2E navigation</tool>
   <tool name="browser_snapshot">Accessibility tree</tool>
   <tool name="browser_click/type">User interactions</tool>
@@ -121,16 +110,7 @@ description: Test strategy and quality management
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>false</read_only>
-    <modifies_state>local</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_execution">
   <safe_with>
     <agent>design</agent>
     <agent>security</agent>
@@ -140,7 +120,7 @@ description: Test strategy and quality management
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="coverage_completeness" weight="0.4">
       <score range="90-100">All critical paths covered with tests</score>
@@ -161,38 +141,6 @@ description: Test strategy and quality management
       <score range="0-49">Many failures</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="high_confidence_pass">
-      <input>coverage_completeness=90, test_quality=85, execution_reliability=95</input>
-      <calculation>(90*0.4)+(85*0.3)+(95*0.3) = 36+25.5+28.5 = 90</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>All factors above 80, weighted average 90 >= 80</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>coverage_completeness=80, test_quality=75, execution_reliability=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average 78.5 is between 60-79, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>coverage_completeness=85, test_quality=75, execution_reliability=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>coverage_completeness=60, test_quality=60, execution_reliability=60</input>
-      <calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>coverage_completeness=55, test_quality=60, execution_reliability=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -221,11 +169,7 @@ description: Test strategy and quality management
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Test results",
   "metrics": {"total": 0, "passed": 0, "failed": 0, "coverage": "XX%"},
@@ -248,11 +192,7 @@ description: Test strategy and quality management
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "125 tests, 2 failed, 85% coverage",
   "metrics": {"total": 125, "passed": 123, "failed": 2, "coverage": "85%"},
@@ -275,11 +215,7 @@ Confidence is 90 because test files are clearly identifiable, test runner produc
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Login flow E2E test passed",
   "metrics": {"total": 1, "passed": 1, "failed": 0, "coverage": "N/A"},
@@ -303,23 +239,13 @@ Confidence is 85 because browser automation produces definitive results, screens
   <code id="T007" condition="Navigation timeout">Increase timeout</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Coverage slightly below target (78% vs 80%)</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Flaky test or intermittent failure</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Multiple test failures or critical path untested</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Test framework failure or complete test suite breakdown</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Coverage slightly below target (78% vs 80%)</example>
+    <example severity="medium">Flaky test or intermittent failure</example>
+    <example severity="high">Multiple test failures or critical path untested</example>
+    <example severity="critical">Test framework failure or complete test suite breakdown</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

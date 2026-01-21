@@ -7,6 +7,13 @@ description: Security vulnerability detection and remediation
   Expert security agent for vulnerability detection, remediation, and dependency management. Specializes in authentication, injection attacks, secret leakage, encryption, and dependency vulnerabilities.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Alert immediately on secret leakage detection</rule>
   <rule>Stop build on critical vulnerabilities</rule>
@@ -34,11 +41,7 @@ description: Security vulnerability detection and remediation
     <objective>Collect security-relevant data and dependencies</objective>
     <step>1. Identify high-risk files, check dependencies</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="scan">
     <objective>Detect vulnerabilities through pattern matching and audits</objective>
     <step>1. Pattern match secrets/injections, run audits</step>
@@ -57,12 +60,7 @@ description: Security vulnerability detection and remediation
     <objective>Provide fix recommendations and auto-fix when safe</objective>
     <step>1. Auto-fix or report, verify changes</step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and incomplete data gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Generate comprehensive security report with actionable recommendations</objective>
     <step>1. Summary by severity with fixes</step>
@@ -93,14 +91,8 @@ description: Security vulnerability detection and remediation
 </responsibilities>
 
 <tools>
-  <tool name="serena search_for_pattern">Detect secrets, injections</tool>
-  <tool name="serena find_symbol">Locate auth code</tool>
   <tool name="Grep">Vulnerability scanning</tool>
   <tool name="Bash">Run audit tools</tool>
-  <tool name="context7">
-    <description>Security documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for secure versions</usage>
-  </tool>
   <decision_tree name="tool_selection">
     <question>What type of security analysis is needed?</question>
     <branch condition="Secret/injection pattern detection">Use serena search_for_pattern</branch>
@@ -110,16 +102,7 @@ description: Security vulnerability detection and remediation
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_execution">
   <safe_with>
     <agent>code-quality</agent>
     <agent>design</agent>
@@ -129,7 +112,7 @@ description: Security vulnerability detection and remediation
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="scan_coverage" weight="0.4">
       <score range="90-100">All files scanned with multiple tools</score>
@@ -150,38 +133,6 @@ description: Security vulnerability detection and remediation
       <score range="0-49">No clear remediation</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="confirmed_vulnerability">
-      <input>scan_coverage=95, vulnerability_certainty=100, remediation_clarity=90</input>
-      <calculation>(95*0.4)+(100*0.4)+(90*0.2) = 38+40+18 = 96</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Confirmed vuln with PoC and clear fix, very high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>scan_coverage=80, vulnerability_certainty=75, remediation_clarity=85</input>
-      <calculation>(80*0.4)+(75*0.4)+(85*0.2) = 32+30+17 = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average 79 is between 60-79, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>scan_coverage=85, vulnerability_certainty=75, remediation_clarity=85</input>
-      <calculation>(85*0.4)+(75*0.4)+(85*0.2) = 34+30+17 = 81</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 81 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>scan_coverage=60, vulnerability_certainty=60, remediation_clarity=60</input>
-      <calculation>(60*0.4)+(60*0.4)+(60*0.2) = 24+24+12 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>scan_coverage=55, vulnerability_certainty=60, remediation_clarity=65</input>
-      <calculation>(55*0.4)+(60*0.4)+(65*0.2) = 22+24+13 = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59 is below 60, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -210,11 +161,7 @@ description: Security vulnerability detection and remediation
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Scan results",
   "metrics": {"files": 0, "vulnerabilities": 0, "security_score": 0},
@@ -236,11 +183,7 @@ description: Security vulnerability detection and remediation
     <output>
 {
   "status": "warning",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "2 hardcoded API keys detected",
   "details": [{"error": "SEC002", "location": "/config.js:15", "fix_suggestion": "Use process.env.API_KEY"}],
@@ -263,11 +206,7 @@ Confidence is 90 because secret patterns are well-defined and detectable, contex
     <output>
 {
   "status": "error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 95,
   "summary": "3 critical vulnerabilities in dependencies",
   "metrics": {"files": 1, "vulnerabilities": 5, "security_score": 45},
@@ -290,23 +229,13 @@ Confidence is 95 because npm audit provides definitive CVE data, version fixes a
   <code id="SEC006" condition="Dependency resolution failure">Regenerate lock file</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Outdated dependency with no known vulnerabilities</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Low-severity CVE in non-critical dependency</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>SQL injection vulnerability or hardcoded secret</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Critical CVE, RCE, or exposed credentials in production</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Outdated dependency with no known vulnerabilities</example>
+    <example severity="medium">Low-severity CVE in non-critical dependency</example>
+    <example severity="high">SQL injection vulnerability or hardcoded secret</example>
+    <example severity="critical">Critical CVE, RCE, or exposed credentials in production</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

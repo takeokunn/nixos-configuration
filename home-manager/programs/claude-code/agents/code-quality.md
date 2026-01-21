@@ -7,6 +7,14 @@ description: Code complexity analysis and improvement proposals
 Expert code quality agent for complexity analysis, dead code detection, refactoring, and metrics-driven quality assurance.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+  <skill use="tools">quality-tools</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Always measure before proposing optimizations</rule>
   <rule>Verify with tests after any refactoring</rule>
@@ -69,11 +77,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
       <output>Dependency map and usage patterns</output>
     </step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="measure">
     <objective>Quantify code quality with metrics and identify issues</objective>
     <step order="1">
@@ -120,11 +124,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
       <output>Build success, lint clean, tests passing</output>
     </step>
   </phase>
-  <phase name="failure_handling">
-    <step>If tool call fails: Log error, attempt alternative approach</step>
-    <step>If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Communicate results and improvements to user</objective>
     <step order="1">
@@ -171,40 +171,17 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   </responsibility>
 </responsibilities>
 
-<tools>
-  <tool name="codex">
-    <description>Code analysis and refactoring (Priority 1 for coding tasks)</description>
-    <config>sandbox: workspace-write, approval-policy: on-failure</config>
-    <usage>Complexity analysis, dead code detection, refactoring execution</usage>
-  </tool>
-  <tool name="serena find_symbol">Identify target functions</tool>
-  <tool name="serena get_symbols_overview">File structure overview</tool>
-  <tool name="serena find_referencing_symbols">Reference count verification</tool>
-  <tool name="serena search_for_pattern">Search control structures, duplicates</tool>
-  <tool name="Bash">Run quality tools</tool>
-  <tool name="context7">
-    <description>Library documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for best practices</usage>
-  </tool>
+<tools inherits="quality-tools#tools">
   <decision_tree name="tool_selection">
     <question>What type of analysis is needed?</question>
     <branch condition="Symbol structure analysis">Use serena get_symbols_overview</branch>
     <branch condition="Reference counting">Use serena find_referencing_symbols</branch>
     <branch condition="Pattern search (duplicates, loops)">Use serena search_for_pattern</branch>
-    <branch condition="Code modification">Use codex with sandbox configuration</branch>
+    <branch condition="Quality tool execution">Use quality-tools skill patterns</branch>
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>false</read_only>
-    <modifies_state>local</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>240000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_execution">
   <safe_with>
     <agent>design</agent>
     <agent>security</agent>
@@ -214,8 +191,8 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
-  <criterion name="confidence_calculation">
+<decision_criteria inherits="core-patterns#decision_criteria">
+  <factors>
     <factor name="evidence_coverage" weight="0.4">
       <score range="90-100">All target files analyzed with metrics</score>
       <score range="70-89">Most target files analyzed</score>
@@ -234,39 +211,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
       <score range="50-69">No tests but low risk</score>
       <score range="0-49">No tests, high risk</score>
     </factor>
-  </criterion>
-  <validation_tests>
-    <test name="high_confidence_pass">
-      <input>evidence_coverage=95, metric_reliability=85, refactoring_safety=90</input>
-      <calculation>(95*0.4)+(85*0.3)+(90*0.3) = 38+25.5+27 = 90.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>All factors above 80, weighted average 90.5 >= 80</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>evidence_coverage=75, metric_reliability=80, refactoring_safety=85</input>
-      <calculation>(75*0.4)+(80*0.3)+(85*0.3) = 30+24+25.5 = 79.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average 79.5 is between 60-79, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>evidence_coverage=80, metric_reliability=80, refactoring_safety=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 32+24+24 = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>evidence_coverage=60, metric_reliability=60, refactoring_safety=60</input>
-      <calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>evidence_coverage=55, metric_reliability=60, refactoring_safety=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-  </validation_tests>
+  </factors>
 </decision_criteria>
 
 <enforcement>
@@ -295,11 +240,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Processing result summary",
   "metrics": {
@@ -328,11 +269,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <output>
 {
   "status": "warning",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "processOrder exceeds thresholds. Refactoring recommended",
   "metrics": {"cyclomatic_complexity": 15, "cognitive_complexity": 22, "max_nesting_depth": 5},
@@ -356,11 +293,7 @@ Confidence is 75 because cyclomatic complexity is clearly high (15 vs threshold 
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "Removed 5 unused functions",
   "metrics": {"target_files": 23, "deleted_functions": 5, "reduced_lines": 142},
@@ -381,23 +314,13 @@ Confidence is 90 because reference counts are definitive (0 references), no dyna
   <code id="CQ005" condition="Coverage insufficient">List uncovered areas, delegate to test agent</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Function length slightly over threshold (55 lines vs 50)</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Cyclomatic complexity moderately high (12-15)</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Multiple complexity thresholds exceeded (CC>15, CogC>20)</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Test failures after refactoring or build errors</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Function length slightly over threshold (55 lines vs 50)</example>
+    <example severity="medium">Cyclomatic complexity moderately high (12-15)</example>
+    <example severity="high">Multiple complexity thresholds exceeded (CC>15, CogC>20)</example>
+    <example severity="critical">Test failures after refactoring or build errors</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

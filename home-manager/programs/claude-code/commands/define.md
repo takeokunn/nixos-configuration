@@ -7,6 +7,14 @@ description: Requirements definition command
 Conduct detailed requirements definition before implementation, clarifying technical constraints, design policies, and specifications.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">requirements-definition</skill>
+  <skill use="workflow">fact-check</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Never modify, create, or delete files</rule>
   <rule>Never implement code; requirements definition only</rule>
@@ -70,8 +78,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Effort estimation, risk analysis</output>
     </step>
     <step number="5">
-      <action>Delegate to fact-check agent: verify external documentation and standard references</action>
-      <tool>Sub-agent delegation</tool>
+      <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
+      <tool>Context7 MCP, WebSearch</tool>
       <output>Verification report, flagged claims</output>
     </step>
   </phase>
@@ -85,11 +93,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <below_threshold>Expand investigation scope or ask user</below_threshold>
     </threshold>
   </reflection_checkpoint>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="clarify">
     <objective>Resolve ambiguities through structured user interaction</objective>
     <step number="1">
@@ -131,24 +135,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Implementation validation</output>
     </step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and edge cases gracefully</objective>
-    <step number="1">
-      <action>If tool call fails: Log error, attempt alternative approach</action>
-      <tool>Error handling</tool>
-      <output>Fallback results or error report</output>
-    </step>
-    <step number="2">
-      <action>If data unavailable: Document gap, proceed with partial analysis</action>
-      <tool>Gap documentation</tool>
-      <output>Partial analysis with gaps noted</output>
-    </step>
-    <step number="3">
-      <action>If contradictory evidence: Flag uncertainty, request user clarification</action>
-      <tool>Conflict resolution</tool>
-      <output>Clarification questions</output>
-    </step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="document">
     <objective>Create comprehensive requirements documentation and task breakdown</objective>
     <step number="1">
@@ -188,7 +175,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
   <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
-  <agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
@@ -196,7 +182,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <agent>explore</agent>
     <agent>design</agent>
     <agent>database</agent>
-    <agent>fact-check</agent>
   </parallel_group>
   <parallel_group id="analysis" depends_on="investigation">
     <agent>general-purpose</agent>
@@ -210,19 +195,9 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
-</parallelization>
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="requirement_clarity" weight="0.4">
       <score range="90-100">All requirements clear and documented</score>
@@ -243,38 +218,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <score range="0-49">Many questions unanswered</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="clear_requirements">
-      <input>requirement_clarity=95, technical_feasibility=90, stakeholder_alignment=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>All requirements documented with confirmed feasibility yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>requirement_clarity=80, technical_feasibility=75, stakeholder_alignment=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Core requirements clear but some questions pending results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>requirement_clarity=85, technical_feasibility=75, stakeholder_alignment=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>requirement_clarity=60, technical_feasibility=55, stakeholder_alignment=60</input>
-      <calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="ambiguous_requirements">
-      <input>requirement_clarity=50, technical_feasibility=55, stakeholder_alignment=45</input>
-      <calculation>(50*0.4)+(55*0.3)+(45\*0.3) = 20+16.5+13.5 = 50</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Many unclear requirements with unanswered questions results in 50, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -335,23 +278,13 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </format>
 </output>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor ambiguity in non-critical feature detail</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Unclear requirement or ambiguous scope</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Technically infeasible request or breaking change</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Request violates security policy or data integrity</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <low>Minor ambiguity in non-critical feature detail</low>
+    <medium>Unclear requirement or ambiguous scope</medium>
+    <high>Technically infeasible request or breaking change</high>
+    <critical>Request violates security policy or data integrity</critical>
+  </examples>
 </error_escalation>
 
 <related_commands>

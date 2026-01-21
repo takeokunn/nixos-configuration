@@ -7,6 +7,12 @@ description: Task execution command
 Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">execution-workflow</skill>
+  <skill use="tools">serena-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Delegate detailed work to specialized sub-agents</rule>
   <rule>Focus on orchestration and policy decisions</rule>
@@ -40,11 +46,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <step order="1">Identify parallel vs sequential tasks</step>
     <step order="2">Define task dependencies</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="assign">
     <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
     <step order="1">Delegate tasks with detailed instructions</step>
@@ -60,12 +62,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <below_threshold>Refine task assignments or ask user</below_threshold>
     </threshold>
   </reflection_checkpoint>
-  <phase name="failure_handling">
-    <objective>Handle errors and edge cases gracefully</objective>
-    <step order="1">If tool call fails: Log error, attempt alternative approach</step>
-    <step order="2">If data unavailable: Document gap, proceed with partial analysis</step>
-    <step order="3">If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="consolidate">
     <objective>Integrate sub-agent outputs into cohesive result</objective>
     <step order="1">Verify sub-agent outputs</step>
@@ -132,19 +129,9 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <rule>No multi-file edits in single call</rule>
 </codex_usage>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>false</read_only>
-    <modifies_state>local</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
-</parallelization>
+<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="task_clarity" weight="0.3">
       <score range="90-100">Clear requirements with acceptance criteria</score>
@@ -165,38 +152,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <score range="0-49">Minimal verification</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="fully_verified">
-      <input>task_clarity=95, implementation_quality=90, verification_completeness=95</input>
-      <calculation>(95*0.3)+(90*0.4)+(95*0.3) = 28.5+36+28.5 = 93</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Clear requirements with tested code and full verification yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>task_clarity=80, implementation_quality=75, verification_completeness=85</input>
-      <calculation>(80*0.3)+(75*0.4)+(85*0.3) = 24+30+25.5 = 79.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Tests pass but some issues remain results in 79.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>task_clarity=85, implementation_quality=75, verification_completeness=85</input>
-      <calculation>(85*0.3)+(75*0.4)+(85*0.3) = 25.5+30+25.5 = 81</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 81 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>task_clarity=65, implementation_quality=55, verification_completeness=60</input>
-      <calculation>(65*0.3)+(55*0.4)+(60*0.3) = 19.5+22+18 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="major_issues">
-      <input>task_clarity=50, implementation_quality=45, verification_completeness=50</input>
-      <calculation>(50*0.3)+(45*0.4)+(50\*0.3) = 15+18+15 = 48</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Unclear requirements with major issues results in 48, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -221,23 +176,13 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   </prohibited_behaviors>
 </enforcement>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor code style inconsistency</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Test failure or unclear implementation approach</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change or major implementation blocker</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Security vulnerability or data loss risk</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor code style inconsistency</example>
+    <example severity="medium">Test failure or unclear implementation approach</example>
+    <example severity="high">Breaking change or major implementation blocker</example>
+    <example severity="critical">Security vulnerability or data loss risk</example>
+  </examples>
 </error_escalation>
 
 <related_commands>

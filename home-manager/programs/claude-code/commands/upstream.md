@@ -7,6 +7,10 @@ description: Upstream PR preparation and review command
 Review and prepare changes before submitting PRs to upstream OSS repositories, auto-fetching contribution guidelines, analyzing code changes, evaluating tests, and generating compliant PR metadata.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Read-only operation: analyze and report only, no file modifications</rule>
   <rule>Auto-fetch CONTRIBUTING.md from upstream with fallback hierarchy (root, .github/, docs/)</rule>
@@ -22,24 +26,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-    <retry_policy>
-      <max_retries>2</max_retries>
-      <retry_conditions>
-        <condition>WebFetch timeout or failure</condition>
-        <condition>gh CLI rate limit or auth error</condition>
-      </retry_conditions>
-    </retry_policy>
-  </execution_strategy>
-</parallelization>
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
   <phase name="preflight">
@@ -164,30 +151,10 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Self-feedback section</output>
     </step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and missing data gracefully</objective>
-    <step order="1">
-      <action>If CONTRIBUTING.md not found: use generic OSS best practices</action>
-    </step>
-    <step order="2">
-      <action>If gh CLI fails: skip PR history, note in report</action>
-    </step>
-    <step order="3">
-      <action>If upstream detection ambiguous: ask user to specify</action>
-    </step>
-    <step order="4">
-      <action>If WebFetch timeout or network unavailable: retry once, then note in report</action>
-    </step>
-    <step order="5">
-      <action>If no changes detected (clean working tree): report to user, exit gracefully</action>
-    </step>
-    <step order="6">
-      <action>If agent timeout: retry once with reduced scope, proceed with partial data</action>
-    </step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="guideline_compliance" weight="0.4">
       <score range="90-100">All contribution guidelines verified and followed</score>
@@ -208,38 +175,6 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <score range="0-49">Tests missing or failing</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="ready_for_pr">
-      <input>guideline_compliance=95, code_quality=90, test_coverage=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Full guideline compliance with quality code and comprehensive tests yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>guideline_compliance=80, code_quality=75, test_coverage=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Core guidelines followed but quality issues results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>guideline_compliance=85, code_quality=75, test_coverage=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>guideline_compliance=60, code_quality=55, test_coverage=60</input>
-      <calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="not_ready">
-      <input>guideline_compliance=50, code_quality=45, test_coverage=50</input>
-      <calculation>(50*0.4)+(45*0.3)+(50*0.3) = 20+13.5+15 = 48.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Multiple guideline violations with quality issues results in 48.5, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <agents>
@@ -397,23 +332,13 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   </prohibited_behaviors>
 </enforcement>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor style inconsistency with upstream</example>
-    <action>Note in checklist as warning, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>CONTRIBUTING.md not found or gh CLI rate limited</example>
-    <action>Document gap, use fallback, proceed with partial data</action>
-  </level>
-  <level severity="high">
-    <example>Major guideline violation or breaking change detected</example>
-    <action>STOP, present issues with recommended fixes</action>
-  </level>
-  <level severity="critical">
-    <example>gh auth failure or no upstream detected</example>
-    <action>BLOCK operation, require user to fix environment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor style inconsistency with upstream</example>
+    <example severity="medium">CONTRIBUTING.md not found or gh CLI rate limited</example>
+    <example severity="high">Major guideline violation or breaking change detected</example>
+    <example severity="critical">gh auth failure or no upstream detected</example>
+  </examples>
 </error_escalation>
 
 <related_commands>

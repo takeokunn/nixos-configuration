@@ -7,6 +7,13 @@ description: Code review and quality evaluation
   Expert quality assurance agent for code review, debugging, error handling design, and accessibility verification.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="tools">codex-usage</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Always identify root cause before proposing fixes</rule>
   <rule>Collect evidence (logs, stack traces) for debugging</rule>
@@ -37,11 +44,7 @@ description: Code review and quality evaluation
     <step>2. Identify changed and affected files</step>
     <step>3. Analyze affected files using Serena or Read</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Perform comprehensive quality assessment</objective>
     <step>1. Quality check for readability and maintainability</step>
@@ -61,11 +64,7 @@ description: Code review and quality evaluation
     <step>2. Propose fixes with code examples</step>
     <step>3. Verify accessibility compliance if applicable</step>
   </phase>
-  <phase name="failure_handling">
-    <step>If tool call fails: Log error, attempt alternative approach</step>
-    <step>If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Deliver comprehensive quality assessment results</objective>
     <step>1. Create summary with severity levels</step>
@@ -102,19 +101,7 @@ description: Code review and quality evaluation
 </responsibilities>
 
 <tools>
-  <tool name="codex">
-    <description>Code review and quality analysis (Priority 1 for coding tasks)</description>
-    <config>sandbox: workspace-write, approval-policy: on-failure</config>
-    <usage>Code review, quality analysis, code modification, refactoring suggestions</usage>
-  </tool>
   <tool name="Bash">Git operations (diff, status, log)</tool>
-  <tool name="serena find_symbol">Code investigation</tool>
-  <tool name="serena find_referencing_symbols">Impact analysis</tool>
-  <tool name="serena search_for_pattern">Search error handling patterns</tool>
-  <tool name="context7">
-    <description>Library documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for best practices</usage>
-  </tool>
   <tool name="playwright browser_snapshot">Capture accessibility tree</tool>
   <decision_tree name="tool_selection">
     <question>What type of quality analysis is needed?</question>
@@ -125,16 +112,7 @@ description: Code review and quality evaluation
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>240000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_analysis">
   <safe_with>
     <agent>design</agent>
     <agent>security</agent>
@@ -144,7 +122,7 @@ description: Code review and quality evaluation
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="review_coverage" weight="0.4">
       <score range="90-100">All files and changes reviewed</score>
@@ -165,38 +143,6 @@ description: Code review and quality evaluation
       <score range="0-49">Vague feedback</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="comprehensive_review">
-      <input>review_coverage=95, issue_detection=90, feedback_quality=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>All files reviewed with actionable feedback yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>review_coverage=80, issue_detection=75, feedback_quality=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Core changes reviewed with major issues found results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>review_coverage=85, issue_detection=75, feedback_quality=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>review_coverage=55, issue_detection=60, feedback_quality=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="incomplete_review">
-      <input>review_coverage=40, issue_detection=45, feedback_quality=50</input>
-      <calculation>(40*0.4)+(45*0.3)+(50*0.3) = 16+13.5+15 = 44.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Minimal review with unclear findings results in 44.5, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -225,11 +171,7 @@ description: Code review and quality evaluation
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "QA results summary",
   "metrics": {
@@ -265,11 +207,7 @@ description: Code review and quality evaluation
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "1 file, 1 function reviewed. 2 improvements.",
   "metrics": {"files_reviewed": 1, "severity": {"critical": 0, "major": 1, "minor": 1}},
@@ -295,11 +233,7 @@ Confidence is 80 because code structure is clear from git diff, error handling g
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Root cause: insufficient API response validation",
   "root_cause": "undefined passed to getUserData due to missing error handling",
@@ -321,23 +255,13 @@ Confidence is 85 because stack trace clearly identifies error location, data flo
   <code id="QA005" condition="Missing accessible name">Recommend ARIA label</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor code style inconsistency</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Missing error handling in non-critical path</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Unhandled exception in critical flow or accessibility violation</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Security vulnerability or data corruption risk</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor code style inconsistency</example>
+    <example severity="medium">Missing error handling in non-critical path</example>
+    <example severity="high">Unhandled exception in critical flow or accessibility violation</example>
+    <example severity="critical">Security vulnerability or data corruption risk</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

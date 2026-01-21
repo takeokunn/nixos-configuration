@@ -7,6 +7,14 @@ description: Root cause investigation command
 Identify root causes from error messages and anomalous behavior, providing fact-based analysis without performing fixes.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">investigation-patterns</skill>
+  <skill use="workflow">fact-check</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Never modify, create, or delete files</rule>
   <rule>Never implement fixes; provide suggestions only</rule>
@@ -23,17 +31,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <rule>Track occurrence path chronologically</rule>
 </rules>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>180000</timeout_per_agent>
-  </execution_strategy>
-</parallelization>
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
   <phase name="analyze">
@@ -48,7 +46,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <step>1. Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
     <step>2. Delegate to explore agent: find error location and related code paths</step>
     <step>3. Delegate to general-purpose agent: analyze logs and dependencies</step>
-    <step>4. Delegate to fact-check agent: verify external documentation references in error context</step>
+    <step>4. Use fact-check skill patterns: verify external documentation references via Context7</step>
     <step>5. Analyze error location details from agent findings</step>
     <step>6. Review dependencies and imports</step>
     <step>7. Check config files and recent changes</step>
@@ -63,17 +61,8 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <step>1. Collect runtime info (OS, versions, env vars)</step>
     <step>2. Check resources (disk, memory, network)</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
-  <phase name="failure_handling">
-    <objective>Handle investigation failures gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Synthesize findings into actionable root cause analysis</objective>
     <step>1. Compile agent findings with confidence metrics</step>
@@ -87,7 +76,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   </phase>
 </workflow>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="root_cause_certainty" weight="0.5">
       <score range="90-100">Root cause confirmed with reproduction</score>
@@ -108,52 +97,18 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <score range="0-49">No clear fix</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="confirmed_root_cause">
-      <input>root_cause_certainty=95, evidence_chain=90, fix_viability=95</input>
-      <calculation>(95*0.5)+(90*0.3)+(95*0.2) = 47.5+27+19 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Reproduced root cause with tested fix yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>root_cause_certainty=80, evidence_chain=75, fix_viability=80</input>
-      <calculation>(80*0.5)+(75*0.3)+(80*0.2) = 40+22.5+16 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Likely cause without complete evidence results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>root_cause_certainty=85, evidence_chain=75, fix_viability=75</input>
-      <calculation>(85*0.5)+(75*0.3)+(75*0.2) = 42.5+22.5+15 = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>root_cause_certainty=60, evidence_chain=55, fix_viability=60</input>
-      <calculation>(60*0.5)+(55*0.3)+(60*0.2) = 30+16.5+12 = 58.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="unclear_cause">
-      <input>root_cause_certainty=45, evidence_chain=50, fix_viability=40</input>
-      <calculation>(45*0.5)+(50*0.3)+(40\*0.2) = 22.5+15+8 = 45.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Unclear root cause with weak evidence results in 45.5, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <agents>
   <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
   <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
-  <agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
   <parallel_group id="error_analysis" depends_on="none">
     <agent>quality-assurance</agent>
     <agent>explore</agent>
-    <agent>fact-check</agent>
   </parallel_group>
   <parallel_group id="context_gathering" depends_on="none">
     <agent>general-purpose</agent>
@@ -219,23 +174,13 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   </prohibited_behaviors>
 </enforcement>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor log warning without impact</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Unclear error context or missing stack trace</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>System crash or data corruption detected</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Security breach or critical data loss risk</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor log warning without impact</example>
+    <example severity="medium">Unclear error context or missing stack trace</example>
+    <example severity="high">System crash or data corruption detected</example>
+    <example severity="critical">Security breach or critical data loss risk</example>
+  </examples>
 </error_escalation>
 
 <related_commands>

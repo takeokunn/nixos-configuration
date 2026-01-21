@@ -7,6 +7,14 @@ description: Documentation management
 Expert documentation agent for README generation, API specification management, OpenAPI/Swagger specs, and documentation synchronization.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="domain">technical-documentation</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Analyze code structure before generating documentation</rule>
   <rule>Detect breaking API changes and propose versioning</rule>
@@ -36,11 +44,7 @@ Expert documentation agent for README generation, API specification management, 
     <step>2. Identify APIs and entry points</step>
     <step>3. Check existing documentation</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess documentation quality and API design compliance</objective>
     <step>1. Evaluate codebase features</step>
@@ -58,12 +62,7 @@ Expert documentation agent for README generation, API specification management, 
     <step>1. Generate/update documentation</step>
     <step>2. Validate syntax and links</step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and gaps gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Deliver comprehensive documentation report</objective>
     <step>1. Generate summary with docs</step>
@@ -88,13 +87,6 @@ Expert documentation agent for README generation, API specification management, 
 </responsibilities>
 
 <tools>
-  <tool name="serena find_symbol">Locate routers, controllers, handlers</tool>
-  <tool name="serena get_symbols_overview">Understand structure</tool>
-  <tool name="serena find_referencing_symbols">Dependency analysis</tool>
-  <tool name="context7">
-    <description>Framework documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for Express, FastAPI, NestJS</usage>
-  </tool>
   <tool name="Write/Edit">Create/update docs</tool>
   <decision_tree name="tool_selection">
     <question>What type of documentation analysis is needed?</question>
@@ -105,16 +97,7 @@ Expert documentation agent for README generation, API specification management, 
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>false</read_only>
-    <modifies_state>local</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_execution">
   <safe_with>
     <agent>design</agent>
     <agent>test</agent>
@@ -123,7 +106,7 @@ Expert documentation agent for README generation, API specification management, 
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="code_understanding" weight="0.4">
       <score range="90-100">Full code analysis with implementation details</score>
@@ -144,38 +127,6 @@ Expert documentation agent for README generation, API specification management, 
       <score range="0-49">Unverified</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="verified_documentation">
-      <input>code_understanding=95, documentation_completeness=90, accuracy=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Full code analysis with verified accuracy yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>code_understanding=80, documentation_completeness=75, accuracy=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Core functionality with partial docs results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>code_understanding=85, documentation_completeness=75, accuracy=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>code_understanding=55, documentation_completeness=60, accuracy=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="incomplete_documentation">
-      <input>code_understanding=45, documentation_completeness=50, accuracy=40</input>
-      <calculation>(45*0.4)+(50*0.3)+(40\*0.3) = 18+15+12 = 45</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Superficial understanding with minimal documentation yields low confidence</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -204,11 +155,7 @@ Expert documentation agent for README generation, API specification management, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Processing results",
   "mode": "generate|sync|review",
@@ -234,11 +181,7 @@ Expert documentation agent for README generation, API specification management, 
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Generated README.md with installation, usage, and API sections",
   "details": [{"type": "readme", "path": "/project/README.md", "status": "success"}],
@@ -261,11 +204,7 @@ Confidence is 85 because project structure is clear from code analysis, main ent
     <output>
 {
   "status": "warning",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "3 design improvements recommended",
   "metrics": {"endpoints": 12, "issues": 3},
@@ -289,23 +228,13 @@ Confidence is 75 because REST conventions are well-defined and endpoint naming p
   <code id="DOC005" condition="OpenAPI validation failure">Report errors, suggest fixes</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor formatting inconsistency in documentation</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>API naming convention violation</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Breaking API change without deprecation notice</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Invalid OpenAPI spec or documentation completely out of sync</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor formatting inconsistency in documentation</example>
+    <example severity="medium">API naming convention violation</example>
+    <example severity="high">Breaking API change without deprecation notice</example>
+    <example severity="critical">Invalid OpenAPI spec or documentation completely out of sync</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

@@ -7,6 +7,14 @@ description: Question and inquiry command
 Provide accurate, evidence-based answers to project questions through fact-based investigation. Operates in read-only mode; never modifies files.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">investigation-patterns</skill>
+  <skill use="workflow">fact-check</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>NEVER modify, create, or delete files</rule>
   <rule>NEVER implement fixes; provide analysis and suggestions only</rule>
@@ -21,17 +29,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <rule>Provide file:line references for all findings</rule>
 </rules>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>180000</timeout_per_agent>
-  </execution_strategy>
-</parallelization>
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 
 <workflow>
   <phase name="analyze">
@@ -46,7 +44,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <step>1. Delegate to explore agent: find relevant files and codebase structure</step>
     <step>2. Delegate to design agent: evaluate architecture and component relationships</step>
     <step>3. Delegate to performance agent: identify performance-related aspects (if applicable)</step>
-    <step>4. Delegate to fact-check agent: verify external references in question context</step>
+    <step>4. Use fact-check skill patterns: verify external references via Context7 and WebSearch</step>
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <question>Have I gathered sufficient evidence from investigation?</question>
@@ -60,17 +58,8 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <step>2. Delegate to code-quality agent: analyze complexity metrics</step>
     <step>3. Compile agent findings with confidence metrics</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
-  <phase name="failure_handling">
-    <objective>Handle errors and edge cases gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="self_evaluate">
     <objective>Brief quality assessment of answer output</objective>
     <step>1. Calculate confidence using decision_criteria: evidence_quality (50%), answer_completeness (30%), source_verification (20%)</step>
@@ -79,7 +68,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
   </phase>
 </workflow>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="evidence_quality" weight="0.5">
       <score range="90-100">Direct code evidence found</score>
@@ -100,38 +89,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
       <score range="0-49">No source cited</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="direct_evidence">
-      <input>evidence_quality=95, answer_completeness=90, source_verification=95</input>
-      <calculation>(95*0.5)+(90*0.3)+(95*0.2) = 47.5+27+19 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Direct code evidence with verified sources yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>evidence_quality=75, answer_completeness=85, source_verification=80</input>
-      <calculation>(75*0.5)+(85*0.3)+(80*0.2) = 37.5+25.5+16 = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Strong inference without direct evidence results in 79, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>evidence_quality=80, answer_completeness=80, source_verification=80</input>
-      <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 40+24+16 = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average exactly 80, meets success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>evidence_quality=60, answer_completeness=55, source_verification=60</input>
-      <calculation>(60*0.5)+(55*0.3)+(60*0.2) = 30+16.5+12 = 58.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="speculation_only">
-      <input>evidence_quality=45, answer_completeness=55, source_verification=40</input>
-      <calculation>(45*0.5)+(55*0.3)+(40\*0.2) = 22.5+16.5+8 = 47</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Speculation without verified sources results in 47, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <agents>
@@ -140,7 +97,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
   <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
   <agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
-  <agent name="fact-check" subagent_type="fact-check" readonly="true">External source verification for claims referencing libraries, documentation, standards</agent>
 </agents>
 
 <execution_graph>
@@ -148,7 +104,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <agent>explore</agent>
     <agent>design</agent>
     <agent>performance</agent>
-    <agent>fact-check</agent>
   </parallel_group>
   <parallel_group id="synthesis" depends_on="investigation">
     <agent>quality-assurance</agent>
@@ -200,23 +155,13 @@ Provide accurate, evidence-based answers to project questions through fact-based
   </prohibited_behaviors>
 </enforcement>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor inconsistency in documentation or comments</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Unclear code pattern or ambiguous architecture</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Conflicting evidence about system behavior</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Potential security vulnerability or data integrity issue</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor inconsistency in documentation or comments</example>
+    <example severity="medium">Unclear code pattern or ambiguous architecture</example>
+    <example severity="high">Conflicting evidence about system behavior</example>
+    <example severity="critical">Potential security vulnerability or data integrity issue</example>
+  </examples>
 </error_escalation>
 
 <related_commands>

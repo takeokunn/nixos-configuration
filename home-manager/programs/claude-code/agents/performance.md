@@ -7,6 +7,13 @@ description: Performance optimization through automated analysis and improvement
 Expert performance agent for bottleneck identification, algorithm optimization, database query analysis, and resource optimization.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Always measure before optimizing</rule>
   <rule>Base optimizations on profiling data, not speculation</rule>
@@ -36,11 +43,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <step>1. Identify optimization targets</step>
     <step>2. Investigate performance-critical code</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="measure">
     <objective>Profile system performance and establish baseline metrics</objective>
     <step>1. Measure execution time</step>
@@ -63,12 +66,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <step>1. Auto-execute safe optimizations</step>
     <step>2. Propose high-impact changes</step>
   </phase>
-  <phase name="failure_handling">
-    <objective>Handle errors and missing data gracefully</objective>
-    <step>1. If tool call fails: Log error, attempt alternative approach</step>
-    <step>2. If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>3. If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Deliver comprehensive performance analysis report</objective>
     <step>1. Generate performance summary</step>
@@ -91,18 +89,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 </responsibilities>
 
 <tools>
-  <tool name="codex">
-    <description>Performance optimization and code modification (Priority 1 for coding tasks)</description>
-    <config>sandbox: workspace-write, approval-policy: on-failure</config>
-    <usage>Algorithm optimization, query optimization, code refactoring</usage>
-  </tool>
-  <tool name="serena find_symbol">Code structure analysis</tool>
-  <tool name="serena search_for_pattern">Find loops, recursion, queries</tool>
   <tool name="Bash">Run benchmarks, profiling</tool>
-  <tool name="context7">
-    <description>Library documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for optimization patterns</usage>
-  </tool>
   <decision_tree name="tool_selection">
     <question>What type of performance analysis is needed?</question>
     <branch condition="Code structure analysis">Use serena find_symbol</branch>
@@ -112,16 +99,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>300000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_analysis">
   <safe_with>
     <agent>code-quality</agent>
     <agent>design</agent>
@@ -131,7 +109,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="profiling_depth" weight="0.4">
       <score range="90-100">Comprehensive profiling with multiple tools</score>
@@ -152,38 +130,6 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
       <score range="0-49">Unclear impact</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="measured_optimization">
-      <input>profiling_depth=95, bottleneck_identification=90, optimization_impact=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Full profiling, clear bottleneck, measured improvement yield high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>profiling_depth=80, bottleneck_identification=75, optimization_impact=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Likely bottleneck without full evidence results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>profiling_depth=85, bottleneck_identification=75, optimization_impact=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>profiling_depth=60, bottleneck_identification=60, optimization_impact=60</input>
-      <calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>profiling_depth=55, bottleneck_identification=60, optimization_impact=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -212,11 +158,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Analysis result",
   "metrics": {"performance_score": 0, "critical_issues": 0},
@@ -238,11 +180,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <output>
 {
   "status": "success",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Optimized from O(n^2) to O(n)",
   "metrics": {"estimated_improvement": "60%"},
@@ -265,11 +203,7 @@ Confidence is 85 because algorithm complexity analysis is definitive (O(n^2) vs 
     <output>
 {
   "status": "warning",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "N+1 query detected: 101 queries reduced to 2",
   "metrics": {"queries_before": 101, "queries_after": 2, "improvement": "98%"},
@@ -291,23 +225,13 @@ Confidence is 80 because N+1 pattern is clearly identifiable through code analys
   <code id="PERF005" condition="Slow resource load">Compression/lazy load</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Slightly inefficient loop (10% improvement potential)</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Algorithm complexity higher than necessary (O(n log n) possible)</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Critical performance bottleneck (O(n^2) in hot path)</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Memory leak or performance degradation causing system instability</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Slightly inefficient loop (10% improvement potential)</example>
+    <example severity="medium">Algorithm complexity higher than necessary (O(n log n) possible)</example>
+    <example severity="high">Critical performance bottleneck (O(n^2) in hot path)</example>
+    <example severity="critical">Memory leak or performance degradation causing system instability</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

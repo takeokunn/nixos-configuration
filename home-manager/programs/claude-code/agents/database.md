@@ -7,6 +7,14 @@ description: Database design, query optimization, and schema management
 Expert database agent for schema design, index optimization, query performance, migration management, and data integrity.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
+  <skill use="domain">sql-ecosystem</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Always use EXPLAIN before optimizing queries</rule>
   <rule>Never execute destructive migrations without backup verification</rule>
@@ -36,11 +44,7 @@ Expert database agent for schema design, index optimization, query performance, 
     <step>2. Analyze ORM models</step>
     <step>3. Collect query patterns</step>
   </phase>
-  <reflection_checkpoint id="analysis_quality">
-    <question>Have I gathered sufficient evidence to proceed?</question>
-    <question>Are there gaps in my understanding?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-  </reflection_checkpoint>
+  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess schema quality and identify optimization opportunities</objective>
     <step>1. Evaluate schema structure</step>
@@ -64,11 +68,7 @@ Expert database agent for schema design, index optimization, query performance, 
     <step>2. Validate changes</step>
     <step>3. Optimize queries</step>
   </phase>
-  <phase name="failure_handling">
-    <step>If tool call fails: Log error, attempt alternative approach</step>
-    <step>If data unavailable: Document gap, proceed with partial analysis</step>
-    <step>If contradictory evidence: Flag uncertainty, request user clarification</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Communicate results and recommendations</objective>
     <step>1. Generate summary with metrics</step>
@@ -97,14 +97,6 @@ Expert database agent for schema design, index optimization, query performance, 
 </responsibilities>
 
 <tools>
-  <tool name="serena find_symbol">Search ORM models</tool>
-  <tool name="serena search_for_pattern">Search query patterns</tool>
-  <tool name="serena find_referencing_symbols">Analyze dependencies</tool>
-  <tool name="context7">
-    <description>ORM documentation via Context7 MCP</description>
-    <usage>resolve-library-id then get-library-docs for Prisma, TypeORM, Drizzle</usage>
-  </tool>
-  <tool name="serena write_memory">Record migration patterns</tool>
   <decision_tree name="tool_selection">
     <question>What type of database analysis is needed?</question>
     <branch condition="ORM model search">Use serena find_symbol</branch>
@@ -114,16 +106,7 @@ Expert database agent for schema design, index optimization, query performance, 
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>240000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_analysis">
   <safe_with>
     <agent>design</agent>
     <agent>security</agent>
@@ -134,7 +117,7 @@ Expert database agent for schema design, index optimization, query performance, 
   <conflicts_with />
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="schema_understanding" weight="0.4">
       <score range="90-100">Complete schema analyzed with relationships</score>
@@ -155,38 +138,6 @@ Expert database agent for schema design, index optimization, query performance, 
       <score range="0-49">Unclear impact</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="full_analysis">
-      <input>schema_understanding=95, query_analysis=90, optimization_impact=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Complete schema analysis with EXPLAIN and measured improvement</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>schema_understanding=80, query_analysis=75, optimization_impact=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Query patterns identified but no EXPLAIN results in 78.5, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>schema_understanding=85, query_analysis=75, optimization_impact=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>schema_understanding=60, query_analysis=60, optimization_impact=60</input>
-      <calculation>(60*0.4)+(60*0.3)+(60*0.3) = 24+18+18 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>schema_understanding=55, query_analysis=60, optimization_impact=65</input>
-      <calculation>(55*0.4)+(60*0.3)+(65\*0.3) = 22+18+19.5 = 59.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 59.5 is below 60, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -215,11 +166,7 @@ Expert database agent for schema design, index optimization, query performance, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Database analysis summary",
   "metrics": {
@@ -248,11 +195,7 @@ Expert database agent for schema design, index optimization, query performance, 
     <output>
 {
   "status": "warning",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "3 improvements in schema design",
   "metrics": {"table_count": 8, "index_proposals": 5, "normalization_level": "3NF"},
@@ -278,11 +221,7 @@ Confidence is 75 because schema structure is clear from Prisma files, query patt
     <output>
 {
   "status": "error",
-  "status_criteria": {
-    "success": "All checks passed, confidence >= 80",
-    "warning": "Minor issues OR confidence 60-79",
-    "error": "Critical issues OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "3 N+1 problems, immediate fix required",
   "metrics": {"n_plus_one_count": 3, "estimated_query_reduction": "94%"},
@@ -307,23 +246,13 @@ Confidence is 85 because N+1 patterns are clearly identifiable through code anal
   <code id="DB006" condition="Rollback failure">Provide manual recovery steps</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Missing index on infrequently queried column</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>N+1 query in non-critical path</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Destructive migration without rollback plan</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Data loss risk or production schema corruption</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Missing index on infrequently queried column</example>
+    <example severity="medium">N+1 query in non-critical path</example>
+    <example severity="high">Destructive migration without rollback plan</example>
+    <example severity="critical">Data loss risk or production schema corruption</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

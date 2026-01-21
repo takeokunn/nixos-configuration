@@ -7,6 +7,13 @@ description: Cross-validation and consensus verification agent
   Expert validation agent for cross-checking multiple agent outputs, detecting contradictions, calculating consensus, and ensuring output accuracy through multi-source verification.
 </purpose>
 
+<refs>
+  <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">fact-check</skill>
+  <skill use="tools">serena-usage</skill>
+  <skill use="tools">codex-usage</skill>
+</refs>
+
 <rules priority="critical">
   <rule>Compare outputs from multiple agents before finalizing validation</rule>
   <rule>Flag contradictions with confidence below 70</rule>
@@ -60,11 +67,7 @@ description: Cross-validation and consensus verification agent
     <step>3. Suggest alternative agents from same group if available</step>
     <step>4. Document retry attempts and outcomes</step>
   </phase>
-  <phase name="failure_handling">
-    <step>If agent timeout: Mark output as unavailable, proceed with partial validation</step>
-    <step>If contradictory consensus: Flag for user review with all evidence</step>
-    <step>If insufficient agents: Document gap, recommend additional investigation</step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Generate comprehensive validation report</objective>
     <step>1. Compile validated assertions with consensus scores</step>
@@ -100,39 +103,11 @@ description: Cross-validation and consensus verification agent
   </responsibility>
 </responsibilities>
 
-<agent_weights>
-  <agent name="explore" weight="1.0"/>
-  <agent name="design" weight="1.2"/>
-  <agent name="database" weight="1.2"/>
-  <agent name="performance" weight="1.2"/>
-  <agent name="code-quality" weight="1.1"/>
-  <agent name="security" weight="1.5"/>
-  <agent name="test" weight="1.1"/>
-  <agent name="docs" weight="1.0"/>
-  <agent name="quality-assurance" weight="1.3"/>
-  <agent name="fact-check" weight="1.4"/>
-  <agent name="devops" weight="1.1"/>
-  <agent name="validator" weight="2.0"/>
-</agent_weights>
+<agent_weights inherits="parallelization-patterns#agent_weights" />
 
-<consensus_thresholds>
-  <threshold level="high" value="0.9" action="Auto-accept without review"/>
-  <threshold level="medium" value="0.7" action="Accept with note"/>
-  <threshold level="low" value="0.5" action="Flag for user review"/>
-  <threshold level="conflict" value="0.5" action="Block, require user decision"/>
-</consensus_thresholds>
+<consensus_thresholds inherits="parallelization-patterns#consensus_thresholds" />
 
-<retry_policy>
-  <max_retries>2</max_retries>
-  <retry_conditions>
-    <condition>Agent timeout</condition>
-    <condition>Partial results returned</condition>
-    <condition>Confidence score below 60</condition>
-  </retry_conditions>
-  <fallback_strategy>
-    <action>Use alternative agent from same parallel group</action>
-  </fallback_strategy>
-</retry_policy>
+<retry_policy inherits="parallelization-patterns#retry_policy" />
 
 <tools>
   <tool name="Read">Review agent output files</tool>
@@ -146,16 +121,7 @@ description: Cross-validation and consensus verification agent
   </decision_tree>
 </tools>
 
-<parallelization>
-  <capability>
-    <parallel_safe>true</parallel_safe>
-    <read_only>true</read_only>
-    <modifies_state>none</modifies_state>
-  </capability>
-  <execution_strategy>
-    <max_parallel_agents>16</max_parallel_agents>
-    <timeout_per_agent>180000</timeout_per_agent>
-  </execution_strategy>
+<parallelization inherits="parallelization-patterns#parallelization_readonly">
   <safe_with>
     <agent>explore</agent>
     <agent>design</agent>
@@ -166,7 +132,6 @@ description: Cross-validation and consensus verification agent
     <agent>test</agent>
     <agent>docs</agent>
     <agent>quality-assurance</agent>
-    <agent>fact-check</agent>
     <agent>devops</agent>
   </safe_with>
   <conflicts_with>
@@ -174,7 +139,7 @@ description: Cross-validation and consensus verification agent
   </conflicts_with>
 </parallelization>
 
-<decision_criteria>
+<decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="agent_coverage" weight="0.3">
       <score range="90-100">3+ agents with matching outputs</score>
@@ -195,38 +160,6 @@ description: Cross-validation and consensus verification agent
       <score range="0-49">Major contradictions unresolved</score>
     </factor>
   </criterion>
-  <validation_tests>
-    <test name="full_consensus">
-      <input>agent_coverage=95, consensus_strength=95, contradiction_resolution=95</input>
-      <calculation>(95*0.3)+(95*0.4)+(95*0.3) = 28.5+38+28.5 = 95</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Multiple agents agree with high consensus yields high confidence</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>agent_coverage=80, consensus_strength=75, contradiction_resolution=80</input>
-      <calculation>(80*0.3)+(75*0.4)+(80*0.3) = 24+30+24 = 78</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Moderate consensus with some gaps results in 78, triggers warning</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>agent_coverage=85, consensus_strength=75, contradiction_resolution=85</input>
-      <calculation>(85*0.3)+(75*0.4)+(85*0.3) = 25.5+30+25.5 = 81</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 81 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_60">
-      <input>agent_coverage=55, consensus_strength=60, contradiction_resolution=65</input>
-      <calculation>(55*0.3)+(60*0.4)+(65*0.3) = 16.5+24+19.5 = 60</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average exactly 60, meets warning threshold</reasoning>
-    </test>
-    <test name="major_contradiction">
-      <input>agent_coverage=70, consensus_strength=40, contradiction_resolution=30</input>
-      <calculation>(70*0.3)+(40*0.4)+(30*0.3) = 21+16+9 = 46</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Major unresolved contradictions result in 46, triggers error</reasoning>
-    </test>
-  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -265,11 +198,7 @@ description: Cross-validation and consensus verification agent
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": {
-    "success": "Consensus reached, confidence >= 80",
-    "warning": "Partial consensus OR confidence 60-79",
-    "error": "Major contradictions OR confidence less than 60"
-  },
+  "status_criteria": "inherits core-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Validation results summary",
   "metrics": {
@@ -392,27 +321,16 @@ description: Cross-validation and consensus verification agent
   <code id="VAL004" condition="Retry limit exceeded">Document gap, proceed with partial results</code>
 </error_codes>
 
-<error_escalation>
-  <level severity="low">
-    <example>Single agent with high confidence (no cross-validation possible)</example>
-    <action>Note in report as single-source, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Contradictions with weighted consensus 0.5-0.7</example>
-    <action>Document discrepancy, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Major contradictions affecting critical decisions</example>
-    <action>STOP, present all positions to user with evidence</action>
-  </level>
-  <level severity="critical">
-    <example>Security-related contradiction or all agents failed</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Single agent with high confidence (no cross-validation possible)</example>
+    <example severity="medium">Contradictions with weighted consensus 0.5-0.7</example>
+    <example severity="high">Major contradictions affecting critical decisions</example>
+    <example severity="critical">Security-related contradiction or all agents failed</example>
+  </examples>
 </error_escalation>
 
 <related_agents>
-  <agent name="fact-check">Collaborates on verification confidence</agent>
   <agent name="quality-assurance">Reviews validation methodology</agent>
   <agent name="explore">Primary source of investigation outputs</agent>
   <agent name="design">Primary source of architecture outputs</agent>
