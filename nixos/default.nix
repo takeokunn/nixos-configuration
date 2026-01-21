@@ -48,7 +48,7 @@ let
 
   # Services
   power = import ./config/services/power.nix;
-  misc = import ./config/services/misc.nix { inherit pkgs; };
+  misc = import ./config/services/misc.nix;
 
   # Virtualization
   virtualisation = import ./config/virtualisation.nix;

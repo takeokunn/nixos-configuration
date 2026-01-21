@@ -1,7 +1,6 @@
 { pkgs, emacsPkg }:
 let
   emacs = import ./emacs { inherit pkgs emacsPkg; };
-  ollama = import ./ollama { inherit pkgs; };
   gpg-agent = import ./gpg-agent { inherit pkgs; };
 
   # Modern services (niri ecosystem)
@@ -21,7 +20,6 @@ let
 in
 [
   emacs
-  ollama
   gpg-agent
 
   # Modern services (niri ecosystem)

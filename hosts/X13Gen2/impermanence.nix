@@ -53,7 +53,6 @@
       "/var/lib/docker"
       "/var/lib/libvirt"
       "/var/lib/tailscale"
-      "/var/lib/ollama"
     ];
     files = [
       "/etc/machine-id"
