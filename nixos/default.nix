@@ -49,6 +49,7 @@ let
   # Services
   power = import ./config/services/power.nix;
   misc = import ./config/services/misc.nix;
+  swayosd = import ./config/services/swayosd.nix { inherit pkgs; };
 
   # Virtualization
   virtualisation = import ./config/virtualisation.nix;
@@ -91,6 +92,8 @@ in
     # Services
     power
     misc
+    swayosd
+
     # Virtualization
     virtualisation
     containers

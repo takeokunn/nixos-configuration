@@ -21,8 +21,8 @@
           "memory"
           "disk"
           "custom/weather"
-          "mpris"
           "tray"
+          "backlight"
           "wireplumber"
           "network"
           "battery"
@@ -87,7 +87,18 @@
           format-ethernet = "󰈀";
           format-disconnected = "󰖪";
           tooltip-format = "{ifname}: {ipaddr}/{cidr}";
-          on-click = "kitty -e nmtui";
+          on-click = "networkmanager_dmenu";
+        };
+
+        backlight = {
+          format = "{icon} {percent}%";
+          format-icons = [ "󰃞" "󰃟" "󰃠" ];
+          tooltip-format = "Brightness: {percent}%\n\nScroll: Adjust brightness\nClick: Brightness 100%\nRight-click: Brightness 50%\nMiddle-click: Brightness 10%";
+          on-scroll-up = "swayosd-client --brightness raise";
+          on-scroll-down = "swayosd-client --brightness lower";
+          on-click = "swayosd-client --brightness +100";
+          on-click-right = "swayosd-client --brightness 50";
+          on-click-middle = "swayosd-client --brightness 10";
         };
 
         wireplumber = {
@@ -153,22 +164,6 @@
           interval = 1800;
           format = "{}";
           tooltip = false;
-        };
-
-        mpris = {
-          format = "{player_icon} {artist} - {title}";
-          format-paused = "{status_icon} {artist} - {title}";
-          player-icons = {
-            default = "";
-            spotify = "";
-            firefox = "";
-            mpv = "🎵";
-          };
-          status-icons = {
-            paused = "⏸";
-            stopped = "⏹";
-          };
-          max-length = 40;
         };
       };
     };
@@ -269,19 +264,6 @@
         color: #f1fa8c;
       }
 
-      #mpris {
-        padding: 0 12px;
-        color: #ff79c6;
-      }
-
-      #mpris.playing {
-        color: #50fa7b;
-      }
-
-      #mpris.paused {
-        color: #6272a4;
-      }
-
       #battery {
         padding: 0 12px;
         color: #50fa7b;
@@ -306,6 +288,11 @@
 
       #network.disconnected {
         color: #ff5555;
+      }
+
+      #backlight {
+        padding: 0 12px;
+        color: #f1fa8c;
       }
 
       #wireplumber {
