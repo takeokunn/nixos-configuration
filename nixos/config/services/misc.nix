@@ -11,6 +11,5 @@
     };
 
     offlineimap.enable = true;
-    openssh.enable = true;
   };
 }

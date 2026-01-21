@@ -7,37 +7,25 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
 
 - NixOS installation USB
 - LUKS passphrase (strong, memorable)
-- External storage for backups
 
-** Step 1: Backup (if migrating from existing system)
-#+begin_src shell
-  # Backup /persist directory
-  sudo tar -cvzf /tmp/persist-backup.tar.gz -C / persist
-
-  # Backup home directory
-  tar -cvzf /tmp/home-backup.tar.gz -C /home take
-
-  # Copy to external storage
-  cp /tmp/*.tar.gz /mnt/external/
-#+end_src
-** Step 2: Boot NixOS Installer USB
+** Step 1: Boot NixOS Installer USB
 #+begin_src shell
   # Set up network
   sudo systemctl start NetworkManager
   nmtui  # Connect to WiFi if needed
 #+end_src
-** Step 3: Clone Configuration
+** Step 2: Clone Configuration
 #+begin_src shell
   nix-shell -p git
-  git clone https://github.com/takeokunn/nixos-configuration /tmp/nixos-config
-  cd /tmp/nixos-config
+  git clone https://github.com/takeokunn/nixos-configuration
+  cd nixos-configuration
 #+end_src
-** Step 4: Create LUKS Password File
+** Step 3: Create LUKS Password File
 #+begin_src shell
   echo "YOUR_STRONG_PASSPHRASE" > /tmp/luks-password
   chmod 600 /tmp/luks-password
 #+end_src
-** Step 5: Run Disko (Partitioning & Formatting)
+** Step 4: Run Disko (Partitioning & Formatting)
 
 *WARNING*: This will erase all data on the target disk.
 
@@ -45,26 +33,14 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
   sudo nix --experimental-features "nix-command flakes" run \
     github:nix-community/disko/latest -- \
     --mode destroy,format,mount \
-    /tmp/nixos-config/hosts/X13Gen2/disko-config.nix
+    ./hosts/X13Gen2/disko-config.nix
 #+end_src
-** Step 6: Install NixOS
+** Step 5: Install NixOS
 #+begin_src shell
   ulimit -n 65536
-  sudo nixos-install --flake /tmp/nixos-config#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
+  sudo nixos-install --flake .#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
 #+end_src
-** Step 7: Restore Backups (if migrating)
-#+begin_src shell
-  # Mount backup drive
-  sudo mount /dev/sdX1 /mnt/external
-
-  # Restore persist data
-  sudo tar -xvzf /mnt/external/persist-backup.tar.gz -C /mnt
-
-  # Restore home data to persist location
-  sudo mkdir -p /mnt/persist/home/take
-  sudo tar -xvzf /mnt/external/home-backup.tar.gz -C /mnt/persist/home/
-#+end_src
-** Step 8: Reboot
+** Step 6: Reboot
 #+begin_src shell
   sudo reboot
 #+end_src
