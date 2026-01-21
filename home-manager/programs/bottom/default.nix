@@ -26,7 +26,7 @@
           ];
         }
         {
-          ratio = 3;
+          ratio = 2;
           child = [
             {
               default = true;

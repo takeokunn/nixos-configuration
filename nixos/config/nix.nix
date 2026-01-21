@@ -3,7 +3,7 @@
   nix = {
     settings = {
       cores = 2;
-      max-jobs = 4;
+      max-jobs = 6;
       sandbox = false;
       substituters = [
         "https://cache.nixos.org"

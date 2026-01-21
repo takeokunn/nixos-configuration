@@ -69,6 +69,13 @@
   (setq user-full-name "takeokunn")
   (setq user-mail-address "bararararatty@gmail.com")
 #+end_src
+** shell-file-name
+:PROPERTIES:
+:CUSTOM_ID: shell-file-name
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (setq shell-file-name (or (executable-find "bash") "/bin/sh"))
+#+end_src
 ** profile
 :PROPERTIES:
 :CUSTOM_ID: profile
@@ -4608,6 +4615,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
 
   (with-eval-after-load 'exec-path-from-shell
+    (setopt exec-path-from-shell-arguments '("-l"))
     (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH")))
 #+END_SRC
 ** Utility

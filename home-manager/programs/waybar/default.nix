@@ -8,8 +8,8 @@
       mainBar = {
         layer = "top";
         position = "top";
-        height = 30;
-        spacing = 4;
+        height = 40;
+        spacing = 8;
 
         modules-left = [
           "niri/workspaces"
@@ -17,6 +17,12 @@
         ];
         modules-center = [ "clock" ];
         modules-right = [
+          "cpu"
+          "memory"
+          "disk"
+          "temperature"
+          "custom/weather"
+          "mpris"
           "tray"
           "wireplumber"
           "network"
@@ -99,22 +105,103 @@
         tray = {
           spacing = 10;
         };
+
+        cpu = {
+          interval = 5;
+          format = " {usage}%";
+          format-icons = [
+            "▁"
+            "▂"
+            "▃"
+            "▄"
+            "▅"
+            "▆"
+            "▇"
+            "█"
+          ];
+          states = {
+            warning = 70;
+            critical = 90;
+          };
+          tooltip-format = "CPU: {usage}%\nLoad: {load}";
+        };
+
+        memory = {
+          interval = 10;
+          format = " {used:0.1f}G/{total:0.1f}G";
+          format-alt = " {percentage}%";
+          states = {
+            warning = 70;
+            critical = 90;
+          };
+          tooltip-format = "RAM: {used:0.1f}G/{total:0.1f}G ({percentage}%)\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G ({swapPercentage}%)";
+        };
+
+        disk = {
+          path = "/";
+          interval = 30;
+          format = " {percentage_used}%";
+          format-alt = " {free}";
+          states = {
+            warning = 75;
+            critical = 90;
+          };
+          tooltip-format = "Disk: {used} / {total} ({percentage_used}%)";
+        };
+
+        temperature = {
+          hwmon-path = [
+            "/sys/class/hwmon/hwmon2/temp1_input"
+            "/sys/class/hwmon/hwmon3/temp1_input"
+            "/sys/class/hwmon/hwmon1/temp1_input"
+          ];
+          critical-threshold = 80;
+          interval = 5;
+          format = " {temperatureC}°C";
+          format-critical = " {temperatureC}°C";
+          tooltip-format = "Temperature: {temperatureC}°C";
+        };
+
+        "custom/weather" = {
+          exec = "curl -s 'https://wttr.in/Tokyo?format=%c+%t' 2>/dev/null || echo '--'";
+          interval = 1800;
+          format = "{}";
+          tooltip = false;
+        };
+
+        mpris = {
+          format = "{player_icon} {artist} - {title}";
+          format-paused = "{status_icon} {artist} - {title}";
+          player-icons = {
+            default = "▶";
+            spotify = "";
+            firefox = "";
+            mpv = "🎵";
+          };
+          status-icons = {
+            paused = "⏸";
+            stopped = "⏹";
+          };
+          max-length = 40;
+        };
       };
     };
 
     style = ''
       * {
         font-family: "HackGen Console NF", "Font Awesome 6 Free";
-        font-size: 15px;
+        font-size: 17px;
         min-height: 0;
+        transition: all 0.2s ease;
       }
 
       window#waybar {
-        background-color: rgba(40, 42, 54, 0.85);
+        background-color: rgba(40, 42, 54, 0.75);
         color: #f8f8f2;
-        border-radius: 12px;
-        margin: 8px 8px 0 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 16px;
+        border: 1px solid rgba(248, 248, 242, 0.1);
+        margin: 8px 12px 0 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
       }
 
       #workspaces button {
@@ -122,34 +209,104 @@
         color: #6272a4;
         background-color: transparent;
         border: none;
-        border-radius: 0;
+        border-radius: 8px;
+        margin: 4px 2px;
       }
 
       #workspaces button:hover {
-        background-color: #44475a;
+        background-color: rgba(68, 71, 90, 0.9);
         color: #f8f8f2;
       }
 
       #workspaces button.active {
         color: #bd93f9;
+        background-color: rgba(189, 147, 249, 0.2);
       }
 
       #workspaces button.urgent {
         color: #ff5555;
+        background-color: rgba(255, 85, 85, 0.2);
       }
 
       #window {
-        padding: 0 10px;
+        padding: 0 12px;
         color: #f8f8f2;
       }
 
       #clock {
-        padding: 0 10px;
+        padding: 0 12px;
+        color: #f8f8f2;
+        font-weight: bold;
+      }
+
+      #cpu {
+        padding: 0 12px;
+        color: #8be9fd;
+      }
+
+      #cpu.warning {
+        color: #ffb86c;
+      }
+
+      #cpu.critical {
+        color: #ff5555;
+      }
+
+      #memory {
+        padding: 0 12px;
+        color: #bd93f9;
+      }
+
+      #memory.warning {
+        color: #ffb86c;
+      }
+
+      #memory.critical {
+        color: #ff5555;
+      }
+
+      #disk {
+        padding: 0 12px;
+        color: #50fa7b;
+      }
+
+      #disk.warning {
+        color: #ffb86c;
+      }
+
+      #disk.critical {
+        color: #ff5555;
+      }
+
+      #temperature {
+        padding: 0 12px;
         color: #f8f8f2;
       }
 
+      #temperature.critical {
+        color: #ff5555;
+      }
+
+      #custom-weather {
+        padding: 0 12px;
+        color: #f1fa8c;
+      }
+
+      #mpris {
+        padding: 0 12px;
+        color: #ff79c6;
+      }
+
+      #mpris.playing {
+        color: #50fa7b;
+      }
+
+      #mpris.paused {
+        color: #6272a4;
+      }
+
       #battery {
-        padding: 0 10px;
+        padding: 0 12px;
         color: #50fa7b;
       }
 
@@ -166,7 +323,7 @@
       }
 
       #network {
-        padding: 0 10px;
+        padding: 0 12px;
         color: #8be9fd;
       }
 
@@ -175,7 +332,7 @@
       }
 
       #wireplumber {
-        padding: 0 10px;
+        padding: 0 12px;
         color: #f1fa8c;
       }
 
@@ -184,7 +341,7 @@
       }
 
       #tray {
-        padding: 0 10px;
+        padding: 0 12px;
       }
 
       #tray > .passive {
@@ -197,9 +354,10 @@
       }
 
       tooltip {
-        background-color: #282a36;
+        background-color: rgba(40, 42, 54, 0.95);
         border: 1px solid #bd93f9;
-        border-radius: 8px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       }
 
       tooltip label {
