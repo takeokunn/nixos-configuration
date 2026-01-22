@@ -18,7 +18,7 @@ let
     if [ -z "$TARGET_ID" ]; then
       # No window exists - spawn new TUI Emacs in Kitty
       # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
-      "$KITTY" --hold=no -o term=xterm-256color -T "$APP_TITLE" -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
+      "$KITTY" -o close_on_child_death=yes -o macos_quit_when_last_window_closed=yes -o term=xterm-256color -T "$APP_TITLE" -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
       sleep 0.3
       # Set floating layout for the new window
       "$AEROSPACE" layout floating
