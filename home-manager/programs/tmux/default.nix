@@ -46,6 +46,9 @@
       # OSC 52 clipboard integration for proper UTF-8/Japanese text handling
       set -s set-clipboard on
 
+      # Disable focus events to prevent OI escape sequences (overrides sensible plugin)
+      set-option -g focus-events off
+
       bind-key C-g display-panes
 
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"

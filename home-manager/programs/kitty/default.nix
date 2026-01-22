@@ -17,6 +17,9 @@
       clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
       hide_window_decorations = true;
 
+      # macOS: Option key as Meta
+      macos_option_as_alt = "both";
+
       # Wayland settings (Linux only)
       linux_display_server = "wayland";
       wayland_titlebar_color = "background";
