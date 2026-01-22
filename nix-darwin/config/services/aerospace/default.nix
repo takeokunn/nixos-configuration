@@ -1,3 +1,51 @@
+{ pkgs, ... }:
+let
+  # Emacs Scratchpad Toggle Script for macOS
+  # Similar to NixOS niri version, but uses aerospace commands
+  emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
+    APP_TITLE=FloatingEmacs
+    AEROSPACE="/run/current-system/sw/bin/aerospace"
+    JQ="${pkgs.jq}/bin/jq"
+    KITTY="${pkgs.kitty}/bin/kitty"
+    EMACSCLIENT="${pkgs.emacs}/bin/emacsclient"
+    SOCKET="/tmp/emacs$(id -u)/server"
+
+    # Get target window ID by title
+    TARGET_ID=$("$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
+      .[] | select(.["window-title"] | contains($title)) | .["window-id"]
+    ' | head -n1)
+
+    if [ -z "$TARGET_ID" ]; then
+      # No window exists - spawn new TUI Emacs in Kitty
+      # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
+      "$KITTY" -o term=xterm-256color -T "$APP_TITLE" -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
+      sleep 0.3
+      # Set floating layout for the new window
+      "$AEROSPACE" layout floating
+      # Center window at 50% screen size
+      SCREEN_INFO=$(system_profiler SPDisplaysDataType | ${pkgs.perl}/bin/perl -ne 'if (/Resolution: (\d+) x (\d+)/) { print "$1 $2"; exit; }')
+      SCREEN_W=$(echo $SCREEN_INFO | cut -d' ' -f1)
+      SCREEN_H=$(echo $SCREEN_INFO | cut -d' ' -f2)
+      WIN_W=$((SCREEN_W / 2))
+      WIN_H=$((SCREEN_H / 2))
+      X=$(((SCREEN_W - WIN_W) / 2))
+      Y=$(((SCREEN_H - WIN_H) / 2))
+      osascript -e "tell application \"System Events\" to tell process \"kitty\" to set position of front window to {$X, $Y}"
+      osascript -e "tell application \"System Events\" to tell process \"kitty\" to set size of front window to {$WIN_W, $WIN_H}"
+    else
+      # Get currently focused window ID
+      FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
+
+      if [ "$FOCUSED_ID" = "$TARGET_ID" ]; then
+        # Already focused - switch to previous window
+        "$AEROSPACE" focus-back-and-forth
+      else
+        # Not focused - bring to focus
+        "$AEROSPACE" focus --window-id "$TARGET_ID"
+      fi
+    fi
+  '';
+in
 {
   services.aerospace = {
     enable = true;
@@ -89,6 +137,9 @@
             ];
 
             alt-r = "mode resize";
+
+            # Emacs Scratchpad Toggle (like NixOS Mod+I)
+            alt-i = "exec-and-forget ${emacsScratchpadToggle}";
           };
         };
 
@@ -118,6 +169,12 @@
       };
 
       on-window-detected = [
+        # FloatingEmacs scratchpad (kitty with specific title)
+        {
+          "if".app-id = "net.kovidgoyal.kitty";
+          "if".window-title-regex-substring = "FloatingEmacs";
+          run = [ "layout floating" ];
+        }
         {
           "if".app-id = "com.google.Chrome";
           run = [
