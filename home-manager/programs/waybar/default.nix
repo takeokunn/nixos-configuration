@@ -92,7 +92,11 @@
 
         backlight = {
           format = "{icon} {percent}%";
-          format-icons = [ "󰃞" "󰃟" "󰃠" ];
+          format-icons = [
+            "󰃞"
+            "󰃟"
+            "󰃠"
+          ];
           tooltip-format = "Brightness: {percent}%\n\nScroll: Adjust brightness\nClick: Brightness 100%\nRight-click: Brightness 50%\nMiddle-click: Brightness 10%";
           on-scroll-up = "swayosd-client --brightness raise";
           on-scroll-down = "swayosd-client --brightness lower";
