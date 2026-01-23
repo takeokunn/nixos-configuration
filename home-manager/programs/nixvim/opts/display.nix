@@ -5,6 +5,9 @@
 # ════════════════════════════════════════════════════════════════════════════════
 
 {
+  # Explicitly set dark background to prevent OSC 11 terminal queries
+  background = "dark";
+
   # Line numbers: disabled (using relative context from mini.nvim instead)
   number = false;
   relativenumber = false;
