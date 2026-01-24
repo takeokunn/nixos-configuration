@@ -8,6 +8,11 @@
       "x86_64-linux"
     ];
     config = {
+      virtualisation = {
+        cores = 8;
+        memorySize = lib.mkForce (1024 * 64);
+        diskSize = lib.mkForce (1024 * 500);
+      };
       nix.settings = {
         experimental-features = [
           "nix-command"
