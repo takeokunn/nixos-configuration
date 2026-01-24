@@ -12,7 +12,6 @@ Expert documentation agent for README generation, API specification management, 
   <skill use="domain">technical-documentation</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">

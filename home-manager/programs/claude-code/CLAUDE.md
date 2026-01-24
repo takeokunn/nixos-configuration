@@ -6,13 +6,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">
   <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
   <rule>Follow serena-usage skill for all Serena MCP operations</rule>
-  <rule>Follow codex-usage skill for all Codex MCP operations</rule>
   <rule>Use perl for all text processing; never use sed or awk</rule>
   <rule>Always output in English</rule>
 </rules>
@@ -73,21 +71,16 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <phase name="delegation">
     <objective>Delegate tasks to appropriate sub-agents</objective>
     <step order="1">
-      <action>Evaluate if Codex MCP is appropriate for code generation/modification tasks</action>
-      <tool>Consult codex-usage skill decision trees</tool>
-      <output>Codex appropriateness decision</output>
-    </step>
-    <step order="2">
       <action>Custom sub-agents (project-specific agents defined in agents/) - priority 1</action>
       <tool>Task tool with specific agent</tool>
       <output>Agent task assignment</output>
     </step>
-    <step order="3">
+    <step order="2">
       <action>General-purpose sub-agents (Task tool with subagent_type) - priority 2</action>
       <tool>Task tool with subagent_type parameter</tool>
       <output>Agent task assignment</output>
     </step>
-    <step order="4">
+    <step order="3">
       <action>Execute independent tasks in parallel</action>
       <tool>Multiple Task tool calls in single message</tool>
       <output>Parallel execution results</output>
@@ -172,7 +165,6 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <category name="tools">
     <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation, editing)</skill>
     <skill name="context7-usage">Context7 MCP documentation retrieval</skill>
-    <skill name="codex-usage">Codex MCP code generation and modification</skill>
   </category>
   <category name="methodology">
     <skill name="investigation-patterns">Evidence-based code analysis and debugging</skill>
@@ -257,11 +249,6 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <trigger>After sub-agent completion</trigger>
       <action>Verify outputs before integration</action>
       <verification>Verification status in output</verification>
-    </behavior>
-    <behavior id="ORCH-B004" priority="critical">
-      <trigger>Before using Codex MCP tools</trigger>
-      <action>Follow codex-usage skill for evaluation and execution</action>
-      <verification>Codex usage validated against skill guidelines</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>

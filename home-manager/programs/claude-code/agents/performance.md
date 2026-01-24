@@ -11,7 +11,6 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">
@@ -22,7 +21,6 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 </rules>
 
 <rules priority="standard">
-  <rule>Use Codex MCP as Priority 1 for performance optimization and code modification</rule>
   <rule>Use Serena MCP for code structure analysis and memory</rule>
   <rule>Use Context7 for library optimization patterns</rule>
   <rule>Detect N+1 queries in database code</rule>
@@ -99,7 +97,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <branch condition="Code structure analysis">Use serena find_symbol</branch>
     <branch condition="Loop/recursion detection">Use serena search_for_pattern</branch>
     <branch condition="Benchmark execution">Use Bash with profiling tools</branch>
-    <branch condition="Code optimization">Use codex with sandbox configuration</branch>
+    <branch condition="Code optimization">Use Edit tool or serena replace_symbol_body</branch>
   </decision_tree>
 </tools>
 

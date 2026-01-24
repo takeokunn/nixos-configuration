@@ -22,8 +22,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
-  <rule>Prefer basic tools (Read/Edit/Write) over Codex MCP when sufficient</rule>
-  <rule>Use Codex MCP only for code generation/modification</rule>
   <rule>Check Serena memories before implementation</rule>
 </rules>
 
@@ -123,22 +121,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <requirement>Memory check: `list_memories` for patterns</requirement>
 </delegation>
 
-<codex_usage>
-  <allowed>Code generation (new files/functions), code modification (editing/refactoring)</allowed>
-  <prohibited>
-    <task alternative="Explore agent, Serena MCP">Research/analysis</task>
-    <task alternative="quality agent">Quality verification</task>
-    <task alternative="security agent">Security verification</task>
-    <task alternative="test agent">Test creation</task>
-    <task alternative="docs agent">Documentation</task>
-    <task alternative="review agent">Code review</task>
-  </prohibited>
-  <rule>Prefer basic tools when sufficient</rule>
-  <rule>One clear, small task per call</rule>
-  <rule>Separate phases: research → design → implementation</rule>
-  <rule>No multi-file edits in single call</rule>
-</codex_usage>
-
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 
 <decision_criteria inherits="core-patterns#decision_criteria">
@@ -215,5 +197,4 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <must>Verify outputs before integration</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Unnecessary comments about past implementations</avoid>
-  <avoid>Multi-file edits in single Codex call</avoid>
 </constraints>

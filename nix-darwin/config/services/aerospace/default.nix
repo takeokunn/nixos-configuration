@@ -2,6 +2,10 @@
 let
   # Emacs Scratchpad Toggle Script for macOS
   # Similar to NixOS niri version, but uses aerospace commands
+  # Window size for floating Emacs scratchpad
+  windowWidth = 600;
+  windowHeight = 400;
+
   emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
     APP_TITLE=FloatingEmacs
     AEROSPACE="/run/current-system/sw/bin/aerospace"
@@ -18,20 +22,40 @@ let
     if [ -z "$TARGET_ID" ]; then
       # No window exists - spawn new TUI Emacs in Kitty
       # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
-      "$KITTY" -o close_on_child_death=yes -o macos_quit_when_last_window_closed=yes -o term=xterm-256color -T "$APP_TITLE" -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
-      sleep 0.3
-      # Set floating layout for the new window
-      "$AEROSPACE" layout floating
-      # Center window at 50% screen size
-      SCREEN_INFO=$(system_profiler SPDisplaysDataType | ${pkgs.perl}/bin/perl -ne 'if (/Resolution: (\d+) x (\d+)/) { print "$1 $2"; exit; }')
-      SCREEN_W=$(echo $SCREEN_INFO | cut -d' ' -f1)
-      SCREEN_H=$(echo $SCREEN_INFO | cut -d' ' -f2)
-      WIN_W=$((SCREEN_W / 2))
-      WIN_H=$((SCREEN_H / 2))
-      X=$(((SCREEN_W - WIN_W) / 2))
-      Y=$(((SCREEN_H - WIN_H) / 2))
-      osascript -e "tell application \"System Events\" to tell process \"kitty\" to set position of front window to {$X, $Y}"
-      osascript -e "tell application \"System Events\" to tell process \"kitty\" to set size of front window to {$WIN_W, $WIN_H}"
+      "$KITTY" \
+        -o close_on_child_death=yes \
+        -o macos_quit_when_last_window_closed=yes \
+        -o term=xterm-256color \
+        -o remember_window_size=no \
+        -o initial_window_width=${toString windowWidth} \
+        -o initial_window_height=${toString windowHeight} \
+        -T "$APP_TITLE" \
+        -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
+
+      # Wait for window and center it
+      sleep 0.5
+      osascript <<EOF
+        tell application "Finder"
+          set screenBounds to bounds of window of desktop
+          set screenW to item 3 of screenBounds
+          set screenH to item 4 of screenBounds
+        end tell
+        set winW to ${toString windowWidth}
+        set winH to ${toString windowHeight}
+        set posX to (screenW - winW) / 2
+        set posY to (screenH - winH) / 2
+        tell application "System Events"
+          tell process "kitty"
+            repeat with w in windows
+              if name of w contains "FloatingEmacs" then
+                set position of w to {posX, posY}
+                set size of w to {winW, winH}
+                exit repeat
+              end if
+            end repeat
+          end tell
+        end tell
+EOF
     else
       # Get currently focused window ID
       FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
@@ -184,10 +208,6 @@ in
         }
         {
           "if".app-id = "com.apple.Terminal";
-          run = [ "move-node-to-workspace 2" ];
-        }
-        {
-          "if".app-id = "net.kovidgoyal.kitty";
           run = [ "move-node-to-workspace 2" ];
         }
         {

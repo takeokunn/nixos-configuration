@@ -13,6 +13,11 @@
       font_size = 13.0;
       font_family = "HackGen Console NF";
 
+      # Window size (don't remember previous size)
+      remember_window_size = false;
+      initial_window_width = 800;
+      initial_window_height = 600;
+
       # OSC 52 clipboard support for tmux integration
       clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
       hide_window_decorations = true;

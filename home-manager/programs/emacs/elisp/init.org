@@ -260,41 +260,53 @@
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'savehist-mode)
 #+end_src
-** [mac] clipboardに入るようにする
+** osx-clipboard
 :PROPERTIES:
-:CUSTOM_ID: mac-clipboard
+:CUSTOM_ID: osx-clipboard
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (defun my/copy-from-osx ()
-    (shell-command-to-string "pbpaste"))
+  (autoload-if-found '(osx-clipboard-mode) "osx-clipboard" nil t)
 
-  (defun my/paste-to-osx (text)
-    (let ((process-connection-type nil))
-      (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
-        (process-send-string proc text)
-        (process-send-eof proc))))
-
-  (when-darwin-not-window-system
-   (setq interprogram-cut-function #'my/paste-to-osx)
-   (setq interprogram-paste-function #'my/copy-from-osx))
+  (osx-clipboard-mode +1)
 #+end_src
-** [linux] clipboardに入るようにする
+** clipetty
 :PROPERTIES:
-:CUSTOM_ID: linux-clipboard
+:CUSTOM_ID: clipetty
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (defun my/copy-from-wayland ()
-    (shell-command-to-string "wl-paste -n"))
+  (autoload-if-found '(global-clipetty-mode) "clipetty" nil t)
 
-  (defun my/paste-to-wayland (text)
-    (let ((process-connection-type nil))
-      (let ((proc (start-process "wl-copy" nil "wl-copy" "--trim-newline")))
-        (process-send-string proc text)
-        (process-send-eof proc))))
+  (global-clipetty-mode +1)
+#+end_src
+** terminal escape sequence handling
+:PROPERTIES:
+:CUSTOM_ID: terminal-escape-sequence-handling
+:END:
+#+begin_src emacs-lisp :tangle yes
+  ;; Terminal escape sequence handling for daemon compatibility
+  ;; When running as daemon, (display-graphic-p) is evaluated at daemon start,
+  ;; not per-frame. Use after-make-frame-functions to handle terminal clients.
 
-  (when-linux-not-window-system
-   (setq interprogram-cut-function #'my/paste-to-wayland)
-   (setq interprogram-paste-function #'my/copy-from-wayland))
+  (defun my/setup-terminal-escape-sequences (&optional frame)
+    "Set up terminal-specific keybindings for FRAME.
+Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
+    (with-selected-frame (or frame (selected-frame))
+      (unless (display-graphic-p frame)
+        ;; Focus reporting - prevents 'OI' characters
+        (define-key input-decode-map "\e[I" [focus-in])
+        (define-key input-decode-map "\e[O" [focus-out])
+        (define-key special-event-map [focus-in] #'ignore)
+        (define-key special-event-map [focus-out] #'ignore)
+        ;; Bracketed paste - prevents '^[[200~' and '^[[201~' characters
+        (require 'term/xterm)
+        (define-key input-decode-map "\e[200~" [xterm-paste]))))
+
+  ;; Apply to new frames (handles emacsclient connections to daemon)
+  (add-hook 'after-make-frame-functions #'my/setup-terminal-escape-sequences)
+
+  ;; Apply to current frame if not running as daemon
+  (unless (daemonp)
+    (my/setup-terminal-escape-sequences))
 #+end_src
 ** native comp
 :PROPERTIES:

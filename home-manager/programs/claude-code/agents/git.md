@@ -10,7 +10,6 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">

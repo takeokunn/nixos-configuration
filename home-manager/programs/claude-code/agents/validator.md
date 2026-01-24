@@ -11,7 +11,6 @@ description: Cross-validation and consensus verification agent
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">fact-check</skill>
   <skill use="tools">serena-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">

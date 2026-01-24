@@ -11,7 +11,6 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">

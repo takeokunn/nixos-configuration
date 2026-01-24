@@ -186,7 +186,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
 
         // Emacs Scratchpad (vime-like)
-        Mod+I { spawn "${emacsScratchpadToggle}"; }
+        Mod+I { spawn "sh" "-c" "${emacsScratchpadToggle}"; }
 
         // Screenshot
         Mod+P { screenshot; }

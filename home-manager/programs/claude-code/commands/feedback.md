@@ -13,7 +13,6 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <skill use="workflow">fact-check</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">
