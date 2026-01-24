@@ -11,7 +11,8 @@
     TMPDIR = "/tmp";
   };
 
-  # Always restart Emacs daemon on activation to pick up config changes
+  # Restart Emacs daemon on activation to pick up config changes
+  # Uses kickstart -k for atomic restart, avoiding race condition with setupLaunchAgents
   home.activation.restartEmacsDaemon = {
     after = [ "setupLaunchAgents" ];
     before = [ ];
@@ -21,14 +22,21 @@
       DOMAIN="gui/$UID"
 
       if [[ -f "$PLIST_PATH" ]]; then
-        # Always attempt bootout (ignore errors if not loaded)
-        /bin/launchctl bootout "$DOMAIN/$AGENT_NAME" 2>/dev/null || true
+        # Use kickstart -k for atomic restart (kills existing and restarts)
+        # This avoids race condition with setupLaunchAgents which may have just started the daemon
+        if /bin/launchctl kickstart -k "$DOMAIN/$AGENT_NAME" 2>/dev/null; then
+          noteEcho "Emacs daemon restarted successfully"
+        else
+          # If kickstart fails (service not loaded), try bootstrap
+          run /bin/launchctl bootstrap "$DOMAIN" "$PLIST_PATH" 2>/dev/null || true
+          noteEcho "Emacs daemon bootstrapped"
+        fi
 
-        # Small delay to ensure clean shutdown
+        # Verify daemon is running
         sleep 1
-
-        # Bootstrap and report any errors
-        run /bin/launchctl bootstrap "$DOMAIN" "$PLIST_PATH"
+        if ! /bin/launchctl print "$DOMAIN/$AGENT_NAME" >/dev/null 2>&1; then
+          warnEcho "Emacs daemon may not have started - check manually with: launchctl print gui/\$UID/$AGENT_NAME"
+        fi
       fi
     '';
   };

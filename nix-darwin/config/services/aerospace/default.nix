@@ -3,8 +3,8 @@ let
   # Emacs Scratchpad Toggle Script for macOS
   # Similar to NixOS niri version, but uses aerospace commands
   # Window size for floating Emacs scratchpad
-  windowWidth = 600;
-  windowHeight = 400;
+  windowWidth = 900;
+  windowHeight = 600;
 
   emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
         APP_TITLE=FloatingEmacs
@@ -26,6 +26,7 @@ let
             -o close_on_child_death=yes \
             -o macos_quit_when_last_window_closed=yes \
             -o term=xterm-256color \
+            -o focus_reporting_protocol=none \
             -o remember_window_size=no \
             -o initial_window_width=${toString windowWidth} \
             -o initial_window_height=${toString windowHeight} \
@@ -48,8 +49,8 @@ let
               tell process "kitty"
                 repeat with w in windows
                   if name of w contains "FloatingEmacs" then
-                    set position of w to {posX, posY}
                     set size of w to {winW, winH}
+                    set position of w to {posX, posY}
                     exit repeat
                   end if
                 end repeat

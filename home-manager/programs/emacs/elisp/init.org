@@ -298,8 +298,9 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
         (define-key special-event-map [focus-in] #'ignore)
         (define-key special-event-map [focus-out] #'ignore)
         ;; Bracketed paste - prevents '^[[200~' and '^[[201~' characters
+        ;; Use xterm-translate-bracketed-paste to properly create event with pasted text
         (require 'term/xterm)
-        (define-key input-decode-map "\e[200~" [xterm-paste]))))
+        (define-key input-decode-map "\e[200~" #'xterm-translate-bracketed-paste))))
 
   ;; Apply to new frames (handles emacsclient connections to daemon)
   (add-hook 'after-make-frame-functions #'my/setup-terminal-escape-sequences)
@@ -3706,8 +3707,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook #'tab-bar-mode)
 
   (keymap-global-set "C-x C-t" tab-prefix-map)
-  (keymap-global-set "M-[" #'tab-previous)
-  (keymap-global-set "M-]" #'tab-next)
 
   (defun my/tab-bar-rename-tab (&rest _)
     (interactive)
@@ -3941,8 +3940,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
             #'(lambda ()
                 (advice-add 'set-fontset-font :around #'set-fontset-font:around)
 
-                ;; Set default font size to 14pt (height is in 1/10pt units)
-                (set-face-attribute 'default nil :height 140)
+                ;; Set default font size to 13pt (height is in 1/10pt units, match kitty)
+                (set-face-attribute 'default nil :height 130)
 
                 (when (functionp 'set-fontset-font)
                   (if (find-font (font-spec :family "Noto Sans"))
