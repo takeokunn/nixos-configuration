@@ -7,67 +7,67 @@ let
   windowHeight = 400;
 
   emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-    APP_TITLE=FloatingEmacs
-    AEROSPACE="/run/current-system/sw/bin/aerospace"
-    JQ="${pkgs.jq}/bin/jq"
-    KITTY="${pkgs.kitty}/bin/kitty"
-    EMACSCLIENT="${pkgs.emacs}/bin/emacsclient"
-    SOCKET="/tmp/emacs$(id -u)/server"
+        APP_TITLE=FloatingEmacs
+        AEROSPACE="/run/current-system/sw/bin/aerospace"
+        JQ="${pkgs.jq}/bin/jq"
+        KITTY="${pkgs.kitty}/bin/kitty"
+        EMACSCLIENT="${pkgs.emacs}/bin/emacsclient"
+        SOCKET="/tmp/emacs$(id -u)/server"
 
-    # Get target window ID by title
-    TARGET_ID=$("$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
-      .[] | select(.["window-title"] | contains($title)) | .["window-id"]
-    ' | head -n1)
+        # Get target window ID by title
+        TARGET_ID=$("$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
+          .[] | select(.["window-title"] | contains($title)) | .["window-id"]
+        ' | head -n1)
 
-    if [ -z "$TARGET_ID" ]; then
-      # No window exists - spawn new TUI Emacs in Kitty
-      # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
-      "$KITTY" \
-        -o close_on_child_death=yes \
-        -o macos_quit_when_last_window_closed=yes \
-        -o term=xterm-256color \
-        -o remember_window_size=no \
-        -o initial_window_width=${toString windowWidth} \
-        -o initial_window_height=${toString windowHeight} \
-        -T "$APP_TITLE" \
-        -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
+        if [ -z "$TARGET_ID" ]; then
+          # No window exists - spawn new TUI Emacs in Kitty
+          # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
+          "$KITTY" \
+            -o close_on_child_death=yes \
+            -o macos_quit_when_last_window_closed=yes \
+            -o term=xterm-256color \
+            -o remember_window_size=no \
+            -o initial_window_width=${toString windowWidth} \
+            -o initial_window_height=${toString windowHeight} \
+            -T "$APP_TITLE" \
+            -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
 
-      # Wait for window and center it
-      sleep 0.5
-      osascript <<EOF
-        tell application "Finder"
-          set screenBounds to bounds of window of desktop
-          set screenW to item 3 of screenBounds
-          set screenH to item 4 of screenBounds
-        end tell
-        set winW to ${toString windowWidth}
-        set winH to ${toString windowHeight}
-        set posX to (screenW - winW) / 2
-        set posY to (screenH - winH) / 2
-        tell application "System Events"
-          tell process "kitty"
-            repeat with w in windows
-              if name of w contains "FloatingEmacs" then
-                set position of w to {posX, posY}
-                set size of w to {winW, winH}
-                exit repeat
-              end if
-            end repeat
-          end tell
-        end tell
-EOF
-    else
-      # Get currently focused window ID
-      FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
+          # Wait for window and center it
+          sleep 0.5
+          osascript <<EOF
+            tell application "Finder"
+              set screenBounds to bounds of window of desktop
+              set screenW to item 3 of screenBounds
+              set screenH to item 4 of screenBounds
+            end tell
+            set winW to ${toString windowWidth}
+            set winH to ${toString windowHeight}
+            set posX to (screenW - winW) / 2
+            set posY to (screenH - winH) / 2
+            tell application "System Events"
+              tell process "kitty"
+                repeat with w in windows
+                  if name of w contains "FloatingEmacs" then
+                    set position of w to {posX, posY}
+                    set size of w to {winW, winH}
+                    exit repeat
+                  end if
+                end repeat
+              end tell
+            end tell
+    EOF
+        else
+          # Get currently focused window ID
+          FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
 
-      if [ "$FOCUSED_ID" = "$TARGET_ID" ]; then
-        # Already focused - switch to previous window
-        "$AEROSPACE" focus-back-and-forth
-      else
-        # Not focused - bring to focus
-        "$AEROSPACE" focus --window-id "$TARGET_ID"
-      fi
-    fi
+          if [ "$FOCUSED_ID" = "$TARGET_ID" ]; then
+            # Already focused - switch to previous window
+            "$AEROSPACE" focus-back-and-forth
+          else
+            # Not focused - bring to focus
+            "$AEROSPACE" focus --window-id "$TARGET_ID"
+          fi
+        fi
   '';
 in
 {
