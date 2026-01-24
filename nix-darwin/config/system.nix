@@ -11,12 +11,12 @@
     primaryUser = username;
     stateVersion = 5;
 
+    startup.chime = false;
+
     keyboard = {
       enableKeyMapping = true;
       remapCapsLockToControl = true;
     };
-
-    startup.chime = false;
 
     defaults = {
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;

@@ -1,8 +1,17 @@
-{ lib, pkgs, emacsPkg }:
+{
+  lib,
+  pkgs,
+  emacsPkg,
+}:
 let
   # Import constants (single source of truth)
   constants = import ./emacs-constants.nix;
-  inherit (constants) socketPath defaultWindowWidth defaultWindowHeight defaultAppId;
+  inherit (constants)
+    socketPath
+    defaultWindowWidth
+    defaultWindowHeight
+    defaultAppId
+    ;
 
   # Scratchpad toggle script generator
   # Generates platform-specific scripts for aerospace (macOS) and niri (NixOS)
@@ -13,7 +22,9 @@ let
       windowHeight ? defaultWindowHeight,
       appId ? defaultAppId,
     }:
-    assert windowManager == "aerospace" || windowManager == "niri"
+    assert
+      windowManager == "aerospace"
+      || windowManager == "niri"
       || throw "windowManager must be 'aerospace' or 'niri', got: ${windowManager}";
     let
       emacsclient = "${emacsPkg}/bin/emacsclient";
@@ -117,5 +128,10 @@ let
     if windowManager == "aerospace" then aerospaceScript else niriScript;
 in
 {
-  inherit socketPath mkScratchpadToggle defaultWindowWidth defaultWindowHeight;
+  inherit
+    socketPath
+    mkScratchpadToggle
+    defaultWindowWidth
+    defaultWindowHeight
+    ;
 }
