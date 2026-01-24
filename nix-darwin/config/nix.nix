@@ -25,6 +25,7 @@
         "nix-command"
         "flakes"
       ];
+      cores = 16;
       max-jobs = "auto";
       http-connections = 50;
       download-buffer-size = 268435456;
