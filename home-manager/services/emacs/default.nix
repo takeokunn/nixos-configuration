@@ -1,4 +1,12 @@
-{ pkgs, emacsPkg, ... }:
+{
+  pkgs,
+  lib ? pkgs.lib,
+  emacsPkg,
+  ...
+}:
+let
+  isDarwin = pkgs.stdenv.isDarwin;
+in
 {
   services.emacs = {
     enable = true;
@@ -6,14 +14,14 @@
     client.enable = true;
   };
 
-  # Set TMPDIR for launchd agent so emacs daemon creates socket in /tmp
-  launchd.agents.emacs.config.EnvironmentVariables = {
+  # macOS: Set TMPDIR for launchd agent so emacs daemon creates socket in /tmp
+  launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf isDarwin {
     TMPDIR = "/tmp";
   };
 
-  # Restart Emacs daemon on activation to pick up config changes
+  # macOS: Restart Emacs daemon on activation to pick up config changes
   # Uses kickstart -k for atomic restart, avoiding race condition with setupLaunchAgents
-  home.activation.restartEmacsDaemon = {
+  home.activation.restartEmacsDaemon = lib.mkIf isDarwin {
     after = [ "setupLaunchAgents" ];
     before = [ ];
     data = ''

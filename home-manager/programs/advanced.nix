@@ -4,6 +4,7 @@
   mcp-servers-nix,
   org-babel,
   emacsPkg,
+  emacsLib,
 }:
 let
   awscli = import ./awscli;
@@ -28,7 +29,7 @@ let
   k9s = import ./k9s;
 
   # Modern window manager (niri ecosystem)
-  niri = import ./niri { inherit pkgs; };
+  niri = import ./niri { inherit pkgs emacsLib; };
   fuzzel = import ./fuzzel { inherit pkgs; };
   networkmanager-dmenu = import ./networkmanager-dmenu { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };

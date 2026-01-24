@@ -1,4 +1,6 @@
 { pkgs, nurPkgs }:
+# Note: Emacs socket path is defined in lib/emacs-constants.nix as single source of truth
+# Fish uses (id -u) syntax while bash uses $(id -u), so we can't directly reference the constant
 {
   xdg.configFile = {
     # completions
@@ -32,7 +34,8 @@
       set -gx LANG en_US.UTF-8
       set -gx LC_ALL en_US.UTF-8
 
-      # for emacs daemon socket (macOS uses $TMPDIR, we use /tmp for consistency)
+      # for emacs daemon socket (uses path from lib/emacs-constants.nix)
+      # Note: fish uses (id -u) syntax, constants use $(id -u) for bash compatibility
       set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server
 
       # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)

@@ -1,33 +1,8 @@
-{ pkgs }:
+{ pkgs, emacsLib }:
 let
-  emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-    APP_ID=FloatingEmacs
-
-    # Get window info in single IPC call
-    window_data=$(${pkgs.niri}/bin/niri msg -j windows | ${pkgs.jq}/bin/jq -r --arg id "$APP_ID" '
-      .[] | select(.app_id == $id) | "\(.id) \(.is_focused)"
-    ')
-
-    if [ -z "$window_data" ]; then
-      # No window exists - spawn new TUI Emacs in Kitty (centered, compact size)
-      XMODIFIERS=@im= ${pkgs.kitty}/bin/kitty --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e ${pkgs.emacs}/bin/emacsclient -t -e '(my/scratchpad-init)' &
-      sleep 0.3
-      # Center the newly created floating window
-      ${pkgs.niri}/bin/niri msg action center-window
-    else
-      # Parse window data
-      window_id=$(echo "$window_data" | cut -d' ' -f1)
-      is_focused=$(echo "$window_data" | cut -d' ' -f2)
-
-      if [ "$is_focused" = "true" ]; then
-        # Focused - switch to previous window (pseudo-hide)
-        ${pkgs.niri}/bin/niri msg action focus-window-previous
-      else
-        # Not focused - bring to focus
-        ${pkgs.niri}/bin/niri msg action focus-window --id "$window_id"
-      fi
-    fi
-  '';
+  emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
+    windowManager = "niri";
+  };
 in
 pkgs.lib.mkIf pkgs.stdenv.isLinux {
   xdg.configFile."niri/config.kdl".text = ''
