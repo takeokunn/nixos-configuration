@@ -12,7 +12,14 @@ let
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
-  emacs = import ./emacs { inherit lib pkgs emacsPkg org-babel; };
+  emacs = import ./emacs {
+    inherit
+      lib
+      pkgs
+      emacsPkg
+      org-babel
+      ;
+  };
   doggo = import ./doggo;
   gh = import ./gh;
   gh-dash = import ./gh-dash;
