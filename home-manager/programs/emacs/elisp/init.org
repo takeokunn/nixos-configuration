@@ -4675,11 +4675,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
 
-  (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
+  ;; Configure variables BEFORE initialization
+  (setopt exec-path-from-shell-arguments '("-l"))
+  (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH"))
 
-  (with-eval-after-load 'exec-path-from-shell
-    (setopt exec-path-from-shell-arguments '("-l"))
-    (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH")))
+  (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
 #+END_SRC
 ** Utility
 :PROPERTIES:
