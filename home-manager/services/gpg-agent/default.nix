@@ -1,5 +1,9 @@
 { pkgs }:
 {
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "$HOME/.gnupg/S.gpg-agent.ssh";
+  };
+
   services.gpg-agent = {
     enable = true;
     pinentry.package = pkgs.pinentry-curses;
@@ -11,6 +15,7 @@
     enableExtraSocket = true;
   };
 
+  # Backup: fish-specific SSH_AUTH_SOCK initialization
   programs.fish = {
     interactiveShellInit = ''
       set -x SSH_AUTH_SOCK $(gpgconf --list-dirs agent-ssh-socket)
