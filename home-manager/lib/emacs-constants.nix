@@ -7,8 +7,8 @@
   socketPath = "/tmp/emacs$(id -u)/server";
 
   # Default window dimensions for scratchpad
-  defaultWindowWidth = 600;
-  defaultWindowHeight = 400;
+  defaultWindowWidth = 900;
+  defaultWindowHeight = 600;
 
   # Default app identifier for floating Emacs scratchpad
   defaultAppId = "FloatingEmacs";

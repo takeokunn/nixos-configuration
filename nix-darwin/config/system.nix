@@ -57,7 +57,9 @@
       trackpad = {
         Clicking = true;
         Dragging = true;
-        TrackpadThreeFingerDrag = true;
+        TrackpadThreeFingerDrag = false;
+        TrackpadThreeFingerHorizSwipeGesture = 2;
+        TrackpadThreeFingerVertSwipeGesture = 2;
       };
 
       controlcenter.BatteryShowPercentage = true;

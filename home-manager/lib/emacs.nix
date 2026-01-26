@@ -48,6 +48,7 @@ let
           # No window exists - spawn new TUI Emacs in Kitty
           # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
           "$KITTY" \
+            --single-instance=no \
             -o close_on_child_death=yes \
             -o macos_quit_when_last_window_closed=yes \
             -o term=xterm-256color \
@@ -58,30 +59,48 @@ let
             -T "$APP_TITLE" \
             -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
 
-          # Wait for window and center it
+          # Wait for window and center it using NSScreen.visibleFrame for accurate positioning
           sleep 0.5
-          osascript <<EOF
-            tell application "Finder"
-              set screenBounds to bounds of window of desktop
-              set screenW to item 3 of screenBounds
-              set screenH to item 4 of screenBounds
-            end tell
-            set winW to ${toString windowWidth}
-            set winH to ${toString windowHeight}
-            set posX to (screenW - winW) / 2
-            set posY to (screenH - winH) / 2
-            tell application "System Events"
-              tell process "kitty"
+          WIN_W=${toString windowWidth}
+          WIN_H=${toString windowHeight}
+          APP_ID_FOR_SCRIPT="${appId}"
+          osascript <<APPLESCRIPT
+        use framework "AppKit"
+        use scripting additions
+
+        set mainScreen to current application's NSScreen's mainScreen()
+        set visFrame to mainScreen's visibleFrame()
+        set fullFrame to mainScreen's frame()
+
+        set visOrigin to item 1 of visFrame
+        set visSize to item 2 of visFrame
+        set fullSize to item 2 of fullFrame
+
+        set screenX to (item 1 of visOrigin) as integer
+        set screenW to (item 1 of visSize) as integer
+        set screenH to (item 2 of visSize) as integer
+        set fullH to (item 2 of fullSize) as integer
+
+        -- Convert from NSScreen coords (bottom-left origin) to window coords (top-left origin)
+        set screenY to (fullH - (item 2 of visOrigin) - screenH) as integer
+
+        set winW to $WIN_W
+        set winH to $WIN_H
+        set posX to screenX + ((screenW - winW) / 2) as integer
+        set posY to screenY + ((screenH - winH) / 2) as integer
+
+        tell application "System Events"
+            tell process "kitty"
                 repeat with w in windows
-                  if name of w contains "${appId}" then
-                    set size of w to {winW, winH}
-                    set position of w to {posX, posY}
-                    exit repeat
-                  end if
+                    if name of w contains "$APP_ID_FOR_SCRIPT" then
+                        set position of w to {posX, posY}
+                        set size of w to {winW, winH}
+                        exit repeat
+                    end if
                 end repeat
-              end tell
             end tell
-        EOF
+        end tell
+        APPLESCRIPT
         else
           # Get currently focused window ID
           FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
