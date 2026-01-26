@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   emacsPkg,
   org-babel,
@@ -13,6 +14,12 @@ in
   };
 
   home = {
+    # Override vim.defaultEditor from programs/basic.nix for advanced configurations
+    sessionVariables = {
+      EDITOR = lib.mkForce "emacsclient -t";
+      VISUAL = lib.mkForce "emacsclient -c";
+    };
+
     file = {
       ".emacs.d/init.el".text = tangle (builtins.readFile ./elisp/init.org);
       ".emacs.d/early-init.el".text = tangle (builtins.readFile ./elisp/early-init.org);

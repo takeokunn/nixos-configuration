@@ -55,6 +55,7 @@ let
     inherit pkgs nurPkgs;
   };
   advancedPrograms = import ./programs/advanced.nix {
+    inherit (nixpkgs) lib;
     inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;

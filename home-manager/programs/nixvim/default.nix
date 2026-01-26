@@ -24,7 +24,7 @@ in
 
     enable = true;
     enableMan = true;
-    defaultEditor = true;
+    defaultEditor = false;
 
     editorconfig.enable = true;
     colorschemes.dracula.enable = true;
