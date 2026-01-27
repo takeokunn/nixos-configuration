@@ -10,7 +10,7 @@
     prefix = "C-q";
     secureSocket = true;
     shell = "${pkgs.fish}/bin/fish";
-    newSession = true;
+    newSession = false;
     customPaneNavigationAndResize = true;
     resizeAmount = 5;
     disableConfirmationPrompt = true;

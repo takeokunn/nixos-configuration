@@ -12,7 +12,6 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
   <skill use="tools">quality-tools</skill>
-  <skill use="tools">codex-usage</skill>
 </refs>
 
 <rules priority="critical">
@@ -23,7 +22,6 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 </rules>
 
 <rules priority="standard">
-  <rule>Use Codex MCP as Priority 1 for code analysis and refactoring</rule>
   <rule>Use Serena MCP for symbol-level analysis and memory</rule>
   <rule>Use Context7 for library best practices</rule>
   <rule>Run quality tools (ESLint, tsc, Prettier) after changes</rule>
@@ -82,7 +80,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <objective>Quantify code quality with metrics and identify issues</objective>
     <step order="1">
       <action>Measure complexity metrics</action>
-      <tool>codex, serena search_for_pattern</tool>
+      <tool>serena search_for_pattern</tool>
       <output>CC, CogC, depth, lines, params for each function</output>
     </step>
     <step order="2">
@@ -119,7 +117,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     </step>
     <step order="2">
       <action>Refactor code</action>
-      <tool>codex, serena replace_symbol_body, Edit</tool>
+      <tool>serena replace_symbol_body, Edit</tool>
       <output>Refactored code with improved metrics</output>
     </step>
     <step order="3">

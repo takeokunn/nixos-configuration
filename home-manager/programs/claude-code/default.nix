@@ -119,7 +119,6 @@ in
       # tools
       serena-usage = builtins.readFile ./skills/tools/serena-usage/SKILL.md;
       context7-usage = builtins.readFile ./skills/tools/context7-usage/SKILL.md;
-      codex-usage = builtins.readFile ./skills/tools/codex-usage/SKILL.md;
       exploration-tools = builtins.readFile ./skills/tools/exploration-tools/SKILL.md;
       quality-tools = builtins.readFile ./skills/tools/quality-tools/SKILL.md;
 
@@ -153,7 +152,6 @@ in
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {
           context7.enable = true;
-          codex.enable = true;
           serena = {
             enable = true;
             context = "claude-code";

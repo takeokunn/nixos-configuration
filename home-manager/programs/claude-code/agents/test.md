@@ -10,7 +10,6 @@ description: Test strategy and quality management
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">testing-patterns</skill>
-  <skill use="tools">codex-usage</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
@@ -23,7 +22,6 @@ description: Test strategy and quality management
 </rules>
 
 <rules priority="standard">
-  <rule>Use Codex MCP as Priority 1 for test code generation and modification</rule>
   <rule>Use Serena MCP to find test functions and analyze coverage</rule>
   <rule>Use Context7 for test framework documentation</rule>
   <rule>Use Playwright MCP for browser automation</rule>
@@ -57,7 +55,7 @@ description: Test strategy and quality management
     <objective>Collect test files, configurations, and patterns</objective>
     <step>1. Identify test files using Glob and Serena</step>
     <step>2. Check test runner configurations</step>
-    <step>3. Review existing test patterns with Codex</step>
+    <step>3. Review existing test patterns</step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">

@@ -1,16 +1,25 @@
 {
+  lib,
   pkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
   org-babel,
   emacsPkg,
+  emacsLib,
 }:
 let
   awscli = import ./awscli;
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
-  emacs = import ./emacs { inherit pkgs emacsPkg org-babel; };
+  emacs = import ./emacs {
+    inherit
+      lib
+      pkgs
+      emacsPkg
+      org-babel
+      ;
+  };
   doggo = import ./doggo;
   gh = import ./gh;
   gh-dash = import ./gh-dash;
@@ -28,7 +37,7 @@ let
   k9s = import ./k9s;
 
   # Modern window manager (niri ecosystem)
-  niri = import ./niri { inherit pkgs emacsPkg; };
+  niri = import ./niri { inherit pkgs emacsLib; };
   fuzzel = import ./fuzzel { inherit pkgs; };
   networkmanager-dmenu = import ./networkmanager-dmenu { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };

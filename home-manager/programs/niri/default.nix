@@ -1,37 +1,8 @@
-{ pkgs, emacsPkg }:
+{ pkgs, emacsLib }:
 let
-  emacsScratchpadToggle = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-    APP_ID=FloatingEmacs
-    # Socket path: XDG_RUNTIME_DIR/emacs/server (Emacs 28+ default on Linux)
-    # Falls back to /tmp/emacs$UID/server if XDG_RUNTIME_DIR is not set
-    SOCKET_PATH="''${XDG_RUNTIME_DIR:-/tmp/emacs$(id -u)}/emacs/server"
-
-    # Get window info in single IPC call
-    window_data=$(${pkgs.niri}/bin/niri msg -j windows | ${pkgs.jq}/bin/jq -r --arg id "$APP_ID" '
-      .[] | select(.app_id == $id) | "\(.id) \(.is_focused)"
-    ')
-
-    if [ -z "$window_data" ]; then
-      # No window exists - spawn new TUI Emacs in Kitty (centered, compact size)
-      # Explicitly specify socket path (don't rely on environment variables)
-      XMODIFIERS=@im= ${pkgs.kitty}/bin/kitty --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e sh -c "${emacsPkg}/bin/emacsclient -s '$SOCKET_PATH' -e '(my/scratchpad-init)' && exec ${emacsPkg}/bin/emacsclient -s '$SOCKET_PATH' -t" &
-      sleep 0.3
-      # Center the newly created floating window
-      ${pkgs.niri}/bin/niri msg action center-window
-    else
-      # Parse window data
-      window_id=$(echo "$window_data" | cut -d' ' -f1)
-      is_focused=$(echo "$window_data" | cut -d' ' -f2)
-
-      if [ "$is_focused" = "true" ]; then
-        # Focused - switch to previous window (pseudo-hide)
-        ${pkgs.niri}/bin/niri msg action focus-window-previous
-      else
-        # Not focused - bring to focus
-        ${pkgs.niri}/bin/niri msg action focus-window --id "$window_id"
-      fi
-    fi
-  '';
+  emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
+    windowManager = "niri";
+  };
 in
 pkgs.lib.mkIf pkgs.stdenv.isLinux {
   xdg.configFile."niri/config.kdl".text = ''
@@ -190,7 +161,7 @@ pkgs.lib.mkIf pkgs.stdenv.isLinux {
         Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
 
         // Emacs Scratchpad (vime-like)
-        Mod+I { spawn "${emacsScratchpadToggle}"; }
+        Mod+I { spawn "sh" "-c" "${emacsScratchpadToggle}"; }
 
         // Screenshot
         Mod+P { screenshot; }

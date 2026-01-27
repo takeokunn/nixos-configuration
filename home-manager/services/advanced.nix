@@ -1,4 +1,8 @@
-{ pkgs, emacsPkg }:
+{
+  pkgs,
+  emacsPkg,
+  emacsLib,
+}:
 let
   lib = pkgs.lib;
   emacs = import ./emacs { inherit pkgs emacsPkg; };

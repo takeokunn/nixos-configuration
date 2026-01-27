@@ -2,6 +2,7 @@
 {
   programs.vim = {
     enable = true;
+    defaultEditor = true;
     packageConfigurable = pkgs.vim;
     extraConfig = ''
       set encoding=utf-8

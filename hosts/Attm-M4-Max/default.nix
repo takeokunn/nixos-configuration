@@ -7,6 +7,7 @@ let
     brew-nix
     mac-app-util
     emacs-overlay
+    nur-packages
     ;
   inherit (inputs) nixpkgs;
 
@@ -17,7 +18,23 @@ let
 
   pkgs = import nixpkgs {
     inherit system;
+    config.allowUnfree = true;
     overlays = advancedOverlay ++ [ brew-nix.overlays.default ];
+  };
+
+  nurPkgs = nur-packages.packages.${system};
+
+  # emacs package (for nix-darwin to use in aerospace)
+  emacs = import ../../home-manager/packages/emacs {
+    inherit (nixpkgs) lib;
+    inherit pkgs nurPkgs;
+  };
+  emacsPkg = emacs.emacs-unstable;
+
+  # emacs library (shared utilities for both nix-darwin and home-manager)
+  emacsLib = import ../../home-manager/lib/emacs.nix {
+    inherit (nixpkgs) lib;
+    inherit pkgs emacsPkg;
   };
 
   configuration =
@@ -30,7 +47,7 @@ nix-darwin.lib.darwinSystem {
   inherit pkgs;
   inherit (inputs.nixpkgs) lib;
   specialArgs = {
-    inherit username pkgs;
+    inherit username pkgs emacsLib;
   };
   modules = [
     configuration

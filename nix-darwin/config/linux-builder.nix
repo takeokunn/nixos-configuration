@@ -2,34 +2,25 @@
 {
   nix.linux-builder = {
     enable = true;
+    ephemeral = true;
     systems = [
       "aarch64-linux"
       "x86_64-linux"
     ];
     config = {
-      boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
       virtualisation = {
         cores = 8;
         memorySize = lib.mkForce (1024 * 64);
         diskSize = lib.mkForce (1024 * 500);
       };
+      security.sudo.wheelNeedsPassword = false;
+      users.users.builder.extraGroups = [ "wheel" ];
       nix.settings = {
         experimental-features = [
           "nix-command"
           "flakes"
         ];
       };
-      security.sudo.extraRules = [
-        {
-          users = [ "builder" ];
-          commands = [
-            {
-              command = "ALL";
-              options = [ "NOPASSWD" ];
-            }
-          ];
-        }
-      ];
     };
   };
 }

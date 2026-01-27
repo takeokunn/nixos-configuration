@@ -11,12 +11,12 @@
     primaryUser = username;
     stateVersion = 5;
 
+    startup.chime = false;
+
     keyboard = {
       enableKeyMapping = true;
       remapCapsLockToControl = true;
     };
-
-    startup.chime = false;
 
     defaults = {
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;
@@ -57,7 +57,9 @@
       trackpad = {
         Clicking = true;
         Dragging = true;
-        TrackpadThreeFingerDrag = true;
+        TrackpadThreeFingerDrag = false;
+        TrackpadThreeFingerHorizSwipeGesture = 2;
+        TrackpadThreeFingerVertSwipeGesture = 2;
       };
 
       controlcenter.BatteryShowPercentage = true;

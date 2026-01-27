@@ -38,6 +38,12 @@ let
   };
   emacsPkg = if isDarwin then emacs.emacs-unstable else emacs.emacs-unstable-pgtk;
 
+  # emacs library (shared utilities)
+  emacsLib = import ./lib/emacs.nix {
+    inherit (nixpkgs) lib;
+    inherit pkgs emacsPkg;
+  };
+
   # misc
   misc = import ./misc;
 
@@ -49,15 +55,16 @@ let
     inherit pkgs nurPkgs;
   };
   advancedPrograms = import ./programs/advanced.nix {
+    inherit (nixpkgs) lib;
     inherit pkgs llmAgentsPkgs;
-    inherit org-babel emacsPkg;
+    inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
   };
 
   # services
   basicServices = import ./services/basic.nix;
   advancedServices = import ./services/advanced.nix {
-    inherit pkgs emacsPkg;
+    inherit pkgs emacsPkg emacsLib;
   };
 in
 {

@@ -10,7 +10,7 @@ description: This skill should be used when the user asks to "execute task", "im
 <tools>
   <tool name="agent_groups">Specialized sub-agents: quality_assurance (quality, security - parallel), implementation (test, refactor, docs - parallel if independent), review (sequential after implementation)</tool>
   <tool name="delegation">Provide scope, file paths, Serena/Context7 tool instructions, reference implementations, memory checks</tool>
-  <tool name="tool_selection">Coding: Codex MCP → Serena MCP → Context7 → Basic tools; Non-coding: Serena MCP → Context7 → Basic tools</tool>
+  <tool name="tool_selection">Coding: Serena MCP → Context7 → Basic tools; Non-coding: Serena MCP → Context7 → Basic tools</tool>
 </tools>
 
 <concepts>

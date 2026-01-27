@@ -260,41 +260,54 @@
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'emacs-startup-hook #'savehist-mode)
 #+end_src
-** [mac] clipboardに入るようにする
+** osx-clipboard
 :PROPERTIES:
-:CUSTOM_ID: mac-clipboard
+:CUSTOM_ID: osx-clipboard
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (defun my/copy-from-osx ()
-    (shell-command-to-string "pbpaste"))
+  (autoload-if-found '(osx-clipboard-mode) "osx-clipboard" nil t)
 
-  (defun my/paste-to-osx (text)
-    (let ((process-connection-type nil))
-      (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
-        (process-send-string proc text)
-        (process-send-eof proc))))
-
-  (when-darwin-not-window-system
-   (setq interprogram-cut-function #'my/paste-to-osx)
-   (setq interprogram-paste-function #'my/copy-from-osx))
+  (osx-clipboard-mode +1)
 #+end_src
-** [linux] clipboardに入るようにする
+** clipetty
 :PROPERTIES:
-:CUSTOM_ID: linux-clipboard
+:CUSTOM_ID: clipetty
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (defun my/copy-from-wayland ()
-    (shell-command-to-string "wl-paste -n"))
+  (autoload-if-found '(global-clipetty-mode) "clipetty" nil t)
 
-  (defun my/paste-to-wayland (text)
-    (let ((process-connection-type nil))
-      (let ((proc (start-process "wl-copy" nil "wl-copy" "--trim-newline")))
-        (process-send-string proc text)
-        (process-send-eof proc))))
+  (global-clipetty-mode +1)
+#+end_src
+** terminal escape sequence handling
+:PROPERTIES:
+:CUSTOM_ID: terminal-escape-sequence-handling
+:END:
+#+begin_src emacs-lisp :tangle yes
+  ;; Terminal escape sequence handling for daemon compatibility
+  ;; When running as daemon, (display-graphic-p) is evaluated at daemon start,
+  ;; not per-frame. Use after-make-frame-functions to handle terminal clients.
 
-  (when-linux-not-window-system
-   (setq interprogram-cut-function #'my/paste-to-wayland)
-   (setq interprogram-paste-function #'my/copy-from-wayland))
+  (defun my/setup-terminal-escape-sequences (&optional frame)
+    "Set up terminal-specific keybindings for FRAME.
+Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
+    (with-selected-frame (or frame (selected-frame))
+      (unless (display-graphic-p frame)
+        ;; Focus reporting - prevents 'OI' characters
+        (define-key input-decode-map "\e[I" [focus-in])
+        (define-key input-decode-map "\e[O" [focus-out])
+        (define-key special-event-map [focus-in] #'ignore)
+        (define-key special-event-map [focus-out] #'ignore)
+        ;; Bracketed paste - prevents '^[[200~' and '^[[201~' characters
+        ;; Use xterm-translate-bracketed-paste to properly create event with pasted text
+        (require 'term/xterm)
+        (define-key input-decode-map "\e[200~" #'xterm-translate-bracketed-paste))))
+
+  ;; Apply to new frames (handles emacsclient connections to daemon)
+  (add-hook 'after-make-frame-functions #'my/setup-terminal-escape-sequences)
+
+  ;; Apply to current frame if not running as daemon
+  (unless (daemonp)
+    (my/setup-terminal-escape-sequences))
 #+end_src
 ** native comp
 :PROPERTIES:
@@ -3694,8 +3707,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook #'tab-bar-mode)
 
   (keymap-global-set "C-x C-t" tab-prefix-map)
-  (keymap-global-set "M-[" #'tab-previous)
-  (keymap-global-set "M-]" #'tab-next)
 
   (defun my/tab-bar-rename-tab (&rest _)
     (interactive)
@@ -3929,8 +3940,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
             #'(lambda ()
                 (advice-add 'set-fontset-font :around #'set-fontset-font:around)
 
-                ;; Set default font size to 14pt (height is in 1/10pt units)
-                (set-face-attribute 'default nil :height 140)
+                ;; Set default font size to 13pt (height is in 1/10pt units, match kitty)
+                (set-face-attribute 'default nil :height 130)
 
                 (when (functionp 'set-fontset-font)
                   (if (find-font (font-spec :family "Noto Sans"))
@@ -4664,11 +4675,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
 
+  ;; Configure variables BEFORE initialization
+  (setopt exec-path-from-shell-arguments '("-l"))
+  (setopt exec-path-from-shell-variables '("PATH" "TERM" "COPILOT_LANGUAGE_SERVER_PATH"))
+
   (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
 
-  (with-eval-after-load 'exec-path-from-shell
-    (setopt exec-path-from-shell-arguments '("-l"))
-    (setopt exec-path-from-shell-variables '("PATH" "TERM" "SSH_AUTH_SOCK" "COPILOT_LANGUAGE_SERVER_PATH")))
+  ;; Explicitly set SSH_AUTH_SOCK for GPG agent (exec-path-from-shell doesn't handle this correctly on macOS)
+  (setenv "SSH_AUTH_SOCK" (expand-file-name "~/.gnupg/S.gpg-agent.ssh"))
 #+END_SRC
 ** Utility
 :PROPERTIES:
