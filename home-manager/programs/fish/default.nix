@@ -32,8 +32,14 @@
       set -gx LANG en_US.UTF-8
       set -gx LC_ALL en_US.UTF-8
 
-      # for emacs daemon socket (macOS uses $TMPDIR, we use /tmp for consistency)
-      set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server
+      # for emacs daemon socket
+      # Linux: XDG_RUNTIME_DIR/emacs/server (Emacs 28+ default)
+      # macOS: /tmp/emacs$UID/server (via TMPDIR in launchd)
+      if test -n "$XDG_RUNTIME_DIR"
+          set -gx EMACS_SOCKET_NAME $XDG_RUNTIME_DIR/emacs/server
+      else
+          set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server
+      end
 
       # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)
       set -gx FZF_CTRL_R_COMMAND ""

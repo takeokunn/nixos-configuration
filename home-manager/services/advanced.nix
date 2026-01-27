@@ -1,5 +1,6 @@
 { pkgs, emacsPkg }:
 let
+  lib = pkgs.lib;
   emacs = import ./emacs { inherit pkgs emacsPkg; };
   gpg-agent = import ./gpg-agent { inherit pkgs; };
 
@@ -12,7 +13,7 @@ let
   playerctld = import ./playerctld { inherit pkgs; };
   cliphist = import ./cliphist { inherit pkgs; };
   wl-clip-persist = import ./wl-clip-persist { inherit pkgs; };
-  easyeffects = import ./easyeffects { inherit pkgs; };
+  easyeffects = import ./easyeffects { inherit pkgs lib; };
   mako = import ./mako { inherit pkgs; };
 
   # Impermanence (Linux only)

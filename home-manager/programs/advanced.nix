@@ -28,7 +28,7 @@ let
   k9s = import ./k9s;
 
   # Modern window manager (niri ecosystem)
-  niri = import ./niri { inherit pkgs; };
+  niri = import ./niri { inherit pkgs emacsPkg; };
   fuzzel = import ./fuzzel { inherit pkgs; };
   networkmanager-dmenu = import ./networkmanager-dmenu { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };
