@@ -29,7 +29,14 @@ let
   };
   llmAgentsPkgs = llm-agents.packages.${system};
   basicPkgs = import ./packages/basic.nix { inherit pkgs; };
-  advancedPkgs = import ./packages/advanced.nix { inherit pkgs llmAgentsPkgs artoPkg; };
+  advancedPkgs = import ./packages/advanced.nix {
+    inherit
+      pkgs
+      nurPkgs
+      llmAgentsPkgs
+      artoPkg
+      ;
+  };
 
   # emacs package
   emacs = import ./packages/emacs {

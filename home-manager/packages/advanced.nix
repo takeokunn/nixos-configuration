@@ -1,5 +1,6 @@
 {
   pkgs,
+  nurPkgs,
   llmAgentsPkgs,
   artoPkg,
 }:
@@ -24,6 +25,7 @@ with pkgs;
   # for web service
   discord
   slack
+  nurPkgs.gogcli
 ]
 ++ lib.optionals stdenv.isLinux [
   # for desktop environment

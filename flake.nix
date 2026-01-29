@@ -2,10 +2,7 @@
   description = "takeokunn's nix configuration";
 
   inputs = {
-    # Pinned to commit before SBCL 2.6.0 update (2026-01-03)
-    # SBCL 2.6.0 has incompatibility with named-readtables, breaking mac-app-util
-    # See: https://bugs.launchpad.net/sbcl/+bug/2134500
-    nixpkgs.url = "github:NixOS/nixpkgs/7ddc14f846f7295b6408619cbeb28087194399ff";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -61,13 +58,7 @@
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
-    mac-app-util = {
-      url = "github:hraban/mac-app-util";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # cl-nix-lite builds Common Lisp packages; must use our nixpkgs with SBCL 2.5.10 pin
-      # See: https://bugs.launchpad.net/sbcl/+bug/2134500 (named-readtables incompatibility with SBCL 2.6.0)
-      inputs.cl-nix-lite.inputs.nixpkgs.follows = "nixpkgs";
-    };
+    mac-app-util.url = "github:hraban/mac-app-util";
     arto = {
       url = "github:arto-app/Arto";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -75,6 +66,7 @@
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     nur-packages = {
       url = "github:takeokunn/nur-packages";
