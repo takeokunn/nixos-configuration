@@ -5,7 +5,15 @@ updates:
     schedule:
       interval: daily
     target-branch: main
+    groups:
+      npm-all:
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
+    groups:
+      github-actions-all:
+        patterns:
+          - "*"
