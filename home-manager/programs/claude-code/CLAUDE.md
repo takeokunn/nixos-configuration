@@ -195,8 +195,10 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 
 <decision_tree name="agent_selection">
   <question>What type of task is this?</question>
-  <branch condition="Requirements clarification">Use /define command</branch>
-  <branch condition="Code implementation">Use /execute command</branch>
+  <branch condition="Quick requirements clarification">Use /define command</branch>
+  <branch condition="Iterative requirements with feedback">Use /define-full command</branch>
+  <branch condition="Quick task execution">Use /execute command</branch>
+  <branch condition="Task execution with feedback loop">Use /execute-full command</branch>
   <branch condition="Investigation or debugging">Use /bug or /ask command</branch>
   <branch condition="Code review">Use /feedback command</branch>
   <branch condition="Documentation">Use /markdown command</branch>

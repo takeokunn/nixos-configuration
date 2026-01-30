@@ -11,6 +11,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">execution-workflow</skill>
   <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
 </refs>
 
 <rules priority="critical">
@@ -144,6 +145,38 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <score range="0-49">Minimal verification</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>task_clarity=95, implementation_quality=90, verification_completeness=90</input>
+      <calculation>(95*0.3)+(90*0.4)+(90*0.3) = 91.5</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>task_clarity=80, implementation_quality=80, verification_completeness=80</input>
+      <calculation>(80*0.3)+(80*0.4)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>task_clarity=79, implementation_quality=79, verification_completeness=79</input>
+      <calculation>(79*0.3)+(79*0.4)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>task_clarity=59, implementation_quality=59, verification_completeness=59</input>
+      <calculation>(59*0.3)+(59*0.4)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>task_clarity=40, implementation_quality=50, verification_completeness=45</input>
+      <calculation>(40*0.3)+(50*0.4)+(45*0.3) = 45.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 
 <enforcement>
@@ -183,6 +216,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <command name="bug">When implementation encounters unexpected errors</command>
   <command name="feedback">Review work after execution completion</command>
   <command name="upstream">When preparing changes for upstream OSS contribution</command>
+  <command name="execute-full">Full version with feedback loop and fix phase</command>
 </related_commands>
 
 <related_skills>

@@ -1,10 +1,11 @@
 ---
-argument-hint: [message]
-description: Requirements definition command
+name: Define Core
+description: Shared workflow phases and patterns for requirements definition commands. Use this skill when implementing /define or /define-full commands to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
+version: 0.1.0
 ---
 
 <purpose>
-Conduct detailed requirements definition before implementation, clarifying technical constraints, design policies, and specifications.
+Provide shared workflow phases, agent definitions, and patterns that are common to all requirements definition commands (define, define-full). This skill eliminates duplication and ensures consistency across requirements definition workflows.
 </purpose>
 
 <refs>
@@ -13,27 +14,10 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <skill use="workflow">fact-check</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="workflow">define-core</skill>
 </refs>
 
-<rules priority="critical">
-  <rule>Never modify, create, or delete files</rule>
-  <rule>Never implement code; requirements definition only</rule>
-  <rule>Clearly identify technically impossible requests</rule>
-  <rule>Prioritize technical validity over user preferences</rule>
-  <rule>Technical evidence over speculation</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use requirements-definition skill for methodology</rule>
-  <rule>Delegate investigations to sub-agents</rule>
-  <rule>Ask questions without limit until requirements are clear</rule>
-  <rule>Investigate and question before concluding</rule>
-  <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
-</rules>
-
 <workflow>
-  <phase name="prepare">
+  <phase name="prepare" id="core_prepare">
     <objective>Initialize Serena and check existing patterns</objective>
     <step number="1">
       <action>Activate Serena project with activate_project</action>
@@ -51,7 +35,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Relevant patterns loaded</output>
     </step>
   </phase>
-  <phase name="analyze">
+
+  <phase name="analyze" id="core_analyze">
     <objective>Understand the user's request and identify technical constraints</objective>
     <step number="1">
       <action>Parse user request to extract core requirements</action>
@@ -74,7 +59,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Initial feasibility assessment</output>
     </step>
   </phase>
-  <phase name="investigate">
+
+  <phase name="investigate" id="core_investigate">
     <objective>Gather evidence from codebase and analyze architecture impact</objective>
     <step number="1">
       <action>Delegate to explore agent: find relevant files and existing patterns</action>
@@ -102,6 +88,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Verification report, flagged claims</output>
     </step>
   </phase>
+
   <reflection_checkpoint id="investigation_complete" after="investigate">
     <questions>
       <question weight="0.4">Have all relevant files and patterns been identified?</question>
@@ -116,8 +103,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <trigger>After investigation phase completes</trigger>
     </serena_validation>
   </reflection_checkpoint>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="clarify">
+
+  <phase name="clarify" id="core_clarify">
     <objective>Resolve ambiguities through structured user interaction</objective>
     <step number="1">
       <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
@@ -145,7 +132,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Confirmed requirements</output>
     </step>
   </phase>
-  <phase name="verify">
+
+  <phase name="verify" id="core_verify">
     <objective>Validate user decisions against technical evidence</objective>
     <step number="1">
       <action>Verify constraints from answers using agent findings</action>
@@ -158,8 +146,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Implementation validation</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="document">
+
+  <phase name="document" id="core_document">
     <objective>Create comprehensive requirements documentation and task breakdown</objective>
     <step number="1">
       <action>Create comprehensive requirements document</action>
@@ -182,15 +170,15 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
 </agents>
 
-<execution_graph>
+<execution_graph id="core_execution_graph">
   <parallel_group id="investigation" depends_on="none">
     <agent>explore</agent>
     <agent>design</agent>
     <agent>database</agent>
   </parallel_group>
-  <parallel_group id="analysis" depends_on="investigation">
+  <sequential_step id="analysis" depends_on="investigation">
     <agent>general-purpose</agent>
-  </parallel_group>
+  </sequential_step>
 </execution_graph>
 
 <delegation>
@@ -200,83 +188,42 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
 
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<rules priority="critical">
+  <rule id="DC-C001">Never modify, create, or delete files</rule>
+  <rule id="DC-C002">Never implement code; requirements definition only</rule>
+  <rule id="DC-C003">Clearly identify technically impossible requests</rule>
+  <rule id="DC-C004">Prioritize technical validity over user preferences</rule>
+  <rule id="DC-C005">Technical evidence over speculation</rule>
+</rules>
 
-<decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="requirement_clarity" weight="0.4">
-      <score range="90-100">All requirements clear and documented</score>
-      <score range="70-89">Core requirements clear</score>
-      <score range="50-69">Some ambiguity remains</score>
-      <score range="0-49">Many unclear requirements</score>
-    </factor>
-    <factor name="technical_feasibility" weight="0.3">
-      <score range="90-100">Feasibility confirmed with evidence</score>
-      <score range="70-89">Likely feasible</score>
-      <score range="50-69">Uncertain feasibility</score>
-      <score range="0-49">Likely infeasible</score>
-    </factor>
-    <factor name="stakeholder_alignment" weight="0.3">
-      <score range="90-100">All questions answered by user</score>
-      <score range="70-89">Most questions answered</score>
-      <score range="50-69">Some questions pending</score>
-      <score range="0-49">Many questions unanswered</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>requirement_clarity=95, technical_feasibility=90, stakeholder_alignment=90</input>
-      <calculation>(95*0.4)+(90*0.3)+(90*0.3) = 92</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>requirement_clarity=80, technical_feasibility=80, stakeholder_alignment=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>requirement_clarity=80, technical_feasibility=78, stakeholder_alignment=78</input>
-      <calculation>(80*0.4)+(78*0.3)+(78*0.3) = 78.8</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Score below 80 but above 60 triggers warning</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>requirement_clarity=60, technical_feasibility=58, stakeholder_alignment=58</input>
-      <calculation>(60*0.4)+(58*0.3)+(58*0.3) = 58.8</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Score below 60 triggers error status</reasoning>
-    </test>
-    <test name="error_case">
-      <input>requirement_clarity=40, technical_feasibility=30, stakeholder_alignment=30</input>
-      <calculation>(40*0.4)+(30*0.3)+(30*0.3) = 34</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores across all factors result in error</reasoning>
-    </test>
-  </validation_tests>
-</decision_criteria>
+<rules priority="standard">
+  <rule id="DC-S001">Use requirements-definition skill for methodology</rule>
+  <rule id="DC-S002">Delegate investigations to sub-agents</rule>
+  <rule id="DC-S003">Ask questions without limit until requirements are clear</rule>
+  <rule id="DC-S004">Investigate and question before concluding</rule>
+  <rule id="DC-S005">Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
+</rules>
 
 <enforcement>
   <mandatory_behaviors>
-    <behavior id="DEF-B001" priority="critical">
+    <behavior id="DC-B001" priority="critical">
       <trigger>Before requirements documentation</trigger>
       <action>Investigate existing codebase patterns</action>
       <verification>Codebase analysis in output</verification>
     </behavior>
-    <behavior id="DEF-B002" priority="critical">
+    <behavior id="DC-B002" priority="critical">
       <trigger>For design decisions</trigger>
       <action>Use AskUserQuestion tool with structured options</action>
       <verification>User responses recorded</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
-    <behavior id="DEF-P001" priority="critical">
+    <behavior id="DC-P001" priority="critical">
       <trigger>Always</trigger>
       <action>Modifying or creating code files</action>
       <response>Block operation, this is read-only command</response>
     </behavior>
-    <behavior id="DEF-P002" priority="critical">
+    <behavior id="DC-P002" priority="critical">
       <trigger>Always</trigger>
       <action>Proceeding without answering critical questions</action>
       <response>Block operation, require clarification first</response>
@@ -285,26 +232,24 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </enforcement>
 
 <output>
-  <format>
-    <requirements_document>
-      <summary>One-sentence request, background, expected outcomes</summary>
-      <current_state>Existing system, tech stack</current_state>
-      <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
-      <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
-      <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-      <metrics>
-        <metric name="feasibility">0-100</metric>
-        <metric name="objectivity">0-100</metric>
-      </metrics>
-      <constraints>Technical, operational</constraints>
-      <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-      <outstanding_issues>Unresolved questions</outstanding_issues>
-    </requirements_document>
-    <task_breakdown>
-      <dependency_graph>Task dependencies visualization</dependency_graph>
-      <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
-      <execute_handoff>Decisions, references, constraints</execute_handoff>
-    </task_breakdown>
+  <format id="requirements_document">
+    <summary>One-sentence request, background, expected outcomes</summary>
+    <current_state>Existing system, tech stack</current_state>
+    <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
+    <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
+    <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
+    <metrics>
+      <metric name="feasibility">0-100</metric>
+      <metric name="objectivity">0-100</metric>
+    </metrics>
+    <constraints>Technical, operational</constraints>
+    <test_requirements>Unit, integration, acceptance criteria</test_requirements>
+    <outstanding_issues>Unresolved questions</outstanding_issues>
+  </format>
+  <format id="task_breakdown">
+    <dependency_graph>Task dependencies visualization</dependency_graph>
+    <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
+    <execute_handoff>Decisions, references, constraints</execute_handoff>
   </format>
 </output>
 
@@ -317,19 +262,17 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </examples>
 </error_escalation>
 
-<related_commands>
-  <command name="ask">When requirements raise technical questions</command>
-  <command name="bug">When defining fix requirements for known issues</command>
-  <command name="execute">Handoff point after requirements are defined</command>
-  <command name="define-full">Full version with self-evaluation phase</command>
-</related_commands>
-
-<related_skills>
-  <skill name="requirements-definition">Core methodology for specification</skill>
-  <skill name="investigation-patterns">Evidence gathering for feasibility</skill>
-  <skill name="serena-usage">Check existing patterns and memories</skill>
-  <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
-</related_skills>
+<best_practices>
+  <practice priority="critical">Always initialize Serena and check memories before starting requirements definition</practice>
+  <practice priority="critical">Investigate existing codebase patterns before documenting any requirements</practice>
+  <practice priority="critical">Use AskUserQuestion tool with structured options (2-4 choices) for all user interactions</practice>
+  <practice priority="critical">Always include a (Recommended) option when presenting choices</practice>
+  <practice priority="high">Score questions using 4-criteria system (design branching, irreversibility, investigation impossibility, effort impact)</practice>
+  <practice priority="high">Delegate investigation tasks to specialized agents in parallel</practice>
+  <practice priority="high">Verify external documentation claims via Context7 and fact-check patterns</practice>
+  <practice priority="medium">Classify questions by type (spec confirmation, design choice, constraint, scope, priority)</practice>
+  <practice priority="medium">Document all assumptions explicitly when requirements are unclear</practice>
+</best_practices>
 
 <constraints>
   <must>Keep all operations read-only</must>
@@ -341,3 +284,28 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <avoid>Proceeding without clear answers to critical questions</avoid>
   <avoid>Using plain text output for questions instead of AskUserQuestion tool</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="requirements-definition">Core methodology for specification (question scoring, requirement formatting)</skill>
+  <skill name="investigation-patterns">Evidence gathering for feasibility assessment</skill>
+  <skill name="serena-usage">Check existing patterns and memories via Serena MCP</skill>
+  <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
+  <skill name="execution-workflow">Handoff methodology after requirements are defined</skill>
+</related_skills>
+
+<usage_in_commands>
+  <command name="define">
+    <inherits>All phases (prepare, analyze, investigate, clarify, verify, document)</inherits>
+    <inherits>All agents</inherits>
+    <inherits>Core execution graph</inherits>
+    <inherits>All delegation requirements</inherits>
+    <inherits>All rules and enforcement</inherits>
+  </command>
+  <command name="define-full">
+    <inherits>All phases as subphases within define_initial</inherits>
+    <inherits>All agents plus plan agent</inherits>
+    <inherits>Core execution graph as base, extended with feedback and regenerate phases</inherits>
+    <inherits>All delegation requirements</inherits>
+    <inherits>All rules and enforcement, plus feedback-specific behaviors</inherits>
+  </command>
+</usage_in_commands>

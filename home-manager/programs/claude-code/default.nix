@@ -100,7 +100,9 @@ in
       ask = builtins.readFile ./commands/ask.md;
       bug = builtins.readFile ./commands/bug.md;
       define = builtins.readFile ./commands/define.md;
+      define-full = builtins.readFile ./commands/define-full.md;
       execute = builtins.readFile ./commands/execute.md;
+      execute-full = builtins.readFile ./commands/execute-full.md;
       feedback = builtins.readFile ./commands/feedback.md;
       markdown = builtins.readFile ./commands/markdown.md;
       upstream = builtins.readFile ./commands/upstream.md;
@@ -124,6 +126,7 @@ in
 
       # methodology
       requirements-definition = builtins.readFile ./skills/methodology/requirements-definition/SKILL.md;
+      define-core = builtins.readFile ./skills/methodology/define-core/SKILL.md;
       investigation-patterns = builtins.readFile ./skills/methodology/investigation-patterns/SKILL.md;
       execution-workflow = builtins.readFile ./skills/methodology/execution-workflow/SKILL.md;
       fact-check = builtins.readFile ./skills/methodology/fact-check/SKILL.md;
