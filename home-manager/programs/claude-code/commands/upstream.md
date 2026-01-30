@@ -9,7 +9,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="workflow">fact-check</skill>
   <skill use="tools">serena-usage</skill>
+  <skill use="tools">context7-usage</skill>
 </refs>
 
 <rules priority="critical">
@@ -23,7 +25,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <rule>Use gh CLI for all GitHub API operations</rule>
   <rule>Check Serena memories for existing contribution patterns</rule>
   <rule>Provide structured checklist output with actionable items</rule>
-  <rule>Include local verification commands in output</rule>
+  <rule>Include comprehensive local reproduction steps with Nix-first ecosystem detection</rule>
   <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
 
@@ -111,16 +113,16 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </serena_validation>
   </reflection_checkpoint>
   <phase name="synthesize">
-    <objective>Generate PR metadata and verification steps</objective>
+    <objective>Generate PR metadata, verification steps, and comprehensive task breakdown</objective>
     <step order="1">
       <action>Generate PR title and description following contribution guide</action>
       <tool>docs agent</tool>
       <output>Compliant PR metadata draft</output>
     </step>
     <step order="2">
-      <action>Determine local verification commands</action>
-      <tool>Analyze package.json, Makefile, CI config</tool>
-      <output>Test and build commands</output>
+      <action>Detect project ecosystem and generate local reproduction steps</action>
+      <tool>Analyze flake.nix, Makefile, Cargo.toml, go.mod, package.json with Nix-first priority</tool>
+      <output>Ecosystem detection, environment setup, service dependencies, verification commands</output>
     </step>
     <step order="3">
       <action>Detect change types and generate manual QA checklist</action>
@@ -131,6 +133,21 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <action>Compile checklist with all findings</action>
       <tool>Consolidate agent outputs</tool>
       <output>Structured checklist report</output>
+    </step>
+    <step order="5">
+      <action>Generate comprehensive task breakdown for /execute handoff</action>
+      <tool>Categorize all identified issues into phased_tasks phases (code_fixes, test_updates, documentation, commit_prep, final_verification)</tool>
+      <output>Phased task list with dependencies using ID format: CF-XXX, TU-XXX, DOC-XXX, GIT-XXX, VER-XXX</output>
+    </step>
+    <step order="6">
+      <action>Build dependency graph for parallel execution optimization</action>
+      <tool>Analyze task dependencies to identify parallel-safe phases</tool>
+      <output>Dependency graph with parallel groups</output>
+    </step>
+    <step order="7">
+      <action>Compile execute_handoff section with decisions, references, and constraints</action>
+      <tool>Consolidate contribution guidelines, code patterns, and past feedback into actionable references</tool>
+      <output>Complete execute_handoff for /execute command consumption</output>
     </step>
   </phase>
   <phase name="self_evaluate">
@@ -188,7 +205,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
   <agent name="history" subagent_type="general-purpose" readonly="true">Analyze author past PR feedback patterns via gh CLI</agent>
   <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description</agent>
-  <agent name="verify" subagent_type="devops" readonly="true">Determine local verification commands and detect change types for manual QA checklist</agent>
+  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, and detect change types for manual QA checklist</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
 </agents>
 
@@ -250,11 +267,142 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
         <title>Suggested PR title following contribution guide</title>
         <description>Suggested PR description with sections per upstream template</description>
       </pr_metadata>
-      <local_verification>
-        <command purpose="lint">npm run lint</command>
-        <command purpose="test">npm test</command>
-        <command purpose="build">npm run build</command>
-      </local_verification>
+      <local_reproduction>
+        <ecosystem_detection>
+          <description>Auto-detect project ecosystem from configuration files</description>
+          <priority_order>
+            <ecosystem priority="1" indicator="flake.nix">Nix (flake-based)</ecosystem>
+            <ecosystem priority="2" indicator="shell.nix or default.nix">Nix (legacy)</ecosystem>
+            <ecosystem priority="3" indicator="Makefile">Make</ecosystem>
+            <ecosystem priority="4" indicator="Cargo.toml">Rust/Cargo</ecosystem>
+            <ecosystem priority="5" indicator="go.mod">Go</ecosystem>
+            <ecosystem priority="6" indicator="package.json">Node.js/npm</ecosystem>
+            <ecosystem priority="7" indicator="pyproject.toml or setup.py">Python</ecosystem>
+            <ecosystem priority="8" indicator="Gemfile">Ruby</ecosystem>
+          </priority_order>
+          <detected_ecosystem>Ecosystem name based on files found</detected_ecosystem>
+        </ecosystem_detection>
+        <environment_setup>
+          <description>Prerequisites and environment initialization</description>
+          <prerequisite_commands ecosystem="nix-flake">
+            <command order="1" purpose="enter-shell">nix develop</command>
+            <command order="2" purpose="build-check">nix flake check</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="nix-legacy">
+            <command order="1" purpose="enter-shell">nix-shell</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="make">
+            <command order="1" purpose="setup">make setup or make deps (if target exists)</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="cargo">
+            <command order="1" purpose="fetch">cargo fetch</command>
+            <command order="2" purpose="build-check">cargo check</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="go">
+            <command order="1" purpose="fetch">go mod download</command>
+            <command order="2" purpose="build-check">go build ./...</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="npm">
+            <command order="1" purpose="install">npm install or npm ci</command>
+          </prerequisite_commands>
+          <prerequisite_commands ecosystem="python">
+            <command order="1" purpose="venv">python -m venv .venv and source .venv/bin/activate</command>
+            <command order="2" purpose="install">pip install -e . or uv sync</command>
+          </prerequisite_commands>
+          <environment_requirements>
+            <requirement type="env_var">List of required environment variables detected from .env.example or config</requirement>
+            <requirement type="tool">List of required tools (detected from CI config or README)</requirement>
+          </environment_requirements>
+        </environment_setup>
+        <service_dependencies>
+          <description>External services required for local testing</description>
+          <detection_sources>
+            <source>docker-compose.yml or compose.yml</source>
+            <source>.env.example (DATABASE_URL, REDIS_URL patterns)</source>
+            <source>CI workflow files (services section)</source>
+            <source>README.md (development setup section)</source>
+          </detection_sources>
+          <detected_services>
+            <service name="service-name" start_command="docker compose up -d service-name">Service description</service>
+          </detected_services>
+          <startup_command>docker compose up -d (if docker-compose.yml exists)</startup_command>
+        </service_dependencies>
+        <verification_commands>
+          <description>Ecosystem-specific verification commands</description>
+          <commands ecosystem="nix-flake">
+            <command purpose="check">nix flake check</command>
+            <command purpose="build">nix build</command>
+            <command purpose="test">nix flake check (if tests defined in flake outputs)</command>
+          </commands>
+          <commands ecosystem="cargo">
+            <command purpose="lint">cargo clippy</command>
+            <command purpose="test">cargo test</command>
+            <command purpose="build">cargo build --release</command>
+          </commands>
+          <commands ecosystem="go">
+            <command purpose="lint">go vet ./...</command>
+            <command purpose="test">go test ./...</command>
+            <command purpose="build">go build ./...</command>
+          </commands>
+          <commands ecosystem="npm">
+            <command purpose="lint">npm run lint</command>
+            <command purpose="test">npm test</command>
+            <command purpose="build">npm run build</command>
+          </commands>
+          <commands ecosystem="make">
+            <command purpose="lint">make lint (if target exists)</command>
+            <command purpose="test">make test</command>
+            <command purpose="build">make build or make all</command>
+          </commands>
+          <commands ecosystem="python">
+            <command purpose="lint">ruff check . or flake8</command>
+            <command purpose="test">pytest</command>
+            <command purpose="build">python -m build or pip install -e .</command>
+          </commands>
+        </verification_commands>
+        <reproduction_steps>
+          <description>Step-by-step local reproduction procedure</description>
+          <step order="1">
+            <action>Checkout branch</action>
+            <command>git checkout [branch-name]</command>
+            <expected_output>Switched to branch [branch-name]</expected_output>
+          </step>
+          <step order="2">
+            <action>Setup environment</action>
+            <command>Ecosystem-specific setup command from environment_setup</command>
+            <expected_output>Dependencies installed, environment ready</expected_output>
+          </step>
+          <step order="3">
+            <action>Start services (if needed)</action>
+            <command>Commands from service_dependencies</command>
+            <expected_output>All required services running</expected_output>
+          </step>
+          <step order="4">
+            <action>Run verification</action>
+            <command>Commands from verification_commands</command>
+            <expected_output>All checks pass (lint, test, build)</expected_output>
+          </step>
+          <step order="5">
+            <action>Manual testing</action>
+            <command>Start application locally (e.g., npm run dev, cargo run, go run .)</command>
+            <expected_output>Application running at expected URL/port</expected_output>
+          </step>
+          <step order="6">
+            <action>Verify change behavior</action>
+            <steps>Context-specific steps based on change type (UI, API, integration)</steps>
+            <expected_output>Change works as expected</expected_output>
+          </step>
+        </reproduction_steps>
+        <reproduction_confidence>
+          <score>0-100 based on detection completeness</score>
+          <factors>
+            <factor name="ecosystem_detected" weight="0.3">Was ecosystem clearly identified</factor>
+            <factor name="services_documented" weight="0.3">Are service dependencies clear</factor>
+            <factor name="commands_verified" weight="0.4">Do verification commands exist in project</factor>
+          </factors>
+          <fallback_guidance>If reproduction not feasible locally, suggest: CI-based testing, containerized environment, or ask maintainers</fallback_guidance>
+        </reproduction_confidence>
+      </local_reproduction>
       <manual_verification>
         <qa_category type="ui" condition="ui_changes_detected">
           <description>Visual and UI verification for frontend changes</description>
@@ -284,11 +432,97 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
         </detection_rules>
         <empty_state>If no change types detected, omit manual_verification section or display: No manual verification required for this change type</empty_state>
       </manual_verification>
-      <recommended_actions>
-        <action priority="high">Critical action before PR</action>
-        <action priority="medium">Recommended improvement</action>
-        <action priority="low">Optional enhancement</action>
-      </recommended_actions>
+      <task_breakdown>
+        <dependency_graph>
+          <description>Visual representation of task dependencies for parallel/sequential execution</description>
+          <example>
+Phase 1: Code Fixes (independent)
+Phase 2: Test Updates (independent)
+Phase 3: Documentation (depends on Phase 1)
+Phase 4: Final Verification (depends on all)
+          </example>
+        </dependency_graph>
+        <phased_tasks>
+          <dependency_format>
+            <description>Valid dependency formats for task dependencies field</description>
+            <format type="none">None</format>
+            <format type="list">CF-001, CF-002</format>
+            <format type="phase">All previous phases</format>
+          </dependency_format>
+          <phase name="code_fixes" order="1" parallel_safe="true">
+            <description>Lint errors, style issues, code quality improvements identified in review</description>
+            <task id="CF-001">
+              <files>List of files to modify</files>
+              <overview>Brief description of what needs to be done</overview>
+              <dependencies>None</dependencies>
+            </task>
+          </phase>
+          <phase name="test_updates" order="2" parallel_safe="true">
+            <description>Missing tests, coverage gaps, test improvements</description>
+            <task id="TU-001">
+              <files>List of test files</files>
+              <overview>Test task description</overview>
+              <dependencies>CF-001</dependencies>
+            </task>
+          </phase>
+          <phase name="documentation" order="3" parallel_safe="true">
+            <description>README, inline docs, changelog, API documentation</description>
+            <task id="DOC-001">
+              <files>Documentation files</files>
+              <overview>Documentation task description</overview>
+              <dependencies>CF-001</dependencies>
+            </task>
+          </phase>
+          <phase name="commit_prep" order="4" parallel_safe="false">
+            <description>Commit message formatting per contribution guidelines, rebasing onto upstream, squashing commits if required</description>
+            <task id="GIT-001">
+              <files>N/A (git operations)</files>
+              <overview>Git preparation task description</overview>
+              <dependencies>All previous phases</dependencies>
+            </task>
+          </phase>
+          <phase name="final_verification" order="5" parallel_safe="false">
+            <description>Running lint, test, build commands before PR</description>
+            <task id="VER-001">
+              <files>N/A (verification commands)</files>
+              <overview>Run all verification commands</overview>
+              <dependencies>All previous phases</dependencies>
+            </task>
+          </phase>
+        </phased_tasks>
+        <execute_handoff>
+          <description>This section is parsed by /execute command to initialize task context</description>
+          <decisions>
+            <decision id="D-001">Design decision description affecting implementation</decision>
+          </decisions>
+          <references>
+            <reference type="upstream_guidelines">Link or content of CONTRIBUTING.md requirements</reference>
+            <reference type="code_patterns">Relevant upstream code patterns to follow (specific file paths)</reference>
+            <reference type="past_feedback">Patterns from past PR reviews to address</reference>
+          </references>
+          <deliverables>
+            <deliverable task="CF-001">Expected output: fixed files passing lint</deliverable>
+            <deliverable task="TU-001">Expected output: new/updated tests passing</deliverable>
+            <deliverable task="DOC-001">Expected output: updated documentation</deliverable>
+            <deliverable task="GIT-001">Expected output: clean commit history ready for PR</deliverable>
+            <deliverable task="VER-001">Expected output: all verification commands pass</deliverable>
+          </deliverables>
+          <memory_hints>
+            <hint>Check serena memory for: contribution patterns of this upstream repo</hint>
+            <hint>Check serena memory for: past PR feedback patterns</hint>
+          </memory_hints>
+          <verification_criteria>
+            <criterion task="CF-001">Lint passes with zero errors</criterion>
+            <criterion task="TU-001">Test suite passes, coverage not decreased</criterion>
+            <criterion task="VER-001">All verification_commands exit 0</criterion>
+          </verification_criteria>
+          <constraints>
+            <constraint>Must maintain read-only until /execute is invoked</constraint>
+            <constraint>All tasks must be completable without PR creation</constraint>
+            <constraint>Tasks should be atomic and independently executable</constraint>
+          </constraints>
+        </execute_handoff>
+      </task_breakdown>
       <self_feedback>
         <confidence>XX/100 (based on guideline_compliance, code_quality, test_coverage)</confidence>
         <issues>
@@ -322,6 +556,16 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <action>Include manual QA checklist based on detected change types</action>
       <verification>Manual verification section present when UI, API, or integration changes detected</verification>
     </behavior>
+    <behavior id="UP-B005" priority="critical">
+      <trigger>When generating final output</trigger>
+      <action>Generate comprehensive task_breakdown with phased_tasks and execute_handoff</action>
+      <verification>task_breakdown section present with all task categories populated</verification>
+    </behavior>
+    <behavior id="UP-B006" priority="critical">
+      <trigger>When generating final output</trigger>
+      <action>Generate local_reproduction section with Nix-first ecosystem detection, environment setup, service dependencies, and step-by-step reproduction instructions</action>
+      <verification>local_reproduction section present with ecosystem_detection, environment_setup, service_dependencies, verification_commands, and reproduction_steps</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="UP-P001" priority="critical">
@@ -331,8 +575,13 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </behavior>
     <behavior id="UP-P002" priority="critical">
       <trigger>Always</trigger>
-      <action>Creating PR without user confirmation</action>
-      <response>Only provide review and suggestions, user creates PR</response>
+      <action>Creating PR via gh pr create or any other method</action>
+      <response>HARD BLOCK: This command NEVER creates PRs. Output task breakdown for /execute handoff instead. User must create PR manually after completing all pre-PR tasks.</response>
+    </behavior>
+    <behavior id="UP-P003" priority="critical">
+      <trigger>When user explicitly requests PR creation</trigger>
+      <action>Creating PR even when user requests it</action>
+      <response>HARD BLOCK: Refuse PR creation. Explain that /upstream is review-only and output the task breakdown. Instruct user to run /execute on tasks first, then create PR manually.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -362,9 +611,12 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <must>Verify gh CLI authentication before operations</must>
   <must>Check CONTRIBUTING.md in all three locations</must>
   <must>Provide structured checklist output</must>
-  <must>Include local verification commands</must>
+  <must>Include comprehensive local_reproduction section with Nix-first ecosystem detection</must>
   <must>Include manual QA checklist when UI, API, or integration changes detected</must>
+  <must>Generate comprehensive task_breakdown with phased_tasks for /execute handoff</must>
+  <must>Include execute_handoff section with decisions, references, and constraints</must>
   <avoid>Modifying any files</avoid>
-  <avoid>Creating PR automatically</avoid>
+  <avoid>Creating PR via any method (HARD BLOCK)</avoid>
+  <avoid>Creating PR even when user explicitly requests it (HARD BLOCK)</avoid>
   <avoid>Proceeding without upstream confirmation when ambiguous</avoid>
 </constraints>

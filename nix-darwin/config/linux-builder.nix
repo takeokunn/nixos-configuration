@@ -3,9 +3,6 @@
   nix.linux-builder = {
     enable = false;
     ephemeral = true;
-    systems = [
-      "x86_64-linux"
-    ];
     config = {
       virtualisation = {
         cores = 8;
