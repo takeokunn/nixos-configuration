@@ -12,6 +12,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <skill use="workflow">fact-check</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
+  <skill use="ecosystem">devenv-ecosystem</skill>
 </refs>
 
 <rules priority="critical">
@@ -125,9 +126,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Ecosystem detection, environment setup, service dependencies, verification commands</output>
     </step>
     <step order="3">
-      <action>Detect change types and generate manual QA checklist</action>
-      <tool>Analyze diff for UI components, API endpoints, integration points using detection_rules</tool>
-      <output>Change type detection (ui, api, integration) and applicable manual QA items</output>
+      <action>Detect change types and generate context-injected manual QA checklist</action>
+      <tool>Analyze diff for UI components, API endpoints, database migrations, config changes, security files, integration points using detection_rules</tool>
+      <output>Change type detection (ui, api, database, config, security, integration) with actual paths, endpoints, and component names injected into qa_step commands</output>
     </step>
     <step order="4">
       <action>Compile checklist with all findings</action>
@@ -205,7 +206,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
   <agent name="history" subagent_type="general-purpose" readonly="true">Analyze author past PR feedback patterns via gh CLI</agent>
   <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description</agent>
-  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, and detect change types for manual QA checklist</agent>
+  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
 </agents>
 
@@ -404,33 +405,193 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
         </reproduction_confidence>
       </local_reproduction>
       <manual_verification>
-        <qa_category type="ui" condition="ui_changes_detected">
-          <description>Visual and UI verification for frontend changes</description>
-          <item>Verify visual layout matches design expectations</item>
-          <item>Test responsive behavior at breakpoints (mobile/tablet/desktop)</item>
-          <item>Check dark mode and theme compatibility</item>
-          <item>Verify accessibility (keyboard navigation, screen reader)</item>
-        </qa_category>
-        <qa_category type="api" condition="api_changes_detected">
-          <description>API endpoint verification for backend changes</description>
-          <item>Verify endpoint responses with curl or Postman</item>
-          <item>Test error responses (4xx, 5xx) with invalid inputs</item>
-          <item>Verify authentication and authorization behavior</item>
-          <item>Check response payload structure matches documentation</item>
-        </qa_category>
-        <qa_category type="integration" condition="integration_changes_detected">
-          <description>Integration flow verification for cross-component changes</description>
-          <item>Test complete user flow end-to-end</item>
-          <item>Verify cross-component data flow correctness</item>
-          <item>Test state persistence across page navigation</item>
-          <item>Verify error handling propagation between components</item>
-        </qa_category>
+        <description>Create a reproducible verification environment using devenv</description>
+        <directory_structure>
+          <base_path>/tmp/[repo-name]/[branch-name-or-issue-number]/</base_path>
+          <files>
+            <file name="devenv.nix">Ecosystem-specific development environment</file>
+            <file name=".envrc">direnv integration with use devenv</file>
+            <file name="README.md">Detailed verification instructions</file>
+            <file name="fixtures/">Test fixtures and sample data directory</file>
+            <file name=".git/">Initialized git repository</file>
+          </files>
+        </directory_structure>
+        <workflow>
+          <step order="1" action="create_directory">
+            <command>mkdir -p /tmp/[repo-name]/[branch-name-or-issue-number]</command>
+            <expected_output>Directory created at /tmp/[repo-name]/[branch-name-or-issue-number]</expected_output>
+          </step>
+          <step order="2" action="generate_devenv">
+            <description>Generate ecosystem-specific devenv.nix based on detected ecosystem</description>
+            <tool>Write tool</tool>
+            <output_file>devenv.nix</output_file>
+          </step>
+          <step order="3" action="generate_envrc">
+            <description>Generate .envrc for direnv integration</description>
+            <tool>Write tool</tool>
+            <output_file>.envrc</output_file>
+            <content>eval "$(devenv direnvrc)"
+use devenv</content>
+          </step>
+          <step order="4" action="generate_fixtures">
+            <description>Generate verification files based on change type</description>
+            <tool>Write tool</tool>
+            <output_directory>fixtures/</output_directory>
+          </step>
+          <step order="5" action="generate_readme">
+            <description>Generate README.md with detailed verification steps</description>
+            <tool>Write tool</tool>
+            <output_file>README.md</output_file>
+          </step>
+          <step order="6" action="initialize_git">
+            <command>cd /tmp/[repo-name]/[branch-name-or-issue-number] &amp;&amp; git init &amp;&amp; git add .</command>
+            <expected_output>Initialized git repository with all files staged</expected_output>
+          </step>
+        </workflow>
+        <devenv_templates>
+          <description>Generate devenv.nix configuration for verification environments based on detected ecosystem</description>
+          <skill_reference>
+            <skill>devenv-ecosystem</skill>
+            <usage>Consult devenv-ecosystem skill for language configuration patterns, version pinning, package manager selection, services (databases, caches), git-hooks, scripts, processes, profiles, env/dotenv configuration, and all devenv.nix options</usage>
+          </skill_reference>
+        </devenv_templates>
+        <fixtures_generation>
+          <fixture_type change_type="api">
+            <directory>fixtures/api/</directory>
+            <files>
+              <file name="request.json">Sample API request body</file>
+              <file name="response.json">Expected API response</file>
+              <file name="test.sh">curl commands for API testing</file>
+            </files>
+          </fixture_type>
+          <fixture_type change_type="database">
+            <directory>fixtures/data/</directory>
+            <files>
+              <file name="seed.sql">Test data seed script</file>
+              <file name="verify.sql">Verification queries</file>
+            </files>
+          </fixture_type>
+          <fixture_type change_type="config">
+            <directory>fixtures/config/</directory>
+            <files>
+              <file name=".env.test">Test environment variables</file>
+              <file name="config.test.json">Test configuration</file>
+            </files>
+          </fixture_type>
+          <fixture_type change_type="ui">
+            <directory>fixtures/screenshots/</directory>
+            <files>
+              <file name="expected/">Expected screenshot directory</file>
+              <file name="viewports.json">Viewport configurations for testing</file>
+            </files>
+          </fixture_type>
+          <fixture_type change_type="security">
+            <directory>fixtures/security/</directory>
+            <files>
+              <file name="test_tokens.json">Test authentication tokens (non-production)</file>
+              <file name="permissions.json">Permission matrix for testing</file>
+              <file name="auth_test.sh">Authentication flow test script</file>
+            </files>
+          </fixture_type>
+          <fixture_type change_type="integration">
+            <directory>fixtures/integration/</directory>
+            <files>
+              <file name="mock_services.json">Mock service configurations</file>
+              <file name="event_payloads.json">Sample event and webhook payloads</file>
+              <file name="sequence.md">Integration test sequence documentation</file>
+            </files>
+          </fixture_type>
+        </fixtures_generation>
+        <readme_template>
+          <sections>
+            <section name="Overview">
+              <description>PR summary and change description</description>
+              <template>
+# Verification Environment for [pr-title]
+
+**Branch:** [branch-name-or-issue-number]
+**Upstream:** [upstream-url]
+**Ecosystem:** [detected-ecosystem]
+
+[pr-description]
+              </template>
+            </section>
+            <section name="Prerequisites">
+              <description>Required tools and environment setup</description>
+              <template>
+## Prerequisites
+
+- nix (with flakes enabled)
+- direnv (for automatic environment activation)
+- devenv
+              </template>
+            </section>
+            <section name="Setup">
+              <description>Step-by-step environment initialization</description>
+              <template>
+## Setup
+
+1. Navigate to this directory
+2. Run `direnv allow` to activate the environment
+3. Wait for devenv to initialize
+              </template>
+            </section>
+            <section name="Verification Steps">
+              <description>Detailed manual verification procedures</description>
+              <template>
+## Verification Steps
+
+(Generated based on detected change types)
+              </template>
+            </section>
+            <section name="Expected Results">
+              <description>What success looks like</description>
+              <template>
+## Expected Results
+
+(Generated based on change analysis)
+              </template>
+            </section>
+            <section name="Troubleshooting">
+              <description>Common issues and solutions</description>
+              <template>
+## Troubleshooting
+
+### direnv not activating
+Run `direnv allow` in the directory.
+
+### devenv not found
+Install devenv: `nix profile install github:cachix/devenv`
+              </template>
+            </section>
+          </sections>
+        </readme_template>
         <detection_rules>
-          <rule type="ui">Changes to *.css, *.scss, *.html, *.jsx, *.tsx, *.vue, *.svelte files</rule>
-          <rule type="api">Changes to **/api/**, **/routes/**, **/handlers/**, *.openapi.*, *.swagger.* files</rule>
-          <rule type="integration">Changes spanning 3+ modules or external service configurations</rule>
+          <rule type="ui">Changes to *.css, *.scss, *.sass, *.less, *.html, *.jsx, *.tsx, *.vue, *.svelte, **/components/**, **/pages/**, **/views/**</rule>
+          <rule type="api">Changes to **/api/**, **/routes/**, **/handlers/**, **/controllers/**, **/endpoints/**, *.openapi.*, *.swagger.*, **/graphql/**</rule>
+          <rule type="database">Changes to **/migrations/**, **/schema/**, **/models/**, *.sql, **/prisma/**, **/drizzle/**, **/typeorm/**, **/sequelize/**</rule>
+          <rule type="config">Changes to *.env*, *.config.*, docker-compose.*, compose.*, *.yaml, *.yml, *.toml, *.json (config), **/config/**, Dockerfile*, .docker/**</rule>
+          <rule type="security">Changes to **/auth/**, **/authentication/**, **/authorization/**, **/permission/**, **/security/**, **/middleware/auth*, **/guards/**, *.key, *.pem, *.cert, **/crypto/**</rule>
+          <rule type="integration">Changes spanning 3+ modules, external service configurations, message queue handlers, event emitters/listeners, webhook handlers</rule>
         </detection_rules>
-        <empty_state>If no change types detected, omit manual_verification section or display: No manual verification required for this change type</empty_state>
+        <context_injection>
+          <description>The synthesize phase MUST replace these placeholders with actual values from diff analysis</description>
+          <placeholder name="[repo-name]">Repository name extracted from git remote (e.g., owner/repo becomes repo)</placeholder>
+          <placeholder name="[branch-name-or-issue-number]">Current branch name or related issue number</placeholder>
+          <placeholder name="[detected-ecosystem]">Ecosystem detected from project files</placeholder>
+          <placeholder name="[upstream-url]">Upstream repository URL</placeholder>
+          <placeholder name="[pr-title]">Generated PR title</placeholder>
+          <placeholder name="[pr-description]">Generated PR description</placeholder>
+        </context_injection>
+        <verification_confidence>
+          <score>0-100 based on environment reproducibility</score>
+          <factors>
+            <factor name="ecosystem_detected" weight="0.3">Was ecosystem clearly identified</factor>
+            <factor name="devenv_completeness" weight="0.4">Does devenv.nix include all required tools</factor>
+            <factor name="readme_clarity" weight="0.3">Are verification steps clear and executable</factor>
+          </factors>
+        </verification_confidence>
+        <empty_state>If no verification environment needed, skip directory creation</empty_state>
       </manual_verification>
       <task_breakdown>
         <dependency_graph>
@@ -551,10 +712,15 @@ Phase 4: Final Verification (depends on all)
       <action>Follow detected contribution guidelines format</action>
       <verification>Metadata matches upstream conventions</verification>
     </behavior>
-    <behavior id="UP-B004" priority="standard">
+    <behavior id="UP-B004" priority="critical">
       <trigger>When generating final output</trigger>
-      <action>Include manual QA checklist based on detected change types</action>
-      <verification>Manual verification section present when UI, API, or integration changes detected</verification>
+      <action>Include manual QA checklist with structured qa_steps based on detected change types (ui, api, database, config, security, integration)</action>
+      <verification>Manual verification section present with ordered qa_steps containing action, tool, command, expected_output for each detected change type</verification>
+    </behavior>
+    <behavior id="UP-B007" priority="critical">
+      <trigger>When generating manual_verification section</trigger>
+      <action>Inject actual values from diff analysis into qa_step commands replacing all placeholders</action>
+      <verification>All placeholders ([endpoint-path], [component-name], [table-name], etc.) replaced with actual detected values; qa_confidence score reflects injection completeness</verification>
     </behavior>
     <behavior id="UP-B005" priority="critical">
       <trigger>When generating final output</trigger>
@@ -612,7 +778,9 @@ Phase 4: Final Verification (depends on all)
   <must>Check CONTRIBUTING.md in all three locations</must>
   <must>Provide structured checklist output</must>
   <must>Include comprehensive local_reproduction section with Nix-first ecosystem detection</must>
-  <must>Include manual QA checklist when UI, API, or integration changes detected</must>
+  <must>Include manual QA checklist with structured qa_steps when ui, api, database, config, security, or integration changes detected</must>
+  <must>Inject actual paths, endpoints, and component names into qa_step commands from diff analysis</must>
+  <must>Include qa_confidence score with weighted factors in manual_verification section</must>
   <must>Generate comprehensive task_breakdown with phased_tasks for /execute handoff</must>
   <must>Include execute_handoff section with decisions, references, and constraints</must>
   <avoid>Modifying any files</avoid>

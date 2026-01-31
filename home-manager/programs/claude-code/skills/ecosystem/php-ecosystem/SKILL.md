@@ -1,15 +1,55 @@
 ---
 name: PHP Ecosystem
 description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", or works with modern PHP language patterns and configuration. Provides comprehensive modern PHP ecosystem patterns and best practices.
+version: 0.2.0
 ---
 
 <purpose>
-  Provide comprehensive patterns for modern PHP (8.1+) language features, PSR standards, testing, static analysis, and package development in a framework-agnostic approach.
+  Provide comprehensive patterns for modern PHP (8.3+) language features, PSR standards, testing, static analysis, and package development in a framework-agnostic approach.
 </purpose>
+
+<tools>
+  <tool>Read - Analyze composer.json and PHP source files</tool>
+  <tool>Edit - Modify PHP code and Composer configuration</tool>
+  <tool>Bash - Run composer, phpunit, phpstan, php-cs-fixer commands</tool>
+  <tool>mcp__context7__get-library-docs - Fetch latest PHP documentation</tool>
+</tools>
+
+<concepts>
+  <concept name="strict_types">Enable declare(strict_types=1) in all PHP files for type safety</concept>
+  <concept name="psr_standards">Follow PSR-1, PSR-4, PER-CS for interoperability</concept>
+  <concept name="dependency_injection">Inject dependencies through constructor; avoid service locator pattern</concept>
+  <concept name="value_objects">Use readonly classes for immutable domain values (PHP 8.2+)</concept>
+  <concept name="property_hooks">Use property hooks for validation and computed properties (PHP 8.4+)</concept>
+</concepts>
+
+<rules priority="critical">
+  <rule>Enable declare(strict_types=1) in all PHP files</rule>
+  <rule>Use prepared statements for all database queries</rule>
+  <rule>Run PHPStan level 9+ before committing</rule>
+  <rule>Never suppress errors with @ operator</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Follow PER-CS coding style</rule>
+  <rule>Use named arguments for functions with 3+ parameters</rule>
+  <rule>Create custom exceptions for domain errors</rule>
+  <rule>Use readonly classes for value objects</rule>
+  <rule>Prefer property hooks over getters/setters (PHP 8.4+)</rule>
+</rules>
 
 <php_version>
   <version_mapping>
     <description>PHP version-specific feature availability</description>
+    <version php="8.4" released="2024-11">
+      <feature>Property hooks (get/set)</feature>
+      <feature>Asymmetric visibility (public private(set))</feature>
+      <feature>#[Deprecated] attribute</feature>
+      <feature>Lazy objects</feature>
+      <feature>new MyClass()-&gt;method() without parentheses</feature>
+      <feature>array_find(), array_find_key(), array_any(), array_all()</feature>
+      <feature>mb_trim(), mb_ltrim(), mb_rtrim()</feature>
+    </version>
     <version php="8.3" released="2023-11">
       <feature>Typed class constants</feature>
       <feature>json_validate() function</feature>
@@ -270,7 +310,206 @@ description: This skill should be used when the user asks to "write php", "php 8
       </example>
     </pattern>
   </typed_class_constants>
+
+  <property_hooks>
+    <pattern name="basic-hooks">
+      <description>Property hooks for validation and transformation (PHP 8.4+)</description>
+      <example>
+        class User
+        {
+            public string $email {
+                get =&gt; $this-&gt;email;
+                set {
+                    if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        throw new InvalidArgumentException('Invalid email');
+                    }
+                    $this-&gt;email = strtolower($value);
+                }
+            }
+        }
+      </example>
+      <decision_tree name="when_to_use">
+        <question>Do you need validation or transformation on property access?</question>
+        <if_yes>Use property hooks instead of getters/setters</if_yes>
+        <if_no>Use simple public properties or readonly</if_no>
+      </decision_tree>
+    </pattern>
+
+    <pattern name="virtual-property">
+      <description>Computed property without backing storage (PHP 8.4+)</description>
+      <example>
+        class User
+        {
+            public string $fullName {
+                get =&gt; $this-&gt;firstName . ' ' . $this-&gt;lastName;
+            }
+
+            public function __construct(
+                public string $firstName,
+                public string $lastName,
+            ) {}
+        }
+      </example>
+    </pattern>
+
+    <pattern name="old_vs_modern">
+      <description>Migration from getters/setters to property hooks</description>
+      <old_way>
+        // Before PHP 8.4: Boilerplate getters/setters
+        class Product
+        {
+            private int $price;
+
+            public function getPrice(): int
+            {
+                return $this-&gt;price;
+            }
+
+            public function setPrice(int $price): void
+            {
+                if ($price &lt; 0) {
+                    throw new InvalidArgumentException('Price cannot be negative');
+                }
+                $this-&gt;price = $price;
+            }
+        }
+
+        // Usage
+        $product-&gt;setPrice(100);
+        echo $product-&gt;getPrice();
+      </old_way>
+      <modern_way>
+        // PHP 8.4+: Property hooks
+        class Product
+        {
+            public int $price {
+                set {
+                    if ($value &lt; 0) {
+                        throw new InvalidArgumentException('Price cannot be negative');
+                    }
+                    $this-&gt;price = $value;
+                }
+            }
+        }
+
+        // Usage - direct property access
+        $product-&gt;price = 100;
+        echo $product-&gt;price;
+      </modern_way>
+    </pattern>
+  </property_hooks>
+
+  <asymmetric_visibility>
+    <pattern name="public-read-private-write">
+      <description>Public read access with private write (PHP 8.4+)</description>
+      <example>
+        class Order
+        {
+            public private(set) string $status = 'pending';
+            public private(set) DateTimeImmutable $createdAt;
+            public private(set) ?DateTimeImmutable $processedAt = null;
+
+            public function __construct()
+            {
+                $this-&gt;createdAt = new DateTimeImmutable();
+            }
+
+            public function process(): void
+            {
+                $this-&gt;status = 'processed';
+                $this-&gt;processedAt = new DateTimeImmutable();
+            }
+        }
+
+        // Usage
+        $order = new Order();
+        echo $order-&gt;status;       // OK: public read
+        $order-&gt;status = 'failed'; // Error: private write
+      </example>
+      <decision_tree name="when_to_use">
+        <question>Do you need public read but controlled write access?</question>
+        <if_yes>Use asymmetric visibility (public private(set))</if_yes>
+        <if_no>Use readonly for immutable or regular visibility for mutable</if_no>
+      </decision_tree>
+    </pattern>
+  </asymmetric_visibility>
+
+  <deprecated_attribute>
+    <pattern name="basic">
+      <description>Mark functions/methods/constants as deprecated (PHP 8.4+)</description>
+      <example>
+        class ApiService
+        {
+            #[Deprecated(
+                message: 'Use fetchV2() instead',
+                since: '2.0.0'
+            )]
+            public function fetch(): array
+            {
+                return $this-&gt;fetchV2();
+            }
+
+            public function fetchV2(): array
+            {
+                // New implementation
+            }
+        }
+
+        // Usage triggers E_USER_DEPRECATED automatically
+        $service-&gt;fetch();
+      </example>
+    </pattern>
+  </deprecated_attribute>
+
+  <lazy_objects>
+    <pattern name="lazy_ghost">
+      <description>Create lazy-initialized objects (PHP 8.4+)</description>
+      <example>
+        class ExpensiveService
+        {
+            public function __construct()
+            {
+                // Heavy initialization...
+            }
+        }
+
+        // Create lazy ghost - initializes only when accessed
+        $reflector = new ReflectionClass(ExpensiveService::class);
+        $service = $reflector-&gt;newLazyGhost(
+            function (ExpensiveService $instance) {
+                // Called when first property/method accessed
+                $instance-&gt;__construct();
+            }
+        );
+
+        // $service not initialized yet
+        $service-&gt;doSomething(); // Triggers initialization
+      </example>
+      <decision_tree name="when_to_use">
+        <question>Do you need to defer expensive object creation?</question>
+        <if_yes>Use lazy ghost for same-class or lazy proxy for interface wrapping</if_yes>
+        <if_no>Use regular instantiation</if_no>
+      </decision_tree>
+    </pattern>
+  </lazy_objects>
 </type_system>
+
+<context7_integration>
+  <library_id>/php/doc-en</library_id>
+  <trust_score>9.4</trust_score>
+
+  <usage_pattern>
+    <step>For PHP core documentation, use library ID /php/doc-en</step>
+    <step>Fetch specific topic documentation with get-library-docs</step>
+  </usage_pattern>
+
+  <common_queries>
+    <query topic="attributes">PHP attribute syntax and usage</query>
+    <query topic="enums">Enumeration types and patterns</query>
+    <query topic="readonly">Readonly properties and classes</query>
+    <query topic="property-hooks">Property hooks syntax (PHP 8.4)</query>
+  </common_queries>
+</context7_integration>
 
 <psr_standards>
   <psr name="PSR-1" title="Basic Coding Standard">
@@ -658,7 +897,7 @@ description: This skill should be used when the user asks to "write php", "php 8
       <example>
         {
             "require": {
-                "php": "^8.2",
+                "php": "^8.3",
                 "psr/log": "^3.0",
                 "guzzlehttp/guzzle": "^7.0"
             },
@@ -957,6 +1196,25 @@ description: This skill should be used when the user asks to "write php", "php 8
       <note>Start at level 5-6 for existing projects, level 9-10 for new projects. Use --level max for highest available.</note>
     </pattern>
 
+    <pattern name="level-9-10-config">
+      <description>Maximum strictness configuration for new projects</description>
+      <example>
+        # phpstan.neon
+        includes:
+            - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+        parameters:
+            level: 10  # PHPStan 2.0+ (use 9 for PHPStan 1.x)
+            paths:
+                - src
+                - tests
+            checkUninitializedProperties: true
+            checkBenevolentUnionTypes: true
+            reportPossiblyNonexistentGeneralArrayOffset: true
+      </example>
+      <note>Level 10 treats implicit mixed (missing types) as strictly as explicit mixed. Use phpstan-strict-rules for additional checks like === enforcement.</note>
+    </pattern>
+
     <pattern name="generics">
       <description>Generic types with PHPStan annotations</description>
       <example>
@@ -1043,8 +1301,8 @@ description: This skill should be used when the user asks to "write php", "php 8
 
         return (new PhpCsFixer\Config())
             -&gt;setRules([
-                '@PER-CS2.0' =&gt; true,
-                '@PHP82Migration' =&gt; true,
+                '@PER-CS' =&gt; true,
+                '@PHP84Migration' =&gt; true,
                 'strict_types' =&gt; true,
                 'declare_strict_types' =&gt; true,
                 'array_syntax' =&gt; ['syntax' =&gt; 'short'],
@@ -1077,9 +1335,9 @@ description: This skill should be used when the user asks to "write php", "php 8
                 SetList::DEAD_CODE,
                 SetList::TYPE_DECLARATION,
             ])
-            -&gt;withPhpSets(php83: true);
+            -&gt;withPhpSets(php84: true);
       </example>
-      <note>LevelSetList (e.g., UP_TO_PHP_83) deprecated since Rector 0.19.2. Use -&gt;withPhpSets() instead.</note>
+      <note>LevelSetList (e.g., UP_TO_PHP_84) deprecated since Rector 0.19.2. Use -&gt;withPhpSets() instead.</note>
     </pattern>
   </rector>
 </static_analysis>
@@ -1161,7 +1419,7 @@ description: This skill should be used when the user asks to "write php", "php 8
       <description>JIT compiler settings (PHP 8.0+)</description>
       <example>
         ; php.ini JIT settings
-        opcache.jit=1255
+        opcache.jit=tracing
         opcache.jit_buffer_size=128M
       </example>
       <note>JIT provides most benefit for CPU-intensive tasks, less for I/O-bound web apps</note>
@@ -1269,6 +1527,51 @@ description: This skill should be used when the user asks to "write php", "php 8
   </pattern>
 </error_handling>
 
+<array_functions>
+  <php84_functions>
+    <function name="array_find">
+      <description>Find first element matching predicate (PHP 8.4+)</description>
+      <example>
+        $users = [
+            ['id' =&gt; 1, 'active' =&gt; false],
+            ['id' =&gt; 2, 'active' =&gt; true],
+            ['id' =&gt; 3, 'active' =&gt; true],
+        ];
+
+        $firstActive = array_find($users, fn($user) =&gt; $user['active']);
+        // ['id' =&gt; 2, 'active' =&gt; true]
+      </example>
+    </function>
+
+    <function name="array_find_key">
+      <description>Find key of first element matching predicate (PHP 8.4+)</description>
+      <example>
+        $users = [
+            'john' =&gt; ['active' =&gt; false],
+            'jane' =&gt; ['active' =&gt; true],
+        ];
+
+        $firstActiveKey = array_find_key($users, fn($user) =&gt; $user['active']);
+        // 'jane'
+      </example>
+    </function>
+
+    <function name="array_any">
+      <description>Check if any element matches predicate (PHP 8.4+)</description>
+      <example>
+        $hasAdmin = array_any($users, fn($u) =&gt; $u['role'] === 'admin');
+      </example>
+    </function>
+
+    <function name="array_all">
+      <description>Check if all elements match predicate (PHP 8.4+)</description>
+      <example>
+        $allActive = array_all($users, fn($u) =&gt; $u['active']);
+      </example>
+    </function>
+  </php84_functions>
+</array_functions>
+
 <anti_patterns>
   <avoid name="god_class">
     <description>Classes that do too much</description>
@@ -1317,7 +1620,7 @@ description: This skill should be used when the user asks to "write php", "php 8
 <best_practices>
   <practice priority="critical">Enable strict_types in all PHP files</practice>
   <practice priority="critical">Use prepared statements for all database queries</practice>
-  <practice priority="critical">Use PHPStan level 6+ for type safety</practice>
+  <practice priority="critical">Use PHPStan level 9+ for type safety</practice>
   <practice priority="high">Use readonly classes for value objects</practice>
   <practice priority="high">Follow PSR-12 coding style</practice>
   <practice priority="high">Use enums instead of string/int constants</practice>

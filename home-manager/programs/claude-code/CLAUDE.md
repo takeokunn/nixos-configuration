@@ -190,6 +190,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="sql-ecosystem">SQL dialect patterns, query optimization, and database schema design</skill>
     <skill name="swift-ecosystem">Swift language, SPM, SwiftLint, SwiftFormat, and cross-platform patterns</skill>
     <skill name="haskell-ecosystem">Haskell language, GHC, Cabal/Stack, HLS, optics (lens), monad transformers (mtl), type-level patterns, and HSpec/QuickCheck testing</skill>
+    <skill name="devenv-ecosystem">Devenv configuration, languages.*, services.*, git-hooks, scripts, processes, profiles, and outputs patterns</skill>
   </category>
 </skills>
 

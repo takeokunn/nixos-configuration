@@ -149,6 +149,7 @@ in
       php-ecosystem = builtins.readFile ./skills/ecosystem/php-ecosystem/SKILL.md;
       swift-ecosystem = builtins.readFile ./skills/ecosystem/swift-ecosystem/SKILL.md;
       haskell-ecosystem = builtins.readFile ./skills/ecosystem/haskell-ecosystem/SKILL.md;
+      devenv-ecosystem = builtins.readFile ./skills/ecosystem/devenv-ecosystem/SKILL.md;
     };
 
     mcpServers =

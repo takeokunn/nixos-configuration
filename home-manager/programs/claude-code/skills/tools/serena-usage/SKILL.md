@@ -295,6 +295,76 @@ version: 0.2.0
     </example>
   </pattern>
 
+  <pattern name="memory_auto_creation_triggers">
+    <description>When to automatically create or update memories</description>
+    <should_create>
+      <trigger>After discovering significant architectural pattern</trigger>
+      <trigger>After resolving complex bug with reusable debugging insights</trigger>
+      <trigger>After completing feature with reusable implementation pattern</trigger>
+      <trigger>When user explicitly mentions a convention or preference</trigger>
+      <trigger>After successful refactoring with transferable approach</trigger>
+    </should_create>
+    <should_not_create>
+      <trigger>One-off fixes with no broader applicability</trigger>
+      <trigger>User-specific temporary preferences</trigger>
+      <trigger>Workarounds that should be replaced later</trigger>
+      <trigger>Information already documented elsewhere</trigger>
+    </should_not_create>
+    <example>
+      <note>Good: After discovering project uses specific error handling pattern</note>
+      write_memory "error-handling-pattern" "# Error Handling Convention\n\nThis project uses Result type pattern with custom Error enum..."
+
+      <note>Skip: After fixing typo in variable name</note>
+      <note>No memory needed - not a reusable pattern</note>
+    </example>
+  </pattern>
+
+  <pattern name="memory_reading_by_task_type">
+    <description>Which memories to prioritize based on task type</description>
+    <task_type name="investigation">
+      <priority>1. {domain}-patterns (e.g., authentication-patterns)</priority>
+      <priority>2. architecture-* (architectural decisions)</priority>
+      <priority>3. {project}-conventions</priority>
+    </task_type>
+    <task_type name="implementation">
+      <priority>1. {feature}-patterns (e.g., api-patterns)</priority>
+      <priority>2. {language}-conventions (e.g., typescript-conventions)</priority>
+      <priority>3. testing-patterns</priority>
+    </task_type>
+    <task_type name="review">
+      <priority>1. {project}-conventions</priority>
+      <priority>2. code-quality-* patterns</priority>
+      <priority>3. architecture-* decisions</priority>
+    </task_type>
+    <task_type name="refactoring">
+      <priority>1. architecture-* decisions</priority>
+      <priority>2. {component}-patterns</priority>
+      <priority>3. testing-patterns</priority>
+    </task_type>
+  </pattern>
+
+  <pattern name="memory_lifecycle">
+    <description>Memory versioning, archival, and consolidation patterns</description>
+    <versioning>
+      <convention>Use date suffix for major updates: {name}-YYYY-MM</convention>
+      <example>claude-code-architecture-2026-01</example>
+      <note>For minor updates, use edit_memory instead of creating new version</note>
+    </versioning>
+    <archival>
+      <trigger>When pattern is superseded by new approach</trigger>
+      <action>Rename with -archived suffix OR delete if no historical value</action>
+      <example>edit_memory "old-pattern" "..." "ARCHIVED: Superseded by new-pattern\n\n..."</example>
+    </archival>
+    <consolidation>
+      <trigger>When multiple small memories cover related topics</trigger>
+      <action>Merge into single comprehensive memory</action>
+      <example>
+        <note>Instead of: api-auth-pattern, api-error-pattern, api-retry-pattern</note>
+        <note>Create: api-patterns with all three sections</note>
+      </example>
+    </consolidation>
+  </pattern>
+
   <decision_tree name="serena_code_operation">
     <question>What type of code operation is needed?</question>
     <branch condition="Understand file structure">Use get_symbols_overview with depth=1</branch>
@@ -322,6 +392,65 @@ version: 0.2.0
     <branch condition="Check patterns">Use list_memories then read_memory</branch>
     <branch condition="Record patterns">Use write_memory</branch>
     <branch condition="Update patterns">Use edit_memory</branch>
+  </decision_tree>
+
+  <decision_tree name="serena_first_tool_selection">
+    <description>Serena-first tool selection hierarchy with explicit fallback conditions</description>
+    <question>What type of search or code operation is needed?</question>
+    <branch condition="Find files by name pattern">
+      <primary>Use Serena find_file</primary>
+      <fallback condition="Serena project not activated OR find_file returns no results">Use Glob</fallback>
+    </branch>
+    <branch condition="Search file contents for pattern">
+      <primary>Use Serena search_for_pattern</primary>
+      <fallback condition="Serena project not activated OR non-code files need different treatment">Use Grep</fallback>
+    </branch>
+    <branch condition="List directory contents">
+      <primary>Use Serena list_dir</primary>
+      <fallback condition="Serena project not activated">Use Bash ls</fallback>
+    </branch>
+    <branch condition="View file structure/symbols">
+      <primary>Use Serena get_symbols_overview (depth=0 first, then depth=1)</primary>
+      <fallback condition="File is not code (YAML, JSON, MD) OR Serena unavailable">Use Read with offset/limit</fallback>
+    </branch>
+    <branch condition="Find specific function/class/method">
+      <primary>Use Serena find_symbol with name_path_pattern</primary>
+      <fallback condition="Symbol name unknown">Use find_symbol with substring_matching=true</fallback>
+      <fallback condition="Still no results OR non-code file">Use Grep</fallback>
+    </branch>
+    <branch condition="Understand code in file">
+      <primary>Use Serena get_symbols_overview then find_symbol with include_body=true</primary>
+      <fallback condition="Need full file context OR non-code file">Use Read</fallback>
+    </branch>
+    <branch condition="Find all usages of symbol">
+      <primary>Use Serena find_referencing_symbols</primary>
+      <fallback condition="Symbol not in LSP scope">Use Grep with symbol name pattern</fallback>
+    </branch>
+    <unavailable_conditions>
+      <condition>Serena project not activated (call activate_project first)</condition>
+      <condition>File type not supported by LSP (use search_for_pattern or Read)</condition>
+      <condition>Tool explicitly fails with error</condition>
+    </unavailable_conditions>
+  </decision_tree>
+
+  <decision_tree name="language_specific_symbol_operations">
+    <description>Language-specific guidance for symbol operations</description>
+    <branch condition="Strongly typed languages (TypeScript, Go, Rust, Java)">
+      <preference>Strongly prefer symbol operations (find_symbol, get_symbols_overview)</preference>
+      <reason>LSP provides accurate symbol resolution</reason>
+    </branch>
+    <branch condition="Dynamic languages (Python, JavaScript, Ruby)">
+      <preference>Use symbol operations with substring_matching=true</preference>
+      <reason>Dynamic nature may require broader matching</reason>
+    </branch>
+    <branch condition="Configuration languages (Nix, YAML, JSON, TOML)">
+      <preference>Use search_for_pattern for structured search</preference>
+      <fallback>Use Read for full context when structure is complex</fallback>
+    </branch>
+    <branch condition="Markup/Documentation (Markdown, RST, HTML)">
+      <preference>Use search_for_pattern or Read</preference>
+      <reason>Symbol operations less useful for prose</reason>
+    </branch>
   </decision_tree>
 </patterns>
 
@@ -394,34 +523,41 @@ version: 0.2.0
 </workflow>
 
 <best_practices>
-  <practice priority="critical">Always activate project and check onboarding at session start</practice>
-  <practice priority="critical">Always check memories with list_memories and read_memory before implementing new features</practice>
-  <practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files</practice>
-  <practice priority="critical">Call think_about_task_adherence before any code modification</practice>
+  <practice priority="critical">Always activate project and check onboarding at session start (SERENA-B001)</practice>
+  <practice priority="critical">Always check memories with list_memories and read_memory before implementing new features (SERENA-B002)</practice>
+  <practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007)</practice>
+  <practice priority="critical">Call think_about_task_adherence before any code modification (SERENA-B003)</practice>
+  <practice priority="critical">Call think_about_collected_information after 3+ search operations (SERENA-B006)</practice>
+  <practice priority="critical">Call think_about_whether_you_are_done before final response (SERENA-B004)</practice>
+  <practice priority="critical">Use Serena navigation tools before Glob/Grep/Read (SERENA-P004)</practice>
   <practice priority="high">Restrict searches by relative_path when scope is known to improve performance</practice>
   <practice priority="high">Use substring_matching for uncertain symbol names to broaden search results</practice>
-  <practice priority="high">Record new patterns and conventions with write_memory for future reference</practice>
+  <practice priority="high">Record significant patterns with write_memory after discovery (SERENA-B005)</practice>
   <practice priority="high">Use edit_memory for updating existing memories instead of delete and recreate</practice>
+  <practice priority="high">Follow serena_first_tool_selection decision tree for consistent tool choices</practice>
   <practice priority="medium">Use context_lines parameters in search_for_pattern to understand surrounding code</practice>
   <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
-  <practice priority="medium">Call think_about_whether_you_are_done before reporting completion</practice>
+  <practice priority="medium">Follow memory_reading_by_task_type to prioritize relevant memories</practice>
 </best_practices>
 
 <rules priority="critical">
-  <rule>Always check memories before implementing new features</rule>
-  <rule>Use symbol operations over reading entire files</rule>
-  <rule>Call think_about_collected_information after non-trivial search sequences</rule>
-  <rule>Call think_about_task_adherence before making code changes</rule>
+  <rule>Always check memories before implementing new features (SERENA-B002)</rule>
+  <rule>Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007, SERENA-P001)</rule>
+  <rule>Call think_about_collected_information after search sequences of 3+ operations (SERENA-B006)</rule>
+  <rule>Call think_about_task_adherence before making code changes (SERENA-B003)</rule>
+  <rule>Call think_about_whether_you_are_done before final response (SERENA-B004, SERENA-P005)</rule>
+  <rule>Use Serena navigation tools (find_file, search_for_pattern, list_dir) before Glob/Grep/Read (SERENA-P004)</rule>
   <rule>Use Serena symbol editing (replace_symbol_body, insert_after_symbol, insert_before_symbol, rename_symbol) for precise code modifications</rule>
+  <rule>Record significant patterns with write_memory after discovery (SERENA-B005, SERENA-P007)</rule>
 </rules>
 
 <rules priority="standard">
   <rule>Restrict searches by relative_path when scope is known</rule>
   <rule>Use substring_matching for uncertain symbol names</rule>
-  <rule>Record new patterns with write_memory</rule>
   <rule>Use edit_memory for updating existing memories; delete_memory only when explicitly requested by user</rule>
-  <rule>Call think_about_whether_you_are_done when task appears complete</rule>
-  <rule>Use Serena navigation (list_dir, find_file, search_for_pattern) for codebase exploration before falling back to Glob/Grep</rule>
+  <rule>Follow serena_first_tool_selection decision tree for tool choices</rule>
+  <rule>Follow language_specific_symbol_operations for language-appropriate tools</rule>
+  <rule>Follow memory_reading_by_task_type for prioritizing which memories to read</rule>
 </rules>
 
 <enforcement>
@@ -446,6 +582,23 @@ version: 0.2.0
       <action>Call think_about_whether_you_are_done</action>
       <verification>Completion check recorded</verification>
     </behavior>
+    <behavior id="SERENA-B005" priority="critical">
+      <trigger>After significant pattern discovery or successful implementation</trigger>
+      <action>Create or update memory with write_memory or edit_memory</action>
+      <verification>Memory operation recorded in output for reusable patterns</verification>
+      <guidance>See memory_auto_creation_triggers pattern for when to create</guidance>
+    </behavior>
+    <behavior id="SERENA-B006" priority="critical">
+      <trigger>After search sequence of 3+ operations (find_symbol, search_for_pattern, get_symbols_overview, Grep, Glob)</trigger>
+      <action>Call think_about_collected_information</action>
+      <verification>Search quality validation recorded</verification>
+    </behavior>
+    <behavior id="SERENA-B007" priority="critical">
+      <trigger>When examining code structure or navigating codebase</trigger>
+      <action>Use get_symbols_overview or find_symbol before Read for code files</action>
+      <verification>Symbol operations attempted before full file read</verification>
+      <exception>Non-code files (YAML, JSON, MD) may use Read directly</exception>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="SERENA-P001" priority="critical">
@@ -463,10 +616,28 @@ version: 0.2.0
       <action>Deleting memories without explicit user request</action>
       <response>Use edit_memory instead or ask user permission</response>
     </behavior>
-    <behavior id="SERENA-P004" priority="standard">
+    <behavior id="SERENA-P004" priority="critical">
       <trigger>Always</trigger>
-      <action>Using Glob/Grep when Serena navigation tools available</action>
-      <response>Use Serena list_dir, find_file, search_for_pattern</response>
+      <action>Using Glob/Grep/Read when Serena navigation tools available</action>
+      <response>Use Serena list_dir, find_file, search_for_pattern, get_symbols_overview, find_symbol first</response>
+      <fallback>Glob/Grep/Read allowed only when: Serena project not activated, tool explicitly fails, or file type not supported</fallback>
+    </behavior>
+    <behavior id="SERENA-P005" priority="critical">
+      <trigger>Before final response to user</trigger>
+      <action>Completing task without calling think_about_whether_you_are_done</action>
+      <response>Call think_about_whether_you_are_done before final response</response>
+    </behavior>
+    <behavior id="SERENA-P006" priority="critical">
+      <trigger>When exploring code files</trigger>
+      <action>Using Read without first attempting get_symbols_overview or find_symbol</action>
+      <response>Use symbol operations first; fall back to Read only if insufficient</response>
+      <exception>Non-code files (YAML, JSON, MD, config) may use Read directly</exception>
+    </behavior>
+    <behavior id="SERENA-P007" priority="critical">
+      <trigger>After discovering reusable patterns</trigger>
+      <action>Failing to document significant patterns in memory</action>
+      <response>Use write_memory to record reusable patterns for future sessions</response>
+      <guidance>See memory_auto_creation_triggers pattern for guidance</guidance>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -501,15 +672,20 @@ version: 0.2.0
 </related_skills>
 
 <constraints>
-  <must>Activate project and check onboarding at session start</must>
-  <must>Check memories before implementing new features</must>
-  <must>Use symbol operations over reading entire files</must>
-  <must>Call think_about_task_adherence before code modifications</must>
-  <must>Call think_about_whether_you_are_done before reporting completion</must>
+  <must>Activate project and check onboarding at session start (SERENA-B001)</must>
+  <must>Check memories before implementing new features (SERENA-B002)</must>
+  <must>Use symbol operations over reading entire files for code (SERENA-B007)</must>
+  <must>Call think_about_task_adherence before code modifications (SERENA-B003)</must>
+  <must>Call think_about_collected_information after 3+ search operations (SERENA-B006)</must>
+  <must>Call think_about_whether_you_are_done before final response (SERENA-B004)</must>
+  <must>Use Serena navigation tools before Glob/Grep/Read (SERENA-P004)</must>
+  <must>Record significant patterns with write_memory (SERENA-B005)</must>
   <must>Restrict searches by relative_path when scope is known</must>
-  <avoid>Reading entire files when symbol operations suffice</avoid>
+  <avoid>Reading entire files when symbol operations suffice (SERENA-P001)</avoid>
   <avoid>Unscoped searches across entire codebase</avoid>
-  <avoid>Ignoring existing memory patterns</avoid>
-  <avoid>Deleting memories without explicit user request</avoid>
-  <avoid>Using Glob/Grep when Serena navigation tools are available</avoid>
+  <avoid>Ignoring existing memory patterns (SERENA-B002 violation)</avoid>
+  <avoid>Deleting memories without explicit user request (SERENA-P003)</avoid>
+  <avoid>Using Glob/Grep/Read when Serena navigation tools are available (SERENA-P004)</avoid>
+  <avoid>Skipping reflection checkpoints at mandatory points (SERENA-P005)</avoid>
+  <avoid>Failing to document reusable patterns in memory (SERENA-P007)</avoid>
 </constraints>

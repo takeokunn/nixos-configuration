@@ -123,6 +123,50 @@ version: 1.0.0
     </example>
   </pattern>
 
+  <pattern name="reflection_workflow_steps">
+    <description>Mandatory reflection tool calls as explicit workflow steps (not just checkpoint definitions)</description>
+    <example>
+<!-- After any search/investigation sequence (3+ operations) -->
+<step order="N">
+  <action>Validate search completeness</action>
+  <tool>Serena think_about_collected_information</tool>
+  <output>Search quality validation</output>
+  <mandatory>true</mandatory>
+</step>
+
+<!-- Before any code modification operation -->
+<step order="N">
+  <action>Validate task adherence</action>
+  <tool>Serena think_about_task_adherence</tool>
+  <output>Task alignment validation</output>
+  <mandatory>true</mandatory>
+</step>
+
+<!-- Before final response/completion -->
+<step order="N">
+  <action>Validate task completion</action>
+  <tool>Serena think_about_whether_you_are_done</tool>
+  <output>Completion validation</output>
+  <mandatory>true</mandatory>
+</step>
+    </example>
+    <triggers>
+      <trigger tool="think_about_collected_information">After search sequence of 3+ operations (find_symbol, search_for_pattern, get_symbols_overview, Grep, Glob)</trigger>
+      <trigger tool="think_about_task_adherence">Before any symbol editing (replace_symbol_body, insert_before_symbol, insert_after_symbol, rename_symbol) or file modification</trigger>
+      <trigger tool="think_about_whether_you_are_done">Before returning final result to user</trigger>
+    </triggers>
+    <on_failure>
+      <think_about_collected_information>Expand search scope, use alternative search strategies, or ask user for clarification</think_about_collected_information>
+      <think_about_task_adherence>Review requirements, document deviation rationale, or ask user before proceeding</think_about_task_adherence>
+      <think_about_whether_you_are_done>Identify incomplete items, iterate on missing work, or report partial completion with remaining items</think_about_whether_you_are_done>
+    </on_failure>
+    <failure_detection>
+      <think_about_collected_information>Tool output indicates incomplete coverage, missing critical areas, or low confidence in search results</think_about_collected_information>
+      <think_about_task_adherence>Tool output indicates task deviation, requirements mismatch, or scope creep detected</think_about_task_adherence>
+      <think_about_whether_you_are_done>Tool output indicates incomplete items, pending work, or unresolved blockers</think_about_whether_you_are_done>
+    </failure_detection>
+  </pattern>
+
   <pattern name="failure_handling">
     <description>Standard failure handling phase for workflows</description>
     <example>
@@ -191,6 +235,7 @@ readonly attribute indicates whether agent can modify files.
   <practice priority="critical">Include reflection_checkpoint at key workflow decision points</practice>
   <practice priority="critical">Include prepare_phase for Serena initialization in commands</practice>
   <practice priority="critical">Add serena_validation to checkpoints before code modifications</practice>
+  <practice priority="critical">Use reflection_workflow_steps pattern for mandatory think_about_* calls</practice>
   <practice priority="high">Add self_evaluate_phase for agents producing reports or recommendations</practice>
   <practice priority="high">Use failure_handling phase in all workflows</practice>
   <practice priority="medium">Use agent_ref syntax for consistent agent references in commands</practice>
@@ -201,6 +246,9 @@ readonly attribute indicates whether agent can modify files.
   <rule>Reflection checkpoints must include confidence threshold</rule>
   <rule>Commands must include prepare_phase for Serena initialization</rule>
   <rule>Use serena_validation_pre_edit before code modification operations</rule>
+  <rule>Call think_about_collected_information after any search sequence of 3+ operations</rule>
+  <rule>Call think_about_task_adherence before any symbol editing or file modification</rule>
+  <rule>Call think_about_whether_you_are_done before returning final result to user</rule>
 </rules>
 
 <rules priority="standard">
@@ -222,7 +270,10 @@ readonly attribute indicates whether agent can modify files.
   <must>Define threshold in reflection_checkpoints</must>
   <must>Include prepare_phase in command workflows</must>
   <must>Use serena_validation before code modifications</must>
+  <must>Call think_about_collected_information after 3+ search operations</must>
+  <must>Call think_about_whether_you_are_done before final response</must>
   <avoid>Custom status thresholds that differ from standard</avoid>
   <avoid>Omitting failure_handling in complex workflows</avoid>
   <avoid>Omitting Serena initialization in commands</avoid>
+  <avoid>Skipping reflection tool calls at mandatory checkpoints</avoid>
 </constraints>
