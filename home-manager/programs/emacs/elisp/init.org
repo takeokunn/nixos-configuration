@@ -267,7 +267,8 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(osx-clipboard-mode) "osx-clipboard" nil t)
 
-  (osx-clipboard-mode +1)
+  (when (fboundp 'osx-clipboard-mode)
+    (osx-clipboard-mode +1))
 #+end_src
 ** clipetty
 :PROPERTIES:
@@ -276,7 +277,8 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-clipetty-mode) "clipetty" nil t)
 
-  (global-clipetty-mode +1)
+  (when (fboundp 'global-clipetty-mode)
+    (global-clipetty-mode +1))
 #+end_src
 ** terminal escape sequence handling
 :PROPERTIES:
