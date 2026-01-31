@@ -1,0 +1,60 @@
+#+STARTUP: fold
+* First Installation (Attm-M4-Max)
+
+Attm-M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-app-util integration.
+
+** Prerequisites
+
+- macOS (Apple Silicon)
+- Xcode Command Line Tools
+- Nix installed (multi-user installation recommended)
+- Network connectivity
+
+** Step 1: Install Xcode Command Line Tools
+
+#+begin_src shell
+  xcode-select --install
+#+end_src
+
+** Step 2: Install Nix
+
+#+begin_src shell
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+#+end_src
+
+Or use the official installer:
+
+#+begin_src shell
+  sh <(curl -L https://nixos.org/nix/install)
+#+end_src
+
+** Step 3: Clone Configuration
+
+#+begin_src shell
+  git clone https://github.com/takeokunn/nixos-configuration
+  cd nixos-configuration
+#+end_src
+
+** Step 4: First nix-darwin Installation
+
+#+begin_src shell
+  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
+#+end_src
+
+** Step 5: Restart Terminal
+
+Close and reopen your terminal to ensure all environment variables are loaded.
+
+** Update Configuration
+
+After installation, use this command to apply configuration changes:
+
+#+begin_src shell
+  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
+#+end_src
+
+** Notes
+
+- This configuration includes home-manager for user environment management
+- brew-nix is integrated for Homebrew package management through Nix
+- mac-app-util ensures macOS applications are properly linked

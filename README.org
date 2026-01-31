@@ -8,7 +8,7 @@
 | machine          | name        | os      | system         | stable |
 |------------------+-------------+---------+----------------+--------|
 | Mac M4 Max       | Attm-M4-Max | OSX     | aarch64-darwin | ◎      |
-| Thinkpad X13Gen2 | X13Gen2     | NixOS   | x86_64-linux   | ○      |
+| Thinkpad X13Gen2 | X13Gen2     | NixOS   | x86_64-linux   | ◎      |
 | Android OPPO-A79 | OPPO-A79    | Android | aarch64-linux  | △      |
 
 ** Usage
@@ -27,4 +27,6 @@
 
 ** Documentation
 
-- [[file:INSTALLATION.org][INSTALLATION.org]] - First installation guide for X13Gen2 (LUKS + Btrfs + Impermanence)
+- [[file:docs/X13Gen2.org][docs/X13Gen2.org]] - NixOS installation guide (LUKS + Btrfs + Impermanence)
+- [[file:docs/Attm-M4-Max.org][docs/Attm-M4-Max.org]] - nix-darwin installation guide for macOS
+- [[file:docs/OPPO-A79.org][docs/OPPO-A79.org]] - nix-on-droid installation guide for Android

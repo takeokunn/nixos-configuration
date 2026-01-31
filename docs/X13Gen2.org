@@ -1,0 +1,119 @@
+#+STARTUP: fold
+* First Installation (X13Gen2)
+
+X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for a fresh installation.
+
+** Prerequisites
+
+- NixOS installation USB
+- Another machine with Nix installed (Mac, Linux, etc.)
+- Network connectivity (Ethernet or WiFi)
+- LUKS passphrase (strong, memorable)
+
+** Step 1: Boot NixOS Installer USB
+
+#+begin_src shell
+  # Set up network
+  sudo systemctl start NetworkManager
+  nmtui  # Connect to WiFi if needed
+#+end_src
+
+** Step 2: Enable SSH Access (on target machine)
+
+#+begin_src shell
+  # Set password for nixos user (for SSH login)
+  passwd
+
+  # Check IP address
+  ip addr
+#+end_src
+
+** Step 3: Run nixos-anywhere (Recommended)
+
+Run this from another machine (Mac, Linux, etc.).
+
+*WARNING*: This will erase all data on the target disk.
+
+#+begin_src shell
+  # First, verify SSH connectivity
+  ssh nixos@<TARGET_IP>  # e.g., nixos@192.168.1.100
+
+  # Create password file securely (avoids shell history exposure)
+  read -s -p "Enter LUKS passphrase: " LUKS_PASS
+
+  # Run nixos-anywhere
+  nix run github:nix-community/nixos-anywhere -- \
+    --flake github:takeokunn/nixos-configuration#X13Gen2 \
+    --disk-encryption-keys /tmp/luks-password <(printf '%s' "$LUKS_PASS") \
+    nixos@<TARGET_IP>
+
+  unset LUKS_PASS
+#+end_src
+
+** Step 4: Reboot
+
+#+begin_src shell
+  sudo reboot
+#+end_src
+
+** Manual Installation (Fallback)
+
+If you don't have another machine available, use this traditional method.
+
+*** Step 1: Clone Configuration
+
+#+begin_src shell
+  nix-shell -p git
+  git clone https://github.com/takeokunn/nixos-configuration
+  cd nixos-configuration
+#+end_src
+
+*** Step 2: Create LUKS Password File
+
+#+begin_src shell
+  # Create password file securely (avoids shell history exposure)
+  read -s -p "Enter LUKS passphrase: " LUKS_PASS
+  printf '%s' "$LUKS_PASS" > /tmp/luks-password
+  chmod 600 /tmp/luks-password
+  unset LUKS_PASS
+#+end_src
+
+*** Step 3: Run Disko (Partitioning & Formatting)
+
+*WARNING*: This will erase all data on the target disk.
+
+#+begin_src shell
+  sudo nix --experimental-features "nix-command flakes" run \
+    github:nix-community/disko/latest -- \
+    --mode destroy,format,mount \
+    ./hosts/X13Gen2/disko-config.nix
+#+end_src
+
+*** Step 4: Install NixOS
+
+#+begin_src shell
+  # Increase file descriptor limit for large builds
+  ulimit -n 65536
+  sudo nixos-install --flake .#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
+#+end_src
+
+*** Step 5: Reboot
+
+#+begin_src shell
+  sudo reboot
+#+end_src
+
+** Update Configuration
+
+After installation, use this command to apply configuration changes:
+
+#+begin_src shell
+  sudo nixos-rebuild switch --flake .#X13Gen2 --show-trace
+#+end_src
+
+** Notes
+
+- This configuration uses LUKS encryption for full disk encryption
+- Btrfs filesystem with subvolumes for efficient snapshots
+- Impermanence module for stateless system management
+- home-manager is integrated with advanced profile
