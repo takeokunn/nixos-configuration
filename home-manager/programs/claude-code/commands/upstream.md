@@ -84,26 +84,32 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Contribution guidelines content</output>
     </step>
     <step order="2">
+      <action>Fetch .github/PULL_REQUEST_TEMPLATE.md from upstream</action>
+      <tool>pr_template agent (WebFetch: https://raw.githubusercontent.com/{owner}/{repo}/{default_branch}/.github/PULL_REQUEST_TEMPLATE.md)</tool>
+      <output>PR template structure with required sections, or null if not found</output>
+    </step>
+    <step order="3">
       <action>Analyze code changes against upstream patterns</action>
       <tool>changes agent (quality-assurance)</tool>
       <output>Code quality assessment</output>
     </step>
-    <step order="3">
+    <step order="4">
       <action>Evaluate test coverage and appropriateness</action>
       <tool>tests agent</tool>
       <output>Test evaluation report</output>
     </step>
-    <step order="4">
-      <action>Fetch author's past PRs to upstream</action>
-      <tool>history agent (gh pr list --author @me --repo upstream --state all --limit 20)</tool>
-      <output>Past PR feedback patterns</output>
+    <step order="5">
+      <action>Sample 10 recently merged PRs from upstream for pattern learning</action>
+      <tool>pr_samples agent (gh pr list --repo {owner}/{repo} --state merged --limit 10 --json title,body,number,author)</tool>
+      <output>PR title patterns, description structure, common sections</output>
     </step>
   </phase>
   <reflection_checkpoint id="gather_complete" after="gather">
     <questions>
-      <question weight="0.4">Were contribution guidelines successfully fetched?</question>
-      <question weight="0.3">Have code changes been analyzed?</question>
-      <question weight="0.3">Has past PR history been retrieved?</question>
+      <question weight="0.3">Were contribution guidelines successfully fetched?</question>
+      <question weight="0.2">Was PR template fetched or confirmed absent?</question>
+      <question weight="0.25">Have code changes been analyzed?</question>
+      <question weight="0.25">Were PR samples retrieved for pattern learning?</question>
     </questions>
     <threshold min="70" action="proceed">
       <below_threshold>Document gaps and proceed with available data</below_threshold>
@@ -116,9 +122,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <phase name="synthesize">
     <objective>Generate PR metadata, verification steps, and comprehensive task breakdown</objective>
     <step order="1">
-      <action>Generate PR title and description following contribution guide</action>
-      <tool>docs agent</tool>
-      <output>Compliant PR metadata draft</output>
+      <action>Generate PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns</action>
+      <tool>metadata agent with pr_template output (if found) and pr_samples patterns as fallback</tool>
+      <output>Template-compliant PR metadata; template_source indicates whether upstream_template, sampled_patterns, or none was used</output>
     </step>
     <step order="2">
       <action>Detect project ecosystem and generate local reproduction steps</action>
@@ -202,10 +208,11 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 
 <agents>
   <agent name="guidelines" subagent_type="docs" readonly="true">Parse CONTRIBUTING.md and extract requirements</agent>
+  <agent name="pr_template" subagent_type="docs" readonly="true">Fetch and parse .github/PULL_REQUEST_TEMPLATE.md from upstream; extract required sections and structure; return null if not found (no fallback)</agent>
   <agent name="changes" subagent_type="quality-assurance" readonly="true">Review code changes for quality and patterns</agent>
   <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
-  <agent name="history" subagent_type="general-purpose" readonly="true">Analyze author past PR feedback patterns via gh CLI</agent>
-  <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description</agent>
+  <agent name="pr_samples" subagent_type="general-purpose" readonly="true">Sample 10 recently merged PRs from upstream via gh CLI; extract title patterns, description structure, and common sections for pattern learning</agent>
+  <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns; set template_source accordingly</agent>
   <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
 </agents>
@@ -213,9 +220,10 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 <execution_graph>
   <parallel_group id="gather" depends_on="none">
     <agent>guidelines</agent>
+    <agent>pr_template</agent>
     <agent>changes</agent>
     <agent>tests</agent>
-    <agent>history</agent>
+    <agent>pr_samples</agent>
   </parallel_group>
   <parallel_group id="post_gather" depends_on="gather">
     <agent>metadata</agent>
@@ -231,6 +239,8 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <requirement>Upstream repository URL or detection</requirement>
   <requirement>Current branch and pending changes</requirement>
   <requirement>Contribution guidelines (if available)</requirement>
+  <requirement>PR template from .github/PULL_REQUEST_TEMPLATE.md (if available)</requirement>
+  <requirement>10 sampled merged PRs for pattern learning</requirement>
   <requirement>Explicit no-modification prohibition</requirement>
   <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
 </delegation>
@@ -265,8 +275,19 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
         </section>
       </checklist>
       <pr_metadata>
-        <title>Suggested PR title following contribution guide</title>
-        <description>Suggested PR description with sections per upstream template</description>
+        <template_source>upstream_template|sampled_patterns|none</template_source>
+        <title>
+          <value>Suggested PR title following learned patterns from sampled PRs</value>
+          <pattern_notes>Pattern observed from 10 sampled PRs (e.g., [type]: description, feat(scope): description)</pattern_notes>
+        </title>
+        <description>
+          <sections>
+            <section name="Summary" required="true">Content based on template or sampled patterns</section>
+            <section name="Test Plan" required="false">Content if template requires or patterns suggest</section>
+          </sections>
+          <raw_markdown>Full PR description in markdown matching upstream conventions</raw_markdown>
+        </description>
+        <pattern_confidence>0-100 based on template availability (40%) and sample quality (60%)</pattern_confidence>
       </pr_metadata>
       <local_reproduction>
         <ecosystem_detection>
@@ -658,6 +679,8 @@ Phase 4: Final Verification (depends on all)
           </decisions>
           <references>
             <reference type="upstream_guidelines">Link or content of CONTRIBUTING.md requirements</reference>
+            <reference type="pr_template">Structure and required sections from .github/PULL_REQUEST_TEMPLATE.md</reference>
+            <reference type="pr_patterns">Title and description patterns learned from 10 sampled merged PRs</reference>
             <reference type="code_patterns">Relevant upstream code patterns to follow (specific file paths)</reference>
             <reference type="past_feedback">Patterns from past PR reviews to address</reference>
           </references>
@@ -709,8 +732,18 @@ Phase 4: Final Verification (depends on all)
     </behavior>
     <behavior id="UP-B003" priority="critical">
       <trigger>When providing PR metadata</trigger>
-      <action>Follow detected contribution guidelines format</action>
-      <verification>Metadata matches upstream conventions</verification>
+      <action>Use PR template structure (if available) and patterns learned from 10 sampled merged PRs</action>
+      <verification>Metadata matches upstream PR template sections and learned patterns; template_source indicates data source used</verification>
+    </behavior>
+    <behavior id="UP-B008" priority="critical">
+      <trigger>When fetching PR template</trigger>
+      <action>Fetch .github/PULL_REQUEST_TEMPLATE.md only (no fallback hierarchy)</action>
+      <verification>Template fetched from exact path or confirmed absent</verification>
+    </behavior>
+    <behavior id="UP-B009" priority="critical">
+      <trigger>When sampling PRs for patterns</trigger>
+      <action>Sample 10 most recently merged PRs from any author via gh pr list --state merged --limit 10</action>
+      <verification>PR samples retrieved with title, body, number, author fields</verification>
     </behavior>
     <behavior id="UP-B004" priority="critical">
       <trigger>When generating final output</trigger>
@@ -776,6 +809,8 @@ Phase 4: Final Verification (depends on all)
 <constraints>
   <must>Verify gh CLI authentication before operations</must>
   <must>Check CONTRIBUTING.md in all three locations</must>
+  <must>Fetch .github/PULL_REQUEST_TEMPLATE.md from upstream (no fallback) and sample 10 merged PRs for pattern learning</must>
+  <must>Generate PR metadata with template_source (upstream_template, sampled_patterns, none) and pattern_confidence score</must>
   <must>Provide structured checklist output</must>
   <must>Include comprehensive local_reproduction section with Nix-first ecosystem detection</must>
   <must>Include manual QA checklist with structured qa_steps when ui, api, database, config, security, or integration changes detected</must>
@@ -787,4 +822,5 @@ Phase 4: Final Verification (depends on all)
   <avoid>Creating PR via any method (HARD BLOCK)</avoid>
   <avoid>Creating PR even when user explicitly requests it (HARD BLOCK)</avoid>
   <avoid>Proceeding without upstream confirmation when ambiguous</avoid>
+  <avoid>Using fallback hierarchy for PR template (only .github/ location)</avoid>
 </constraints>
