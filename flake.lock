@@ -8,11 +8,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769923950,
-        "narHash": "sha256-uR0v+sqGNTDpX0qrObVIVHVCFQYXTqNS6h2h00nhVyI=",
+        "lastModified": 1769931401,
+        "narHash": "sha256-RbVlqasopD71xjbOFomLz6v89fIj6ZHei/Lc2fYU+gY=",
         "owner": "arto-app",
         "repo": "Arto",
-        "rev": "b24dc2ed121f8d18548c75811ee3fdc47d147f82",
+        "rev": "b6a10b5f24793e62c5eb246def014d9661b4e5b5",
         "type": "github"
       },
       "original": {
@@ -46,11 +46,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1769923748,
-        "narHash": "sha256-TGvGGnuIXiqi8XDk2PMKWtMmGsIGRaNm87Ix9vqVT0c=",
+        "lastModified": 1769933206,
+        "narHash": "sha256-ohVpvyjYbMXv+5+4UbYH9uKSzpfnga3ecpXxBqnC8tQ=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "e6f03a7ca57e3196bd8a7fbb27b2bc6f7cc83fa4",
+        "rev": "05746220ae84c13511a19b0d3ee01caad519c69f",
         "type": "github"
       },
       "original": {
