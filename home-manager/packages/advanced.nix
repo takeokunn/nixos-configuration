@@ -2,7 +2,6 @@
   pkgs,
   nurPkgs,
   llmAgentsPkgs,
-  artoPkg,
 }:
 with pkgs;
 [
@@ -46,6 +45,5 @@ with pkgs;
   brewCasks.slite
   brewCasks.element
 
-  # custom macOS apps
-  artoPkg
+  nurPkgs.arto
 ]

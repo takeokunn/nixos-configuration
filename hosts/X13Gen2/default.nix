@@ -57,7 +57,6 @@ nixpkgs.lib.nixosSystem {
           emacs-overlay
           org-babel
           brew-nix
-          arto
           ;
       };
     }

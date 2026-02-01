@@ -73,7 +73,6 @@ nix-darwin.lib.darwinSystem {
             emacs-overlay
             org-babel
             brew-nix
-            arto
             ;
         };
       };

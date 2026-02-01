@@ -59,10 +59,6 @@
       flake = false;
     };
     mac-app-util.url = "github:hraban/mac-app-util";
-    arto = {
-      url = "github:arto-app/Arto";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -7,6 +7,7 @@ let
   pinentry-el = epkgs.pinentry;
   sudden-death = nurPkgs.emacs-sudden-death;
   zalgo-mode = nurPkgs.emacs-zalgo-mode;
+  emacs-arto = nurPkgs.emacs-arto;
 in
 with epkgs;
 [
@@ -43,6 +44,7 @@ with epkgs;
   redacted
   lorem-ipsum
   zalgo-mode
+  emacs-arto
 
   # Minor Modes
   command-log-mode
