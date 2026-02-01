@@ -6,6 +6,7 @@
   mcp-servers-nix,
   llm-agents,
   brew-nix,
+  firefox-addons,
   nur-packages,
   ...
 }:
@@ -63,6 +64,7 @@ let
     inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
+    inherit firefox-addons;
   };
 
   # services

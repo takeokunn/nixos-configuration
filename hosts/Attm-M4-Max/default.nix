@@ -62,6 +62,7 @@ nix-darwin.lib.darwinSystem {
         sharedModules = [
           nixvim.homeModules.nixvim
           mac-app-util.homeManagerModules.default
+          inputs.zen-browser.homeModules.twilight
         ];
         extraSpecialArgs = {
           inherit system username;
@@ -73,6 +74,7 @@ nix-darwin.lib.darwinSystem {
             emacs-overlay
             org-babel
             brew-nix
+            firefox-addons
             ;
         };
       };

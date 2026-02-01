@@ -68,6 +68,8 @@
           format = "{icon} {capacity}%";
           format-charging = "󰂄 {capacity}%";
           format-plugged = "󰚥 {capacity}%";
+          format-warning = "󰁺⚠ {capacity}%";
+          format-critical = "󰁺🔥 {capacity}%";
           format-icons = [
             "󰁺"
             "󰁻"
@@ -123,6 +125,8 @@
         cpu = {
           interval = 5;
           format = "󰍛 {usage}%";
+          format-warning = "󰍛⚠ {usage}%";
+          format-critical = "󰍛🔥 {usage}%";
           format-icons = [
             "▁"
             "▂"
@@ -144,6 +148,8 @@
           interval = 10;
           format = "󰘚 {used:0.1f}G/{total:0.1f}G";
           format-alt = "󰘚 {percentage}%";
+          format-warning = "󰘚⚠ {used:0.1f}G/{total:0.1f}G";
+          format-critical = "󰘚🔥 {used:0.1f}G/{total:0.1f}G";
           states = {
             warning = 70;
             critical = 90;
@@ -156,6 +162,8 @@
           interval = 30;
           format = " {percentage_used}%";
           format-alt = " {free}";
+          format-warning = "⚠ {percentage_used}%";
+          format-critical = "🔥 {percentage_used}%";
           states = {
             warning = 75;
             critical = 90;
@@ -318,7 +326,6 @@
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #ff5555;
       }
 
       tooltip {

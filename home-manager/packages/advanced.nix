@@ -44,6 +44,4 @@ with pkgs;
   brewCasks.clickup
   brewCasks.slite
   brewCasks.element
-
-  nurPkgs.arto
 ]

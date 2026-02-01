@@ -45,6 +45,7 @@ nixpkgs.lib.nixosSystem {
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
       home-manager.sharedModules = [
         nixvim.homeModules.nixvim
+        inputs.zen-browser.homeModules.twilight
       ];
       home-manager.extraSpecialArgs = {
         inherit system;
@@ -57,6 +58,7 @@ nixpkgs.lib.nixosSystem {
           emacs-overlay
           org-babel
           brew-nix
+          firefox-addons
           ;
       };
     }

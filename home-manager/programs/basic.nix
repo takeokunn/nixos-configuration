@@ -5,7 +5,7 @@
 let
   bat = import ./bat { inherit nurPkgs; };
   bottom = import ./bottom;
-  cargo = import ./cargo;
+  cargo = import ./cargo { inherit pkgs; };
   direnv = import ./direnv;
   dust = import ./dust;
   editorconfig = import ./editorconfig { inherit pkgs; };

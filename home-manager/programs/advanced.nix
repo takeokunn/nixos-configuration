@@ -6,6 +6,7 @@
   org-babel,
   emacsPkg,
   emacsLib,
+  firefox-addons,
 }:
 let
   awscli = import ./awscli;
@@ -47,11 +48,13 @@ let
   # theming
   gtk = import ./gtk { inherit pkgs; };
   qt = import ./qt { inherit pkgs; };
+  zen-browser = import ./zen-browser { inherit pkgs firefox-addons; };
 in
 [
   awscli
   chromium
   firefox
+  zen-browser
   claude-code
   emacs
   doggo
