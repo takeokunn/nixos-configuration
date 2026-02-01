@@ -1,13 +1,12 @@
 { pkgs }:
 {
-  home.packages =
-    pkgs.lib.optionals pkgs.stdenv.isDarwin (
-      with pkgs;
-      [
-        llvmPackages.clang
-        llvmPackages.lld
-      ]
-    );
+  home.packages = pkgs.lib.optionals pkgs.stdenv.isDarwin (
+    with pkgs;
+    [
+      llvmPackages.clang
+      llvmPackages.lld
+    ]
+  );
 
   programs.cargo = {
     enable = true;
