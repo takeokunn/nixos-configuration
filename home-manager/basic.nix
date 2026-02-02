@@ -2,6 +2,7 @@
   system,
   nixpkgs,
   nur-packages,
+  ...
 }:
 let
   # nur-packages

@@ -2,6 +2,8 @@
   nixpkgs,
   pkgs,
   system,
+  nur-packages,
+  nixvim,
   ...
 }:
 {
@@ -16,8 +18,10 @@
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    config = import ../home-manager/basic.nix {
-      inherit system nixpkgs;
+    sharedModules = [ nixvim.homeModules.nixvim ];
+    extraSpecialArgs = {
+      inherit nixpkgs system nur-packages nixvim;
     };
+    config = import ../home-manager/basic.nix;
   };
 }
