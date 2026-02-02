@@ -20,7 +20,12 @@
     useGlobalPkgs = true;
     sharedModules = [ nixvim.homeModules.nixvim ];
     extraSpecialArgs = {
-      inherit nixpkgs system nur-packages nixvim;
+      inherit
+        nixpkgs
+        system
+        nur-packages
+        nixvim
+        ;
     };
     config = import ../home-manager/basic.nix;
   };
