@@ -19,7 +19,6 @@ with pkgs;
 
   # for ai
   llmAgentsPkgs.ccusage
-  llmAgentsPkgs.codex
 
   # for web service
   discord
