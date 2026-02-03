@@ -149,11 +149,11 @@ description: This skill should be used when working with SQL databases, "SELECT"
         LIMIT 10 OFFSET 0;
 
         -- Aggregate with grouping
-        SELECT status, COUNT(_) as count, SUM(total) as revenue
+        SELECT status, COUNT(*) as count, SUM(total) as revenue
         FROM orders
         WHERE created_at >= '2024-01-01'
         GROUP BY status
-        HAVING COUNT(_) > 10
+        HAVING COUNT(*) > 10
         ORDER BY revenue DESC;
       </example>
     </pattern>
@@ -205,7 +205,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
         WHERE o.user_id = u.id AND u.vip = true;
 
         -- Update with returning (PostgreSQL)
-        UPDATE users SET active = false WHERE id = 1 RETURNING \*;
+        UPDATE users SET active = false WHERE id = 1 RETURNING *;
       </example>
     </pattern>
 
@@ -240,25 +240,25 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
         -- PostgreSQL with pg (Node.js)
         client.query(
-          'SELECT \* FROM users WHERE email = $1 AND status = $2',
+          'SELECT * FROM users WHERE email = $1 AND status = $2',
           [userEmail, status]
         )
 
         -- MySQL with mysql-connector (Python)
         cursor.execute(
-          "SELECT \* FROM users WHERE email = %s AND status = %s",
+          "SELECT * FROM users WHERE email = %s AND status = %s",
           (user_email, status)
         )
 
         -- MySQL with mysql2 (Node.js)
         connection.execute(
-          'SELECT \* FROM users WHERE email = ? AND status = ?',
+          'SELECT * FROM users WHERE email = ? AND status = ?',
           [userEmail, status]
         )
 
         -- SQLite with sqlite3 (Python)
         cursor.execute(
-          "SELECT \* FROM users WHERE email = ? AND status = ?",
+          "SELECT * FROM users WHERE email = ? AND status = ?",
           (user_email, status)
         )
 
@@ -272,10 +272,10 @@ description: This skill should be used when working with SQL databases, "SELECT"
       <example>
         -- DANGEROUS: SQL injection vulnerability
         query = "SELECT _ FROM users WHERE email = '" + user_input + "'"
-        query = f"SELECT \* FROM users WHERE email = '{user_input}'"
+        query = f"SELECT * FROM users WHERE email = '{user_input}'"
 
         -- If user_input = "'; DROP TABLE users; --"
-        -- Executes: SELECT \* FROM users WHERE email = ''; DROP TABLE users; --'
+        -- Executes: SELECT * FROM users WHERE email = ''; DROP TABLE users; --'
       </example>
     </pattern>
 
@@ -287,21 +287,21 @@ description: This skill should be used when working with SQL databases, "SELECT"
         SELECT * FROM products WHERE name LIKE '%' || user_input || '%';
 
         -- SAFE: Escape wildcards before using in LIKE
-        -- Python: escaped = user*input.replace('%', '\\%').replace('*', '\\\_')
+        -- Python: escaped = user_input.replace('%', '\\%').replace('_', '\\_')
         -- Then use parameterized query:
         cursor.execute(
-          "SELECT \* FROM products WHERE name LIKE %s",
+          "SELECT * FROM products WHERE name LIKE %s",
           ('%' + escaped_input + '%',)
         )
 
         -- PostgreSQL: Use ESCAPE clause explicitly
-        SELECT \* FROM products
+        SELECT * FROM products
         WHERE name LIKE '%' || $1 || '%' ESCAPE '\';
 
         -- Alternative: Use position() or strpos() for exact matching
-        SELECT \* FROM products WHERE position($1 in name) > 0;
+        SELECT * FROM products WHERE position($1 in name) > 0;
       </example>
-      <warning>Wildcards % and \_ in user input can bypass intended restrictions</warning>
+      <warning>Wildcards % and _ in user input can bypass intended restrictions</warning>
     </pattern>
 
     <pattern name="dynamic_sql_safely">
@@ -535,7 +535,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
           FROM employees e
           INNER JOIN org_tree ot ON e.manager_id = ot.id
         )
-        SELECT \* FROM org_tree ORDER BY level, name;
+        SELECT * FROM org_tree ORDER BY level, name;
       </example>
       <use_case>Tree structures, bill of materials, path finding</use_case>
     </pattern>
@@ -796,7 +796,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
         );
 
         -- Query active records
-        SELECT \* FROM users WHERE deleted_at IS NULL;
+        SELECT * FROM users WHERE deleted_at IS NULL;
       </example>
       <use_case>Audit trails, data recovery, compliance</use_case>
     </pattern>
@@ -1440,7 +1440,7 @@ description: This skill should be used when working with SQL databases, "SELECT"
 
 <anti_patterns>
   <avoid name="select_star">
-    <description>Using SELECT \* in production queries</description>
+    <description>Using SELECT * in production queries</description>
     <instead>Explicitly list required columns for performance and clarity</instead>
   </avoid>
 
@@ -1489,17 +1489,108 @@ description: This skill should be used when working with SQL databases, "SELECT"
 </anti_patterns>
 
 <best_practices>
-  <practice priority="critical">Use parameterized queries to prevent SQL injection</practice>
-  <practice priority="critical">Create indexes on foreign keys and frequently filtered columns</practice>
-  <practice priority="critical">Use transactions for multi-statement operations</practice>
-  <practice priority="high">Analyze query plans with EXPLAIN before optimizing</practice>
-  <practice priority="high">Use appropriate isolation levels for transaction requirements</practice>
-  <practice priority="high">Implement soft deletes for audit trails</practice>
-  <practice priority="high">Name constraints explicitly for easier migration management</practice>
-  <practice priority="medium">Prefer keyset pagination over offset for large datasets</practice>
-  <practice priority="medium">Use CTEs for complex query readability</practice>
-  <practice priority="medium">Batch large data modifications to reduce lock contention</practice>
-  <practice priority="medium">Test migrations on production-like data before deployment</practice>
+  <!-- Formatting/Style -->
+  <practice priority="critical">Follow Emacs sql-indent style: right-align keywords (SELECT, FROM, WHERE, GROUP BY), use leading commas for column lists</practice>
+  <practice priority="critical">Use snake_case for all identifiers (tables, columns, aliases); avoid abbreviations unless universally understood</practice>
+  <practice priority="critical">Use UPPERCASE for SQL keywords (SELECT, FROM, WHERE, JOIN, AS, OVER); lowercase for identifiers</practice>
+  <practice priority="standard">Comment WHY not WHAT; use -- for single-line, /* */ for multi-line comments</practice>
+  <practice priority="standard">Use meaningful table aliases with explicit AS keyword (FROM orders AS o, not FROM orders t1)</practice>
+
+  <!-- Query Design -->
+  <practice priority="critical">Never use SELECT * in production; explicitly list required columns for clarity, performance, and stability</practice>
+  <practice priority="critical">Use explicit JOIN syntax with ON clause; never use implicit comma-separated joins</practice>
+  <practice priority="critical">Use IS NULL / IS NOT NULL for NULL comparisons; never = NULL or != NULL</practice>
+  <practice priority="critical">Use COALESCE for default values (ANSI-standard); NULLIF to prevent division by zero</practice>
+  <practice priority="critical">Use CTEs for complex multi-step queries; subqueries for simple IN/EXISTS checks</practice>
+  <practice priority="critical">Prefer JOINs over correlated subqueries for performance</practice>
+
+  <!-- Performance -->
+  <practice priority="critical">Create indexes on foreign key columns and frequently filtered/sorted columns</practice>
+  <practice priority="critical">Avoid functions on indexed columns in WHERE clause; restructure queries instead</practice>
+  <practice priority="critical">Use EXISTS instead of IN for large subqueries (EXISTS stops at first match)</practice>
+  <practice priority="critical">Use keyset pagination (WHERE id > last_id) over OFFSET for large datasets</practice>
+  <practice priority="critical">Batch large operations (10,000-100,000 rows per batch) to reduce lock contention</practice>
+  <practice priority="critical">Analyze query plans with EXPLAIN/EXPLAIN ANALYZE before optimizing</practice>
+  <practice priority="standard">Avoid leading wildcards in LIKE patterns (LIKE 'prefix%' is indexable, '%suffix' is not)</practice>
+
+  <!-- Security -->
+  <practice priority="critical">Use parameterized queries for ALL user input; NEVER concatenate strings into SQL</practice>
+  <practice priority="critical">Escape wildcards (%, _) in LIKE patterns when using user input</practice>
+  <practice priority="critical">Whitelist allowed values for dynamic table/column names; never use user input directly</practice>
+  <practice priority="critical">Grant minimum required permissions; use roles instead of direct user grants</practice>
+  <practice priority="critical">Encrypt sensitive data at rest (TDE) and in transit (SSL/TLS)</practice>
+  <practice priority="standard">Use dynamic data masking for non-privileged access to PII/PHI</practice>
+  <practice priority="standard">Separate admin accounts from regular application accounts</practice>
+
+  <!-- Maintainability -->
+  <practice priority="critical">Use explicit transaction boundaries (BEGIN/COMMIT) for multi-statement operations</practice>
+  <practice priority="critical">Name constraints explicitly (CONSTRAINT fk_user_id FOREIGN KEY...) for easier migration management</practice>
+  <practice priority="critical">Store database migrations in version control with application code</practice>
+  <practice priority="critical">Use appropriate isolation levels for transaction requirements (READ COMMITTED default, SERIALIZABLE for critical)</practice>
+  <practice priority="standard">Implement soft deletes (deleted_at column) for audit trails where appropriate</practice>
+  <practice priority="standard">Test migrations on production-like data volume before deployment</practice>
+  <practice priority="standard">Document stored procedures with standard headers (author, date, parameters, change history)</practice>
+  <practice priority="standard">Use views to encapsulate common query logic; refactor repeated CTEs into views</practice>
+
+  <formatting_style name="emacs_sql_indent">
+    <description>Emacs sql-indent compatible formatting conventions for SQL code</description>
+    <rules>
+      <rule>Right-align SQL keywords so content starts at consistent column (SELECT at col 1, FROM indented 2 spaces, WHERE indented 1 space)</rule>
+      <rule>Place commas at beginning of lines, aligned with first column name after SELECT</rule>
+      <rule>Indent subquery content by 4 spaces; closing parenthesis aligns with start of subquery block</rule>
+      <rule>Use UPPERCASE for all SQL keywords including AS, OVER, PARTITION BY, LAG, SUM, etc.</rule>
+      <rule>Place each column on its own line for readability and cleaner version control diffs</rule>
+    </rules>
+    <good_example><![CDATA[
+SELECT month
+       , monthly_sales
+       , LAG(monthly_sales) OVER (ORDER BY month) AS last_month_sales
+       , ROUND(monthly_sales / LAG(monthly_sales) OVER (ORDER BY month), 2) AS growth_rate
+  FROM (
+    SELECT DATE_FORMAT(order_date, '%Y-%m') AS month
+           , SUM(amount) AS monthly_sales
+      FROM orders
+     GROUP BY month
+  ) AS MonthlySummary;
+
+SELECT c.customer_id
+       , c.customer_name
+       , COUNT(o.order_id) AS order_count
+       , COALESCE(SUM(o.total), 0) AS total_spent
+  FROM customers AS c
+  LEFT JOIN orders AS o
+    ON c.customer_id = o.customer_id
+ WHERE c.status = 'active'
+   AND c.created_at >= '2024-01-01'
+ GROUP BY c.customer_id
+        , c.customer_name
+HAVING COUNT(o.order_id) > 5
+ ORDER BY total_spent DESC
+ LIMIT 100;
+    ]]></good_example>
+    <bad_example><![CDATA[
+select
+    month,
+    monthly_sales,
+    LAG(monthly_sales) OVER (order by month) as last_month_sales,
+    ROUND(monthly_sales / LAG(monthly_sales) OVER (order by month), 2) as growth_rate
+from (
+    select
+        DATE_FORMAT(order_date, '%Y-%m') as month,
+        SUM(amount) AS monthly_sales
+    from orders
+    group by month
+) as MonthlySummary;
+
+SELECT c.customer_id, c.customer_name, COUNT(o.order_id) AS order_count,
+       COALESCE(SUM(o.total), 0) AS total_spent
+FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.status = 'active' AND c.created_at >= '2024-01-01'
+GROUP BY c.customer_id, c.customer_name
+HAVING COUNT(o.order_id) > 5
+ORDER BY total_spent DESC LIMIT 100;
+    ]]></bad_example>
+  </formatting_style>
 </best_practices>
 
 <workflow>
