@@ -25,7 +25,7 @@
     };
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.home-manager.follows = "home-manager";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
