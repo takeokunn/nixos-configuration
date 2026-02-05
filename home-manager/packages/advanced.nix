@@ -19,6 +19,7 @@ with pkgs;
 
   # for ai
   llmAgentsPkgs.ccusage
+  nurPkgs.z_ai-coding-helper
 
   # for web service
   discord
