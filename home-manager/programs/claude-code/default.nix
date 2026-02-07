@@ -71,6 +71,7 @@ in
         DISABLE_TELEMETRY = "1";
         ENABLE_EXPERIMENTAL_MCP_CLI = "false";
         ENABLE_TOOL_SEARCH = "true";
+        CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
       };
 
       statusLine = {
