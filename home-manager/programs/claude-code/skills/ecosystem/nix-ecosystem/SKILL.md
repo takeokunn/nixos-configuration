@@ -1,6 +1,6 @@
 ---
 name: Nix Ecosystem
-description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
+description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
 ---
 
 <purpose>
@@ -694,6 +694,7 @@ description: This skill should be used when the user asks to "write nix", "nix e
   <skill name="serena-usage">Symbol operations for navigating Nix expressions and module definitions</skill>
   <skill name="context7-usage">Fetch latest nixpkgs and Home Manager documentation</skill>
   <skill name="investigation-patterns">Debug evaluation errors and understand derivation failures</skill>
+  <skill name="ecosystem skills">Language-specific conventions for nixpkgs packaging via golang-ecosystem, rust-ecosystem, haskell-ecosystem, php-ecosystem, swift-ecosystem, c-ecosystem, cplusplus-ecosystem, common-lisp-ecosystem</skill>
 </related_skills>
 
 <nixos>
@@ -737,3 +738,76 @@ description: This skill should be used when the user asks to "write nix", "nix e
     </pattern>
   </patterns>
 </nixos>
+
+<nixpkgs_packaging>
+  <concept name="languages_frameworks">
+    <description>Nixpkgs provides language-specific packaging infrastructure documented in doc/languages-frameworks/. Use Context7 with library ID /nixos/nixpkgs to retrieve up-to-date packaging patterns for each language.</description>
+  </concept>
+
+  <context7_topics>
+    <topic name="go">
+      <query>buildGoModule</query>
+      <query_alt>go packaging</query_alt>
+      <builders>buildGoModule</builders>
+      <related_skill>golang-ecosystem</related_skill>
+    </topic>
+
+    <topic name="rust">
+      <query>rustPlatform.buildRustPackage</query>
+      <query_alt>rust packaging</query_alt>
+      <builders>rustPlatform.buildRustPackage, rustPlatform.importCargoLock</builders>
+      <related_skill>rust-ecosystem</related_skill>
+    </topic>
+
+    <topic name="haskell">
+      <query>haskellPackages</query>
+      <query_alt>haskell packaging</query_alt>
+      <builders>haskellPackages.mkDerivation, haskellPackages.callCabal2nix</builders>
+      <related_skill>haskell-ecosystem</related_skill>
+    </topic>
+
+    <topic name="php">
+      <query>buildComposerProject2</query>
+      <query_alt>php packaging</query_alt>
+      <builders>php.buildComposerProject2</builders>
+      <related_skill>php-ecosystem</related_skill>
+    </topic>
+
+    <topic name="swift">
+      <query>swift packaging</query>
+      <builders>stdenv.mkDerivation with swift and swiftpm as nativeBuildInputs</builders>
+      <related_skill>swift-ecosystem</related_skill>
+    </topic>
+
+    <topic name="c_cpp">
+      <query>cmake</query>
+      <query_alt>meson</query_alt>
+      <builders>stdenv.mkDerivation with cmake or meson as nativeBuildInputs</builders>
+      <related_skill>c-ecosystem, cplusplus-ecosystem</related_skill>
+    </topic>
+
+    <topic name="common_lisp">
+      <query>lisp packaging</query>
+      <builders>sbcl.buildASDFSystem, lispPackages_new.sbclPackages</builders>
+      <related_skill>common-lisp-ecosystem</related_skill>
+    </topic>
+  </context7_topics>
+
+  <decision_tree name="packaging_approach">
+    <question>Is the target language listed in context7_topics above?</question>
+    <if_yes>Use the corresponding Context7 topic query with library ID /nixos/nixpkgs</if_yes>
+    <if_no>Use get-library-docs with context7CompatibleLibraryID="/nixos/nixpkgs" and topic="LANGUAGE packaging" as a fallback</if_no>
+  </decision_tree>
+
+  <best_practices>
+    <practice priority="critical">
+      Always consult Context7 for the latest nixpkgs packaging patterns before writing language-specific derivations
+    </practice>
+    <practice priority="high">
+      Use language-specific builders (buildGoModule, rustPlatform.buildRustPackage, etc.) instead of raw mkDerivation
+    </practice>
+    <practice priority="medium">
+      Cross-reference with the corresponding ecosystem skill for language-specific conventions
+    </practice>
+  </best_practices>
+</nixpkgs_packaging>

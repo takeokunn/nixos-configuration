@@ -1,9 +1,10 @@
 {
   home.file.".config/git/message".source = ./message;
 
+  programs.gitHooks.enable = true;
+
   programs.gitleaks = {
     enable = true;
-    enableGitHook = true;
     settings = {
       extend.useDefault = true;
     };
@@ -31,6 +32,7 @@
       "devenv.lock"
       ".devenv.flake.nix"
       ".pre-commit-config.yaml"
+      ".git-hooks-config.yaml"
       ".markdown-preview.html"
       ".serena/"
       ".cache/"

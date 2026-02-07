@@ -25,6 +25,9 @@ with pkgs;
   discord
   slack
   nurPkgs.gogcli
+
+  # for editor
+  nurPkgs.kakehashi
 ]
 ++ lib.optionals stdenv.isLinux [
   # for desktop environment

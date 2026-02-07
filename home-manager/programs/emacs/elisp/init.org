@@ -2419,6 +2419,18 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     ;; config
     (setopt lsp-copilot-enabled nil))
 #+END_SRC
+*** kakehashi
+:PROPERTIES:
+:CUSTOM_ID: kakehashi
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (with-eval-after-load 'lsp-mode
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection '("kakehashi"))
+      :activation-fn (lsp-activate-on "markdown")
+      :server-id 'kakehashi)))
+#+end_src
 *** emacs-lsp-booster
 :PROPERTIES:
 :CUSTOM_ID: emacs-lsp-booster

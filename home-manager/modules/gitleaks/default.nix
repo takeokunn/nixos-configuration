@@ -163,22 +163,12 @@ let
       };
     in
     extend // rules // allowlists;
-  # pre-commitフック用のシェルスクリプト
-  preCommitHook = pkgs.writeShellScript "gitleaks-pre-commit" ''
-    exec ${cfg.package}/bin/gitleaks protect --staged --verbose --config ${config.xdg.configHome}/gitleaks/config.toml
-  '';
 in
 {
   options.programs.gitleaks = {
     enable = lib.mkEnableOption "Scan git repos for secrets";
 
     package = lib.mkPackageOption pkgs "gitleaks" { };
-
-    enableGitHook = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Enable gitleaks as git pre-commit hook";
-    };
 
     enableBashIntegration = lib.hm.shell.mkBashIntegrationOption { inherit config; };
 
@@ -247,8 +237,6 @@ in
     home.sessionVariables = {
       GITLEAKS_CONFIG = "${config.xdg.configHome}/gitleaks/config.toml";
     };
-
-    programs.git.hooks.pre-commit = lib.mkIf cfg.enableGitHook preCommitHook;
 
     programs = {
       bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''

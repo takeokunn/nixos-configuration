@@ -1,6 +1,7 @@
 [
   ./doggo
   ./dust
+  ./git-hooks
   ./gitleaks
   ./lnav
   ./tig
