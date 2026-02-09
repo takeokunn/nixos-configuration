@@ -5,6 +5,9 @@
   emacs-overlay,
   mcp-servers-nix,
   llm-agents,
+  anthropic-skills,
+  cloudflare-skills,
+  hashicorp-agent-skills,
   brew-nix,
   firefox-addons,
   nur-packages,
@@ -64,6 +67,7 @@ let
     inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
+    inherit anthropic-skills cloudflare-skills hashicorp-agent-skills;
     inherit firefox-addons;
   };
 

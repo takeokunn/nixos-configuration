@@ -113,46 +113,6 @@ in
       enforce-perl = builtins.readFile ./hooks/enforce-perl.sh;
     };
 
-    skills = {
-      # patterns
-      core-patterns = builtins.readFile ./skills/patterns/core-patterns/SKILL.md;
-      parallelization-patterns = builtins.readFile ./skills/patterns/parallelization-patterns/SKILL.md;
-      workflow-patterns = builtins.readFile ./skills/patterns/workflow-patterns/SKILL.md;
-
-      # tools
-      serena-usage = builtins.readFile ./skills/tools/serena-usage/SKILL.md;
-      context7-usage = builtins.readFile ./skills/tools/context7-usage/SKILL.md;
-      exploration-tools = builtins.readFile ./skills/tools/exploration-tools/SKILL.md;
-      quality-tools = builtins.readFile ./skills/tools/quality-tools/SKILL.md;
-
-      # methodology
-      requirements-definition = builtins.readFile ./skills/methodology/requirements-definition/SKILL.md;
-      define-core = builtins.readFile ./skills/methodology/define-core/SKILL.md;
-      investigation-patterns = builtins.readFile ./skills/methodology/investigation-patterns/SKILL.md;
-      execution-workflow = builtins.readFile ./skills/methodology/execution-workflow/SKILL.md;
-      fact-check = builtins.readFile ./skills/methodology/fact-check/SKILL.md;
-      testing-patterns = builtins.readFile ./skills/methodology/testing-patterns/SKILL.md;
-      technical-documentation = builtins.readFile ./skills/methodology/technical-documentation/SKILL.md;
-      technical-writing = builtins.readFile ./skills/methodology/technical-writing/SKILL.md;
-
-      # ecosystem
-      nix-ecosystem = builtins.readFile ./skills/ecosystem/nix-ecosystem/SKILL.md;
-      typescript-ecosystem = builtins.readFile ./skills/ecosystem/typescript-ecosystem/SKILL.md;
-      golang-ecosystem = builtins.readFile ./skills/ecosystem/golang-ecosystem/SKILL.md;
-      rust-ecosystem = builtins.readFile ./skills/ecosystem/rust-ecosystem/SKILL.md;
-      common-lisp-ecosystem = builtins.readFile ./skills/ecosystem/common-lisp-ecosystem/SKILL.md;
-      emacs-ecosystem = builtins.readFile ./skills/ecosystem/emacs-ecosystem/SKILL.md;
-      org-ecosystem = builtins.readFile ./skills/ecosystem/org-ecosystem/SKILL.md;
-      aws-ecosystem = builtins.readFile ./skills/ecosystem/aws-ecosystem/SKILL.md;
-      cplusplus-ecosystem = builtins.readFile ./skills/ecosystem/cplusplus-ecosystem/SKILL.md;
-      sql-ecosystem = builtins.readFile ./skills/ecosystem/sql-ecosystem/SKILL.md;
-      c-ecosystem = builtins.readFile ./skills/ecosystem/c-ecosystem/SKILL.md;
-      php-ecosystem = builtins.readFile ./skills/ecosystem/php-ecosystem/SKILL.md;
-      swift-ecosystem = builtins.readFile ./skills/ecosystem/swift-ecosystem/SKILL.md;
-      haskell-ecosystem = builtins.readFile ./skills/ecosystem/haskell-ecosystem/SKILL.md;
-      devenv-ecosystem = builtins.readFile ./skills/ecosystem/devenv-ecosystem/SKILL.md;
-    };
-
     mcpServers =
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {

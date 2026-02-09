@@ -63,13 +63,15 @@ nix-darwin.lib.darwinSystem {
           nixvim.homeModules.nixvim
           mac-app-util.homeManagerModules.default
           inputs.zen-browser.homeModules.twilight
+          inputs.agent-skills.homeManagerModules.default
         ];
         extraSpecialArgs = {
-          inherit system username;
+          inherit inputs system username;
           inherit (inputs) nixpkgs nixvim;
           inherit (inputs) mcp-servers-nix;
           inherit (inputs) llm-agents;
           inherit (inputs) nur-packages;
+          inherit (inputs) anthropic-skills cloudflare-skills hashicorp-agent-skills;
           inherit (inputs)
             emacs-overlay
             org-babel

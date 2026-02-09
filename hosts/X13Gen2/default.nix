@@ -46,14 +46,18 @@ nixpkgs.lib.nixosSystem {
       home-manager.sharedModules = [
         nixvim.homeModules.nixvim
         inputs.zen-browser.homeModules.twilight
+        inputs.agent-skills.homeManagerModules.default
       ];
       home-manager.extraSpecialArgs = {
-        inherit system;
+        inherit inputs system;
         inherit (inputs)
           nixpkgs
           nixvim
           mcp-servers-nix
           llm-agents
+          anthropic-skills
+          cloudflare-skills
+          hashicorp-agent-skills
           nur-packages
           emacs-overlay
           org-babel
