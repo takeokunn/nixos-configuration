@@ -4289,6 +4289,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; config
     (setopt dimmer-fraction 0.05))
 #+end_src
+** Warm Mode
+:PROPERTIES:
+:CUSTOM_ID: warm-mode
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(warm-mode) "warm-mode" nil t)
+#+end_src
 ** Doom
 :PROPERTIES:
 :CUSTOM_ID: doom

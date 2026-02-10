@@ -1,4 +1,10 @@
-{ epkgs }:
+{
+  epkgs,
+  nurPkgs,
+}:
+let
+  warm-mode = nurPkgs.emacs-warm-mode;
+in
 with epkgs;
 [
   highlight-indent-guides
@@ -19,4 +25,5 @@ with epkgs;
   font-lock-studio
   emojify
   modus-themes
+  warm-mode
 ]

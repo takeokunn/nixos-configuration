@@ -19,7 +19,7 @@ let
   org = import ./packages/org { inherit epkgs pkgs nurPkgs; };
   project = import ./packages/project { inherit epkgs; };
   remote_access = import ./packages/remote_access { inherit epkgs pkgs nurPkgs; };
-  themes = import ./packages/themes { inherit epkgs; };
+  themes = import ./packages/themes { inherit epkgs nurPkgs; };
   search = import ./packages/search { inherit epkgs; };
   tree-sitter = import ./packages/tree-sitter { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
