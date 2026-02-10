@@ -47,4 +47,5 @@ with pkgs;
   brewCasks.clickup
   brewCasks.slite
   brewCasks.element
+  brewCasks.claude
 ]
