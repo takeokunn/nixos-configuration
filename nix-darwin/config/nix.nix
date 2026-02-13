@@ -20,6 +20,10 @@
       options = "--delete-older-than 7d";
     };
     settings = {
+      trusted-users = [
+        "root"
+        "take"
+      ];
       sandbox = false;
       experimental-features = [
         "nix-command"
