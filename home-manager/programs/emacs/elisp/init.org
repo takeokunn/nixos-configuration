@@ -4710,7 +4710,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (setopt exec-path-from-shell-arguments '("-l"))
   (setopt exec-path-from-shell-variables '("PATH" "TERM" "COPILOT_LANGUAGE_SERVER_PATH"))
 
-  (add-hook 'emacs-startup-hook #'exec-path-from-shell-initialize)
+  (exec-path-from-shell-initialize)
 
   ;; Explicitly set SSH_AUTH_SOCK for GPG agent (exec-path-from-shell doesn't handle this correctly on macOS)
   (setenv "SSH_AUTH_SOCK" (expand-file-name "~/.gnupg/S.gpg-agent.ssh"))

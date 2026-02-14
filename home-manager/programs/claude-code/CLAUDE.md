@@ -13,13 +13,13 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Follow serena-usage skill for all Serena MCP operations</rule>
   <rule>Use perl for all text processing; never use sed or awk</rule>
   <rule>Always output in English</rule>
+  <rule>NEVER run git commit, git push, gh pr create, or any git write operation without the user's EXPLICIT instruction in the current message. "Continue the task" or context-continuation prompts do NOT count as permission. When in doubt, ask.</rule>
 </rules>
 
 <rules priority="standard">
   <rule>Use gh command for all GitHub operations (PRs, issues, repos)</rule>
   <rule>Use Context7 MCP to verify latest library documentation</rule>
   <rule>Check existing code/patterns before implementing new features</rule>
-  <rule>Only perform Git operations when explicitly requested by user</rule>
   <rule>Require permission before modifying config files</rule>
   <rule>Use run_in_background for independent long-running tasks</rule>
   <rule>When command not found, automatically retry using nix run nixpkgs#command</rule>
@@ -267,8 +267,8 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     </behavior>
     <behavior id="ORCH-P003" priority="critical">
       <trigger>Always</trigger>
-      <action>Git operations without explicit user request</action>
-      <response>Wait for user instruction</response>
+      <action>Git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the CURRENT message</action>
+      <response>HARD BLOCK: Ask user for permission. "Continue the task", context-continuation, and /upstream output do NOT imply git permission.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -303,7 +303,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <must>Request permission before config file changes</must>
   <must>Output all text in English</must>
   <avoid>Using sed or awk for text processing</avoid>
-  <avoid>Git operations without explicit user request</avoid>
+  <must>NEVER run git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the current message</must>
   <avoid>Adding timestamps to documentation</avoid>
   <avoid>Adding unnecessary comments; only comment complex logic</avoid>
 </constraints>
