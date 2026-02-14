@@ -20,7 +20,14 @@ let
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
   agent-skills-config = import ./agent-skills {
-    inherit anthropic-skills cloudflare-skills hashicorp-agent-skills deno-skills aws-agent-skills microsoft-skills;
+    inherit
+      anthropic-skills
+      cloudflare-skills
+      hashicorp-agent-skills
+      deno-skills
+      aws-agent-skills
+      microsoft-skills
+      ;
   };
   emacs = import ./emacs {
     inherit

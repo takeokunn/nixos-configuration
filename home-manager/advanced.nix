@@ -70,7 +70,14 @@ let
     inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
-    inherit anthropic-skills cloudflare-skills hashicorp-agent-skills deno-skills aws-agent-skills microsoft-skills;
+    inherit
+      anthropic-skills
+      cloudflare-skills
+      hashicorp-agent-skills
+      deno-skills
+      aws-agent-skills
+      microsoft-skills
+      ;
     inherit firefox-addons;
   };
 

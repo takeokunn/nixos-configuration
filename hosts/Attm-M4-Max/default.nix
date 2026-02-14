@@ -71,7 +71,14 @@ nix-darwin.lib.darwinSystem {
           inherit (inputs) mcp-servers-nix;
           inherit (inputs) llm-agents;
           inherit (inputs) nur-packages;
-          inherit (inputs) anthropic-skills cloudflare-skills hashicorp-agent-skills deno-skills aws-agent-skills microsoft-skills;
+          inherit (inputs)
+            anthropic-skills
+            cloudflare-skills
+            hashicorp-agent-skills
+            deno-skills
+            aws-agent-skills
+            microsoft-skills
+            ;
           inherit (inputs)
             emacs-overlay
             org-babel
