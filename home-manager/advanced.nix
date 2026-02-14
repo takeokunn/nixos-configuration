@@ -8,6 +8,9 @@
   anthropic-skills,
   cloudflare-skills,
   hashicorp-agent-skills,
+  deno-skills,
+  aws-agent-skills,
+  microsoft-skills,
   brew-nix,
   firefox-addons,
   nur-packages,
@@ -67,7 +70,7 @@ let
     inherit pkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
-    inherit anthropic-skills cloudflare-skills hashicorp-agent-skills;
+    inherit anthropic-skills cloudflare-skills hashicorp-agent-skills deno-skills aws-agent-skills microsoft-skills;
     inherit firefox-addons;
   };
 

@@ -83,6 +83,18 @@
       url = "github:hashicorp/agent-skills";
       flake = false;
     };
+    deno-skills = {
+      url = "github:denoland/skills";
+      flake = false;
+    };
+    aws-agent-skills = {
+      url = "github:itsmostafa/aws-agent-skills";
+      flake = false;
+    };
+    microsoft-skills = {
+      url = "github:microsoft/skills";
+      flake = false;
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

@@ -58,6 +58,9 @@ nixpkgs.lib.nixosSystem {
           anthropic-skills
           cloudflare-skills
           hashicorp-agent-skills
+          deno-skills
+          aws-agent-skills
+          microsoft-skills
           nur-packages
           emacs-overlay
           org-babel

@@ -2,6 +2,9 @@
   anthropic-skills,
   cloudflare-skills,
   hashicorp-agent-skills,
+  deno-skills,
+  aws-agent-skills,
+  microsoft-skills,
 }:
 {
   programs.agent-skills = {
@@ -9,7 +12,7 @@
     sources = {
       custom = {
         path = ./skills;
-        filter.maxDepth = 2;
+        filter.maxDepth = 1;
       };
       anthropic = {
         path = anthropic-skills;
@@ -23,6 +26,19 @@
         path = hashicorp-agent-skills;
         filter.maxDepth = 4;
       };
+      deno = {
+        path = deno-skills;
+        subdir = "skills";
+      };
+      aws = {
+        path = aws-agent-skills;
+        subdir = "skills";
+      };
+      microsoft = {
+        path = microsoft-skills;
+        subdir = ".github/skills";
+        filter.nameRegex = ".*-(ts|rust)";
+      };
     };
     skills = {
       enableAll = [
@@ -30,6 +46,9 @@
         "anthropic"
         "cloudflare"
         "hashicorp"
+        "deno"
+        "aws"
+        "microsoft"
       ];
     };
     targets.claude.enable = true;

@@ -183,7 +183,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="common-lisp-ecosystem">Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns</skill>
     <skill name="emacs-ecosystem">Emacs Lisp, configuration, Magit, LSP patterns</skill>
     <skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
-    <skill name="aws-ecosystem">AWS CLI and Terraform AWS Provider patterns</skill>
+    <skill name="aws-*">AWS service skills (s3, lambda, ec2, iam, ecs, eks, etc.) via itsmostafa/aws-agent-skills</skill>
     <skill name="cplusplus-ecosystem">C++ language, CMake, and modern C++ patterns</skill>
     <skill name="c-ecosystem">C language (C11/C17/C23), memory management, CLI development patterns</skill>
     <skill name="php-ecosystem">PHP 8.3+, PSR standards, Composer, PHPStan, and modern PHP patterns</skill>

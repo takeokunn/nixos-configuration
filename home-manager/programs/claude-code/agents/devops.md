@@ -256,7 +256,7 @@ Confidence is 85 because workflow analysis is definitive, cache benefits are wel
 </related_agents>
 
 <related_skills>
-  <skill name="aws-ecosystem">Essential for Terraform, CloudFormation, and Kubernetes configuration</skill>
+  <skill name="aws-*">Essential for Terraform, CloudFormation, and Kubernetes configuration (via itsmostafa/aws-agent-skills)</skill>
   <skill name="execution-workflow">Critical for pipeline design and build optimization</skill>
 </related_skills>
 

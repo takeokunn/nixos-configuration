@@ -1,10 +1,10 @@
 ---
-name: Context7 Usage
-description: This skill should be used when the user asks to "check documentation", "latest API", "library docs", "context7", or needs up-to-date library documentation. Provides Context7 MCP usage patterns.
+name: Context7 & DeepWiki Usage
+description: This skill should be used when the user asks to "check documentation", "latest API", "library docs", "context7", "deepwiki", or needs up-to-date library documentation. Provides Context7 MCP usage patterns with DeepWiki as fallback.
 ---
 
 <purpose>
-  Provide patterns for effective use of Context7 MCP for retrieving up-to-date library documentation.
+  Provide patterns for effective use of Context7 MCP for retrieving up-to-date library documentation, with DeepWiki MCP as fallback when Context7 returns no results, low trust scores, or is unavailable.
 </purpose>
 
 <tools>
@@ -20,6 +20,23 @@ description: This skill should be used when the user asks to "check documentatio
     <param name="topic">Optional topic to focus on (e.g., "hooks", "routing")</param>
     <param name="tokens">Max tokens to retrieve (default: 5000)</param>
     <use_case>Retrieve up-to-date documentation snippets with code examples</use_case>
+  </tool>
+  <tool name="deepwiki-read_wiki_structure">
+    <description>Retrieve list of documentation topics from a GitHub repository (DeepWiki fallback)</description>
+    <param name="repo">Repository in format "owner/repo" (e.g., "facebook/react")</param>
+    <use_case>Get overview of available documentation when Context7 lacks coverage</use_case>
+  </tool>
+  <tool name="deepwiki-read_wiki_contents">
+    <description>Access document content from a GitHub repository (DeepWiki fallback)</description>
+    <param name="repo">Repository in format "owner/repo"</param>
+    <param name="topic">Specific documentation topic to retrieve</param>
+    <use_case>Read detailed documentation when Context7 returns low trust score or no results</use_case>
+  </tool>
+  <tool name="deepwiki-ask_question">
+    <description>Ask questions about a repository and get AI-generated contextual answers (DeepWiki fallback)</description>
+    <param name="repo">Repository in format "owner/repo"</param>
+    <param name="question">The question to ask about the repository</param>
+    <use_case>Get contextual answers when Context7 documentation is insufficient</use_case>
   </tool>
 </tools>
 
@@ -87,6 +104,14 @@ description: This skill should be used when the user asks to "check documentatio
       <step>3. Plan migration based on documentation</step>
     </example>
   </pattern>
+  <pattern name="fallback_to_deepwiki">
+    <description>Use DeepWiki when Context7 returns no results, low trust scores, or is unavailable</description>
+    <example>
+      <step>1. Try Context7 resolve-library-id</step>
+      <step>2. If not found or trust score &lt; 7, use DeepWiki ask_question with repo="owner/repo"</step>
+      <step>3. If DeepWiki also insufficient, use WebSearch as final fallback</step>
+    </example>
+  </pattern>
   <decision_tree name="tool_selection">
     <question>What type of operation is needed?</question>
     <branch condition="Library name unknown">Use resolve-library-id to find library</branch>
@@ -95,6 +120,9 @@ description: This skill should be used when the user asks to "check documentatio
     <branch condition="General overview">Use get-library-docs without topic</branch>
     <branch condition="Quick lookup">Use get-library-docs with 2000-3000 tokens</branch>
     <branch condition="Comprehensive search">Use get-library-docs with 8000-10000 tokens</branch>
+    <branch condition="Context7 no results or trust &lt; 7">Fallback to DeepWiki ask_question</branch>
+    <branch condition="Context7 service unavailable">Fallback to DeepWiki ask_question</branch>
+    <branch condition="DeepWiki also insufficient">Fallback to WebSearch</branch>
   </decision_tree>
 </patterns>
 
@@ -167,7 +195,7 @@ description: This skill should be used when the user asks to "check documentatio
   </level>
   <level severity="high">
     <example>Context7 service unavailable</example>
-    <action>STOP, present options to user</action>
+    <action>Fallback to DeepWiki, notify user of degraded mode</action>
   </level>
   <level severity="critical">
     <example>Conflicting documentation versions</example>
@@ -182,6 +210,7 @@ description: This skill should be used when the user asks to "check documentatio
   <skill name="typescript-ecosystem">Uses Context7 for TypeScript and framework documentation</skill>
   <skill name="golang-ecosystem">Uses Context7 for Go library documentation</skill>
   <skill name="rust-ecosystem">Uses Context7 for Rust crate documentation</skill>
+  <skill name="fact-check">DeepWiki provides alternative verification source</skill>
 </related_skills>
 
 <constraints>
@@ -190,4 +219,5 @@ description: This skill should be used when the user asks to "check documentatio
   <must>Check documentation version matches project requirements</must>
   <avoid>Fetching documentation without verifying library identity</avoid>
   <avoid>Using outdated documentation for current implementations</avoid>
+  <must>Use DeepWiki as fallback when Context7 returns no results or trust score below 7</must>
 </constraints>

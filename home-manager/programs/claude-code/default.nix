@@ -123,6 +123,11 @@ in
             enableWebDashboard = false;
           };
         };
-      }).config.settings.servers;
+      }).config.settings.servers // {
+        deepwiki = {
+          type = "http";
+          url = "https://mcp.deepwiki.com/mcp";
+        };
+      };
   };
 }
