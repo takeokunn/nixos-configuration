@@ -131,4 +131,10 @@ in
         };
       };
   };
+
+  programs.serena.ignoredPaths = [
+    ".devenv"
+    ".direnv"
+    ".terraform"
+  ];
 }

@@ -4,6 +4,7 @@
   ./git-hooks
   ./gitleaks
   ./lnav
+  ./serena
   ./tig
   ./wget
   ./zellij
