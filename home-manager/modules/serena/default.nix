@@ -13,7 +13,11 @@ in
     ignoredPaths = lib.mkOption {
       type = with lib.types; listOf str;
       default = [ ];
-      example = [ ".devenv" ".direnv" ".terraform" ];
+      example = [
+        ".devenv"
+        ".direnv"
+        ".terraform"
+      ];
       description = ''
         List of paths to ignore across all projects in the global Serena configuration.
         Same syntax as gitignore, so you can use * and **.
