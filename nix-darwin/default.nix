@@ -8,6 +8,7 @@
 let
   fonts = import ./config/fonts.nix { inherit pkgs; };
   homebrew = import ./config/homebrew.nix;
+  linuxBuilder = import ./config/linux-builder.nix;
   networking = import ./config/networking.nix;
   nix = import ./config/nix.nix;
   security = import ./config/security.nix;
@@ -18,6 +19,7 @@ in
   imports = [
     fonts
     homebrew
+    linuxBuilder
     networking
     nix
     security

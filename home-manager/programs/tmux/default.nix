@@ -31,8 +31,34 @@
       {
         plugin = tmuxPlugins.dracula;
         extraConfig = ''
-          set -g clock-mode-colour "#81a2be"
-          set-option -g @dracula-plugins "battery"
+          # Powerline with rounded separators (pill style)
+          set -g @dracula-show-powerline true
+          set -g @dracula-show-left-sep ""
+          set -g @dracula-show-right-sep ""
+          set -g @dracula-transparent-powerline-bg true
+
+          # Left icon: session name
+          set -g @dracula-show-left-icon " #S"
+          set -g @dracula-left-icon-padding 1
+
+          # Plugins: git only (branch name)
+          set -g @dracula-plugins "git"
+          set -g @dracula-show-flags true
+          set -g @dracula-show-empty-plugins false
+
+          # Git widget (branch name only)
+          set -g @dracula-git-disable-status true
+          set -g @dracula-git-show-current-symbol ""
+          set -g @dracula-git-show-diff-symbol ""
+          set -g @dracula-git-no-repo-message ""
+          set -g @dracula-git-show-remote-status false
+          set -g @dracula-git-colors "light_purple dark_gray"
+
+          # Purple-based palette (replace loud green/yellow)
+          set -g @dracula-colors "green='#bd93f9' yellow='#bd93f9'"
+
+          # Border contrast
+          set -g @dracula-border-contrast true
         '';
       }
     ];
