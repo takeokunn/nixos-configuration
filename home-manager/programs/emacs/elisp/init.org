@@ -4617,23 +4617,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                                   (lambda ()
                                     (setopt my/gcmh-status nil))))))
 #+end_src
-** Command
-:PROPERTIES:
-:CUSTOM_ID: command
-:END:
-*** amx
-:PROPERTIES:
-:CUSTOM_ID: amx
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(amx-mode) "amx" nil t)
-
-  (add-hook 'emacs-startup-hook #'amx-mode)
-
-  (with-eval-after-load 'amx
-    ;; config
-    (setopt amx-history-length 100))
-#+END_SRC
 ** GPG
 :PROPERTIES:
 :CUSTOM_ID: gpg

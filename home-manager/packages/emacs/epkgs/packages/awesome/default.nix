@@ -13,9 +13,6 @@ with epkgs;
 [
   dumb-jump
 
-  # Command
-  amx
-
   # Cursor
   avy
   avy-zap
