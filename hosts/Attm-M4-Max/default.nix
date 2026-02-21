@@ -8,6 +8,7 @@ let
     mac-app-util
     emacs-overlay
     nur-packages
+    darwin-vz-nix
     ;
   inherit (inputs) nixpkgs;
 
@@ -47,11 +48,12 @@ nix-darwin.lib.darwinSystem {
   inherit pkgs;
   inherit (inputs.nixpkgs) lib;
   specialArgs = {
-    inherit username pkgs emacsLib;
+    inherit inputs username pkgs emacsLib;
   };
   modules = [
     configuration
     ../../nix-darwin
+    darwin-vz-nix.darwinModules.default
     brew-nix.darwinModules.default
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager

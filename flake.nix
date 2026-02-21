@@ -110,6 +110,7 @@
       url = "github:takeokunn/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
   };
 
   outputs =
