@@ -1803,6 +1803,8 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
 
+  (require 'ccc)
+
   (keymap-global-set "C-x C-j" #'skk-mode)
 
   (defun my/skk-C-j-key (arg)
@@ -1945,14 +1947,34 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-corfu-mode) "corfu" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-corfu-mode)
+  ;; corfu child-frames require a GUI frame; defer in daemon mode
+  (defun my/setup-corfu-daemon ()
+    (global-corfu-mode 1)
+    (remove-hook 'server-after-make-frame-hook #'my/setup-corfu-daemon))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'my/setup-corfu-daemon)
+    (add-hook 'emacs-startup-hook #'global-corfu-mode))
 
   (with-eval-after-load 'corfu
     ;; config
     (setopt corfu-auto t)
     (setopt corfu-auto-delay 0.2)
+    (setopt corfu-auto-prefix 2)
     (setopt corfu-cycle t)
-    (setopt corfu-on-exact-match nil))
+    (setopt corfu-on-exact-match nil)
+    (setopt corfu-quit-no-match 'separator)
+
+    ;; extensions
+    (require 'corfu-popupinfo)
+    (require 'corfu-history)
+    (require 'corfu-terminal)
+    (corfu-popupinfo-mode 1)
+    (corfu-history-mode 1)
+    (corfu-terminal-mode 1))
+
+  (with-eval-after-load 'savehist
+    (add-to-list 'savehist-additional-variables 'corfu-history))
 
   (with-eval-after-load 'indent
     ;; config
@@ -1966,14 +1988,16 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   (autoload-if-found '(cape-file
                        cape-dabbrev
                        cape-elisp-block
-                       cape-history
-                       cape-keyword) "cape" nil t)
+                       cape-history) "cape" nil t)
 
-  (with-eval-after-load 'minibuffer
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-    (add-to-list 'completion-at-point-functions #'cape-history))
+  (with-eval-after-load 'cape
+    ;; config
+    (setopt cape-dabbrev-min-length 2))
+
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  (add-hook 'completion-at-point-functions #'cape-history)
 #+end_src
 *** prescient
 :PROPERTIES:

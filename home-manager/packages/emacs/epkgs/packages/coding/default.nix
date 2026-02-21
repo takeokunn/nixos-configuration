@@ -13,6 +13,7 @@ with epkgs;
 
   # completion
   corfu
+  corfu-terminal
   cape
   prescient
   kind-icon

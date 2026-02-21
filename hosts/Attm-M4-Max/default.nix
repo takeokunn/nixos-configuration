@@ -52,7 +52,6 @@ nix-darwin.lib.darwinSystem {
   modules = [
     configuration
     ../../nix-darwin
-    inputs.nix-rosetta-builder.darwinModules.default
     brew-nix.darwinModules.default
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
