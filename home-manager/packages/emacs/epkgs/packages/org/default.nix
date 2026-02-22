@@ -12,6 +12,7 @@ let
   ob-racket = nurPkgs.emacs-ob-racket;
   ob-treesitter = nurPkgs.emacs-ob-treesitter;
   ob-fish = nurPkgs.emacs-ob-fish;
+  ob-gleam = nurPkgs.emacs-ob-gleam;
   ox-hatena = nurPkgs.emacs-ox-hatena;
 in
 with epkgs;
@@ -68,6 +69,7 @@ with epkgs;
   ob-treesitter
   ob-racket
   ob-base64
+  ob-gleam
   ob-prolog
   org-nix-shell
 

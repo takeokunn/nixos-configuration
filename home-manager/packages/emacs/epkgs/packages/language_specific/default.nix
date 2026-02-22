@@ -7,6 +7,7 @@ let
   rainbow-csv = nurPkgs.emacs-rainbow-csv;
   emacs-php-doc-block = nurPkgs.emacs-php-doc-block;
   fish-repl = nurPkgs.emacs-fish-repl;
+  dasel = nurPkgs.emacs-dasel;
 in
 with epkgs;
 [
@@ -82,6 +83,7 @@ with epkgs;
   # JSON
   jq-mode
   json-reformat
+  dasel
 
   # Python
   py-isort
