@@ -5,12 +5,12 @@ let
 in
 {
   services.darwin-vz = {
-    enable = true;
+    enable = false;
     cores = 14;
     memory = 49152;
     diskSize = "200G";
     rosetta = true;
-    user = "take";
+    maxJobs = 4;
     kernelPath = "${darwin-vz-pkgs.guest-kernel}/Image";
     initrdPath = "${darwin-vz-pkgs.guest-initrd}/initrd";
     systemPath = "${darwin-vz-pkgs.guest-system}";
