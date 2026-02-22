@@ -5511,6 +5511,23 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(json-reformat-region) "json-reformat" nil t)
 #+end_src
+*** dasel
+:PROPERTIES:
+:CUSTOM_ID: dasel
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(dasel-interactive) "dasel-interactive" nil t)
+  (autoload-if-found '(dasel-convert) "dasel-convert" nil t)
+  (autoload-if-found '(dasel-format-buffer dasel-format-region) "dasel-format" nil t)
+  (autoload-if-found '(dasel-edit-put) "dasel-edit" nil t)
+#+end_src
+*** consult-dasel
+:PROPERTIES:
+:CUSTOM_ID: consult-dasel
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(consult-dasel) "consult-dasel" nil t)
+#+end_src
 ** Python
 :PROPERTIES:
 :CUSTOM_ID: python
@@ -6644,6 +6661,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-src
     (add-to-list 'org-src-lang-modes '("deno" . deno)))
+#+end_src
+*** ob-gleam
+:PROPERTIES:
+:CUSTOM_ID: ob-gleam
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(org-babel-execute:gleam) "ob-gleam" nil t)
+
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("gleam" . gleam)))
 #+end_src
 *** org-nix-shell
 :PROPERTIES:

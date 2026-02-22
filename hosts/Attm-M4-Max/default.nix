@@ -48,7 +48,12 @@ nix-darwin.lib.darwinSystem {
   inherit pkgs;
   inherit (inputs.nixpkgs) lib;
   specialArgs = {
-    inherit inputs username pkgs emacsLib;
+    inherit
+      inputs
+      username
+      pkgs
+      emacsLib
+      ;
   };
   modules = [
     configuration
