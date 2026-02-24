@@ -5,7 +5,7 @@ let
 in
 {
   services.darwin-vz = {
-    enable = true;
+    enable = false;
     cores = 14;
     memory = 49152;
     diskSize = "200G";

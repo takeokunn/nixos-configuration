@@ -45,7 +45,6 @@ let
   # Language servers, treesitter, and language-specific tooling
   languageLsp = import ./language/lsp.nix { };
   languageTreesitter = import ./language/treesitter.nix { inherit pkgs; };
-  languageJapanese = import ./language/japanese.nix { inherit pkgs customPackages; };
   languageMarkdown = import ./language/markdown.nix { inherit pkgs customPackages; };
   languageRust = import ./language/rust.nix { };
   languageWeb = import ./language/web.nix { };
@@ -73,7 +72,6 @@ let
     # Language
     languageLsp
     languageTreesitter
-    languageJapanese
     languageMarkdown
     languageRust
     languageWeb

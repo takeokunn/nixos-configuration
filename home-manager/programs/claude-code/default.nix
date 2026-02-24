@@ -117,6 +117,7 @@ in
       (mcp-servers-nix.lib.evalModule pkgs {
         programs = {
           context7.enable = true;
+          playwright.enable = true;
           serena = {
             enable = true;
             context = "claude-code";
