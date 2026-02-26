@@ -64,13 +64,13 @@ let
   # theming
   gtk = import ./gtk { inherit pkgs; };
   qt = import ./qt { inherit pkgs; };
-  zen-browser = import ./zen-browser { inherit pkgs firefox-addons; };
+  # zen-browser = import ./zen-browser { inherit pkgs firefox-addons; };  # TODO: hash mismatch, re-enable after fix
 in
 [
   awscli
   chromium
   firefox
-  zen-browser
+  # zen-browser  # TODO: hash mismatch, re-enable after fix
   claude-code
   agent-skills-config
   emacs

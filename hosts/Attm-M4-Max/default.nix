@@ -69,7 +69,7 @@ nix-darwin.lib.darwinSystem {
         sharedModules = [
           nixvim.homeModules.nixvim
           mac-app-util.homeManagerModules.default
-          inputs.zen-browser.homeModules.twilight
+          # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
           inputs.agent-skills.homeManagerModules.default
         ];
         extraSpecialArgs = {
