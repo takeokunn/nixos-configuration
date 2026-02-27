@@ -2301,18 +2301,6 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   ;; (with-eval-after-load 'lisp-mode
   ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-local-mode))
 #+end_src
-*** origami
-:PROPERTIES:
-:CUSTOM_ID: origami
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(global-origami-mode origami-recursively-toggle-node origami-recursively-toggle-node) "origami" nil t)
-
-  (keymap-global-set "C-c t" #'origami-recursively-toggle-node)
-  (keymap-global-set "C-c C-t" #'origami-recursively-toggle-node)
-
-  (add-hook 'emacs-startup-hook #'global-origami-mode)
-#+end_src
 ** LSP
 :PROPERTIES:
 :CUSTOM_ID: lsp

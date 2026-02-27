@@ -43,7 +43,6 @@ with epkgs;
 
   # narrowing
   fancy-narrow
-  origami
 
   # LSP
   eglot-booster

@@ -6,6 +6,14 @@
 }:
 let
   isDarwin = pkgs.stdenv.isDarwin;
+  # Use the emacsWithPackages derivation (before the open-a-Emacs wrapper replaces
+  # Emacs.app/Contents/MacOS/Emacs with an emacsclient script).  The daemon must
+  # use the real Cocoa binary so NSApp is initialised with proper bundle context,
+  # allowing emacsclient -c to create GUI frames.
+  cocoaEmacs =
+    if isDarwin && emacsPkg ? passthru && emacsPkg.passthru ? withPackages
+    then emacsPkg.passthru.withPackages
+    else emacsPkg;
 in
 {
   services.emacs = {
@@ -18,6 +26,14 @@ in
   launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf isDarwin {
     TMPDIR = "/tmp";
   };
+
+  # macOS: Launch daemon via Emacs.app binary directly, not the bin/emacs shell
+  # wrapper.  The shell wrapper lacks .app bundle context, so NSApp does not
+  # initialise properly and emacsclient -c cannot create GUI frames.
+  launchd.agents.emacs.config.ProgramArguments = lib.mkIf isDarwin (lib.mkForce [
+    "${cocoaEmacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
+    "--fg-daemon"
+  ]);
 
   # macOS: Gracefully stop Emacs before setupLaunchAgents to prevent I/O error 5
   # (upstream bootoutAgent sleeps only 1s, insufficient for Emacs shutdown)
