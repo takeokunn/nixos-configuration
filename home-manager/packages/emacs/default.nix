@@ -48,7 +48,9 @@ in
     pkgs.symlinkJoin {
       name = base.name;
       paths = [ base ];
-      passthru = base.passthru // { withPackages = base; };
+      passthru = base.passthru // {
+        withPackages = base;
+      };
       postBuild = lib.optionalString pkgs.stdenv.isDarwin ''
         EXEC="$out/Applications/Emacs.app/Contents/MacOS/Emacs"
         if [ -e "$EXEC" ] || [ -L "$EXEC" ]; then

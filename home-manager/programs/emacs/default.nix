@@ -24,7 +24,8 @@ in
 
     packages = [
       emacsPkg
-    ] ++ (with pkgs; [
+    ]
+    ++ (with pkgs; [
       emacs-lsp-booster
       pinentry-emacs
     ]);
