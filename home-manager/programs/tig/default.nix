@@ -1,5 +1,6 @@
 { nurPkgs }:
 {
+  home.packages = [ nurPkgs.diff-highlight ];
   home.file = {
     ".tig/dracula/config".source = "${nurPkgs.dracula-tig}/share/tig/dracula.tigrc";
   };

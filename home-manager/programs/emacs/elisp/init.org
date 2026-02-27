@@ -3736,7 +3736,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
   (defun my/tab-bar-rename-tab (&rest _)
     (interactive)
-    (let ((proj-name (if (projectile-project-p)
+    (let ((proj-name (if (and (fboundp 'projectile-project-p)
+                              (projectile-project-p))
                          (projectile-project-name)
                        "-")))
       (tab-bar-rename-tab proj-name)))

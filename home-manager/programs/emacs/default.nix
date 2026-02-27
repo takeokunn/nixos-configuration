@@ -8,11 +8,6 @@ let
   tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
 in
 {
-  programs.emacs = {
-    enable = true;
-    package = emacsPkg;
-  };
-
   home = {
     # Override vim.defaultEditor from programs/basic.nix for advanced configurations
     sessionVariables = {
@@ -27,9 +22,11 @@ in
       ".emacs.d/misc/mu4e-dashboard.org".source = ./misc/mu4e-dashboard.org;
     };
 
-    packages = with pkgs; [
+    packages = [
+      emacsPkg
+    ] ++ (with pkgs; [
       emacs-lsp-booster
       pinentry-emacs
-    ];
+    ]);
   };
 }
