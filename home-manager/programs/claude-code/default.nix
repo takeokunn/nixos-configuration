@@ -17,6 +17,7 @@ in
     memory.source = ./CLAUDE.md;
     settings = {
       theme = "dark";
+      model = "sonnet";
       autoUpdates = false;
       includeCoAuthoredBy = false;
       autoCompactEnabled = true;
