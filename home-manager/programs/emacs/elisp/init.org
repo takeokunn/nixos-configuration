@@ -3349,6 +3349,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
   (with-eval-after-load 'affe
     ;; config
+    (setopt affe-count 100000)
     (setopt affe-highlight-function 'orderless-highlight-matches)
     (setopt affe-find-command "fd --color=never --full-path")
     (setopt affe-regexp-function 'orderless-pattern-compiler))
