@@ -1,15 +1,38 @@
-{ llmAgentsPkgs }:
+{ pkgs, llmAgentsPkgs }:
 let
   claude-prompts-path = ../../claude-prompts;
 in
 {
+  home.packages = [ pkgs.uv ];
+
+  home.file.".opencode/CLAUDE.md" = {
+    source = "${claude-prompts-path}/CLAUDE.md";
+    force = true;
+  };
+
   programs.opencode = {
     enable = true;
     package = llmAgentsPkgs.opencode;
     rules = "${claude-prompts-path}/CLAUDE.md";
 
     settings = {
-      model = "anthropic/claude-sonnet-4-5-20250514";
+      theme = "dark";
+      model = "zai-coding-plan/glm-5";
+
+      mcp = {
+        serena = {
+          type = "local";
+          command = [ "uvx" "--from" "git+https://github.com/oraios/serena" "serena" "start-mcp-server" ];
+        };
+        context7 = {
+          type = "remote";
+          url = "https://mcp.context7.com/mcp";
+        };
+        deepwiki = {
+          type = "remote";
+          url = "https://mcp.deepwiki.com/mcp";
+        };
+      };
 
       permission = {
         bash = {
@@ -71,12 +94,24 @@ in
   home.sessionVariables = {
     OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS = "300000";
     OPENCODE_EXPERIMENTAL_BASH_MAX_TIMEOUT_MS = "1200000";
+    OPENCODE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1";
+    OPENCODE_CODE_MAX_OUTPUT_TOKENS = "32000";
+    OPENCODE_CODE_AUTO_CONNECT_IDE = "0";
+    OPENCODE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
+    OPENCODE_CODE_ENABLE_TELEMETRY = "0";
+    OPENCODE_CODE_IDE_SKIP_AUTO_INSTALL = "1";
+    OPENCODE_CODE_IDE_SKIP_VALID_CHECK = "1";
     MAX_MCP_OUTPUT_TOKENS = "50000";
     MCP_TOOL_TIMEOUT = "120000";
+    DISABLE_AUTOUPDATER = "1";
+    DISABLE_ERROR_REPORTING = "1";
+    DISABLE_INTERLEAVED_THINKING = "1";
+    DISABLE_MICROCOMPACT = "1";
     DISABLE_NON_ESSENTIAL_MODEL_CALLS = "1";
     DISABLE_TELEMETRY = "1";
-    OPENCODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
-    OPENCODE_ENABLE_TELEMETRY = "0";
+    ENABLE_EXPERIMENTAL_MCP_CLI = "false";
+    ENABLE_TOOL_SEARCH = "true";
+    OPENCODE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
   };
 
   programs.serena.ignoredPaths = [
