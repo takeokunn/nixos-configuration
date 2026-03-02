@@ -4,17 +4,22 @@
   llmAgentsPkgs,
 }:
 let
-  # Override claude-code to disable version check that fails in Nix sandbox
-  # due to Bun's Intl.Segmenter ICU initialization issue on macOS
+  claude-prompts-path = ../../claude-prompts;
+
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (oldAttrs: {
     doInstallCheck = false;
   });
 in
 {
+  home.file.".claude/CLAUDE.md" = {
+    source = "${claude-prompts-path}/CLAUDE.md";
+    force = true;
+  };
+
   programs.claude-code = {
     enable = true;
     package = claude-code-fixed;
-    memory.source = ./CLAUDE.md;
+    memory.source = "${claude-prompts-path}/CLAUDE.md";
     settings = {
       theme = "dark";
       model = "sonnet";
@@ -77,41 +82,41 @@ in
 
       statusLine = {
         type = "command";
-        command = ./scripts/statusline.sh;
+        command = "${claude-prompts-path}/scripts/statusline.sh";
         padding = 0;
       };
 
     };
 
     agents = {
-      code-quality = builtins.readFile ./agents/code-quality.md;
-      database = builtins.readFile ./agents/database.md;
-      design = builtins.readFile ./agents/design.md;
-      devops = builtins.readFile ./agents/devops.md;
-      docs = builtins.readFile ./agents/docs.md;
-      explore = builtins.readFile ./agents/explore.md;
-      git = builtins.readFile ./agents/git.md;
-      performance = builtins.readFile ./agents/performance.md;
-      quality-assurance = builtins.readFile ./agents/quality-assurance.md;
-      security = builtins.readFile ./agents/security.md;
-      test = builtins.readFile ./agents/test.md;
-      validator = builtins.readFile ./agents/validator.md;
+      code-quality = builtins.readFile "${claude-prompts-path}/agents/code-quality.md";
+      database = builtins.readFile "${claude-prompts-path}/agents/database.md";
+      design = builtins.readFile "${claude-prompts-path}/agents/design.md";
+      devops = builtins.readFile "${claude-prompts-path}/agents/devops.md";
+      docs = builtins.readFile "${claude-prompts-path}/agents/docs.md";
+      explore = builtins.readFile "${claude-prompts-path}/agents/explore.md";
+      git = builtins.readFile "${claude-prompts-path}/agents/git.md";
+      performance = builtins.readFile "${claude-prompts-path}/agents/performance.md";
+      quality-assurance = builtins.readFile "${claude-prompts-path}/agents/quality-assurance.md";
+      security = builtins.readFile "${claude-prompts-path}/agents/security.md";
+      test = builtins.readFile "${claude-prompts-path}/agents/test.md";
+      validator = builtins.readFile "${claude-prompts-path}/agents/validator.md";
     };
 
     commands = {
-      ask = builtins.readFile ./commands/ask.md;
-      bug = builtins.readFile ./commands/bug.md;
-      define = builtins.readFile ./commands/define.md;
-      define-full = builtins.readFile ./commands/define-full.md;
-      execute = builtins.readFile ./commands/execute.md;
-      execute-full = builtins.readFile ./commands/execute-full.md;
-      feedback = builtins.readFile ./commands/feedback.md;
-      markdown = builtins.readFile ./commands/markdown.md;
-      upstream = builtins.readFile ./commands/upstream.md;
+      ask = builtins.readFile "${claude-prompts-path}/commands/ask.md";
+      bug = builtins.readFile "${claude-prompts-path}/commands/bug.md";
+      define = builtins.readFile "${claude-prompts-path}/commands/define.md";
+      define-full = builtins.readFile "${claude-prompts-path}/commands/define-full.md";
+      execute = builtins.readFile "${claude-prompts-path}/commands/execute.md";
+      execute-full = builtins.readFile "${claude-prompts-path}/commands/execute-full.md";
+      feedback = builtins.readFile "${claude-prompts-path}/commands/feedback.md";
+      markdown = builtins.readFile "${claude-prompts-path}/commands/markdown.md";
+      upstream = builtins.readFile "${claude-prompts-path}/commands/upstream.md";
     };
 
     hooks = {
-      enforce-perl = builtins.readFile ./hooks/enforce-perl.sh;
+      enforce-perl = builtins.readFile "${claude-prompts-path}/hooks/enforce-perl.sh";
     };
 
     mcpServers =
