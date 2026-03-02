@@ -19,6 +19,7 @@ let
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
+  opencode = import ./opencode { inherit llmAgentsPkgs; };
   agent-skills-config = import ./agent-skills {
     inherit
       anthropic-skills
@@ -72,6 +73,7 @@ in
   firefox
   # zen-browser  # TODO: hash mismatch, re-enable after fix
   claude-code
+  opencode
   agent-skills-config
   emacs
   doggo
