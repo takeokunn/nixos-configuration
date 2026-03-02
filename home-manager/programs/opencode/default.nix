@@ -22,7 +22,13 @@ in
       mcp = {
         serena = {
           type = "local";
-          command = [ "uvx" "--from" "git+https://github.com/oraios/serena" "serena" "start-mcp-server" ];
+          command = [
+            "uvx"
+            "--from"
+            "git+https://github.com/oraios/serena"
+            "serena"
+            "start-mcp-server"
+          ];
         };
         context7 = {
           type = "remote";
