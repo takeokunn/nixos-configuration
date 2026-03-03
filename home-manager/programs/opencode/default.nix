@@ -1,4 +1,8 @@
-{ pkgs, llmAgentsPkgs, mcp-servers-nix }:
+{
+  pkgs,
+  llmAgentsPkgs,
+  mcp-servers-nix,
+}:
 let
   claude-prompts-path = ../../claude-prompts;
   opencodeConfig = mcp-servers-nix.lib.mkConfig pkgs {
@@ -17,7 +21,19 @@ let
 
     settings = {
       theme = "dark";
-      model = "zai-coding-plan/glm-4.7";
+      model = if pkgs.stdenv.isDarwin then "ollama/qwen3.5:27b" else "zai-coding-plan/glm-4.7";
+
+      provider = pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+        ollama = {
+          npm = "@ai-sdk/openai-compatible";
+          options.baseURL = "http://localhost:11434/v1";
+          models."qwen3.5:27b" = {
+            name = "Qwen3.5";
+            tools = true;
+            options.num_ctx = 262144;
+          };
+        };
+      };
 
       servers.deepwiki = {
         type = "http";
