@@ -22,6 +22,9 @@ let
 
   # Impermanence (Linux only)
   impermanence = import ./impermanence { inherit pkgs; };
+
+  # Darwin only
+  ollama = import ./ollama;
 in
 [
   emacs
@@ -42,4 +45,8 @@ in
 ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
   # Impermanence (Linux only)
   impermanence
+]
+++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+  # Darwin only
+  ollama
 ]

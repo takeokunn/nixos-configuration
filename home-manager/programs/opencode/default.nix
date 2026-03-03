@@ -1,43 +1,27 @@
-{ pkgs, llmAgentsPkgs }:
+{ pkgs, llmAgentsPkgs, mcp-servers-nix }:
 let
   claude-prompts-path = ../../claude-prompts;
-in
-{
-  home.packages = [ pkgs.uv ];
+  opencodeConfig = mcp-servers-nix.lib.mkConfig pkgs {
+    flavor = "opencode";
+    fileName = "opencode.json";
 
-  home.file.".opencode/CLAUDE.md" = {
-    source = "${claude-prompts-path}/CLAUDE.md";
-    force = true;
-  };
-
-  programs.opencode = {
-    enable = true;
-    package = llmAgentsPkgs.opencode;
-    rules = "${claude-prompts-path}/CLAUDE.md";
+    programs = {
+      serena = {
+        enable = true;
+        context = "claude-code";
+        enableWebDashboard = false;
+      };
+      context7.enable = true;
+      playwright.enable = true;
+    };
 
     settings = {
       theme = "dark";
-      model = "zai-coding-plan/glm-5";
+      model = "zai-coding-plan/glm-4.7";
 
-      mcp = {
-        serena = {
-          type = "local";
-          command = [
-            "uvx"
-            "--from"
-            "git+https://github.com/oraios/serena"
-            "serena"
-            "start-mcp-server"
-          ];
-        };
-        context7 = {
-          type = "remote";
-          url = "https://mcp.context7.com/mcp";
-        };
-        deepwiki = {
-          type = "remote";
-          url = "https://mcp.deepwiki.com/mcp";
-        };
+      servers.deepwiki = {
+        type = "http";
+        url = "https://mcp.deepwiki.com/mcp";
       };
 
       permission = {
@@ -68,7 +52,22 @@ in
         http = "allow";
       };
     };
+  };
+in
+{
+  home.file.".opencode/CLAUDE.md" = {
+    source = "${claude-prompts-path}/CLAUDE.md";
+    force = true;
+  };
 
+  xdg.configFile."opencode/opencode.json" = {
+    source = opencodeConfig;
+    force = true;
+  };
+
+  programs.opencode = {
+    enable = true;
+    package = llmAgentsPkgs.opencode;
     agents = {
       code-quality = builtins.readFile "${claude-prompts-path}/agents/code-quality.md";
       database = builtins.readFile "${claude-prompts-path}/agents/database.md";
@@ -76,6 +75,7 @@ in
       devops = builtins.readFile "${claude-prompts-path}/agents/devops.md";
       docs = builtins.readFile "${claude-prompts-path}/agents/docs.md";
       explore = builtins.readFile "${claude-prompts-path}/agents/explore.md";
+      general-purpose = builtins.readFile "${claude-prompts-path}/agents/general-purpose.md";
       git = builtins.readFile "${claude-prompts-path}/agents/git.md";
       performance = builtins.readFile "${claude-prompts-path}/agents/performance.md";
       quality-assurance = builtins.readFile "${claude-prompts-path}/agents/quality-assurance.md";
@@ -83,7 +83,6 @@ in
       test = builtins.readFile "${claude-prompts-path}/agents/test.md";
       validator = builtins.readFile "${claude-prompts-path}/agents/validator.md";
     };
-
     commands = {
       ask = builtins.readFile "${claude-prompts-path}/commands/ask.md";
       bug = builtins.readFile "${claude-prompts-path}/commands/bug.md";
