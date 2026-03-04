@@ -55,7 +55,7 @@ in
         EXEC="$out/Applications/Emacs.app/Contents/MacOS/Emacs"
         if [ -e "$EXEC" ] || [ -L "$EXEC" ]; then
           rm -f "$EXEC"
-          printf '#!/bin/bash\nexec ${base}/bin/emacsclient -c -n "$@"\n' > "$EXEC"
+          printf '#!/bin/bash\nexec ${base}/bin/emacsclient -c -n -s "/tmp/emacs$(id -u)/server" "$@"\n' > "$EXEC"
           chmod +x "$EXEC"
         else
           echo "warning: Emacs.app not found in $out, skipping emacsclient wrapper" >&2

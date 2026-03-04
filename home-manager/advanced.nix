@@ -84,7 +84,7 @@ let
   # services
   basicServices = import ./services/basic.nix;
   advancedServices = import ./services/advanced.nix {
-    inherit pkgs emacsPkg emacsLib;
+    inherit pkgs emacsPkg emacsLib nur-packages;
   };
 in
 {
