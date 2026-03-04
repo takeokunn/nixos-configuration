@@ -27,7 +27,11 @@ let
 
   # Darwin only
   lmstudio = import ./lmstudio;
-  lmstudioPackage = { ... }: { services.lmstudio.package = nurPkgs.lmstudio; };
+  lmstudioPackage =
+    { ... }:
+    {
+      services.lmstudio.package = nurPkgs.lmstudio;
+    };
 in
 [
   emacs
