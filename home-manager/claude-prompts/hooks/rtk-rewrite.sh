@@ -18,12 +18,12 @@ else
 fi
 
 # Only process Bash commands
-if [[ "$tool_name" != "Bash" ]] || [[ -z "$command" ]]; then
+if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
 # Skip if rtk binary is not available
-if [[ ! -x "$RTK_BIN" ]]; then
+if [[ ! -x $RTK_BIN ]]; then
   exit 0
 fi
 

@@ -117,10 +117,9 @@ in
 
     hooks = {
       enforce-perl = builtins.readFile "${claude-prompts-path}/hooks/enforce-perl.sh";
-      rtk-rewrite = builtins.replaceStrings
-        [ "@RTK_BIN@" ]
-        [ "${llmAgentsPkgs.rtk}/bin/rtk" ]
-        (builtins.readFile "${claude-prompts-path}/hooks/rtk-rewrite.sh");
+      rtk-rewrite = builtins.replaceStrings [ "@RTK_BIN@" ] [ "${llmAgentsPkgs.rtk}/bin/rtk" ] (
+        builtins.readFile "${claude-prompts-path}/hooks/rtk-rewrite.sh"
+      );
     };
 
     mcpServers =
