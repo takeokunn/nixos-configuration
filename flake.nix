@@ -109,6 +109,7 @@
     nur-packages = {
       url = "github:takeokunn/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.devenv.inputs.nixpkgs.follows = "nixpkgs";
     };
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
   };

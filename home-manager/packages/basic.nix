@@ -1,8 +1,8 @@
-{ pkgs }:
+{ pkgs, nurPkgs }:
 with pkgs;
 [
   # for terminal tools
-  devenv
+  nurPkgs.devenv
   dasel
   unixtools.watch
 

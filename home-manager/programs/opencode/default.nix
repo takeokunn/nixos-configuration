@@ -19,48 +19,9 @@ let
       playwright.enable = true;
     };
 
-    # OpenCode LLM Provider Configuration
-    # ====================================
-    #
-    # Platform-Specific Provider Selection:
-    #
-    # Darwin (macOS): LM Studio
-    #   - Rationale: Better performance on Apple Silicon with optimized binaries
-    #   - Architecture: Local OpenAI-compatible server on localhost:1234
-    #   - Model: qwen3.5:35b (35B parameter model)
-    #     * Excellent code understanding and generation
-    #     * Large context window (262K tokens) for codebase analysis
-    #     * Tool calling support for agent workflows
-    #   - Port choice: 1234 (avoids conflicts with Ollama on 11434)
-    #
-    # Linux: Zai Coding Plan (zai-coding-plan/glm-4.7)
-    #   - Rationale: GLM-4.7 optimized for Linux environments
-    #   - Architecture: Remote/cloud-based LLM service
-    #   - Model: glm-4.7 (47B parameter model)
-    #     * Strong coding capabilities for diverse languages
-    #     * Production-ready for Linux development workflows
-    #
-    # OpenAI Compatibility Note:
-    #   - LM Studio uses @ai-sdk/openai-compatible npm package
-    #   - Exposes standard OpenAI API endpoints (/v1/*)
-    #   - Enables drop-in compatibility with OpenAI clients
-    #   - No code changes required for OpenCode integration
-    #
     settings = {
       theme = "dark";
-      model = if pkgs.stdenv.isDarwin then "lmstudio/qwen3.5:35b" else "zai-coding-plan/glm-4.7";
-
-      provider = pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
-        lmstudio = {
-          npm = "@ai-sdk/openai-compatible";
-          options.baseURL = "http://localhost:1234/v1";
-          models."qwen3.5:35b" = {
-            name = "Qwen3.5";
-            tools = true;
-            options.num_ctx = 262144;
-          };
-        };
-      };
+      model = "zai-coding-plan/glm-4.7";
 
       servers.deepwiki = {
         type = "http";

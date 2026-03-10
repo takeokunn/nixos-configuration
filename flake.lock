@@ -316,7 +316,6 @@
         "nix": "nix",
         "nixd": "nixd",
         "nixpkgs": [
-          "nur-packages",
           "nixpkgs"
         ]
       },

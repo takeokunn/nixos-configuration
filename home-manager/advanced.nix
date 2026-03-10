@@ -33,7 +33,7 @@ let
       basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
-  basicPkgs = import ./packages/basic.nix { inherit pkgs; };
+  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs; };
   advancedPkgs = import ./packages/advanced.nix {
     inherit
       pkgs
@@ -88,7 +88,6 @@ let
       pkgs
       emacsPkg
       emacsLib
-      nur-packages
       ;
   };
 in

@@ -3417,9 +3417,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     ;; sudo
     (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
-    ;; ellama
-    (define-key embark-general-map (kbd "L") #'ellama-transient-main-menu)
-
     ;; copilot-chat
     (define-key embark-general-map (kbd "C") #'copilot-chat-transient-code)
 
@@ -7183,50 +7180,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'copilot-chat-copilot
     (setopt copilot-chat-prompt-review "次のコードをレビューしてください。\n"))
-#+end_src
-** llm
-:PROPERTIES:
-:CUSTOM_ID: llm
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(make-llm-ollama) "llm-ollama" nil t)
-
-  (with-eval-after-load 'llm
-    ;; config
-    (setopt llm-warn-on-nonfree nil))
-#+end_src
-** ellama
-:PROPERTIES:
-:CUSTOM_ID: ellama
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(ellama-transient-main-menu) "ellama-transient" nil t)
-  (autoload-if-found '(ellama-blueprint-select) "ellama-blueprint" nil t)
-  (autoload-if-found '(ellama-context-prompt-with-context) "ellama-context" nil t)
-  (autoload-if-found '(ellama-community-prompts-select-blueprint) "ellama-community-prompts")
-
-  (keymap-global-set "C-c e" #'ellama-transient-main-menu)
-
-  (with-eval-after-load 'ellama
-    ;; config
-    (setopt ellama-language "日本語")
-
-    (let ((gemma2 (make-llm-ollama :chat-model "gemma2:9b" :embedding-model "gemma2:9b"))
-          (codellama (make-llm-ollama :chat-model "codellama:latest" :embedding-model "codellama:latest"))
-          (deepseek (make-llm-ollama :chat-model "deepseek-r1:8b" :embedding-model "deepseek-r1:8b"))
-          (llama3 (make-llm-ollama :chat-model "llama3:8b" :embedding-model "llama3:8b")))
-      (setopt ellama-provider gemma2)
-      (setopt ellama-translation-provider gemma2)
-      (setopt ellama-summarization-provider deepseek)
-      (setopt ellama-coding-provider codellama)
-      (setopt ellama-providers
-              `(("gemma2" . ,gemma2)
-                ("codellama" . ,codellama)
-                ("deepseek" . ,deepseek)
-                ("llama3" . ,llama3))))
-
-    ;; advice
-    (advice-add 'ellama-instant :around #'my/advice-disable-buffer-readonly))
 #+end_src
 * MyFunc
 :PROPERTIES:

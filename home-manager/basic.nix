@@ -15,7 +15,7 @@ let
     config.allowUnfree = true;
     overlays = basicOverlay;
   };
-  basicPkgs = import ./packages/basic.nix { inherit pkgs; };
+  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs; };
 
   # modules
   modules = import ./modules;

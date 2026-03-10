@@ -2,11 +2,9 @@
   pkgs,
   emacsPkg,
   emacsLib,
-  nur-packages,
 }:
 let
   lib = pkgs.lib;
-  nurPkgs = nur-packages.packages.${pkgs.system};
   emacs = import ./emacs { inherit pkgs emacsPkg; };
   gpg-agent = import ./gpg-agent { inherit pkgs; };
 
@@ -24,14 +22,6 @@ let
 
   # Impermanence (Linux only)
   impermanence = import ./impermanence { inherit pkgs; };
-
-  # Darwin only
-  lmstudio = import ./lmstudio;
-  lmstudioPackage =
-    { ... }:
-    {
-      services.lmstudio.package = nurPkgs.lmstudio;
-    };
 in
 [
   emacs
@@ -52,9 +42,4 @@ in
 ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
   # Impermanence (Linux only)
   impermanence
-]
-++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-  # Darwin only
-  lmstudio
-  lmstudioPackage
 ]
