@@ -1807,14 +1807,14 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 
   (with-eval-after-load 'nskk
     ;; AZIK
-    (setq nskk-converter-romaji-style 'azik)
-    (setq nskk-azik-keyboard-type 'jp106)
+    (setopt nskk-converter-romaji-style 'azik)
+    (setopt nskk-azik-keyboard-type 'jp106)
 
     ;; use skkserv
     (when-darwin
-     (setq nskk-server-enable t)
-     (setq nskk-server-host "localhost")
-     (setq nskk-server-portnum 1178)))
+     (setopt nskk-server-enable t)
+     (setopt nskk-server-host "localhost")
+     (setopt nskk-server-portnum 1178)))
 #+end_src
 ** scratchpad
 :PROPERTIES:
