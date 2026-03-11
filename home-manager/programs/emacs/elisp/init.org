@@ -1796,61 +1796,25 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :PROPERTIES:
 :CUSTOM_ID: ime
 :END:
-** ddskk
+** nskk
 :PROPERTIES:
-:CUSTOM_ID: ddskk
+:CUSTOM_ID: nskk
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(skk-mode) "ddskk-autoloads" nil t)
+  (autoload-if-found '(nskk-mode nskk-global-mode) "nskk-autoloads" nil t)
 
-  (require 'ccc)
+  (keymap-global-set "C-x C-j" #'nskk-mode)
 
-  (keymap-global-set "C-x C-j" #'skk-mode)
+  (with-eval-after-load 'nskk
+    ;; AZIK
+    (setq nskk-converter-romaji-style 'azik)
+    (setq nskk-azik-keyboard-type 'jp106)
 
-  (defun my/skk-C-j-key (arg)
-    (interactive "P")
-    (cond
-     ((and (null (skk-in-minibuffer-p))
-           (null skk-henkan-mode))
-      (skk-emulate-original-map arg))
-     (t
-      (skk-kakutei arg))))
-
-  (with-eval-after-load 'skk
-    ;; config
-    (setq skk-preload t)
-    (setq default-input-method "japanese-skk"))
-
-  (with-eval-after-load 'skk-vars
     ;; use skkserv
     (when-darwin
-     (setq skk-server-host "localhost")
-     (setq skk-server-portnum 1178))
-
-    ;; guix
-    (setq skk-byte-compile-init-file t)
-    (setq skk-isearch-mode-enable 'always)
-    (setq skk-egg-like-newline t)
-    (setq skk-show-annotation nil)
-    (setq skk-auto-insert-paren t)
-
-    ;; azik
-    (setq skk-use-azik t)
-    (setq skk-azik-keyboard-type 'jp106)
-
-    ;; ref: https://github.com/skk-dev/ddskk/blob/master/etc/dot.skk#L752-L768
-    (add-to-list 'skk-rom-kana-rule-list '(skk-kakutei-key nil my/skk-C-j-key)))
-#+END_SRC
-** ddskk-posframe
-:PROPERTIES:
-:CUSTOM_ID: ddskk-posframe
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(ddskk-posframe-mode) "ddskk-posframe" nil t)
-
-  (with-eval-after-load 'skk
-    ;; hooks
-    (add-hook 'skk-mode-hook #'ddskk-posframe-mode))
+     (setq nskk-server-enable t)
+     (setq nskk-server-host "localhost")
+     (setq nskk-server-portnum 1178)))
 #+end_src
 ** scratchpad
 :PROPERTIES:
@@ -1858,10 +1822,10 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :END:
 #+begin_src emacs-lisp :tangle yes
   (defun my/scratchpad-init ()
-    "Initialize scratchpad: switch to *scratch* and enable skk-mode."
+    "Initialize scratchpad: switch to *scratch* and enable nskk-mode."
     (switch-to-buffer "*scratch*")
-    (when (fboundp 'skk-mode)
-      (skk-mode 1))
+    (when (fboundp 'nskk-mode)
+      (nskk-mode 1))
     nil)
 #+end_src
 * Coding
@@ -4341,10 +4305,15 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (with-eval-after-load 'doom-modeline
     ;; config
     (setopt doom-modeline-buffer-file-name-style 'truncate-with-project)
-    (setopt doom-modeline-icon `,(display-graphic-p))
-    (setopt doom-modeline-major-mode-icon `,(display-graphic-p))
+    (setopt doom-modeline-icon t)
+    (setopt doom-modeline-major-mode-icon t)
     (setopt doom-modeline-minor-modes nil)
-    (setopt doom-modeline-check-icon nil))
+    (setopt doom-modeline-check-icon nil)
+    ;; emacsclient -c でGUIフレームが生成されたとき modeline を再描画する
+    (add-hook 'after-make-frame-functions
+              #'(lambda (frame)
+                  (when (display-graphic-p frame)
+                    (doom-modeline-refresh-bars)))))
 #+END_SRC
 ** hl-line
 :PROPERTIES:

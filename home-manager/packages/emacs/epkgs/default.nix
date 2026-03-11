@@ -12,7 +12,7 @@ let
   eshell = import ./packages/eshell { inherit epkgs pkgs nurPkgs; };
   eww = import ./packages/eww { inherit epkgs; };
   file = import ./packages/file { inherit epkgs; };
-  ime = import ./packages/ime { inherit epkgs; };
+  ime = import ./packages/ime { inherit epkgs nurPkgs; };
   language = import ./packages/language { inherit epkgs pkgs nurPkgs; };
   language_specific = import ./packages/language_specific { inherit epkgs pkgs nurPkgs; };
   monitor = import ./packages/monitor { inherit epkgs pkgs nurPkgs; };
