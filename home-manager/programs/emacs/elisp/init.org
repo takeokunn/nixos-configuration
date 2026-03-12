@@ -1801,14 +1801,25 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :CUSTOM_ID: nskk
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(nskk-mode nskk-global-mode) "nskk-autoloads" nil t)
+  (autoload-if-found '(nskk-mode nskk-global-mode) "nskk" nil t)
 
   (keymap-global-set "C-x C-j" #'nskk-mode)
 
   (with-eval-after-load 'nskk
+    ;; custom
+    (setopt nskk-state-default-mode 'hiragana)
+
     ;; AZIK
     (setopt nskk-converter-romaji-style 'azik)
     (setopt nskk-azik-keyboard-type 'jp106)
+
+    ;; cursor color (dracula palette)
+    (setopt nskk-use-color-cursor t)
+    (set-face-attribute 'nskk-cursor-hiragana nil :background "#ff79c6")
+    (set-face-attribute 'nskk-cursor-katakana nil :background "#8be9fd")
+    (set-face-attribute 'nskk-cursor-latin nil :background "#50fa7b")
+    (set-face-attribute 'nskk-cursor-jisx0208-latin nil :background "#ffb86c")
+    (set-face-attribute 'nskk-cursor-abbrev nil :background "#f1fa8c")
 
     ;; use skkserv
     (when-darwin
@@ -4283,7 +4294,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'emacs-startup-hook
             #'(lambda ()
                 (when (require 'doom-themes)
-                  (load-theme 'doom-dracula t))))
+                  (load-theme 'doom-dracula t)
+                  (set-cursor-color "#bd93f9"))))
 
   (with-eval-after-load 'doom-themes
     ;; config
@@ -4309,6 +4321,15 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt doom-modeline-major-mode-icon t)
     (setopt doom-modeline-minor-modes nil)
     (setopt doom-modeline-check-icon nil)
+    ;; nskk segment
+    (doom-modeline-def-segment my/nskk
+      "NSKK input mode indicator."
+      (when (and (bound-and-true-p nskk-mode)
+                 (fboundp 'nskk-modeline-indicator))
+        (nskk-modeline-indicator)))
+    (doom-modeline-def-modeline 'main
+      '(eldoc bar window-state workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
+      '(compilation objed-state misc-info project-name persp-name battery grip irc mu4e gnus github debug repl lsp my/nskk minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))
     ;; emacsclient -c でGUIフレームが生成されたとき modeline を再描画する
     (add-hook 'after-make-frame-functions
               #'(lambda (frame)
