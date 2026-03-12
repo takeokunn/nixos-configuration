@@ -83,11 +83,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1773343055,
-        "narHash": "sha256-aPoFuHYJ0yXyV8TtVF52eIwizU00qU5b/0ZaRQEme9g=",
+        "lastModified": 1773349786,
+        "narHash": "sha256-klPwdQ5kgf+MJNsTvZEkwkAT4UN6QK9FWlv20xirX2M=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "c7133c8e8b28dcb72764cca9811ea7e6c37752bc",
+        "rev": "c84fb44beddadddcaa02b9696654e59e6b57bebe",
         "type": "github"
       },
       "original": {
@@ -1194,11 +1194,11 @@
     "microsoft-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1772691295,
-        "narHash": "sha256-Sxa+mov3zo9JxlYJ22OJJpEgjcrRbyfC9FBh0y5go2Y=",
+        "lastModified": 1773352467,
+        "narHash": "sha256-A/KxSkdrJW0MElCQupFa1vp6gIeFZGJPFUbexj9n4RQ=",
         "owner": "microsoft",
         "repo": "skills",
-        "rev": "e27a68881a3b8bb906cc5ef00877a9a80f521bf6",
+        "rev": "34dddbd53c2226379c6da1dac1e05223554a821e",
         "type": "github"
       },
       "original": {
@@ -1797,11 +1797,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773321813,
-        "narHash": "sha256-VATxIFgGf1VVHjNNZDGWMdZ9G+CqIthdGI4h1xn9V4Y=",
+        "lastModified": 1773355571,
+        "narHash": "sha256-XVV8tJummNUIfE11e0aFDEM062Kly0OkIUhP6LwCCvo=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "f2ee009a3b53dff31bd56f337c97187e536cdf68",
+        "rev": "2b40a52b8a51e9656767079781845811635a022a",
         "type": "github"
       },
       "original": {
