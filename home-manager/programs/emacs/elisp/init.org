@@ -4172,14 +4172,14 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(highlight-indent-guides-mode) "highlight-indent-guides" nil t)
 
-  (with-eval-after-load 'yaml-mode
-    ;; hooks
-    (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
+  ;; (with-eval-after-load 'yaml-mode
+  ;;   ;; hooks
+  ;;   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
-  (with-eval-after-load 'highlight-indent-guides
-    ;; config
-    (setopt highlight-indent-guides-responsive 'stack)
-    (setopt highlight-indent-guides-method 'bitmap))
+  ;; (with-eval-after-load 'highlight-indent-guides
+  ;;   ;; config
+  ;;   (setopt highlight-indent-guides-responsive 'stack)
+  ;;   (setopt highlight-indent-guides-method 'bitmap))
 #+end_src
 *** hl-todo
 :PROPERTIES:
