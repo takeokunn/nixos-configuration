@@ -1815,11 +1815,11 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 
     ;; cursor color (dracula palette)
     (setopt nskk-use-color-cursor t)
-    (set-face-attribute 'nskk-cursor-hiragana nil :background "#ff79c6")
+    (set-face-attribute 'nskk-cursor-hiragana nil :background "#50fa7b")
     (set-face-attribute 'nskk-cursor-katakana nil :background "#8be9fd")
-    (set-face-attribute 'nskk-cursor-latin nil :background "#50fa7b")
+    (set-face-attribute 'nskk-cursor-latin nil :background "#ff79c6")
     (set-face-attribute 'nskk-cursor-jisx0208-latin nil :background "#ffb86c")
-    (set-face-attribute 'nskk-cursor-abbrev nil :background "#f1fa8c")
+    (set-face-attribute 'nskk-cursor-abbrev nil :background "#bd93f9")
 
     ;; use skkserv
     (when-darwin
@@ -4295,7 +4295,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
             #'(lambda ()
                 (when (require 'doom-themes)
                   (load-theme 'doom-dracula t)
-                  (set-cursor-color "#bd93f9"))))
+                  (set-cursor-color "#f8f8f2"))))
 
   (with-eval-after-load 'doom-themes
     ;; config
