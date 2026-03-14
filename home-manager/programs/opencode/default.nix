@@ -120,7 +120,8 @@ let
 
   ohMyOpencodeConfig = pkgs.writeText "oh-my-opencode.json" (
     builtins.toJSON {
-      "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/dev/assets/oh-my-opencode.schema.json";
+      "$schema" =
+        "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/dev/assets/oh-my-opencode.schema.json";
       claude_code = {
         agents = false;
       };

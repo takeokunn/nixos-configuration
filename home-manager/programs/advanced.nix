@@ -22,7 +22,14 @@ let
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
-  opencode = import ./opencode { inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix; };
+  opencode = import ./opencode {
+    inherit
+      pkgs
+      nurPkgs
+      llmAgentsPkgs
+      mcp-servers-nix
+      ;
+  };
   agent-skills-config = import ./agent-skills {
     inherit
       anthropic-skills
