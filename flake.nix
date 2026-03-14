@@ -117,8 +117,8 @@
     nur-packages = {
       url = "github:takeokunn/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.devenv.inputs.nixpkgs.follows = "nixpkgs";
     };
+    devenv.url = "github:cachix/devenv/v2.0.4";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
   };
 

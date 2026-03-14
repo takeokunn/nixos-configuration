@@ -16,6 +16,7 @@
   brew-nix,
   firefox-addons,
   nur-packages,
+  devenv,
   ...
 }:
 let
@@ -23,6 +24,7 @@ let
 
   # nur-packages
   nurPkgs = nur-packages.packages.${system};
+  devenvPkgs = devenv.packages.${system};
 
   # packages
   basicOverlay = import ./overlay/basic.nix;
@@ -35,7 +37,7 @@ let
       basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
-  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs; };
+  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs devenvPkgs; };
   advancedPkgs = import ./packages/advanced.nix {
     inherit
       pkgs

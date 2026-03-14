@@ -1,8 +1,7 @@
-{ pkgs, nurPkgs }:
+{ pkgs, nurPkgs, devenvPkgs ? null }:
 with pkgs;
-[
-  # for terminal tools
-  nurPkgs.devenv
+lib.optional (devenvPkgs != null) devenvPkgs.devenv
+++ [
   dasel
   unixtools.watch
 

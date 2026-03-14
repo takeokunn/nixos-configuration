@@ -22,7 +22,7 @@ let
   claudeSonnet = "anthropic/claude-sonnet-4-6";
 
   # GitHub Copilot: fast utility for miscellaneous / quick tasks
-  copilot = "github-copilot/gpt-4.5";
+  copilot = "github-copilot/gpt-4.1";
 
   # ── Fallback chain policies ────────────────────────────────────────────────
   # claude-sonnet primary: Codex → Opus → GLM
@@ -85,7 +85,7 @@ let
     settings = {
       theme = "dark";
       plugin = [ "oh-my-opencode" ];
-      model = claudeSonnet;
+      model = gptCodex;
       share = "disabled";
 
       provider.openai.options = {

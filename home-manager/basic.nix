@@ -2,11 +2,13 @@
   system,
   nixpkgs,
   nur-packages,
+  devenv,
   ...
 }:
 let
   # nur-packages
   nurPkgs = nur-packages.packages.${system};
+  devenvPkgs = devenv.packages.${system};
 
   # packages
   basicOverlay = import ./overlay/basic.nix;
@@ -15,7 +17,7 @@ let
     config.allowUnfree = true;
     overlays = basicOverlay;
   };
-  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs; };
+  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs devenvPkgs; };
 
   # modules
   modules = import ./modules;
