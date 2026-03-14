@@ -83,11 +83,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1773425461,
-        "narHash": "sha256-1yq+Sj8RqwznIH4uJkJFEnl7NOVmuapSTKE2dI4d5RU=",
+        "lastModified": 1773465636,
+        "narHash": "sha256-DLaMhdXXxjJtq5K+MIOTQdfv9IAvvYZGufml/BdEIlU=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "e0178851a7126847a56a4a7e9ebcebed5070a386",
+        "rev": "325bf1881bdcb096f4ee10745fd2d1379e24d1a8",
         "type": "github"
       },
       "original": {
@@ -288,6 +288,22 @@
         "type": "github"
       }
     },
+    "context7-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773444733,
+        "narHash": "sha256-6HblApKndJkMtv6tXfPD12y8Yq5QsnxpXCRsA6YBplw=",
+        "owner": "upstash",
+        "repo": "context7",
+        "rev": "d806b9fb5df8fd79aad0fc6d7cae0bcb1e02c537",
+        "type": "github"
+      },
+      "original": {
+        "owner": "upstash",
+        "repo": "context7",
+        "type": "github"
+      }
+    },
     "crane": {
       "locked": {
         "lastModified": 1771438068,
@@ -444,11 +460,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1773412331,
-        "narHash": "sha256-8Nt8MekVkl30dzUfaYmiP78npQtrgtkBghM1xpJkldo=",
+        "lastModified": 1773449929,
+        "narHash": "sha256-z6nOxEunptr/x1ktCFabjlKWE5QjxpRtcsdfcYrlwPA=",
         "owner": "cachix",
         "repo": "devenv",
-        "rev": "802f033ef91113de5ebca649bb6f0c5a9d8864e4",
+        "rev": "d100515e03946b62b1bf87fa96d5b0d63a2ac581",
         "type": "github"
       },
       "original": {
@@ -534,11 +550,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773420083,
-        "narHash": "sha256-VvsAWJbDvL6FbBTbSWRC+QSCUYOyLEC66+F2XTCKHKQ=",
+        "lastModified": 1773456530,
+        "narHash": "sha256-HQjEJwPZqwRhPAcHvtSR5SjFXAlJyemaVXWKjlZVt7k=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "7440fb92bd4f38dd351dd3410f711f4aa7a4e7e8",
+        "rev": "6a3d47b976c5a1cd4a93e14246d77bb42217d115",
         "type": "github"
       },
       "original": {
@@ -555,11 +571,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1773374581,
-        "narHash": "sha256-cqbRdYEmO8FNoaUtoc6+GLR4EGU1f24cGJiQUPJJmxI=",
+        "lastModified": 1773460974,
+        "narHash": "sha256-ub9lQJZOgj9351Rv7YrmrimlocUj45AmWi5/vxOkrug=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "c73146d00a2a01e2ac844ceed9640e0f314a5dda",
+        "rev": "cc0fa04294fb230b831e0b0d0d842d6ddb40806f",
         "type": "gitlab"
       },
       "original": {
@@ -1135,11 +1151,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773412360,
-        "narHash": "sha256-d6FY3t40JRc3nNZUu40rhfcMrOlVQeXGjUvzG/l0G8M=",
+        "lastModified": 1773459162,
+        "narHash": "sha256-QdrMe4cftS8ALHB2+DTNOZIkw+rqddm5lcsAhm/voqk=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a638ae24d87ea4bb42f57416c0b3c75d980e810d",
+        "rev": "64d8585ea7ba1a88b1afa82a89bdd10d4c894f45",
         "type": "github"
       },
       "original": {
@@ -1797,11 +1813,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773418635,
-        "narHash": "sha256-nkXsfTFHLURROcPgH61orpaSXuVGajdU6JAvp32MSAo=",
+        "lastModified": 1773465122,
+        "narHash": "sha256-QX2oOGqsC4181YY2ogP1Lk43hAoOGg0N9Yi2EDOXXQs=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "be868b173daf7c1c7eaa92eff855801ff0ffd9a0",
+        "rev": "6668e26f70ead0e6456c0e5dc9603a3020e4f173",
         "type": "github"
       },
       "original": {
@@ -1895,6 +1911,7 @@
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
         "cloudflare-skills": "cloudflare-skills",
+        "context7-skills": "context7-skills",
         "darwin-vz-nix": "darwin-vz-nix",
         "deno-skills": "deno-skills",
         "disko": "disko",
@@ -1916,6 +1933,7 @@
         "nixvim": "nixvim",
         "nur-packages": "nur-packages_2",
         "org-babel": "org-babel",
+        "scientific-skills": "scientific-skills",
         "treefmt-nix": "treefmt-nix_4",
         "xremap": "xremap",
         "zen-browser": "zen-browser"
@@ -1940,6 +1958,22 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "scientific-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773248348,
+        "narHash": "sha256-D3b5RiGGuD4Ztzh/tR3Yd9Krh8e8avozO9EXOdjWtZs=",
+        "owner": "K-Dense-AI",
+        "repo": "claude-scientific-skills",
+        "rev": "575f1e586f6b484feb3cba040b6e29f2a56f3c74",
+        "type": "github"
+      },
+      "original": {
+        "owner": "K-Dense-AI",
+        "repo": "claude-scientific-skills",
         "type": "github"
       }
     },

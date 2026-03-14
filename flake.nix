@@ -95,6 +95,14 @@
       url = "github:microsoft/skills";
       flake = false;
     };
+    scientific-skills = {
+      url = "github:K-Dense-AI/claude-scientific-skills";
+      flake = false;
+    };
+    context7-skills = {
+      url = "github:upstash/context7";
+      flake = false;
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

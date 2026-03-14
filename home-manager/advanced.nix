@@ -11,6 +11,8 @@
   deno-skills,
   aws-agent-skills,
   microsoft-skills,
+  scientific-skills,
+  context7-skills,
   brew-nix,
   firefox-addons,
   nur-packages,
@@ -67,7 +69,7 @@ let
   };
   advancedPrograms = import ./programs/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs llmAgentsPkgs;
+    inherit pkgs nurPkgs llmAgentsPkgs;
     inherit org-babel emacsPkg emacsLib;
     inherit mcp-servers-nix;
     inherit
@@ -77,6 +79,8 @@ let
       deno-skills
       aws-agent-skills
       microsoft-skills
+      scientific-skills
+      context7-skills
       ;
     inherit firefox-addons;
   };

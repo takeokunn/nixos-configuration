@@ -5,6 +5,8 @@
   deno-skills,
   aws-agent-skills,
   microsoft-skills,
+  scientific-skills,
+  context7-skills,
 }:
 {
   programs.agent-skills = {
@@ -37,7 +39,19 @@
       microsoft = {
         path = microsoft-skills;
         subdir = ".github/skills";
-        filter.nameRegex = ".*-(ts|rust)";
+        # Exclude mcp-builder and skill-creator which conflict with anthropic source
+        filter.nameRegex = "cloud-solution-architect|continual-learning|copilot-sdk|entra-agent-id|frontend-design-review|github-issue-creator|podcast-generation";
+      };
+      scientific = {
+        path = scientific-skills;
+        subdir = "scientific-skills";
+        # Exclude docx, pdf, pptx, xlsx which conflict with anthropic source
+        # Regex matches any string that is NOT exactly one of those four names
+        filter.nameRegex = "[^p]..|.[^d].|..[^f]|[^dpx]...|d[^o]..|do[^c].|doc[^x]|p[^p]..|pp[^t].|ppt[^x]|x[^l]..|xl[^s].|xls[^x]|.{5,}";
+      };
+      context7 = {
+        path = context7-skills;
+        subdir = "skills";
       };
     };
     skills = {
@@ -49,6 +63,8 @@
         "deno"
         "aws"
         "microsoft"
+        "scientific"
+        "context7"
       ];
     };
     targets.claude.enable = true;

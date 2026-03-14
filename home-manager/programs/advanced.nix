@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
   anthropic-skills,
@@ -9,6 +10,8 @@
   deno-skills,
   aws-agent-skills,
   microsoft-skills,
+  scientific-skills,
+  context7-skills,
   org-babel,
   emacsPkg,
   emacsLib,
@@ -19,7 +22,7 @@ let
   chromium = import ./chromium { inherit pkgs; };
   firefox = import ./firefox { inherit pkgs; };
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
-  opencode = import ./opencode { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
+  opencode = import ./opencode { inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix; };
   agent-skills-config = import ./agent-skills {
     inherit
       anthropic-skills
@@ -28,6 +31,8 @@ let
       deno-skills
       aws-agent-skills
       microsoft-skills
+      scientific-skills
+      context7-skills
       ;
   };
   emacs = import ./emacs {

@@ -85,6 +85,8 @@ nix-darwin.lib.darwinSystem {
             deno-skills
             aws-agent-skills
             microsoft-skills
+            scientific-skills
+            context7-skills
             ;
           inherit (inputs)
             emacs-overlay

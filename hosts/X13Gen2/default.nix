@@ -61,6 +61,8 @@ nixpkgs.lib.nixosSystem {
           deno-skills
           aws-agent-skills
           microsoft-skills
+          scientific-skills
+          context7-skills
           nur-packages
           emacs-overlay
           org-babel
