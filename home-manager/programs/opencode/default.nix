@@ -8,12 +8,12 @@ let
   claude-prompts-path = ../../claude-prompts;
 
   # ── Model tier definitions ─────────────────────────────────────────────────
-  # GPT (OpenAI): high reasoning, deep coding, fast utility
-  gptHigh = "openai/gpt-5.4"; # orchestration, planning, multimodal
-  gptCodex = "openai/gpt-5.3-codex"; # deep autonomous coding, review
-  gptNano = "openai/gpt-5-nano"; # utility (title generation, compaction, fast tasks)
+  # Model IDs must use providerID/modelID format (e.g. "anthropic/claude-sonnet-4-6").
 
-  # GLM (Z.ai Coding Plan): always-available primary for writing/research/visual
+  # GPT (OpenAI): high reasoning, deep coding, fast utility
+  gptCodex = "openai/gpt-5.3-codex"; # deep autonomous coding, review
+
+  # GLM (Z.ai): always-available primary for writing/research/visual
   glm   = "zai-coding-plan/glm-5";
   glm47 = "zai-coding-plan/glm-4.7";
 
@@ -21,21 +21,20 @@ let
   claudeOpus   = "anthropic/claude-opus-4-6";
   claudeSonnet = "anthropic/claude-sonnet-4-6";
 
+  # GitHub Copilot: fast utility for miscellaneous / quick tasks
+  copilot = "github-copilot/gpt-4.5";
+
   # ── Fallback chain policies ────────────────────────────────────────────────
-  # claude-opus primary: Sonnet → Codex → GLM
-  claudeOpusFallback = [ claudeSonnet gptCodex glm glm47 ];
   # claude-sonnet primary: Codex → Opus → GLM
   claudeSonnetFallback = [ gptCodex claudeOpus glm glm47 ];
-  # gpt-5.4 primary: Opus → Sonnet → GLM
-  gptHighFallback = [ claudeOpus claudeSonnet glm glm47 ];
   # gpt-codex primary: Opus → Sonnet → GLM
   gptCodexFallback = [ claudeOpus claudeSonnet glm glm47 ];
-  # gpt-nano primary: stay cheap (Z.ai) → escalate to Claude
-  gptNanoFallback = [ glm47 glm claudeSonnet claudeOpus ];
   # glm-5 primary: stay cheap → Sonnet → Opus only as last resort
-  glmFallback = [ glm47 gptNano claudeSonnet claudeOpus ];
+  glmFallback = [ glm47 claudeSonnet claudeOpus ];
   # glm-4.7 primary: stay cheap → Sonnet → Opus only as last resort
-  glm47Fallback = [ glm gptNano claudeSonnet claudeOpus ];
+  glm47Fallback = [ copilot claudeSonnet ];
+  # copilot primary: fall back to GLM for miscellaneous tasks
+  copilotFallback = [ glm47 claudeSonnet ];
 
   # ── Shared prompt_append fragments ─────────────────────────────────────────
   promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
@@ -65,9 +64,8 @@ let
 
     settings = {
       theme = "dark";
-      model = glm; # opencode base model (no plugin)
-      small_model = glm;
       plugin = [ "oh-my-opencode" ];
+      model = claudeSonnet;
       share = "disabled";
 
       provider.openai.options = {
@@ -76,6 +74,11 @@ let
       };
 
       provider.anthropic.options = {
+        timeout = 600000;
+        chunkTimeout = 60000;
+      };
+
+      provider."github-copilot".options = {
         timeout = 600000;
         chunkTimeout = 60000;
       };
@@ -176,12 +179,12 @@ let
       agents = {
         # ── Orchestrators: planning, delegation, coordination ────────────────
         sisyphus = {
-          model = claudeOpus;
-          fallback_models = claudeOpusFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "medium";
           ultrawork = {
-            model = gptHigh;
-            fallback_models = gptHighFallback;
+            model = claudeSonnet;
+            fallback_models = claudeSonnetFallback;
             variant = "xhigh";
           };
           compaction = compactionCfg;
@@ -189,8 +192,8 @@ let
           description = "Primary orchestrator. Plans tasks, delegates to specialist agents and categories, ensures quality.";
         };
         prometheus = {
-          model = gptCodex;
-          fallback_models = gptCodexFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "xhigh";
           compaction = compactionCfg;
           prompt_append = promptOrchestrator;
@@ -223,23 +226,23 @@ let
           description = "Autonomous deep worker. Handles complex multi-file implementations and thorough exploration.";
         };
         oracle = {
-          model = claudeSonnet;
-          fallback_models = claudeSonnetFallback;
+          model = gptCodex;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           compaction = compactionCfg;
           prompt_append = promptLang;
           description = "Read-only advisor. Architecture design, code review, and deep debugging analysis.";
         };
         metis = {
-          model = glm;
-          fallback_models = glmFallback;
+          model = gptCodex;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           prompt_append = promptLang;
           description = "Gap detector. Finds overlooked issues, ambiguities, and edge cases.";
         };
         momus = {
-          model = claudeSonnet;
-          fallback_models = claudeSonnetFallback;
+          model = gptCodex;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           prompt_append = promptLang;
           description = "Strict reviewer. Thorough critical code and design review.";
@@ -247,15 +250,15 @@ let
 
         # ── Fast agents: lightweight search, docs lookup ─────────────────────
         librarian = {
-          model = glm;
-          fallback_models = glmFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "high";
           prompt_append = promptLibrarian;
           description = "Specification researcher. Looks up docs via context7, web search, and API references.";
         };
         explore = {
           model = glm;
-          fallback_models = glmFallback;
+          fallback_models = [ glm47 copilot ];
           variant = "high";
           prompt_append = promptLang;
           description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
@@ -265,8 +268,8 @@ let
       categories = {
         # ── GLM-primary: natural language, writing, visual, research ──────────
         "visual-engineering" = {
-          model = glm;
-          fallback_models = glmFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           prompt_append = promptLang;
           description = "Frontend UI implementation, styling, and component refactors.";
         };
@@ -285,8 +288,8 @@ let
 
         # ── High-tier categories: deep reasoning, coding, review ─────────────
         ultrabrain = {
-          model = claudeSonnet;
-          fallback_models = claudeSonnetFallback;
+          model = gptCodex;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           prompt_append = promptLang;
           description = "Hard reasoning, architecture, tradeoff analysis, and bug forensics.";
@@ -306,8 +309,8 @@ let
           description = "Code review, design review, and debugging analysis.";
         };
         refactor = {
-          model = gptNano;
-          fallback_models = gptNanoFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "high";
           prompt_append = promptLang;
           description = "Routine refactors, cleanup, repetitive edits, and test generation.";
@@ -315,8 +318,8 @@ let
 
         # ── Mid-tier categories: general complex work ────────────────────────
         "unspecified-high" = {
-          model = claudeSonnet;
-          fallback_models = claudeSonnetFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "medium";
           prompt_append = promptLang;
           description = "Default lane for complex general work.";
@@ -324,15 +327,15 @@ let
 
         # ── Low-tier categories: fast, routine, low-complexity ───────────────
         quick = {
-          model = glm47;
-          fallback_models = glm47Fallback;
+          model = copilot;
+          fallback_models = copilotFallback;
           variant = "xhigh";
           prompt_append = promptLang;
           description = "Tiny mechanical edits: typos, trivial renames, one-file micro-fixes.";
         };
         "unspecified-low" = {
-          model = glm;
-          fallback_models = glmFallback;
+          model = copilot;
+          fallback_models = copilotFallback;
           variant = "xhigh";
           prompt_append = promptLang;
           description = "Default lane for routine implementation, moderate refactors, and research synthesis.";
