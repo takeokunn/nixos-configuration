@@ -14,11 +14,11 @@ let
   gptCodex = "openai/gpt-5.3-codex"; # deep autonomous coding, review
 
   # GLM (Z.ai): always-available primary for writing/research/visual
-  glm   = "zai-coding-plan/glm-5";
+  glm = "zai-coding-plan/glm-5";
   glm47 = "zai-coding-plan/glm-4.7";
 
   # Claude (Anthropic): orchestration flagship + quality fallback
-  claudeOpus   = "anthropic/claude-opus-4-6";
+  claudeOpus = "anthropic/claude-opus-4-6";
   claudeSonnet = "anthropic/claude-sonnet-4-6";
 
   # GitHub Copilot: fast utility for miscellaneous / quick tasks
@@ -26,15 +26,35 @@ let
 
   # ── Fallback chain policies ────────────────────────────────────────────────
   # claude-sonnet primary: Codex → Opus → GLM
-  claudeSonnetFallback = [ gptCodex claudeOpus glm glm47 ];
+  claudeSonnetFallback = [
+    gptCodex
+    claudeOpus
+    glm
+    glm47
+  ];
   # gpt-codex primary: Opus → Sonnet → GLM
-  gptCodexFallback = [ claudeOpus claudeSonnet glm glm47 ];
+  gptCodexFallback = [
+    claudeOpus
+    claudeSonnet
+    glm
+    glm47
+  ];
   # glm-5 primary: stay cheap → Sonnet → Opus only as last resort
-  glmFallback = [ glm47 claudeSonnet claudeOpus ];
+  glmFallback = [
+    glm47
+    claudeSonnet
+    claudeOpus
+  ];
   # glm-4.7 primary: stay cheap → Sonnet → Opus only as last resort
-  glm47Fallback = [ copilot claudeSonnet ];
+  glm47Fallback = [
+    copilot
+    claudeSonnet
+  ];
   # copilot primary: fall back to GLM for miscellaneous tasks
-  copilotFallback = [ glm47 claudeSonnet ];
+  copilotFallback = [
+    glm47
+    claudeSonnet
+  ];
 
   # ── Shared prompt_append fragments ─────────────────────────────────────────
   promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
@@ -144,14 +164,14 @@ let
       };
       diff_style = "auto";
       keybinds = {
-        messages_line_down      = "j";
-        messages_line_up        = "k";
+        messages_line_down = "j";
+        messages_line_up = "k";
         messages_half_page_down = "ctrl+d";
-        messages_half_page_up   = "ctrl+u";
-        messages_first          = "g";
-        messages_last           = "G";
-        messages_next           = "]";
-        messages_previous       = "[";
+        messages_half_page_up = "ctrl+u";
+        messages_first = "g";
+        messages_last = "G";
+        messages_next = "]";
+        messages_previous = "[";
       };
     }
   );
@@ -169,7 +189,12 @@ let
 
       runtime_fallback = {
         enabled = true;
-        retry_on_errors = [ 400 429 503 529 ];
+        retry_on_errors = [
+          400
+          429
+          503
+          529
+        ];
         max_fallback_attempts = 10;
         cooldown_seconds = 30;
         timeout_seconds = 30;
@@ -258,7 +283,10 @@ let
         };
         explore = {
           model = glm;
-          fallback_models = [ glm47 copilot ];
+          fallback_models = [
+            glm47
+            copilot
+          ];
           variant = "high";
           prompt_append = promptLang;
           description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
