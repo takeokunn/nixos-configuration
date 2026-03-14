@@ -1,4 +1,8 @@
-{ pkgs, nurPkgs, devenvPkgs ? null }:
+{
+  pkgs,
+  nurPkgs,
+  devenvPkgs ? null,
+}:
 with pkgs;
 lib.optional (devenvPkgs != null) devenvPkgs.devenv
 ++ [
