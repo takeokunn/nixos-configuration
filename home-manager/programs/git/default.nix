@@ -35,6 +35,7 @@
       ".git-hooks-config.yaml"
       ".markdown-preview.html"
       ".serena/"
+      ".sisyphus/"
       ".cache/"
       "**/.claude/settings.local.json"
       "coverage.out"

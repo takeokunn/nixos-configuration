@@ -14,18 +14,38 @@ let
   gptNano = "openai/gpt-5-nano"; # utility (title generation, compaction, fast tasks)
 
   # GLM (Z.ai Coding Plan): always-available primary for writing/research/visual
-  glm = "zai-coding-plan/glm-5";
+  glm   = "zai-coding-plan/glm-5";
+  glm47 = "zai-coding-plan/glm-4.7";
+
+  # Claude (Anthropic): orchestration flagship + quality fallback
+  claudeOpus   = "anthropic/claude-opus-4-6";
+  claudeSonnet = "anthropic/claude-sonnet-4-6";
 
   # ── Fallback chain policies ────────────────────────────────────────────────
-  # GPT-primary agents: fall through to GLM when OpenAI is unavailable
-  gptFallback = [ glm ];
-  # GLM-primary agents: fall through to GPT-high for heavier reasoning
-  glmFallback = [ gptHigh ];
+  # claude-opus primary: Sonnet → Codex → GLM
+  claudeOpusFallback = [ claudeSonnet gptCodex glm glm47 ];
+  # claude-sonnet primary: Codex → Opus → GLM
+  claudeSonnetFallback = [ gptCodex claudeOpus glm glm47 ];
+  # gpt-5.4 primary: Opus → Sonnet → GLM
+  gptHighFallback = [ claudeOpus claudeSonnet glm glm47 ];
+  # gpt-codex primary: Opus → Sonnet → GLM
+  gptCodexFallback = [ claudeOpus claudeSonnet glm glm47 ];
+  # gpt-nano primary: stay cheap (Z.ai) → escalate to Claude
+  gptNanoFallback = [ glm47 glm claudeSonnet claudeOpus ];
+  # glm-5 primary: stay cheap → Sonnet → Opus only as last resort
+  glmFallback = [ glm47 gptNano claudeSonnet claudeOpus ];
+  # glm-4.7 primary: stay cheap → Sonnet → Opus only as last resort
+  glm47Fallback = [ glm gptNano claudeSonnet claudeOpus ];
+
+  # ── Shared prompt_append fragments ─────────────────────────────────────────
+  promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
+  promptOrchestrator = "Assess the full picture, identify task dependencies, and delegate independent tasks in parallel to appropriate subagents. Always specify run_in_background when spawning subagents (false for delegation, true for parallel exploration only). ${promptLang}";
+  promptLibrarian = "Verify specifications via Web search and context7 MCP before answering. ${promptLang}";
 
   # ── Shared compaction model ────────────────────────────────────────────────
   # Context window summarization: needs enough capability to preserve code semantics
   compactionCfg = {
-    model = gptNano;
+    model = glm;
     variant = "medium";
   };
 
@@ -45,12 +65,17 @@ let
 
     settings = {
       theme = "dark";
-      model = gptCodex; # opencode base model (no plugin)
-      small_model = gptNano;
+      model = glm; # opencode base model (no plugin)
+      small_model = glm;
       plugin = [ "oh-my-opencode" ];
       share = "disabled";
 
       provider.openai.options = {
+        timeout = 600000;
+        chunkTimeout = 60000;
+      };
+
+      provider.anthropic.options = {
         timeout = 600000;
         chunkTimeout = 60000;
       };
@@ -109,12 +134,22 @@ let
   tuiConfig = pkgs.writeText "tui.json" (
     builtins.toJSON {
       "$schema" = "https://opencode.ai/tui.json";
-      theme = "tokyonight";
+      theme = "dracula";
       scroll_speed = 3;
       scroll_acceleration = {
         enabled = true;
       };
       diff_style = "auto";
+      keybinds = {
+        messages_line_down      = "j";
+        messages_line_up        = "k";
+        messages_half_page_down = "ctrl+d";
+        messages_half_page_up   = "ctrl+u";
+        messages_first          = "g";
+        messages_last           = "G";
+        messages_next           = "]";
+        messages_previous       = "[";
+      };
     }
   );
 
@@ -129,91 +164,101 @@ let
       model_fallback = true;
       disabled_hooks = [ "comment-checker" ];
 
+      runtime_fallback = {
+        enabled = true;
+        retry_on_errors = [ 400 429 503 529 ];
+        max_fallback_attempts = 10;
+        cooldown_seconds = 30;
+        timeout_seconds = 30;
+        notify_on_fallback = true;
+      };
+
       agents = {
-        # ── Orchestrators (gptHigh): planning, delegation, coordination ───────
+        # ── Orchestrators: planning, delegation, coordination ────────────────
         sisyphus = {
-          model = gptHigh;
-          fallback_models = gptFallback;
+          model = claudeOpus;
+          fallback_models = claudeOpusFallback;
           variant = "medium";
           ultrawork = {
             model = gptHigh;
+            fallback_models = gptHighFallback;
             variant = "xhigh";
           };
           compaction = compactionCfg;
-          prompt_append = "状況を俯瞰して捉え、タスクの依存関係を把握し、依存関係のないタスクはできる限りそれぞれ適切なsubagentに並列でタスクを委譲し、検討やプロジェクト品質維持に努めてください。subagentを呼ぶときは run_in_background を必ず指定（委譲は false、並列探索のみ true）、検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "メインのオーケストレータ。計画し、専門エージェントや category ベースの実行へ委譲します。";
+          prompt_append = promptOrchestrator;
+          description = "Primary orchestrator. Plans tasks, delegates to specialist agents and categories, ensures quality.";
         };
         prometheus = {
-          model = gptHigh;
-          fallback_models = gptFallback;
+          model = gptCodex;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           compaction = compactionCfg;
-          prompt_append = "状況を俯瞰して捉え、タスクの依存関係を把握し、依存関係のないタスクはできる限りそれぞれ適切なsubagentに並列でタスクを委譲し、検討やプロジェクト品質維持に努めてください。subagentを呼ぶときは run_in_background を必ず指定（委譲は false、並列探索のみ true）、検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "計画作成役";
+          prompt_append = promptOrchestrator;
+          description = "Planning specialist. Creates detailed implementation plans and task breakdowns.";
         };
         atlas = {
-          model = gptHigh;
-          fallback_models = gptFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "xhigh";
           compaction = compactionCfg;
-          prompt_append = "状況を俯瞰して捉え、タスクの依存関係を把握し、依存関係のないタスクはできる限りそれぞれ適切なsubagentに並列でタスクを委譲し、検討やプロジェクト品質維持に努めてください。subagentを呼ぶときは run_in_background を必ず指定（委譲は false、並列探索のみ true）、検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Todo ベースの実行コンダクタ。仕事を切って委譲し、結果を束ねる役。";
+          prompt_append = promptOrchestrator;
+          description = "Execution conductor. Splits work into todos, delegates, and consolidates results.";
         };
         "multimodal-looker" = {
-          model = gptHigh;
-          fallback_models = gptFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "high";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "マルチモーダルの目役";
+          prompt_append = promptLang;
+          description = "Multimodal analyst. Interprets images, screenshots, diagrams, and visual content.";
         };
 
-        # ── Deep workers (gptCodex): autonomous coding, review, reasoning ─────
+        # ── Deep workers: autonomous coding, review, reasoning ───────────────
         hephaestus = {
           model = gptCodex;
-          fallback_models = gptFallback;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
           allow_non_gpt_model = true;
           compaction = compactionCfg;
-          prompt_append = "状況を俯瞰して捉え、タスクの依存関係を把握し、依存関係のないタスクはできる限りそれぞれ適切なsubagentに並列でタスクを委譲し、検討やプロジェクト品質維持に努めてください。subagentを呼ぶときは run_in_background を必ず指定（委譲は false、並列探索のみ true）、検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "自律型の deep worker。複数ファイルに跨る難しい実装・深い探索向け。";
+          prompt_append = promptLang;
+          description = "Autonomous deep worker. Handles complex multi-file implementations and thorough exploration.";
         };
         oracle = {
-          model = gptCodex;
-          fallback_models = gptFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "xhigh";
           compaction = compactionCfg;
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "read-only の相談役。アーキ設計・コードレビュー・デバッグの深掘り向け。";
+          prompt_append = promptLang;
+          description = "Read-only advisor. Architecture design, code review, and deep debugging analysis.";
         };
         metis = {
-          model = gptCodex;
-          fallback_models = gptFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "抜け漏れや曖昧さを暴く";
+          prompt_append = promptLang;
+          description = "Gap detector. Finds overlooked issues, ambiguities, and edge cases.";
         };
         momus = {
-          model = gptCodex;
-          fallback_models = gptFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "厳しくレビューする";
+          prompt_append = promptLang;
+          description = "Strict reviewer. Thorough critical code and design review.";
         };
 
-        # ── Fast agents (gptNano): lightweight search, docs lookup ───────────
+        # ── Fast agents: lightweight search, docs lookup ─────────────────────
         librarian = {
-          model = gptNano;
-          fallback_models = gptFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "high";
-          prompt_append = "仕様についてWeb検索することもそうなのですが、context7なども用いて確認してください。検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "context7などで仕様調査";
+          prompt_append = promptLibrarian;
+          description = "Specification researcher. Looks up docs via context7, web search, and API references.";
         };
         explore = {
-          model = gptNano;
-          fallback_models = gptFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "high";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "探索役";
+          prompt_append = promptLang;
+          description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
         };
       };
 
@@ -222,75 +267,83 @@ let
         "visual-engineering" = {
           model = glm;
           fallback_models = glmFallback;
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Frontend implementation, UI code changes, styling, component refactors.";
+          prompt_append = promptLang;
+          description = "Frontend UI implementation, styling, and component refactors.";
         };
         writing = {
-          model = glm;
-          fallback_models = glmFallback;
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Documentation, ADRs, changelogs, migration notes, technical writing.";
+          model = glm47;
+          fallback_models = glm47Fallback;
+          prompt_append = promptLang;
+          description = "Documentation, ADRs, changelogs, and technical writing.";
         };
         research = {
-          model = glm;
-          fallback_models = glmFallback;
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Documentation lookup, OSS pattern survey, comparison writeups, implementation research.";
+          model = glm47;
+          fallback_models = glm47Fallback;
+          prompt_append = promptLang;
+          description = "Spec lookup, OSS pattern survey, and implementation research.";
         };
 
-        # ── GPT-Codex-primary: deep reasoning, coding, review ─────────────────
+        # ── High-tier categories: deep reasoning, coding, review ─────────────
         ultrabrain = {
-          model = gptCodex;
-          fallback_models = gptFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Hard reasoning, architecture, large-context review, tradeoff analysis, bug forensics.";
+          prompt_append = promptLang;
+          description = "Hard reasoning, architecture, tradeoff analysis, and bug forensics.";
         };
         deep = {
           model = gptCodex;
-          fallback_models = gptFallback;
+          fallback_models = gptCodexFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Autonomous deep implementation, non-trivial debugging, complex multi-file changes.";
+          prompt_append = promptLang;
+          description = "Autonomous deep implementation, non-trivial debugging, and complex multi-file changes.";
         };
         review = {
-          model = gptCodex;
-          fallback_models = gptFallback;
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Code review, design review, large-context reading, debugging analysis, difficult reasoning.";
+          prompt_append = promptLang;
+          description = "Code review, design review, and debugging analysis.";
         };
         refactor = {
-          model = gptCodex;
-          fallback_models = gptFallback;
-          variant = "high";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Routine refactors, cleanup, repetitive edits, code generation, and tests.";
-        };
-
-        # ── GPT-High-primary: general complex work ────────────────────────────
-        "unspecified-high" = {
-          model = gptHigh;
-          fallback_models = gptFallback;
-          variant = "medium";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Default lane for complex general work when the task is not obviously tiny.";
-        };
-
-        # ── GPT-Spark-primary: fast, routine, low-complexity ──────────────────
-        quick = {
           model = gptNano;
-          fallback_models = gptFallback;
+          fallback_models = gptNanoFallback;
+          variant = "high";
+          prompt_append = promptLang;
+          description = "Routine refactors, cleanup, repetitive edits, and test generation.";
+        };
+
+        # ── Mid-tier categories: general complex work ────────────────────────
+        "unspecified-high" = {
+          model = claudeSonnet;
+          fallback_models = claudeSonnetFallback;
+          variant = "medium";
+          prompt_append = promptLang;
+          description = "Default lane for complex general work.";
+        };
+
+        # ── Low-tier categories: fast, routine, low-complexity ───────────────
+        quick = {
+          model = glm47;
+          fallback_models = glm47Fallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Tiny mechanical edits only: typos, trivial renames, one-file micro-fixes.";
+          prompt_append = promptLang;
+          description = "Tiny mechanical edits: typos, trivial renames, one-file micro-fixes.";
         };
         "unspecified-low" = {
-          model = gptNano;
-          fallback_models = gptFallback;
+          model = glm;
+          fallback_models = glmFallback;
           variant = "xhigh";
-          prompt_append = "検討や作業は英語で、ユーザーへの回答やドキュメンテーションは日本語でお願いします。";
-          description = "Default lane for routine implementation, moderate refactors, research synthesis, and output-heavy general work.";
+          prompt_append = promptLang;
+          description = "Default lane for routine implementation, moderate refactors, and research synthesis.";
+        };
+
+        # ── GLM-primary: parallel exploration (rate-limit isolated from OpenAI) ─
+        "parallel-explore" = {
+          model = glm;
+          fallback_models = glmFallback;
+          prompt_append = promptLang;
+          description = "Parallel read-only exploration: file search, grep, and spec lookup. GLM-primary for rate-limit isolation.";
         };
       };
     }

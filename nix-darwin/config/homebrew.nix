@@ -13,6 +13,7 @@
     casks = [
       "aquaskk"
       "cleanshot"
+      "codexbar"
       "font-sketchybar-app-font"
       "google-chrome"
       "sf-symbols"
