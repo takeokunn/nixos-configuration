@@ -2260,21 +2260,14 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :PROPERTIES:
 :CUSTOM_ID: narrowing
 :END:
-*** fancy-narrow
+*** soft-narrow
 :PROPERTIES:
-:CUSTOM_ID: fancy-narrow
+:CUSTOM_ID: soft-narrow
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(fancy-narrow-mode) "fancy-narrow" nil t)
+  (autoload-if-found '(soft-narrow-mode) "soft-narrow" nil t)
 
-  ;; (with-eval-after-load 'org
-  ;;   (add-hook 'org-mode-hook #'fancy-narrow-local-mode))
-
-  ;; (with-eval-after-load 'elisp-mode
-  ;;   (add-hook 'emacs-lisp-mode-hook #'fancy-narrow-local-mode))
-
-  ;; (with-eval-after-load 'lisp-mode
-  ;;   (add-hook 'lisp-mode-hook #'fancy-narrow-local-mode))
+  (add-hook 'emacs-startup-hook #'soft-narrow-mode)
 #+end_src
 ** LSP
 :PROPERTIES:

@@ -8,6 +8,7 @@ let
   sudden-death = nurPkgs.emacs-sudden-death;
   zalgo-mode = nurPkgs.emacs-zalgo-mode;
   emacs-arto = nurPkgs.emacs-arto;
+  soft-narrow = nurPkgs.emacs-soft-narrow;
 in
 with epkgs;
 [
@@ -45,6 +46,7 @@ with epkgs;
 
   # Minor Modes
   command-log-mode
+  soft-narrow
 
   # Shell
   exec-path-from-shell

@@ -41,9 +41,6 @@ with epkgs;
   yasnippet
   consult-yasnippet
 
-  # narrowing
-  fancy-narrow
-
   # LSP
   eglot-booster
   lsp-mode
