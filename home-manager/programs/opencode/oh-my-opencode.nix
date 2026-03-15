@@ -30,8 +30,8 @@ pkgs.writeText "oh-my-opencode.json" (
     agents = {
       # ── Tier 1 (main): deep reasoning, autonomous coding, review ────────────
       hephaestus = {
-        model = models.gptCodex;
-        fallback_models = models.gptCodexFallback;
+        model = models.claudeSonnet;
+        fallback_models = models.claudeSonnetFallback;
         variant = "xhigh";
         allow_non_gpt_model = true;
         compaction = models.compactionCfg;
@@ -39,23 +39,23 @@ pkgs.writeText "oh-my-opencode.json" (
         description = "Autonomous deep worker. Handles complex multi-file implementations and thorough exploration.";
       };
       oracle = {
-        model = models.gptCodex;
-        fallback_models = models.gptCodexFallback;
+        model = models.claudeSonnet;
+        fallback_models = models.claudeSonnetFallback;
         variant = "xhigh";
         compaction = models.compactionCfg;
         prompt_append = models.promptLang;
         description = "Read-only advisor. Architecture design, code review, and deep debugging analysis.";
       };
       metis = {
-        model = models.gptCodex;
-        fallback_models = models.gptCodexFallback;
+        model = models.glm;
+        fallback_models = models.glmFallback;
         variant = "xhigh";
         prompt_append = models.promptLang;
         description = "Gap detector. Finds overlooked issues, ambiguities, and edge cases.";
       };
       momus = {
-        model = models.gptCodex;
-        fallback_models = models.gptCodexFallback;
+        model = models.glm;
+        fallback_models = models.glmFallback;
         variant = "xhigh";
         prompt_append = models.promptLang;
         description = "Strict reviewer. Thorough critical code and design review.";
@@ -63,12 +63,12 @@ pkgs.writeText "oh-my-opencode.json" (
 
       # ── Tier 2 (mid): orchestration, planning — sonnet primary ──────────────
       sisyphus = {
-        model = models.claudeSonnet;
-        fallback_models = models.claudeSonnetFallback;
+        model = models.glm;
+        fallback_models = models.glmFallback;
         variant = "medium";
         ultrawork = {
-          model = models.claudeSonnet;
-          fallback_models = models.claudeSonnetFallback;
+          model = models.glm;
+          fallback_models = models.glmFallback;
           variant = "xhigh";
         };
         compaction = models.compactionCfg;

@@ -64,6 +64,7 @@ nixpkgs.lib.nixosSystem {
           scientific-skills
           context7-skills
           nur-packages
+          devenv
           emacs-overlay
           org-babel
           brew-nix
