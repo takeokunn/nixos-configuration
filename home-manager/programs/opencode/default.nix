@@ -3,11 +3,12 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
+  modelSet ? "premium",
 }:
 let
   claude-prompts-path = ../../claude-prompts;
 
-  models = import ./models.nix;
+  models = import ./models/${modelSet}.nix;
 
   opencodeConfig = import ./opencode-config.nix {
     inherit pkgs mcp-servers-nix models;

@@ -20,7 +20,7 @@ mcp-servers-nix.lib.mkConfig pkgs {
   settings = {
     theme = "dark";
     plugin = [ "oh-my-opencode" ];
-    model = models.gptCodex;
+    model = models.apex.model;
     share = "disabled";
 
     provider.openai.options = models.providerTimeoutOpts;
