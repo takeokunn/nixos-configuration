@@ -83,11 +83,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1773529616,
-        "narHash": "sha256-I76h0L2E5KdrwhpPwHsO9lxI1Za3C/pzehOYJ8Bw5xs=",
+        "lastModified": 1773562196,
+        "narHash": "sha256-iBwQj/Kqr+tSFqYluuy0/Kg1ntjxosFXnm+zclQa3DA=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "75c4419d67c839a54d7389814129a744751f1b35",
+        "rev": "4ee025ed995ae9291802e3c6ca120a862afa2728",
         "type": "github"
       },
       "original": {
@@ -1124,11 +1124,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773532378,
-        "narHash": "sha256-zkxvaVYdIhcJUtlVAMuw2TdcC/WYgUCdVpgEPHY1B0w=",
+        "lastModified": 1773546381,
+        "narHash": "sha256-dkKoqq7Hi0O5Ffq0EsLWStoQd+4GTSSJWr2qVuBSjWM=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "f3f35999cca62ab71e42e30298105e8428a74e04",
+        "rev": "8caa78773b737e872794ef1bb8334f9f0424f181",
         "type": "github"
       },
       "original": {
@@ -1813,11 +1813,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773544885,
-        "narHash": "sha256-dhyHIfXh0FU7952Ys6IrwGOmmmgg+GJWRqBLlSG+MJw=",
+        "lastModified": 1773549924,
+        "narHash": "sha256-UF01vjSpZQ483ZAEw+4fV9Ijvqq599BW1JIkOt1kzRE=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "5b6816b6b8b4a3ed950b91bee34e771115f4c566",
+        "rev": "a88d90054491af07bd0423dce6b848d3a721baa1",
         "type": "github"
       },
       "original": {
