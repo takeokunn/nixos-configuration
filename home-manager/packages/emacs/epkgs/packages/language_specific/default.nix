@@ -8,6 +8,7 @@ let
   emacs-php-doc-block = nurPkgs.emacs-php-doc-block;
   fish-repl = nurPkgs.emacs-fish-repl;
   dasel = nurPkgs.emacs-dasel;
+  consult-dasel = nurPkgs.emacs-consult-dasel;
 in
 with epkgs;
 [
@@ -84,6 +85,7 @@ with epkgs;
   jq-mode
   json-reformat
   dasel
+  consult-dasel
 
   # Python
   py-isort
