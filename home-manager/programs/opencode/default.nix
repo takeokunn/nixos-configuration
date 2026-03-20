@@ -3,7 +3,7 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
-  modelSet ? "premium",
+  modelSet ? "economy",
 }:
 let
   claude-prompts-path = ../../claude-prompts;
