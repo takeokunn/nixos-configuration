@@ -83,11 +83,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1774037237,
-        "narHash": "sha256-u/u57zOMHZchIxHtx6uD/fb4uIc5BBnq0fUJKLZHCI0=",
+        "lastModified": 1774080390,
+        "narHash": "sha256-mlV+L3h35dhJH8RVKM5Y2ldOc/6MnrkZbLlQcaiVf2w=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "a73068c216e5326988d58f202826b4439ca1785b",
+        "rev": "ec8308adb64edbdb198330a16020ce5f532c2498",
         "type": "github"
       },
       "original": {
@@ -537,11 +537,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774025049,
-        "narHash": "sha256-mlXHmmL8lZibp/DytQuHjCfl0iU56qf4uJjlLZFY1Kc=",
+        "lastModified": 1774082071,
+        "narHash": "sha256-FcK2KwqDHxcQh51fCpU1Oan1ZnmSKMuGK1nG76rNr9A=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "2f30afcd2ca141e1cf9745439fffcf5fb044dfc8",
+        "rev": "efa1d2253095cc62fae754f09a8379e75ada3a41",
         "type": "github"
       },
       "original": {
@@ -558,11 +558,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1773979456,
-        "narHash": "sha256-9kBMJ5IvxqNlkkj/swmE8uK1Sc7TL/LIRUI958m7uBM=",
+        "lastModified": 1774065775,
+        "narHash": "sha256-anJXbdfZMhXWjHSfB5v6e8+yv1ASTHM4TwikH8tloMI=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "81e28f47ac18d9e89513929c77e711e657b64851",
+        "rev": "4b3bbb9dc3c80d1b62228c9a2ca0bef74a24a192",
         "type": "gitlab"
       },
       "original": {
@@ -1124,11 +1124,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774017304,
-        "narHash": "sha256-4+MRnM772f76dpsXUxVp/2jW68C2wp4766pujWyqzx8=",
+        "lastModified": 1774063450,
+        "narHash": "sha256-p1Y2iUsWyLKk1z35OdAGcEpmbpRTG3AgjdyAVh5kmc8=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "bbf9d11b64b8f42df45a8eb5829c9f64fe02cea8",
+        "rev": "71c3b957aeb56aea79fd9a964e3f0bff2b794251",
         "type": "github"
       },
       "original": {
@@ -1813,11 +1813,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774032512,
-        "narHash": "sha256-EIiESo9SfvhM8QHQoN7GuozHGvmEtzoLvFVT+OqiFkA=",
+        "lastModified": 1774069276,
+        "narHash": "sha256-x2sX9wzrq6Elw7t42aXGsZeRM+CQGH92VZfvuQcjM58=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "dc76a602645d943b95da5b1649b1d04d4f30ac6d",
+        "rev": "b160b538ada965a5dcae6c9c77fae75215132255",
         "type": "github"
       },
       "original": {
