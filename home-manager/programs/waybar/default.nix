@@ -239,10 +239,13 @@
 
       #cpu.warning {
         color: #ffb86c;
+        text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
       }
 
       #cpu.critical {
         color: #ff5555;
+        text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       #memory {
@@ -252,10 +255,13 @@
 
       #memory.warning {
         color: #ffb86c;
+        text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
       }
 
       #memory.critical {
         color: #ff5555;
+        text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       #disk {
@@ -265,10 +271,13 @@
 
       #disk.warning {
         color: #ffb86c;
+        text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
       }
 
       #disk.critical {
         color: #ff5555;
+        text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       #custom-weather {
@@ -283,10 +292,13 @@
 
       #battery.warning {
         color: #ffb86c;
+        text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
       }
 
       #battery.critical {
         color: #ff5555;
+        text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       #battery.charging {
@@ -326,6 +338,11 @@
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
       }
 
       tooltip {
