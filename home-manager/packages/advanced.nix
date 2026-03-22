@@ -24,7 +24,6 @@ with pkgs;
   # for web service
   discord
   slack
-  nurPkgs.gogcli
 
   # for editor
   nurPkgs.kakehashi
