@@ -14,8 +14,14 @@ in
     exec = "emacsclient -c -a emacs %F";
     icon = "emacs";
     type = "Application";
-    categories = [ "Development" "TextEditor" ];
-    mimeType = [ "text/plain" "text/x-makefile" ];
+    categories = [
+      "Development"
+      "TextEditor"
+    ];
+    mimeType = [
+      "text/plain"
+      "text/x-makefile"
+    ];
     startupNotify = true;
   };
 

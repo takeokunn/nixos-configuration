@@ -83,11 +83,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1774123469,
-        "narHash": "sha256-7WU/+CNi2Nul3h3Z+I/OIaasYgwxAJdNheQIKdGO8mM=",
+        "lastModified": 1774166846,
+        "narHash": "sha256-0BUco5Yxaj5U4Fo24m581ezf7peL1jxXR1riMQXzPg0=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "3c8c3f462c6be4250bd58251ee68e512c0c51921",
+        "rev": "273ea091f3a6d927bd44a2c74c5493de030c611b",
         "type": "github"
       },
       "original": {
@@ -283,11 +283,11 @@
     "context7-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1773960535,
-        "narHash": "sha256-PmxUQayR6+kLsYlc0frd0as7ndOCkS/FkojWdlz0QCc=",
+        "lastModified": 1774157210,
+        "narHash": "sha256-0lYEFsmb4Z84w2zvnDTFUy8FvBw7Na4gaZc40irW4sg=",
         "owner": "upstash",
         "repo": "context7",
-        "rev": "d93157965eb3158a0abf4c1bd797f6af12b4c445",
+        "rev": "7f7b7268c36b1ee5b03c8e3fb38dd68065252616",
         "type": "github"
       },
       "original": {
@@ -537,11 +537,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774110692,
-        "narHash": "sha256-0JPH7CPdBCxx5IWNXZuqeiTwK8jS5ClT3xIO5brPNhI=",
+        "lastModified": 1774168555,
+        "narHash": "sha256-8MaMTblYgRxfoHCYCVsVKg7bfD1YOwoWtgFKofOqJLo=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "e7876ebeff5bd7dcb1fcec5222f9f3a6f2ec7d89",
+        "rev": "cc288f918615db71ed0afeff4342caab52ffa0e9",
         "type": "github"
       },
       "original": {
@@ -558,11 +558,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1774065775,
-        "narHash": "sha256-anJXbdfZMhXWjHSfB5v6e8+yv1ASTHM4TwikH8tloMI=",
+        "lastModified": 1774152686,
+        "narHash": "sha256-RlEgsdHr9IQm79SsXKNT8iU+ZjjIOPTJXcatMqgSfwk=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "4b3bbb9dc3c80d1b62228c9a2ca0bef74a24a192",
+        "rev": "4c83dbe717272428562a33db817f492195e227ae",
         "type": "gitlab"
       },
       "original": {
@@ -1059,11 +1059,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774007980,
-        "narHash": "sha256-FOnZjElEI8pqqCvB6K/1JRHTE8o4rer8driivTpq2uo=",
+        "lastModified": 1774135471,
+        "narHash": "sha256-TVeIGOxnfSPM6JvkRkXHpJECnj1OG2dXkWMSA4elzzQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "9670de2921812bc4e0452f6e3efd8c859696c183",
+        "rev": "856b01ebd1de3f53c3929ce8082d9d67d799d816",
         "type": "github"
       },
       "original": {
@@ -1124,11 +1124,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774104280,
-        "narHash": "sha256-kQeR1qqTFleJzMWsOttJMWUxMsykcKrUA2ttPIg2O4k=",
+        "lastModified": 1774149162,
+        "narHash": "sha256-nEccD+VNmqMkDbTssNY01AKQ/T2yX0ZHj2QXOF/TIUQ=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "4f6fca6b05c5b59b6bbb442a262596ddf86661e8",
+        "rev": "104fae2a6ddde32838b7b1dabaa77edbdb69378a",
         "type": "github"
       },
       "original": {
@@ -1813,11 +1813,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774111008,
-        "narHash": "sha256-OU1VwDsIAMNBLzkdWndT1wMc/60kmTnFi4Keidy9LQk=",
+        "lastModified": 1774156564,
+        "narHash": "sha256-c/s+gkpUVs1EJoFVVM+Gg3WfN82L1bwMwBIEnX9We74=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "53d9bf17b27f10085b076274da3390361d4723e2",
+        "rev": "2331391e744705fec7de15e9174655b23ac48bc2",
         "type": "github"
       },
       "original": {
@@ -2177,11 +2177,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774103303,
-        "narHash": "sha256-ZKsQGY0D4DLe3071/RZSQHLqqmFvsA38PudjEvnPbZI=",
+        "lastModified": 1774155194,
+        "narHash": "sha256-0+8XV5WPO5Ie8hBcEEpPoR7mCqUmMnVZFiu6DQIxIE0=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "ae52b215dd66f73cb131106b7588f3a983617cee",
+        "rev": "56e6e71b465967758ff4db948ff943cb8ea31ca4",
         "type": "github"
       },
       "original": {

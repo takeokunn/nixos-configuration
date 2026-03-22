@@ -36,10 +36,11 @@
 
       # for emacs daemon socket (uses path from lib/emacs-constants.nix)
       # Note: fish uses (id -u) syntax, constants use $(id -u) for bash compatibility
-      ${if pkgs.stdenv.isDarwin then
-        "set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server"
-      else
-        "set -gx EMACS_SOCKET_NAME $XDG_RUNTIME_DIR/emacs/server"
+      ${
+        if pkgs.stdenv.isDarwin then
+          "set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server"
+        else
+          "set -gx EMACS_SOCKET_NAME $XDG_RUNTIME_DIR/emacs/server"
       }
 
       # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)

@@ -12,10 +12,7 @@ let
     defaultAppId
     ;
   socketPath =
-    if pkgs.stdenv.isDarwin then
-      constants.socketPath
-    else
-      "/run/user/$(id -u)/emacs/server";
+    if pkgs.stdenv.isDarwin then constants.socketPath else "/run/user/$(id -u)/emacs/server";
 
   # Scratchpad toggle script generator
   # Generates platform-specific scripts for aerospace (macOS) and niri (NixOS)
