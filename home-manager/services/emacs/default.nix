@@ -23,6 +23,16 @@ in
     client.enable = true;
   };
 
+  # Linux: start emacs daemon after WAYLAND_DISPLAY is available in the systemd
+  # user environment (niri exports it to systemd via dbus-update-activation-environment
+  # as part of graphical-session.target activation).
+  systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
+    Unit = {
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+  };
+
   # macOS: Set TMPDIR so emacs daemon creates socket in /tmp
   launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf isDarwin {
     TMPDIR = "/tmp";

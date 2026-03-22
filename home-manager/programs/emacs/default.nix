@@ -8,6 +8,17 @@ let
   tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
 in
 {
+  xdg.desktopEntries.emacsclient-gui = lib.mkIf pkgs.stdenv.isLinux {
+    name = "Emacs (Client)";
+    genericName = "Text Editor";
+    exec = "emacsclient -c -a emacs %F";
+    icon = "emacs";
+    type = "Application";
+    categories = [ "Development" "TextEditor" ];
+    mimeType = [ "text/plain" "text/x-makefile" ];
+    startupNotify = true;
+  };
+
   home = {
     # Override vim.defaultEditor from programs/basic.nix for advanced configurations
     sessionVariables = {
