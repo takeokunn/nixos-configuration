@@ -13,6 +13,7 @@
       hackgen-font
       hackgen-nf-font
       nerd-fonts.fira-code
+      nerd-fonts.symbols-only
       emacs-all-the-icons-fonts
       font-awesome
       font-awesome_5

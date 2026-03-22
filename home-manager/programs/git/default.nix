@@ -42,8 +42,8 @@
     ];
 
     signing = {
-      key = "0B10DAA7BA0236D7382287660F79C0AB03FD7A1C";
-      format = "openpgp";
+      key = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGmHwiLkYQH4o4UDheVqkn9L/TW+t3Fzq0WUvpkjaSPD";
+      format = "ssh";
       signByDefault = true;
     };
 
@@ -112,7 +112,9 @@
       };
 
       gpg = {
-        program = "gpg";
+        ssh = {
+          allowedSignersFile = "~/.config/git/allowed_signers";
+        };
       };
 
       diff = {
