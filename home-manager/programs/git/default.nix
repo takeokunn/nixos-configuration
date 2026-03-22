@@ -42,7 +42,7 @@
     ];
 
     signing = {
-      key = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGmHwiLkYQH4o4UDheVqkn9L/TW+t3Fzq0WUvpkjaSPD";
+      key = "~/.ssh/signing_key.pub";
       format = "ssh";
       signByDefault = true;
     };
