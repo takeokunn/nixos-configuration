@@ -102,9 +102,12 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
-  home.stateVersion = "24.11";
+  home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;
   home.packages = basicPkgs ++ advancedPkgs;
+
+  targets.darwin.linkApps.enable = isDarwin;
+  targets.darwin.copyApps.enable = false;
 
   accounts.email.accounts = {
     Gmail = {
