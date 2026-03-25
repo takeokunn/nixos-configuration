@@ -1,47 +1,38 @@
 ---
-name: Parallelization Patterns
-description: Patterns for parallel execution strategies, timeout configuration, retry policies, and consensus mechanisms.
-version: 1.0.0
+name: parallelization-patterns
+description: "Use when configuring 'parallel execution', 'agent timeouts', 'retry policies', 'consensus mechanisms', or 'multi-agent orchestration'. Provides standardized patterns for parallel agent execution strategies, timeout tiers, retry policies, and consensus thresholds."
 ---
 
-<purpose>
-  Provide standardized patterns for parallel agent execution, timeout configuration, retry policies, and consensus mechanisms shared across orchestrators and agents.
-</purpose>
+Standardized patterns for parallel agent execution, timeout configuration, retry policies, and consensus mechanisms shared across orchestrators and agents.
 
-<tools>
-  <tool name="parallelization_template">
-    <description>Standard parallel execution capability and strategy patterns</description>
-    <use_case>Include in agents and commands for consistent parallel execution</use_case>
-  </tool>
-</tools>
+## Parallel Safety Classification
 
-<concepts>
-  <concept name="parallel_safety">
-    <description>Classification of agents by their parallel execution safety</description>
-    <example>
-      read_only: Safe to run with any other agent (explore, validator)
-      analysis: Safe with other analysis agents (design, database, performance)
-      execution: May modify local state, requires coordination (security, test, devops)
-      orchestration: Manages sub-agents (commands, CLAUDE.md)
-    </example>
-  </concept>
+Agents are classified by their parallel execution safety:
 
-  <concept name="timeout_tiers">
-    <description>Standard timeout values by agent type</description>
-    <example>
-      Fast read-only (explore): 180000ms (3 min)
-      Medium analysis (design, database, quality-assurance): 240000ms (4 min)
-      Deep analysis (security, performance, test): 300000ms (5 min)
-      Complex operations (code-quality, devops, git, docs): 300000ms (5 min)
-      Orchestration (commands, CLAUDE.md): 300000ms (5 min)
-    </example>
-  </concept>
-</concepts>
+| Classification | Modifies State | Examples | Safe With |
+|---------------|---------------|----------|-----------|
+| Read-only | None | explore, validator | All agents |
+| Analysis | None | design, database, performance | Other analysis agents |
+| Execution | Local | security, test, devops | Requires coordination |
+| Orchestration | Orchestration | commands, CLAUDE.md | Manages sub-agents |
 
-<patterns>
-  <pattern name="parallelization_readonly">
-    <description>Parallelization pattern for read-only agents (explore, validator)</description>
-    <example>
+## Timeout Tiers
+
+| Agent Type | Timeout | Examples |
+|-----------|---------|----------|
+| Fast read-only | 180,000ms (3 min) | explore |
+| Medium analysis | 240,000ms (4 min) | design, database, quality-assurance |
+| Deep analysis | 300,000ms (5 min) | security, performance, test |
+| Complex operations | 300,000ms (5 min) | code-quality, devops, git, docs |
+| Orchestration | 300,000ms (5 min) | commands, CLAUDE.md |
+
+## Parallelization Patterns
+
+### Read-Only Pattern
+
+For agents that never modify state (explore, validator):
+
+```xml
 <parallelization>
   <capability>
     <parallel_safe>true</parallel_safe>
@@ -52,17 +43,14 @@ version: 1.0.0
     <max_parallel_agents>16</max_parallel_agents>
     <timeout_per_agent>180000</timeout_per_agent>
   </execution_strategy>
-  <safe_with>
-    <agent>all read-only agents</agent>
-  </safe_with>
-  <conflicts_with />
 </parallelization>
-    </example>
-  </pattern>
+```
 
-  <pattern name="parallelization_analysis">
-    <description>Parallelization pattern for analysis agents (design, database, code-quality, performance)</description>
-    <example>
+### Analysis Pattern
+
+For analysis agents (design, database, code-quality, performance):
+
+```xml
 <parallelization>
   <capability>
     <parallel_safe>true</parallel_safe>
@@ -73,17 +61,14 @@ version: 1.0.0
     <max_parallel_agents>16</max_parallel_agents>
     <timeout_per_agent>240000</timeout_per_agent>
   </execution_strategy>
-  <safe_with>
-    <agent>other analysis agents</agent>
-  </safe_with>
-  <conflicts_with />
 </parallelization>
-    </example>
-  </pattern>
+```
 
-  <pattern name="parallelization_execution">
-    <description>Parallelization pattern for execution agents (security, test, devops)</description>
-    <example>
+### Execution Pattern
+
+For agents that modify local state (security, test, devops):
+
+```xml
 <parallelization>
   <capability>
     <parallel_safe>true</parallel_safe>
@@ -95,12 +80,13 @@ version: 1.0.0
     <timeout_per_agent>300000</timeout_per_agent>
   </execution_strategy>
 </parallelization>
-    </example>
-  </pattern>
+```
 
-  <pattern name="parallelization_orchestration">
-    <description>Parallelization pattern for orchestrators (CLAUDE.md, commands)</description>
-    <example>
+### Orchestration Pattern
+
+For orchestrators managing sub-agents, with dependency groups:
+
+```xml
 <parallelization>
   <capability>
     <parallel_safe>true</parallel_safe>
@@ -118,12 +104,11 @@ version: 1.0.0
     </parallel_groups>
   </execution_strategy>
 </parallelization>
-    </example>
-  </pattern>
+```
 
-  <pattern name="retry_policy">
-    <description>Standard retry policy for agent execution failures</description>
-    <example>
+## Retry Policy
+
+```xml
 <retry_policy>
   <max_retries>2</max_retries>
   <retry_conditions>
@@ -135,87 +120,44 @@ version: 1.0.0
     <action>Use alternative agent from same parallel group</action>
   </fallback_strategy>
 </retry_policy>
-    </example>
-  </pattern>
+```
 
-  <pattern name="consensus_thresholds">
-    <description>Standard consensus thresholds for multi-agent validation</description>
-    <example>
-<consensus_thresholds>
-  <threshold level="high" value="0.9" action="Auto-accept without review"/>
-  <threshold level="medium" value="0.7" action="Accept with note"/>
-  <threshold level="low" value="0.5" action="Flag for user review"/>
-  <threshold level="conflict" value="0.5" action="Block, require user decision"/>
-</consensus_thresholds>
-    </example>
-  </pattern>
+## Consensus Mechanism
 
-  <pattern name="agent_weights">
-    <description>Standard agent weights for consensus mechanism</description>
-    <example>
-<weights>
-  <agent name="explore" weight="1.0"/>
-  <agent name="design" weight="1.2"/>
-  <agent name="database" weight="1.2"/>
-  <agent name="performance" weight="1.2"/>
-  <agent name="code-quality" weight="1.1"/>
-  <agent name="security" weight="1.5"/>
-  <agent name="test" weight="1.1"/>
-  <agent name="docs" weight="1.0"/>
-  <agent name="quality-assurance" weight="1.3"/>
-  <agent name="devops" weight="1.1"/>
-  <agent name="validator" weight="2.0"/>
-</weights>
-    </example>
-  </pattern>
+### Thresholds
 
-  <decision_tree name="timeout_selection">
-    <question>What type of agent is this?</question>
-    <branch condition="Fast read-only (explore)">180000ms</branch>
-    <branch condition="Medium analysis (design, database, quality-assurance)">240000ms</branch>
-    <branch condition="Deep analysis (security, performance, test)">300000ms</branch>
-    <branch condition="Complex operations (code-quality, devops, git, docs)">300000ms</branch>
-    <branch condition="Orchestration (commands, CLAUDE.md)">300000ms</branch>
-  </decision_tree>
+| Level | Value | Action |
+|-------|-------|--------|
+| High | >= 0.9 | Auto-accept without review |
+| Medium | >= 0.7 | Accept with note |
+| Low | >= 0.5 | Flag for user review |
+| Conflict | < 0.5 | Block, require user decision |
 
-  <decision_tree name="parallelization_selection">
-    <question>What does this agent modify?</question>
-    <branch condition="Nothing (read-only)">Use parallelization_readonly</branch>
-    <branch condition="Analysis only">Use parallelization_analysis</branch>
-    <branch condition="Local state">Use parallelization_execution</branch>
-    <branch condition="Orchestrates sub-agents">Use parallelization_orchestration</branch>
-  </decision_tree>
-</patterns>
+### Agent Weights
 
-<best_practices>
-  <practice priority="critical">Select appropriate parallelization pattern based on agent capabilities</practice>
-  <practice priority="critical">Select timeout based on agent type following decision_tree</practice>
-  <practice priority="high">Group independent agents in parallel_groups for concurrent execution</practice>
-  <practice priority="high">Define depends_on for validation agents that require prior results</practice>
-  <practice priority="medium">Use retry_policy for critical operations</practice>
-</best_practices>
+| Agent | Weight | Agent | Weight |
+|-------|--------|-------|--------|
+| explore | 1.0 | code-quality | 1.1 |
+| design | 1.2 | security | 1.5 |
+| database | 1.2 | test | 1.1 |
+| performance | 1.2 | quality-assurance | 1.3 |
+| docs | 1.0 | devops | 1.1 |
+| validator | 2.0 | | |
 
-<rules priority="critical">
-  <rule>Read-only agents must use parallelization_readonly or parallelization_analysis</rule>
-  <rule>Agents that modify state must use parallelization_execution</rule>
-  <rule>Orchestrators must use parallelization_orchestration</rule>
-</rules>
+## Decision Workflow
 
-<rules priority="standard">
-  <rule>Use timeout_selection decision tree for consistent timeout values</rule>
-  <rule>Apply retry_policy for operations that may fail transiently</rule>
-  <rule>Use consensus_thresholds for multi-agent validation scenarios</rule>
-</rules>
+1. **Classify the agent**: Determine if it is read-only, analysis, execution, or orchestration
+2. **Select timeout**: Match agent type to the appropriate timeout tier
+3. **Choose parallelization pattern**: Based on state modification behavior
+4. **Configure groups**: For orchestrators, define independent and dependent parallel groups
+5. **Set retry policy**: Apply retry conditions for critical operations
+6. **Define consensus**: Set thresholds and weights for multi-agent validation
 
-<related_skills>
-  <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
-  <skill name="workflow-patterns">Output formats, reflection checkpoints, self-evaluation</skill>
-</related_skills>
+## Critical Rules
 
-<constraints>
-  <must>Match parallelization pattern to agent's state modification behavior</must>
-  <must>Use standard timeout tiers from timeout_selection</must>
-  <must>Define parallel_groups with correct dependency chains</must>
-  <avoid>Running write agents in parallel without coordination</avoid>
-  <avoid>Using non-standard timeout values</avoid>
-</constraints>
+- The agent should match parallelization pattern to the agent's state modification behavior
+- Read-only agents must use `parallelization_readonly` or `parallelization_analysis`
+- Agents that modify state must use `parallelization_execution`
+- Orchestrators must use `parallelization_orchestration` with defined dependency chains
+- The agent should never run write agents in parallel without coordination
+- The agent should always use standard timeout tiers from the decision workflow

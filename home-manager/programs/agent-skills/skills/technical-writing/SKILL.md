@@ -1,342 +1,154 @@
 ---
-name: Technical Writing
-description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese.
+name: technical-writing
+description: "Use when asked to write a blog post, technical article, tutorial, concept explanation, or when guidance on technical writing for external audiences is needed. Provides patterns for technical blogs and articles in English and Japanese."
 ---
 
-<purpose>
-  Provide structured patterns for writing technical blogs and articles that effectively communicate technical concepts to external audiences.
-</purpose>
+Structured patterns for writing technical blogs and articles that effectively communicate technical concepts to external audiences. The agent should start with a compelling hook, test all code examples, and match writing style to the target audience.
 
-<tools>
-  <tool>Write</tool>
-  <tool>Read</tool>
-  <tool>Edit</tool>
-  <tool>WebSearch</tool>
-  <tool>mcp__context7__resolve-library-id</tool>
-  <tool>mcp__context7__get-library-docs</tool>
-</tools>
+## Critical Rules
 
-<concepts>
-  <concept name="article_types">Five types: tutorial (task-based), concept explanation (deep understanding), comparison (decision help), case study (real-world story), opinion piece (best practices)</concept>
-  <concept name="hook_principle">Capture attention in the first paragraph using problem statement, surprising fact, or relatable story</concept>
-  <concept name="inverted_pyramid">Lead with conclusion, most important information first, details follow</concept>
-  <concept name="show_dont_tell">Demonstrate with working code, diagrams, and before/after comparisons rather than abstract description</concept>
-</concepts>
+- Test all code examples compile and run before publishing
+- Verify all technical claims with sources or benchmarks
+- Start with a compelling hook — never generic openings like "In this article..."
+- Use inverted pyramid: most important point first
 
-<patterns>
-  <pattern name="tutorial">
-    <description>Step-by-step guide to accomplish a specific task</description>
-    <decision_tree name="when_to_use">
-      <question>Are you teaching readers how to accomplish a specific task?</question>
-      <if_yes>Create tutorial with step-by-step instructions and working examples</if_yes>
-      <if_no>Consider concept explanation for understanding or comparison for decision-making</if_no>
-    </decision_tree>
-    <audience>Developers learning a new skill</audience>
-    <structure>
-      <section>Problem statement / What you'll learn</section>
-      <section>Prerequisites</section>
-      <section>Step-by-step instructions</section>
-      <section>Complete working example</section>
-      <section>Troubleshooting common issues</section>
-      <section>Next steps / Further reading</section>
-    </structure>
-    <length>1500-3000 words</length>
-  </pattern>
+## Workflow
 
-  <pattern name="concept_explanation">
-    <description>Deep dive into a technical concept</description>
-    <decision_tree name="when_to_use">
-      <question>Are you explaining a complex concept for deeper understanding?</question>
-      <if_yes>Create concept explanation with examples and misconceptions</if_yes>
-      <if_no>Use tutorial for task-based learning or opinion piece for best practices</if_no>
-    </decision_tree>
-    <audience>Developers seeking understanding</audience>
-    <structure>
-      <section>Hook / Why this matters</section>
-      <section>Core concept explanation</section>
-      <section>Analogies and visualizations</section>
-      <section>Practical examples</section>
-      <section>Common misconceptions</section>
-      <section>When to use / When to avoid</section>
-    </structure>
-    <length>1000-2500 words</length>
-  </pattern>
+1. **Plan** — Select article type, audience, core message, language, and target length
+2. **Outline** — Create section headings with key points
+3. **Draft** — Write article content following writing principles
+4. **Edit** — Verify hook is compelling, each section has one purpose, code tested, claims verified, trimmed unnecessary words
 
-  <pattern name="comparison">
-    <description>Compare technologies, approaches, or tools</description>
-    <decision_tree name="when_to_use">
-      <question>Are you helping readers choose between multiple options?</question>
-      <if_yes>Create comparison with feature analysis and use case recommendations</if_yes>
-      <if_no>Use tutorial for implementation or concept explanation for understanding</if_no>
-    </decision_tree>
-    <audience>Developers making technical decisions</audience>
-    <structure>
-      <section>Context and criteria</section>
-      <section>Overview of each option</section>
-      <section>Feature-by-feature comparison</section>
-      <section>Benchmark results (if applicable)</section>
-      <section>Use case recommendations</section>
-      <section>Conclusion with clear guidance</section>
-    </structure>
-    <length>1500-2500 words</length>
-  </pattern>
+## Article Type Selection
 
-  <pattern name="case_study">
-    <description>Real-world implementation story</description>
-    <decision_tree name="when_to_use">
-      <question>Are you sharing a real-world implementation experience?</question>
-      <if_yes>Create case study with challenge, solution, and lessons learned</if_yes>
-      <if_no>Use tutorial for general how-to or opinion piece for best practices</if_no>
-    </decision_tree>
-    <audience>Developers and technical leaders</audience>
-    <structure>
-      <section>Background and challenge</section>
-      <section>Solution approach</section>
-      <section>Implementation details</section>
-      <section>Results and metrics</section>
-      <section>Lessons learned</section>
-      <section>Recommendations</section>
-    </structure>
-    <length>1500-3000 words</length>
-  </pattern>
+| Type | Audience | Length | When to Use |
+|------|----------|--------|-------------|
+| Tutorial | Developers learning a new skill | 1500-3000 words | Teaching how to accomplish a specific task |
+| Concept Explanation | Developers seeking understanding | 1000-2500 words | Deep dive into a technical concept |
+| Comparison | Developers making decisions | 1500-2500 words | Choosing between multiple options |
+| Case Study | Developers and tech leaders | 1500-3000 words | Sharing real-world implementation experience |
+| Opinion Piece | Experienced developers | 800-1500 words | Technical opinions or best practices |
 
-  <pattern name="opinion_piece">
-    <description>Technical opinion or best practices</description>
-    <audience>Experienced developers</audience>
-    <structure>
-      <section>Thesis statement</section>
-      <section>Supporting arguments with evidence</section>
-      <section>Counterarguments addressed</section>
-      <section>Practical implications</section>
-      <section>Call to action</section>
-    </structure>
-    <length>800-1500 words</length>
-  </pattern>
-</patterns>
+## Article Structures
 
-<writing_principles>
-  <principle name="hook_early">
-    <description>Capture attention in the first paragraph</description>
-    <technique>Start with a problem the reader faces</technique>
-    <technique>Use a surprising fact or statistic</technique>
-    <technique>Tell a brief relatable story</technique>
-  </principle>
+### Tutorial
 
-  <principle name="one_idea_per_section">
-    <description>Each section should have a single clear purpose</description>
-    <guideline>If a section covers multiple ideas, split it</guideline>
-    <guideline>Use headings that summarize the key point</guideline>
-  </principle>
+1. Problem statement / What the reader will learn
+2. Prerequisites
+3. Step-by-step instructions with working examples
+4. Complete working example
+5. Troubleshooting common issues
+6. Next steps / Further reading
 
-  <principle name="show_dont_tell">
-    <description>Demonstrate concepts with examples</description>
-    <technique>Include working code snippets</technique>
-    <technique>Use diagrams for architecture</technique>
-    <technique>Show before/after comparisons</technique>
-  </principle>
+### Concept Explanation
 
-  <principle name="respect_reader_time">
-    <description>Be concise, get to the point</description>
-    <technique>Lead with the conclusion</technique>
-    <technique>Use bullet points for lists</technique>
-    <technique>Provide TL;DR for long articles</technique>
-  </principle>
+1. Hook / Why this matters
+2. Core concept explanation
+3. Analogies and visualizations
+4. Practical examples
+5. Common misconceptions
+6. When to use / When to avoid
 
-  <principle name="credibility">
-    <description>Build trust through accuracy and honesty</description>
-    <technique>Cite sources and benchmarks</technique>
-    <technique>Acknowledge limitations</technique>
-    <technique>Show your work (methodology)</technique>
-  </principle>
-</writing_principles>
+### Comparison
 
-<language_guidelines>
-  <english>
-    <style>Conversational but professional</style>
-    <tone>Confident, helpful, peer-to-peer</tone>
-    <voice>First person ("I found that...") or second person ("You can...")</voice>
-    <sentence_length>Vary between short and medium</sentence_length>
-    <avoid>Overly formal academic language, buzzwords without substance</avoid>
-  </english>
+1. Context and evaluation criteria
+2. Overview of each option
+3. Feature-by-feature comparison (table format)
+4. Benchmark results (if applicable)
+5. Use case recommendations
+6. Conclusion with clear guidance
 
-  <japanese>
-    <style>読者との対話を意識した文体</style>
-    <tone>専門的だが親しみやすい</tone>
-    <formality>技術記事: です・ます調、個人ブログ: 柔軟に</formality>
-    <avoid>過度に硬い表現、主語の省略による曖昧さ</avoid>
-    <note>英語の技術用語は適度にカタカナで使用可</note>
-  </japanese>
+## Writing Principles
 
-  <bilingual>
-    <rule>Adapt style to each language's conventions (not literal translation)</rule>
-    <rule>Keep technical terms consistent</rule>
-    <rule>Adjust examples for cultural relevance when appropriate</rule>
-  </bilingual>
-</language_guidelines>
+### Hook Early
 
+Capture attention in the first paragraph:
+- Start with a problem the reader faces
+- Use a surprising fact or statistic
+- Tell a brief relatable story
 
-<output>
-  <format>
-    <article_plan>
-      - Type: [tutorial/concept/comparison/case_study/opinion]
-      - Audience: [beginner/intermediate/advanced developers]
-      - Core message: [one sentence]
-      - Language: [en/ja/both]
-      - Target length: [word count]</article_plan>
-    <outline>[Section headings with key points]</outline>
-    <draft>[Article content]</draft>
-    <edit_checklist>
-      - [ ] Hook is compelling
-      - [ ] Each section has one clear purpose
-      - [ ] Code examples tested and working
-      - [ ] Technical claims verified
-      - [ ] Read aloud for flow
-      - [ ] Trimmed unnecessary words
-      - [ ] Title and headings optimized</edit_checklist>
-  </format>
-</output>
+### One Idea Per Section
 
-<title_patterns>
-  <pattern name="how_to">
-    <description>How to [achieve result] with [tool/technique]</description>
-    <example>How to Implement Rate Limiting with Redis</example>
-  </pattern>
-  <pattern name="number_list">
-    <description>[N] [Things] Every Developer Should Know About [Topic]</description>
-    <example>5 Things Every Developer Should Know About TypeScript Generics</example>
-  </pattern>
-  <pattern name="comparison">
-    <description>[A] vs [B]: Which Should You Choose in [Year]?</description>
-    <example>REST vs GraphQL: Which Should You Choose in 2025?</example>
-  </pattern>
-  <pattern name="problem_solution">
-    <description>Solving [Problem] with [Solution]</description>
-    <example>Solving N+1 Queries with DataLoader</example>
-  </pattern>
-  <pattern name="deep_dive">
-    <description>Understanding [Concept]: A Deep Dive</description>
-    <example>Understanding React Reconciliation: A Deep Dive</example>
-  </pattern>
-  <pattern name="lessons">
-    <description>What I Learned [Building/Using] [Thing]</description>
-    <example>What I Learned Building a Real-Time Collaboration System</example>
-  </pattern>
-</title_patterns>
+Each section should have a single clear purpose. If a section covers multiple ideas, split it. Use headings that summarize the key point.
 
-<best_practices>
-  <practice priority="critical">
-    <description>Start with a compelling hook in the first paragraph</description>
-    <technique>Use a problem the reader faces, a surprising fact, or a brief relatable story</technique>
-  </practice>
-  <practice priority="critical">
-    <description>Put the most important point first using inverted pyramid structure</description>
-    <technique>Lead with the conclusion, provide TL;DR for long articles</technique>
-  </practice>
-  <practice priority="critical">
-    <description>Test all code examples before publishing</description>
-    <technique>Verify code compiles, runs, and produces expected output</technique>
-  </practice>
-  <practice priority="high">
-    <description>Explain code context before or after each snippet</description>
-    <technique>Describe what the code does and why it's written that way</technique>
-  </practice>
-  <practice priority="high">
-    <description>Support claims with evidence</description>
-    <technique>Include benchmarks, examples, or reasoned arguments for technical claims</technique>
-  </practice>
-  <practice priority="high">
-    <description>Each section should have one clear purpose</description>
-    <technique>Split sections covering multiple ideas, use headings that summarize the key point</technique>
-  </practice>
-  <practice priority="medium">
-    <description>Use diagrams for architectural concepts</description>
-    <technique>Include visual representations to complement text explanations</technique>
-  </practice>
-  <practice priority="medium">
-    <description>Vary sentence length for readability</description>
-    <technique>Mix short and medium sentences to maintain reader engagement</technique>
-  </practice>
-  <practice priority="medium">
-    <description>Adapt style to language conventions</description>
-    <technique>Use conversational but professional tone in English, です・ます調 in Japanese technical articles</technique>
-  </practice>
-</best_practices>
+### Show, Don't Tell
 
-<anti_patterns>
-  <avoid name="burying_the_lede">
-    <description>Hiding the main point deep in the article</description>
-    <instead>Put the most important point first, use inverted pyramid structure</instead>
-  </avoid>
-  <avoid name="assuming_motivation">
-    <description>Not explaining why the topic matters</description>
-    <instead>Explain why the reader should care early in the article</instead>
-  </avoid>
-  <avoid name="code_without_context">
-    <description>Showing code without explaining its purpose</description>
-    <instead>Explain what code does and why before or after the snippet</instead>
-  </avoid>
-  <avoid name="unsubstantiated_claims">
-    <description>Making claims like "X is the best" without evidence</description>
-    <instead>Support claims with benchmarks, examples, or reasoned arguments</instead>
-  </avoid>
-  <avoid name="clickbait_disappointment">
-    <description>Title promises more than content delivers</description>
-    <instead>Ensure title accurately reflects content and scope</instead>
-  </avoid>
-  <avoid name="wall_of_code">
-    <description>Long code blocks without explanation</description>
-    <instead>Break up code with explanations, highlight key lines, add comments</instead>
-  </avoid>
-  <avoid name="generic_introductions">
-    <description>Starting with "In this article..." or similar phrases</description>
-    <instead>Start with a hook that captures attention immediately</instead>
-  </avoid>
-</anti_patterns>
+```python
+# Bad: "Our function is fast"
+# Good: Show benchmark results
+import time
+start = time.time()
+result = process_batch(10_000_items)
+elapsed = time.time() - start
+print(f"Processed 10K items in {elapsed:.2f}s")  # Output: Processed 10K items in 0.03s
+```
 
-<rules priority="critical">
-  <rule>Test all code examples compile and run before publishing</rule>
-  <rule>Verify all technical claims with sources or benchmarks</rule>
-  <rule>Start with a compelling hook, never generic openings like "In this article..."</rule>
-</rules>
+### Respect Reader Time
 
-<rules priority="standard">
-  <rule>Explain code context before or after each snippet</rule>
-  <rule>Use inverted pyramid: most important point first</rule>
-  <rule>Break long code blocks with explanations</rule>
-  <rule>Ensure title accurately reflects content scope</rule>
-</rules>
+- Lead with the conclusion
+- Use bullet points for lists
+- Provide TL;DR for long articles
 
-<error_escalation>
-  <level severity="low">
-    <example>Grammar or style issue</example>
-    <action>Fix issue, follow style guide</action>
-  </level>
-  <level severity="medium">
-    <example>Technical inaccuracy in example</example>
-    <action>Verify and correct example</action>
-  </level>
-  <level severity="high">
-    <example>Misleading or incorrect technical claim</example>
-    <action>Stop, verify claim before publishing</action>
-  </level>
-  <level severity="critical">
-    <example>Content could cause harm if followed</example>
-    <action>Block publication, require expert review</action>
-  </level>
-</error_escalation>
+### Build Credibility
 
-<constraints>
-  <must>Verify all technical claims</must>
-  <must>Test all code examples</must>
-  <must>Write for target audience level</must>
-  <avoid>Jargon without explanation</avoid>
-  <avoid>Untested code examples</avoid>
-  <avoid>Overly complex explanations</avoid>
-</constraints>
+- Cite sources and benchmarks
+- Acknowledge limitations
+- Show methodology
 
-<related_skills>
-  <skill name="serena-usage">Symbol operations for extracting code examples from projects</skill>
-  <skill name="context7-usage">Library documentation lookup for accurate technical references</skill>
-  <skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
-  <skill name="technical-documentation">Creating reference documentation from blog content</skill>
-</related_skills>
+## Title Patterns
+
+| Pattern | Example |
+|---------|---------|
+| How to [result] with [tool] | How to Implement Rate Limiting with Redis |
+| [N] Things About [Topic] | 5 Things Every Developer Should Know About TypeScript Generics |
+| [A] vs [B]: Which to Choose | REST vs GraphQL: Which Should You Choose in 2025? |
+| Solving [Problem] with [Solution] | Solving N+1 Queries with DataLoader |
+| Understanding [Concept]: A Deep Dive | Understanding React Reconciliation: A Deep Dive |
+| What I Learned [Building/Using] [Thing] | What I Learned Building a Real-Time Collaboration System |
+
+## Language Guidelines
+
+### English
+
+- Conversational but professional tone
+- First person ("I found that...") or second person ("You can...")
+- Vary sentence length between short and medium
+- Avoid overly formal academic language and buzzwords without substance
+
+### Japanese
+
+- 読者との対話を意識した文体 — conversational style aware of the reader
+- 技術記事: です・ます調; 個人ブログ: 柔軟に
+- Avoid: 過度に硬い表現、主語の省略による曖昧さ
+- English technical terms may be used in katakana as appropriate
+
+### Bilingual
+
+- Adapt style to each language's conventions (not literal translation)
+- Keep technical terms consistent across languages
+- Adjust examples for cultural relevance when appropriate
+
+## Best Practices
+
+- Explain code context before or after each snippet — describe what it does and why
+- Support claims with benchmarks, examples, or reasoned arguments
+- Use diagrams for architectural concepts
+- Break long code blocks with explanations highlighting key lines
+- Ensure title accurately reflects content scope
+
+## Anti-Patterns to Avoid
+
+- **Burying the lede** — put the most important point first
+- **Assuming motivation** — explain why the topic matters early
+- **Code without context** — explain purpose before or after snippets
+- **Unsubstantiated claims** — support with benchmarks or evidence
+- **Clickbait titles** — ensure title matches content scope
+- **Wall of code** — break up with explanations
+- **Generic introductions** — start with a hook, not "In this article..."
+
+## Error Escalation
+
+- **Low:** Grammar or style issue — fix issue, follow style guide
+- **Medium:** Technical inaccuracy in example — verify and correct
+- **High:** Misleading or incorrect technical claim — stop, verify before publishing
+- **Critical:** Content could cause harm if followed — block publication, require expert review

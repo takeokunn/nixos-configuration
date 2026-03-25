@@ -1,197 +1,102 @@
 ---
-name: Quality Tools
-description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters). Agents reference this skill instead of inline tool definitions.
-version: 1.0.0
+name: quality-tools
+description: "Use when running 'eslint', 'prettier', 'tsc', 'cargo clippy', 'go vet', 'nixfmt', 'ruff', 'black', 'mypy', or any code quality/linting workflow. Provides standardized tool definitions and usage patterns for multi-language code quality verification."
 ---
 
-<purpose>
-  Provide standardized tool definitions and usage patterns for code quality verification. This skill centralizes tool knowledge that was previously duplicated across agents.
-</purpose>
+Centralized tool definitions and usage patterns for code quality verification across JavaScript/TypeScript, Go, Rust, Nix, and Python ecosystems. The agent should reference this skill instead of inline tool definitions.
 
-<tools>
-  <tool name="ESLint">
-    <description>JavaScript/TypeScript linter for code quality and style</description>
-    <commands>
-      <command name="check">eslint [files]</command>
-      <command name="fix">eslint --fix [files]</command>
-      <command name="format">eslint --format=json [files]</command>
-    </commands>
-    <use_case>Check code style, find potential bugs, enforce coding standards</use_case>
-    <output>
-      Error/warning count, file locations, rule violations
-    </output>
-  </tool>
+## Tool Reference
 
-  <tool name="Prettier">
-    <description>Code formatter for consistent style</description>
-    <commands>
-      <command name="check">prettier --check [files]</command>
-      <command name="fix">prettier --write [files]</command>
-    </commands>
-    <use_case>Ensure consistent code formatting</use_case>
-    <output>
-      List of files that need formatting (check mode)
-    </output>
-  </tool>
+### JavaScript/TypeScript
 
-  <tool name="TypeScript_Compiler">
-    <description>TypeScript type checker</description>
-    <commands>
-      <command name="check">tsc --noEmit</command>
-      <command name="check_project">tsc -p tsconfig.json --noEmit</command>
-    </commands>
-    <use_case>Type checking, finding type errors</use_case>
-    <output>
-      Type errors with file:line locations
-    </output>
-  </tool>
+| Tool | Check Command | Fix Command | Purpose |
+|------|--------------|-------------|---------|
+| ESLint | `eslint [files]` | `eslint --fix [files]` | Linting, code quality, standards |
+| Prettier | `prettier --check [files]` | `prettier --write [files]` | Consistent formatting |
+| TypeScript | `tsc --noEmit` | N/A | Type checking |
 
-  <tool name="Go_Tools">
-    <description>Go language quality tools</description>
-    <commands>
-      <command name="fmt">go fmt ./...</command>
-      <command name="vet">go vet ./...</command>
-      <command name="lint">golangci-lint run</command>
-    </commands>
-    <use_case>Go code formatting and static analysis</use_case>
-  </tool>
+### Go
 
-  <tool name="Rust_Tools">
-    <description>Rust language quality tools</description>
-    <commands>
-      <command name="fmt">cargo fmt --check</command>
-      <command name="clippy">cargo clippy</command>
-      <command name="check">cargo check</command>
-    </commands>
-    <use_case>Rust code formatting and linting</use_case>
-  </tool>
+| Tool | Command | Purpose |
+|------|---------|---------|
+| go fmt | `go fmt ./...` | Formatting |
+| go vet | `go vet ./...` | Static analysis |
+| golangci-lint | `golangci-lint run` | Comprehensive linting |
 
-  <tool name="Nix_Tools">
-    <description>Nix language quality tools</description>
-    <commands>
-      <command name="fmt">nixfmt [files]</command>
-      <command name="check">nix flake check</command>
-      <command name="lint">statix check</command>
-    </commands>
-    <use_case>Nix code formatting and validation</use_case>
-  </tool>
+### Rust
 
-  <tool name="Python_Tools">
-    <description>Python language quality tools</description>
-    <commands>
-      <command name="fmt">black [files]</command>
-      <command name="lint">ruff check [files]</command>
-      <command name="type">mypy [files]</command>
-    </commands>
-    <use_case>Python code formatting, linting, and type checking</use_case>
-  </tool>
-</tools>
+| Tool | Command | Purpose |
+|------|---------|---------|
+| cargo fmt | `cargo fmt --check` | Formatting |
+| cargo clippy | `cargo clippy` | Linting |
+| cargo check | `cargo check` | Fast type/syntax check |
 
-<patterns>
-  <pattern name="quality_check_workflow">
-    <description>Standard workflow for quality verification</description>
-    <example>
-      1. Run type checker (tsc, mypy, etc.)
-      2. Run linter (eslint, clippy, etc.)
-      3. Run formatter check (prettier, black, etc.)
-      4. Report findings with locations
-    </example>
-  </pattern>
+### Nix
 
-  <pattern name="auto_fix_workflow">
-    <description>Workflow for automatic fixes</description>
-    <example>
-      1. Run formatter (prettier --write, cargo fmt)
-      2. Run linter with fix (eslint --fix)
-      3. Verify with check commands
-      4. Run tests to confirm no regressions
-    </example>
-  </pattern>
+| Tool | Command | Purpose |
+|------|---------|---------|
+| nixfmt | `nixfmt [files]` | Formatting |
+| nix flake check | `nix flake check` | Flake validation |
+| statix | `statix check` | Linting |
 
-  <pattern name="incremental_check">
-    <description>Check only changed files</description>
-    <example>
-      1. Get list of changed files (git diff --name-only)
-      2. Filter by file type
-      3. Run quality tools on filtered list
-    </example>
-  </pattern>
-</patterns>
+### Python
 
-<concepts>
-  <concept name="lint_categories">
-    <description>Types of lint rules and their purposes</description>
-    <example>
-      Error prevention: Catch potential bugs
-      Best practices: Enforce coding standards
-      Style: Consistent formatting
-      Security: Detect vulnerable patterns
-    </example>
-  </concept>
+| Tool | Command | Purpose |
+|------|---------|---------|
+| black | `black [files]` | Formatting |
+| ruff | `ruff check [files]` | Linting |
+| mypy | `mypy [files]` | Type checking |
 
-  <concept name="fix_safety">
-    <description>Which fixes are safe to auto-apply</description>
-    <example>
-      Safe: Formatting, import sorting, simple style fixes
-      Review needed: Complex refactors, logic changes
-      Manual only: Security issues, breaking changes
-    </example>
-  </concept>
+## Quality Check Workflow
 
-  <concept name="exit_codes">
-    <description>Standard exit codes for quality tools</description>
-    <example>
-      0: Success, no issues
-      1: Issues found
-      2: Configuration or execution error
-    </example>
-  </concept>
-</concepts>
+1. Run the type checker first (`tsc --noEmit`, `mypy`, `cargo check`) for fastest feedback
+2. Run the linter (`eslint`, `clippy`, `ruff`) to catch bugs and style issues
+3. Run the formatter check (`prettier --check`, `black --check`, `cargo fmt --check`)
+4. Report all findings with `file:line` locations
 
-<best_practices>
-  <practice priority="critical">Run type checker before linter for faster feedback</practice>
-  <practice priority="critical">Verify with tests after auto-fixes</practice>
-  <practice priority="high">Use project-specific configuration when available</practice>
-  <practice priority="high">Report all issues with file:line locations</practice>
-  <practice priority="medium">Run incremental checks for large codebases</practice>
-  <practice priority="medium">Separate formatting from logic changes in commits</practice>
-</best_practices>
+## Auto-Fix Workflow
 
-<anti_patterns>
-  <avoid name="blind_auto_fix">
-    <description>Auto-fixing without reviewing changes</description>
-    <instead>Review auto-fix changes, run tests after</instead>
-  </avoid>
+1. Run the formatter (`prettier --write`, `cargo fmt`, `black`)
+2. Run the linter with fix flag (`eslint --fix`, `ruff check --fix`)
+3. Verify with check commands that no issues remain
+4. Run tests to confirm no regressions were introduced
 
-  <avoid name="ignoring_warnings">
-    <description>Only addressing errors, ignoring warnings</description>
-    <instead>Address warnings that indicate potential issues</instead>
-  </avoid>
+## Incremental Check (Large Codebases)
 
-  <avoid name="skipping_type_check">
-    <description>Running linter without type checking first</description>
-    <instead>Run type checker first for faster feedback loop</instead>
-  </avoid>
-</anti_patterns>
+```bash
+# Get changed files and filter by type
+git diff --name-only | grep '\.ts$' | xargs eslint
+git diff --name-only | grep '\.py$' | xargs ruff check
+```
 
-<decision_tree name="tool_selection">
-  <question>What type of quality check is needed?</question>
-  <branch condition="Type errors">Use language-specific type checker (tsc, mypy, cargo check)</branch>
-  <branch condition="Code style and bugs">Use linter (eslint, clippy, ruff)</branch>
-  <branch condition="Formatting only">Use formatter (prettier, black, cargo fmt)</branch>
-  <branch condition="All of the above">Run in sequence: types → lint → format</branch>
-</decision_tree>
+## Fix Safety Classification
 
-<constraints>
-  <must>Run quality checks before marking implementation complete</must>
-  <must>Report findings with file:line locations</must>
-  <must>Use project configuration when available</must>
-  <avoid>Auto-fixing without test verification</avoid>
-  <avoid>Ignoring type errors</avoid>
-  <avoid>Running only subset of quality tools</avoid>
-</constraints>
+| Safety Level | Examples | Action |
+|-------------|----------|--------|
+| Safe to auto-apply | Formatting, import sorting, simple style | Apply automatically |
+| Review needed | Complex refactors, logic changes | Present diff to user |
+| Manual only | Security issues, breaking changes | Flag and explain |
 
-<related_skills>
-  <skill name="testing-patterns">Run tests after quality fixes</skill>
-  <skill name="execution-workflow">Integration with implementation workflow</skill>
-</related_skills>
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success, no issues found |
+| 1 | Issues found |
+| 2 | Configuration or execution error |
+
+## Best Practices
+
+- The agent should run the type checker before the linter for faster feedback
+- The agent should verify with tests after applying auto-fixes
+- The agent should use project-specific configuration files when available
+- The agent should report all issues with `file:line` locations
+- The agent should run incremental checks for large codebases
+- The agent should separate formatting changes from logic changes in commits
+
+## Anti-Patterns
+
+- **Blind auto-fix**: Always review auto-fix changes and run tests afterward
+- **Ignoring warnings**: Address warnings that indicate potential issues, not only errors
+- **Skipping type check**: Run the type checker first for a faster feedback loop
+- **Running partial toolset**: Run all applicable quality tools (types, lint, format) in sequence
