@@ -101,7 +101,8 @@ in
   imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+  nixpkgs.overlays =
+    basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
 
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;
