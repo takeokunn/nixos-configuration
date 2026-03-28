@@ -14,8 +14,8 @@ common // {
   high = { model = glm;       fallback = [ gpt54mini gptCodex ]; };
 
   # Tier 2 balanced — orchestration, planning
-  mid  = { model = gpt54mini; fallback = [ glm glm47 ]; };
+  mid  = { model = gpt54mini; fallback = [ glm glm47 gptCodex ]; };
 
   # Tier 3 — routine/fast
-  base = { model = glm47;     fallback = [ glm gpt54mini ]; };
+  base = { model = glm47;     fallback = [ glm gpt54mini gptCodex ]; };
 }

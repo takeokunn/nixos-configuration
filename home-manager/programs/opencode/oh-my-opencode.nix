@@ -78,7 +78,7 @@ pkgs.writeText "oh-my-opencode.json" (
       librarian = {
         model = models.high.model;
         fallback_models = models.high.fallback;
-        variant = "high";
+        variant = "medium";
         prompt_append = models.promptLibrarian;
         description = "Specification researcher. Looks up docs via context7, web search, and API references.";
       };
@@ -95,7 +95,7 @@ pkgs.writeText "oh-my-opencode.json" (
       atlas = {
         model = models.mid.model;
         fallback_models = models.mid.fallback;
-        variant = "xhigh";
+        variant = "medium";
         compaction = models.compactionCfg;
         prompt_append = models.promptOrchestrator;
         description = "Execution conductor. Splits work into todos, delegates, and consolidates results.";
@@ -105,14 +105,14 @@ pkgs.writeText "oh-my-opencode.json" (
       explore = {
         model = models.base.model;
         fallback_models = models.base.fallback;
-        variant = "high";
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
       };
       "multimodal-looker" = {
         model = models.base.model;
         fallback_models = models.base.fallback;
-        variant = "high";
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Multimodal analyst. Interprets images, screenshots, diagrams, and visual content.";
       };
@@ -139,6 +139,7 @@ pkgs.writeText "oh-my-opencode.json" (
       "visual-engineering" = {
         model = models.high.model;
         fallback_models = models.high.fallback;
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Frontend UI implementation, styling, and component refactors.";
       };
@@ -154,7 +155,7 @@ pkgs.writeText "oh-my-opencode.json" (
       refactor = {
         model = models.mid.model;
         fallback_models = models.mid.fallback;
-        variant = "high";
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Routine refactors, cleanup, repetitive edits, and test generation.";
       };
@@ -170,12 +171,14 @@ pkgs.writeText "oh-my-opencode.json" (
       writing = {
         model = models.base.model;
         fallback_models = models.base.fallback;
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Documentation, ADRs, changelogs, and technical writing.";
       };
       research = {
         model = models.base.model;
         fallback_models = models.base.fallback;
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Spec lookup, OSS pattern survey, and implementation research.";
       };
@@ -196,6 +199,7 @@ pkgs.writeText "oh-my-opencode.json" (
       "parallel-explore" = {
         model = models.base.model;
         fallback_models = models.base.fallback;
+        variant = "medium";
         prompt_append = models.promptLang;
         description = "Parallel read-only exploration: file search, grep, and spec lookup. GLM-primary for rate-limit isolation.";
       };
