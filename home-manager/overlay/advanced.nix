@@ -2,14 +2,6 @@
 [
   (import emacs-overlay)
   (final: prev: {
-    # direnv 2.37.1 GNUmakefile passes -linkmode=external but CGO is not enabled in the nix sandbox
-    # Removing -linkmode=external falls back to internal linking which works fine on darwin
-    direnv = prev.direnv.overrideAttrs (old: {
-      postPatch = (old.postPatch or "") + ''
-        substituteInPlace GNUmakefile --replace-fail '-linkmode=external' ""
-      '';
-    });
-
     # ECL 24.5.10 doesn't build with C23/clang - use develop branch with full C23 fixes
     # See: https://gitlab.com/embeddable-common-lisp/ecl/-/issues/775
     # and: https://bugs.debian.org/1115924
