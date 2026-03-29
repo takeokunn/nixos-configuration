@@ -54,14 +54,14 @@ pkgs.writeText "oh-my-opencode.json" (
         description = "Gap detector. Finds overlooked issues, ambiguities, and edge cases.";
       };
       momus = {
-        model = models.mid.model;
-        fallback_models = models.mid.fallback;
+        model = models.high.model;
+        fallback_models = models.high.fallback;
         variant = "xhigh";
         prompt_append = models.promptLang;
         description = "Strict reviewer. Thorough critical code and design review.";
       };
 
-      # ── Tier 2 (mid): orchestration, planning — sonnet primary ──────────────
+      # ── Tier 2 (mid): orchestration, planning — glm primary ─────────────────
       sisyphus = {
         model = models.mid.model;
         fallback_models = models.mid.fallback;
@@ -76,8 +76,8 @@ pkgs.writeText "oh-my-opencode.json" (
         description = "Primary orchestrator. Plans tasks, delegates to specialist agents and categories, ensures quality.";
       };
       librarian = {
-        model = models.high.model;
-        fallback_models = models.high.fallback;
+        model = models.base.model;
+        fallback_models = models.base.fallback;
         variant = "medium";
         prompt_append = models.promptLibrarian;
         description = "Specification researcher. Looks up docs via context7, web search, and API references.";
@@ -110,8 +110,8 @@ pkgs.writeText "oh-my-opencode.json" (
         description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
       };
       "multimodal-looker" = {
-        model = models.base.model;
-        fallback_models = models.base.fallback;
+        model = models.high.model;
+        fallback_models = models.high.fallback;
         variant = "medium";
         prompt_append = models.promptLang;
         description = "Multimodal analyst. Interprets images, screenshots, diagrams, and visual content.";
@@ -135,10 +135,10 @@ pkgs.writeText "oh-my-opencode.json" (
         description = "Autonomous deep implementation, non-trivial debugging, and complex multi-file changes.";
       };
 
-      # ── Tier 2 (mid): quality-sensitive — sonnet primary ────────────────────
+      # ── Tier 2 (high): code/review quality — codex primary ─────────────────
       "visual-engineering" = {
-        model = models.high.model;
-        fallback_models = models.high.fallback;
+        model = models.base.model;
+        fallback_models = models.base.fallback;
         variant = "medium";
         prompt_append = models.promptLang;
         description = "Frontend UI implementation, styling, and component refactors.";
