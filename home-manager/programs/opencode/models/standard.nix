@@ -1,12 +1,12 @@
 # Set: GPT+GLM — apex=gpt-5.4, high=gpt-5.3-codex, mid=glm-5, base=glm-5
 let
-  common        = import ./common.nix;
-  gpt54         = "openai/gpt-5.4";
-  gptCodex      = "openai/gpt-5.3-codex";
+  common = import ./common.nix;
+  gpt54 = "openai/gpt-5.4";
+  gptCodex = "openai/gpt-5.3-codex";
   gptCodexSpark = "openai/gpt-5.3-codex-spark";
-  gpt54mini     = "openai/gpt-5.4-mini";
-  glm5          = "zai-coding-plan/glm-5";
-  glm47         = "zai-coding-plan/glm-4.7";
+  gpt54mini = "openai/gpt-5.4-mini";
+  glm5 = "zai-coding-plan/glm-5";
+  glm47 = "zai-coding-plan/glm-4.7";
 in
 common
 // {
