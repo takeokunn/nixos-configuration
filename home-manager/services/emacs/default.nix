@@ -31,6 +31,10 @@ in
       After = [ "graphical-session.target" ];
       PartOf = [ "graphical-session.target" ];
     };
+    Service = {
+      Restart = "always";
+      RestartSec = 10;
+    };
   };
 
   # macOS: Set TMPDIR so emacs daemon creates socket in /tmp
@@ -47,6 +51,8 @@ in
       "--fg-daemon"
     ]
   );
+  launchd.agents.emacs.config.KeepAlive = lib.mkIf isDarwin (lib.mkForce true);
+  launchd.agents.emacs.config.ThrottleInterval = lib.mkIf isDarwin 10;
 
   # macOS: Gracefully stop Emacs before setupLaunchAgents to prevent I/O error 5
   # (upstream bootoutAgent sleeps only 1s, insufficient for Emacs shutdown)
