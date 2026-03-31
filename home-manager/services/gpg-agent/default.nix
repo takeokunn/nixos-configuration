@@ -1,4 +1,7 @@
-{ pkgs, lib ? pkgs.lib }:
+{
+  pkgs,
+  lib ? pkgs.lib,
+}:
 let
   isDarwin = pkgs.stdenv.isDarwin;
 in
