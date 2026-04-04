@@ -1,7 +1,7 @@
 ---
 name: Haskell Ecosystem
 description: This skill should be used when working with Haskell projects, "cabal.project", "stack.yaml", "ghc", "cabal build/test/run", "stack build/test/run", or Haskell language patterns. Provides comprehensive Haskell ecosystem patterns and best practices.
-version: 0.1.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -30,7 +30,7 @@ version: 0.1.0
       <example>
         data Maybe a = Nothing | Just a
         data Either a b = Left a | Right b
-        data Person = Person { name :: String, age :: Int }
+        data Person = Person { name :: Text, age :: Int }
       </example>
     </concept>
 
@@ -55,7 +55,7 @@ version: 0.1.0
           (/=) :: a -> a -> Bool
 
         instance Eq Person where
-          p1 == p2 = name p1 == name p2 && age p1 == age p2
+          p1 == p2 = p1.name == p2.name && p1.age == p2.age
       </example>
     </concept>
 
@@ -119,7 +119,7 @@ version: 0.1.0
           data Validated
           data Unvalidated
 
-          validateEmail :: Tagged Unvalidated String -> Maybe (Tagged Validated String)
+          validateEmail :: Tagged Unvalidated Text -> Maybe (Tagged Validated Text)
         </example>
       </pattern>
     </concept>
@@ -179,6 +179,57 @@ version: 0.1.0
     </common_transformers>
   </monad_transformers>
 
+  <effect_systems>
+    <description>Modern alternatives to mtl monad transformer stacks</description>
+
+    <system name="effectful">
+      <description>Fast extensible effects library; recommended modern alternative to mtl for new projects</description>
+      <example>
+        import Effectful
+        import Effectful.Reader.Static
+        import Effectful.State.Static.Local
+        import Effectful.Error.Static
+
+        doSomething :: (Reader Config :> es, State AppState :> es, Error AppError :> es) => Eff es Result
+        doSomething = do
+          cfg <- ask
+          st <- get
+          when (invalid cfg) $ throwError InvalidConfig
+          pure (compute cfg st)
+
+        runApp :: Config -> AppState -> Eff '[Reader Config, State AppState, Error AppError, IOE] a -> IO (Either (CallStack, AppError) a)
+        runApp cfg st = runEff . runError . runState st . runReader cfg
+      </example>
+      <note>Better performance than mtl due to no newtype wrapping; better error messages; supports static and dynamic dispatch</note>
+    </system>
+
+    <system name="bluefin">
+      <description>Effect system using linearity for safety; alternative to effectful</description>
+      <note>Uses a different approach based on handles rather than type-level effect lists</note>
+    </system>
+
+    <decision_tree name="effect_system_choice">
+      <question>Which effect system should I use?</question>
+      <branch condition="Existing mtl codebase">Keep mtl; migrate incrementally if needed</branch>
+      <branch condition="New project, performance matters">effectful (best performance)</branch>
+      <branch condition="Simple application">mtl is still fine</branch>
+      <branch condition="Experimental, novel approach">bluefin</branch>
+    </decision_tree>
+  </effect_systems>
+
+  <linear_types>
+    <description>LinearTypes extension (stable since GHC 9.0); ensures values are used exactly once</description>
+    <example>
+      {-# LANGUAGE LinearTypes #-}
+      -- A linear function: argument must be used exactly once
+      dup :: a %1 -> (a, a)  -- This would NOT type-check
+
+      -- Useful for resource management
+      withFile :: FilePath -> (Handle %1 -> IO a) %1 -> IO a
+    </example>
+    <note>Primarily useful for resource-safe APIs and performance-critical code. Not needed for most application code.</note>
+  </linear_types>
+
   <optics>
     <description>Composable getters, setters, and traversals using lens library</description>
 
@@ -187,16 +238,16 @@ version: 0.1.0
       <example>
         import Control.Lens
 
-        data Person = Person { _name :: String, _age :: Int }
+        data Person = Person { _name :: Text, _age :: Int }
         makeLenses ''Person
 
-        -- name :: Lens' Person String
+        -- name :: Lens' Person Text
         -- age :: Lens' Person Int
 
-        getName :: Person -> String
+        getName :: Person -> Text
         getName p = p ^. name
 
-        setName :: String -> Person -> Person
+        setName :: Text -> Person -> Person
         setName n p = p & name .~ n
 
         modifyAge :: (Int -> Int) -> Person -> Person
@@ -265,7 +316,7 @@ version: 0.1.0
       <example>
         import Control.Monad.Except
 
-        data AppError = NotFound | InvalidInput String | IOError IOException
+        data AppError = NotFound | InvalidInput Text | IOError IOException
 
         loadUser :: MonadError AppError m => UserId -> m User
         loadUser uid = do
@@ -279,13 +330,21 @@ version: 0.1.0
 
   <common_patterns>
     <pattern name="newtype">
-      <description>Zero-cost wrapper for type safety</description>
+      <description>Zero-cost wrapper for type safety; use DerivingStrategies and DerivingVia</description>
       <example>
-        newtype UserId = UserId { unUserId :: Int }
-          deriving (Eq, Ord, Show)
+        {-# LANGUAGE DerivingStrategies #-}
+        {-# LANGUAGE DerivingVia #-}
+        newtype UserId = UserId Int
+          deriving stock (Show)
+          deriving newtype (Eq, Ord)
 
-        newtype Email = Email { unEmail :: Text }
-          deriving (Eq, Show)
+        newtype Email = Email Text
+          deriving stock (Show)
+          deriving newtype (Eq, IsString)
+
+        -- DerivingVia for custom instances
+        newtype Dollars = Dollars Int
+          deriving (Semigroup, Monoid) via (Sum Int)
       </example>
     </pattern>
 
@@ -304,19 +363,25 @@ version: 0.1.0
     </pattern>
 
     <pattern name="records">
-      <description>Named fields with accessor functions</description>
+      <description>Modern record pattern using NoFieldSelectors + OverloadedRecordDot (since GHC 9.2)</description>
       <example>
-        {-# LANGUAGE RecordWildCards #-}
+        {-# LANGUAGE NoFieldSelectors #-}
+        {-# LANGUAGE OverloadedRecordDot #-}
         data Config = Config
-          { configHost :: String
-          , configPort :: Int
-          , configTimeout :: Int
+          { host :: Text
+          , port :: Int
+          , timeout :: Int
           }
 
-        -- Using RecordWildCards
+        -- Using OverloadedRecordDot (dot syntax for field access)
         mkConnection :: Config -> IO Connection
-        mkConnection Config{..} = connect configHost configPort
+        mkConnection cfg = connect cfg.host cfg.port
+
+        -- Record update syntax still works
+        withTimeout :: Int -> Config -> Config
+        withTimeout t cfg = cfg { timeout = t }
       </example>
+      <note>NoFieldSelectors prevents generating top-level field accessor functions, avoiding name clashes. OverloadedRecordDot enables dot-syntax field access. This is the modern standard replacing prefixed field names (configHost, configPort).</note>
     </pattern>
   </common_patterns>
 
@@ -339,6 +404,27 @@ version: 0.1.0
     <avoid name="orphan_instances">
       <description>Defining type class instances outside the module of the type or class</description>
       <instead>Use newtype wrappers or define instances in appropriate modules</instead>
+    </avoid>
+
+    <avoid name="existential_overuse">
+      <description>Overusing ExistentialQuantification to simulate OOP-style polymorphism</description>
+      <instead>Use sum types, type classes with concrete types, or the Handle pattern. Existentials hide type information and make code harder to reason about.</instead>
+      <example_bad>
+        -- Anti-pattern: existential wrapper for heterogeneous collection
+        data AnyShow = forall a. Show a => AnyShow a
+        items :: [AnyShow]
+        items = [AnyShow (1 :: Int), AnyShow "hello"]
+      </example_bad>
+      <example_good>
+        -- Prefer: explicit sum type
+        data Item = ItemInt Int | ItemText Text
+          deriving stock (Show)
+      </example_good>
+    </avoid>
+
+    <avoid name="old_style_records">
+      <description>Using prefixed field names (configHost, personName) to avoid name clashes</description>
+      <instead>Use NoFieldSelectors + OverloadedRecordDot for modern record access</instead>
     </avoid>
   </anti_patterns>
 </haskell_language>
@@ -378,35 +464,35 @@ version: 0.1.0
       library
         import:           warnings
         exposed-modules:  MyProject
-        build-depends:    base ^>=4.18,
+        build-depends:    base ^>=4.21,
                           text ^>=2.0,
                           containers ^>=0.6
         hs-source-dirs:   src
-        default-language: GHC2021
+        default-language: GHC2024
 
       executable my-project
         import:           warnings
         main-is:          Main.hs
-        build-depends:    base ^>=4.18,
+        build-depends:    base ^>=4.21,
                           my-project
         hs-source-dirs:   app
-        default-language: GHC2021
+        default-language: GHC2024
 
       test-suite my-project-test
         import:           warnings
         type:             exitcode-stdio-1.0
         main-is:          Spec.hs
-        build-depends:    base ^>=4.18,
+        build-depends:    base ^>=4.21,
                           my-project,
                           hspec ^>=2.11,
                           QuickCheck ^>=2.14
         hs-source-dirs:   test
-        default-language: GHC2021
+        default-language: GHC2024
     </basic_structure>
 
     <version_bounds>
       -- Caret (^>=): major version compatible
-      base ^>=4.18        -- 4.18.x.x
+      base ^>=4.21        -- 4.21.x.x (GHC 9.14)
 
       -- Range
       text >=2.0 && <2.2
@@ -418,13 +504,14 @@ version: 0.1.0
     <language_extensions>
       default-extensions:
         OverloadedStrings
+        OverloadedRecordDot
+        NoFieldSelectors
         LambdaCase
-        RecordWildCards
         DerivingStrategies
-        GeneralizedNewtypeDeriving
-        TypeApplications
+        DerivingVia
+        TypeFamilies
 
-      default-language: GHC2021  -- Recommended for new projects
+      default-language: GHC2024  -- Recommended for new projects (default since GHC 9.12)
     </language_extensions>
   </cabal_file>
 
@@ -463,6 +550,11 @@ version: 0.1.0
     <command name="cabal gen-bounds">Generate version bounds</command>
     <command name="cabal outdated">Check for outdated dependencies</command>
   </commands>
+
+  <cabal_install>
+    <current_version>cabal-install 3.14+</current_version>
+    <note>Use cabal.project files for multi-package projects and dependency configuration</note>
+  </cabal_install>
 </cabal>
 
 <stack>
@@ -478,7 +570,7 @@ version: 0.1.0
 
   <stack_yaml>
     <basic_structure>
-      resolver: lts-22.0  # Stackage LTS snapshot
+      resolver: lts-23.0  # Stackage LTS snapshot
 
       packages:
         - .
@@ -501,7 +593,7 @@ version: 0.1.0
       version: 0.1.0.0
 
       dependencies:
-        - base >= 4.18 && < 5
+        - base >= 4.21 && < 5
         - text
         - containers
 
@@ -557,7 +649,7 @@ version: 0.1.0
 <toolchain>
   <ghc>
     <description>Glasgow Haskell Compiler</description>
-    <current_version>GHC 9.12+ (2025-2026)</current_version>
+    <current_version>GHC 9.14.1 (latest major/LTS), GHC 9.12.4 (latest 9.12 bugfix)</current_version>
 
     <common_options>
       <option name="-Wall">Enable all warnings</option>
@@ -569,10 +661,17 @@ version: 0.1.0
     </common_options>
 
     <language_standards>
-      <standard name="Haskell2010">Previous standard</standard>
-      <standard name="GHC2021">Default edition; enables common extensions</standard>
-      <standard name="GHC2024">Current recommended for new code; extends GHC2021</standard>
+      <standard name="Haskell2010">Legacy standard; avoid for new projects</standard>
+      <standard name="GHC2021">Widely supported; enables common extensions</standard>
+      <standard name="GHC2024" recommended="true">Current recommended default (since GHC 9.12); extends GHC2021 with ExplicitNamespaces, TypeData, MonoLocalBinds, and others</standard>
     </language_standards>
+
+    <ghc_lts_policy>
+      <description>Starting with GHC 9.14, designated major versions receive LTS status with minimum 2 years of bugfix support. No new features are backported to LTS releases.</description>
+      <current_lts>GHC 9.14 (first LTS release)</current_lts>
+    </ghc_lts_policy>
+
+    <release_cadence>Major releases are made twice a year.</release_cadence>
   </ghc>
 
   <hls>
@@ -601,18 +700,19 @@ version: 0.1.0
   </hls>
 
   <formatters>
-    <formatter name="fourmolu">
-      <description>Opinionated formatter; ormolu fork with more options</description>
+    <formatter name="fourmolu" recommended="true">
+      <description>Standard Haskell formatter; ormolu fork with more configuration options. Recommended for new projects.</description>
       <usage>fourmolu -i src/**/*.hs</usage>
+      <config_file>fourmolu.yaml</config_file>
     </formatter>
 
     <formatter name="ormolu">
-      <description>Minimal configuration formatter</description>
+      <description>Minimal configuration formatter; fourmolu is preferred for most projects</description>
       <usage>ormolu -i src/**/*.hs</usage>
     </formatter>
 
-    <formatter name="stylish-haskell">
-      <description>Configurable import organization and formatting</description>
+    <formatter name="stylish-haskell" status="legacy">
+      <description>Configurable import organization and formatting; largely superseded by fourmolu</description>
       <usage>stylish-haskell -i src/**/*.hs</usage>
     </formatter>
   </formatters>
@@ -705,6 +805,26 @@ version: 0.1.0
     </integration>
   </quickcheck>
 
+  <tasty>
+    <description>Flexible test framework that unifies HUnit, QuickCheck, and other test providers under one runner</description>
+    <example>
+      import Test.Tasty
+      import Test.Tasty.HUnit
+      import Test.Tasty.QuickCheck as QC
+
+      main :: IO ()
+      main = defaultMain tests
+
+      tests :: TestTree
+      tests = testGroup "Tests"
+        [ testCase "Addition" $ 1 + 1 @?= 2
+        , QC.testProperty "reverse/reverse" $ \xs ->
+            reverse (reverse xs) == (xs :: [Int])
+        ]
+    </example>
+    <note>Good choice when combining multiple test providers; hspec is better for BDD-style tests</note>
+  </tasty>
+
   <hedgehog>
     <description>Modern property-based testing with integrated shrinking</description>
     <example>
@@ -760,6 +880,33 @@ version: 0.1.0
   </usage_patterns>
 </context7_integration>
 
+<best_practices>
+  <practice priority="critical">Let types guide design; use the type system to prevent errors</practice>
+  <practice priority="critical">Avoid partial functions; use safe alternatives</practice>
+  <practice priority="critical">Run hlint and fix suggestions before committing</practice>
+  <practice priority="high">Use Text/ByteString instead of String for performance</practice>
+  <practice priority="high">Prefer mtl-style or effectful constraints over concrete monad stacks</practice>
+  <practice priority="high">Write property-based tests for core logic</practice>
+  <practice priority="medium">Document exported functions with Haddock comments</practice>
+  <practice priority="medium">Use newtypes for type safety</practice>
+  <practice priority="medium">Enable GHC2024 as default-language for new projects</practice>
+  <practice priority="medium">Use NoFieldSelectors + OverloadedRecordDot for records</practice>
+  <practice priority="medium">Use DerivingStrategies and DerivingVia for deriving instances</practice>
+</best_practices>
+
+<rules priority="critical">
+  <rule>Run hlint before committing; address all suggestions</rule>
+  <rule>Avoid partial functions (head, tail, fromJust); use safe alternatives</rule>
+  <rule>Use types to encode invariants; make illegal states unrepresentable</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Use fourmolu for consistent formatting (standard formatter)</rule>
+  <rule>Prefer Text over String for text processing</rule>
+  <rule>Write HSpec tests for behavior; QuickCheck for properties</rule>
+  <rule>Use explicit type signatures for top-level definitions</rule>
+</rules>
+
 <workflow>
   <phase name="analyze">
     <objective>Understand Haskell code requirements</objective>
@@ -784,31 +931,6 @@ version: 0.1.0
   </phase>
 </workflow>
 
-<best_practices>
-  <practice priority="critical">Let types guide design; use the type system to prevent errors</practice>
-  <practice priority="critical">Avoid partial functions; use safe alternatives</practice>
-  <practice priority="critical">Run hlint and fix suggestions before committing</practice>
-  <practice priority="high">Use Text/ByteString instead of String for performance</practice>
-  <practice priority="high">Prefer mtl-style type class constraints over concrete monad stacks</practice>
-  <practice priority="high">Write property-based tests for core logic</practice>
-  <practice priority="medium">Document exported functions with Haddock comments</practice>
-  <practice priority="medium">Use newtypes for type safety</practice>
-  <practice priority="medium">Enable GHC2021 or explicit commonly-used extensions</practice>
-</best_practices>
-
-<rules priority="critical">
-  <rule>Run hlint before committing; address all suggestions</rule>
-  <rule>Avoid partial functions (head, tail, fromJust); use safe alternatives</rule>
-  <rule>Use types to encode invariants; make illegal states unrepresentable</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use fourmolu or ormolu for consistent formatting</rule>
-  <rule>Prefer Text over String for text processing</rule>
-  <rule>Write HSpec tests for behavior; QuickCheck for properties</rule>
-  <rule>Use explicit type signatures for top-level definitions</rule>
-</rules>
-
 <error_escalation>
   <level severity="low">
     <example>HLint suggestion about style</example>
@@ -828,13 +950,6 @@ version: 0.1.0
   </level>
 </error_escalation>
 
-<related_skills>
-  <skill name="serena-usage">Navigate type class hierarchies and module structure</skill>
-  <skill name="context7-usage">Fetch Haskell documentation and library references</skill>
-  <skill name="investigation-patterns">Debug type errors, missing instances, and performance issues</skill>
-  <skill name="nix-ecosystem">haskell.nix integration and nixpkgs Haskell infrastructure</skill>
-</related_skills>
-
 <constraints>
   <must>Use types to encode invariants</must>
   <must>Avoid partial functions in library code</must>
@@ -843,3 +958,10 @@ version: 0.1.0
   <avoid>Lazy IO in production code</avoid>
   <avoid>Orphan instances</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="serena-usage">Navigate type class hierarchies and module structure</skill>
+  <skill name="context7-usage">Fetch Haskell documentation and library references</skill>
+  <skill name="investigation-patterns">Debug type errors, missing instances, and performance issues</skill>
+  <skill name="nix-ecosystem">haskell.nix integration and nixpkgs Haskell infrastructure</skill>
+</related_skills>

@@ -172,6 +172,35 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <output>Phased task list with dependencies</output>
     </step>
   </phase>
+  <phase name="critique">
+    <objective>Adversarial review of requirements document for gaps and risks</objective>
+    <step number="1">
+      <action>Delegate requirements document to validator agent for critique</action>
+      <tool>Sub-agent delegation (validator)</tool>
+      <aspects>Missing steps, unidentified risks, unclear acceptance criteria, dependency gaps, scope ambiguity</aspects>
+      <output>Critique report with identified gaps</output>
+    </step>
+    <step number="2">
+      <action>Evaluate critique findings and incorporate valid feedback</action>
+      <tool>Synthesis</tool>
+      <output>Updated requirements document addressing critique</output>
+    </step>
+    <step number="3">
+      <action>Flag unresolved critique items as outstanding issues</action>
+      <tool>Issue tracking</tool>
+      <output>Outstanding issues appended to requirements</output>
+    </step>
+  </phase>
+  <reflection_checkpoint id="critique_quality" after="critique">
+    <questions>
+      <question weight="0.4">Were critique findings adequately addressed or flagged?</question>
+      <question weight="0.3">Are remaining outstanding issues clearly documented?</question>
+      <question weight="0.3">Is the final requirements document complete and consistent?</question>
+    </questions>
+    <threshold min="70" action="proceed">
+      <below_threshold>Revisit critique findings or ask user for guidance</below_threshold>
+    </threshold>
+  </reflection_checkpoint>
 </workflow>
 
 <agents>
@@ -322,6 +351,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <command name="bug">When defining fix requirements for known issues</command>
   <command name="execute">Handoff point after requirements are defined</command>
   <command name="define-full">Full version with self-evaluation phase</command>
+  <command name="simplify">Code cleanup after implementation</command>
 </related_commands>
 
 <related_skills>

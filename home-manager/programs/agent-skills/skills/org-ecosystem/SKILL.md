@@ -1,11 +1,49 @@
 ---
 name: Org Ecosystem
 description: This skill should be used when the user asks to "write org", "org-mode", "org file", ".org file", "org syntax", "org document", "org babel", "org export", "org agenda", "org capture", "GTD", "literate programming", "org publishing", or "org-mode workflow". Provides comprehensive Org-mode patterns and best practices.
+version: 2.0.0
 ---
 
 <purpose>
   Provide comprehensive patterns for Org-mode document creation, GTD workflow, literate programming with Babel, and export/publishing.
 </purpose>
+
+<tools>
+  <tool name="org-capture">
+    <description>Quick capture notes and tasks</description>
+    <use_case>Capturing ideas without interrupting current work</use_case>
+  </tool>
+
+  <tool name="org-agenda">
+    <description>Unified view of scheduled items and TODOs</description>
+    <use_case>Daily/weekly planning and review</use_case>
+  </tool>
+
+  <tool name="org-refile">
+    <description>Move entries to different locations</description>
+    <use_case>Organizing captured items into proper locations</use_case>
+  </tool>
+
+  <tool name="org-babel">
+    <description>Execute code blocks in documents</description>
+    <use_case>Literate programming, reproducible research</use_case>
+  </tool>
+
+  <tool name="org-export">
+    <description>Export to various formats</description>
+    <use_case>Publishing documents, creating presentations</use_case>
+  </tool>
+
+  <tool name="org-clock">
+    <description>Time tracking within org files</description>
+    <use_case>Project time tracking, productivity analysis</use_case>
+  </tool>
+
+  <tool name="org-cite">
+    <description>Built-in citation system (since Org 9.5, bundled with Emacs 30.2)</description>
+    <use_case>Academic citations using org-cite-basic or citeproc processors</use_case>
+  </tool>
+</tools>
 
 <org_syntax>
   <fundamentals>
@@ -419,6 +457,7 @@ description: This skill should be used when the user asks to "write org", "org-m
     <pattern name="language_specific">
       <description>Language-specific configurations</description>
       <example>
+        ;; Org 9.7+ (bundled with Emacs 30.2)
         (org-babel-do-load-languages
         'org-babel-load-languages
         '((emacs-lisp . t)
@@ -426,6 +465,9 @@ description: This skill should be used when the user asks to "write org", "org-m
         (shell . t)
         (js . t)
         (sql . t)
+        (C . t)
+        (haskell . t)
+        (ruby . t)
         (plantuml . t)))
 
         (setq org-confirm-babel-evaluate nil)
@@ -568,6 +610,20 @@ description: This skill should be used when the user asks to "write org", "org-m
       <note>C-c C-e P p to publish project</note>
     </pattern>
 
+    <pattern name="citations">
+      <description>Built-in citation support with org-cite (Org 9.5+, bundled with Emacs 30.2)</description>
+      <example>
+        #+BIBLIOGRAPHY: references.bib
+        #+CITE_EXPORT: basic
+
+        See [cite:@knuth1984] for details.
+        As noted by [cite/t:@doe2023], the approach works.
+
+        #+PRINT_BIBLIOGRAPHY:
+      </example>
+      <note>org-cite-basic is built-in; citeproc and biblatex processors available via packages</note>
+    </pattern>
+
     <pattern name="selective_export">
       <description>Control what gets exported</description>
       <example>
@@ -598,37 +654,19 @@ description: This skill should be used when the user asks to "write org", "org-m
   </decision_tree>
 </export>
 
-<tools>
-  <tool name="org-capture">
-    <description>Quick capture notes and tasks</description>
-    <use_case>Capturing ideas without interrupting current work</use_case>
-  </tool>
-
-  <tool name="org-agenda">
-    <description>Unified view of scheduled items and TODOs</description>
-    <use_case>Daily/weekly planning and review</use_case>
-  </tool>
-
-  <tool name="org-refile">
-    <description>Move entries to different locations</description>
-    <use_case>Organizing captured items into proper locations</use_case>
-  </tool>
-
-  <tool name="org-babel">
-    <description>Execute code blocks in documents</description>
-    <use_case>Literate programming, reproducible research</use_case>
-  </tool>
-
-  <tool name="org-export">
-    <description>Export to various formats</description>
-    <use_case>Publishing documents, creating presentations</use_case>
-  </tool>
-
-  <tool name="org-clock">
-    <description>Time tracking within org files</description>
-    <use_case>Project time tracking, productivity analysis</use_case>
-  </tool>
-</tools>
+<context7_integration>
+  <description>Use Context7 MCP to fetch latest Org-mode documentation when needed</description>
+  <usage>
+    <step>1. resolve-library-id with query "org-mode" or "emacs org"</step>
+    <step>2. get-library-docs with resolved ID for specific topics (babel, export, cite, agenda)</step>
+    <step>3. Verify patterns against latest Org 9.7+ features (bundled with Emacs 30.2)</step>
+  </usage>
+  <notes>
+    <note>Org 9.7+ is current, bundled with Emacs 30.2</note>
+    <note>org-cite (org-cite-basic) is the built-in citation system since Org 9.5</note>
+    <note>org-babel-do-load-languages is still the standard way to enable language support</note>
+  </notes>
+</context7_integration>
 
 <best_practices>
   <practice priority="critical">Use one file per major project or area of responsibility</practice>
@@ -641,6 +679,8 @@ description: This skill should be used when the user asks to "write org", "org-m
   <practice priority="medium">Set :EFFORT: property for time estimation</practice>
   <practice priority="medium">Use column view for project overviews</practice>
   <practice priority="medium">Configure org-agenda-custom-commands for common views</practice>
+  <practice priority="high">Use org-cite for citations (built-in since Org 9.5, preferred over org-ref)</practice>
+  <practice priority="medium">Use org-roam v2 for Zettelkasten-style knowledge management with backlinks</practice>
 </best_practices>
 
 <anti_patterns>
@@ -673,7 +713,30 @@ description: This skill should be used when the user asks to "write org", "org-m
     <description>Absolute paths in org files</description>
     <instead>Use relative paths or org-directory variable</instead>
   </avoid>
+
+  <avoid name="org_ref_over_org_cite">
+    <description>Using org-ref for citations when org-cite suffices</description>
+    <instead>Use org-cite (built-in since Org 9.5). org-cite-basic is included; use citeproc or biblatex processors for advanced needs.</instead>
+  </avoid>
+
+  <avoid name="manual_link_management">
+    <description>Manually managing cross-file links and backlinks</description>
+    <instead>Use org-roam v2 for Zettelkasten-style note linking with automatic backlinks, graph visualization, and org-roam-ui.</instead>
+  </avoid>
 </anti_patterns>
+
+<rules priority="critical">
+  <rule>Use appropriate heading levels (do not skip levels)</rule>
+  <rule>Close all drawers and blocks properly</rule>
+  <rule>Use consistent timestamp format throughout document</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Add :PROPERTIES: drawer after heading, not before</rule>
+  <rule>Use #+NAME: before code blocks that are referenced</rule>
+  <rule>Set document-wide header-args with #+PROPERTY:</rule>
+  <rule>Use :noexport: tag for internal notes</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">
@@ -697,19 +760,6 @@ description: This skill should be used when the user asks to "write org", "org-m
   </phase>
 </workflow>
 
-<rules priority="critical">
-  <rule>Use appropriate heading levels (do not skip levels)</rule>
-  <rule>Close all drawers and blocks properly</rule>
-  <rule>Use consistent timestamp format throughout document</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Add :PROPERTIES: drawer after heading, not before</rule>
-  <rule>Use #+NAME: before code blocks that are referenced</rule>
-  <rule>Set document-wide header-args with #+PROPERTY:</rule>
-  <rule>Use :noexport: tag for internal notes</rule>
-</rules>
-
 <error_escalation>
   <level severity="low">
     <example>Minor formatting inconsistency</example>
@@ -729,13 +779,6 @@ description: This skill should be used when the user asks to "write org", "org-m
   </level>
 </error_escalation>
 
-<related_skills>
-  <skill name="emacs-ecosystem">Emacs Lisp configuration for org-mode customization</skill>
-  <skill name="serena-usage">Symbol operations for navigating org structures</skill>
-  <skill name="context7-usage">Fetch latest org-mode documentation</skill>
-  <skill name="technical-documentation">Documentation patterns applicable to org export</skill>
-</related_skills>
-
 <constraints>
   <must>Use consistent heading structure (do not skip levels)</must>
   <must>Close all blocks and drawers properly</must>
@@ -744,3 +787,59 @@ description: This skill should be used when the user asks to "write org", "org-m
   <avoid>Side effects in babel blocks without clear documentation</avoid>
   <avoid>Hardcoded absolute paths in documents</avoid>
 </constraints>
+
+<org_roam>
+  <description>Org-roam v2 - Zettelkasten-style knowledge management for Org-mode</description>
+
+  <pattern name="basic_setup">
+    <description>Org-roam v2 configuration with use-package</description>
+    <example>
+      (use-package org-roam
+        :ensure t
+        :custom
+        (org-roam-directory (file-truename "~/org/roam/"))
+        (org-roam-completion-everywhere t)
+        :bind (("C-c n l" . org-roam-buffer-toggle)
+               ("C-c n f" . org-roam-node-find)
+               ("C-c n i" . org-roam-node-insert)
+               ("C-c n c" . org-roam-capture))
+        :config
+        (org-roam-db-autosync-mode))
+    </example>
+  </pattern>
+
+  <pattern name="capture_templates">
+    <description>Org-roam capture templates for new nodes</description>
+    <example>
+      (setq org-roam-capture-templates
+            '(("d" "default" plain "%?"
+               :target (file+head "%&lt;%Y%m%d%H%M%S&gt;-${slug}.org"
+                                  "#+title: ${title}\n")
+               :unnarrowed t)
+              ("r" "reference" plain "%?"
+               :target (file+head "references/${slug}.org"
+                                  "#+title: ${title}\n#+filetags: :reference:\n")
+               :unnarrowed t)))
+    </example>
+  </pattern>
+
+  <pattern name="org_roam_ui">
+    <description>Visual graph exploration of org-roam nodes</description>
+    <example>
+      (use-package org-roam-ui
+        :ensure t
+        :after org-roam
+        :config
+        (setq org-roam-ui-sync-theme t
+              org-roam-ui-follow t
+              org-roam-ui-update-on-save t))
+    </example>
+  </pattern>
+</org_roam>
+
+<related_skills>
+  <skill name="emacs-ecosystem">Emacs Lisp configuration for org-mode customization</skill>
+  <skill name="serena-usage">Symbol operations for navigating org structures</skill>
+  <skill name="context7-usage">Fetch latest org-mode documentation</skill>
+  <skill name="technical-documentation">Documentation patterns applicable to org export</skill>
+</related_skills>

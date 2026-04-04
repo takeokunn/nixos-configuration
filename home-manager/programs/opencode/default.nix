@@ -49,7 +49,8 @@ in
   programs.opencode = {
     enable = true;
     package = llmAgentsPkgs.opencode;
-  } // opencodeAgents;
+  }
+  // opencodeAgents;
 
   home.sessionVariables = import ./env.nix;
 

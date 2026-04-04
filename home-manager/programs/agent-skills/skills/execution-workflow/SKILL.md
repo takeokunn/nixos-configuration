@@ -1,6 +1,7 @@
 ---
 name: Execution Workflow
 description: This skill should be used when the user asks to "execute task", "implement feature", "delegate work", "run workflow", "review code", "code quality check", or needs task orchestration and code review guidance. Provides execution, delegation, and code review patterns.
+version: 2.0.0
 ---
 
 <purpose>
@@ -149,6 +150,15 @@ description: This skill should be used when the user asks to "execute task", "im
   </pattern>
 </patterns>
 
+<best_practices>
+  <practice priority="critical">Analyze task dependencies before execution to determine parallel vs sequential execution model</practice>
+  <practice priority="critical">Provide comprehensive context to sub-agents including file paths, tool usage, and reference implementations</practice>
+  <practice priority="critical">Systematically review all phases: initial scan, deep analysis, context evaluation, standards compliance</practice>
+  <practice priority="high">Balance critical feedback with positive observations of good practices</practice>
+  <practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
+  <practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
+</best_practices>
+
 <anti_patterns>
   <avoid name="nitpicking_style">
     <description>Focusing on code style issues when functionality is broken</description>
@@ -175,15 +185,6 @@ description: This skill should be used when the user asks to "execute task", "im
     <instead>Analyze dependencies and execute dependent tasks sequentially</instead>
   </avoid>
 </anti_patterns>
-
-<best_practices>
-  <practice priority="critical">Analyze task dependencies before execution to determine parallel vs sequential execution model</practice>
-  <practice priority="critical">Provide comprehensive context to sub-agents including file paths, tool usage, and reference implementations</practice>
-  <practice priority="critical">Systematically review all phases: initial scan, deep analysis, context evaluation, standards compliance</practice>
-  <practice priority="high">Balance critical feedback with positive observations of good practices</practice>
-  <practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
-  <practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
-</best_practices>
 
 <rules priority="critical">
   <rule>Execute independent tasks in parallel</rule>
@@ -218,12 +219,6 @@ description: This skill should be used when the user asks to "execute task", "im
   </level>
 </error_escalation>
 
-<related_skills>
-  <skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
-  <skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
-  <skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
-</related_skills>
-
 <constraints>
   <must>Delegate detailed work to sub-agents</must>
   <must>Execute independent tasks in parallel</must>
@@ -232,3 +227,9 @@ description: This skill should be used when the user asks to "execute task", "im
   <avoid>Sequential execution of independent tasks</avoid>
   <avoid>Skipping verification of sub-agent outputs</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
+  <skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
+  <skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
+</related_skills>

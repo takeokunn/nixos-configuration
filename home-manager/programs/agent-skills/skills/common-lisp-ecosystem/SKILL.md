@@ -1,6 +1,7 @@
 ---
 name: Common Lisp Ecosystem
 description: This skill should be used when the user asks to "write common lisp", "CLOS", "ASDF", "defpackage", "defsystem", or works with Common Lisp, SBCL, or Coalton. Provides comprehensive Common Lisp ecosystem patterns and best practices.
+version: 2.0.0
 ---
 
 <purpose>
@@ -174,7 +175,7 @@ description: This skill should be used when the user asks to "write common lisp"
 </packages>
 
 <asdf>
-  <description>Another System Definition Facility - Build system for Common Lisp</description>
+  <description>Another System Definition Facility - Build system for Common Lisp (ASDF 3.4+)</description>
 
   <pattern name="basic_defsystem">
     <description>Basic ASDF system definition with metadata and component dependencies.</description>
@@ -252,7 +253,7 @@ description: This skill should be used when the user asks to "write common lisp"
 </asdf>
 
 <sbcl>
-  <description>Steel Bank Common Lisp - High-performance implementation</description>
+  <description>Steel Bank Common Lisp - High-performance implementation (current: SBCL 2.6.x, monthly releases)</description>
 
   <pattern name="save_executable">
     <description>Create standalone executable with SBCL.</description>
@@ -364,7 +365,102 @@ description: This skill should be used when the user asks to "write common lisp"
   </pattern>
 </coalton>
 
-<context7_libraries>
+<common_patterns>
+  <pattern name="with_macro">
+    <description>Resource management with unwind-protect for cleanup.</description>
+    <example>
+      (defmacro with-open-socket ((var host port) &body body)
+        `(let ((,var (make-socket ,host ,port)))
+           (unwind-protect
+               (progn ,@body)
+             (close-socket ,var))))
+    </example>
+  </pattern>
+
+  <pattern name="loop_macro">
+    <description>Loop macro for iteration with collection, filtering, and accumulation.</description>
+    <example>
+      (loop for item in list
+            for i from 0
+            when (evenp i)
+              collect item into evens
+            finally (return evens))
+    </example>
+  </pattern>
+
+  <pattern name="format_directives">
+    <description>Common format directives: ~a (aesthetic), ~s (standard), ~d (decimal), ~f (float), ~% (newline), ~{~} (iteration), ~[~] (conditional).</description>
+    <example>
+      (format t "~a is ~d years old~%" name age)
+    </example>
+  </pattern>
+
+  <pattern name="documentation">
+    <description>Document functions with docstrings explaining purpose and parameters.</description>
+    <example>
+      (defun my-function (arg)
+        "Docstring describing the function.
+         ARG is the argument description."
+        (process arg))
+    </example>
+  </pattern>
+</common_patterns>
+
+<standard_libraries>
+  <library name="alexandria">
+    <description>Conservative utility library. Provides essential utilities: when-let, if-let, hash-table-alist, ensure-list, mappings, and more. De facto standard for CL projects.</description>
+  </library>
+
+  <library name="serapeum">
+    <description>Comprehensive utility library (superset of alexandria). Provides additional utilities: string manipulation, sequences, types, binding macros, and more.</description>
+  </library>
+
+  <library name="cffi">
+    <description>Common Foreign Function Interface. Portable FFI for calling C libraries from Common Lisp. Preferred over implementation-specific FFI (e.g., sb-alien).</description>
+    <example>
+      (cffi:defcfun ("strlen" c-strlen) :int
+        (str :string))
+
+      (c-strlen "hello") ; => 5
+    </example>
+  </library>
+</standard_libraries>
+
+<package_sources>
+  <source name="quicklisp">
+    <description>Primary package distribution for Common Lisp. Monthly dist updates with tested library versions.</description>
+  </source>
+
+  <source name="ultralisp">
+    <description>Complementary distribution with more frequent updates. Tracks latest library versions from GitHub.</description>
+  </source>
+</package_sources>
+
+<modern_tooling>
+  <tool name="qlot">
+    <description>Per-project dependency manager (like bundler/npm). Manages dependencies via qlfile, supports Quicklisp and Ultralisp distributions.</description>
+    <use_case>Install dependencies from qlfile</use_case>
+    <use_case>Run commands with project dependencies</use_case>
+    <example>
+      qlot install
+      qlot exec ros run
+    </example>
+  </tool>
+
+  <tool name="roswell">
+    <description>Lisp implementation manager and script runner</description>
+    <use_case>Install Lisp implementations or libraries</use_case>
+    <use_case>Start REPL with specified implementation</use_case>
+    <use_case>Build standalone executable</use_case>
+    <example>
+      ros install sbcl
+      ros run
+      ros build myapp.ros
+    </example>
+  </tool>
+</modern_tooling>
+
+<context7_integration>
   <description>Available Context7 documentation libraries for Common Lisp ecosystem.</description>
 
   <tool name="context7_common_lisp_docs">
@@ -418,48 +514,7 @@ description: This skill should be used when the user asks to "write common lisp"
         topic="defsystem"
     </example>
   </pattern>
-</context7_libraries>
-
-<common_patterns>
-  <pattern name="with_macro">
-    <description>Resource management with unwind-protect for cleanup.</description>
-    <example>
-      (defmacro with-open-socket ((var host port) &body body)
-        `(let ((,var (make-socket ,host ,port)))
-           (unwind-protect
-               (progn ,@body)
-             (close-socket ,var))))
-    </example>
-  </pattern>
-
-  <pattern name="loop_macro">
-    <description>Loop macro for iteration with collection, filtering, and accumulation.</description>
-    <example>
-      (loop for item in list
-            for i from 0
-            when (evenp i)
-              collect item into evens
-            finally (return evens))
-    </example>
-  </pattern>
-
-  <pattern name="format_directives">
-    <description>Common format directives: ~a (aesthetic), ~s (standard), ~d (decimal), ~f (float), ~% (newline), ~{~} (iteration), ~[~] (conditional).</description>
-    <example>
-      (format t "~a is ~d years old~%" name age)
-    </example>
-  </pattern>
-
-  <pattern name="documentation">
-    <description>Document functions with docstrings explaining purpose and parameters.</description>
-    <example>
-      (defun my-function (arg)
-        "Docstring describing the function.
-         ARG is the argument description."
-        (process arg))
-    </example>
-  </pattern>
-</common_patterns>
+</context7_integration>
 
 <best_practices>
   <practice priority="high">Use `*earmuffs*` for special variables</practice>
@@ -472,44 +527,10 @@ description: This skill should be used when the user asks to "write common lisp"
   <practice priority="medium">Prefer ASDF package-inferred-system for new projects</practice>
   <practice priority="medium">Consider Qlot for per-project dependency management</practice>
   <practice priority="medium">Use Roswell for portable script execution</practice>
+  <practice priority="high">Use Alexandria and Serapeum as standard utility libraries</practice>
+  <practice priority="medium">Use CFFI for foreign function calls (portable across implementations)</practice>
+  <practice priority="medium">Consider Coalton for type-safe functional subsystems</practice>
 </best_practices>
-
-<rules priority="critical">
-  <rule>Use ASDF for all system definitions; never load files directly</rule>
-  <rule>Provide restarts for recoverable error conditions</rule>
-  <rule>Document all exported symbols with docstrings</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use *earmuffs* for special variables, +plus-signs+ for constants</rule>
-  <rule>Prefer :import-from over bare :use for clear dependencies</rule>
-  <rule>Use check-type for argument validation at function boundaries</rule>
-  <rule>Consider package-inferred-system for new projects</rule>
-</rules>
-
-<modern_tooling>
-  <tool name="qlot">
-    <description>Per-project dependency manager (like bundler/npm)</description>
-    <use_case>Install dependencies from qlfile</use_case>
-    <use_case>Run commands with project dependencies</use_case>
-    <example>
-      qlot install
-      qlot exec ros run
-    </example>
-  </tool>
-
-  <tool name="roswell">
-    <description>Lisp implementation manager and script runner</description>
-    <use_case>Install Lisp implementations or libraries</use_case>
-    <use_case>Start REPL with specified implementation</use_case>
-    <use_case>Build standalone executable</use_case>
-    <example>
-      ros install sbcl
-      ros run
-      ros build myapp.ros
-    </example>
-  </tool>
-</modern_tooling>
 
 <anti_patterns>
   <avoid name="global_state">
@@ -541,7 +562,30 @@ description: This skill should be used when the user asks to "write common lisp"
     <description>Custom reader macros make code harder to read for others.</description>
     <instead>Use reader macros sparingly and document them clearly when necessary.</instead>
   </avoid>
+
+  <avoid name="loop_for_everything">
+    <description>Using the loop macro for all iteration, even when simpler constructs suffice.</description>
+    <instead>Use mapcar/remove-if/reduce for simple functional transforms. Consider iterate or series for complex iteration that loop handles poorly. Reserve loop for multi-clause iteration with collection and accumulation.</instead>
+  </avoid>
+
+  <avoid name="ignoring_conditions_system">
+    <description>Using simple error signaling without restarts, or catching and discarding conditions.</description>
+    <instead>Design APIs with restart-case to offer recovery strategies. Use handler-bind to handle conditions without unwinding the stack when possible.</instead>
+  </avoid>
 </anti_patterns>
+
+<rules priority="critical">
+  <rule>Use ASDF for all system definitions; never load files directly</rule>
+  <rule>Provide restarts for recoverable error conditions</rule>
+  <rule>Document all exported symbols with docstrings</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Use *earmuffs* for special variables, +plus-signs+ for constants</rule>
+  <rule>Prefer :import-from over bare :use for clear dependencies</rule>
+  <rule>Use check-type for argument validation at function boundaries</rule>
+  <rule>Consider package-inferred-system for new projects</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">

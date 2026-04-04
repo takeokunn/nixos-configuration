@@ -1,7 +1,7 @@
 ---
 name: Go Ecosystem
 description: This skill should be used when the user asks to "write go", "golang", "go.mod", "go module", "go test", "go build", or works with Go language development. Provides comprehensive Go ecosystem patterns and best practices.
-version: 0.2.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -104,7 +104,7 @@ version: 0.2.0
         switch v := x.(type) {
         case string: // v is string
         case int:    // v is int
-        default:     // v is interface{}
+        default:     // v is any
         }
       </example>
     </pattern>
@@ -187,6 +187,40 @@ version: 0.2.0
   </pattern>
 </error_handling>
 
+<modern_go_features>
+  <feature name="green_tea_gc">
+    <description>Green Tea garbage collector is now enabled by default in Go 1.26, improving GC performance.</description>
+  </feature>
+  <feature name="new_with_value">
+    <description>The built-in new function now allows an expression specifying the initial value (Go 1.26).</description>
+    <example>
+      p := new(MyStruct{Field: "value"})
+    </example>
+  </feature>
+  <feature name="self_referential_generics">
+    <description>Generic types may now refer to themselves in their own type parameter list (Go 1.26).</description>
+  </feature>
+  <feature name="range_over_int">
+    <description>Range over integers for simple iteration (Go 1.22+).</description>
+    <example>
+      for i := range 10 {
+      fmt.Println(i)
+      }
+    </example>
+  </feature>
+  <feature name="range_over_func">
+    <description>Range over iterator functions (Go 1.23+).</description>
+    <example>
+      for v := range slices.Values(s) {
+      fmt.Println(v)
+      }
+    </example>
+  </feature>
+  <feature name="cgo_overhead_reduction">
+    <description>Baseline cgo overhead reduced by approximately 30% in Go 1.26.</description>
+  </feature>
+</modern_go_features>
+
 <interfaces>
   <principles>
     <principle>Accept interfaces, return concrete types</principle>
@@ -242,9 +276,9 @@ version: 0.2.0
     <example>
       module github.com/user/project
 
-      go 1.23
+      go 1.26
 
-      toolchain go1.23.0
+      toolchain go1.26.0
 
       require (
       github.com/pkg/errors v0.9.1
@@ -286,9 +320,9 @@ version: 0.2.0
   </commands>
 
   <pattern name="toolchain_directive">
-    <description>Suggest specific Go toolchain version (Go 1.21+). Used when module requires newer toolchain than default.</description>
+    <description>Suggest specific Go toolchain version (Go 1.21+); current is 1.26. Used when module requires newer toolchain than default.</description>
     <example>
-      toolchain go1.23.0
+      toolchain go1.26.0
     </example>
   </pattern>
 
@@ -557,6 +591,142 @@ version: 0.2.0
   </sync_package>
 </concurrency>
 
+<standard_library_additions>
+  <pattern name="slog">
+    <description>Structured logging with log/slog (Go 1.21+). Recommended over log and third-party loggers for new projects.</description>
+    <example>
+      import "log/slog"
+
+      slog.Info("user logged in",
+      "user_id", userID,
+      "ip", request.RemoteAddr,
+      )
+
+      // With structured logger
+      logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+      logger.Info("request", "method", r.Method, "path", r.URL.Path)
+    </example>
+  </pattern>
+
+  <pattern name="slices_maps">
+    <description>Generic slices and maps packages (Go 1.21+). Replace hand-rolled loops and sort.Slice.</description>
+    <example>
+      import (
+      "slices"
+      "maps"
+      )
+
+      slices.Sort(names)
+      if slices.Contains(names, "alice") { ... }
+      idx := slices.Index(names, "bob")
+      keys := slices.Collect(maps.Keys(m))
+    </example>
+  </pattern>
+
+  <pattern name="cmp_package">
+    <description>cmp package for comparison and defaults (Go 1.22+).</description>
+    <example>
+      import "cmp"
+
+      // Default value pattern
+      name := cmp.Or(userInput, envVar, "default")
+
+      // Ordered comparison
+      result := cmp.Compare(a, b)
+    </example>
+  </pattern>
+
+  <pattern name="http_routing">
+    <description>Enhanced net/http routing with method and path patterns (Go 1.22+). Reduces need for third-party routers.</description>
+    <example>
+      mux := http.NewServeMux()
+      mux.HandleFunc("GET /api/users/{id}", getUser)
+      mux.HandleFunc("POST /api/users", createUser)
+      mux.HandleFunc("DELETE /api/users/{id}", deleteUser)
+
+      func getUser(w http.ResponseWriter, r *http.Request) {
+      id := r.PathValue("id")
+      // ...
+      }
+    </example>
+  </pattern>
+
+  <pattern name="tool_directive">
+    <description>Tool dependencies in go.mod (Go 1.24+). Replaces tools.go blank-import hack.</description>
+    <example>
+      // In go.mod:
+      tool (
+      golang.org/x/tools/cmd/stringer
+      github.com/golangci/golangci-lint/cmd/golangci-lint
+      )
+    </example>
+  </pattern>
+</standard_library_additions>
+
+<build_commands>
+  <tool name="go build">
+    <description>Compile package</description>
+    <use_case>Build executable from current package</use_case>
+  </tool>
+  <tool name="go build -o">
+    <description>Specify output name</description>
+    <param name="name">Output binary name</param>
+    <use_case>Build with custom binary name</use_case>
+  </tool>
+  <tool name="go install">
+    <description>Compile and install to GOPATH/bin</description>
+    <use_case>Install package for global use</use_case>
+  </tool>
+  <tool name="go run">
+    <description>Compile and run</description>
+    <param name="main.go">Go file to execute</param>
+    <use_case>Quick compile and execute for development</use_case>
+  </tool>
+  <tool name="go fmt">
+    <description>Format all code</description>
+    <param name="./...">All packages recursively</param>
+    <use_case>Standardize code formatting</use_case>
+  </tool>
+  <tool name="go vet">
+    <description>Static analysis</description>
+    <param name="./...">All packages recursively</param>
+    <use_case>Detect suspicious code constructs</use_case>
+  </tool>
+  <tool name="go generate">
+    <description>Run code generators</description>
+    <use_case>Execute //go:generate directives</use_case>
+  </tool>
+  <tool name="golangci-lint">
+    <description>Standard meta-linter aggregating multiple linters</description>
+    <use_case>Run comprehensive linting with golangci-lint run</use_case>
+  </tool>
+  <tool name="cross-compile">
+    <description>Cross-compile for different platforms</description>
+    <example>
+      GOOS=linux GOARCH=amd64 go build
+    </example>
+    <use_case>Build binaries for different operating systems and architectures</use_case>
+  </tool>
+</build_commands>
+
+<context7_integration>
+  <description>Use Context7 MCP for up-to-date Go documentation</description>
+
+  <go_libraries>
+    <library name="Go Website" id="/golang/website" trust="8.3" />
+    <library name="Go Tools" id="/golang/tools" trust="8.3" />
+  </go_libraries>
+
+  <usage_patterns>
+    <pattern name="module_reference">
+      <description>Retrieve Go module documentation from Context7.</description>
+      <example>
+        get-library-docs context7CompatibleLibraryID="/golang/website" topic="go.mod modules"
+      </example>
+    </pattern>
+  </usage_patterns>
+</context7_integration>
+
 <best_practices>
   <practice priority="high">Use gofmt/goimports for consistent code formatting</practice>
   <practice priority="high">Handle errors explicitly at each call site</practice>
@@ -569,19 +739,6 @@ version: 0.2.0
   <practice priority="medium">Define interfaces where they are used, not implemented</practice>
   <practice priority="medium">Use go mod tidy regularly to maintain clean dependencies</practice>
 </best_practices>
-
-<rules priority="critical">
-  <rule>Handle all errors explicitly; never ignore returned errors</rule>
-  <rule>Run go vet and go test before committing</rule>
-  <rule>Use context.Context for cancellation and timeouts in concurrent code</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use gofmt/goimports for consistent formatting</rule>
-  <rule>Follow Go naming conventions (exported vs unexported)</rule>
-  <rule>Prefer table-driven tests for comprehensive coverage</rule>
-  <rule>Run tests with -race flag to detect data races</rule>
-</rules>
 
 <anti_patterns>
   <avoid name="init_overuse">
@@ -618,65 +775,18 @@ version: 0.2.0
   </avoid>
 </anti_patterns>
 
-<context7_integration>
-  <description>Use Context7 MCP for up-to-date Go documentation</description>
+<rules priority="critical">
+  <rule>Handle all errors explicitly; never ignore returned errors</rule>
+  <rule>Run go vet and go test before committing</rule>
+  <rule>Use context.Context for cancellation and timeouts in concurrent code</rule>
+</rules>
 
-  <go_libraries>
-    <library name="Go Website" id="/golang/website" trust="8.3" />
-    <library name="Go Tools" id="/golang/tools" trust="8.3" />
-  </go_libraries>
-
-  <usage_patterns>
-    <pattern name="module_reference">
-      <description>Retrieve Go module documentation from Context7.</description>
-      <example>
-        get-library-docs context7CompatibleLibraryID="/golang/website" topic="go.mod modules"
-      </example>
-    </pattern>
-  </usage_patterns>
-</context7_integration>
-
-<build_commands>
-  <tool name="go build">
-    <description>Compile package</description>
-    <use_case>Build executable from current package</use_case>
-  </tool>
-  <tool name="go build -o">
-    <description>Specify output name</description>
-    <param name="name">Output binary name</param>
-    <use_case>Build with custom binary name</use_case>
-  </tool>
-  <tool name="go install">
-    <description>Compile and install to GOPATH/bin</description>
-    <use_case>Install package for global use</use_case>
-  </tool>
-  <tool name="go run">
-    <description>Compile and run</description>
-    <param name="main.go">Go file to execute</param>
-    <use_case>Quick compile and execute for development</use_case>
-  </tool>
-  <tool name="go fmt">
-    <description>Format all code</description>
-    <param name="./...">All packages recursively</param>
-    <use_case>Standardize code formatting</use_case>
-  </tool>
-  <tool name="go vet">
-    <description>Static analysis</description>
-    <param name="./...">All packages recursively</param>
-    <use_case>Detect suspicious code constructs</use_case>
-  </tool>
-  <tool name="go generate">
-    <description>Run code generators</description>
-    <use_case>Execute //go:generate directives</use_case>
-  </tool>
-  <tool name="cross-compile">
-    <description>Cross-compile for different platforms</description>
-    <example>
-      GOOS=linux GOARCH=amd64 go build
-    </example>
-    <use_case>Build binaries for different operating systems and architectures</use_case>
-  </tool>
-</build_commands>
+<rules priority="standard">
+  <rule>Use gofmt/goimports for consistent formatting</rule>
+  <rule>Follow Go naming conventions (exported vs unexported)</rule>
+  <rule>Prefer table-driven tests for comprehensive coverage</rule>
+  <rule>Run tests with -race flag to detect data races</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">
@@ -699,15 +809,9 @@ version: 0.2.0
   </phase>
 </workflow>
 
-<related_skills>
-  <skill name="serena-usage">Navigate Go packages and symbol definitions efficiently</skill>
-  <skill name="context7-usage">Access latest Go standard library and toolchain documentation</skill>
-  <skill name="investigation-patterns">Debug goroutine leaks, race conditions, and performance issues</skill>
-</related_skills>
-
 <error_escalation>
   <level severity="low">
-    <example>Golint style warning</example>
+    <example>golangci-lint style warning</example>
     <action>Fix style issue, maintain idiomatic code</action>
   </level>
   <level severity="medium">
@@ -732,3 +836,9 @@ version: 0.2.0
   <avoid>Using init() without strong justification</avoid>
   <avoid>Overusing global variables</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="serena-usage">Navigate Go packages and symbol definitions efficiently</skill>
+  <skill name="context7-usage">Access latest Go standard library and toolchain documentation</skill>
+  <skill name="investigation-patterns">Debug goroutine leaks, race conditions, and performance issues</skill>
+</related_skills>

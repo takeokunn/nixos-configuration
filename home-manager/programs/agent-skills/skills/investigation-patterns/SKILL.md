@@ -1,187 +1,12 @@
 ---
 name: Investigation Patterns
 description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", or needs evidence-based code analysis and debugging. Provides systematic investigation and debugging methodology.
+version: 2.0.0
 ---
 
 <purpose>
   Provide systematic patterns for codebase investigation and debugging, ensuring evidence-based analysis with proper confidence assessment.
 </purpose>
-
-<rules priority="critical">
-  <rule>Always provide file:line references for all findings using format path/to/file.ext:line_number</rule>
-  <rule>Rate confidence and coverage metrics for all investigation results</rule>
-  <rule>Complete investigation before proposing solutions</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use Serena symbol tools before reading entire files</rule>
-  <rule>Independently verify claims rather than confirming assumptions</rule>
-  <rule>Document information gaps and unclear points</rule>
-  <rule>Check multiple sources to increase confidence</rule>
-  <rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
-</rules>
-
-<patterns>
-  <pattern name="scope_classification">
-    <description>Classify the question type to determine investigation approach</description>
-    <decision_tree name="when_to_use">
-      <question>Does the question require understanding codebase structure or behavior?</question>
-      <if_yes>Apply scope classification to determine investigation depth and tools</if_yes>
-      <if_no>Consider requirements-definition skill for unclear requirements</if_no>
-    </decision_tree>
-    <example>
-      Architecture: System design, component relationships
-      Implementation: Specific code behavior, algorithm details
-      Debugging: Error causes, unexpected behavior
-      Design: Pattern usage, code organization
-    </example>
-  </pattern>
-
-  <pattern name="source_identification">
-    <description>Identify relevant sources for investigation</description>
-    <decision_tree name="when_to_use">
-      <question>Is the codebase large or unfamiliar?</question>
-      <if_yes>Apply source identification to locate relevant evidence efficiently</if_yes>
-      <if_no>Directly examine known sources</if_no>
-    </decision_tree>
-    <example>
-      Code: Use Serena for symbol search and dependency analysis
-      Documentation: Check inline comments, README, API docs
-      History: Git log for context on changes
-      External: Context7 for library documentation
-    </example>
-  </pattern>
-
-  <pattern name="evidence_collection">
-    <description>Collect evidence systematically using appropriate tools</description>
-    <decision_tree name="when_to_use">
-      <question>Do you have specific symbols or patterns to investigate?</question>
-      <if_yes>Apply evidence collection with symbol-level tools</if_yes>
-      <if_no>Start with source identification to locate relevant areas</if_no>
-    </decision_tree>
-    <example>
-      find_symbol: Locate specific symbols by name
-      get_symbols_overview: Understand file structure
-      find_referencing_symbols: Trace dependencies
-      search_for_pattern: Find patterns across codebase
-    </example>
-  </pattern>
-
-  <pattern name="synthesis">
-    <description>Synthesize findings with confidence metrics</description>
-    <decision_tree name="when_to_use">
-      <question>Have you collected sufficient evidence from multiple sources?</question>
-      <if_yes>Apply synthesis to combine findings with confidence metrics</if_yes>
-      <if_no>Continue evidence collection to increase coverage</if_no>
-    </decision_tree>
-    <example>
-      Combine evidence from multiple sources
-      Rate confidence based on evidence quality (0-100)
-      Report coverage of relevant code examined (0-100)
-      Identify and document information gaps
-    </example>
-  </pattern>
-
-  <pattern name="reproduce">
-    <description>Confirm the issue is reproducible</description>
-    <decision_tree name="when_to_use">
-      <question>Is this a bug or unexpected behavior investigation?</question>
-      <if_yes>Apply reproduce pattern to confirm issue before debugging</if_yes>
-      <if_no>Use other investigation patterns for analysis tasks</if_no>
-    </decision_tree>
-    <example>
-      Gather exact steps to reproduce
-      Identify environment conditions
-      Determine consistency (always/sometimes fails)
-    </example>
-  </pattern>
-
-  <pattern name="isolate">
-    <description>Narrow down the problem scope</description>
-    <decision_tree name="when_to_use">
-      <question>Is the bug reproducible but involves many components?</question>
-      <if_yes>Apply isolate pattern to narrow down the problem scope</if_yes>
-      <if_no>Proceed to investigate pattern if scope is clear</if_no>
-    </decision_tree>
-    <example>
-      Identify when issue started (git bisect if needed)
-      Remove unrelated components
-      Create minimal reproduction case
-    </example>
-  </pattern>
-
-  <pattern name="investigate">
-    <description>Collect evidence systematically for debugging</description>
-    <decision_tree name="when_to_use">
-      <question>Has the issue been reproduced and isolated?</question>
-      <if_yes>Apply investigate pattern to collect debugging evidence</if_yes>
-      <if_no>Complete reproduce and isolate patterns first</if_no>
-    </decision_tree>
-    <example>
-      Examine error messages and stack traces
-      Check logs at relevant timestamps
-      Use Serena for code path analysis
-      Trace data flow through the system
-    </example>
-  </pattern>
-
-  <pattern name="hypothesize">
-    <description>Form and test hypotheses</description>
-    <decision_tree name="when_to_use">
-      <question>Have you collected sufficient debugging evidence?</question>
-      <if_yes>Apply hypothesize pattern to form and test root cause theories</if_yes>
-      <if_no>Continue investigate pattern to gather more evidence</if_no>
-    </decision_tree>
-    <example>
-      List possible causes
-      Rank by likelihood
-      Design tests to confirm/refute each
-    </example>
-  </pattern>
-
-  <pattern name="fix">
-    <description>Implement and verify solution</description>
-    <decision_tree name="when_to_use">
-      <question>Has a hypothesis been confirmed as the root cause?</question>
-      <if_yes>Apply fix pattern to implement and verify solution</if_yes>
-      <if_no>Continue hypothesize pattern to test other theories</if_no>
-    </decision_tree>
-    <example>
-      Make minimal targeted change
-      Verify fix resolves the issue
-      Check for regressions
-      Add test to prevent recurrence
-    </example>
-  </pattern>
-</patterns>
-
-<error_escalation>
-  <level severity="low">
-    <example>Evidence trail incomplete</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Conflicting evidence found</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Root cause cannot be determined</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Investigation reveals security issue</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
-</error_escalation>
-
-<constraints>
-  <must>Build evidence chains before conclusions</must>
-  <must>Cite specific file:line references</must>
-  <must>State confidence levels explicitly</must>
-  <avoid>Speculation without evidence</avoid>
-  <avoid>Confirmation bias in hypothesis testing</avoid>
-  <avoid>Concluding without exploring alternatives</avoid>
-</constraints>
 
 <tools>
   <tool name="find_symbol">
@@ -332,13 +157,150 @@ description: This skill should be used when the user asks to "investigate code",
   </concept>
 </concepts>
 
-<related_skills>
-  <skill name="serena-usage">Use for memory operations and symbol-level code navigation</skill>
-  <skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
-  <skill name="fact-check">Use to verify external documentation and library behavior</skill>
-  <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
-  <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
-</related_skills>
+<patterns>
+  <pattern name="scope_classification">
+    <description>Classify the question type to determine investigation approach</description>
+    <decision_tree name="when_to_use">
+      <question>Does the question require understanding codebase structure or behavior?</question>
+      <if_yes>Apply scope classification to determine investigation depth and tools</if_yes>
+      <if_no>Consider requirements-definition skill for unclear requirements</if_no>
+    </decision_tree>
+    <example>
+      Architecture: System design, component relationships
+      Implementation: Specific code behavior, algorithm details
+      Debugging: Error causes, unexpected behavior
+      Design: Pattern usage, code organization
+    </example>
+  </pattern>
+
+  <pattern name="source_identification">
+    <description>Identify relevant sources for investigation</description>
+    <decision_tree name="when_to_use">
+      <question>Is the codebase large or unfamiliar?</question>
+      <if_yes>Apply source identification to locate relevant evidence efficiently</if_yes>
+      <if_no>Directly examine known sources</if_no>
+    </decision_tree>
+    <example>
+      Code: Use Serena for symbol search and dependency analysis
+      Documentation: Check inline comments, README, API docs
+      History: Git log for context on changes
+      External: Context7 for library documentation
+    </example>
+  </pattern>
+
+  <pattern name="evidence_collection">
+    <description>Collect evidence systematically using appropriate tools</description>
+    <decision_tree name="when_to_use">
+      <question>Do you have specific symbols or patterns to investigate?</question>
+      <if_yes>Apply evidence collection with symbol-level tools</if_yes>
+      <if_no>Start with source identification to locate relevant areas</if_no>
+    </decision_tree>
+    <example>
+      find_symbol: Locate specific symbols by name
+      get_symbols_overview: Understand file structure
+      find_referencing_symbols: Trace dependencies
+      search_for_pattern: Find patterns across codebase
+    </example>
+  </pattern>
+
+  <pattern name="synthesis">
+    <description>Synthesize findings with confidence metrics</description>
+    <decision_tree name="when_to_use">
+      <question>Have you collected sufficient evidence from multiple sources?</question>
+      <if_yes>Apply synthesis to combine findings with confidence metrics</if_yes>
+      <if_no>Continue evidence collection to increase coverage</if_no>
+    </decision_tree>
+    <example>
+      Combine evidence from multiple sources
+      Rate confidence based on evidence quality (0-100)
+      Report coverage of relevant code examined (0-100)
+      Identify and document information gaps
+    </example>
+  </pattern>
+
+  <pattern name="reproduce">
+    <description>Confirm the issue is reproducible</description>
+    <decision_tree name="when_to_use">
+      <question>Is this a bug or unexpected behavior investigation?</question>
+      <if_yes>Apply reproduce pattern to confirm issue before debugging</if_yes>
+      <if_no>Use other investigation patterns for analysis tasks</if_no>
+    </decision_tree>
+    <example>
+      Gather exact steps to reproduce
+      Identify environment conditions
+      Determine consistency (always/sometimes fails)
+    </example>
+  </pattern>
+
+  <pattern name="isolate">
+    <description>Narrow down the problem scope</description>
+    <decision_tree name="when_to_use">
+      <question>Is the bug reproducible but involves many components?</question>
+      <if_yes>Apply isolate pattern to narrow down the problem scope</if_yes>
+      <if_no>Proceed to investigate pattern if scope is clear</if_no>
+    </decision_tree>
+    <example>
+      Identify when issue started (git bisect if needed)
+      Remove unrelated components
+      Create minimal reproduction case
+    </example>
+  </pattern>
+
+  <pattern name="investigate">
+    <description>Collect evidence systematically for debugging</description>
+    <decision_tree name="when_to_use">
+      <question>Has the issue been reproduced and isolated?</question>
+      <if_yes>Apply investigate pattern to collect debugging evidence</if_yes>
+      <if_no>Complete reproduce and isolate patterns first</if_no>
+    </decision_tree>
+    <example>
+      Examine error messages and stack traces
+      Check logs at relevant timestamps
+      Use Serena for code path analysis
+      Trace data flow through the system
+    </example>
+  </pattern>
+
+  <pattern name="hypothesize">
+    <description>Form and test hypotheses</description>
+    <decision_tree name="when_to_use">
+      <question>Have you collected sufficient debugging evidence?</question>
+      <if_yes>Apply hypothesize pattern to form and test root cause theories</if_yes>
+      <if_no>Continue investigate pattern to gather more evidence</if_no>
+    </decision_tree>
+    <example>
+      List possible causes
+      Rank by likelihood
+      Design tests to confirm/refute each
+    </example>
+  </pattern>
+
+  <pattern name="fix">
+    <description>Implement and verify solution</description>
+    <decision_tree name="when_to_use">
+      <question>Has a hypothesis been confirmed as the root cause?</question>
+      <if_yes>Apply fix pattern to implement and verify solution</if_yes>
+      <if_no>Continue hypothesize pattern to test other theories</if_no>
+    </decision_tree>
+    <example>
+      Make minimal targeted change
+      Verify fix resolves the issue
+      Check for regressions
+      Add test to prevent recurrence
+    </example>
+  </pattern>
+</patterns>
+
+<best_practices>
+  <practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
+  <practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
+  <practice priority="critical">Complete investigation before proposing solutions</practice>
+  <practice priority="high">Use Serena symbol tools before reading entire files</practice>
+  <practice priority="high">Independently verify claims rather than confirming assumptions</practice>
+  <practice priority="high">Document information gaps and unclear points</practice>
+  <practice priority="medium">Check multiple sources to increase confidence</practice>
+  <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
+</best_practices>
 
 <anti_patterns>
   <avoid name="speculation">
@@ -362,13 +324,52 @@ description: This skill should be used when the user asks to "investigate code",
   </avoid>
 </anti_patterns>
 
-<best_practices>
-  <practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
-  <practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
-  <practice priority="critical">Complete investigation before proposing solutions</practice>
-  <practice priority="high">Use Serena symbol tools before reading entire files</practice>
-  <practice priority="high">Independently verify claims rather than confirming assumptions</practice>
-  <practice priority="high">Document information gaps and unclear points</practice>
-  <practice priority="medium">Check multiple sources to increase confidence</practice>
-  <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
-</best_practices>
+<rules priority="critical">
+  <rule>Always provide file:line references for all findings using format path/to/file.ext:line_number</rule>
+  <rule>Rate confidence and coverage metrics for all investigation results</rule>
+  <rule>Complete investigation before proposing solutions</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Use Serena symbol tools before reading entire files</rule>
+  <rule>Independently verify claims rather than confirming assumptions</rule>
+  <rule>Document information gaps and unclear points</rule>
+  <rule>Check multiple sources to increase confidence</rule>
+  <rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
+</rules>
+
+<error_escalation>
+  <level severity="low">
+    <example>Evidence trail incomplete</example>
+    <action>Note in report, proceed</action>
+  </level>
+  <level severity="medium">
+    <example>Conflicting evidence found</example>
+    <action>Document issue, use AskUserQuestion for clarification</action>
+  </level>
+  <level severity="high">
+    <example>Root cause cannot be determined</example>
+    <action>STOP, present options to user</action>
+  </level>
+  <level severity="critical">
+    <example>Investigation reveals security issue</example>
+    <action>BLOCK operation, require explicit user acknowledgment</action>
+  </level>
+</error_escalation>
+
+<constraints>
+  <must>Build evidence chains before conclusions</must>
+  <must>Cite specific file:line references</must>
+  <must>State confidence levels explicitly</must>
+  <avoid>Speculation without evidence</avoid>
+  <avoid>Confirmation bias in hypothesis testing</avoid>
+  <avoid>Concluding without exploring alternatives</avoid>
+</constraints>
+
+<related_skills>
+  <skill name="serena-usage">Use for memory operations and symbol-level code navigation</skill>
+  <skill name="execution-workflow">Use after investigation to implement fixes with proper delegation</skill>
+  <skill name="fact-check">Use to verify external documentation and library behavior</skill>
+  <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
+  <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
+</related_skills>

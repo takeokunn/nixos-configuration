@@ -1,6 +1,7 @@
 ---
 name: Technical Writing
 description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese.
+version: 2.0.0
 ---
 
 <purpose>
@@ -12,8 +13,8 @@ description: This skill should be used when the user asks to "write blog post", 
   <tool>Read</tool>
   <tool>Edit</tool>
   <tool>WebSearch</tool>
-  <tool>mcp__context7__resolve-library-id</tool>
-  <tool>mcp__context7__get-library-docs</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__resolve-library-id</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__get-library-docs</tool>
 </tools>
 
 <concepts>
@@ -174,7 +175,6 @@ description: This skill should be used when the user asks to "write blog post", 
   </bilingual>
 </language_guidelines>
 
-
 <output>
   <format>
     <article_plan>
@@ -207,7 +207,7 @@ description: This skill should be used when the user asks to "write blog post", 
   </pattern>
   <pattern name="comparison">
     <description>[A] vs [B]: Which Should You Choose in [Year]?</description>
-    <example>REST vs GraphQL: Which Should You Choose in 2025?</example>
+    <example>REST vs GraphQL: Which Should You Choose in [Current Year]?</example>
   </pattern>
   <pattern name="problem_solution">
     <description>Solving [Problem] with [Solution]</description>
@@ -305,6 +305,25 @@ description: This skill should be used when the user asks to "write blog post", 
   <rule>Break long code blocks with explanations</rule>
   <rule>Ensure title accurately reflects content scope</rule>
 </rules>
+
+<workflow>
+  <phase name="planning">
+    <step order="1">Identify article type, target audience, and core message</step>
+    <step order="2">Research topic using Context7 and WebSearch for accuracy</step>
+    <step order="3">Create outline following the appropriate pattern structure</step>
+  </phase>
+  <phase name="drafting">
+    <step order="1">Write the hook and introduction first</step>
+    <step order="2">Draft each section following one-idea-per-section principle</step>
+    <step order="3">Add code examples, diagrams, and supporting evidence</step>
+  </phase>
+  <phase name="revision">
+    <step order="1">Verify all code examples compile and run</step>
+    <step order="2">Check technical claims against sources</step>
+    <step order="3">Review against edit checklist</step>
+    <step order="4">Read aloud for flow and trim unnecessary words</step>
+  </phase>
+</workflow>
 
 <error_escalation>
   <level severity="low">

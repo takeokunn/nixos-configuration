@@ -204,6 +204,9 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <branch condition="Code review">Use /feedback command</branch>
   <branch condition="Documentation">Use /markdown command</branch>
   <branch condition="Upstream PR preparation">Use /upstream command</branch>
+  <branch condition="Code cleanup and review">Use /simplify command</branch>
+  <branch condition="Memory review and organization">Use /remember command</branch>
+  <branch condition="Capture session as reusable skill">Use /skillify command</branch>
 </decision_tree>
 
 <parallelization inherits="parallelization-patterns#parallelization_orchestration">
@@ -270,6 +273,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <action>Git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the CURRENT message</action>
       <response>HARD BLOCK: Ask user for permission. "Continue the task", context-continuation, and /upstream output do NOT imply git permission.</response>
     </behavior>
+    <behavior id="ORCH-P004" priority="critical">
+      <trigger>When delegating to sub-agents</trigger>
+      <action>Delegating synthesis to sub-agents without providing specific file paths, line numbers, and change descriptions</action>
+      <response>Always synthesize findings yourself first. Write prompts that prove you understood: include file paths, line numbers, what specifically to change. The orchestrator owns the synthesis; sub-agents own the execution.</response>
+    </behavior>
   </prohibited_behaviors>
 </enforcement>
 
@@ -295,6 +303,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <agent name="git">Git workflow and branching strategy</agent>
   <agent name="quality-assurance">Code review and quality evaluation</agent>
   <agent name="validator">Cross-validation and consensus verification</agent>
+  <agent name="verification">Adversarial red-team testing to break implementations</agent>
 </related_agents>
 
 <constraints>

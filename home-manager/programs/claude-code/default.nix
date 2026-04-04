@@ -101,6 +101,7 @@ in
       security = builtins.readFile "${claude-prompts-path}/agents/security.md";
       test = builtins.readFile "${claude-prompts-path}/agents/test.md";
       validator = builtins.readFile "${claude-prompts-path}/agents/validator.md";
+      verification = builtins.readFile "${claude-prompts-path}/agents/verification.md";
     };
 
     commands = {
@@ -112,6 +113,9 @@ in
       execute-full = builtins.readFile "${claude-prompts-path}/commands/execute-full.md";
       feedback = builtins.readFile "${claude-prompts-path}/commands/feedback.md";
       markdown = builtins.readFile "${claude-prompts-path}/commands/markdown.md";
+      remember = builtins.readFile "${claude-prompts-path}/commands/remember.md";
+      simplify = builtins.readFile "${claude-prompts-path}/commands/simplify.md";
+      skillify = builtins.readFile "${claude-prompts-path}/commands/skillify.md";
       upstream = builtins.readFile "${claude-prompts-path}/commands/upstream.md";
     };
 

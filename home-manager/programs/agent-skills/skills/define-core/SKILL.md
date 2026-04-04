@@ -1,7 +1,7 @@
 ---
 name: Define Core
 description: Shared workflow phases and patterns for requirements definition commands. Use this skill when implementing /define or /define-full commands to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
-version: 0.1.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -188,6 +188,59 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
 
+<output>
+  <format id="requirements_document">
+    <summary>One-sentence request, background, expected outcomes</summary>
+    <current_state>Existing system, tech stack</current_state>
+    <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
+    <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
+    <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
+    <metrics>
+      <metric name="feasibility">0-100</metric>
+      <metric name="objectivity">0-100</metric>
+    </metrics>
+    <constraints>Technical, operational</constraints>
+    <test_requirements>Unit, integration, acceptance criteria</test_requirements>
+    <outstanding_issues>Unresolved questions</outstanding_issues>
+  </format>
+  <format id="task_breakdown">
+    <dependency_graph>Task dependencies visualization</dependency_graph>
+    <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
+    <execute_handoff>Decisions, references, constraints</execute_handoff>
+  </format>
+</output>
+
+<best_practices>
+  <practice priority="critical">Always initialize Serena and check memories before starting requirements definition</practice>
+  <practice priority="critical">Investigate existing codebase patterns before documenting any requirements</practice>
+  <practice priority="critical">Use AskUserQuestion tool with structured options (2-4 choices) for all user interactions</practice>
+  <practice priority="critical">Always include a (Recommended) option when presenting choices</practice>
+  <practice priority="high">Score questions using 4-criteria system (design branching, irreversibility, investigation impossibility, effort impact)</practice>
+  <practice priority="high">Delegate investigation tasks to specialized agents in parallel</practice>
+  <practice priority="high">Verify external documentation claims via Context7 and fact-check patterns</practice>
+  <practice priority="medium">Classify questions by type (spec confirmation, design choice, constraint, scope, priority)</practice>
+  <practice priority="medium">Document all assumptions explicitly when requirements are unclear</practice>
+</best_practices>
+
+<anti_patterns>
+  <avoid name="code_modification">
+    <description>Modifying or creating code files during requirements definition</description>
+    <instead>Keep all operations read-only; this is a requirements-only phase</instead>
+  </avoid>
+  <avoid name="skipping_investigation">
+    <description>Documenting requirements without investigating existing codebase</description>
+    <instead>Always investigate existing patterns and code before defining requirements</instead>
+  </avoid>
+  <avoid name="unstructured_questions">
+    <description>Using plain text output for questions instead of AskUserQuestion tool</description>
+    <instead>Use AskUserQuestion tool with 2-4 structured options for all user interactions</instead>
+  </avoid>
+  <avoid name="proceeding_without_answers">
+    <description>Proceeding with assumptions when critical questions are unanswered</description>
+    <instead>Block progress until clear answers to critical questions are obtained</instead>
+  </avoid>
+</anti_patterns>
+
 <rules priority="critical">
   <rule id="DC-C001">Never modify, create, or delete files</rule>
   <rule id="DC-C002">Never implement code; requirements definition only</rule>
@@ -231,28 +284,6 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   </prohibited_behaviors>
 </enforcement>
 
-<output>
-  <format id="requirements_document">
-    <summary>One-sentence request, background, expected outcomes</summary>
-    <current_state>Existing system, tech stack</current_state>
-    <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
-    <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
-    <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-    <metrics>
-      <metric name="feasibility">0-100</metric>
-      <metric name="objectivity">0-100</metric>
-    </metrics>
-    <constraints>Technical, operational</constraints>
-    <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-    <outstanding_issues>Unresolved questions</outstanding_issues>
-  </format>
-  <format id="task_breakdown">
-    <dependency_graph>Task dependencies visualization</dependency_graph>
-    <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
-    <execute_handoff>Decisions, references, constraints</execute_handoff>
-  </format>
-</output>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor ambiguity in non-critical feature detail</low>
@@ -261,18 +292,6 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
     <critical>Request violates security policy or data integrity</critical>
   </examples>
 </error_escalation>
-
-<best_practices>
-  <practice priority="critical">Always initialize Serena and check memories before starting requirements definition</practice>
-  <practice priority="critical">Investigate existing codebase patterns before documenting any requirements</practice>
-  <practice priority="critical">Use AskUserQuestion tool with structured options (2-4 choices) for all user interactions</practice>
-  <practice priority="critical">Always include a (Recommended) option when presenting choices</practice>
-  <practice priority="high">Score questions using 4-criteria system (design branching, irreversibility, investigation impossibility, effort impact)</practice>
-  <practice priority="high">Delegate investigation tasks to specialized agents in parallel</practice>
-  <practice priority="high">Verify external documentation claims via Context7 and fact-check patterns</practice>
-  <practice priority="medium">Classify questions by type (spec confirmation, design choice, constraint, scope, priority)</practice>
-  <practice priority="medium">Document all assumptions explicitly when requirements are unclear</practice>
-</best_practices>
 
 <constraints>
   <must>Keep all operations read-only</must>

@@ -1,6 +1,7 @@
 ---
 name: Emacs Ecosystem
 description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", or "magit". Provides comprehensive Emacs ecosystem patterns and best practices. For org-mode, use org-ecosystem skill.
+version: 2.0.0
 ---
 
 <purpose>
@@ -150,11 +151,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
               ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
       (package-initialize)
 
-      ;; Install use-package if not present
-      (unless (package-installed-p 'use-package)
-        (package-refresh-contents)
-        (package-install 'use-package))
-
+      ;; use-package is built-in since Emacs 29; no installation needed
       (eval-when-compile
         (require 'use-package))
 
@@ -173,18 +170,16 @@ description: This skill should be used when the user asks to "write elisp", "ema
       <if_no>Use require for simple packages with no configuration needs</if_no>
     </decision_tree>
     <example>
-      (use-package company
+      (use-package corfu
         :ensure t
         :defer t
-        :hook (prog-mode . company-mode)
-        :bind (:map company-active-map
-                    ("C-n" . company-select-next)
-                    ("C-p" . company-select-previous))
+        :hook (prog-mode . corfu-mode)
+        :bind (:map corfu-map
+                    ("C-n" . corfu-next)
+                    ("C-p" . corfu-previous))
         :custom
-        (company-idle-delay 0.2)
-        (company-minimum-prefix-length 2)
-        :config
-        (setq company-backends '(company-capf)))
+        (corfu-auto t)
+        (corfu-cycle t))
     </example>
     <note>
       Keywords:
@@ -280,7 +275,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
 <tools>
   <tool name="package.el">
-    <description>Built-in package manager for Emacs</description>
+    <description>Built-in package manager for Emacs. Reliable and sufficient for most workflows.</description>
     <example>
       ;; Commands:
       ;; - package-install - Install a package
@@ -299,8 +294,22 @@ description: This skill should be used when the user asks to "write elisp", "ema
     </example>
   </tool>
 
+  <tool name="use-package">
+    <description>Built-in since Emacs 29. The standard declarative way to configure packages. No installation needed on Emacs 29+.</description>
+    <example>
+      ;; use-package is built-in since Emacs 29; just require it
+      (eval-when-compile
+        (require 'use-package))
+
+      ;; Declarative package configuration
+      (use-package magit
+        :ensure t
+        :bind ("C-x g" . magit-status))
+    </example>
+  </tool>
+
   <tool name="straight.el">
-    <description>Functional package manager with Git integration</description>
+    <description>Functional package manager with Git integration. Still widely used, but elpaca is gaining adoption for reproducible package management.</description>
     <example>
       ;; Bootstrap
       (defvar bootstrap-version)
@@ -326,7 +335,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
   </tool>
 
   <tool name="elpaca">
-    <description>Modern async package manager</description>
+    <description>Modern async package manager gaining adoption for reproducible package management. An alternative to straight.el with improved performance.</description>
     <example>
       ;; Bootstrap
       (defvar elpaca-installer-version 0.7)
@@ -395,30 +404,33 @@ description: This skill should be used when the user asks to "write elisp", "ema
 <lsp_integration>
   <decision_tree name="when_to_use">
     <question>Do you need LSP features like completion, go-to-definition, and diagnostics?</question>
-    <if_yes>Use eglot for built-in simplicity or lsp-mode for rich features</if_yes>
+    <if_yes>Use eglot (built-in, recommended default). Use lsp-mode only for advanced configurations requiring features beyond eglot.</if_yes>
     <if_no>Use basic major modes without LSP overhead</if_no>
   </decision_tree>
 
   <pattern name="eglot">
-    <description>Built-in LSP client (Emacs 29+)</description>
+    <description>Built-in LSP client (Emacs 29+). Recommended default for most use cases. Tightly integrated with Emacs core, leveraging built-in completion (completion-at-point), Flymake for diagnostics, and project.el for project management.</description>
     <example>
       (use-package eglot
-        :ensure nil ; built-in
+        :ensure nil ; built-in since Emacs 29
         :hook ((python-mode . eglot-ensure)
-               (typescript-mode . eglot-ensure)
-               (rust-mode . eglot-ensure))
+               (python-ts-mode . eglot-ensure)
+               (typescript-ts-mode . eglot-ensure)
+               (rust-ts-mode . eglot-ensure))
         :config
         (setq eglot-autoshutdown t)
-        (setq eglot-events-buffer-size 0))
+        (setq eglot-events-buffer-size 0)
+        ;; Emacs 30+: improved tree-sitter integration with eglot
+        (setq eglot-report-progress nil))
 
       ;; Custom server configuration
       (add-to-list 'eglot-server-programs
-                   '(rust-mode . ("rust-analyzer")))
+                   '(rust-ts-mode . ("rust-analyzer")))
     </example>
   </pattern>
 
   <pattern name="lsp_mode">
-    <description>Feature-rich LSP client with lsp-mode and lsp-ui</description>
+    <description>Feature-rich LSP client for advanced configurations. Use when eglot does not meet requirements (e.g., DAP integration, custom UI features via lsp-ui).</description>
     <example>
       (use-package lsp-mode
         :ensure t
@@ -442,9 +454,9 @@ description: This skill should be used when the user asks to "write elisp", "ema
   </pattern>
 
   <pattern name="completion">
-    <description>LSP completion with corfu/company</description>
+    <description>LSP completion with corfu (recommended) or company. Corfu works with Emacs built-in completion-at-point and pairs well with eglot. Cape provides additional completion-at-point backends.</description>
     <example>
-      ;; With corfu (modern)
+      ;; With corfu + cape (current best practice)
       (use-package corfu
         :ensure t
         :custom
@@ -453,7 +465,13 @@ description: This skill should be used when the user asks to "write elisp", "ema
         :init
         (global-corfu-mode))
 
-      ;; With company (traditional)
+      (use-package cape
+        :ensure t
+        :init
+        (add-hook 'completion-at-point-functions #'cape-dabbrev)
+        (add-hook 'completion-at-point-functions #'cape-file))
+
+      ;; With company (traditional, still maintained)
       (use-package company
         :ensure t
         :hook (after-init . global-company-mode)
@@ -465,7 +483,7 @@ description: This skill should be used when the user asks to "write elisp", "ema
 
 <modern_packages>
   <tool name="vertico">
-    <description>Vertical completion UI with orderless, marginalia, and consult</description>
+    <description>Vertical completion UI. Part of the current best-practice completion stack: vertico (UI), orderless (matching), marginalia (annotations), consult (commands), embark (actions).</description>
     <example>
       (use-package vertico
         :ensure t
@@ -499,22 +517,30 @@ description: This skill should be used when the user asks to "write elisp", "ema
   </tool>
 
   <tool name="treesit">
-    <description>Tree-sitter integration (Emacs 29+)</description>
+    <description>Native tree-sitter integration (Emacs 29+, improved in Emacs 30). Emacs 30.2 includes enhanced tree-sitter support with better fontification, indentation, and navigation. Use *-ts-mode variants for tree-sitter-backed major modes.</description>
     <example>
       (setq treesit-language-source-alist
             '((python "https://github.com/tree-sitter/tree-sitter-python")
               (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
               (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
-                          "master" "typescript/src")))
+                          "master" "typescript/src")
+              (tsx "https://github.com/tree-sitter/tree-sitter-typescript"
+                   "master" "tsx/src")))
 
       ;; Install grammars
       (mapc #'treesit-install-language-grammar
             (mapcar #'car treesit-language-source-alist))
 
-      ;; Remap modes
+      ;; Remap modes to tree-sitter variants
       (setq major-mode-remap-alist
             '((python-mode . python-ts-mode)
-              (javascript-mode . js-ts-mode)))
+              (javascript-mode . js-ts-mode)
+              (typescript-mode . typescript-ts-mode)
+              (css-mode . css-ts-mode)
+              (json-mode . json-ts-mode)))
+
+      ;; Emacs 30+: treesit-auto can manage grammar installation
+      ;; and mode remapping automatically
     </example>
   </tool>
 </modern_packages>
@@ -555,8 +581,11 @@ description: This skill should be used when the user asks to "write elisp", "ema
   <practice priority="medium">Use :hook instead of add-hook in use-package</practice>
   <practice priority="medium">Lazy load packages with :defer, :commands, or :hook</practice>
   <practice priority="medium">Use native-compilation when available (Emacs 28+)</practice>
-  <practice priority="medium">Prefer eglot for LSP (built-in, simpler)</practice>
-  <practice priority="medium">Use tree-sitter modes when available (Emacs 29+)</practice>
+  <practice priority="high">Prefer eglot for LSP (built-in since Emacs 29, recommended default)</practice>
+  <practice priority="high">Use tree-sitter *-ts-mode variants when available (Emacs 29+, improved in 30.2)</practice>
+  <practice priority="high">Use the modern completion stack: vertico, orderless, marginalia, consult, corfu, cape</practice>
+  <practice priority="medium">use-package is built-in since Emacs 29; no need to install it</practice>
+  <practice priority="medium">Current stable is Emacs 30.2 (August 2025); Emacs 31 is in development</practice>
 </best_practices>
 
 <anti_patterns>
@@ -604,7 +633,31 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <description>Complex logic in early-init.el</description>
     <instead>Keep early-init.el minimal (frame settings, package setup)</instead>
   </avoid>
+
+  <avoid name="lsp_mode_when_eglot_suffices">
+    <description>Using lsp-mode when eglot meets all requirements</description>
+    <instead>Use eglot (built-in since Emacs 29, preferred default). Only use lsp-mode for DAP integration or lsp-ui features not available in eglot.</instead>
+  </avoid>
+
+  <avoid name="company_mode">
+    <description>Using company-mode for in-buffer completion</description>
+    <instead>Use corfu + cape, which integrate with Emacs built-in completion-at-point and pair well with eglot and the vertico stack.</instead>
+  </avoid>
+
+  <avoid name="helm_ivy">
+    <description>Using helm or ivy/counsel for minibuffer completion</description>
+    <instead>Use the modern completion stack: vertico (UI) + orderless (matching) + marginalia (annotations) + consult (commands) + embark (actions).</instead>
+  </avoid>
 </anti_patterns>
+
+<rules>
+  <rule priority="critical">Target Emacs 30.2 (current stable, August 2025) as the baseline version</rule>
+  <rule priority="critical">Prefer built-in packages (eglot, use-package, treesit) over third-party alternatives</rule>
+  <rule priority="high">Use tree-sitter *-ts-mode variants for all languages with grammar support</rule>
+  <rule priority="high">Configure eglot as the default LSP client; only suggest lsp-mode when eglot is insufficient</rule>
+  <rule priority="high">Recommend the modern completion stack (vertico, orderless, marginalia, consult, corfu, cape) over legacy alternatives (helm, ivy, company)</rule>
+  <rule priority="medium">For reproducible package management, mention elpaca alongside straight.el</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">
@@ -626,14 +679,6 @@ description: This skill should be used when the user asks to "write elisp", "ema
     <step>3. Verify keybindings don't conflict</step>
   </phase>
 </workflow>
-
-<related_skills>
-  <skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
-  <skill name="serena-usage">Symbol operations for elisp code navigation</skill>
-  <skill name="context7-usage">Emacs documentation lookup via /websites/emacsdocs</skill>
-  <skill name="investigation-patterns">Debugging package conflicts and performance issues</skill>
-  <skill name="technical-documentation">Creating package documentation and README files</skill>
-</related_skills>
 
 <error_escalation>
   <level severity="low">
@@ -662,3 +707,11 @@ description: This skill should be used when the user asks to "write elisp", "ema
   <avoid>Overriding standard keybindings silently</avoid>
   <avoid>Blocking operations in hooks</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
+  <skill name="serena-usage">Symbol operations for elisp code navigation</skill>
+  <skill name="context7-usage">Emacs documentation lookup via /websites/emacsdocs</skill>
+  <skill name="investigation-patterns">Debugging package conflicts and performance issues</skill>
+  <skill name="technical-documentation">Creating package documentation and README files</skill>
+</related_skills>

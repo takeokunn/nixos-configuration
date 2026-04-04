@@ -1,11 +1,11 @@
 ---
 name: Exploration Tools
 description: Tool definitions and usage patterns for codebase exploration (Glob, Grep, Read, LSP). Agents reference this skill instead of inline tool definitions.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <purpose>
-  Provide standardized tool definitions and usage patterns for codebase exploration. This skill centralizes tool knowledge that was previously duplicated across agents.
+  Provide standardized tool definitions and usage patterns for codebase exploration. This skill centralizes tool knowledge that was previously duplicated across agents, ensuring consistent search strategies and result formatting.
 </purpose>
 
 <tools>
@@ -29,10 +29,12 @@ version: 1.0.0
       <param name="path" required="false">File or directory to search in</param>
       <param name="glob" required="false">Filter files by glob pattern</param>
       <param name="type" required="false">File type filter (js, py, rust, etc.)</param>
-      <param name="output_mode" required="false">content, files_with_matches, or count</param>
+      <param name="output_mode" required="false">content, files_with_matches (default), or count</param>
       <param name="-A" required="false">Lines after match</param>
       <param name="-B" required="false">Lines before match</param>
-      <param name="-C" required="false">Lines around match</param>
+      <param name="-C" required="false">Lines of context around match</param>
+      <param name="-i" required="false">Case insensitive search</param>
+      <param name="multiline" required="false">Enable multiline matching for cross-line patterns</param>
     </params>
     <use_case>Search file contents for patterns, keywords, or code constructs</use_case>
     <example>
@@ -49,7 +51,7 @@ version: 1.0.0
       <param name="offset" required="false">Starting line number</param>
       <param name="limit" required="false">Number of lines to read</param>
     </params>
-    <use_case>View file contents after finding with Glob or Grep</use_case>
+    <use_case>View file contents after locating with Glob or Grep</use_case>
     <example>
       file_path: /path/to/file.ts
       offset: 50
@@ -75,7 +77,7 @@ version: 1.0.0
       <param name="line" required="true">Line number of the definition</param>
       <param name="character" required="true">Column position of the definition</param>
     </params>
-    <use_case>Find all usages of a function, class, or variable</use_case>
+    <use_case>Find all usages of a function, class, or variable across the codebase</use_case>
   </tool>
 
   <tool name="LSP_documentSymbol">
@@ -86,6 +88,28 @@ version: 1.0.0
     <use_case>Get an overview of classes, functions, and variables in a file</use_case>
   </tool>
 </tools>
+
+<concepts>
+  <concept name="search_scope">
+    <description>Choosing appropriate search boundaries to balance speed and completeness</description>
+    <example>
+      Narrow: Single file or directory
+      Medium: File type across project
+      Broad: All files in project
+
+      Start narrow, expand only if results are insufficient
+    </example>
+  </concept>
+
+  <concept name="result_ranking">
+    <description>Prioritizing search results by relevance</description>
+    <example>
+      High relevance: Exact matches, definition sites
+      Medium relevance: Usage sites, related patterns
+      Low relevance: Comments, test files, generated code
+    </example>
+  </concept>
+</concepts>
 
 <patterns>
   <pattern name="file_discovery">
@@ -116,54 +140,6 @@ version: 1.0.0
   </pattern>
 </patterns>
 
-<concepts>
-  <concept name="search_scope">
-    <description>Choosing appropriate search boundaries</description>
-    <example>
-      Narrow: Single file or directory
-      Medium: File type across project
-      Broad: All files in project
-
-      Start narrow, expand if needed
-    </example>
-  </concept>
-
-  <concept name="result_ranking">
-    <description>Prioritizing search results by relevance</description>
-    <example>
-      High relevance: Exact matches, definition sites
-      Medium relevance: Usage sites, related patterns
-      Low relevance: Comments, test files, generated code
-    </example>
-  </concept>
-</concepts>
-
-<best_practices>
-  <practice priority="critical">Use Glob for file discovery, Grep for content search</practice>
-  <practice priority="critical">Always return file:line references for findings</practice>
-  <practice priority="high">Start with narrow search scope, expand if needed</practice>
-  <practice priority="high">Use LSP tools when available for accurate symbol navigation</practice>
-  <practice priority="medium">Filter out binary and generated files</practice>
-  <practice priority="medium">Limit results to manageable size</practice>
-</best_practices>
-
-<anti_patterns>
-  <avoid name="blind_broad_search">
-    <description>Searching entire codebase without filters</description>
-    <instead>Start with file type or directory filters</instead>
-  </avoid>
-
-  <avoid name="reading_without_searching">
-    <description>Reading files without first using Glob/Grep to locate</description>
-    <instead>Use search tools to find relevant files first</instead>
-  </avoid>
-
-  <avoid name="ignoring_context">
-    <description>Returning matches without surrounding context</description>
-    <instead>Use -C flag with Grep or read surrounding lines</instead>
-  </avoid>
-</anti_patterns>
-
 <decision_tree name="tool_selection">
   <question>What type of search is needed?</question>
   <branch condition="Find files by name pattern">Use Glob</branch>
@@ -173,10 +149,42 @@ version: 1.0.0
   <branch condition="View file contents">Use Read</branch>
 </decision_tree>
 
+<best_practices>
+  <practice priority="critical">Use Glob for file discovery, Grep for content search</practice>
+  <practice priority="critical">Always return file:line references for findings</practice>
+  <practice priority="high">Start with narrow search scope, expand if needed</practice>
+  <practice priority="high">Use LSP tools when available for accurate symbol navigation</practice>
+  <practice priority="medium">Filter out binary and generated files</practice>
+  <practice priority="medium">Limit results to manageable size using head_limit</practice>
+</best_practices>
+
+<anti_patterns>
+  <avoid name="blind_broad_search">
+    <description>Searching entire codebase without filters</description>
+    <instead>Start with file type or directory filters</instead>
+  </avoid>
+
+  <avoid name="reading_without_searching">
+    <description>Reading files without first using Glob/Grep to locate them</description>
+    <instead>Use search tools to find relevant files first</instead>
+  </avoid>
+
+  <avoid name="ignoring_context">
+    <description>Returning matches without surrounding context</description>
+    <instead>Use -C flag with Grep or read surrounding lines</instead>
+  </avoid>
+</anti_patterns>
+
+<rules>
+  <rule priority="critical">Exploration operations must be read-only; never modify files during search</rule>
+  <rule priority="critical">Always use absolute file paths in Read tool calls</rule>
+  <rule priority="high">Prefer Grep over shell grep/rg commands for consistent behavior</rule>
+</rules>
+
 <constraints>
   <must>Return file paths with line numbers for all findings</must>
   <must>Limit results to manageable size</must>
-  <must>Maintain read-only operations</must>
+  <must>Maintain read-only operations during exploration</must>
   <avoid>Modifying files during exploration</avoid>
   <avoid>Returning raw dumps without filtering</avoid>
   <avoid>Searching binary or generated files</avoid>

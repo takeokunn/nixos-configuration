@@ -1,7 +1,7 @@
 ---
 name: Workflow Patterns
 description: Patterns for output formats, reflection checkpoints, agent references, and self-evaluation shared across agents and commands.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -258,12 +258,6 @@ readonly attribute indicates whether agent can modify files.
   <rule>Add serena_validation_investigation after investigation phases</rule>
 </rules>
 
-<related_skills>
-  <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
-  <skill name="parallelization-patterns">Parallel execution and timeout configuration</skill>
-  <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation)</skill>
-</related_skills>
-
 <constraints>
   <must>Use standard output_status_criteria thresholds</must>
   <must>Include confidence score in all structured outputs</must>
@@ -277,3 +271,9 @@ readonly attribute indicates whether agent can modify files.
   <avoid>Omitting Serena initialization in commands</avoid>
   <avoid>Skipping reflection tool calls at mandatory checkpoints</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
+  <skill name="parallelization-patterns">Parallel execution and timeout configuration</skill>
+  <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation)</skill>
+</related_skills>

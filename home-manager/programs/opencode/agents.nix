@@ -20,6 +20,7 @@
         "security"
         "test"
         "validator"
+        "verification"
       ]
   );
   commands = builtins.listToAttrs (
@@ -37,6 +38,9 @@
         "execute-full"
         "feedback"
         "markdown"
+        "remember"
+        "simplify"
+        "skillify"
         "upstream"
       ]
   );

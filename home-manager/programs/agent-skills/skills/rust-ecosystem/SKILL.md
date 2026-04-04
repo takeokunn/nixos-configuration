@@ -1,6 +1,7 @@
 ---
 name: Rust Ecosystem
 description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Provides comprehensive Rust ecosystem patterns and best practices.
+version: 2.0.0
 ---
 
 <purpose>
@@ -111,6 +112,7 @@ description: This skill should be used when working with Rust projects, "Cargo.t
           Parse { msg: String },
         }
       </example>
+      <note>Use thiserror 2.0+ which provides improved error messages and automatic From implementations.</note>
     </pattern>
   </error_handling>
 
@@ -142,6 +144,56 @@ description: This skill should be used when working with Rust projects, "Cargo.t
       <use_case>Prevent invalid state transitions at compile time</use_case>
     </pattern>
   </common_patterns>
+
+  <edition_2024_features>
+    <feature name="async_closures">
+      <description>Rust now supports async closures like async || {} which return futures when called (Edition 2024).</description>
+      <example>
+        let closure = async || {
+          do_async_work().await
+        };
+        let result = closure().await;
+      </example>
+    </feature>
+    <feature name="rpit_lifetime_capture">
+      <description>impl Trait return types now capture all in-scope lifetimes by default. Use use&lt;..&gt; to explicitly specify captured parameters.</description>
+    </feature>
+    <feature name="diagnostic_do_not_recommend">
+      <description>#[diagnostic::do_not_recommend] attribute lets crate authors control which trait implementations are suggested in compiler diagnostics.</description>
+    </feature>
+    <feature name="temporary_lifetime_changes">
+      <description>Changed scope of temporaries for if let expressions and tail expressions in blocks (Edition 2024).</description>
+    </feature>
+    <feature name="async_fn_in_traits">
+      <description>async fn in trait definitions and implementations is stable since Rust 1.75. No longer requires the async-trait crate for most use cases.</description>
+      <example>
+        trait DataStore {
+          async fn fetch(&amp;self, id: u64) -&gt; Result&lt;Data, Error&gt;;
+        }
+
+        impl DataStore for PostgresStore {
+          async fn fetch(&amp;self, id: u64) -&gt; Result&lt;Data, Error&gt; {
+            sqlx::query_as("SELECT * FROM data WHERE id = $1")
+              .bind(id)
+              .fetch_one(&amp;self.pool)
+              .await
+          }
+        }
+      </example>
+      <note>For public traits in libraries, consider using trait_variant::make to provide Send bounds.</note>
+    </feature>
+    <feature name="let_chains">
+      <description>Chain let patterns in if and while conditions (stable in edition 2024).</description>
+      <example>
+        if let Some(user) = get_user(id)
+          &amp;&amp; let Some(email) = user.email
+          &amp;&amp; email.ends_with("@company.com")
+        {
+          send_internal_notification(email);
+        }
+      </example>
+    </feature>
+  </edition_2024_features>
 
   <anti_patterns>
     <avoid name="unwrap_in_library">
@@ -196,8 +248,8 @@ description: This skill should be used when working with Rust projects, "Cargo.t
       [package]
       name = "my-crate"
       version = "0.1.0"
-      edition = "2021" # Current edition; edition 2024 (upcoming/future)
-      rust-version = "1.83" # Current stable as of Dec 2025
+      edition = "2024" # Current edition (stable since Rust 1.85)
+      rust-version = "1.94" # Current stable as of April 2026
 
       [dependencies]
       serde = { version = "1.0", features = ["derive"] }
@@ -233,12 +285,12 @@ description: This skill should be used when working with Rust projects, "Cargo.t
   <workspace>
     <root_cargo_toml>
       [workspace]
-      resolver = "2"  # Current default for edition 2021; resolver 3 (upcoming, requires Edition 2024)
+      resolver = "3"  # Default for edition 2024
       members = ["crate-a", "crate-b"]
 
       [workspace.package]
       version = "0.1.0"
-      edition = "2021"
+      edition = "2024"
       license = "MIT"
 
       [workspace.dependencies]
@@ -290,7 +342,7 @@ description: This skill should be used when working with Rust projects, "Cargo.t
 
       <file_reference>Or in clippy.toml</file_reference>
 
-      msrv = "1.70"
+      msrv = "1.94"
       cognitive-complexity-threshold = 25
     </configuration>
 
@@ -308,7 +360,7 @@ description: This skill should be used when working with Rust projects, "Cargo.t
 
     <configuration>
       <file_reference>rustfmt.toml</file_reference>
-      edition = "2021"
+      edition = "2024"
       max_width = 100
       use_small_heuristics = "Max"
       imports_granularity = "Crate"
@@ -352,6 +404,15 @@ description: This skill should be used when working with Rust projects, "Cargo.t
     </tool>
     <tool name="cargo-expand">
       <description>Macro expansion debugging</description>
+    </tool>
+    <tool name="cargo-binstall">
+      <description>Install pre-built binaries from crates.io (faster than cargo install)</description>
+    </tool>
+    <tool name="cargo-vet">
+      <description>Supply chain security — audit third-party crate reviews</description>
+    </tool>
+    <tool name="cargo-mutants">
+      <description>Mutation testing to verify test effectiveness</description>
     </tool>
   </other_tools>
 </toolchain>

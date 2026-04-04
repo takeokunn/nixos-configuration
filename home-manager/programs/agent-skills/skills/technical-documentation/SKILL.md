@@ -1,6 +1,7 @@
 ---
 name: Technical Documentation
 description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Provides comprehensive documentation patterns for developers, teams, and end-users in both English and Japanese.
+version: 2.0.0
 ---
 
 <purpose>
@@ -319,64 +320,6 @@ description: This skill should be used when the user asks to "write documentatio
   </pattern>
 </patterns>
 
-<best_practices>
-  <practice priority="critical">
-    <description>Audience-first approach - Write for your specific audience's knowledge level</description>
-    <example>
-      Developers: Assume technical background, focus on implementation details
-      Team members: Balance context with technical depth
-      End users: Avoid jargon, use step-by-step instructions
-    </example>
-  </practice>
-
-  <practice priority="critical">
-    <description>Progressive disclosure - Start with essentials, reveal complexity gradually</description>
-    <example>
-      1. Quick start for immediate value
-      2. Common use cases
-      3. Advanced configuration
-      4. Edge cases and troubleshooting
-    </example>
-  </practice>
-
-  <practice priority="high">
-    <description>Make content scannable to enable quick information retrieval</description>
-    <example>
-      - Use descriptive headings
-      - Use bullet points for lists
-      - Include code blocks with syntax highlighting
-      - Use tables for structured data
-      - Use bold for key terms (sparingly)
-    </example>
-  </practice>
-
-  <practice priority="high">
-    <description>Example-driven documentation - Show, don't just tell</description>
-    <example>
-      - Include working code examples
-      - Show expected output
-      - Provide copy-pasteable commands
-    </example>
-  </practice>
-
-  <practice priority="medium">
-    <description>Active voice and present tense for clarity</description>
-    <example>
-      Good: Run this command to start the server.
-      Bad: The server can be started by running the following command.
-    </example>
-  </practice>
-
-  <practice priority="medium">
-    <description>Test all code examples before publishing</description>
-    <example>
-      Always verify that code examples compile and run correctly
-      Include expected output
-      Test edge cases mentioned in documentation
-    </example>
-  </practice>
-</best_practices>
-
 <language_guidelines>
   <english>
     <style>Active voice, present tense</style>
@@ -436,6 +379,64 @@ description: This skill should be used when the user asks to "write documentatio
     </review_checklist>
   </format>
 </output>
+
+<best_practices>
+  <practice priority="critical">
+    <description>Audience-first approach - Write for your specific audience's knowledge level</description>
+    <example>
+      Developers: Assume technical background, focus on implementation details
+      Team members: Balance context with technical depth
+      End users: Avoid jargon, use step-by-step instructions
+    </example>
+  </practice>
+
+  <practice priority="critical">
+    <description>Progressive disclosure - Start with essentials, reveal complexity gradually</description>
+    <example>
+      1. Quick start for immediate value
+      2. Common use cases
+      3. Advanced configuration
+      4. Edge cases and troubleshooting
+    </example>
+  </practice>
+
+  <practice priority="high">
+    <description>Make content scannable to enable quick information retrieval</description>
+    <example>
+      - Use descriptive headings
+      - Use bullet points for lists
+      - Include code blocks with syntax highlighting
+      - Use tables for structured data
+      - Use bold for key terms (sparingly)
+    </example>
+  </practice>
+
+  <practice priority="high">
+    <description>Example-driven documentation - Show, don't just tell</description>
+    <example>
+      - Include working code examples
+      - Show expected output
+      - Provide copy-pasteable commands
+    </example>
+  </practice>
+
+  <practice priority="medium">
+    <description>Active voice and present tense for clarity</description>
+    <example>
+      Good: Run this command to start the server.
+      Bad: The server can be started by running the following command.
+    </example>
+  </practice>
+
+  <practice priority="medium">
+    <description>Test all code examples before publishing</description>
+    <example>
+      Always verify that code examples compile and run correctly
+      Include expected output
+      Test edge cases mentioned in documentation
+    </example>
+  </practice>
+</best_practices>
 
 <anti_patterns>
   <avoid name="wall_of_text">

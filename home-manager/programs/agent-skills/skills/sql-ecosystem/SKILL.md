@@ -1,25 +1,12 @@
 ---
 name: SQL Ecosystem
 description: This skill should be used when working with SQL databases, "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE TABLE", "JOIN", "INDEX", "EXPLAIN", transactions, or database migrations. Provides comprehensive SQL patterns across PostgreSQL, MySQL, and SQLite.
+version: 2.0.0
 ---
 
 <purpose>
   Provide comprehensive patterns for SQL database operations, schema design, query optimization, transaction management, and migrations across ANSI SQL standard with database-specific notes.
 </purpose>
-
-<rules priority="critical">
-  <rule>Use parameterized queries for ALL user input - NEVER use string concatenation</rule>
-  <rule>Create indexes on foreign key columns</rule>
-  <rule>Use explicit transaction boundaries for multi-statement operations</rule>
-  <rule>Escape wildcards in LIKE patterns when using user input</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Analyze query plans with EXPLAIN before optimizing</rule>
-  <rule>Use appropriate isolation levels for transaction requirements</rule>
-  <rule>Implement soft deletes for audit trails</rule>
-  <rule>Name constraints explicitly for easier migration management</rule>
-</rules>
 
 <sql_fundamentals>
   <data_types>
@@ -361,6 +348,90 @@ description: This skill should be used when working with SQL databases, "SELECT"
   </constraints>
 </sql_fundamentals>
 
+<database_versions>
+  <postgresql>
+    <supported_versions>18, 17 (LTS), 16, 15, 14</supported_versions>
+    <eol_versions>13 and earlier (13 reached EOL November 2025)</eol_versions>
+    <postgresql_18>
+      <description>PostgreSQL 18 (latest major version, released 2025)</description>
+      <latest_minor>18.3 (as of Feb 2026)</latest_minor>
+      <feature name="async_io">
+        <description>Asynchronous I/O (AIO) enables concurrent I/O tasks like readahead and sequential scan, significantly improving performance for I/O-bound workloads.</description>
+      </feature>
+    </postgresql_18>
+    <postgresql_17>
+      <description>PostgreSQL 17 (LTS)</description>
+      <feature name="sql_json">
+        <description>SQL/JSON standard functions: JSON_TABLE, JSON_QUERY, JSON_VALUE, JSON_EXISTS for standards-compliant JSON processing</description>
+        <example>
+          -- JSON_TABLE: convert JSON to relational rows (PG 17+)
+          SELECT jt.*
+            FROM orders AS o
+               , JSON_TABLE(o.metadata, '$.items[*]'
+                   COLUMNS (
+                     product_name TEXT PATH '$.name'
+                   , quantity INTEGER PATH '$.qty'
+                   , price NUMERIC PATH '$.price'
+                   )
+                 ) AS jt;
+
+          -- JSON_QUERY: extract JSON sub-object
+          SELECT JSON_QUERY(metadata, '$.shipping') AS shipping_info
+            FROM orders;
+        </example>
+      </feature>
+    </postgresql_17>
+    <postgresql_15>
+      <feature name="merge_statement">
+        <description>MERGE statement (SQL standard UPSERT with full MATCHED/NOT MATCHED logic, since PG 15)</description>
+        <example>
+          MERGE INTO inventory AS target
+          USING new_shipment AS source
+             ON target.product_id = source.product_id
+          WHEN MATCHED THEN
+            UPDATE SET quantity = target.quantity + source.quantity
+                     , updated_at = CURRENT_TIMESTAMP
+          WHEN NOT MATCHED THEN
+            INSERT (product_id, quantity, updated_at)
+            VALUES (source.product_id, source.quantity, CURRENT_TIMESTAMP);
+        </example>
+      </feature>
+    </postgresql_15>
+    <performance_features>
+      <feature name="incremental_sort">
+        <description>Incremental sort (PG 13+, improved through PG 17/18): exploits existing partial sort order from indexes, reducing sort overhead for ORDER BY with multiple columns</description>
+        <example>
+          -- With index on (user_id), query ORDER BY user_id, created_at
+          -- PG uses incremental sort: sorts only created_at within each user_id group
+          EXPLAIN ANALYZE
+          SELECT * FROM orders ORDER BY user_id, created_at;
+          -- Look for "Incremental Sort" in plan output
+        </example>
+      </feature>
+      <feature name="logical_replication">
+        <description>Logical replication improvements (PG 15-18): failover slots (PG 17), parallel apply (PG 16), row filters and column lists (PG 15)</description>
+      </feature>
+    </performance_features>
+    <monitoring>
+      <feature name="pg_stat_io">
+        <description>pg_stat_io view for I/O monitoring (since PG 16): tracks reads, writes, extends, hits, and evictions per backend type and I/O context</description>
+        <example>
+          SELECT backend_type, context, reads, writes, hits
+            FROM pg_stat_io
+           WHERE reads > 0
+           ORDER BY reads DESC;
+        </example>
+      </feature>
+    </monitoring>
+  </postgresql>
+  <mysql>
+    <description>MySQL 8.4 LTS (long-term support) and MySQL 9.x Innovation releases</description>
+  </mysql>
+  <sqlite>
+    <description>SQLite 3.48+ with type affinity system; single-file database</description>
+  </sqlite>
+</database_versions>
+
 <query_patterns>
   <joins>
     <pattern name="inner_join">
@@ -423,6 +494,28 @@ description: This skill should be used when working with SQL databases, "SELECT"
         FROM employees e
         LEFT JOIN employees m ON e.manager_id = m.id;
       </example>
+    </pattern>
+
+    <pattern name="lateral_join">
+      <description>LATERAL join: subquery can reference columns from preceding FROM items (PostgreSQL, MySQL 8.0.14+)</description>
+      <example>
+        -- Top 3 orders per user (more efficient than window function approach)
+        SELECT u.name, top_orders.total, top_orders.created_at
+          FROM users AS u
+          LEFT JOIN LATERAL (
+            SELECT o.total, o.created_at
+              FROM orders AS o
+             WHERE o.user_id = u.id
+             ORDER BY o.total DESC
+             LIMIT 3
+          ) AS top_orders ON true;
+
+        -- Use with set-returning functions
+        SELECT u.name, tag.value
+          FROM users AS u
+             , LATERAL unnest(u.tags) AS tag(value);
+      </example>
+      <use_case>Top-N per group, dependent subqueries in FROM, set-returning functions</use_case>
     </pattern>
   </joins>
 
@@ -496,7 +589,30 @@ description: This skill should be used when working with SQL databases, "SELECT"
         LEFT JOIN orders o ON au.id = o.user_id
         GROUP BY au.id, au.name;
       </example>
-      <note>CTEs improve readability; some DBs materialize them (performance consideration)</note>
+      <note>CTEs improve readability; some DBs materialize them (performance consideration). Use MATERIALIZED / NOT MATERIALIZED hints (PG 12+) to control this behavior.</note>
+    </pattern>
+
+    <pattern name="cte_materialization_hints">
+      <description>Control CTE materialization in PostgreSQL 12+ for performance tuning</description>
+      <example>
+        -- Force materialization (useful when CTE is referenced multiple times)
+        WITH expensive_calc AS MATERIALIZED (
+          SELECT user_id, SUM(total) AS lifetime_value
+            FROM orders
+           GROUP BY user_id
+        )
+        SELECT * FROM expensive_calc WHERE lifetime_value > 1000;
+
+        -- Prevent materialization (allow optimizer to inline the CTE)
+        WITH simple_filter AS NOT MATERIALIZED (
+          SELECT id, name FROM users WHERE active = true
+        )
+        SELECT sf.name, COUNT(o.id)
+          FROM simple_filter AS sf
+          LEFT JOIN orders AS o ON sf.id = o.user_id
+         GROUP BY sf.id, sf.name;
+      </example>
+      <note>Default: PG inlines CTEs referenced once, materializes if referenced multiple times. Use hints to override.</note>
     </pattern>
 
     <pattern name="multiple_ctes">
@@ -591,15 +707,20 @@ description: This skill should be used when working with SQL databases, "SELECT"
     </pattern>
 
     <pattern name="running_aggregates">
-      <description>Cumulative calculations</description>
+      <description>Cumulative calculations with window framing (ROWS, RANGE, GROUPS)</description>
       <example>
         SELECT
           date,
           revenue,
           SUM(revenue) OVER (ORDER BY date) as cumulative_revenue,
-          AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as moving_avg_7d
+          AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as moving_avg_7d,
+          -- RANGE: based on value distance (e.g., all rows within 7 days)
+          SUM(revenue) OVER (ORDER BY date RANGE BETWEEN INTERVAL '7 days' PRECEDING AND CURRENT ROW) as rolling_7d_sum,
+          -- GROUPS: based on peer groups (rows with same ORDER BY value)
+          AVG(revenue) OVER (ORDER BY date GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) as avg_adjacent_groups
         FROM daily_sales;
       </example>
+      <note>ROWS = physical rows, RANGE = logical value range, GROUPS = peer groups (PG 11+). Choose based on whether duplicates in ORDER BY column should be treated as one unit.</note>
     </pattern>
 
     <pattern name="first_last_value">
@@ -688,6 +809,20 @@ description: This skill should be used when working with SQL databases, "SELECT"
         GROUP BY ROLLUP (year, quarter);
         -- Produces: (year, quarter), (year), ()
       </example>
+    </pattern>
+
+    <pattern name="cube">
+      <description>All possible grouping combinations</description>
+      <example>
+        SELECT
+          category,
+          region,
+          SUM(sales) as total_sales
+        FROM sales_data
+        GROUP BY CUBE (category, region);
+        -- Produces: (category, region), (category), (region), ()
+      </example>
+      <note>CUBE produces 2^N grouping sets for N columns; use GROUPING SETS for selective combinations</note>
     </pattern>
   </aggregations>
 </query_patterns>
@@ -864,6 +999,28 @@ description: This skill should be used when working with SQL databases, "SELECT"
         );
       </example>
       <note>Prefer over ENUM for flexibility; easier to add/modify values</note>
+    </pattern>
+
+    <pattern name="generated_columns">
+      <description>Computed columns stored or virtual (PG 12+, MySQL 5.7+, SQLite 3.31+)</description>
+      <example>
+        -- PostgreSQL: STORED generated columns (computed on write)
+        CREATE TABLE products (
+          id SERIAL PRIMARY KEY,
+          price NUMERIC(10, 2) NOT NULL,
+          tax_rate NUMERIC(4, 3) NOT NULL,
+          total_price NUMERIC(10, 2) GENERATED ALWAYS AS (price * (1 + tax_rate)) STORED
+        );
+
+        -- MySQL: supports both STORED and VIRTUAL
+        CREATE TABLE products (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          first_name VARCHAR(50),
+          last_name VARCHAR(50),
+          full_name VARCHAR(101) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) VIRTUAL
+        );
+      </example>
+      <note>PostgreSQL only supports STORED; MySQL/SQLite support both STORED and VIRTUAL. VIRTUAL is computed on read, STORED is persisted and indexable.</note>
     </pattern>
 
     <pattern name="junction_table">
@@ -1438,55 +1595,29 @@ description: This skill should be used when working with SQL databases, "SELECT"
   </usage_patterns>
 </context7_integration>
 
-<anti_patterns>
-  <avoid name="select_star">
-    <description>Using SELECT * in production queries</description>
-    <instead>Explicitly list required columns for performance and clarity</instead>
-  </avoid>
-
-  <avoid name="missing_indexes">
-    <description>Querying without appropriate indexes on filter/join columns</description>
-    <instead>Create indexes on columns used in WHERE, JOIN, ORDER BY</instead>
-  </avoid>
-
-  <avoid name="n_plus_one">
-    <description>Executing N+1 queries in a loop</description>
-    <example>
-      -- Bad: N+1 queries
-      for user in users:
-        orders = query("SELECT * FROM orders WHERE user_id = ?", user.id)
-    </example>
-    <instead>Use JOIN or IN clause to fetch all data in single query</instead>
-  </avoid>
-
-  <avoid name="string_concatenation_sql">
-    <description>Building SQL with string concatenation (SQL injection risk)</description>
-    <instead>Use parameterized queries/prepared statements</instead>
-  </avoid>
-
-  <avoid name="implicit_type_conversion">
-    <description>Comparing columns with mismatched types</description>
-    <example>
-      -- Bad: string comparison prevents index usage
-      SELECT * FROM users WHERE id = '123';
-    </example>
-    <instead>Use correct types; cast explicitly if needed</instead>
-  </avoid>
-
-  <avoid name="cartesian_joins">
-    <description>Accidental cross joins from missing join conditions</description>
-    <example>
-      -- Bad: missing ON clause
-      SELECT * FROM users, orders;
-    </example>
-    <instead>Always use explicit JOIN with ON clause</instead>
-  </avoid>
-
-  <avoid name="over_normalization">
-    <description>Excessive normalization causing too many joins</description>
-    <instead>Denormalize for read-heavy queries; balance with write complexity</instead>
-  </avoid>
-</anti_patterns>
+<tooling>
+  <formatting>
+    <tool name="pgFormatter">
+      <description>PostgreSQL SQL formatter (pg_format CLI); formats SQL with consistent indentation and keyword casing</description>
+      <usage>pg_format --spaces 2 --keyword-case 2 input.sql</usage>
+    </tool>
+    <tool name="sqlfluff">
+      <description>SQL linter and auto-fixer supporting multiple dialects (PostgreSQL, MySQL, SQLite, BigQuery, etc.)</description>
+      <usage>sqlfluff lint --dialect postgres query.sql; sqlfluff fix --dialect postgres query.sql</usage>
+    </tool>
+  </formatting>
+  <testing>
+    <tool name="pgTAP">
+      <description>Unit testing framework for PostgreSQL; write tests in SQL using TAP protocol</description>
+      <example>
+        SELECT plan(2);
+        SELECT has_table('users', 'users table should exist');
+        SELECT has_column('users', 'email', 'users should have email column');
+        SELECT finish();
+      </example>
+    </tool>
+  </testing>
+</tooling>
 
 <best_practices>
   <!-- Formatting/Style -->
@@ -1592,6 +1723,113 @@ ORDER BY total_spent DESC LIMIT 100;
     ]]></bad_example>
   </formatting_style>
 </best_practices>
+
+<anti_patterns>
+  <avoid name="select_star">
+    <description>Using SELECT * in production queries</description>
+    <instead>Explicitly list required columns for performance and clarity</instead>
+  </avoid>
+
+  <avoid name="missing_indexes">
+    <description>Querying without appropriate indexes on filter/join columns</description>
+    <instead>Create indexes on columns used in WHERE, JOIN, ORDER BY</instead>
+  </avoid>
+
+  <avoid name="n_plus_one">
+    <description>Executing N+1 queries in a loop</description>
+    <example>
+      -- Bad: N+1 queries
+      for user in users:
+        orders = query("SELECT * FROM orders WHERE user_id = ?", user.id)
+    </example>
+    <instead>Use JOIN or IN clause to fetch all data in single query</instead>
+  </avoid>
+
+  <avoid name="string_concatenation_sql">
+    <description>Building SQL with string concatenation (SQL injection risk)</description>
+    <instead>Use parameterized queries/prepared statements</instead>
+  </avoid>
+
+  <avoid name="implicit_type_conversion">
+    <description>Comparing columns with mismatched types</description>
+    <example>
+      -- Bad: string comparison prevents index usage
+      SELECT * FROM users WHERE id = '123';
+    </example>
+    <instead>Use correct types; cast explicitly if needed</instead>
+  </avoid>
+
+  <avoid name="cartesian_joins">
+    <description>Accidental cross joins from missing join conditions</description>
+    <example>
+      -- Bad: missing ON clause
+      SELECT * FROM users, orders;
+    </example>
+    <instead>Always use explicit JOIN with ON clause</instead>
+  </avoid>
+
+  <avoid name="over_normalization">
+    <description>Excessive normalization causing too many joins</description>
+    <instead>Denormalize for read-heavy queries; balance with write complexity</instead>
+  </avoid>
+
+  <avoid name="float_monetary_values">
+    <description>Storing monetary values as FLOAT or DOUBLE (introduces rounding errors)</description>
+    <example>
+      -- Bad: floating-point rounding errors
+      CREATE TABLE invoices (
+        id SERIAL PRIMARY KEY,
+        amount FLOAT  -- 0.1 + 0.2 != 0.3
+      );
+
+      -- Good: exact decimal arithmetic
+      CREATE TABLE invoices (
+        id SERIAL PRIMARY KEY,
+        amount DECIMAL(10, 2) NOT NULL  -- or NUMERIC(10, 2)
+      );
+
+      -- Alternative: store as integer cents
+      CREATE TABLE invoices (
+        id SERIAL PRIMARY KEY,
+        amount_cents INTEGER NOT NULL  -- 1999 = $19.99
+      );
+    </example>
+    <instead>Use DECIMAL/NUMERIC for monetary values, or store as integer cents/minor units</instead>
+  </avoid>
+
+  <avoid name="missing_fk_indexes">
+    <description>Missing indexes on foreign key columns (causes slow joins and cascading deletes)</description>
+    <example>
+      -- Bad: FK without index (PostgreSQL does NOT auto-create indexes on FK columns)
+      CREATE TABLE orders (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id)
+      );
+
+      -- Good: explicit index on FK column
+      CREATE TABLE orders (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id)
+      );
+      CREATE INDEX idx_orders_user_id ON orders(user_id);
+    </example>
+    <instead>Always create indexes on foreign key columns; MySQL does this automatically, PostgreSQL does not</instead>
+  </avoid>
+</anti_patterns>
+
+<rules priority="critical">
+  <rule>Use parameterized queries for ALL user input - NEVER use string concatenation</rule>
+  <rule>Create indexes on foreign key columns</rule>
+  <rule>Use explicit transaction boundaries for multi-statement operations</rule>
+  <rule>Escape wildcards in LIKE patterns when using user input</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Analyze query plans with EXPLAIN before optimizing</rule>
+  <rule>Use appropriate isolation levels for transaction requirements</rule>
+  <rule>Implement soft deletes for audit trails</rule>
+  <rule>Name constraints explicitly for easier migration management</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">

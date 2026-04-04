@@ -1,7 +1,7 @@
 ---
 name: Fact Check
 description: This skill should be used when the user asks to "verify claims", "fact check", "validate documentation", "check sources", or needs verification of external source references. Provides patterns for systematic fact verification using Context7 and WebSearch.
-version: 0.2.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -36,15 +36,6 @@ version: 0.2.0
     <use_case>Verify claims against specific documentation pages or specifications</use_case>
   </tool>
 </tools>
-
-<error_escalation inherits="core-patterns#error_escalation">
-  <examples>
-    <example severity="low">Claim cannot be verified due to missing documentation</example>
-    <example severity="medium">Conflicting information from different sources</example>
-    <example severity="high">Claim directly contradicts authoritative source</example>
-    <example severity="critical">Security-related claim is incorrect</example>
-  </examples>
-</error_escalation>
 
 <patterns>
   <pattern name="claim_extraction">
@@ -212,6 +203,15 @@ version: 0.2.0
   <rule>Note version context when verifying version-specific claims</rule>
   <rule>Cross-reference disputed claims with multiple sources</rule>
 </rules>
+
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Claim cannot be verified due to missing documentation</example>
+    <example severity="medium">Conflicting information from different sources</example>
+    <example severity="high">Claim directly contradicts authoritative source</example>
+    <example severity="critical">Security-related claim is incorrect</example>
+  </examples>
+</error_escalation>
 
 <constraints>
   <must>Query authoritative sources before verification</must>

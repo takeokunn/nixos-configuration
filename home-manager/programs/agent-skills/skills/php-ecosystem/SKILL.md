@@ -1,11 +1,11 @@
 ---
 name: PHP Ecosystem
 description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", or works with modern PHP language patterns and configuration. Provides comprehensive modern PHP ecosystem patterns and best practices.
-version: 0.2.0
+version: 2.0.0
 ---
 
 <purpose>
-  Provide comprehensive patterns for modern PHP (8.3+) language features, PSR standards, testing, static analysis, and package development in a framework-agnostic approach.
+  Provide comprehensive patterns for modern PHP (8.5+) language features, PSR standards, testing, static analysis, and package development in a framework-agnostic approach.
 </purpose>
 
 <tools>
@@ -23,24 +23,20 @@ version: 0.2.0
   <concept name="property_hooks">Use property hooks for validation and computed properties (PHP 8.4+)</concept>
 </concepts>
 
-<rules priority="critical">
-  <rule>Enable declare(strict_types=1) in all PHP files</rule>
-  <rule>Use prepared statements for all database queries</rule>
-  <rule>Run PHPStan level 9+ before committing</rule>
-  <rule>Never suppress errors with @ operator</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Follow PER-CS coding style</rule>
-  <rule>Use named arguments for functions with 3+ parameters</rule>
-  <rule>Create custom exceptions for domain errors</rule>
-  <rule>Use readonly classes for value objects</rule>
-  <rule>Prefer property hooks over getters/setters (PHP 8.4+)</rule>
-</rules>
-
 <php_version>
   <version_mapping>
-    <description>PHP version-specific feature availability</description>
+    <description>PHP version-specific feature availability and support timeline</description>
+    <support_timeline>
+      <version php="8.5" status="current">Active support until Dec 2027, security until Dec 2029</version>
+      <version php="8.4" status="supported">Still supported</version>
+      <version php="8.3" status="maintenance">Maintenance/upgrade runway</version>
+      <version php="8.6" status="upcoming">Expected late 2026</version>
+    </support_timeline>
+    <version php="8.5" released="2025-11">
+      <feature>Pipe operator (|>)</feature>
+      <feature>Clone with modified properties (clone $obj with {...})</feature>
+      <feature>#[\NoDiscard] attribute</feature>
+    </version>
     <version php="8.4" released="2024-11">
       <feature>Property hooks (get/set)</feature>
       <feature>Asymmetric visibility (public private(set))</feature>
@@ -68,7 +64,7 @@ version: 0.2.0
     <version php="8.1" released="2021-11">
       <feature>Enums (backed and unit)</feature>
       <feature>Readonly properties</feature>
-      <feature>Fibers</feature>
+      <feature>Fibers (cooperative multitasking)</feature>
       <feature>Intersection types</feature>
       <feature>never return type</feature>
       <feature>First-class callable syntax</feature>
@@ -399,6 +395,38 @@ version: 0.2.0
     </pattern>
   </property_hooks>
 
+  <php_85_features>
+    <feature name="pipe_operator">
+      <description>The pipe operator (|>) enables functional-style chaining for cleaner, more readable code (PHP 8.5).</description>
+      <example>
+        $result = $input
+          |> fn($x) => trim($x)
+          |> fn($x) => strtolower($x)
+          |> fn($x) => str_replace(' ', '-', $x);
+      </example>
+    </feature>
+    <feature name="clone_with">
+      <description>Clone an object while modifying selected properties in a single expression (PHP 8.5).</description>
+      <example>
+        $newUser = clone $user with {
+          name: 'New Name',
+          email: 'new@example.com',
+        };
+      </example>
+    </feature>
+    <feature name="no_discard_attribute">
+      <description>#[\NoDiscard] attribute emits warnings when important return values are ignored (PHP 8.5).</description>
+      <example>
+        #[\NoDiscard]
+        function computeChecksum(string $data): string {
+          return hash('sha256', $data);
+        }
+        // Warning: Return value of computeChecksum() is not used
+        computeChecksum($data);
+      </example>
+    </feature>
+  </php_85_features>
+
   <asymmetric_visibility>
     <pattern name="public-read-private-write">
       <description>Public read access with private write (PHP 8.4+)</description>
@@ -492,24 +520,23 @@ version: 0.2.0
       </decision_tree>
     </pattern>
   </lazy_objects>
+
+  <fibers>
+    <pattern name="fibers">
+      <description>PHP Fibers (8.1+) enable cooperative multitasking for async I/O without callbacks.</description>
+      <example>
+        $fiber = new Fiber(function (): void {
+          $value = Fiber::suspend('fiber started');
+          echo "Fiber resumed with: $value";
+        });
+
+        $result = $fiber->start(); // 'fiber started'
+        $fiber->resume('hello');   // 'Fiber resumed with: hello'
+      </example>
+      <note>Fibers are low-level primitives. Prefer async libraries (ReactPHP, AMPHP, Revolt) that use Fibers internally.</note>
+    </pattern>
+  </fibers>
 </type_system>
-
-<context7_integration>
-  <library_id>/php/doc-en</library_id>
-  <trust_score>9.4</trust_score>
-
-  <usage_pattern>
-    <step>For PHP core documentation, use library ID /php/doc-en</step>
-    <step>Fetch specific topic documentation with get-library-docs</step>
-  </usage_pattern>
-
-  <common_queries>
-    <query topic="attributes">PHP attribute syntax and usage</query>
-    <query topic="enums">Enumeration types and patterns</query>
-    <query topic="readonly">Readonly properties and classes</query>
-    <query topic="property-hooks">Property hooks syntax (PHP 8.4)</query>
-  </common_queries>
-</context7_integration>
 
 <psr_standards>
   <psr name="PSR-1" title="Basic Coding Standard">
@@ -897,7 +924,7 @@ version: 0.2.0
       <example>
         {
             "require": {
-                "php": "^8.3",
+                "php": "^8.5",
                 "psr/log": "^3.0",
                 "guzzlehttp/guzzle": "^7.0"
             },
@@ -1156,6 +1183,17 @@ version: 0.2.0
         });
       </example>
     </pattern>
+    <pest_v3>
+      <description>Pest v3 (2024+) adds architecture testing, mutation testing, and type coverage.</description>
+      <example>
+        // Architecture testing
+        arch()->expect('App\Models')->toExtend('Illuminate\Database\Eloquent\Model');
+        arch()->expect('App')->toUseStrictTypes();
+
+        // Mutation testing
+        // pest --mutate
+      </example>
+    </pest_v3>
   </pest>
 </testing>
 
@@ -1302,7 +1340,7 @@ version: 0.2.0
         return (new PhpCsFixer\Config())
             -&gt;setRules([
                 '@PER-CS' =&gt; true,
-                '@PHP84Migration' =&gt; true,
+                '@PHP85Migration' =&gt; true,
                 'strict_types' =&gt; true,
                 'declare_strict_types' =&gt; true,
                 'array_syntax' =&gt; ['syntax' =&gt; 'short'],
@@ -1335,9 +1373,9 @@ version: 0.2.0
                 SetList::DEAD_CODE,
                 SetList::TYPE_DECLARATION,
             ])
-            -&gt;withPhpSets(php84: true);
+            -&gt;withPhpSets(php85: true);
       </example>
-      <note>LevelSetList (e.g., UP_TO_PHP_84) deprecated since Rector 0.19.2. Use -&gt;withPhpSets() instead.</note>
+      <note>LevelSetList (e.g., UP_TO_PHP_85) deprecated since Rector 0.19.2. Use -&gt;withPhpSets() instead.</note>
     </pattern>
   </rector>
 </static_analysis>
@@ -1572,6 +1610,37 @@ version: 0.2.0
   </php84_functions>
 </array_functions>
 
+<context7_integration>
+  <library_id>/php/doc-en</library_id>
+  <trust_score>9.4</trust_score>
+
+  <usage_pattern>
+    <step>For PHP core documentation, use library ID /php/doc-en</step>
+    <step>Fetch specific topic documentation with get-library-docs</step>
+  </usage_pattern>
+
+  <common_queries>
+    <query topic="attributes">PHP attribute syntax and usage</query>
+    <query topic="enums">Enumeration types and patterns</query>
+    <query topic="readonly">Readonly properties and classes</query>
+    <query topic="property-hooks">Property hooks syntax (PHP 8.4+)</query>
+    <query topic="pipe-operator">Pipe operator syntax (PHP 8.5)</query>
+  </common_queries>
+</context7_integration>
+
+<best_practices>
+  <practice priority="critical">Enable strict_types in all PHP files</practice>
+  <practice priority="critical">Use prepared statements for all database queries</practice>
+  <practice priority="critical">Use PHPStan level 9+ for type safety</practice>
+  <practice priority="high">Use readonly classes for value objects</practice>
+  <practice priority="high">Follow PSR-12 coding style</practice>
+  <practice priority="high">Use enums instead of string/int constants</practice>
+  <practice priority="high">Inject dependencies through constructor</practice>
+  <practice priority="medium">Use named arguments for complex function calls</practice>
+  <practice priority="medium">Create custom exceptions for domain errors</practice>
+  <practice priority="medium">Use attributes for metadata instead of docblock annotations</practice>
+</best_practices>
+
 <anti_patterns>
   <avoid name="god_class">
     <description>Classes that do too much</description>
@@ -1617,18 +1686,21 @@ version: 0.2.0
   </avoid>
 </anti_patterns>
 
-<best_practices>
-  <practice priority="critical">Enable strict_types in all PHP files</practice>
-  <practice priority="critical">Use prepared statements for all database queries</practice>
-  <practice priority="critical">Use PHPStan level 9+ for type safety</practice>
-  <practice priority="high">Use readonly classes for value objects</practice>
-  <practice priority="high">Follow PSR-12 coding style</practice>
-  <practice priority="high">Use enums instead of string/int constants</practice>
-  <practice priority="high">Inject dependencies through constructor</practice>
-  <practice priority="medium">Use named arguments for complex function calls</practice>
-  <practice priority="medium">Create custom exceptions for domain errors</practice>
-  <practice priority="medium">Use attributes for metadata instead of docblock annotations</practice>
-</best_practices>
+<rules priority="critical">
+  <rule>Enable declare(strict_types=1) in all PHP files</rule>
+  <rule>Use prepared statements for all database queries</rule>
+  <rule>Run PHPStan level 9+ before committing</rule>
+  <rule>Never suppress errors with @ operator</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Follow PER-CS coding style</rule>
+  <rule>Use named arguments for functions with 3+ parameters</rule>
+  <rule>Create custom exceptions for domain errors</rule>
+  <rule>Use readonly classes for value objects</rule>
+  <rule>Prefer property hooks over getters/setters (PHP 8.4+)</rule>
+  <rule>Use pipe operator for functional-style chaining (PHP 8.5+)</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">
@@ -1685,5 +1757,5 @@ version: 0.2.0
   <skill name="serena-usage">Symbol-level navigation for class and interface definitions</skill>
   <skill name="context7-usage">Fetch latest PHP and library documentation</skill>
   <skill name="testing-patterns">Test strategy and coverage patterns</skill>
-  <skill name="database">PDO patterns and query optimization</skill>
+  <skill name="sql-ecosystem">PDO patterns and query optimization</skill>
 </related_skills>

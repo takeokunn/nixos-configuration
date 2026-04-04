@@ -1,7 +1,7 @@
 ---
 name: Devenv Ecosystem
 description: This skill should be used when the user asks to "devenv", "devenv.nix", "languages.*", "services.*", "git-hooks", "devenv shell", "devenv up", "devenv build", or works with devenv development environments. Provides comprehensive devenv configuration patterns.
-version: 0.1.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -14,14 +14,14 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     Nix language syntax and semantics, flake structure and inputs, general NixOS module patterns, lib.* functions
   </defer_to>
   <unique_coverage>
-    languages.* language modules, services.* service configuration, git-hooks.hooks pre-commit hooks, processes and process-compose, scripts and tasks, outputs and profiles
+    languages.* language modules, services.* service configuration, git-hooks.hooks pre-commit hooks, processes and native process manager (default in 2.0) or process-compose, scripts and tasks, outputs and profiles, devenv.shells multi-shell configurations (2.0+), devenv.outputs custom flake outputs (2.0+), devenv 2.0 features (interactive TUI, native shell, C FFI backend, incremental eval cache, cross-repo references)
   </unique_coverage>
 </scope>
 
 <tools>
   <tool name="devenv init">Initialize new devenv project with devenv.nix and .envrc</tool>
   <tool name="devenv shell">Enter development shell with all configured tools</tool>
-  <tool name="devenv up">Start all configured processes (process-compose)</tool>
+  <tool name="devenv up">Start all configured processes (native process manager by default in 2.0; use process-compose via process.manager.implementation)</tool>
   <tool name="devenv build">Build configured outputs</tool>
   <tool name="devenv test">Run configured tests</tool>
   <tool name="devenv tasks run">Execute configured tasks</tool>
@@ -68,6 +68,29 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </concept>
 </concepts>
 
+<devenv_20>
+  <description>devenv 2.0 released March 2026 — "A Fresh Interface to Nix"</description>
+  <feature name="interactive_tui">
+    <description>Every devenv command now shows a live terminal interface with structured progress: evaluation status, derivation build/download counts, task execution hierarchy, and auto-expanding error details.</description>
+  </feature>
+  <feature name="native_shell">
+    <description>Background rebuilds while shell stays interactive. Save a file, devenv rebuilds in background, status line shows progress, Ctrl+Alt+R applies new environment. Errors appear in status line without disruption.</description>
+  </feature>
+  <feature name="c_ffi_backend">
+    <description>Replaced multiple nix CLI invocations with C FFI backend (nix-bindings-rust). Calls Nix evaluator and store directly through C API instead of spawning separate processes.</description>
+  </feature>
+  <feature name="incremental_eval_cache">
+    <description>Each evaluated attribute cached individually with tracked file/env dependencies. Only changed attributes re-evaluated.</description>
+  </feature>
+  <feature name="cross_repo_references">
+    <description>Reference outputs from another devenv project (third most upvoted feature request).</description>
+  </feature>
+  <breaking_changes>
+    <change>Native process manager is now the default. Set process.manager.implementation = "process-compose" for old behavior.</change>
+    <change>devenv 0.x is deprecated. Support will be dropped in devenv 3.</change>
+  </breaking_changes>
+</devenv_20>
+
 <languages>
   <common_patterns>
     <pattern name="basic_enable">
@@ -80,7 +103,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     <pattern name="version_specification">
       <description>Specify language version (available for some languages)</description>
       <example>
-        languages.python.version = "3.11.3";
+        languages.python.version = "3.13";
         languages.ruby.version = "3.2.1";
         languages.rust.channel = "stable";
       </example>
@@ -89,7 +112,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     <pattern name="package_override">
       <description>Use custom package instead of default</description>
       <example>
-        languages.go.package = pkgs.go_1_21;
+        languages.go.package = pkgs.go_1_26;
         languages.java.jdk.package = pkgs.jdk17;
       </example>
     </pattern>
@@ -103,7 +126,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     </pattern>
 
     <pattern name="dev_tooling">
-      <description>Configure LSP, debugger, linter, formatter (devenv 1.8+)</description>
+      <description>Configure LSP, debugger, linter, formatter (devenv 1.8+, enhanced in 2.0)</description>
       <example>
         languages.rust.dev = {
           lsp.enable = true;
@@ -123,6 +146,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
         languages.rust = {
           enable = true;
           channel = "stable"; # or "nightly", "beta"
+          edition = "2024"; # Rust edition (2015, 2018, 2021, 2024)
           components = [ "rustc" "cargo" "clippy" "rustfmt" "rust-analyzer" ];
           targets = [ "wasm32-unknown-unknown" ];
         };
@@ -136,7 +160,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       <example>
         languages.go = {
           enable = true;
-          package = pkgs.go_1_22;
+          package = pkgs.go_1_26;
         };
       </example>
       <output_pattern>
@@ -196,7 +220,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       <example>
         languages.python = {
           enable = true;
-          version = "3.12";
+          version = "3.13";
           uv.enable = true;
           uv.sync.enable = true;
         };
@@ -230,7 +254,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       <example>
         languages.php = {
           enable = true;
-          package = pkgs.php83;
+          package = pkgs.php85;
           extensions = [ "opcache" "redis" ];
         };
       </example>
@@ -376,7 +400,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       <example>
         languages.javascript = {
           enable = true;
-          package = pkgs.nodejs_22;
+          package = pkgs.nodejs_24;
           npm.enable = true;
           npm.install.enable = true;
         };
@@ -622,7 +646,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     <question>Should you use devenv or pure Nix flakes?</question>
     <branch condition="Need services (databases, caches)">Use devenv - services.* is simpler</branch>
     <branch condition="Need pre-commit hooks">Use devenv - git-hooks integration built-in</branch>
-    <branch condition="Need process supervision">Use devenv - process-compose integration</branch>
+    <branch condition="Need process supervision">Use devenv - native process manager (2.0 default) or process-compose</branch>
     <branch condition="Need language version management">Use devenv - languages.* handles versions</branch>
     <branch condition="Pure Nix derivations only">Use flakes - devenv adds overhead</branch>
     <branch condition="NixOS system configuration">Use flakes - devenv is for dev environments</branch>
@@ -879,7 +903,8 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </category>
 
   <category name="processes">
-    <description>Background processes via process-compose</description>
+    <description>Background processes managed by native process manager (devenv 2.0 default) or process-compose</description>
+    <note>In devenv 2.0, the native process manager is the default. To use process-compose instead, set process.manager.implementation = "process-compose".</note>
     <example>
       processes = {
         web.exec = "npm run dev";
@@ -888,7 +913,10 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       };
     </example>
 
-    <advanced_example>
+    <process_compose_example>
+      # To use process-compose (no longer the default in 2.0):
+      process.manager.implementation = "process-compose";
+
       processes = {
         web = {
           exec = "npm run dev";
@@ -915,7 +943,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
           };
         };
       };
-    </advanced_example>
+    </process_compose_example>
   </category>
 
   <category name="tasks">
@@ -997,6 +1025,47 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     </example>
   </pattern>
 
+  <pattern name="multi_shell">
+    <description>Multiple shell configurations via devenv.shells (devenv 2.0+)</description>
+    <example>
+      # devenv.nix
+      { pkgs, ... }:
+      {
+        devenv.shells.default = {
+          languages.python.enable = true;
+          packages = [ pkgs.git ];
+        };
+
+        devenv.shells.ci = {
+          languages.python.enable = true;
+          packages = [ pkgs.git pkgs.buildkit ];
+          env.CI = "true";
+        };
+
+        devenv.shells.docs = {
+          packages = [ pkgs.mdbook ];
+          scripts.build-docs.exec = "mdbook build";
+        };
+      }
+    </example>
+  </pattern>
+
+  <pattern name="custom_flake_outputs">
+    <description>Custom flake outputs via devenv.outputs (devenv 2.0+)</description>
+    <example>
+      { pkgs, config, ... }:
+      {
+        devenv.outputs = {
+          packages.my-app = config.languages.rust.import ./. {};
+          checks.lint = pkgs.runCommand "lint" {} ''
+            ${pkgs.clippy}/bin/cargo-clippy
+            touch $out
+          '';
+        };
+      }
+    </example>
+  </pattern>
+
   <pattern name="custom_derivation">
     <description>Custom derivation as output</description>
     <example>
@@ -1023,19 +1092,19 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
       { pkgs, ... }:
       {
         languages.python.enable = true;
-        languages.python.version = "3.12";
+        languages.python.version = "3.13";
 
         profiles = {
+          "python-3.12".config = {
+            languages.python.version = "3.12";
+          };
           "python-3.11".config = {
             languages.python.version = "3.11";
-          };
-          "python-3.10".config = {
-            languages.python.version = "3.10";
           };
         };
       }
     </example>
-    <usage>devenv shell --profile python-3.11</usage>
+    <usage>devenv shell --profile python-3.12</usage>
   </pattern>
 
   <pattern name="team_profile">
@@ -1105,7 +1174,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
         languages = {
           javascript = {
             enable = true;
-            package = pkgs.nodejs_22;
+            package = pkgs.nodejs_24;
             pnpm.enable = true;
           };
           typescript.enable = true;
@@ -1182,6 +1251,58 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </decision_tree>
 </patterns>
 
+<context7_integration>
+  <library_id>/cachix/devenv</library_id>
+  <trust_score>9.7</trust_score>
+  <snippets>1354</snippets>
+  <usage_patterns>
+    <pattern topic="languages">Fetch specific language configuration options</pattern>
+    <pattern topic="services">Fetch service configuration details</pattern>
+    <pattern topic="git-hooks">Fetch available pre-commit hooks</pattern>
+    <pattern topic="outputs">Fetch packaging patterns</pattern>
+    <pattern topic="profiles">Fetch profile configuration (1.9+)</pattern>
+    <pattern topic="devenv-2.0">Fetch devenv 2.0 features and migration guide</pattern>
+  </usage_patterns>
+</context7_integration>
+
+<best_practices>
+  <practice priority="critical">
+    Use languages.*.enable instead of adding language packages directly to packages list
+  </practice>
+
+  <practice priority="critical">
+    Keep enterShell fast; move slow operations to tasks or scripts
+  </practice>
+
+  <practice priority="high">
+    Use git-hooks for consistent code quality across team
+  </practice>
+
+  <practice priority="high">
+    Use services.* instead of running databases manually
+  </practice>
+
+  <practice priority="high">
+    Use dotenv.enable for environment-specific configuration
+  </practice>
+
+  <practice priority="high">
+    In devenv 2.0, prefer the native process manager (default). Only switch to process-compose if you need advanced features like health checks and dependency ordering.
+  </practice>
+
+  <practice priority="medium">
+    Document scripts with description attribute
+  </practice>
+
+  <practice priority="medium">
+    Use profiles for multi-context development (different language versions, team roles)
+  </practice>
+
+  <practice priority="medium">
+    Use outputs for packaging applications when needed
+  </practice>
+</best_practices>
+
 <anti_patterns>
   <avoid name="hardcoded_versions">
     <description>Hardcoding specific package versions instead of using version options</description>
@@ -1212,7 +1333,41 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     <description>Storing production secrets in env attribute</description>
     <instead>Use dotenv.enable with .env files in .gitignore, or use external secret management</instead>
   </avoid>
+
+  <avoid name="assuming_process_compose_default">
+    <description>Assuming process-compose is the default process manager in devenv 2.0</description>
+    <instead>Native process manager is the default in devenv 2.0. Set process.manager.implementation = "process-compose" explicitly if needed.</instead>
+  </avoid>
+
+  <avoid name="manual_shell_hooks">
+    <description>Using manual shell hooks (e.g. shellHook, .bashrc modifications) instead of enterShell</description>
+    <instead>Use enterShell for shell initialization. Use scripts for reusable commands. Use tasks for build-time operations.</instead>
+  </avoid>
+
+  <avoid name="hardcoded_paths">
+    <description>Hardcoding absolute paths instead of using devenv variables (config.devenv.root, config.env.DEVENV_STATE, config.env.DEVENV_DOTFILE)</description>
+    <instead>Use config.devenv.root for project root, config.env.DEVENV_STATE for state directory, and config.env.DEVENV_DOTFILE for the .devenv directory path.</instead>
+  </avoid>
+
+  <avoid name="direct_process_compose">
+    <description>Using process-compose directly (e.g. adding process-compose.yaml or running process-compose commands) instead of devenv processes</description>
+    <instead>Use processes.* with the native process manager (devenv 2.0 default). For advanced features, set process.manager.implementation = "process-compose" and configure via process-compose attribute on each process.</instead>
+  </avoid>
 </anti_patterns>
+
+<rules priority="critical">
+  <rule>Use devenv languages.* options instead of manually adding language packages</rule>
+  <rule>Use devenv services.* instead of manual service setup</rule>
+  <rule>Keep enterShell lightweight and fast</rule>
+  <rule>In devenv 2.0, native process manager is the default; set process.manager.implementation = "process-compose" explicitly for process-compose</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Enable git-hooks for code quality enforcement</rule>
+  <rule>Use scripts for common development commands</rule>
+  <rule>Document configuration with comments</rule>
+  <rule>Use profiles for environment variations</rule>
+</rules>
 
 <workflow>
   <phase name="analyze">
@@ -1228,77 +1383,17 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
     <step>2. Add services with appropriate settings</step>
     <step>3. Configure git-hooks for code quality</step>
     <step>4. Add scripts for common operations</step>
-    <step>5. Set up processes for development servers</step>
+    <step>5. Set up processes for development servers (native process manager is default in 2.0)</step>
     <step>6. Add profiles if needed</step>
   </phase>
   <phase name="validate">
     <objective>Verify devenv configuration works</objective>
     <step>1. Run devenv shell to verify environment</step>
-    <step>2. Run devenv up to verify services start</step>
+    <step>2. Run devenv up to verify processes start</step>
     <step>3. Test git hooks with sample commits</step>
     <step>4. Verify scripts work as expected</step>
   </phase>
 </workflow>
-
-<best_practices>
-  <practice priority="critical">
-    Use languages.*.enable instead of adding language packages directly to packages list
-  </practice>
-
-  <practice priority="critical">
-    Keep enterShell fast; move slow operations to tasks or scripts
-  </practice>
-
-  <practice priority="high">
-    Use git-hooks for consistent code quality across team
-  </practice>
-
-  <practice priority="high">
-    Use services.* instead of running databases manually
-  </practice>
-
-  <practice priority="high">
-    Use dotenv.enable for environment-specific configuration
-  </practice>
-
-  <practice priority="medium">
-    Document scripts with description attribute
-  </practice>
-
-  <practice priority="medium">
-    Use profiles for multi-context development (different language versions, team roles)
-  </practice>
-
-  <practice priority="medium">
-    Use outputs for packaging applications when needed
-  </practice>
-</best_practices>
-
-<rules priority="critical">
-  <rule>Use devenv languages.* options instead of manually adding language packages</rule>
-  <rule>Use devenv services.* instead of manual service setup</rule>
-  <rule>Keep enterShell lightweight and fast</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Enable git-hooks for code quality enforcement</rule>
-  <rule>Use scripts for common development commands</rule>
-  <rule>Document configuration with comments</rule>
-  <rule>Use profiles for environment variations</rule>
-</rules>
-
-<context7_integration>
-  <library_id>/cachix/devenv</library_id>
-  <trust_score>9.7</trust_score>
-  <snippets>1354</snippets>
-  <usage_patterns>
-    <pattern topic="languages">Fetch specific language configuration options</pattern>
-    <pattern topic="services">Fetch service configuration details</pattern>
-    <pattern topic="git-hooks">Fetch available pre-commit hooks</pattern>
-    <pattern topic="outputs">Fetch packaging patterns</pattern>
-    <pattern topic="profiles">Fetch profile configuration (1.9+)</pattern>
-  </usage_patterns>
-</context7_integration>
 
 <error_escalation>
   <level severity="low">
@@ -1319,24 +1414,20 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </level>
 </error_escalation>
 
-<related_agents>
-  <agent name="explore">Finding existing devenv configurations and patterns</agent>
-  <agent name="design">Evaluating devenv architecture and service dependencies</agent>
-  <agent name="security">Reviewing devenv configuration for security issues</agent>
-</related_agents>
+<constraints>
+  <must>Use devenv languages.* options for language configuration</must>
+  <must>Use devenv services.* for service management</must>
+  <must>Follow project existing devenv patterns if present</must>
+  <must>Be aware that native process manager is the default in devenv 2.0</must>
+  <avoid>Hardcoding versions instead of using version options</avoid>
+  <avoid>Slow operations in enterShell</avoid>
+  <avoid>Mixing multiple conflicting package managers</avoid>
+  <avoid>Storing secrets in env attribute</avoid>
+  <avoid>Assuming process-compose is still the default process manager</avoid>
+</constraints>
 
 <related_skills>
   <skill name="nix-ecosystem">Nix language fundamentals, flakes, Home Manager (devenv uses Nix)</skill>
   <skill name="serena-usage">Symbol operations for navigating devenv configurations</skill>
   <skill name="context7-usage">Fetch latest devenv documentation</skill>
 </related_skills>
-
-<constraints>
-  <must>Use devenv languages.* options for language configuration</must>
-  <must>Use devenv services.* for service management</must>
-  <must>Follow project existing devenv patterns if present</must>
-  <avoid>Hardcoding versions instead of using version options</avoid>
-  <avoid>Slow operations in enterShell</avoid>
-  <avoid>Mixing multiple conflicting package managers</avoid>
-  <avoid>Storing secrets in env attribute</avoid>
-</constraints>

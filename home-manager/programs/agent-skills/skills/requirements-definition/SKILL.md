@@ -1,6 +1,7 @@
 ---
 name: Requirements Definition
 description: This skill should be used when the user asks to "define requirements", "create specification", "clarify requirements", "write requirements document", or mentions requirement analysis. Provides comprehensive requirements definition methodology.
+version: 2.0.0
 ---
 
 <purpose>
@@ -216,6 +217,40 @@ description: This skill should be used when the user asks to "define requirement
   </format>
 </output>
 
+<best_practices>
+  <practice priority="critical">Always investigate current state before defining requirements using Serena's symbol-level operations</practice>
+  <practice priority="critical">Score questions using the 4-criteria scoring system and prioritize high-score questions (>= 15)</practice>
+  <practice priority="critical">Clearly distinguish mandatory from optional requirements with explicit rationale</practice>
+  <practice priority="high">Document all assumptions when requirements are unclear or incomplete</practice>
+  <practice priority="high">Map each requirement to specific test scenarios for verification</practice>
+  <practice priority="high">Include rationale for key design decisions in technical specifications</practice>
+  <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
+  <practice priority="medium">Create dependency graphs showing task execution order</practice>
+</best_practices>
+
+<anti_patterns>
+  <avoid name="vague_requirements">
+    <description>Requirements that are unclear or unmeasurable</description>
+    <instead>Write specific, testable requirements with clear acceptance criteria</instead>
+  </avoid>
+  <avoid name="implementation_details">
+    <description>Specifying implementation details instead of requirements</description>
+    <instead>Describe what needs to be achieved, not how to implement it</instead>
+  </avoid>
+  <avoid name="skipping_investigation">
+    <description>Writing requirements without investigating existing code</description>
+    <instead>Always investigate current state before defining requirements</instead>
+  </avoid>
+  <avoid name="missing_constraints">
+    <description>Not identifying technical or operational constraints</description>
+    <instead>Explicitly document all constraints that affect implementation</instead>
+  </avoid>
+  <avoid name="undefined_priorities">
+    <description>Treating all requirements as equally important</description>
+    <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
+  </avoid>
+</anti_patterns>
+
 <rules priority="critical">
   <rule>Never proceed without clear answers to critical questions (score >= 15)</rule>
   <rule>All requirements must be verifiable and measurable</rule>
@@ -228,17 +263,6 @@ description: This skill should be used when the user asks to "define requirement
   <rule>Include rationale for key design decisions</rule>
   <rule>Map requirements to test scenarios</rule>
 </rules>
-
-<best_practices>
-  <practice priority="critical">Always investigate current state before defining requirements using Serena's symbol-level operations</practice>
-  <practice priority="critical">Score questions using the 4-criteria scoring system and prioritize high-score questions (>= 15)</practice>
-  <practice priority="critical">Clearly distinguish mandatory from optional requirements with explicit rationale</practice>
-  <practice priority="high">Document all assumptions when requirements are unclear or incomplete</practice>
-  <practice priority="high">Map each requirement to specific test scenarios for verification</practice>
-  <practice priority="high">Include rationale for key design decisions in technical specifications</practice>
-  <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
-  <practice priority="medium">Create dependency graphs showing task execution order</practice>
-</best_practices>
 
 <error_escalation>
   <level severity="low">
@@ -273,26 +297,3 @@ description: This skill should be used when the user asks to "define requirement
   <skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
   <skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
 </related_skills>
-
-<anti_patterns>
-  <avoid name="vague_requirements">
-    <description>Requirements that are unclear or unmeasurable</description>
-    <instead>Write specific, testable requirements with clear acceptance criteria</instead>
-  </avoid>
-  <avoid name="implementation_details">
-    <description>Specifying implementation details instead of requirements</description>
-    <instead>Describe what needs to be achieved, not how to implement it</instead>
-  </avoid>
-  <avoid name="skipping_investigation">
-    <description>Writing requirements without investigating existing code</description>
-    <instead>Always investigate current state before defining requirements</instead>
-  </avoid>
-  <avoid name="missing_constraints">
-    <description>Not identifying technical or operational constraints</description>
-    <instead>Explicitly document all constraints that affect implementation</instead>
-  </avoid>
-  <avoid name="undefined_priorities">
-    <description>Treating all requirements as equally important</description>
-    <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
-  </avoid>
-</anti_patterns>

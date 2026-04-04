@@ -1,6 +1,7 @@
 ---
 name: Nix Ecosystem
 description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
+version: 2.0.0
 ---
 
 <purpose>
@@ -168,6 +169,33 @@ description: This skill should be used when the user asks to "write nix", "nix e
         enable = lib.mkEnableOption "my service";
       </example>
     </pattern>
+
+    <pattern name="mkPackageOption">
+      <description>Option for specifying a package with a default from pkgs</description>
+      <example>
+        package = lib.mkPackageOption pkgs "mypackage" { };
+        # With nullable:
+        package = lib.mkPackageOption pkgs "mypackage" { nullable = true; };
+      </example>
+    </pattern>
+
+    <pattern name="mkMerge">
+      <description>Merge multiple configuration sets</description>
+      <example>
+        config = lib.mkMerge [
+        (lib.mkIf config.services.foo.enable { environment.systemPackages = [ pkgs.foo ]; })
+        (lib.mkIf config.services.bar.enable { environment.systemPackages = [ pkgs.bar ]; })
+        ];
+      </example>
+    </pattern>
+
+    <pattern name="mkForce">
+      <description>Override a value with higher priority (force it over other definitions)</description>
+      <example>
+        services.openssh.settings.PermitRootLogin = lib.mkForce "no";
+      </example>
+      <warning>Use sparingly; prefer lib.mkDefault for setting lower-priority defaults instead</warning>
+    </pattern>
   </patterns>
 
   <anti_patterns>
@@ -190,10 +218,32 @@ description: This skill should be used when the user asks to "write nix", "nix e
       <description>Using string interpolation for path operations is error-prone</description>
       <instead>Use lib functions for path manipulation (lib.concatStringsSep, builtins.path)</instead>
     </avoid>
+
+    <avoid name="with_lib_extensively">
+      <description>Using "with lib;" at the top of modules pollutes scope and hides where functions come from</description>
+      <instead>Use explicit attribute access: lib.mkIf, lib.mkOption, lib.types.str. Only use "with" for narrow scopes like package lists (with pkgs; [ ... ])</instead>
+    </avoid>
+
+    <avoid name="fetchurl_without_hash">
+      <description>Using fetchurl or fetchTarball without a hash (sha256/hash) breaks reproducibility</description>
+      <instead>Always provide hash or sha256. Use nix-prefetch-url or lib.fakeHash to obtain the correct hash</instead>
+    </avoid>
+
+    <avoid name="legacy_nix_env">
+      <description>Using nix-env -i for imperative package management creates mutable unreproducible state</description>
+      <instead>Use declarative configuration via flakes, home.packages, or environment.systemPackages</instead>
+    </avoid>
+
+    <avoid name="mutable_nix_var_state">
+      <description>Relying on mutable state in /nix/var (e.g., nix-channel, nix-env profiles) breaks reproducibility</description>
+      <instead>Use flake inputs for pinning and lock files for reproducibility</instead>
+    </avoid>
   </anti_patterns>
 </nix_language>
 
 <flakes>
+  <note>Flakes are the de facto standard for Nix projects as of 2025. While technically still behind an experimental flag in upstream Nix, they are universally adopted in the ecosystem. Lix (a community fork of the Nix evaluator) also supports flakes.</note>
+
   <concept name="flake_structure">
     <description>Basic structure of a flake.nix file</description>
     <example>
@@ -294,7 +344,7 @@ description: This skill should be used when the user asks to "write nix", "nix e
         inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
         # Specific branch
-        stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+        stable.url = "github:NixOS/nixpkgs/nixos-25.05";
         # Specific revision
         pinned.url = "github:owner/repo/abc123def";
         };
@@ -376,6 +426,33 @@ description: This skill should be used when the user asks to "write nix", "nix e
       <use_case>CI/CD validation, pre-commit checks</use_case>
     </tool>
   </tools>
+
+  <tooling>
+    <tool name="formatter">
+      <description>nixfmt (RFC-style) is the standard Nix formatter, replacing nixpkgs-fmt</description>
+      <example>nix fmt # uses formatter defined in flake.nix</example>
+      <flake_config>formatter.x86_64-linux = pkgs.nixfmt-rfc-style;</flake_config>
+    </tool>
+
+    <tool name="lsp">
+      <description>Language servers for Nix: nil (nix-community) and nixd (nix-community) are the two main options</description>
+      <note>nil is lightweight and widely used; nixd provides richer nixpkgs-aware completions</note>
+    </tool>
+
+    <tool name="nix-direnv">
+      <description>Fast direnv integration for Nix flake devShells, caches environments to avoid slow re-evaluation</description>
+      <example>
+        programs.direnv = {
+        enable = true;
+        nix-direnv.enable = true;
+        };
+      </example>
+    </tool>
+  </tooling>
+
+  <ecosystem_note>
+    <description>Lix is a community fork of the Nix evaluator with improved error messages and performance. It is a drop-in replacement for CppNix and supports flakes. Be aware of its existence when users reference it.</description>
+  </ecosystem_note>
 </flakes>
 
 <home_manager>
@@ -625,13 +702,13 @@ description: This skill should be used when the user asks to "write nix", "nix e
   <concept name="state_version">
     <description>Track Home Manager state version for compatibility</description>
     <example>
-      home.stateVersion = "24.11"; # Current stable. 25.05 (upcoming).
+      home.stateVersion = "25.05"; # Current stable. 25.11 (upcoming).
     </example>
     <warning>Do not change after initial setup unless migrating</warning>
   </concept>
 
   <concept name="minimal_mode">
-    <description>HM 24.11+ (25.05 upcoming) supports minimal mode for faster evaluation</description>
+    <description>HM 25.05+ supports minimal mode for faster evaluation</description>
     <example>
       imports = [
       "${modulesPath}/programs/fzf.nix"
@@ -640,6 +717,145 @@ description: This skill should be used when the user asks to "write nix", "nix e
     <note>Advanced users optimizing evaluation time</note>
   </concept>
 </home_manager>
+
+<nixos>
+  <patterns>
+    <pattern name="basic">
+      <description>Basic NixOS configuration with Home Manager</description>
+      <example>
+        nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        ];
+        specialArgs = { inherit inputs; };
+        };
+      </example>
+    </pattern>
+
+    <pattern name="standalone_home_manager">
+      <description>Standalone Home Manager without NixOS</description>
+      <example>
+        homeConfigurations."user@host" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        modules = [ ./home.nix ];
+        extraSpecialArgs = { inherit inputs; };
+        };
+      </example>
+    </pattern>
+
+    <pattern name="as_nixos_module">
+      <description>Home Manager as a NixOS module</description>
+      <example>
+        {
+        imports = [ home-manager.nixosModules.home-manager ];
+
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.username = import ./home.nix;
+        }
+      </example>
+    </pattern>
+  </patterns>
+</nixos>
+
+<nixpkgs_packaging>
+  <concept name="languages_frameworks">
+    <description>Nixpkgs provides language-specific packaging infrastructure documented in doc/languages-frameworks/. Use Context7 with library ID /nixos/nixpkgs to retrieve up-to-date packaging patterns for each language.</description>
+  </concept>
+
+  <context7_topics>
+    <topic name="go">
+      <query>buildGoModule</query>
+      <query_alt>go packaging</query_alt>
+      <builders>buildGoModule</builders>
+      <language_version>Go 1.26</language_version>
+      <related_skill>golang-ecosystem</related_skill>
+    </topic>
+
+    <topic name="rust">
+      <query>rustPlatform.buildRustPackage</query>
+      <query_alt>rust packaging</query_alt>
+      <builders>rustPlatform.buildRustPackage, rustPlatform.importCargoLock</builders>
+      <language_version>Rust edition 2024</language_version>
+      <related_skill>rust-ecosystem</related_skill>
+    </topic>
+
+    <topic name="haskell">
+      <query>haskellPackages</query>
+      <query_alt>haskell packaging</query_alt>
+      <builders>haskellPackages.mkDerivation, haskellPackages.callCabal2nix</builders>
+      <language_version>GHC 9.14</language_version>
+      <related_skill>haskell-ecosystem</related_skill>
+    </topic>
+
+    <topic name="php">
+      <query>buildComposerProject2</query>
+      <query_alt>php packaging</query_alt>
+      <builders>php.buildComposerProject2</builders>
+      <language_version>PHP 8.5</language_version>
+      <related_skill>php-ecosystem</related_skill>
+    </topic>
+
+    <topic name="swift">
+      <query>swift packaging</query>
+      <builders>stdenv.mkDerivation with swift and swiftpm as nativeBuildInputs</builders>
+      <language_version>Swift 6.3</language_version>
+      <related_skill>swift-ecosystem</related_skill>
+    </topic>
+
+    <topic name="c_cpp">
+      <query>cmake</query>
+      <query_alt>meson</query_alt>
+      <builders>stdenv.mkDerivation with cmake or meson as nativeBuildInputs</builders>
+      <related_skill>c-ecosystem, cplusplus-ecosystem</related_skill>
+    </topic>
+
+    <topic name="nodejs">
+      <query>node packaging</query>
+      <query_alt>buildNpmPackage</query_alt>
+      <builders>buildNpmPackage, buildYarnPackage</builders>
+      <language_version>Node.js 24 LTS</language_version>
+      <related_skill>typescript-ecosystem</related_skill>
+    </topic>
+
+    <topic name="python">
+      <query>python packaging</query>
+      <query_alt>buildPythonPackage</query_alt>
+      <builders>python3Packages.buildPythonPackage, python3Packages.buildPythonApplication</builders>
+      <language_version>Python 3.13</language_version>
+    </topic>
+
+    <topic name="common_lisp">
+      <query>lisp packaging</query>
+      <builders>sbcl.buildASDFSystem, lispPackages_new.sbclPackages</builders>
+      <related_skill>common-lisp-ecosystem</related_skill>
+    </topic>
+  </context7_topics>
+
+  <decision_tree name="packaging_approach">
+    <question>Is the target language listed in context7_topics above?</question>
+    <if_yes>Use the corresponding Context7 topic query with library ID /nixos/nixpkgs</if_yes>
+    <if_no>Use get-library-docs with context7CompatibleLibraryID="/nixos/nixpkgs" and topic="LANGUAGE packaging" as a fallback</if_no>
+  </decision_tree>
+
+  <best_practices>
+    <practice priority="critical">
+      Always consult Context7 for the latest nixpkgs packaging patterns before writing language-specific derivations
+    </practice>
+    <practice priority="high">
+      Use language-specific builders (buildGoModule, rustPlatform.buildRustPackage, etc.) instead of raw mkDerivation
+    </practice>
+    <practice priority="medium">
+      Cross-reference with the corresponding ecosystem skill for language-specific conventions
+    </practice>
+  </best_practices>
+</nixpkgs_packaging>
+
+<devenv>
+  <note>devenv 2.0 is the current version. See devenv-ecosystem skill for detailed patterns.</note>
+</devenv>
 
 <workflow>
   <phase name="analyze">
@@ -695,119 +911,5 @@ description: This skill should be used when the user asks to "write nix", "nix e
   <skill name="context7-usage">Fetch latest nixpkgs and Home Manager documentation</skill>
   <skill name="investigation-patterns">Debug evaluation errors and understand derivation failures</skill>
   <skill name="ecosystem skills">Language-specific conventions for nixpkgs packaging via golang-ecosystem, rust-ecosystem, haskell-ecosystem, php-ecosystem, swift-ecosystem, c-ecosystem, cplusplus-ecosystem, common-lisp-ecosystem</skill>
+  <skill name="devenv-ecosystem">Devenv 2.0 configuration patterns</skill>
 </related_skills>
-
-<nixos>
-  <patterns>
-    <pattern name="basic">
-      <description>Basic NixOS configuration with Home Manager</description>
-      <example>
-        nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-        ./configuration.nix
-        home-manager.nixosModules.home-manager
-        ];
-        specialArgs = { inherit inputs; };
-        };
-      </example>
-    </pattern>
-
-    <pattern name="standalone_home_manager">
-      <description>Standalone Home Manager without NixOS</description>
-      <example>
-        homeConfigurations."user@host" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        modules = [ ./home.nix ];
-        extraSpecialArgs = { inherit inputs; };
-        };
-      </example>
-    </pattern>
-
-    <pattern name="as_nixos_module">
-      <description>Home Manager as a NixOS module</description>
-      <example>
-        {
-        imports = [ home-manager.nixosModules.home-manager ];
-
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.users.username = import ./home.nix;
-        }
-      </example>
-    </pattern>
-  </patterns>
-</nixos>
-
-<nixpkgs_packaging>
-  <concept name="languages_frameworks">
-    <description>Nixpkgs provides language-specific packaging infrastructure documented in doc/languages-frameworks/. Use Context7 with library ID /nixos/nixpkgs to retrieve up-to-date packaging patterns for each language.</description>
-  </concept>
-
-  <context7_topics>
-    <topic name="go">
-      <query>buildGoModule</query>
-      <query_alt>go packaging</query_alt>
-      <builders>buildGoModule</builders>
-      <related_skill>golang-ecosystem</related_skill>
-    </topic>
-
-    <topic name="rust">
-      <query>rustPlatform.buildRustPackage</query>
-      <query_alt>rust packaging</query_alt>
-      <builders>rustPlatform.buildRustPackage, rustPlatform.importCargoLock</builders>
-      <related_skill>rust-ecosystem</related_skill>
-    </topic>
-
-    <topic name="haskell">
-      <query>haskellPackages</query>
-      <query_alt>haskell packaging</query_alt>
-      <builders>haskellPackages.mkDerivation, haskellPackages.callCabal2nix</builders>
-      <related_skill>haskell-ecosystem</related_skill>
-    </topic>
-
-    <topic name="php">
-      <query>buildComposerProject2</query>
-      <query_alt>php packaging</query_alt>
-      <builders>php.buildComposerProject2</builders>
-      <related_skill>php-ecosystem</related_skill>
-    </topic>
-
-    <topic name="swift">
-      <query>swift packaging</query>
-      <builders>stdenv.mkDerivation with swift and swiftpm as nativeBuildInputs</builders>
-      <related_skill>swift-ecosystem</related_skill>
-    </topic>
-
-    <topic name="c_cpp">
-      <query>cmake</query>
-      <query_alt>meson</query_alt>
-      <builders>stdenv.mkDerivation with cmake or meson as nativeBuildInputs</builders>
-      <related_skill>c-ecosystem, cplusplus-ecosystem</related_skill>
-    </topic>
-
-    <topic name="common_lisp">
-      <query>lisp packaging</query>
-      <builders>sbcl.buildASDFSystem, lispPackages_new.sbclPackages</builders>
-      <related_skill>common-lisp-ecosystem</related_skill>
-    </topic>
-  </context7_topics>
-
-  <decision_tree name="packaging_approach">
-    <question>Is the target language listed in context7_topics above?</question>
-    <if_yes>Use the corresponding Context7 topic query with library ID /nixos/nixpkgs</if_yes>
-    <if_no>Use get-library-docs with context7CompatibleLibraryID="/nixos/nixpkgs" and topic="LANGUAGE packaging" as a fallback</if_no>
-  </decision_tree>
-
-  <best_practices>
-    <practice priority="critical">
-      Always consult Context7 for the latest nixpkgs packaging patterns before writing language-specific derivations
-    </practice>
-    <practice priority="high">
-      Use language-specific builders (buildGoModule, rustPlatform.buildRustPackage, etc.) instead of raw mkDerivation
-    </practice>
-    <practice priority="medium">
-      Cross-reference with the corresponding ecosystem skill for language-specific conventions
-    </practice>
-  </best_practices>
-</nixpkgs_packaging>

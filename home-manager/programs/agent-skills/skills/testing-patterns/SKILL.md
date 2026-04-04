@@ -1,11 +1,34 @@
 ---
 name: Testing Patterns
 description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs testing guidance. Provides testing methodology and patterns.
+version: 2.0.0
 ---
 
 <purpose>
   Provide testing patterns and strategies for comprehensive test coverage and maintainable test suites.
 </purpose>
+
+<tools>
+  <tool name="vitest" version="4.x" status="preferred">
+    <description>Current standard for JS/TS testing; preferred for all new projects</description>
+    <features>Stable Browser Mode, visual regression testing, snapshot testing, ESM-native, Vite-powered</features>
+  </tool>
+  <tool name="jest" status="supported">
+    <description>Widely used JS/TS test runner; still supported but Vitest is preferred for new projects</description>
+  </tool>
+  <tool name="eslint" version="10.x">
+    <description>Linting for JS/TS codebases; flat config only (eslintrc format removed)</description>
+  </tool>
+  <tool name="quickcheck" ecosystem="haskell">
+    <description>Property-based testing for Haskell</description>
+  </tool>
+  <tool name="hedgehog" ecosystem="haskell">
+    <description>Property-based testing with integrated shrinking for Haskell</description>
+  </tool>
+  <tool name="fast-check" ecosystem="js/ts">
+    <description>Property-based testing for JavaScript/TypeScript</description>
+  </tool>
+</tools>
 
 <concept name="unit">
   <description>Test individual functions/methods in isolation</description>
@@ -26,6 +49,21 @@ description: This skill should be used when the user asks to "write tests", "tes
   <scope>Full application stack</scope>
   <characteristics>Slowest, tests real user scenarios</characteristics>
   <when>Critical user journeys, smoke tests</when>
+</concept>
+
+<concept name="line_coverage">
+  <description>Percentage of code lines executed during tests</description>
+  <guidance>Measures which lines of code are exercised</guidance>
+</concept>
+
+<concept name="branch_coverage">
+  <description>Percentage of code branches (if/else, switch) taken during tests</description>
+  <guidance>More thorough than line coverage as it measures decision paths</guidance>
+</concept>
+
+<concept name="function_coverage">
+  <description>Percentage of functions/methods called during tests</description>
+  <guidance>Identifies untested functions</guidance>
 </concept>
 
 <pattern name="arrange_act_assert">
@@ -174,6 +212,42 @@ description: This skill should be used when the user asks to "write tests", "tes
   <note>Format: [method]_should_[expected_behavior]_when_[condition]</note>
 </pattern>
 
+<pattern name="property_based_testing">
+  <description>Generate random inputs to verify properties that should always hold</description>
+  <decision_tree name="when_to_use">
+    <question>Does the function have a property or invariant that holds for all valid inputs?</question>
+    <if_yes>Apply property-based testing to generate random inputs and verify invariants</if_yes>
+    <if_no>Use example-based tests with arrange-act-assert</if_no>
+  </decision_tree>
+  <example>
+    <note>Haskell (QuickCheck/Hedgehog)</note>
+    prop_reverse_involutive xs = reverse (reverse xs) == xs
+
+    <note>JS/TS (fast-check)</note>
+    fc.assert(
+      fc.property(fc.array(fc.integer()), (arr) =>
+        deepEqual(arr, reverse(reverse(arr)))
+      )
+    )
+  </example>
+  <tools>QuickCheck (Haskell), Hedgehog (Haskell), fast-check (JS/TS), Hypothesis (Python)</tools>
+  <use_case>Serialization round-trips, sorting invariants, mathematical properties, parser correctness</use_case>
+</pattern>
+
+<pattern name="snapshot_testing">
+  <description>Capture output and compare against a stored reference snapshot</description>
+  <decision_tree name="when_to_use">
+    <question>Is the output complex and best verified by comparing against a known-good reference?</question>
+    <if_yes>Apply snapshot testing to detect unintended output changes</if_yes>
+    <if_no>Use explicit assertions for specific values</if_no>
+  </decision_tree>
+  <example>
+    expect(renderComponent()).toMatchSnapshot()
+  </example>
+  <note>Vitest 4.x supports visual regression testing via Browser Mode for comparing rendered UI screenshots against baseline images</note>
+  <use_case>Component rendering, serialized data structures, CLI output</use_case>
+</pattern>
+
 <best_practices>
   <practice priority="critical">
     <name>Test happy path first</name>
@@ -297,34 +371,6 @@ description: This skill should be used when the user asks to "write tests", "tes
   </practice>
 </best_practices>
 
-<concept name="line_coverage">
-  <description>Percentage of code lines executed during tests</description>
-  <guidance>Measures which lines of code are exercised</guidance>
-</concept>
-
-<concept name="branch_coverage">
-  <description>Percentage of code branches (if/else, switch) taken during tests</description>
-  <guidance>More thorough than line coverage as it measures decision paths</guidance>
-</concept>
-
-<concept name="function_coverage">
-  <description>Percentage of functions/methods called during tests</description>
-  <guidance>Identifies untested functions</guidance>
-</concept>
-
-<rules priority="standard">
-  <rule>Aim for high coverage but prioritize meaningful tests over coverage numbers</rule>
-  <rule>80%+ coverage is a good target for critical code paths</rule>
-  <rule>100% coverage does not guarantee bug-free code</rule>
-  <rule>Focus on testing behavior, not achieving coverage metrics</rule>
-</rules>
-
-<related_skills>
-  <skill name="requirements-definition">Use to define test requirements and acceptance criteria</skill>
-  <skill name="execution-workflow">Use to implement tests as part of feature development workflow</skill>
-  <skill name="investigation-patterns">Use when debugging test failures or flaky tests</skill>
-</related_skills>
-
 <anti_patterns>
   <avoid name="testing_implementation">
     <description>Testing implementation details instead of behavior</description>
@@ -351,6 +397,13 @@ description: This skill should be used when the user asks to "write tests", "tes
     <instead>Make each test independent with proper setup/teardown and isolated state. Each test should create its own test data.</instead>
   </avoid>
 </anti_patterns>
+
+<rules priority="standard">
+  <rule>Aim for high coverage but prioritize meaningful tests over coverage numbers</rule>
+  <rule>80%+ coverage is a good target for critical code paths</rule>
+  <rule>100% coverage does not guarantee bug-free code</rule>
+  <rule>Focus on testing behavior, not achieving coverage metrics</rule>
+</rules>
 
 <error_escalation>
   <level severity="low">
@@ -379,3 +432,9 @@ description: This skill should be used when the user asks to "write tests", "tes
   <avoid>Writing flaky or non-deterministic tests</avoid>
   <avoid>Ignoring existing test conventions</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="requirements-definition">Use to define test requirements and acceptance criteria</skill>
+  <skill name="execution-workflow">Use to implement tests as part of feature development workflow</skill>
+  <skill name="investigation-patterns">Use when debugging test failures or flaky tests</skill>
+</related_skills>

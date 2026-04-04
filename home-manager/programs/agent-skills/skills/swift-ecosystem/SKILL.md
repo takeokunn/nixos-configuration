@@ -1,7 +1,7 @@
 ---
 name: Swift Ecosystem
-description: This skill should be used when working with Swift projects, "Package.swift", "swift build/test/run", "swiftc", SwiftLint, SwiftFormat, or Swift language patterns. Provides comprehensive Swift ecosystem patterns and best practices for cross-platform CLI and library development.
-version: 0.1.0
+description: This skill should be used when working with Swift projects, "Package.swift", "swift build/test/run", "swiftc", SwiftLint, SwiftFormat, or Swift language patterns. Provides comprehensive Swift 6.3 ecosystem patterns and best practices for cross-platform CLI and library development.
+version: 2.0.0
 ---
 
 <purpose>
@@ -233,6 +233,20 @@ version: 0.1.0
       </example>
     </pattern>
 
+    <pattern name="main_actor">
+      <description>@MainActor ensures code runs on the main thread. Essential for UI updates.</description>
+      <example>
+        @MainActor
+        class ViewModel: ObservableObject {
+          @Published var items: [Item] = []
+
+          func loadItems() async {
+            items = await fetchItems()
+          }
+        }
+      </example>
+    </pattern>
+
     <pattern name="sendable">
       <description>Mark types safe for concurrent access</description>
       <example>
@@ -266,6 +280,20 @@ version: 0.1.0
           }
         }
       </example>
+    </pattern>
+
+    <pattern name="strict_concurrency">
+      <description>Enable complete strict concurrency checking for data race safety (Swift 6 default).</description>
+      <example>
+        // In Package.swift
+        swiftSettings: [
+          .swiftLanguageMode(.v6), // Enables strict concurrency
+        ]
+
+        // Or compiler flag:
+        // -strict-concurrency=complete
+      </example>
+      <note>Swift 6 enables strict concurrency by default. For migration, use -strict-concurrency=complete with Swift 5 mode to find issues incrementally.</note>
     </pattern>
 
     <rules priority="critical">
@@ -411,6 +439,24 @@ version: 0.1.0
   </anti_patterns>
 </swift_language>
 
+<swift_63_features>
+  <feature name="android_sdk">
+    <description>First Swift SDK for Android in stable. Enables native Android development in Swift, updating existing Swift packages for Android support, and integrating Swift code in Kotlin/Java apps via Swift Java and Swift Java JNI Core.</description>
+  </feature>
+  <feature name="c_attribute">
+    <description>The @c attribute lets developers expose Swift functions and enums to C code within a single project.</description>
+    <example>
+      @c func myFunction() -> Int32 { return 42 }
+    </example>
+  </feature>
+  <feature name="swift_build_in_spm">
+    <description>Swift Build integration in Swift Package Manager is now available as opt-in, deduplicating build technologies and delivering consistent cross-platform build experience.</description>
+  </feature>
+  <feature name="embedded_swift_improvements">
+    <description>Continued improvements for using Swift in embedded environments.</description>
+  </feature>
+</swift_63_features>
+
 <patterns>
   <decision_tree name="error_handling_choice">
     <question>Is this synchronous code with recoverable errors?</question>
@@ -474,7 +520,7 @@ version: 0.1.0
 
   <package_swift>
     <basic_structure>
-      // swift-tools-version: 6.0
+      // swift-tools-version: 6.3
       import PackageDescription
 
       // For cross-platform (macOS + Linux), omit platforms array entirely
@@ -615,7 +661,7 @@ version: 0.1.0
 
     <configuration>
       <file_reference>.swiftformat</file_reference>
-      --swiftversion 6.0
+      --swiftversion 6.3
       --indent 4
       --indentcase false
       --trimwhitespace always
@@ -659,7 +705,7 @@ version: 0.1.0
 
   <other_tools>
     <tool name="swift-testing">
-      <description>Modern testing framework (Swift 6+)</description>
+      <description>Modern testing framework (stable since Swift 6.0)</description>
       <example>
         import Testing
 
@@ -689,7 +735,7 @@ version: 0.1.0
 
 <testing>
   <swift_testing>
-    <description>Modern testing framework with Swift 6 macros</description>
+    <description>Modern testing framework, stable since Swift 6.0, with macro-based test declarations</description>
 
     <pattern name="basic_test">
       <example>
@@ -791,6 +837,55 @@ version: 0.1.0
   </usage_patterns>
 </context7_integration>
 
+<best_practices>
+  <practice priority="critical">Use swift build for compilation; swift test for testing</practice>
+  <practice priority="critical">Run swiftlint before committing</practice>
+  <practice priority="critical">Format with swiftformat for consistent style</practice>
+  <practice priority="high">Prefer value types (structs) over reference types (classes)</practice>
+  <practice priority="high">Use async/await for asynchronous code</practice>
+  <practice priority="high">Mark types as Sendable for concurrency safety</practice>
+  <practice priority="medium">Document public API with /// doc comments</practice>
+  <practice priority="medium">Write tests alongside implementation</practice>
+  <practice priority="medium">Use Swift Testing framework for new test code</practice>
+  <practice priority="medium">Specify swift-tools-version in Package.swift</practice>
+</best_practices>
+
+<anti_patterns>
+  <avoid name="force_unwrap">
+    <description>Using ! to force unwrap optionals</description>
+    <instead>Use if-let, guard-let, or nil-coalescing</instead>
+  </avoid>
+  <avoid name="force_try">
+    <description>Using try! to ignore errors</description>
+    <instead>Use do-catch or propagate with throws</instead>
+  </avoid>
+  <avoid name="class_for_data">
+    <description>Using class for simple data containers</description>
+    <instead>Use struct for value semantics</instead>
+  </avoid>
+  <avoid name="any_abuse">
+    <description>Overusing Any or AnyObject types</description>
+    <instead>Use generics or protocols with associated types</instead>
+  </avoid>
+  <avoid name="retain_cycles">
+    <description>Strong reference cycles in closures</description>
+    <instead>Use [weak self] or [unowned self] capture lists</instead>
+  </avoid>
+</anti_patterns>
+
+<rules priority="critical">
+  <rule>Run swiftlint before committing; fix all warnings</rule>
+  <rule>Never use force unwrap (!) in library code</rule>
+  <rule>Use async/await over completion handlers for new code</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Use swiftformat for consistent formatting</rule>
+  <rule>Prefer structs over classes for data types</rule>
+  <rule>Write unit tests in Tests/ directory</rule>
+  <rule>Use guard for early exit patterns</rule>
+</rules>
+
 <workflow>
   <phase name="analyze">
     <objective>Understand Swift code requirements</objective>
@@ -812,32 +907,6 @@ version: 0.1.0
   </phase>
 </workflow>
 
-<best_practices>
-  <practice priority="critical">Use swift build for compilation; swift test for testing</practice>
-  <practice priority="critical">Run swiftlint before committing</practice>
-  <practice priority="critical">Format with swiftformat for consistent style</practice>
-  <practice priority="high">Prefer value types (structs) over reference types (classes)</practice>
-  <practice priority="high">Use async/await for asynchronous code</practice>
-  <practice priority="high">Mark types as Sendable for concurrency safety</practice>
-  <practice priority="medium">Document public API with /// doc comments</practice>
-  <practice priority="medium">Write tests alongside implementation</practice>
-  <practice priority="medium">Use Swift Testing framework for new test code</practice>
-  <practice priority="medium">Specify swift-tools-version in Package.swift</practice>
-</best_practices>
-
-<rules priority="critical">
-  <rule>Run swiftlint before committing; fix all warnings</rule>
-  <rule>Never use force unwrap (!) in library code</rule>
-  <rule>Use async/await over completion handlers for new code</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use swiftformat for consistent formatting</rule>
-  <rule>Prefer structs over classes for data types</rule>
-  <rule>Write unit tests in Tests/ directory</rule>
-  <rule>Use guard for early exit patterns</rule>
-</rules>
-
 <error_escalation>
   <level severity="low">
     <example>SwiftLint warning about style</example>
@@ -857,12 +926,6 @@ version: 0.1.0
   </level>
 </error_escalation>
 
-<related_skills>
-  <skill name="serena-usage">Navigate protocol implementations and module structure</skill>
-  <skill name="context7-usage">Fetch Swift language and library documentation</skill>
-  <skill name="investigation-patterns">Debug type errors, optional handling, and concurrency issues</skill>
-</related_skills>
-
 <constraints>
   <must>Prefer value types over reference types</must>
   <must>Use optionals and proper error handling</must>
@@ -871,3 +934,9 @@ version: 0.1.0
   <avoid>Using force try (try!) in production code</avoid>
   <avoid>Completion handlers when async/await is available</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="serena-usage">Navigate protocol implementations and module structure</skill>
+  <skill name="context7-usage">Fetch Swift language and library documentation</skill>
+  <skill name="investigation-patterns">Debug type errors, optional handling, and concurrency issues</skill>
+</related_skills>

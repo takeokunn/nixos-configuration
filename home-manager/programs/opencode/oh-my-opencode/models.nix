@@ -21,10 +21,10 @@ in
   apex = {
     model = gptCodex;
     fallback = [
-      gpt54        # OpenAI: comparable quality
-      glm5         # ZAI:    provider diversity
+      gpt54 # OpenAI: comparable quality
+      glm5 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter reasoning
-      gpt54mini    # OpenAI: last-resort cheapest
+      gpt54mini # OpenAI: last-resort cheapest
     ];
   };
 
@@ -32,10 +32,10 @@ in
   upper = {
     model = gpt54;
     fallback = [
-      gptCodex     # OpenAI: stronger reasoning
-      glm5         # ZAI:    provider diversity
+      gptCodex # OpenAI: stronger reasoning
+      glm5 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter coding
-      gpt54mini    # OpenAI: last-resort cheapest
+      gpt54mini # OpenAI: last-resort cheapest
     ];
   };
 
@@ -44,9 +44,9 @@ in
     model = gpt54mini;
     fallback = [
       gptCodexSpark # OpenAI: similar-tier coding
-      glm5         # ZAI:    equivalent tier
-      glm47        # ZAI:    lower last-resort
-      gpt54        # OpenAI: up-tier safety net
+      glm5 # ZAI:    equivalent tier
+      glm47 # ZAI:    lower last-resort
+      gpt54 # OpenAI: up-tier safety net
     ];
   };
 
@@ -54,9 +54,9 @@ in
   mid = {
     model = gptCodexSpark;
     fallback = [
-      glm5         # ZAI:    equivalent tier
-      glm47        # ZAI:    lower same-provider
-      gpt54mini    # OpenAI: similar weight
+      glm5 # ZAI:    equivalent tier
+      glm47 # ZAI:    lower same-provider
+      gpt54mini # OpenAI: similar weight
     ];
   };
 
@@ -64,9 +64,9 @@ in
   base = {
     model = glm5;
     fallback = [
-      glm47        # ZAI:    same-provider lower version
+      glm47 # ZAI:    same-provider lower version
       gptCodexSpark # OpenAI: mid-tier diversity
-      gpt54mini    # OpenAI: wider OpenAI fallback
+      gpt54mini # OpenAI: wider OpenAI fallback
     ];
   };
 }

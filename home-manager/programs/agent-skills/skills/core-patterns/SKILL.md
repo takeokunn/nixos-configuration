@@ -8,23 +8,6 @@ version: 2.0.0
   Provide standardized base templates for error handling, decision criteria, and enforcement behaviors shared across all agents and commands.
 </purpose>
 
-<tools>
-  <tool name="error_escalation_template">
-    <description>Standard 4-level severity escalation pattern</description>
-    <use_case>Include in agents and commands for consistent error handling</use_case>
-  </tool>
-
-  <tool name="decision_criteria_template">
-    <description>Standard confidence calculation with validation tests</description>
-    <use_case>Include in agents and commands for consistent quality assessment</use_case>
-  </tool>
-
-  <tool name="enforcement_template">
-    <description>Standard mandatory and prohibited behaviors pattern</description>
-    <use_case>Include in agents and commands for consistent behavior enforcement</use_case>
-  </tool>
-</tools>
-
 <concepts>
   <concept name="severity_levels">
     <description>Standard 4-level severity classification for error escalation</description>
@@ -203,6 +186,47 @@ Use attribute values:
   </pattern>
 </patterns>
 
+<error_escalation>
+  <level severity="low">
+    <example>Minor inconsistency in behavior ID format</example>
+    <action>Note in report, proceed</action>
+  </level>
+  <level severity="medium">
+    <example>Missing one boundary test</example>
+    <action>Document issue, add missing test</action>
+  </level>
+  <level severity="high">
+    <example>Decision criteria weights do not sum to 1.0</example>
+    <action>STOP, fix weight distribution before proceeding</action>
+  </level>
+  <level severity="critical">
+    <example>Error escalation missing critical level</example>
+    <action>BLOCK operation, require complete 4-level structure</action>
+  </level>
+</error_escalation>
+
+<enforcement>
+  <mandatory_behaviors>
+    <behavior id="CORE-B001" priority="critical">
+      <trigger>When creating new agent or command</trigger>
+      <action>Reference core-patterns skill in refs section</action>
+      <verification>refs tag contains core-patterns</verification>
+    </behavior>
+    <behavior id="CORE-B002" priority="critical">
+      <trigger>When defining decision_criteria</trigger>
+      <action>Include all 5 validation tests with boundary cases</action>
+      <verification>Tests include boundary_success_80, boundary_warning_79, boundary_error_59</verification>
+    </behavior>
+  </mandatory_behaviors>
+  <prohibited_behaviors>
+    <behavior id="CORE-P001" priority="critical">
+      <trigger>Always</trigger>
+      <action>Using non-standard confidence thresholds</action>
+      <response>Use 60/80 thresholds as defined in this skill</response>
+    </behavior>
+  </prohibited_behaviors>
+</enforcement>
+
 <anti_patterns>
   <avoid name="inline_error_escalation">
     <description>Duplicating full error_escalation in each file</description>
@@ -251,53 +275,6 @@ Use attribute values:
   <rule>Use consistent behavior ID naming convention</rule>
 </rules>
 
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="CORE-B001" priority="critical">
-      <trigger>When creating new agent or command</trigger>
-      <action>Reference core-patterns skill in refs section</action>
-      <verification>refs tag contains core-patterns</verification>
-    </behavior>
-    <behavior id="CORE-B002" priority="critical">
-      <trigger>When defining decision_criteria</trigger>
-      <action>Include all 5 validation tests with boundary cases</action>
-      <verification>Tests include boundary_success_80, boundary_warning_79, boundary_error_59</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="CORE-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Using non-standard confidence thresholds</action>
-      <response>Use 60/80 thresholds as defined in this skill</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
-
-<error_escalation>
-  <level severity="low">
-    <example>Minor inconsistency in behavior ID format</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Missing one boundary test</example>
-    <action>Document issue, add missing test</action>
-  </level>
-  <level severity="high">
-    <example>Decision criteria weights do not sum to 1.0</example>
-    <action>STOP, fix weight distribution before proceeding</action>
-  </level>
-  <level severity="critical">
-    <example>Error escalation missing critical level</example>
-    <action>BLOCK operation, require complete 4-level structure</action>
-  </level>
-</error_escalation>
-
-<related_skills>
-  <skill name="parallelization-patterns">Parallel execution strategies and timeout configuration</skill>
-  <skill name="workflow-patterns">Output formats, reflection checkpoints, agent weights</skill>
-  <skill name="serena-usage">For memory operations to store pattern decisions</skill>
-</related_skills>
-
 <constraints>
   <must>Define exactly 4 severity levels for error_escalation</must>
   <must>Include all 5 validation tests for decision_criteria</must>
@@ -307,3 +284,9 @@ Use attribute values:
   <avoid>Omitting boundary tests</avoid>
   <avoid>Using non-standard thresholds</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="parallelization-patterns">Parallel execution strategies and timeout configuration</skill>
+  <skill name="workflow-patterns">Output formats, reflection checkpoints, agent weights</skill>
+  <skill name="serena-usage">For memory operations to store pattern decisions</skill>
+</related_skills>

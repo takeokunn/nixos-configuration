@@ -1,7 +1,7 @@
 ---
 name: Parallelization Patterns
 description: Patterns for parallel execution strategies, timeout configuration, retry policies, and consensus mechanisms.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -207,11 +207,6 @@ version: 1.0.0
   <rule>Use consensus_thresholds for multi-agent validation scenarios</rule>
 </rules>
 
-<related_skills>
-  <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
-  <skill name="workflow-patterns">Output formats, reflection checkpoints, self-evaluation</skill>
-</related_skills>
-
 <constraints>
   <must>Match parallelization pattern to agent's state modification behavior</must>
   <must>Use standard timeout tiers from timeout_selection</must>
@@ -219,3 +214,8 @@ version: 1.0.0
   <avoid>Running write agents in parallel without coordination</avoid>
   <avoid>Using non-standard timeout values</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
+  <skill name="workflow-patterns">Output formats, reflection checkpoints, self-evaluation</skill>
+</related_skills>

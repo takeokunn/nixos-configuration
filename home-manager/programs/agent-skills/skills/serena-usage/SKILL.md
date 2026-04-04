@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
 description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", or needs Serena MCP guidance. Provides Serena tool usage patterns and orchestration integration.
-version: 0.2.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -29,16 +29,16 @@ version: 0.2.0
     <description>Get high-level view of symbols in a file</description>
     <param name="relative_path">Path to file (required)</param>
     <param name="depth">Descendant depth, 0 for top-level only</param>
-    <use_case>First step when exploring a new file</use_case>
+    <use_case>First step when exploring a new file; prefer depth=0 initially</use_case>
   </tool>
 
   <tool name="find_symbol">
     <description>Find symbols by name path pattern</description>
     <param name="name_path_pattern">Symbol name or path (e.g., "MyClass/myMethod")</param>
     <param name="relative_path">Restrict to file or directory</param>
-    <param name="include_body">Include source code</param>
+    <param name="include_body">Include source code (default false)</param>
     <param name="depth">Include descendants</param>
-    <param name="substring_matching">Match partial names</param>
+    <param name="substring_matching">Match partial names (useful for uncertain names)</param>
     <use_case>Locate specific functions, classes, or methods</use_case>
   </tool>
 
@@ -46,7 +46,7 @@ version: 0.2.0
     <description>Find all references to a symbol</description>
     <param name="name_path">Symbol to find references for</param>
     <param name="relative_path">File containing the symbol</param>
-    <use_case>Dependency analysis, impact assessment</use_case>
+    <use_case>Dependency analysis, impact assessment before refactoring</use_case>
   </tool>
 
   <tool name="search_for_pattern">
@@ -58,7 +58,7 @@ version: 0.2.0
     <param name="restrict_search_to_code_files">Search only code files or all files</param>
     <param name="paths_include_glob">Glob pattern for files to include</param>
     <param name="paths_exclude_glob">Glob pattern for files to exclude</param>
-    <use_case>Find patterns, non-code files, complex searches</use_case>
+    <use_case>Find patterns, search non-code files, complex regex searches</use_case>
   </tool>
 
   <tool name="list_dir">
@@ -88,7 +88,7 @@ version: 0.2.0
     <param name="name_path">Symbol to insert before</param>
     <param name="relative_path">File containing symbol</param>
     <param name="body">Content to insert</param>
-    <use_case>Add imports, decorators, comments</use_case>
+    <use_case>Add imports, decorators, comments before a symbol</use_case>
   </tool>
 
   <tool name="insert_after_symbol">
@@ -96,15 +96,15 @@ version: 0.2.0
     <param name="name_path">Symbol to insert after</param>
     <param name="relative_path">File containing symbol</param>
     <param name="body">Content to insert</param>
-    <use_case>Add new functions, classes</use_case>
+    <use_case>Add new functions, classes after a symbol</use_case>
   </tool>
 
   <tool name="rename_symbol">
-    <description>Rename symbol across codebase</description>
+    <description>Rename symbol across codebase with automatic reference updates</description>
     <param name="name_path">Symbol to rename</param>
     <param name="relative_path">File containing symbol</param>
     <param name="new_name">New symbol name</param>
-    <use_case>Consistent renaming with reference updates</use_case>
+    <use_case>Consistent renaming with reference updates across all files</use_case>
   </tool>
 
   <tool name="list_memories">
@@ -119,10 +119,10 @@ version: 0.2.0
   </tool>
 
   <tool name="write_memory">
-    <description>Write information to a memory file</description>
+    <description>Write information to a memory file (creates or overwrites)</description>
     <param name="memory_file_name">Name of memory file to write</param>
     <param name="content">Content to write</param>
-    <use_case>Record new patterns and conventions</use_case>
+    <use_case>Record new patterns and conventions for future sessions</use_case>
   </tool>
 
   <tool name="edit_memory">
@@ -131,7 +131,14 @@ version: 0.2.0
     <param name="needle">Pattern to search for</param>
     <param name="repl">Replacement string</param>
     <param name="mode">Either "literal" or "regex"</param>
-    <use_case>Update specific parts of memory files</use_case>
+    <use_case>Update specific parts of memory files without full rewrite</use_case>
+  </tool>
+
+  <tool name="rename_memory">
+    <description>Rename a memory file</description>
+    <param name="memory_file_name">Current name of the memory file</param>
+    <param name="new_memory_file_name">New name for the memory file</param>
+    <use_case>Rename memories for better organization or archival</use_case>
   </tool>
 
   <tool name="delete_memory">
@@ -140,30 +147,36 @@ version: 0.2.0
     <use_case>Remove obsolete or incorrect patterns (requires user permission)</use_case>
   </tool>
 
+  <tool name="get_current_config">
+    <description>Get current Serena configuration for the active project</description>
+    <use_case>Verify project settings and available language servers</use_case>
+  </tool>
+
   <tool name="think_about_collected_information">
     <description>Validate search quality and completeness</description>
-    <use_case>After investigation or search sequences</use_case>
+    <use_case>After 3+ search operations to assess information sufficiency</use_case>
   </tool>
 
   <tool name="think_about_task_adherence">
     <description>Verify alignment with task before code modification</description>
-    <use_case>Before any symbol editing operation</use_case>
+    <use_case>Mandatory before any symbol editing operation</use_case>
   </tool>
 
   <tool name="think_about_whether_you_are_done">
     <description>Confirm task completion</description>
-    <use_case>Before reporting task completion to user</use_case>
+    <use_case>Mandatory before reporting task completion to user</use_case>
   </tool>
 </tools>
 
 <concepts>
   <concept name="memory_files">
-    <description>Persistent storage for project patterns, conventions, and architectural decisions</description>
+    <description>Persistent storage for project patterns, conventions, and architectural decisions that survive across sessions</description>
     <example>
       list_memories  # Check existing patterns
       read_memory "nix-conventions"  # Load Nix patterns
       write_memory "api-patterns" "REST API conventions..."  # Record new pattern
       edit_memory "api-patterns" "old text" "new text" mode="literal"  # Update memory
+      rename_memory "old-name" "new-name"  # Rename for organization
     </example>
   </concept>
 
@@ -178,7 +191,7 @@ version: 0.2.0
   </concept>
 
   <concept name="symbol_path">
-    <description>Path to symbol within a file (e.g., MyClass/myMethod)</description>
+    <description>Path to symbol within a file using slash-separated hierarchy (e.g., MyClass/myMethod)</description>
     <example>
       find_symbol "MyClass/myMethod"  # Find specific method
       find_symbol "get*" substring_matching=true  # Find all getter methods
@@ -186,12 +199,12 @@ version: 0.2.0
   </concept>
 
   <concept name="reflection_tools">
-    <description>Meta-cognitive tools for ensuring search quality and task alignment</description>
+    <description>Meta-cognitive tools for ensuring search quality and task alignment at mandatory checkpoints</description>
     <example>
-      <note>After searching multiple files</note>
+      <note>After 3+ search operations</note>
       think_about_collected_information
 
-      <note>Before making changes</note>
+      <note>Before making code changes</note>
       think_about_task_adherence
 
       <note>When task seems complete</note>
@@ -352,8 +365,8 @@ version: 0.2.0
     </versioning>
     <archival>
       <trigger>When pattern is superseded by new approach</trigger>
-      <action>Rename with -archived suffix OR delete if no historical value</action>
-      <example>edit_memory "old-pattern" "..." "ARCHIVED: Superseded by new-pattern\n\n..."</example>
+      <action>Rename with -archived suffix using rename_memory OR delete if no historical value</action>
+      <example>rename_memory "old-pattern" "old-pattern-archived"</example>
     </archival>
     <consolidation>
       <trigger>When multiple small memories cover related topics</trigger>
@@ -367,7 +380,7 @@ version: 0.2.0
 
   <decision_tree name="serena_code_operation">
     <question>What type of code operation is needed?</question>
-    <branch condition="Understand file structure">Use get_symbols_overview with depth=1</branch>
+    <branch condition="Understand file structure">Use get_symbols_overview with depth=0, then depth=1</branch>
     <branch condition="Find specific symbol by name">Use find_symbol with name_path_pattern</branch>
     <branch condition="Read symbol implementation">Use find_symbol with include_body=true</branch>
     <branch condition="Find symbol references">Use find_referencing_symbols</branch>
@@ -454,112 +467,6 @@ version: 0.2.0
   </decision_tree>
 </patterns>
 
-<anti_patterns>
-  <avoid name="reading_entire_files">
-    <description>Reading entire files when only specific symbols are needed</description>
-    <instead>Use get_symbols_overview for file structure and find_symbol with include_body for specific implementations</instead>
-  </avoid>
-
-  <avoid name="unscoped_searches">
-    <description>Searching entire codebase when scope is known</description>
-    <instead>Use relative_path parameter to restrict search to known files or directories</instead>
-  </avoid>
-
-  <avoid name="ignoring_memories">
-    <description>Implementing features without checking existing patterns</description>
-    <instead>Always check list_memories and read_memory before implementation</instead>
-  </avoid>
-
-  <avoid name="manual_refactoring">
-    <description>Manually updating symbol references across files</description>
-    <instead>Use rename_symbol for consistent renaming with automatic reference updates</instead>
-  </avoid>
-
-  <avoid name="excessive_depth">
-    <description>Using high depth values unnecessarily in get_symbols_overview</description>
-    <instead>Start with depth=0, then incrementally increase if needed</instead>
-  </avoid>
-
-  <avoid name="skipping_reflection">
-    <description>Modifying code without calling think_about_task_adherence</description>
-    <instead>Always call think_about_task_adherence before symbol editing operations</instead>
-  </avoid>
-
-  <avoid name="deleting_memories_without_permission">
-    <description>Using delete_memory without explicit user request</description>
-    <instead>Use edit_memory to update memories; only delete when user explicitly requests</instead>
-  </avoid>
-
-  <avoid name="using_glob_grep_directly">
-    <description>Using Glob/Grep tools when Serena navigation tools are available</description>
-    <instead>Prefer Serena list_dir, find_file, search_for_pattern for codebase exploration</instead>
-  </avoid>
-</anti_patterns>
-
-<workflow>
-  <phase name="prepare">
-    <objective>Prepare for effective Serena tool usage</objective>
-    <step>1. Activate project with activate_project</step>
-    <step>2. Verify onboarding with check_onboarding_performed</step>
-    <step>3. Check list_memories for existing patterns</step>
-    <step>4. Read relevant memories with read_memory</step>
-    <step>5. Identify target symbols or files</step>
-    <step>6. Choose appropriate tool based on decision_tree</step>
-  </phase>
-  <phase name="execute">
-    <objective>Execute Serena operations efficiently</objective>
-    <step>1. Start with get_symbols_overview for file structure</step>
-    <step>2. Use find_symbol with include_body for details</step>
-    <step>3. Use find_referencing_symbols for dependencies</step>
-    <step>4. Call think_about_task_adherence before edits</step>
-    <step>5. Use symbol editing tools for modifications</step>
-  </phase>
-  <phase name="verify">
-    <objective>Verify results and record patterns</objective>
-    <step>1. Call think_about_collected_information after searches</step>
-    <step>2. Record new patterns with write_memory</step>
-    <step>3. Call think_about_whether_you_are_done when complete</step>
-  </phase>
-</workflow>
-
-<best_practices>
-  <practice priority="critical">Always activate project and check onboarding at session start (SERENA-B001)</practice>
-  <practice priority="critical">Always check memories with list_memories and read_memory before implementing new features (SERENA-B002)</practice>
-  <practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007)</practice>
-  <practice priority="critical">Call think_about_task_adherence before any code modification (SERENA-B003)</practice>
-  <practice priority="critical">Call think_about_collected_information after 3+ search operations (SERENA-B006)</practice>
-  <practice priority="critical">Call think_about_whether_you_are_done before final response (SERENA-B004)</practice>
-  <practice priority="critical">Use Serena navigation tools before Glob/Grep/Read (SERENA-P004)</practice>
-  <practice priority="high">Restrict searches by relative_path when scope is known to improve performance</practice>
-  <practice priority="high">Use substring_matching for uncertain symbol names to broaden search results</practice>
-  <practice priority="high">Record significant patterns with write_memory after discovery (SERENA-B005)</practice>
-  <practice priority="high">Use edit_memory for updating existing memories instead of delete and recreate</practice>
-  <practice priority="high">Follow serena_first_tool_selection decision tree for consistent tool choices</practice>
-  <practice priority="medium">Use context_lines parameters in search_for_pattern to understand surrounding code</practice>
-  <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
-  <practice priority="medium">Follow memory_reading_by_task_type to prioritize relevant memories</practice>
-</best_practices>
-
-<rules priority="critical">
-  <rule>Always check memories before implementing new features (SERENA-B002)</rule>
-  <rule>Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007, SERENA-P001)</rule>
-  <rule>Call think_about_collected_information after search sequences of 3+ operations (SERENA-B006)</rule>
-  <rule>Call think_about_task_adherence before making code changes (SERENA-B003)</rule>
-  <rule>Call think_about_whether_you_are_done before final response (SERENA-B004, SERENA-P005)</rule>
-  <rule>Use Serena navigation tools (find_file, search_for_pattern, list_dir) before Glob/Grep/Read (SERENA-P004)</rule>
-  <rule>Use Serena symbol editing (replace_symbol_body, insert_after_symbol, insert_before_symbol, rename_symbol) for precise code modifications</rule>
-  <rule>Record significant patterns with write_memory after discovery (SERENA-B005, SERENA-P007)</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Restrict searches by relative_path when scope is known</rule>
-  <rule>Use substring_matching for uncertain symbol names</rule>
-  <rule>Use edit_memory for updating existing memories; delete_memory only when explicitly requested by user</rule>
-  <rule>Follow serena_first_tool_selection decision tree for tool choices</rule>
-  <rule>Follow language_specific_symbol_operations for language-appropriate tools</rule>
-  <rule>Follow memory_reading_by_task_type for prioritizing which memories to read</rule>
-</rules>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="SERENA-B001" priority="critical">
@@ -642,6 +549,112 @@ version: 0.2.0
   </prohibited_behaviors>
 </enforcement>
 
+<best_practices>
+  <practice priority="critical">Always activate project and check onboarding at session start (SERENA-B001)</practice>
+  <practice priority="critical">Always check memories with list_memories and read_memory before implementing new features (SERENA-B002)</practice>
+  <practice priority="critical">Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007)</practice>
+  <practice priority="critical">Call think_about_task_adherence before any code modification (SERENA-B003)</practice>
+  <practice priority="critical">Call think_about_collected_information after 3+ search operations (SERENA-B006)</practice>
+  <practice priority="critical">Call think_about_whether_you_are_done before final response (SERENA-B004)</practice>
+  <practice priority="critical">Use Serena navigation tools before Glob/Grep/Read (SERENA-P004)</practice>
+  <practice priority="high">Restrict searches by relative_path when scope is known to improve performance</practice>
+  <practice priority="high">Use substring_matching for uncertain symbol names to broaden search results</practice>
+  <practice priority="high">Record significant patterns with write_memory after discovery (SERENA-B005)</practice>
+  <practice priority="high">Use edit_memory for updating existing memories instead of delete and recreate</practice>
+  <practice priority="high">Follow serena_first_tool_selection decision tree for consistent tool choices</practice>
+  <practice priority="medium">Use context_lines parameters in search_for_pattern to understand surrounding code</practice>
+  <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
+  <practice priority="medium">Follow memory_reading_by_task_type to prioritize relevant memories</practice>
+</best_practices>
+
+<anti_patterns>
+  <avoid name="reading_entire_files">
+    <description>Reading entire files when only specific symbols are needed</description>
+    <instead>Use get_symbols_overview for file structure and find_symbol with include_body for specific implementations</instead>
+  </avoid>
+
+  <avoid name="unscoped_searches">
+    <description>Searching entire codebase when scope is known</description>
+    <instead>Use relative_path parameter to restrict search to known files or directories</instead>
+  </avoid>
+
+  <avoid name="ignoring_memories">
+    <description>Implementing features without checking existing patterns</description>
+    <instead>Always check list_memories and read_memory before implementation</instead>
+  </avoid>
+
+  <avoid name="manual_refactoring">
+    <description>Manually updating symbol references across files</description>
+    <instead>Use rename_symbol for consistent renaming with automatic reference updates</instead>
+  </avoid>
+
+  <avoid name="excessive_depth">
+    <description>Using high depth values unnecessarily in get_symbols_overview</description>
+    <instead>Start with depth=0, then incrementally increase if needed</instead>
+  </avoid>
+
+  <avoid name="skipping_reflection">
+    <description>Modifying code without calling think_about_task_adherence</description>
+    <instead>Always call think_about_task_adherence before symbol editing operations</instead>
+  </avoid>
+
+  <avoid name="deleting_memories_without_permission">
+    <description>Using delete_memory without explicit user request</description>
+    <instead>Use edit_memory to update memories; only delete when user explicitly requests</instead>
+  </avoid>
+
+  <avoid name="using_glob_grep_directly">
+    <description>Using Glob/Grep tools when Serena navigation tools are available</description>
+    <instead>Prefer Serena list_dir, find_file, search_for_pattern for codebase exploration</instead>
+  </avoid>
+</anti_patterns>
+
+<rules priority="critical">
+  <rule>Always check memories before implementing new features (SERENA-B002)</rule>
+  <rule>Use symbol operations (get_symbols_overview, find_symbol) over reading entire files (SERENA-B007, SERENA-P001)</rule>
+  <rule>Call think_about_collected_information after search sequences of 3+ operations (SERENA-B006)</rule>
+  <rule>Call think_about_task_adherence before making code changes (SERENA-B003)</rule>
+  <rule>Call think_about_whether_you_are_done before final response (SERENA-B004, SERENA-P005)</rule>
+  <rule>Use Serena navigation tools (find_file, search_for_pattern, list_dir) before Glob/Grep/Read (SERENA-P004)</rule>
+  <rule>Use Serena symbol editing (replace_symbol_body, insert_after_symbol, insert_before_symbol, rename_symbol) for precise code modifications</rule>
+  <rule>Record significant patterns with write_memory after discovery (SERENA-B005, SERENA-P007)</rule>
+</rules>
+
+<rules priority="standard">
+  <rule>Restrict searches by relative_path when scope is known</rule>
+  <rule>Use substring_matching for uncertain symbol names</rule>
+  <rule>Use edit_memory for updating existing memories; delete_memory only when explicitly requested by user</rule>
+  <rule>Follow serena_first_tool_selection decision tree for tool choices</rule>
+  <rule>Follow language_specific_symbol_operations for language-appropriate tools</rule>
+  <rule>Follow memory_reading_by_task_type for prioritizing which memories to read</rule>
+</rules>
+
+<workflow>
+  <phase name="prepare">
+    <objective>Prepare for effective Serena tool usage</objective>
+    <step>1. Activate project with activate_project</step>
+    <step>2. Verify onboarding with check_onboarding_performed</step>
+    <step>3. Check list_memories for existing patterns</step>
+    <step>4. Read relevant memories with read_memory</step>
+    <step>5. Identify target symbols or files</step>
+    <step>6. Choose appropriate tool based on decision_tree</step>
+  </phase>
+  <phase name="execute">
+    <objective>Execute Serena operations efficiently</objective>
+    <step>1. Start with get_symbols_overview for file structure</step>
+    <step>2. Use find_symbol with include_body for details</step>
+    <step>3. Use find_referencing_symbols for dependencies</step>
+    <step>4. Call think_about_task_adherence before edits</step>
+    <step>5. Use symbol editing tools for modifications</step>
+  </phase>
+  <phase name="verify">
+    <objective>Verify results and record patterns</objective>
+    <step>1. Call think_about_collected_information after searches</step>
+    <step>2. Record new patterns with write_memory</step>
+    <step>3. Call think_about_whether_you_are_done when complete</step>
+  </phase>
+</workflow>
+
 <error_escalation>
   <level severity="low">
     <example>Symbol not found with exact match</example>
@@ -649,7 +662,7 @@ version: 0.2.0
   </level>
   <level severity="medium">
     <example>Memory file not found</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
+    <action>Document issue, ask user for clarification</action>
   </level>
   <level severity="high">
     <example>Conflicting information in memories</example>
@@ -660,16 +673,6 @@ version: 0.2.0
     <action>BLOCK operation, require explicit user acknowledgment</action>
   </level>
 </error_escalation>
-
-<related_skills>
-  <skill name="investigation-patterns">Investigation methodology using Serena tools</skill>
-  <skill name="nix-ecosystem">Nix patterns stored in Serena memories</skill>
-  <skill name="typescript-ecosystem">TypeScript patterns stored in Serena memories</skill>
-  <skill name="golang-ecosystem">Go patterns stored in Serena memories</skill>
-  <skill name="rust-ecosystem">Rust patterns stored in Serena memories</skill>
-  <skill name="common-lisp-ecosystem">Common Lisp patterns stored in Serena memories</skill>
-  <skill name="emacs-ecosystem">Emacs patterns stored in Serena memories</skill>
-</related_skills>
 
 <constraints>
   <must>Activate project and check onboarding at session start (SERENA-B001)</must>
@@ -689,3 +692,14 @@ version: 0.2.0
   <avoid>Skipping reflection checkpoints at mandatory points (SERENA-P005)</avoid>
   <avoid>Failing to document reusable patterns in memory (SERENA-P007)</avoid>
 </constraints>
+
+<related_skills>
+  <skill name="investigation-patterns">Investigation methodology using Serena tools</skill>
+  <skill name="core-patterns">Shared patterns for error escalation, decision criteria, enforcement</skill>
+  <skill name="nix-ecosystem">Nix patterns stored in Serena memories</skill>
+  <skill name="typescript-ecosystem">TypeScript patterns stored in Serena memories</skill>
+  <skill name="golang-ecosystem">Go patterns stored in Serena memories</skill>
+  <skill name="rust-ecosystem">Rust patterns stored in Serena memories</skill>
+  <skill name="common-lisp-ecosystem">Common Lisp patterns stored in Serena memories</skill>
+  <skill name="emacs-ecosystem">Emacs patterns stored in Serena memories</skill>
+</related_skills>

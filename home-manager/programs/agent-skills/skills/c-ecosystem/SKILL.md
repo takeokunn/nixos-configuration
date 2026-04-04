@@ -1,11 +1,239 @@
 ---
 name: C Ecosystem
-description: This skill should be used when working with C projects, "C11", "C17", "C23", "Makefile", "gcc", "clang", "valgrind", "getopt", or C language patterns. Provides comprehensive Modern C (C11-C23) patterns, memory management, and CLI development best practices.
+description: This skill should be used when working with C projects, "C11", "C17", "C23", "Makefile", "gcc", "clang", "valgrind", "getopt", or C language patterns. Provides comprehensive C23 and modern C patterns, memory management, and CLI development best practices.
+version: 2.0.0
 ---
 
 <purpose>
-Provide comprehensive patterns for Modern C language (C11/C17/C23), memory management, toolchain configuration, and CLI tool development.
+Provide comprehensive patterns for C23 and modern C language, memory management, toolchain configuration, and CLI tool development.
 </purpose>
+
+<toolchain>
+  <compilers>
+    <compiler name="gcc">
+      <description>GNU Compiler Collection. GCC 15: C23 (gnu23) is the default mode. C23 support is essentially feature-complete. GCC 8-14 defaulted to C17 (gnu17).</description>
+      <flags>
+        <flag name="-std=c23">Enable C23 standard (recommended default)</flag>
+        <flag name="-std=gnu23">C23 with GNU extensions (GCC 15 default)</flag>
+        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
+        <flag name="-Werror">Treat warnings as errors</flag>
+        <flag name="-Wshadow">Warn on variable shadowing</flag>
+        <flag name="-Wconversion">Warn on implicit conversions</flag>
+        <flag name="-Wstrict-prototypes">Require function prototypes</flag>
+        <flag name="-fanalyzer">Static analysis (GCC 10+)</flag>
+      </flags>
+    </compiler>
+
+    <compiler name="clang">
+      <description>LLVM C compiler. Clang 18+: supports -std=c23. Clang 19+: supports -std=c2y (post-C23).</description>
+      <flags>
+        <flag name="-std=c23">Enable C23 standard (recommended default, Clang 18+)</flag>
+        <flag name="-std=c2y">Enable post-C23 draft standard (Clang 19+)</flag>
+        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
+        <flag name="-Werror">Treat warnings as errors</flag>
+        <flag name="-Weverything">All warnings (use selectively)</flag>
+      </flags>
+    </compiler>
+  </compilers>
+
+  <sanitizers>
+    <sanitizer name="AddressSanitizer">
+      <description>Memory error detection (buffer overflow, use-after-free)</description>
+      <flags>-fsanitize=address -fno-omit-frame-pointer</flags>
+      <example>
+gcc -fsanitize=address -fno-omit-frame-pointer -g -o myapp myapp.c
+      </example>
+    </sanitizer>
+
+    <sanitizer name="UndefinedBehaviorSanitizer">
+      <description>Undefined behavior detection</description>
+      <flags>-fsanitize=undefined</flags>
+      <example>
+gcc -fsanitize=undefined -g -o myapp myapp.c
+      </example>
+    </sanitizer>
+
+    <sanitizer name="ThreadSanitizer">
+      <description>Data race detection</description>
+      <flags>-fsanitize=thread</flags>
+      <note>Cannot be combined with AddressSanitizer</note>
+    </sanitizer>
+
+    <sanitizer name="MemorySanitizer">
+      <description>Uninitialized memory read detection (Clang only)</description>
+      <flags>-fsanitize=memory</flags>
+    </sanitizer>
+  </sanitizers>
+
+  <static_analysis>
+    <tool name="clang-format">
+      <description>Clang-based code formatter for consistent style</description>
+      <usage>clang-format -i src/*.c include/*.h</usage>
+      <configuration>
+        <file_reference>.clang-format</file_reference>
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 100
+SortIncludes: CaseInsensitive
+      </configuration>
+    </tool>
+
+    <tool name="clang-tidy">
+      <description>Clang-based linter and static analyzer</description>
+      <usage>clang-tidy src/*.c -- -std=c23</usage>
+      <configuration>
+        <file_reference>.clang-tidy</file_reference>
+Checks: > -*,
+bugprone-_,
+clang-analyzer-_,
+misc-_,
+performance-_,
+readability-\*,
+-readability-identifier-length
+
+WarningsAsErrors: '\*'
+      </configuration>
+    </tool>
+
+    <tool name="cppcheck">
+      <description>Static analysis tool for C/C++</description>
+      <usage>cppcheck --enable=all --error-exitcode=1 src/</usage>
+    </tool>
+
+    <tool name="valgrind">
+      <description>Runtime memory error detection</description>
+      <usage>valgrind --leak-check=full --show-leak-kinds=all ./myapp</usage>
+      <tools>
+        <tool name="memcheck">Memory error detection (default)</tool>
+        <tool name="helgrind">Thread error detection</tool>
+        <tool name="cachegrind">Cache profiling</tool>
+        <tool name="callgrind">Call graph profiling</tool>
+      </tools>
+    </tool>
+  </static_analysis>
+
+  <testing>
+    <decision_tree name="framework_selection">
+      <question>What testing style do you prefer?</question>
+      <branch condition="Simple, minimal dependencies">Use Check or Unity</branch>
+      <branch condition="BDD-style">Use cmocka</branch>
+      <branch condition="Embedded/resource-constrained">Use Unity (smallest footprint)</branch>
+    </decision_tree>
+
+    <framework name="Check">
+      <description>Unit testing framework for C</description>
+      <example>
+#include &lt;check.h&gt;
+
+START_TEST(test_addition) {
+ck_assert_int_eq(1 + 1, 2);
+}
+END_TEST
+
+Suite *math_suite(void) {
+Suite *s = suite_create("Math");
+TCase \*tc = tcase_create("Core");
+tcase_add_test(tc, test_addition);
+suite_add_tcase(s, tc);
+return s;
+}
+
+int main(void) {
+Suite *s = math_suite();
+SRunner *sr = srunner_create(s);
+srunner_run_all(sr, CK_NORMAL);
+int failed = srunner_ntests_failed(sr);
+srunner_free(sr);
+return failed ? EXIT_FAILURE : EXIT_SUCCESS;
+}
+      </example>
+    </framework>
+  </testing>
+</toolchain>
+
+<build_systems>
+  <decision_tree name="build_system_selection">
+    <question>What is your project's complexity and portability needs?</question>
+    <branch condition="Simple project, Unix-only">Use Make</branch>
+    <branch condition="Cross-platform, dependencies">Use CMake or Meson</branch>
+    <branch condition="Modern, fast builds">Use Meson</branch>
+  </decision_tree>
+
+  <make>
+    <pattern name="simple_makefile">
+      <description>Basic Makefile for C projects</description>
+      <example>
+CC := gcc
+CFLAGS := -std=c23 -Wall -Wextra -Wpedantic -g
+LDFLAGS :=
+LDLIBS :=
+
+SRCS := $(wildcard src/\*.c)
+OBJS := $(SRCS:.c=.o)
+TARGET := myapp
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+%.o: %.c
+$(CC) $(CFLAGS) -c -o $@ $&lt;
+
+clean:
+rm -f $(OBJS) $(TARGET)
+      </example>
+    </pattern>
+  </make>
+
+  <cmake>
+    <pattern name="modern_cmake">
+      <description>Modern CMake for C projects</description>
+      <example>
+cmake_minimum_required(VERSION 3.30)
+project(myapp VERSION 1.0.0 LANGUAGES C)
+
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+add_executable(myapp src/main.c src/utils.c)
+target_include_directories(myapp PRIVATE include)
+
+target_compile_options(myapp PRIVATE
+$&lt;$&lt;C_COMPILER_ID:GNU,Clang&gt;:
+-Wall -Wextra -Wpedantic -Werror
+&gt;
+)
+      </example>
+      <note>For detailed CMake patterns, see cplusplus-ecosystem skill</note>
+    </pattern>
+  </cmake>
+
+  <meson>
+    <pattern name="meson_build">
+      <description>Meson build for C projects</description>
+      <example>
+# meson.build
+project('myapp', 'c',
+version: '1.0.0',
+default_options: [
+'c_std=c23',
+'warning_level=3',
+'werror=true',
+]
+)
+
+src = files('src/main.c', 'src/utils.c')
+inc = include_directories('include')
+
+executable('myapp', src, include_directories: inc)
+      </example>
+    </pattern>
+  </meson>
+</build_systems>
 
 <c_language>
   <standards_evolution>
@@ -33,7 +261,7 @@ Provide comprehensive patterns for Modern C language (C11/C17/C23), memory manag
     </standard>
 
     <standard name="C23">
-      <description>ISO/IEC 9899:2024 - Significant modernization with C++ alignment</description>
+      <description>ISO/IEC 9899:2024 - Published October 31, 2024. Current C standard. Default in GCC 15 (gnu23). Significant modernization with C++ alignment.</description>
       <features>
         <feature name="nullptr">Null pointer constant with nullptr_t type</feature>
         <feature name="typeof">Type inference operator</feature>
@@ -43,11 +271,87 @@ Provide comprehensive patterns for Modern C language (C11/C17/C23), memory manag
         <feature name="digit_separators">Single quote separator in numeric literals</feature>
         <feature name="attributes">[[nodiscard]], [[maybe_unused]], [[deprecated]], [[fallthrough]], [[noreturn]]</feature>
         <feature name="bool_true_false">bool, true, false as keywords</feature>
-        <feature name="embed">embed directive for binary resource inclusion</feature>
-        <feature name="static_assert">Single argument form</feature>
+        <feature name="embed">#embed directive for binary resource inclusion</feature>
+        <feature name="static_assert">Single argument form (no message required)</feature>
+        <feature name="typeof_unqual">typeof_unqual for unqualified type inference</feature>
+        <feature name="elifdef">#elifdef and #elifndef preprocessor directives</feature>
+        <feature name="labels_end_of_block">Labels allowed at end of compound statements</feature>
       </features>
     </standard>
   </standards_evolution>
+
+  <c23_features>
+    <description>C23 (ISO/IEC 9899:2024) is the current C standard. Default in GCC 15.</description>
+    <feature name="embed_directive">
+      <description>#embed directive for binary resource inclusion and __has_embed for availability checking.</description>
+      <example>
+        const unsigned char icon[] = {
+          #embed "icon.png"
+        };
+      </example>
+    </feature>
+    <feature name="auto_type_inference">
+      <description>auto keyword now causes type inference (in addition to storage class specifier).</description>
+      <example>
+        auto x = 42; // x is int
+      </example>
+    </feature>
+    <feature name="zero_initialization">
+      <description>Zero initialization with {} for any type including VLAs.</description>
+      <example>
+        int arr[10] = {};
+      </example>
+    </feature>
+    <feature name="typeof_operator">
+      <description>typeof and typeof_unqual operators standardized.</description>
+    </feature>
+    <feature name="nullptr">
+      <description>nullptr constant and nullptr_t type (replacing NULL macro ambiguity).</description>
+    </feature>
+    <feature name="bool_true_false">
+      <description>bool, true, false are now keywords (no longer macros from stdbool.h).</description>
+    </feature>
+    <feature name="elifdef">
+      <description>#elifdef and #elifndef preprocessor directives.</description>
+    </feature>
+    <feature name="constexpr">
+      <description>constexpr for object definitions (compile-time constants). Unlike C++, only applies to objects, not functions.</description>
+      <example>
+        constexpr int MAX_SIZE = 1024;
+      </example>
+    </feature>
+    <feature name="attributes">
+      <description>Standard attributes: [[nodiscard]], [[maybe_unused]], [[deprecated]], [[fallthrough]], [[noreturn]], [[reproducible]], [[unsequenced]].</description>
+      <example>
+        [[nodiscard]] int compute(int x);
+        [[maybe_unused]] static void helper(void) { }
+        [[deprecated("use new_func instead")]] void old_func(void);
+      </example>
+    </feature>
+    <feature name="static_assert_single_arg">
+      <description>static_assert with single argument (no message string required).</description>
+      <example>
+        static_assert(sizeof(int) >= 4);
+      </example>
+    </feature>
+    <feature name="digit_separators">
+      <description>Single quote as digit separator in numeric literals for readability.</description>
+      <example>
+        int million = 1'000'000;
+        unsigned hex = 0xFF'FF'FF'FF;
+      </example>
+    </feature>
+    <feature name="labels_end_of_block">
+      <description>Labels are now allowed at end of compound statements (before closing brace).</description>
+      <example>
+        void f(void) {
+            goto done;
+            // ...
+        done:
+        }
+      </example>
+    </feature>
+  </c23_features>
 
   <type_system>
     <concept name="integer_types">
@@ -194,6 +498,21 @@ return atomic_load(&amp;counter);
     <avoid name="format_string_vuln">
       <description>Using user input as format string (printf(user_input))</description>
       <instead>Always use printf("%s", user_input) or puts()</instead>
+    </avoid>
+
+    <avoid name="null_macro">
+      <description>Using NULL macro instead of nullptr (C23)</description>
+      <instead>Use nullptr for null pointer constants (type-safe, no integer ambiguity)</instead>
+    </avoid>
+
+    <avoid name="implicit_function_declarations">
+      <description>Calling functions without prior declaration or prototype</description>
+      <instead>Always include proper headers or forward-declare functions. Implicit declarations were removed in C99 and are errors in C23.</instead>
+    </avoid>
+
+    <avoid name="manual_memory_no_ownership">
+      <description>Manual memory management without clear ownership semantics</description>
+      <instead>Document ownership in function comments (caller-owned vs callee-owned). Use naming conventions like _new/_free pairs.</instead>
     </avoid>
   </anti_patterns>
 </c_language>
@@ -569,219 +888,6 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
   </pattern>
 </cli_development>
 
-<toolchain>
-  <compilers>
-    <compiler name="gcc">
-      <description>GNU Compiler Collection</description>
-      <flags>
-        <flag name="-std=c11">Enable C11 standard (or c17, c23)</flag>
-        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
-        <flag name="-Werror">Treat warnings as errors</flag>
-        <flag name="-Wshadow">Warn on variable shadowing</flag>
-        <flag name="-Wconversion">Warn on implicit conversions</flag>
-        <flag name="-Wstrict-prototypes">Require function prototypes</flag>
-        <flag name="-fanalyzer">Static analysis (GCC 10+)</flag>
-      </flags>
-    </compiler>
-
-    <compiler name="clang">
-      <description>LLVM C compiler</description>
-      <flags>
-        <flag name="-std=c11">Enable C11 standard (or c17, c23)</flag>
-        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
-        <flag name="-Werror">Treat warnings as errors</flag>
-        <flag name="-Weverything">All warnings (use selectively)</flag>
-      </flags>
-    </compiler>
-  </compilers>
-
-  <sanitizers>
-    <sanitizer name="AddressSanitizer">
-      <description>Memory error detection (buffer overflow, use-after-free)</description>
-      <flags>-fsanitize=address -fno-omit-frame-pointer</flags>
-      <example>
-gcc -fsanitize=address -fno-omit-frame-pointer -g -o myapp myapp.c
-      </example>
-    </sanitizer>
-
-    <sanitizer name="UndefinedBehaviorSanitizer">
-      <description>Undefined behavior detection</description>
-      <flags>-fsanitize=undefined</flags>
-      <example>
-gcc -fsanitize=undefined -g -o myapp myapp.c
-      </example>
-    </sanitizer>
-
-    <sanitizer name="ThreadSanitizer">
-      <description>Data race detection</description>
-      <flags>-fsanitize=thread</flags>
-      <note>Cannot be combined with AddressSanitizer</note>
-    </sanitizer>
-
-    <sanitizer name="MemorySanitizer">
-      <description>Uninitialized memory read detection (Clang only)</description>
-      <flags>-fsanitize=memory</flags>
-    </sanitizer>
-  </sanitizers>
-
-  <static_analysis>
-    <tool name="clang-tidy">
-      <description>Clang-based linter and static analyzer</description>
-      <usage>clang-tidy src/*.c -- -std=c11</usage>
-      <configuration>
-        <file_reference>.clang-tidy</file_reference>
-Checks: > -*,
-bugprone-_,
-clang-analyzer-_,
-misc-_,
-performance-_,
-readability-\*,
--readability-identifier-length
-
-WarningsAsErrors: '\*'
-      </configuration>
-    </tool>
-
-    <tool name="cppcheck">
-      <description>Static analysis tool for C/C++</description>
-      <usage>cppcheck --enable=all --error-exitcode=1 src/</usage>
-    </tool>
-
-    <tool name="valgrind">
-      <description>Runtime memory error detection</description>
-      <usage>valgrind --leak-check=full --show-leak-kinds=all ./myapp</usage>
-      <tools>
-        <tool name="memcheck">Memory error detection (default)</tool>
-        <tool name="helgrind">Thread error detection</tool>
-        <tool name="cachegrind">Cache profiling</tool>
-        <tool name="callgrind">Call graph profiling</tool>
-      </tools>
-    </tool>
-  </static_analysis>
-
-  <testing>
-    <decision_tree name="framework_selection">
-      <question>What testing style do you prefer?</question>
-      <branch condition="Simple, minimal dependencies">Use Check or Unity</branch>
-      <branch condition="BDD-style">Use cmocka</branch>
-      <branch condition="Embedded/resource-constrained">Use Unity (smallest footprint)</branch>
-    </decision_tree>
-
-    <framework name="Check">
-      <description>Unit testing framework for C</description>
-      <example>
-#include &lt;check.h&gt;
-
-START_TEST(test_addition) {
-ck_assert_int_eq(1 + 1, 2);
-}
-END_TEST
-
-Suite *math_suite(void) {
-Suite *s = suite_create("Math");
-TCase \*tc = tcase_create("Core");
-tcase_add_test(tc, test_addition);
-suite_add_tcase(s, tc);
-return s;
-}
-
-int main(void) {
-Suite *s = math_suite();
-SRunner *sr = srunner_create(s);
-srunner_run_all(sr, CK_NORMAL);
-int failed = srunner_ntests_failed(sr);
-srunner_free(sr);
-return failed ? EXIT_FAILURE : EXIT_SUCCESS;
-}
-      </example>
-    </framework>
-  </testing>
-</toolchain>
-
-<build_systems>
-  <decision_tree name="build_system_selection">
-    <question>What is your project's complexity and portability needs?</question>
-    <branch condition="Simple project, Unix-only">Use Make</branch>
-    <branch condition="Cross-platform, dependencies">Use CMake or Meson</branch>
-    <branch condition="Modern, fast builds">Use Meson</branch>
-  </decision_tree>
-
-  <make>
-    <pattern name="simple_makefile">
-      <description>Basic Makefile for C projects</description>
-      <example>
-CC := gcc
-CFLAGS := -std=c11 -Wall -Wextra -Wpedantic -g
-LDFLAGS :=
-LDLIBS :=
-
-SRCS := $(wildcard src/\*.c)
-OBJS := $(SRCS:.c=.o)
-TARGET := myapp
-
-.PHONY: all clean
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-%.o: %.c
-$(CC) $(CFLAGS) -c -o $@ $&lt;
-
-clean:
-rm -f $(OBJS) $(TARGET)
-      </example>
-    </pattern>
-  </make>
-
-  <cmake>
-    <pattern name="modern_cmake">
-      <description>Modern CMake for C projects</description>
-      <example>
-cmake_minimum_required(VERSION 3.20)
-project(myapp VERSION 1.0.0 LANGUAGES C)
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
-add_executable(myapp src/main.c src/utils.c)
-target_include_directories(myapp PRIVATE include)
-
-target_compile_options(myapp PRIVATE
-$&lt;$&lt;C_COMPILER_ID:GNU,Clang&gt;:
--Wall -Wextra -Wpedantic -Werror
-&gt;
-)
-      </example>
-      <note>For detailed CMake patterns, see cplusplus-ecosystem skill</note>
-    </pattern>
-  </cmake>
-
-  <meson>
-    <pattern name="meson_build">
-      <description>Meson build for C projects</description>
-      <example>
-# meson.build
-project('myapp', 'c',
-version: '1.0.0',
-default_options: [
-'c_std=c11',
-'warning_level=3',
-'werror=true',
-]
-)
-
-src = files('src/main.c', 'src/utils.c')
-inc = include_directories('include')
-
-executable('myapp', src, include_directories: inc)
-      </example>
-    </pattern>
-  </meson>
-</build_systems>
-
 <context7_integration>
   <description>Use Context7 MCP for up-to-date C documentation</description>
 
@@ -814,6 +920,9 @@ executable('myapp', src, include_directories: inc)
   <practice priority="medium">Prefer const for read-only parameters</practice>
   <practice priority="medium">Use enum for related constants instead of define</practice>
   <practice priority="medium">Include what you use - minimize header dependencies</practice>
+  <practice priority="high">Use nullptr instead of NULL in C23 code</practice>
+  <practice priority="high">Use [[nodiscard]] on functions whose return value must be checked</practice>
+  <practice priority="medium">Use clang-format for consistent code formatting</practice>
 </best_practices>
 
 <workflow>
@@ -825,7 +934,7 @@ executable('myapp', src, include_directories: inc)
   </phase>
   <phase name="implement">
     <objective>Write safe, portable C code</objective>
-    <step>1. Use appropriate C standard (C11 minimum recommended)</step>
+    <step>1. Use C23 as the default standard (C11 minimum for legacy compatibility)</step>
     <step>2. Follow memory management patterns</step>
     <step>3. Handle all error conditions</step>
   </phase>
@@ -862,6 +971,8 @@ executable('myapp', src, include_directories: inc)
   <must>Enable compiler warnings</must>
   <must>Run sanitizers during development</must>
   <avoid>Using gets(), sprintf(), or other unsafe functions</avoid>
+  <avoid>Using NULL instead of nullptr in C23 code</avoid>
+  <avoid>Implicit function declarations (always include headers or forward-declare)</avoid>
   <avoid>Raw pointer arithmetic without bounds checking</avoid>
   <avoid>Implicit type conversions that may lose data</avoid>
   <avoid>Global mutable state when possible</avoid>

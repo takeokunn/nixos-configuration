@@ -1,7 +1,7 @@
 ---
 name: Quality Tools
 description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters). Agents reference this skill instead of inline tool definitions.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -10,12 +10,16 @@ version: 1.0.0
 
 <tools>
   <tool name="ESLint">
-    <description>JavaScript/TypeScript linter for code quality and style</description>
+    <description>JavaScript/TypeScript linter (ESLint 10, flat config only)</description>
     <commands>
       <command name="check">eslint [files]</command>
       <command name="fix">eslint --fix [files]</command>
       <command name="format">eslint --format=json [files]</command>
     </commands>
+    <config>
+      Flat config only (eslint.config.js/ts). Use defineConfig() and globalIgnores().
+      eslintrc format is fully removed. Config is resolved from each linted file's directory, not cwd.
+    </config>
     <use_case>Check code style, find potential bugs, enforce coding standards</use_case>
     <output>
       Error/warning count, file locations, rule violations
@@ -35,7 +39,7 @@ version: 1.0.0
   </tool>
 
   <tool name="TypeScript_Compiler">
-    <description>TypeScript type checker</description>
+    <description>TypeScript type checker (TS 6.0 stable, TS 7.0 native preview available)</description>
     <commands>
       <command name="check">tsc --noEmit</command>
       <command name="check_project">tsc -p tsconfig.json --noEmit</command>
@@ -47,17 +51,17 @@ version: 1.0.0
   </tool>
 
   <tool name="Go_Tools">
-    <description>Go language quality tools</description>
+    <description>Go language quality tools (Go 1.26)</description>
     <commands>
-      <command name="fmt">go fmt ./...</command>
+      <command name="fmt">gofmt -l [files]</command>
       <command name="vet">go vet ./...</command>
-      <command name="lint">golangci-lint run</command>
+      <command name="staticcheck">staticcheck ./...</command>
     </commands>
     <use_case>Go code formatting and static analysis</use_case>
   </tool>
 
   <tool name="Rust_Tools">
-    <description>Rust language quality tools</description>
+    <description>Rust language quality tools (edition 2024)</description>
     <commands>
       <command name="fmt">cargo fmt --check</command>
       <command name="clippy">cargo clippy</command>
@@ -67,7 +71,7 @@ version: 1.0.0
   </tool>
 
   <tool name="Nix_Tools">
-    <description>Nix language quality tools</description>
+    <description>Nix language quality tools (nixfmt-rfc-style is the standard formatter)</description>
     <commands>
       <command name="fmt">nixfmt [files]</command>
       <command name="check">nix flake check</command>
@@ -76,47 +80,70 @@ version: 1.0.0
     <use_case>Nix code formatting and validation</use_case>
   </tool>
 
-  <tool name="Python_Tools">
-    <description>Python language quality tools</description>
+  <tool name="Biome">
+    <description>Unified linter and formatter for JS/TS/JSON/CSS (alternative to ESLint+Prettier)</description>
     <commands>
-      <command name="fmt">black [files]</command>
+      <command name="check">biome check [files]</command>
+      <command name="fix">biome check --fix [files]</command>
+      <command name="format">biome format [files]</command>
+      <command name="lint">biome lint [files]</command>
+    </commands>
+    <config>biome.json configuration file. Supports linting + formatting in a single pass with 10-100x faster performance than ESLint+Prettier.</config>
+    <use_case>All-in-one code quality for JS/TS projects; preferred when ESLint plugin ecosystem is not required</use_case>
+    <output>
+      Error/warning count, file locations, rule violations
+    </output>
+  </tool>
+
+  <tool name="PHP_Tools">
+    <description>PHP language quality tools (PHP 8.5+)</description>
+    <commands>
+      <command name="lint">phpstan analyse</command>
+      <command name="fmt">php-cs-fixer fix [files]</command>
+      <command name="test">pest --parallel</command>
+    </commands>
+    <use_case>PHP static analysis, formatting, and testing</use_case>
+  </tool>
+
+  <tool name="Haskell_Tools">
+    <description>Haskell language quality tools (GHC 9.14)</description>
+    <commands>
+      <command name="fmt">fourmolu -i [files]</command>
+      <command name="lint">hlint [files]</command>
+      <command name="check">cabal build --ghc-options="-Wall -Werror"</command>
+    </commands>
+    <use_case>Haskell code formatting, linting, and type checking</use_case>
+  </tool>
+
+  <tool name="C_Cpp_Tools">
+    <description>C/C++ quality tools (C23, C++26)</description>
+    <commands>
+      <command name="fmt">clang-format -i [files]</command>
+      <command name="lint">clang-tidy [files]</command>
+    </commands>
+    <use_case>C/C++ formatting and static analysis</use_case>
+  </tool>
+
+  <tool name="Swift_Tools">
+    <description>Swift language quality tools (Swift 6.3)</description>
+    <commands>
+      <command name="fmt">swift-format format -i [files]</command>
+      <command name="lint">swiftlint [files]</command>
+    </commands>
+    <use_case>Swift code formatting and linting</use_case>
+  </tool>
+
+  <tool name="Python_Tools">
+    <description>Python language quality tools (ruff is the dominant linter/formatter, replacing flake8, black, isort)</description>
+    <commands>
+      <command name="fmt">ruff format [files]</command>
       <command name="lint">ruff check [files]</command>
+      <command name="fix">ruff check --fix [files]</command>
       <command name="type">mypy [files]</command>
     </commands>
     <use_case>Python code formatting, linting, and type checking</use_case>
   </tool>
 </tools>
-
-<patterns>
-  <pattern name="quality_check_workflow">
-    <description>Standard workflow for quality verification</description>
-    <example>
-      1. Run type checker (tsc, mypy, etc.)
-      2. Run linter (eslint, clippy, etc.)
-      3. Run formatter check (prettier, black, etc.)
-      4. Report findings with locations
-    </example>
-  </pattern>
-
-  <pattern name="auto_fix_workflow">
-    <description>Workflow for automatic fixes</description>
-    <example>
-      1. Run formatter (prettier --write, cargo fmt)
-      2. Run linter with fix (eslint --fix)
-      3. Verify with check commands
-      4. Run tests to confirm no regressions
-    </example>
-  </pattern>
-
-  <pattern name="incremental_check">
-    <description>Check only changed files</description>
-    <example>
-      1. Get list of changed files (git diff --name-only)
-      2. Filter by file type
-      3. Run quality tools on filtered list
-    </example>
-  </pattern>
-</patterns>
 
 <concepts>
   <concept name="lint_categories">
@@ -148,6 +175,46 @@ version: 1.0.0
   </concept>
 </concepts>
 
+<patterns>
+  <pattern name="quality_check_workflow">
+    <description>Standard workflow for quality verification</description>
+    <example>
+      1. Run type checker (tsc, mypy, etc.)
+      2. Run linter (eslint, clippy, etc.)
+      3. Run formatter check (prettier, ruff format, etc.)
+      4. Report findings with locations
+    </example>
+  </pattern>
+
+  <pattern name="auto_fix_workflow">
+    <description>Workflow for automatic fixes</description>
+    <example>
+      1. Run formatter (prettier --write, ruff format, cargo fmt)
+      2. Run linter with fix (eslint --fix, ruff check --fix)
+      3. Verify with check commands
+      4. Run tests to confirm no regressions
+    </example>
+  </pattern>
+
+  <pattern name="incremental_check">
+    <description>Check only changed files</description>
+    <example>
+      1. Get list of changed files (git diff --name-only)
+      2. Filter by file type
+      3. Run quality tools on filtered list
+    </example>
+  </pattern>
+</patterns>
+
+<decision_tree name="tool_selection">
+  <question>What type of quality check is needed?</question>
+  <branch condition="Type errors">Use language-specific type checker (tsc, mypy, cargo check)</branch>
+  <branch condition="Code style and bugs">Use linter (eslint, clippy, ruff, biome lint)</branch>
+  <branch condition="Formatting only">Use formatter (prettier, ruff format, cargo fmt, biome format)</branch>
+  <branch condition="Lint + format in one pass (JS/TS)">Use biome check (single tool for both)</branch>
+  <branch condition="All of the above">Run in sequence: types → lint → format</branch>
+</decision_tree>
+
 <best_practices>
   <practice priority="critical">Run type checker before linter for faster feedback</practice>
   <practice priority="critical">Verify with tests after auto-fixes</practice>
@@ -173,14 +240,6 @@ version: 1.0.0
     <instead>Run type checker first for faster feedback loop</instead>
   </avoid>
 </anti_patterns>
-
-<decision_tree name="tool_selection">
-  <question>What type of quality check is needed?</question>
-  <branch condition="Type errors">Use language-specific type checker (tsc, mypy, cargo check)</branch>
-  <branch condition="Code style and bugs">Use linter (eslint, clippy, ruff)</branch>
-  <branch condition="Formatting only">Use formatter (prettier, black, cargo fmt)</branch>
-  <branch condition="All of the above">Run in sequence: types → lint → format</branch>
-</decision_tree>
 
 <constraints>
   <must>Run quality checks before marking implementation complete</must>

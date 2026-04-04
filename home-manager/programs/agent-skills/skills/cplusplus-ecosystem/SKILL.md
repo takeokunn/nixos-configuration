@@ -1,10 +1,11 @@
 ---
 name: C++ Ecosystem
-description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++11-23) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
+description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++20/23/26) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
+version: 2.0.0
 ---
 
 <purpose>
-  Provide comprehensive patterns for Modern C++ (C++11-23) language, CMake build system, and toolchain configuration.
+  Provide comprehensive patterns for Modern C++ (C++20/23/26) language, CMake build system, and toolchain configuration.
 </purpose>
 
 <cplusplus_language>
@@ -44,6 +45,7 @@ description: This skill should be used when working with C++ projects, CMakeList
         <version name="C++14">Loops and local variables allowed</version>
         <version name="C++17">if constexpr for compile-time branching</version>
         <version name="C++20">constexpr std::vector, std::string</version>
+        <version name="C++23">if consteval for context detection, constexpr std::bitset/std::unique_ptr</version>
       </evolution>
     </concept>
 
@@ -97,7 +99,7 @@ description: This skill should be used when working with C++ projects, CMakeList
         import math;
         int main() { return add(1, 2); }
       </example>
-      <note>Requires CMake 3.28+ with CMAKE_CXX_SCAN_FOR_MODULES</note>
+      <note>Requires CMake 3.28+ with CMAKE_CXX_SCAN_FOR_MODULES. GCC 15+ and Clang 18+ have production-ready support. Use CMake 3.30+ for import std; support (set CMAKE_CXX_MODULE_STD ON).</note>
     </concept>
 
     <concept name="coroutines">
@@ -149,6 +151,189 @@ description: This skill should be used when working with C++ projects, CMakeList
       </example>
     </concept>
   </modern_features>
+
+  <cpp26_features>
+    <description>C++26 completed March 2026 — the most compelling release since C++11. GCC and Clang already implement most features.</description>
+    <feature name="reflection">
+      <description>Static reflection via the ^^ operator (cat-ears operator). The biggest upgrade for C++ development since templates.</description>
+      <example>
+        consteval auto get_member_names(auto T) {
+          return members_of(^^T);
+        }
+      </example>
+      <compiler_flag>-std=c++2c</compiler_flag>
+      <note>GCC 16 has reflection merged in trunk. Experimental Clang fork by Dan Katz also available.</note>
+    </feature>
+    <feature name="contracts">
+      <description>Contract assertions with contract_assert keyword, plus pre and post conditions.</description>
+      <example>
+        int divide(int a, int b)
+          pre(b != 0)
+          post(r: r * b == a)
+        {
+          contract_assert(b != 0);
+          return a / b;
+        }
+      </example>
+      <note>GCC has contracts merged in trunk, awaiting release.</note>
+    </feature>
+    <feature name="std_execution">
+      <description>std::execution (P2300) — sender/receiver model for structured async and parallel programming. Replaces ad-hoc async patterns with composable, type-safe pipelines.</description>
+      <example>
+        #include &lt;execution&gt;
+
+        auto work = std::execution::schedule(scheduler)
+          | std::execution::then([] { return compute(); })
+          | std::execution::then([](auto result) { return process(result); });
+
+        std::execution::sync_wait(std::move(work));
+      </example>
+      <note>stdexec (formerly libunifex) provides a reference implementation. Shipping in GCC 16 and libc++.</note>
+    </feature>
+    <feature name="pattern_matching">
+      <description>Pattern matching (P2688) — not approved for C++26. Expected for C++29. Use std::visit with std::variant as the current alternative.</description>
+    </feature>
+  </cpp26_features>
+
+  <cpp23_features>
+    <description>C++23 is fully stable and well-supported by GCC 14+, Clang 18+, and MSVC 17.10+. Use -std=c++23 confidently in production.</description>
+
+    <feature name="std_expected">
+      <description>std::expected — monadic error handling, superior to exceptions for expected failure paths</description>
+      <example>
+        #include &lt;expected&gt;
+
+        std::expected&lt;int, std::string&gt; parse_int(std::string_view sv) {
+          int val;
+          auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), val);
+          if (ec != std::errc{}) return std::unexpected("parse error");
+          return val;
+        }
+
+        auto result = parse_int("42")
+          .transform([](int v) { return v * 2; })
+          .transform_error([](auto e) { return "failed: " + e; });
+      </example>
+    </feature>
+
+    <feature name="std_print">
+      <description>std::print / std::println — type-safe formatted output, replaces iostream and printf</description>
+      <example>
+        #include &lt;print&gt;
+
+        std::println("Hello, {}!", "world");
+        std::print("x = {}, y = {}\n", 1, 2);
+      </example>
+    </feature>
+
+    <feature name="flat_containers">
+      <description>std::flat_map / std::flat_set — cache-friendly sorted containers backed by contiguous storage</description>
+      <example>
+        #include &lt;flat_map&gt;
+        #include &lt;flat_set&gt;
+
+        std::flat_map&lt;std::string, int&gt; scores;
+        scores["alice"] = 100;
+
+        std::flat_set&lt;int&gt; ids = {3, 1, 4, 1, 5};
+      </example>
+      <note>Better performance than std::map/std::set for small-to-medium collections due to cache locality.</note>
+    </feature>
+
+    <feature name="deducing_this">
+      <description>Explicit object parameter (deducing this) — eliminates CRTP boilerplate, enables recursive lambdas</description>
+      <example>
+        struct Widget {
+          template&lt;typename Self&gt;
+          auto&amp;&amp; name(this Self&amp;&amp; self) {
+            return std::forward&lt;Self&gt;(self).name_;
+          }
+        private:
+          std::string name_;
+        };
+
+        // Recursive lambda
+        auto fib = [](this auto self, int n) -&gt; int {
+          return n &lt; 2 ? n : self(n - 1) + self(n - 2);
+        };
+      </example>
+    </feature>
+
+    <feature name="std_generator">
+      <description>std::generator — standard coroutine generator, no more custom promise types needed</description>
+      <example>
+        #include &lt;generator&gt;
+
+        std::generator&lt;int&gt; fibonacci() {
+          int a = 0, b = 1;
+          while (true) {
+            co_yield a;
+            auto tmp = a;
+            a = b;
+            b += tmp;
+          }
+        }
+      </example>
+    </feature>
+
+    <feature name="import_std">
+      <description>import std; — import the entire standard library as a module. Dramatically improves compile times.</description>
+      <example>
+        import std;
+
+        int main() {
+          std::println("Hello from modules!");
+          std::vector&lt;int&gt; v = {1, 2, 3};
+        }
+      </example>
+      <note>Requires CMake 3.30+ and compiler support. GCC 15+, Clang 18+ with libc++. Set CMAKE_CXX_MODULE_STD ON.</note>
+    </feature>
+
+    <feature name="std_stacktrace">
+      <description>std::stacktrace — portable stack trace capture for diagnostics</description>
+      <example>
+        #include &lt;stacktrace&gt;
+
+        void log_error(std::string_view msg) {
+          std::println(stderr, "Error: {}\nStack trace:\n{}", msg, std::stacktrace::current());
+        }
+      </example>
+      <note>Link with -lstdc++_libbacktrace on GCC.</note>
+    </feature>
+
+    <feature name="if_consteval">
+      <description>if consteval — detect compile-time evaluation context, replacing std::is_constant_evaluated()</description>
+      <example>
+        constexpr int compute(int x) {
+          if consteval {
+            // compile-time path
+            return x * x;
+          } else {
+            // runtime path, can use non-constexpr operations
+            return fast_runtime_compute(x);
+          }
+        }
+      </example>
+    </feature>
+
+    <feature name="multidimensional_subscript">
+      <description>Multidimensional subscript operator — operator[] with multiple arguments</description>
+      <example>
+        template&lt;typename T&gt;
+        class Matrix {
+          std::vector&lt;T&gt; data_;
+          size_t cols_;
+        public:
+          T&amp; operator[](size_t row, size_t col) {
+            return data_[row * cols_ + col];
+          }
+        };
+
+        Matrix&lt;double&gt; m(3, 3);
+        m[1, 2] = 3.14;
+      </example>
+    </feature>
+  </cpp23_features>
 
   <concurrency>
     <decision_tree name="when_to_use">
@@ -360,6 +545,11 @@ description: This skill should be used when working with C++ projects, CMakeList
       <description>Using const_cast to remove const from data you do not own</description>
       <instead>Fix the design to avoid needing const_cast</instead>
     </avoid>
+
+    <avoid name="manual_raii">
+      <description>Writing custom destructors for resource management when standard smart pointers suffice</description>
+      <instead>Use std::unique_ptr with custom deleters, or Rule of Zero with standard containers and smart pointers</instead>
+    </avoid>
   </anti_patterns>
 </cplusplus_language>
 
@@ -391,22 +581,67 @@ description: This skill should be used when working with C++ projects, CMakeList
 
   <cmake_patterns>
     <pattern name="modern_cmake">
-      <description>Target-based CMake (3.0+)</description>
+      <description>Target-based CMake (3.30+ recommended for C++23/26 and module support)</description>
       <example>
-        cmake_minimum_required(VERSION 3.20)
+        cmake_minimum_required(VERSION 3.30)
         project(MyProject VERSION 1.0.0 LANGUAGES CXX)
 
-        set(CMAKE_CXX_STANDARD 20)
+        set(CMAKE_CXX_STANDARD 23)
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
         set(CMAKE_CXX_EXTENSIONS OFF)
 
         add_library(mylib STATIC src/mylib.cpp)
         target_include_directories(mylib PUBLIC include)
-        target_compile_features(mylib PUBLIC cxx_std_20)
+        target_compile_features(mylib PUBLIC cxx_std_23)
 
         add_executable(myapp src/main.cpp)
         target_link_libraries(myapp PRIVATE mylib)
       </example>
+    </pattern>
+
+    <pattern name="cmake_presets">
+      <description>CMakePresets.json for reproducible builds (CMake 3.21+, widely adopted)</description>
+      <example>
+        // CMakePresets.json
+        {
+          "version": 6,
+          "configurePresets": [
+            {
+              "name": "default",
+              "generator": "Ninja",
+              "binaryDir": "${sourceDir}/build/${presetName}",
+              "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+              }
+            },
+            {
+              "name": "release",
+              "inherits": "default",
+              "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+              }
+            }
+          ],
+          "buildPresets": [
+            { "name": "default", "configurePreset": "default" },
+            { "name": "release", "configurePreset": "release" }
+          ]
+        }
+      </example>
+      <usage>cmake --preset default &amp;&amp; cmake --build --preset default</usage>
+    </pattern>
+
+    <pattern name="package_management">
+      <description>Use vcpkg or Conan 2.x for dependency management</description>
+      <vcpkg>
+        <usage>cmake -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake</usage>
+        <manifest>vcpkg.json declares dependencies; integrates seamlessly with CMake presets</manifest>
+      </vcpkg>
+      <conan>
+        <usage>conan install . --output-folder=build --build=missing</usage>
+        <note>Conan 2.x (not 1.x) — uses conanfile.py or conanfile.txt with CMake generators</note>
+      </conan>
     </pattern>
 
     <pattern name="find_package">
@@ -448,9 +683,11 @@ description: This skill should be used when working with C++ projects, CMakeList
 <toolchain>
   <compilers>
     <compiler name="clang">
-      <description>LLVM C++ compiler</description>
+      <description>LLVM C++ compiler (Clang 19+ has comprehensive C++23 support)</description>
       <flags>
         <flag name="-std=c++20">Enable C++20 standard</flag>
+        <flag name="-std=c++23">Enable C++23 standard (widely supported)</flag>
+        <flag name="-std=c++2c">Enable C++26 standard (experimental)</flag>
         <flag name="-stdlib=libc++">Use LLVM libc++ standard library</flag>
         <flag name="-Wall -Wextra -Wpedantic">Enable comprehensive warnings</flag>
         <flag name="-Werror">Treat warnings as errors</flag>
@@ -460,8 +697,14 @@ description: This skill should be used when working with C++ projects, CMakeList
 
     <compiler name="gcc">
       <description>GNU C++ compiler</description>
+      <defaults>
+        <default name="GCC 16">Default is C++20 mode (was C++17 before)</default>
+        <default name="GCC 15">C23 is the default for C mode</default>
+      </defaults>
       <flags>
-        <flag name="-std=c++20">Enable C++20 standard</flag>
+        <flag name="-std=c++20">Enable C++20 standard (default in GCC 16)</flag>
+        <flag name="-std=c++23">Enable C++23 standard (widely supported)</flag>
+        <flag name="-std=c++2c or -std=gnu++2c">Enable C++26 standard (experimental)</flag>
         <flag name="-Wall -Wextra -Wpedantic">Enable comprehensive warnings</flag>
         <flag name="-Werror">Treat warnings as errors</flag>
         <flag name="-fsanitize=address,undefined">Enable sanitizers</flag>
@@ -471,8 +714,8 @@ description: This skill should be used when working with C++ projects, CMakeList
   </compilers>
 
   <clang_tidy>
-    <description>Static analysis and linting tool</description>
-    <usage>clang-tidy src/*.cpp -- -std=c++20</usage>
+    <description>Static analysis and linting tool (use clang-tidy 19+ for C++23 support)</description>
+    <usage>clang-tidy src/*.cpp -- -std=c++23</usage>
 
     <configuration>
       <file_reference>.clang-tidy</file_reference>
@@ -510,7 +753,7 @@ description: This skill should be used when working with C++ projects, CMakeList
   </clang_tidy>
 
   <clang_format>
-    <description>Code formatting tool</description>
+    <description>Code formatting tool (use clang-format 19+ for C++23 syntax support)</description>
     <usage>clang-format -i src/*.cpp include/*.hpp</usage>
 
     <configuration>
@@ -519,7 +762,7 @@ description: This skill should be used when working with C++ projects, CMakeList
       IndentWidth: 4
       ColumnLimit: 100
       Language: Cpp
-      Standard: c++20
+      Standard: c++23
       AccessModifierOffset: -4
       AlignAfterOpenBracket: Align
       AllowShortFunctionsOnASingleLine: Inline
