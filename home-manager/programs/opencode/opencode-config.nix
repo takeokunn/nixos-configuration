@@ -1,8 +1,13 @@
 {
   pkgs,
   mcp-servers-nix,
-  models,
 }:
+let
+  providerTimeoutOpts = {
+    timeout = 600000;
+    chunkTimeout = 60000;
+  };
+in
 mcp-servers-nix.lib.mkConfig pkgs {
   flavor = "opencode";
   fileName = "opencode.json";
@@ -20,12 +25,12 @@ mcp-servers-nix.lib.mkConfig pkgs {
   settings = {
     theme = "dark";
     plugin = [ "oh-my-opencode" ];
-    model = models.apex.model;
+    model = "openai/gpt-5.3-codex-spark";
     share = "disabled";
 
-    provider.openai.options = models.providerTimeoutOpts;
-    provider.anthropic.options = models.providerTimeoutOpts;
-    provider."github-copilot".options = models.providerTimeoutOpts;
+    provider.openai.options = providerTimeoutOpts;
+    provider.anthropic.options = providerTimeoutOpts;
+    provider."github-copilot".options = providerTimeoutOpts;
 
     compaction = {
       auto = true;

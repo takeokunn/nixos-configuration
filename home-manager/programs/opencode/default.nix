@@ -3,22 +3,23 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
-  modelSet ? "standard",
 }:
 let
   claude-prompts-path = ../../claude-prompts;
 
-  models = import ./models/${modelSet}.nix;
+  models = import ./oh-my-opencode/models.nix;
 
   opencodeConfig = import ./opencode-config.nix {
-    inherit pkgs mcp-servers-nix models;
+    inherit pkgs mcp-servers-nix;
   };
 
   tuiConfig = import ./tui-config.nix { inherit pkgs; };
 
-  ohMyOpencodeConfig = import ./oh-my-opencode.nix {
+  ohMyOpencodeConfig = import ./oh-my-opencode {
     inherit pkgs models;
   };
+
+  opencodeAgents = import ./agents.nix { inherit claude-prompts-path; };
 in
 {
   home.packages = [
@@ -48,70 +49,9 @@ in
   programs.opencode = {
     enable = true;
     package = llmAgentsPkgs.opencode;
-    agents = builtins.listToAttrs (
-      map
-        (name: {
-          inherit name;
-          value = builtins.readFile "${claude-prompts-path}/agents/${name}.md";
-        })
-        [
-          "code-quality"
-          "database"
-          "design"
-          "devops"
-          "docs"
-          "explore"
-          "general-purpose"
-          "git"
-          "performance"
-          "quality-assurance"
-          "security"
-          "test"
-          "validator"
-        ]
-    );
-    commands = builtins.listToAttrs (
-      map
-        (name: {
-          inherit name;
-          value = builtins.readFile "${claude-prompts-path}/commands/${name}.md";
-        })
-        [
-          "ask"
-          "bug"
-          "define"
-          "define-full"
-          "execute"
-          "execute-full"
-          "feedback"
-          "markdown"
-          "upstream"
-        ]
-    );
-  };
+  } // opencodeAgents;
 
-  home.sessionVariables = {
-    OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS = "300000";
-    OPENCODE_EXPERIMENTAL_BASH_MAX_TIMEOUT_MS = "1200000";
-    OPENCODE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1";
-    OPENCODE_CODE_MAX_OUTPUT_TOKENS = "32000";
-    OPENCODE_CODE_AUTO_CONNECT_IDE = "0";
-    OPENCODE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
-    OPENCODE_CODE_ENABLE_TELEMETRY = "0";
-    OPENCODE_CODE_IDE_SKIP_AUTO_INSTALL = "1";
-    OPENCODE_CODE_IDE_SKIP_VALID_CHECK = "1";
-    MAX_MCP_OUTPUT_TOKENS = "50000";
-    MCP_TOOL_TIMEOUT = "120000";
-    DISABLE_AUTOUPDATER = "1";
-    DISABLE_ERROR_REPORTING = "1";
-    DISABLE_INTERLEAVED_THINKING = "1";
-    DISABLE_MICROCOMPACT = "1";
-    DISABLE_NON_ESSENTIAL_MODEL_CALLS = "1";
-    DISABLE_TELEMETRY = "1";
-    ENABLE_EXPERIMENTAL_MCP_CLI = "false";
-    ENABLE_TOOL_SEARCH = "true";
-    OPENCODE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-  };
+  home.sessionVariables = import ./env.nix;
 
   programs.serena.ignoredPaths = [
     "**/.devenv/**"
