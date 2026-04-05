@@ -23,30 +23,34 @@
           withNativeCompilation = false;
         };
         readthezero = nur-packages.packages.${system}.readthezero;
+        emacs-takeokunn-org = pkgs.stdenv.mkDerivation {
+          name = "emacs-takeokunn-org";
+          src = ../.;
+          nativeBuildInputs = with pkgs; [
+            (emacsPkg.pkgs.withPackages (epkgs: with epkgs; [ htmlize ]))
+            perl
+          ];
+          buildPhase = ''
+            perl -pi -e "s|https://takeokunn.github.io/readthezero/readthezero-dracula.setup|${readthezero}/readthezero-dracula.setup|g" \
+              home-manager/programs/emacs/elisp/init.org \
+              home-manager/programs/emacs/elisp/early-init.org
+            emacs --batch --load deploy/script.el --funcall export-org-files
+            cp ${readthezero}/readthezero-base.css public/
+            cp ${readthezero}/readthezero-theme-dracula.css public/
+            cp ${readthezero}/readthezero.js public/
+          '';
+          installPhase = ''
+            mv public/init.html public/index.html
+            cp -r public/ $out/
+          '';
+        };
       in
       {
         packages = {
-          emacs-takeokunn-org = pkgs.stdenv.mkDerivation {
-            name = "emacs-takeokunn-org";
-            src = ../.;
-            nativeBuildInputs = with pkgs; [
-              (emacsPkg.pkgs.withPackages (epkgs: with epkgs; [ htmlize ]))
-              perl
-            ];
-            buildPhase = ''
-              perl -pi -e "s|https://takeokunn.github.io/readthezero/readthezero-dracula.setup|${readthezero}/readthezero-dracula.setup|g" \
-                home-manager/programs/emacs/elisp/init.org \
-                home-manager/programs/emacs/elisp/early-init.org
-              emacs --batch --load deploy/script.el --funcall export-org-files
-              cp ${readthezero}/readthezero-base.css public/
-              cp ${readthezero}/readthezero-theme-dracula.css public/
-              cp ${readthezero}/readthezero.js public/
-            '';
-            installPhase = ''
-              mv public/init.html public/index.html
-              cp -r public/ $out/
-            '';
-          };
+          inherit emacs-takeokunn-org;
+        };
+        checks = {
+          inherit emacs-takeokunn-org;
         };
       }
     );

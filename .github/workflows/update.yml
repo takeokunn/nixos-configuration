@@ -26,6 +26,8 @@ jobs:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Run flake update
         run: nix flake update
+      - name: Run deploy flake update
+        run: cd deploy && nix flake update
       - name: Run fmt
         run: nix fmt
       - name: Commit changes
