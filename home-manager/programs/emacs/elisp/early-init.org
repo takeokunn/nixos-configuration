@@ -3,6 +3,7 @@
 #+EMAIL: bararararatty@gmail.com
 #+STARTUP: fold
 #+SETUPFILE: https://takeokunn.github.io/readthezero/readthezero-dracula.setup
+#+OPTIONS: toc:t
 * early-init.el
 ** Header
 #+begin_src emacs-lisp :tangle yes
