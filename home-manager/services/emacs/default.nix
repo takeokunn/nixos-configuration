@@ -32,7 +32,7 @@ in
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
-      Restart = "always";
+      Restart = lib.mkForce "always";
       RestartSec = 10;
     };
   };
