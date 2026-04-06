@@ -12,6 +12,7 @@ let
   nix = import ./config/nix.nix;
   security = import ./config/security.nix;
   services = import ./config/services { inherit pkgs emacsLib; };
+  spotlight = import ./config/spotlight.nix;
   system = import ./config/system.nix { inherit username; };
 in
 {
@@ -22,6 +23,7 @@ in
     nix
     security
     services
+    spotlight
     system
   ];
 }
