@@ -7131,7 +7131,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'copilot
     ;; config
     (setopt copilot-log-max 100000)
-    (setopt copilot-server-executable (getenv "COPILOT_LANGUAGE_SERVER_PATH"))
+    (when-let ((path (getenv "COPILOT_LANGUAGE_SERVER_PATH")))
+      (setopt copilot-server-executable path))
 
     ;; keymap
     (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)
