@@ -53,6 +53,21 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <rule>Specify only what is necessary; do not over-specify obvious implementation details</rule>
 </rules>
 
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Refining requirements incrementally through many small meetings — AI can gather and synthesize all available signals in a single investigation pass</practice>
+    <practice>Writing requirements documents as the primary artifact of a meeting process — requirements must be grounded in codebase evidence, not just stakeholder conversation</practice>
+    <practice>Deferring technical feasibility to a later phase — AI can verify feasibility during the same session as requirement gathering</practice>
+    <practice>One question at a time, waiting for async responses — AI can batch-score all questions and ask the highest-priority ones first in structured form</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Investigate the full blast radius in a single pass before formulating any questions — don't ask what can be verified</principle>
+    <principle>When scope is unclear, always start with the minimum viable scope and expand only when necessity is demonstrated</principle>
+    <principle>Parallelise independent investigation dimensions (architecture, data, API, effort) rather than proceeding sequentially</principle>
+    <principle>The harder and more irreversible a design decision, the more it deserves a dedicated question; trivial decisions should be resolved by investigation, not conversation</principle>
+  </applicable_ai_principles>
+</ai_principles>
+
 <thinking_framework>
   <golden_circle>
     <principle>Always reason in this order: Why (motivation, constraints, goals) → How (approach, design decisions) → What (specific requirements, acceptance criteria). Output structure may vary, but internal reasoning must start from Why.</principle>
@@ -402,6 +417,45 @@ Conduct detailed requirements definition before implementation, clarifying techn
     Defining requirements for one component while ignoring related components that will be affected. Requirements must account for the full blast radius.
   </pattern>
 </anti_patterns>
+
+<request_signals>
+  <description>When reading a user's request, detect these signals before forming questions. Signal → hypothesis → verify → conclude. Never skip directly from signal to question.</description>
+  <signal pattern="User describes a solution ('add X', 'change Y to Z', 'use library A')">
+    <indicates>The real requirement may be hidden behind the proposed solution. The user has already narrowed to an approach.</indicates>
+    <investigate>What problem does this solution solve? Are there simpler solutions? Does the proposed solution fit the existing architecture?</investigate>
+  </signal>
+  <signal pattern="User describes behavior they want ('make it faster', 'show errors', 'support X format')">
+    <indicates>Acceptance criteria may be clear, but scope and implementation approach are open.</indicates>
+    <investigate>Which components own the behavior? What are the measurable thresholds? What constraints apply?</investigate>
+  </signal>
+  <signal pattern="User references a bug or regression ('it broke', 'this stopped working', 'used to work')">
+    <indicates>Root cause and symptom may differ. Fix scope may be broader than the reported location.</indicates>
+    <investigate>When did it break? What changed? Are there other locations with the same root cause?</investigate>
+  </signal>
+  <signal pattern="User uses vague scope words ('everywhere', 'all', 'the whole', 'everywhere we do X')">
+    <indicates>Scope is likely under-defined. 'All' almost never means all — it means the places the user is aware of.</indicates>
+    <investigate>Enumerate the actual locations. Verify completeness by searching the codebase, not by trusting the description.</investigate>
+  </signal>
+  <signal pattern="User requests something that requires a capability not yet in the codebase">
+    <indicates>Hidden dependency on a library, service, or infrastructure that doesn't exist yet.</indicates>
+    <investigate>Does this capability exist? What is the introduction cost? Is there a simpler alternative using existing primitives?</investigate>
+  </signal>
+  <signal pattern="User says 'just' or 'simple' ('just add a field', 'simple change')">
+    <indicates>The user may be unaware of blast radius. 'Simple' changes often have non-simple dependencies.</indicates>
+    <investigate>Map all dependents. Check schema migrations, API consumers, test coverage, and downstream effects.</investigate>
+  </signal>
+</request_signals>
+
+<minimum_viable_scope>
+  <principle>Always start requirements with the minimum scope that satisfies the user's core need. Expand only when a concrete necessity is demonstrated — not when it seems useful or might be needed later.</principle>
+  <checklist>
+    <item>Can the core need be satisfied with fewer components than initially described?</item>
+    <item>Are any parts of the request "nice to have" rather than load-bearing for the stated goal?</item>
+    <item>Does any requirement exist only because the user assumed it was needed, not because the goal requires it?</item>
+    <item>Is there a phased approach where Phase 1 delivers value and Phase 2 can be deferred?</item>
+  </checklist>
+  <anti_scope_creep>Do not include requirements that address hypothetical future needs. Three similar future cases are needed before generalising — specifying for one imagined future case creates premature scope.</anti_scope_creep>
+</minimum_viable_scope>
 
 <enforcement>
   <mandatory_behaviors>
