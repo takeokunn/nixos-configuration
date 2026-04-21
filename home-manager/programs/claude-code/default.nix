@@ -19,7 +19,7 @@ in
   programs.claude-code = {
     enable = true;
     package = claude-code-fixed;
-    memory.source = "${claude-prompts-path}/CLAUDE.md";
+    context = "${claude-prompts-path}/CLAUDE.md";
     settings = {
       theme = "dark";
       model = "sonnet";

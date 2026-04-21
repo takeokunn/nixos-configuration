@@ -36,9 +36,9 @@ with pkgs;
 ++ lib.optionals stdenv.isDarwin [
   # for macOS (brew-nix casks)
   brewCasks.keycastr
-  brewCasks.raycast
+  raycast
   brewCasks.docker-desktop
-  brewCasks.postman
+  postman
   brewCasks.postico
   brewCasks.sequel-ace
   brewCasks.sublime-text
