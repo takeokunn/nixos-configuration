@@ -13,7 +13,7 @@ in
   promptLibrarian = "Verify specifications via Web search and context7 MCP before answering. ${promptLang}";
 
   compactionCfg = {
-    model = "zai-coding-plan/glm-5";
+    model = "openai/gpt-5.3-codex-spark";
     variant = "medium";
   };
 

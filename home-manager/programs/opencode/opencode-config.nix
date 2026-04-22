@@ -24,8 +24,8 @@ mcp-servers-nix.lib.mkConfig pkgs {
 
   settings = {
     theme = "dark";
-    plugin = [ "oh-my-opencode" ];
-    model = "openai/gpt-5.3-codex-spark";
+    plugin = [ "oh-my-openagent" ];
+    model = "openai/gpt-5.4";
     share = "disabled";
 
     provider.openai.options = providerTimeoutOpts;
