@@ -21,6 +21,7 @@ pkgs.writeText "oh-my-opencode.json" (
       enabled = true;
       retry_on_errors = [
         400
+        500
         429
         503
         529
