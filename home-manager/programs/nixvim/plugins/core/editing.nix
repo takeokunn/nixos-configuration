@@ -1,5 +1,7 @@
 { pkgs }:
 {
+  plugins.lz-n.enable = true;
+
   # Undotree - no mini.nvim equivalent, keep it
   plugins.undotree = {
     enable = true;

@@ -47,6 +47,11 @@ in
           old:
           parallelBuildAttrs
           // {
+            buildInputs = old.buildInputs ++ lib.optional pkgs.stdenv.isDarwin [ pkgs.apple-sdk ];
+            # On Darwin 25.x (macOS 16), ObjC files (.m) fail to compile because
+            # the compiler defaults to a pre-C11 standard where `bool` and `alignof`
+            # are unknown. Force gnu11 standard and include stdbool.h explicitly.
+            NIX_CFLAGS_COMPILE = lib.optionalString pkgs.stdenv.isDarwin "-std=gnu11 -include stdbool.h";
             env = (old.env or { }) // parallelBuildAttrs.env;
           }
         );
