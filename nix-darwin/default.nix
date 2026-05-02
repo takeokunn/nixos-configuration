@@ -3,6 +3,7 @@
   lib,
   username,
   emacsLib,
+  nurPkgs,
   ...
 }:
 let
@@ -14,6 +15,7 @@ let
   services = import ./config/services { inherit pkgs emacsLib; };
   spotlight = import ./config/spotlight.nix;
   system = import ./config/system.nix { inherit username; };
+  wallpaper = import ./config/wallpaper.nix { inherit nurPkgs username; };
 in
 {
   imports = [
@@ -25,5 +27,6 @@ in
     services
     spotlight
     system
+    wallpaper
   ];
 }

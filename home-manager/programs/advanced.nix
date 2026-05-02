@@ -72,7 +72,7 @@ let
   networkmanager-dmenu = import ./networkmanager-dmenu { inherit pkgs; };
   yazi = import ./yazi { inherit pkgs; };
   clipse = import ./clipse { inherit pkgs; };
-  swww = import ./swww { inherit pkgs; };
+  swww = import ./swww { inherit pkgs nurPkgs; };
   waybar = import ./waybar { inherit pkgs; };
   # theming
   gtk = import ./gtk { inherit pkgs; };

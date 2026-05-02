@@ -53,6 +53,7 @@ nix-darwin.lib.darwinSystem {
       username
       pkgs
       emacsLib
+      nurPkgs
       ;
   };
   modules = [

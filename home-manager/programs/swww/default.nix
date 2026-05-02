@@ -1,10 +1,4 @@
-{ pkgs }:
-let
-  draculaNixosWallpaper = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/dracula/wallpaper/master/first-collection/nixos.png";
-    sha256 = "sha256-hJBs+1MYSAqxb9+ENP0AsHdUrvjTzjobGv57dx5pPGE=";
-  };
-in
+{ pkgs, nurPkgs }:
 {
   home.packages =
     with pkgs;
@@ -100,6 +94,6 @@ in
 
   # Dracula NixOS wallpaper
   home.file."Pictures/Wallpapers/dracula-nixos.png" = pkgs.lib.mkIf pkgs.stdenv.isLinux {
-    source = draculaNixosWallpaper;
+    source = "${nurPkgs.dracula-wallpaper}/first-collection/nixos.png";
   };
 }
