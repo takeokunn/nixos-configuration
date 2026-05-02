@@ -26,14 +26,14 @@ let
   nurPkgs = nur-packages.packages.${system};
 
   # emacs package (for nix-darwin to use in aerospace)
-  emacs = import ../../home-manager/packages/emacs {
+  emacs = import ../../home-manager/editor/packages {
     inherit (nixpkgs) lib;
     inherit pkgs nurPkgs;
   };
   emacsPkg = emacs.emacs-unstable;
 
   # emacs library (shared utilities for both nix-darwin and home-manager)
-  emacsLib = import ../../home-manager/lib/emacs.nix {
+  emacsLib = import ../../home-manager/editor/lib/emacs.nix {
     inherit (nixpkgs) lib;
     inherit pkgs emacsPkg;
   };

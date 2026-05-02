@@ -6,11 +6,9 @@
   ...
 }:
 let
-  # nur-packages
   nurPkgs = nur-packages.packages.${system};
   devenvPkgs = devenv.packages.${system};
 
-  # packages
   basicOverlay = import ./overlay/basic.nix;
   pkgs = import nixpkgs {
     inherit system;
@@ -19,19 +17,14 @@ let
   };
   basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs devenvPkgs; };
 
-  # modules
-  modules = import ./modules;
-
-  # programs
-  basicPrograms = import ./programs/basic.nix {
-    inherit pkgs nurPkgs;
-  };
-
-  # services
-  basicServices = import ./services/basic.nix;
+  shell = import ./shell/basic.nix { inherit pkgs nurPkgs; };
+  editor = import ./editor/basic.nix { inherit pkgs nurPkgs; };
+  vcs = import ./vcs/basic.nix { inherit nurPkgs; };
+  security = import ./security/basic.nix { inherit pkgs; };
+  development = import ./development/basic.nix { inherit pkgs; };
 in
 {
-  imports = modules ++ basicPrograms ++ basicServices;
+  imports = shell ++ editor ++ vcs ++ security ++ development;
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;
   home.packages = basicPkgs;

@@ -32,8 +32,8 @@
           ];
           buildPhase = ''
             perl -pi -e "s|https://takeokunn.github.io/readthezero/readthezero-dracula.setup|${readthezero}/readthezero-dracula.setup|g" \
-              home-manager/programs/emacs/elisp/init.org \
-              home-manager/programs/emacs/elisp/early-init.org
+              home-manager/editor/emacs/elisp/init.org \
+              home-manager/editor/emacs/elisp/early-init.org
             emacs --batch --load deploy/script.el --funcall export-org-files
             cp ${readthezero}/readthezero-base.css public/
             cp ${readthezero}/readthezero-theme-dracula.css public/

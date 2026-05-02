@@ -22,11 +22,9 @@
 let
   isDarwin = builtins.match ".*-darwin" system != null;
 
-  # nur-packages
   nurPkgs = nur-packages.packages.${system};
   devenvPkgs = devenv.packages.${system};
 
-  # packages
   basicOverlay = import ./overlay/basic.nix;
   advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
   brewNixOverlay = if isDarwin then [ brew-nix.overlays.default ] else [ ];
@@ -46,34 +44,38 @@ let
       ;
   };
 
-  # emacs package
-  emacs = import ./packages/emacs {
+  emacsPkgSet = import ./editor/packages {
     inherit (nixpkgs) lib;
     inherit pkgs nurPkgs;
   };
-  emacsPkg = if isDarwin then emacs.emacs-unstable else emacs.emacs-unstable-pgtk;
-
-  # emacs library (shared utilities)
-  emacsLib = import ./lib/emacs.nix {
+  emacsPkg = if isDarwin then emacsPkgSet.emacs-unstable else emacsPkgSet.emacs-unstable-pgtk;
+  emacsLib = import ./editor/lib/emacs.nix {
     inherit (nixpkgs) lib;
     inherit pkgs emacsPkg;
   };
 
-  # misc
-  misc = import ./misc;
+  shell = import ./shell/basic.nix { inherit pkgs nurPkgs; };
+  editor = import ./editor/basic.nix { inherit pkgs nurPkgs; };
+  vcs = import ./vcs/basic.nix { inherit nurPkgs; };
+  security = import ./security/basic.nix { inherit pkgs; };
+  development = import ./development/basic.nix { inherit pkgs; };
 
-  # modules
-  modules = import ./modules;
-
-  # programs
-  basicPrograms = import ./programs/basic.nix {
-    inherit pkgs nurPkgs;
-  };
-  advancedPrograms = import ./programs/advanced.nix {
+  shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
+  editorAdvanced = import ./editor/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs nurPkgs llmAgentsPkgs;
-    inherit org-babel emacsPkg emacsLib;
-    inherit mcp-servers-nix;
+    inherit pkgs emacsPkg org-babel llmAgentsPkgs;
+  };
+  browser = import ./browser { inherit pkgs firefox-addons; };
+  vcsAdvanced = import ./vcs/advanced.nix;
+  securityAdvanced = import ./security/advanced.nix { inherit pkgs; };
+  email = import ./email { inherit pkgs; };
+  wayland = import ./wayland { inherit pkgs nurPkgs emacsLib; };
+  nixTools = import ./nix;
+  cloud = import ./cloud;
+  developmentAdvanced = import ./development/advanced.nix { inherit pkgs; };
+  mac = if isDarwin then import ./mac { inherit pkgs; } else [ ];
+  aiTools = import ./ai-tools {
+    inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix;
     inherit
       anthropic-skills
       cloudflare-skills
@@ -84,21 +86,14 @@ let
       scientific-skills
       context7-skills
       ;
-    inherit firefox-addons;
-  };
-
-  # services
-  basicServices = import ./services/basic.nix;
-  advancedServices = import ./services/advanced.nix {
-    inherit
-      pkgs
-      emacsPkg
-      emacsLib
-      ;
   };
 in
 {
-  imports = misc ++ modules ++ basicPrograms ++ advancedPrograms ++ basicServices ++ advancedServices;
+  imports =
+    shell ++ editor ++ vcs ++ security ++ development
+    ++ shellAdvanced ++ editorAdvanced ++ browser ++ vcsAdvanced ++ securityAdvanced
+    ++ email ++ wayland ++ nixTools ++ cloud ++ developmentAdvanced
+    ++ aiTools ++ mac;
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays =
