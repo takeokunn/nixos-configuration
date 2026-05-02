@@ -1,4 +1,8 @@
-{ pkgs, nurPkgs, emacsLib }:
+{
+  pkgs,
+  nurPkgs,
+  emacsLib,
+}:
 let
   lib = pkgs.lib;
   niri = import ./niri { inherit pkgs emacsLib; };
@@ -22,8 +26,25 @@ let
   mako = import ./mako { inherit pkgs; };
 in
 [
-  niri fuzzel networkmanager-dmenu yazi clipse swww waybar gtk qt
-  hypridle hyprlock swayosd wlsunset kanshi playerctld cliphist wl-clip-persist easyeffects mako
+  niri
+  fuzzel
+  networkmanager-dmenu
+  yazi
+  clipse
+  swww
+  waybar
+  gtk
+  qt
+  hypridle
+  hyprlock
+  swayosd
+  wlsunset
+  kanshi
+  playerctld
+  cliphist
+  wl-clip-persist
+  easyeffects
+  mako
 ]
 ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
   (import ./impermanence { inherit pkgs; })

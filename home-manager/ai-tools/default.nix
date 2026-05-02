@@ -14,7 +14,14 @@
 }:
 let
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
-  opencode = import ./opencode { inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix; };
+  opencode = import ./opencode {
+    inherit
+      pkgs
+      nurPkgs
+      llmAgentsPkgs
+      mcp-servers-nix
+      ;
+  };
   agent-skills = import ./agent-skills {
     inherit
       anthropic-skills
@@ -28,4 +35,9 @@ let
       ;
   };
 in
-[ claude-code opencode agent-skills ./serena ]
+[
+  claude-code
+  opencode
+  agent-skills
+  ./serena
+]

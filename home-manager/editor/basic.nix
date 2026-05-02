@@ -4,4 +4,8 @@ let
   vim = import ./vim { inherit pkgs; };
   editorconfig = import ./editorconfig { inherit pkgs; };
 in
-[ nixvim vim editorconfig ]
+[
+  nixvim
+  vim
+  editorconfig
+]

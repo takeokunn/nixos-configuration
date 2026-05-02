@@ -63,7 +63,12 @@ let
   shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
   editorAdvanced = import ./editor/advanced.nix {
     inherit (nixpkgs) lib;
-    inherit pkgs emacsPkg org-babel llmAgentsPkgs;
+    inherit
+      pkgs
+      emacsPkg
+      org-babel
+      llmAgentsPkgs
+      ;
   };
   browser = import ./browser { inherit pkgs firefox-addons; };
   vcsAdvanced = import ./vcs/advanced.nix;
@@ -75,7 +80,12 @@ let
   developmentAdvanced = import ./development/advanced.nix { inherit pkgs; };
   mac = if isDarwin then import ./mac { inherit pkgs; } else [ ];
   aiTools = import ./ai-tools {
-    inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix;
+    inherit
+      pkgs
+      nurPkgs
+      llmAgentsPkgs
+      mcp-servers-nix
+      ;
     inherit
       anthropic-skills
       cloudflare-skills
@@ -90,10 +100,23 @@ let
 in
 {
   imports =
-    shell ++ editor ++ vcs ++ security ++ development
-    ++ shellAdvanced ++ editorAdvanced ++ browser ++ vcsAdvanced ++ securityAdvanced
-    ++ email ++ wayland ++ nixTools ++ cloud ++ developmentAdvanced
-    ++ aiTools ++ mac;
+    shell
+    ++ editor
+    ++ vcs
+    ++ security
+    ++ development
+    ++ shellAdvanced
+    ++ editorAdvanced
+    ++ browser
+    ++ vcsAdvanced
+    ++ securityAdvanced
+    ++ email
+    ++ wayland
+    ++ nixTools
+    ++ cloud
+    ++ developmentAdvanced
+    ++ aiTools
+    ++ mac;
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays =

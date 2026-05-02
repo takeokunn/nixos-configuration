@@ -4,4 +4,9 @@ let
   nix-config = import ./nix-config;
   nix-gc = import ./nix-gc;
 in
-[ nix-index nix-init nix-config nix-gc ]
+[
+  nix-index
+  nix-init
+  nix-config
+  nix-gc
+]

@@ -16,5 +16,25 @@ let
   wget = import ./wget { };
   zoxide = import ./zoxide;
 in
-[ ./modules/wget ./modules/dust ./modules/zellij ]
-++ [ bat bottom direnv dust eza fd fish fzf jq man readline ripgrep tmux wget zoxide ]
+[
+  ./modules/wget
+  ./modules/dust
+  ./modules/zellij
+]
+++ [
+  bat
+  bottom
+  direnv
+  dust
+  eza
+  fd
+  fish
+  fzf
+  jq
+  man
+  readline
+  ripgrep
+  tmux
+  wget
+  zoxide
+]
