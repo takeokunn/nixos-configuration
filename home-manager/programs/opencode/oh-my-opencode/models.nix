@@ -1,9 +1,8 @@
 let
   promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
-  gpt54 = "openai/gpt-5.4";
+  gpt55 = "openai/gpt-5.5";
   gptCodex = "openai/gpt-5.3-codex";
   gptCodexSpark = "openai/gpt-5.3-codex-spark";
-  gpt54mini = "openai/gpt-5.4-mini";
   glm5 = "zai-coding-plan/glm-5";
   glm47 = "zai-coding-plan/glm-4.7";
 in
@@ -21,32 +20,29 @@ in
   apex = {
     model = gptCodex;
     fallback = [
-      gpt54 # OpenAI: comparable quality
+      gpt55 # OpenAI: comparable quality
       glm5 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter reasoning
-      gpt54mini # OpenAI: last-resort cheapest
     ];
   };
 
-  # Tier 2 — high quality coding/review: GPT-5.4 primary
+  # Tier 2 — high quality coding/review: GPT-5.5 primary
   upper = {
-    model = gpt54;
+    model = gpt55;
     fallback = [
       gptCodex # OpenAI: stronger reasoning
       glm5 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter coding
-      gpt54mini # OpenAI: last-resort cheapest
     ];
   };
 
-  # Tier 3 — balanced orchestration/planning: GPT-5.4-mini primary
+  # Tier 3 — balanced orchestration/planning: GPT-5.5 primary
   high = {
-    model = gpt54mini;
+    model = gpt55;
     fallback = [
       gptCodexSpark # OpenAI: similar-tier coding
       glm5 # ZAI:    equivalent tier
       glm47 # ZAI:    lower last-resort
-      gpt54 # OpenAI: up-tier safety net
     ];
   };
 
@@ -56,7 +52,6 @@ in
     fallback = [
       glm5 # ZAI:    equivalent tier
       glm47 # ZAI:    lower same-provider
-      gpt54mini # OpenAI: similar weight
     ];
   };
 
@@ -66,7 +61,6 @@ in
     fallback = [
       glm47 # ZAI:    same-provider lower version
       gptCodexSpark # OpenAI: mid-tier diversity
-      gpt54mini # OpenAI: wider OpenAI fallback
     ];
   };
 }
