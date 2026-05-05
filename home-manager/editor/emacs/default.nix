@@ -39,17 +39,6 @@ in
       ".emacs.d/misc/mu4e-dashboard.org".source = ./misc/mu4e-dashboard.org;
     };
 
-    activation.tangleYasnippet = {
-      after = [ "writeBoundary" ];
-      before = [ ];
-      data = ''
-        run ${emacsPkg}/bin/emacs --batch \
-          --eval "(require 'ob-tangle)" \
-          --eval "(setq org-confirm-babel-evaluate nil)" \
-          --eval "(org-babel-tangle-file \"$HOME/.emacs.d/misc/yasnippet.org\")"
-      '';
-    };
-
     packages = [
       emacsPkg
     ]

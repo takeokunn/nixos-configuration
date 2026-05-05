@@ -3,8 +3,8 @@ let
   gpt55 = "openai/gpt-5.5";
   gptCodex = "openai/gpt-5.3-codex";
   gptCodexSpark = "openai/gpt-5.3-codex-spark";
+  glm51 = "zai-coding-plan/glm-5.1";
   glm5 = "zai-coding-plan/glm-5";
-  glm47 = "zai-coding-plan/glm-4.7";
 in
 {
   inherit promptLang;
@@ -21,7 +21,7 @@ in
     model = gptCodex;
     fallback = [
       gpt55 # OpenAI: comparable quality
-      glm5 # ZAI:    provider diversity
+      glm51 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter reasoning
     ];
   };
@@ -31,7 +31,7 @@ in
     model = gpt55;
     fallback = [
       gptCodex # OpenAI: stronger reasoning
-      glm5 # ZAI:    provider diversity
+      glm51 # ZAI:    provider diversity
       gptCodexSpark # OpenAI: lighter coding
     ];
   };
@@ -41,8 +41,8 @@ in
     model = gpt55;
     fallback = [
       gptCodexSpark # OpenAI: similar-tier coding
-      glm5 # ZAI:    equivalent tier
-      glm47 # ZAI:    lower last-resort
+      glm51 # ZAI:    equivalent tier
+      glm5 # ZAI:    lower last-resort
     ];
   };
 
@@ -50,16 +50,16 @@ in
   mid = {
     model = gptCodexSpark;
     fallback = [
-      glm5 # ZAI:    equivalent tier
-      glm47 # ZAI:    lower same-provider
+      glm51 # ZAI:    equivalent tier
+      glm5 # ZAI:    lower same-provider
     ];
   };
 
-  # Tier 4b — GLM-balanced lightweight: GLM-5 primary
+  # Tier 4b — GLM-balanced lightweight: GLM-5.1 primary
   base = {
-    model = glm5;
+    model = glm51;
     fallback = [
-      glm47 # ZAI:    same-provider lower version
+      glm5 # ZAI:    same-provider lower version
       gptCodexSpark # OpenAI: mid-tier diversity
     ];
   };
