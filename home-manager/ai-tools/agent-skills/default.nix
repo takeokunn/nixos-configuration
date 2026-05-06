@@ -7,6 +7,7 @@
   microsoft-skills,
   scientific-skills,
   context7-skills,
+  ast-grep-skill,
 }:
 {
   programs.agent-skills = {
@@ -53,6 +54,10 @@
         path = context7-skills;
         subdir = "skills";
       };
+      ast-grep = {
+        path = ast-grep-skill;
+        subdir = "ast-grep/skills";
+      };
     };
     skills = {
       enableAll = [
@@ -65,6 +70,7 @@
         "microsoft"
         "scientific"
         "context7"
+        "ast-grep"
       ];
     };
     targets.claude.enable = true;

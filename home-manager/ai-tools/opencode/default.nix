@@ -10,7 +10,7 @@ let
   models = import ./oh-my-opencode/models.nix;
 
   opencodeConfig = import ./opencode-config.nix {
-    inherit pkgs mcp-servers-nix;
+    inherit pkgs mcp-servers-nix nurPkgs;
   };
 
   tuiConfig = import ./tui-config.nix { inherit pkgs; };

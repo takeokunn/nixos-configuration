@@ -63,6 +63,7 @@ nixpkgs.lib.nixosSystem {
           microsoft-skills
           scientific-skills
           context7-skills
+          ast-grep-skill
           nur-packages
           devenv
           emacs-overlay

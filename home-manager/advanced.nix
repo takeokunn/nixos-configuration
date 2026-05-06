@@ -13,6 +13,7 @@
   microsoft-skills,
   scientific-skills,
   context7-skills,
+  ast-grep-skill,
   brew-nix,
   firefox-addons,
   nur-packages,
@@ -95,6 +96,7 @@ let
       microsoft-skills
       scientific-skills
       context7-skills
+      ast-grep-skill
       ;
   };
 in

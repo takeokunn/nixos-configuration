@@ -39,6 +39,22 @@
         "type": "github"
       }
     },
+    "ast-grep-skill": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769044697,
+        "narHash": "sha256-LgGFtPieyKtoru22AhHW8hvkJ8kCHO2Cr8rBOWGuxvY=",
+        "owner": "ast-grep",
+        "repo": "agent-skill",
+        "rev": "577f4d4507678f2c8cee150fae25e6ce309f70b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ast-grep",
+        "repo": "agent-skill",
+        "type": "github"
+      }
+    },
     "aws-agent-skills": {
       "flake": false,
       "locked": {
@@ -1798,11 +1814,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778043817,
-        "narHash": "sha256-Wgf0imuibTJ1NyE2BSpHQANvl8FzT7w9FFtZJzTe7uw=",
+        "lastModified": 1778060754,
+        "narHash": "sha256-7IMuEu7vg2aH5PJiCQ5E/59rWi9qHKd5jn4p1bBaP98=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "3723639861dced0e73926147a9eaf2024cbb8172",
+        "rev": "57b062b1da6e5021e63a0ea1e7d1e99a92ff91a8",
         "type": "github"
       },
       "original": {
@@ -1888,6 +1904,7 @@
       "inputs": {
         "agent-skills": "agent-skills",
         "anthropic-skills": "anthropic-skills",
+        "ast-grep-skill": "ast-grep-skill",
         "aws-agent-skills": "aws-agent-skills",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",

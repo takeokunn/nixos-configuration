@@ -103,6 +103,10 @@
       url = "github:upstash/context7";
       flake = false;
     };
+    ast-grep-skill = {
+      url = "github:ast-grep/agent-skill";
+      flake = false;
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {

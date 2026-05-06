@@ -11,6 +11,7 @@
   microsoft-skills,
   scientific-skills,
   context7-skills,
+  ast-grep-skill,
 }:
 let
   claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
@@ -32,6 +33,7 @@ let
       microsoft-skills
       scientific-skills
       context7-skills
+      ast-grep-skill
       ;
   };
 in

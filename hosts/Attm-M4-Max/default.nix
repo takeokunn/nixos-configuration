@@ -89,6 +89,7 @@ nix-darwin.lib.darwinSystem {
             microsoft-skills
             scientific-skills
             context7-skills
+            ast-grep-skill
             ;
           inherit (inputs)
             emacs-overlay

@@ -1,6 +1,7 @@
 {
   pkgs,
   mcp-servers-nix,
+  nurPkgs,
 }:
 let
   providerTimeoutOpts = {
@@ -52,6 +53,11 @@ mcp-servers-nix.lib.mkConfig pkgs {
     servers.deepwiki = {
       type = "http";
       url = "https://mcp.deepwiki.com/mcp";
+    };
+
+    servers."ast-grep" = {
+      type = "local";
+      command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
     };
 
     permission = {
