@@ -125,21 +125,32 @@ version: 1.0.0
 <debugging_workflow>
   <description>High-efficiency SBCL debugging flow for fast root-cause discovery</description>
 
-  <phase name="1_reproduce">
-    <goal>Produce a stable minimal reproduction</goal>
-    <actions>
-      <item>Fix the execution mode first (REPL or script).</item>
-      <item>Strip inputs/environment to a minimal failing case.</item>
-    </actions>
+  <phase name="reproduce">
+    <objective>Produce a stable minimal reproduction</objective>
+    <step order="1">
+      <action>Fix the execution mode first (REPL or script)</action>
+      <output>Stable execution mode selected</output>
+    </step>
+    <step order="2">
+      <action>Strip inputs/environment to a minimal failing case</action>
+      <output>Minimal reproducible failure case</output>
+    </step>
   </phase>
 
-  <phase name="2_observe">
-    <goal>Observe failure location, not only symptom text</goal>
-    <actions>
-      <item>Inspect debugger backtrace and stack frames.</item>
-      <item>Use inspect / describe for problematic objects.</item>
-      <item>Use trace for high-value call-path visibility.</item>
-    </actions>
+  <phase name="observe">
+    <objective>Observe failure location, not only symptom text</objective>
+    <step order="1">
+      <action>Inspect debugger backtrace and stack frames</action>
+      <output>Candidate fault location identified</output>
+    </step>
+    <step order="2">
+      <action>Use inspect/describe for problematic objects</action>
+      <output>Object state diagnostics captured</output>
+    </step>
+    <step order="3">
+      <action>Use trace for high-value call-path visibility</action>
+      <output>Call-path evidence captured</output>
+    </step>
     <example>
       (trace my-app::parse-input)
       (untrace my-app::parse-input)
@@ -148,20 +159,28 @@ version: 1.0.0
     </example>
   </phase>
 
-  <phase name="3_hypothesis">
-    <goal>Test one root-cause hypothesis at a time</goal>
-    <actions>
-      <item>Define observable signals per hypothesis.</item>
-      <item>Use step/break/log checks to prove or reject each signal.</item>
-    </actions>
+  <phase name="hypothesis">
+    <objective>Test one root-cause hypothesis at a time</objective>
+    <step order="1">
+      <action>Define observable signals per hypothesis</action>
+      <output>Hypothesis-to-signal mapping</output>
+    </step>
+    <step order="2">
+      <action>Use step/break/log checks to prove or reject each signal</action>
+      <output>Validated or rejected hypotheses</output>
+    </step>
   </phase>
 
-  <phase name="4_fix_and_verify">
-    <goal>Apply minimal fix and verify non-regression</goal>
-    <actions>
-      <item>Re-run the same reproduction command after the fix.</item>
-      <item>Add tests that preserve the failure case.</item>
-    </actions>
+  <phase name="fix_and_verify">
+    <objective>Apply minimal fix and verify non-regression</objective>
+    <step order="1">
+      <action>Re-run the same reproduction command after the fix</action>
+      <output>Fix effectiveness verified</output>
+    </step>
+    <step order="2">
+      <action>Add tests that preserve the failure case</action>
+      <output>Regression protection added</output>
+    </step>
   </phase>
 
   <pattern name="restart_oriented_debugging">
@@ -351,23 +370,59 @@ version: 1.0.0
 <workflow>
   <phase name="triage">
     <objective>Reproduce and record the failure</objective>
-    <step>1. Choose run mode (REPL / script / non-interactive)</step>
-    <step>2. Build a minimal reproduction</step>
-    <step>3. Capture backtrace and input conditions</step>
+    <step order="1">
+  <action>1. Choose run mode (REPL / script / non-interactive)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Build a minimal reproduction</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Capture backtrace and input conditions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 
   <phase name="debug">
     <objective>Narrow and validate root-cause hypotheses</objective>
-    <step>1. Observe state with inspect / describe / trace</step>
-    <step>2. Define recovery paths using restarts</step>
-    <step>3. Test one hypothesis at a time</step>
+    <step order="1">
+  <action>1. Observe state with inspect / describe / trace</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Define recovery paths using restarts</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Test one hypothesis at a time</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 
   <phase name="validate">
     <objective>Confirm fix quality and regression safety</objective>
-    <step>1. Re-run the exact reproduction command</step>
-    <step>2. Run asdf:test-system</step>
-    <step>3. Profile if performance side effects are possible</step>
+    <step order="1">
+  <action>1. Re-run the exact reproduction command</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run asdf:test-system</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Profile if performance side effects are possible</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

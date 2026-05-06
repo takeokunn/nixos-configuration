@@ -1223,7 +1223,7 @@ version: 2.0.0
 
         -- Transaction fails if constraint violated
         BEGIN;
-        UPDATE accounts SET balance = balance - 1000 WHERE id = 1;  -- Fails if balance < 1000
+        UPDATE accounts SET balance = balance - 1000 WHERE id = 1;  -- Fails if balance &lt; 1000
         COMMIT;
       </example>
     </concept>
@@ -1579,18 +1579,42 @@ version: 2.0.0
 
   <usage_patterns>
     <pattern name="postgresql_docs">
-      <step>resolve-library-id libraryName="postgresql"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/websites/postgresql" topic="window functions"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="postgresql"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/postgresql" topic="window functions"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="mysql_docs">
-      <step>resolve-library-id libraryName="mysql"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/websites/dev_mysql_doc_refman_9_4_en" topic="JSON functions"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="mysql"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/dev_mysql_doc_refman_9_4_en" topic="JSON functions"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="sqlite_docs">
-      <step>resolve-library-id libraryName="sqlite"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/sqlite/sqlite" topic="query optimization"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="sqlite"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/sqlite/sqlite" topic="query optimization"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -1834,21 +1858,57 @@ ORDER BY total_spent DESC LIMIT 100;
 <workflow>
   <phase name="analyze">
     <objective>Understand database requirements</objective>
-    <step>1. Identify data model and relationships</step>
-    <step>2. Determine query patterns and access frequency</step>
-    <step>3. Review existing schema and indexes</step>
+    <step order="1">
+  <action>1. Identify data model and relationships</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Determine query patterns and access frequency</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Review existing schema and indexes</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write efficient SQL</objective>
-    <step>1. Design normalized schema (3NF baseline)</step>
-    <step>2. Write queries with appropriate indexes</step>
-    <step>3. Use transactions for data integrity</step>
+    <step order="1">
+  <action>1. Design normalized schema (3NF baseline)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Write queries with appropriate indexes</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Use transactions for data integrity</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify SQL correctness and performance</objective>
-    <step>1. Analyze with EXPLAIN</step>
-    <step>2. Test with production-like data volume</step>
-    <step>3. Verify transaction isolation</step>
+    <step order="1">
+  <action>1. Analyze with EXPLAIN</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Test with production-like data volume</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Verify transaction isolation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

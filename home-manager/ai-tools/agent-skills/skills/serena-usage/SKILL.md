@@ -217,16 +217,32 @@ version: 2.0.0
   <pattern name="session_initialization">
     <description>Initialize Serena at session start</description>
     <example>
-      <step>Step 1: Activate project</step>
+      <step order="1">
+  <action>Step 1: Activate project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       activate_project project="project-name"
 
-      <step>Step 2: Verify onboarding</step>
+      <step order="1">
+  <action>Step 2: Verify onboarding</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       check_onboarding_performed
 
-      <step>Step 3: If not onboarded, run onboarding</step>
+      <step order="1">
+  <action>Step 3: If not onboarded, run onboarding</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       onboarding (if needed)
 
-      <step>Step 4: Check available memories</step>
+      <step order="1">
+  <action>Step 4: Check available memories</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       list_memories
     </example>
   </pattern>
@@ -234,13 +250,25 @@ version: 2.0.0
   <pattern name="explore_file">
     <description>Systematically explore file structure from high-level to detailed</description>
     <example>
-      <step>Step 1: Get top-level overview</step>
+      <step order="1">
+  <action>Step 1: Get top-level overview</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       get_symbols_overview relative_path="src/main.ts" depth=0
 
-      <step>Step 2: Explore class members</step>
+      <step order="1">
+  <action>Step 2: Explore class members</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       get_symbols_overview relative_path="src/main.ts" depth=1
 
-      <step>Step 3: Get specific implementation</step>
+      <step order="1">
+  <action>Step 3: Get specific implementation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       find_symbol name_path_pattern="MyClass/myMethod" include_body=true
     </example>
   </pattern>
@@ -248,13 +276,25 @@ version: 2.0.0
   <pattern name="trace_dependencies">
     <description>Trace symbol dependencies and callers</description>
     <example>
-      <step>Step 1: Locate the symbol</step>
+      <step order="1">
+  <action>Step 1: Locate the symbol</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       find_symbol name_path_pattern="processData" relative_path="src/processor.ts"
 
-      <step>Step 2: Find all callers</step>
+      <step order="1">
+  <action>Step 2: Find all callers</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       find_referencing_symbols name_path="processData" relative_path="src/processor.ts"
 
-      <step>Step 3: Recursively trace for full dependency graph</step>
+      <step order="1">
+  <action>Step 3: Recursively trace for full dependency graph</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       <note>Repeat steps 1-2 for each caller to build complete dependency tree</note>
     </example>
   </pattern>
@@ -262,19 +302,39 @@ version: 2.0.0
   <pattern name="safe_refactoring">
     <description>Refactor with full impact analysis</description>
     <example>
-      <step>Step 1: Understand current implementation</step>
+      <step order="1">
+  <action>Step 1: Understand current implementation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       find_symbol name_path_pattern="MyClass/oldMethod" include_body=true
 
-      <step>Step 2: Identify all usages</step>
+      <step order="1">
+  <action>Step 2: Identify all usages</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       find_referencing_symbols name_path="MyClass/oldMethod" relative_path="src/myclass.ts"
 
-      <step>Step 3: Call think_about_task_adherence</step>
+      <step order="1">
+  <action>Step 3: Call think_about_task_adherence</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       think_about_task_adherence
 
-      <step>Step 4: Perform the change</step>
+      <step order="1">
+  <action>Step 4: Perform the change</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       replace_symbol_body name_path="MyClass/oldMethod" relative_path="src/myclass.ts" body="..."
 
-      <step>Step 5: Update references if interface changed</step>
+      <step order="1">
+  <action>Step 5: Update references if interface changed</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
       <note>If method signature changed, update all calling sites identified in step 2</note>
     </example>
   </pattern>
@@ -632,26 +692,82 @@ version: 2.0.0
 <workflow>
   <phase name="prepare">
     <objective>Prepare for effective Serena tool usage</objective>
-    <step>1. Activate project with activate_project</step>
-    <step>2. Verify onboarding with check_onboarding_performed</step>
-    <step>3. Check list_memories for existing patterns</step>
-    <step>4. Read relevant memories with read_memory</step>
-    <step>5. Identify target symbols or files</step>
-    <step>6. Choose appropriate tool based on decision_tree</step>
+    <step order="1">
+  <action>1. Activate project with activate_project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Verify onboarding with check_onboarding_performed</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Check list_memories for existing patterns</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Read relevant memories with read_memory</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>5. Identify target symbols or files</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>6. Choose appropriate tool based on decision_tree</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="execute">
     <objective>Execute Serena operations efficiently</objective>
-    <step>1. Start with get_symbols_overview for file structure</step>
-    <step>2. Use find_symbol with include_body for details</step>
-    <step>3. Use find_referencing_symbols for dependencies</step>
-    <step>4. Call think_about_task_adherence before edits</step>
-    <step>5. Use symbol editing tools for modifications</step>
+    <step order="1">
+  <action>1. Start with get_symbols_overview for file structure</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use find_symbol with include_body for details</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Use find_referencing_symbols for dependencies</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Call think_about_task_adherence before edits</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>5. Use symbol editing tools for modifications</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="verify">
     <objective>Verify results and record patterns</objective>
-    <step>1. Call think_about_collected_information after searches</step>
-    <step>2. Record new patterns with write_memory</step>
-    <step>3. Call think_about_whether_you_are_done when complete</step>
+    <step order="1">
+  <action>1. Call think_about_collected_information after searches</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Record new patterns with write_memory</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Call think_about_whether_you_are_done when complete</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

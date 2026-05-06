@@ -16,6 +16,11 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   <skill use="tools">context7-usage</skill>
 </refs>
 
+<tools>
+  <tool name="Read">Read requirements, related prompts, and existing specifications</tool>
+  <tool name="Grep">Search for requirement patterns and terminology consistency</tool>
+</tools>
+
 <workflow>
   <phase name="prepare" id="core_prepare">
     <objective>Initialize Serena and check existing patterns</objective>
@@ -199,7 +204,30 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
       <metric name="feasibility">0-100</metric>
       <metric name="objectivity">0-100</metric>
     </metrics>
-    <constraints>Technical, operational</constraints>
+    <tools>
+  <tool name="Read">Read relevant source files and docs</tool>
+  <tool name="Grep">Search for patterns and references</tool>
+</tools>
+
+<patterns>
+  <pattern name="usage">
+    <description>Apply this skill when task keywords and domain match</description>
+    <example>Use the canonical workflow and verify with project conventions</example>
+  </pattern>
+</patterns>
+
+<decision_tree name="skill_activation">
+  <question>Does the task clearly match this skill domain?</question>
+  <branch condition="Yes">Use this skill workflow and constraints</branch>
+  <branch condition="No">Use a more appropriate domain skill</branch>
+</decision_tree>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+</related_agents>
+
+<constraints>Technical, operational</constraints>
     <test_requirements>Unit, integration, acceptance criteria</test_requirements>
     <outstanding_issues>Unresolved questions</outstanding_issues>
   </format>

@@ -132,7 +132,7 @@ version: 2.0.0
   </pattern>
 </elisp_fundamentals>
 
-<configuration_patterns>
+<patterns>
   <pattern name="init_el_structure">
     <description>Modern init.el organization</description>
     <example>
@@ -271,7 +271,7 @@ version: 2.0.0
         :group 'my-package)
     </example>
   </pattern>
-</configuration_patterns>
+</patterns>
 
 <tools>
   <tool name="package.el">
@@ -549,8 +549,16 @@ version: 2.0.0
   <library name="Emacs Docs" id="/websites/emacsdocs" trust="7.5" snippets="6792" />
 
   <usage_pattern>
-    <step>Resolve library ID (known: /websites/emacsdocs)</step>
-    <step>Fetch documentation with specific topic</step>
+    <step order="1">
+  <action>Resolve library ID (known: /websites/emacsdocs)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>Fetch documentation with specific topic</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     <examples>
       <example topic="elisp">Emacs Lisp programming patterns</example>
       <example topic="use-package">Package configuration patterns</example>
@@ -650,33 +658,71 @@ version: 2.0.0
   </avoid>
 </anti_patterns>
 
-<rules>
-  <rule priority="critical">Target Emacs 30.x as the baseline major series and align exact version with the active package set</rule>
-  <rule priority="critical">Prefer built-in packages (eglot, use-package, treesit) over third-party alternatives</rule>
-  <rule priority="high">Use tree-sitter *-ts-mode variants for all languages with grammar support</rule>
-  <rule priority="high">Configure eglot as the default LSP client; only suggest lsp-mode when eglot is insufficient</rule>
-  <rule priority="high">Recommend the modern completion stack (vertico, orderless, marginalia, consult, corfu, cape) over legacy alternatives (helm, ivy, company)</rule>
-  <rule priority="medium">For reproducible package management, mention elpaca alongside straight.el</rule>
+<rules priority="critical">
+  <rule>Target Emacs 30.x as the baseline major series and align exact version with the active package set</rule>
+  <rule>Prefer built-in packages (eglot, use-package, treesit) over third-party alternatives</rule>
+  <rule>Use tree-sitter *-ts-mode variants for all languages with grammar support</rule>
+  <rule>Configure eglot as the default LSP client; only suggest lsp-mode when eglot is insufficient</rule>
+</rules>
+<rules priority="standard">
+  <rule>Recommend the modern completion stack (vertico, orderless, marginalia, consult, corfu, cape) over legacy alternatives (helm, ivy, company)</rule>
+  <rule>For reproducible package management, mention elpaca alongside straight.el</rule>
 </rules>
 
 <workflow>
   <phase name="analyze">
     <objective>Understand Emacs Lisp requirements</objective>
-    <step>1. Check package dependencies and autoloads</step>
-    <step>2. Review existing configuration patterns</step>
-    <step>3. Identify hook and advice usage</step>
+    <step order="1">
+  <action>1. Check package dependencies and autoloads</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing configuration patterns</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify hook and advice usage</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write idiomatic Emacs Lisp code</objective>
-    <step>1. Use lexical binding</step>
-    <step>2. Follow Emacs Lisp conventions</step>
-    <step>3. Provide appropriate customization options</step>
+    <step order="1">
+  <action>1. Use lexical binding</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Follow Emacs Lisp conventions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Provide appropriate customization options</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Emacs Lisp correctness</objective>
-    <step>1. Byte-compile without warnings</step>
-    <step>2. Test in clean Emacs instance</step>
-    <step>3. Verify keybindings don't conflict</step>
+    <step order="1">
+  <action>1. Byte-compile without warnings</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Test in clean Emacs instance</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Verify keybindings don't conflict</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 
@@ -698,6 +744,18 @@ version: 2.0.0
     <action>Provide recovery steps, require user action</action>
   </level>
 </error_escalation>
+
+<rules priority="critical">
+  <rule>Keep guidance evidence-based and version-aware</rule>
+</rules>
+<rules priority="standard">
+  <rule>Prefer project conventions over generic defaults</rule>
+</rules>
+
+<related_agents>
+  <agent name="explore">Locate relevant code patterns</agent>
+  <agent name="quality-assurance">Review output consistency</agent>
+</related_agents>
 
 <constraints>
   <must>Use lexical-binding: t in all files</must>

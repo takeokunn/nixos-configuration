@@ -26,24 +26,68 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
 <workflow>
   <phase name="analyze">
     <objective>Interpret profiling data and identify optimization targets</objective>
-    <step>1. What does profiling data show?</step>
-    <step>2. Where are the actual bottlenecks?</step>
-    <step>3. What is the algorithm complexity?</step>
-    <step>4. Are there N+1 query problems?</step>
-    <step>5. What is the expected improvement?</step>
+    <step order="1">
+      <action>What does profiling data show?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Where are the actual bottlenecks?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>What is the algorithm complexity?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Are there N+1 query problems?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What is the expected improvement?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="gather">
     <objective>Collect performance-critical code and establish baseline</objective>
-    <step>1. Identify optimization targets</step>
-    <step>2. Investigate performance-critical code</step>
+    <step order="1">
+      <action>Identify optimization targets</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Investigate performance-critical code</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="measure">
     <objective>Profile system performance and establish baseline metrics</objective>
-    <step>1. Measure execution time</step>
-    <step>2. Analyze memory usage</step>
-    <step>3. Count database queries</step>
-    <step>4. Calculate algorithm complexity</step>
+    <step order="1">
+      <action>Measure execution time</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Analyze memory usage</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Count database queries</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Calculate algorithm complexity</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="profiling_complete" after="profile">
     <questions>
@@ -61,14 +105,36 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   </reflection_checkpoint>
   <phase name="optimize">
     <objective>Apply optimizations and verify improvements</objective>
-    <step>1. Auto-execute safe optimizations</step>
-    <step>2. Propose high-impact changes</step>
+    <step order="1">
+      <action>Auto-execute safe optimizations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Propose high-impact changes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Deliver comprehensive performance analysis report</objective>
-    <step>1. Generate performance summary</step>
-    <step>2. Include metrics and benchmarks</step>
+    <step order="1">
+      <action>Generate performance summary</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Include metrics and benchmarks</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

@@ -27,45 +27,45 @@ Code review and cleanup command that identifies changes via git diff, launches t
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and gather existing patterns</objective>
-    <step>
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check list_memories for existing utility and pattern references</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="identify_changes">
-    <objective>Collect the diff that all agents will review</objective>
-    <step>
+    <step order="1">
       <action>Run git diff to get unstaged changes</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Run git diff HEAD to get staged changes</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>If both are empty, ask user for files or scope to review</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>Combine into a single diff payload for agents</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="scope_quality" after="identify_changes" inherits="workflow-patterns#reflection_checkpoint">
     <question>Is the diff non-empty and well-scoped?</question>
@@ -73,22 +73,22 @@ Code review and cleanup command that identifies changes via git diff, launches t
     <threshold>If confidence less than 70, ask user to clarify scope</threshold>
   </reflection_checkpoint>
   <phase name="review">
-    <objective>Launch three review agents in parallel with the full diff</objective>
-    <step>
+    <step order="1">
       <action>Launch Agent 1 (Code Reuse), Agent 2 (Code Quality), Agent 3 (Efficiency) simultaneously</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Each agent receives the full diff and relevant codebase context</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Collect all agent results</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="review_quality" after="review">
     <question>Did all three agents complete successfully?</question>
@@ -101,45 +101,45 @@ Code review and cleanup command that identifies changes via git diff, launches t
     </serena_validation>
   </reflection_checkpoint>
   <phase name="aggregate">
-    <objective>Deduplicate and prioritize findings across all agents</objective>
-    <step>
+    <step order="1">
       <action>Merge findings from all three agents</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Deduplicate overlapping issues</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Prioritize by severity: critical, warning, suggestion</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>Identify false positives and mark for skipping</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="fix">
-    <objective>Apply fixes for all confirmed issues</objective>
-    <step>
+    <step order="1">
       <action>Fix each confirmed issue directly in the codebase</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>For false positives, note the reason and skip</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Verify fixes do not introduce new issues</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="completion_validation" after="fix">
     <serena_validation>
@@ -147,7 +147,13 @@ Code review and cleanup command that identifies changes via git diff, launches t
       <trigger>Before reporting task completion to user</trigger>
     </serena_validation>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">

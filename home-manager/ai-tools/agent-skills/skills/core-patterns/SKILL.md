@@ -275,6 +275,22 @@ Use attribute values:
   <rule>Use consistent behavior ID naming convention</rule>
 </rules>
 
+<tools>
+  <tool name="Read">Read relevant source files and docs</tool>
+  <tool name="Grep">Search for patterns and references</tool>
+</tools>
+
+<decision_tree name="skill_activation">
+  <question>Does the task clearly match this skill domain?</question>
+  <branch condition="Yes">Use this skill workflow and constraints</branch>
+  <branch condition="No">Use a more appropriate domain skill</branch>
+</decision_tree>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+</related_agents>
+
 <constraints>
   <must>Define exactly 4 severity levels for error_escalation</must>
   <must>Include all 5 validation tests for decision_criteria</must>

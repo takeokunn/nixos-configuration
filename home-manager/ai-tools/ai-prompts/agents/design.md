@@ -122,7 +122,13 @@ Expert system design agent for architecture evaluation, requirements definition,
       <output>Effort estimates with confidence</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Deliver comprehensive analysis with actionable recommendations</objective>
     <step order="1">

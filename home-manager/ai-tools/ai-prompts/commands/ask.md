@@ -28,68 +28,68 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
-    <step>
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="analyze">
-    <objective>Understand the question and determine investigation scope</objective>
-    <step>
+    <step order="1">
       <action>What is the user's core question?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Which code/documentation sources are relevant?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>What scope of investigation is appropriate?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>Classify question type (architecture, implementation, debugging, design)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="investigate">
-    <objective>Gather evidence from codebase using parallel agent delegation</objective>
-    <step>
+    <step order="1">
       <action>Delegate to explore agent: find relevant files and codebase structure</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Delegate to design agent: evaluate architecture and component relationships</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Delegate to performance agent: identify performance-related aspects (if applicable)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>Use fact-check skill patterns: verify external references via Context7 and WebSearch</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <question>Have I gathered sufficient evidence from investigation?</question>
@@ -102,41 +102,34 @@ Provide accurate, evidence-based answers to project questions through fact-based
     </serena_validation>
   </reflection_checkpoint>
   <phase name="synthesize">
-    <objective>Compile and verify findings with confidence metrics</objective>
-    <step>
+    <step order="1">
       <action>Delegate to quality-assurance agent: evaluate code quality findings</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Delegate to code-quality agent: analyze complexity metrics</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Compile agent findings with confidence metrics</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="self_evaluate">
-    <objective>Brief quality assessment of answer output</objective>
-    <step>
-      <action>Calculate confidence using decision_criteria: evidence_quality (50%), answer_completeness (30%), source_verification (20%)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Detect and classify failures during command execution</action>
+      <tool>Error analysis and severity assessment</tool>
+      <output>Failure classification and impact summary</output>
     </step>
-    <step>
-      <action>Identify top 1-2 critical issues if confidence below 80 or gaps detected</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
-    </step>
-    <step>
-      <action>Append self_feedback section to output</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+    <step order="2">
+      <action>Apply recovery path or escalate with concrete blocker details</action>
+      <tool>Retry policy and fallback strategy</tool>
+      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
 </workflow>

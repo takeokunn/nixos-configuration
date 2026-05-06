@@ -30,83 +30,83 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
-    <step>
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="analyze">
-    <objective>Classify error type and establish investigation scope</objective>
-    <step>
+    <step order="1">
       <action>What type of error is this? (syntax, runtime, logic)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Where does it occur? (file, line, function)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>What logs are available?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>What is the error context? (before, during, after)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="investigate">
-    <objective>Delegate parallel investigations to specialized agents</objective>
-    <step>
+    <step order="1">
       <action>Delegate to quality-assurance agent: analyze stack trace, error patterns</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Delegate to explore agent: find error location and related code paths</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Delegate to general-purpose agent: analyze logs and dependencies</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>Use fact-check skill patterns: verify external documentation references via Context7</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="5">
       <action>Analyze error location details from agent findings</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="6">
       <action>Review dependencies and imports</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="7">
       <action>Check config files and recent changes</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <question>Have I built a complete evidence chain from symptom to cause?</question>
@@ -118,50 +118,48 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
-    <objective>Collect environmental context and runtime conditions</objective>
-    <step>
+    <step order="1">
       <action>Collect runtime info (OS, versions, env vars)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check resources (disk, memory, network)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="report">
-    <objective>Synthesize findings into actionable root cause analysis</objective>
-    <step>
-      <action>Compile agent findings with confidence metrics</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Detect and classify failures during command execution</action>
+      <tool>Error analysis and severity assessment</tool>
+      <output>Failure classification and impact summary</output>
     </step>
-    <step>
-      <action>Identify root cause with supporting evidence</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+    <step order="2">
+      <action>Apply recovery path or escalate with concrete blocker details</action>
+      <tool>Retry policy and fallback strategy</tool>
+      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
   <phase name="self_evaluate">
-    <objective>Brief quality assessment of investigation output</objective>
-    <step>
+    <step order="1">
       <action>Calculate confidence using decision_criteria: root_cause_certainty (50%), evidence_chain (30%), fix_viability (20%)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Identify top 1-2 critical issues if confidence below 80 or evidence gaps detected</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Append self_feedback section to output</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
 </workflow>
 

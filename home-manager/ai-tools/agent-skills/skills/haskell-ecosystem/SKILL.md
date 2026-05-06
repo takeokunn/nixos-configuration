@@ -55,7 +55,7 @@ version: 2.0.0
           (/=) :: a -> a -> Bool
 
         instance Eq Person where
-          p1 == p2 = p1.name == p2.name && p1.age == p2.age
+          p1 == p2 = p1.name == p2.name &amp;&amp; p1.age == p2.age
       </example>
     </concept>
 
@@ -162,8 +162,8 @@ version: 2.0.0
 
         doSomething :: (MonadReader Config m, MonadState AppState m, MonadError AppError m) => m Result
         doSomething = do
-          cfg <- ask
-          st <- get
+          cfg &lt;- ask
+          st &lt;- get
           when (invalid cfg) $ throwError InvalidConfig
           pure (compute cfg st)
       </example>
@@ -192,8 +192,8 @@ version: 2.0.0
 
         doSomething :: (Reader Config :> es, State AppState :> es, Error AppError :> es) => Eff es Result
         doSomething = do
-          cfg <- ask
-          st <- get
+          cfg &lt;- ask
+          st &lt;- get
           when (invalid cfg) $ throwError InvalidConfig
           pure (compute cfg st)
 
@@ -248,10 +248,10 @@ version: 2.0.0
         getName p = p ^. name
 
         setName :: Text -> Person -> Person
-        setName n p = p & name .~ n
+        setName n p = p &amp; name .~ n
 
         modifyAge :: (Int -> Int) -> Person -> Person
-        modifyAge f p = p & age %~ f
+        modifyAge f p = p &amp; age %~ f
       </example>
     </pattern>
 
@@ -296,7 +296,7 @@ version: 2.0.0
         -- Safe chaining with Monad
         getUserEmail :: UserId -> Maybe Email
         getUserEmail uid = do
-          user <- findUser uid
+          user &lt;- findUser uid
           pure (userEmail user)
       </example>
     </pattern>
@@ -306,7 +306,7 @@ version: 2.0.0
       <example>
         parseConfig :: Text -> Either ParseError Config
         parseConfig input = do
-          json <- parseJSON input
+          json &lt;- parseJSON input
           validateConfig json
       </example>
     </pattern>
@@ -320,7 +320,7 @@ version: 2.0.0
 
         loadUser :: MonadError AppError m => UserId -> m User
         loadUser uid = do
-          mUser <- findUser uid
+          mUser &lt;- findUser uid
           case mUser of
             Nothing -> throwError NotFound
             Just u  -> pure u
@@ -495,7 +495,7 @@ version: 2.0.0
       base ^>=4.21        -- 4.21.x.x (GHC 9.14)
 
       -- Range
-      text >=2.0 && <2.2
+      text >=2.0 &amp;&amp; &lt;2.2
 
       -- Any version (avoid in published packages)
       containers
@@ -593,7 +593,7 @@ version: 2.0.0
       version: 0.1.0.0
 
       dependencies:
-        - base >= 4.21 && < 5
+        - base >= 4.21 &amp;&amp; &lt; 5
         - text
         - containers
 
@@ -794,7 +794,7 @@ version: 2.0.0
       newtype PositiveInt = PositiveInt Int deriving Show
 
       instance Arbitrary PositiveInt where
-        arbitrary = PositiveInt . abs <$> arbitrary
+        arbitrary = PositiveInt . abs &lt;$> arbitrary
     </example>
 
     <integration>
@@ -834,7 +834,7 @@ version: 2.0.0
 
       prop_reverse :: Property
       prop_reverse = property $ do
-        xs <- forAll $ Gen.list (Range.linear 0 100) Gen.alpha
+        xs &lt;- forAll $ Gen.list (Range.linear 0 100) Gen.alpha
         reverse (reverse xs) === xs
     </example>
   </hedgehog>
@@ -866,16 +866,32 @@ version: 2.0.0
 
   <usage_patterns>
     <pattern name="optics_usage">
-      <step>resolve-library-id libraryName="optics haskell"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_optics-0_4_2_1" topic="lenses"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="optics haskell"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_optics-0_4_2_1" topic="lenses"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="testing_framework">
-      <step>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_hspec-2_11_12" topic="expectations"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_hspec-2_11_12" topic="expectations"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="web_framework">
-      <step>get-library-docs context7CompatibleLibraryID="/haskell-servant/servant" topic="server"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/haskell-servant/servant" topic="server"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -910,24 +926,72 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Haskell code requirements</objective>
-    <step>1. Check cabal file or package.yaml for project configuration</step>
-    <step>2. Review existing types and type classes</step>
-    <step>3. Identify monad transformer requirements</step>
-    <step>4. Check for type-level programming needs</step>
+    <step order="1">
+  <action>1. Check cabal file or package.yaml for project configuration</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing types and type classes</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify monad transformer requirements</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Check for type-level programming needs</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write pure, type-safe Haskell code</objective>
-    <step>1. Design with types first; let types guide implementation</step>
-    <step>2. Use appropriate abstractions (Functor, Applicative, Monad)</step>
-    <step>3. Handle errors with Maybe/Either/ExceptT</step>
-    <step>4. Write property-based tests for core logic</step>
+    <step order="1">
+  <action>1. Design with types first; let types guide implementation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use appropriate abstractions (Functor, Applicative, Monad)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Handle errors with Maybe/Either/ExceptT</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Write property-based tests for core logic</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Haskell code correctness</objective>
-    <step>1. Run cabal build or stack build</step>
-    <step>2. Run hlint for suggestions</step>
-    <step>3. Run cabal test or stack test</step>
-    <step>4. Check formatting with fourmolu/ormolu</step>
+    <step order="1">
+  <action>1. Run cabal build or stack build</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run hlint for suggestions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Run cabal test or stack test</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Check formatting with fourmolu/ormolu</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

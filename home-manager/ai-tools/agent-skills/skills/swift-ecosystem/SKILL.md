@@ -689,9 +689,21 @@ version: 2.0.0
     <usage>Bundled with Swift toolchain</usage>
 
     <vscode_setup>
-      <step>Install Swift extension (official)</step>
-      <step>Extension uses SourceKit-LSP automatically</step>
-      <step>Run swift build to generate index</step>
+      <step order="1">
+  <action>Install Swift extension (official)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>Extension uses SourceKit-LSP automatically</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>Run swift build to generate index</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </vscode_setup>
 
     <features>
@@ -788,10 +800,26 @@ version: 2.0.0
     <description>Legacy testing framework for existing codebases</description>
 
     <migration>
-      <step>Replace XCTAssert with #expect</step>
-      <step>Replace XCTAssertEqual with #expect(a == b)</step>
-      <step>Replace XCTestCase class with @Test functions</step>
-      <step>Use @Suite for test grouping</step>
+      <step order="1">
+  <action>Replace XCTAssert with #expect</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>Replace XCTAssertEqual with #expect(a == b)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>Replace XCTestCase class with @Test functions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>Use @Suite for test grouping</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </migration>
   </xctest>
 
@@ -823,16 +851,32 @@ version: 2.0.0
 
   <usage_patterns>
     <pattern name="language_reference">
-      <step>resolve-library-id libraryName="swift"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="concurrency"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="swift"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="concurrency"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="package_configuration">
-      <step>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="Package.swift"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="Package.swift"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="library_usage">
-      <step>get-library-docs context7CompatibleLibraryID="/alamofire/alamofire" topic="request"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/alamofire/alamofire" topic="request"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -889,21 +933,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Swift code requirements</objective>
-    <step>1. Check Package.swift for package configuration</step>
-    <step>2. Review existing patterns and protocols</step>
-    <step>3. Identify concurrency requirements</step>
+    <step order="1">
+  <action>1. Check Package.swift for package configuration</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing patterns and protocols</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify concurrency requirements</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write safe, idiomatic Swift code</objective>
-    <step>1. Design with value types and protocols</step>
-    <step>2. Use optionals and error handling correctly</step>
-    <step>3. Follow Swift API design guidelines</step>
+    <step order="1">
+  <action>1. Design with value types and protocols</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use optionals and error handling correctly</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Follow Swift API design guidelines</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Swift code correctness</objective>
-    <step>1. Run swift build for compilation check</step>
-    <step>2. Run swiftlint for style/safety lints</step>
-    <step>3. Run swift test for testing</step>
+    <step order="1">
+  <action>1. Run swift build for compilation check</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run swiftlint for style/safety lints</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Run swift test for testing</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

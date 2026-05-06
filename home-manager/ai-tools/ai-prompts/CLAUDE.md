@@ -5,8 +5,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
+  </refs>
 
 <rules priority="critical">
   <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
@@ -28,27 +27,27 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <workflow>
   <phase name="task_analysis">
     <objective>Understand user request and plan delegation strategy</objective>
-    <step order="0">
+    <step order="1">
       <action>Initialize Serena (see serena-usage skill for details)</action>
       <tool>Serena activate_project, check_onboarding_performed</tool>
       <output>Project activated with available memories</output>
     </step>
-    <step order="1">
+    <step order="2">
       <action>What is the user requesting?</action>
       <tool>Read user message, parse intent</tool>
       <output>Clear task description</output>
     </step>
-    <step order="2">
+    <step order="3">
       <action>Which sub-agents are best suited for this task?</action>
       <tool>Consult decision_tree for agent_selection</tool>
       <output>List of appropriate agents</output>
     </step>
-    <step order="3">
+    <step order="4">
       <action>What existing patterns/memories should be consulted?</action>
       <tool>Serena list_memories, read_memory (see serena-usage skill)</tool>
       <output>Relevant patterns and conventions</output>
     </step>
-    <step order="4">
+    <step order="5">
       <action>What are the dependencies between subtasks?</action>
       <tool>Analyze task structure</tool>
       <output>Dependency graph for parallel/sequential execution</output>
@@ -72,17 +71,17 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <objective>Delegate tasks to appropriate sub-agents</objective>
     <step order="1">
       <action>Custom sub-agents (project-specific agents defined in agents/) - priority 1</action>
-      <tool>Task tool with specific agent</tool>
+      <tool>task() tool with specific agent</tool>
       <output>Agent task assignment</output>
     </step>
     <step order="2">
-      <action>General-purpose sub-agents (Task tool with subagent_type) - priority 2</action>
-      <tool>Task tool with subagent_type parameter</tool>
+      <action>General-purpose sub-agents (task() tool with subagent_type) - priority 2</action>
+      <tool>task() tool with subagent_type parameter</tool>
       <output>Agent task assignment</output>
     </step>
     <step order="3">
       <action>Execute independent tasks in parallel</action>
-      <tool>Multiple Task tool calls in single message</tool>
+      <tool>Multiple task() tool calls in single message</tool>
       <output>Parallel execution results</output>
     </step>
   </phase>
@@ -130,12 +129,12 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <objective>Validate outputs through cross-agent verification</objective>
     <step order="1">
       <action>For critical tasks, delegate same analysis to 2+ agents</action>
-      <tool>Task tool with multiple agents</tool>
+      <tool>task() tool with multiple agents</tool>
       <output>Multiple agent outputs for comparison</output>
     </step>
     <step order="2">
       <action>Delegate outputs to validator agent for comparison</action>
-      <tool>Task tool with validator agent</tool>
+      <tool>task() tool with validator agent</tool>
       <output>Cross-validation report</output>
     </step>
     <step order="3">
@@ -147,13 +146,19 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <phase name="failure_handling">
     <objective>Handle errors and edge cases gracefully</objective>
     <step order="1">
-      <action>If sub-agent fails: Review error, adjust instructions, retry with alternative agent</action>
+      <action>If sub-agent fails: review error and retry with adjusted instructions</action>
+      <tool>Task orchestration and retry policy</tool>
+      <output>Recovered sub-agent execution or explicit blocker</output>
     </step>
     <step order="2">
-      <action>If memory not found: Document gap, proceed with investigation</action>
+      <action>If memory not found: document gap and continue with bounded investigation</action>
+      <tool>Memory fallback strategy</tool>
+      <output>Gap note with continued progress</output>
     </step>
     <step order="3">
-      <action>If conflicting outputs: Synthesize findings, flag uncertainty to user</action>
+      <action>If outputs conflict: synthesize uncertainty and request user decision</action>
+      <tool>Cross-validation synthesis</tool>
+      <output>Conflict report with decision options</output>
     </step>
   </phase>
 </workflow>
@@ -249,7 +254,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     </behavior>
     <behavior id="ORCH-B002" priority="critical">
       <trigger>For independent tasks</trigger>
-      <action>Execute in parallel using multiple Task tool calls</action>
+      <action>Execute in parallel using multiple task() tool calls</action>
       <verification>Parallel execution in single message</verification>
     </behavior>
     <behavior id="ORCH-B003" priority="critical">

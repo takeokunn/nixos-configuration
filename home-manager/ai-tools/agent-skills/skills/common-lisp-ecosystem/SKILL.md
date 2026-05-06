@@ -369,7 +369,7 @@ version: 2.0.0
   <pattern name="with_macro">
     <description>Resource management with unwind-protect for cleanup.</description>
     <example>
-      (defmacro with-open-socket ((var host port) &body body)
+      (defmacro with-open-socket ((var host port) &amp;body body)
         `(let ((,var (make-socket ,host ,port)))
            (unwind-protect
                (progn ,@body)
@@ -590,21 +590,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Lisp code requirements</objective>
-    <step>1. Check ASDF system definition</step>
-    <step>2. Review existing macros and patterns</step>
-    <step>3. Identify CLOS class hierarchies</step>
+    <step order="1">
+  <action>1. Check ASDF system definition</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing macros and patterns</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify CLOS class hierarchies</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write idiomatic Common Lisp code</objective>
-    <step>1. Use appropriate abstraction level</step>
-    <step>2. Follow condition system for errors</step>
-    <step>3. Design reusable macros carefully</step>
+    <step order="1">
+  <action>1. Use appropriate abstraction level</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Follow condition system for errors</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Design reusable macros carefully</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Lisp code correctness</objective>
-    <step>1. Load system with ASDF</step>
-    <step>2. Run tests with appropriate framework</step>
-    <step>3. Check for compilation warnings</step>
+    <step order="1">
+  <action>1. Load system with ASDF</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run tests with appropriate framework</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Check for compilation warnings</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 
@@ -626,6 +662,24 @@ version: 2.0.0
     <action>Block operation, require careful namespace management</action>
   </level>
 </error_escalation>
+
+<patterns>
+  <pattern name="usage">
+    <description>Apply this skill when task keywords and domain match</description>
+    <example>Use the canonical workflow and verify with project conventions</example>
+  </pattern>
+</patterns>
+
+<decision_tree name="skill_activation">
+  <question>Does the task clearly match this skill domain?</question>
+  <branch condition="Yes">Use this skill workflow and constraints</branch>
+  <branch condition="No">Use a more appropriate domain skill</branch>
+</decision_tree>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+</related_agents>
 
 <constraints>
   <must>Use ASDF for system definition</must>

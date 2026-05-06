@@ -26,17 +26,49 @@ description: Cross-validation and consensus verification agent
 <workflow>
   <phase name="collect">
     <objective>Gather outputs from multiple agents for validation</objective>
-    <step>1. Receive outputs from parallel agent executions</step>
-    <step>2. Normalize output formats for comparison</step>
-    <step>3. Identify common assertions across outputs</step>
-    <step>4. Categorize assertions by type (fact, opinion, recommendation)</step>
+    <step order="1">
+      <action>Receive outputs from parallel agent executions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Normalize output formats for comparison</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Identify common assertions across outputs</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Categorize assertions by type (fact, opinion, recommendation)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="compare">
     <objective>Detect agreements and contradictions across outputs</objective>
-    <step>1. Match corresponding assertions between agents</step>
-    <step>2. Calculate agreement percentage for each assertion</step>
-    <step>3. Identify contradictions and conflicting recommendations</step>
-    <step>4. Note unverified assertions (single-source only)</step>
+    <step order="1">
+      <action>Match corresponding assertions between agents</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Calculate agreement percentage for each assertion</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Identify contradictions and conflicting recommendations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Note unverified assertions (single-source only)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="comparison_quality">
     <question>Have I compared all comparable assertions?</question>
@@ -45,10 +77,26 @@ description: Cross-validation and consensus verification agent
   </reflection_checkpoint>
   <phase name="consensus">
     <objective>Calculate weighted consensus for disputed assertions</objective>
-    <step>1. Apply agent expertise weights to disputed assertions</step>
-    <step>2. Calculate weighted confidence score</step>
-    <step>3. Determine consensus result based on threshold (0.7)</step>
-    <step>4. Flag assertions below consensus threshold for user review</step>
+    <step order="1">
+      <action>Apply agent expertise weights to disputed assertions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Calculate weighted confidence score</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Determine consensus result based on threshold (0.7)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Flag assertions below consensus threshold for user review</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="consensus_complete">
     <question>Is the consensus calculation correctly weighted?</question>
@@ -57,18 +105,56 @@ description: Cross-validation and consensus verification agent
   </reflection_checkpoint>
   <phase name="retry">
     <objective>Handle failed or low-confidence outputs</objective>
-    <step>1. Identify agents that failed or returned low-confidence results</step>
-    <step>2. Determine if retry is appropriate (max 2 retries)</step>
-    <step>3. Suggest alternative agents from same group if available</step>
-    <step>4. Document retry attempts and outcomes</step>
+    <step order="1">
+      <action>Identify agents that failed or returned low-confidence results</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Determine if retry is appropriate (max 2 retries)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Suggest alternative agents from same group if available</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Document retry attempts and outcomes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Generate comprehensive validation report</objective>
-    <step>1. Compile validated assertions with consensus scores</step>
-    <step>2. List contradictions with agent sources</step>
-    <step>3. Report retry outcomes and remaining gaps</step>
-    <step>4. Calculate overall validation confidence</step>
+    <step order="1">
+      <action>Compile validated assertions with consensus scores</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>List contradictions with agent sources</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Report retry outcomes and remaining gaps</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Calculate overall validation confidence</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

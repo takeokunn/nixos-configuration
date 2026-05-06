@@ -25,163 +25,127 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 <workflow>
-  <phase name="execute_initial">
-    <objective>Execute core workflow phases to complete initial implementation</objective>
-    <subphase name="prepare">
-      <objective>Initialize Serena and check existing patterns</objective>
-      <step order="1">
-        <action>Activate Serena project with activate_project</action>
-        <tool>Serena activate_project</tool>
-        <output>Project activated</output>
-      </step>
-      <step order="2">
-        <action>Check list_memories for relevant patterns</action>
-        <tool>Serena list_memories</tool>
-        <output>Available memory list</output>
-      </step>
-      <step order="3">
-        <action>Load applicable memories with read_memory</action>
-        <tool>Serena read_memory</tool>
-        <output>Relevant patterns loaded</output>
-      </step>
-    </subphase>
-    <subphase name="analyze">
-      <objective>Understand the task scope and identify required resources</objective>
-      <step order="1">
-        <action>What tasks need to be done?</action>
-        <tool>Task analysis</tool>
-        <output>Task list</output>
-      </step>
-      <step order="2">
-        <action>Which sub-agents are best suited?</action>
-        <tool>Agent selection</tool>
-        <output>Agent assignments</output>
-      </step>
-      <step order="3">
-        <action>Which tasks can run in parallel?</action>
-        <tool>Dependency analysis</tool>
-        <output>Parallel task groups</output>
-      </step>
-      <step order="4">
-        <action>What dependencies exist between tasks?</action>
-        <tool>Dependency mapping</tool>
-        <output>Dependency graph</output>
-      </step>
-      <step order="5">
-        <action>What verification is needed?</action>
-        <tool>Verification planning</tool>
-        <output>Verification checklist</output>
-      </step>
-    </subphase>
-    <subphase name="decompose">
-      <objective>Break down complex tasks into manageable units</objective>
-      <step order="1">
-        <action>Split into manageable units</action>
-        <tool>Task decomposition</tool>
-        <output>Atomic task list</output>
-      </step>
-      <step order="2">
-        <action>Identify task boundaries</action>
-        <tool>Boundary analysis</tool>
-        <output>Clear task scopes</output>
-      </step>
-    </subphase>
-    <subphase name="structure">
-      <objective>Organize tasks for optimal execution</objective>
-      <step order="1">
-        <action>Identify parallel vs sequential tasks</action>
-        <tool>Execution planning</tool>
-        <output>Execution order</output>
-      </step>
-      <step order="2">
-        <action>Define task dependencies</action>
-        <tool>Dependency definition</tool>
-        <output>Task dependency map</output>
-      </step>
-    </subphase>
-    <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-    <subphase name="assign">
-      <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
-      <step order="1">
-        <action>Delegate tasks with detailed instructions</action>
-        <tool>Sub-agent delegation</tool>
-        <output>Delegated tasks</output>
-      </step>
-      <step order="2">
-        <action>Provide context and constraints</action>
-        <tool>Context provision</tool>
-        <output>Contextual guidance</output>
-      </step>
-    </subphase>
-    <reflection_checkpoint id="assignment_complete" after="assign">
-      <questions>
-        <question weight="0.4">Have all tasks been properly delegated?</question>
-        <question weight="0.3">Are the sub-agent instructions clear?</question>
-        <question weight="0.3">Are dependencies between tasks handled?</question>
-      </questions>
-      <threshold min="70" action="proceed">
-        <below_threshold>Refine task assignments or ask user</below_threshold>
-      </threshold>
-      <serena_validation>
-        <tool>think_about_task_adherence</tool>
-        <trigger>Before any code modification delegation</trigger>
-      </serena_validation>
-    </reflection_checkpoint>
-    <subphase name="consolidate">
-      <objective>Integrate sub-agent outputs into cohesive result</objective>
-      <step order="1">
-        <action>Verify sub-agent outputs</action>
-        <tool>Output verification</tool>
-        <output>Verification results</output>
-      </step>
-      <step order="2">
-        <action>Combine results</action>
-        <tool>Result integration</tool>
-        <output>Consolidated implementation</output>
-      </step>
-    </subphase>
+  <phase name="prepare">
+    <step order="1">
+      <action>Activate Serena project with activate_project</action>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
+    </step>
+    <step order="2">
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Serena list_memories</tool>
+      <output>Available memory list</output>
+    </step>
+    <step order="3">
+      <action>Load applicable memories with read_memory</action>
+      <tool>Serena read_memory</tool>
+      <output>Relevant patterns loaded</output>
+    </step>
+  </phase>
+
+  <phase name="analyze_execute">
+    <step order="4">
+      <action>What tasks need to be done?</action>
+      <tool>Task analysis</tool>
+      <output>Task list</output>
+    </step>
+    <step order="5">
+      <action>Which sub-agents are best suited?</action>
+      <tool>Agent selection</tool>
+      <output>Agent assignments</output>
+    </step>
+    <step order="6">
+      <action>Which tasks can run in parallel?</action>
+      <tool>Dependency analysis</tool>
+      <output>Parallel task groups</output>
+    </step>
+    <step order="7">
+      <action>What dependencies exist between tasks?</action>
+      <tool>Dependency mapping</tool>
+      <output>Dependency graph</output>
+    </step>
+    <step order="8">
+      <action>What verification is needed?</action>
+      <tool>Verification planning</tool>
+      <output>Verification checklist</output>
+    </step>
+    <step order="9">
+      <action>Split into manageable units</action>
+      <tool>Task decomposition</tool>
+      <output>Atomic task list</output>
+    </step>
+    <step order="10">
+      <action>Identify task boundaries</action>
+      <tool>Boundary analysis</tool>
+      <output>Clear task scopes</output>
+    </step>
+    <step order="11">
+      <action>Identify parallel vs sequential tasks</action>
+      <tool>Execution planning</tool>
+      <output>Execution order</output>
+    </step>
+    <step order="12">
+      <action>Define task dependencies</action>
+      <tool>Dependency definition</tool>
+      <output>Task dependency map</output>
+    </step>
+    <step order="13">
+      <action>Delegate tasks with detailed instructions</action>
+      <tool>Sub-agent delegation</tool>
+      <output>Delegated tasks</output>
+    </step>
+    <step order="14">
+      <action>Provide context and constraints</action>
+      <tool>Context provision</tool>
+      <output>Contextual guidance</output>
+    </step>
+    <step order="15">
+      <action>Verify sub-agent outputs</action>
+      <tool>think_about_task_adherence</tool>
+      <output>Verification results</output>
+    </step>
+    <step order="16">
+      <action>Combine results</action>
+      <tool>Result integration</tool>
+      <output>Consolidated implementation</output>
+    </step>
   </phase>
 
   <phase name="collect_feedback">
-    <objective>Launch feedback agents in execute mode and collect evaluation results</objective>
     <step order="1">
       <action>Launch quality agent: syntax, type, format verification</action>
       <tool>Sub-agent delegation (quality-assurance)</tool>
-      <aspects>Syntax correctness, type safety, code formatting, style compliance</aspects>
       <output>Quality evaluation report</output>
     </step>
     <step order="2">
       <action>Launch security agent: vulnerability detection</action>
       <tool>Sub-agent delegation (security)</tool>
-      <aspects>Security vulnerabilities, input validation, authentication, authorization</aspects>
       <output>Security evaluation report</output>
     </step>
     <step order="3">
       <action>Launch design agent: architecture consistency</action>
       <tool>Sub-agent delegation (design)</tool>
-      <aspects>Architecture patterns, dependency management, API design, coupling</aspects>
       <output>Design evaluation report</output>
     </step>
     <step order="4">
       <action>Launch docs agent: documentation completeness</action>
       <tool>Sub-agent delegation (docs)</tool>
-      <aspects>Code comments, API documentation, README updates</aspects>
       <output>Documentation evaluation report</output>
     </step>
     <step order="5">
       <action>Launch performance agent: performance implications</action>
       <tool>Sub-agent delegation (performance)</tool>
-      <aspects>Algorithm complexity, resource usage, potential bottlenecks</aspects>
       <output>Performance evaluation report</output>
     </step>
     <step order="6">
       <action>Launch test agent: test coverage analysis</action>
       <tool>Sub-agent delegation (test)</tool>
-      <aspects>Test coverage, edge cases, test quality</aspects>
       <output>Test evaluation report</output>
     </step>
-    <execution_mode>All agents in parallel</execution_mode>
-    <reflection_checkpoint id="feedback_quality" after="collect_feedback">
+  </phase>
+
+  <execution_mode>All agents in parallel</execution_mode>
+  <reflection_checkpoint id="feedback_quality" after="collect_feedback">
       <questions>
         <question weight="0.4">Did all feedback agents complete successfully?</question>
         <question weight="0.3">Is the feedback specific and actionable?</question>
@@ -195,12 +159,8 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
         <trigger>After feedback collection completes</trigger>
       </serena_validation>
     </reflection_checkpoint>
-  </phase>
 
   <phase name="fix_issues">
-    <condition>Execute only if feedback found critical or warning issues</condition>
-    <skip_condition>Skip if no issues found in feedback</skip_condition>
-    <objective>Fix identified issues from feedback phase</objective>
     <step order="1">
       <action>Synthesize feedback from all agents</action>
       <tool>Feedback synthesis</tool>
@@ -214,7 +174,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     <step order="3">
       <action>Delegate fixes to appropriate sub-agents</action>
       <tool>Sub-agent delegation</tool>
-      <scope>Only issues identified in feedback, not full re-implementation</scope>
       <output>Fix assignments</output>
     </step>
     <step order="4">
@@ -227,8 +186,10 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <tool>Result consolidation</tool>
       <output>Fixed implementation</output>
     </step>
-    <iteration_limit>1</iteration_limit>
-    <reflection_checkpoint id="fix_complete" after="fix_issues">
+  </phase>
+
+  <iteration_limit>1</iteration_limit>
+  <reflection_checkpoint id="fix_complete" after="fix_issues">
       <questions>
         <question weight="0.5">Have all critical issues been addressed?</question>
         <question weight="0.3">Have warning issues been addressed where feasible?</question>
@@ -237,14 +198,15 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <threshold min="70" action="complete">
         <below_threshold>Flag remaining issues for user review</below_threshold>
       </threshold>
-      <serena_validation>
-        <tool>think_about_whether_you_are_done</tool>
-        <trigger>Before final output</trigger>
-      </serena_validation>
     </reflection_checkpoint>
-  </phase>
 
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">

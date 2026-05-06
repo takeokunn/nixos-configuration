@@ -25,18 +25,50 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <workflow>
   <phase name="analyze">
     <objective>Understand current Git state and project workflow</objective>
-    <step>1. What is the current branch state?</step>
-    <step>2. Are there uncommitted changes?</step>
-    <step>3. What is the project's branching strategy?</step>
-    <step>4. Are there any conflicts to resolve?</step>
-    <step>5. What validation is needed after changes?</step>
+    <step order="1">
+      <action>What is the current branch state?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Are there uncommitted changes?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>What is the project's branching strategy?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Are there any conflicts to resolve?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What validation is needed after changes?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="identify">
     <objective>Detect Git workflow issues and conflicts</objective>
-    <step>1. Detect stale branches, conflicts, naming issues</step>
-    <step>2. Check for uncommitted or unstaged changes</step>
-    <step>3. Verify branch protection rules compliance</step>
+    <step order="1">
+      <action>Detect stale branches, conflicts, naming issues</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Check for uncommitted or unstaged changes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Verify branch protection rules compliance</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="safety_check">
     <question>Is the planned operation safe and reversible?</question>
@@ -49,22 +81,64 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
   </reflection_checkpoint>
   <phase name="resolve">
     <objective>Apply conflict resolution and workflow fixes</objective>
-    <step>1. Classify conflicts, analyze context, apply fixes</step>
-    <step>2. Preserve semantic meaning in all resolutions</step>
-    <step>3. Document resolution decisions</step>
+    <step order="1">
+      <action>Classify conflicts, analyze context, apply fixes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Preserve semantic meaning in all resolutions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Document resolution decisions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="validate">
     <objective>Verify changes don't break functionality</objective>
-    <step>1. Run builds, execute tests</step>
-    <step>2. Verify no new conflicts introduced</step>
-    <step>3. Confirm Git state is clean</step>
+    <step order="1">
+      <action>Run builds, execute tests</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Verify no new conflicts introduced</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Confirm Git state is clean</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Communicate results and next steps</objective>
-    <step>1. Summarize state, list actions</step>
-    <step>2. Report confidence score with justification</step>
-    <step>3. Provide recommended next actions</step>
+    <step order="1">
+      <action>Summarize state, list actions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Report confidence score with justification</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Provide recommended next actions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

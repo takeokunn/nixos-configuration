@@ -102,7 +102,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
     <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Serena activate_project</tool>
@@ -118,37 +117,37 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <tool>Serena read_memory</tool>
       <output>Relevant patterns loaded</output>
     </step>
+
   </phase>
   <phase name="analyze">
-    <objective>Understand the user's request and identify technical constraints</objective>
-    <step order="0">
+    <step order="1">
       <action>Get the big picture: which L0 systems/components are affected? Estimate scope (how many layers, files, services). This step prevents diving into details before understanding overall impact.</action>
       <tool>Serena list_dir, find_file, codebase knowledge</tool>
       <output>Affected systems list, scope estimate (small/medium/large), impacted layers</output>
     </step>
-    <step order="1">
+    <step order="2">
       <action>Parse user request in "subject → object → operation" form. If the rephrasing differs from the original, flag the gap as a clarification candidate.</action>
       <tool>Text analysis</tool>
       <output>Structured request form, identified framing gaps</output>
     </step>
-    <step order="2">
+    <step order="3">
       <action>Identify technical constraints from request context</action>
       <tool>Codebase knowledge</tool>
       <output>Constraint list</output>
     </step>
-    <step order="3">
+    <step order="4">
       <action>Determine design decisions requiring user input</action>
       <tool>Requirements analysis</tool>
       <output>Question candidates list</output>
     </step>
-    <step order="4">
+    <step order="5">
       <action>Assess technical feasibility at high level</action>
       <tool>Technical knowledge</tool>
       <output>Initial feasibility assessment</output>
     </step>
+
   </phase>
   <phase name="investigate">
-    <objective>Gather evidence from codebase and analyze architecture impact</objective>
     <step order="1">
       <action>Delegate to explore agent: find relevant files and existing patterns</action>
       <tool>Sub-agent delegation</tool>
@@ -174,6 +173,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <tool>Context7 MCP, WebSearch</tool>
       <output>Verification report, flagged claims</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="investigation_complete" after="investigate">
     <questions>
@@ -191,7 +191,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </reflection_checkpoint>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="clarify">
-    <objective>Resolve ambiguities through structured user interaction</objective>
     <step order="1">
       <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
       <tool>Question scoring algorithm</tool>
@@ -217,9 +216,9 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <tool>Priority ordering</tool>
       <output>Confirmed requirements</output>
     </step>
+
   </phase>
   <phase name="verify">
-    <objective>Validate user decisions against technical evidence</objective>
     <step order="1">
       <action>Verify constraints from answers using agent findings</action>
       <tool>Cross-reference analysis</tool>
@@ -230,27 +229,24 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <tool>Code analysis</tool>
       <output>Implementation validation</output>
     </step>
+
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="document">
-    <objective>Create comprehensive requirements documentation and task breakdown</objective>
+  <phase name="failure_handling">
     <step order="1">
-      <action>Create comprehensive requirements document (internal investigation findings are separate from the output document)</action>
-      <tool>Requirements template</tool>
-      <output>Complete requirements specification</output>
+      <action>Detect and classify failures during command execution</action>
+      <tool>Error analysis and severity assessment</tool>
+      <output>Failure classification and impact summary</output>
     </step>
     <step order="2">
-      <action>Break down tasks for /execute handoff</action>
-      <tool>Task decomposition</tool>
-      <output>Phased task list with dependencies</output>
+      <action>Apply recovery path or escalate with concrete blocker details</action>
+      <tool>Retry policy and fallback strategy</tool>
+      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
   <phase name="critique">
-    <objective>Adversarial review of requirements document for gaps and risks</objective>
     <step order="1">
       <action>Delegate requirements document to validator agent for critique</action>
       <tool>Sub-agent delegation (validator)</tool>
-      <aspects>Missing steps, unidentified risks, unclear acceptance criteria, dependency gaps, scope ambiguity</aspects>
       <output>Critique report with identified gaps</output>
     </step>
     <step order="2">
@@ -263,6 +259,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <tool>Issue tracking</tool>
       <output>Outstanding issues appended to requirements</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="critique_quality" after="critique">
     <questions>
@@ -282,30 +279,94 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
 </reflection_checkpoint>
 <common_investigation_workflows>
-  <workflow id="A" name="New Feature Definition">
-    <step>1. Identify which L0 systems are affected (new vs. extending existing)</step>
-    <step>2. Find similar existing implementations as reference patterns</step>
-    <step>3. Map data model changes (L1) and API changes (L2)</step>
-    <step>4. Identify acceptance criteria from the user's goal, not their proposed solution</step>
-  </workflow>
-  <workflow id="B" name="Refactor / Architecture Change">
-    <step>1. Map current boundaries, dependencies, and change reasons (change-axis analysis)</step>
-    <step>2. Identify what stays the same (stable) vs. what changes (variable)</step>
-    <step>3. Detect invariants that must not break across the refactor</step>
-    <step>4. Estimate blast radius: how many modules are affected by each design choice</step>
-  </workflow>
-  <workflow id="C" name="Bug Fix Specification">
-    <step>1. Reproduce and confirm the failure mode with evidence from code/logs</step>
-    <step>2. Distinguish root cause from symptoms</step>
-    <step>3. Identify all places where the same root cause could recur</step>
-    <step>4. Specify acceptance criteria as observable behavior, not internal mechanism</step>
-  </workflow>
-  <workflow id="D" name="Integration / External System">
-    <step>1. Verify external system capabilities via Context7 or documentation (don't assume)</step>
-    <step>2. Map authentication, rate limits, and error contracts</step>
-    <step>3. Identify data translation boundaries (what transforms, what passes through)</step>
-    <step>4. Define fallback behavior for external failures</step>
-  </workflow>
+  <playbook id="A" name="New Feature Definition">
+    <step order="1">
+      <action>Identify which L0 systems are affected (new vs. extending existing)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="2">
+      <action>Find similar existing implementations as reference patterns</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="3">
+      <action>Map data model changes (L1) and API changes (L2)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="4">
+      <action>Identify acceptance criteria from the user's goal, not their proposed solution</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+  </playbook>
+  <playbook id="B" name="Refactor / Architecture Change">
+    <step order="1">
+      <action>Map current boundaries, dependencies, and change reasons (change-axis analysis)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="2">
+      <action>Identify what stays the same (stable) vs. what changes (variable)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="3">
+      <action>Detect invariants that must not break across the refactor</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="4">
+      <action>Estimate blast radius: how many modules are affected by each design choice</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+  </playbook>
+  <playbook id="C" name="Bug Fix Specification">
+    <step order="1">
+      <action>Reproduce and confirm the failure mode with evidence from code/logs</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="2">
+      <action>Distinguish root cause from symptoms</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="3">
+      <action>Identify all places where the same root cause could recur</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="4">
+      <action>Specify acceptance criteria as observable behavior, not internal mechanism</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+  </playbook>
+  <playbook id="D" name="Integration / External System">
+    <step order="1">
+      <action>Verify external system capabilities via Context7 or documentation (don't assume)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="2">
+      <action>Map authentication, rate limits, and error contracts</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="3">
+      <action>Identify data translation boundaries (what transforms, what passes through)</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+    <step order="4">
+      <action>Define fallback behavior for external failures</action>
+      <tool>Requirements analysis and evidence gathering tools</tool>
+      <output>Investigation step result</output>
+    </step>
+  </playbook>
 </common_investigation_workflows>
 <agents>
   <agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>

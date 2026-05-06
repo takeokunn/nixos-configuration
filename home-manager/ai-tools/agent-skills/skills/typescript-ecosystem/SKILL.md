@@ -694,7 +694,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 
     <tsx>
       <tool name="tsx">
-        <description>TypeScript execution with esbuild (fallback for Node.js < 24 or code using non-erasable syntax)</description>
+        <description>TypeScript execution with esbuild (fallback for Node.js &lt; 24 or code using non-erasable syntax)</description>
         <use_case name="run">tsx src/index.ts - Run TypeScript directly</use_case>
         <use_case name="watch">tsx watch src/index.ts - Watch mode</use_case>
       </tool>
@@ -740,8 +740,16 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <snippets>16397</snippets>
 
   <usage_pattern>
-    <step>Resolve library ID if needed (already known: /microsoft/typescript)</step>
-    <step>Fetch documentation with specific topic</step>
+    <step order="1">
+  <action>Resolve library ID if needed (already known: /microsoft/typescript)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>Fetch documentation with specific topic</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     <examples>
       <example topic="tsconfig">Configuration options and patterns</example>
       <example topic="generics">Generic type patterns</example>
@@ -839,21 +847,57 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 <workflow>
   <phase name="analyze">
     <objective>Understand TypeScript code requirements</objective>
-    <step>1. Check tsconfig.json for project settings</step>
-    <step>2. Review existing type patterns in project</step>
-    <step>3. Identify type dependencies and imports</step>
+    <step order="1">
+  <action>1. Check tsconfig.json for project settings</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing type patterns in project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify type dependencies and imports</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write type-safe TypeScript code</objective>
-    <step>1. Define types before implementation</step>
-    <step>2. Use strict type checking features</step>
-    <step>3. Follow project naming conventions</step>
+    <step order="1">
+  <action>1. Define types before implementation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use strict type checking features</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Follow project naming conventions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify TypeScript correctness</objective>
-    <step>1. Run tsc --noEmit for type checking</step>
-    <step>2. Check with ESLint for style issues</step>
-    <step>3. Verify tests pass</step>
+    <step order="1">
+  <action>1. Run tsc --noEmit for type checking</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Check with ESLint for style issues</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Verify tests pass</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

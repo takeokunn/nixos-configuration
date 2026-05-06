@@ -78,11 +78,11 @@ version: 2.0.0
     <concept name="timestamps">
       <description>Date and time specifications</description>
       <example>
-        <2024-01-15 Mon>           ; active timestamp
+        &lt;2024-01-15 Mon>           ; active timestamp
         [2024-01-15 Mon]           ; inactive timestamp
-        <2024-01-15 Mon 10:00>     ; with time
-        <2024-01-15 Mon +1w>       ; repeating weekly
-        <2024-01-15 Mon .+1d>      ; restart from completion
+        &lt;2024-01-15 Mon 10:00>     ; with time
+        &lt;2024-01-15 Mon +1w>       ; repeating weekly
+        &lt;2024-01-15 Mon .+1d>      ; restart from completion
       </example>
     </concept>
 
@@ -657,9 +657,21 @@ version: 2.0.0
 <context7_integration>
   <description>Use Context7 MCP to fetch latest Org-mode documentation when needed</description>
   <usage>
-    <step>1. resolve-library-id with query "org-mode" or "emacs org"</step>
-    <step>2. get-library-docs with resolved ID for specific topics (babel, export, cite, agenda)</step>
-    <step>3. Verify patterns against latest Org 9.7+ features (bundled with Emacs 30.2)</step>
+    <step order="1">
+  <action>1. resolve-library-id with query "org-mode" or "emacs org"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. get-library-docs with resolved ID for specific topics (babel, export, cite, agenda)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Verify patterns against latest Org 9.7+ features (bundled with Emacs 30.2)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </usage>
   <notes>
     <note>Org 9.7+ is current, bundled with Emacs 30.2</note>
@@ -741,22 +753,62 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand org document requirements</objective>
-    <step>1. Identify document type: notes, project, literate program, publication</step>
-    <step>2. Determine required features: GTD, babel, export</step>
-    <step>3. Check existing org patterns in project</step>
+    <step order="1">
+  <action>1. Identify document type: notes, project, literate program, publication</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Determine required features: GTD, babel, export</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Check existing org patterns in project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Create or modify org document</objective>
-    <step>1. Set up document header with appropriate options</step>
-    <step>2. Structure content with appropriate heading levels</step>
-    <step>3. Add metadata (properties, tags, timestamps) as needed</step>
-    <step>4. Configure babel blocks for executable content</step>
+    <step order="1">
+  <action>1. Set up document header with appropriate options</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Structure content with appropriate heading levels</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Add metadata (properties, tags, timestamps) as needed</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Configure babel blocks for executable content</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify org document correctness</objective>
-    <step>1. Check syntax with org-lint</step>
-    <step>2. Test babel blocks execute correctly</step>
-    <step>3. Verify export produces expected output</step>
+    <step order="1">
+  <action>1. Check syntax with org-lint</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Test babel blocks execute correctly</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Verify export produces expected output</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

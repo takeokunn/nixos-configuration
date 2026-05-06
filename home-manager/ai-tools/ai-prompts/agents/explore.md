@@ -62,9 +62,13 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
     </step>
   </phase>
   <reflection_checkpoint id="search_quality">
-    <question>Have I found relevant matches?</question>
-    <question>Should I expand or refine the search?</question>
-    <threshold>If matches less than expected, try alternative patterns</threshold>
+    <questions>
+      <question weight="0.5">Have I found relevant matches?</question>
+      <question weight="0.5">Should I expand or refine the search?</question>
+    </questions>
+    <threshold min="70" action="proceed">
+      <below_threshold>Expand search patterns and retry with alternative strategies</below_threshold>
+    </threshold>
     <serena_validation>
       <tool>think_about_collected_information</tool>
       <trigger>After search phase completes</trigger>
@@ -83,7 +87,13 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
       <output>Clean result set</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Present findings in actionable format</objective>
     <step order="1">

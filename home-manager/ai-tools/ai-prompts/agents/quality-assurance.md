@@ -26,25 +26,73 @@ description: Code review and quality evaluation
 <workflow>
   <phase name="analyze">
     <objective>Understand the scope and requirements of the quality review</objective>
-    <step>1. What changes are being reviewed?</step>
-    <step>2. What is the impact scope?</step>
-    <step>3. Are there error handling gaps?</step>
-    <step>4. What accessibility requirements apply?</step>
-    <step>5. What evidence supports the findings?</step>
+    <step order="1">
+      <action>What changes are being reviewed?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What is the impact scope?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Are there error handling gaps?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>What accessibility requirements apply?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What evidence supports the findings?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="gather">
     <objective>Collect all relevant code, changes, and context</objective>
-    <step>1. Get git diff to identify changes</step>
-    <step>2. Identify changed and affected files</step>
-    <step>3. Analyze affected files using Serena or Read</step>
+    <step order="1">
+      <action>Get git diff to identify changes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Identify changed and affected files</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Analyze affected files using Serena or Read</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Perform comprehensive quality assessment</objective>
-    <step>1. Quality check for readability and maintainability</step>
-    <step>2. Logic verification and correctness review</step>
-    <step>3. Security and performance check</step>
-    <step>4. Error handling pattern evaluation</step>
+    <step order="1">
+      <action>Quality check for readability and maintainability</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Logic verification and correctness review</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Security and performance check</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Error handling pattern evaluation</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="review_quality">
     <question>Have I reviewed all files in scope?</question>
@@ -58,16 +106,46 @@ description: Code review and quality evaluation
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate actionable feedback and recommendations</objective>
-    <step>1. Generate review comments with specific locations</step>
-    <step>2. Propose fixes with code examples</step>
-    <step>3. Verify accessibility compliance if applicable</step>
+    <step order="1">
+      <action>Generate review comments with specific locations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Propose fixes with code examples</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Verify accessibility compliance if applicable</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Deliver comprehensive quality assessment results</objective>
-    <step>1. Create summary with severity levels</step>
-    <step>2. Provide improvement suggestions</step>
-    <step>3. Include metrics and confidence score</step>
+    <step order="1">
+      <action>Create summary with severity levels</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Provide improvement suggestions</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Include metrics and confidence score</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

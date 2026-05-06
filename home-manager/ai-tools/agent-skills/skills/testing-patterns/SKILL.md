@@ -30,6 +30,7 @@ version: 2.0.0
   </tool>
 </tools>
 
+<concepts>
 <concept name="unit">
   <description>Test individual functions/methods in isolation</description>
   <scope>Single function, class, or module</scope>
@@ -65,7 +66,9 @@ version: 2.0.0
   <description>Percentage of functions/methods called during tests</description>
   <guidance>Identifies untested functions</guidance>
 </concept>
+</concepts>
 
+<patterns>
 <pattern name="arrange_act_assert">
   <description>Three-phase test structure for clear test organization</description>
   <decision_tree name="when_to_use">
@@ -248,6 +251,8 @@ version: 2.0.0
   <use_case>Component rendering, serialized data structures, CLI output</use_case>
 </pattern>
 
+</patterns>
+
 <best_practices>
   <practice priority="critical">
     <name>Test happy path first</name>
@@ -423,6 +428,18 @@ version: 2.0.0
     <action>BLOCK operation, require explicit user acknowledgment</action>
   </level>
 </error_escalation>
+
+<rules priority="critical">
+  <rule>Keep guidance evidence-based and version-aware</rule>
+</rules>
+<rules priority="standard">
+  <rule>Prefer project conventions over generic defaults</rule>
+</rules>
+
+<related_agents>
+  <agent name="explore">Locate relevant code patterns</agent>
+  <agent name="quality-assurance">Review output consistency</agent>
+</related_agents>
 
 <constraints>
   <must>Follow project test patterns</must>

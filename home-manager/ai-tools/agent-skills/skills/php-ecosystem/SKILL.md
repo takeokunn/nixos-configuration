@@ -1615,8 +1615,16 @@ version: 2.0.0
   <trust_score>9.4</trust_score>
 
   <usage_pattern>
-    <step>For PHP core documentation, use library ID /php/doc-en</step>
-    <step>Fetch specific topic documentation with get-library-docs</step>
+    <step order="1">
+  <action>For PHP core documentation, use library ID /php/doc-en</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>Fetch specific topic documentation with get-library-docs</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </usage_pattern>
 
   <common_queries>
@@ -1705,22 +1713,62 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand PHP code requirements</objective>
-    <step>1. Check PHP version constraints in composer.json</step>
-    <step>2. Review existing type patterns in project</step>
-    <step>3. Identify PSR standards in use</step>
+    <step order="1">
+  <action>1. Check PHP version constraints in composer.json</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing type patterns in project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify PSR standards in use</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write type-safe PHP code</objective>
-    <step>1. Add declare(strict_types=1) at file start</step>
-    <step>2. Define interfaces before implementations</step>
-    <step>3. Use constructor property promotion</step>
-    <step>4. Add return types to all methods</step>
+    <step order="1">
+  <action>1. Add declare(strict_types=1) at file start</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Define interfaces before implementations</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Use constructor property promotion</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Add return types to all methods</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify PHP correctness</objective>
-    <step>1. Run PHPStan for type checking</step>
-    <step>2. Run PHP CS Fixer for style</step>
-    <step>3. Run PHPUnit/Pest for tests</step>
+    <step order="1">
+  <action>1. Run PHPStan for type checking</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run PHP CS Fixer for style</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Run PHPUnit/Pest for tests</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

@@ -31,17 +31,49 @@ description: Adversarial verification agent that actively tries to break impleme
 <workflow>
   <phase name="reconnaissance">
     <objective>Understand what changed and identify the attack surface</objective>
-    <step>1. Read CLAUDE.md/README for build, test, and lint commands</step>
-    <step>2. Review the diff to understand what changed</step>
-    <step>3. Identify the change type (frontend, backend, CLI, config, library, bug fix, refactoring, nix)</step>
-    <step>4. Map the attack surface: inputs, boundaries, edge cases, failure modes</step>
+    <step order="1">
+      <action>Read CLAUDE.md/README for build, test, and lint commands</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Review the diff to understand what changed</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Identify the change type (frontend, backend, CLI, config, library, bug fix, refactoring, nix)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Map the attack surface: inputs, boundaries, edge cases, failure modes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="baseline">
     <objective>Establish that the project builds and existing tests pass</objective>
-    <step>1. Run the build (broken build = automatic FAIL)</step>
-    <step>2. Run the test suite (failing tests = automatic FAIL)</step>
-    <step>3. Run linters and type-checkers if configured</step>
-    <step>4. Record baseline results before adversarial probing</step>
+    <step order="1">
+      <action>Run the build (broken build = automatic FAIL)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Run the test suite (failing tests = automatic FAIL)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Run linters and type-checkers if configured</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Record baseline results before adversarial probing</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="baseline_gate">
     <question>Did the build succeed?</question>
@@ -51,7 +83,11 @@ description: Adversarial verification agent that actively tries to break impleme
   </reflection_checkpoint>
   <phase name="strategy_selection">
     <objective>Select verification strategy based on change type</objective>
-    <step>Use verification_strategy to choose the probe approach before adversarial probing</step>
+    <step order="1">
+      <action>Use verification_strategy to choose the probe approach before adversarial probing</action>
+      <tool>Verification strategy decision tree</tool>
+      <output>Selected probe strategy</output>
+    </step>
     <decision_tree name="verification_strategy">
       <question>What type of change is being verified?</question>
       <branch condition="Frontend">Start dev server, use browser automation, curl subresources</branch>
@@ -66,12 +102,36 @@ description: Adversarial verification agent that actively tries to break impleme
   </phase>
   <phase name="adversarial_probing">
     <objective>Actively try to break the implementation through targeted probes</objective>
-    <step>1. Concurrency probes: race conditions, parallel execution, shared state</step>
-    <step>2. Boundary value probes: empty inputs, maximum values, off-by-one, type boundaries</step>
-    <step>3. Idempotency probes: run the same operation twice, verify consistent results</step>
-    <step>4. Orphan operation probes: interrupted workflows, partial failures, cleanup verification</step>
-    <step>5. Error path probes: invalid inputs, missing dependencies, permission errors</step>
-    <step>6. Write ephemeral test scripts to /tmp if needed for custom probes</step>
+    <step order="1">
+      <action>Concurrency probes: race conditions, parallel execution, shared state</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Boundary value probes: empty inputs, maximum values, off-by-one, type boundaries</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Idempotency probes: run the same operation twice, verify consistent results</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Orphan operation probes: interrupted workflows, partial failures, cleanup verification</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>Error path probes: invalid inputs, missing dependencies, permission errors</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="6">
+      <action>Write ephemeral test scripts to /tmp if needed for custom probes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="adversarial_completeness">
     <question>Have I attempted at least one adversarial probe?</question>
@@ -82,18 +142,56 @@ description: Adversarial verification agent that actively tries to break impleme
   </reflection_checkpoint>
   <phase name="regression_check">
     <objective>Verify no existing functionality is broken</objective>
-    <step>1. Run full test suite again if adversarial probes modified test state</step>
-    <step>2. Verify public API surface is unchanged (for refactoring)</step>
-    <step>3. Check for unintended side effects in related modules</step>
+    <step order="1">
+      <action>Run full test suite again if adversarial probes modified test state</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Verify public API surface is unchanged (for refactoring)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Check for unintended side effects in related modules</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="verdict">
     <objective>Issue final PASS or FAIL verdict with evidence</objective>
-    <step>1. Compile all check results with commands and outputs</step>
-    <step>2. Calculate confidence score based on coverage and probe results</step>
-    <step>3. Before FAIL: verify issue is not already handled, intentional, or not actionable</step>
-    <step>4. Before PASS: confirm at least one adversarial probe result is included</step>
-    <step>5. Issue final verdict with confidence score</step>
+    <step order="1">
+      <action>Compile all check results with commands and outputs</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Calculate confidence score based on coverage and probe results</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Before FAIL: verify issue is not already handled, intentional, or not actionable</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Before PASS: confirm at least one adversarial probe result is included</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>Issue final verdict with confidence score</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

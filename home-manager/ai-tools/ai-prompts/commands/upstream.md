@@ -28,7 +28,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
-  <phase name="preflight">
+  <phase name="prepare">
     <objective>Verify environment and detect upstream repository</objective>
     <step order="1">
       <action>Check Serena memories for contribution patterns of upstream repo</action>
@@ -61,7 +61,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Summary of divergent changes</output>
     </step>
   </phase>
-  <reflection_checkpoint id="preflight_complete" after="preflight">
+  <reflection_checkpoint id="preflight_complete" after="prepare">
     <questions>
       <question weight="0.4">Is gh CLI authenticated?</question>
       <question weight="0.3">Is upstream repository clearly identified?</question>
@@ -175,7 +175,13 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Self-feedback section</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
@@ -433,7 +439,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
             <file name=".git/">Initialized git repository</file>
           </files>
         </directory_structure>
-        <workflow>
+        <procedure>
           <step order="1" action="create_directory">
             <command>mkdir -p /tmp/[repo-name]/[branch-name-or-issue-number]</command>
             <expected_output>Directory created at /tmp/[repo-name]/[branch-name-or-issue-number]</expected_output>
@@ -464,7 +470,7 @@ use devenv</content>
             <command>cd /tmp/[repo-name]/[branch-name-or-issue-number] &amp;&amp; git init &amp;&amp; git add .</command>
             <expected_output>Initialized git repository with all files staged</expected_output>
           </step>
-        </workflow>
+        </procedure>
         <devenv_templates>
           <description>Generate devenv.nix configuration for verification environments based on detected ecosystem</description>
           <skill_reference>
@@ -629,7 +635,11 @@ Phase 4: Final Verification (depends on all)
           </dependency_format>
           <phase name="code_fixes" order="1" parallel_safe="true">
             <description>Lint errors, style issues, code quality improvements identified in review</description>
-            <step>Apply code fix tasks in this phase according to their dependencies</step>
+            <step order="1">
+              <action>Apply code fix tasks in this phase according to their dependencies</action>
+              <tool>Task orchestration guidance</tool>
+              <output>Phase execution guidance emitted</output>
+            </step>
             <responsibility name="code_fix_tasks">
               <task id="CF-001">
                 <files>List of files to modify</files>
@@ -640,7 +650,11 @@ Phase 4: Final Verification (depends on all)
           </phase>
           <phase name="test_updates" order="2" parallel_safe="true">
             <description>Missing tests, coverage gaps, test improvements</description>
-            <step>Apply test update tasks in this phase according to their dependencies</step>
+            <step order="1">
+              <action>Apply test update tasks in this phase according to their dependencies</action>
+              <tool>Task orchestration guidance</tool>
+              <output>Phase execution guidance emitted</output>
+            </step>
             <responsibility name="test_update_tasks">
               <task id="TU-001">
                 <files>List of test files</files>
@@ -651,7 +665,11 @@ Phase 4: Final Verification (depends on all)
           </phase>
           <phase name="documentation" order="3" parallel_safe="true">
             <description>README, inline docs, changelog, API documentation</description>
-            <step>Apply documentation tasks in this phase according to their dependencies</step>
+            <step order="1">
+              <action>Apply documentation tasks in this phase according to their dependencies</action>
+              <tool>Task orchestration guidance</tool>
+              <output>Phase execution guidance emitted</output>
+            </step>
             <responsibility name="documentation_tasks">
               <task id="DOC-001">
                 <files>Documentation files</files>
@@ -662,7 +680,11 @@ Phase 4: Final Verification (depends on all)
           </phase>
           <phase name="commit_prep" order="4" parallel_safe="false">
             <description>Commit message formatting per contribution guidelines, rebasing onto upstream, squashing commits if required</description>
-            <step>Prepare git-related task guidance without performing git write operations</step>
+            <step order="1">
+              <action>Prepare git-related task guidance without performing git write operations</action>
+              <tool>Task orchestration guidance</tool>
+              <output>Phase execution guidance emitted</output>
+            </step>
             <responsibility name="commit_preparation_tasks">
               <task id="GIT-001">
                 <files>N/A (git operations)</files>
@@ -673,7 +695,11 @@ Phase 4: Final Verification (depends on all)
           </phase>
           <phase name="final_verification" order="5" parallel_safe="false">
             <description>Running lint, test, build commands before PR</description>
-            <step>Run final verification tasks after all dependent phases complete</step>
+            <step order="1">
+              <action>Run final verification tasks after all dependent phases complete</action>
+              <tool>Task orchestration guidance</tool>
+              <output>Phase execution guidance emitted</output>
+            </step>
             <responsibility name="final_verification_tasks">
               <task id="VER-001">
                 <files>N/A (verification commands)</files>

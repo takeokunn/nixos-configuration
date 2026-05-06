@@ -17,7 +17,7 @@ version: 2.0.0
 
 <concepts>
   <concept name="ownership">Each value has one owner; when owner goes out of scope, value is dropped</concept>
-  <concept name="borrowing">Immutable (&T) allows multiple borrows; mutable (&mut T) allows exactly one; cannot mix</concept>
+  <concept name="borrowing">Immutable (&amp;T) allows multiple borrows; mutable (&amp;mut T) allows exactly one; cannot mix</concept>
   <concept name="result_option">Result for recoverable errors (Ok/Err), Option for optional values (Some/None); use ? for propagation</concept>
   <concept name="traits">Define behavior with traits; use derive for common implementations (Debug, Clone, PartialEq)</concept>
 </concepts>
@@ -32,9 +32,9 @@ version: 2.0.0
     <concept name="borrowing">
       <description>Immutable and mutable references with strict rules</description>
       <rules priority="critical">
-        <rule>&T allows multiple simultaneous borrows</rule>
-        <rule>&mut T allows exactly one mutable borrow</rule>
-        <rule>Cannot have &mut T while &T exists</rule>
+        <rule>&amp;T allows multiple simultaneous borrows</rule>
+        <rule>&amp;mut T allows exactly one mutable borrow</rule>
+        <rule>Cannot have &amp;mut T while &amp;T exists</rule>
       </rules>
     </concept>
 
@@ -46,7 +46,7 @@ version: 2.0.0
       <pattern name="explicit">
         <description>Explicit lifetime annotations for complex cases</description>
         <example>
-          fn foo<'a>(x: &'a str) -> &'a str {
+          fn foo&lt;'a>(x: &amp;'a str) -> &amp;'a str {
             x
           }
         </example>
@@ -432,16 +432,32 @@ version: 2.0.0
 
   <usage_patterns>
     <pattern name="language_reference">
-      <step>resolve-library-id libraryName="rust lang"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/rust-lang/book" topic="ownership"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="rust lang"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/book" topic="ownership"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="cargo_configuration">
-      <step>get-library-docs context7CompatibleLibraryID="/rust-lang/cargo.git" topic="workspace"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/cargo.git" topic="workspace"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="clippy_lints">
-      <step>get-library-docs context7CompatibleLibraryID="/rust-lang/rust-clippy" topic="lints configuration"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/rust-clippy" topic="lints configuration"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -451,7 +467,7 @@ version: 2.0.0
   <practice priority="critical">Run cargo clippy before committing</practice>
   <practice priority="critical">Format with cargo fmt for consistent style</practice>
   <practice priority="high">Use workspace for multi-crate projects</practice>
-  <practice priority="high">Prefer &str over String for function parameters</practice>
+  <practice priority="high">Prefer &amp;str over String for function parameters</practice>
   <practice priority="high">Use impl Trait for return types when possible</practice>
   <practice priority="medium">Document public API with /// doc comments</practice>
   <practice priority="medium">Write unit tests alongside code in same file</practice>
@@ -467,7 +483,7 @@ version: 2.0.0
 
 <rules priority="standard">
   <rule>Use cargo fmt for consistent formatting</rule>
-  <rule>Prefer &str over String for function parameters</rule>
+  <rule>Prefer &amp;str over String for function parameters</rule>
   <rule>Write unit tests in same file, integration tests in tests/ directory</rule>
   <rule>Use cargo check for fast iteration during development</rule>
 </rules>
@@ -475,21 +491,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Rust code requirements</objective>
-    <step>1. Check Cargo.toml for crate configuration</step>
-    <step>2. Review existing patterns and traits</step>
-    <step>3. Identify ownership and lifetime requirements</step>
+    <step order="1">
+  <action>1. Check Cargo.toml for crate configuration</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing patterns and traits</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify ownership and lifetime requirements</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write safe, idiomatic Rust code</objective>
-    <step>1. Design with ownership in mind</step>
-    <step>2. Use Result/Option for error handling</step>
-    <step>3. Follow Rust API guidelines</step>
+    <step order="1">
+  <action>1. Design with ownership in mind</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use Result/Option for error handling</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Follow Rust API guidelines</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Rust code correctness</objective>
-    <step>1. Run cargo check for quick validation</step>
-    <step>2. Run cargo clippy for lints</step>
-    <step>3. Run cargo test for testing</step>
+    <step order="1">
+  <action>1. Run cargo check for quick validation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run cargo clippy for lints</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Run cargo test for testing</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

@@ -153,7 +153,7 @@ version: 2.0.0
   </modern_features>
 
   <cpp26_features>
-    <description>C++26 was finalized in 2026, and major toolchains are progressively implementing its features. Prefer feature detection and compiler checks over hard assumptions.</description>
+    <description>C++26 features are progressively landing across major toolchains. Prefer feature detection and compiler checks over hard assumptions.</description>
     <feature name="reflection">
       <description>Static reflection via the ^^ operator (cat-ears operator). The biggest upgrade for C++ development since templates.</description>
       <example>
@@ -769,7 +769,7 @@ version: 2.0.0
       BreakBeforeBraces: Attach
       IncludeBlocks: Regroup
       IncludeCategories:
-        - Regex: '^<.*>'
+        - Regex: '^&lt;.*>'
           Priority: 1
         - Regex: '^".*"'
           Priority: 2
@@ -917,16 +917,32 @@ version: 2.0.0
 
   <usage_patterns>
     <pattern name="language_reference">
-      <step>resolve-library-id libraryName="cppreference"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="std::unique_ptr"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="cppreference"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="std::unique_ptr"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="cmake_reference">
-      <step>get-library-docs context7CompatibleLibraryID="/Kitware/CMake" topic="target_link_libraries"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/Kitware/CMake" topic="target_link_libraries"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="testing_reference">
-      <step>get-library-docs context7CompatibleLibraryID="/google/googletest" topic="assertions"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/google/googletest" topic="assertions"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -949,21 +965,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand C++ code requirements</objective>
-    <step>1. Check CMakeLists.txt for build configuration</step>
-    <step>2. Review existing code patterns and standards</step>
-    <step>3. Identify memory management requirements</step>
+    <step order="1">
+  <action>1. Check CMakeLists.txt for build configuration</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing code patterns and standards</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify memory management requirements</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write modern, safe C++ code</objective>
-    <step>1. Use RAII and smart pointers</step>
-    <step>2. Follow C++ Core Guidelines</step>
-    <step>3. Prefer standard library over raw implementations</step>
+    <step order="1">
+  <action>1. Use RAII and smart pointers</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Follow C++ Core Guidelines</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Prefer standard library over raw implementations</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify C++ code correctness</objective>
-    <step>1. Build with warnings enabled</step>
-    <step>2. Run static analysis tools</step>
-    <step>3. Execute tests with sanitizers</step>
+    <step order="1">
+  <action>1. Build with warnings enabled</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run static analysis tools</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Execute tests with sanitizers</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 
@@ -985,6 +1037,29 @@ version: 2.0.0
     <action>Block operation, require immediate fix</action>
   </level>
 </error_escalation>
+
+<tools>
+  <tool name="Read">Read relevant source files and docs</tool>
+  <tool name="Grep">Search for patterns and references</tool>
+</tools>
+
+<patterns>
+  <pattern name="usage">
+    <description>Apply this skill when task keywords and domain match</description>
+    <example>Use the canonical workflow and verify with project conventions</example>
+  </pattern>
+</patterns>
+
+<decision_tree name="skill_activation">
+  <question>Does the task clearly match this skill domain?</question>
+  <branch condition="Yes">Use this skill workflow and constraints</branch>
+  <branch condition="No">Use a more appropriate domain skill</branch>
+</decision_tree>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+</related_agents>
 
 <constraints>
   <must>Use smart pointers for memory management</must>

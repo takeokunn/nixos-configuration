@@ -175,11 +175,27 @@ version: 2.0.0
   </avoid>
 </anti_patterns>
 
-<rules>
-  <rule priority="critical">Exploration operations must be read-only; never modify files during search</rule>
-  <rule priority="critical">Always use absolute file paths in Read tool calls</rule>
-  <rule priority="high">Prefer Grep over shell grep/rg commands for consistent behavior</rule>
+<rules priority="critical">
+  <rule>Exploration operations must be read-only; never modify files during search</rule>
+  <rule>Always use absolute file paths in Read tool calls</rule>
+  <rule>Keep guidance evidence-based and version-aware</rule>
 </rules>
+<rules priority="standard">
+  <rule>Prefer Grep over shell grep/rg commands for consistent behavior</rule>
+  <rule>Prefer project conventions over generic defaults</rule>
+</rules>
+
+<error_escalation>
+  <level severity="low"><example>Minor inconsistency</example><action>Document and continue</action></level>
+  <level severity="medium"><example>Ambiguous guidance</example><action>Clarify assumptions</action></level>
+  <level severity="high"><example>Conflicting constraints</example><action>Escalate with options</action></level>
+  <level severity="critical"><example>Unsafe or misleading retrieval guidance</example><action>Block and escalate to maintainers with corrective steps</action></level>
+</error_escalation>
+
+<related_agents>
+  <agent name="explore">Locate relevant code patterns</agent>
+  <agent name="quality-assurance">Review output consistency</agent>
+</related_agents>
 
 <constraints>
   <must>Return file paths with line numbers for all findings</must>

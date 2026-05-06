@@ -31,165 +31,131 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
-  <phase name="define_initial">
-    <objective>Execute core define phases to produce initial requirements document</objective>
-    <subphase name="prepare">
-      <objective>Initialize Serena and check existing patterns</objective>
-      <step order="1">
-        <action>Activate Serena project with activate_project</action>
-        <tool>Serena activate_project</tool>
-        <output>Project activated</output>
-      </step>
-      <step order="2">
-        <action>Check list_memories for relevant patterns</action>
-        <tool>Serena list_memories</tool>
-        <output>Available memory list</output>
-      </step>
-      <step order="3">
-        <action>Load applicable memories with read_memory</action>
-        <tool>Serena read_memory</tool>
-        <output>Relevant patterns loaded</output>
-      </step>
-    </subphase>
-    <subphase name="analyze">
-      <objective>Understand the user's request and identify technical constraints</objective>
-      <step order="1">
-        <action>Parse user request to extract core requirements</action>
-        <tool>Text analysis</tool>
-        <output>Initial requirements list</output>
-      </step>
-      <step order="2">
-        <action>Identify technical constraints from request context</action>
-        <tool>Codebase knowledge</tool>
-        <output>Constraint list</output>
-      </step>
-      <step order="3">
-        <action>Determine design decisions requiring user input</action>
-        <tool>Requirements analysis</tool>
-        <output>Question candidates list</output>
-      </step>
-      <step order="4">
-        <action>Assess technical feasibility at high level</action>
-        <tool>Technical knowledge</tool>
-        <output>Initial feasibility assessment</output>
-      </step>
-    </subphase>
-    <subphase name="investigate">
-      <objective>Gather evidence from codebase and analyze architecture impact</objective>
-      <step order="1">
-        <action>Delegate to explore agent: find relevant files and existing patterns</action>
-        <tool>Sub-agent delegation</tool>
-        <output>File paths, patterns, code samples</output>
-      </step>
-      <step order="2">
-        <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
-        <tool>Sub-agent delegation</tool>
-        <output>Architecture analysis, dependency graph</output>
-      </step>
-      <step order="3">
-        <action>Delegate to database agent: analyze database design (if applicable)</action>
-        <tool>Sub-agent delegation</tool>
-        <output>Schema analysis, query patterns</output>
-      </step>
-      <step order="4">
-        <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
-        <tool>Sub-agent delegation</tool>
-        <output>Effort estimation, risk analysis</output>
-      </step>
-      <step order="5">
-        <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
-        <tool>Context7 MCP, WebSearch</tool>
-        <output>Verification report, flagged claims</output>
-      </step>
-    </subphase>
-    <reflection_checkpoint id="investigation_complete" after="investigate">
-      <questions>
-        <question weight="0.4">Have all relevant files and patterns been identified?</question>
-        <question weight="0.3">Is the scope clearly understood?</question>
-        <question weight="0.3">Are there any technical blockers identified?</question>
-      </questions>
-      <threshold min="70" action="proceed">
-        <below_threshold>Expand investigation scope or ask user</below_threshold>
-      </threshold>
-      <serena_validation>
-        <tool>think_about_collected_information</tool>
-        <trigger>After investigation subphase completes</trigger>
-      </serena_validation>
-    </reflection_checkpoint>
-    <subphase name="clarify">
-      <objective>Resolve ambiguities through structured user interaction</objective>
-      <step order="1">
-        <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
-        <tool>Question scoring algorithm</tool>
-        <output>Prioritized question list</output>
-      </step>
-      <step order="2">
-        <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
-        <tool>Question taxonomy</tool>
-        <output>Categorized questions</output>
-      </step>
-      <step order="3">
-        <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
-        <tool>AskUserQuestion</tool>
-        <output>User responses</output>
-      </step>
-      <step order="4">
-        <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
-        <tool>AskUserQuestion</tool>
-        <output>Additional user responses</output>
-      </step>
-      <step order="5">
-        <action>Present high-score questions first; do not proceed without clear answers</action>
-        <tool>Priority ordering</tool>
-        <output>Confirmed requirements</output>
-      </step>
-    </subphase>
-    <subphase name="verify">
-      <objective>Validate user decisions against technical evidence</objective>
-      <step order="1">
-        <action>Verify constraints from answers using agent findings</action>
-        <tool>Cross-reference analysis</tool>
-        <output>Validated constraints</output>
-      </step>
-      <step order="2">
-        <action>Check implementations related to chosen approach</action>
-        <tool>Code analysis</tool>
-        <output>Implementation validation</output>
-      </step>
-    </subphase>
-    <subphase name="document">
-      <objective>Create comprehensive requirements documentation and task breakdown</objective>
-      <step order="1">
-        <action>Create comprehensive requirements document</action>
-        <tool>Requirements template</tool>
-        <output>Complete requirements specification</output>
-      </step>
-      <step order="2">
-        <action>Break down tasks for /execute handoff</action>
-        <tool>Task decomposition</tool>
-        <output>Phased task list with dependencies</output>
-      </step>
-    </subphase>
+  <phase name="prepare">
+    <step order="1">
+      <action>Activate Serena project with activate_project</action>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
+    </step>
+    <step order="2">
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Serena list_memories</tool>
+      <output>Available memory list</output>
+    </step>
+    <step order="3">
+      <action>Load applicable memories with read_memory</action>
+      <tool>Serena read_memory</tool>
+      <output>Relevant patterns loaded</output>
+    </step>
+  </phase>
+
+  <phase name="analyze_define">
+    <step order="4">
+      <action>Parse user request to extract core requirements</action>
+      <tool>Text analysis</tool>
+      <output>Initial requirements list</output>
+    </step>
+    <step order="5">
+      <action>Identify technical constraints from request context</action>
+      <tool>Codebase knowledge</tool>
+      <output>Constraint list</output>
+    </step>
+    <step order="6">
+      <action>Determine design decisions requiring user input</action>
+      <tool>Requirements analysis</tool>
+      <output>Question candidates list</output>
+    </step>
+    <step order="7">
+      <action>Assess technical feasibility at high level</action>
+      <tool>Technical knowledge</tool>
+      <output>Initial feasibility assessment</output>
+    </step>
+    <step order="8">
+      <action>Delegate to explore agent: find relevant files and existing patterns</action>
+      <tool>Sub-agent delegation</tool>
+      <output>File paths, patterns, code samples</output>
+    </step>
+    <step order="9">
+      <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
+      <tool>Sub-agent delegation</tool>
+      <output>Architecture analysis, dependency graph</output>
+    </step>
+    <step order="10">
+      <action>Delegate to database agent: analyze database design (if applicable)</action>
+      <tool>Sub-agent delegation</tool>
+      <output>Schema analysis, query patterns</output>
+    </step>
+    <step order="11">
+      <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
+      <tool>Sub-agent delegation</tool>
+      <output>Effort estimation, risk analysis</output>
+    </step>
+    <step order="12">
+      <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
+      <tool>Context7 MCP, WebSearch</tool>
+      <output>Verification report, flagged claims</output>
+    </step>
+    <step order="13">
+      <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
+      <tool>think_about_collected_information</tool>
+      <output>Prioritized question list</output>
+    </step>
+    <step order="14">
+      <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
+      <tool>Question taxonomy</tool>
+      <output>Categorized questions</output>
+    </step>
+    <step order="15">
+      <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
+      <tool>AskUserQuestion</tool>
+      <output>User responses</output>
+    </step>
+    <step order="16">
+      <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
+      <tool>AskUserQuestion</tool>
+      <output>Additional user responses</output>
+    </step>
+    <step order="17">
+      <action>Present high-score questions first; do not proceed without clear answers</action>
+      <tool>Priority ordering</tool>
+      <output>Confirmed requirements</output>
+    </step>
+    <step order="18">
+      <action>Verify constraints from answers using agent findings</action>
+      <tool>Cross-reference analysis</tool>
+      <output>Validated constraints</output>
+    </step>
+    <step order="19">
+      <action>Check implementations related to chosen approach</action>
+      <tool>Code analysis</tool>
+      <output>Implementation validation</output>
+    </step>
+    <step order="20">
+      <action>Create comprehensive requirements document</action>
+      <tool>Requirements template</tool>
+      <output>Complete requirements specification</output>
+    </step>
+    <step order="21">
+      <action>Break down tasks for /execute handoff</action>
+      <tool>Task decomposition</tool>
+      <output>Phased task list with dependencies</output>
+    </step>
   </phase>
 
   <phase name="collect_feedback">
-    <objective>Launch feedback agents in define mode and collect evaluation results</objective>
     <step order="1">
       <action>Launch plan agent: evaluate execution plan quality</action>
       <tool>Sub-agent delegation (plan)</tool>
-      <aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
       <output>Plan evaluation report</output>
     </step>
     <step order="2">
       <action>Launch estimation agent: evaluate estimation validity</action>
       <tool>Sub-agent delegation (general-purpose)</tool>
-      <aspects>Effort accuracy, risk assessment, dependency completeness</aspects>
       <output>Estimation evaluation report</output>
     </step>
     <step order="3">
       <action>Launch validator agent: cross-validate requirements consistency</action>
       <tool>Sub-agent delegation (validator)</tool>
-      <aspects>Internal consistency, completeness, contradiction detection</aspects>
       <output>Validation report</output>
     </step>
     <step order="4">
@@ -197,8 +163,10 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <tool>Context7 MCP, WebSearch</tool>
       <output>Fact-check report</output>
     </step>
-    <execution_mode>All agents in parallel</execution_mode>
-    <reflection_checkpoint id="feedback_quality" after="collect_feedback">
+  </phase>
+
+  <execution_mode>All agents in parallel</execution_mode>
+  <reflection_checkpoint id="feedback_quality" after="collect_feedback">
       <questions>
         <question weight="0.4">Did all feedback agents complete successfully?</question>
         <question weight="0.3">Is the feedback specific and actionable?</question>
@@ -212,10 +180,8 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
         <trigger>After feedback collection completes</trigger>
       </serena_validation>
     </reflection_checkpoint>
-  </phase>
 
   <phase name="regenerate">
-    <objective>Incorporate feedback and generate complete updated specification</objective>
     <step order="1">
       <action>Synthesize feedback from all agents</action>
       <tool>Feedback synthesis</tool>
@@ -241,6 +207,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <tool>Decision criteria evaluation</tool>
       <output>Final confidence score</output>
     </step>
+
     <reflection_checkpoint id="regeneration_complete" after="regenerate">
       <questions>
         <question weight="0.4">Have all critical feedback items been addressed?</question>
@@ -257,7 +224,13 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </reflection_checkpoint>
   </phase>
 
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
@@ -271,7 +244,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
   <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
-  <agent name="plan" subagent_type="plan" readonly="true">Execution plan review and evaluation</agent>
+  <agent name="plan" subagent_type="general-purpose" readonly="true">Execution plan review and evaluation</agent>
 </agents>
 <execution_graph>
   <parallel_group id="investigation" depends_on="none">

@@ -26,20 +26,48 @@ description: Security vulnerability detection and remediation
 <workflow>
   <phase name="analyze">
     <objective>Identify high-risk areas and vulnerability scope</objective>
-    <step>1. What are the high-risk files/areas?</step>
-    <step>2. What authentication/authorization patterns exist?</step>
-    <step>3. Are there hardcoded secrets?</step>
-    <step>4. What dependencies have known vulnerabilities?</step>
-    <step>5. What is the appropriate severity level?</step>
+    <step order="1">
+      <action>What are the high-risk files/areas?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What authentication/authorization patterns exist?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Are there hardcoded secrets?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>What dependencies have known vulnerabilities?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What is the appropriate severity level?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="gather">
     <objective>Collect security-relevant data and dependencies</objective>
-    <step>1. Identify high-risk files, check dependencies</step>
+    <step order="1">
+      <action>Identify high-risk files, check dependencies</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="scan">
     <objective>Detect vulnerabilities through pattern matching and audits</objective>
-    <step>1. Pattern match secrets/injections, run audits</step>
+    <step order="1">
+      <action>Pattern match secrets/injections, run audits</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="scan_complete" after="scan">
     <questions>
@@ -57,12 +85,26 @@ description: Security vulnerability detection and remediation
   </reflection_checkpoint>
   <phase name="remediate">
     <objective>Provide fix recommendations and auto-fix when safe</objective>
-    <step>1. Auto-fix or report, verify changes</step>
+    <step order="1">
+      <action>Auto-fix or report, verify changes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Generate comprehensive security report with actionable recommendations</objective>
-    <step>1. Summary by severity with fixes</step>
+    <step order="1">
+      <action>Summary by severity with fixes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

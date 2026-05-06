@@ -897,12 +897,24 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
 
   <usage_patterns>
     <pattern name="language_reference">
-      <step>resolve-library-id libraryName="cppreference"</step>
-      <step>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="stdatomic.h"</step>
+      <step order="1">
+  <action>resolve-library-id libraryName="cppreference"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="stdatomic.h"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
 
     <pattern name="standard_library">
-      <step>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="malloc"</step>
+      <step order="1">
+  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="malloc"</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
     </pattern>
   </usage_patterns>
 </context7_integration>
@@ -928,21 +940,57 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
 <workflow>
   <phase name="analyze">
     <objective>Understand C code requirements</objective>
-    <step>1. Check for existing code patterns and conventions</step>
-    <step>2. Identify memory ownership requirements</step>
-    <step>3. Review header dependencies</step>
+    <step order="1">
+  <action>1. Check for existing code patterns and conventions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Identify memory ownership requirements</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Review header dependencies</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write safe, portable C code</objective>
-    <step>1. Use C23 as the default standard (C11 minimum for legacy compatibility)</step>
-    <step>2. Follow memory management patterns</step>
-    <step>3. Handle all error conditions</step>
+    <step order="1">
+  <action>1. Use C23 as the default standard (C11 minimum for legacy compatibility)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Follow memory management patterns</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Handle all error conditions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify C code correctness</objective>
-    <step>1. Compile with warnings enabled</step>
-    <step>2. Run with sanitizers</step>
-    <step>3. Test with Valgrind</step>
+    <step order="1">
+  <action>1. Compile with warnings enabled</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run with sanitizers</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Test with Valgrind</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 
@@ -964,6 +1012,29 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
     <action>Block operation, require immediate fix and review</action>
   </level>
 </error_escalation>
+
+<tools>
+  <tool name="Read">Read relevant source files and docs</tool>
+  <tool name="Grep">Search for patterns and references</tool>
+</tools>
+
+<patterns>
+  <pattern name="usage">
+    <description>Apply this skill when task keywords and domain match</description>
+    <example>Use the canonical workflow and verify with project conventions</example>
+  </pattern>
+</patterns>
+
+<decision_tree name="skill_activation">
+  <question>Does the task clearly match this skill domain?</question>
+  <branch condition="Yes">Use this skill workflow and constraints</branch>
+  <branch condition="No">Use a more appropriate domain skill</branch>
+</decision_tree>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+</related_agents>
 
 <constraints>
   <must>Check all allocation return values</must>

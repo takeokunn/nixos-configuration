@@ -26,18 +26,50 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
 <workflow>
   <phase name="analyze">
     <objective>Assess current infrastructure state, cost implications, security concerns, and rollback strategy</objective>
-    <step>1. What is the current infrastructure state?</step>
-    <step>2. What are the cost implications?</step>
-    <step>3. Are there security concerns?</step>
-    <step>4. What is the rollback strategy?</step>
-    <step>5. How will this affect availability?</step>
+    <step order="1">
+      <action>What is the current infrastructure state?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What are the cost implications?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Are there security concerns?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>What is the rollback strategy?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>How will this affect availability?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="design">
     <objective>Propose infrastructure optimizations with monitoring and alerting strategy</objective>
-    <step>1. Propose infrastructure optimizations</step>
-    <step>2. Design monitoring and alerting</step>
-    <step>3. Configure appropriate alerts</step>
+    <step order="1">
+      <action>Propose infrastructure optimizations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Design monitoring and alerting</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Configure appropriate alerts</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="design_quality">
     <question>Does the design address all identified issues?</question>
@@ -47,16 +79,46 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
   </reflection_checkpoint>
   <phase name="implement">
     <objective>Execute infrastructure changes with proper testing and observability</objective>
-    <step>1. Update configuration files</step>
-    <step>2. Create CI/CD workflows</step>
-    <step>3. Add logging and observability</step>
+    <step order="1">
+      <action>Update configuration files</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Create CI/CD workflows</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Add logging and observability</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Deliver comprehensive analysis with actionable metrics and cost breakdown</objective>
-    <step>1. Generate summary with metrics</step>
-    <step>2. Provide cost analysis</step>
-    <step>3. Document improvements</step>
+    <step order="1">
+      <action>Generate summary with metrics</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Provide cost analysis</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Document improvements</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

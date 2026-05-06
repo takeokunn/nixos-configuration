@@ -108,7 +108,7 @@ version: 2.0.0
     </decision_tree>
     <example>
       Performance:
-      - API response time < 200ms for 95th percentile
+      - API response time &lt; 200ms for 95th percentile
       - Support 1000 concurrent users
 
       Security:

@@ -173,7 +173,7 @@ version: 2.0.0
 
       // Extract custom error type
       var valErr \*ValidationError
-      if errors.As(err, &valErr) {
+      if errors.As(err, &amp;valErr) {
       log.Printf("field: %s", valErr.Field)
       }
     </example>
@@ -521,14 +521,14 @@ version: 2.0.0
     <pattern name="receive_only">
       <description>Receive-only channel parameter.</description>
       <example>
-        func consumer(ch <-chan int)
+        func consumer(ch &lt;-chan int)
       </example>
     </pattern>
 
     <pattern name="send_only">
       <description>Send-only channel parameter.</description>
       <example>
-        func producer(ch chan<- int)
+        func producer(ch chan&lt;- int)
       </example>
     </pattern>
 
@@ -536,11 +536,11 @@ version: 2.0.0
       <description>Select statement for multiplexing channel operations.</description>
       <example>
         select {
-        case msg := <-ch1:
+        case msg := &lt;-ch1:
         handle(msg)
-        case ch2 <- value:
+        case ch2 &lt;- value:
         // sent
-        case <-ctx.Done():
+        case &lt;-ctx.Done():
         return ctx.Err()
         default:
         // non-blocking
@@ -564,9 +564,9 @@ version: 2.0.0
       defer cancel()
 
       select {
-      case result := <-doWork(ctx):
+      case result := &lt;-doWork(ctx):
       return result, nil
-      case <-ctx.Done():
+      case &lt;-ctx.Done():
       return nil, ctx.Err()
       }
     </example>
@@ -791,21 +791,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Go code requirements</objective>
-    <step>1. Check go.mod for module and dependencies</step>
-    <step>2. Review existing code patterns in project</step>
-    <step>3. Identify interface and struct designs</step>
+    <step order="1">
+  <action>1. Check go.mod for module and dependencies</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Review existing code patterns in project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Identify interface and struct designs</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write idiomatic Go code</objective>
-    <step>1. Follow Go naming conventions</step>
-    <step>2. Use interfaces for abstraction</step>
-    <step>3. Handle errors explicitly</step>
+    <step order="1">
+  <action>1. Follow Go naming conventions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use interfaces for abstraction</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Handle errors explicitly</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Go code correctness</objective>
-    <step>1. Run go build for compilation</step>
-    <step>2. Run go vet for static analysis</step>
-    <step>3. Run go test for testing</step>
+    <step order="1">
+  <action>1. Run go build for compilation</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run go vet for static analysis</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Run go test for testing</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

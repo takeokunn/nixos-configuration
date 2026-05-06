@@ -344,7 +344,7 @@ version: 2.0.0
         inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
         # Specific branch
-        stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+        stable.url = "github:NixOS/nixpkgs/nixos-25.11";
         # Specific revision
         pinned.url = "github:owner/repo/abc123def";
         };
@@ -860,21 +860,57 @@ version: 2.0.0
 <workflow>
   <phase name="analyze">
     <objective>Understand Nix expression requirements</objective>
-    <step>1. Identify target: flake, module, derivation, or expression</step>
-    <step>2. Check existing patterns in project</step>
-    <step>3. Consult Serena memories for conventions</step>
+    <step order="1">
+  <action>1. Identify target: flake, module, derivation, or expression</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Check existing patterns in project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Consult Serena memories for conventions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write idiomatic Nix code</objective>
-    <step>1. Follow patterns from decision trees</step>
-    <step>2. Use appropriate lib functions</step>
-    <step>3. Apply best practices for target type</step>
+    <step order="1">
+  <action>1. Follow patterns from decision trees</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Use appropriate lib functions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Apply best practices for target type</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify Nix expression correctness</objective>
-    <step>1. Check syntax with nix flake check</step>
-    <step>2. Verify evaluation with nix eval</step>
-    <step>3. Test build with nix build</step>
+    <step order="1">
+  <action>1. Check syntax with nix flake check</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Verify evaluation with nix eval</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Test build with nix build</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

@@ -26,33 +26,89 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
-    <step order="1">Activate Serena project with activate_project</step>
-    <step order="2">Check list_memories for relevant patterns</step>
-    <step order="3">Load applicable memories with read_memory</step>
+    <step order="1">
+      <action>Activate Serena project with activate_project</action>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
+    </step>
+    <step order="2">
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Serena list_memories</tool>
+      <output>Relevant memory index</output>
+    </step>
+    <step order="3">
+      <action>Load applicable memories with read_memory</action>
+      <tool>Serena read_memory</tool>
+      <output>Applicable patterns loaded</output>
+    </step>
   </phase>
   <phase name="analyze">
     <objective>Understand the task scope and identify required resources</objective>
-    <step order="1">What tasks need to be done?</step>
-    <step order="2">Which sub-agents are best suited?</step>
-    <step order="3">Which tasks can run in parallel?</step>
-    <step order="4">What dependencies exist between tasks?</step>
-    <step order="5">What verification is needed?</step>
+    <step order="1">
+      <action>Identify concrete tasks that need to be completed</action>
+      <tool>Task decomposition analysis</tool>
+      <output>Task inventory</output>
+    </step>
+    <step order="2">
+      <action>Select best-fit sub-agents for each task</action>
+      <tool>Agent capability mapping</tool>
+      <output>Delegation map</output>
+    </step>
+    <step order="3">
+      <action>Identify which tasks can run in parallel</action>
+      <tool>Dependency analysis</tool>
+      <output>Parallelization plan</output>
+    </step>
+    <step order="4">
+      <action>Determine task dependencies and execution order</action>
+      <tool>Dependency graphing</tool>
+      <output>Ordered dependency chain</output>
+    </step>
+    <step order="5">
+      <action>Define verification requirements for completion</action>
+      <tool>Quality gate planning</tool>
+      <output>Verification checklist</output>
+    </step>
   </phase>
   <phase name="decompose">
     <objective>Break down complex tasks into manageable units</objective>
-    <step order="1">Split into manageable units</step>
-    <step order="2">Identify task boundaries</step>
+    <step order="1">
+      <action>Split work into manageable units</action>
+      <tool>Task decomposition</tool>
+      <output>Atomic task units</output>
+    </step>
+    <step order="2">
+      <action>Define boundaries for each task unit</action>
+      <tool>Scope boundary analysis</tool>
+      <output>Task boundaries</output>
+    </step>
   </phase>
   <phase name="structure">
     <objective>Organize tasks for optimal execution</objective>
-    <step order="1">Identify parallel vs sequential tasks</step>
-    <step order="2">Define task dependencies</step>
+    <step order="1">
+      <action>Classify tasks as parallel or sequential</action>
+      <tool>Execution strategy analysis</tool>
+      <output>Execution classification</output>
+    </step>
+    <step order="2">
+      <action>Define dependencies between structured tasks</action>
+      <tool>Dependency mapping</tool>
+      <output>Dependency matrix</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="assign">
     <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
-    <step order="1">Delegate tasks with detailed instructions</step>
-    <step order="2">Provide context and constraints</step>
+    <step order="1">
+      <action>Delegate tasks with detailed instructions</action>
+      <tool>Task orchestration</tool>
+      <output>Delegation requests issued</output>
+    </step>
+    <step order="2">
+      <action>Provide complete context and constraints to assignees</action>
+      <tool>Context packaging</tool>
+      <output>Execution-ready delegation context</output>
+    </step>
   </phase>
   <reflection_checkpoint id="assignment_complete" after="assign">
     <questions>
@@ -68,11 +124,25 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <trigger>Before any code modification delegation</trigger>
     </serena_validation>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="consolidate">
     <objective>Integrate sub-agent outputs into cohesive result</objective>
-    <step order="1">Verify sub-agent outputs</step>
-    <step order="2">Combine results</step>
+    <step order="1">
+      <action>Verify sub-agent outputs for completeness and correctness</action>
+      <tool>Output validation</tool>
+      <output>Verified sub-agent results</output>
+    </step>
+    <step order="2">
+      <action>Combine verified results into a cohesive final output</action>
+      <tool>Synthesis</tool>
+      <output>Consolidated result</output>
+    </step>
   </phase>
 </workflow>
 

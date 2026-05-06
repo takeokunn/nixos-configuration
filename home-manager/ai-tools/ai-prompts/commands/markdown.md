@@ -17,48 +17,52 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
   <rule>Use specified file path if provided</rule>
   <rule>Never include revision history or discussion process</rule>
 </rules>
+<rules priority="standard">
+  <rule>Keep output reproducible and file-scoped</rule>
+  <rule>Preserve existing section semantics while formatting</rule>
+</rules>
 <parallelization inherits="parallelization-patterns#parallelization_execution" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
-    <step>
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check list_memories for documentation patterns</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="analyze">
-    <objective>Understand previous command output and context</objective>
-    <step>
+    <step order="1">
       <action>What was the previous command?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>What is the appropriate output file?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Was a specific file path provided?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>What content should be included/excluded?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="analyze_quality">
     <question>Have I correctly identified the previous command and its output?</question>
@@ -70,44 +74,42 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
-    <objective>Retrieve all relevant information for documentation</objective>
-    <step>
+    <step order="1">
       <action>Retrieve previous command results</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Collect relevant context</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="determine">
-    <objective>Decide on output file location and structure</objective>
-    <step>
+    <step order="1">
       <action>Determine output filename based on command type</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check if user specified file path</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="execute">
-    <objective>Write the documentation to file</objective>
-    <step>
-      <action>Write file using Write/Edit tool</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Detect and classify failures during command execution</action>
+      <tool>Error analysis and severity assessment</tool>
+      <output>Failure classification and impact summary</output>
     </step>
-    <step>
-      <action>Verify output format</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+    <step order="2">
+      <action>Apply recovery path or escalate with concrete blocker details</action>
+      <tool>Retry policy and fallback strategy</tool>
+      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
 </workflow>

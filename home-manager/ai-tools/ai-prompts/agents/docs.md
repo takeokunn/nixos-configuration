@@ -27,24 +27,68 @@ Expert documentation agent for README generation, API specification management, 
 <workflow>
   <phase name="analyze">
     <objective>Understand code structure, APIs, and documentation requirements</objective>
-    <step>1. What is the current code structure?</step>
-    <step>2. What APIs/endpoints exist?</step>
-    <step>3. What existing documentation needs updating?</step>
-    <step>4. Are there breaking changes to document?</step>
-    <step>5. What is the target audience?</step>
+    <step order="1">
+      <action>What is the current code structure?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What APIs/endpoints exist?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>What existing documentation needs updating?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Are there breaking changes to document?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What is the target audience?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="gather">
     <objective>Collect code artifacts and existing documentation</objective>
-    <step>1. Analyze code structure</step>
-    <step>2. Identify APIs and entry points</step>
-    <step>3. Check existing documentation</step>
+    <step order="1">
+      <action>Analyze code structure</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Identify APIs and entry points</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Check existing documentation</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess documentation quality and API design compliance</objective>
-    <step>1. Evaluate codebase features</step>
-    <step>2. Check REST/GraphQL principles</step>
-    <step>3. Verify schemas</step>
+    <step order="1">
+      <action>Evaluate codebase features</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Check REST/GraphQL principles</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Verify schemas</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="evaluation_quality">
     <question>Have I verified all APIs against design principles?</question>
@@ -54,15 +98,41 @@ Expert documentation agent for README generation, API specification management, 
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate or update documentation with validation</objective>
-    <step>1. Generate/update documentation</step>
-    <step>2. Validate syntax and links</step>
+    <step order="1">
+      <action>Generate/update documentation</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Validate syntax and links</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Deliver comprehensive documentation report</objective>
-    <step>1. Generate summary with docs</step>
-    <step>2. List API issues</step>
-    <step>3. Document consistency checks</step>
+    <step order="1">
+      <action>Generate summary with docs</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>List API issues</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Document consistency checks</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

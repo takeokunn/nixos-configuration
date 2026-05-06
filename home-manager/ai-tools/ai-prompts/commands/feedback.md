@@ -27,92 +27,92 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
-    <step>
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="analyze">
-    <objective>Determine review scope and appropriate mode selection</objective>
-    <step>
+    <step order="1">
       <action>What was the previous command? (/define, /execute, /bug, /ask, other)</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>What files/work need to be reviewed?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>Which agents should run in parallel?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>What metrics are relevant for this mode?</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <phase name="select">
-    <objective>Select review mode and configure appropriate agents</objective>
-    <step>
+    <step order="1">
       <action>Determine mode based on previous command</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>After /define: Execution plan feedback</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="3">
       <action>After /execute: Work content feedback</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="4">
       <action>After /bug: Investigation quality feedback</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="5">
       <action>After /ask: Answer accuracy feedback</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="6">
       <action>Other: Recent work feedback</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="execute">
-    <objective>Execute parallel review analysis across selected agents</objective>
-    <step>
+    <step order="1">
       <action>Launch all agents in parallel</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
-    <step>
+    <step order="2">
       <action>Collect agent results</action>
       <tool>Task tool and Serena read/search tools as needed</tool>
       <output>Step result recorded for the phase</output>
     </step>
+
   </phase>
   <reflection_checkpoint id="review_quality">
     <question>Did all agents complete successfully?</question>
@@ -124,18 +124,16 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
       <trigger>After review agents complete</trigger>
     </serena_validation>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
-  <phase name="synthesize">
-    <objective>Compile comprehensive feedback report with actionable recommendations</objective>
-    <step>
-      <action>Compile feedback with metrics</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Detect and classify failures during command execution</action>
+      <tool>Error analysis and severity assessment</tool>
+      <output>Failure classification and impact summary</output>
     </step>
-    <step>
-      <action>Generate actionable recommendations</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+    <step order="2">
+      <action>Apply recovery path or escalate with concrete blocker details</action>
+      <tool>Retry policy and fallback strategy</tool>
+      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
 </workflow>
@@ -150,7 +148,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <target>Execution plan from conversation history</target>
     <aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
     <agents>
-      <agent name="plan" subagent_type="plan" readonly="true">Execution plan review</agent>
+      <agent name="plan" subagent_type="general-purpose" readonly="true">Execution plan review</agent>
       <agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
     </agents>
     <fact_check>Use fact-check skill patterns for external source verification via Context7</fact_check>
@@ -206,7 +204,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   </mode>
 </modes>
 <agents>
-  <agent name="plan" subagent_type="plan" readonly="true">Execution plan review</agent>
+  <agent name="plan" subagent_type="general-purpose" readonly="true">Execution plan review</agent>
   <agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
   <agent name="quality" subagent_type="quality-assurance" readonly="true">Naming, DRY, readability</agent>
   <agent name="security" subagent_type="security" readonly="true">OWASP Top 10, input validation, auth</agent>

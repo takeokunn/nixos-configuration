@@ -154,7 +154,13 @@ Analyze the current session to extract a repeatable process, interview the user 
       <output>Completion message with usage instructions</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle execution errors and apply fallback strategy</action>
+      <tool>Error analysis and retry policy</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">

@@ -70,7 +70,13 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
       <trigger>After execution phase completes</trigger>
     </serena_validation>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Present findings and results in actionable format</objective>
     <step order="1">

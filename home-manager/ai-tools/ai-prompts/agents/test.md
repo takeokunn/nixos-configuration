@@ -27,11 +27,31 @@ description: Test strategy and quality management
 <workflow>
   <phase name="analyze">
     <objective>Understand the current test landscape and identify gaps</objective>
-    <step>1. What test files exist?</step>
-    <step>2. What is the test distribution (unit/integration/E2E)?</step>
-    <step>3. What is the current coverage?</step>
-    <step>4. Are there known flaky tests?</step>
-    <step>5. What test runner is configured?</step>
+    <step order="1">
+      <action>What test files exist?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What is the test distribution (unit/integration/E2E)?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>What is the current coverage?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Are there known flaky tests?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>What test runner is configured?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_complete" after="analyze">
     <questions>
@@ -49,31 +69,93 @@ description: Test strategy and quality management
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect test files, configurations, and patterns</objective>
-    <step>1. Identify test files using Glob and Serena</step>
-    <step>2. Check test runner configurations</step>
-    <step>3. Review existing test patterns</step>
+    <step order="1">
+      <action>Identify test files using Glob and Serena</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Check test runner configurations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Review existing test patterns</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess test quality and coverage completeness</objective>
-    <step>1. Evaluate coverage metrics and identify gaps</step>
-    <step>2. Analyze test distribution across layers</step>
-    <step>3. Review test quality against best practices</step>
+    <step order="1">
+      <action>Evaluate coverage metrics and identify gaps</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Analyze test distribution across layers</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Review test quality against best practices</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="execute">
     <objective>Run tests and collect results</objective>
-    <step>1. Run test suites with appropriate runners</step>
-    <step>2. Execute browser tests using Playwright MCP</step>
-    <step>3. Generate coverage reports</step>
-    <step>4. Capture screenshots and performance metrics</step>
+    <step order="1">
+      <action>Run test suites with appropriate runners</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Execute browser tests using Playwright MCP</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Generate coverage reports</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Capture screenshots and performance metrics</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Provide comprehensive test results and recommendations</objective>
-    <step>1. Summarize test execution results (pass/fail counts)</step>
-    <step>2. Report coverage metrics and gaps</step>
-    <step>3. Include screenshots and performance data</step>
-    <step>4. Recommend next actions for improvement</step>
+    <step order="1">
+      <action>Summarize test execution results (pass/fail counts)</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Report coverage metrics and gaps</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Include screenshots and performance data</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>Recommend next actions for improvement</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 

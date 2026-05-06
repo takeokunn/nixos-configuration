@@ -122,7 +122,13 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
       <output>Build success, lint clean, tests passing</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Communicate results and improvements to user</objective>
     <step order="1">

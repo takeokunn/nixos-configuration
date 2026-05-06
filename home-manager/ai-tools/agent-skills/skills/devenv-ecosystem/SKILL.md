@@ -1372,26 +1372,82 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
 <workflow>
   <phase name="analyze">
     <objective>Understand devenv configuration requirements</objective>
-    <step>1. Identify required languages and their versions</step>
-    <step>2. Determine needed services (databases, caches, etc.)</step>
-    <step>3. Plan background processes and scripts</step>
-    <step>4. Consider team profiles if multi-developer project</step>
+    <step order="1">
+  <action>1. Identify required languages and their versions</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Determine needed services (databases, caches, etc.)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Plan background processes and scripts</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Consider team profiles if multi-developer project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="implement">
     <objective>Write devenv.nix configuration</objective>
-    <step>1. Start with minimal configuration (packages, primary language)</step>
-    <step>2. Add services with appropriate settings</step>
-    <step>3. Configure git-hooks for code quality</step>
-    <step>4. Add scripts for common operations</step>
-    <step>5. Set up processes for development servers (native process manager is default in 2.0)</step>
-    <step>6. Add profiles if needed</step>
+    <step order="1">
+  <action>1. Start with minimal configuration (packages, primary language)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Add services with appropriate settings</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Configure git-hooks for code quality</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Add scripts for common operations</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>5. Set up processes for development servers (native process manager is default in 2.0)</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>6. Add profiles if needed</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
   <phase name="validate">
     <objective>Verify devenv configuration works</objective>
-    <step>1. Run devenv shell to verify environment</step>
-    <step>2. Run devenv up to verify processes start</step>
-    <step>3. Test git hooks with sample commits</step>
-    <step>4. Verify scripts work as expected</step>
+    <step order="1">
+  <action>1. Run devenv shell to verify environment</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>2. Run devenv up to verify processes start</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>3. Test git hooks with sample commits</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+    <step order="1">
+  <action>4. Verify scripts work as expected</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
   </phase>
 </workflow>
 

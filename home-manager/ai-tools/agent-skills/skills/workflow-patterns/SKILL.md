@@ -86,9 +86,21 @@ version: 2.0.0
     <example>
 <phase name="prepare">
   <objective>Initialize Serena and check existing patterns</objective>
-  <step>1. Activate Serena project with activate_project</step>
-  <step>2. Check list_memories for relevant patterns</step>
-  <step>3. Load applicable memories with read_memory</step>
+  <step order="1">
+  <action>Activate Serena project with activate_project</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+  <step order="2">
+  <action>Check list_memories for relevant patterns</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
+  <step order="3">
+  <action>Load applicable memories with read_memory</action>
+  <tool>Workflow guidance</tool>
+  <output>Step completed</output>
+</step>
 </phase>
     </example>
   </pattern>
@@ -168,13 +180,13 @@ version: 2.0.0
   </pattern>
 
   <pattern name="failure_handling">
-    <description>Standard failure handling phase for workflows</description>
+    <description>Failure-handling phase template for exceptional paths aligned with shared workflow usage</description>
     <example>
 <phase name="failure_handling">
   <objective>Handle errors and edge cases gracefully</objective>
-  <step order="1">If tool call fails: Log error, attempt alternative approach</step>
-  <step order="2">If data unavailable: Document gap, proceed with partial analysis</step>
-  <step order="3">If contradictory evidence: Flag uncertainty, request user clarification</step>
+  <step order="1">If tool call fails: log error and attempt alternative approach</step>
+  <step order="2">If data unavailable: document gap and continue with bounded analysis</step>
+  <step order="3">If contradictory evidence: flag uncertainty and request clarification</step>
 </phase>
     </example>
   </pattern>

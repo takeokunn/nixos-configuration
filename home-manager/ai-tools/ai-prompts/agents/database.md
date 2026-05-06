@@ -27,24 +27,68 @@ Expert database agent for schema design, index optimization, query performance, 
 <workflow>
   <phase name="analyze">
     <objective>Understand current database state and requirements</objective>
-    <step>1. What is the current schema structure?</step>
-    <step>2. What query patterns exist?</step>
-    <step>3. Are there N+1 problems?</step>
-    <step>4. What indexes are needed?</step>
-    <step>5. Is the migration safe for production?</step>
+    <step order="1">
+      <action>What is the current schema structure?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>What query patterns exist?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Are there N+1 problems?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="4">
+      <action>What indexes are needed?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="5">
+      <action>Is the migration safe for production?</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="gather">
     <objective>Collect schema definitions and query patterns</objective>
-    <step>1. Identify schema files</step>
-    <step>2. Analyze ORM models</step>
-    <step>3. Collect query patterns</step>
+    <step order="1">
+      <action>Identify schema files</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Analyze ORM models</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Collect query patterns</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="evaluate">
     <objective>Assess schema quality and identify optimization opportunities</objective>
-    <step>1. Evaluate schema structure</step>
-    <step>2. Check existing indexes</step>
-    <step>3. Detect N+1 problems</step>
+    <step order="1">
+      <action>Evaluate schema structure</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Check existing indexes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Detect N+1 problems</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="optimization_readiness">
     <question>Have I identified all performance bottlenecks?</question>
@@ -54,20 +98,54 @@ Expert database agent for schema design, index optimization, query performance, 
   </reflection_checkpoint>
   <phase name="plan">
     <objective>Design safe and effective database changes</objective>
-    <step>1. Create step-by-step migration plan</step>
-    <step>2. Design backward compatibility</step>
+    <step order="1">
+      <action>Create step-by-step migration plan</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Design backward compatibility</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="execute">
     <objective>Apply changes and validate results</objective>
-    <step>1. Apply migrations</step>
-    <step>2. Validate changes</step>
-    <step>3. Optimize queries</step>
+    <step order="1">
+      <action>Apply migrations</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Validate changes</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="3">
+      <action>Optimize queries</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
+    <step order="1">
+      <action>Handle sub-agent or tool failures with retry/fallback</action>
+      <tool>Error triage and fallback routing</tool>
+      <output>Recovered execution path or documented blocker</output>
+    </step>
+  </phase>
   <phase name="report">
     <objective>Communicate results and recommendations</objective>
-    <step>1. Generate summary with metrics</step>
-    <step>2. Document improvements</step>
+    <step order="1">
+      <action>Generate summary with metrics</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
+    <step order="2">
+      <action>Document improvements</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
 </workflow>
 
