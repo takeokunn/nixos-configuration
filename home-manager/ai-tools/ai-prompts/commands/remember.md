@@ -6,12 +6,10 @@ description: Memory review and organization command
 <purpose>
 Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md, Serena memories, auto-memory) and produce a clear report of proposed changes grouped by action type. Do NOT apply changes — present proposals for user approval.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Present ALL proposals before making any changes</rule>
   <rule>Do NOT modify files without explicit user approval</rule>
@@ -19,7 +17,6 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   <rule>Ask about ambiguous entries — do not guess their destination</rule>
   <rule>Keep all operations read-only until user approves specific changes</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Delegate file reading and memory gathering to sub-agents</rule>
   <rule>Classify each memory entry by its best destination</rule>
@@ -27,16 +24,16 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   <rule>CLAUDE.md is for instructions to Claude, not user preferences for external tools</rule>
   <rule>Workflow practices are ambiguous — always ask the user about them</rule>
 </rules>
-
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and establish baseline</objective>
-    <step number="1">
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Serena activate_project</tool>
       <output>Project activated</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Check onboarding status</action>
       <tool>Serena check_onboarding_performed</tool>
       <output>Onboarding status confirmed</output>
@@ -44,32 +41,32 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   </phase>
   <phase name="gather">
     <objective>Collect all memory entries from every layer</objective>
-    <step number="1">
+    <step order="1">
       <action>Read CLAUDE.md from project root (if it exists)</action>
       <tool>Read tool</tool>
       <output>Project-wide conventions and instructions</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Read CLAUDE.local.md from project root (if it exists)</action>
       <tool>Read tool</tool>
       <output>Personal user instructions</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>List all Serena memories</action>
       <tool>Serena list_memories</tool>
       <output>Complete memory list</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Read each Serena memory</action>
       <tool>Serena read_memory</tool>
       <output>Full memory contents</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Review auto-memory content already present in system prompt</action>
       <tool>Context analysis</tool>
       <output>Auto-memory inventory</output>
     </step>
-    <step number="6">
+    <step order="6">
       <action>Note which team memory sections exist</action>
       <tool>File system check</tool>
       <output>Team memory inventory</output>
@@ -87,17 +84,17 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   </reflection_checkpoint>
   <phase name="classify">
     <objective>Determine the best destination for each memory entry</objective>
-    <step number="1">
+    <step order="1">
       <action>For each memory entry, classify its best destination</action>
       <tool>Analysis</tool>
       <output>Classification table</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Apply destination criteria: CLAUDE.md for project conventions for all contributors; CLAUDE.local.md for personal instructions for this user only; Serena memory for patterns, decisions, working context; Stay as-is for working notes and temporary context</action>
       <tool>Classification logic</tool>
       <output>Destination assignments</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Flag ambiguous entries (especially workflow practices) for user input</action>
       <tool>Ambiguity detection</tool>
       <output>Ambiguous entries list</output>
@@ -105,17 +102,17 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   </phase>
   <phase name="identify_cleanup">
     <objective>Find duplicates, outdated entries, and conflicts across all layers</objective>
-    <step number="1">
+    <step order="1">
       <action>Identify duplicates: entries already captured elsewhere</action>
       <tool>Cross-layer comparison</tool>
       <output>Duplicate entries with removal proposals</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Identify outdated entries: entries contradicted by newer entries</action>
       <tool>Chronological analysis</tool>
       <output>Outdated entries with update proposals</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Identify conflicts: contradictions between layers</action>
       <tool>Conflict detection</tool>
       <output>Conflicting entries with resolution proposals</output>
@@ -137,17 +134,17 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   </reflection_checkpoint>
   <phase name="present">
     <objective>Compile and present the organized report for user approval</objective>
-    <step number="1">
+    <step order="1">
       <action>Group proposals by action type: Promotions, Cleanup, Ambiguous, No action needed</action>
       <tool>Report generation</tool>
       <output>Structured report</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>For each proposal, include source, destination, rationale</action>
       <tool>Report formatting</tool>
       <output>Detailed proposals</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Present report and await user approval before any modifications</action>
       <tool>User interaction</tool>
       <output>User decisions on proposals</output>
@@ -156,12 +153,16 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <agents>
   <agent name="explore" subagent_type="explore" readonly="true">Finding CLAUDE.md, CLAUDE.local.md, and other memory files</agent>
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Memory classification, duplicate detection, conflict analysis</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation of classification decisions</agent>
 </agents>
-
 <execution_graph>
   <parallel_group id="gathering" depends_on="none">
     <agent>explore</agent>
@@ -170,15 +171,11 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
     <agent>general-purpose</agent>
   </parallel_group>
 </execution_graph>
-
 <delegation>
   <requirement>Explicit read-only constraint</requirement>
   <requirement>All memory layers to inspect</requirement>
   <requirement>Classification criteria for destinations</requirement>
 </delegation>
-
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="layer_coverage" weight="0.4">
@@ -201,44 +198,6 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
     </factor>
   </criterion>
 </decision_criteria>
-
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="REM-B001" priority="critical">
-      <trigger>Before any file modification</trigger>
-      <action>Present complete proposal report and receive explicit user approval</action>
-      <verification>User approval recorded before any write operation</verification>
-    </behavior>
-    <behavior id="REM-B002" priority="critical">
-      <trigger>During classification phase</trigger>
-      <action>Flag ambiguous entries (especially workflow practices) for user input</action>
-      <verification>Ambiguous entries listed in report with questions</verification>
-    </behavior>
-    <behavior id="REM-B003" priority="critical">
-      <trigger>During gather phase</trigger>
-      <action>Read all memory layers: CLAUDE.md, CLAUDE.local.md, Serena memories, auto-memory</action>
-      <verification>All accessible layers included in inventory</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="REM-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Modifying any file without explicit user approval</action>
-      <response>Block operation, present proposal first</response>
-    </behavior>
-    <behavior id="REM-P002" priority="critical">
-      <trigger>Always</trigger>
-      <action>Guessing the destination of ambiguous entries</action>
-      <response>Ask user for clarification</response>
-    </behavior>
-    <behavior id="REM-P003" priority="critical">
-      <trigger>Always</trigger>
-      <action>Creating new files unless the target file does not exist</action>
-      <response>Only propose creation when no target file exists</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
-
 <output>
   <format>
     <memory_report>
@@ -275,7 +234,42 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
     </memory_report>
   </format>
 </output>
-
+<enforcement>
+  <mandatory_behaviors>
+    <behavior id="REM-B001" priority="critical">
+      <trigger>Before any file modification</trigger>
+      <action>Present complete proposal report and receive explicit user approval</action>
+      <verification>User approval recorded before any write operation</verification>
+    </behavior>
+    <behavior id="REM-B002" priority="critical">
+      <trigger>During classification phase</trigger>
+      <action>Flag ambiguous entries (especially workflow practices) for user input</action>
+      <verification>Ambiguous entries listed in report with questions</verification>
+    </behavior>
+    <behavior id="REM-B003" priority="critical">
+      <trigger>During gather phase</trigger>
+      <action>Read all memory layers: CLAUDE.md, CLAUDE.local.md, Serena memories, auto-memory</action>
+      <verification>All accessible layers included in inventory</verification>
+    </behavior>
+  </mandatory_behaviors>
+  <prohibited_behaviors>
+    <behavior id="REM-P001" priority="critical">
+      <trigger>Always</trigger>
+      <action>Modifying any file without explicit user approval</action>
+      <response>Block operation, present proposal first</response>
+    </behavior>
+    <behavior id="REM-P002" priority="critical">
+      <trigger>Always</trigger>
+      <action>Guessing the destination of ambiguous entries</action>
+      <response>Ask user for clarification</response>
+    </behavior>
+    <behavior id="REM-P003" priority="critical">
+      <trigger>Always</trigger>
+      <action>Creating new files unless the target file does not exist</action>
+      <response>Only propose creation when no target file exists</response>
+    </behavior>
+  </prohibited_behaviors>
+</enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor duplicate between Serena memory and auto-memory</low>
@@ -284,19 +278,22 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
     <critical>Memory entry contains sensitive information or security-relevant instructions</critical>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="execute">Apply approved memory changes after review</command>
   <command name="define">When memory review reveals requirements gaps</command>
   <command name="ask">When memory entries raise technical questions</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="serena-usage">Core tool for memory read and write operations</skill>
   <skill name="core-patterns">Shared patterns for error escalation and enforcement</skill>
   <skill name="investigation-patterns">Evidence gathering for conflict resolution</skill>
 </related_skills>
-
 <constraints>
   <must>Present all proposals before making any changes</must>
   <must>Ask about ambiguous entries rather than guessing</must>

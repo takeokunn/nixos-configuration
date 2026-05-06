@@ -354,7 +354,7 @@ version: 2.0.0
     <eol_versions>13 and earlier (13 reached EOL November 2025)</eol_versions>
     <postgresql_18>
       <description>PostgreSQL 18 (latest major version, released 2025)</description>
-      <latest_minor>18.3 (as of Feb 2026)</latest_minor>
+      <latest_minor>Use the latest PostgreSQL 18.x minor available in the active package set</latest_minor>
       <feature name="async_io">
         <description>Asynchronous I/O (AIO) enables concurrent I/O tasks like readahead and sequential scan, significantly improving performance for I/O-bound workloads.</description>
       </feature>

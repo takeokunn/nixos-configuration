@@ -6,7 +6,6 @@ description: Question and inquiry command
 <purpose>
 Provide accurate, evidence-based answers to project questions through fact-based investigation. Operates in read-only mode; never modifies files.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">investigation-patterns</skill>
@@ -14,7 +13,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>NEVER modify, create, or delete files</rule>
   <rule>NEVER implement fixes; provide analysis and suggestions only</rule>
@@ -22,35 +20,76 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <rule>ALWAYS report confidence levels and unclear points honestly</rule>
   <rule>NEVER justify user assumptions; prioritize technical accuracy</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use investigation-patterns skill for systematic analysis</rule>
   <rule>Delegate to appropriate agents in parallel</rule>
   <rule>Provide file:line references for all findings</rule>
 </rules>
-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
-    <step>1. Activate Serena project with activate_project</step>
-    <step>2. Check list_memories for relevant patterns</step>
-    <step>3. Load applicable memories with read_memory</step>
+    <step>
+      <action>Activate Serena project with activate_project</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Load applicable memories with read_memory</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="analyze">
     <objective>Understand the question and determine investigation scope</objective>
-    <step>1. What is the user's core question?</step>
-    <step>2. Which code/documentation sources are relevant?</step>
-    <step>3. What scope of investigation is appropriate?</step>
-    <step>4. Classify question type (architecture, implementation, debugging, design)</step>
+    <step>
+      <action>What is the user's core question?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Which code/documentation sources are relevant?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>What scope of investigation is appropriate?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Classify question type (architecture, implementation, debugging, design)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="investigate">
     <objective>Gather evidence from codebase using parallel agent delegation</objective>
-    <step>1. Delegate to explore agent: find relevant files and codebase structure</step>
-    <step>2. Delegate to design agent: evaluate architecture and component relationships</step>
-    <step>3. Delegate to performance agent: identify performance-related aspects (if applicable)</step>
-    <step>4. Use fact-check skill patterns: verify external references via Context7 and WebSearch</step>
+    <step>
+      <action>Delegate to explore agent: find relevant files and codebase structure</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Delegate to design agent: evaluate architecture and component relationships</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Delegate to performance agent: identify performance-related aspects (if applicable)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Use fact-check skill patterns: verify external references via Context7 and WebSearch</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <question>Have I gathered sufficient evidence from investigation?</question>
@@ -64,20 +103,67 @@ Provide accurate, evidence-based answers to project questions through fact-based
   </reflection_checkpoint>
   <phase name="synthesize">
     <objective>Compile and verify findings with confidence metrics</objective>
-    <step>1. Delegate to quality-assurance agent: evaluate code quality findings</step>
-    <step>2. Delegate to code-quality agent: analyze complexity metrics</step>
-    <step>3. Compile agent findings with confidence metrics</step>
+    <step>
+      <action>Delegate to quality-assurance agent: evaluate code quality findings</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Delegate to code-quality agent: analyze complexity metrics</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Compile agent findings with confidence metrics</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="self_evaluate">
     <objective>Brief quality assessment of answer output</objective>
-    <step>1. Calculate confidence using decision_criteria: evidence_quality (50%), answer_completeness (30%), source_verification (20%)</step>
-    <step>2. Identify top 1-2 critical issues if confidence below 80 or gaps detected</step>
-    <step>3. Append self_feedback section to output</step>
+    <step>
+      <action>Calculate confidence using decision_criteria: evidence_quality (50%), answer_completeness (30%), source_verification (20%)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Identify top 1-2 critical issues if confidence below 80 or gaps detected</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Append self_feedback section to output</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
+<agents>
+  <agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
+  <agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
+  <agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
+  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
+  <agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
+</agents>
+<execution_graph>
+  <parallel_group id="investigation" depends_on="none">
+    <agent>explore</agent>
+    <agent>design</agent>
+    <agent>performance</agent>
+  </parallel_group>
+  <parallel_group id="synthesis" depends_on="investigation">
+    <agent>quality-assurance</agent>
+    <agent>code-quality</agent>
+  </parallel_group>
+</execution_graph>
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="evidence_quality" weight="0.5">
@@ -100,27 +186,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
     </factor>
   </criterion>
 </decision_criteria>
-
-<agents>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
-  <agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
-  <agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
-  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
-  <agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
-</agents>
-
-<execution_graph>
-  <parallel_group id="investigation" depends_on="none">
-    <agent>explore</agent>
-    <agent>design</agent>
-    <agent>performance</agent>
-  </parallel_group>
-  <parallel_group id="synthesis" depends_on="investigation">
-    <agent>quality-assurance</agent>
-    <agent>code-quality</agent>
-  </parallel_group>
-</execution_graph>
-
 <output>
   <format>
     <question>Restate the user's question for confirmation</question>
@@ -142,7 +207,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
     </self_feedback>
   </format>
 </output>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="ASK-B001" priority="critical">
@@ -164,7 +228,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <example severity="low">Minor inconsistency in documentation or comments</example>
@@ -173,20 +236,23 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <example severity="critical">Potential security vulnerability or data integrity issue</example>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="bug">When investigating error-related questions</command>
   <command name="define">When question requires requirements clarification</command>
   <command name="execute">When answer leads to implementation needs</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="investigation-patterns">Core skill for systematic evidence-based analysis</skill>
   <skill name="serena-usage">Symbol-level search for efficient code navigation</skill>
   <skill name="context7-usage">Verify library documentation for accuracy</skill>
   <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
-
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Provide file:line references for findings</must>

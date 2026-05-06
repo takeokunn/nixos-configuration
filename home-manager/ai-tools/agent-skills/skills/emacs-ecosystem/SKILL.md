@@ -585,7 +585,7 @@ version: 2.0.0
   <practice priority="high">Use tree-sitter *-ts-mode variants when available (Emacs 29+, improved in 30.2)</practice>
   <practice priority="high">Use the modern completion stack: vertico, orderless, marginalia, consult, corfu, cape</practice>
   <practice priority="medium">use-package is built-in since Emacs 29; no need to install it</practice>
-  <practice priority="medium">Current stable is Emacs 30.2 (August 2025); Emacs 31 is in development</practice>
+  <practice priority="medium">Use Emacs 30.x as the baseline and defer to the active package set for the exact stable point release</practice>
 </best_practices>
 
 <anti_patterns>
@@ -651,7 +651,7 @@ version: 2.0.0
 </anti_patterns>
 
 <rules>
-  <rule priority="critical">Target Emacs 30.2 (current stable, August 2025) as the baseline version</rule>
+  <rule priority="critical">Target Emacs 30.x as the baseline major series and align exact version with the active package set</rule>
   <rule priority="critical">Prefer built-in packages (eglot, use-package, treesit) over third-party alternatives</rule>
   <rule priority="high">Use tree-sitter *-ts-mode variants for all languages with grammar support</rule>
   <rule priority="high">Configure eglot as the default LSP client; only suggest lsp-mode when eglot is insufficient</rule>

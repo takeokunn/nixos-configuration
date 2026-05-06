@@ -27,7 +27,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
     <description>Node.js version-specific recommended configurations</description>
     <mapping>
       <version node="24" lts="true" target="ES2024">Active LTS - use ES2024 for stable features</version>
-      <version node="26" upcoming="true" target="ES2025">Upcoming (April 2026) - use ES2025 for latest features</version>
+      <version node="26" current="true" target="ES2025">Current release - use ES2025 for latest features</version>
     </mapping>
     <version node="24" lts="true">
       <config>
@@ -52,7 +52,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
       </config>
       <note>Node.js 24 Active LTS - use ES2024 target/lib for stable features</note>
     </version>
-    <version node="26" upcoming="true">
+    <version node="26" current="true">
       <config>
         {
         "compilerOptions": {
@@ -73,7 +73,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
         "exclude": ["node_modules", "dist"]
         }
       </config>
-      <note>Node.js 26 (upcoming April 2026) - use ES2025 target/lib for latest features</note>
+      <note>Node.js 26 current release - use ES2025 target/lib for latest features</note>
     </version>
   </recommended_base>
 
@@ -130,7 +130,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
         }
         }
       </example>
-      <warning>baseUrl: deprecated in TS 6.0 (latest stable), will be removed in TS 7.0; prefer paths without baseUrl</warning>
+      <warning>baseUrl: deprecated in TS 6.x and expected to be removed in TS 7.x; prefer paths without baseUrl</warning>
       <warning>moduleResolution: "node" (alias "node10"): removed in TS 6.0; use "nodenext" or "bundler"</warning>
       <decision_tree name="when_to_use">
         <question>Are you using a bundler or working with Node.js modules?</question>
@@ -765,7 +765,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <practice priority="high">Prefer 'unknown' over 'any' for unknown types</practice>
   <practice priority="high">Use 'satisfies' to check types without widening</practice>
   <practice priority="high">Create branded types for domain primitives</practice>
-  <practice priority="high">Use TS 6.0 as current stable; prepare for TS 7.0 Go-native migration</practice>
+  <practice priority="high">Use TS 6.x as the current baseline in this repository and prepare for TS 7.0 migration</practice>
   <practice priority="medium">Use Result types for error handling over exceptions</practice>
   <practice priority="medium">Keep type definitions close to usage</practice>
   <practice priority="medium">Export types separately with 'export type'</practice>

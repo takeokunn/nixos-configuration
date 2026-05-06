@@ -6,13 +6,11 @@ description: Full task execution with feedback loop
 <purpose>
 Execute tasks with automatic feedback collection and conditional fix phase. Runs execute -> feedback -> fix issues (only if issues found) in a single automated flow.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">execution-workflow</skill>
   <skill use="tools">serena-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Delegate detailed work to specialized sub-agents</rule>
   <rule>Complete full cycle: execute -> feedback -> fix (conditional)</rule>
@@ -20,29 +18,28 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <rule>Automatic flow between phases (no user confirmation)</rule>
   <rule>Skip fix phase if no issues found in feedback</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
   <rule>Check Serena memories before implementation</rule>
   <rule>Fix only issues identified in feedback, not full re-implementation</rule>
 </rules>
-
+<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 <workflow>
   <phase name="execute_initial">
     <objective>Execute core workflow phases to complete initial implementation</objective>
     <subphase name="prepare">
       <objective>Initialize Serena and check existing patterns</objective>
-      <step number="1">
+      <step order="1">
         <action>Activate Serena project with activate_project</action>
         <tool>Serena activate_project</tool>
         <output>Project activated</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Check list_memories for relevant patterns</action>
         <tool>Serena list_memories</tool>
         <output>Available memory list</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Load applicable memories with read_memory</action>
         <tool>Serena read_memory</tool>
         <output>Relevant patterns loaded</output>
@@ -50,27 +47,27 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </subphase>
     <subphase name="analyze">
       <objective>Understand the task scope and identify required resources</objective>
-      <step number="1">
+      <step order="1">
         <action>What tasks need to be done?</action>
         <tool>Task analysis</tool>
         <output>Task list</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Which sub-agents are best suited?</action>
         <tool>Agent selection</tool>
         <output>Agent assignments</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Which tasks can run in parallel?</action>
         <tool>Dependency analysis</tool>
         <output>Parallel task groups</output>
       </step>
-      <step number="4">
+      <step order="4">
         <action>What dependencies exist between tasks?</action>
         <tool>Dependency mapping</tool>
         <output>Dependency graph</output>
       </step>
-      <step number="5">
+      <step order="5">
         <action>What verification is needed?</action>
         <tool>Verification planning</tool>
         <output>Verification checklist</output>
@@ -78,12 +75,12 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </subphase>
     <subphase name="decompose">
       <objective>Break down complex tasks into manageable units</objective>
-      <step number="1">
+      <step order="1">
         <action>Split into manageable units</action>
         <tool>Task decomposition</tool>
         <output>Atomic task list</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Identify task boundaries</action>
         <tool>Boundary analysis</tool>
         <output>Clear task scopes</output>
@@ -91,12 +88,12 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </subphase>
     <subphase name="structure">
       <objective>Organize tasks for optimal execution</objective>
-      <step number="1">
+      <step order="1">
         <action>Identify parallel vs sequential tasks</action>
         <tool>Execution planning</tool>
         <output>Execution order</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Define task dependencies</action>
         <tool>Dependency definition</tool>
         <output>Task dependency map</output>
@@ -105,12 +102,12 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
     <subphase name="assign">
       <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
-      <step number="1">
+      <step order="1">
         <action>Delegate tasks with detailed instructions</action>
         <tool>Sub-agent delegation</tool>
         <output>Delegated tasks</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Provide context and constraints</action>
         <tool>Context provision</tool>
         <output>Contextual guidance</output>
@@ -132,12 +129,12 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </reflection_checkpoint>
     <subphase name="consolidate">
       <objective>Integrate sub-agent outputs into cohesive result</objective>
-      <step number="1">
+      <step order="1">
         <action>Verify sub-agent outputs</action>
         <tool>Output verification</tool>
         <output>Verification results</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Combine results</action>
         <tool>Result integration</tool>
         <output>Consolidated implementation</output>
@@ -147,37 +144,37 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
 
   <phase name="collect_feedback">
     <objective>Launch feedback agents in execute mode and collect evaluation results</objective>
-    <step number="1">
+    <step order="1">
       <action>Launch quality agent: syntax, type, format verification</action>
       <tool>Sub-agent delegation (quality-assurance)</tool>
       <aspects>Syntax correctness, type safety, code formatting, style compliance</aspects>
       <output>Quality evaluation report</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Launch security agent: vulnerability detection</action>
       <tool>Sub-agent delegation (security)</tool>
       <aspects>Security vulnerabilities, input validation, authentication, authorization</aspects>
       <output>Security evaluation report</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Launch design agent: architecture consistency</action>
       <tool>Sub-agent delegation (design)</tool>
       <aspects>Architecture patterns, dependency management, API design, coupling</aspects>
       <output>Design evaluation report</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Launch docs agent: documentation completeness</action>
       <tool>Sub-agent delegation (docs)</tool>
       <aspects>Code comments, API documentation, README updates</aspects>
       <output>Documentation evaluation report</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Launch performance agent: performance implications</action>
       <tool>Sub-agent delegation (performance)</tool>
       <aspects>Algorithm complexity, resource usage, potential bottlenecks</aspects>
       <output>Performance evaluation report</output>
     </step>
-    <step number="6">
+    <step order="6">
       <action>Launch test agent: test coverage analysis</action>
       <tool>Sub-agent delegation (test)</tool>
       <aspects>Test coverage, edge cases, test quality</aspects>
@@ -204,28 +201,28 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     <condition>Execute only if feedback found critical or warning issues</condition>
     <skip_condition>Skip if no issues found in feedback</skip_condition>
     <objective>Fix identified issues from feedback phase</objective>
-    <step number="1">
+    <step order="1">
       <action>Synthesize feedback from all agents</action>
       <tool>Feedback synthesis</tool>
       <output>Consolidated issue list</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Prioritize issues by severity (critical > warning > info)</action>
       <tool>Issue prioritization</tool>
       <output>Prioritized issue list</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Delegate fixes to appropriate sub-agents</action>
       <tool>Sub-agent delegation</tool>
       <scope>Only issues identified in feedback, not full re-implementation</scope>
       <output>Fix assignments</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Verify fixes address the identified issues</action>
       <tool>Fix verification</tool>
       <output>Verification results</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Consolidate fix results</action>
       <tool>Result consolidation</tool>
       <output>Fixed implementation</output>
@@ -250,6 +247,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <agents>
   <agent name="quality" subagent_type="quality-assurance" readonly="false">Syntax, type, format verification</agent>
   <agent name="security" subagent_type="security" readonly="false">Vulnerability detection</agent>
@@ -271,7 +273,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
   <agent name="design" subagent_type="design" readonly="true">Architecture evaluation for feedback</agent>
 </agents>
-
 <execution_graph>
   <sequential_phase id="execute" depends_on="none">
     <parallel_group id="quality_assurance">
@@ -304,7 +305,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </parallel_group>
   </conditional_phase>
 </execution_graph>
-
 <delegation>
   <requirement>Specific scope and expected deliverables</requirement>
   <requirement>Target file paths</requirement>
@@ -312,9 +312,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <requirement>Memory check: list_memories for patterns</requirement>
   <requirement>For fix phase: specific issue references from feedback</requirement>
 </delegation>
-
-<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
-
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="task_clarity" weight="0.2">
@@ -377,69 +374,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </test>
   </validation_tests>
 </decision_criteria>
-
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="EXECF-B001" priority="critical">
-      <trigger>Before implementation</trigger>
-      <action>Check Serena memories for existing patterns</action>
-      <verification>Pattern check in output</verification>
-    </behavior>
-    <behavior id="EXECF-B002" priority="critical">
-      <trigger>After initial execution</trigger>
-      <action>Execute feedback collection phase automatically</action>
-      <verification>Feedback results in output</verification>
-    </behavior>
-    <behavior id="EXECF-B003" priority="critical">
-      <trigger>After feedback collection</trigger>
-      <action>Evaluate if issues require fix phase</action>
-      <verification>Issue evaluation in output</verification>
-    </behavior>
-    <behavior id="EXECF-B004" priority="critical">
-      <trigger>When issues found</trigger>
-      <action>Execute fix phase for identified issues only</action>
-      <verification>Fix results in output</verification>
-    </behavior>
-    <behavior id="EXECF-B005" priority="critical">
-      <trigger>When no issues found</trigger>
-      <action>Skip fix phase with confirmation message</action>
-      <verification>Skip confirmation in output</verification>
-    </behavior>
-    <behavior id="EXECF-B006" priority="critical">
-      <trigger>During feedback phase</trigger>
-      <action>Launch all feedback agents in parallel</action>
-      <verification>Parallel execution confirmed</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="EXECF-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Implementing without sub-agent delegation</action>
-      <response>Block operation, delegate to specialized agents</response>
-    </behavior>
-    <behavior id="EXECF-P002" priority="critical">
-      <trigger>Always</trigger>
-      <action>Multiple fix iterations</action>
-      <response>Block operation, maximum one fix iteration allowed</response>
-    </behavior>
-    <behavior id="EXECF-P003" priority="critical">
-      <trigger>Between phases</trigger>
-      <action>Requesting user confirmation to proceed</action>
-      <response>Proceed automatically between phases</response>
-    </behavior>
-    <behavior id="EXECF-P004" priority="critical">
-      <trigger>In fix phase</trigger>
-      <action>Full re-implementation instead of targeted fixes</action>
-      <response>Fix only identified issues from feedback</response>
-    </behavior>
-    <behavior id="EXECF-P005" priority="critical">
-      <trigger>When no issues found</trigger>
-      <action>Executing fix phase unnecessarily</action>
-      <response>Skip fix phase when feedback shows no issues</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
-
 <output>
   <format>
     <execution_results>
@@ -517,7 +451,67 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </final_status>
   </format>
 </output>
-
+<enforcement>
+  <mandatory_behaviors>
+    <behavior id="EXECF-B001" priority="critical">
+      <trigger>Before implementation</trigger>
+      <action>Check Serena memories for existing patterns</action>
+      <verification>Pattern check in output</verification>
+    </behavior>
+    <behavior id="EXECF-B002" priority="critical">
+      <trigger>After initial execution</trigger>
+      <action>Execute feedback collection phase automatically</action>
+      <verification>Feedback results in output</verification>
+    </behavior>
+    <behavior id="EXECF-B003" priority="critical">
+      <trigger>After feedback collection</trigger>
+      <action>Evaluate if issues require fix phase</action>
+      <verification>Issue evaluation in output</verification>
+    </behavior>
+    <behavior id="EXECF-B004" priority="critical">
+      <trigger>When issues found</trigger>
+      <action>Execute fix phase for identified issues only</action>
+      <verification>Fix results in output</verification>
+    </behavior>
+    <behavior id="EXECF-B005" priority="critical">
+      <trigger>When no issues found</trigger>
+      <action>Skip fix phase with confirmation message</action>
+      <verification>Skip confirmation in output</verification>
+    </behavior>
+    <behavior id="EXECF-B006" priority="critical">
+      <trigger>During feedback phase</trigger>
+      <action>Launch all feedback agents in parallel</action>
+      <verification>Parallel execution confirmed</verification>
+    </behavior>
+  </mandatory_behaviors>
+  <prohibited_behaviors>
+    <behavior id="EXECF-P001" priority="critical">
+      <trigger>Always</trigger>
+      <action>Implementing without sub-agent delegation</action>
+      <response>Block operation, delegate to specialized agents</response>
+    </behavior>
+    <behavior id="EXECF-P002" priority="critical">
+      <trigger>Always</trigger>
+      <action>Multiple fix iterations</action>
+      <response>Block operation, maximum one fix iteration allowed</response>
+    </behavior>
+    <behavior id="EXECF-P003" priority="critical">
+      <trigger>Between phases</trigger>
+      <action>Requesting user confirmation to proceed</action>
+      <response>Proceed automatically between phases</response>
+    </behavior>
+    <behavior id="EXECF-P004" priority="critical">
+      <trigger>In fix phase</trigger>
+      <action>Full re-implementation instead of targeted fixes</action>
+      <response>Fix only identified issues from feedback</response>
+    </behavior>
+    <behavior id="EXECF-P005" priority="critical">
+      <trigger>When no issues found</trigger>
+      <action>Executing fix phase unnecessarily</action>
+      <response>Skip fix phase when feedback shows no issues</response>
+    </behavior>
+  </prohibited_behaviors>
+</enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <example severity="low">Minor code style inconsistency</example>
@@ -526,7 +520,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     <example severity="critical">Security vulnerability or data loss risk</example>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="execute">Basic execution without feedback loop</command>
   <command name="feedback">Standalone feedback command for reviewing work</command>
@@ -537,12 +530,16 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <command name="upstream">When preparing changes for upstream OSS contribution</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="execution-workflow">Core delegation and orchestration patterns</skill>
   <skill name="serena-usage">Check memories for existing patterns before implementation</skill>
   <skill name="testing-patterns">Ensure proper test coverage</skill>
 </related_skills>
-
 <constraints>
   <must>Delegate detailed work to sub-agents</must>
   <must>Execute independent tasks in parallel</must>

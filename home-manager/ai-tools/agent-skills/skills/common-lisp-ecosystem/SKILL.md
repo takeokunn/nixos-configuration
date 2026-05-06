@@ -640,4 +640,5 @@ version: 2.0.0
   <skill name="serena-usage">Navigate CLOS hierarchies, generic functions, and symbol definitions</skill>
   <skill name="context7-usage">Access ASDF, SBCL, and Common Lisp library documentation</skill>
   <skill name="investigation-patterns">Debug condition handling, macro expansion, and SBCL-specific issues</skill>
+  <skill name="sbcl-usage">Operational SBCL execution, debugger, profiling, and executable build workflows</skill>
 </related_skills>

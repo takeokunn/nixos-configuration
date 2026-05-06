@@ -153,7 +153,7 @@ version: 2.0.0
   </modern_features>
 
   <cpp26_features>
-    <description>C++26 completed March 2026 — the most compelling release since C++11. GCC and Clang already implement most features.</description>
+    <description>C++26 was finalized in 2026, and major toolchains are progressively implementing its features. Prefer feature detection and compiler checks over hard assumptions.</description>
     <feature name="reflection">
       <description>Static reflection via the ^^ operator (cat-ears operator). The biggest upgrade for C++ development since templates.</description>
       <example>

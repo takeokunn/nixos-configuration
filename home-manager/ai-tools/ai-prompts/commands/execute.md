@@ -6,26 +6,23 @@ description: Task execution command
 <purpose>
 Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">execution-workflow</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Delegate detailed work to specialized sub-agents</rule>
   <rule>Focus on orchestration and policy decisions</rule>
   <rule>Execute independent tasks in parallel</rule>
   <rule>Verify sub-agent outputs before integration</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
   <rule>Check Serena memories before implementation</rule>
 </rules>
-
+<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
@@ -79,6 +76,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   </phase>
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <agents>
   <agent name="quality" subagent_type="quality-assurance" readonly="false">Syntax, type, format verification</agent>
   <agent name="security" subagent_type="security" readonly="false">Vulnerability detection</agent>
@@ -99,7 +101,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base management</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
 </agents>
-
 <execution_graph>
   <parallel_group id="quality_assurance" depends_on="none">
     <agent>quality</agent>
@@ -114,16 +115,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <reason>Requires completion of quality checks and implementation</reason>
   </sequential_phase>
 </execution_graph>
-
 <delegation>
   <requirement>Specific scope and expected deliverables</requirement>
   <requirement>Target file paths</requirement>
   <requirement>Reference implementations (specific paths)</requirement>
   <requirement>Memory check: `list_memories` for patterns</requirement>
 </delegation>
-
-<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
-
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="task_clarity" weight="0.3">
@@ -178,7 +175,20 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     </test>
   </validation_tests>
 </decision_criteria>
-
+<output>
+  <format>
+    <execution_result>
+      <summary>What was implemented and why</summary>
+      <changes>
+        <change path="path/to/file">Description of targeted change</change>
+      </changes>
+      <verification>
+        <check command="command run">Observed result</check>
+      </verification>
+      <follow_up>Remaining risks or next actions, if any</follow_up>
+    </execution_result>
+  </format>
+</output>
 <enforcement>
   <mandatory_behaviors>
     <behavior id="EXEC-B001" priority="critical">
@@ -200,7 +210,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <example severity="low">Minor code style inconsistency</example>
@@ -209,7 +218,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <example severity="critical">Security vulnerability or data loss risk</example>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="define">When implementation reveals unclear requirements</command>
   <command name="ask">When implementation requires investigation</command>
@@ -219,12 +227,16 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <command name="execute-full">Full version with feedback loop and fix phase</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="execution-workflow">Core delegation and orchestration patterns</skill>
   <skill name="serena-usage">Check memories for existing patterns before implementation</skill>
   <skill name="testing-patterns">Ensure proper test coverage</skill>
 </related_skills>
-
 <constraints>
   <must>Delegate detailed work to sub-agents</must>
   <must>Execute independent tasks in parallel</must>

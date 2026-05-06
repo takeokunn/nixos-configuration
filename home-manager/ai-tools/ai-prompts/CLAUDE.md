@@ -12,7 +12,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
   <rule>Follow serena-usage skill for all Serena MCP operations</rule>
   <rule>Use perl for all text processing; never use sed or awk</rule>
-  <rule>Always output in English</rule>
+  <rule>Follow the active tool or session language directive; default to English only when no directive is configured</rule>
   <rule>NEVER run git commit, git push, gh pr create, or any git write operation without the user's EXPLICIT instruction in the current message. "Continue the task" or context-continuation prompts do NOT count as permission. When in doubt, ask.</rule>
 </rules>
 
@@ -181,6 +181,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="golang-ecosystem">Go language, modules, and toolchain patterns</skill>
     <skill name="rust-ecosystem">Rust language, Cargo, and toolchain patterns</skill>
     <skill name="common-lisp-ecosystem">Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns</skill>
+    <skill name="sbcl-usage">SBCL execution, debugging, REPL, ASDF loading, profiling, and save-lisp-and-die operational patterns</skill>
     <skill name="emacs-ecosystem">Emacs Lisp, configuration, Magit, LSP patterns</skill>
     <skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
     <skill name="aws-*">AWS service skills (s3, lambda, ec2, iam, ecs, eks, etc.) via itsmostafa/aws-agent-skills</skill>
@@ -297,6 +298,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <agent name="security">Vulnerability detection and remediation</agent>
   <agent name="test">Test creation and coverage analysis</agent>
   <agent name="docs">Documentation generation and maintenance</agent>
+  <agent name="general-purpose">Broad analytical and implementation tasks that do not fit a single specialty</agent>
   <agent name="performance">Performance optimization and profiling</agent>
   <agent name="database">Database design and query optimization</agent>
   <agent name="devops">CI/CD and infrastructure design</agent>
@@ -310,7 +312,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <must>Follow serena-usage skill for all Serena MCP operations</must>
   <must>Use perl for text processing (e.g., perl -pi -e 's/old/new/g' file.txt)</must>
   <must>Request permission before config file changes</must>
-  <must>Output all text in English</must>
+  <must>Follow the active tool or session language directive for user-facing output; default to English only when no directive is configured</must>
   <avoid>Using sed or awk for text processing</avoid>
   <must>NEVER run git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the current message</must>
   <avoid>Adding timestamps to documentation</avoid>

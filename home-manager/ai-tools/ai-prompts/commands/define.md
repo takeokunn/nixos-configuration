@@ -1,13 +1,11 @@
 ---
 argument-hint: [message]
 description: Requirements definition command
-allowed-tools: Read, Grep, Glob, Bash, mcp__plugin_claude-code-home-manager_serena__activate_project, mcp__plugin_claude-code-home-manager_serena__check_onboarding_performed, mcp__plugin_claude-code-home-manager_serena__list_memories, mcp__plugin_claude-code-home-manager_serena__read_memory, mcp__plugin_claude-code-home-manager_serena__find_symbol, mcp__plugin_claude-code-home-manager_serena__get_symbols_overview, mcp__plugin_claude-code-home-manager_serena__find_file, mcp__plugin_claude-code-home-manager_serena__search_for_pattern, mcp__plugin_claude-code-home-manager_serena__list_dir, mcp__plugin_claude-code-home-manager_context7__resolve-library-id, mcp__plugin_claude-code-home-manager_context7__get-library-docs, AskUserQuestion, Agent, TaskCreate, TaskUpdate, WebSearch
 ---
 
 <purpose>
 Conduct detailed requirements definition before implementation, clarifying technical constraints, design policies, and specifications.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">requirements-definition</skill>
@@ -16,7 +14,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <skill use="tools">context7-usage</skill>
   <skill use="workflow">define-core</skill>
 </refs>
-
 <scope>
   <when_to_use>
     <case>Unclear scope with multiple design choices (e.g., "add authentication", "refactor data layer")</case>
@@ -32,7 +29,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <case>Documentation-only changes — use /markdown instead</case>
   </when_not_to_use>
 </scope>
-
 <rules priority="critical">
   <rule>Never modify, create, or delete files</rule>
   <rule>Never implement code; requirements definition only</rule>
@@ -42,7 +38,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <rule>Challenge the user's framing — the stated problem may not be the real problem</rule>
   <rule>Form hypotheses before concluding; signal detection → hypothesis → verification → conclusion</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use requirements-definition skill for methodology</rule>
   <rule>Delegate investigations to sub-agents</rule>
@@ -52,7 +47,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <rule>Think in Why → How → What order (Golden Circle); output may differ, but reasoning must start from Why</rule>
   <rule>Specify only what is necessary; do not over-specify obvious implementation details</rule>
 </rules>
-
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Refining requirements incrementally through many small meetings — AI can gather and synthesize all available signals in a single investigation pass</practice>
@@ -67,7 +61,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <principle>The harder and more irreversible a design decision, the more it deserves a dedicated question; trivial decisions should be resolved by investigation, not conversation</principle>
   </applicable_ai_principles>
 </ai_principles>
-
 <thinking_framework>
   <golden_circle>
     <principle>Always reason in this order: Why (motivation, constraints, goals) → How (approach, design decisions) → What (specific requirements, acceptance criteria). Output structure may vary, but internal reasoning must start from Why.</principle>
@@ -84,7 +77,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <rule>Delegate investigation to appropriate sub-agents per level; synthesize findings yourself.</rule>
   </investigation_depth>
 </thinking_framework>
-
 <bias_correction>
   <known_bias id="BC-001">
     <pattern>Accepting the user's stated solution as the requirement</pattern>
@@ -107,21 +99,21 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <correction>Before designing around a framework feature, library, or system capability, verify it exists in the current codebase. Memory about past states may be stale.</correction>
   </known_bias>
 </bias_correction>
-
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
-    <step number="1">
+    <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Serena activate_project</tool>
       <output>Project activated</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Serena list_memories</tool>
       <output>Available memory list</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Load applicable memories with read_memory</action>
       <tool>Serena read_memory</tool>
       <output>Relevant patterns loaded</output>
@@ -129,27 +121,27 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </phase>
   <phase name="analyze">
     <objective>Understand the user's request and identify technical constraints</objective>
-    <step number="0">
+    <step order="0">
       <action>Get the big picture: which L0 systems/components are affected? Estimate scope (how many layers, files, services). This step prevents diving into details before understanding overall impact.</action>
       <tool>Serena list_dir, find_file, codebase knowledge</tool>
       <output>Affected systems list, scope estimate (small/medium/large), impacted layers</output>
     </step>
-    <step number="1">
+    <step order="1">
       <action>Parse user request in "subject → object → operation" form. If the rephrasing differs from the original, flag the gap as a clarification candidate.</action>
       <tool>Text analysis</tool>
       <output>Structured request form, identified framing gaps</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Identify technical constraints from request context</action>
       <tool>Codebase knowledge</tool>
       <output>Constraint list</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Determine design decisions requiring user input</action>
       <tool>Requirements analysis</tool>
       <output>Question candidates list</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Assess technical feasibility at high level</action>
       <tool>Technical knowledge</tool>
       <output>Initial feasibility assessment</output>
@@ -157,27 +149,27 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </phase>
   <phase name="investigate">
     <objective>Gather evidence from codebase and analyze architecture impact</objective>
-    <step number="1">
+    <step order="1">
       <action>Delegate to explore agent: find relevant files and existing patterns</action>
       <tool>Sub-agent delegation</tool>
       <output>File paths, patterns, code samples</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
       <tool>Sub-agent delegation</tool>
       <output>Architecture analysis, dependency graph</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Delegate to database agent: analyze database design (if applicable)</action>
       <tool>Sub-agent delegation</tool>
       <output>Schema analysis, query patterns</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
       <tool>Sub-agent delegation</tool>
       <output>Effort estimation, risk analysis</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
       <tool>Context7 MCP, WebSearch</tool>
       <output>Verification report, flagged claims</output>
@@ -200,27 +192,27 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="clarify">
     <objective>Resolve ambiguities through structured user interaction</objective>
-    <step number="1">
+    <step order="1">
       <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
       <tool>Question scoring algorithm</tool>
       <output>Prioritized question list</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
       <tool>Question taxonomy</tool>
       <output>Categorized questions</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
       <tool>AskUserQuestion</tool>
       <output>User responses</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
       <tool>AskUserQuestion</tool>
       <output>Additional user responses</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Present high-score questions first; do not proceed without clear answers</action>
       <tool>Priority ordering</tool>
       <output>Confirmed requirements</output>
@@ -228,12 +220,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </phase>
   <phase name="verify">
     <objective>Validate user decisions against technical evidence</objective>
-    <step number="1">
+    <step order="1">
       <action>Verify constraints from answers using agent findings</action>
       <tool>Cross-reference analysis</tool>
       <output>Validated constraints</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Check implementations related to chosen approach</action>
       <tool>Code analysis</tool>
       <output>Implementation validation</output>
@@ -242,12 +234,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="document">
     <objective>Create comprehensive requirements documentation and task breakdown</objective>
-    <step number="1">
+    <step order="1">
       <action>Create comprehensive requirements document (internal investigation findings are separate from the output document)</action>
       <tool>Requirements template</tool>
       <output>Complete requirements specification</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Break down tasks for /execute handoff</action>
       <tool>Task decomposition</tool>
       <output>Phased task list with dependencies</output>
@@ -255,18 +247,18 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </phase>
   <phase name="critique">
     <objective>Adversarial review of requirements document for gaps and risks</objective>
-    <step number="1">
+    <step order="1">
       <action>Delegate requirements document to validator agent for critique</action>
       <tool>Sub-agent delegation (validator)</tool>
       <aspects>Missing steps, unidentified risks, unclear acceptance criteria, dependency gaps, scope ambiguity</aspects>
       <output>Critique report with identified gaps</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Evaluate critique findings and incorporate valid feedback</action>
       <tool>Synthesis</tool>
       <output>Updated requirements document addressing critique</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Flag unresolved critique items as outstanding issues</action>
       <tool>Issue tracking</tool>
       <output>Outstanding issues appended to requirements</output>
@@ -284,6 +276,11 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </reflection_checkpoint>
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <common_investigation_workflows>
   <workflow id="A" name="New Feature Definition">
     <step>1. Identify which L0 systems are affected (new vs. extending existing)</step>
@@ -310,7 +307,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <step>4. Define fallback behavior for external failures</step>
   </workflow>
 </common_investigation_workflows>
-
 <agents>
   <agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>
   <agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
@@ -318,7 +314,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
 </agents>
-
 <execution_graph>
   <parallel_group id="investigation" depends_on="none">
     <agent>explore</agent>
@@ -329,16 +324,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <agent>general-purpose</agent>
   </parallel_group>
 </execution_graph>
-
 <delegation>
   <requirement>Scope overview</requirement>
   <requirement>Target file paths</requirement>
   <requirement>Explicit edit prohibition</requirement>
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
-
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="requirement_clarity" weight="0.4">
@@ -393,7 +384,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     </test>
   </validation_tests>
 </decision_criteria>
-
 <anti_patterns>
   <pattern id="AP-001" name="Solution acceptance without problem validation">
     Accepting the user's proposed solution as the requirement. Requirements must describe the problem to solve; solutions are proposed during /execute, not /define.
@@ -417,7 +407,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     Defining requirements for one component while ignoring related components that will be affected. Requirements must account for the full blast radius.
   </pattern>
 </anti_patterns>
-
 <request_signals>
   <description>When reading a user's request, detect these signals before forming questions. Signal → hypothesis → verify → conclude. Never skip directly from signal to question.</description>
   <signal pattern="User describes a solution ('add X', 'change Y to Z', 'use library A')">
@@ -445,7 +434,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <investigate>Map all dependents. Check schema migrations, API consumers, test coverage, and downstream effects.</investigate>
   </signal>
 </request_signals>
-
 <minimum_viable_scope>
   <principle>Always start requirements with the minimum scope that satisfies the user's core need. Expand only when a concrete necessity is demonstrated — not when it seems useful or might be needed later.</principle>
   <checklist>
@@ -456,7 +444,40 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </checklist>
   <anti_scope_creep>Do not include requirements that address hypothetical future needs. Three similar future cases are needed before generalising — specifying for one imagined future case creates premature scope.</anti_scope_creep>
 </minimum_viable_scope>
-
+<output>
+  <format>
+    <requirements_document>
+      <section name="Summary" required="always">One-sentence request, background (Why), expected outcomes</section>
+      <section name="Current State" required="always">Existing system, tech stack, affected components</section>
+      <section name="Functional Requirements" required="always">FR-001 format (mandatory/optional); behavior-level, not implementation-level</section>
+      <section name="Non-Functional Requirements" required="when-applicable">Performance, security, maintainability</section>
+      <section name="Technical Specifications" required="always">Design policies, impact scope, key decisions and rationale</section>
+      <section name="Architecture Impact" required="when-multi-layer">System diagram (Mermaid) if 2+ layers affected; dependency changes</section>
+      <section name="Data / Schema Changes" required="when-applicable">ERD or schema diff if data model changes</section>
+      <section name="Interface / API Changes" required="when-applicable">Endpoint table or contract diff if public interfaces change</section>
+      <section name="Metrics" required="always">
+        <metric name="feasibility">0-100 with evidence</metric>
+        <metric name="objectivity">0-100</metric>
+      </section>
+      <section name="Constraints" required="always">Technical, operational</section>
+      <section name="Test Requirements" required="always">Unit, integration, acceptance criteria as observable behavior</section>
+      <section name="Outstanding Issues" required="always">Unresolved questions; "none" must be explicitly stated</section>
+    </requirements_document>
+    <task_breakdown>
+      <dependency_graph>Task dependencies visualization (Mermaid preferred for complex graphs)</dependency_graph>
+      <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
+      <execute_handoff>Decisions made, references, constraints, what /execute must NOT assume</execute_handoff>
+    </task_breakdown>
+  </format>
+  <output_rules>
+    <rule>Internal investigation analysis is separate from the output document. Do not paste agent outputs into requirements.</rule>
+    <rule>Use Mermaid diagrams and tables to convey structure; prefer visual over prose for architectural impacts.</rule>
+    <rule>Abstract → Concrete ordering: system impact before implementation detail.</rule>
+    <rule>Outstanding issues must always be written — "none" explicitly stated if truly none.</rule>
+    <rule>Test requirements must be expressed as observable behavior, not internal mechanism.</rule>
+    <rule>Do not include implementation detail that any competent developer would naturally choose.</rule>
+  </output_rules>
+</output>
 <enforcement>
   <mandatory_behaviors>
     <behavior id="DEF-B001" priority="critical">
@@ -493,42 +514,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
-<output>
-  <format>
-    <requirements_document>
-      <section name="Summary" required="always">One-sentence request, background (Why), expected outcomes</section>
-      <section name="Current State" required="always">Existing system, tech stack, affected components</section>
-      <section name="Functional Requirements" required="always">FR-001 format (mandatory/optional); behavior-level, not implementation-level</section>
-      <section name="Non-Functional Requirements" required="when-applicable">Performance, security, maintainability</section>
-      <section name="Technical Specifications" required="always">Design policies, impact scope, key decisions and rationale</section>
-      <section name="Architecture Impact" required="when-multi-layer">System diagram (Mermaid) if 2+ layers affected; dependency changes</section>
-      <section name="Data / Schema Changes" required="when-applicable">ERD or schema diff if data model changes</section>
-      <section name="Interface / API Changes" required="when-applicable">Endpoint table or contract diff if public interfaces change</section>
-      <section name="Metrics" required="always">
-        <metric name="feasibility">0-100 with evidence</metric>
-        <metric name="objectivity">0-100</metric>
-      </section>
-      <section name="Constraints" required="always">Technical, operational</section>
-      <section name="Test Requirements" required="always">Unit, integration, acceptance criteria as observable behavior</section>
-      <section name="Outstanding Issues" required="always">Unresolved questions; "none" must be explicitly stated</section>
-    </requirements_document>
-    <task_breakdown>
-      <dependency_graph>Task dependencies visualization (Mermaid preferred for complex graphs)</dependency_graph>
-      <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
-      <execute_handoff>Decisions made, references, constraints, what /execute must NOT assume</execute_handoff>
-    </task_breakdown>
-  </format>
-  <output_rules>
-    <rule>Internal investigation analysis is separate from the output document. Do not paste agent outputs into requirements.</rule>
-    <rule>Use Mermaid diagrams and tables to convey structure; prefer visual over prose for architectural impacts.</rule>
-    <rule>Abstract → Concrete ordering: system impact before implementation detail.</rule>
-    <rule>Outstanding issues must always be written — "none" explicitly stated if truly none.</rule>
-    <rule>Test requirements must be expressed as observable behavior, not internal mechanism.</rule>
-    <rule>Do not include implementation detail that any competent developer would naturally choose.</rule>
-  </output_rules>
-</output>
-
 <completion_conditions>
   <pre_completion_checklist>
     <item>Have I verified the user's framing reflects the real problem, not just the stated solution?</item>
@@ -554,7 +539,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <criterion>Pre-completion checklist passed</criterion>
   </done_when>
 </completion_conditions>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor ambiguity in non-critical feature detail</low>
@@ -563,7 +547,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <critical>Request violates security policy or data integrity</critical>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="ask">When requirements raise technical questions</command>
   <command name="bug">When defining fix requirements for known issues</command>
@@ -572,13 +555,17 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <command name="simplify">Code cleanup after implementation</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="requirements-definition">Core methodology for specification</skill>
   <skill name="investigation-patterns">Evidence gathering for feasibility</skill>
   <skill name="serena-usage">Check existing patterns and memories</skill>
   <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
-
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Delegate detailed investigation to sub-agents</must>

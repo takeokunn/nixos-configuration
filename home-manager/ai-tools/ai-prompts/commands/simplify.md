@@ -6,43 +6,66 @@ description: Review changed code for reuse, quality, and efficiency, then fix an
 <purpose>
 Code review and cleanup command that identifies changes via git diff, launches three specialized review agents in parallel (code reuse, code quality, efficiency), aggregates findings, and fixes issues directly.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
   <skill use="workflow">execution-workflow</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Launch all three review agents simultaneously in one message (timeout avoidance)</rule>
   <rule>Provide the full diff to every agent</rule>
   <rule>Fix issues directly after aggregation; do not just report</rule>
   <rule>Skip false positives with a brief note explaining why</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use git diff for unstaged changes, git diff HEAD for staged changes</rule>
   <rule>If no git changes, review recently modified files mentioned by user</rule>
   <rule>Check Serena memories for existing utilities before flagging reuse issues</rule>
   <rule>Prefer existing abstractions over new ones</rule>
 </rules>
-
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
-
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and gather existing patterns</objective>
-    <step>1. Activate Serena project with activate_project</step>
-    <step>2. Check list_memories for existing utility and pattern references</step>
-    <step>3. Load applicable memories with read_memory</step>
+    <step>
+      <action>Activate Serena project with activate_project</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check list_memories for existing utility and pattern references</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Load applicable memories with read_memory</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="identify_changes">
     <objective>Collect the diff that all agents will review</objective>
-    <step>1. Run git diff to get unstaged changes</step>
-    <step>2. Run git diff HEAD to get staged changes</step>
-    <step>3. If both are empty, ask user for files or scope to review</step>
-    <step>4. Combine into a single diff payload for agents</step>
+    <step>
+      <action>Run git diff to get unstaged changes</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Run git diff HEAD to get staged changes</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>If both are empty, ask user for files or scope to review</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Combine into a single diff payload for agents</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="scope_quality" after="identify_changes" inherits="workflow-patterns#reflection_checkpoint">
     <question>Is the diff non-empty and well-scoped?</question>
@@ -51,9 +74,21 @@ Code review and cleanup command that identifies changes via git diff, launches t
   </reflection_checkpoint>
   <phase name="review">
     <objective>Launch three review agents in parallel with the full diff</objective>
-    <step>1. Launch Agent 1 (Code Reuse), Agent 2 (Code Quality), Agent 3 (Efficiency) simultaneously</step>
-    <step>2. Each agent receives the full diff and relevant codebase context</step>
-    <step>3. Collect all agent results</step>
+    <step>
+      <action>Launch Agent 1 (Code Reuse), Agent 2 (Code Quality), Agent 3 (Efficiency) simultaneously</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Each agent receives the full diff and relevant codebase context</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Collect all agent results</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="review_quality" after="review">
     <question>Did all three agents complete successfully?</question>
@@ -67,16 +102,44 @@ Code review and cleanup command that identifies changes via git diff, launches t
   </reflection_checkpoint>
   <phase name="aggregate">
     <objective>Deduplicate and prioritize findings across all agents</objective>
-    <step>1. Merge findings from all three agents</step>
-    <step>2. Deduplicate overlapping issues</step>
-    <step>3. Prioritize by severity: critical, warning, suggestion</step>
-    <step>4. Identify false positives and mark for skipping</step>
+    <step>
+      <action>Merge findings from all three agents</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Deduplicate overlapping issues</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Prioritize by severity: critical, warning, suggestion</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Identify false positives and mark for skipping</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="fix">
     <objective>Apply fixes for all confirmed issues</objective>
-    <step>1. Fix each confirmed issue directly in the codebase</step>
-    <step>2. For false positives, note the reason and skip</step>
-    <step>3. Verify fixes do not introduce new issues</step>
+    <step>
+      <action>Fix each confirmed issue directly in the codebase</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>For false positives, note the reason and skip</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Verify fixes do not introduce new issues</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="completion_validation" after="fix">
     <serena_validation>
@@ -87,6 +150,11 @@ Code review and cleanup command that identifies changes via git diff, launches t
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <agents>
   <agent name="reuse" subagent_type="code-quality" readonly="true">
     <objective>Find opportunities to reuse existing code instead of writing new code</objective>
@@ -121,7 +189,19 @@ Code review and cleanup command that identifies changes via git diff, launches t
     </checklist>
   </agent>
 </agents>
-
+<execution_graph>
+  <parallel_group id="review" depends_on="none">
+    <agent>reuse</agent>
+    <agent>quality</agent>
+    <agent>efficiency</agent>
+  </parallel_group>
+  <sequential_phase id="aggregate" depends_on="review">
+    <action>Deduplicate, prioritize, and classify all findings</action>
+  </sequential_phase>
+  <sequential_phase id="fix" depends_on="aggregate">
+    <action>Apply fixes for confirmed issues and record skipped false positives</action>
+  </sequential_phase>
+</execution_graph>
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="issue_severity">
     <factor name="correctness_impact" weight="0.4">
@@ -144,7 +224,6 @@ Code review and cleanup command that identifies changes via git diff, launches t
     </factor>
   </criterion>
 </decision_criteria>
-
 <output>
   <format>
     <simplify_results>
@@ -166,7 +245,6 @@ Code review and cleanup command that identifies changes via git diff, launches t
     </simplify_results>
   </format>
 </output>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="SIM-B001" priority="critical">
@@ -208,7 +286,6 @@ Code review and cleanup command that identifies changes via git diff, launches t
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor style issue or marginal reuse opportunity</low>
@@ -217,18 +294,21 @@ Code review and cleanup command that identifies changes via git diff, launches t
     <critical>Data loss risk, security vulnerability, or correctness bug in changed code</critical>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="feedback">General review of Claude Code's work across multiple dimensions</command>
   <command name="execute">Primary target for simplify after implementation</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="execution-workflow">Understanding code review and fix methodology</skill>
   <skill name="investigation-patterns">Evidence-based code analysis</skill>
   <skill name="testing-patterns">Verifying fixes do not break tests</skill>
 </related_skills>
-
 <constraints>
   <must>Launch all three agents simultaneously (no sequential execution)</must>
   <must>Fix confirmed issues directly in the codebase</must>

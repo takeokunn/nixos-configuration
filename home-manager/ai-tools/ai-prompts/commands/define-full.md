@@ -6,7 +6,6 @@ description: Full requirements definition with feedback loop
 <purpose>
 Conduct detailed requirements definition with automatic feedback and regeneration cycle. Executes the complete define workflow, collects feedback from multiple agents, and regenerates an improved specification in a single automated flow.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">requirements-definition</skill>
@@ -16,7 +15,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <skill use="tools">context7-usage</skill>
   <skill use="workflow">define-core</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Never modify, create, or delete files</rule>
   <rule>Never implement code; requirements definition only</rule>
@@ -24,7 +22,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <rule>Maximum one iteration (no infinite loops)</rule>
   <rule>Automatic flow between phases (no user confirmation between phases)</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use requirements-definition skill for methodology</rule>
   <rule>Delegate investigations to sub-agents</rule>
@@ -32,23 +29,23 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <rule>Investigate and question before concluding</rule>
   <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
-
+<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow>
   <phase name="define_initial">
     <objective>Execute core define phases to produce initial requirements document</objective>
     <subphase name="prepare">
       <objective>Initialize Serena and check existing patterns</objective>
-      <step number="1">
+      <step order="1">
         <action>Activate Serena project with activate_project</action>
         <tool>Serena activate_project</tool>
         <output>Project activated</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Check list_memories for relevant patterns</action>
         <tool>Serena list_memories</tool>
         <output>Available memory list</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Load applicable memories with read_memory</action>
         <tool>Serena read_memory</tool>
         <output>Relevant patterns loaded</output>
@@ -56,22 +53,22 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </subphase>
     <subphase name="analyze">
       <objective>Understand the user's request and identify technical constraints</objective>
-      <step number="1">
+      <step order="1">
         <action>Parse user request to extract core requirements</action>
         <tool>Text analysis</tool>
         <output>Initial requirements list</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Identify technical constraints from request context</action>
         <tool>Codebase knowledge</tool>
         <output>Constraint list</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Determine design decisions requiring user input</action>
         <tool>Requirements analysis</tool>
         <output>Question candidates list</output>
       </step>
-      <step number="4">
+      <step order="4">
         <action>Assess technical feasibility at high level</action>
         <tool>Technical knowledge</tool>
         <output>Initial feasibility assessment</output>
@@ -79,27 +76,27 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </subphase>
     <subphase name="investigate">
       <objective>Gather evidence from codebase and analyze architecture impact</objective>
-      <step number="1">
+      <step order="1">
         <action>Delegate to explore agent: find relevant files and existing patterns</action>
         <tool>Sub-agent delegation</tool>
         <output>File paths, patterns, code samples</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
         <tool>Sub-agent delegation</tool>
         <output>Architecture analysis, dependency graph</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Delegate to database agent: analyze database design (if applicable)</action>
         <tool>Sub-agent delegation</tool>
         <output>Schema analysis, query patterns</output>
       </step>
-      <step number="4">
+      <step order="4">
         <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
         <tool>Sub-agent delegation</tool>
         <output>Effort estimation, risk analysis</output>
       </step>
-      <step number="5">
+      <step order="5">
         <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
         <tool>Context7 MCP, WebSearch</tool>
         <output>Verification report, flagged claims</output>
@@ -121,27 +118,27 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </reflection_checkpoint>
     <subphase name="clarify">
       <objective>Resolve ambiguities through structured user interaction</objective>
-      <step number="1">
+      <step order="1">
         <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
         <tool>Question scoring algorithm</tool>
         <output>Prioritized question list</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
         <tool>Question taxonomy</tool>
         <output>Categorized questions</output>
       </step>
-      <step number="3">
+      <step order="3">
         <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
         <tool>AskUserQuestion</tool>
         <output>User responses</output>
       </step>
-      <step number="4">
+      <step order="4">
         <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
         <tool>AskUserQuestion</tool>
         <output>Additional user responses</output>
       </step>
-      <step number="5">
+      <step order="5">
         <action>Present high-score questions first; do not proceed without clear answers</action>
         <tool>Priority ordering</tool>
         <output>Confirmed requirements</output>
@@ -149,12 +146,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </subphase>
     <subphase name="verify">
       <objective>Validate user decisions against technical evidence</objective>
-      <step number="1">
+      <step order="1">
         <action>Verify constraints from answers using agent findings</action>
         <tool>Cross-reference analysis</tool>
         <output>Validated constraints</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Check implementations related to chosen approach</action>
         <tool>Code analysis</tool>
         <output>Implementation validation</output>
@@ -162,12 +159,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </subphase>
     <subphase name="document">
       <objective>Create comprehensive requirements documentation and task breakdown</objective>
-      <step number="1">
+      <step order="1">
         <action>Create comprehensive requirements document</action>
         <tool>Requirements template</tool>
         <output>Complete requirements specification</output>
       </step>
-      <step number="2">
+      <step order="2">
         <action>Break down tasks for /execute handoff</action>
         <tool>Task decomposition</tool>
         <output>Phased task list with dependencies</output>
@@ -177,25 +174,25 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
 
   <phase name="collect_feedback">
     <objective>Launch feedback agents in define mode and collect evaluation results</objective>
-    <step number="1">
+    <step order="1">
       <action>Launch plan agent: evaluate execution plan quality</action>
       <tool>Sub-agent delegation (plan)</tool>
       <aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
       <output>Plan evaluation report</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Launch estimation agent: evaluate estimation validity</action>
       <tool>Sub-agent delegation (general-purpose)</tool>
       <aspects>Effort accuracy, risk assessment, dependency completeness</aspects>
       <output>Estimation evaluation report</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Launch validator agent: cross-validate requirements consistency</action>
       <tool>Sub-agent delegation (validator)</tool>
       <aspects>Internal consistency, completeness, contradiction detection</aspects>
       <output>Validation report</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Use fact-check skill patterns: verify external source claims via Context7</action>
       <tool>Context7 MCP, WebSearch</tool>
       <output>Fact-check report</output>
@@ -219,27 +216,27 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
 
   <phase name="regenerate">
     <objective>Incorporate feedback and generate complete updated specification</objective>
-    <step number="1">
+    <step order="1">
       <action>Synthesize feedback from all agents</action>
       <tool>Feedback synthesis</tool>
       <output>Consolidated feedback summary</output>
     </step>
-    <step number="2">
+    <step order="2">
       <action>Identify critical issues requiring specification changes</action>
       <tool>Issue prioritization</tool>
       <output>Prioritized issue list</output>
     </step>
-    <step number="3">
+    <step order="3">
       <action>Update requirements document addressing critical and warning issues</action>
       <tool>Requirements revision</tool>
       <output>Updated requirements specification</output>
     </step>
-    <step number="4">
+    <step order="4">
       <action>Update task breakdown reflecting specification changes</action>
       <tool>Task revision</tool>
       <output>Updated phased task list</output>
     </step>
-    <step number="5">
+    <step order="5">
       <action>Calculate final confidence score</action>
       <tool>Decision criteria evaluation</tool>
       <output>Final confidence score</output>
@@ -263,15 +260,19 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <agents>
   <agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>
   <agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
   <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
   <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
-  <agent name="plan" subagent_type="Plan" readonly="true">Execution plan review and evaluation</agent>
+  <agent name="plan" subagent_type="plan" readonly="true">Execution plan review and evaluation</agent>
 </agents>
-
 <execution_graph>
   <parallel_group id="investigation" depends_on="none">
     <agent>explore</agent>
@@ -293,16 +294,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     <action>Synthesize feedback and regenerate specification</action>
   </sequential_step>
 </execution_graph>
-
 <delegation>
   <requirement>Scope overview</requirement>
   <requirement>Target file paths</requirement>
   <requirement>Explicit edit prohibition</requirement>
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
-
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="requirement_clarity" weight="0.3">
@@ -368,64 +365,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </test>
   </validation_tests>
 </decision_criteria>
-
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="DEFF-B001" priority="critical">
-      <trigger>Before requirements documentation</trigger>
-      <action>Investigate existing codebase patterns</action>
-      <verification>Codebase analysis in output</verification>
-    </behavior>
-    <behavior id="DEFF-B002" priority="critical">
-      <trigger>For design decisions</trigger>
-      <action>Use AskUserQuestion tool with structured options</action>
-      <verification>User responses recorded</verification>
-    </behavior>
-    <behavior id="DEFF-B003" priority="critical">
-      <trigger>After initial requirements document</trigger>
-      <action>Execute feedback collection phase</action>
-      <verification>Feedback results in output</verification>
-    </behavior>
-    <behavior id="DEFF-B004" priority="critical">
-      <trigger>After feedback collection</trigger>
-      <action>Execute regeneration phase</action>
-      <verification>Regenerated specification in output</verification>
-    </behavior>
-    <behavior id="DEFF-B005" priority="critical">
-      <trigger>During feedback phase</trigger>
-      <action>Launch all feedback agents in parallel</action>
-      <verification>Parallel execution confirmed</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="DEFF-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Modifying or creating code files</action>
-      <response>Block operation, this is read-only command</response>
-    </behavior>
-    <behavior id="DEFF-P002" priority="critical">
-      <trigger>Always</trigger>
-      <action>Proceeding without answering critical questions</action>
-      <response>Block operation, require clarification first</response>
-    </behavior>
-    <behavior id="DEFF-P003" priority="critical">
-      <trigger>Always</trigger>
-      <action>Skipping feedback or regeneration phases</action>
-      <response>Block operation, full cycle required</response>
-    </behavior>
-    <behavior id="DEFF-P004" priority="critical">
-      <trigger>Always</trigger>
-      <action>Multiple regeneration iterations</action>
-      <response>Block operation, maximum one iteration</response>
-    </behavior>
-    <behavior id="DEFF-P005" priority="critical">
-      <trigger>Between phases</trigger>
-      <action>Requesting user confirmation to proceed</action>
-      <response>Proceed automatically between phases</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
-
 <output>
   <format>
     <initial_requirements_document>
@@ -523,7 +462,62 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </final_requirements_document>
   </format>
 </output>
-
+<enforcement>
+  <mandatory_behaviors>
+    <behavior id="DEFF-B001" priority="critical">
+      <trigger>Before requirements documentation</trigger>
+      <action>Investigate existing codebase patterns</action>
+      <verification>Codebase analysis in output</verification>
+    </behavior>
+    <behavior id="DEFF-B002" priority="critical">
+      <trigger>For design decisions</trigger>
+      <action>Use AskUserQuestion tool with structured options</action>
+      <verification>User responses recorded</verification>
+    </behavior>
+    <behavior id="DEFF-B003" priority="critical">
+      <trigger>After initial requirements document</trigger>
+      <action>Execute feedback collection phase</action>
+      <verification>Feedback results in output</verification>
+    </behavior>
+    <behavior id="DEFF-B004" priority="critical">
+      <trigger>After feedback collection</trigger>
+      <action>Execute regeneration phase</action>
+      <verification>Regenerated specification in output</verification>
+    </behavior>
+    <behavior id="DEFF-B005" priority="critical">
+      <trigger>During feedback phase</trigger>
+      <action>Launch all feedback agents in parallel</action>
+      <verification>Parallel execution confirmed</verification>
+    </behavior>
+  </mandatory_behaviors>
+  <prohibited_behaviors>
+    <behavior id="DEFF-P001" priority="critical">
+      <trigger>Always</trigger>
+      <action>Modifying or creating code files</action>
+      <response>Block operation, this is read-only command</response>
+    </behavior>
+    <behavior id="DEFF-P002" priority="critical">
+      <trigger>Always</trigger>
+      <action>Proceeding without answering critical questions</action>
+      <response>Block operation, require clarification first</response>
+    </behavior>
+    <behavior id="DEFF-P003" priority="critical">
+      <trigger>Always</trigger>
+      <action>Skipping feedback or regeneration phases</action>
+      <response>Block operation, full cycle required</response>
+    </behavior>
+    <behavior id="DEFF-P004" priority="critical">
+      <trigger>Always</trigger>
+      <action>Multiple regeneration iterations</action>
+      <response>Block operation, maximum one iteration</response>
+    </behavior>
+    <behavior id="DEFF-P005" priority="critical">
+      <trigger>Between phases</trigger>
+      <action>Requesting user confirmation to proceed</action>
+      <response>Proceed automatically between phases</response>
+    </behavior>
+  </prohibited_behaviors>
+</enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor ambiguity in non-critical feature detail</low>
@@ -532,7 +526,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     <critical>Request violates security policy or data integrity</critical>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="define">Basic requirements definition without feedback loop</command>
   <command name="execute">Handoff point after requirements are defined</command>
@@ -541,6 +534,11 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <command name="bug">When defining fix requirements for known issues</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="requirements-definition">Core methodology for specification</skill>
   <skill name="execution-workflow">Understanding work review methodology</skill>
@@ -548,7 +546,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <skill name="serena-usage">Check existing patterns and memories</skill>
   <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
-
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Delegate detailed investigation to sub-agents</must>

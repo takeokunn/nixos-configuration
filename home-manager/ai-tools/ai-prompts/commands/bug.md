@@ -6,7 +6,6 @@ description: Root cause investigation command
 <purpose>
 Identify root causes from error messages and anomalous behavior, providing fact-based analysis without performing fixes.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">investigation-patterns</skill>
@@ -14,7 +13,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Never modify, create, or delete files</rule>
   <rule>Never implement fixes; provide suggestions only</rule>
@@ -22,7 +20,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <rule>Judge from facts, not user speculation</rule>
   <rule>Logs as primary information source</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use investigation-patterns skill for debugging methodology</rule>
   <rule>Delegate investigations to debug agent</rule>
@@ -30,32 +27,86 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <rule>Verify similar implementations nearby</rule>
   <rule>Track occurrence path chronologically</rule>
 </rules>
-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
-    <step>1. Activate Serena project with activate_project</step>
-    <step>2. Check list_memories for relevant patterns</step>
-    <step>3. Load applicable memories with read_memory</step>
+    <step>
+      <action>Activate Serena project with activate_project</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Load applicable memories with read_memory</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="analyze">
     <objective>Classify error type and establish investigation scope</objective>
-    <step>1. What type of error is this? (syntax, runtime, logic)</step>
-    <step>2. Where does it occur? (file, line, function)</step>
-    <step>3. What logs are available?</step>
-    <step>4. What is the error context? (before, during, after)</step>
+    <step>
+      <action>What type of error is this? (syntax, runtime, logic)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Where does it occur? (file, line, function)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>What logs are available?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>What is the error context? (before, during, after)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="investigate">
     <objective>Delegate parallel investigations to specialized agents</objective>
-    <step>1. Delegate to quality-assurance agent: analyze stack trace, error patterns</step>
-    <step>2. Delegate to explore agent: find error location and related code paths</step>
-    <step>3. Delegate to general-purpose agent: analyze logs and dependencies</step>
-    <step>4. Use fact-check skill patterns: verify external documentation references via Context7</step>
-    <step>5. Analyze error location details from agent findings</step>
-    <step>6. Review dependencies and imports</step>
-    <step>7. Check config files and recent changes</step>
+    <step>
+      <action>Delegate to quality-assurance agent: analyze stack trace, error patterns</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Delegate to explore agent: find error location and related code paths</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Delegate to general-purpose agent: analyze logs and dependencies</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Use fact-check skill patterns: verify external documentation references via Context7</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Analyze error location details from agent findings</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Review dependencies and imports</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check config files and recent changes</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <question>Have I built a complete evidence chain from symptom to cause?</question>
@@ -68,24 +119,81 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect environmental context and runtime conditions</objective>
-    <step>1. Collect runtime info (OS, versions, env vars)</step>
-    <step>2. Check resources (disk, memory, network)</step>
+    <step>
+      <action>Collect runtime info (OS, versions, env vars)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check resources (disk, memory, network)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Synthesize findings into actionable root cause analysis</objective>
-    <step>1. Compile agent findings with confidence metrics</step>
-    <step>2. Identify root cause with supporting evidence</step>
+    <step>
+      <action>Compile agent findings with confidence metrics</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Identify root cause with supporting evidence</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="self_evaluate">
     <objective>Brief quality assessment of investigation output</objective>
-    <step>1. Calculate confidence using decision_criteria: root_cause_certainty (50%), evidence_chain (30%), fix_viability (20%)</step>
-    <step>2. Identify top 1-2 critical issues if confidence below 80 or evidence gaps detected</step>
-    <step>3. Append self_feedback section to output</step>
+    <step>
+      <action>Calculate confidence using decision_criteria: root_cause_certainty (50%), evidence_chain (30%), fix_viability (20%)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Identify top 1-2 critical issues if confidence below 80 or evidence gaps detected</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Append self_feedback section to output</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
+<agents>
+  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
+  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
+  <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
+</agents>
+<execution_graph>
+  <parallel_group id="error_analysis" depends_on="none">
+    <agent>quality-assurance</agent>
+    <agent>explore</agent>
+  </parallel_group>
+  <parallel_group id="context_gathering" depends_on="none">
+    <agent>general-purpose</agent>
+  </parallel_group>
+  <sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
+    <agent>quality-assurance</agent>
+    <reason>Requires findings from both error analysis and context gathering</reason>
+  </sequential_phase>
+</execution_graph>
+<delegation>
+  <requirement>Full error message/stack trace</requirement>
+  <requirement>Reproduction steps (if known)</requirement>
+  <requirement>Related file paths</requirement>
+  <requirement>Explicit edit prohibition</requirement>
+</delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="root_cause_certainty" weight="0.5">
@@ -108,34 +216,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     </factor>
   </criterion>
 </decision_criteria>
-
-<agents>
-  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
-  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
-</agents>
-
-<execution_graph>
-  <parallel_group id="error_analysis" depends_on="none">
-    <agent>quality-assurance</agent>
-    <agent>explore</agent>
-  </parallel_group>
-  <parallel_group id="context_gathering" depends_on="none">
-    <agent>general-purpose</agent>
-  </parallel_group>
-  <sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
-    <agent>quality-assurance</agent>
-    <reason>Requires findings from both error analysis and context gathering</reason>
-  </sequential_phase>
-</execution_graph>
-
-<delegation>
-  <requirement>Full error message/stack trace</requirement>
-  <requirement>Reproduction steps (if known)</requirement>
-  <requirement>Related file paths</requirement>
-  <requirement>Explicit edit prohibition</requirement>
-</delegation>
-
 <output>
   <format>
     <overview>Summary of error and investigation</overview>
@@ -161,7 +241,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     </self_feedback>
   </format>
 </output>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="BUG-B001" priority="critical">
@@ -183,7 +262,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <example severity="low">Minor log warning without impact</example>
@@ -192,20 +270,23 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <example severity="critical">Security breach or critical data loss risk</example>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="ask">When investigation reveals architectural questions</command>
   <command name="define">When bug fix requires requirements specification</command>
   <command name="execute">When ready to implement fix after investigation</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="investigation-patterns">Core debugging methodology</skill>
   <skill name="serena-usage">Navigate error locations efficiently</skill>
   <skill name="testing-patterns">Understand test failures and coverage gaps</skill>
   <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
-
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Prioritize logs as primary information source</must>

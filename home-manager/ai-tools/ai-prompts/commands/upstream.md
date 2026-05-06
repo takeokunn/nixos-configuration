@@ -6,7 +6,6 @@ description: Upstream PR preparation and review command
 <purpose>
 Review and prepare changes before submitting PRs to upstream OSS repositories, auto-fetching contribution guidelines, analyzing code changes, evaluating tests, and generating compliant PR metadata.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">fact-check</skill>
@@ -14,14 +13,12 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <skill use="tools">context7-usage</skill>
   <skill use="ecosystem">devenv-ecosystem</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Read-only operation: analyze and report only, no file modifications</rule>
   <rule>Auto-fetch CONTRIBUTING.md from upstream with fallback hierarchy (root, .github/, docs/)</rule>
   <rule>Launch all gather-phase agents in parallel</rule>
   <rule>Verify gh CLI authentication before PR history operations</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use gh CLI for all GitHub API operations</rule>
   <rule>Check Serena memories for existing contribution patterns</rule>
@@ -29,9 +26,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <rule>Include comprehensive local reproduction steps with Nix-first ecosystem detection</rule>
   <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <workflow>
   <phase name="preflight">
     <objective>Verify environment and detect upstream repository</objective>
@@ -183,6 +178,47 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
 </workflow>
 
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
+<agents>
+  <agent name="guidelines" subagent_type="docs" readonly="true">Parse CONTRIBUTING.md and extract requirements</agent>
+  <agent name="pr_template" subagent_type="docs" readonly="true">Fetch and parse .github/PULL_REQUEST_TEMPLATE.md from upstream; extract required sections and structure; return null if not found (no fallback)</agent>
+  <agent name="changes" subagent_type="quality-assurance" readonly="true">Review code changes for quality and patterns</agent>
+  <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
+  <agent name="pr_samples" subagent_type="general-purpose" readonly="true">Sample 10 recently merged PRs from upstream via gh CLI; extract title patterns, description structure, and common sections for pattern learning</agent>
+  <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns; set template_source accordingly</agent>
+  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
+  <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
+</agents>
+<execution_graph>
+  <parallel_group id="gather" depends_on="none">
+    <agent>guidelines</agent>
+    <agent>pr_template</agent>
+    <agent>changes</agent>
+    <agent>tests</agent>
+    <agent>pr_samples</agent>
+  </parallel_group>
+  <parallel_group id="post_gather" depends_on="gather">
+    <agent>metadata</agent>
+    <agent>verify</agent>
+  </parallel_group>
+  <sequential_phase id="validation" depends_on="post_gather">
+    <agent>validator</agent>
+    <reason>Cross-validate all findings before final output</reason>
+  </sequential_phase>
+</execution_graph>
+<delegation>
+  <requirement>Upstream repository URL or detection</requirement>
+  <requirement>Current branch and pending changes</requirement>
+  <requirement>Contribution guidelines (if available)</requirement>
+  <requirement>PR template from .github/PULL_REQUEST_TEMPLATE.md (if available)</requirement>
+  <requirement>10 sampled merged PRs for pattern learning</requirement>
+  <requirement>Explicit no-modification prohibition</requirement>
+  <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
+</delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="guideline_compliance" weight="0.4">
@@ -205,46 +241,6 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </factor>
   </criterion>
 </decision_criteria>
-
-<agents>
-  <agent name="guidelines" subagent_type="docs" readonly="true">Parse CONTRIBUTING.md and extract requirements</agent>
-  <agent name="pr_template" subagent_type="docs" readonly="true">Fetch and parse .github/PULL_REQUEST_TEMPLATE.md from upstream; extract required sections and structure; return null if not found (no fallback)</agent>
-  <agent name="changes" subagent_type="quality-assurance" readonly="true">Review code changes for quality and patterns</agent>
-  <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
-  <agent name="pr_samples" subagent_type="general-purpose" readonly="true">Sample 10 recently merged PRs from upstream via gh CLI; extract title patterns, description structure, and common sections for pattern learning</agent>
-  <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns; set template_source accordingly</agent>
-  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
-  <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
-</agents>
-
-<execution_graph>
-  <parallel_group id="gather" depends_on="none">
-    <agent>guidelines</agent>
-    <agent>pr_template</agent>
-    <agent>changes</agent>
-    <agent>tests</agent>
-    <agent>pr_samples</agent>
-  </parallel_group>
-  <parallel_group id="post_gather" depends_on="gather">
-    <agent>metadata</agent>
-    <agent>verify</agent>
-  </parallel_group>
-  <sequential_phase id="validation" depends_on="post_gather">
-    <agent>validator</agent>
-    <reason>Cross-validate all findings before final output</reason>
-  </sequential_phase>
-</execution_graph>
-
-<delegation>
-  <requirement>Upstream repository URL or detection</requirement>
-  <requirement>Current branch and pending changes</requirement>
-  <requirement>Contribution guidelines (if available)</requirement>
-  <requirement>PR template from .github/PULL_REQUEST_TEMPLATE.md (if available)</requirement>
-  <requirement>10 sampled merged PRs for pattern learning</requirement>
-  <requirement>Explicit no-modification prohibition</requirement>
-  <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
-</delegation>
-
 <output>
   <status_criteria>
     <status name="ready">Confidence score >= 80, no critical issues</status>
@@ -633,43 +629,58 @@ Phase 4: Final Verification (depends on all)
           </dependency_format>
           <phase name="code_fixes" order="1" parallel_safe="true">
             <description>Lint errors, style issues, code quality improvements identified in review</description>
-            <task id="CF-001">
-              <files>List of files to modify</files>
-              <overview>Brief description of what needs to be done</overview>
-              <dependencies>None</dependencies>
-            </task>
+            <step>Apply code fix tasks in this phase according to their dependencies</step>
+            <responsibility name="code_fix_tasks">
+              <task id="CF-001">
+                <files>List of files to modify</files>
+                <overview>Brief description of what needs to be done</overview>
+                <dependencies>None</dependencies>
+              </task>
+            </responsibility>
           </phase>
           <phase name="test_updates" order="2" parallel_safe="true">
             <description>Missing tests, coverage gaps, test improvements</description>
-            <task id="TU-001">
-              <files>List of test files</files>
-              <overview>Test task description</overview>
-              <dependencies>CF-001</dependencies>
-            </task>
+            <step>Apply test update tasks in this phase according to their dependencies</step>
+            <responsibility name="test_update_tasks">
+              <task id="TU-001">
+                <files>List of test files</files>
+                <overview>Test task description</overview>
+                <dependencies>CF-001</dependencies>
+              </task>
+            </responsibility>
           </phase>
           <phase name="documentation" order="3" parallel_safe="true">
             <description>README, inline docs, changelog, API documentation</description>
-            <task id="DOC-001">
-              <files>Documentation files</files>
-              <overview>Documentation task description</overview>
-              <dependencies>CF-001</dependencies>
-            </task>
+            <step>Apply documentation tasks in this phase according to their dependencies</step>
+            <responsibility name="documentation_tasks">
+              <task id="DOC-001">
+                <files>Documentation files</files>
+                <overview>Documentation task description</overview>
+                <dependencies>CF-001</dependencies>
+              </task>
+            </responsibility>
           </phase>
           <phase name="commit_prep" order="4" parallel_safe="false">
             <description>Commit message formatting per contribution guidelines, rebasing onto upstream, squashing commits if required</description>
-            <task id="GIT-001">
-              <files>N/A (git operations)</files>
-              <overview>Git preparation task description</overview>
-              <dependencies>All previous phases</dependencies>
-            </task>
+            <step>Prepare git-related task guidance without performing git write operations</step>
+            <responsibility name="commit_preparation_tasks">
+              <task id="GIT-001">
+                <files>N/A (git operations)</files>
+                <overview>Git preparation task description</overview>
+                <dependencies>All previous phases</dependencies>
+              </task>
+            </responsibility>
           </phase>
           <phase name="final_verification" order="5" parallel_safe="false">
             <description>Running lint, test, build commands before PR</description>
-            <task id="VER-001">
-              <files>N/A (verification commands)</files>
-              <overview>Run all verification commands</overview>
-              <dependencies>All previous phases</dependencies>
-            </task>
+            <step>Run final verification tasks after all dependent phases complete</step>
+            <responsibility name="final_verification_tasks">
+              <task id="VER-001">
+                <files>N/A (verification commands)</files>
+                <overview>Run all verification commands</overview>
+                <dependencies>All previous phases</dependencies>
+              </task>
+            </responsibility>
           </phase>
         </phased_tasks>
         <execute_handoff>
@@ -717,7 +728,6 @@ Phase 4: Final Verification (depends on all)
     </upstream_review>
   </format>
 </output>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="UP-B001" priority="critical">
@@ -784,7 +794,6 @@ Phase 4: Final Verification (depends on all)
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <example severity="low">Minor style inconsistency with upstream</example>
@@ -793,19 +802,22 @@ Phase 4: Final Verification (depends on all)
     <example severity="critical">gh auth failure or no upstream detected</example>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="execute">After upstream review, implement recommended fixes</command>
   <command name="feedback">Additional review after fixes applied</command>
   <command name="define">If requirements for contribution unclear</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="execution-workflow">Understanding PR review methodology</skill>
   <skill name="testing-patterns">Evaluating test appropriateness</skill>
   <skill name="fact-check">Verifying contribution guideline compliance</skill>
 </related_skills>
-
 <constraints>
   <must>Verify gh CLI authentication before operations</must>
   <must>Check CONTRIBUTING.md in all three locations</must>

@@ -249,7 +249,7 @@ version: 2.0.0
       name = "my-crate"
       version = "0.1.0"
       edition = "2024" # Current edition (stable since Rust 1.85)
-      rust-version = "1.94" # Current stable as of April 2026
+      rust-version = "1.85" # Minimum supported version for edition 2024
 
       [dependencies]
       serde = { version = "1.0", features = ["derive"] }

@@ -242,7 +242,7 @@ version: 2.0.0
 </nix_language>
 
 <flakes>
-  <note>Flakes are the de facto standard for Nix projects as of 2025. While technically still behind an experimental flag in upstream Nix, they are universally adopted in the ecosystem. Lix (a community fork of the Nix evaluator) also supports flakes.</note>
+  <note>Flakes are the de facto standard for Nix projects. While technically still behind an experimental flag in upstream Nix, they are universally adopted in the ecosystem. Lix (a community fork of the Nix evaluator) also supports flakes.</note>
 
   <concept name="flake_structure">
     <description>Basic structure of a flake.nix file</description>
@@ -702,7 +702,7 @@ version: 2.0.0
   <concept name="state_version">
     <description>Track Home Manager state version for compatibility</description>
     <example>
-      home.stateVersion = "25.05"; # Current stable. 25.11 (upcoming).
+      home.stateVersion = "25.11"; # Stable baseline for 2026-05 configurations.
     </example>
     <warning>Do not change after initial setup unless migrating</warning>
   </concept>

@@ -6,7 +6,6 @@ description: Review command for Claude Code's recent work
 <purpose>
 Multi-faceted review of Claude Code's work within the same session, automatically selecting appropriate review mode and executing efficiently in parallel.
 </purpose>
-
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">execution-workflow</skill>
@@ -14,50 +13,106 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
-
 <rules priority="critical">
   <rule>Launch all Task tools simultaneously in one message (timeout avoidance)</rule>
   <rule>Auto-select mode based on previous command</rule>
   <rule>Review only changed code in execute mode, not existing issues</rule>
   <rule>Provide concrete fix proposals, not abstract theories</rule>
 </rules>
-
 <rules priority="standard">
   <rule>Use execution-workflow skill for code review methodology</rule>
   <rule>Check Serena memories for existing patterns</rule>
   <rule>Target session operations, not git diff</rule>
 </rules>
-
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
-
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
-    <step>1. Activate Serena project with activate_project</step>
-    <step>2. Check list_memories for relevant patterns</step>
-    <step>3. Load applicable memories with read_memory</step>
+    <step>
+      <action>Activate Serena project with activate_project</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Check list_memories for relevant patterns</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Load applicable memories with read_memory</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="analyze">
     <objective>Determine review scope and appropriate mode selection</objective>
-    <step>1. What was the previous command? (/define, /execute, /bug, /ask, other)</step>
-    <step>2. What files/work need to be reviewed?</step>
-    <step>3. Which agents should run in parallel?</step>
-    <step>4. What metrics are relevant for this mode?</step>
+    <step>
+      <action>What was the previous command? (/define, /execute, /bug, /ask, other)</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>What files/work need to be reviewed?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Which agents should run in parallel?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>What metrics are relevant for this mode?</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <phase name="select">
     <objective>Select review mode and configure appropriate agents</objective>
-    <step>1. Determine mode based on previous command</step>
-    <step>2. After /define: Execution plan feedback</step>
-    <step>3. After /execute: Work content feedback</step>
-    <step>4. After /bug: Investigation quality feedback</step>
-    <step>5. After /ask: Answer accuracy feedback</step>
-    <step>6. Other: Recent work feedback</step>
+    <step>
+      <action>Determine mode based on previous command</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>After /define: Execution plan feedback</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>After /execute: Work content feedback</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>After /bug: Investigation quality feedback</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>After /ask: Answer accuracy feedback</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Other: Recent work feedback</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="execute">
     <objective>Execute parallel review analysis across selected agents</objective>
-    <step>1. Launch all agents in parallel</step>
-    <step>2. Collect agent results</step>
+    <step>
+      <action>Launch all agents in parallel</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Collect agent results</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
   <reflection_checkpoint id="review_quality">
     <question>Did all agents complete successfully?</question>
@@ -72,40 +127,30 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="synthesize">
     <objective>Compile comprehensive feedback report with actionable recommendations</objective>
-    <step>1. Compile feedback with metrics</step>
-    <step>2. Generate actionable recommendations</step>
+    <step>
+      <action>Compile feedback with metrics</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
+    <step>
+      <action>Generate actionable recommendations</action>
+      <tool>Task tool and Serena read/search tools as needed</tool>
+      <output>Step result recorded for the phase</output>
+    </step>
   </phase>
 </workflow>
 
-<decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="review_depth" weight="0.4">
-      <score range="90-100">All code paths and edge cases reviewed</score>
-      <score range="70-89">Main code paths reviewed</score>
-      <score range="50-69">Surface level review</score>
-      <score range="0-49">Minimal review</score>
-    </factor>
-    <factor name="feedback_actionability" weight="0.3">
-      <score range="90-100">All feedback is specific and actionable</score>
-      <score range="70-89">Most feedback actionable</score>
-      <score range="50-69">Some vague feedback</score>
-      <score range="0-49">Mostly vague feedback</score>
-    </factor>
-    <factor name="issue_prioritization" weight="0.3">
-      <score range="90-100">Clear priority levels with rationale</score>
-      <score range="70-89">Priority levels assigned</score>
-      <score range="50-69">Partial prioritization</score>
-      <score range="0-49">No prioritization</score>
-    </factor>
-  </criterion>
-</decision_criteria>
-
+<reflection_checkpoint id="group_consistency">
+  <question>Are command-group required sections complete and ordered?</question>
+  <question>Is the command safe to execute within stated constraints?</question>
+  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+</reflection_checkpoint>
 <modes>
   <mode name="define">
     <target>Execution plan from conversation history</target>
     <aspects>Step granularity, dependencies, risk identification, completeness, feasibility</aspects>
     <agents>
-      <agent name="plan" subagent_type="Plan" readonly="true">Execution plan review</agent>
+      <agent name="plan" subagent_type="plan" readonly="true">Execution plan review</agent>
       <agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
     </agents>
     <fact_check>Use fact-check skill patterns for external source verification via Context7</fact_check>
@@ -160,7 +205,55 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <execution>All agents in parallel</execution>
   </mode>
 </modes>
-
+<agents>
+  <agent name="plan" subagent_type="plan" readonly="true">Execution plan review</agent>
+  <agent name="estimation" subagent_type="general-purpose" readonly="true">Estimation validity review</agent>
+  <agent name="quality" subagent_type="quality-assurance" readonly="true">Naming, DRY, readability</agent>
+  <agent name="security" subagent_type="security" readonly="true">OWASP Top 10, input validation, auth</agent>
+  <agent name="design" subagent_type="design" readonly="true">Architecture consistency, patterns</agent>
+  <agent name="docs" subagent_type="docs" readonly="true">Accuracy, structure, completeness</agent>
+  <agent name="performance" subagent_type="performance" readonly="true">Performance review</agent>
+  <agent name="test" subagent_type="test" readonly="true">Test coverage review</agent>
+  <agent name="review" subagent_type="quality-assurance" readonly="true">Comprehensive work review</agent>
+  <agent name="complexity" subagent_type="code-quality" readonly="true">Code complexity review</agent>
+  <agent name="memory" subagent_type="general-purpose" readonly="true">Consistency check with existing patterns</agent>
+  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis and dependency investigation evaluation</agent>
+  <agent name="explore" subagent_type="explore" readonly="true">Evidence and code path coverage evaluation</agent>
+  <agent name="code-quality" subagent_type="code-quality" readonly="true">Reference precision and conclusion validity</agent>
+</agents>
+<execution_graph>
+  <sequential_phase id="mode_selection" depends_on="none">
+    <action>Select one review mode from the modes section based on the previous command</action>
+  </sequential_phase>
+  <parallel_group id="selected_review" depends_on="mode_selection">
+    <agent>Agents listed in the selected mode</agent>
+  </parallel_group>
+  <sequential_phase id="synthesis" depends_on="selected_review">
+    <action>Compile the review report with metrics, findings, and recommended actions</action>
+  </sequential_phase>
+</execution_graph>
+<decision_criteria inherits="core-patterns#decision_criteria">
+  <criterion name="confidence_calculation">
+    <factor name="review_depth" weight="0.4">
+      <score range="90-100">All code paths and edge cases reviewed</score>
+      <score range="70-89">Main code paths reviewed</score>
+      <score range="50-69">Surface level review</score>
+      <score range="0-49">Minimal review</score>
+    </factor>
+    <factor name="feedback_actionability" weight="0.3">
+      <score range="90-100">All feedback is specific and actionable</score>
+      <score range="70-89">Most feedback actionable</score>
+      <score range="50-69">Some vague feedback</score>
+      <score range="0-49">Mostly vague feedback</score>
+    </factor>
+    <factor name="issue_prioritization" weight="0.3">
+      <score range="90-100">Clear priority levels with rationale</score>
+      <score range="70-89">Priority levels assigned</score>
+      <score range="50-69">Partial prioritization</score>
+      <score range="0-49">No prioritization</score>
+    </factor>
+  </criterion>
+</decision_criteria>
 <output>
   <format>
     <feedback_results mode="{Mode}">
@@ -195,7 +288,6 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     </feedback_results>
   </format>
 </output>
-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="FB-B001" priority="critical">
@@ -217,7 +309,6 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
     <low>Minor code quality issue in reviewed work</low>
@@ -226,7 +317,6 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <critical>Data loss risk or security breach in reviewed work</critical>
   </examples>
 </error_escalation>
-
 <related_commands>
   <command name="execute">Primary target for feedback after implementation</command>
   <command name="define">Feedback on execution plans</command>
@@ -235,13 +325,17 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <command name="upstream">Review before submitting upstream PR</command>
 </related_commands>
 
+<related_agents>
+  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
+  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
+  <agent name="validator">Cross-validation when findings may conflict</agent>
+</related_agents>
 <related_skills>
   <skill name="execution-workflow">Understanding work review methodology</skill>
   <skill name="investigation-patterns">Evaluating evidence quality in investigations</skill>
   <skill name="testing-patterns">Assessing test coverage and quality</skill>
   <skill name="fact-check">Verifying external source claims</skill>
 </related_skills>
-
 <constraints>
   <must>Launch all agents simultaneously (no sequential execution)</must>
   <must>Review only changed code in execute mode</must>

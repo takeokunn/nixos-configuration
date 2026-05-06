@@ -156,6 +156,16 @@
         (autoload f file docstring interactive type))
       t))
 #+end_src
+** compat
+:PROPERTIES:
+:CUSTOM_ID: compat
+:END:
+#+begin_src emacs-lisp :tangle yes
+  ;; compat-30 appears before compat-31 in load-path; load compat-31 explicitly
+  ;; so that Emacs 31 compatibility functions (e.g. set-local used by corfu) are available
+  (when (version< emacs-version "31")
+    (require 'compat-31))
+#+end_src
 * Basic
 :PROPERTIES:
 :CUSTOM_ID: basic
