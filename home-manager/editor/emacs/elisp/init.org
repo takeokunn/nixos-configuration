@@ -3438,8 +3438,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
   (with-eval-after-load 'minibuffer
     ;; config
-    (add-to-list 'completion-styles-alist '(orderless orderless-try-completion orderless-all-completions
-                                                      "Completion of multiple components, in any order."))
+    (require 'orderless)
     (setopt completion-styles '(orderless initials flex basic))
     (setopt completion-category-overrides '((file (styles flex basic partial-completion)))))
 #+end_src
