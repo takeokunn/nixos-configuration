@@ -95,10 +95,6 @@ Code review and cleanup command that identifies changes via git diff, launches t
     <question>Are findings specific with file:line references?</question>
     <question>Are there contradictions between agents?</question>
     <threshold>If confidence less than 70, re-run failed agents or gather additional context</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After review agents complete</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="aggregate">
     <step order="1">
@@ -142,10 +138,6 @@ Code review and cleanup command that identifies changes via git diff, launches t
 
   </phase>
   <reflection_checkpoint id="completion_validation" after="fix">
-    <serena_validation>
-      <tool>think_about_whether_you_are_done</tool>
-      <trigger>Before reporting task completion to user</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">

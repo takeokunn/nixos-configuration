@@ -101,7 +101,7 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     </step>
     <step order="15">
       <action>Verify sub-agent outputs</action>
-      <tool>think_about_task_adherence</tool>
+      <tool>Output verification</tool>
       <output>Verification results</output>
     </step>
     <step order="16">
@@ -154,10 +154,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <threshold min="70" action="proceed">
         <below_threshold>Re-run failed agents or gather additional context</below_threshold>
       </threshold>
-      <serena_validation>
-        <tool>think_about_collected_information</tool>
-        <trigger>After feedback collection completes</trigger>
-      </serena_validation>
     </reflection_checkpoint>
 
   <phase name="fix_issues">

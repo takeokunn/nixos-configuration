@@ -98,10 +98,6 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <threshold min="70" action="proceed">
       <below_threshold>Expand profiling or verify measurements</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_task_adherence</tool>
-      <trigger>Before applying optimizations</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="optimize">
     <objective>Apply optimizations and verify improvements</objective>
@@ -161,7 +157,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <decision_tree name="tool_selection">
     <question>What type of performance analysis is needed?</question>
     <branch condition="Code structure analysis">Use serena find_symbol</branch>
-    <branch condition="Loop/recursion detection">Use serena search_for_pattern</branch>
+    <branch condition="Loop/recursion detection">Use Grep</branch>
     <branch condition="Benchmark execution">Use Bash with profiling tools</branch>
     <branch condition="Code optimization">Use Edit tool or serena replace_symbol_body</branch>
   </decision_tree>
@@ -258,7 +254,7 @@ Confidence is 85 because algorithm complexity analysis is definitive (O(n^2) vs 
   <example name="n_plus_one_detection">
     <input>Profile database queries in user listing endpoint</input>
     <process>
-1. Search for query patterns with serena search_for_pattern
+1. Search for query patterns with Grep
 2. Identify loops with database calls
 3. Measure query count before and after optimization
 4. Propose eager loading solution

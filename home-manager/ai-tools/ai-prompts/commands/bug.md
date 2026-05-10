@@ -112,10 +112,6 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <question>Have I built a complete evidence chain from symptom to cause?</question>
     <question>Can I explain the error mechanism with concrete evidence?</question>
     <threshold>If confidence less than 70, continue investigation or flag uncertainty</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After investigation phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
     <step order="1">

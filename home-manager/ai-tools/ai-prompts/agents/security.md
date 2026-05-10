@@ -78,10 +78,6 @@ description: Security vulnerability detection and remediation
     <threshold min="70" action="proceed">
       <below_threshold>Expand scan scope or verify findings</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_task_adherence</tool>
-      <trigger>Before applying security fixes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="remediate">
     <objective>Provide fix recommendations and auto-fix when safe</objective>
@@ -140,7 +136,7 @@ description: Security vulnerability detection and remediation
   <tool name="Bash">Run audit tools</tool>
   <decision_tree name="tool_selection">
     <question>What type of security analysis is needed?</question>
-    <branch condition="Secret/injection pattern detection">Use serena search_for_pattern</branch>
+    <branch condition="Secret/injection pattern detection">Use Grep</branch>
     <branch condition="Auth code location">Use serena find_symbol</branch>
     <branch condition="Dependency audit">Use Bash with npm audit, cargo audit</branch>
     <branch condition="Secure library versions">Use context7 for version verification</branch>
@@ -216,7 +212,7 @@ description: Security vulnerability detection and remediation
   <example name="secret_scan">
     <input>Scan for hardcoded API keys</input>
     <process>
-1. Search for API key patterns with serena search_for_pattern
+1. Search for API key patterns with Grep
 2. Check config files for hardcoded values
 3. Verify if values are actual secrets or placeholders
     </process>

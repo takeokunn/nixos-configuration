@@ -96,10 +96,6 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <question>Do findings from different agents align?</question>
     <question>Are there conflicting signals that require deeper analysis?</question>
     <threshold>If confidence less than 70, expand investigation scope or seek clarification</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After investigation phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="synthesize">
     <step order="1">

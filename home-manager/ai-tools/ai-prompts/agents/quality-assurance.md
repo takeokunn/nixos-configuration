@@ -99,10 +99,6 @@ description: Code review and quality evaluation
     <question>Are my findings specific and actionable?</question>
     <question>Is my confidence score justified by evidence?</question>
     <threshold>If any answer is no, revisit evaluation phase</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After review evaluation completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate actionable feedback and recommendations</objective>
@@ -187,7 +183,7 @@ description: Code review and quality evaluation
     <question>What type of quality analysis is needed?</question>
     <branch condition="Code investigation">Use serena find_symbol</branch>
     <branch condition="Impact analysis">Use serena find_referencing_symbols</branch>
-    <branch condition="Error pattern search">Use serena search_for_pattern</branch>
+    <branch condition="Error pattern search">Use Grep</branch>
     <branch condition="Accessibility verification">Use playwright browser_snapshot</branch>
   </decision_tree>
 </tools>

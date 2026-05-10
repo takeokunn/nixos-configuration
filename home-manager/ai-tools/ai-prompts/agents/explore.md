@@ -69,10 +69,6 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
     <threshold min="70" action="proceed">
       <below_threshold>Expand search patterns and retry with alternative strategies</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After search phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="filter">
     <objective>Narrow results to most relevant matches</objective>

@@ -109,10 +109,6 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     <threshold min="70" action="proceed">
       <below_threshold>Document gaps and proceed with available data</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After gather phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="synthesize">
     <objective>Generate PR metadata, verification steps, and comprehensive task breakdown</objective>

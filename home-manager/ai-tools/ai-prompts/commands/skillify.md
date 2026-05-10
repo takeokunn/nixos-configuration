@@ -107,10 +107,6 @@ Analyze the current session to extract a repeatable process, interview the user 
     <threshold min="70" action="proceed">
       <below_threshold>Ask additional clarifying questions</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After interview rounds complete</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="write_skill">

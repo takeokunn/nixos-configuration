@@ -184,10 +184,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <threshold min="70" action="proceed">
       <below_threshold>Expand investigation scope or ask user</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After investigation phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="clarify">

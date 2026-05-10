@@ -76,7 +76,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <objective>Quantify code quality with metrics and identify issues</objective>
     <step order="1">
       <action>Measure complexity metrics</action>
-      <tool>serena search_for_pattern</tool>
+      <tool>Grep</tool>
       <output>CC, CogC, depth, lines, params for each function</output>
     </step>
     <step order="2">
@@ -99,10 +99,6 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <threshold min="70" action="proceed">
       <below_threshold>Re-measure or ask user for guidance</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_task_adherence</tool>
-      <trigger>Before applying code improvements</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Apply code improvements and verify no regressions</objective>
@@ -184,7 +180,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <question>What type of analysis is needed?</question>
     <branch condition="Symbol structure analysis">Use serena get_symbols_overview</branch>
     <branch condition="Reference counting">Use serena find_referencing_symbols</branch>
-    <branch condition="Pattern search (duplicates, loops)">Use serena search_for_pattern</branch>
+    <branch condition="Pattern search (duplicates, loops)">Use Grep</branch>
     <branch condition="Quality tool execution">Use quality-tools skill patterns</branch>
   </decision_tree>
 </tools>

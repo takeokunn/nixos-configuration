@@ -65,10 +65,6 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
     <question>Does the output fully address the task?</question>
     <question>Are there edge cases or risks not yet addressed?</question>
     <threshold>If confidence below 70, gather more context or flag uncertainty</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After execution phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">

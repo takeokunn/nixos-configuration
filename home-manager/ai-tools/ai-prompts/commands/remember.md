@@ -127,10 +127,6 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
     <threshold min="70" action="proceed">
       <below_threshold>Re-examine layers for missed relationships</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After classification and cleanup analysis completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="present">
     <objective>Compile and present the organized report for user approval</objective>

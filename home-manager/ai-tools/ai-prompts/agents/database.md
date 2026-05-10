@@ -177,7 +177,7 @@ Expert database agent for schema design, index optimization, query performance, 
   <decision_tree name="tool_selection">
     <question>What type of database analysis is needed?</question>
     <branch condition="ORM model search">Use serena find_symbol</branch>
-    <branch condition="Query pattern search">Use serena search_for_pattern</branch>
+    <branch condition="Query pattern search">Use Grep</branch>
     <branch condition="Dependency analysis">Use serena find_referencing_symbols</branch>
     <branch condition="ORM documentation">Use context7 resolve-library-id then get-library-docs</branch>
   </decision_tree>
@@ -285,7 +285,7 @@ Confidence is 75 because schema structure is clear from Prisma files, query patt
   <example name="n_plus_one_detection">
     <input>Detect N+1 problems in user service</input>
     <process>
-1. Find query patterns with serena search_for_pattern
+1. Find query patterns with Grep
 2. Identify loops with database calls
 3. Calculate query reduction potential
 4. Propose eager loading solution

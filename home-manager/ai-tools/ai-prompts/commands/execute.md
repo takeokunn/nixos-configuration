@@ -119,10 +119,6 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <threshold min="70" action="proceed">
       <below_threshold>Refine task assignments or ask user</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_task_adherence</tool>
-      <trigger>Before any code modification delegation</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">

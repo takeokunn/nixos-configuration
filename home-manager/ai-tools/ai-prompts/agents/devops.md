@@ -159,7 +159,7 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
     <branch condition="IaC file discovery">Use Glob for **/*.tf, **/.github/workflows/*.yml</branch>
     <branch condition="Terraform operations">Use Bash with terraform CLI</branch>
     <branch condition="Kubernetes operations">Use Bash with kubectl CLI</branch>
-    <branch condition="Log pattern analysis">Use serena search_for_pattern</branch>
+    <branch condition="Log pattern analysis">Use Grep</branch>
   </decision_tree>
 </tools>
 <parallelization inherits="parallelization-patterns#parallelization_execution">

@@ -97,7 +97,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </step>
     <step order="13">
       <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
-      <tool>think_about_collected_information</tool>
+      <tool>Requirements analysis</tool>
       <output>Prioritized question list</output>
     </step>
     <step order="14">
@@ -175,10 +175,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <threshold min="70" action="proceed">
         <below_threshold>Re-run failed agents or gather additional context</below_threshold>
       </threshold>
-      <serena_validation>
-        <tool>think_about_collected_information</tool>
-        <trigger>After feedback collection completes</trigger>
-      </serena_validation>
     </reflection_checkpoint>
 
   <phase name="regenerate">
@@ -217,10 +213,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <threshold min="70" action="complete">
         <below_threshold>Flag remaining issues for user review</below_threshold>
       </threshold>
-      <serena_validation>
-        <tool>think_about_whether_you_are_done</tool>
-        <trigger>Before final output</trigger>
-      </serena_validation>
     </reflection_checkpoint>
   </phase>
 

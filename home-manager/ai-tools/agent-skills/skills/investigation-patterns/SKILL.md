@@ -31,12 +31,11 @@ version: 2.0.0
     <use_case>Tracing dependencies and usage patterns</use_case>
   </tool>
 
-  <tool name="search_for_pattern">
-    <description>Search for regex patterns across codebase</description>
+  <tool name="Grep">
+    <description>Search for regex patterns across codebase (use Bash grep or Glob)</description>
     <param name="substring_pattern">Regular expression to search</param>
-    <param name="relative_path">Optional path to restrict search</param>
-    <param name="restrict_search_to_code_files">Limit to code files</param>
-    <use_case>Finding specific patterns or usage across files</use_case>
+    <param name="relative_path">Optional path to restrict search scope</param>
+    <use_case>Finding specific patterns or usage across files; follow up with Serena find_symbol or find_referencing_symbols for navigation</use_case>
   </tool>
 </tools>
 
@@ -199,7 +198,7 @@ version: 2.0.0
       find_symbol: Locate specific symbols by name
       get_symbols_overview: Understand file structure
       find_referencing_symbols: Trace dependencies
-      search_for_pattern: Find patterns across codebase
+      Grep: Find patterns across codebase
     </example>
   </pattern>
 

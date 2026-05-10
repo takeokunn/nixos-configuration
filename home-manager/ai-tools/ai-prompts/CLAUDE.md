@@ -22,6 +22,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Require permission before modifying config files</rule>
   <rule>Use run_in_background for independent long-running tasks</rule>
   <rule>When command not found, automatically retry using nix run nixpkgs#command</rule>
+  <rule>When asking users questions, always use the AskUserQuestion tool with 2–4 structured options to enable interactive selection</rule>
 </rules>
 
 <workflow>
@@ -62,10 +63,6 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <threshold min="70" action="proceed">
       <below_threshold>Gather more context before delegation</below_threshold>
     </threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After investigation sub-agent returns results</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="delegation">
     <objective>Delegate tasks to appropriate sub-agents</objective>
@@ -96,10 +93,6 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     </threshold>
   </reflection_checkpoint>
   <reflection_checkpoint id="pre_edit_validation" before="code_modification">
-    <serena_validation>
-      <tool>think_about_task_adherence</tool>
-      <trigger>Before any symbol editing operation (see serena-usage skill)</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="consolidation">
     <objective>Verify and synthesize sub-agent outputs</objective>
@@ -120,10 +113,6 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     </step>
   </phase>
   <reflection_checkpoint id="completion_validation" after="consolidation">
-    <serena_validation>
-      <tool>think_about_whether_you_are_done</tool>
-      <trigger>Before reporting task completion to user</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="cross_validation">
     <objective>Validate outputs through cross-agent verification</objective>

@@ -68,10 +68,6 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     <question>Have I correctly identified the previous command and its output?</question>
     <question>Do I understand what content needs to be documented?</question>
     <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After analyze phase completes</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="gather">
     <step order="1">

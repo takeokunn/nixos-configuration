@@ -119,10 +119,6 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <question>Is the feedback specific and actionable?</question>
     <question>Have I assigned priority levels to all issues?</question>
     <threshold>If confidence less than 70, gather additional context or re-run agents</threshold>
-    <serena_validation>
-      <tool>think_about_collected_information</tool>
-      <trigger>After review agents complete</trigger>
-    </serena_validation>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
