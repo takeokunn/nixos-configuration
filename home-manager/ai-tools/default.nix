@@ -14,7 +14,7 @@
   ast-grep-skill,
 }:
 let
-  claude-code = import ./claude-code { inherit pkgs llmAgentsPkgs mcp-servers-nix; };
+  claude-code = import ./claude-code { inherit pkgs nurPkgs llmAgentsPkgs mcp-servers-nix; };
   opencode = import ./opencode {
     inherit
       pkgs

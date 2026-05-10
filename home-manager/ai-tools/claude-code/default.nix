@@ -1,5 +1,6 @@
 {
   pkgs,
+  nurPkgs,
   mcp-servers-nix,
   llmAgentsPkgs,
 }:
@@ -131,14 +132,19 @@ in
         programs = {
           context7.enable = true;
           playwright.enable = true;
-          serena = {
-            enable = true;
-            context = "claude-code";
-            enableWebDashboard = false;
-          };
         };
       }).config.settings.servers
       // {
+        serena = {
+          command = "${nurPkgs.serena}/bin/serena";
+          args = [
+            "start-mcp-server"
+            "--context"
+            "claude-code"
+            "--enable-web-dashboard"
+            "false"
+          ];
+        };
         deepwiki = {
           type = "http";
           url = "https://mcp.deepwiki.com/mcp";

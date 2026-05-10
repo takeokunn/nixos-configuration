@@ -99,11 +99,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1778441123,
-        "narHash": "sha256-hWJ7ei85JYSVUsp7j1g7/mixtKIEyYWltYrlO+h7p2I=",
+        "lastModified": 1778447810,
+        "narHash": "sha256-ZvhcZCeA3QH7Gu3bLTmTgjraOCtKLQVOQpWxhBsu7aY=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "b666cff5372de43d577fb70ba0e9bec1ff733bc6",
+        "rev": "96678f19c743b36d724b9430db707861248992f2",
         "type": "github"
       },
       "original": {
@@ -154,11 +154,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777369708,
-        "narHash": "sha256-1xW7cRZNsFNPQD+cE0fwnLVStnDth0HSoASEIFeT7uI=",
+        "lastModified": 1778445566,
+        "narHash": "sha256-oQvcadh2BCkrog+SGrG6YffKJrveYpjj3TdQJWaKhaM=",
         "owner": "nix-community",
         "repo": "bun2nix",
-        "rev": "e659e1cc4b8e1b21d0aa85f1c481f9db61ecfa98",
+        "rev": "2499dedd70744dba1815875b854818a3019e9e4c",
         "type": "github"
       },
       "original": {
@@ -1075,11 +1075,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778365864,
-        "narHash": "sha256-ImoT/wqmgMImf2dAC+E0MverAdA4QXsedOeES9B7Ezw=",
+        "lastModified": 1778444552,
+        "narHash": "sha256-f18pIiR9q/p1vHY93gmAum7aHhQOG49oGvAB9+lptRo=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2f419037039a152448c5f4ae9494154753d1b399",
+        "rev": "dcebe66f958673729896eec2de4abfd86ef22d21",
         "type": "github"
       },
       "original": {
@@ -1125,11 +1125,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778438712,
-        "narHash": "sha256-J6+/wNUyJKN46YYi6ZJJHYm1IGGWQxfupePZfPlObjg=",
+        "lastModified": 1778449082,
+        "narHash": "sha256-Biy8xXtPVPa3UrjKwNO2Xa0QEZUst0vuw/BisFgrkZA=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "78ca26374de60045477164c0b9795cd6c3edc127",
+        "rev": "558ea74880161eb23a74cb4f7f89236f0e4df723",
         "type": "github"
       },
       "original": {
@@ -1814,11 +1814,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778430378,
-        "narHash": "sha256-Mvx9zDwzMjI3OwRVbgVUn2AIkNDwMtBl0tAjUcmcWUE=",
+        "lastModified": 1778455715,
+        "narHash": "sha256-R18xLFL7Ix+31Vo0iIPnfkuzmqWwev1uzzRIs51rDq4=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "be907b4d2eb71ec33a6e0e628b743d2bf0a2515c",
+        "rev": "2c92d69b93079be56c9fd1ae959239be28ef67e2",
         "type": "github"
       },
       "original": {

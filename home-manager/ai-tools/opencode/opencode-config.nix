@@ -14,11 +14,6 @@ mcp-servers-nix.lib.mkConfig pkgs {
   fileName = "opencode.json";
 
   programs = {
-    serena = {
-      enable = true;
-      context = "claude-code";
-      enableWebDashboard = false;
-    };
     context7.enable = true;
     playwright.enable = true;
   };
@@ -49,6 +44,18 @@ mcp-servers-nix.lib.mkConfig pkgs {
       "node_modules/**"
       "flake.lock"
     ];
+
+    servers.serena = {
+      type = "local";
+      command = [
+        "${nurPkgs.serena}/bin/serena"
+        "start-mcp-server"
+        "--context"
+        "claude-code"
+        "--enable-web-dashboard"
+        "false"
+      ];
+    };
 
     servers.deepwiki = {
       type = "http";
