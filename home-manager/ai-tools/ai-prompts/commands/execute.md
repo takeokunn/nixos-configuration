@@ -4,7 +4,7 @@ description: Task execution command
 ---
 
 <purpose>
-Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration.
+Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration. Includes test self-healing: if written tests fail, one targeted fix attempt is made before completion. For comprehensive multi-agent quality review across all dimensions, use /execute-full.
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
@@ -18,6 +18,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <rule>Execute independent tasks in parallel</rule>
   <rule>Verify sub-agent outputs before integration</rule>
   <rule>Write tests for all implemented functionality; test creation is mandatory, not optional</rule>
+  <rule>Maximum one fix iteration for test failures in consolidate phase; report remaining failures as blockers</rule>
 </rules>
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
@@ -136,9 +137,19 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <output>Verified sub-agent results</output>
     </step>
     <step order="2">
-      <action>Combine verified results into a cohesive final output</action>
+      <action>Run test commands for all written tests; infer command from project language/framework (pytest, go test, npm test, etc.); if command cannot be inferred, check package.json/Makefile/pyproject.toml/go.mod; if still undetermined, report as blocker</action>
+      <tool>Bash (test runner)</tool>
+      <output>Test execution results: pass/fail status, failing test names if any</output>
+    </step>
+    <step order="3">
+      <action>If tests fail: delegate one targeted fix to test/general-purpose agent for specific failing tests; re-run once to confirm; if still failing after one attempt, report remaining failures as blockers in follow_up and mark status FAIL</action>
+      <tool>Sub-agent delegation (conditional)</tool>
+      <output>All tests passing, or blocker report listing remaining failures</output>
+    </step>
+    <step order="4">
+      <action>Combine all verified results and test outcomes into a cohesive final output</action>
       <tool>Synthesis</tool>
-      <output>Consolidated result</output>
+      <output>Consolidated result including test execution status</output>
     </step>
   </phase>
 </workflow>
@@ -251,6 +262,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       </changes>
       <verification>
         <check command="command run">Observed result</check>
+        <test_execution>
+          <command>test command used</command>
+          <status>PASS / FAIL</status>
+          <failures>failing test names if any</failures>
+        </test_execution>
       </verification>
       <follow_up>Remaining risks or next actions, if any</follow_up>
     </execution_result>
@@ -272,6 +288,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <trigger>During implementation</trigger>
       <action>Delegate test creation to test agent for all implemented functionality; use acceptance criteria from /define output as test targets</action>
       <verification>Test files created and listed in output</verification>
+    </behavior>
+    <behavior id="EXEC-B004" priority="critical">
+      <trigger>After test creation in consolidate phase (step 2)</trigger>
+      <action>Run all test commands; if any fail, delegate one targeted fix then re-run once; if still failing, report as blockers — do not silently complete with failing tests</action>
+      <verification>Test execution results in output; either all-pass confirmation or explicit blocker list</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
@@ -296,7 +317,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <command name="bug">When implementation encounters unexpected errors</command>
   <command name="feedback">Review work after execution completion</command>
   <command name="upstream">When preparing changes for upstream OSS contribution</command>
-  <command name="execute-full">Full version with feedback loop and fix phase</command>
+  <command name="execute-full">Full version with comprehensive multi-agent feedback loop (quality, security, design, docs, performance) plus fix phase; use when broad quality review beyond test self-healing is needed</command>
 </related_commands>
 
 <related_agents>
@@ -314,6 +335,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <must>Execute independent tasks in parallel</must>
   <must>Verify outputs before integration</must>
   <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
+  <must>Run all test commands after test creation; attempt one fix for failures; report any remaining failures as blockers rather than silently completing</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Unnecessary comments about past implementations</avoid>
   <avoid>Marking implementation complete without corresponding tests</avoid>

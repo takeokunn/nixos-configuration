@@ -110,6 +110,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <tool>Result integration</tool>
       <output>Consolidated implementation</output>
     </step>
+    <step order="17">
+      <action>Run test commands for all written tests; infer from project language/framework (pytest, go test, npm test, etc.); record pass/fail results</action>
+      <tool>Bash (test runner)</tool>
+      <output>Test execution results: pass/fail status, failing test names — feeds into collect_feedback and fix_issues</output>
+    </step>
   </phase>
 
   <phase name="collect_feedback">
@@ -159,9 +164,9 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
 
   <phase name="fix_issues">
     <step order="1">
-      <action>Synthesize feedback from all agents</action>
+      <action>Synthesize feedback from all agents; include test execution failures from analyze_execute step 17 as issues in the consolidated list</action>
       <tool>Feedback synthesis</tool>
-      <output>Consolidated issue list</output>
+      <output>Consolidated issue list including test failures from execution phase</output>
     </step>
     <step order="2">
       <action>Prioritize issues by severity (critical > warning > info)</action>
@@ -343,7 +348,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
           <changes>Summary of changes</changes>
         </file>
       </files_modified>
-      <tests_status>Pass/Fail status</tests_status>
+      <tests_status>
+        <command>test command used</command>
+        <status>Pass/Fail</status>
+        <failures>failing test names if any</failures>
+      </tests_status>
     </execution_results>
     <feedback_summary>
       <evaluation_scores>
@@ -447,6 +456,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <action>Delegate test creation to test agent for all implemented functionality; use acceptance criteria from /define output as test targets</action>
       <verification>Test files created and listed in output</verification>
     </behavior>
+    <behavior id="EXECF-B008" priority="critical">
+      <trigger>After test creation in execute phase (analyze_execute step 17)</trigger>
+      <action>Run all test commands; failures are treated as issues and feed into fix_issues phase</action>
+      <verification>Test execution results recorded in output; failures appear in fix_results</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="EXECF-P001" priority="critical">
@@ -513,6 +527,7 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <must>Skip fix phase when no issues found</must>
   <must>Limit to maximum one fix iteration</must>
   <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
+  <must>Run all test commands after test creation; failures are treated as fix-phase issues</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Multiple fix iterations (exactly one allowed when needed)</avoid>
   <avoid>Sequential execution of independent feedback agents</avoid>
