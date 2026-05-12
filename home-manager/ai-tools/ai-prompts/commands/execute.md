@@ -17,6 +17,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <rule>Focus on orchestration and policy decisions</rule>
   <rule>Execute independent tasks in parallel</rule>
   <rule>Verify sub-agent outputs before integration</rule>
+  <rule>Write tests for all implemented functionality; test creation is mandatory, not optional</rule>
 </rules>
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
@@ -267,6 +268,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <action>Delegate verification to quality and security agents</action>
       <verification>Agent reports in output</verification>
     </behavior>
+    <behavior id="EXEC-B003" priority="critical">
+      <trigger>During implementation</trigger>
+      <action>Delegate test creation to test agent for all implemented functionality; use acceptance criteria from /define output as test targets</action>
+      <verification>Test files created and listed in output</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="EXEC-P001" priority="critical">
@@ -307,6 +313,8 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <must>Delegate detailed work to sub-agents</must>
   <must>Execute independent tasks in parallel</must>
   <must>Verify outputs before integration</must>
+  <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Unnecessary comments about past implementations</avoid>
+  <avoid>Marking implementation complete without corresponding tests</avoid>
 </constraints>

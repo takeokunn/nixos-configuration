@@ -17,6 +17,7 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <rule>Maximum one fix iteration (no infinite loops)</rule>
   <rule>Automatic flow between phases (no user confirmation)</rule>
   <rule>Skip fix phase if no issues found in feedback</rule>
+  <rule>Write tests for all implemented functionality; test creation is mandatory, not optional</rule>
 </rules>
 <rules priority="standard">
   <rule>Use execution-workflow skill for delegation patterns</rule>
@@ -441,6 +442,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <action>Launch all feedback agents in parallel</action>
       <verification>Parallel execution confirmed</verification>
     </behavior>
+    <behavior id="EXECF-B007" priority="critical">
+      <trigger>During execute phase</trigger>
+      <action>Delegate test creation to test agent for all implemented functionality; use acceptance criteria from /define output as test targets</action>
+      <verification>Test files created and listed in output</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="EXECF-P001" priority="critical">
@@ -506,9 +512,11 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <must>Automatically proceed between phases without user confirmation</must>
   <must>Skip fix phase when no issues found</must>
   <must>Limit to maximum one fix iteration</must>
+  <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Multiple fix iterations (exactly one allowed when needed)</avoid>
   <avoid>Sequential execution of independent feedback agents</avoid>
   <avoid>Full re-implementation in fix phase</avoid>
   <avoid>Requesting user confirmation between phases</avoid>
+  <avoid>Marking implementation complete without corresponding tests</avoid>
 </constraints>
