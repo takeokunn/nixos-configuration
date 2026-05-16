@@ -12,11 +12,6 @@ let
   });
 in
 {
-  home.file.".claude/CLAUDE.md" = {
-    source = "${ai-prompts-path}/CLAUDE.md";
-    force = true;
-  };
-
   programs.claude-code = {
     enable = true;
     package = claude-code-fixed;
