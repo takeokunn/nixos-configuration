@@ -2,4 +2,7 @@
 let
   kitty = import ./kitty { inherit pkgs; };
 in
-[ kitty ]
+[
+  kitty
+  { home.packages = [ pkgs.yq ]; }
+]

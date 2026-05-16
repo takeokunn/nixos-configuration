@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, devenvPkgs }:
 let
   cargo = import ./cargo { inherit pkgs; };
 in
@@ -6,4 +6,5 @@ in
   ./modules/doggo
   ./modules/lnav
   cargo
+  { home.packages = [ devenvPkgs.devenv ]; }
 ]

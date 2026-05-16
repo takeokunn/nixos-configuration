@@ -37,4 +37,5 @@ in
   tmux
   wget
   zoxide
+  { home.packages = with pkgs; [ dasel unixtools.watch nix-output-monitor ]; }
 ]

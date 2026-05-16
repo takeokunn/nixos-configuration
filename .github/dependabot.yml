@@ -1,14 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: daily
-    target-branch: main
-    groups:
-      npm-all:
-        patterns:
-          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:

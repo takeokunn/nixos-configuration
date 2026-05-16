@@ -26,25 +26,15 @@ let
   nurPkgs = nur-packages.packages.${system};
   devenvPkgs = devenv.packages.${system};
 
-  basicOverlay = import ./overlay/basic.nix;
-  advancedOverlay = import ./overlay/advanced.nix { inherit emacs-overlay; };
+  editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
   brewNixOverlay = if isDarwin then [ brew-nix.overlays.default ] else [ ];
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
     overlays =
-      basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+      editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
-  basicPkgs = import ./packages/basic.nix { inherit pkgs nurPkgs devenvPkgs; };
-  advancedPkgs = import ./packages/advanced.nix {
-    inherit
-      pkgs
-      nurPkgs
-      llmAgentsPkgs
-      ;
-  };
-
   emacsPkgSet = import ./editor/packages {
     inherit (nixpkgs) lib;
     inherit pkgs nurPkgs;
@@ -57,9 +47,9 @@ let
 
   shell = import ./shell/basic.nix { inherit pkgs nurPkgs; };
   editor = import ./editor/basic.nix { inherit pkgs nurPkgs; };
-  vcs = import ./vcs/basic.nix { inherit nurPkgs; };
+  vcs = import ./vcs/basic.nix { inherit pkgs nurPkgs; };
   security = import ./security/basic.nix { inherit pkgs; };
-  development = import ./development/basic.nix { inherit pkgs; };
+  development = import ./development/basic.nix { inherit pkgs devenvPkgs; };
 
   shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
   editorAdvanced = import ./editor/advanced.nix {
@@ -69,6 +59,7 @@ let
       emacsPkg
       org-babel
       llmAgentsPkgs
+      nurPkgs
       ;
   };
   browser = import ./browser { inherit pkgs firefox-addons; };
@@ -77,9 +68,10 @@ let
   email = import ./email { inherit pkgs; };
   wayland = import ./wayland { inherit pkgs nurPkgs emacsLib; };
   nixTools = import ./nix;
-  cloud = import ./cloud;
+  cloud = import ./cloud { inherit pkgs; };
   developmentAdvanced = import ./development/advanced.nix { inherit pkgs; };
   mac = if isDarwin then import ./mac { inherit pkgs; } else [ ];
+  communication = import ./communication { inherit pkgs; };
   aiTools = import ./ai-tools {
     inherit
       pkgs
@@ -118,15 +110,15 @@ in
     ++ cloud
     ++ developmentAdvanced
     ++ aiTools
-    ++ mac;
+    ++ mac
+    ++ communication;
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays =
-    basicOverlay ++ advancedOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+    editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
 
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;
-  home.packages = basicPkgs ++ advancedPkgs;
 
   targets.darwin.linkApps.enable = isDarwin;
   targets.darwin.copyApps.enable = false;

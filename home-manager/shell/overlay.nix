@@ -1,6 +1,4 @@
-{ emacs-overlay }:
 [
-  (import emacs-overlay)
   (final: prev: {
     # direnv test-zsh deadlocks on macOS due to /etc/zshenv inflating the env past the 64KB pipe buffer
     direnv = prev.direnv.overrideAttrs (_: {

@@ -4,6 +4,7 @@
   emacsPkg,
   org-babel,
   llmAgentsPkgs,
+  nurPkgs,
 }:
 let
   emacs = import ./emacs {
@@ -21,4 +22,5 @@ in
   emacs
   emacs-service
   copilot-language-server
+  { home.packages = [ nurPkgs.kakehashi ]; }
 ]

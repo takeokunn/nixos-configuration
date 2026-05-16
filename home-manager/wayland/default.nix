@@ -48,4 +48,5 @@ in
 ]
 ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
   (import ./impermanence { inherit pkgs; })
+  { home.packages = with pkgs; [ networkmanagerapplet networkmanager_dmenu ]; }
 ]

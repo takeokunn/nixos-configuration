@@ -15,12 +15,13 @@ let
   username = "take";
   system = "aarch64-darwin";
 
-  advancedOverlay = import ../../home-manager/overlay/advanced.nix { inherit emacs-overlay; };
+  editorOverlay = import ../../home-manager/editor/overlay.nix { inherit emacs-overlay; };
+  shellOverlay  = import ../../home-manager/shell/overlay.nix;
 
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = advancedOverlay ++ [ brew-nix.overlays.default ];
+    overlays = editorOverlay ++ shellOverlay ++ [ brew-nix.overlays.default ];
   };
 
   nurPkgs = nur-packages.packages.${system};
