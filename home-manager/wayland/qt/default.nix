@@ -1,8 +1,5 @@
-{ pkgs, ... }:
 {
-  qt = {
-    enable = pkgs.stdenv.isLinux;
-    platformTheme.name = "gtk";
-    style.name = "gtk2";
-  };
+  qt.enable = true;
+  qt.platformTheme.name = "gtk";
+  qt.style.name = "gtk2";
 }

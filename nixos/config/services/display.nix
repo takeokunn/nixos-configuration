@@ -1,17 +1,9 @@
 { username }:
 {
-  services = {
-    xserver = {
-      enable = true;
-      xkb.layout = "jp";
-    };
+  services.xserver.enable = true;
+  services.xserver.xkb.layout = "jp";
 
-    displayManager = {
-      gdm.enable = true;
-      autoLogin = {
-        enable = true;
-        user = username;
-      };
-    };
-  };
+  services.displayManager.gdm.enable = true;
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = username;
 }

@@ -1,4 +1,3 @@
-{ pkgs, ... }:
 {
   home.persistence."/persist" = {
     directories = [

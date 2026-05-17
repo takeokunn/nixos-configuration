@@ -1,13 +1,7 @@
-{ pkgs, lib }:
 {
-  services.easyeffects = lib.mkIf pkgs.stdenv.isLinux {
-    enable = true;
-  };
+  services.easyeffects.enable = true;
 
-  dconf.settings = lib.mkIf pkgs.stdenv.isLinux {
-    "com/github/wwmm/easyeffects/streamoutputs" = {
-      output-device = "alsa_output.pci-0000_06_00.6.HiFi__Headphones__sink";
-      use-default-output-device = false;
-    };
-  };
+  dconf.settings."com/github/wwmm/easyeffects/streamoutputs".output-device =
+    "alsa_output.pci-0000_06_00.6.HiFi__Headphones__sink";
+  dconf.settings."com/github/wwmm/easyeffects/streamoutputs".use-default-output-device = false;
 }

@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ nurPkgs }:
 let
   consult-tramp = nurPkgs.emacs-consult-tramp;
 in

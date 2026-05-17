@@ -409,11 +409,6 @@ let
   '';
 in
 {
-  programs.sketchybar = {
-    enable = pkgs.stdenv.isDarwin;
-    package = pkgs.sketchybar;
-    config = {
-      text = sketchybarConfig;
-    };
-  };
+  programs.sketchybar.enable = true;
+  programs.sketchybar.config.text = sketchybarConfig;
 }

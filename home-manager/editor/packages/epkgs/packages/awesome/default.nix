@@ -1,8 +1,4 @@
-{
-  pkgs,
-  epkgs,
-  nurPkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   pinentry-el = epkgs.pinentry;
   sudden-death = nurPkgs.emacs-sudden-death;

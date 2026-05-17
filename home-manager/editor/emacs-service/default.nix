@@ -1,10 +1,6 @@
-{
-  pkgs,
-  lib ? pkgs.lib,
-  emacsPkg,
-  ...
-}:
+{ pkgs, emacsPkg }:
 let
+  lib = pkgs.lib;
   isDarwin = pkgs.stdenv.isDarwin;
   # Use the emacsWithPackages derivation (before the open-a-Emacs wrapper replaces
   # Emacs.app/Contents/MacOS/Emacs with an emacsclient script).  The daemon must
@@ -17,24 +13,18 @@ let
       emacsPkg;
 in
 {
-  services.emacs = {
-    enable = true;
-    package = emacsPkg;
-    client.enable = true;
-  };
+  services.emacs.enable = true;
+  services.emacs.package = emacsPkg;
+  services.emacs.client.enable = true;
 
   # Linux: start emacs daemon after WAYLAND_DISPLAY is available in the systemd
   # user environment (niri exports it to systemd via dbus-update-activation-environment
   # as part of graphical-session.target activation).
   systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
-    Unit = {
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
-    };
-    Service = {
-      Restart = lib.mkForce "always";
-      RestartSec = 10;
-    };
+    Unit.After = [ "graphical-session.target" ];
+    Unit.PartOf = [ "graphical-session.target" ];
+    Service.Restart = lib.mkForce "always";
+    Service.RestartSec = 10;
   };
 
   # macOS: Set TMPDIR so emacs daemon creates socket in /tmp

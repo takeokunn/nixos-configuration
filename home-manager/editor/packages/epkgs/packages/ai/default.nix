@@ -1,7 +1,4 @@
-{
-  epkgs,
-  pkgs,
-}:
+{ epkgs }:
 with epkgs;
 [
   # copilot

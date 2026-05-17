@@ -1,9 +1,8 @@
 { pkgs, nurPkgs }:
 let
-  tig = import ./tig { inherit nurPkgs; };
+  tig = import ./tig { inherit pkgs nurPkgs; };
 in
 [
-  ./modules/tig
   ./modules/git-hooks
   tig
   { home.packages = [ pkgs.ghq ]; }

@@ -1,7 +1,5 @@
 {
-  programs.fd = {
-    enable = true;
-    hidden = true;
-    ignores = [ ".git/" ];
-  };
+  programs.fd.enable = true;
+  programs.fd.hidden = true;
+  programs.fd.ignores = [ ".git/" ];
 }

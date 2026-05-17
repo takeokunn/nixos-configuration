@@ -4,14 +4,12 @@ let
   darwin-vz-pkgs = inputs.darwin-vz-nix.packages.${guestSystem};
 in
 {
-  services.darwin-vz = {
-    enable = false;
-    cores = 14;
-    memory = 49152;
-    diskSize = "200G";
-    rosetta = true;
-    kernelPath = "${darwin-vz-pkgs.guest-kernel}/Image";
-    initrdPath = "${darwin-vz-pkgs.guest-initrd}/initrd";
-    systemPath = "${darwin-vz-pkgs.guest-system}";
-  };
+  services.darwin-vz.enable = false;
+  services.darwin-vz.cores = 14;
+  services.darwin-vz.memory = 49152;
+  services.darwin-vz.diskSize = "200G";
+  services.darwin-vz.rosetta = true;
+  services.darwin-vz.kernelPath = "${darwin-vz-pkgs.guest-kernel}/Image";
+  services.darwin-vz.initrdPath = "${darwin-vz-pkgs.guest-initrd}/initrd";
+  services.darwin-vz.systemPath = "${darwin-vz-pkgs.guest-system}";
 }

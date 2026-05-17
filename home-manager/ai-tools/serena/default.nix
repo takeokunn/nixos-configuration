@@ -11,7 +11,7 @@ in
 {
   options.programs.serena = {
     ignoredPaths = lib.mkOption {
-      type = with lib.types; listOf str;
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       example = [
         ".devenv"
@@ -29,14 +29,12 @@ in
   };
 
   config = lib.mkIf (cfg.ignoredPaths != [ ]) {
-    home.activation.serenaIgnoredPaths = {
-      after = [ "writeBoundary" ];
-      before = [ ];
-      data = ''
-        if [ -f "$HOME/.serena/serena_config.yml" ]; then
-          ${lib.getExe pkgs.yq-go} -i '${yqExpr}' "$HOME/.serena/serena_config.yml"
-        fi
-      '';
-    };
+    home.activation.serenaIgnoredPaths.after = [ "writeBoundary" ];
+    home.activation.serenaIgnoredPaths.before = [ ];
+    home.activation.serenaIgnoredPaths.data = ''
+      if [ -f "$HOME/.serena/serena_config.yml" ]; then
+        ${lib.getExe pkgs.yq-go} -i '${yqExpr}' "$HOME/.serena/serena_config.yml"
+      fi
+    '';
   };
 }

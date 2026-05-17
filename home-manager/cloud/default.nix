@@ -6,5 +6,11 @@ in
 [
   awscli
   k9s
-  { home.packages = with pkgs; [ kubectl docker-client lazydocker ]; }
+  {
+    home.packages = with pkgs; [
+      kubectl
+      docker-client
+      lazydocker
+    ];
+  }
 ]

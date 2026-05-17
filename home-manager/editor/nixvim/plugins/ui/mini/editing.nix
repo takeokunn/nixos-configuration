@@ -5,7 +5,7 @@
 # move, splitjoin, operators, align, comment, and animate.
 # ════════════════════════════════════════════════════════════════════════════════
 
-_: {
+{
   plugins.mini.modules = {
     # ══════════════════════════════════════════════════════════════════════════
     # Pairs (replaces nvim-autopairs)

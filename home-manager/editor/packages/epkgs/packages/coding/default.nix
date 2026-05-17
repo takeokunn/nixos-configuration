@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ epkgs }:
 with epkgs;
 [
   # check

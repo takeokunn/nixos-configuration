@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   org-view-mode = epkgs.org-view-mode;
   org-dashboard = epkgs.org-dashboard;

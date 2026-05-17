@@ -1,5 +1,3 @@
 {
-  programs.doggo = {
-    enable = true;
-  };
+  programs.doggo.enable = true;
 }

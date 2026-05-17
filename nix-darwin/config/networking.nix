@@ -1,9 +1,7 @@
 {
-  networking = {
-    knownNetworkServices = [
-      "Wi-Fi"
-      "Ethernet Adaptor"
-      "Thunderbolt Ethernet"
-    ];
-  };
+  networking.knownNetworkServices = [
+    "Wi-Fi"
+    "Ethernet Adaptor"
+    "Thunderbolt Ethernet"
+  ];
 }

@@ -3,7 +3,7 @@ let
   bat = import ./bat { inherit nurPkgs; };
   bottom = import ./bottom;
   direnv = import ./direnv;
-  dust = import ./dust;
+  dust = import ./dust { inherit pkgs; };
   eza = import ./eza;
   fd = import ./fd;
   fish = import ./fish { inherit pkgs nurPkgs; };
@@ -13,15 +13,10 @@ let
   readline = import ./readline;
   ripgrep = import ./ripgrep;
   tmux = import ./tmux { inherit pkgs nurPkgs; };
-  wget = import ./wget { };
+  wget = import ./wget { inherit pkgs; };
   zoxide = import ./zoxide;
 in
 [
-  ./modules/wget
-  ./modules/dust
-  ./modules/zellij
-]
-++ [
   bat
   bottom
   direnv
@@ -37,5 +32,11 @@ in
   tmux
   wget
   zoxide
-  { home.packages = with pkgs; [ dasel unixtools.watch nix-output-monitor ]; }
+  {
+    home.packages = with pkgs; [
+      dasel
+      unixtools.watch
+      nix-output-monitor
+    ];
+  }
 ]

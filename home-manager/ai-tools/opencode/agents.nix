@@ -1,47 +1,43 @@
 { ai-prompts-path }:
+let
+  readFiles =
+    dir: names:
+    builtins.listToAttrs (
+      map (name: {
+        inherit name;
+        value = builtins.readFile "${dir}/${name}.md";
+      }) names
+    );
+in
 {
-  agents = builtins.listToAttrs (
-    map
-      (name: {
-        inherit name;
-        value = builtins.readFile "${ai-prompts-path}/agents/${name}.md";
-      })
-      [
-        "code-quality"
-        "database"
-        "design"
-        "devops"
-        "docs"
-        "explore"
-        "general-purpose"
-        "git"
-        "performance"
-        "quality-assurance"
-        "security"
-        "test"
-        "validator"
-        "verification"
-      ]
-  );
-  commands = builtins.listToAttrs (
-    map
-      (name: {
-        inherit name;
-        value = builtins.readFile "${ai-prompts-path}/commands/${name}.md";
-      })
-      [
-        "ask"
-        "bug"
-        "define"
-        "define-full"
-        "execute"
-        "execute-full"
-        "feedback"
-        "markdown"
-        "remember"
-        "simplify"
-        "skillify"
-        "upstream"
-      ]
-  );
+  agents = readFiles "${ai-prompts-path}/agents" [
+    "code-quality"
+    "database"
+    "design"
+    "devops"
+    "docs"
+    "explore"
+    "general-purpose"
+    "git"
+    "performance"
+    "quality-assurance"
+    "security"
+    "test"
+    "validator"
+    "verification"
+  ];
+  commands = readFiles "${ai-prompts-path}/commands" [
+    "ask"
+    "bug"
+    "define"
+    "define-full"
+    "execute"
+    "execute-full"
+    "feedback"
+    "markdown"
+    "remember"
+    "simplify"
+    "skillify"
+    "upstream"
+  ];
 }

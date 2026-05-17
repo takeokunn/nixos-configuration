@@ -3,28 +3,20 @@
   plugins.lz-n.enable = true;
 
   # Undotree - no mini.nvim equivalent, keep it
-  plugins.undotree = {
-    enable = true;
-    settings = {
-      WindowLayout = 3;
-    };
-  };
+  plugins.undotree.enable = true;
+  plugins.undotree.settings.WindowLayout = 3;
 
   # Rainbow delimiters - no mini.nvim equivalent, keep it
-  plugins.rainbow-delimiters = {
-    enable = true;
-  };
+  plugins.rainbow-delimiters.enable = true;
 
-  extraPlugins = with pkgs.vimPlugins; [
-    vim-table-mode
-    vim-textobj-entire
+  extraPlugins = [
+    pkgs.vimPlugins.vim-table-mode
+    pkgs.vimPlugins.vim-textobj-entire
   ];
 
   userCommands = {
-    UndotreeToggleAndFocus = {
-      command = ":UndotreeToggle | :UndotreeFocus";
-      desc = "Toggle and focus Undotree";
-    };
+    UndotreeToggleAndFocus.command = ":UndotreeToggle | :UndotreeFocus";
+    UndotreeToggleAndFocus.desc = "Toggle and focus Undotree";
   };
 
   keymaps = [

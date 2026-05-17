@@ -7,11 +7,10 @@
 let
   cfg = config.programs.doggo;
 in
-with lib;
 {
   options.programs.doggo = {
-    enable = mkEnableOption "Command-line DNS Client for Humans. Written in Golang";
-    package = mkPackageOption pkgs "doggo" { };
+    enable = lib.mkEnableOption "Command-line DNS Client for Humans. Written in Golang";
+    package = lib.mkPackageOption pkgs "doggo" { };
 
     enableBashIntegration = lib.hm.shell.mkBashIntegrationOption { inherit config; };
 
@@ -20,21 +19,19 @@ with lib;
     enableFishIntegration = lib.hm.shell.mkFishIntegrationOption { inherit config; };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     home.packages = [ cfg.package ];
 
-    programs = {
-      bash.initExtra = mkIf (cfg.enableBashIntegration && cfg.package != null) ''
-        eval "$(${getExe cfg.package} completions bash)"
-      '';
+    programs.bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
+      eval "$(${lib.getExe cfg.package} completions bash)"
+    '';
 
-      zsh.initContent = mkIf (cfg.enableZshIntegration && cfg.package != null) ''
-        eval "$(${getExe cfg.package} completions zsh)"
-      '';
+    programs.zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
+      eval "$(${lib.getExe cfg.package} completions zsh)"
+    '';
 
-      fish.interactiveShellInit = mkIf (cfg.enableFishIntegration && cfg.package != null) ''
-        ${getExe cfg.package} completions fish | source
-      '';
-    };
+    programs.fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
+      ${lib.getExe cfg.package} completions fish | source
+    '';
   };
 }

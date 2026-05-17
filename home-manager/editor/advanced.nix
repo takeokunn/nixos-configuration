@@ -16,7 +16,7 @@ let
       ;
   };
   emacs-service = import ./emacs-service { inherit pkgs emacsPkg; };
-  copilot-language-server = import ./copilot-language-server { inherit pkgs llmAgentsPkgs; };
+  copilot-language-server = import ./copilot-language-server { inherit llmAgentsPkgs; };
 in
 [
   emacs

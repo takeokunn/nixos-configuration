@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   mu4e-dashboard = nurPkgs.emacs-mu4e-dashboard;
 in

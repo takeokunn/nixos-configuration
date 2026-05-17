@@ -1,25 +1,16 @@
-_: {
+{
   # mini.diff and mini.git are configured in ui/mini.nix
   # Keep neogit and diffview for advanced git UI
 
-  plugins.neogit = {
-    enable = true;
-    settings = {
-      integrations = {
-        diffview = true;
-        # mini.pick integration instead of telescope
-        mini_pick = true;
-      };
-    };
-  };
+  plugins.neogit.enable = true;
+  plugins.neogit.settings.integrations.diffview = true;
+  plugins.neogit.settings.integrations.mini_pick = true;
 
-  plugins.diffview = {
-    enable = true;
-    lazyLoad.settings.cmd = [
-      "DiffviewOpen"
-      "DiffviewFileHistory"
-    ];
-  };
+  plugins.diffview.enable = true;
+  plugins.diffview.lazyLoad.settings.cmd = [
+    "DiffviewOpen"
+    "DiffviewFileHistory"
+  ];
 
   keymaps = [
     {

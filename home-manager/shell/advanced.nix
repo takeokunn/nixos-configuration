@@ -1,6 +1,6 @@
 { pkgs }:
 let
-  kitty = import ./kitty { inherit pkgs; };
+  kitty = import ./kitty;
 in
 [
   kitty

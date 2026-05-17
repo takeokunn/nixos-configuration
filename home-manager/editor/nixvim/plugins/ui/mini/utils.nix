@@ -29,9 +29,7 @@
   mkMiniKeymap = mode: key: module: func: desc: {
     inherit mode key;
     action.__raw = "function() require('mini.${module}').${func}() end";
-    options = {
-      inherit desc;
-      silent = true;
-    };
+    options.desc = desc;
+    options.silent = true;
   };
 }

@@ -35,7 +35,7 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
     override = override;
   };
 
@@ -55,7 +55,7 @@ in
             env = (old.env or { }) // parallelBuildAttrs.env;
           }
         );
-        extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+        extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
         override = override;
       };
     in
@@ -88,7 +88,7 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
     override = override;
   };
 
@@ -101,7 +101,7 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
     override = override;
   };
 
@@ -114,7 +114,7 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit pkgs nurPkgs; };
+    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
     override = override;
   };
 }

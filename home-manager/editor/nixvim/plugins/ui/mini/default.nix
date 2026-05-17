@@ -10,14 +10,13 @@
 #   - completion.nix: Completion, hipatterns, cursorword, trailspace, bufremove, bracketed, map, misc, snippets
 # ════════════════════════════════════════════════════════════════════════════════
 
-_:
 let
   # Import all domain modules
-  ui = import ./ui.nix { };
-  editing = import ./editing.nix { };
-  navigation = import ./navigation.nix { };
-  git = import ./git.nix { };
-  completion = import ./completion.nix { };
+  ui = import ./ui.nix;
+  editing = import ./editing.nix;
+  navigation = import ./navigation.nix;
+  git = import ./git.nix;
+  completion = import ./completion.nix;
 
   allModules = [
     ui

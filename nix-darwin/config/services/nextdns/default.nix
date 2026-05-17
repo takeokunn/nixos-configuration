@@ -1,9 +1,7 @@
 {
-  services.nextdns = {
-    enable = false;
-    arguments = [
-      "-profile"
-      "2c6735"
-    ];
-  };
+  services.nextdns.enable = false;
+  services.nextdns.arguments = [
+    "-profile"
+    "2c6735"
+  ];
 }

@@ -1,8 +1,4 @@
 {
-  programs.nix-init = {
-    enable = true;
-    settings = {
-      maintainers = [ "takeokunn" ];
-    };
-  };
+  programs.nix-init.enable = true;
+  programs.nix-init.settings.maintainers = [ "takeokunn" ];
 }

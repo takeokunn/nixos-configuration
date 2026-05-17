@@ -1,8 +1,7 @@
-{ pkgs }:
 let
   pandoc = import ./pandoc;
   doggo = import ./doggo;
-  lnav = import ./lnav { inherit pkgs; };
+  lnav = import ./lnav;
 in
 [
   pandoc

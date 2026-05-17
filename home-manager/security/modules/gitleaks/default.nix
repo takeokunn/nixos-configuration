@@ -234,22 +234,18 @@ in
     xdg.configFile."gitleaks/config.toml".source =
       tomlFormat.generate "gitleaks-config.toml" configToToml;
 
-    home.sessionVariables = {
-      GITLEAKS_CONFIG = "${config.xdg.configHome}/gitleaks/config.toml";
-    };
+    home.sessionVariables.GITLEAKS_CONFIG = "${config.xdg.configHome}/gitleaks/config.toml";
 
-    programs = {
-      bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
-        eval "$(${lib.getExe cfg.package} completion bash)"
-      '';
+    programs.bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
+      eval "$(${lib.getExe cfg.package} completion bash)"
+    '';
 
-      zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
-        eval "$(${lib.getExe cfg.package} completion zsh)"
-      '';
+    programs.zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
+      eval "$(${lib.getExe cfg.package} completion zsh)"
+    '';
 
-      fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
-        ${lib.getExe cfg.package} completion fish | source
-      '';
-    };
+    programs.fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
+      ${lib.getExe cfg.package} completion fish | source
+    '';
   };
 }

@@ -1,4 +1,4 @@
-{ epkgs, ... }:
+{ epkgs }:
 with epkgs;
 [
   esh-help

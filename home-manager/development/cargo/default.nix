@@ -8,20 +8,13 @@
     ]
   );
 
-  programs.cargo = {
-    enable = true;
-    settings = {
-      build.jobs = 12;
-      profile.dev.codegen-units = 16;
-
-      # macOS Apple Silicon: use lld for faster linking
-      target.aarch64-apple-darwin = {
-        linker = "clang";
-        rustflags = [
-          "-C"
-          "link-arg=-fuse-ld=lld"
-        ];
-      };
-    };
-  };
+  programs.cargo.enable = true;
+  programs.cargo.settings.build.jobs = 12;
+  programs.cargo.settings.profile.dev.codegen-units = 16;
+  # macOS Apple Silicon: use lld for faster linking
+  programs.cargo.settings.target.aarch64-apple-darwin.linker = "clang";
+  programs.cargo.settings.target.aarch64-apple-darwin.rustflags = [
+    "-C"
+    "link-arg=-fuse-ld=lld"
+  ];
 }

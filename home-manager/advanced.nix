@@ -21,7 +21,8 @@
   ...
 }:
 let
-  isDarwin = builtins.match ".*-darwin" system != null;
+  lib = nixpkgs.lib;
+  isDarwin = lib.hasSuffix "-darwin" system;
 
   nurPkgs = nur-packages.packages.${system};
   devenvPkgs = devenv.packages.${system};
@@ -31,18 +32,15 @@ let
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays =
-      editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+    overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
   emacsPkgSet = import ./editor/packages {
-    inherit (nixpkgs) lib;
-    inherit pkgs nurPkgs;
+    inherit lib pkgs nurPkgs;
   };
   emacsPkg = if isDarwin then emacsPkgSet.emacs-unstable else emacsPkgSet.emacs-unstable-pgtk;
   emacsLib = import ./editor/lib/emacs.nix {
-    inherit (nixpkgs) lib;
-    inherit pkgs emacsPkg;
+    inherit lib pkgs emacsPkg;
   };
 
   shell = import ./shell/basic.nix { inherit pkgs nurPkgs; };
@@ -53,7 +51,7 @@ let
 
   shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
   editorAdvanced = import ./editor/advanced.nix {
-    inherit (nixpkgs) lib;
+    inherit lib;
     inherit
       pkgs
       emacsPkg
@@ -65,11 +63,11 @@ let
   browser = import ./browser { inherit pkgs firefox-addons; };
   vcsAdvanced = import ./vcs/advanced.nix;
   securityAdvanced = import ./security/advanced.nix { inherit pkgs; };
-  email = import ./email { inherit pkgs; };
+  email = import ./email;
   wayland = import ./wayland { inherit pkgs nurPkgs emacsLib; };
   nixTools = import ./nix;
   cloud = import ./cloud { inherit pkgs; };
-  developmentAdvanced = import ./development/advanced.nix { inherit pkgs; };
+  developmentAdvanced = import ./development/advanced.nix;
   mac = if isDarwin then import ./mac { inherit pkgs; } else [ ];
   communication = import ./communication { inherit pkgs; };
   aiTools = import ./ai-tools {
@@ -114,8 +112,7 @@ in
     ++ communication;
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays =
-    editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+  nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
 
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;
@@ -123,12 +120,8 @@ in
   targets.darwin.linkApps.enable = isDarwin;
   targets.darwin.copyApps.enable = false;
 
-  accounts.email.accounts = {
-    Gmail = {
-      primary = true;
-      flavor = "gmail.com";
-      realName = "takeo obara";
-      address = "bararararatty@gmail.com";
-    };
-  };
+  accounts.email.accounts.Gmail.primary = true;
+  accounts.email.accounts.Gmail.flavor = "gmail.com";
+  accounts.email.accounts.Gmail.realName = "takeo obara";
+  accounts.email.accounts.Gmail.address = "bararararatty@gmail.com";
 }

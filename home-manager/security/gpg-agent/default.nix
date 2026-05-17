@@ -1,25 +1,19 @@
-{
-  pkgs,
-  lib ? pkgs.lib,
-}:
+{ pkgs }:
 let
+  lib = pkgs.lib;
   isDarwin = pkgs.stdenv.isDarwin;
 in
 {
-  home.sessionVariables = {
-    SSH_AUTH_SOCK = "$HOME/.gnupg/S.gpg-agent.ssh";
-  };
+  home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.gnupg/S.gpg-agent.ssh";
 
-  services.gpg-agent = {
-    enable = true;
-    pinentry.package = pkgs.pinentry-curses;
-    defaultCacheTtl = 60 * 60 * 24;
-    defaultCacheTtlSsh = 60 * 60 * 24;
-    maxCacheTtl = 60 * 60 * 24;
-    maxCacheTtlSsh = 60 * 60 * 24;
-    enableSshSupport = true;
-    enableExtraSocket = true;
-  };
+  services.gpg-agent.enable = true;
+  services.gpg-agent.pinentry.package = pkgs.pinentry-curses;
+  services.gpg-agent.defaultCacheTtl = 60 * 60 * 24;
+  services.gpg-agent.defaultCacheTtlSsh = 60 * 60 * 24;
+  services.gpg-agent.maxCacheTtl = 60 * 60 * 24;
+  services.gpg-agent.maxCacheTtlSsh = 60 * 60 * 24;
+  services.gpg-agent.enableSshSupport = true;
+  services.gpg-agent.enableExtraSocket = true;
 
   # macOS: Override --supervised mode (exits code 2; launchd socket activation
   # places sockets at /private/var/run/ which is unwritable for user agents,
@@ -46,9 +40,7 @@ in
   };
 
   # Backup: fish-specific SSH_AUTH_SOCK initialization
-  programs.fish = {
-    interactiveShellInit = ''
-      set -x SSH_AUTH_SOCK $(gpgconf --list-dirs agent-ssh-socket)
-    '';
-  };
+  programs.fish.interactiveShellInit = ''
+    set -x SSH_AUTH_SOCK $(gpgconf --list-dirs agent-ssh-socket)
+  '';
 }

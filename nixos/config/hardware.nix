@@ -1,10 +1,5 @@
 {
-  hardware = {
-    alsa.enablePersistence = true;
-    bluetooth.enable = true;
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-  };
+  hardware.bluetooth.enable = true;
+  hardware.graphics.enable = true;
+  hardware.graphics.enable32Bit = true;
 }

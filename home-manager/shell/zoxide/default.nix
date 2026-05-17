@@ -1,11 +1,7 @@
 {
-  programs.zoxide = {
-    enable = true;
-  };
-
-  programs.fish = {
-    shellAliases = {
-      cd = "z";
-    };
-  };
+  programs.zoxide.enable = true;
+  programs.zoxide.options = [
+    "--cmd"
+    "cd"
+  ];
 }

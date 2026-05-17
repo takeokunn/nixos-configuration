@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   explain-pause-mode = nurPkgs.emacs-explain-pause-mode;
 in

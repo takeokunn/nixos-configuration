@@ -29,11 +29,9 @@ mcp-servers-nix.lib.mkConfig pkgs {
     provider."github-copilot".options = providerTimeoutOpts;
     provider."zai-coding-plan".options = providerTimeoutOpts;
 
-    compaction = {
-      auto = true;
-      prune = true;
-      reserved = 10000;
-    };
+    compaction.auto = true;
+    compaction.prune = true;
+    compaction.reserved = 10000;
 
     watcher.ignore = [
       ".devenv/**"
@@ -45,27 +43,21 @@ mcp-servers-nix.lib.mkConfig pkgs {
       "flake.lock"
     ];
 
-    servers.serena = {
-      type = "local";
-      command = [
-        "${nurPkgs.serena}/bin/serena"
-        "start-mcp-server"
-        "--context"
-        "claude-code"
-        "--enable-web-dashboard"
-        "false"
-      ];
-    };
+    servers.serena.type = "local";
+    servers.serena.command = [
+      "${nurPkgs.serena}/bin/serena"
+      "start-mcp-server"
+      "--context"
+      "claude-code"
+      "--enable-web-dashboard"
+      "false"
+    ];
 
-    servers.deepwiki = {
-      type = "http";
-      url = "https://mcp.deepwiki.com/mcp";
-    };
+    servers.deepwiki.type = "http";
+    servers.deepwiki.url = "https://mcp.deepwiki.com/mcp";
 
-    servers."ast-grep" = {
-      type = "local";
-      command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
-    };
+    servers."ast-grep".type = "local";
+    servers."ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
 
     permission = {
       bash = {

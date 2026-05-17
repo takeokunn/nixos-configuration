@@ -5,7 +5,7 @@
 # indentscope, and clue (which-key replacement).
 # ════════════════════════════════════════════════════════════════════════════════
 
-_: {
+{
   # Disable web-devicons in favor of mini.icons
   plugins.web-devicons.enable = false;
 
@@ -67,9 +67,7 @@ _: {
     # ══════════════════════════════════════════════════════════════════════════
     indentscope = {
       symbol = "│";
-      options = {
-        try_as_border = true;
-      };
+      options.try_as_border = true;
     };
 
     # ══════════════════════════════════════════════════════════════════════════
@@ -121,19 +119,15 @@ _: {
       mode = "n";
       key = "<Tab>";
       action = "<cmd>bnext<CR>";
-      options = {
-        desc = "Next buffer";
-        silent = true;
-      };
+      options.desc = "Next buffer";
+      options.silent = true;
     }
     {
       mode = "n";
       key = "<S-Tab>";
       action = "<cmd>bprevious<CR>";
-      options = {
-        desc = "Previous buffer";
-        silent = true;
-      };
+      options.desc = "Previous buffer";
+      options.silent = true;
     }
   ];
 }

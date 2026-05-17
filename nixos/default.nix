@@ -1,6 +1,5 @@
 {
   pkgs,
-  config,
   xremap,
   username,
   ...
@@ -23,7 +22,7 @@ let
   compositor = import ./config/compositor.nix;
 
   # Input
-  input = import ./config/services/input.nix { inherit pkgs username; };
+  input = import ./config/services/input.nix { inherit username; };
 
   # Network
   network = import ./config/network.nix;

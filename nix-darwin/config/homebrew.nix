@@ -1,21 +1,18 @@
 {
-  homebrew = {
-    enable = true;
-    onActivation = {
-      autoUpdate = true;
-      upgrade = true;
-      cleanup = "uninstall";
-    };
-    brews = [
-      "pdfpc"
-      "docker-credential-helper"
-    ];
-    casks = [
-      "aquaskk"
-      "cleanshot"
-      "font-sketchybar-app-font"
-      "google-chrome"
-      "sf-symbols"
-    ];
-  };
+  homebrew.enable = true;
+  homebrew.onActivation.autoUpdate = true;
+  homebrew.onActivation.upgrade = true;
+  homebrew.onActivation.cleanup = "uninstall";
+  homebrew.brews = [
+    "pdfpc"
+    "docker-credential-helper"
+  ];
+  homebrew.casks = [
+    "aquaskk"
+    "cleanshot"
+    "claude"
+    "font-sketchybar-app-font"
+    "google-chrome"
+    "sf-symbols"
+  ];
 }

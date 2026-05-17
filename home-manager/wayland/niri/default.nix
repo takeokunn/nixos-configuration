@@ -4,7 +4,7 @@ let
     windowManager = "niri";
   };
 in
-pkgs.lib.mkIf pkgs.stdenv.isLinux {
+{
   xdg.configFile."niri/config.kdl".text = ''
     // Niri Configuration - Modern Scrolling Tiling Compositor
     // Vi-style keybindings (hjkl navigation)

@@ -5,7 +5,6 @@
 # files (oil replacement), visits (harpoon replacement), and sessions.
 # ════════════════════════════════════════════════════════════════════════════════
 
-_:
 let
   utils = import ./utils.nix;
   inherit (utils) mkPickKeymap mkExtraPickKeymap mkMiniKeymap;
@@ -34,9 +33,7 @@ in
         mark = "<C-x>";
         mark_all = "<C-a>";
       };
-      options = {
-        use_cache = true;
-      };
+      options.use_cache = true;
       window = {
         config.__raw = ''
           function()
@@ -82,9 +79,7 @@ in
         trim_left = "<";
         trim_right = ">";
       };
-      options = {
-        use_as_default_explorer = true;
-      };
+      options.use_as_default_explorer = true;
       windows = {
         preview = true;
         width_focus = 50;
@@ -139,19 +134,15 @@ in
       mode = "n";
       key = "<leader>e";
       action.__raw = "function() require('mini.files').open(vim.fn.getcwd(), true) end";
-      options = {
-        desc = "Toggle file explorer (project root)";
-        silent = true;
-      };
+      options.desc = "Toggle file explorer (project root)";
+      options.silent = true;
     }
     {
       mode = "n";
       key = "<leader>E";
       action.__raw = "function() require('mini.files').open(vim.api.nvim_buf_get_name(0), true) end";
-      options = {
-        desc = "Toggle file explorer (current file)";
-        silent = true;
-      };
+      options.desc = "Toggle file explorer (current file)";
+      options.silent = true;
     }
 
     # mini.visits keymaps (replacing harpoon)

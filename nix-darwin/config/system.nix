@@ -1,74 +1,61 @@
-{ username, ... }:
+{ username }:
 {
   time.timeZone = "Asia/Tokyo";
 
-  power = {
-    restartAfterFreeze = true;
-    sleep.allowSleepByPowerButton = true;
+  power.restartAfterFreeze = true;
+  power.sleep.allowSleepByPowerButton = true;
+
+  system.primaryUser = username;
+  system.stateVersion = 5;
+
+  system.startup.chime = false;
+
+  system.keyboard.enableKeyMapping = true;
+  system.keyboard.remapCapsLockToControl = true;
+
+  system.defaults.SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;
+  system.defaults.LaunchServices.LSQuarantine = false;
+
+  system.defaults.NSGlobalDomain = {
+    _HIHideMenuBar = true;
+    AppleShowAllExtensions = true;
+    AppleInterfaceStyle = "Dark";
+    ApplePressAndHoldEnabled = false;
+    InitialKeyRepeat = 15;
+    KeyRepeat = 2;
+    NSAutomaticCapitalizationEnabled = false;
+    NSAutomaticDashSubstitutionEnabled = false;
+    NSAutomaticPeriodSubstitutionEnabled = false;
+    NSAutomaticQuoteSubstitutionEnabled = false;
+    NSAutomaticSpellingCorrectionEnabled = false;
+    NSNavPanelExpandedStateForSaveMode = true;
+    NSNavPanelExpandedStateForSaveMode2 = true;
   };
 
-  system = {
-    primaryUser = username;
-    stateVersion = 5;
-
-    startup.chime = false;
-
-    keyboard = {
-      enableKeyMapping = true;
-      remapCapsLockToControl = true;
-    };
-
-    defaults = {
-      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = true;
-      LaunchServices.LSQuarantine = false;
-
-      NSGlobalDomain = {
-        _HIHideMenuBar = true;
-        AppleShowAllExtensions = true;
-        AppleInterfaceStyle = "Dark";
-        ApplePressAndHoldEnabled = false;
-        InitialKeyRepeat = 15;
-        KeyRepeat = 2;
-        NSAutomaticCapitalizationEnabled = false;
-        NSAutomaticDashSubstitutionEnabled = false;
-        NSAutomaticPeriodSubstitutionEnabled = false;
-        NSAutomaticQuoteSubstitutionEnabled = false;
-        NSAutomaticSpellingCorrectionEnabled = false;
-        NSNavPanelExpandedStateForSaveMode = true;
-        NSNavPanelExpandedStateForSaveMode2 = true;
-      };
-
-      finder = {
-        AppleShowAllFiles = true;
-        AppleShowAllExtensions = true;
-        _FXShowPosixPathInTitle = true;
-        ShowPathbar = true;
-        ShowStatusBar = true;
-        FXEnableExtensionChangeWarning = false;
-      };
-
-      dock = {
-        autohide = true;
-        show-recents = false;
-        launchanim = false;
-        orientation = "bottom";
-      };
-
-      trackpad = {
-        Clicking = true;
-        Dragging = true;
-        TrackpadThreeFingerDrag = false;
-        TrackpadThreeFingerHorizSwipeGesture = 2;
-        TrackpadThreeFingerVertSwipeGesture = 2;
-      };
-
-      controlcenter.BatteryShowPercentage = true;
-
-      WindowManager.EnableStandardClickToShowDesktop = false;
-    };
-
-    activationScripts.extraActivation.text = ''
-      softwareupdate --all --install
-    '';
+  system.defaults.finder = {
+    AppleShowAllFiles = true;
+    AppleShowAllExtensions = true;
+    _FXShowPosixPathInTitle = true;
+    ShowPathbar = true;
+    ShowStatusBar = true;
+    FXEnableExtensionChangeWarning = false;
   };
+
+  system.defaults.dock = {
+    autohide = true;
+    show-recents = false;
+    launchanim = false;
+  };
+
+  system.defaults.trackpad = {
+    Clicking = true;
+    Dragging = true;
+    TrackpadThreeFingerDrag = false;
+    TrackpadThreeFingerHorizSwipeGesture = 2;
+    TrackpadThreeFingerVertSwipeGesture = 2;
+  };
+
+  system.defaults.controlcenter.BatteryShowPercentage = true;
+
+  system.defaults.WindowManager.EnableStandardClickToShowDesktop = false;
 }

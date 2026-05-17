@@ -5,7 +5,6 @@
 # Note: neogit and diffview are kept separately for advanced git UI.
 # ════════════════════════════════════════════════════════════════════════════════
 
-_:
 let
   utils = import ./utils.nix;
   inherit (utils) mkMiniKeymap;

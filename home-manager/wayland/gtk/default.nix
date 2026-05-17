@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs }:
 let
   draculaTheme = {
     name = "Dracula";
@@ -6,13 +6,9 @@ let
   };
 in
 {
-  gtk = {
-    enable = pkgs.stdenv.isLinux;
-    theme = draculaTheme;
-    iconTheme = {
-      name = "Dracula";
-      package = pkgs.dracula-icon-theme;
-    };
-    gtk4.theme = draculaTheme;
-  };
+  gtk.enable = true;
+  gtk.theme = draculaTheme;
+  gtk.iconTheme.name = "Dracula";
+  gtk.iconTheme.package = pkgs.dracula-icon-theme;
+  gtk.gtk4.theme = draculaTheme;
 }

@@ -1,70 +1,34 @@
-_: {
+{
   # mini.completion is configured in ui/mini.nix
   # Just keep LSP and lspsaga here
 
-  plugins.lsp = {
-    enable = true;
-    keymaps = {
-      lspBuf = {
-        gd = "definition";
-      };
-    };
-    servers = {
-      nil_ls = {
-        enable = true;
-        settings = {
-          formatting = {
-            command = [ "nixfmt" ];
-          };
-          nix = {
-            flake = {
-              autoArchive = true;
-              autoEvalInputs = true;
-              nixpkgsInputName = "nixpkgs";
-            };
-          };
-        };
-      };
-      ts_ls = {
-        enable = true;
-      };
-      intelephense = {
-        enable = true;
-        package = null;
-      };
-      gopls = {
-        enable = true;
-      };
-      html = {
-        enable = true;
-      };
-      cssls = {
-        enable = true;
-      };
-      bashls = {
-        enable = true;
-      };
-      emmet_ls = {
-        enable = true;
-        filetypes = [
-          "html"
-          "css"
-          "scss"
-          "javascript"
-          "javascriptreact"
-          "typescript"
-          "typescriptreact"
-        ];
-      };
-    };
-  };
+  plugins.lsp.enable = true;
+  plugins.lsp.keymaps.lspBuf.gd = "definition";
+  plugins.lsp.servers.nil_ls.enable = true;
+  plugins.lsp.servers.nil_ls.settings.formatting.command = [ "nixfmt" ];
+  plugins.lsp.servers.nil_ls.settings.nix.flake.autoArchive = true;
+  plugins.lsp.servers.nil_ls.settings.nix.flake.autoEvalInputs = true;
+  plugins.lsp.servers.nil_ls.settings.nix.flake.nixpkgsInputName = "nixpkgs";
+  plugins.lsp.servers.ts_ls.enable = true;
+  plugins.lsp.servers.intelephense.enable = true;
+  plugins.lsp.servers.intelephense.package = null;
+  plugins.lsp.servers.gopls.enable = true;
+  plugins.lsp.servers.html.enable = true;
+  plugins.lsp.servers.cssls.enable = true;
+  plugins.lsp.servers.bashls.enable = true;
+  plugins.lsp.servers.emmet_ls.enable = true;
+  plugins.lsp.servers.emmet_ls.filetypes = [
+    "html"
+    "css"
+    "scss"
+    "javascript"
+    "javascriptreact"
+    "typescript"
+    "typescriptreact"
+  ];
 
-  plugins.lspsaga = {
-    enable = true;
-    lazyLoad.settings = {
-      event = "LspAttach";
-    };
-  };
+  plugins.lspsaga.enable = true;
+  plugins.lspsaga.lazyLoad.settings.event = "LspAttach";
 
   extraConfigLua = ''
     vim.diagnostic.config({

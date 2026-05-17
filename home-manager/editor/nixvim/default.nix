@@ -1,6 +1,6 @@
 { pkgs, nurPkgs }:
 let
-  customPackages = import ./packages { inherit pkgs nurPkgs; };
+  customPackages = import ./packages { inherit nurPkgs; };
   plugins = import ./plugins { inherit pkgs customPackages; };
   opts = import ./opts;
   baseKeymaps = import ./keymaps;
@@ -12,34 +12,25 @@ let
   extraConfigLua = plugins.extraConfigLua or "";
 in
 {
-  programs.nixvim = {
-    inherit
-      opts
-      keymaps
-      globals
-      userCommands
-      extraConfigLua
-      ;
-    inherit (plugins) plugins extraPlugins;
+  programs.nixvim.opts = opts;
+  programs.nixvim.keymaps = keymaps;
+  programs.nixvim.globals = globals;
+  programs.nixvim.userCommands = userCommands;
+  programs.nixvim.extraConfigLua = extraConfigLua;
+  programs.nixvim.plugins = plugins.plugins;
+  programs.nixvim.extraPlugins = plugins.extraPlugins;
 
-    enable = true;
-    enableMan = true;
-    defaultEditor = false;
+  programs.nixvim.enable = true;
 
-    editorconfig.enable = true;
-    colorschemes.dracula.enable = true;
+  programs.nixvim.editorconfig.enable = true;
+  programs.nixvim.colorschemes.dracula.enable = true;
 
-    luaLoader.enable = true;
-    performance.byteCompileLua = {
-      enable = true;
-      nvimRuntime = true;
-      configs = true;
-      plugins = true;
-    };
+  programs.nixvim.luaLoader.enable = true;
+  programs.nixvim.performance.byteCompileLua.enable = true;
+  programs.nixvim.performance.byteCompileLua.nvimRuntime = true;
+  programs.nixvim.performance.byteCompileLua.configs = true;
+  programs.nixvim.performance.byteCompileLua.plugins = true;
 
-    clipboard.providers = {
-      pbcopy.enable = pkgs.stdenv.isDarwin;
-      wl-copy.enable = pkgs.stdenv.isLinux;
-    };
-  };
+  programs.nixvim.clipboard.providers.pbcopy.enable = pkgs.stdenv.isDarwin;
+  programs.nixvim.clipboard.providers.wl-copy.enable = pkgs.stdenv.isLinux;
 }

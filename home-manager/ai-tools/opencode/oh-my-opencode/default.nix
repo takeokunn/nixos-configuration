@@ -17,21 +17,6 @@ pkgs.writeText "oh-my-opencode.json" (
     model_fallback = true;
     disabled_hooks = [ "comment-checker" ];
 
-    runtime_fallback = {
-      enabled = true;
-      retry_on_errors = [
-        400
-        500
-        429
-        503
-        529
-      ];
-      max_fallback_attempts = 10;
-      cooldown_seconds = 30;
-      timeout_seconds = 30;
-      notify_on_fallback = true;
-    };
-
     inherit agents categories;
   }
 )

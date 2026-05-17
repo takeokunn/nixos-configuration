@@ -3,6 +3,7 @@ let
   inherit (inputs)
     nix-darwin
     home-manager
+    nixpkgs
     nixvim
     brew-nix
     mac-app-util
@@ -10,13 +11,13 @@ let
     nur-packages
     darwin-vz-nix
     ;
-  inherit (inputs) nixpkgs;
 
   username = "take";
   system = "aarch64-darwin";
+  lib = nixpkgs.lib;
 
   editorOverlay = import ../../home-manager/editor/overlay.nix { inherit emacs-overlay; };
-  shellOverlay  = import ../../home-manager/shell/overlay.nix;
+  shellOverlay = import ../../home-manager/shell/overlay.nix;
 
   pkgs = import nixpkgs {
     inherit system;
@@ -26,28 +27,21 @@ let
 
   nurPkgs = nur-packages.packages.${system};
 
-  # emacs package (for nix-darwin to use in aerospace)
   emacs = import ../../home-manager/editor/packages {
-    inherit (nixpkgs) lib;
-    inherit pkgs nurPkgs;
+    inherit lib pkgs nurPkgs;
   };
   emacsPkg = emacs.emacs-unstable;
 
-  # emacs library (shared utilities for both nix-darwin and home-manager)
   emacsLib = import ../../home-manager/editor/lib/emacs.nix {
-    inherit (nixpkgs) lib;
-    inherit pkgs emacsPkg;
+    inherit lib pkgs emacsPkg;
   };
 
-  configuration =
-    { ... }:
-    {
-      users.users.${username}.home = "/Users/${username}";
-    };
+  configuration = _: {
+    users.users.${username}.home = "/Users/${username}";
+  };
 in
 nix-darwin.lib.darwinSystem {
-  inherit pkgs;
-  inherit (inputs.nixpkgs) lib;
+  inherit pkgs lib;
   specialArgs = {
     inherit
       inputs
@@ -65,40 +59,37 @@ nix-darwin.lib.darwinSystem {
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
     {
-      home-manager = {
-        useUserPackages = true;
-        users."${username}" = import ../../home-manager/advanced.nix;
-        sharedModules = [
-          nixvim.homeModules.nixvim
-          mac-app-util.homeManagerModules.default
-          # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
-          inputs.agent-skills.homeManagerModules.default
-        ];
-        extraSpecialArgs = {
-          inherit inputs system username;
-          inherit (inputs) nixpkgs nixvim;
-          inherit (inputs) mcp-servers-nix;
-          inherit (inputs) llm-agents;
-          inherit (inputs) nur-packages;
-          inherit (inputs) devenv;
-          inherit (inputs)
-            anthropic-skills
-            cloudflare-skills
-            hashicorp-agent-skills
-            deno-skills
-            aws-agent-skills
-            microsoft-skills
-            scientific-skills
-            context7-skills
-            ast-grep-skill
-            ;
-          inherit (inputs)
-            emacs-overlay
-            org-babel
-            brew-nix
-            firefox-addons
-            ;
-        };
+      home-manager.useUserPackages = true;
+      home-manager.users."${username}" = import ../../home-manager/advanced.nix;
+      home-manager.sharedModules = [
+        nixvim.homeModules.nixvim
+        mac-app-util.homeManagerModules.default
+        # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
+        inputs.agent-skills.homeManagerModules.default
+      ];
+      home-manager.extraSpecialArgs = {
+        inherit inputs system username;
+        inherit (inputs)
+          nixpkgs
+          nixvim
+          mcp-servers-nix
+          llm-agents
+          nur-packages
+          devenv
+          anthropic-skills
+          cloudflare-skills
+          hashicorp-agent-skills
+          deno-skills
+          aws-agent-skills
+          microsoft-skills
+          scientific-skills
+          context7-skills
+          ast-grep-skill
+          emacs-overlay
+          org-babel
+          brew-nix
+          firefox-addons
+          ;
       };
     }
   ];

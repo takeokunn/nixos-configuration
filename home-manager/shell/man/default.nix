@@ -1,6 +1,4 @@
 {
-  programs.man = {
-    enable = true;
-    generateCaches = true;
-  };
+  programs.man.enable = true;
+  programs.man.generateCaches = true;
 }

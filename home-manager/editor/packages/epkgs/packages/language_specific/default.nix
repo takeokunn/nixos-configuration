@@ -1,8 +1,4 @@
-{
-  nurPkgs,
-  epkgs,
-  pkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   rainbow-csv = nurPkgs.emacs-rainbow-csv;
   emacs-php-doc-block = nurPkgs.emacs-php-doc-block;

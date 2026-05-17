@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs }:
+{ nurPkgs }:
 {
   skkeleton = nurPkgs.vim-skkeleton;
   skkeleton-azik = nurPkgs.vim-skkeleton-azik;

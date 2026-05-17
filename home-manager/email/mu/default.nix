@@ -1,13 +1,5 @@
-{ pkgs }:
 {
-  programs.mu = {
-    enable = true;
-    package = pkgs.mu;
-  };
+  programs.mu.enable = true;
 
-  accounts.email.accounts = {
-    Gmail = {
-      mu.enable = true;
-    };
-  };
+  accounts.email.accounts.Gmail.mu.enable = true;
 }

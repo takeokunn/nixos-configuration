@@ -1,8 +1,4 @@
-{
-  epkgs,
-  pkgs,
-  nurPkgs,
-}:
+{ epkgs, nurPkgs }:
 let
   bazel-mode = epkgs.bazel;
   direnv-mode = epkgs.direnv;

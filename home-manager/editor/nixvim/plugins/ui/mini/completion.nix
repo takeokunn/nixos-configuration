@@ -5,7 +5,6 @@
 # (TODO highlighting), cursorword, trailspace, bufremove, bracketed, map, misc, snippets.
 # ════════════════════════════════════════════════════════════════════════════════
 
-_:
 let
   utils = import ./utils.nix;
   inherit (utils) mkMiniKeymap;
@@ -125,10 +124,8 @@ in
       mode = "n";
       key = "<leader>bc";
       action.__raw = "function() require('mini.bufremove').delete() end";
-      options = {
-        desc = "Close current buffer";
-        silent = true;
-      };
+      options.desc = "Close current buffer";
+      options.silent = true;
     }
 
     # mini.map keymaps
