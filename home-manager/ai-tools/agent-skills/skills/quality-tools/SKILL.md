@@ -250,7 +250,21 @@ version: 2.0.0
   <avoid>Running only subset of quality tools</avoid>
 </constraints>
 
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor linting warning with no functional impact</example>
+    <example severity="medium">Type error or test failure blocking CI</example>
+    <example severity="high">Code quality gate failure preventing deployment</example>
+    <example severity="critical">Security vulnerability detected by static analysis</example>
+  </examples>
+</error_escalation>
+
 <related_skills>
   <skill name="testing-patterns">Run tests after quality fixes</skill>
   <skill name="execution-workflow">Integration with implementation workflow</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

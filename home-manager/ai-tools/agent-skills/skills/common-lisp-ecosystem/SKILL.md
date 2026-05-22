@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze ASDF system definitions and Lisp source files</tool>
   <tool>Edit - Modify Common Lisp code and system definitions</tool>
   <tool>Bash - Run SBCL, Roswell, Qlot commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch ASDF, SBCL, and library documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch ASDF, SBCL, and library documentation</tool>
 </tools>
 
 <concepts>
@@ -509,7 +509,7 @@ version: 2.0.0
     <description>Use resolve-library-id then get-library-docs for latest documentation.</description>
     <example>
       ;; Get ASDF documentation
-      mcp__context7__get-library-docs
+      mcp__plugin_claude-code-home-manager_context7__query-docs
         context7CompatibleLibraryID="/websites/asdf_common-lisp_dev"
         topic="defsystem"
     </example>
@@ -578,6 +578,7 @@ version: 2.0.0
   <rule>Use ASDF for all system definitions; never load files directly</rule>
   <rule>Provide restarts for recoverable error conditions</rule>
   <rule>Document all exported symbols with docstrings</rule>
+  <rule>Target SBCL 2.5+ features; use modern ASDF 3.3+ defsystem patterns; never use legacy DEFINE-SYSTEM forms</rule>
 </rules>
 
 <rules priority="standard">
@@ -644,23 +645,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Style inconsistency</example>
-    <action>Fix formatting, follow project conventions</action>
-  </level>
-  <level severity="medium">
-    <example>Compilation warning or type error</example>
-    <action>Fix issue, add type declarations if needed</action>
-  </level>
-  <level severity="high">
-    <example>Macro expansion error</example>
-    <action>Debug with macroexpand, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Reader macro conflict</example>
-    <action>Block operation, require careful namespace management</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Style inconsistency</example>
+    <example severity="medium">Compilation warning or type error</example>
+    <example severity="high">Macro expansion error</example>
+    <example severity="critical">Reader macro conflict</example>
+  </examples>
 </error_escalation>
 
 <patterns>
@@ -677,8 +668,9 @@ version: 2.0.0
 </decision_tree>
 
 <related_agents>
-  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
   <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
 </related_agents>
 
 <constraints>

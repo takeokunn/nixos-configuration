@@ -23,6 +23,18 @@ Analyze the current session to extract a repeatable process, interview the user 
   <rule>Respect the user's naming preferences over auto-generated names</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Asking clarifying questions immediately without first analyzing the session — AI must complete full session analysis before starting any interview round to avoid asking questions the session already answers</practice>
+    <practice>Writing the SKILL.md in one pass without structured user validation — the four-round interview produces the user input needed to make the skill reusable rather than session-specific</practice>
+    <practice>Using generic step descriptions without success criteria — every step in the generated SKILL.md must have an explicit success condition so future invocations can self-verify</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Extract the repeatable process from session history holistically: identify inputs, steps, corrections, tools, and success signals before framing the first interview question</principle>
+    <principle>Use AskUserQuestion for all four interview rounds to enable structured option selection; collapse rounds only for trivially simple single-step processes</principle>
+    <principle>Present the complete SKILL.md as a code block before writing; the user's explicit confirmation is a hard gate that prevents premature file creation</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
@@ -200,6 +212,38 @@ Analyze the current session to extract a repeatable process, interview the user 
       <score range="0-49">Incomplete skill definition</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>session_analysis=92, interview_completeness=93, skill_quality=92</input>
+      <calculation>(92*0.3)+(93*0.4)+(92*0.3) = 92.4</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>session_analysis=80, interview_completeness=80, skill_quality=80</input>
+      <calculation>(80*0.3)+(80*0.4)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>session_analysis=79, interview_completeness=79, skill_quality=79</input>
+      <calculation>(79*0.3)+(79*0.4)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>session_analysis=59, interview_completeness=59, skill_quality=59</input>
+      <calculation>(59*0.3)+(59*0.4)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>session_analysis=40, interview_completeness=35, skill_quality=45</input>
+      <calculation>(40*0.3)+(35*0.4)+(45*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -272,10 +316,10 @@ Analyze the current session to extract a repeatable process, interview the user 
 </enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor ambiguity in step ordering</low>
-    <medium>Session has no clear repeatable process</medium>
-    <high>Conflicting user answers across interview rounds</high>
-    <critical>Skill would automate destructive operations without safeguards</critical>
+    <example severity="low">Minor ambiguity in step ordering</example>
+    <example severity="medium">Session has no clear repeatable process</example>
+    <example severity="high">Conflicting user answers across interview rounds</example>
+    <example severity="critical">Skill would automate destructive operations without safeguards</example>
   </examples>
 </error_escalation>
 <related_commands>

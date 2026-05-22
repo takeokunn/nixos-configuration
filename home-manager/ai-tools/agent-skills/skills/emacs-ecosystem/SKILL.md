@@ -659,6 +659,7 @@ version: 2.0.0
 </anti_patterns>
 
 <rules priority="critical">
+  <rule>Target Emacs 30.1+ features including built-in use-package and native Tree-sitter support; never recommend installing use-package as a separate dependency</rule>
   <rule>Target Emacs 30.x as the baseline major series and align exact version with the active package set</rule>
   <rule>Prefer built-in packages (eglot, use-package, treesit) over third-party alternatives</rule>
   <rule>Use tree-sitter *-ts-mode variants for all languages with grammar support</rule>
@@ -726,35 +727,19 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Byte-compilation warning</example>
-    <action>Fix warning, ensure clean compilation</action>
-  </level>
-  <level severity="medium">
-    <example>Configuration error on startup</example>
-    <action>Debug with --debug-init, fix issue</action>
-  </level>
-  <level severity="high">
-    <example>Package conflict or version mismatch</example>
-    <action>Stop, present resolution options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Emacs becomes unusable</example>
-    <action>Provide recovery steps, require user action</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Byte-compilation warning</example>
+    <example severity="medium">Configuration error on startup</example>
+    <example severity="high">Package conflict or version mismatch</example>
+    <example severity="critical">Emacs becomes unusable</example>
+  </examples>
 </error_escalation>
 
-<rules priority="critical">
-  <rule>Keep guidance evidence-based and version-aware</rule>
-</rules>
-<rules priority="standard">
-  <rule>Prefer project conventions over generic defaults</rule>
-</rules>
-
 <related_agents>
-  <agent name="explore">Locate relevant code patterns</agent>
-  <agent name="quality-assurance">Review output consistency</agent>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
 </related_agents>
 
 <constraints>

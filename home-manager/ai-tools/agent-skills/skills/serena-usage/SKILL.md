@@ -709,23 +709,13 @@ version: 3.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Symbol not found with exact match</example>
-    <action>Retry with substring_matching=true, note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Memory file not found</example>
-    <action>Document issue, ask user for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Conflicting information in memories</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Memory corruption or invalid state</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Symbol not found with exact match</example>
+    <example severity="medium">Memory file not found</example>
+    <example severity="high">Conflicting information in memories</example>
+    <example severity="critical">Memory corruption or invalid state</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -753,3 +743,8 @@ version: 3.0.0
   <skill name="common-lisp-ecosystem">Common Lisp patterns stored in Serena memories</skill>
   <skill name="emacs-ecosystem">Emacs patterns stored in Serena memories</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="explore">Complement Serena symbol search with file-level exploration</agent>
+  <agent name="general-purpose">Apply Serena-retrieved context to implementation tasks</agent>
+</related_agents>

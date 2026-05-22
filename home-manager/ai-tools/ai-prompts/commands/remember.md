@@ -25,6 +25,18 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
   <rule>Workflow practices are ambiguous — always ask the user about them</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Reading each memory file sequentially before forming a picture — AI can gather all memory layers (CLAUDE.md, CLAUDE.local.md, Serena memories, auto-memory) in a parallel sweep</practice>
+    <practice>Guessing the destination for ambiguous workflow practices — AI must flag these for user input rather than assuming, because the boundary between project conventions and personal preferences is context-dependent</practice>
+    <practice>Making changes as soon as an issue is identified — the entire proposal set must be assembled and presented before any modification occurs</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Treat the memory landscape as a graph: read all nodes first, then detect cross-layer duplicates, conflicts, and outdated entries holistically before proposing any changes</principle>
+    <principle>Distinguish strictly between CLAUDE.md (shared project conventions) and CLAUDE.local.md (personal user instructions) — misrouting erodes the separation of concerns</principle>
+    <principle>Present the complete proposal report in a single structured output before any write operation; user approval is a hard gate, not a preference</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and establish baseline</objective>
@@ -199,6 +211,38 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
       <score range="0-49">Minimal cleanup analysis</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>layer_coverage=93, classification_quality=92, cleanup_completeness=92</input>
+      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>layer_coverage=80, classification_quality=80, cleanup_completeness=80</input>
+      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>layer_coverage=79, classification_quality=79, cleanup_completeness=79</input>
+      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>layer_coverage=59, classification_quality=59, cleanup_completeness=59</input>
+      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>layer_coverage=35, classification_quality=45, cleanup_completeness=40</input>
+      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -274,10 +318,10 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
 </enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor duplicate between Serena memory and auto-memory</low>
-    <medium>Entry destination is ambiguous between CLAUDE.md and CLAUDE.local.md</medium>
-    <high>Direct contradiction between memory layers</high>
-    <critical>Memory entry contains sensitive information or security-relevant instructions</critical>
+    <example severity="low">Minor duplicate between Serena memory and auto-memory</example>
+    <example severity="medium">Entry destination is ambiguous between CLAUDE.md and CLAUDE.local.md</example>
+    <example severity="high">Direct contradiction between memory layers</example>
+    <example severity="critical">Memory entry contains sensitive information or security-relevant instructions</example>
   </examples>
 </error_escalation>
 <related_commands>

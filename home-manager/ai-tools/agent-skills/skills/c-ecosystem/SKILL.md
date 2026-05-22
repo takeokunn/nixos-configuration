@@ -994,23 +994,13 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Compiler warning about unused variable</example>
-    <action>Fix warning, maintain clean build</action>
-  </level>
-  <level severity="medium">
-    <example>Valgrind reports minor memory leak</example>
-    <action>Track down and fix leak, verify with Valgrind</action>
-  </level>
-  <level severity="high">
-    <example>AddressSanitizer detects buffer overflow</example>
-    <action>Stop, fix immediately - this is a security issue</action>
-  </level>
-  <level severity="critical">
-    <example>Use-after-free or double-free detected</example>
-    <action>Block operation, require immediate fix and review</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Compiler warning about unused variable</example>
+    <example severity="medium">Valgrind reports minor memory leak</example>
+    <example severity="high">AddressSanitizer detects buffer overflow</example>
+    <example severity="critical">Use-after-free or double-free detected</example>
+  </examples>
 </error_escalation>
 
 <tools>
@@ -1025,6 +1015,10 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
   </pattern>
 </patterns>
 
+<rules priority="critical">
+  <rule>Target C23 (-std=c23) by default; never write new code targeting C11 or older without documented justification</rule>
+</rules>
+
 <decision_tree name="skill_activation">
   <question>Does the task clearly match this skill domain?</question>
   <branch condition="Yes">Use this skill workflow and constraints</branch>
@@ -1032,8 +1026,9 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
 </decision_tree>
 
 <related_agents>
-  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
   <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
 </related_agents>
 
 <constraints>

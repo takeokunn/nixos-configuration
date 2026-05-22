@@ -1,7 +1,7 @@
 ---
 name: sbcl-usage
 description: Practical SBCL (Steel Bank Common Lisp) operations guide. Use this skill whenever the user mentions SBCL execution/debugging, --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, or SLY-based Common Lisp development.
-version: 1.0.0
+version: 2.0.0
 ---
 
 <purpose>
@@ -10,11 +10,16 @@ version: 1.0.0
   This complements common-lisp-ecosystem by focusing on practical runtime workflows.
 </purpose>
 
+<version_info>
+  <current_version>SBCL 2.5.x (2026 stable)</current_version>
+  <note>All patterns in this skill apply to SBCL 2.x series. SBCL releases frequently (monthly builds); use nix or Roswell to pin a specific version.</note>
+</version_info>
+
 <tools>
   <tool>Read - Inspect Lisp/ASDF files, configs, logs</tool>
   <tool>Edit - Update *.lisp / *.asd / run scripts</tool>
   <tool>Bash - Execute sbcl / roswell / qlot / nix commands</tool>
-  <tool>mcp__context7__get-library-docs - Verify SBCL / ASDF / CFFI details</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Verify SBCL / ASDF / CFFI details</tool>
 </tools>
 
 <scope>
@@ -359,6 +364,7 @@ version: 1.0.0
   <rule>Prioritize observability (backtrace, inspect, trace) during root-cause analysis.</rule>
   <rule>Fix proposals must include reproduction, verification, and failure-mode behavior.</rule>
   <rule>Performance recommendations must be grounded in measured data.</rule>
+  <rule>Target SBCL 2.5+ (2.x series); use sb-ext:exit for process exit, not cl:exit or os-exit directly</rule>
 </rules>
 
 <rules priority="standard">
@@ -426,6 +432,15 @@ version: 1.0.0
   </phase>
 </workflow>
 
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor SBCL warning during compilation</example>
+    <example severity="medium">Unhandled condition or ASDF load failure</example>
+    <example severity="high">Runtime error or heap exhaustion in production image</example>
+    <example severity="critical">Memory corruption or undefined behavior in FFI boundary</example>
+  </examples>
+</error_escalation>
+
 <constraints>
   <must>Debugging guidance must preserve the sequence: reproduce → observe → verify</must>
   <must>Keep SLY compatibility in editor integration guidance</must>
@@ -435,8 +450,13 @@ version: 1.0.0
 </constraints>
 
 <related_skills>
-  <skill name="Common Lisp Ecosystem">CLOS/ASDF/condition-system foundations</skill>
-  <skill name="Nix Ecosystem">Pinned SBCL runtime environments with nix shell/flake</skill>
-  <skill name="Investigation Patterns">Evidence-driven root-cause methodology</skill>
-  <skill name="Quality Tools">Automated checks and CI quality discipline</skill>
+  <skill name="common-lisp-ecosystem">CLOS/ASDF/condition-system foundations</skill>
+  <skill name="nix-ecosystem">Pinned SBCL runtime environments with nix shell/flake</skill>
+  <skill name="investigation-patterns">Evidence-driven root-cause methodology</skill>
+  <skill name="quality-tools">Automated checks and CI quality discipline</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

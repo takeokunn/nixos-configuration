@@ -219,3 +219,7 @@ version: 2.0.0
   <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
   <skill name="workflow-patterns">Output formats, reflection checkpoints, self-evaluation</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="validator">Validate that parallel task results are consistent and non-conflicting</agent>
+</related_agents>

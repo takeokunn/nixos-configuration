@@ -264,23 +264,13 @@ version: 2.0.0
   <rule>Map requirements to test scenarios</rule>
 </rules>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor ambiguity in non-critical detail</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Unclear requirement affecting scope</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Technically infeasible requirement</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Requirement violates security or ethics</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor ambiguity in non-critical detail</example>
+    <example severity="medium">Unclear requirement affecting scope</example>
+    <example severity="high">Technically infeasible requirement</example>
+    <example severity="critical">Requirement violates security or ethics</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -297,3 +287,9 @@ version: 2.0.0
   <skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
   <skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="explore">Locate existing implementations and patterns to ground requirements in evidence</agent>
+  <agent name="design">Evaluate architectural feasibility and consistency of proposed requirements</agent>
+  <agent name="validator">Cross-validate requirements document for completeness and consistency</agent>
+</related_agents>

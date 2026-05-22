@@ -812,23 +812,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor formatting inconsistency</example>
-    <action>Fix and continue</action>
-  </level>
-  <level severity="medium">
-    <example>Babel block execution error</example>
-    <action>Debug block, check language support</action>
-  </level>
-  <level severity="high">
-    <example>Export failure or corrupted output</example>
-    <action>Check document structure, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Data loss from failed tangle or corrupted file</example>
-    <action>Block operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor formatting inconsistency</example>
+    <example severity="medium">Babel block execution error</example>
+    <example severity="high">Export failure or corrupted output</example>
+    <example severity="critical">Data loss from failed tangle or corrupted file</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -895,3 +885,8 @@ version: 2.0.0
   <skill name="context7-usage">Fetch latest org-mode documentation</skill>
   <skill name="technical-documentation">Documentation patterns applicable to org export</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

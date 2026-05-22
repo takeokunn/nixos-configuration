@@ -28,6 +28,18 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <rule>Track occurrence path chronologically</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Reproducing bugs manually in isolation — AI can trace all call paths and state transitions from a stack trace in a single pass</practice>
+    <practice>Treating the error location as the root cause — AI can distinguish symptom from root cause by mapping the full dependency chain</practice>
+    <practice>One hypothesis at a time — AI can score multiple hypotheses in parallel and rule out lower-probability causes simultaneously</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Build a complete evidence chain (symptom → mechanism → root cause) before concluding — never jump from signal to verdict</principle>
+    <principle>Verify hypotheses against code evidence, not user description alone — the reported location is often not the true source</principle>
+    <principle>Map all recurrence locations in a single investigation pass — don't fix only the reported instance</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
@@ -49,24 +61,24 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   </phase>
   <phase name="analyze">
     <step order="1">
-      <action>What type of error is this? (syntax, runtime, logic)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <observe>Error message text, exception type, and any provided stack trace or logs</observe>
+      <reason>Error classification (syntax / runtime / logic / config) determines the investigation branch and which agents are most relevant</reason>
+      <act>Classify error type; record classification as input to investigate phase delegation</act>
     </step>
     <step order="2">
-      <action>Where does it occur? (file, line, function)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <observe>Stack trace line numbers, file names, and call chain depth</observe>
+      <reason>The deepest non-library frame is the symptom location — not necessarily the root cause; the full chain reveals how control flow reached the failure point</reason>
+      <act>Record primary error location (file:line) and call chain; flag the distinction between symptom site and likely root cause site</act>
     </step>
     <step order="3">
-      <action>What logs are available?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <observe>Available log output: timestamps, log levels, preceding events</observe>
+      <reason>Logs provide temporal context to distinguish a new failure from a recurring pattern, and reveal system state at failure time</reason>
+      <act>Identify log lines directly preceding and surrounding the error; note any state anomalies</act>
     </step>
     <step order="4">
-      <action>What is the error context? (before, during, after)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <observe>Events immediately before, during, and after the error occurrence</observe>
+      <reason>Temporal context distinguishes transient conditions (race, resource exhaustion) from deterministic bugs (logic error, missing null check)</reason>
+      <act>Record the error trigger sequence; classify as deterministic or condition-dependent</act>
     </step>
 
   </phase>
@@ -165,9 +177,24 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
 </reflection_checkpoint>
 <agents>
-  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Error tracking, stack trace analysis, debugging</agent>
-  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis, observability, dependency errors</agent>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding error locations, related code paths</agent>
+  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">
+    <role>Analyze error patterns, stack traces, and code defects to identify failure mechanisms</role>
+    <receives>error_message, stack_trace, file_paths[], reproduction_steps</receives>
+    <produces>error_classification{type, mechanism}, defects[]{location: file:line, description}, hypotheses[]{cause, confidence: 0-100}</produces>
+    <done_when>Evidence chain from symptom to root cause established; confidence >= 70 or competing hypotheses explicitly ranked</done_when>
+  </agent>
+  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">
+    <role>Analyze logs, runtime environment, and dependency relationships for contextual evidence</role>
+    <receives>log_content, environment_info{os, versions, env_vars}, dependency_list[]</receives>
+    <produces>log_analysis{critical_events[], timeline}, env_anomalies[], dependency_issues[]</produces>
+    <done_when>All available log entries processed; environmental factors assessed with file:line references where applicable</done_when>
+  </agent>
+  <agent name="explore" subagent_type="explore" readonly="true">
+    <role>Locate error sites, trace call paths, and find all recurrence locations for the same root cause</role>
+    <receives>error_location{file, line}, symbol_names[], search_patterns[]</receives>
+    <produces>error_site{surrounding_code, call_chain}, related_paths[], recurrences[]{file:line, similarity_reason}</produces>
+    <done_when>Error site mapped; all locations sharing the same root cause pattern identified</done_when>
+  </agent>
 </agents>
 <execution_graph>
   <parallel_group id="error_analysis" depends_on="none">
@@ -177,10 +204,10 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <parallel_group id="context_gathering" depends_on="none">
     <agent>general-purpose</agent>
   </parallel_group>
-  <sequential_phase id="synthesis" depends_on="error_analysis,context_gathering">
+  <sequential_step id="synthesis" depends_on="error_analysis,context_gathering">
     <agent>quality-assurance</agent>
     <reason>Requires findings from both error analysis and context gathering</reason>
-  </sequential_phase>
+  </sequential_step>
 </execution_graph>
 <delegation>
   <requirement>Full error message/stack trace</requirement>
@@ -209,6 +236,38 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <score range="0-49">No clear fix</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>root_cause_certainty=95, evidence_chain=90, fix_viability=90</input>
+      <calculation>(95*0.5)+(90*0.3)+(90*0.2) = 92.5</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>root_cause_certainty=80, evidence_chain=80, fix_viability=80</input>
+      <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>root_cause_certainty=79, evidence_chain=79, fix_viability=79</input>
+      <calculation>(79*0.5)+(79*0.3)+(79*0.2) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>root_cause_certainty=59, evidence_chain=59, fix_viability=59</input>
+      <calculation>(59*0.5)+(59*0.3)+(59*0.2) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>root_cause_certainty=40, evidence_chain=50, fix_viability=30</input>
+      <calculation>(40*0.5)+(50*0.3)+(30*0.2) = 41</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -227,7 +286,11 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <recommendations>Fix suggestions (no implementation), prevention</recommendations>
     <further_investigation>Unclear points, next steps</further_investigation>
     <self_feedback>
-      <confidence>XX/100 (based on root_cause_certainty)</confidence>
+      <confidence>XX/100</confidence>
+      <dimension name="root_cause_certainty">XX/100: one-line rationale</dimension>
+      <dimension name="evidence_chain">XX/100: one-line rationale</dimension>
+      <dimension name="fix_viability">XX/100: one-line rationale</dimension>
+      <gaps>What additional evidence or context would raise confidence above current score</gaps>
       <issues>
 - [Critical] Issue description (if any, max 2 total)
 - [Warning] Issue description (if any)

@@ -27,6 +27,18 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Fetching contribution guidelines, reviewing code, and sampling merged PRs sequentially — all gather-phase agents (guidelines, pr_template, changes, tests, pr_samples) are independent and must run in parallel</practice>
+    <practice>Writing PR descriptions from memory of common conventions — AI must fetch CONTRIBUTING.md and sample 10 real merged PRs from the upstream repo to learn actual patterns before generating metadata</practice>
+    <practice>Making any file modifications during review — this command is strictly read-only; all output feeds into an /execute handoff, never direct file writes</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Learn upstream conventions empirically: sample 10 recently merged PRs to extract title patterns, description structure, and required sections rather than guessing from general OSS norms</principle>
+    <principle>Inject actual values (file paths, endpoint names, component names) from diff analysis into every qa_step command; placeholder text in verification steps is a quality failure</principle>
+    <principle>Generate the complete task_breakdown with phased_tasks and execute_handoff so /execute can consume the output directly without requiring another planning pass</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <objective>Verify environment and detect upstream repository</objective>
@@ -242,6 +254,38 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <score range="0-49">Tests missing or failing</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>guideline_compliance=93, code_quality=92, test_coverage=92</input>
+      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>guideline_compliance=80, code_quality=80, test_coverage=80</input>
+      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>guideline_compliance=79, code_quality=79, test_coverage=79</input>
+      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>guideline_compliance=59, code_quality=59, test_coverage=59</input>
+      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>guideline_compliance=35, code_quality=45, test_coverage=40</input>
+      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <status_criteria>

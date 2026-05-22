@@ -25,6 +25,18 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <rule>Check Serena memories before implementation</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Implementing all logic in a single agent pass without delegation — every specialized concern (quality, security, tests, docs) must be delegated to the appropriate sub-agent with full context and explicit deliverables</practice>
+    <practice>Treating test creation as optional or deferrable — tests are mandatory for all implemented functionality; no implementation is considered complete without corresponding tests</practice>
+    <practice>Silently completing when tests fail after a fix attempt — remaining test failures after one targeted fix must be surfaced as explicit blockers in the follow_up section, not hidden</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Decompose tasks into atomic units with clear boundaries before delegating; independent units run in parallel while dependent units run sequentially — never serialize what can be parallelized</principle>
+    <principle>Check Serena memories for existing patterns before every implementation; implementing what already exists as a utility or convention wastes effort and creates divergence</principle>
+    <principle>After test creation, run the inferred test command immediately; if tests fail, attempt exactly one targeted fix and re-run; report any remaining failures as blockers rather than suppressing them</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <objective>Initialize Serena and check existing patterns</objective>
@@ -160,24 +172,114 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
 </reflection_checkpoint>
 <agents>
-  <agent name="quality" subagent_type="quality-assurance" readonly="false">Syntax, type, format verification</agent>
-  <agent name="security" subagent_type="security" readonly="false">Vulnerability detection</agent>
-  <agent name="test" subagent_type="test" readonly="false">Test creation, coverage</agent>
-  <agent name="refactor" subagent_type="general-purpose" readonly="false">Refactoring, tech debt</agent>
-  <agent name="docs" subagent_type="docs" readonly="false">Documentation updates</agent>
-  <agent name="review" subagent_type="quality-assurance" readonly="false">Post-implementation review</agent>
-  <agent name="debug" subagent_type="general-purpose" readonly="false">Debug support</agent>
-  <agent name="performance" subagent_type="performance" readonly="false">Performance optimization</agent>
-  <agent name="clean" subagent_type="code-quality" readonly="false">Dead code elimination</agent>
-  <agent name="error-handling" subagent_type="general-purpose" readonly="false">Error handling patterns</agent>
-  <agent name="migration" subagent_type="general-purpose" readonly="false">Migration planning and execution</agent>
-  <agent name="database" subagent_type="database" readonly="false">Database design and optimization</agent>
-  <agent name="infrastructure" subagent_type="devops" readonly="false">Infrastructure design</agent>
-  <agent name="ci-cd" subagent_type="devops" readonly="false">CI/CD pipeline design</agent>
-  <agent name="observability" subagent_type="devops" readonly="false">Logging, monitoring, tracing</agent>
-  <agent name="git" subagent_type="git" readonly="false">Git workflow design</agent>
-  <agent name="memory" subagent_type="general-purpose" readonly="false">Knowledge base management</agent>
-  <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
+  <agent name="quality" subagent_type="quality-assurance" readonly="false">
+    <role>Verify syntax correctness, type safety, and code format compliance for implemented changes</role>
+    <receives>file_paths[], change_description, project_language, style_config_path</receives>
+    <produces>issues[]{severity: critical|warning|info, location: file:line, message, suggestion}, confidence: 0-100</produces>
+    <done_when>All modified files checked; no critical issues remain or all critical issues documented</done_when>
+  </agent>
+  <agent name="security" subagent_type="security" readonly="false">
+    <role>Detect security vulnerabilities introduced by the implementation</role>
+    <receives>file_paths[], change_description, threat_context</receives>
+    <produces>vulnerabilities[]{severity: critical|high|medium|low, cwe, location: file:line, description, remediation}, risk_score: 0-100</produces>
+    <done_when>All security-relevant code paths analyzed; OWASP top-10 categories checked for applicable patterns</done_when>
+  </agent>
+  <agent name="test" subagent_type="test" readonly="false">
+    <role>Create comprehensive tests covering all implemented functionality and edge cases</role>
+    <receives>implementation_files[], acceptance_criteria[], existing_test_paths[], test_framework</receives>
+    <produces>test_files_created[], test_cases[]{name, type: unit|integration|e2e, coverage_target}, test_run_command</produces>
+    <done_when>Tests written for all acceptance criteria; test_run_command confirmed executable</done_when>
+  </agent>
+  <agent name="refactor" subagent_type="general-purpose" readonly="false">
+    <role>Improve code structure and reduce tech debt without changing observable behavior</role>
+    <receives>file_paths[], tech_debt_notes[], refactoring_scope</receives>
+    <produces>refactored_files[], changes_summary[], behavior_invariants_preserved: bool</produces>
+    <done_when>Targeted refactoring applied; all behavior invariants preserved and documented</done_when>
+  </agent>
+  <agent name="docs" subagent_type="docs" readonly="false">
+    <role>Update documentation to accurately reflect implementation changes</role>
+    <receives>changed_files[], change_summary, doc_paths[], api_changes[]</receives>
+    <produces>updated_doc_files[], new_doc_sections[], coverage_report{updated: int, missing: int}</produces>
+    <done_when>All public interfaces and behavior changes documented; no stale references remain</done_when>
+  </agent>
+  <agent name="review" subagent_type="quality-assurance" readonly="false">
+    <role>Perform holistic post-implementation review across all quality dimensions</role>
+    <receives>all_changed_files[], implementation_summary, test_results, agent_reports[]</receives>
+    <produces>review_summary{score: 0-100, critical_findings[], warnings[], commendations[]}, go_no_go: bool</produces>
+    <done_when>All implementation artifacts reviewed; go/no-go decision made with rationale</done_when>
+  </agent>
+  <agent name="debug" subagent_type="general-purpose" readonly="false">
+    <role>Diagnose and resolve failures encountered during implementation or test execution</role>
+    <receives>error_message, stack_trace, failing_test_names[], file_paths[]</receives>
+    <produces>root_cause{location: file:line, description}, fix_applied{file, change}, verification_command</produces>
+    <done_when>Root cause identified and fix applied; verification command confirmed passing</done_when>
+  </agent>
+  <agent name="performance" subagent_type="performance" readonly="false">
+    <role>Optimize performance-critical paths and eliminate unnecessary overhead</role>
+    <receives>file_paths[], performance_targets, profiling_data</receives>
+    <produces>optimizations[]{location: file:line, before, after, expected_improvement}, benchmark_command</produces>
+    <done_when>Performance targets met or improvement quantified; no regressions introduced</done_when>
+  </agent>
+  <agent name="clean" subagent_type="code-quality" readonly="false">
+    <role>Eliminate dead code, unused imports, and unreachable paths safely</role>
+    <receives>file_paths[], scope_boundary</receives>
+    <produces>removed_symbols[], cleaned_files[], impact_assessment{safe_to_remove: bool, reason}</produces>
+    <done_when>All confirmed-dead code removed; no live code deleted</done_when>
+  </agent>
+  <agent name="error-handling" subagent_type="general-purpose" readonly="false">
+    <role>Implement consistent error handling, recovery patterns, and user-facing error messages</role>
+    <receives>file_paths[], error_scenarios[], handling_policy</receives>
+    <produces>error_handlers_added[]{location: file:line, pattern}, unhandled_paths_remaining[]</produces>
+    <done_when>All identified error paths handled; handling consistent with project policy</done_when>
+  </agent>
+  <agent name="migration" subagent_type="general-purpose" readonly="false">
+    <role>Plan and execute data or code migrations with verified rollback safety</role>
+    <receives>migration_scope, current_state, target_state, rollback_requirements</receives>
+    <produces>migration_steps[], rollback_plan, pre_conditions[], post_conditions[]</produces>
+    <done_when>Migration plan verified safe; rollback path confirmed; pre/post conditions testable</done_when>
+  </agent>
+  <agent name="database" subagent_type="database" readonly="false">
+    <role>Design and optimize database schema changes and queries</role>
+    <receives>schema_changes[], query_patterns[], performance_requirements</receives>
+    <produces>migration_sql[], index_recommendations[], query_optimizations[], impact_analysis</produces>
+    <done_when>Schema changes migration-safe; queries optimized to meet performance targets</done_when>
+  </agent>
+  <agent name="infrastructure" subagent_type="devops" readonly="false">
+    <role>Design infrastructure changes and validate deployment configurations</role>
+    <receives>service_requirements, current_infra_config, scaling_targets</receives>
+    <produces>infra_config_changes[], deployment_steps[], rollback_procedure</produces>
+    <done_when>Infrastructure changes validated in non-production; rollback procedure confirmed</done_when>
+  </agent>
+  <agent name="ci-cd" subagent_type="devops" readonly="false">
+    <role>Design and optimize CI/CD pipelines and deployment workflows</role>
+    <receives>pipeline_config_paths[], build_requirements, deployment_targets[]</receives>
+    <produces>pipeline_changes[], stage_definitions[], expected_run_time_minutes: int</produces>
+    <done_when>Pipeline changes validated; all required stages present and ordered correctly</done_when>
+  </agent>
+  <agent name="observability" subagent_type="devops" readonly="false">
+    <role>Instrument code with logging, metrics, and tracing for production observability</role>
+    <receives>file_paths[], observability_requirements, existing_instrumentation</receives>
+    <produces>instrumentation_added[]{type: log|metric|trace, location: file:line}, dashboard_updates[]</produces>
+    <done_when>All critical code paths instrumented; log levels consistent with project policy</done_when>
+  </agent>
+  <agent name="git" subagent_type="git" readonly="false">
+    <role>Design branching strategy, commit structure, and merge workflows</role>
+    <receives>change_scope, team_workflow, target_branches[]</receives>
+    <produces>branch_strategy, commit_plan[], pr_description_template</produces>
+    <done_when>Branch strategy aligned with team workflow; commit history logical and reviewable</done_when>
+  </agent>
+  <agent name="memory" subagent_type="general-purpose" readonly="false">
+    <role>Capture significant architectural decisions and novel patterns to persistent memory</role>
+    <receives>implementation_summary, novel_patterns[], architectural_decisions[]</receives>
+    <produces>memory_entries_created[], memory_paths[]</produces>
+    <done_when>All non-obvious decisions and patterns captured; memory entries verified writable</done_when>
+  </agent>
+  <agent name="validator" subagent_type="validator" readonly="true">
+    <role>Cross-validate findings from multiple agents to detect contradictions and confirm consensus</role>
+    <receives>agent_reports[], implementation_claims[], expected_outcomes[]</receives>
+    <produces>consensus_report{agreed: [], disputed: [], confidence: 0-100}, contradiction_flags[]</produces>
+    <done_when>All agent outputs cross-checked; contradictions resolved or flagged for user review</done_when>
+  </agent>
 </agents>
 <execution_graph>
   <parallel_group id="quality_assurance" depends_on="none">
@@ -188,10 +290,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <agent>test</agent>
     <agent>docs</agent>
   </parallel_group>
-  <sequential_phase id="review_phase" depends_on="quality_assurance,implementation">
+  <sequential_step id="review_phase" depends_on="quality_assurance,implementation">
     <agent>review</agent>
     <reason>Requires completion of quality checks and implementation</reason>
-  </sequential_phase>
+  </sequential_step>
 </execution_graph>
 <delegation>
   <requirement>Specific scope and expected deliverables</requirement>
@@ -269,6 +371,13 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
         </test_execution>
       </verification>
       <follow_up>Remaining risks or next actions, if any</follow_up>
+      <self_feedback>
+        <confidence>XX/100</confidence>
+        <dimension name="task_clarity">XX/100: one-line rationale</dimension>
+        <dimension name="implementation_quality">XX/100: one-line rationale</dimension>
+        <dimension name="verification_completeness">XX/100: one-line rationale</dimension>
+        <gaps>What additional verification or context would raise confidence</gaps>
+      </self_feedback>
     </execution_result>
   </format>
 </output>

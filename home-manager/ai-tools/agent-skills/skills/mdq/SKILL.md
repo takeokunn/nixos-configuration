@@ -220,23 +220,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>No matches found (exit code 1 in --quiet mode)</example>
-    <action>Check selector syntax; verify heading or element text matches exactly</action>
-  </level>
-  <level severity="medium">
-    <example>Unexpected output format or extra content extracted</example>
-    <action>Review chaining — add a parent section selector to restrict scope</action>
-  </level>
-  <level severity="high">
-    <example>Wrong content extracted; selector matches unintended elements</example>
-    <action>Use quoted strings or regex anchors (^start, end$) to tighten matching</action>
-  </level>
-  <level severity="critical">
-    <example>mdq binary not found or not installed</example>
-    <action>Check PATH, install mdq (cargo install mdq or nix package), or suggest alternative (grep, awk)</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">No matches found (exit code 1 in --quiet mode)</example>
+    <example severity="medium">Unexpected output format or extra content extracted</example>
+    <example severity="high">Wrong content extracted; selector matches unintended elements</example>
+    <example severity="critical">mdq binary not found or not installed</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

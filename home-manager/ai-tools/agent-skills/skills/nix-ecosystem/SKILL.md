@@ -914,23 +914,24 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Style inconsistency in Nix expression</example>
-    <action>Note issue, suggest formatting</action>
-  </level>
-  <level severity="medium">
-    <example>Evaluation error or type mismatch</example>
-    <action>Debug with --show-trace, fix expression</action>
-  </level>
-  <level severity="high">
-    <example>Build failure in derivation</example>
-    <action>Analyze build log, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Impure expression breaking reproducibility</example>
-    <action>Block operation, require pure alternatives</action>
-  </level>
+<rules priority="critical">
+  <rule>Always verify flake.lock is updated after any input change</rule>
+  <rule>Prefer `pkgs.lib` functions over inline Nix expressions for complex transformations</rule>
+  <rule>Use `mkIf` and `mkMerge` for conditional module options, not plain `if` at top level</rule>
+</rules>
+<rules priority="standard">
+  <rule>Check nixpkgs-unstable before nixpkgs-stable for newer package versions</rule>
+  <rule>Use `nix flake check` to validate flake outputs before committing</rule>
+  <rule>Document non-obvious overlay and override rationale in comments</rule>
+</rules>
+
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Style inconsistency in Nix expression</example>
+    <example severity="medium">Evaluation error or type mismatch</example>
+    <example severity="high">Build failure in derivation</example>
+    <example severity="critical">Impure expression breaking reproducibility</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -949,3 +950,8 @@ version: 2.0.0
   <skill name="ecosystem skills">Language-specific conventions for nixpkgs packaging via golang-ecosystem, rust-ecosystem, haskell-ecosystem, php-ecosystem, swift-ecosystem, c-ecosystem, cplusplus-ecosystem, common-lisp-ecosystem</skill>
   <skill name="devenv-ecosystem">Devenv 2.0 configuration patterns</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

@@ -185,11 +185,13 @@ version: 2.0.0
   <rule>Prefer project conventions over generic defaults</rule>
 </rules>
 
-<error_escalation>
-  <level severity="low"><example>Minor inconsistency</example><action>Document and continue</action></level>
-  <level severity="medium"><example>Ambiguous guidance</example><action>Clarify assumptions</action></level>
-  <level severity="high"><example>Conflicting constraints</example><action>Escalate with options</action></level>
-  <level severity="critical"><example>Unsafe or misleading retrieval guidance</example><action>Block and escalate to maintainers with corrective steps</action></level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor inconsistency</example>
+    <example severity="medium">Ambiguous guidance</example>
+    <example severity="high">Conflicting constraints</example>
+    <example severity="critical">Unsafe or misleading retrieval guidance</example>
+  </examples>
 </error_escalation>
 
 <related_agents>

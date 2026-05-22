@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze cabal files, stack.yaml, and Haskell source files</tool>
   <tool>Edit - Modify Haskell code and build configuration</tool>
   <tool>Bash - Run cabal build, stack build, ghci commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest Haskell documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Haskell documentation</tool>
 </tools>
 
 <concepts>
@@ -995,23 +995,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>HLint suggestion about style</example>
-    <action>Apply suggestion, maintain idiomatic code</action>
-  </level>
-  <level severity="medium">
-    <example>Type error or missing instance</example>
-    <action>Review types, add instance or adjust design</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change in public API</example>
-    <action>Stop, present migration options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Partial function usage or unsafe code in library</example>
-    <action>Block operation, require safe alternatives</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">HLint suggestion about style</example>
+    <example severity="medium">Type error or missing instance</example>
+    <example severity="high">Breaking change in public API</example>
+    <example severity="critical">Partial function usage or unsafe code in library</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -1029,3 +1019,8 @@ version: 2.0.0
   <skill name="investigation-patterns">Debug type errors, missing instances, and performance issues</skill>
   <skill name="nix-ecosystem">haskell.nix integration and nixpkgs Haskell infrastructure</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

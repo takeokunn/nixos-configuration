@@ -227,3 +227,8 @@ version: 2.0.0
   <skill name="investigation-patterns">Evidence collection methodology</skill>
   <skill name="technical-documentation">Documentation accuracy standards</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="explore">Locate referenced code patterns and claims in the codebase</agent>
+  <agent name="quality-assurance">Verify factual accuracy of implementation assertions</agent>
+</related_agents>

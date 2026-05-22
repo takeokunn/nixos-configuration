@@ -337,23 +337,13 @@ version: 2.0.0
   <rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
 </rules>
 
-<error_escalation>
-  <level severity="low">
-    <example>Evidence trail incomplete</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Conflicting evidence found</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Root cause cannot be determined</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Investigation reveals security issue</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Evidence trail incomplete</example>
+    <example severity="medium">Conflicting evidence found</example>
+    <example severity="high">Root cause cannot be determined</example>
+    <example severity="critical">Investigation reveals security issue</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -372,3 +362,9 @@ version: 2.0.0
   <skill name="testing-patterns">Use to add regression tests after fixing identified bugs</skill>
   <skill name="requirements-definition">Use when investigation reveals unclear requirements</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="explore">Codebase discovery and file-level evidence gathering</agent>
+  <agent name="quality-assurance">Cross-check investigation findings for completeness</agent>
+  <agent name="validator">Consensus verification when investigation findings conflict</agent>
+</related_agents>

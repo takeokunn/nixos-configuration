@@ -1912,23 +1912,13 @@ ORDER BY total_spent DESC LIMIT 100;
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Missing index on infrequently queried column</example>
-    <action>Note for future optimization, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Query performance degradation under load</example>
-    <action>Analyze EXPLAIN output, propose index or query optimization</action>
-  </level>
-  <level severity="high">
-    <example>Deadlock or lock timeout in production</example>
-    <action>Stop, analyze lock patterns, present resolution options</action>
-  </level>
-  <level severity="critical">
-    <example>Data corruption or SQL injection vulnerability</example>
-    <action>Block operation, require immediate remediation</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Missing index on infrequently queried column</example>
+    <example severity="medium">Query performance degradation under load</example>
+    <example severity="high">Deadlock or lock timeout in production</example>
+    <example severity="critical">Data corruption or SQL injection vulnerability</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -1947,3 +1937,8 @@ ORDER BY total_spent DESC LIMIT 100;
   <skill name="context7-usage">Fetch PostgreSQL, MySQL, SQLite documentation</skill>
   <skill name="investigation-patterns">Debug query performance issues</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

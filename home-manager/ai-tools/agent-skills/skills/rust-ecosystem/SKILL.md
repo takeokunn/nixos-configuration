@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze Cargo.toml and Rust source files</tool>
   <tool>Edit - Modify Rust code and Cargo configuration</tool>
   <tool>Bash - Run cargo build, cargo test, cargo clippy commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest Rust documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Rust documentation</tool>
 </tools>
 
 <concepts>
@@ -545,23 +545,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Clippy warning about style</example>
-    <action>Fix warning, maintain idiomatic code</action>
-  </level>
-  <level severity="medium">
-    <example>Borrow checker error</example>
-    <action>Redesign ownership, avoid unsafe unless necessary</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change in public API</example>
-    <action>Stop, present migration options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Unsafe code without proper justification</example>
-    <action>Block operation, require safe alternatives</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Clippy warning about style</example>
+    <example severity="medium">Borrow checker error</example>
+    <example severity="high">Breaking change in public API</example>
+    <example severity="critical">Unsafe code without proper justification</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -578,3 +568,8 @@ version: 2.0.0
   <skill name="context7-usage">Fetch Rust book, cargo, and clippy documentation</skill>
   <skill name="investigation-patterns">Debug borrow checker errors, lifetime issues, and performance bottlenecks</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

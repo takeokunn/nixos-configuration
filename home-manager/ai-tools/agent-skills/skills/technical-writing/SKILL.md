@@ -14,7 +14,7 @@ version: 2.0.0
   <tool>Edit</tool>
   <tool>WebSearch</tool>
   <tool>mcp__plugin_claude-code-home-manager_context7__resolve-library-id</tool>
-  <tool>mcp__plugin_claude-code-home-manager_context7__get-library-docs</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs</tool>
 </tools>
 
 <concepts>
@@ -325,23 +325,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Grammar or style issue</example>
-    <action>Fix issue, follow style guide</action>
-  </level>
-  <level severity="medium">
-    <example>Technical inaccuracy in example</example>
-    <action>Verify and correct example</action>
-  </level>
-  <level severity="high">
-    <example>Misleading or incorrect technical claim</example>
-    <action>Stop, verify claim before publishing</action>
-  </level>
-  <level severity="critical">
-    <example>Content could cause harm if followed</example>
-    <action>Block publication, require expert review</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Grammar or style issue</example>
+    <example severity="medium">Technical inaccuracy in example</example>
+    <example severity="high">Misleading or incorrect technical claim</example>
+    <example severity="critical">Content could cause harm if followed</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -359,3 +349,8 @@ version: 2.0.0
   <skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
   <skill name="technical-documentation">Creating reference documentation from blog content</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="docs">Primary agent for technical article and blog post generation</agent>
+  <agent name="quality-assurance">Review technical writing for clarity, accuracy, and structure</agent>
+</related_agents>

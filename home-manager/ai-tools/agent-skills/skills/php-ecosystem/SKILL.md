@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze composer.json and PHP source files</tool>
   <tool>Edit - Modify PHP code and Composer configuration</tool>
   <tool>Bash - Run composer, phpunit, phpstan, php-cs-fixer commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest PHP documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest PHP documentation</tool>
 </tools>
 
 <concepts>
@@ -1772,23 +1772,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor coding style issue</example>
-    <action>Auto-fix with PHP CS Fixer</action>
-  </level>
-  <level severity="medium">
-    <example>PHPStan error or missing type</example>
-    <action>Fix type, verify with static analysis</action>
-  </level>
-  <level severity="high">
-    <example>Breaking API change or security issue</example>
-    <action>Stop, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>SQL injection or authentication bypass</example>
-    <action>Block operation, require immediate fix</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor coding style issue</example>
+    <example severity="medium">PHPStan error or missing type</example>
+    <example severity="high">Breaking API change or security issue</example>
+    <example severity="critical">SQL injection or authentication bypass</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -1807,3 +1797,8 @@ version: 2.0.0
   <skill name="testing-patterns">Test strategy and coverage patterns</skill>
   <skill name="sql-ecosystem">PDO patterns and query optimization</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

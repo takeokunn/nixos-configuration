@@ -408,33 +408,17 @@ version: 2.0.0
   <rule>80%+ coverage is a good target for critical code paths</rule>
   <rule>100% coverage does not guarantee bug-free code</rule>
   <rule>Focus on testing behavior, not achieving coverage metrics</rule>
-</rules>
-
-<error_escalation>
-  <level severity="low">
-    <example>Minor coverage gap in non-critical path</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Test flakiness detected</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Critical path lacks test coverage</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Tests reveal security vulnerability</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
-</error_escalation>
-
-<rules priority="critical">
-  <rule>Keep guidance evidence-based and version-aware</rule>
-</rules>
-<rules priority="standard">
   <rule>Prefer project conventions over generic defaults</rule>
 </rules>
+
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor coverage gap in non-critical path</example>
+    <example severity="medium">Test flakiness detected</example>
+    <example severity="high">Critical path lacks test coverage</example>
+    <example severity="critical">Tests reveal security vulnerability</example>
+  </examples>
+</error_escalation>
 
 <related_agents>
   <agent name="explore">Locate relevant code patterns</agent>

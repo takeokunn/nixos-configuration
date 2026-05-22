@@ -1451,23 +1451,13 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Missing optional configuration attribute</example>
-    <action>Note in output, suggest improvement</action>
-  </level>
-  <level severity="medium">
-    <example>Service configuration incomplete or enterShell too slow</example>
-    <action>Document issue, suggest refactoring approach</action>
-  </level>
-  <level severity="high">
-    <example>Configuration fails to evaluate or services fail to start</example>
-    <action>Debug with devenv info, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Security issue in configuration (secrets exposed, unsafe permissions)</example>
-    <action>Block operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Missing optional configuration attribute</example>
+    <example severity="medium">Service configuration incomplete or enterShell too slow</example>
+    <example severity="high">Configuration fails to evaluate or services fail to start</example>
+    <example severity="critical">Security issue in configuration (secrets exposed, unsafe permissions)</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -1487,3 +1477,9 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   <skill name="serena-usage">Symbol operations for navigating devenv configurations</skill>
   <skill name="context7-usage">Fetch latest devenv documentation</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

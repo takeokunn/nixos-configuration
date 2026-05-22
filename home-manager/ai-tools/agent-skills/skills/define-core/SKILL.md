@@ -200,30 +200,6 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
       <metric name="feasibility">0-100</metric>
       <metric name="objectivity">0-100</metric>
     </metrics>
-    <tools>
-  <tool name="Read">Read relevant source files and docs</tool>
-  <tool name="Grep">Search for patterns and references</tool>
-</tools>
-
-<patterns>
-  <pattern name="usage">
-    <description>Apply this skill when task keywords and domain match</description>
-    <example>Use the canonical workflow and verify with project conventions</example>
-  </pattern>
-</patterns>
-
-<decision_tree name="skill_activation">
-  <question>Does the task clearly match this skill domain?</question>
-  <branch condition="Yes">Use this skill workflow and constraints</branch>
-  <branch condition="No">Use a more appropriate domain skill</branch>
-</decision_tree>
-
-<related_agents>
-  <agent name="explore">Locate code patterns and references for this domain</agent>
-  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
-</related_agents>
-
-<constraints>Technical, operational</constraints>
     <test_requirements>Unit, integration, acceptance criteria</test_requirements>
     <outstanding_issues>Unresolved questions</outstanding_issues>
   </format>
@@ -310,10 +286,10 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
 
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor ambiguity in non-critical feature detail</low>
-    <medium>Unclear requirement or ambiguous scope</medium>
-    <high>Technically infeasible request or breaking change</high>
-    <critical>Request violates security policy or data integrity</critical>
+    <example severity="low">Minor ambiguity in non-critical feature detail</example>
+    <example severity="medium">Unclear requirement or ambiguous scope</example>
+    <example severity="high">Technically infeasible request or breaking change</example>
+    <example severity="critical">Request violates security policy or data integrity</example>
   </examples>
 </error_escalation>
 
@@ -336,6 +312,12 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   <skill name="execution-workflow">Handoff methodology after requirements are defined</skill>
 </related_skills>
 
+<related_agents>
+  <agent name="explore">Locate existing requirement patterns and similar feature implementations</agent>
+  <agent name="design">Evaluate architecture consistency and dependency impact during requirements definition</agent>
+  <agent name="validator">Cross-validate requirements for completeness, consistency, and feasibility</agent>
+</related_agents>
+
 <usage_in_commands>
   <command name="define">
     <inherits>All phases (prepare, analyze, investigate, clarify, verify, document)</inherits>
@@ -345,9 +327,9 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
     <inherits>All rules and enforcement</inherits>
   </command>
   <command name="define-full">
-    <inherits>All phases as subphases within define_initial</inherits>
+    <inherits>Full workflow via &lt;phase name="core_workflow" inherits="define-core#workflow" /&gt;</inherits>
     <inherits>All agents plus plan agent</inherits>
-    <inherits>Core execution graph as base, extended with feedback and regenerate phases</inherits>
+    <inherits>Core execution graph as base, extended with collect_feedback and regenerate phases</inherits>
     <inherits>All delegation requirements</inherits>
     <inherits>All rules and enforcement, plus feedback-specific behaviors</inherits>
   </command>

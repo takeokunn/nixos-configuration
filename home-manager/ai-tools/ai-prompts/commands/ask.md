@@ -26,6 +26,18 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <rule>Provide file:line references for all findings</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Investigating files one at a time before synthesizing — AI can survey all relevant files in a single parallel investigation pass</practice>
+    <practice>Accepting the question framing as the correct framing — AI should verify whether the stated question matches the underlying need before answering</practice>
+    <practice>Reporting uncertainty without evidence — every finding must be anchored to a specific file:line reference, not general impressions</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Map the full evidence surface (all relevant files, cross-references, documentation) before forming any conclusion</principle>
+    <principle>Distinguish facts (from code evidence) from inferences (deduced) from speculation (no evidence) — label each finding explicitly</principle>
+    <principle>Always verify claimed patterns exist in the current codebase; memory and training data about past states can be stale</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
@@ -136,11 +148,36 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
 </reflection_checkpoint>
 <agents>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding files, exploring codebase structure</agent>
-  <agent name="design" subagent_type="design" readonly="true">System design, architecture, API structure</agent>
-  <agent name="performance" subagent_type="performance" readonly="true">Performance bottlenecks, optimization questions</agent>
-  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Code quality evaluation, best practices</agent>
-  <agent name="code-quality" subagent_type="code-quality" readonly="true">Code complexity analysis</agent>
+  <agent name="explore" subagent_type="explore" readonly="true">
+    <role>Discover and map codebase structure relevant to the question</role>
+    <receives>question_topic, suspected_file_paths[], search_keywords[]</receives>
+    <produces>file_paths[], code_excerpts[]{path: file:line, content}, structure_summary</produces>
+    <done_when>All relevant files and code paths identified; confidence >= 70 or explicit uncertainty reported</done_when>
+  </agent>
+  <agent name="design" subagent_type="design" readonly="true">
+    <role>Evaluate system design, architectural decisions, and component relationships</role>
+    <receives>component_names[], question_context, file_paths[]</receives>
+    <produces>architecture_analysis, dependency_map, design_assessment{pattern, rationale, alternatives[]}</produces>
+    <done_when>Architectural relationships mapped; all relevant components evaluated</done_when>
+  </agent>
+  <agent name="performance" subagent_type="performance" readonly="true">
+    <role>Identify performance characteristics, bottlenecks, and optimization opportunities</role>
+    <receives>code_paths[], performance_concern, context</receives>
+    <produces>bottleneck_locations[]{file:line, description}, complexity_analysis, optimization_candidates[]</produces>
+    <done_when>Performance-sensitive code paths analyzed; findings reported with file:line evidence</done_when>
+  </agent>
+  <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">
+    <role>Evaluate code quality, best practices compliance, and correctness</role>
+    <receives>file_paths[], code_excerpts[], quality_dimensions[]</receives>
+    <produces>quality_assessment{score: 0-100, issues[]{severity, location: file:line, description}}, gaps[]</produces>
+    <done_when>All provided files assessed; quality score and issue list produced with evidence</done_when>
+  </agent>
+  <agent name="code-quality" subagent_type="code-quality" readonly="true">
+    <role>Analyze code complexity metrics and structural maintainability</role>
+    <receives>file_paths[], complexity_threshold</receives>
+    <produces>complexity_metrics{cyclomatic, cognitive}, refactoring_candidates[], maintainability_score: 0-100</produces>
+    <done_when>Complexity metrics computed for all provided files; candidates ranked by impact</done_when>
+  </agent>
 </agents>
 <execution_graph>
   <parallel_group id="investigation" depends_on="none">
@@ -174,6 +211,38 @@ Provide accurate, evidence-based answers to project questions through fact-based
       <score range="0-49">No source cited</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>evidence_quality=95, answer_completeness=90, source_verification=90</input>
+      <calculation>(95*0.5)+(90*0.3)+(90*0.2) = 92.5</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>evidence_quality=80, answer_completeness=80, source_verification=80</input>
+      <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>evidence_quality=79, answer_completeness=79, source_verification=79</input>
+      <calculation>(79*0.5)+(79*0.3)+(79*0.2) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>evidence_quality=59, answer_completeness=59, source_verification=59</input>
+      <calculation>(59*0.5)+(59*0.3)+(59*0.2) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>evidence_quality=40, answer_completeness=50, source_verification=30</input>
+      <calculation>(40*0.5)+(50*0.3)+(30*0.2) = 41</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -188,7 +257,11 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <recommendations>Optional: Suggested actions without implementation</recommendations>
     <unclear_points>Information gaps that would improve the answer</unclear_points>
     <self_feedback>
-      <confidence>XX/100 (based on evidence_quality)</confidence>
+      <confidence>XX/100</confidence>
+      <dimension name="evidence_quality">XX/100: one-line rationale</dimension>
+      <dimension name="answer_completeness">XX/100: one-line rationale</dimension>
+      <dimension name="source_verification">XX/100: one-line rationale</dimension>
+      <gaps>What additional evidence or context would raise confidence above current score</gaps>
       <issues>
 - [Critical] Issue description (if any, max 2 total)
 - [Warning] Issue description (if any)

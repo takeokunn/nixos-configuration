@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze Package.swift and Swift source files</tool>
   <tool>Edit - Modify Swift code and SPM configuration</tool>
   <tool>Bash - Run swift build, swift test, swiftlint commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest Swift documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Swift documentation</tool>
 </tools>
 
 <concepts>
@@ -987,23 +987,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>SwiftLint warning about style</example>
-    <action>Fix warning, maintain idiomatic code</action>
-  </level>
-  <level severity="medium">
-    <example>Type safety error or optional handling issue</example>
-    <action>Redesign with proper types, use safe unwrapping</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change in public API</example>
-    <action>Stop, present migration options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Force unwrap or unsafe code in library</example>
-    <action>Block operation, require safe alternatives</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">SwiftLint warning about style</example>
+    <example severity="medium">Type safety error or optional handling issue</example>
+    <example severity="high">Breaking change in public API</example>
+    <example severity="critical">Force unwrap or unsafe code in library</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -1020,3 +1010,8 @@ version: 2.0.0
   <skill name="context7-usage">Fetch Swift language and library documentation</skill>
   <skill name="investigation-patterns">Debug type errors, optional handling, and concurrency issues</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

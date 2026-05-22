@@ -199,3 +199,7 @@ readonly attribute indicates whether agent can modify files.
   <skill name="parallelization-patterns">Parallel execution and timeout configuration</skill>
   <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation)</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="validator">Verify workflow consistency and checkpoint completeness</agent>
+</related_agents>

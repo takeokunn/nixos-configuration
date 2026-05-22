@@ -12,7 +12,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <tool>Read - Analyze tsconfig.json and TypeScript source files</tool>
   <tool>Edit - Modify TypeScript configurations and source code</tool>
   <tool>Bash - Run tsc, tsx, eslint, and build commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest TypeScript documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest TypeScript documentation</tool>
 </tools>
 
 <concepts>
@@ -901,23 +901,13 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor type inference issue</example>
-    <action>Add explicit type annotation</action>
-  </level>
-  <level severity="medium">
-    <example>Type error in implementation</example>
-    <action>Fix type, verify with tsc</action>
-  </level>
-  <level severity="high">
-    <example>Breaking type change in public API</example>
-    <action>Stop, present migration options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Type safety bypass with any or type assertion</example>
-    <action>Block operation, require proper typing</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor type inference issue</example>
+    <example severity="medium">Type error in implementation</example>
+    <example severity="high">Breaking type change in public API</example>
+    <example severity="critical">Type safety bypass with any or type assertion</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -934,3 +924,8 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <skill name="context7-usage">Fetch latest TypeScript compiler and tooling documentation</skill>
   <skill name="investigation-patterns">Debug type errors and investigate compilation issues</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>

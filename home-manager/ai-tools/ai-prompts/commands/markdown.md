@@ -22,6 +22,18 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
   <rule>Preserve existing section semantics while formatting</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_execution" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Manually reformatting content section by section — AI can analyze the entire previous command output and determine the correct structure in a single analysis pass</practice>
+    <practice>Including revision history, change logs, or discussion traces in the output — documentation must be clean, forward-looking, and free of session artifacts</practice>
+    <practice>Choosing filenames based on convention alone — AI should infer the correct filename from command type and content context, with user-specified paths taking precedence</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Extract only the signal from the previous command output: conclusions, specifications, and decisions — never the deliberation process or revision history</principle>
+    <principle>Verify every code example in the documentation is syntactically correct before writing; stale or broken examples erode trust in documentation</principle>
+    <principle>Select the appropriate output filename from the command type mapping (define→EXECUTION.md, ask/bug→RESEARCH.md, other→MEMO.md) unless the user explicitly specified a path</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
@@ -150,6 +162,38 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
       <score range="0-49">Incomplete</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>content_accuracy=93, structure_quality=92, completeness=92</input>
+      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>content_accuracy=80, structure_quality=80, completeness=80</input>
+      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>content_accuracy=79, structure_quality=79, completeness=79</input>
+      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>content_accuracy=59, structure_quality=59, completeness=59</input>
+      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>content_accuracy=35, structure_quality=45, completeness=40</input>
+      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>

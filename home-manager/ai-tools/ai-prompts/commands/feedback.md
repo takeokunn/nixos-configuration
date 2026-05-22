@@ -25,6 +25,18 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <rule>Target session operations, not git diff</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Reviewing work sequentially across quality dimensions before synthesizing — AI can launch all review agents (quality, security, design, docs, performance, test) simultaneously in a single pass</practice>
+    <practice>Providing general impressions without anchoring to code — every feedback item must cite a specific file:line reference, replacing vague commentary with precise evidence</practice>
+    <practice>Waiting for user to triage and prioritize issues — AI should assign severity and priority levels automatically based on impact assessment</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Parallelize all review dimensions simultaneously; no dimension should block another since they operate on the same diff</principle>
+    <principle>Anchor each finding to a specific location (file:line) and include a concrete fix proposal — never report issues without accompanying remediation</principle>
+    <principle>Calibrate severity levels by actual runtime impact, not style preference; distinguish critical (data loss/security) from warning (degraded behavior) from info (style)</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
@@ -247,6 +259,38 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
       <score range="0-49">No prioritization</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>review_depth=93, feedback_actionability=92, issue_prioritization=92</input>
+      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>review_depth=80, feedback_actionability=80, issue_prioritization=80</input>
+      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>review_depth=79, feedback_actionability=79, issue_prioritization=79</input>
+      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>review_depth=59, feedback_actionability=59, issue_prioritization=59</input>
+      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>review_depth=35, feedback_actionability=45, issue_prioritization=40</input>
+      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -305,10 +349,10 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 </enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor code quality issue in reviewed work</low>
-    <medium>Unclear quality metric or missing test coverage</medium>
-    <high>Critical security flaw or major design issue in reviewed work</high>
-    <critical>Data loss risk or security breach in reviewed work</critical>
+    <example severity="low">Minor code quality issue in reviewed work</example>
+    <example severity="medium">Unclear quality metric or missing test coverage</example>
+    <example severity="high">Critical security flaw or major design issue in reviewed work</example>
+    <example severity="critical">Data loss risk or security breach in reviewed work</example>
   </examples>
 </error_escalation>
 <related_commands>

@@ -947,6 +947,18 @@ version: 2.0.0
   </usage_patterns>
 </context7_integration>
 
+<rules priority="critical">
+  <rule>Always compile with `-Wall -Wextra -Wpedantic` and treat warnings as errors in CI</rule>
+  <rule>Use RAII for all resource management; never use raw `new`/`delete` outside smart pointer factory</rule>
+  <rule>Run sanitizers (AddressSanitizer, UBSan) in debug builds</rule>
+  <rule>Target C++23 as the stable baseline; enable C++26 features only when compiler support is confirmed (Clang 20+ / GCC 15+)</rule>
+</rules>
+<rules priority="standard">
+  <rule>Prefer `std::span` over raw pointer+length parameters for buffer arguments</rule>
+  <rule>Use `[[nodiscard]]` on functions whose return values must not be silently discarded</rule>
+  <rule>Run `clang-format` and `clang-tidy` before committing</rule>
+</rules>
+
 <best_practices>
   <practice priority="critical">Use smart pointers instead of raw pointers for ownership</practice>
   <practice priority="critical">Enable -Wall -Wextra -Werror for all builds</practice>
@@ -1019,23 +1031,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>Compiler warning about unused variable</example>
-    <action>Fix warning, maintain clean build</action>
-  </level>
-  <level severity="medium">
-    <example>Compilation error</example>
-    <action>Fix error, verify with full build</action>
-  </level>
-  <level severity="high">
-    <example>Memory leak or undefined behavior detected</example>
-    <action>Stop, require safe memory management</action>
-  </level>
-  <level severity="critical">
-    <example>Buffer overflow or security vulnerability</example>
-    <action>Block operation, require immediate fix</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Compiler warning about unused variable</example>
+    <example severity="medium">Compilation error</example>
+    <example severity="high">Memory leak or undefined behavior detected</example>
+    <example severity="critical">Buffer overflow or security vulnerability</example>
+  </examples>
 </error_escalation>
 
 <tools>
@@ -1057,8 +1059,9 @@ version: 2.0.0
 </decision_tree>
 
 <related_agents>
-  <agent name="explore">Locate code patterns and references for this domain</agent>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
   <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
 </related_agents>
 
 <constraints>

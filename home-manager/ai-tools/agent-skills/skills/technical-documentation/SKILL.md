@@ -493,23 +493,13 @@ version: 2.0.0
   <rule>Keep README under 500 lines; link to detailed docs for more</rule>
 </rules>
 
-<error_escalation>
-  <level severity="low">
-    <example>Minor formatting inconsistency</example>
-    <action>Fix formatting, follow style guide</action>
-  </level>
-  <level severity="medium">
-    <example>Outdated information detected</example>
-    <action>Update content, verify with code</action>
-  </level>
-  <level severity="high">
-    <example>Incorrect technical information</example>
-    <action>Stop, verify with implementation before publishing</action>
-  </level>
-  <level severity="critical">
-    <example>Security-sensitive information exposed</example>
-    <action>Block publication, require security review</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Minor formatting inconsistency</example>
+    <example severity="medium">Outdated information detected</example>
+    <example severity="high">Incorrect technical information</example>
+    <example severity="critical">Security-sensitive information exposed</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -527,3 +517,9 @@ version: 2.0.0
   <skill name="investigation-patterns">Analyzing codebases to understand features for documentation</skill>
   <skill name="technical-writing">Creating blog posts and tutorials from documentation</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="docs">Primary agent for documentation generation following this skill's patterns</agent>
+  <agent name="quality-assurance">Review documentation for completeness, accuracy, and consistency</agent>
+  <agent name="explore">Locate existing documentation patterns and API references to document</agent>
+</related_agents>

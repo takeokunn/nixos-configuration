@@ -200,23 +200,13 @@ version: 2.0.0
   <rule>Confirm all acceptance criteria met</rule>
 </rules>
 
-<error_escalation>
-  <level severity="low">
-    <example>Sub-agent returns partial results</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Sub-agent task fails</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Critical task cannot be completed</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Sub-agent introduces breaking change</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">Sub-agent returns partial results</example>
+    <example severity="medium">Sub-agent task fails</example>
+    <example severity="high">Critical task cannot be completed</example>
+    <example severity="critical">Sub-agent introduces breaking change</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -233,3 +223,9 @@ version: 2.0.0
   <skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
   <skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
 </related_skills>
+
+<related_agents>
+  <agent name="general-purpose">Execute delegated tasks following this skill's orchestration patterns</agent>
+  <agent name="quality-assurance">Review implementation outputs for quality compliance</agent>
+  <agent name="validator">Cross-validate task results before integration</agent>
+</related_agents>

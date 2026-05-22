@@ -8,11 +8,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="patterns">parallelization-patterns</skill>
   <skill use="workflow">requirements-definition</skill>
   <skill use="workflow">fact-check</skill>
+  <skill use="workflow">define-core</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
-  <skill use="workflow">define-core</skill>
 </refs>
 <scope>
   <when_to_use>
@@ -100,175 +101,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </known_bias>
 </bias_correction>
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
-<workflow>
-  <phase name="prepare">
-    <step order="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
-    </step>
-    <step order="2">
-      <action>Check list_memories for relevant patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Available memory list</output>
-    </step>
-    <step order="3">
-      <action>Load applicable memories with read_memory</action>
-      <tool>Serena read_memory</tool>
-      <output>Relevant patterns loaded</output>
-    </step>
-
-  </phase>
-  <phase name="analyze">
-    <step order="1">
-      <action>Get the big picture: which L0 systems/components are affected? Estimate scope (how many layers, files, services). This step prevents diving into details before understanding overall impact.</action>
-      <tool>Serena list_dir, find_file, codebase knowledge</tool>
-      <output>Affected systems list, scope estimate (small/medium/large), impacted layers</output>
-    </step>
-    <step order="2">
-      <action>Parse user request in "subject → object → operation" form. If the rephrasing differs from the original, flag the gap as a clarification candidate.</action>
-      <tool>Text analysis</tool>
-      <output>Structured request form, identified framing gaps</output>
-    </step>
-    <step order="3">
-      <action>Identify technical constraints from request context</action>
-      <tool>Codebase knowledge</tool>
-      <output>Constraint list</output>
-    </step>
-    <step order="4">
-      <action>Determine design decisions requiring user input</action>
-      <tool>Requirements analysis</tool>
-      <output>Question candidates list</output>
-    </step>
-    <step order="5">
-      <action>Assess technical feasibility at high level</action>
-      <tool>Technical knowledge</tool>
-      <output>Initial feasibility assessment</output>
-    </step>
-
-  </phase>
-  <phase name="investigate">
-    <step order="1">
-      <action>Delegate to explore agent: find relevant files and existing patterns</action>
-      <tool>Sub-agent delegation</tool>
-      <output>File paths, patterns, code samples</output>
-    </step>
-    <step order="2">
-      <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Architecture analysis, dependency graph</output>
-    </step>
-    <step order="3">
-      <action>Delegate to database agent: analyze database design (if applicable)</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Schema analysis, query patterns</output>
-    </step>
-    <step order="4">
-      <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Effort estimation, risk analysis</output>
-    </step>
-    <step order="5">
-      <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
-      <tool>Context7 MCP, WebSearch</tool>
-      <output>Verification report, flagged claims</output>
-    </step>
-
-  </phase>
-  <reflection_checkpoint id="investigation_complete" after="investigate">
-    <questions>
-      <question weight="0.4">Have all relevant files and patterns been identified?</question>
-      <question weight="0.3">Is the scope clearly understood?</question>
-      <question weight="0.3">Are there any technical blockers identified?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Expand investigation scope or ask user</below_threshold>
-    </threshold>
-  </reflection_checkpoint>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="clarify">
-    <step order="1">
-      <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
-      <tool>Question scoring algorithm</tool>
-      <output>Prioritized question list</output>
-    </step>
-    <step order="2">
-      <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
-      <tool>Question taxonomy</tool>
-      <output>Categorized questions</output>
-    </step>
-    <step order="3">
-      <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
-      <tool>AskUserQuestion</tool>
-      <output>User responses</output>
-    </step>
-    <step order="4">
-      <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
-      <tool>AskUserQuestion</tool>
-      <output>Additional user responses</output>
-    </step>
-    <step order="5">
-      <action>Present high-score questions first; do not proceed without clear answers</action>
-      <tool>Priority ordering</tool>
-      <output>Confirmed requirements</output>
-    </step>
-
-  </phase>
-  <phase name="verify">
-    <step order="1">
-      <action>Verify constraints from answers using agent findings</action>
-      <tool>Cross-reference analysis</tool>
-      <output>Validated constraints</output>
-    </step>
-    <step order="2">
-      <action>Check implementations related to chosen approach</action>
-      <tool>Code analysis</tool>
-      <output>Implementation validation</output>
-    </step>
-
-  </phase>
-  <phase name="failure_handling">
-    <step order="1">
-      <action>Detect and classify failures during command execution</action>
-      <tool>Error analysis and severity assessment</tool>
-      <output>Failure classification and impact summary</output>
-    </step>
-    <step order="2">
-      <action>Apply recovery path or escalate with concrete blocker details</action>
-      <tool>Retry policy and fallback strategy</tool>
-      <output>Recovered flow or explicit blocker report</output>
-    </step>
-  </phase>
-  <phase name="critique">
-    <step order="1">
-      <action>Delegate requirements document to validator agent for critique</action>
-      <tool>Sub-agent delegation (validator)</tool>
-      <output>Critique report with identified gaps</output>
-    </step>
-    <step order="2">
-      <action>Evaluate critique findings and incorporate valid feedback</action>
-      <tool>Synthesis</tool>
-      <output>Updated requirements document addressing critique</output>
-    </step>
-    <step order="3">
-      <action>Flag unresolved critique items as outstanding issues</action>
-      <tool>Issue tracking</tool>
-      <output>Outstanding issues appended to requirements</output>
-    </step>
-
-  </phase>
-  <reflection_checkpoint id="critique_quality" after="critique">
-    <questions>
-      <question weight="0.4">Were critique findings adequately addressed or flagged?</question>
-      <question weight="0.3">Are remaining outstanding issues clearly documented?</question>
-      <question weight="0.3">Is the final requirements document complete and consistent?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Revisit critique findings or ask user for guidance</below_threshold>
-    </threshold>
-  </reflection_checkpoint>
-</workflow>
-
+<workflow inherits="define-core#workflow" />
 <reflection_checkpoint id="group_consistency">
   <question>Are command-group required sections complete and ordered?</question>
   <question>Is the command safe to execute within stated constraints?</question>
@@ -364,29 +197,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
     </step>
   </playbook>
 </common_investigation_workflows>
-<agents>
-  <agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>
-  <agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
-  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
-  <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
-</agents>
-<execution_graph>
-  <parallel_group id="investigation" depends_on="none">
-    <agent>explore</agent>
-    <agent>design</agent>
-    <agent>database</agent>
-  </parallel_group>
-  <parallel_group id="analysis" depends_on="investigation">
-    <agent>general-purpose</agent>
-  </parallel_group>
-</execution_graph>
-<delegation>
-  <requirement>Scope overview</requirement>
-  <requirement>Target file paths</requirement>
-  <requirement>Explicit edit prohibition</requirement>
-  <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
-</delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
   <criterion name="confidence_calculation">
     <factor name="requirement_clarity" weight="0.4">
@@ -598,29 +408,61 @@ Conduct detailed requirements definition before implementation, clarifying techn
 </completion_conditions>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor ambiguity in non-critical feature detail</low>
-    <medium>Unclear requirement or ambiguous scope</medium>
-    <high>Technically infeasible request or breaking change</high>
-    <critical>Request violates security policy or data integrity</critical>
+    <example severity="low">Minor ambiguity in non-critical feature detail</example>
+    <example severity="medium">Unclear requirement or ambiguous scope</example>
+    <example severity="high">Technically infeasible request or breaking change</example>
+    <example severity="critical">Request violates security policy or data integrity</example>
   </examples>
 </error_escalation>
 <related_commands>
   <command name="ask">When requirements raise technical questions</command>
   <command name="bug">When defining fix requirements for known issues</command>
   <command name="execute">Handoff point after requirements are defined</command>
-  <command name="define-full">Full version with self-evaluation phase</command>
+  <command name="define-full">Full version with automatic feedback and regeneration cycle</command>
   <command name="simplify">Code cleanup after implementation</command>
 </related_commands>
-
+<agents>
+  <agent name="design" subagent_type="design" readonly="true">
+    <role>Evaluate architecture consistency, component dependencies, and API design feasibility</role>
+    <receives>component_names[], request_context, existing_architecture_paths[]</receives>
+    <produces>architecture_assessment{consistency: 0-100, concerns[]}, dependency_impact[], design_alternatives[]</produces>
+    <done_when>All affected architectural layers assessed; design alternatives identified for non-obvious decisions</done_when>
+  </agent>
+  <agent name="database" subagent_type="database" readonly="true">
+    <role>Analyze data model requirements, schema implications, and query feasibility</role>
+    <receives>entity_descriptions[], relationship_requirements, performance_constraints</receives>
+    <produces>schema_proposal, migration_complexity: low|medium|high, query_feasibility_assessment</produces>
+    <done_when>Data model changes fully specified; migration path and complexity assessed</done_when>
+  </agent>
+  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">
+    <role>Analyze requirements completeness, estimate implementation effort, and identify dependency risks</role>
+    <receives>functional_requirements[], technical_constraints[], existing_codebase_context</receives>
+    <produces>effort_estimate{level: low|medium|high, rationale}, risk_assessment[], missing_requirements[], dependency_graph</produces>
+    <done_when>All requirements analyzed for completeness; effort estimate justified with evidence</done_when>
+  </agent>
+  <agent name="explore" subagent_type="explore" readonly="true">
+    <role>Find existing implementations, patterns, and code relevant to the requirements</role>
+    <receives>feature_keywords[], suspected_file_paths[], pattern_descriptions[]</receives>
+    <produces>existing_patterns[]{path: file:line, description}, similar_implementations[], reference_files[]</produces>
+    <done_when>All relevant existing code located; similar patterns identified for reuse consideration</done_when>
+  </agent>
+  <agent name="validator" subagent_type="validator" readonly="true">
+    <role>Cross-validate requirements consistency and flag contradictions between specifications</role>
+    <receives>requirements_document, technical_constraints[], agent_findings[]</receives>
+    <produces>consistency_report{consistent: bool, contradictions[]}, ambiguities[], validation_confidence: 0-100</produces>
+    <done_when>All requirements cross-checked; no unresolved contradictions in final document</done_when>
+  </agent>
+</agents>
 <related_agents>
   <agent name="explore">Codebase discovery for uncertain implementation details</agent>
   <agent name="quality-assurance">Cross-check result quality before finalization</agent>
   <agent name="validator">Cross-validation when findings may conflict</agent>
 </related_agents>
 <related_skills>
-  <skill name="requirements-definition">Core methodology for specification</skill>
-  <skill name="investigation-patterns">Evidence gathering for feasibility</skill>
-  <skill name="serena-usage">Check existing patterns and memories</skill>
+  <skill name="define-core">Shared workflow phases (prepare → analyze → investigate → clarify → verify → document)</skill>
+  <skill name="requirements-definition">Core methodology for specification (question scoring, FR format)</skill>
+  <skill name="investigation-patterns">Evidence gathering for feasibility assessment</skill>
+  <skill name="serena-usage">Check existing patterns and memories via Serena MCP</skill>
   <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
 </related_skills>
 <constraints>

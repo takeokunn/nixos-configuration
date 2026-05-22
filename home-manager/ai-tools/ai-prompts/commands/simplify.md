@@ -25,6 +25,18 @@ Code review and cleanup command that identifies changes via git diff, launches t
   <rule>Prefer existing abstractions over new ones</rule>
 </rules>
 <parallelization inherits="parallelization-patterns#parallelization_orchestration" />
+<ai_principles>
+  <inapplicable_traditional_practices>
+    <practice>Running code reuse, quality, and efficiency reviews sequentially — all three agents receive the same diff and can evaluate independently in a single parallel pass</practice>
+    <practice>Suggesting new abstractions when an existing utility already covers the case — AI must search the codebase for existing patterns before proposing any new code</practice>
+    <practice>Reporting issues as a list and leaving fixes to the user — the simplify command fixes each confirmed issue directly; reporting without fixing is prohibited</practice>
+  </inapplicable_traditional_practices>
+  <applicable_ai_principles>
+    <principle>Provide the complete diff to all three review agents simultaneously; no agent should wait for another since reuse, quality, and efficiency concerns are orthogonal</principle>
+    <principle>Search Serena memories and codebase symbols for existing utilities before flagging any reuse opportunity — avoid false positives that suggest creating what already exists</principle>
+    <principle>After aggregation, fix each confirmed issue in-place; skip only genuine false positives and document the reason; never leave the codebase in a partially-reviewed state</principle>
+  </applicable_ai_principles>
+</ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
@@ -221,6 +233,38 @@ Code review and cleanup command that identifies changes via git diff, launches t
       <score range="0-49">Negligible performance difference</score>
     </factor>
   </criterion>
+  <validation_tests>
+    <test name="success_case">
+      <input>correctness_impact=92, reuse_opportunity=93, efficiency_gain=92</input>
+      <calculation>(92*0.4)+(93*0.3)+(92*0.3) = 92.3</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>High scores across all factors yield success</reasoning>
+    </test>
+    <test name="boundary_success_80">
+      <input>correctness_impact=80, reuse_opportunity=80, efficiency_gain=80</input>
+      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
+      <expected_status>success</expected_status>
+      <reasoning>Exactly 80 is success threshold</reasoning>
+    </test>
+    <test name="boundary_warning_79">
+      <input>correctness_impact=79, reuse_opportunity=79, efficiency_gain=79</input>
+      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
+      <expected_status>warning</expected_status>
+      <reasoning>79 is below success threshold</reasoning>
+    </test>
+    <test name="boundary_error_59">
+      <input>correctness_impact=59, reuse_opportunity=59, efficiency_gain=59</input>
+      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>59 is at error threshold</reasoning>
+    </test>
+    <test name="error_case">
+      <input>correctness_impact=35, reuse_opportunity=45, efficiency_gain=40</input>
+      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
+      <expected_status>error</expected_status>
+      <reasoning>Low scores yield error status</reasoning>
+    </test>
+  </validation_tests>
 </decision_criteria>
 <output>
   <format>
@@ -286,10 +330,10 @@ Code review and cleanup command that identifies changes via git diff, launches t
 </enforcement>
 <error_escalation inherits="core-patterns#error_escalation">
   <examples>
-    <low>Minor style issue or marginal reuse opportunity</low>
-    <medium>Duplicated logic that should use existing utility</medium>
-    <high>N+1 query, unbounded data structure, or significant code duplication</high>
-    <critical>Data loss risk, security vulnerability, or correctness bug in changed code</critical>
+    <example severity="low">Minor style issue or marginal reuse opportunity</example>
+    <example severity="medium">Duplicated logic that should use existing utility</example>
+    <example severity="high">N+1 query, unbounded data structure, or significant code duplication</example>
+    <example severity="critical">Data loss risk, security vulnerability, or correctness bug in changed code</example>
   </examples>
 </error_escalation>
 <related_commands>

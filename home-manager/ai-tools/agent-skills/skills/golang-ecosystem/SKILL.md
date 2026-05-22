@@ -12,7 +12,7 @@ version: 2.0.0
   <tool>Read - Analyze go.mod and Go source files</tool>
   <tool>Edit - Modify Go code and module configuration</tool>
   <tool>Bash - Run go build, go test, go mod commands</tool>
-  <tool>mcp__context7__get-library-docs - Fetch latest Go documentation</tool>
+  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Go documentation</tool>
 </tools>
 
 <concepts>
@@ -845,23 +845,13 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation>
-  <level severity="low">
-    <example>golangci-lint style warning</example>
-    <action>Fix style issue, maintain idiomatic code</action>
-  </level>
-  <level severity="medium">
-    <example>Compilation error</example>
-    <action>Fix error, verify with go build</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change in exported API</example>
-    <action>Stop, present migration options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Data race or unsafe memory operation</example>
-    <action>Block operation, require safe implementation</action>
-  </level>
+<error_escalation inherits="core-patterns#error_escalation">
+  <examples>
+    <example severity="low">golangci-lint style warning</example>
+    <example severity="medium">Compilation error</example>
+    <example severity="high">Breaking change in exported API</example>
+    <example severity="critical">Data race or unsafe memory operation</example>
+  </examples>
 </error_escalation>
 
 <constraints>
@@ -878,3 +868,8 @@ version: 2.0.0
   <skill name="context7-usage">Access latest Go standard library and toolchain documentation</skill>
   <skill name="investigation-patterns">Debug goroutine leaks, race conditions, and performance issues</skill>
 </related_skills>
+<related_agents>
+  <agent name="explore">Locate code patterns and references in this skill domain</agent>
+  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
+  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
+</related_agents>
