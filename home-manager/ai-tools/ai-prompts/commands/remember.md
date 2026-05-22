@@ -129,6 +129,14 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
       <tool>Conflict detection</tool>
       <output>Conflicting entries with resolution proposals</output>
     </step>
+    <step order="4">
+      <action>Identify potentially stale Serena memories: check filename date suffix (YYYY-MM pattern);
+        flag entries older than 3 months as stale candidates. For each candidate, verify whether
+        the referenced code, pattern, or context still exists in the current codebase.
+        Propose one of: re-verify (still valid), update (partially outdated), or archive (rename with -archived suffix).</action>
+      <tool>Date analysis, codebase verification</tool>
+      <output>Stale memory candidates with freshness status and proposed action for each</output>
+    </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" after="identify_cleanup">
     <questions>

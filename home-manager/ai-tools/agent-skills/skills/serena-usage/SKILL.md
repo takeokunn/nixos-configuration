@@ -191,10 +191,12 @@ version: 3.0.0
   <concept name="memory_naming">
     <description>Consistent naming conventions for memory files</description>
     <example>
-      {project}-conventions  # Project-wide conventions
-      {feature}-patterns     # Feature-specific patterns
+      convention-{topic}     # Forward-looking project conventions (e.g., convention-nix-module-structure)
+      decision-{topic}       # Architectural decision records (e.g., decision-use-home-manager)
+      review-{topic}-YYYY-MM # Past investigation findings (e.g., review-nixvim-2026-05)
+      {feature}-patterns     # Feature-specific reusable patterns
       {domain}-patterns      # Domain-specific patterns
-      architecture-{decision}  # Architecture decisions
+      {project}-conventions  # (legacy) Project-wide conventions
     </example>
   </concept>
 
@@ -402,6 +404,31 @@ version: 3.0.0
     </task_type>
   </pattern>
 
+  <pattern name="memory_content_format">
+    <description>Standard YAML frontmatter for new Serena memory files, enabling structured filtering and lifecycle management</description>
+    <frontmatter_template>
+---
+domain: &lt;nixvim | home-manager | ai-prompts | nix | general&gt;
+status: active
+created: YYYY-MM
+last-verified: YYYY-MM
+---
+    </frontmatter_template>
+    <fields>
+      <field name="domain">Primary area this memory applies to (nixvim, home-manager, ai-prompts, nix, general)</field>
+      <field name="status">active = current and verified; archived = superseded; draft = unverified hypothesis</field>
+      <field name="created">Year-month the memory was first written (e.g., 2026-05)</field>
+      <field name="last-verified">Year-month the content was last confirmed accurate; set equal to created on initial write</field>
+    </fields>
+    <rules>
+      <rule>Apply to all new memories created via write_memory going forward</rule>
+      <rule>Do NOT migrate existing memories retroactively — apply only to new entries</rule>
+      <rule>When editing an existing memory that lacks frontmatter, add it at that time</rule>
+      <rule>On write_memory: set last-verified = created</rule>
+      <rule>On edit_memory: update last-verified to current YYYY-MM; leave created unchanged</rule>
+    </rules>
+  </pattern>
+
   <pattern name="memory_lifecycle">
     <description>Memory versioning, archival, and consolidation patterns</description>
     <versioning>
@@ -560,6 +587,13 @@ version: 3.0.0
       <action>Use get_symbols_overview or find_symbol before Read for code files</action>
       <verification>Symbol operations attempted before full file read</verification>
       <exception>Non-code files (YAML, JSON, MD) may use Read directly</exception>
+    </behavior>
+    <behavior id="SERENA-B008" priority="critical">
+      <trigger>When saving findings to an existing memory topic</trigger>
+      <action>First call list_memories to check if a memory for this topic exists;
+        if it exists, use edit_memory to append or update sections;
+        only use write_memory for genuinely new memory topics</action>
+      <verification>edit_memory used for existing topics; write_memory only for new ones</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>

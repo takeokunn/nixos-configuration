@@ -184,6 +184,24 @@ Use attribute values:
   domain: Domain knowledge and best practices (nix-ecosystem, typescript-ecosystem)
     </example>
   </pattern>
+
+  <pattern name="parallel_project_isolation">
+    <description>Constraints for safe operation when multiple Claude Code sessions
+      run concurrently in the same working directory</description>
+    <assumption>Assume other Claude Code sessions may be active in the same repository
+      at any time. Never treat the working directory as exclusively owned.</assumption>
+    <prohibited_operations>
+      <operation>git stash / git stash pop — may absorb or destroy another session's uncommitted changes</operation>
+      <operation>git checkout [branch] / git switch [branch] — switches working tree, destroying other sessions' work</operation>
+      <operation>git reset --hard — discards all uncommitted changes across all sessions</operation>
+      <operation>git clean -f / git clean -fd — deletes untracked files that may belong to other sessions</operation>
+    </prohibited_operations>
+    <safe_alternatives>
+      <alternative>Branch isolation needed → git worktree add [path] [branch]</alternative>
+      <alternative>Work-in-progress save → WIP commit instead of stash</alternative>
+      <alternative>Use Claude Code's isolation: worktree mode for truly isolated work</alternative>
+    </safe_alternatives>
+  </pattern>
 </patterns>
 
 <error_escalation>

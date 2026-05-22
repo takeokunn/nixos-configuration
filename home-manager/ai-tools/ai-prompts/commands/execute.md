@@ -39,7 +39,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </ai_principles>
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
+    <objective>Initialize Serena and load task-type-appropriate patterns</objective>
     <step order="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Serena activate_project</tool>
@@ -48,12 +48,20 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Serena list_memories</tool>
-      <output>Relevant memory index</output>
+      <output>Full memory index</output>
     </step>
     <step order="3">
-      <action>Load applicable memories with read_memory</action>
+      <action>Classify task type as "implementation". Apply memory_reading_by_task_type filter
+        (serena-usage skill): prioritize {feature}-patterns → {language}-conventions → testing-patterns.
+        Filter the memory index from step 2 against these categories; record matched names.</action>
+      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
+      <output>Filtered priority memory list for implementation tasks</output>
+    </step>
+    <step order="4">
+      <action>Load only memories matching the prioritized categories with read_memory;
+        skip categories absent from the index</action>
       <tool>Serena read_memory</tool>
-      <output>Applicable patterns loaded</output>
+      <output>Prioritized patterns loaded</output>
     </step>
   </phase>
   <phase name="analyze">
@@ -113,6 +121,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="assign">
     <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
+    <step order="0">
+      <action>For tasks that modify existing symbols: call find_referencing_symbols (Serena) to assess blast radius;
+        embed reference count and affected file list into the delegation prompt (EXEC-B005)</action>
+      <tool>Serena find_referencing_symbols</tool>
+      <output>Blast radius: N references in M files; included in delegation context</output>
+    </step>
     <step order="1">
       <action>Delegate tasks with detailed instructions</action>
       <tool>Task orchestration</tool>
@@ -144,9 +158,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <phase name="consolidate">
     <objective>Integrate sub-agent outputs into cohesive result</objective>
     <step order="1">
-      <action>Verify sub-agent outputs for completeness and correctness</action>
-      <tool>Output validation</tool>
-      <output>Verified sub-agent results</output>
+      <action>Verify sub-agent outputs for completeness; call get_diagnostics_for_file (min_severity=2)
+        on each modified file to catch LSP errors before test execution</action>
+      <tool>Output validation, Serena get_diagnostics_for_file</tool>
+      <output>Verified sub-agent results; any LSP errors reported as blockers</output>
     </step>
     <step order="2">
       <action>Run test commands for all written tests; infer command from project language/framework (pytest, go test, npm test, etc.); if command cannot be inferred, check package.json/Makefile/pyproject.toml/go.mod; if still undetermined, report as blocker</action>
@@ -162,6 +177,29 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <action>Combine all verified results and test outcomes into a cohesive final output</action>
       <tool>Synthesis</tool>
       <output>Consolidated result including test execution status</output>
+    </step>
+  </phase>
+  <!-- persist phase: orchestrator-synthesized insights visible only after all agents complete.
+       The memory agent in execution_graph captures patterns sourced from implementation sub-agents.
+       These two mechanisms are complementary: agent-sourced findings → memory agent; orchestrator-level synthesis → this phase. -->
+  <phase name="persist">
+    <objective>Capture orchestrator-level synthesis insights to Serena memory</objective>
+    <step order="1">
+      <action>Evaluate each trigger in memory_auto_creation_triggers (serena-usage skill):
+        architectural pattern / feature pattern / user-stated convention / refactoring approach.
+        Call list_memories to check if a memory for this topic already exists.</action>
+      <tool>Serena list_memories, evaluation against trigger list</tool>
+      <output>Trigger match: yes/no for each; existing memory: yes/no</output>
+    </step>
+    <step order="2">
+      <action>If trigger matched: use edit_memory (existing topic) or write_memory (new topic)
+        following memory_lifecycle convention ({topic}-YYYY-MM or {topic}-patterns).
+        For write_memory: prepend memory_content_format frontmatter (serena-usage skill)
+        with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
+        For edit_memory on a memory lacking frontmatter: add it at that time, updating last-verified.
+        If no triggers matched: output "persist: no triggers matched — skip"</action>
+      <tool>Serena edit_memory or write_memory</tool>
+      <output>Memory entries updated with frontmatter (names listed), or explicit skip reason</output>
     </step>
   </phase>
 </workflow>
@@ -264,9 +302,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   </agent>
   <agent name="git" subagent_type="git" readonly="false">
     <role>Design branching strategy, commit structure, and merge workflows</role>
-    <receives>change_scope, team_workflow, target_branches[]</receives>
+    <receives>change_scope, team_workflow, target_branches[], parallel_isolation_required: true</receives>
     <produces>branch_strategy, commit_plan[], pr_description_template</produces>
     <done_when>Branch strategy aligned with team workflow; commit history logical and reviewable</done_when>
+    <constraint>Never use git stash, git checkout [branch], git reset --hard, or git clean.
+      For branch isolation use git worktree add. Follow core-patterns#parallel_project_isolation.</constraint>
   </agent>
   <agent name="memory" subagent_type="general-purpose" readonly="false">
     <role>Capture significant architectural decisions and novel patterns to persistent memory</role>
@@ -293,6 +333,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <sequential_step id="review_phase" depends_on="quality_assurance,implementation">
     <agent>review</agent>
     <reason>Requires completion of quality checks and implementation</reason>
+  </sequential_step>
+  <sequential_step id="persist_phase" depends_on="review_phase">
+    <agent>memory</agent>
+    <reason>Capture novel patterns and architectural decisions after all other phases complete</reason>
   </sequential_step>
 </execution_graph>
 <delegation>
@@ -402,6 +446,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <trigger>After test creation in consolidate phase (step 2)</trigger>
       <action>Run all test commands; if any fail, delegate one targeted fix then re-run once; if still failing, report as blockers — do not silently complete with failing tests</action>
       <verification>Test execution results in output; either all-pass confirmation or explicit blocker list</verification>
+    </behavior>
+    <behavior id="EXEC-B005" priority="critical">
+      <trigger>Before modifying any existing symbol (function, class, method)</trigger>
+      <action>Use Serena find_referencing_symbols to assess blast radius;
+        include reference count and affected files in delegation prompt to sub-agents</action>
+      <verification>Blast radius assessment included in sub-agent instructions</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>

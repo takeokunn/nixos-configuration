@@ -44,18 +44,26 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <phase name="prepare">
     <step order="1">
       <action>Activate Serena project with activate_project</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
     </step>
     <step order="2">
       <action>Check list_memories for relevant patterns</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena list_memories</tool>
+      <output>Full memory index</output>
     </step>
     <step order="3">
-      <action>Load applicable memories with read_memory</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Classify task type as "investigation". Apply memory_reading_by_task_type filter
+        (serena-usage skill): prioritize {domain}-patterns → architecture-* → {project}-conventions.
+        Filter the memory index from step 2 against these categories; record matched names.</action>
+      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
+      <output>Filtered priority memory list for investigation tasks</output>
+    </step>
+    <step order="4">
+      <action>Load only memories matching the prioritized categories with read_memory;
+        skip categories absent from the index</action>
+      <tool>Serena read_memory</tool>
+      <output>Prioritized patterns loaded</output>
     </step>
 
   </phase>
@@ -168,6 +176,26 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <output>Step result recorded for the phase</output>
     </step>
 
+  </phase>
+  <phase name="persist">
+    <objective>Capture reusable debugging insights to Serena memory</objective>
+    <step order="1">
+      <action>Evaluate memory_auto_creation_triggers: did this investigation reveal a reusable debugging pattern,
+        an architectural insight, or a recurring bug class?
+        Call list_memories to check if a memory for this topic already exists.</action>
+      <tool>Serena list_memories, evaluation against trigger list</tool>
+      <output>Trigger match: yes/no; existing memory: yes/no</output>
+    </step>
+    <step order="2">
+      <action>If trigger matched: use edit_memory (existing topic) or write_memory (new topic).
+        Note: write_memory is Serena memory only — this does not violate the read-only file constraint.
+        For write_memory: prepend memory_content_format frontmatter (serena-usage skill)
+        with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
+        For edit_memory on a memory lacking frontmatter: add it, updating last-verified.
+        If no trigger matched: output "persist: no triggers matched — skip"</action>
+      <tool>Serena edit_memory or write_memory</tool>
+      <output>Memory entry updated with frontmatter (name listed), or explicit skip reason</output>
+    </step>
   </phase>
 </workflow>
 

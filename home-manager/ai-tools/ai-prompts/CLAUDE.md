@@ -44,9 +44,15 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <output>List of appropriate agents</output>
     </step>
     <step order="4">
-      <action>What existing patterns/memories should be consulted?</action>
-      <tool>Serena list_memories, read_memory (see serena-usage skill)</tool>
-      <output>Relevant patterns and conventions</output>
+      <action>Classify task type based on the delegated command:
+        investigation (/ask, /bug) → prioritize {domain}-patterns, architecture-*, {project}-conventions;
+        implementation (/execute, /execute-full) → prioritize {feature}-patterns, {language}-conventions, testing-patterns;
+        review (/feedback, /simplify) → prioritize {project}-conventions, code-quality-*, architecture-*;
+        refactoring → prioritize architecture-*, {component}-patterns, testing-patterns.
+        Call list_memories, then filter against the matching category priorities
+        (serena-usage#memory_reading_by_task_type). Load only matched entries with read_memory.</action>
+      <tool>Serena list_memories, read_memory (see serena-usage#memory_reading_by_task_type)</tool>
+      <output>Task type classified; prioritized patterns loaded</output>
     </step>
     <step order="5">
       <action>What are the dependencies between subtasks?</action>
@@ -107,9 +113,16 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <output>Consolidated result</output>
     </step>
     <step order="3">
-      <action>Save significant findings to Serena memory if applicable</action>
-      <tool>Serena write_memory (see serena-usage skill)</tool>
-      <output>Memory saved for future sessions</output>
+      <action>Evaluate each trigger in memory_auto_creation_triggers (serena-usage skill):
+        architectural pattern / bug insight / feature pattern / user-stated convention / refactoring approach.
+        Call list_memories to check if a memory for this topic already exists;
+        use edit_memory for existing topics, write_memory for new ones.
+        For write_memory: prepend memory_content_format frontmatter (serena-usage skill)
+        with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
+        For edit_memory on a memory lacking frontmatter: add it, updating last-verified.
+        If no trigger matched: explicitly note "persist: no triggers matched — skip" in output.</action>
+      <tool>Serena list_memories, then edit_memory or write_memory (see serena-usage#memory_content_format)</tool>
+      <output>Memory entries updated with frontmatter and topic names, or explicit skip reason</output>
     </step>
   </phase>
   <reflection_checkpoint id="completion_validation" after="consolidation">
@@ -273,6 +286,14 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <action>Delegating synthesis to sub-agents without providing specific file paths, line numbers, and change descriptions</action>
       <response>Always synthesize findings yourself first. Write prompts that prove you understood: include file paths, line numbers, what specifically to change. The orchestrator owns the synthesis; sub-agents own the execution.</response>
     </behavior>
+    <behavior id="ORCH-P005" priority="critical">
+      <trigger>Always</trigger>
+      <action>git stash, git checkout [branch], git reset --hard, git clean -f, or any operation
+        that mutates shared working tree state</action>
+      <response>HARD BLOCK: Assume concurrent Claude Code sessions are active in the same repository.
+        Use git worktree add for branch isolation, or WIP commit instead of stash.
+        Follow core-patterns#parallel_project_isolation.</response>
+    </behavior>
   </prohibited_behaviors>
 </enforcement>
 
@@ -309,6 +330,8 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <must>Follow the active tool or session language directive for user-facing output; default to English only when no directive is configured</must>
   <avoid>Using sed or awk for text processing</avoid>
   <must>NEVER run git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the current message</must>
+  <must>Assume concurrent Claude Code sessions may be active in the same repository. Never use git stash, git checkout [branch], git reset --hard, or any operation that mutates shared working tree state. Follow core-patterns#parallel_project_isolation.</must>
+  <must>When delegating, include Serena symbol paths (e.g., MyClass/method in file:line) when the target symbol is identifiable, so sub-agents can use replace_symbol_body instead of raw file edits.</must>
   <avoid>Adding timestamps to documentation</avoid>
   <avoid>Adding unnecessary comments; only comment complex logic</avoid>
 </constraints>

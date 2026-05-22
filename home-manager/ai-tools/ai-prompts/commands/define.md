@@ -362,6 +362,14 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <action>Run pre-completion self-check (see completion_conditions)</action>
       <verification>All checklist items answered</verification>
     </behavior>
+    <behavior id="DEF-B004" priority="critical">
+      <trigger>After completing requirements definition</trigger>
+      <action>Evaluate memory_auto_creation_triggers (serena-usage skill); if any trigger matched
+        (architectural decisions discovered, conventions identified, novel patterns found),
+        call list_memories then use edit_memory (existing) or write_memory (new topic).
+        Note: write_memory is Serena memory only — this does not violate the read-only file constraint.</action>
+      <verification>Memory operation recorded in output, or "persist: no triggers matched — skip"</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="DEF-P001" priority="critical">

@@ -47,12 +47,20 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
     <step order="2">
       <action>Check list_memories for relevant patterns</action>
       <tool>Serena list_memories</tool>
-      <output>Available memory list</output>
+      <output>Full memory index</output>
     </step>
     <step order="3">
-      <action>Load applicable memories with read_memory</action>
+      <action>Classify task type as "implementation". Apply memory_reading_by_task_type filter
+        (serena-usage skill): prioritize {feature}-patterns → {language}-conventions → testing-patterns.
+        Filter the memory index from step 2 against these categories; record matched names.</action>
+      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
+      <output>Filtered priority memory list for implementation tasks</output>
+    </step>
+    <step order="4">
+      <action>Load only memories matching the prioritized categories with read_memory;
+        skip categories absent from the index</action>
       <tool>Serena read_memory</tool>
-      <output>Relevant patterns loaded</output>
+      <output>Prioritized patterns loaded</output>
     </step>
   </phase>
 
@@ -320,15 +328,20 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   </agent>
   <agent name="git" subagent_type="git" readonly="false">
     <role>Design branching strategy, commit structure, and merge workflows</role>
-    <receives>change_scope, team_workflow, target_branches[]</receives>
+    <receives>change_scope, team_workflow, target_branches[], parallel_isolation_required: true</receives>
     <produces>branch_strategy, commit_plan[], pr_description_template</produces>
     <done_when>Branch strategy aligned with team workflow; commit history logical and reviewable</done_when>
+    <constraint>Never use git stash, git checkout [branch], git reset --hard, or git clean.
+      For branch isolation use git worktree add. Follow core-patterns#parallel_project_isolation.</constraint>
   </agent>
   <agent name="memory" subagent_type="general-purpose" readonly="false">
     <role>Capture significant architectural decisions and novel patterns to persistent memory</role>
     <receives>implementation_summary, novel_patterns[], architectural_decisions[]</receives>
     <produces>memory_entries_created[], memory_paths[]</produces>
     <done_when>All non-obvious decisions and patterns captured; memory entries verified writable</done_when>
+    <constraint>For each write_memory call: prepend memory_content_format frontmatter (serena-usage skill)
+      with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
+      For edit_memory on a memory lacking frontmatter: add it, updating last-verified.</constraint>
   </agent>
   <agent name="validator" subagent_type="validator" readonly="true">
     <role>Cross-validate findings from multiple agents to detect contradictions and confirm consensus</role>
@@ -379,6 +392,10 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       <agent>Agents matching issue categories</agent>
     </parallel_group>
   </conditional_phase>
+  <sequential_step id="persist_phase" depends_on="fix">
+    <agent>memory</agent>
+    <reason>Capture novel patterns and architectural decisions discovered during execute-feedback-fix cycle</reason>
+  </sequential_step>
 </execution_graph>
 <delegation>
   <requirement>Specific scope and expected deliverables</requirement>

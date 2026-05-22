@@ -386,6 +386,14 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <action>Launch all feedback agents in parallel</action>
       <verification>Parallel execution confirmed</verification>
     </behavior>
+    <behavior id="DEFF-B006" priority="critical">
+      <trigger>After completing each requirements definition cycle (including regeneration cycles)</trigger>
+      <action>Evaluate memory_auto_creation_triggers (serena-usage skill); if any trigger matched
+        (architectural decisions discovered, conventions identified, novel patterns found),
+        call list_memories then use edit_memory (existing topic) or write_memory (new topic).
+        Note: write_memory is Serena memory only — this does not violate the read-only file constraint.</action>
+      <verification>Memory operation recorded in output, or "persist: no triggers matched — skip"</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="DEFF-P001" priority="critical">
