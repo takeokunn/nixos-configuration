@@ -68,7 +68,6 @@ nixpkgs.lib.nixosSystem {
           devenv
           emacs-overlay
           org-babel
-          brew-nix
           firefox-addons
           ;
       };

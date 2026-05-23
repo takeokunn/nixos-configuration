@@ -32,10 +32,6 @@
     impermanence.inputs.home-manager.follows = "home-manager";
     nixvim.url = "github:nix-community/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
-    brew-nix.url = "github:BatteredBunny/brew-nix";
-    brew-nix.inputs.brew-api.follows = "brew-api";
-    brew-api.url = "github:BatteredBunny/brew-api";
-    brew-api.flake = false;
     mac-app-util.url = "github:hraban/mac-app-util";
     llm-agents.url = "github:numtide/llm-agents.nix";
     llm-agents.inputs.nixpkgs.follows = "nixpkgs";

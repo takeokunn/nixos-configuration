@@ -14,7 +14,6 @@
   scientific-skills,
   context7-skills,
   ast-grep-skill,
-  brew-nix,
   firefox-addons,
   nur-packages,
   devenv,
@@ -28,11 +27,10 @@ let
   devenvPkgs = devenv.packages.${system};
 
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
-  brewNixOverlay = if isDarwin then [ brew-nix.overlays.default ] else [ ];
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+    overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
   };
   llmAgentsPkgs = llm-agents.packages.${system};
   emacsPkgSet = import ./editor/packages {
@@ -68,8 +66,8 @@ let
   nixTools = import ./nix;
   cloud = import ./cloud { inherit pkgs; };
   developmentAdvanced = import ./development/advanced.nix;
-  mac = if isDarwin then import ./mac { inherit pkgs; } else [ ];
-  communication = import ./communication { inherit pkgs; };
+  sketchybar = if isDarwin then [ (import ./mac/sketchybar { inherit pkgs; }) ] else [ ];
+  communication = import ./communication { inherit pkgs isDarwin; };
   aiTools = import ./ai-tools {
     inherit
       pkgs
@@ -108,11 +106,11 @@ in
     ++ cloud
     ++ developmentAdvanced
     ++ aiTools
-    ++ mac
+    ++ sketchybar
     ++ communication;
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ] ++ brewNixOverlay;
+  nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
 
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;

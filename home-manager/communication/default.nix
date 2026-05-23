@@ -1,9 +1,12 @@
-{ pkgs }:
+{ pkgs, isDarwin ? false }:
 [
   {
-    home.packages = with pkgs; [
-      discord
-      slack
-    ];
+    home.packages = pkgs.lib.optionals (!isDarwin) (
+      with pkgs;
+      [
+        discord
+        slack
+      ]
+    );
   }
 ]

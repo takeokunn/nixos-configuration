@@ -5,7 +5,6 @@ let
     home-manager
     nixpkgs
     nixvim
-    brew-nix
     mac-app-util
     emacs-overlay
     nur-packages
@@ -22,7 +21,7 @@ let
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = editorOverlay ++ shellOverlay ++ [ brew-nix.overlays.default ];
+    overlays = editorOverlay ++ shellOverlay;
   };
 
   nurPkgs = nur-packages.packages.${system};
@@ -55,7 +54,6 @@ nix-darwin.lib.darwinSystem {
     configuration
     ../../nix-darwin
     darwin-vz-nix.darwinModules.default
-    brew-nix.darwinModules.default
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
     {
@@ -87,7 +85,6 @@ nix-darwin.lib.darwinSystem {
           ast-grep-skill
           emacs-overlay
           org-babel
-          brew-nix
           firefox-addons
           ;
       };
