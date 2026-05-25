@@ -73,7 +73,6 @@ nix-darwin.lib.darwinSystem {
           mcp-servers-nix
           llm-agents
           nur-packages
-          devenv
           anthropic-skills
           cloudflare-skills
           hashicorp-agent-skills

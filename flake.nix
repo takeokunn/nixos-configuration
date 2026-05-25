@@ -64,9 +64,6 @@
     firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
-    devenv.url = "github:cachix/devenv";
-    devenv.inputs.nixpkgs.follows = "nixpkgs";
-    devenv.inputs.flake-parts.follows = "flake-parts";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
     darwin-vz-nix.inputs.nixpkgs.follows = "nixpkgs";
   };

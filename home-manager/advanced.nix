@@ -16,7 +16,6 @@
   ast-grep-skill,
   firefox-addons,
   nur-packages,
-  devenv,
   ...
 }:
 let
@@ -24,7 +23,6 @@ let
   isDarwin = lib.hasSuffix "-darwin" system;
 
   nurPkgs = nur-packages.packages.${system};
-  devenvPkgs = devenv.packages.${system};
 
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
@@ -45,7 +43,7 @@ let
   editor = import ./editor/basic.nix { inherit pkgs nurPkgs; };
   vcs = import ./vcs/basic.nix { inherit pkgs nurPkgs; };
   security = import ./security/basic.nix { inherit pkgs; };
-  development = import ./development/basic.nix { inherit pkgs devenvPkgs; };
+  development = import ./development/basic.nix { inherit pkgs nurPkgs; };
 
   shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
   editorAdvanced = import ./editor/advanced.nix {
@@ -111,6 +109,8 @@ in
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
+
+  programs.nixvim.nixpkgs.source = nixpkgs;
 
   home.stateVersion = "25.11";
   home.enableNixpkgsReleaseCheck = false;

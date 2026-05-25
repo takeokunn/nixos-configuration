@@ -65,7 +65,6 @@ nixpkgs.lib.nixosSystem {
           context7-skills
           ast-grep-skill
           nur-packages
-          devenv
           emacs-overlay
           org-babel
           firefox-addons
