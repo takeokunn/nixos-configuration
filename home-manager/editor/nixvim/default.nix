@@ -21,6 +21,7 @@ in
   programs.nixvim.extraPlugins = plugins.extraPlugins;
 
   programs.nixvim.enable = true;
+  programs.nixvim.version.enableNixpkgsReleaseCheck = false;
 
   programs.nixvim.editorconfig.enable = true;
   programs.nixvim.colorschemes.dracula.enable = true;
