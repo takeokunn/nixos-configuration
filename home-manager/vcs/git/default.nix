@@ -134,7 +134,7 @@
       blame.markIgnoredLines = true;
     };
 
-    url."git@github.com:".insteadOf = "https://github.com/";
+    url."git@github.com:".pushInsteadOf = "https://github.com/";
 
     init.defaultBranch = "main";
 
