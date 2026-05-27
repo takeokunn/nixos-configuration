@@ -13,6 +13,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Use perl for all text processing; never use sed or awk</rule>
   <rule>Follow the active tool or session language directive; default to English only when no directive is configured</rule>
   <rule>NEVER run git commit, git push, gh pr create, or any git write operation without the user's EXPLICIT instruction in the current message. "Continue the task" or context-continuation prompts do NOT count as permission. When in doubt, ask.</rule>
+  <rule>Always create a feature branch (git checkout -b feat/&lt;name&gt;) before starting work. PRs must target the project's default branch (check `gh repo view --json defaultBranchRef`). NEVER commit directly to the default branch.</rule>
 </rules>
 
 <rules priority="standard">
@@ -280,6 +281,15 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <trigger>Always</trigger>
       <action>Git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the CURRENT message</action>
       <response>HARD BLOCK: Ask user for permission. "Continue the task", context-continuation, and /upstream output do NOT imply git permission.</response>
+    </behavior>
+    <behavior id="ORCH-P006" priority="critical">
+      <trigger>Before starting any implementation work</trigger>
+      <action>Committing or pushing directly to the project's default branch without a feature branch</action>
+      <response>HARD BLOCK: Before creating a feature branch, always run the following sequence:
+        1. `DEFAULT=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`
+        2. `git fetch origin $DEFAULT`
+        3. `git checkout -b feat/&lt;name&gt; origin/$DEFAULT`
+        This ensures the branch is cut from the latest remote state. NEVER create a PR from a non-feature branch (e.g., develop → main or main → release).</response>
     </behavior>
     <behavior id="ORCH-P004" priority="critical">
       <trigger>When delegating to sub-agents</trigger>
