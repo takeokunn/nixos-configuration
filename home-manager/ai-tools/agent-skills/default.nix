@@ -30,7 +30,7 @@
   programs.agent-skills.sources.microsoft.filter.nameRegex =
     "cloud-solution-architect|continual-learning|copilot-sdk|entra-agent-id|frontend-design-review|github-issue-creator|podcast-generation";
   programs.agent-skills.sources.scientific.path = scientific-skills;
-  programs.agent-skills.sources.scientific.subdir = "scientific-skills";
+  programs.agent-skills.sources.scientific.subdir = "skills";
   # Exclude docx, pdf, pptx, xlsx which conflict with anthropic source
   # Regex matches any string that is NOT exactly one of those four names
   programs.agent-skills.sources.scientific.filter.nameRegex =
