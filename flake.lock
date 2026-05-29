@@ -26,11 +26,11 @@
     "anthropic-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779199866,
-        "narHash": "sha256-GMXFJSePrpEvhzMQ82YI9Z10BDkuFK/lXUDELclvQ4c=",
+        "lastModified": 1780020146,
+        "narHash": "sha256-BiZvEV7VK1AwhiGg+pNMgTUQmt4exevLWwL0Brx4YyE=",
         "owner": "anthropics",
         "repo": "skills",
-        "rev": "690f15cac7f7b4c055c5ab109c79ed9259934081",
+        "rev": "da20c92503b2e8ff1cf28ca81a0df4673debdbf7",
         "type": "github"
       },
       "original": {
@@ -199,11 +199,11 @@
     },
     "crane_2": {
       "locked": {
-        "lastModified": 1779130139,
-        "narHash": "sha256-BLrtr42azquO7MdGFU5a7KiMl3YpFlTeIXqy1fT5GlQ=",
+        "lastModified": 1780029330,
+        "narHash": "sha256-fWFKEKB5CP+NO8/3uOaEZIVbd03mvDJ//VsnKkXty08=",
         "owner": "ipetkov",
         "repo": "crane",
-        "rev": "edb38893982a3338972bb4a2ec7ce7c29ba10fd9",
+        "rev": "6823b493a0bc2142082075576efa6633b537197e",
         "type": "github"
       },
       "original": {
@@ -316,11 +316,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1779940971,
-        "narHash": "sha256-bmmLVGqgohXF8Lb447TDAD2a1r9siFE8e//lAKosmyY=",
+        "lastModified": 1780027372,
+        "narHash": "sha256-LQ3CUdVZoKQqWzS2eEpY0rp9bJuzqydNFJUiJ6De9r8=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "96bf7ce4c4420a800986309413dbc08cc27c36c1",
+        "rev": "ef18b76eabdf4f9b2ce8e99e78ce698923693300",
         "type": "gitlab"
       },
       "original": {
@@ -536,11 +536,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779996558,
-        "narHash": "sha256-97+sQrHMlAm605Knx9zceiXYW9N8BYvotQiGcIcoCXU=",
+        "lastModified": 1780033696,
+        "narHash": "sha256-4cjtg7FkVkg2r0lMsZ7nb9H8F0elNn9UDTMPb9jf0gA=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "fbdfb26f43f9c74543ff3ddfa80c954355c0b6ac",
+        "rev": "3d06fc69a2f33f9353504facb481ef2bb8465add",
         "type": "github"
       },
       "original": {
@@ -579,11 +579,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779806928,
-        "narHash": "sha256-0XtBTT1QpZfq+JmSfUPDOn3k2Bnp8VkQjQxiY2ApgRY=",
+        "lastModified": 1780020977,
+        "narHash": "sha256-tOvefrBbmR7zoJb6UJ+3FrEoIl2nAAuO5iOXPUBT0NY=",
         "owner": "natsukium",
         "repo": "mcp-servers-nix",
-        "rev": "f0b12052ad9092cdb262df0969745277981d120c",
+        "rev": "474cfab3a9829eaadc0f96ece681400391b8590d",
         "type": "github"
       },
       "original": {
@@ -990,11 +990,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779989209,
-        "narHash": "sha256-CXs/INkZ48fFFvQ43K66ZZ7/MrazxCY904FTKQEWE90=",
+        "lastModified": 1780032297,
+        "narHash": "sha256-FjZ2mMY7QG+PUdCc7OfQ2h26hiM/eQA9Sl4O+ALq0LY=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "69d48270399778e2b0ca5c30b8b6077767c2f959",
+        "rev": "89c9837401d6129e51232b1d6aceb2a35333ccc4",
         "type": "github"
       },
       "original": {
@@ -1056,11 +1056,11 @@
     "scientific-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779997908,
-        "narHash": "sha256-D8sRYz5WMcqRuDqiUoloKG+pHgaDGd6lQJyOsG/ZYM4=",
+        "lastModified": 1780008732,
+        "narHash": "sha256-p/EYVbElrff2U8XGUcVJwGl7S/X2unqKln/Ze3W9Khs=",
         "owner": "K-Dense-AI",
         "repo": "claude-scientific-skills",
-        "rev": "d9a978ab9c6a6bf4c843030467054d24ef52e742",
+        "rev": "effb57c5699c1d400ef461a7aa80fc6693939805",
         "type": "github"
       },
       "original": {
