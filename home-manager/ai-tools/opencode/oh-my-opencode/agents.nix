@@ -1,5 +1,35 @@
 { models }:
 {
+  # ── Tier 0 (gpt55Full): ultra-premium, security, architecture ───────────────
+  zeus = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptOrchestrator;
+    description = "Ultra orchestrator. Handles the highest-stakes multi-system tasks where quality outweighs speed.";
+  };
+  themis = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Security specialist. Vulnerability analysis, threat modeling, and security-critical code review requiring exhaustive coverage.";
+  };
+  daedalus = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Architecture designer. Cross-system, long-horizon design decisions with written rationale. Use oracle for fast advisory; use daedalus for final-say architectural choices.";
+  };
+  heracles = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Complex debugger. Multi-system root cause analysis spanning services, hard-to-reproduce failures. Use oracle for single-system debug; use heracles for cross-system investigations.";
+  };
+
   # ── Tier 1 (deepseekPro): orchestration, planning, research ─────────────
   sisyphus = {
     model = models.deepseekPro.model;

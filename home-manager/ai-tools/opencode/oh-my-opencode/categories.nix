@@ -1,5 +1,28 @@
 { models }:
 {
+  # ── Tier 0 (gpt55Full): ultra-complex, security, architecture ────────────
+  ultra = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Default lane for ultra-complex, mission-critical tasks requiring maximum quality.";
+  };
+  security = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Security-focused analysis, vulnerability review, and threat modeling.";
+  };
+  architecture = {
+    model = models.gpt55Full.model;
+    fallback_models = models.gpt55Full.fallback;
+    variant = "xhigh";
+    prompt_append = models.promptLang;
+    description = "Cross-system or long-horizon architectural decisions requiring written rationale. Use ultrabrain for single-system tradeoffs; use architecture for irreversible structural choices.";
+  };
+
   # ── Tier 1 (deepseekPro): planning, research, writing ────────────────────
   research = {
     model = models.deepseekPro.model;
