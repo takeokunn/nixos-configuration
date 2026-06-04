@@ -22,7 +22,7 @@
         emacsPkg = pkgs.emacs.override {
           withNativeCompilation = false;
         };
-        readthezero = nur-packages.packages.${system}.readthezero;
+        readthezero = nur-packages.legacyPackages.${system}.readthezero;
         emacs-takeokunn-org = pkgs.stdenv.mkDerivation {
           name = "emacs-takeokunn-org";
           src = ../.;
