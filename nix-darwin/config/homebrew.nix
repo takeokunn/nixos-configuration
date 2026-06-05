@@ -3,6 +3,7 @@
   homebrew.onActivation.autoUpdate = true;
   homebrew.onActivation.upgrade = true;
   homebrew.onActivation.cleanup = "uninstall";
+  homebrew.onActivation.extraFlags = [ "--force-cleanup" ];
   homebrew.brews = [
     "pdfpc"
     "docker-credential-helper"
