@@ -25,8 +25,8 @@
       "nix-command"
       "flakes"
     ];
-    cores = 0;
-    max-jobs = "auto";
+    cores = 8;
+    max-jobs = 8;
     http-connections = 50;
     download-buffer-size = 268435456;
     always-allow-substitutes = true;
