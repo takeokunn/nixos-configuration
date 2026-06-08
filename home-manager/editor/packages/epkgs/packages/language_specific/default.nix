@@ -21,7 +21,7 @@ with epkgs;
 
   # Emacs Lisp
   eros
-  elsa
+  # elsa
   lispxmp
   macrostep
   elisp-slime-nav

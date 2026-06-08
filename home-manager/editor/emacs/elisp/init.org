@@ -1892,7 +1892,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :PROPERTIES:
 :CUSTOM_ID: flycheck-elsa
 :END:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
   (autoload-if-found '(flycheck-elsa-setup) "flycheck-elsa" nil t)
 
   (with-eval-after-load 'elisp-mode
@@ -4923,7 +4923,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 :PROPERTIES:
 :CUSTOM_ID: elsa
 :END:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
   (autoload-if-found '(elsa-run) "elsa" nil t)
 #+end_src
 *** lispxmp

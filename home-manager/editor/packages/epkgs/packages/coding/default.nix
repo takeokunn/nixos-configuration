@@ -3,7 +3,7 @@ with epkgs;
 [
   # check
   flycheck
-  flycheck-elsa
+  # flycheck-elsa
   flycheck-projectile
   flycheck-cfn
 
