@@ -1,5 +1,6 @@
+{ pkgs }:
 let
-  mu = import ./mu;
+  mu = import ./mu { inherit pkgs; };
   offlineimap = import ./offlineimap;
 in
 [

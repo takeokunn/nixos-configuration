@@ -38,7 +38,7 @@ in
     emacsPkg
   ]
   ++ (with pkgs; [
-    emacs-lsp-booster
+    (emacs-lsp-booster.override { emacs = emacs-unstable; })
     pinentry-emacs
   ]);
 }

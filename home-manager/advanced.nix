@@ -22,7 +22,10 @@ let
   lib = nixpkgs.lib;
   isDarwin = lib.hasSuffix "-darwin" system;
 
-  nurPkgs = nur-packages.packages.${system};
+  nurPkgs = import "${nur-packages}" {
+    inherit pkgs;
+    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
+  };
 
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
@@ -59,7 +62,7 @@ let
   browser = import ./browser { inherit pkgs firefox-addons; };
   vcsAdvanced = import ./vcs/advanced.nix;
   securityAdvanced = import ./security/advanced.nix { inherit pkgs; };
-  email = import ./email;
+  email = import ./email { inherit pkgs; };
   wayland = import ./wayland { inherit pkgs nurPkgs emacsLib; };
   nixTools = import ./nix;
   cloud = import ./cloud { inherit pkgs; };

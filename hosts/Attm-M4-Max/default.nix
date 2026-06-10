@@ -24,7 +24,10 @@ let
     overlays = editorOverlay ++ shellOverlay;
   };
 
-  nurPkgs = nur-packages.packages.${system};
+  nurPkgs = import "${nur-packages}" {
+    inherit pkgs;
+    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
+  };
 
   emacs = import ../../home-manager/editor/packages {
     inherit lib pkgs nurPkgs;
