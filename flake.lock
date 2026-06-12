@@ -295,11 +295,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781206392,
-        "narHash": "sha256-p9tbea+oZNN8HmUT6ItfQX2MKsbjv6Pm4lkYLP8lQFo=",
+        "lastModified": 1781241592,
+        "narHash": "sha256-+JZdAMvf7KgQaVXmjPVLfEL+bOaH5gH6cY6gTmx76As=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "6cbac845556ceffec3d6a13df74b7ee51aa29b37",
+        "rev": "c616997bedac36a7048a5421a7e2c39e035ecbaa",
         "type": "github"
       },
       "original": {
@@ -316,11 +316,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1781150628,
-        "narHash": "sha256-b4mp8l3qWuSCyYYo9HSngDtcB3PpecYiOXjULrjwwlw=",
+        "lastModified": 1781236970,
+        "narHash": "sha256-vD9qAPuGpLktDpfmt2mMnsO0YJVZjFCWWUlqUre1jpY=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "753319310f4673a2dabbfab87482187b40bf9bac",
+        "rev": "e198f98260ad14a8229ac8f5e9885e599f167149",
         "type": "gitlab"
       },
       "original": {
@@ -536,11 +536,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781209846,
-        "narHash": "sha256-2qKRx1US3c70mqONEvWlJShn9ax0hk22Xw/4ZTjJ5FA=",
+        "lastModified": 1781245669,
+        "narHash": "sha256-kbVCdRcll+JaelSqVNHhW38oQD5dctDLi/vRWT9t6/M=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "0d3d38c56f957245dc6ff7b6d090207ee1373a63",
+        "rev": "10a7a6c07357af3351455eb4b3638418a4e76fec",
         "type": "github"
       },
       "original": {
@@ -615,11 +615,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781196189,
-        "narHash": "sha256-8ZFs9+ylq+YRDnkw9/ITEcxcl1GjMvIDgWUFIsKwJH8=",
+        "lastModified": 1781242433,
+        "narHash": "sha256-bchLZZ3sRn740zyvD2icZSnNoTaanN0nw7l6fjVXO+E=",
         "owner": "LnL7",
         "repo": "nix-darwin",
-        "rev": "d0d0978f34fbd7da190801f7549992718057a8d6",
+        "rev": "aabb2037edfc0f210723b72cd5f528aab5dd3f0b",
         "type": "github"
       },
       "original": {
@@ -901,11 +901,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1781141223,
-        "narHash": "sha256-Eye4UQJjC4TLobclolFCMl6MrjgiF6Bk1cOI5x8SH00=",
+        "lastModified": 1781173989,
+        "narHash": "sha256-fnzKKPvS+oieI/pTzotA5tkoM47EB1NpaBcgk4R97hE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b503dde361500433ca25a32e8f4d218bf58fb659",
+        "rev": "8c91a71d13451abc40eb9dae8910f972f979852f",
         "type": "github"
       },
       "original": {
@@ -1006,11 +1006,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781198672,
-        "narHash": "sha256-R63/ftErCvOrvKxaKw6qOhmrPKLcYiP7gvqlMz9FrZE=",
+        "lastModified": 1781242323,
+        "narHash": "sha256-TSJYz+EN5rflSieRif92WRWkUxmQclbTW5GhxctiMFQ=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "0e33b9b18a1cdd5bc46c0353d1eae5bf060f0fd7",
+        "rev": "9a690a5532b018e27ae2ea1674c533aa1682743a",
         "type": "github"
       },
       "original": {
@@ -1021,11 +1021,11 @@
     },
     "org-babel": {
       "locked": {
-        "lastModified": 1777311427,
-        "narHash": "sha256-5pUNDxoPEhW0d4aw5UnZiL3JzHbupls14GZwD2q8vLE=",
+        "lastModified": 1781216126,
+        "narHash": "sha256-f1OICjF3pdRb89ackr20ulKJeTfGnQKXns2mgxOxE00=",
         "owner": "emacs-twist",
         "repo": "org-babel",
-        "rev": "bcd049a1a86779c421ab10027f1d4b78363dcc4e",
+        "rev": "e39a14ee977472e15c1c3019b7e00c0da9ecbaa2",
         "type": "github"
       },
       "original": {
@@ -1072,11 +1072,11 @@
     "scientific-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1781197564,
-        "narHash": "sha256-Vgx8+65l4nuJ8zA5OKiEAQrHJE4FTi3s5q7111GlyVM=",
+        "lastModified": 1781216922,
+        "narHash": "sha256-PXW83JpI5LnHva2LTx0IAsi9pyt3B52mFMvArXFmTeg=",
         "owner": "K-Dense-AI",
         "repo": "claude-scientific-skills",
-        "rev": "0f1c54dfe52055dd1f0648f581d82729aecd4d06",
+        "rev": "dab7aa672944a77f20cda3f2a672a6f1582adab6",
         "type": "github"
       },
       "original": {
