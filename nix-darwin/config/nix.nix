@@ -26,7 +26,7 @@
       "flakes"
     ];
     cores = 8;
-    max-jobs = 8;
+    max-jobs = 4;
     http-connections = 50;
     download-buffer-size = 268435456;
     always-allow-substitutes = true;

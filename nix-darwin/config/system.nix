@@ -1,5 +1,17 @@
 { username }:
 {
+  launchd.daemons.sysctl-max-files = {
+    serviceConfig = {
+      Label = "org.nixos.sysctl-max-files";
+      ProgramArguments = [
+        "/bin/sh"
+        "-c"
+        "/usr/sbin/sysctl -w kern.maxfiles=1048576 kern.maxfilesperproc=524288"
+      ];
+      RunAtLoad = true;
+    };
+  };
+
   time.timeZone = "Asia/Tokyo";
 
   power.restartAfterFreeze = true;
