@@ -15,8 +15,11 @@ let
     in
     builtins.listToAttrs (
       map (skill: {
-        name = ".codex/skills/${skill}/SKILL.md";
-        value = { source = "${skillsPath}/${skill}/SKILL.md"; };
+        name = "codex/skills/${skill}/SKILL.md";
+        value = {
+          source = "${skillsPath}/${skill}/SKILL.md";
+          force = true;
+        };
       }) skillNames
     );
 
@@ -34,6 +37,11 @@ let
     approval_policy = "on-request";
     sandbox_mode = "workspace-write";
     model_auto_compact_token_limit = 50000;
+    # Nix manages the codex package; disable the built-in updater.
+    check_for_update_on_startup = false;
+    suppress_unstable_features_warning = true;
+    analytics = { enabled = false; };
+    feedback = { enabled = false; };
 
     mcp_servers = {
       context7 = pickMcpServer nixMcpServers.context7;
@@ -58,12 +66,12 @@ in
 {
   home.packages = [ llmAgentsPkgs.codex ];
 
-  home.file = skillFileAttrs // {
-    ".codex/AGENTS.md" = {
+  xdg.configFile = skillFileAttrs // {
+    "codex/AGENTS.md" = {
       source = "${promptsPath}/AGENTS.md";
       force = true;
     };
-    ".codex/config.toml" = {
+    "codex/config.toml" = {
       source = codexConfig;
       force = true;
     };
@@ -71,5 +79,6 @@ in
 
   home.sessionVariables = {
     CODEX_DISABLE_TELEMETRY = "1";
+    CODEX_HOME = "$HOME/.config/codex";
   };
 }

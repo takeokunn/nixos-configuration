@@ -18,7 +18,7 @@ Analyze the current session and extract a reusable skill (SKILL.md) from the wor
 </rules>
 <rules priority="standard">
   <rule>Use AskUserQuestion for all interview rounds to enable structured responses</rule>
-  <rule>Write to ~/.codex/skills/<skill-name>/SKILL.md (or the local skills directory)</rule>
+  <rule>Write to ~/.config/codex/skills/<skill-name>/SKILL.md (or the local skills directory)</rule>
   <rule>Infer skill name from the session if the argument is empty; confirm with user</rule>
 </rules>
 <ai_principles>
