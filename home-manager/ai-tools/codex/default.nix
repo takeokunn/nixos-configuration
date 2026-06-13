@@ -49,8 +49,12 @@ let
     # Nix manages the codex package; disable the built-in updater.
     check_for_update_on_startup = false;
     suppress_unstable_features_warning = true;
-    analytics = { enabled = false; };
-    feedback = { enabled = false; };
+    analytics = {
+      enabled = false;
+    };
+    feedback = {
+      enabled = false;
+    };
   };
 
   codexMcpServers = {
