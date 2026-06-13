@@ -30,6 +30,14 @@ let
       mcp-servers-nix
       ;
   };
+  codex = import ./codex {
+    inherit
+      pkgs
+      nurPkgs
+      llmAgentsPkgs
+      mcp-servers-nix
+      ;
+  };
   agent-skills = import ./agent-skills {
     inherit
       anthropic-skills
@@ -47,6 +55,7 @@ in
 [
   claude-code
   opencode
+  codex
   agent-skills
   ./serena
   {
