@@ -20,7 +20,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <rule>Never implement code; requirements definition only</rule>
   <rule>Complete full cycle: define -> feedback -> regenerate</rule>
   <rule>Maximum one iteration (no infinite loops)</rule>
-  <rule>Automatic flow between phases (no user confirmation between phases)</rule>
+  <rule>Automatic flow between phases (no user confirmation at inter-phase transitions). EXCEPTION: the terminal finalize gate (define-core#core_finalize) runs after the last phase, not between phases — it is permitted to prompt the user when Outstanding Issues remain.</rule>
 </rules>
 <rules priority="standard">
   <rule>Use requirements-definition skill for methodology</rule>
@@ -190,6 +190,9 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <sequential_step id="regenerate" depends_on="feedback">
     <action>Synthesize feedback and regenerate specification</action>
   </sequential_step>
+  <sequential_step id="finalize" depends_on="regenerate">
+    <action>Run the terminal finalize gate (define-core#core_finalize) on the FINAL regenerated document: if its Outstanding Issues section is non-empty, prompt the user once via AskUserQuestion (Resolve now / Defer to /execute / Stop &amp; revise scope) per DEFF-B007. This is the authoritative position of the gate — it runs after regenerate, never inside core_workflow.</action>
+  </sequential_step>
 </execution_graph>
 <delegation>
   <requirement>Scope overview</requirement>
@@ -329,7 +332,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       </metrics>
       <constraints>Technical, operational</constraints>
       <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-      <outstanding_issues>Unresolved questions (if any remain)</outstanding_issues>
+      <outstanding_issues>Unresolved questions (if any remain); state "none" explicitly when there are none. This is the canonical section the finalize gate (DEFF-B007) inspects.</outstanding_issues>
       <task_breakdown>
         <dependency_graph>Task dependencies visualization</dependency_graph>
         <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
@@ -394,6 +397,11 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
         Note: write_memory is Serena memory only — this does not violate the read-only file constraint.</action>
       <verification>Memory operation recorded in output, or "persist: no triggers matched — skip"</verification>
     </behavior>
+    <behavior id="DEFF-B007" priority="critical">
+      <trigger>After the regenerate phase, when the final requirements document's remaining/outstanding issues are non-empty</trigger>
+      <action>Run the inherited terminal finalize gate (define-core#core_finalize) EXACTLY ONCE, evaluating the FINAL (regenerated) document — never the initial document. The CANONICAL trigger section is the final document's &lt;outstanding_issues&gt; element (not the &lt;self_feedback&gt;&lt;remaining_issues&gt; summary, which is non-authoritative); fire when it is non-empty (not "none"). Offer "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope". If the user picks "Resolve now", collect answers and patch the final document directly; do NOT trigger a second feedback/regenerate cycle (preserves DEFF-P004 maximum-one-iteration).</action>
+      <verification>Finalize gate appears once at the end of output when final outstanding issues >= 1; no second regeneration cycle is run</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="DEFF-P001" priority="critical">
@@ -414,12 +422,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     <behavior id="DEFF-P004" priority="critical">
       <trigger>Always</trigger>
       <action>Multiple regeneration iterations</action>
-      <response>Block operation, maximum one iteration</response>
+      <response>Block operation, maximum one iteration. EXCEPTION: the finalize gate's "Resolve now" path (DEFF-B007) edits the already-final document in place and is NOT a regeneration iteration — it does not re-run collect_feedback/regenerate, so it is permitted.</response>
     </behavior>
     <behavior id="DEFF-P005" priority="critical">
-      <trigger>Between phases</trigger>
+      <trigger>Between phases (inter-phase transitions only; NOT the terminal finalize gate)</trigger>
       <action>Requesting user confirmation to proceed</action>
-      <response>Proceed automatically between phases</response>
+      <response>Proceed automatically between phases. This does not apply to the terminal finalize gate (define-core#core_finalize), which runs after the final phase and is allowed to prompt when Outstanding Issues remain.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -458,7 +466,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <must>Present questions before making assumptions</must>
   <must>Complete all three phases: define, feedback, regenerate</must>
   <must>Execute feedback agents in parallel</must>
-  <must>Automatically proceed between phases without user confirmation</must>
+  <must>Automatically proceed between phases without user confirmation, EXCEPT the terminal finalize gate (define-core#core_finalize), which may prompt once after the final phase when Outstanding Issues remain</must>
   <avoid>Implementing or modifying code</avoid>
   <avoid>Justifying user requests over technical validity</avoid>
   <avoid>Proceeding without clear answers to critical questions</avoid>

@@ -161,6 +161,33 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
       <output>Phased task list with dependencies</output>
     </step>
   </phase>
+
+  <phase name="finalize" id="core_finalize">
+    <objective>Gate on unresolved Outstanding Issues before terminating; let the user choose how to dispose of them rather than silently documenting and ending</objective>
+    <step number="1">
+      <action>Evaluate the Outstanding Issues section of the FINAL requirements document. For commands that produce a single document (/define), this is the document from the document phase. SUPPRESSION RULE: when this workflow is inherited as a NON-terminal phase (e.g. /define-full declares it as the `core_workflow` phase that precedes collect_feedback/regenerate), this finalize phase MUST NOT fire at the end of that inherited phase; it is suppressed there and re-invoked EXACTLY ONCE by the consuming command's own terminal step (e.g. /define-full's DEFF-B007 after the regenerate phase), evaluating that command's final document.</action>
+      <tool>Document inspection</tool>
+      <output>Outstanding Issues count (0 means the section reads "none")</output>
+    </step>
+    <step number="2">
+      <action>If the count is 0 ("none"), skip the gate entirely and finish normally — do not prompt. If the count is >= 1 (any non-empty Outstanding Issues), invoke the disposition gate in step 3.</action>
+      <tool>Conditional branch</tool>
+      <output>Gate fired or skipped</output>
+    </step>
+    <step number="3">
+      <action>Invoke AskUserQuestion with exactly three options for how to dispose of the remaining Outstanding Issues:
+        "Resolve now (Recommended)" — re-enter the clarify phase, ask the outstanding questions via AskUserQuestion, and patch the requirements document with the answers;
+        "Defer to /execute" — keep the issues documented as-is and carry them explicitly into the execute_handoff so the downstream implementer inherits them;
+        "Stop &amp; revise scope" — halt without finalizing the /execute handoff; leave the already-produced (read-only) document visible so the user can revise their request.</action>
+      <tool>AskUserQuestion</tool>
+      <output>User-selected disposition</output>
+    </step>
+    <step number="4">
+      <action>Act on the selected disposition. For "Resolve now", apply the answers, then re-evaluate the Outstanding Issues section. This resolution loop is BOUNDED: re-present the gate at most once more, after which only "Defer to /execute" and "Stop &amp; revise scope" remain. Never loop unbounded. The clarify-phase "block until answered" rule (DC-P002) is SATISFIED, not bypassed, by offering Defer/Stop on the bounded re-check — choosing a disposition IS a valid resolution of an issue that cannot be answered.</action>
+      <tool>Bounded resolution loop</tool>
+      <output>Updated document, deferred handoff, or terminal stop</output>
+    </step>
+  </phase>
 </workflow>
 
 <agents>
@@ -201,7 +228,7 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
       <metric name="objectivity">0-100</metric>
     </metrics>
     <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-    <outstanding_issues>Unresolved questions</outstanding_issues>
+    <outstanding_issues>Unresolved questions; "none" must be explicitly stated when there are none (the finalize gate's skip-branch keys off this "none" sentinel)</outstanding_issues>
   </format>
   <format id="task_breakdown">
     <dependency_graph>Task dependencies visualization</dependency_graph>
@@ -255,6 +282,7 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   <rule id="DC-S003">Ask questions without limit until requirements are clear</rule>
   <rule id="DC-S004">Investigate and question before concluding</rule>
   <rule id="DC-S005">Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
+  <rule id="DC-S006">When the final requirements document has non-empty Outstanding Issues, do not silently end — run the finalize gate (core_finalize) so the user chooses to resolve, defer, or stop</rule>
 </rules>
 
 <enforcement>
@@ -268,6 +296,11 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
       <trigger>For design decisions</trigger>
       <action>Use AskUserQuestion tool with structured options</action>
       <verification>User responses recorded</verification>
+    </behavior>
+    <behavior id="DC-B003" priority="critical">
+      <trigger>After the final requirements document is produced, when its Outstanding Issues section is non-empty (>= 1 item, not "none")</trigger>
+      <action>Run the finalize gate (core_finalize): invoke AskUserQuestion offering "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope", then act on the choice. Bounded to at most one additional resolution pass.</action>
+      <verification>Disposition gate recorded in output whenever Outstanding Issues >= 1; gate skipped when "none"</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
@@ -320,11 +353,12 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
 
 <usage_in_commands>
   <command name="define">
-    <inherits>All phases (prepare, analyze, investigate, clarify, verify, document)</inherits>
+    <inherits>All phases (prepare, analyze, investigate, clarify, verify, document, finalize)</inherits>
     <inherits>All agents</inherits>
     <inherits>Core execution graph</inherits>
     <inherits>All delegation requirements</inherits>
     <inherits>All rules and enforcement</inherits>
+    <note>finalize gate runs immediately after document, since /define produces a single document</note>
   </command>
   <command name="define-full">
     <inherits>Full workflow via &lt;phase name="core_workflow" inherits="define-core#workflow" /&gt;</inherits>
@@ -332,5 +366,6 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
     <inherits>Core execution graph as base, extended with collect_feedback and regenerate phases</inherits>
     <inherits>All delegation requirements</inherits>
     <inherits>All rules and enforcement, plus feedback-specific behaviors</inherits>
+    <note>finalize gate is DEFERRED until after the regenerate phase and evaluates the final document's remaining issues; "Resolve now" patches the final document without triggering a second feedback/regenerate cycle (preserves the maximum-one-iteration rule)</note>
   </command>
 </usage_in_commands>

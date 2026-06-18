@@ -9,12 +9,13 @@ let
 
   aiPromptsPath = ../ai-prompts;
   commandPromptsPath = aiPromptsPath + "/commands";
+  agentPromptsPath = aiPromptsPath + "/agents";
 
   codexRuntimeAdapter = ''
     <codex_runtime_adapter>
       <purpose>Apply the shared Claude/OpenCode orchestration prompt in Codex while preserving Codex tool semantics.</purpose>
       <rules priority="critical">
-        <rule>The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*.md.</rule>
+        <rule>The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.</rule>
         <rule>When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.</rule>
         <rule>Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, no git write operations unless explicitly requested, and explicit verification reporting.</rule>
       </rules>
@@ -43,9 +44,15 @@ let
   '';
 
   commandFiles = builtins.readDir commandPromptsPath;
+  agentFiles = builtins.readDir agentPromptsPath;
   skillNames = map (name: lib.removeSuffix ".md" name) (
     builtins.filter (name: commandFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
       builtins.attrNames commandFiles
+    )
+  );
+  agentNames = map (name: lib.removeSuffix ".md" name) (
+    builtins.filter (name: agentFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
+      builtins.attrNames agentFiles
     )
   );
 
@@ -66,6 +73,25 @@ let
       ${body}
     '';
 
+  agentPromptToCodexAgent =
+    agent:
+    let
+      content = builtins.readFile (agentPromptsPath + "/${agent}.md");
+      lines = lib.splitString "\n" content;
+      nameLine = builtins.elemAt lines 1;
+      descriptionLine = builtins.elemAt lines 2;
+      body = lib.concatStringsSep "\n" (lib.drop 4 lines);
+      name = lib.removePrefix "name: " nameLine;
+      description = lib.removePrefix "description: " descriptionLine;
+    in
+    assert lib.hasPrefix "name: " nameLine;
+    assert lib.hasPrefix "description: " descriptionLine;
+    pkgs.writeText "codex-agent-${agent}.toml" ''
+      name = ${builtins.toJSON name}
+      description = ${builtins.toJSON description}
+      developer_instructions = ${builtins.toJSON body}
+    '';
+
   skillFileAttrs = builtins.listToAttrs (
     map (skill: {
       name = "codex/skills/${skill}/SKILL.md";
@@ -74,6 +100,16 @@ let
         force = true;
       };
     }) skillNames
+  );
+
+  agentFileAttrs = builtins.listToAttrs (
+    map (agent: {
+      name = "codex/agents/${agent}.toml";
+      value = {
+        source = agentPromptToCodexAgent agent;
+        force = true;
+      };
+    }) agentNames
   );
 
   nixMcpServers =
@@ -93,7 +129,7 @@ let
     } server;
 
   codexSettings = {
-    model = "gpt-5.5";
+    model = "gpt-5.4-mini";
     model_provider = "openai";
     approval_policy = "on-request";
     sandbox_mode = "danger-full-access";
@@ -173,7 +209,7 @@ in
 {
   home.packages = [ codexWrapped ];
 
-  xdg.configFile = skillFileAttrs // {
+  xdg.configFile = skillFileAttrs // agentFileAttrs // {
     "codex/AGENTS.md" = {
       source = codexAgents;
       force = true;

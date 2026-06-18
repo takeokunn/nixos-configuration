@@ -44,6 +44,14 @@ in
   launchd.agents.emacs.config.KeepAlive = lib.mkIf isDarwin (lib.mkForce true);
   launchd.agents.emacs.config.ThrottleInterval = lib.mkIf isDarwin 10;
 
+  # macOS: launchd hands every agent a 256-file soft rlimit by default, which Emacs
+  # (native-comp .eln files alone keep ~500 FDs open at idle, plus LSP servers and many
+  # buffers/processes) exhausts -> "too many open files".  Pin the agent itself so it does
+  # not depend on the global launchctl limit (a separate launchd domain).  65536 is ~130x
+  # measured idle usage -- ample headroom without an enormous soft rlimit.
+  launchd.agents.emacs.config.SoftResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
+  launchd.agents.emacs.config.HardResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
+
   # macOS: Gracefully stop Emacs before setupLaunchAgents to prevent I/O error 5
   # (upstream bootoutAgent sleeps only 1s, insufficient for Emacs shutdown)
   home.activation.preStopEmacsDaemon = lib.mkIf isDarwin {

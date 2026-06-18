@@ -397,6 +397,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <item>Have all acceptance criteria been expressed as observable behavior?</item>
     <item>Is the blast radius (which systems/files are affected) clearly stated?</item>
     <item>Are outstanding issues documented, even if the answer is "none"?</item>
+    <item>If outstanding issues are non-empty, did I run the finalize gate (define-core#core_finalize) so the user chose to resolve, defer, or stop — rather than silently ending?</item>
     <item>Does the /execute handoff contain enough context that a fresh implementer could proceed without re-asking?</item>
   </pre_completion_checklist>
   <final_self_check>
@@ -412,6 +413,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <criterion>Acceptance criteria expressed as observable behavior</criterion>
     <criterion>Critique phase completed and findings incorporated or flagged</criterion>
     <criterion>Pre-completion checklist passed</criterion>
+    <criterion>Outstanding-issues disposition resolved with the user via the finalize gate (resolve / defer / stop) when any outstanding issues remain; gate correctly skipped when "none"</criterion>
   </done_when>
 </completion_conditions>
 <error_escalation inherits="core-patterns#error_escalation">
