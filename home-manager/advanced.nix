@@ -67,8 +67,8 @@ let
   nixTools = import ./nix;
   cloud = import ./cloud { inherit pkgs; };
   developmentAdvanced = import ./development/advanced.nix;
-    sketchybar = if isDarwin then [ (import ./mac/sketchybar { inherit pkgs; }) ] else [ ];
-    communication = import ./communication { inherit pkgs isDarwin; };
+  sketchybar = if isDarwin then [ (import ./mac/sketchybar { inherit pkgs; }) ] else [ ];
+  communication = import ./communication { inherit pkgs isDarwin; };
   aiTools = import ./ai-tools {
     inherit
       pkgs
@@ -107,8 +107,8 @@ in
     ++ cloud
     ++ developmentAdvanced
     ++ aiTools
-      ++ sketchybar
-      ++ communication;
+    ++ sketchybar
+    ++ communication;
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
