@@ -202,6 +202,10 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="haskell-ecosystem">Haskell language, GHC, Cabal/Stack, HLS, optics (lens), monad transformers (mtl), type-level patterns, and HSpec/QuickCheck testing</skill>
     <skill name="devenv-ecosystem">Devenv configuration, languages.*, services.*, git-hooks, scripts, processes, profiles, and outputs patterns</skill>
   </category>
+  <category name="design">
+    <skill name="web-ux">World-class web UX best practices: Nielsen heuristics, Laws of UX, WCAG accessibility, Core Web Vitals, IA, forms, and microcopy</skill>
+    <skill name="game-ux">World-class game UX best practices: MDA framework, game feel/juice, flow and difficulty, player motivation, FTUE, HUD/UI, and game accessibility</skill>
+  </category>
 </skills>
 
 <decision_tree name="agent_selection">
