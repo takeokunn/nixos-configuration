@@ -14,6 +14,11 @@ let
         rm -f $out/share/emacs/site-lisp/elpa/copilot-*/copilot-chat.elc
       '';
     });
+    # projectile ≥ 20260627 requires consult at byte-compile time but the
+    # generated nixpkgs derivation does not yet declare it as a dependency.
+    projectile = super.projectile.overrideAttrs (old: {
+      propagatedBuildInputs = (old.propagatedBuildInputs or [ ]) ++ [ super.consult ];
+    });
   };
 
   parallelBuildAttrs = {

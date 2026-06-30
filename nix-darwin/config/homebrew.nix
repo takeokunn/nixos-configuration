@@ -18,6 +18,7 @@
     "element"
     "font-sketchybar-app-font"
     "google-chrome"
+    "microsoft-excel"
     "keycastr"
     "postico"
     "postman"
