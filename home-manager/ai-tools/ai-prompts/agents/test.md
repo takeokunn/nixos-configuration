@@ -99,6 +99,11 @@ description: Test strategy and quality management
       <tool>Task-specific analysis and verification tools</tool>
       <output>Step result captured for this phase</output>
     </step>
+    <step order="4">
+      <action>Apply the adversarial persona lens (testing-patterns#adversarial_persona_lens) to detect perspective-coverage gaps; each perspective must leave at least one confirmation point</action>
+      <tool>Task-specific analysis and verification tools</tool>
+      <output>Step result captured for this phase</output>
+    </step>
   </phase>
   <phase name="execute">
     <objective>Run tests and collect results</objective>

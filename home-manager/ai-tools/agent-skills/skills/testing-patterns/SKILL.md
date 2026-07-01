@@ -66,6 +66,11 @@ version: 2.0.0
   <description>Percentage of functions/methods called during tests</description>
   <guidance>Identifies untested functions</guidance>
 </concept>
+
+<concept name="quality_characteristic_coverage">
+  <description>Coverage measured against ISO/IEC 25010 quality characteristics, not only executed lines or branches</description>
+  <guidance>Check each characteristic for applicability: functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability, portability</guidance>
+</concept>
 </concepts>
 
 <patterns>
@@ -251,6 +256,26 @@ version: 2.0.0
   <use_case>Component rendering, serialized data structures, CLI output</use_case>
 </pattern>
 
+<pattern name="adversarial_persona_lens">
+  <description>Design test cases by rotating through adversarial reviewer perspectives so perspective-coverage gaps surface systematically</description>
+  <decision_tree name="when_to_use">
+    <question>Are you designing test cases and need to avoid missing an entire class of scenarios?</question>
+    <if_yes>Rotate through every adversarial perspective; each must contribute at least one check</if_yes>
+    <if_no>Use a single focused pattern (arrange-act-assert) for a known, isolated scenario</if_no>
+  </decision_tree>
+  <example>
+    <note>V1 naive user: intuitive misuse, unexpected operation order</note>
+    <note>V2 heavy user: rapid, bulk, or sustained input; behavior under load</note>
+    <note>V3 adversarial input: boundary values, invalid values, out-of-permission operations, injection</note>
+    <note>V4 integrity auditor: verify persisted state directly, not the return value or UI alone</note>
+    <note>V5 compatibility/migration: existing data, legacy formats, missing or malformed data</note>
+    <note>V6 regression sentinel: side effects on neighboring features; existing behavior preserved</note>
+    <note>V7 spec skeptic: divergence from the primary source (requirements, spec, source code)</note>
+  </example>
+  <note>Rule: each perspective leaves at least one confirmation point; never trust "it should work"</note>
+  <use_case>Test-case design reviews, coverage-gap detection, exhaustive scenario enumeration</use_case>
+</pattern>
+
 </patterns>
 
 <best_practices>
@@ -277,6 +302,19 @@ version: 2.0.0
     <description>Verify error handling paths work correctly</description>
     <example>
       Invalid inputs, network failures, permission errors, timeout scenarios
+    </example>
+  </practice>
+
+  <practice priority="critical">
+    <name>Ground expected values in evidence</name>
+    <description>Base every expected value on a primary source (requirements, spec, or source code); when a value cannot be verified, mark it explicitly instead of guessing</description>
+    <example>
+      <note>Good: expectation traceable to its basis</note>
+      test_calculateTotal_appliesTenPercentDiscount_perSpecSection4
+
+      <note>Unverifiable: state it, do not fabricate</note>
+
+      expected total: unverified -- requires-analysis
     </example>
   </practice>
 
@@ -400,6 +438,16 @@ version: 2.0.0
   <avoid name="test_interdependence">
     <description>Tests that depend on execution order or shared state</description>
     <instead>Make each test independent with proper setup/teardown and isolated state. Each test should create its own test data.</instead>
+  </avoid>
+
+  <avoid name="fabricated_expectations">
+    <description>Filling in expected values by guessing when they cannot be verified against a source</description>
+    <instead>State unknowns explicitly (mark as unverified or requires-analysis) and cite the primary source for known expectations. Do not fabricate assertions to make a test look complete.</instead>
+  </avoid>
+
+  <avoid name="execution_over_design">
+    <description>Using AI merely to run tests while neglecting exhaustive test-case design and perspective coverage</description>
+    <instead>Use AI as a test designer first: enumerate scenarios across adversarial perspectives before execution. Design coverage, then run.</instead>
   </avoid>
 </anti_patterns>
 
