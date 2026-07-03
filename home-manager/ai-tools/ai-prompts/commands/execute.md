@@ -201,6 +201,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
       <tool>Serena edit_memory or write_memory</tool>
       <output>Memory entries updated with frontmatter (names listed), or explicit skip reason</output>
     </step>
+    <step order="3">
+      <action>Apply memory_staleness_verification (serena-usage skill) to memories loaded in the prepare phase (step 4): bump last-verified if still accurate, correct if partially outdated, or rename_memory with an -archived suffix if fully superseded. Do not read additional memories solely for this check.</action>
+      <tool>Serena edit_memory, rename_memory</tool>
+      <output>Verified/updated/archived memories noted, or "no memories read this task required verification"</output>
+    </step>
   </phase>
 </workflow>
 

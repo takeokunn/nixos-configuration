@@ -370,6 +370,11 @@ Conduct detailed requirements definition before implementation, clarifying techn
         Note: write_memory is Serena memory only — this does not violate the read-only file constraint.</action>
       <verification>Memory operation recorded in output, or "persist: no triggers matched — skip"</verification>
     </behavior>
+    <behavior id="DEF-B005" priority="high">
+      <trigger>After completing requirements definition</trigger>
+      <action>Apply memory_staleness_verification (serena-usage skill) to any memory read via read_memory during this task; bump last-verified, correct, or archive as appropriate. Skip if no memories were read.</action>
+      <verification>Staleness check outcome recorded in output, or "no memories read this task"</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="DEF-P001" priority="critical">

@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
 description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", or needs Serena MCP guidance. Provides Serena tool usage patterns and orchestration integration.
-version: 3.0.0
+version: 3.1.0
 ---
 
 <purpose>
@@ -189,7 +189,7 @@ version: 3.0.0
   </concept>
 
   <concept name="memory_naming">
-    <description>Consistent naming conventions for memory files</description>
+    <description>Consistent naming conventions for memory files. Names may include "/" to organize into subtopics (e.g., "codex/slash-command-mapping"); list_memories enumerates nested paths transparently.</description>
     <example>
       convention-{topic}     # Forward-looking project conventions (e.g., convention-nix-module-structure)
       decision-{topic}       # Architectural decision records (e.g., decision-use-home-manager)
@@ -197,6 +197,8 @@ version: 3.0.0
       {feature}-patterns     # Feature-specific reusable patterns
       {domain}-patterns      # Domain-specific patterns
       {project}-conventions  # (legacy) Project-wide conventions
+      global/{topic}         # Shared across all projects, not just the active one — use only when the
+                              # user explicitly instructs a memory to be project-independent (e.g., "global/nix/style-guide")
     </example>
   </concept>
 
@@ -430,7 +432,7 @@ last-verified: YYYY-MM
   </pattern>
 
   <pattern name="memory_lifecycle">
-    <description>Memory versioning, archival, and consolidation patterns</description>
+    <description>Memory versioning, archival, and consolidation patterns. Freshness is maintained by two complementary mechanisms: memory_staleness_verification runs lazily during normal task execution against only the memories that task happened to read, while the /remember command performs a full periodic sweep across the entire memory index.</description>
     <versioning>
       <convention>Use date suffix for major updates: {name}-YYYY-MM</convention>
       <example>claude-code-architecture-2026-01</example>
@@ -449,6 +451,29 @@ last-verified: YYYY-MM
         <note>Create: api-patterns with all three sections</note>
       </example>
     </consolidation>
+  </pattern>
+
+  <pattern name="memory_staleness_verification">
+    <description>Lightweight, opportunistic freshness check applied only to memories actually read during a task — the lazy complement to the full sweep performed by the standalone /remember command. Piggybacks on read_memory calls already mandated by SERENA-B002, so it adds no extra memory reads of its own.</description>
+    <trigger>A memory loaded via read_memory during this task was relied upon (its content informed a decision, an implementation choice, or an investigation finding)</trigger>
+    <staleness_signal>
+      <primary>Frontmatter last-verified field (see memory_content_format) — stale if more than 3 months old</primary>
+      <fallback>If frontmatter is absent, treat the memory as a stale candidate on this basis alone and add frontmatter when editing (see memory_content_format rules)</fallback>
+    </staleness_signal>
+    <action_by_outcome>
+      <outcome name="still_accurate">edit_memory to bump last-verified to the current YYYY-MM; add frontmatter first if it was missing</outcome>
+      <outcome name="partially_outdated">edit_memory to correct the stale section and bump last-verified</outcome>
+      <outcome name="fully_superseded">rename_memory with an "-archived" suffix; note the reason in output</outcome>
+    </action_by_outcome>
+    <scope_boundary>
+      <in_scope>Only memories the task already read for its own purposes</in_scope>
+      <out_of_scope>Proactively reading additional memories solely to check their freshness — that full-index sweep belongs to the /remember command, not to task execution</out_of_scope>
+    </scope_boundary>
+    <example>
+      <note>During implementation, read_memory "nix-conventions" returns content with last-verified: 2026-02 (5 months old, current date 2026-07)</note>
+      <note>Task confirms the described pattern still matches the codebase</note>
+      edit_memory "nix-conventions" needle="last-verified: 2026-02" repl="last-verified: 2026-07" mode="literal"
+    </example>
   </pattern>
 
   <decision_tree name="serena_code_operation">
@@ -595,6 +620,11 @@ last-verified: YYYY-MM
         only use write_memory for genuinely new memory topics</action>
       <verification>edit_memory used for existing topics; write_memory only for new ones</verification>
     </behavior>
+    <behavior id="SERENA-B009" priority="high">
+      <trigger>After relying on the content of a memory that was read via read_memory during this task</trigger>
+      <action>Follow memory_staleness_verification: check last-verified against a 3-month threshold; bump, correct, or archive as appropriate</action>
+      <verification>Staleness check outcome noted in output (verified / updated / archived / already fresh)</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="SERENA-P001" priority="critical">
@@ -636,6 +666,7 @@ last-verified: YYYY-MM
   <practice priority="high">Restrict searches by relative_path when scope is known to improve performance</practice>
   <practice priority="high">Use substring_matching for uncertain symbol names to broaden search results</practice>
   <practice priority="high">Record significant patterns with write_memory after discovery (SERENA-B005)</practice>
+  <practice priority="high">Verify freshness of memories read this task via memory_staleness_verification; bump last-verified, correct, or archive as needed (SERENA-B009)</practice>
   <practice priority="high">Use edit_memory for updating existing memories instead of delete and recreate</practice>
   <practice priority="high">Follow serena_first_tool_selection decision tree for consistent tool choices</practice>
   <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
@@ -690,6 +721,7 @@ last-verified: YYYY-MM
   <rule>Follow serena_first_tool_selection decision tree for tool choices</rule>
   <rule>Follow language_specific_symbol_operations for language-appropriate tools</rule>
   <rule>Follow memory_reading_by_task_type for prioritizing which memories to read</rule>
+  <rule>Follow memory_staleness_verification for memories read during a task; leave full-index sweeps to /remember</rule>
 </rules>
 
 <workflow>

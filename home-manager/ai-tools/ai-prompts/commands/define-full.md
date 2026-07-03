@@ -402,6 +402,11 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <action>Run the inherited terminal finalize gate (define-core#core_finalize) EXACTLY ONCE, evaluating the FINAL (regenerated) document — never the initial document. The CANONICAL trigger section is the final document's &lt;outstanding_issues&gt; element (not the &lt;self_feedback&gt;&lt;remaining_issues&gt; summary, which is non-authoritative); fire when it is non-empty (not "none"). Offer "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope". If the user picks "Resolve now", collect answers and patch the final document directly; do NOT trigger a second feedback/regenerate cycle (preserves DEFF-P004 maximum-one-iteration).</action>
       <verification>Finalize gate appears once at the end of output when final outstanding issues >= 1; no second regeneration cycle is run</verification>
     </behavior>
+    <behavior id="DEFF-B008" priority="high">
+      <trigger>After completing each requirements definition cycle (including regeneration cycles)</trigger>
+      <action>Apply memory_staleness_verification (serena-usage skill) to any memory read via read_memory during this cycle; bump last-verified, correct, or archive as appropriate. Skip if no memories were read.</action>
+      <verification>Staleness check outcome recorded in output, or "no memories read this cycle"</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="DEFF-P001" priority="critical">

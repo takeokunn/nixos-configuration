@@ -335,13 +335,15 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
       For branch isolation use git worktree add. Follow core-patterns#parallel_project_isolation.</constraint>
   </agent>
   <agent name="memory" subagent_type="general-purpose" readonly="false">
-    <role>Capture significant architectural decisions and novel patterns to persistent memory</role>
-    <receives>implementation_summary, novel_patterns[], architectural_decisions[]</receives>
-    <produces>memory_entries_created[], memory_paths[]</produces>
-    <done_when>All non-obvious decisions and patterns captured; memory entries verified writable</done_when>
+    <role>Capture significant architectural decisions and novel patterns to persistent memory; verify freshness of memories consulted during this task</role>
+    <receives>implementation_summary, novel_patterns[], architectural_decisions[], memories_read_this_task[]</receives>
+    <produces>memory_entries_created[], memory_paths[], memories_verified[]</produces>
+    <done_when>All non-obvious decisions and patterns captured; memory entries verified writable; memories_read_this_task checked for staleness</done_when>
     <constraint>For each write_memory call: prepend memory_content_format frontmatter (serena-usage skill)
       with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
-      For edit_memory on a memory lacking frontmatter: add it, updating last-verified.</constraint>
+      For edit_memory on a memory lacking frontmatter: add it, updating last-verified.
+      Apply memory_staleness_verification (serena-usage skill) to memories_read_this_task: bump last-verified
+      if still accurate, correct if partially outdated, or rename_memory with an -archived suffix if superseded.</constraint>
   </agent>
   <agent name="validator" subagent_type="validator" readonly="true">
     <role>Cross-validate findings from multiple agents to detect contradictions and confirm consensus</role>

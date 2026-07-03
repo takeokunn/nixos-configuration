@@ -126,6 +126,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <tool>Serena list_memories, then edit_memory or write_memory (see serena-usage#memory_content_format)</tool>
       <output>Memory entries updated with frontmatter and topic names, or explicit skip reason</output>
     </step>
+    <step order="4">
+      <action>Apply memory_staleness_verification (serena-usage skill) to every memory this task read via read_memory (step 4 of task_analysis): if last-verified is more than 3 months old (or frontmatter is absent), verify its content against what this task actually observed; bump last-verified, correct, or archive with rename_memory as appropriate. Skip memories that were not read this task — full-index sweeps belong to /remember.</action>
+      <tool>Serena edit_memory, rename_memory (see serena-usage#memory_staleness_verification)</tool>
+      <output>Verified/updated/archived memories noted in output, or "no memories read this task required verification"</output>
+    </step>
   </phase>
   <reflection_checkpoint id="completion_validation" after="consolidation">
   </reflection_checkpoint>
@@ -182,7 +187,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="requirements-definition">Requirements specification methodology</skill>
     <skill name="testing-patterns">Test strategy and patterns</skill>
     <skill name="technical-documentation">README, API docs, design docs, user guides</skill>
-    <skill name="technical-writing">Technical blogs and articles</skill>
+    <skill name="technical-writing">Technical blogs and articles; canonical Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance)</skill>
   </category>
   <category name="ecosystem">
     <skill name="nix-ecosystem">Nix language, flakes, and Home Manager patterns</skill>
@@ -274,6 +279,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <trigger>When a significant insight, pattern, convention, or architectural decision is discovered — at any point during execution, not only at task end</trigger>
       <action>Immediately call list_memories to check for an existing entry on the topic, then edit_memory (existing) or write_memory (new) to persist it. Do not defer to the consolidation phase.</action>
       <verification>Memory write or edit recorded in output at the point of discovery</verification>
+    </behavior>
+    <behavior id="ORCH-B005" priority="high">
+      <trigger>Consolidation phase, step 4</trigger>
+      <action>Apply memory_staleness_verification (serena-usage skill) to memories read this task; do not proactively read additional memories just to check freshness</action>
+      <verification>Staleness verification outcome recorded in consolidation output</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>

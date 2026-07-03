@@ -1,7 +1,7 @@
 ---
 name: Technical Documentation
 description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Provides comprehensive documentation patterns for developers, teams, and end-users in both English and Japanese.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -515,7 +515,7 @@ version: 2.0.0
   <skill name="serena-usage">Symbol operations for extracting code examples and API signatures</skill>
   <skill name="context7-usage">Library documentation lookup for accurate API references</skill>
   <skill name="investigation-patterns">Analyzing codebases to understand features for documentation</skill>
-  <skill name="technical-writing">Creating blog posts and tutorials from documentation</skill>
+  <skill name="technical-writing">Creating blog posts and tutorials from documentation; also the canonical source for Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance, dramatization restraint, redundancy) — apply its `&lt;japanese&gt;&lt;prose_norms&gt;` when writing Japanese documentation</skill>
 </related_skills>
 
 <related_agents>

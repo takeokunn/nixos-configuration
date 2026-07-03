@@ -130,11 +130,17 @@ Review the user's memory landscape across all layers (CLAUDE.md, CLAUDE.local.md
       <output>Conflicting entries with resolution proposals</output>
     </step>
     <step order="4">
-      <action>Identify potentially stale Serena memories: check filename date suffix (YYYY-MM pattern);
-        flag entries older than 3 months as stale candidates. For each candidate, verify whether
-        the referenced code, pattern, or context still exists in the current codebase.
-        Propose one of: re-verify (still valid), update (partially outdated), or archive (rename with -archived suffix).</action>
-      <tool>Date analysis, codebase verification</tool>
+      <action>Identify potentially stale Serena memories: for each memory, prefer its frontmatter
+        last-verified field (see serena-usage#memory_content_format) as the freshness signal;
+        flag as a stale candidate if last-verified is more than 3 months old.
+        For memories with no frontmatter, fall back to the underlying file's mtime (via a read-only
+        filesystem check on .serena/memories/) as the freshness signal instead of parsing the filename —
+        filename date suffixes (YYYY-MM) are a naming convention, not a reliability guarantee, and many
+        legacy memories carry no date suffix at all. For each stale candidate, verify whether the
+        referenced code, pattern, or context still exists in the current codebase.
+        Propose one of: re-verify (still valid — bump last-verified, adding frontmatter if absent),
+        update (partially outdated), or archive (rename with -archived suffix).</action>
+      <tool>Frontmatter analysis (last-verified), file mtime fallback, codebase verification</tool>
       <output>Stale memory candidates with freshness status and proposed action for each</output>
     </step>
   </phase>
