@@ -7,7 +7,7 @@
 * early-init.el
 ** Header
 #+begin_src emacs-lisp :tangle yes
-  ;; early-init.el --- My early-init.el -*- lexical-binding: t -*-
+  ;; early-init.el --- My early-init.el -*- lexical-binding: t; -*-
 #+end_src
 ** 自動的なpackageのロードを無効にする
 #+begin_src emacs-lisp :tangle yes

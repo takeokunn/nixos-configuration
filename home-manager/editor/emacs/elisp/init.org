@@ -26,7 +26,7 @@
 :CUSTOM_ID: header
 :END:
 #+begin_src emacs-lisp :tangle yes
-  ;; init.el --- My init.el -*- lexical-binding: t -*-
+  ;; init.el --- My init.el -*- lexical-binding: t; -*-
   ;; Configurations for Emacs
   ;;                                         Takeo Obara  <bararararatty@gmail.com>
 #+end_src
@@ -1942,10 +1942,12 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     ;; extensions
     (require 'corfu-popupinfo)
     (require 'corfu-history)
-    (require 'corfu-terminal)
     (corfu-popupinfo-mode 1)
     (corfu-history-mode 1)
-    (corfu-terminal-mode 1))
+
+    (when (< emacs-major-version 31)
+      (require 'corfu-terminal)
+      (corfu-terminal-mode 1)))
 
   (with-eval-after-load 'savehist
     (add-to-list 'savehist-additional-variables 'corfu-history))
@@ -3512,7 +3514,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt recentf-max-menu-items 10000)
     (setopt recentf-max-saved-items 10000)
     (setopt recentf-save-file  "~/.emacs.d/.recentf")
-    (setopt recentf-exclude '(".recentf" "\\.gpg\\")))
+    (setopt recentf-exclude
+            (list (regexp-quote (expand-file-name ".recentf" user-emacs-directory))
+                  "\\.gpg\\'")))
 #+END_SRC
 ** open-junk-file
 :PROPERTIES:
