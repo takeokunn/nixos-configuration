@@ -2,10 +2,10 @@
   programs.fzf.enable = true;
   programs.fzf.tmux.enableShellIntegration = true;
   programs.fzf.defaultCommand = "fd --type f --hidden --exclude .git";
-  programs.fzf.fileWidgetCommand = "fd --type f --hidden --exclude .git";
-  programs.fzf.changeDirWidgetCommand = "fd --type d --hidden --exclude .git";
-  programs.fzf.fileWidgetOptions = [ "--preview 'bat --color=always --style=plain {}'" ];
-  programs.fzf.changeDirWidgetOptions = [ "--preview 'eza --tree --level=2 --color=always {}'" ];
+  programs.fzf.fileWidget.command = "fd --type f --hidden --exclude .git";
+  programs.fzf.changeDirWidget.command = "fd --type d --hidden --exclude .git";
+  programs.fzf.fileWidget.options = [ "--preview 'bat --color=always --style=plain {}'" ];
+  programs.fzf.changeDirWidget.options = [ "--preview 'eza --tree --level=2 --color=always {}'" ];
   programs.fzf.defaultOptions = [ "--highlight-line" ];
   programs.fzf.colors = {
     fg = "#f8f8f2";

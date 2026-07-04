@@ -149,6 +149,46 @@ let
     fi
   '';
 
+  # Sleep-prevention (caffeinate) state file, shared by both scripts below.
+  # PID-file (not `pgrep -f caffeinate`) so a user-launched caffeinate elsewhere is never
+  # touched by the toggle. Session-scoped: doesn't survive logout/reboot, by design (no sudo).
+  caffeinatePidfile = "$HOME/.cache/sketchybar_caffeinate.pid";
+
+  # Sleep-prevention display plugin script (reflects the actual caffeinate process state).
+  # Only trusts the pidfile if that PID is still actually a caffeinate process, since PIDs
+  # get reused by macOS and a stale entry could otherwise point at an unrelated process.
+  sleepPreventPlugin = pkgs.writeShellScript "sleep_prevent.sh" ''
+    PIDFILE="${caffeinatePidfile}"
+
+    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "caffeinate" ]; then
+      sketchybar --set "$NAME" icon.color=${colors.orange}
+    else
+      sketchybar --set "$NAME" icon.color=${colors.comment}
+    fi
+  '';
+
+  # Sleep-prevention toggle click script: starts/stops a detached caffeinate process (no sudo)
+  sleepPreventTogglePlugin = pkgs.writeShellScript "sleep_prevent_toggle.sh" ''
+    PIDFILE="${caffeinatePidfile}"
+    LOCKDIR="$PIDFILE.lock"
+    mkdir -p "$(dirname "$PIDFILE")"
+
+    # Guard against a rapid double-click racing two toggles and orphaning a caffeinate process
+    mkdir "$LOCKDIR" 2>/dev/null || exit 0
+    trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
+
+    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "caffeinate" ]; then
+      kill "$(cat "$PIDFILE")" 2>/dev/null
+      rm -f "$PIDFILE"
+    else
+      nohup caffeinate -d -i -s >/dev/null 2>&1 &
+      disown
+      echo "$!" > "$PIDFILE"
+    fi
+
+    sketchybar --update
+  '';
+
   # Main configuration
   sketchybarConfig = ''
     #!/bin/bash
@@ -220,10 +260,7 @@ let
                       icon.color="$PURPLE" \
                       icon.padding_left=8 \
                       icon.padding_right=8 \
-                      background.color="$CURRENT_LINE" \
-                      background.corner_radius=8 \
-                      background.height=28 \
-                      background.padding_right=4 \
+                      background.color="$TRANSPARENT" \
                       click_script="sketchybar --update"
 
     # Aerospace Workspaces
@@ -306,6 +343,19 @@ let
                       icon.color="$GREEN" \
                       label.drawing=off
 
+    # Sleep prevention toggle (caffeinate, no sudo required; update_freq=5 since it's a cheap
+    # kill -0 check, not a heavier poll like the 1s-interval items below). Icon-only (no label,
+    # matching power_icon) to keep the right-side item group narrow enough to clear the notch.
+    sketchybar --add item sleep_prevent right \
+                --set sleep_prevent \
+                      icon=󰅶 \
+                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.color="$COMMENT" \
+                      label.drawing=off \
+                      update_freq=5 \
+                      script="${sleepPreventPlugin}" \
+                      click_script="${sleepPreventTogglePlugin}"
+
     # Separator
     sketchybar --add item separator_power right \
                 --set separator_power \
@@ -385,7 +435,7 @@ let
                       background.height=32
 
     # Power bracket
-    sketchybar --add bracket power_bracket power_icon battery \
+    sketchybar --add bracket power_bracket power_icon battery sleep_prevent \
                 --set power_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \

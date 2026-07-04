@@ -31,115 +31,240 @@ let
       emacsclient = "${emacsPkg}/bin/emacsclient";
       kitty = "${pkgs.kitty}/bin/kitty";
       jq = "${pkgs.jq}/bin/jq";
+      emacsclientTerminal = pkgs.writeShellScript "emacs-scratchpad-emacsclient" ''
+        EMACSCLIENT="${emacsclient}"
+        SOCKET="${socketPath}"
+        TIMEOUT="${pkgs.coreutils}/bin/timeout"
+
+        emacs_ready() {
+          "$TIMEOUT" 1 "$EMACSCLIENT" -s "$SOCKET" -e '(emacs-pid)' >/dev/null 2>&1
+        }
+
+        start_emacs_service() {
+          ${
+            if pkgs.stdenv.isDarwin then
+              ''
+                /bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1 || true
+              ''
+            else
+              ''
+                ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
+              ''
+          }
+        }
+
+        if ! emacs_ready; then
+          start_emacs_service
+        fi
+
+        i=0
+        while [ "$i" -lt 100 ]; do
+          if emacs_ready; then
+            exec "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)"
+          fi
+          i=$((i + 1))
+          sleep 0.1
+        done
+
+        printf '%s\n' "emacs daemon did not become ready for $SOCKET" >&2
+        exit 1
+      '';
 
       aerospaceScript = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-        APP_TITLE=${appId}
+        APP_TITLE="${appId}"
         AEROSPACE="/run/current-system/sw/bin/aerospace"
         JQ="${jq}"
         KITTY="${kitty}"
-        EMACSCLIENT="${emacsclient}"
-        SOCKET="${socketPath}"
+        LOCK_DIR="''${TMPDIR:-/tmp}/emacs-scratchpad-$APP_TITLE.lock"
 
-        # Get target window ID by title
-        TARGET_ID=$("$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
-          .[] | select(.["window-title"] | contains($title)) | .["window-id"]
-        ' | head -n1)
+        window_id_by_title() {
+          "$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
+            first(.[] | select((.["window-title"] // "") | contains($title)) | .["window-id"]) // empty
+          '
+        }
 
-        if [ -z "$TARGET_ID" ]; then
-          # No window exists - spawn new TUI Emacs in Kitty
-          # Use -o term=xterm-256color because Emacs daemon doesn't have kitty's terminfo
-          "$KITTY" \
-            --single-instance=no \
-            -o close_on_child_death=yes \
-            -o macos_quit_when_last_window_closed=yes \
-            -o term=xterm-256color \
-            -o focus_reporting_protocol=none \
-            -o remember_window_size=no \
-            -o initial_window_width=${toString windowWidth} \
-            -o initial_window_height=${toString windowHeight} \
-            -T "$APP_TITLE" \
-            -- "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)" &
+        focused_window_id() {
+          "$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // empty'
+        }
 
-          # Wait for window and center it using NSScreen.visibleFrame for accurate positioning
-          sleep 0.5
-          WIN_W=${toString windowWidth}
-          WIN_H=${toString windowHeight}
-          APP_ID_FOR_SCRIPT="${appId}"
-          osascript <<APPLESCRIPT
-        use framework "AppKit"
-        use scripting additions
+        start_emacs_service() {
+          /bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1 || true
+        }
 
-        set mainScreen to current application's NSScreen's mainScreen()
-        set visFrame to mainScreen's visibleFrame()
-        set fullFrame to mainScreen's frame()
+        acquire_lock() {
+          if mkdir "$LOCK_DIR" 2>/dev/null; then
+            printf '%s\n' "$$" > "$LOCK_DIR/pid"
+            return 0
+          fi
 
-        set visOrigin to item 1 of visFrame
-        set visSize to item 2 of visFrame
-        set fullSize to item 2 of fullFrame
+          local old_pid
+          if [ -r "$LOCK_DIR/pid" ]; then
+            old_pid="$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)"
+            if [ -n "$old_pid" ] && ! kill -0 "$old_pid" 2>/dev/null; then
+              /bin/rm -f "$LOCK_DIR/pid"
+              rmdir "$LOCK_DIR" 2>/dev/null || true
+              if mkdir "$LOCK_DIR" 2>/dev/null; then
+                printf '%s\n' "$$" > "$LOCK_DIR/pid"
+                return 0
+              fi
+            fi
+          fi
 
-        set screenX to (item 1 of visOrigin) as integer
-        set screenW to (item 1 of visSize) as integer
-        set screenH to (item 2 of visSize) as integer
-        set fullH to (item 2 of fullSize) as integer
+          return 1
+        }
 
-        -- Convert from NSScreen coords (bottom-left origin) to window coords (top-left origin)
-        set screenY to (fullH - (item 2 of visOrigin) - screenH) as integer
+        release_lock() {
+          if [ -f "$LOCK_DIR/pid" ] && [ "$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
+            /bin/rm -f "$LOCK_DIR/pid"
+            rmdir "$LOCK_DIR" 2>/dev/null || true
+          fi
+        }
 
-        set winW to $WIN_W
-        set winH to $WIN_H
-        set posX to screenX + ((screenW - winW) / 2) as integer
-        set posY to screenY + ((screenH - winH) / 2) as integer
+        focus_existing_window() {
+          local i=0
+          while [ "$i" -lt 100 ]; do
+            TARGET_ID="$(window_id_by_title)"
+            if [ -n "$TARGET_ID" ]; then
+              "$AEROSPACE" focus --window-id "$TARGET_ID"
+              return 0
+            fi
+            i=$((i + 1))
+            sleep 0.1
+          done
 
-        tell application "System Events"
-            tell process "kitty"
-                repeat with w in windows
-                    if name of w contains "$APP_ID_FOR_SCRIPT" then
-                        set position of w to {posX, posY}
-                        set size of w to {winW, winH}
-                        exit repeat
-                    end if
-                end repeat
-            end tell
-        end tell
-        APPLESCRIPT
-        else
-          # Get currently focused window ID
-          FOCUSED_ID=$("$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // ""')
+          return 1
+        }
 
-          if [ "$FOCUSED_ID" = "$TARGET_ID" ]; then
-            # Already focused - switch to previous window
+        focus_or_toggle_window() {
+          local target_id="$1"
+          local focused_id
+          focused_id="$(focused_window_id)"
+
+          if [ -n "$focused_id" ] && [ "$focused_id" = "$target_id" ]; then
             "$AEROSPACE" focus-back-and-forth
           else
-            # Not focused - bring to focus
-            "$AEROSPACE" focus --window-id "$TARGET_ID"
+            "$AEROSPACE" focus --window-id "$target_id"
           fi
+        }
+
+        TARGET_ID="$(window_id_by_title)"
+
+        if [ -n "$TARGET_ID" ]; then
+          focus_or_toggle_window "$TARGET_ID"
+          exit 0
         fi
+
+        if ! acquire_lock; then
+          exit 0
+        fi
+        trap 'release_lock' EXIT INT TERM
+
+        TARGET_ID="$(window_id_by_title)"
+        if [ -n "$TARGET_ID" ]; then
+          focus_or_toggle_window "$TARGET_ID"
+          exit 0
+        fi
+
+        start_emacs_service
+
+        # Keep hotkey startup on AeroSpace/kitty/emacsclient only. AppleScript/System Events
+        # adds a fixed delay and can race with Accessibility permissions during login.
+        "$KITTY" \
+          --single-instance=no \
+          -o close_on_child_death=yes \
+          -o macos_quit_when_last_window_closed=yes \
+          -o term=xterm-256color \
+          -o focus_reporting_protocol=none \
+          -o remember_window_size=no \
+          -o initial_window_width=${toString windowWidth} \
+          -o initial_window_height=${toString windowHeight} \
+          -T "$APP_TITLE" \
+          -- ${emacsclientTerminal} &
+
+        focus_existing_window
       '';
 
       niriScript = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-        APP_ID=${appId}
+        APP_ID="${appId}"
+        LOCK_DIR="''${XDG_RUNTIME_DIR:-/tmp}/emacs-scratchpad-$APP_ID.lock"
 
-        # Get window info in single IPC call
-        window_data=$(${pkgs.niri}/bin/niri msg -j windows | ${jq} -r --arg id "$APP_ID" '
-          .[] | select(.app_id == $id) | "\(.id) \(.is_focused)"
-        ')
+        window_data() {
+          ${pkgs.niri}/bin/niri msg -j windows | ${jq} -r --arg id "$APP_ID" '
+            first(.[] | select(.app_id == $id) | "\(.id) \(.is_focused)") // empty
+          '
+        }
 
-        if [ -z "$window_data" ]; then
-          # No window exists - spawn new TUI Emacs in Kitty (centered, compact size)
-          XMODIFIERS=@im= ${kitty} --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e ${emacsclient} -s "${socketPath}" -t -e '(my/scratchpad-init)' &
-          sleep 0.3
-          # Center the newly created floating window
-          ${pkgs.niri}/bin/niri msg action center-window
-        else
-          # Parse window data
-          window_id=$(echo "$window_data" | cut -d' ' -f1)
-          is_focused=$(echo "$window_data" | cut -d' ' -f2)
+        start_emacs_service() {
+          ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
+        }
+
+        acquire_lock() {
+          if mkdir "$LOCK_DIR" 2>/dev/null; then
+            printf '%s\n' "$$" > "$LOCK_DIR/pid"
+            return 0
+          fi
+
+          local old_pid
+          if [ -r "$LOCK_DIR/pid" ]; then
+            old_pid="$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)"
+            if [ -n "$old_pid" ] && ! kill -0 "$old_pid" 2>/dev/null; then
+              /bin/rm -f "$LOCK_DIR/pid"
+              rmdir "$LOCK_DIR" 2>/dev/null || true
+              if mkdir "$LOCK_DIR" 2>/dev/null; then
+                printf '%s\n' "$$" > "$LOCK_DIR/pid"
+                return 0
+              fi
+            fi
+          fi
+
+          return 1
+        }
+
+        release_lock() {
+          if [ -f "$LOCK_DIR/pid" ] && [ "$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
+            /bin/rm -f "$LOCK_DIR/pid"
+            rmdir "$LOCK_DIR" 2>/dev/null || true
+          fi
+        }
+
+        center_new_window() {
+          local i=0
+          while [ "$i" -lt 100 ]; do
+            window_data_value="$(window_data)"
+            if [ -n "$window_data_value" ]; then
+              ${pkgs.niri}/bin/niri msg action center-window
+              return 0
+            fi
+            i=$((i + 1))
+            sleep 0.1
+          done
+
+          return 1
+        }
+
+        window_data_value="$(window_data)"
+
+        if [ -z "$window_data_value" ]; then
+          if ! acquire_lock; then
+            exit 0
+          fi
+          trap 'release_lock' EXIT INT TERM
+
+          window_data_value="$(window_data)"
+          if [ -z "$window_data_value" ]; then
+            start_emacs_service
+            XMODIFIERS=@im= ${kitty} --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e ${emacsclientTerminal} &
+            center_new_window
+          fi
+        fi
+
+        if [ -n "$window_data_value" ]; then
+          window_id="''${window_data_value%% *}"
+          is_focused="''${window_data_value#* }"
 
           if [ "$is_focused" = "true" ]; then
-            # Focused - switch to previous window (pseudo-hide)
             ${pkgs.niri}/bin/niri msg action focus-window-previous
           else
-            # Not focused - bring to focus
             ${pkgs.niri}/bin/niri msg action focus-window --id "$window_id"
           fi
         fi
