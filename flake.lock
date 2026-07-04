@@ -464,6 +464,27 @@
         "type": "indirect"
       }
     },
+    "git-bulk-clean": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783184238,
+        "narHash": "sha256-fONQE4zeV2dJg8s95lqWsZgTdY2/3qbyhBmHbYIFdhc=",
+        "owner": "takeokunn",
+        "repo": "git-bulk-clean",
+        "rev": "42db95de03e32d3d155001778cbffa990eb44331",
+        "type": "github"
+      },
+      "original": {
+        "owner": "takeokunn",
+        "ref": "v0.3.0",
+        "repo": "git-bulk-clean",
+        "type": "github"
+      }
+    },
     "hashicorp-agent-skills": {
       "flake": false,
       "locked": {
@@ -1028,17 +1049,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1783158805,
-        "narHash": "sha256-ox1VtubwSA+XH04jVLKGS+VjRvk9BBmfq+eoihP8KIE=",
-        "owner": "takeokunn",
-        "repo": "nur-packages",
-        "rev": "c590c11fd6aee0f9710b2d276fecb0654588b6f1",
-        "type": "github"
+        "lastModified": 1783184785,
+        "narHash": "sha256-LEMzeISukiUO+PZDstHeb9mc2NCnPtpkrCAKFZ18a3I=",
+        "path": "/Users/take/ghq/github.com/takeokunn/nur-packages",
+        "type": "path"
       },
       "original": {
-        "owner": "takeokunn",
-        "repo": "nur-packages",
-        "type": "github"
+        "path": "/Users/take/ghq/github.com/takeokunn/nur-packages",
+        "type": "path"
       }
     },
     "org-babel": {
@@ -1070,6 +1088,7 @@
         "emacs-overlay": "emacs-overlay",
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
+        "git-bulk-clean": "git-bulk-clean",
         "hashicorp-agent-skills": "hashicorp-agent-skills",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
