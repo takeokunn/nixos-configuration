@@ -62,7 +62,7 @@
     zen-browser.inputs.home-manager.follows = "home-manager";
     firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
     firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
-    nur-packages.url = "path:/Users/take/ghq/github.com/takeokunn/nur-packages";
+    nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
     darwin-vz-nix.inputs.nixpkgs.follows = "nixpkgs";

@@ -1049,14 +1049,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1783184785,
-        "narHash": "sha256-LEMzeISukiUO+PZDstHeb9mc2NCnPtpkrCAKFZ18a3I=",
-        "path": "/Users/take/ghq/github.com/takeokunn/nur-packages",
-        "type": "path"
+        "lastModified": 1783185158,
+        "narHash": "sha256-JtLTvmfAlqSVrPtaA2pkU636/rV8EcV3enjkI+lr4BM=",
+        "owner": "takeokunn",
+        "repo": "nur-packages",
+        "rev": "fb285c34dd37b0304ef676e763ffeb3094b09f7e",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/take/ghq/github.com/takeokunn/nur-packages",
-        "type": "path"
+        "owner": "takeokunn",
+        "repo": "nur-packages",
+        "type": "github"
       }
     },
     "org-babel": {
