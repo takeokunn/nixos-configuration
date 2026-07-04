@@ -6,5 +6,5 @@ in
   ./modules/doggo
   ./modules/lnav
   cargo
-  { home.packages = [ nurPkgs.devenv ]; }
+  { home.packages = [ nurPkgs.devenv nurPkgs.kuro ]; }
 ]

@@ -67,6 +67,14 @@ nix-darwin.lib.darwinSystem {
         mac-app-util.homeManagerModules.default
         # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
         inputs.agent-skills.homeManagerModules.default
+        inputs.git-bulk-clean.homeManagerModules.default
+        {
+          # Keep the git-bulk-clean clone lean via a background launchd agent.
+          services.git-maintenance = {
+            enable = true;
+            repositories = [ "/Users/${username}/ghq/github.com/takeokunn/git-bulk-clean" ];
+          };
+        }
       ];
       home-manager.extraSpecialArgs = {
         inherit inputs system username;
