@@ -1,12 +1,12 @@
 { pkgs, ... }:
 {
-  # Match the guest's Nix version (nixpkgs-linux, also unstable) so the
-  # ssh-ng distributed-build protocol between this host's nix-daemon and
-  # the darwin-vz-nix builder doesn't hit a client/server mismatch.
-  # nix-darwin's own default nix.package lags noticeably behind nixpkgs
-  # (2.30.2 vs. this flake's pinned 2.34.7), and that gap made every
-  # remote build fail immediately with "interrupted by the user" on the
-  # guest's nix-daemon.
+  # Pin the host nix-daemon to this flake's nixpkgs `nix` so the host and the
+  # darwin-vz-nix guest — a tightly-coupled ssh-ng distributed-build pair —
+  # run the same Nix version, giving consistent protocol and tooling and
+  # closing nix-darwin's default-package version lag. (This is version
+  # alignment for its own sake; it was NOT the fix for the distributed-build
+  # failures — that root cause was the guest `builder` user being in the
+  # `nixbld` group, fixed in darwin-vz-nix itself.)
   nix.package = pkgs.nix;
 
   nix.optimise.automatic = true;
