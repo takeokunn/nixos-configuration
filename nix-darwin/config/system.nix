@@ -27,6 +27,19 @@
     };
   };
 
+  # Disabled: nix-darwin's manual-html build invokes nixos-render-docs with the
+  # removed --toc-depth flag (nixpkgs replaced it with --sidebar-depth), so the
+  # HTML manual derivation fails on current nixpkgs-unstable. man/info pages are
+  # unaffected since they're gated by separate options.
+  documentation.doc.enable = false;
+
+  # darwin-uninstaller evaluates its own bare-defaults system (independent of
+  # this config, so it can still run if the config is broken) to embed for
+  # rollback. That bare eval defaults documentation.doc.enable back to true,
+  # so it hits the same --toc-depth failure above regardless of the setting
+  # here. Disable the tool itself until nix-darwin fixes the manual builder.
+  system.tools.darwin-uninstaller.enable = false;
+
   time.timeZone = "Asia/Tokyo";
 
   power.restartAfterFreeze = true;

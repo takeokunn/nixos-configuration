@@ -4,7 +4,7 @@ let
   darwin-vz-pkgs = inputs.darwin-vz-nix.packages.${guestSystem};
 in
 {
-  services.darwin-vz.enable = true;
+  services.darwin-vz.enable = false;
   services.darwin-vz.cores = 14;
   services.darwin-vz.memory = 49152;
   services.darwin-vz.diskSize = "200G";
