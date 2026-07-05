@@ -1,4 +1,8 @@
-{ pkgs, emacsPkg, nurPkgs }:
+{
+  pkgs,
+  emacsPkg,
+  nurPkgs,
+}:
 let
   lib = pkgs.lib;
   isDarwin = pkgs.stdenv.isDarwin;
