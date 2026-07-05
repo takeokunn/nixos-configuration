@@ -21,6 +21,7 @@ let
   remote_access = import ./packages/remote_access { inherit nurPkgs; };
   themes = import ./packages/themes { inherit epkgs nurPkgs; };
   search = import ./packages/search { inherit epkgs; };
+  terminal = import ./packages/terminal { inherit nurPkgs; };
   tree-sitter = import ./packages/tree-sitter { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
 in
@@ -44,5 +45,6 @@ ai
 ++ remote_access
 ++ themes
 ++ search
+++ terminal
 ++ tree-sitter
 ++ window

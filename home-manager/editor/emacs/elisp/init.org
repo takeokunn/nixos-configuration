@@ -5636,6 +5636,20 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'elfeed-goodies
     (setopt elfeed-goodies/entry-pane-size 0.6))
 #+end_src
+* Terminal
+:PROPERTIES:
+:CUSTOM_ID: terminal
+:END:
+** kuro
+:PROPERTIES:
+:CUSTOM_ID: kuro
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(kuro-create kuro-list-sessions kuro-attach kuro-kill) "kuro" nil t)
+
+  (keymap-global-set "C-c t" #'kuro-create)
+  (keymap-global-set "C-c T" #'kuro-list-sessions)
+#+end_src
 * Eshell
 :PROPERTIES:
 :CUSTOM_ID: eshell

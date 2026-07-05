@@ -1,4 +1,4 @@
-{ pkgs, emacsPkg }:
+{ pkgs, emacsPkg, nurPkgs }:
 let
   lib = pkgs.lib;
   isDarwin = pkgs.stdenv.isDarwin;
@@ -135,6 +135,26 @@ in
   # measured idle usage -- ample headroom without an enormous soft rlimit.
   launchd.agents.emacs.config.SoftResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
   launchd.agents.emacs.config.HardResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
+
+  # Install the Nix-built kuro native module into kuro-module.el's XDG default
+  # location (~/.local/share/kuro/). kuro-module.el validates the module file
+  # itself: it must be mode 0600, a single hard link, and not a symlink -- a
+  # raw /nix/store path fails all three (store files are read-only, often
+  # hardlink-deduplicated, and this activation would symlink rather than
+  # copy). A real copy with `install -m 600` is the only way to satisfy that
+  # check, which is also exactly the layout upstream's own installer produces.
+  home.activation.installKuroModule =
+    let
+      libName = if pkgs.stdenv.isDarwin then "libkuro_core.dylib" else "libkuro_core.so";
+    in
+    {
+      after = [ "writeBoundary" ];
+      before = [ ];
+      data = ''
+        run mkdir -p "$HOME/.local/share/kuro"
+        run install -m 600 "${nurPkgs.kuro}/lib/${libName}" "$HOME/.local/share/kuro/${libName}"
+      '';
+    };
 
   # macOS: Gracefully stop Emacs before setupLaunchAgents to prevent I/O error 5
   # (upstream bootoutAgent sleeps only 1s, insufficient for Emacs shutdown)

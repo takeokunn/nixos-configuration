@@ -15,7 +15,7 @@ let
       org-babel
       ;
   };
-  emacs-service = import ./emacs-service { inherit pkgs emacsPkg; };
+  emacs-service = import ./emacs-service { inherit pkgs emacsPkg nurPkgs; };
   copilot-language-server = import ./copilot-language-server { inherit llmAgentsPkgs; };
 in
 [
