@@ -169,11 +169,11 @@
     "context7-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1783412800,
-        "narHash": "sha256-9Hkb67/uuWWYWQpdvEt4nqfW5O1sEnEtUWOHzFGDnSY=",
+        "lastModified": 1783420215,
+        "narHash": "sha256-K/NqThnxK+DJZUGDa3P2eSfqNyiU8eXOJffvRsHC5nI=",
         "owner": "upstash",
         "repo": "context7",
-        "rev": "7366cca8d279cb47f42a413f876d1625fffe46e7",
+        "rev": "503abf87743abf6bb2fa6de3228ce81dc43c9953",
         "type": "github"
       },
       "original": {
@@ -296,11 +296,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783395319,
-        "narHash": "sha256-L9nucc6xpvFUZO0LI74Ru303ajfXW/KjfEF36w4WJ+U=",
+        "lastModified": 1783450103,
+        "narHash": "sha256-NbkQzAcS2DAHfhcgpEVbbNsKFFe2tF8NwwjzJ/3fVyw=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "c51e9cef5ddf3a439d0ac7f8b026cf3e5d3d26a7",
+        "rev": "d3ec864c649dc93b29a3cf04b10c1772fccb2c43",
         "type": "github"
       },
       "original": {
@@ -508,11 +508,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783388784,
-        "narHash": "sha256-w+YU5vatysjLZIg1wOKSzo/RL9Z66eBQuIjVnBM/1Zg=",
+        "lastModified": 1783436070,
+        "narHash": "sha256-F80z1JoiJgZyTT5D+3siLOVzqmCEphLR7t0Ym/I2CLI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "63d02d1c19f1c2b47a5bc7e55c620b6af7b218a6",
+        "rev": "f09af49406ffad37acb6538d3207189a1a1e0b7e",
         "type": "github"
       },
       "original": {
@@ -558,11 +558,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783411742,
-        "narHash": "sha256-orlNeEeHs3J7DpsDr5AaQ9NuHIBk7V1BnhmKarPXE2k=",
+        "lastModified": 1783455701,
+        "narHash": "sha256-aOd1t0GTj7w2zF1lC+3lOZNbZyFBI8v9TwLvyHv6H+g=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "57fba3d92024204e49b3724fd69c026a8f56e3a7",
+        "rev": "caf06e6b47db79541bbb8c2be9322d603576dbeb",
         "type": "github"
       },
       "original": {
@@ -617,11 +617,11 @@
     "microsoft-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1783355216,
-        "narHash": "sha256-qls5rtikpOS0rgloCw/BvPYjttnacf6UlKBwrh2P0/4=",
+        "lastModified": 1783443148,
+        "narHash": "sha256-MEvnsfm32Yt1LfAhqZ2GN6QEJXb0bn4MjCbNh7esb4g=",
         "owner": "microsoft",
         "repo": "skills",
-        "rev": "079ddaabb53a3f6b6d622bfb02d2e1497f85883e",
+        "rev": "5d928f2cc2c62b890eed8656458069fd1ef3cc9b",
         "type": "github"
       },
       "original": {
@@ -1049,11 +1049,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783401762,
-        "narHash": "sha256-B6Q92gXMVJYqCeIptneFiJJP9qIKBIleiYpyPF32YI8=",
+        "lastModified": 1783443232,
+        "narHash": "sha256-G34OHy+aUJd67IUf9q4JJ6oxTmCgVdOJfJwcWHnIzjo=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "c4490bfa4ac1589cea0b1a4f446dacf3f8b6489a",
+        "rev": "0799e724013758dc5ff29af4d9dfaf32f3279883",
         "type": "github"
       },
       "original": {
