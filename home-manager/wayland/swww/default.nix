@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs }:
+{ pkgs, nurPkgs, ... }:
 {
   home.packages = [ pkgs.swww ];
 

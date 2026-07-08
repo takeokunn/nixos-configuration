@@ -2,6 +2,7 @@
   pkgs,
   emacsPkg,
   nurPkgs,
+  ...
 }:
 let
   lib = pkgs.lib;

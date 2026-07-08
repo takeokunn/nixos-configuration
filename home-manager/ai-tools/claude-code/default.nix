@@ -3,6 +3,7 @@
   nurPkgs,
   mcp-servers-nix,
   llmAgentsPkgs,
+  ...
 }:
 let
   ai-prompts-path = ../ai-prompts;

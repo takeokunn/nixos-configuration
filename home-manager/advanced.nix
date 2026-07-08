@@ -1,20 +1,9 @@
 {
   system,
   nixpkgs,
-  org-babel,
   emacs-overlay,
   mcp-servers-nix,
   llm-agents,
-  anthropic-skills,
-  cloudflare-skills,
-  hashicorp-agent-skills,
-  deno-skills,
-  aws-agent-skills,
-  microsoft-skills,
-  scientific-skills,
-  context7-skills,
-  ast-grep-skill,
-  firefox-addons,
   nur-packages,
   ...
 }:
@@ -22,93 +11,61 @@ let
   lib = nixpkgs.lib;
   isDarwin = lib.hasSuffix "-darwin" system;
 
-  nurPkgs = import "${nur-packages}" {
-    inherit pkgs;
-    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
-  };
-
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
     overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
   };
+
+  # nurPkgs built against emacs-unstable, used only to build the Emacs package
+  # set (the module-system `nurPkgs` from ./nur.nix uses the default emacs
+  # packages and serves every other module).
+  nurPkgsEmacs = import "${nur-packages}" {
+    inherit pkgs;
+    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
+  };
   llmAgentsPkgs = llm-agents.packages.${system};
+
   emacsPkgSet = import ./editor/packages {
-    inherit lib pkgs nurPkgs;
+    inherit lib pkgs;
+    nurPkgs = nurPkgsEmacs;
   };
   emacsPkg = if isDarwin then emacsPkgSet.emacs-unstable else emacsPkgSet.emacs-unstable-pgtk;
   emacsLib = import ./editor/lib/emacs.nix {
     inherit lib pkgs emacsPkg;
   };
-
-  shell = import ./shell/basic.nix { inherit pkgs nurPkgs; };
-  editor = import ./editor/basic.nix { inherit pkgs nurPkgs; };
-  vcs = import ./vcs/basic.nix { inherit pkgs nurPkgs; };
-  security = import ./security/basic.nix { inherit pkgs; };
-  development = import ./development/basic.nix { inherit pkgs nurPkgs; };
-
-  shellAdvanced = import ./shell/advanced.nix { inherit pkgs; };
-  editorAdvanced = import ./editor/advanced.nix {
-    inherit lib;
-    inherit
-      pkgs
-      emacsPkg
-      org-babel
-      llmAgentsPkgs
-      nurPkgs
-      ;
-  };
-  browser = import ./browser { inherit pkgs firefox-addons; };
-  vcsAdvanced = import ./vcs/advanced.nix;
-  securityAdvanced = import ./security/advanced.nix { inherit pkgs; };
-  email = import ./email { inherit pkgs; };
-  wayland = import ./wayland { inherit pkgs nurPkgs emacsLib; };
-  nixTools = import ./nix;
-  cloud = import ./cloud { inherit pkgs; };
-  developmentAdvanced = import ./development/advanced.nix;
-  sketchybar = if isDarwin then [ (import ./mac/sketchybar { inherit pkgs; }) ] else [ ];
-  communication = import ./communication { inherit pkgs isDarwin; };
-  aiTools = import ./ai-tools {
-    inherit
-      pkgs
-      nurPkgs
-      llmAgentsPkgs
-      mcp-servers-nix
-      ;
-    inherit
-      anthropic-skills
-      cloudflare-skills
-      hashicorp-agent-skills
-      deno-skills
-      aws-agent-skills
-      microsoft-skills
-      scientific-skills
-      context7-skills
-      ast-grep-skill
-      ;
-  };
 in
 {
-  imports =
-    shell
-    ++ editor
-    ++ vcs
-    ++ security
-    ++ development
-    ++ shellAdvanced
-    ++ editorAdvanced
-    ++ browser
-    ++ vcsAdvanced
-    ++ securityAdvanced
-    ++ email
-    ++ wayland
-    ++ nixTools
-    ++ cloud
-    ++ developmentAdvanced
-    ++ aiTools
-    ++ sketchybar
-    ++ communication;
+  imports = [
+    ./nur.nix
+    ./shell/basic.nix
+    ./shell/advanced.nix
+    ./editor/basic.nix
+    ./editor/advanced.nix
+    ./vcs/basic.nix
+    ./vcs/advanced.nix
+    ./security/basic.nix
+    ./security/advanced.nix
+    ./development/basic.nix
+    ./development/advanced.nix
+    ./browser
+    ./email
+    ./nix
+    ./cloud
+    ./communication
+    ./ai-tools
+  ]
+  ++ lib.optionals isDarwin [ ./mac/sketchybar ]
+  ++ lib.optionals (!isDarwin) [ ./wayland ];
+
+  # Threaded to the Emacs/copilot modules that need pre-built derivations. These
+  # are not among the host extraSpecialArgs, so setting them here is safe (a
+  # specialArg cannot be shadowed by _module.args). org-babel, mcp-servers-nix
+  # and the skill sources remain specialArgs supplied by the host.
+  _module.args = {
+    inherit emacsPkg emacsLib llmAgentsPkgs;
+  };
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];

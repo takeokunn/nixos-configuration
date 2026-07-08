@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs }:
+{ pkgs, nurPkgs, ... }:
 {
   programs.tmux.enable = true;
   programs.tmux.terminal = "xterm-256color";

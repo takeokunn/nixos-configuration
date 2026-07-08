@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
   services.swayosd.enable = true;
   services.swayosd.topMargin = 0.95;

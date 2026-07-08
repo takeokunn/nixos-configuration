@@ -3,6 +3,7 @@
   pkgs,
   emacsPkg,
   org-babel,
+  ...
 }:
 let
   tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };

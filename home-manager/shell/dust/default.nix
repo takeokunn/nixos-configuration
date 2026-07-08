@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
   home.packages = [ pkgs.dust ];
   xdg.configFile."dust/config.toml".text = ''

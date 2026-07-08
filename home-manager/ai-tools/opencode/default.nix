@@ -3,6 +3,7 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
+  ...
 }:
 let
   ai-prompts-path = ../ai-prompts;
@@ -20,7 +21,9 @@ let
   opencodeAgents = import ./agents.nix { inherit ai-prompts-path; };
 in
 {
-  home.packages = [
+  # oh-my-openagent evaluates to null on aarch64-linux (darwin-only in the
+  # NUR), so guard it for the Linux containers.
+  home.packages = pkgs.lib.optionals (nurPkgs.oh-my-openagent != null) [
     nurPkgs.oh-my-openagent
   ];
 

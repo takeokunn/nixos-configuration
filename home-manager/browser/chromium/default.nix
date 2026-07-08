@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
   programs.chromium.enable = pkgs.stdenv.isLinux;
   programs.chromium.extensions = [

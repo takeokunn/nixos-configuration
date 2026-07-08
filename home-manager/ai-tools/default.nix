@@ -2,67 +2,20 @@
   pkgs,
   nurPkgs,
   llmAgentsPkgs,
-  mcp-servers-nix,
-  anthropic-skills,
-  cloudflare-skills,
-  hashicorp-agent-skills,
-  deno-skills,
-  aws-agent-skills,
-  microsoft-skills,
-  scientific-skills,
-  context7-skills,
-  ast-grep-skill,
+  ...
 }:
-let
-  claude-code = import ./claude-code {
-    inherit
-      pkgs
-      nurPkgs
-      llmAgentsPkgs
-      mcp-servers-nix
-      ;
-  };
-  opencode = import ./opencode {
-    inherit
-      pkgs
-      nurPkgs
-      llmAgentsPkgs
-      mcp-servers-nix
-      ;
-  };
-  codex = import ./codex {
-    inherit
-      pkgs
-      nurPkgs
-      llmAgentsPkgs
-      mcp-servers-nix
-      ;
-  };
-  agent-skills = import ./agent-skills {
-    inherit
-      anthropic-skills
-      cloudflare-skills
-      hashicorp-agent-skills
-      deno-skills
-      aws-agent-skills
-      microsoft-skills
-      scientific-skills
-      context7-skills
-      ast-grep-skill
-      ;
-  };
-in
-[
-  claude-code
-  opencode
-  codex
-  agent-skills
-  ./serena
-  {
-    home.packages = [
-      pkgs.mdq
-      llmAgentsPkgs.ccusage
-      nurPkgs.z_ai-coding-helper
-    ];
-  }
-]
+{
+  imports = [
+    ./claude-code
+    ./opencode
+    ./codex
+    ./agent-skills
+    ./serena
+  ];
+
+  home.packages = [
+    pkgs.mdq
+    llmAgentsPkgs.ccusage
+    nurPkgs.z_ai-coding-helper
+  ];
+}

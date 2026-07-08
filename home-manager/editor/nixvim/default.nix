@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs }:
+{ pkgs, nurPkgs, ... }:
 let
   customPackages = import ./packages { inherit nurPkgs; };
   plugins = import ./plugins { inherit pkgs customPackages; };
@@ -22,6 +22,7 @@ in
 
   programs.nixvim.enable = true;
   programs.nixvim.version.enableNixpkgsReleaseCheck = false;
+  programs.nixvim.enableMan = true;
 
   programs.nixvim.editorconfig.enable = true;
   programs.nixvim.colorschemes.dracula.enable = true;

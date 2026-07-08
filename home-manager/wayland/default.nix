@@ -1,33 +1,32 @@
+# Linux-only. Imported conditionally from home-manager/advanced.nix so the
+# module system never evaluates it (and its Linux-only options) on Darwin.
+{ pkgs, ... }:
 {
-  pkgs,
-  nurPkgs,
-  emacsLib,
-}:
-pkgs.lib.optionals pkgs.stdenv.isLinux [
-  (import ./niri { inherit pkgs emacsLib; })
-  (import ./fuzzel)
-  (import ./networkmanager-dmenu)
-  (import ./yazi { inherit pkgs; })
-  (import ./clipse { inherit pkgs; })
-  (import ./swww { inherit pkgs nurPkgs; })
-  (import ./waybar)
-  (import ./gtk { inherit pkgs; })
-  (import ./qt)
-  (import ./hypridle)
-  (import ./hyprlock)
-  (import ./swayosd { inherit pkgs; })
-  (import ./wlsunset)
-  (import ./kanshi)
-  (import ./playerctld)
-  (import ./cliphist)
-  (import ./wl-clip-persist)
-  (import ./easyeffects)
-  (import ./mako)
-  (import ./impermanence)
-  {
-    home.packages = with pkgs; [
-      networkmanagerapplet
-      networkmanager_dmenu
-    ];
-  }
-]
+  imports = [
+    ./niri
+    ./fuzzel
+    ./networkmanager-dmenu
+    ./yazi
+    ./clipse
+    ./swww
+    ./waybar
+    ./gtk
+    ./qt
+    ./hypridle
+    ./hyprlock
+    ./swayosd
+    ./wlsunset
+    ./kanshi
+    ./playerctld
+    ./cliphist
+    ./wl-clip-persist
+    ./easyeffects
+    ./mako
+    ./impermanence
+  ];
+
+  home.packages = with pkgs; [
+    networkmanagerapplet
+    networkmanager_dmenu
+  ];
+}

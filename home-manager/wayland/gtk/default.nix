@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 let
   draculaTheme = {
     name = "Dracula";

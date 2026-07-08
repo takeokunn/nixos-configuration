@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
   home.packages = [ pkgs.wget ];
   xdg.configFile."wgetrc".text = ''

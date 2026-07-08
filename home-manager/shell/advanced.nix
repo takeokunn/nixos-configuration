@@ -1,8 +1,8 @@
-{ pkgs }:
-let
-  kitty = import ./kitty;
-in
-[
-  kitty
-  { home.packages = [ pkgs.yq ]; }
-]
+{ pkgs, ... }:
+{
+  imports = [
+    ./kitty
+  ];
+
+  home.packages = [ pkgs.yq ];
+}

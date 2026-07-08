@@ -1,15 +1,13 @@
-{ pkgs, nurPkgs }:
-let
-  cargo = import ./cargo { inherit pkgs; };
-in
-[
-  ./modules/doggo
-  ./modules/lnav
-  cargo
-  {
-    home.packages = [
-      nurPkgs.devenv
-      nurPkgs.kuro
-    ];
-  }
-]
+{ nurPkgs, ... }:
+{
+  imports = [
+    ./modules/doggo
+    ./modules/lnav
+    ./cargo
+  ];
+
+  home.packages = [
+    nurPkgs.devenv
+    nurPkgs.kuro
+  ];
+}

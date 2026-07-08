@@ -8,6 +8,7 @@
   scientific-skills,
   context7-skills,
   ast-grep-skill,
+  ...
 }:
 {
   programs.agent-skills.enable = true;

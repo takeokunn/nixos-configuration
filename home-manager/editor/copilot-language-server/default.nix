@@ -1,4 +1,4 @@
-{ llmAgentsPkgs }:
+{ llmAgentsPkgs, ... }:
 {
   home.packages = [
     llmAgentsPkgs.copilot-language-server

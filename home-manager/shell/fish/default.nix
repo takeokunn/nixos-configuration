@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs }:
+{ pkgs, nurPkgs, ... }:
 # Note: Emacs socket path is defined in lib/emacs-constants.nix as single source of truth
 # Fish uses (id -u) syntax while bash uses $(id -u), so we can't directly reference the constant
 {

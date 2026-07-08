@@ -3,6 +3,7 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
+  ...
 }:
 let
   inherit (pkgs) lib;

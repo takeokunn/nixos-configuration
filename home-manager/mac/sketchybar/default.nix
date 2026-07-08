@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 let
   # Dracula Color Palette
   colors = {

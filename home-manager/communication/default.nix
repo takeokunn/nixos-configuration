@@ -1,15 +1,10 @@
+{ pkgs, ... }:
 {
-  pkgs,
-  isDarwin ? false,
-}:
-[
-  {
-    home.packages = pkgs.lib.optionals (!isDarwin) (
-      with pkgs;
-      [
-        discord
-        slack
-      ]
-    );
-  }
-]
+  home.packages = pkgs.lib.optionals (!pkgs.stdenv.isDarwin) (
+    with pkgs;
+    [
+      discord
+      slack
+    ]
+  );
+}
