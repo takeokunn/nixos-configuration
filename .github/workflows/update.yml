@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: 0 8 * * *
-    - cron: 0 20 * * *
 jobs:
   nix-update:
     name: Update lockfile
@@ -32,6 +31,10 @@ jobs:
         run: nix fmt
       - name: Commit changes
         run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
           git add .
           git commit -S -m "Update lockfile"
-          git push origin HEAD
+          git push origin HEAD:"${GITHUB_REF_NAME}"

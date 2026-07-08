@@ -14,6 +14,7 @@
     "claude"
     "clickup"
     "discord"
+    "drawio"
     "docker-desktop"
     "element"
     "font-sketchybar-app-font"
