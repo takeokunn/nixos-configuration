@@ -197,6 +197,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="common-lisp-ecosystem">Common Lisp, CLOS, ASDF, SBCL, and Coalton patterns</skill>
     <skill name="sbcl-usage">SBCL execution, debugging, REPL, ASDF loading, profiling, and save-lisp-and-die operational patterns</skill>
     <skill name="emacs-ecosystem">Emacs Lisp, configuration, Magit, LSP patterns</skill>
+    <skill name="lisp-macro">General-purpose Lisp macro/DSL authoring: On Lisp and Let Over Lambda technique catalog (once-only, anaphora, g!/o!-symbols, CPS macros, duality of syntax) plus hygiene/phase-separation/compile-time-diagnostics discipline for CL and Elisp</skill>
     <skill name="org-ecosystem">Org-mode document creation, GTD workflow, Babel, export patterns</skill>
     <skill name="aws-*">AWS service skills (s3, lambda, ec2, iam, ecs, eks, etc.) via itsmostafa/aws-agent-skills</skill>
     <skill name="cplusplus-ecosystem">C++ language, CMake, and modern C++ patterns</skill>
