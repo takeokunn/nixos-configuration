@@ -200,7 +200,7 @@
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-display-line-numbers-mode) "display-line-numbers" nil t)
 
-  ;; (add-hook 'emacs-startup-hook #'global-display-line-numbers-mode)
+  ;; (add-hook 'after-init-hook #'global-display-line-numbers-mode)
 
   (with-eval-after-load 'display-line-numbers
     (setopt display-line-numbers-grow-only t))
@@ -231,21 +231,21 @@
 :CUSTOM_ID: auto-insert-parentheses
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook #'electric-pair-mode)
+  (add-hook 'after-init-hook #'electric-pair-mode)
 #+END_SRC
 ** global-auto-revert-mode
 :PROPERTIES:
 :CUSTOM_ID: global-auto-revert-mode
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook #'global-auto-revert-mode)
+  (add-hook 'after-init-hook #'global-auto-revert-mode)
 #+end_src
 ** yes/no to y/n
 :PROPERTIES:
 :CUSTOM_ID: yes-no-to-y-n
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda ()
                 (fset 'yes-or-no-p 'y-or-n-p)))
 #+end_src
@@ -265,7 +265,7 @@
 :CUSTOM_ID: enable-savehist
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook #'savehist-mode)
+  (add-hook 'after-init-hook #'savehist-mode)
 #+end_src
 ** osx-clipboard
 :PROPERTIES:
@@ -346,7 +346,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :CUSTOM_ID: protect-from-kill
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda ()
                 (with-current-buffer "*scratch*"
                   (emacs-lock-mode 'kill))
@@ -381,7 +381,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :CUSTOM_ID: save-place-mode
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook #'save-place-mode)
+  (add-hook 'after-init-hook #'save-place-mode)
 #+end_src
 ** enable-local-variables
 :PROPERTIES:
@@ -451,7 +451,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (setopt ediff-window-setup-function #'ediff-setup-windows-plain))
 
   (with-eval-after-load 'winner
-    (add-hook 'emacs-startup-hook #'winner-mode))
+    (add-hook 'after-init-hook #'winner-mode))
 #+end_src
 ** debug-on-error
 :PROPERTIES:
@@ -680,7 +680,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :END:
 #+begin_src emacs-lisp :tangle yes
   (when (autoload-if-found '(direnv-envrc-mode direnv-mode direnv-allow) "direnv" nil t)
-    (add-hook 'emacs-startup-hook #'direnv-mode)
+    (add-hook 'after-init-hook #'direnv-mode)
     (add-to-list 'auto-mode-alist '("\\.envrc$" . direnv-envrc-mode)))
 
   (with-eval-after-load 'direnv
@@ -1865,15 +1865,14 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 :CUSTOM_ID: flycheck
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(flycheck-mode flycheck-define-checker) "flycheck" nil t)
+  (autoload-if-found '(flycheck-mode) "flycheck" nil t)
 #+end_src
 *** flycheck-textlint
 :PROPERTIES:
 :CUSTOM_ID: flycheck-textlint
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (defun my/flycheck-textlint-setup ()
-    (interactive)
+  (with-eval-after-load 'flycheck
     (flycheck-define-checker textlint
       "A linter for prose."
       :command ("textlint" "--format" "unix" source-inplace)
@@ -1885,8 +1884,6 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
                 line-end))
       :modes (org-mode))
     (add-to-list 'flycheck-checkers 'textlint))
-
-  (add-hook 'emacs-startup-hook #'my/flycheck-textlint-setup)
 #+end_src
 *** flycheck-elsa
 :PROPERTIES:
@@ -1928,7 +1925,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-corfu-mode) "corfu" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-corfu-mode)
+  (add-hook 'after-init-hook #'global-corfu-mode)
 
   (with-eval-after-load 'corfu
     ;; config
@@ -1982,7 +1979,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(prescient-persist-mode) "prescient" nil t)
 
-  (add-hook 'emacs-startup-hook #'prescient-persist-mode)
+  (add-hook 'after-init-hook #'prescient-persist-mode)
 
   (with-eval-after-load 'prescient
     ;; config
@@ -2011,7 +2008,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   (autoload-if-found '(magit-status magit-blame) "magit")
   (autoload-if-found '(magit-branch) "magit-branch")
 
-  (add-hook 'emacs-startup-hook #'global-git-commit-mode)
+  (add-hook 'after-init-hook #'global-git-commit-mode)
 
   (keymap-global-set "C-x g" #'my/magit-status)
   (keymap-global-set "C-x G" #'magit-blame)
@@ -2160,8 +2157,8 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(key-chord-mode key-chord-define-global) "key-chord" nil t)
 
-  (add-hook 'emacs-startup-hook #'key-chord-mode)
-  (add-hook 'emacs-startup-hook #'(lambda ()
+  (add-hook 'after-init-hook #'key-chord-mode)
+  (add-hook 'after-init-hook #'(lambda ()
                                  (key-chord-define-global "fj" #'view-mode)
                                  (key-chord-define-global "jf" #'view-mode)))
 #+end_src
@@ -2201,7 +2198,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(which-key-mode) "which-key" nil t)
 
-  (add-hook 'emacs-startup-hook #'which-key-mode)
+  (add-hook 'after-init-hook #'which-key-mode)
 #+end_src
 *** dmacro
 :PROPERTIES:
@@ -2210,7 +2207,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-dmacro-mode) "dmacro" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-dmacro-mode)
+  (add-hook 'after-init-hook #'global-dmacro-mode)
 #+end_src
 *** god-mode
 :PROPERTIES:
@@ -2245,7 +2242,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(yas-global-mode) "yasnippet" nil t)
 
-  (add-hook 'emacs-startup-hook #'yas-global-mode)
+  (add-hook 'after-init-hook #'yas-global-mode)
 #+end_src
 *** consult-yasnippet
 :PROPERTIES:
@@ -2268,7 +2265,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(soft-narrow-mode) "soft-narrow" nil t)
 
-  (add-hook 'emacs-startup-hook #'soft-narrow-mode)
+  (add-hook 'after-init-hook #'soft-narrow-mode)
 #+end_src
 ** LSP
 :PROPERTIES:
@@ -2299,7 +2296,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(eglot-booster-mode) "eglot-booster" nil t)
 
-  (add-hook 'emacs-startup-hook #'eglot-booster-mode)
+  (add-hook 'after-init-hook #'eglot-booster-mode)
 #+end_src
 *** lsp-mode
 :PROPERTIES:
@@ -2641,7 +2638,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-syntax-subword-mode) "syntax-subword" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-syntax-subword-mode)
+  (add-hook 'after-init-hook #'global-syntax-subword-mode)
 #+end_src
 ** Undo
 :PROPERTIES:
@@ -2654,7 +2651,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-undo-tree-mode) "undo-tree" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-undo-tree-mode)
+  (add-hook 'after-init-hook #'global-undo-tree-mode)
 
   (with-eval-after-load 'undo-tree
     (setopt undo-tree-auto-save-history nil))
@@ -2788,7 +2785,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(delete-selection-mode) "delsel" nil t)
 
-  (add-hook 'emacs-startup-hook #'delete-selection-mode)
+  (add-hook 'after-init-hook #'delete-selection-mode)
 #+end_src
 *** dogears
 :PROPERTIES:
@@ -2842,7 +2839,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(puni-global-mode puni-disable-puni-mode) "puni" nil t)
 
-  (add-hook 'emacs-startup-hook #'puni-global-mode)
+  (add-hook 'after-init-hook #'puni-global-mode)
 
   (with-eval-after-load 'lisp-mode
     (add-hook 'lisp-mode-hook #'puni-disable-puni-mode))
@@ -2889,7 +2886,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(smart-jump-setup-default-registers) "smart-jump" nil t)
 
-  (add-hook 'emacs-startup-hook #'smart-jump-setup-default-registers)
+  (add-hook 'after-init-hook #'smart-jump-setup-default-registers)
 #+end_src
 *** string-inflection
 :PROPERTIES:
@@ -3025,8 +3022,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(keyfreq-mode keyfreq-autosave-mode) "keyfreq" nil t)
 
-  (add-hook 'emacs-startup-hook #'keyfreq-mode)
-  (add-hook 'emacs-startup-hook #'keyfreq-autosave-mode)
+  (add-hook 'after-init-hook #'keyfreq-mode)
+  (add-hook 'after-init-hook #'keyfreq-autosave-mode)
 #+end_src
 *** uptimes
 :PROPERTIES:
@@ -3408,7 +3405,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(vertico-mode) "vertico-autoloads" nil t)
 
-  (add-hook 'emacs-startup-hook #'vertico-mode)
+  (add-hook 'after-init-hook #'vertico-mode)
 
   (with-eval-after-load 'vertico
     ;; config
@@ -3422,7 +3419,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(marginalia-mode marginalia-cycle) "marginalia" nil t)
 
-  (add-hook 'emacs-startup-hook #'marginalia-mode)
+  (add-hook 'after-init-hook #'marginalia-mode)
 
   (with-eval-after-load 'minibuffer
     ;; config
@@ -3455,7 +3452,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(auto-save-buffers-enhanced) "auto-save-buffers-enhanced" nil t)
 
-  ;; (add-hook 'emacs-startup-hook #'auto-save-buffers-enhanced)
+  ;; (add-hook 'after-init-hook #'auto-save-buffers-enhanced)
 
   (with-eval-after-load 'auto-save-buffers-enhanced
     (setopt auto-save-buffers-enhanced-interval 10))
@@ -3467,7 +3464,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(editorconfig-mode) "editorconfig" nil t)
 
-  (add-hook 'emacs-startup-hook #'editorconfig-mode)
+  (add-hook 'after-init-hook #'editorconfig-mode)
 #+END_SRC
 ** popwin
 :PROPERTIES:
@@ -3476,7 +3473,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(popwin-mode) "popwin" nil t)
 
-  (add-hook 'emacs-startup-hook #'popwin-mode)
+  (add-hook 'after-init-hook #'popwin-mode)
 #+end_src
 ** whitespace
 :PROPERTIES:
@@ -3486,7 +3483,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (autoload-if-found '(global-whitespace-mode) "whitespace" nil t)
 
   (when window-system
-    (add-hook 'emacs-startup-hook #'global-whitespace-mode))
+    (add-hook 'after-init-hook #'global-whitespace-mode))
 
   (with-eval-after-load 'whitespace
     ;; config
@@ -3506,7 +3503,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(recentf-mode) "recentf" nil t)
 
-  (add-hook 'emacs-startup-hook #'recentf-mode)
+  (add-hook 'after-init-hook #'recentf-mode)
 
   (with-eval-after-load 'recentf
     ;; config
@@ -3562,8 +3559,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        projectile-clear-known-projects
                        projectile-cleanup-known-projects) "projectile" nil t)
 
-  (add-hook 'emacs-startup-hook #'projectile-mode)
-  (add-hook 'emacs-startup-hook #'my/update-projectile-known-projects)
+  (add-hook 'after-init-hook #'projectile-mode)
+  (add-hook 'after-init-hook #'my/update-projectile-known-projects)
 
   (defun my/update-projectile-known-projects ()
     (interactive)
@@ -3629,7 +3626,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(projectile-git-autofetch-setup) "projectile-git-autofetch" nil t)
 
-  (add-hook 'emacs-startup-hook #'projectile-git-autofetch-setup)
+  (add-hook 'after-init-hook #'projectile-git-autofetch-setup)
 
   (with-eval-after-load 'projectile-git-autofetch
     ;; config
@@ -3698,7 +3695,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        tab-next
                        tab-bar-rename-tab) "tab-bar" nil t)
 
-  (add-hook 'emacs-startup-hook #'tab-bar-mode)
+  (add-hook 'after-init-hook #'tab-bar-mode)
 
   (keymap-global-set "C-x C-t" tab-prefix-map)
 
@@ -3767,7 +3764,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(er/expand-region) "expand-region" nil t)
 
-  (add-hook 'emacs-startup-hook #'transient-mark-mode)
+  (add-hook 'after-init-hook #'transient-mark-mode)
 
   (keymap-global-set "C-M-@" #'er/expand-region)
 #+end_src
@@ -3931,7 +3928,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
         (funcall set-fontset-font name target font-spec frame add))))
 
   ;; reset all settings in default fontset
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda ()
                 (advice-add 'set-fontset-font :around #'set-fontset-font:around)
 
@@ -4183,7 +4180,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-hl-todo-mode) "hl-todo" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-hl-todo-mode)
+  (add-hook 'after-init-hook #'global-hl-todo-mode)
 
   (with-eval-after-load 'hl-todo
     ;; config
@@ -4206,7 +4203,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(xterm-color-filter) "xterm-color" nil t)
 
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda () (setenv "TERM" "xterm-256color")))
 
   (with-eval-after-load 'xterm-color
@@ -4264,7 +4261,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(dimmer-mode) "dimmer" nil t)
 
-  (add-hook 'emacs-startup-hook #'dimmer-mode)
+  (add-hook 'after-init-hook #'dimmer-mode)
 
   (with-eval-after-load 'dimmer
     ;; config
@@ -4286,7 +4283,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 :CUSTOM_ID: doom-themes
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda ()
                 (when (require 'doom-themes)
                   (load-theme 'doom-dracula t)
@@ -4305,9 +4302,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(doom-modeline-mode) "doom-modeline" nil t)
 
-  (add-hook 'emacs-startup-hook #'doom-modeline-mode)
-  (add-hook 'emacs-startup-hook #'(lambda () (line-number-mode 0)))
-  (add-hook 'emacs-startup-hook #'(lambda () (column-number-mode 0)))
+  (add-hook 'after-init-hook #'doom-modeline-mode)
+  (add-hook 'after-init-hook #'(lambda () (line-number-mode 0)))
+  (add-hook 'after-init-hook #'(lambda () (column-number-mode 0)))
 
   (with-eval-after-load 'doom-modeline
     ;; config
@@ -4317,6 +4314,10 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (setopt doom-modeline-minor-modes nil)
     (setopt doom-modeline-check-icon nil)
     ;; nskk segment
+    ;; doom-modeline-def-segment is a macro: with-eval-after-load only defers
+    ;; runtime execution, not macroexpansion at (native-comp) compile time, so
+    ;; the macro must also be visible to the compiler here.
+    (eval-when-compile (require 'doom-modeline))
     (doom-modeline-def-segment my/nskk
       "NSKK input mode indicator."
       (when (and (bound-and-true-p nskk-mode)
@@ -4338,7 +4339,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(global-hl-line-mode) "hl-line-mode" nil t)
 
-  (add-hook 'emacs-startup-hook
+  (add-hook 'after-init-hook
             #'(lambda ()
                 (when (not window-system)
                   (global-hl-line-mode))))
@@ -4370,7 +4371,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (defun my/neotree-toggle ()
     (interactive)
     (let ((default-directory (or (locate-dominating-file default-directory ".neotree")
-                                 (locate-dominating-file default-directory ".git"))))
+                                 (locate-dominating-file default-directory ".git")
+                                 default-directory)))
       (if (and (fboundp 'neo-global--window-exists-p)
                (neo-global--window-exists-p))
           (neotree-hide)
@@ -4398,7 +4400,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(nyan-mode) "nyan-mode" nil t)
 
-  (add-hook 'emacs-startup-hook #'nyan-mode)
+  (add-hook 'after-init-hook #'nyan-mode)
 
   (with-eval-after-load 'nyan-mode
     ;; config
@@ -4412,7 +4414,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(volatile-highlights-mode) "volatile-highlights" nil t)
 
-  (add-hook 'emacs-startup-hook #'volatile-highlights-mode)
+  (add-hook 'after-init-hook #'volatile-highlights-mode)
 #+end_src
 ** topsy
 :PROPERTIES:
@@ -4555,7 +4557,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        sops-edit-file
                        global-sops-mode) "sops" nil t)
 
-  (add-hook 'emacs-startup-hook #'global-sops-mode)
+  (add-hook 'after-init-hook #'global-sops-mode)
 #+end_src
 ** Dictionary
 :PROPERTIES:
@@ -4590,7 +4592,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(gcmh-mode) "gcmh" nil t)
 
-  (add-hook 'emacs-startup-hook #'gcmh-mode)
+  (add-hook 'after-init-hook #'gcmh-mode)
 
   (with-eval-after-load 'gcmh
     ;; config
@@ -4624,7 +4626,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(epa-file-enable) "epa-file" nil t)
 
-  (add-hook 'emacs-startup-hook #'epa-file-enable)
+  (add-hook 'after-init-hook #'epa-file-enable)
 
   (fset 'epg-wait-for-status 'ignore)
 
@@ -4713,7 +4715,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(midnight-mode) "midnight" nil t)
 
-  (add-hook 'emacs-startup-hook #'midnight-mode)
+  (add-hook 'after-init-hook #'midnight-mode)
 
   (with-eval-after-load 'midnight
     (setopt clean-buffer-list-delay-general 1))
@@ -4742,7 +4744,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(inhibit-mouse-mode) "inhibit-mouse" nil t)
 
-  (add-hook 'emacs-startup-hook #'inhibit-mouse-mode)
+  (add-hook 'after-init-hook #'inhibit-mouse-mode)
 #+end_src
 ** PDF
 :PROPERTIES:
@@ -4756,7 +4758,11 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (autoload-if-found '(pdf-tools-install) "pdf-tools" nil t)
   (autoload-if-found '(pdf-occur-global-minor-mode) "pdf-occur" nil t)
 
-  (add-hook 'emacs-startup-hook #'pdf-tools-install)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (condition-case err
+                  (pdf-tools-install t)
+                (error (message "pdf-tools-install failed: %s" (error-message-string err))))))
 #+end_src
 ** Jump
 :PROPERTIES:
@@ -4772,7 +4778,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                        dumb-jump-go
                        dumb-jump-back) "dumb-jump" nil t)
 
-  (add-hook 'emacs-startup-hook #'dumb-jump-mode)
+  (add-hook 'after-init-hook #'dumb-jump-mode)
 
   (with-eval-after-load 'xref
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
@@ -6257,7 +6263,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-super-agenda-mode) "org-super-agenda" nil t)
 
-  (add-hook 'emacs-startup-hook #'org-super-agenda-mode)
+  (add-hook 'after-init-hook #'org-super-agenda-mode)
 
   (with-eval-after-load 'org-agenda
     ;; config
@@ -7023,7 +7029,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-ql-ql-init) "org-roam-ql-ql" nil t)
 
-  (add-hook 'emacs-startup-hook #'org-roam-ql-ql-init)
+  (add-hook 'after-init-hook #'org-roam-ql-ql-init)
 #+end_src
 ** Citar
 :PROPERTIES:
