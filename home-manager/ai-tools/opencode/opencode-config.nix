@@ -59,6 +59,9 @@ mcp-servers-nix.lib.mkConfig pkgs {
     servers."ast-grep".type = "local";
     servers."ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
 
+    servers.metabase-mcp.type = "local";
+    servers.metabase-mcp.command = [ "${nurPkgs.metabase-mcp}/bin/metabase-mcp" ];
+
     permission = {
       bash = {
         "*" = "allow";

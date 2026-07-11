@@ -143,6 +143,8 @@ in
       ];
       deepwiki.type = "http";
       deepwiki.url = "https://mcp.deepwiki.com/mcp";
+      metabase-mcp.type = "local";
+      metabase-mcp.command = "${nurPkgs.metabase-mcp}/bin/metabase-mcp";
     };
 
   programs.serena.ignoredPaths = [
