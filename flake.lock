@@ -296,11 +296,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783740062,
-        "narHash": "sha256-lTS506vzRgGzHwxfeNcys9RAGNtvUghIOI4oQgRISPM=",
+        "lastModified": 1783791998,
+        "narHash": "sha256-QKcrfEjpBYYpMTeUTNEw6Ds/2I9JcI6GLrvGBYiimWI=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "14c6235a724a2382b998714eb8239b29fc120bf6",
+        "rev": "d21ae0c4e6a1d81192bfe5a36ca7815a705b46a3",
         "type": "github"
       },
       "original": {
@@ -558,11 +558,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783752748,
-        "narHash": "sha256-4+COAESx5tOc3gqKV2gjXUtviRohjO4RL3cPBACIVEw=",
+        "lastModified": 1783797034,
+        "narHash": "sha256-TPWvYHdyHqf3/WBTlSpMd3brqXn5M/81H+sgW7oyU0A=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a9de839fad56718bafd75a6267d2b5a6fc45d8fe",
+        "rev": "b649d666509e2225abcde0a812579b5d16f2dda8",
         "type": "github"
       },
       "original": {
@@ -727,11 +727,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1783692676,
-        "narHash": "sha256-6FXlRphexzMo3HpoN0NxEl7uQoE8llWeNJrD8NMA/CY=",
+        "lastModified": 1783792734,
+        "narHash": "sha256-50rvY9GdFvpYDcMLcD/4cWSi0hVxArT5wsGlVsHy8eY=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "4471c6a218fe813ad4838c400866c8845d3eba6b",
+        "rev": "8efb4337e857949f4cfac86d12ef1066f417f31f",
         "type": "github"
       },
       "original": {
@@ -1049,11 +1049,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783774901,
-        "narHash": "sha256-5woshNkp0AB0BXEtTztOj7EHprQCZvnrACIJNI/+NqQ=",
+        "lastModified": 1783797033,
+        "narHash": "sha256-uNrplTAsrKF46jhPnsd6OBmmhFK5jcXKLDeGjqaWcH0=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "6a878ef9023e700950c778ea541938102986cd82",
+        "rev": "a9687b90e683192c005c180fcf6b5e155d0c94b8",
         "type": "github"
       },
       "original": {
@@ -1080,11 +1080,11 @@
     "paredit-cli-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1783756261,
-        "narHash": "sha256-zaYPCMk4wasFJVx4664rZD8pIXQXq+WFc2xgd/oLvr0=",
+        "lastModified": 1783796150,
+        "narHash": "sha256-EiA9eOKIZ5mIPHUzINSg/lKxHNjm/ljn0BVWCFQHwDI=",
         "owner": "takeokunn",
         "repo": "paredit-cli",
-        "rev": "6f301259277d1330c2592d09b2c21dc461a9b585",
+        "rev": "335e3b8e7f737ed9afec5f166ab944e524d38059",
         "type": "github"
       },
       "original": {
