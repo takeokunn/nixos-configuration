@@ -27,7 +27,6 @@ mcp-servers-nix.lib.mkConfig pkgs {
     provider.openai.options = providerTimeoutOpts;
     provider.anthropic.options = providerTimeoutOpts;
     provider."github-copilot".options = providerTimeoutOpts;
-    provider."zai-coding-plan".options = providerTimeoutOpts;
 
     compaction.auto = true;
     compaction.prune = true;
