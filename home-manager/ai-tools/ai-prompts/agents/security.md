@@ -198,7 +198,7 @@ description: Security vulnerability detection and remediation
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Scan results",
   "metrics": {"files": 0, "vulnerabilities": 0, "security_score": 0},
@@ -219,7 +219,7 @@ description: Security vulnerability detection and remediation
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "2 hardcoded API keys detected",
   "details": [{"error": "SEC002", "location": "/config.js:15", "fix_suggestion": "Use process.env.API_KEY"}],
@@ -242,7 +242,7 @@ Confidence is 90 because secret patterns are well-defined and detectable, contex
     <output>
 {
   "status": "error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 95,
   "summary": "3 critical vulnerabilities in dependencies",
   "metrics": {"files": 1, "vulnerabilities": 5, "security_score": 45},

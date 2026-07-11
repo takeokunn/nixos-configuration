@@ -1,7 +1,7 @@
 ---
 name: Lisp Macro Architecture
 description: This skill should be used when the user asks to "write a macro", "defmacro", "design a DSL", "build a compiler-time code transformer", "hygienic macro", "macro hygiene", "code walker", "CPS transform", "anaphoric macro", "once-only", "g!-symbol", "duality of syntax", "pandoric macro", "On Lisp", "Let Over Lambda", or works with compile-time metaprogramming in Common Lisp or Emacs Lisp. Provides both the canonical macro-writing technique catalog (On Lisp, Let Over Lambda) and a rigorous engineering discipline — phase separation, hygiene, evaluation-order preservation, compile-time diagnostics — for turning those techniques into correct, production-quality macros and DSLs. For general CL/Elisp language basics, defer to common-lisp-ecosystem / emacs-ecosystem.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -442,6 +442,107 @@ version: 2.0.0
   </technique>
 </canonical_technique_library>
 
+<fasl_safe_expansion>
+  <description>
+    Constraints on what a macro may place into the code it returns, so the expansion survives
+    file-compilation (compile-file / FASL dump) and self-hosted or descriptor-backed evaluation,
+    not just interactive macroexpansion at the REPL. Interactive expansion hides these bugs
+    because nothing is serialized.
+  </description>
+
+  <principle name="never_embed_a_function_object">
+    <statement>Do not let a compiled function object become a literal in macro output. A macro that captures #'fn (e.g. as a default callback or transformer) and splices it into the expansion embeds a function object that the file compiler cannot externalize, and compile-file fails at FASL-dump time.</statement>
+    <why>Literal function objects are not dumpable to a FASL; only source-level function designators are. A REPL macroexpand never triggers the failure because it never dumps.</why>
+    <how_to_apply>Splice a function-designator symbol (identity, not #'identity) and funcall it in the expansion, or resolve #'fn at the call site rather than inside the macro. This keeps the expansion source-serializable.</how_to_apply>
+    <example>
+      ;; bad: the &optional default is evaluated at macroexpansion to a FUNCTION OBJECT,
+      ;; which is then spliced into the expansion and cannot be dumped to a FASL.
+      (defmacro deftransform (name &optional (fn #'identity))
+        `(defun ,name (x) (funcall ,fn x)))   ; ,fn splices a compiled function object
+
+      ;; good: let a function-designator SYMBOL flow through; funcall accepts it.
+      (defmacro deftransform (name &optional (fn ''identity))
+        `(defun ,name (x) (funcall ,fn x)))   ; ,fn splices the symbol IDENTITY
+    </example>
+  </principle>
+
+  <principle name="macro_body_declarations_are_not_calls">
+    <statement>Leading (declare ...) forms in a macro body are declarations, not runtime calls. Any machinery that evaluates a macro body form-by-form — a self-hosted or descriptor-backed evaluator — must strip or specially handle leading declarations before evaluation; otherwise (declare (ignore x)) is evaluated as a call to a nonexistent function IGNORE.</statement>
+    <scope>General for any custom macro-body evaluator; standard CL compilers already handle this. Recorded as an observation from a self-hosting expander context.</scope>
+  </principle>
+</fasl_safe_expansion>
+
+<binding_form_scope_reference>
+  <description>
+    A macro that mechanically rewrites code — rename a symbol, extract a function, inline a
+    binding, hoist a let — is only correct if it respects the exact scope, shadowing, and
+    namespace rules of every binding form it walks. The most common macro/refactor bug is
+    treating all parenthesized (name value) shapes as one uniform "binding": the safety of a
+    mechanical edit depends on which namespace a name lives in and which sub-forms it shadows.
+    This catalogs the rules that make such rewrites safe.
+  </description>
+
+  <namespace_rule name="value_vs_callable_bindings">
+    <statement>Distinguish value-place bindings from callable bindings, because a name in one namespace must not shadow a rename target in the other.</statement>
+    <value_bindings>let, let*, symbol-macrolet, do/do*, prog/prog*, dolist, dotimes, with-slots, with-accessors bind value/place names. symbol-macrolet in particular is a value-place form: its names must not shadow function-call heads, and its expansion forms resolve in the outer environment while its body is shadowed by the symbol-macro names.</value_bindings>
+    <callable_bindings>flet, labels, macrolet, compiler-macrolet introduce local callable bindings that DO shadow an outer callable rename target within their body scope.</callable_bindings>
+  </namespace_rule>
+
+  <scope_rule name="init_vs_body_evaluation_environment">
+    <statement>For each binding form, know which sub-forms see the outer environment and which see the bound names — this determines which occurrences a rename may rewrite.</statement>
+    <items>
+      <item>let / prog: init forms are evaluated in the outer scope (parallel); the body sees all bound names.</item>
+      <item>let* / do* / prog*: sequential — each init sees earlier bound names but not its own; the body sees all.</item>
+      <item>do: init forms are outer-scope; step forms, the end-test, and the body see all iteration variables.</item>
+      <item>dolist / dotimes: the list/count source is outer-scope; the iteration variable shadows the target in the optional result form and body.</item>
+      <item>symbol-macrolet: expansion forms resolve in the outer environment; only body references count as in-scope references to the symbol macro (relevant to unused-binding and inline analyses). In quasiquote, preserve comma/comma-at prefixes and rename only the unquoted symbol-macro references.</item>
+      <item>with-slots / with-accessors: the instance expression is outer-scope; slot/accessor names in specs are not value references; body references are the shadowed ones. Renaming a bare with-slots spec must expand it from slot to (new-name slot) to preserve the slot-name mapping.</item>
+      <item>handler-bind / restart-bind: the spec head (condition type / restart name) and restart-bind option keywords (:report, :test, :interactive) are designators, not value references. A lambda in a handler function or restart-option position introduces parameters that shadow only that lambda's own body.</item>
+    </items>
+  </scope_rule>
+
+  <boundary_rule name="reader_prefix_and_quasiquote">
+    <statement>Treat quote and quasiquote reader prefixes as reference-literal boundaries, not merely (quote ...)/(list ...) heads. Under quote, symbols are data and must not be rewritten. Under quasiquote, data is protected but unquote (, / ,@) re-enters evaluation, so a rename must thread quasiquote depth: rewrite only unquoted references and preserve the , / ,@ prefixes on the replacement.</statement>
+    <note>#'symbol and (function symbol) are callable designators: rename them with the target in executable context, but skip them inside quasiquoted data unless an unquote re-enters evaluation.</note>
+  </boundary_rule>
+
+  <special_rule name="define_modify_macro_implicit_place">
+    <statement>define-modify-macro has an implicit leading place argument that precedes the user lambda-list parameters. Any call-site rewrite (add/remove/move/reorder an argument) must offset user arguments by one so the place argument is preserved.</statement>
+  </special_rule>
+</binding_form_scope_reference>
+
+<lambda_list_and_quasiquote_traps>
+  <description>
+    Implementation-detail traps encountered when a macro system parses and re-emits macro
+    lambda lists, and when tests construct expected expansions by hand.
+  </description>
+
+  <trap name="whole_binding_shape">
+    <statement>&amp;whole binds the entire original form. If a destructuring routine stores its result as an alist consumed via (cdr (assoc ...)), the &amp;whole entry must be a dotted pair (cons whole arg) — but that dotted shape is not itself a valid let binding, so normalize dotted/improper entries to (var value) at the code-generation boundary before emitting let/let*.</statement>
+  </trap>
+
+  <trap name="environment_extraction_and_normalization">
+    <statement>Handling &amp;environment requires two coordinated steps: extract the environment symbol and wrap the expander body so it is bound, AND remove &amp;environment from the lambda list used to generate the call-site argument bindings, or the environment symbol is overwritten by an argument binding. Because some expansion paths call a local expander with a nil environment, normalize a nil environment to a non-nil sentinel when the macro requests &amp;environment.</statement>
+  </trap>
+
+  <trap name="quasiquote_in_expected_values">
+    <statement>When a test builds the expected expansion, do not construct it with '(,name ...) inside a backquote — nested quote/backquote can preserve the comma as literal data instead of interpolating the gensym. Build the expected structure explicitly with list/cons.</statement>
+  </trap>
+
+  <trap name="reuse_lambda_binding_generation">
+    <statement>defsetf long form and similar accessor-defining macros should reuse the same lambda-list binding generation as macro lambda lists, so optional/rest/key/aux structure is supported uniformly; bind the store variable separately and emit the body inside a let/let* wrapper.</statement>
+  </trap>
+
+  <trap name="quote_requested_data_into_helpers">
+    <statement>When an expander forwards user-supplied structural options into a runtime helper (e.g. the symbol-type list of with-package-iterator: :internal / :external / :inherited), pass them as quoted data, not as a live form — otherwise (:internal :external :inherited) is emitted as a runtime call.</statement>
+  </trap>
+
+  <reference name="with_standard_io_syntax_bindings">
+    <statement>A with-standard-io-syntax-style macro must rebind the full ANSI set, not a subset. Beyond the read/print numeric and escape variables it must bind *readtable* to a standard readtable (copy-readtable nil), *print-pprint-dispatch* to a standard dispatch (copy-pprint-dispatch nil), and *print-readably* to t. Omitting *readtable* or the pprint-dispatch/readably bindings is a common incomplete-reimplementation bug.</statement>
+    <scope>The 21-variable binding set is ANSI-specified (CLHS with-standard-io-syntax).</scope>
+  </reference>
+</lambda_list_and_quasiquote_traps>
+
 <dialect_notes>
   <dialect name="common_lisp">
     <item>Phase separation: eval-when (:compile-toplevel :load-toplevel :execute)</item>
@@ -476,6 +577,10 @@ version: 2.0.0
   <practice priority="high">Use &amp;body in CL lambda lists for trailing body arguments; use (declare (indent ...) (debug ...)) in Elisp macros</practice>
   <practice priority="medium">Verify every non-trivial macro's expansion with macroexpand-1/macroexpand against the Phase-1 proof before considering it complete</practice>
   <practice priority="medium">Push static analysis (liveness, dependency graphs, non-determinism enumeration) into the analyzer stage, never into emitted runtime code</practice>
+  <practice priority="high">Splice function designators (symbols), never #'fn function objects, into macro output so expansions remain FASL-dumpable</practice>
+  <practice priority="high">Before mechanically renaming/extracting across a binding form, confirm its namespace (value vs callable) and which sub-forms it shadows</practice>
+  <practice priority="medium">Thread quasiquote depth in code-walking rewrites; preserve , / ,@ prefixes and leave quoted data untouched</practice>
+  <practice priority="medium">Reimplement standard binding macros (e.g. with-standard-io-syntax) against the full ANSI variable set, not a convenient subset</practice>
 </best_practices>
 
 <anti_patterns>
@@ -512,6 +617,16 @@ version: 2.0.0
   <avoid name="reader_macro_overuse">
     <description>Reaching for set-macro-character / custom reader syntax to simplify a DSL</description>
     <instead>Prefer ordinary defmacro; reader macros are global, non-composable, and break tooling that doesn't know about them. Reserve for narrow, well-documented cases.</instead>
+  </avoid>
+
+  <avoid name="function_object_in_expansion">
+    <description>Splicing a captured #'fn function object into macro output (e.g. as a default callback), which the file compiler cannot externalize and fails to dump to a FASL</description>
+    <instead>Splice a function-designator symbol and funcall it, or resolve #'fn at the call site; keep the expansion source-serializable</instead>
+  </avoid>
+
+  <avoid name="uniform_binding_assumption">
+    <description>Treating every (name value) shape as one uniform "binding" during a mechanical rewrite, ignoring value-vs-callable namespace and per-form shadowing rules</description>
+    <instead>Consult the binding_form_scope_reference: check the namespace of each name and which sub-forms it shadows before renaming, extracting, or inlining across it</instead>
   </avoid>
 </anti_patterns>
 

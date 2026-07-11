@@ -239,7 +239,7 @@ Expert system design agent for architecture evaluation, requirements definition,
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Analysis summary",
   "metrics": {"components": 0, "violations": 0, "story_points": 0},
@@ -262,7 +262,7 @@ Expert system design agent for architecture evaluation, requirements definition,
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 70,
   "summary": "Layered architecture, 2 dependency violations",
   "metrics": {"components": 45, "violations": 2},
@@ -285,7 +285,7 @@ Confidence is 70 because architecture pattern is identifiable through directory 
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Authentication feature estimated at 13 story points",
   "metrics": {"components": 8, "story_points": 13},

@@ -1,7 +1,7 @@
 ---
 name: Common Lisp Ecosystem
 description: This skill should be used when the user asks to "write common lisp", "CLOS", "ASDF", "defpackage", "defsystem", or works with Common Lisp, SBCL, or Coalton. Provides comprehensive Common Lisp ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -251,6 +251,122 @@ version: 2.0.0
     </example>
   </pattern>
 </asdf>
+
+<asdf_path_resolution>
+  <description>
+    Resolving repository-relative files (fixtures, READMEs, data, sibling test fragments)
+    correctly under both fresh-process ASDF loads and direct source loads. The core hazard:
+    when ASDF loads a compiled FASL, *load-truename* points into the FASL output cache, not the
+    source tree, so merge-pathnames against it resolves under the cache and fails.
+  </description>
+
+  <principle name="resolve_from_the_system_not_load_truename">
+    <statement>Resolve project-local paths through the system object — asdf:system-relative-pathname or asdf:system-source-directory — not from *load-truename* / merge-pathnames. In a fresh test process *load-truename* may even be unbound inside a test file.</statement>
+    <example>
+      ;; robust: anchored to the system's source directory
+      (asdf:system-relative-pathname :my-project "tests/fixtures/data.txt")
+
+      ;; fragile under FASL loads: *load-truename* points into the cache
+      ;; (merge-pathnames "fixtures/data.txt" *load-truename*)
+    </example>
+    <how_to_apply>
+      Require :asdf at compile/load/execute time; resolve the base directory from the system
+      when it is registered; fall back to *compile-file-truename* / *load-truename* /
+      *load-pathname* only for direct script/source loads that run outside ASDF. This applies to
+      any split test loader that calls load on sibling fragments.
+    </how_to_apply>
+  </principle>
+
+  <principle name="initialize_source_registry_first">
+    <statement>A fresh or inherited ASDF session must have its source registry pointed at the project root before asdf:load-system; loading the .asd file alone is not sufficient and can stall inside find-system/load-system discovery. Treat clean CL_SOURCE_REGISTRY execution as a required smoke path, run from a child process.</statement>
+  </principle>
+</asdf_path_resolution>
+
+<asdf_system_definition_pitfalls>
+  <description>Recurring traps when defining a library system plus its test system in a .asd file.</description>
+
+  <pitfall name="conditional_test_system_definition">
+    <problem>Guarding the test-system definition with (unless (asdf:find-system "proj/test" nil) ...) makes asdf:test-system recurse into the same .asd load path and can surface as a circular dependency during system discovery.</problem>
+    <fix>Define the library system and the test system unconditionally; let ASDF handle repeated loads/redefinitions of the .asd file.</fix>
+  </pitfall>
+
+  <pitfall name="bare_operation_symbol_in_perform">
+    <problem>Writing :perform (test-op ...) or :in-order-to with a bare test-op resolves to COMMON-LISP-USER::TEST-OP, which is not the ASDF operation class, and fails with class-not-found at run time.</problem>
+    <fix>Qualify the operation as asdf:test-op in :perform, and prefer an explicit (asdf:test-system ...) call in the :perform body over a chained :in-order-to graph, which is easier to isolate and less likely to stall the compile/load plan.</fix>
+  </pitfall>
+
+  <pitfall name="relative_file_pathnames_in_raw_checkout">
+    <problem>:file "src/..." / :file "t/..." relative component paths can raise "Invalid relative pathname" in a raw checkout.</problem>
+    <fix>Group components under (:module "src" :pathname "src" :components (...)) so the module carries the pathname, rather than embedding directory segments in each :file.</fix>
+  </pitfall>
+
+  <pitfall name="canonical_system_in_alias_named_asd">
+    <problem>Defining the canonical test system inside an alias-named .asd (e.g. proj-test.asd), so that loading the library does not let ASDF discover it, triggers an ASDF warning and a fresh-registry smoke gap.</problem>
+    <fix>Keep the canonical proj/test system in the primary proj.asd; let the alias-named .asd define only a thin compatibility alias depending on proj/test. In a fresh registry, load the alias system explicitly before asserting the canonical one is reachable.</fix>
+  </pitfall>
+
+  <example>
+    ;; proj.asd — both systems defined unconditionally; module carries the pathname;
+    ;; the operation class is qualified as asdf:test-op and runs the framework directly.
+    (defsystem "proj"
+      :components ((:module "src" :pathname "src"
+                    :components ((:file "package")
+                                 (:file "core" :depends-on ("package"))))))
+
+    (defsystem "proj/test"
+      :depends-on ("proj" "fiveam")
+      :components ((:module "tests" :pathname "tests"
+                    :components ((:file "suite"))))
+      :perform (asdf:test-op (o c)
+                 (uiop:symbol-call :fiveam '#:run!
+                   (uiop:find-symbol* '#:proj-suite :proj/test))))
+  </example>
+</asdf_system_definition_pitfalls>
+
+<asdf_parallel_execution>
+  <principle name="isolate_fasl_output_translations">
+    <statement>Concurrent CLI/test invocations that each call asdf:load-system can race on an inherited default FASL cache and fail with "Failed to find the TRUENAME of ...fasl". Initialize output translations in the launcher, before load-system, to a private per-user cache, and keep that initialization in the packaged launcher (not only in ad hoc scripts) so every subcommand inherits it.</statement>
+    <example>
+      (asdf:initialize-output-translations
+        '(:output-translations
+          (t (:home ".cache" "common-lisp" :implementation))
+          :ignore-inherited-configuration))
+    </example>
+  </principle>
+</asdf_parallel_execution>
+
+<constant_reload_safety>
+  <principle name="defconstant_is_eql_reload_unsafe_for_compound_literals">
+    <statement>ANSI leaves the consequences undefined if a constant is redefined to a value that is not eql to its current value; SBCL enforces this by signalling SB-EXT:DEFCONSTANT-UNEQL. Because eql is identity-based for compound objects, re-loading a file that defconstant's a vector, list, or string literal fails even when the contents are visually identical, since each load builds a fresh object.</statement>
+    <how_to_apply>Reserve defconstant for scalars and objects with stable eql identity. For tables, vectors, quoted lists, string defaults, and any compound literal that must survive repeated load/compile cycles, use defparameter (or defvar). alexandria:define-constant with :test #'equal is the portable alternative when a genuine constant is required.</how_to_apply>
+    <scope>The eql redefinition rule is ANSI; the DEFCONSTANT-UNEQL condition name is SBCL-specific.</scope>
+    <example>
+      ;; unsafe on reload: each load builds a fresh vector, not eql to the prior one
+      (defconstant +md5-table+ #(1 2 3 4))    ; => SB-EXT:DEFCONSTANT-UNEQL on reload
+
+      ;; reload-safe: mutable-binding forms rebind without an eql check
+      (defparameter +md5-table+ #(1 2 3 4))
+
+      ;; genuine constant with structural identity: alexandria:define-constant
+      (alexandria:define-constant +md5-table+ #(1 2 3 4) :test #'equalp)
+    </example>
+  </principle>
+</constant_reload_safety>
+
+<test_suite_architecture>
+  <description>Design principles for organizing a test system so it stays fast, isolatable, and
+  robust against the compile-unit stalls documented in sbcl-usage.</description>
+
+  <principle name="zero_runtime_deps_test_only_framework">
+    <statement>Keep the main system's runtime dependencies at zero (or minimal) and concentrate test-only dependencies (e.g. FiveAM) in the separate proj/test system. Runtime source then loads in a plain SBCL image, while the canonical verification path is the one that pulls the test framework — commonly a pinned dev shell where the framework is provisioned.</statement>
+  </principle>
+  <principle name="stratified_suites">
+    <statement>Stratify the test system into explicit tiers — unit, integration, e2e, perf — as separate components, and keep property-based test support in its own support file. This lets a fast tier run in isolation and keeps slow/perf tiers opt-in.</statement>
+  </principle>
+  <principle name="layered_component_decomposition">
+    <statement>For a component that both defines a surface syntax and executes it, separate the specification/description layer, the parsing layer, and the orchestration layer into distinct units. Beyond clarity, this bounds each compile unit and lets every layer be loaded and tested independently.</statement>
+  </principle>
+</test_suite_architecture>
 
 <sbcl>
   <description>Steel Bank Common Lisp - High-performance implementation (current: SBCL 2.6.x, monthly releases)</description>
@@ -530,6 +646,10 @@ version: 2.0.0
   <practice priority="high">Use Alexandria and Serapeum as standard utility libraries</practice>
   <practice priority="medium">Use CFFI for foreign function calls (portable across implementations)</practice>
   <practice priority="medium">Consider Coalton for type-safe functional subsystems</practice>
+  <practice priority="high">Resolve project-relative paths via asdf:system-relative-pathname / system-source-directory, never *load-truename* under FASL loads</practice>
+  <practice priority="high">Define library and test systems unconditionally, and qualify operation classes as asdf:test-op in :perform</practice>
+  <practice priority="medium">Use defparameter/defvar (or alexandria:define-constant :test #'equal) for compound-literal tables; reserve defconstant for eql-stable scalars</practice>
+  <practice priority="medium">Initialize asdf output-translations to a private cache in launchers that may run concurrently</practice>
 </best_practices>
 
 <anti_patterns>
@@ -571,6 +691,21 @@ version: 2.0.0
   <avoid name="ignoring_conditions_system">
     <description>Using simple error signaling without restarts, or catching and discarding conditions.</description>
     <instead>Design APIs with restart-case to offer recovery strategies. Use handler-bind to handle conditions without unwinding the stack when possible.</instead>
+  </avoid>
+
+  <avoid name="defconstant_for_compound_literals">
+    <description>Using defconstant for vectors, lists, strings, or other compound literals that get reloaded; SBCL's eql redefinition check signals DEFCONSTANT-UNEQL on the fresh object even with identical contents.</description>
+    <instead>Use defparameter/defvar, or alexandria:define-constant with :test #'equal when a real constant is needed.</instead>
+  </avoid>
+
+  <avoid name="load_truename_for_project_paths">
+    <description>Resolving project fixtures/data via merge-pathnames against *load-truename*, which points into the FASL cache (or is unbound) when ASDF loads a compiled file.</description>
+    <instead>Resolve through asdf:system-relative-pathname / asdf:system-source-directory.</instead>
+  </avoid>
+
+  <avoid name="conditional_test_system_definition">
+    <description>Guarding a test-system definition with (unless (asdf:find-system ...)) so test-system recurses into the same ASD load and can surface as a circular dependency.</description>
+    <instead>Define the test system unconditionally and let ASDF manage repeated ASD loads.</instead>
   </avoid>
 </anti_patterns>
 

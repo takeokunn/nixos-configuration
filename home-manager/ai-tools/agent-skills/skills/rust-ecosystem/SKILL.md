@@ -1,7 +1,7 @@
 ---
 name: Rust Ecosystem
 description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Provides comprehensive Rust ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -144,6 +144,96 @@ version: 2.0.0
       <use_case>Prevent invalid state transitions at compile time</use_case>
     </pattern>
   </common_patterns>
+
+  <trust_boundary_types>
+    <principle>
+      A trust boundary is any point where data crosses from an unvalidated source (config files, external processes, network, shell) into code that acts on it. The general rule: never let a raw String or Map travel to the final action site (process spawn, shell emission, SQL) still typed as raw text. Wrap validated values in newtypes so the type system, not developer discipline, enforces that only validated data reaches the boundary.
+    </principle>
+
+    <pattern name="validated_newtype_over_raw_string">
+      <description>Public/config model fields that carry constrained values should use validated newtypes instead of raw String / HashMap&lt;String, String&gt;, so direct Rust construction cannot bypass the serde/runtime validators.</description>
+      <rule>Do not add infallible From&lt;&amp;str&gt; or From&lt;String&gt; for a validated newtype — that reintroduces unchecked construction and defeats the boundary. Provide only a fallible constructor (TryFrom / new -&gt; Result).</rule>
+      <example>
+        // Raw form: any String can be constructed, validation is optional and easy to skip.
+        struct Config { name: String }
+
+        // Validated form: the only way to build a Name is through validation.
+        struct Name(String);
+        impl Name {
+          fn new(s: &amp;str) -&gt; Result&lt;Self, NameError&gt; { /* enforce invariants */ }
+        }
+        struct Config { name: Name }
+      </example>
+    </pattern>
+
+    <pattern name="single_source_for_schema_and_validator">
+      <description>Derive the published schema and the runtime validator from the same constant. If a JSON Schema advertises an inclusive maximum while the runtime constructor enforces an exclusive one, a documented-valid config can be rejected at runtime (or worse, the reverse).</description>
+      <rule>Keep schema generation, serde deserialization, and direct constructors on one typed boundary. Publish numeric bounds (e.g. exclusiveMaximum) from the same crate-level constant the constructor checks, not from a separately written field-level annotation.</rule>
+    </pattern>
+
+    <pattern name="runtime_validate_mirrors_serde">
+      <description>When a type is constructed both via serde (deserialization) and directly by API callers, the direct-construction validate() path is a second trust boundary. It must mirror the serde validators exactly — same limits, same shared constants (e.g. a single MAX_DEPTH used by validator, compiler, and executor).</description>
+      <rule>A separate model-side limit that disagrees with the downstream limit lets a "valid" value fail later during generation or execution. Route both paths through one constant.</rule>
+    </pattern>
+
+    <pattern name="convert_at_entry_require_at_boundary">
+      <description>Keep serde-facing models ergonomic (plain String), but convert to the validated newtype immediately after validation, and require the newtype at every downstream API. Tests and real execution then share one un-bypassable boundary.</description>
+      <rule>Downstream backend/executor signatures should take &amp;ValidatedName, not &amp;str, so no call site can smuggle an unvalidated value to the action point.</rule>
+    </pattern>
+
+    <pattern name="distinct_types_for_distinct_semantics">
+      <description>When two values are both "strings" but have different execution semantics, give them distinct output types so call sites cannot mix them. A concrete argument value and an already-quoted shell word are not interchangeable even though both are text.</description>
+      <rule>Cross the boundary explicitly (as_str() / into_inner()) so the conversion is visible and intentional. This also applies to identity handles parsed from external process stdout — parse into a validated Id type, then require that Id for follow-up operations.</rule>
+    </pattern>
+
+    <pattern name="reject_non_utf8_before_validation">
+      <description>Bytes read from external processes are not guaranteed UTF-8. Reject non-UTF-8 before constructing an execution handle; lossy conversion (from_utf8_lossy / to_string_lossy) is acceptable only for user-facing diagnostics, never for values that will be fed back into execution.</description>
+    </pattern>
+
+    <pattern name="deterministic_ordering">
+      <description>For maps whose iteration order feeds generated output (emitted options, template expansion, argv), use BTreeMap rather than HashMap at the public model type so ordering is deterministic at the type level. Downstream code then iterates directly instead of re-sorting at each call site.</description>
+    </pattern>
+
+    <pattern name="propagate_dont_silently_skip">
+      <description>A loader that reads and validates a directory of config files is a trust boundary. It must not silently skip malformed files or directory-entry errors, because that makes validation/listing output disagree with actual on-disk state and can hide broken or unsafe definitions.</description>
+      <rule>Ignore only explicitly out-of-scope inputs (e.g. unsupported extensions). Propagate parse/validation errors with the file path in the error chain, and propagate read_dir entry errors with directory context. Sort successful results for deterministic output.</rule>
+    </pattern>
+  </trust_boundary_types>
+
+  <polymorphism>
+    <principle>
+      Choose the dispatch mechanism from whether the set of implementers is open or closed. A closed, compile-time-known set can use static dispatch with no vtable or heap allocation; an open/plugin set needs dynamic dispatch.
+    </principle>
+
+    <pattern name="trait_plus_enum_dispatch">
+      <description>For a closed set of implementers, combine a trait with an enum whose variants are the implementers, annotated with #[enum_dispatch]. This gives zero-cost (static) polymorphism — the enum forwards each trait method to the active variant with no Box&lt;dyn Trait&gt; indirection — while keeping one exhaustive registration point.</description>
+      <example>
+        #[enum_dispatch]
+        trait Fetcher {
+          async fn get_info(&amp;self, cl: &amp;Client) -&gt; PackageInfo;
+        }
+
+        #[enum_dispatch(Fetcher)]
+        enum FetcherDispatch {
+          FromGit(FromGit),
+          FromRegistry(FromRegistry),
+        }
+      </example>
+      <decision_tree name="when_to_use">
+        <question>Is the set of implementers closed and known at compile time?</question>
+        <if_yes>trait + enum_dispatch — static dispatch, exhaustive matching, no allocation</if_yes>
+        <if_no>Box&lt;dyn Trait&gt; — open set, plugin boundaries, or heterogeneous collections whose members are decided at runtime</if_no>
+      </decision_tree>
+    </pattern>
+
+    <pattern name="extension_procedure">
+      <description>Formalize adding a new implementer so the enum stays the single source of truth.</description>
+      <step order="1">Create the implementation module and implement the trait for the new type.</step>
+      <step order="2">Add a variant to the dispatch enum (the enum carries the #[enum_dispatch(Trait)] attribute).</step>
+      <step order="3">Wire construction/selection (CLI variant, factory, or detection logic) to produce the new variant.</step>
+      <note>Because dispatch is exhaustive over the enum, the compiler flags every match that must handle the new variant — the type system drives completeness.</note>
+    </pattern>
+  </polymorphism>
 
   <edition_2024_features>
     <feature name="async_closures">
@@ -416,6 +506,28 @@ version: 2.0.0
     </tool>
   </other_tools>
 </toolchain>
+
+<release_profile_and_test_gating>
+  <principle>
+    Assertions and tests behave differently under the release profile than under dev. debug_assert! and any debug-only invariant check compile out when built with --release, so tests that expect a debug_assert to fire will not observe it in an optimized build. Packaging pipelines (distro packages, sandboxed builds) commonly build with --release and no network, so the release build is the one that actually ships — design tests to stay green there.
+  </principle>
+
+  <pattern name="debug_assert_stripped_in_release">
+    <description>debug_assert! is a no-op in release builds. It is fine as an internal sanity check, but it is not a runtime safety boundary — the real boundary must be a normal check that returns a Result (or panics unconditionally), so the guarantee survives optimization.</description>
+    <rule>Gate #[should_panic] tests that exercise debug_assert! behavior behind #[cfg(debug_assertions)], otherwise they fail (no panic) under a release test run.</rule>
+    <example>
+      #[cfg(debug_assertions)]
+      #[test]
+      #[should_panic]
+      fn rejects_invalid_in_debug() { /* triggers a debug_assert! path */ }
+    </example>
+  </pattern>
+
+  <pattern name="sandbox_build_test_gating">
+    <description>Packaged/sandboxed builds typically run --release with no network access and a minimal toolchain (no git, no external CLIs). Tests that need network, git, or external tools will fail there if run unconditionally.</description>
+    <rule>Mark network/IO/external-tool tests with #[ignore] or put them behind a feature flag so the default (and packaged) test run passes in the sandbox. Reserve real external backends for opt-in test profiles; use recording/mock backends by default.</rule>
+  </pattern>
+</release_profile_and_test_gating>
 
 <context7_integration>
   <description>Use Context7 MCP for up-to-date Rust documentation</description>

@@ -207,6 +207,9 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="swift-ecosystem">Swift language, SPM, SwiftLint, SwiftFormat, and cross-platform patterns</skill>
     <skill name="haskell-ecosystem">Haskell language, GHC, Cabal/Stack, HLS, optics (lens), monad transformers (mtl), type-level patterns, and HSpec/QuickCheck testing</skill>
     <skill name="devenv-ecosystem">Devenv configuration, languages.*, services.*, git-hooks, scripts, processes, profiles, and outputs patterns</skill>
+    <skill name="terraform-ecosystem">Terraform provider development (terraform-plugin-framework) and HCL operations: plan modifiers, validators, acceptance tests, credential-scope troubleshooting, state management</skill>
+    <skill name="effect-ts">Effect (Effect-TS) design patterns: Effect.Service definitions, Layer composition discipline, escape-late principle, Schema-as-SSOT, and @effect/vitest testing</skill>
+    <skill name="melpa-packaging">MELPA submission and packaging: recipe :files, package headers, package-lint/checkdoc review response, release hygiene for Emacs Lisp packages</skill>
   </category>
   <category name="design">
     <skill name="web-ux">World-class web UX best practices: Nielsen heuristics, Laws of UX, WCAG accessibility, Core Web Vitals, IA, forms, and microcopy</skill>

@@ -178,7 +178,7 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Search summary",
   "metrics": {"files_searched": 0, "matches_found": 0},
@@ -220,7 +220,7 @@ High confidence because Grep found exact matches for useState in TypeScript file
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 88,
   "summary": "UserService defined in src/services/user.ts, used in 8 files",
   "metrics": {"files_searched": 45, "matches_found": 9},

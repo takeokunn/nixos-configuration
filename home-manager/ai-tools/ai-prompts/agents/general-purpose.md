@@ -186,7 +186,7 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "task_type": "log_analysis|refactoring|debug|migration|error_handling|knowledge_base",
   "summary": "What was done and key findings",

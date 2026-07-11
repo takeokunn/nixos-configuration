@@ -243,7 +243,7 @@ description: Code review and quality evaluation
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "QA results summary",
   "metrics": {
@@ -277,7 +277,7 @@ description: Code review and quality evaluation
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "1 file, 1 function reviewed. 2 improvements.",
   "metrics": {"files_reviewed": 1, "severity": {"critical": 0, "major": 1, "minor": 1}},
@@ -303,7 +303,7 @@ Confidence is 80 because code structure is clear from git diff, error handling g
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Root cause: insufficient API response validation",
   "root_cause": "undefined passed to getUserData due to missing error handling",

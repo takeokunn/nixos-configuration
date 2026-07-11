@@ -1,7 +1,7 @@
 ---
 name: Quality Tools
-description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters). Agents reference this skill instead of inline tool definitions.
-version: 2.0.0
+description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Agents reference this skill instead of inline tool definitions.
+version: 2.1.0
 ---
 
 <purpose>
@@ -206,6 +206,49 @@ version: 2.0.0
   </pattern>
 </patterns>
 
+<refactoring_operations>
+  <description>A catalog of language-neutral operations that raise cohesion and testability. Each is a bounded, behavior-preserving move; apply the smallest one that addresses the finding rather than a broad rewrite.</description>
+
+  <operation name="view_data_extraction">
+    <description>Move display-derivation logic (the branching that decides what to show) out of a view or component into a pure selector or "data" helper, leaving the view render-only.</description>
+    <when>A component mixes decision logic with rendering, so it cannot be tested without rendering it.</when>
+    <result>The pure helper is unit-testable in isolation; the view composes or renders frames without embedding decisions. A component is legitimately render-only only once such a pure selector exists.</result>
+  </operation>
+
+  <operation name="barrel_removal">
+    <description>Replace a thin re-export module (a barrel or index) with direct imports from the concrete modules.</description>
+    <when>A file exists only to re-export other modules and adds an indirection layer without any behavior.</when>
+    <steps>
+      <step>Point each consumer at the concrete module it actually needs.</step>
+      <step>Once no consumer imports the barrel, delete it.</step>
+    </steps>
+  </operation>
+
+  <operation name="helper_split_wiring_from_implementation">
+    <description>Separate wiring (state, transport, lifecycle) from implementation (the actual computation) by extracting the implementation into a focused helper module.</description>
+    <when>A hook, handler, or service function grows because it both wires dependencies and performs complex logic.</when>
+    <examples>
+      <example>Extract complex callback logic from a hook into a helper, keeping only state wiring in the hook file.</example>
+      <example>Keep transport-level handlers thin and move stream piping or payload-to-event mapping into a dedicated helper.</example>
+      <example>Split a complex command into data-only spec helpers, a parse helper that returns explicit values, and a thin orchestrator that only validates and dispatches.</example>
+    </examples>
+    <verify>Run the targeted test file and the type or compile check for the touched package after each extraction; behavior must be unchanged.</verify>
+  </operation>
+</refactoring_operations>
+
+<scored_review>
+  <description>Output skeleton for a multi-dimensional quality review (performance, documentation, or general design). It turns a diffuse "review" into a prioritized, actionable report.</description>
+  <structure>
+    <step order="1">Score each dimension separately on a fixed scale (for example N dimensions each out of 100) with a one-line status per dimension, so weak areas stay visible rather than being averaged away.</step>
+    <step order="2">Separate findings into Critical (must fix before release) and Quick Wins (high impact, low effort), each with an effort estimate.</step>
+    <step order="3">Sequence remediation into phases (for example reliability first, then performance, then testing, then advanced), so the report reads as a rollout plan rather than a flat list.</step>
+  </structure>
+  <honesty>
+    <rule>State the analysis's basis and its limits: an architectural or static review is not runtime measurement. Do not present estimated improvements or scores as measured results.</rule>
+    <rule>Give an explicit confidence level and its known limitations (what was not exercised: real workloads, low-resource systems, actual profiling).</rule>
+  </honesty>
+</scored_review>
+
 <decision_tree name="tool_selection">
   <question>What type of quality check is needed?</question>
   <branch condition="Type errors">Use language-specific type checker (tsc, mypy, cargo check)</branch>
@@ -222,6 +265,8 @@ version: 2.0.0
   <practice priority="high">Report all issues with file:line locations</practice>
   <practice priority="medium">Run incremental checks for large codebases</practice>
   <practice priority="medium">Separate formatting from logic changes in commits</practice>
+  <practice priority="medium">Prefer the smallest cohesion-raising refactor operation (view-data extraction, barrel removal, helper split) over a broad rewrite, and verify behavior with targeted tests after each move (refactoring_operations)</practice>
+  <practice priority="medium">For scored reviews, separate Critical from Quick Wins, phase the rollout, and state the analysis basis and its limits honestly (scored_review)</practice>
 </best_practices>
 
 <anti_patterns>

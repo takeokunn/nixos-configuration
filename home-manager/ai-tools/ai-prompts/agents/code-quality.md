@@ -240,7 +240,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Processing result summary",
   "metrics": {
@@ -268,7 +268,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "processOrder exceeds thresholds. Refactoring recommended",
   "metrics": {"cyclomatic_complexity": 15, "cognitive_complexity": 22, "max_nesting_depth": 5},
@@ -292,7 +292,7 @@ Confidence is 75 because cyclomatic complexity is clearly high (15 vs threshold 
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "Removed 5 unused functions",
   "metrics": {"target_files": 23, "deleted_functions": 5, "reduced_lines": 142},

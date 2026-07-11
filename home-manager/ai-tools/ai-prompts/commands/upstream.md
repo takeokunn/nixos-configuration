@@ -732,6 +732,15 @@ Phase 4: Final Verification (depends on all)
                 <dependencies>All previous phases</dependencies>
               </task>
             </responsibility>
+            <git_mechanics>
+              <description>Principles the commit_prep tasks must encode for the /execute handoff. This command plans these steps; it never runs them (read-only, UP-P001/UP-P002).</description>
+              <principle name="branch_naming">Name the branch after the issue it addresses, cut from the upstream default branch (e.g. fix/&lt;issue-number&gt;-&lt;slug&gt; for a bug, feat/&lt;slug&gt; for a feature).</principle>
+              <principle name="rebase_onto_upstream">Rebase the work onto the freshly fetched upstream default branch so the PR applies cleanly and contains only the intended changes, not merge-commit noise.</principle>
+              <principle name="single_reviewable_commit">Organize the change into one reviewable, logically complete commit (squash incidental fixups). Reviewers read a coherent diff, not the authoring history.</principle>
+              <principle name="issue_reference">Reference the issue in the commit message and PR body with a closing keyword (Fixes #N / Closes #N) so the merge auto-closes it.</principle>
+              <principle name="force_with_lease">When the branch was rebased and must be re-pushed, plan git push --force-with-lease, never --force. --force-with-lease updates the remote only if its current tip still matches your remote-tracking ref, so it refuses to clobber commits someone else pushed since your last fetch; plain --force overwrites them silently and disables that check. Caveat: a background git fetch can invalidate the lease, and --force-if-includes closes that gap by requiring the fetched remote updates to be integrated locally first.</principle>
+              <principle name="compat_and_tests_as_a_set">Design a backward-compatibility fallback together with its test coverage. Gate new behavior behind an opt-in (a new enum variant, mode flag, or config key) that preserves the old default, and pair it with tests that exercise both the old default path and the new path. Compatibility without a test pinning the old behavior is unverified.</principle>
+            </git_mechanics>
           </phase>
           <phase name="final_verification" order="5" parallel_safe="false">
             <description>Running lint, test, build commands before PR</description>
@@ -760,6 +769,7 @@ Phase 4: Final Verification (depends on all)
             <reference type="pr_patterns">Title and description patterns learned from 10 sampled merged PRs</reference>
             <reference type="code_patterns">Relevant upstream code patterns to follow (specific file paths)</reference>
             <reference type="past_feedback">Patterns from past PR reviews to address</reference>
+            <reference type="git_mechanics">Branch naming from the issue, rebase onto the upstream default branch, squash to one reviewable commit, Fixes #N reference, and force-with-lease re-push (see commit_prep git_mechanics)</reference>
           </references>
           <deliverables>
             <deliverable task="CF-001">Expected output: fixed files passing lint</deliverable>

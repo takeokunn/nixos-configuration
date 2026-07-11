@@ -218,7 +218,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Analysis result",
   "metrics": {"performance_score": 0, "critical_issues": 0},
@@ -239,7 +239,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Optimized from O(n^2) to O(n)",
   "metrics": {"estimated_improvement": "60%"},
@@ -262,7 +262,7 @@ Confidence is 85 because algorithm complexity analysis is definitive (O(n^2) vs 
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "N+1 query detected: 101 queries reduced to 2",
   "metrics": {"queries_before": 101, "queries_after": 2, "improvement": "98%"},

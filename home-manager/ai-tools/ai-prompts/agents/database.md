@@ -239,7 +239,7 @@ Expert database agent for schema design, index optimization, query performance, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Database analysis summary",
   "metrics": {
@@ -267,7 +267,7 @@ Expert database agent for schema design, index optimization, query performance, 
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "3 improvements in schema design",
   "metrics": {"table_count": 8, "index_proposals": 5, "normalization_level": "3NF"},
@@ -293,7 +293,7 @@ Confidence is 75 because schema structure is clear from Prisma files, query patt
     <output>
 {
   "status": "error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "3 N+1 problems, immediate fix required",
   "metrics": {"n_plus_one_count": 3, "estimated_query_reduction": "94%"},

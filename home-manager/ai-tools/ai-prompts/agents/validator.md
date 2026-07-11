@@ -276,7 +276,7 @@ description: Cross-validation and consensus verification agent
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Validation results summary",
   "metrics": {

@@ -1,7 +1,7 @@
 ---
 name: Nix Ecosystem
 description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -856,6 +856,292 @@ version: 2.0.0
 <devenv>
   <note>devenv 2.0 is the current version. See devenv-ecosystem skill for detailed patterns.</note>
 </devenv>
+
+<flake_input_discipline>
+  <principle name="single_dependency_graph">
+    <description>
+      Every flake input can itself declare inputs, and by default each resolves independently. A `follows` declaration rewires a transitive input to point at a node higher in the graph (usually the root), collapsing what would be several independent copies into one shared instance. The goal is a single coherent dependency graph: one nixpkgs, one lib, one set of core libraries for the whole closure.
+    </description>
+    <mechanism>
+      Without follows, `flake.lock` gains multiple nixpkgs nodes (nixpkgs, nixpkgs_2, nixpkgs_3, ...), each pinned to a different revision. Downstream this produces divergent versions of core libraries (glibc, openssl, libgit2), binary-cache misses that force rebuilds from source, and occasional ABI mismatches between components that were meant to interoperate.
+    </mechanism>
+    <example>
+      <note>Collapse a dependency's nixpkgs (and its own transitive inputs) onto the root</note>
+      home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      };
+
+      <note>Deeper override: force a grandchild input to the root as well</note>
+      some-tool.inputs.helper.inputs.nixpkgs.follows = "nixpkgs";
+    </example>
+  </principle>
+
+  <principle name="justified_exceptions">
+    <description>
+      A follows exception is sometimes correct and should not be reflexively "fixed":
+      a component that is incompatible with nixpkgs-unstable can be pointed at a
+      stable channel instead (inputs.nixpkgs.follows = "nixpkgs-stable"), and a tool
+      whose prebuilt closure lives in its own binary cache may need to keep its own
+      nixpkgs during initial bootstrap so the cache actually hits (add follows only
+      after the first successful build).
+    </description>
+    <rule>Keep each exception a single isolated node, and record the reason inline with a link to the upstream issue that justifies it. An undocumented divergence is the failure mode, not the divergence itself.</rule>
+    <symptom>If you see the same package built twice with different hashes, or an unexpected rebuild-from-source after a flake update, inspect the lock for duplicated nixpkgs nodes and audit which inputs are missing a follows.</symptom>
+  </principle>
+</flake_input_discipline>
+
+<home_manager_module_design>
+  <pattern name="directory_autodiscovery">
+    <description>
+      When a module deploys many files that share one directory structure (skill files, command files, per-tool configs), enumerate them with `builtins.readDir` instead of listing each by hand. Adding a file then needs no edit to the module.
+    </description>
+    <example>
+      let
+      skillFileAttrs =
+      let
+      entries = builtins.readDir ./skills;
+      names = builtins.filter (n: entries.${n} == "directory") (builtins.attrNames entries);
+      in
+      builtins.listToAttrs (map (name: {
+      name = "app/skills/${name}/SKILL.md";
+      value = { source = ./skills/${name}/SKILL.md; force = true; };
+      }) names);
+      in
+      { xdg.configFile = skillFileAttrs; }
+    </example>
+    <note>`builtins.readDir` returns an attrset of name to type ("directory" | "regular" | "symlink"); filter by type rather than assuming all entries are files.</note>
+    <warning>Flakes only see git-tracked files, so a newly created directory or file is invisible to evaluation until it is `git add`ed. "Works with `nix build` locally but the file is missing after switch" is almost always an un-added path.</warning>
+  </pattern>
+
+  <pattern name="modules_as_flake_output_ssot">
+    <description>
+      Export reusable Home Manager modules as `homeManagerModules.*` flake outputs so several configurations consume one source of truth instead of vendoring copies. Downstream flakes import the modules and can reference the upstream flake's own inputs (inputs.upstream.inputs.someTool) so pins stay centrally managed.
+    </description>
+    <warning name="double_import_of_ambient_module_args">
+      If a bundle module internally imports a companion that sets `_module.args.foo`, importing that same companion AGAIN alongside the bundle in the same scope throws `error: attribute '...foo' is defined multiple times`. The module system does not dedupe two imports that both define a `_module.args` entry. Rely on the ambient one the bundle already provides; do not import it a second time. (This surfaces at build time, not always at eval time.)
+    </warning>
+    <note>Modules pulled in via `imports = [ ./x ]` must take `...` in their signature so the module system can pass extra arguments (lib, the distributed specialArgs, etc.).</note>
+  </pattern>
+
+  <pattern name="specialargs_constant_distribution">
+    <description>
+      Distribute cross-cutting constants and inputs to every module through `specialArgs` (nixosSystem / as a NixOS module) or `extraSpecialArgs` (standalone homeManagerConfiguration) rather than relative imports. Modules then consume them as ordinary function arguments.
+    </description>
+    <example>
+      <note>Producer</note>
+      extraSpecialArgs = { inherit inputs; inherit (lib) constants; };
+
+      <note>Consumer</note>
+      { constants, inputs, ... }: { nix.settings = constants.nixSettings; }
+    </example>
+    <note>For a value that only some modules need, `_module.args.foo = ...;` sets it locally without threading it through every signature.</note>
+  </pattern>
+
+  <pattern name="two_layer_git_hooks">
+    <description>
+      Git hooks compose cleanly in two layers because git config scoping is local &gt; global. A global layer (Home Manager `programs.git.hooks`, setting `core.hooksPath`) applies to every repository; a per-project layer (for example devenv setting `git config --local core.hooksPath .git/hooks`) overrides it inside that project. The two coexist without conflict.
+    </description>
+    <note>In hook shell scripts, use NUL-delimited iteration (`-z` / `-0` / `--null`) for safe filename handling and prefer `printf` over `echo` for robustness against filenames and options.</note>
+  </pattern>
+</home_manager_module_design>
+
+<packaging_patterns>
+  <concept name="rust_current_pattern">
+    <description>
+      Package Rust with `rustPlatform.buildRustPackage`, providing a `cargoHash` computed over the vendored crate sources.
+    </description>
+    <example>
+      rustPlatform.buildRustPackage (finalAttrs: {
+      pname = "tool";
+      version = "1.2.3";
+
+      src = fetchFromGitHub {
+      owner = "owner"; repo = "repo";
+      rev = "refs/tags/v${finalAttrs.version}";
+      hash = "sha256-...";
+      };
+
+      cargoHash = "sha256-...";
+
+      nativeBuildInputs = [ pkg-config cmake ];
+      buildInputs = [ openssl ]
+      ++ lib.optionals stdenv.hostPlatform.isDarwin [ apple-sdk_15 ];
+
+      doCheck = false; # when the suite needs network/tooling absent in the sandbox
+      })
+    </example>
+    <note name="fetchCargoVendor_is_default">On nixpkgs 25.05 and later the fetchCargoVendor mechanism is the default and non-optional; a bare `useFetchCargoVendor = true;` is now redundant and nixpkgs emits a message asking you to remove it. Older derivations set it explicitly — drop it when you touch them. `cargoHash` is still required (or use `cargoLock` for a path-based lockfile).</note>
+    <note name="hash_bootstrap">Seed unknown hashes with `lib.fakeHash`, build, then copy the real hash from the mismatch error. `cmake` is commonly needed transitively (e.g. `aws-lc-sys` via rustls).</note>
+    <warning name="override_cargoDeps">`overrideAttrs` cannot change vendored dependencies by setting a new `cargoHash` — it has no effect after the fact. To override for a version bump you must override the resulting `cargoDeps` and set its `outputHash`.</warning>
+  </concept>
+
+  <concept name="darwin_sdk_pattern">
+    <description>
+      Nixpkgs replaced the per-framework Darwin inputs with a bundled, versioned SDK. Drop unversioned `darwin.apple_sdk.frameworks.*` entries entirely — the default SDK is in the Darwin stdenv now — and add `apple-sdk_NN` (for example `apple-sdk_15`) to `buildInputs` only when a specific SDK version is required. The SDK propagates libiconv/libresolv automatically, so conditionally adding those on Darwin is generally no longer necessary. The legacy `darwin.apple_sdk_11_0.*` compatibility stubs have been removed and now error out.
+    </description>
+  </concept>
+
+  <decision_tree name="js_builder_selection">
+    <question>Which JavaScript/TypeScript builder fits the project?</question>
+    <branch condition="npm lockfile, no build step">buildNpmPackage with npmDepsHash and dontNpmBuild = true</branch>
+    <branch condition="npm lockfile, needs build">buildNpmPackage with npmDepsHash; use finalAttrs when src needs the version</branch>
+    <branch condition="pnpm lockfile">stdenvNoCC.mkDerivation + fetchPnpmDeps (hash + fetcherVersion) + pnpmConfigHook; the pnpm major used to fetch deps must match the one used to build</branch>
+    <branch condition="bun lockfile">two-phase: a fixed-output derivation runs `bun install --frozen-lockfile` for node_modules, then the main build consumes it</branch>
+    <branch condition="turbo/monorepo orchestrator">see build_cache_daemon_sandbox below — the daemon must be disabled</branch>
+    <note>Use `nodejs-slim_NN` for the runtime wrapper and full `nodejs_NN` for the build; wrap node entrypoints with `makeBinaryWrapper`; install app trees under `$out/lib/&lt;pname&gt;/`.</note>
+  </decision_tree>
+
+  <anti_pattern name="build_cache_daemon_sandbox">
+    <description>
+      Monorepo build tools that spawn a background daemon holding file locks on cache directories (turbo, and similar) break Nix sandbox teardown with errors like `cannot unlink "...drv-0": Directory not empty`, because the daemon is still alive and its cache tree is locked when the sandbox tries to clean up.
+    </description>
+    <instead>
+      Disable the daemon by both environment variable and CLI flag, force cache bypass, and remove the cache directories at the end of buildPhase:
+      export TURBO_DAEMON=0; export TURBO_FORCE=true; pnpm turbo build --no-daemon; then `rm -rf .turbo node_modules/.cache/turbo || true`. The general rule: any build helper that persists a daemon or on-disk cache across invocations must be forced into a single-shot, cache-clean mode inside the Nix sandbox.
+    </instead>
+  </anti_pattern>
+
+  <best_practices>
+    <practice priority="high">Compute all hashes as SRI (sha256-...); language builders carry a second hash for the dependency set (cargoHash, vendorHash, npmDepsHash, pnpmDeps.hash) that must be regenerated whenever the lockfile changes.</practice>
+    <practice priority="medium">Prefer language-specific builders over raw mkDerivation, and keep `meta` complete (description, homepage, license, maintainers, platforms, mainProgram for CLIs).</practice>
+  </best_practices>
+</packaging_patterns>
+
+<secrets_outside_store>
+  <principle name="store_is_world_readable">
+    <description>
+      The Nix store is world-readable by design (store paths are 0555 directories and 0444 files) and content-addressed. Anything materialized into the store — via `writeText`, `builtins.toJSON` piped into a store file, an unquoted path literal, or string-interpolating a path — becomes readable by every local user AND is copied into any binary cache the closure is pushed to. Therefore no plaintext OR ciphertext secret should ever enter the store.
+    </description>
+  </principle>
+
+  <anti_pattern name="path_literal_store_capture">
+    <description>
+      A path literal, or a string produced by coercing a path (`"${./secrets.yaml}"`, `"${inputs.self}/secrets.yaml"`), is copied into the store as an evaluation input. Even a store-resident sops file is then in the closure.
+    </description>
+    <instead>
+      Reference the secret by a runtime string path that is never a Nix path type — an absolute string like `"/var/lib/app-secrets/secrets.yaml"` that resolves only on the target at runtime. With sops-nix this also requires `sops.validateSopsFiles = false;`, because the validator asserts `builtins.isPath sopsFile` and rejects a plain string. The effect: the encrypted file is provisioned out-of-band on the target and is never a store input.
+    </instead>
+  </anti_pattern>
+
+  <pattern name="runtime_derived_key">
+    <description>
+      Keep decryption key material out of source and store by deriving it at boot. A oneshot systemd service (Type = oneshot, RemainAfterExit = true, ordered before the units that need it) derives an age key from the host SSH key with `ssh-to-age`, writes it 0600, and decrypted secrets land under a runtime tmpfs (for example /run/secrets) — all outside the store. Make the derivation idempotent (skip if a valid key already exists) and order it explicitly after host-key generation.
+    </description>
+  </pattern>
+
+  <verification name="closure_leak_audit">
+    <description>
+      Prove no secret entered the closure by querying its requisites and confirming the secret path is absent:
+      nix-store -q --requisites &lt;drvPath-or-outPath&gt; | grep -i secrets
+      An empty result is the pass condition. Do this whenever a config touches secret handling, and especially before pushing a closure to a public cache.
+    </description>
+  </verification>
+
+  <note>Declarative session/config modules that serialize their whole config into the store (writeText of a toJSON blob) turn any `env`, `vars`, command strings, or hook bodies into world-readable store data. Treat such modules as non-secret-only unless reworked to avoid store materialization.</note>
+</secrets_outside_store>
+
+<darwin_linux_builder>
+  <note>Apple Silicon macOS cannot natively build *-linux derivations. To build them locally you register a Linux builder VM as a nix build machine; for anything large you offload to native CI and only substitute the result.</note>
+
+  <decision_tree name="builder_mechanism_spectrum">
+    <question>How much native performance versus simplicity does the Linux builder need?</question>
+    <branch condition="simplest, zero extra inputs">nix-darwin's built-in `nix.linux-builder` (QEMU-backed). It auto-configures buildMachines, distributedBuilds, and builders-use-substitutes. Slowest execution but least to maintain.</branch>
+    <branch condition="faster boot / native virtio">a MicroVM framework (microvm.nix) or a lightweight vfkit-based runner over Apple's hypervisor. On macOS vfkit is the practical hypervisor (built-in virtiofs, no 9p and no TAP); microvm.nix on Darwin needs a compatible pin because virtiofsd is unavailable on some revisions, and requires `storeOnDisk = false` plus `vmHostPackages = nixpkgs.legacyPackages.aarch64-darwin`. Faster and more native I/O, more moving parts, and thinner community precedent on Darwin.</branch>
+    <branch condition="near-native speed">an Apple Virtualization.framework based builder VM. Direct framework access (no QEMU overhead) and Rosetta gives x86_64-linux at roughly 70-90% native speed versus QEMU's order-of-magnitude slowdown. Most native, most bespoke.</branch>
+    <note>Only one linux-builder mechanism can be active at once — they are mutually exclusive on `nix.buildMachines`/`nix.linux-builder`.</note>
+  </decision_tree>
+
+  <constraints name="native_framework_path">
+    <constraint>Networking is NAT/user-mode only: no TAP interface and no port forwarding. The guest IP is not fixed — discover it via the ARP table (by a deterministic guest MAC) or the macOS DHCP lease file (`/var/db/dhcpd_leases`, matched by a fixed guest hostname).</constraint>
+    <constraint>`/nix/store` is shared read-only over virtiofs with an overlay providing the writable layer; these backends do not support 9p, and `storeOnDisk` is often false (ephemeral store in the overlay).</constraint>
+    <constraint>No nested virtualization on Apple Silicon: the builder VM will not run inside another VM (fails in typical CI M-series runners).</constraint>
+  </constraints>
+
+  <principle name="key_handling">
+    <description>
+      Generate the builder SSH keypair at activation time and keep the private key on the host; never commit it (the config repo may be public). Share only the public key into the guest over a read-only mount and inject it into authorized_keys at boot. Bootstrap may use a password, but harden to key-only (PermitRootLogin prohibit-password, PasswordAuthentication no) once the builder works.
+    </description>
+  </principle>
+
+  <concept name="cross_platform_substitution">
+    <description>
+      Building or substituting foreign-platform derivations from Darwin needs explicit flags, because NixOS `system.build.toplevel` sets preferLocalBuild (allowSubstitutes = false) and the daemon negatively caches narinfo 404s.
+    </description>
+    <example>
+      nix build .#packages.aarch64-linux.&lt;pkg&gt; \
+      --max-jobs 0 \
+      --option extra-platforms aarch64-linux \
+      --option always-allow-substitutes true
+      <note>Add `--option narinfo-cache-negative-ttl 0` when a stale negative cache hides a now-available path.</note>
+    </example>
+    <note>Permanent form in nix-darwin: `nix.settings = { extra-platforms = [ "aarch64-linux" ]; always-allow-substitutes = true; };`. A closure often spans multiple substituters (cache.nixos.org plus a project cache), so both must be configured for the fetch to complete.</note>
+  </concept>
+
+  <principle name="offload_large_builds_to_ci">
+    <description>
+      For large closures (hundreds to thousands of derivations) build on native CI (a real aarch64-linux runner) and push to a binary cache; let the Mac and its builder VM only substitute the finished closure and activate. Building a big *-linux closure on a virtiofs-overlay store can churn the store hard enough to lose store-path visibility mid-build — an architectural limit of the shared/overlay store, not a transient bug.
+    </description>
+  </principle>
+
+  <operational name="launchd_notes">
+    <note>Run the builder (and comparable long-lived agents) as a launchd job in the correct domain. A daemon that needs a graphical session must live in the `gui` domain; leaving it in the background/user domain can inject `LimitLoadToSessionType = Background` and cause flaky bootstrap where a process is alive but `launchctl print gui/$UID/...` shows nothing loaded. During migration from a previous user-domain job, explicitly boot out the old `user/$UID/...` job or launchd may respawn it.</note>
+    <note>Raise file-descriptor limits in layers or you hit "Too many open files": a boot-time daemon for `kern.maxfiles` / `kern.maxfilesperproc` / `launchctl limit maxfiles`, per-agent `NumberOfFiles` (soft and hard), and — the commonly missed one — the GUI/user session's own `launchctl limit maxfiles`.</note>
+    <note>On-demand socket activation (launchd listens on the build port and starts the VM only when a build connects, with a TTL idle-shutdown) keeps an idle builder from consuming resources.</note>
+  </operational>
+</darwin_linux_builder>
+
+<deployment_operations>
+  <concept name="switch_to_configuration_lock">
+    <description>
+      NixOS activation (`switch-to-configuration`, as driven by deploy-rs) takes a non-blocking exclusive flock at `/run/nixos/switch-to-configuration.lock`. A second concurrent activation fails immediately (no retry, exit code 11 / EAGAIN) rather than queueing.
+    </description>
+    <recovery>
+      A local Ctrl+C on deploy-rs can leave the remote `switch-to-configuration` running and holding the lock; kill the leftover remote process. A crash while holding the lock leaves a stale lock file to remove manually. Check with `fuser` / `ps` on the target before assuming the lock is stale.
+    </recovery>
+  </concept>
+
+  <concept name="rollback_and_timeout_tuning">
+    <description>
+      deploy-rs `magicRollback` verifies post-activation reachability and rolls back on failure, but when activation starts many or slow services (for example a fleet of containers) startup can exceed the verification window and trigger a false rollback. In that case disable `magicRollback` and rely on `autoRollback`, and raise `activationTimeout` (e.g. 600s) to fit the real startup time.
+    </description>
+    <example>
+      { autoRollback = true; magicRollback = false; activationTimeout = 600; }
+    </example>
+    <note>Keep ephemeral containers' `systemd` `TimeoutStopSec` low (e.g. 15s) so a slow shutdown does not hold the activation lock; with the default 90s across many containers, teardown alone can block the next deploy for a long time.</note>
+  </concept>
+
+  <note name="nixos_containers">Declared NixOS containers are auto-started by systemd on activation; a full reset of systemd-machined state before applying can be needed to avoid EEXIST races on redeploy. Unrelated per-tool gotcha: tmux `base-index 1` means new windows must be appended with `-a` or they collide on the in-use index.</note>
+</deployment_operations>
+
+<flake_parts_ci>
+  <concept name="standard_rust_flake_composition">
+    <description>
+      A common reproducible-build stack: flake-parts (perSystem for multi-system outputs) + crane (Rust builds) + treefmt-nix (formatting) + rust-overlay (toolchain). crane's two-phase build compiles dependencies once (`buildDepsOnly`) and caches them separately from the package build (`buildPackage`), so source-only changes do not rebuild the dependency graph. The treefmt-nix flakeModule auto-adds a `checks.treefmt` and the `formatter` output.
+    </description>
+    <example>
+      <note>Typical checks surface</note>
+      checks.clippy = ...; # cargo clippy -- -D warnings
+      checks.tests  = ...; # cargo test
+      # checks.treefmt is contributed automatically by the treefmt flakeModule
+    </example>
+    <note>Version coupling is the recurring maintenance cost: tool versions must match between the vendored lockfile and nixpkgs (wasm-bindgen-cli vs the wasm-bindgen pin in Cargo.lock; the pnpm major used to fetch deps vs to build). A dependency-set hash such as `pnpmDeps.hash` must be regenerated whenever its lockfile changes, or the build fails on a hash mismatch.</note>
+  </concept>
+
+  <concept name="ci_verification_chain">
+    <description>
+      A representative CI chain: actionlint (validate the workflow itself) then `nix flake check` (evaluate + run all checks) then `nix build` of the real outputs, pushing results to a binary cache so downstream jobs (e.g. a docs/site deploy, or a deploy target) only substitute. Gating on `nix flake check` before build catches evaluation and formatting regressions cheaply.
+    </description>
+  </concept>
+
+  <principle name="sandbox_test_discipline">
+    <description>
+      The Nix build sandbox has no network access and a minimal toolset (no git), and Nix builds Rust in the release profile. Two consequences must be encoded in the tests:
+    </description>
+    <rule>Tests needing network or git must be `#[ignore]`d (or feature-gated) so the sandboxed `cargo test` still passes; run them outside the sandbox in a dev shell.</rule>
+    <rule>The release profile strips `debug_assert!`, so a `#[should_panic]` test that asserts a `debug_assert!` fires must be gated with `#[cfg(debug_assertions)]`, or it fails under the Nix build even though it passes under a debug `cargo test`.</rule>
+  </principle>
+</flake_parts_ci>
 
 <workflow>
   <phase name="analyze">

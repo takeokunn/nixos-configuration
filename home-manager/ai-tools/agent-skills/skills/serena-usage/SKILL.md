@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
 description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", or needs Serena MCP guidance. Provides Serena tool usage patterns and orchestration integration.
-version: 3.1.0
+version: 3.2.0
 ---
 
 <purpose>
@@ -219,6 +219,21 @@ version: 3.1.0
       <note>Literal match for exact short strings</note>
       replace_content relative_path="config.nix" needle="oldValue = true" repl="oldValue = false" mode="literal"
     </example>
+  </concept>
+
+  <concept name="language_support_architecture">
+    <description>Serena resolves code intelligence through language servers (LSP). Each supported language is registered in a Language enum with a filename matcher (its file extensions) and mapped to a language-server class through a factory. A project has a set of active languages; symbol tools only work for files whose language is active and backed by a working LSP. This shapes both how the tool is extended and why it sometimes cannot help.</description>
+    <adding_a_language>
+      <note>Extending Serena to a new language is an LSP-integration task, not a parser-writing task. The decisive choices are which existing language server to wrap and how it is installed and launched.</note>
+      <step>Wrap an existing language server rather than writing a parser. Prefer the single-core-dependency provider when the server is one executable or archive; use the multi-dependency base provider only when setup is genuinely complex.</step>
+      <step>Register the language: add it to the Language enum with a filename matcher for its extensions, and add a factory branch that constructs the server.</step>
+      <step>Provide a minimal test repository that exercises symbols, within-file references, and cross-file references.</step>
+      <step>Write tests that assert the actual expected symbol names and reference locations were found. Asserting only that a non-empty list or a non-null result came back is insufficient and is the most common reason such contributions are rejected.</step>
+    </adding_a_language>
+    <selection_criteria>
+      <criterion>Mandatory LSP capabilities for symbol tools are documentSymbol, definition, and references. A server missing any of these cannot back find_symbol or find_referencing_symbols and should be deferred, or offered only as experimental (completion/hover) support.</criterion>
+      <criterion>Installation footprint (extra runtimes or package managers the server needs) determines adoption cost and CI feasibility.</criterion>
+    </selection_criteria>
   </concept>
 </concepts>
 
@@ -476,6 +491,20 @@ last-verified: YYYY-MM
     </example>
   </pattern>
 
+  <pattern name="symbol_tools_unavailable_fallback">
+    <description>In a multi-language repository, language detection may fix the project's active language on the dominant language. Symbol tools then fail for files of a secondary language — typically an error that reports the active languages and refuses to extract symbols for the target file. Treat this as an ongoing constraint of that repository, not a transient glitch to retry against.</description>
+    <detection>
+      <signal>get_symbols_overview or find_symbol errors with a message naming the active languages and an inability to extract symbols for the target file</signal>
+      <signal>get_current_config shows the target file's language is not among the active languages</signal>
+    </detection>
+    <fallback>
+      <step order="1">Locate definitions and references with Grep (rg) using symbol-name patterns, searching across both source and tests</step>
+      <step order="2">Edit with text-based tools (replace_content in literal or regex mode, or the standard Edit tool) rather than replace_symbol_body or insert_after_symbol</step>
+      <step order="3">Verify with the language's own build or load step, since get_diagnostics_for_file is also unavailable for the inactive language</step>
+    </fallback>
+    <note>Confirm the constraint once with get_current_config, then commit to the text-based path; do not repeatedly retry symbol tools that cannot work for an inactive language.</note>
+  </pattern>
+
   <decision_tree name="serena_code_operation">
     <question>What type of code operation is needed?</question>
     <branch condition="Understand file structure">Use get_symbols_overview with depth=0, then depth=1</branch>
@@ -565,6 +594,7 @@ last-verified: YYYY-MM
     <unavailable_conditions>
       <condition>Serena project not activated (call initial_instructions then activate_project first)</condition>
       <condition>File type not supported by LSP (use Grep or Read)</condition>
+      <condition>Target file's language is not among the project's active languages — multi-language detection fixed on the dominant language; use Grep plus text edits (see symbol_tools_unavailable_fallback)</condition>
       <condition>Tool explicitly fails with error</condition>
     </unavailable_conditions>
   </decision_tree>
@@ -671,6 +701,7 @@ last-verified: YYYY-MM
   <practice priority="high">Follow serena_first_tool_selection decision tree for consistent tool choices</practice>
   <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
   <practice priority="medium">Follow memory_reading_by_task_type to prioritize relevant memories</practice>
+  <practice priority="medium">When a multi-language repo's language detection excludes the target file's language, fall back to Grep plus text edits instead of retrying symbol tools (symbol_tools_unavailable_fallback)</practice>
 </best_practices>
 
 <anti_patterns>

@@ -1,7 +1,7 @@
 ---
 name: mdq
 description: This skill should be used when the user asks to parse, search, grep, query, filter, or extract headings, sections, tasks, code blocks, links, or tables from Markdown files. Use when working with mdq, jq-style Markdown querying, section extraction, checklist validation, CI task scripts, or documentation automation pipelines.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -112,7 +112,7 @@ version: 2.0.0
   <option flag="--output plain" short="-o plain">Plain text without Markdown formatting.</option>
   <option flag="--quiet" short="-q">Suppress stdout; exit code 0 if match found, 1 if not.</option>
   <option flag="--link-format inline">Inline links instead of reference-style.</option>
-  <option flag="--link-format text">Strip links to plain text.</option>
+  <option flag="--link-format keep">Keep links in their original format (default is reference).</option>
 </output_options>
 
 <patterns>

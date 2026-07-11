@@ -220,7 +220,7 @@ Expert documentation agent for README generation, API specification management, 
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Processing results",
   "mode": "generate|sync|review",
@@ -245,7 +245,7 @@ Expert documentation agent for README generation, API specification management, 
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Generated README.md with installation, usage, and API sections",
   "details": [{"type": "readme", "path": "/project/README.md", "status": "success"}],
@@ -268,7 +268,7 @@ Confidence is 85 because project structure is clear from code analysis, main ent
     <output>
 {
   "status": "warning",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "3 design improvements recommended",
   "metrics": {"endpoints": 12, "issues": 3},

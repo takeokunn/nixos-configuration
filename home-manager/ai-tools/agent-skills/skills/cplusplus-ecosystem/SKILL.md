@@ -1,7 +1,7 @@
 ---
 name: C++ Ecosystem
 description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++20/23/26) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -162,7 +162,7 @@ version: 2.0.0
         }
       </example>
       <compiler_flag>-std=c++2c</compiler_flag>
-      <note>GCC 16 has reflection merged in trunk. Experimental Clang fork by Dan Katz also available.</note>
+      <note>GCC 16.1 (released April 2026) ships reflection via -std=c++26 -freflection. Experimental Clang fork by Dan Katz also available.</note>
     </feature>
     <feature name="contracts">
       <description>Contract assertions with contract_assert keyword, plus pre and post conditions.</description>
@@ -175,7 +175,7 @@ version: 2.0.0
           return a / b;
         }
       </example>
-      <note>GCC has contracts merged in trunk, awaiting release.</note>
+      <note>GCC 16.1 (released April 2026) ships an initial contracts implementation experimentally.</note>
     </feature>
     <feature name="std_execution">
       <description>std::execution (P2300) — sender/receiver model for structured async and parallel programming. Replaces ad-hoc async patterns with composable, type-safe pipelines.</description>

@@ -219,7 +219,7 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "DevOps analysis summary",
   "metrics": {
@@ -248,7 +248,7 @@ Expert DevOps agent for infrastructure (IaC), CI/CD pipeline design, and observa
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "Reduced monthly cost from $1,250 to $680 (46% reduction)",
   "metrics": {"resource_count": 45, "cost_optimization_proposals": 6},
@@ -274,7 +274,7 @@ Confidence is 80 because resource configurations are clearly defined in Terrafor
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Reduced build time from 5m30s to 2m15s (59% improvement)",
   "metrics": {"before": "5m30s", "after": "2m15s", "improvement": "59%"},

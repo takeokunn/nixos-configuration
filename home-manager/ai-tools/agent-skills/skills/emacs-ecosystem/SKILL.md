@@ -1,7 +1,7 @@
 ---
 name: Emacs Ecosystem
 description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", or "magit". Provides comprehensive Emacs ecosystem patterns and best practices. For org-mode, use org-ecosystem skill.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -57,7 +57,7 @@ version: 2.0.0
             (y 2))
         (+ x y))
 
-      (let\* ((x 1)
+      (let* ((x 1)
               (y (+ x 1))) ; y can reference x
         y)
     </example>
@@ -84,7 +84,7 @@ version: 2.0.0
       (pcase value
         ('symbol (handle-symbol))
         ((pred stringp) (handle-string))
-        (\_ (handle-default)))
+        (_ (handle-default)))
     </example>
   </pattern>
 
@@ -111,9 +111,9 @@ version: 2.0.0
     <example>
       (lambda (x) (* x 2))
 
-      (mapcar (lambda (x) (\* x 2)) '(1 2 3))
+      (mapcar (lambda (x) (* x 2)) '(1 2 3))
 
-      ;; Short form (Emacs 28+)
+      ;; lambda self-quotes — #' is optional when passing it directly
       (mapcar (lambda (x) (+ x 1)) list)
     </example>
   </pattern>
@@ -136,7 +136,7 @@ version: 2.0.0
   <pattern name="init_el_structure">
     <description>Modern init.el organization</description>
     <example>
-      ;;; init.el --- Emacs configuration -\*- lexical-binding: t; -\_-
+      ;;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
 
       ;;; Commentary:
       ;; Personal Emacs configuration
@@ -545,6 +545,235 @@ version: 2.0.0
   </tool>
 </modern_packages>
 
+<treesit_mode_availability>
+  <description>Correctly detecting whether a tree-sitter major mode will actually work, versus merely existing as a symbol.</description>
+
+  <principle name="fboundp_is_insufficient">
+    <mechanism>
+      On Emacs 29.1+, the *-ts-mode functions (for example json-ts-mode, python-ts-mode) are autoloaded built-ins. Because they are autoloaded, their symbols are always fboundp regardless of whether the tree-sitter grammar shared library (libtree-sitter-LANG.so / .dylib) is installed. So `(fboundp 'json-ts-mode)` returns non-nil even when activating that mode would fail with "language grammar for LANG is unavailable". fboundp answers "is this mode defined?" not "can this mode run?".
+    </mechanism>
+    <instead>
+      Check grammar availability with `treesit-language-available-p`, which returns non-nil only when the grammar for a language exists and can be loaded. It takes a language symbol (for example `json`), not a mode symbol, so a mode-to-language mapping is required. `treesit-ready-p` is a higher-level convenience that also verifies readiness and can emit a diagnostic message; prefer it when you want the standard user-facing warning, and `treesit-language-available-p` when you want a silent boolean.
+    </instead>
+    <example>
+      ;; Map ts-mode symbols to their grammar language symbols, because the
+      ;; language name is not always the mode-name prefix (js-ts-mode -> javascript).
+      (defvar my-ts-mode-language-alist
+        '((json-ts-mode   . json)
+          (js-ts-mode     . javascript)
+          (python-ts-mode . python)))
+
+      (defun my-ts-mode-available-p (mode)
+        "Return non-nil if MODE is a ts-mode whose grammar is loadable."
+        (when-let ((lang (alist-get mode my-ts-mode-language-alist)))
+          (and (fboundp mode)
+               (treesit-language-available-p lang))))
+    </example>
+  </principle>
+
+  <principle name="mode_language_sync_test">
+    <mechanism>
+      When a mode-to-language mapping is maintained separately from the list of modes a package actually dispatches to, the two tables drift: a new ts-mode is added to the dispatch list but its grammar language is never registered, so the availability check silently returns nil and the mode is never selected.
+    </mechanism>
+    <instead>
+      Add a unit test that asserts every ts-mode referenced by the package appears in the mode-to-language mapping (and vice versa). This turns a silent runtime fallthrough into a fast, deterministic test failure whenever the tables diverge.
+    </instead>
+    <example>
+      ;; my-output-mode-alist is the dispatch list; my-ts-mode-language-alist is
+      ;; the grammar mapping. Assert every ts-mode in the former is registered.
+      (ert-deftest my-ts-mode-alist-sync ()
+        (dolist (entry my-output-mode-alist)
+          (let ((mode (cdr entry)))
+            (when (string-suffix-p "-ts-mode" (symbol-name mode))
+              (should (assq mode my-ts-mode-language-alist))))))
+    </example>
+  </principle>
+</treesit_mode_availability>
+
+<keymap_testing>
+  <description>Reliably asserting keymap contents in unit tests. Keymaps are a data structure, and the convenient lookup APIs have edges that produce false negatives.</description>
+
+  <principle name="traverse_recursively">
+    <mechanism>
+      `lookup-key` and `where-is-internal` are lossy for test assertions. For a key sequence that is only a prefix of a longer binding, `lookup-key` returns an integer (the number of events consumed) rather than a command, which is easy to misread as "bound to something". Bindings that live inside a composed keymap (built with `make-composed-keymap`) or a nested prefix keymap can also be missed depending on how the lookup is issued.
+    </mechanism>
+    <instead>
+      For composed or prefix-heavy keymaps, walk the raw keymap structure recursively with `map-keymap`, descending into nested keymaps yourself, and assert on the commands you collect. This inspects the actual structure instead of trusting a resolver that can return prefix-depth integers or skip composed layers.
+    </instead>
+    <example>
+      (defun my-keymap-commands (keymap)
+        "Collect all commands bound anywhere in KEYMAP, recursively."
+        (let (acc)
+          (map-keymap
+           (lambda (_event binding)
+             (cond
+              ((keymapp binding)
+               (setq acc (append acc (my-keymap-commands binding))))
+              ((commandp binding)
+               (push binding acc))))
+           keymap)
+          acc))
+    </example>
+  </principle>
+
+  <principle name="kbd_notation_trap">
+    <mechanism>
+      Named function keys must use angle-bracket syntax. `(kbd "<left>")` returns the named-key vector `[left]`, which is what keymaps store for the arrow key. `(kbd "[left]")` instead returns the six literal characters `[`, `l`, `e`, `f`, `t`, `]`. Looking a binding up with the wrong form fails to match, and because `[` is itself a self-inserting prefix, `lookup-key` can return an integer partial-match, disguising the mistake.
+    </mechanism>
+    <instead>
+      Always write named keys with angle brackets in both bindings and test lookups: `"<left>"`, `"<right>"`, `"<home>"`, `"<end>"`, `"<tab>"`, `"<return>"`.
+    </instead>
+  </principle>
+
+  <principle name="interactive_mock_requirement">
+    <mechanism>
+      Code that dispatches a command with `call-interactively` requires that the target satisfy `commandp`, i.e. it must be an interactive function. When a test replaces a real command (for example a navigation command) with a plain lambda to observe calls, `call-interactively` signals `(wrong-type-argument commandp ...)` because the stub is not interactive.
+    </mechanism>
+    <instead>
+      Give mock lambdas an `(interactive)` form when the code under test invokes them via `call-interactively`.
+    </instead>
+    <example>
+      (cl-letf (((symbol-function 'forward-char)
+                 (lambda (&amp;rest _) (interactive) (setq nav-called t))))
+        ...)
+    </example>
+  </principle>
+
+  <principle name="know_the_defining_file">
+    <mechanism>
+      A mode's keymap and the mode entry point are frequently defined in different files (the keymap via `defvar-keymap` in the main feature file, helper commands in a sibling file). A test that requires only the helper feature can observe an unbound or empty keymap and assert against nothing.
+    </mechanism>
+    <instead>
+      Require the feature that actually defines the keymap before asserting on it; do not assume the keymap lives in the file whose name resembles "keymap".
+    </instead>
+  </principle>
+</keymap_testing>
+
+<bytecompile_verification_hazards>
+  <description>Byte-compilation artifacts and load order can make tests lie: a run can pass or fail against code that is not the source you just edited.</description>
+
+  <principle name="stale_elc_masks_source">
+    <mechanism>
+      By default Emacs prefers the compiled file: with both LIB.el and LIB.elc present on the same load-path entry, `load` uses LIB.elc even when LIB.el is newer, emitting only a warning (which is easy to miss in batch output). A native-compiled .eln is preferred over .elc, which is preferred over .el. Consequently a stale .elc can hide a source fix: the test exercises old bytecode, so a passing test does not prove the patch works, and a failing test may not reflect the current source.
+    </mechanism>
+    <instead>
+      Before trusting a batch ERT/byte-compile result, either delete source-tree .elc artifacts, or set `load-prefer-newer` to t in the batch invocation so `load` picks whichever of .el/.elc is newest by modification time. Better still, byte-compile to a temporary destination so verification never leaves .elc files in the source tree. If a result contradicts a source change, suspect stale bytecode first.
+    </instead>
+    <example>
+      # Batch verification that will not silently run stale bytecode:
+      # remove source-tree .elc, force newest-source loading, then run ERT.
+      find . -name '*.elc' -delete
+      emacs -Q --batch \
+        --eval '(setq load-prefer-newer t)' \
+        -L . -L test \
+        -l ert -l my-feature -l my-feature-test \
+        -f ert-run-tests-batch-and-exit
+    </example>
+  </principle>
+
+  <principle name="cross_file_macro_recompile">
+    <mechanism>
+      Macros are expanded at compile time in the file that calls them. When a macro is defined in one file and invoked in another, recompiling only the macro-defining file is not enough: the call-site file still carries an old expansion (or, if interpreted, resolves the macro at run time), and can fail with `invalid-function` or call a stale expansion.
+    </mechanism>
+    <instead>
+      Compile the macro-defining file and all of its call-site files together, then run the tests with the same load-path set. Treat a macro's callers as part of its compilation unit.
+    </instead>
+  </principle>
+
+  <principle name="batch_load_path_completeness">
+    <mechanism>
+      A batch test run fails at load time, before any test executes, if a required feature's directory is absent from the load-path. Transitive requires matter: a test-support file that requires feature A, which in turn requires feature B, needs both A's and B's directories on `-L`, or the loader errors first.
+    </mechanism>
+    <instead>
+      Pass one `-L DIR` for every directory that contributes a required feature, including transitive dependencies and test-support helpers, not just the directory holding the test file.
+    </instead>
+  </principle>
+
+  <principle name="macroexpand_shape_normalization">
+    <mechanism>
+      Tests that inspect the structure of macro output are brittle because expansion shape varies. A `defun`-generating macro can expand to `(defalias NAME #'(lambda ...))` rather than a literal `defun`, and `macroexpand` is a top-level contract only: it may fully expand the outermost macro (for example into a `progn`) while leaving nested macro calls inside `let` untouched.
+    </mechanism>
+    <instead>
+      Normalize the expansion to a canonical shape before asserting on heads, membership, or tail forms, so tests stay stable across byte-compiled and directly-macroexpanded paths. Do not hard-code one particular expansion layout.
+    </instead>
+  </principle>
+</bytecompile_verification_hazards>
+
+<autoload_cookie_safety>
+  <description>Where `;;;###autoload` cookies are safe to place, so that generated autoload files contain autoload calls rather than executable code.</description>
+
+  <principle name="cookie_only_before_recognized_definitions">
+    <mechanism>
+      The autoload machinery (`loaddefs-generate`) copies the form following a `;;;###autoload` cookie verbatim into the generated loaddefs file, except for a fixed set of recognized definition forms which it converts into safe `autoload` calls: `defun`, `defmacro`, `cl-defun`, `cl-defmacro`, and `define-overloadable-function`. Put a cookie before anything else, such as a custom macro invocation (`defun/foo ...`, a mode-defining macro) or a side-effecting top-level form (`(some-register ...)`), and the whole form is copied raw into loaddefs and executed at load time. That runs side effects unconditionally and can fail if the macro is not yet defined when loaddefs loads.
+    </mechanism>
+    <instead>
+      Only place a bare cookie before a real `defun`/`defmacro` (or the other recognized forms). To autoload a name produced by a custom macro, write the explicit form on the line after the cookie so you control exactly what is recorded:
+      `;;;###autoload (autoload 'my-command "my-file")`
+      Otherwise, remove the unsafe cookie.
+    </instead>
+  </principle>
+
+  <principle name="vc_install_test_directory">
+    <mechanism>
+      When a package is installed directly from source (`package-vc`, `use-package :vc`), the package manager may traverse and byte-compile the `test/` directory during install. On Emacs 30.x, `.elpaignore` and a README `:ignored-files ("test/")` declaration do not reliably stop `package--compile` from descending into tests, so compilation fails on test-only files that require unavailable test helpers.
+    </mechanism>
+    <instead>
+      A repo-side approach that has worked on Emacs 30.x is to add `test/.dir-locals.el` binding `no-byte-compile` to t, i.e. `((emacs-lisp-mode . ((no-byte-compile . t))))`. This lets the installer traverse the tests while skipping their byte-compilation. Because `no-byte-compile` is fundamentally a per-file variable honored when each file is compiled, verify the behavior against your target Emacs version rather than assuming it suppresses compilation of every file in the tree.
+    </instead>
+  </principle>
+</autoload_cookie_safety>
+
+<testability_design>
+  <description>Structuring Elisp so that behavior is reachable by unit tests without stubbing macros, and so that load order stays explicit.</description>
+
+  <principle name="extract_output_across_macro_boundary">
+    <mechanism>
+      Output produced through a macro boundary such as `with-help-window` is awkward to test: assertions have to stub the macro via `eval` tricks or rebind its `symbol-function`, which couples tests to expansion details.
+    </mechanism>
+    <instead>
+      Extract the rendering into a small, pure-ish helper that writes into the current buffer, and keep the public command a thin wrapper around that helper plus the window-opening macro. Tests then call the helper inside `with-temp-buffer` and assert on buffer contents directly. The seam is the point where side-effecting presentation meets pure content generation.
+    </instead>
+  </principle>
+
+  <principle name="isolate_feature_local_macros">
+    <mechanism>
+      Macros used only within one feature still force every call-site file to know the macro at compile time. Left inline in a large feature file, they blur the data/logic boundary and make load order implicit.
+    </mechanism>
+    <instead>
+      Move feature-local macros into a sibling `*-macros.el` module, keep runtime functions in the original file, and have the original `require` the macros module. Verify by byte-compiling both files. This makes load order explicit and shrinks the feature file.
+    </instead>
+  </principle>
+
+  <principle name="declarative_macro_for_command_families">
+    <mechanism>
+      A family of nearly identical interactive commands invites a parallel data table describing them, which becomes a second source of truth that drifts from the definitions.
+    </mechanism>
+    <instead>
+      Define the family with a declarative `defmacro` that expands into the command definitions, passing per-command differences as explicit forms. When the macro invocations are the only consumers of the parallel table, delete the table so the macro forms are the single source of truth.
+    </instead>
+  </principle>
+</testability_design>
+
+<upstream_contribution>
+  <description>A generalized recon checklist for contributing to an established Emacs Lisp project before opening a pull request. The goal is to discover a project's conventions from its own artifacts rather than guessing.</description>
+
+  <principle name="discover_conventions_from_artifacts">
+    <mechanism>
+      Emacs packages vary widely in commit style, changelog format, naming, and test harness. Submitting against the wrong conventions causes review churn. Every convention is discoverable from files already in the repository.
+    </mechanism>
+    <checklist>
+      - Commit style: read CONTRIBUTING plus `git log` for the actual subject/body norm (imperative ~50-char subject with 72-char wrapped body is common; conventional-commit prefixes like feat:/fix:/docs: appear in many projects even without a rule).
+      - Changelog: find the file and format (a `CHANGELOG.org` in Org markup vs a `NEWS` file), including any symbol-quoting convention (for example `~symbol~` in Org, or `` `nil' `` in docstrings).
+      - Naming: confirm the private/public prefix split (private `pkg--`, public `pkg-`, sometimes with a group-specific middle segment).
+      - Test harness: determine how tests run (a `make test` target, `eask`, `ert-runner`), the test-file layout (`test/pkg-*.el`), test tags used to skip environment-specific cases, and the mocking idiom in use (commonly `cl-letf` on `symbol-function`).
+      - Compatibility gate: note the minimum supported Emacs version and CI matrix, and whether byte-compilation is treated as an error (`byte-compile-error-on-warn`) so your change must compile cleanly there.
+      - Formatting commits: check whether whitespace/formatting-only changes must be a separate commit recorded in `.git-blame-ignore-revs`.
+    </checklist>
+  </principle>
+
+  <note>For MELPA submission specifics (recipe format, `package-lint`/`checkdoc` gates, PR mechanics), see the melpa-packaging skill.</note>
+</upstream_contribution>
+
 <context7_integration>
   <library name="Emacs Docs" id="/websites/emacsdocs" trust="7.5" snippets="6792" />
 
@@ -577,7 +806,7 @@ version: 2.0.0
 </context7_integration>
 
 <best_practices>
-  <practice priority="critical">Enable lexical-binding in all Elisp files: -\*- lexical-binding: t; -\_-</practice>
+  <practice priority="critical">Enable lexical-binding in all Elisp files: -*- lexical-binding: t; -*-</practice>
   <practice priority="high">Use #'function-name for function references (enables byte-compiler warnings)</practice>
   <practice priority="high">Document functions with docstrings</practice>
   <practice priority="high">Namespace all symbols with package prefix</practice>
@@ -757,4 +986,5 @@ version: 2.0.0
   <skill name="context7-usage">Emacs documentation lookup via /websites/emacsdocs</skill>
   <skill name="investigation-patterns">Debugging package conflicts and performance issues</skill>
   <skill name="technical-documentation">Creating package documentation and README files</skill>
+  <skill name="melpa-packaging">MELPA recipe authoring and submission mechanics for publishing packages</skill>
 </related_skills>

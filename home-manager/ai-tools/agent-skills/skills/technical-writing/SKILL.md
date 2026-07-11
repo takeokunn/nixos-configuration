@@ -1,7 +1,7 @@
 ---
 name: Technical Writing
-description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese. Includes a Japanese prose-quality ruleset (argumentation rigor, LLM-tell avoidance, dramatization restraint, redundancy removal) for drafting and revising Japanese manuscripts.
-version: 2.1.0
+description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese. Includes a Japanese prose-quality ruleset for drafting and revising Japanese manuscripts, plus a language-neutral long-form structure ruleset for books and serialized pieces.
+version: 2.2.0
 ---
 
 <purpose>
@@ -346,6 +346,65 @@ version: 2.1.0
   </pattern>
 </title_patterns>
 
+<long_form_structure>
+  <description>Patterns for book chapters, multi-part series, and other long-form pieces where the reader progresses across many sections. These operate above the single-article patterns and are language-neutral; when writing Japanese, also apply the japanese/prose_norms ruleset. They govern how a chapter opens, how examples grow, and how a chapter or a whole work closes.</description>
+
+  <pattern name="chapter_arc">
+    <description>Shape each chapter or installment as problem-then-solution</description>
+    <structure>
+      <section>Introduction: make the conventional approach's failure concrete before naming the new approach. Show the scenario where the old method breaks (a realistic "works on my machine" or "the build fails on the new OS" situation) so the solution is felt as relief rather than asserted as superior.</section>
+      <section>Foundation: the core structure or theory of the new approach.</section>
+      <section>Migration: how to move from the old approach to the new one, shown as a side-by-side change of one concrete example.</section>
+      <section>Practice: a worked, realistic example.</section>
+      <section>Deep dive: the mechanism behind why it works.</section>
+      <section>Outlook: a bridge to the next chapter's higher demand.</section>
+    </structure>
+    <technique>Introduce the solution in three graded moves: what visibly changes ("it becomes this"), why it changes (the mechanism), then the essential value ("so, in effect"). Build credibility with one concrete, checkable fact (adoption status, a count of supported items, who authored it) rather than adjectives.</technique>
+    <length>Keep the introduction's problem framing tight (roughly 300-400 words); a longer intro delays the payoff and front-loads detail unrelated to the example to come.</length>
+  </pattern>
+
+  <pattern name="code_example_escalation">
+    <description>Grow code examples in stages rather than presenting one large block</description>
+    <sequence>
+      <stage>Minimal example: the smallest version that runs.</stage>
+      <stage>Incremental complexity: add one axis at a time (an environment variable, then a hook, then a service), each as its own step.</stage>
+      <stage>Integrated example: combine the pieces into one realistic configuration.</stage>
+    </sequence>
+    <guideline>Cap a single code block at what a reader can absorb in a few minutes (on the order of 50-70 lines); split anything longer.</guideline>
+    <guideline>Frame each block: one or two sentences of lead-in before it, a two- or three-sentence takeaway after it, and defer the deeper "why" to the following subsection.</guideline>
+    <guideline>Watch the prose-to-code balance. A section that is mostly code with thin narration is under-explained; when code exceeds roughly two-thirds of a section, add explanation or move some code to a later stage.</guideline>
+    <guideline>Trim decorative shell or log output to the few lines that carry the point (a 40-line status dump where 5-10 lines matter is noise).</guideline>
+    <guideline>Do not let example difficulty regress: the last example in a chapter should not be the simplest one.</guideline>
+  </pattern>
+
+  <pattern name="concluding_chapter_rubric">
+    <description>Evaluate and write closing sections (chapter endings and the final chapter)</description>
+    <required_beats>
+      <beat name="recap">Name the specific technical elements the chapter taught, not a vague gesture at "what we covered".</beat>
+      <beat name="significance">State what was achieved and which problem it solved.</beat>
+      <beat name="next_steps">Point to concrete next actions and, at most, the single most important learning resource.</beat>
+    </required_beats>
+    <chapter_ending_types>
+      <type name="bridging">Ends by handing off to the next chapter's demand ("the environment built here now faces a higher requirement"). The default for interior chapters.</type>
+      <type name="terminal">Ends a series by integrating all prior chapters. It must still name the individual results, not only assert a "culmination".</type>
+    </chapter_ending_types>
+    <length>A closing section is short (about half a page, ~600 words across 3-4 paragraphs). Under-length is as much a defect as over-length: a final chapter that claims to integrate everything but omits the individual results is incomplete.</length>
+    <checklist>
+      <item>Does it reference the chapter's actual sections and results, not just its title?</item>
+      <item>Is there a single message focus rather than several competing ones?</item>
+      <item>Is the ending type (bridging vs terminal) consistent with sibling chapters' endings?</item>
+    </checklist>
+  </pattern>
+
+  <pattern name="long_form_redundancy_trimming">
+    <description>Reduce the bloat that accumulates across a long piece</description>
+    <technique>Merge duplicated messages: the same claim restated in three places (a feature's "everything is automated" line appearing across three consecutive subsections) collapses to one.</technique>
+    <technique>Prune URL enumeration: cite the single most important link, not a list.</technique>
+    <technique>Cut encouragement padding ("surely", "you should be able to ...") and re-summaries that immediately follow the thing they summarize.</technique>
+    <technique>Define a central term before or at its first use within a section, and keep its meaning stable across chapters instead of reintroducing it with a shifted sense.</technique>
+  </pattern>
+</long_form_structure>
+
 <best_practices>
   <practice priority="critical">
     <description>Start with a compelling hook in the first paragraph</description>
@@ -382,6 +441,10 @@ version: 2.1.0
   <practice priority="medium">
     <description>Adapt style to language conventions</description>
     <technique>Use conversational but professional tone in English, です・ます調 in Japanese technical articles</technique>
+  </practice>
+  <practice priority="medium">
+    <description>For long-form pieces, frame the conventional approach's failure before introducing the solution, and escalate code examples from minimal to integrated</description>
+    <technique>See long_form_structure: chapter_arc and code_example_escalation</technique>
   </practice>
 </best_practices>
 

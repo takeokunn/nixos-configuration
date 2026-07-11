@@ -236,7 +236,7 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Git operation summary",
   "workflow": {"strategy": "...", "branches": {}},
@@ -258,7 +258,7 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 80,
   "summary": "Recommend GitHub Flow for small team with frequent deployments",
   "workflow": {"strategy": "GitHub Flow", "branches": {"main": "Production", "feature/*": "Features"}},
@@ -281,7 +281,7 @@ Confidence is 80 because team size and deployment frequency are observable from 
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 75,
   "summary": "Resolved config conflict by merging both feature additions",
   "metrics": {"conflicts": 1, "resolved": 1},

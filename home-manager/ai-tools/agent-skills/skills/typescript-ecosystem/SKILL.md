@@ -1,7 +1,7 @@
 ---
 name: TypeScript Ecosystem
 description: This skill should be used when the user asks to "write typescript", "typescript config", "tsconfig", "type definition", "generics", "utility types", or works with TypeScript language patterns and configuration. Provides comprehensive TypeScript ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -393,6 +393,36 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
       </example>
     </pattern>
   </satisfies_operator>
+
+  <schema_single_source>
+    <principle>
+      Define a value's shape once, as a runtime schema, and derive everything else from it. A schema library (e.g. Zod, Valibot, ArkType) produces both a runtime validator and the static type via inference, so the type and the validation can never drift apart. Never hand-maintain a separate interface alongside a validator — that is two sources of truth for one shape.
+    </principle>
+
+    <pattern name="derive_type_from_schema">
+      <description>Write the schema, then infer the type from it rather than declaring the type independently.</description>
+      <example>
+        const UserSchema = z.object({
+        id: z.string().uuid(),
+        email: z.string().email(),
+        });
+        type User = z.infer&lt;typeof UserSchema&gt;; // stays in lockstep with the validator
+      </example>
+    </pattern>
+
+    <pattern name="machine_readable_field_descriptions">
+      <description>Attach descriptions to schema fields so the same definition powers validation, static types, and generated artifacts (OpenAPI, JSON Schema, form metadata, LLM tool schemas). One annotated schema replaces separate docs.</description>
+      <example>
+        const CreateOrder = z.object({
+        amount: z.number().int().describe("Total in minor currency units"),
+        });
+      </example>
+    </pattern>
+
+    <pattern name="normalize_validation_result">
+      <description>When one endpoint accepts multiple input encodings, validate each branch against its schema and normalize all branches into a single validated result object of one shape, so downstream code never re-inspects which encoding arrived.</description>
+    </pattern>
+  </schema_single_source>
 </type_patterns>
 
 <runtime_patterns>
@@ -549,6 +579,114 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
     </pattern>
   </module_patterns>
 </runtime_patterns>
+
+<server_client_boundary>
+  <principle>
+    In full-stack frameworks (React Router v7, Remix, Next.js) a single codebase compiles for two targets. Server-only code — DB clients, secrets, node: modules — must never reach the client bundle. Enforce this with an explicit boundary the bundler understands, not with the hope that tree-shaking drops unused code. Correctness must not depend on an optimization.
+  </principle>
+
+  <pattern name="server_file_naming">
+    <description>Name server-only modules with a `.server.ts` suffix (or place them under a `.server/` directory). Framework bundlers treat these as a hard boundary and exclude them from the browser build. Server-only route exports (loader, action, headers) and imports of server-only packages are the other two recognized forms of server-only code.</description>
+    <example>
+      app/
+      ├── auth.server.ts       // never shipped to the client
+      ├── database.server.ts
+      └── routes/
+      └── dashboard/
+      ├── loader.server.ts
+      └── action.server.ts
+    </example>
+    <note>Do not rely on tree-shaking for correctness: a value that must stay server-side belongs behind the `.server` boundary, even if it currently looks unused on the client.</note>
+  </pattern>
+
+  <pattern name="forbid_server_barrel_value_imports">
+    <description>A barrel (index.ts) that re-exports server implementations alongside client-safe types will pull the server code into the client bundle the moment any client-reachable file does a value import from it. Forbid value imports of server-mixed barrels from client-reachable code with a lint rule; allow type-only imports.</description>
+    <example>
+      // eslint.config.js — no-restricted-imports with allowTypeImports
+      // Applies to client-reachable files (everything except *.server.ts):
+      // - forbid value imports of barrels that re-export .server modules
+      // - permit `import type { ... }` from the same barrel
+      // Client code should import from safe subpaths (e.g. pkg/domain, pkg/application)
+      // rather than the package root barrel.
+    </example>
+  </pattern>
+
+  <pattern name="strict_content_type_handling">
+    <description>On request handlers, accept an explicit allow-list of content types (application/json, multipart/form-data, application/x-www-form-urlencoded) and reject the rest, rather than auto-guessing. Parse and validate each accepted branch, then normalize to one validated result. Prefer form-data-only handling for in-page forms; add JSON support only where a non-browser/external caller genuinely needs it.</description>
+  </pattern>
+</server_client_boundary>
+
+<edge_isolate_runtime>
+  <principle>
+    Edge/isolate runtimes (Cloudflare Workers and similar V8-isolate platforms) are not Node.js. They have no synchronous filesystem, `import.meta.url` is undefined, and process.env is not the source of configuration. Code that assumes the Node module/file model fails at module-initialization time — before any request is handled — which makes the failure look like a deploy error rather than a runtime one.
+  </principle>
+
+  <pattern name="no_runtime_file_or_path_resolution">
+    <description>Do not read files or resolve paths at runtime in an isolate. Because `import.meta.url` is undefined there, any path derived from it (or any createRequire(import.meta.url) a bundler emits for CJS interop) throws at load. Inline content at build time via static imports so the bundler embeds it as a string constant.</description>
+    <example>
+      // Fails on isolates: resolves a path from import.meta.url at runtime.
+      // const text = readFileSync(new URL("./prompt.md", import.meta.url));
+
+      // Works: content is a static import, inlined at build time.
+      import { promptTemplates } from "./prompts.js";
+    </example>
+    <note>If a dependency crashes at load with an undefined-path error, the usual cause is a bundler defaulting to a Node platform target; target a web/neutral platform so no code depends on a runtime `import.meta.url`.</note>
+  </pattern>
+
+  <pattern name="inject_config_per_request_not_at_module_init">
+    <description>Isolates provide secrets/config through a per-request env binding, not process.env at module load. A module-level singleton constructed from process.env will read empty values. Export factory functions that accept config explicitly and construct per request.</description>
+    <example>
+      // Fails on isolates: reads the key at module-init from process.env.
+      // export const client = makeClient(process.env.API_KEY);
+
+      // Works: factory receives the key from the request-time env binding.
+      export const createClient = (apiKey: string) =&gt; makeClient(apiKey);
+      // handler: const client = createClient(env.API_KEY);
+    </example>
+  </pattern>
+</edge_isolate_runtime>
+
+<auth_security_patterns>
+  <principle>
+    Authentication boundaries fail open when a check is merely structural rather than cryptographic, or when security-relevant state lives somewhere that does not survive scale-out. Treat every externally supplied token and every cross-request nonce as adversarial.
+  </principle>
+
+  <pattern name="verify_external_idp_token_signatures">
+    <description>An ID token from an external identity provider must be signature-verified — fetch the provider's JWKS, verify the RS256/ES256 signature, and handle key id (kid) rotation — before trusting any claim. Parsing the payload and checking its structure is not verification; it accepts forged tokens.</description>
+  </pattern>
+
+  <pattern name="oauth_state_in_shared_store">
+    <description>Store OAuth `state` (and similar one-time nonces) in a shared store (Redis/DB) and delete it on first use. A process-local Map breaks under multiple instances or a restart, and a state that cannot be reliably validated cannot protect against CSRF on the callback.</description>
+  </pattern>
+
+  <pattern name="cookie_auth_hardening">
+    <description>Cookie-authenticated mutating routes need CSRF/Origin verification (return 403 on failure). Set JWTs in HTTPOnly cookies from the server; the client only navigates/redirects. Synchronize the JWT `exp` and the cookie Max-Age from one source so they cannot drift. Store only a hash (e.g. SHA-256) of refresh tokens and rotate them one-time (invalidate on use, issue a new one).</description>
+  </pattern>
+
+  <pattern name="decouple_optional_dependencies">
+    <description>Do not let one login method's required environment (e.g. an embedded mini-app / in-app-webview integration) throw at dependency construction and take down an unrelated login path (e.g. email). Validate a subsystem's environment only when that subsystem is actually used.</description>
+  </pattern>
+</auth_security_patterns>
+
+<hexagonal_ports>
+  <principle>
+    Abstract every external dependency behind a port (an interface), with an adapter per environment. This is what makes an application testable and portable across runtimes: the domain talks to ports, and only the composition root knows which adapter is wired in. Crucially, non-obvious externalities — the clock, timers, randomness — are dependencies too and should be ports.
+  </principle>
+
+  <pattern name="port_the_timer_and_clock">
+    <description>Wrap timers/intervals in a TimerPort (e.g. setInterval that returns a cleanup function, plus lifecycle observation) rather than calling the platform timer directly. Periodic and time-dependent behavior then becomes deterministic in tests via fake timers.</description>
+    <example>
+      interface TimerPort {
+      setInterval(fn: () =&gt; void, ms: number): () =&gt; void; // returns cleanup
+      }
+      // test: vi.useFakeTimers() drives the port deterministically
+    </example>
+  </pattern>
+
+  <pattern name="inject_ports_via_factories">
+    <description>Provide ports through factory functions / constructor injection rather than module-level singletons. This composes naturally with per-request injection on isolate runtimes and with mocking in tests, and keeps intermediate types (raw parsed rows, DTOs) from leaking platform concerns into the domain.</description>
+  </pattern>
+</hexagonal_ports>
 
 <tooling>
   <eslint>
@@ -923,6 +1061,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <skill name="serena-usage">Symbol-level navigation for type definitions and interfaces</skill>
   <skill name="context7-usage">Fetch latest TypeScript compiler and tooling documentation</skill>
   <skill name="investigation-patterns">Debug type errors and investigate compilation issues</skill>
+  <skill name="effect-ts">Effect (Effect-TS) service, Layer, Schema, and error-channel patterns built on top of TypeScript</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate code patterns and references in this skill domain</agent>

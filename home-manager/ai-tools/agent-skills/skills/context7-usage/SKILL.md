@@ -1,7 +1,7 @@
 ---
 name: context7-usage
 description: Context7 MCP documentation retrieval patterns for up-to-date library and API references. Use this skill whenever current library docs, API signatures, version-specific behavior, or migration notes are needed.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -40,16 +40,16 @@ Provide consistent, efficient usage patterns for Context7 MCP so agents can retr
 
 <known_library_ids>
   <description>Pre-resolved IDs for frequently used libraries in this repository. Use these directly without calling resolve-library-id.</description>
-  <library name="TypeScript" id="/microsoft/typescript" trust="9.9" />
-  <library name="Nixpkgs / NixOS" id="/nixos/nixpkgs" trust="9.0" />
-  <library name="Home Manager" id="/nix-community/home-manager" trust="8.5" />
-  <library name="Go (website)" id="/golang/website" trust="8.3" />
-  <library name="Go (tools)" id="/golang/tools" trust="8.3" />
-  <library name="Rust (The Book)" id="/rust-lang/book" trust="9.0" />
-  <library name="Rust (std)" id="/rust-lang/rust" trust="9.5" />
-  <library name="Swift" id="/apple/swift" trust="8.5" />
-  <library name="PHP" id="/php/php-src" trust="8.0" />
-  <library name="GHC / Haskell" id="/ghc/ghc" trust="7.5" />
+  <library name="TypeScript" id="/microsoft/typescript" reputation="High" />
+  <library name="Nixpkgs / NixOS" id="/nixos/nixpkgs" reputation="High" />
+  <library name="Home Manager" id="/nix-community/home-manager" reputation="High" />
+  <library name="Go (website)" id="/golang/website" reputation="High" />
+  <library name="Go (tools)" id="/golang/tools" reputation="High" />
+  <library name="Rust (The Book)" id="/rust-lang/book" reputation="High" />
+  <library name="Rust (std)" id="/rust-lang/rust" reputation="High" />
+  <library name="Swift" id="/apple/swift" reputation="High" />
+  <library name="PHP" id="/php/php-src" reputation="High" />
+  <library name="GHC / Haskell" id="/ghc/ghc" reputation="High" />
 </known_library_ids>
 
 <patterns>
@@ -58,31 +58,31 @@ Provide consistent, efficient usage patterns for Context7 MCP so agents can retr
     <example>
       Step 1: resolve-library-id for "typescript"
       → returns "/microsoft/typescript"
-      Step 2: query-docs context7CompatibleLibraryID="/microsoft/typescript" topic="tsconfig moduleResolution nodenext"
+      Step 2: query-docs libraryId="/microsoft/typescript" query="tsconfig moduleResolution nodenext"
     </example>
   </pattern>
 
   <pattern name="version_sensitive_queries">
     <description>When behavior differs by version, specify the version in the topic or use a versioned library ID.</description>
     <example>
-      query-docs id="/microsoft/typescript" topic="TypeScript 6.0 breaking changes module resolution"
-      query-docs id="/nixos/nixpkgs" topic="buildGoModule Go 1.26"
+      query-docs libraryId="/microsoft/typescript" query="TypeScript 6.0 breaking changes module resolution"
+      query-docs libraryId="/nixos/nixpkgs" query="buildGoModule Go 1.26"
     </example>
   </pattern>
 
   <pattern name="migration_check">
     <description>Before upgrading a dependency, check migration notes.</description>
     <example>
-      query-docs id="/microsoft/typescript" topic="TypeScript 5 to 6 migration breaking changes"
-      query-docs id="/rust-lang/rust" topic="Rust edition 2021 to 2024 migration"
+      query-docs libraryId="/microsoft/typescript" query="TypeScript 5 to 6 migration breaking changes"
+      query-docs libraryId="/rust-lang/rust" query="Rust edition 2021 to 2024 migration"
     </example>
   </pattern>
 
   <pattern name="ecosystem_packaging">
     <description>For nixpkgs language packaging (buildGoModule, rustPlatform, etc.), always use Context7.</description>
     <example>
-      query-docs id="/nixos/nixpkgs" topic="buildGoModule vendorHash cargoHash"
-      query-docs id="/nixos/nixpkgs" topic="rustPlatform.buildRustPackage importCargoLock"
+      query-docs libraryId="/nixos/nixpkgs" query="buildGoModule vendorHash cargoHash"
+      query-docs libraryId="/nixos/nixpkgs" query="rustPlatform.buildRustPackage importCargoLock"
     </example>
   </pattern>
 </patterns>

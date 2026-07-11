@@ -1,7 +1,7 @@
 ---
 name: Fact Check
 description: This skill should be used when the user asks to "verify claims", "fact check", "validate documentation", "check sources", or needs verification of external source references. Provides patterns for systematic fact verification using Context7 and WebSearch.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -12,14 +12,13 @@ version: 2.0.0
   <tool name="resolve-library-id">
     <description>Resolve package name to Context7-compatible library ID</description>
     <param name="libraryName">Library name to search for</param>
-    <use_case>Must call before get-library-docs for library documentation claims</use_case>
+    <use_case>Must call before query-docs for library documentation claims</use_case>
   </tool>
 
-  <tool name="get-library-docs">
+  <tool name="query-docs">
     <description>Fetch documentation for a specific library to verify claims</description>
-    <param name="context7CompatibleLibraryID">Library ID from resolve-library-id</param>
-    <param name="topic">Specific topic to verify</param>
-    <param name="tokens">Max tokens to retrieve (default: 5000)</param>
+    <param name="libraryId">Library ID from resolve-library-id</param>
+    <param name="query">Specific topic or question to verify, scoped to a single concept</param>
     <use_case>Verify claims about library APIs, behavior, and best practices</use_case>
   </tool>
 
@@ -55,7 +54,7 @@ version: 2.0.0
 
       Version-specific example:
       Claim: "React 18 introduces automatic batching for all updates"
-      Verification: Query Context7 with topic="batching" for React 18 docs
+      Verification: Query Context7 with query="batching" for React 18 docs
       Result: Confirmed - React 18 automatically batches state updates inside promises, setTimeout, and native event handlers
     </example>
   </pattern>
@@ -64,14 +63,14 @@ version: 2.0.0
     <description>Choose appropriate verification source based on claim type</description>
     <decision_tree name="when_to_use">
       <question>What type of claim needs verification?</question>
-      <branch condition="Library/framework API">Use Context7 with resolve-library-id then get-library-docs</branch>
+      <branch condition="Library/framework API">Use Context7 with resolve-library-id then query-docs</branch>
       <branch condition="Web standard/specification">Use WebSearch for official specification</branch>
       <branch condition="General technical fact">Use WebSearch with authoritative domain filter</branch>
       <branch condition="Specific documentation URL">Use WebFetch to retrieve and verify</branch>
     </decision_tree>
     <example>
       Source priority:
-      Context7 for library documentation (trust score 7+)
+      Context7 for library documentation (prefer High Source Reputation and higher Benchmark Score)
       WebFetch for specific URLs cited in claims
       WebSearch for general technical claims
       Mark as unverifiable if no source available
@@ -162,7 +161,7 @@ version: 2.0.0
   <practice priority="critical">Use Context7 as primary source for library documentation claims</practice>
   <practice priority="critical">Flag all claims with verification confidence below 80</practice>
   <practice priority="critical">Document evidence source for each verification</practice>
-  <practice priority="high">Prefer libraries with Context7 trust score 7+ for verification</practice>
+  <practice priority="high">Prefer libraries with High Source Reputation and a strong Benchmark Score in Context7 for verification</practice>
   <practice priority="high">Use WebSearch fallback when Context7 unavailable</practice>
   <practice priority="medium">Include direct quotes from sources as evidence</practice>
   <practice priority="medium">Note when verification source has version mismatch</practice>

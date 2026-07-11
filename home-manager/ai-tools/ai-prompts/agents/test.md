@@ -250,7 +250,7 @@ description: Test strategy and quality management
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 0,
   "summary": "Test results",
   "metrics": {"total": 0, "passed": 0, "failed": 0, "coverage": "XX%"},
@@ -272,7 +272,7 @@ description: Test strategy and quality management
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 90,
   "summary": "125 tests, 2 failed, 85% coverage",
   "metrics": {"total": 125, "passed": 123, "failed": 2, "coverage": "85%"},
@@ -295,7 +295,7 @@ Confidence is 90 because test files are clearly identifiable, test runner produc
     <output>
 {
   "status": "success",
-  "status_criteria": "inherits core-patterns#output_status_criteria",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "confidence": 85,
   "summary": "Login flow E2E test passed",
   "metrics": {"total": 1, "passed": 1, "failed": 0, "coverage": "N/A"},

@@ -1,7 +1,7 @@
 ---
 name: SQL Ecosystem
 description: This skill should be used when working with SQL databases, "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE TABLE", "JOIN", "INDEX", "EXPLAIN", transactions, or database migrations. Provides comprehensive SQL patterns across PostgreSQL, MySQL, and SQLite.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -1020,7 +1020,7 @@ version: 2.0.0
           full_name VARCHAR(101) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) VIRTUAL
         );
       </example>
-      <note>PostgreSQL only supports STORED; MySQL/SQLite support both STORED and VIRTUAL. VIRTUAL is computed on read, STORED is persisted and indexable.</note>
+      <note>PostgreSQL supported only STORED through version 17; PostgreSQL 18+ adds VIRTUAL (computed on read) and makes VIRTUAL the default when neither keyword is specified. MySQL/SQLite support both STORED and VIRTUAL. VIRTUAL is computed on read, STORED is persisted and indexable.</note>
     </pattern>
 
     <pattern name="junction_table">

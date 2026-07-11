@@ -1,7 +1,7 @@
 ---
 name: PHP Ecosystem
 description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", or works with modern PHP language patterns and configuration. Provides comprehensive modern PHP ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -91,6 +91,33 @@ version: 2.0.0
       opcache.validate_timestamps = 1
     </config>
   </recommended_config>
+
+  <version_upgrade_coherence>
+    <principle>
+      A PHP major/minor bump is a cross-cutting change, not a one-line edit to composer.json. The language version is pinned in several independent places, and if any one lags, static analysis and CI validate against a different language level than the code actually runs on — a silent, confidence-eroding split. Bump every pin in one pass and verify with the full check suite.
+    </principle>
+
+    <pattern name="align_all_version_pins">
+      <description>Enumerate and update every location that encodes the PHP version together.</description>
+      <checklist>
+        <item>composer.json: the "php" constraint (e.g. "^8.5")</item>
+        <item>Local dev environment: the toolchain pin (Nix devenv php85, asdf/mise, or equivalent)</item>
+        <item>Docker base images: both the CLI and FPM variants</item>
+        <item>CI: the setup-php (or equivalent) php-version input</item>
+        <item>Static analysis: PHPStan phpVersion (e.g. 80500)</item>
+        <item>Automated refactoring: Rector -&gt;withPhpSets() / PhpVersion target</item>
+      </checklist>
+    </pattern>
+
+    <pattern name="regenerate_baseline_after_toolchain_bump">
+      <description>After upgrading the static-analysis toolchain itself (e.g. a PHPStan major, or its framework extension), regenerate the baseline (phpstan-baseline.neon) for the new toolchain rather than hand-editing it. The new version surfaces and reclassifies errors differently; a stale baseline hides real regressions.</description>
+      <note>New rules that would require broad mechanical changes to pre-existing code (for example, banning inline ignore comments across a legacy codebase) can be disabled deliberately and tracked as separate technical debt, rather than blocking the upgrade.</note>
+    </pattern>
+
+    <pattern name="track_accepted_advisories">
+      <description>composer audit may report a low-severity advisory that is pinned by a transitive dependency you do not control. Record the advisory and why it is deferred (blocking constraint) instead of silently ignoring the audit, so the decision is auditable and revisited when the constraint lifts.</description>
+    </pattern>
+  </version_upgrade_coherence>
 </php_version>
 
 <type_system>
@@ -899,6 +926,36 @@ version: 2.0.0
   </pattern>
 </design_patterns>
 
+<framework_conventions>
+  <principle>
+    Application frameworks (Laravel and peers) reward a small set of conventions that keep domain logic testable and correct as a codebase grows. These are framework-general disciplines: push persistence behind an abstraction, keep values strongly typed, and never trust a lazy relation load in a loop.
+  </principle>
+
+  <pattern name="strict_and_final">
+    <description>declare(strict_types=1) at the top of every file, and prefer final class when a type is not designed for extension. Finality makes the intended extension points explicit and keeps mocking honest (mock the interface, not a concrete class).</description>
+  </pattern>
+
+  <pattern name="persistence_behind_repository">
+    <description>Interact with the database through a Repository rather than calling the ORM/query builder directly from controllers or services. The repository is the seam for testing and for swapping persistence, and it keeps query concerns out of domain code.</description>
+  </pattern>
+
+  <pattern name="prevent_n_plus_one">
+    <description>Load relations explicitly with eager loading (with() / loadMissing()) instead of touching a relation inside a loop, which triggers one query per iteration. N+1 is the most common performance regression in ORM-backed code and is invisible until the collection grows.</description>
+  </pattern>
+
+  <pattern name="collection_pipelines">
+    <description>Prefer collection pipeline methods (map, filter, each, reduce) over manual foreach accumulation. The intent reads more directly and the transformations compose.</description>
+  </pattern>
+
+  <pattern name="money_as_integer">
+    <description>Represent exact monetary amounts as integers in minor units, never floats — floating point cannot represent decimal currency exactly. A workable rule set: prices are strict integers; discounts round down (consistent with how consumption tax is handled); cost figures may permit float where they are estimates rather than charged amounts.</description>
+  </pattern>
+
+  <pattern name="string_backed_enums">
+    <description>Back enums with descriptive string values and store those strings in the database, not integers. String values keep stored data self-describing and stable across enum reordering; integer backing couples the schema to declaration order.</description>
+  </pattern>
+</framework_conventions>
+
 <composer>
   <package_management>
     <pattern name="require">
@@ -1489,6 +1546,43 @@ version: 2.0.0
       </config>
     </pattern>
   </preloading>
+
+  <caching>
+    <principle>
+      Read-heavy, non-critical endpoints (dashboards, homepages, rankings) are the highest-leverage caching targets: they run the same expensive read on every request and tolerate slightly stale data. Wrapping them in a remembered cache can turn hundreds of milliseconds of database work per request into single-digit milliseconds and cut query load by orders of magnitude. The design work is in the invalidation and failure behavior, not the cache call itself.
+    </principle>
+
+    <pattern name="remember_with_ttl_flag_and_namespace">
+      <description>Wrap the read in a remember()-style helper with an explicit TTL, gate it behind a config feature flag (so it can be turned off without a code change), and namespace the keys by prefix. The flag and namespace make the cache observable and reversible in production.</description>
+      <example>
+        return Cache::remember(
+            "homepage:daily_ranking",
+            300, // seconds
+            fn () =&gt; $this-&gt;repository-&gt;dailyRanking(),
+        );
+      </example>
+    </pattern>
+
+    <pattern name="cache_stampede_evaluation">
+      <description>A stampede happens when a hot key expires and many concurrent requests all recompute it at once. Evaluate the risk along four axes before choosing mitigations.</description>
+      <axes>
+        <axis name="concurrency">How many requests hit the key within the recompute window?</axis>
+        <axis name="data_size">How heavy is a single recomputation (query cost, payload size)?</axis>
+        <axis name="ttl">Shorter TTL means fresher data but more frequent expiry events.</axis>
+        <axis name="criticality">Presentational data tolerates brief staleness; transactional data does not.</axis>
+      </axes>
+      <mitigations>
+        <mitigation>Tune the TTL so expiry lands in lower-traffic periods; lengthen it if a stampede is observed.</mitigation>
+        <mitigation>Use a lock (Cache::lock) around the recompute so only one request rebuilds while others wait or serve stale.</mitigation>
+        <mitigation>Warm the cache shortly before expiry so the key never actually goes cold under load.</mitigation>
+        <mitigation>Wrap the cache backend in try/catch so a cache outage degrades to a direct read instead of an error.</mitigation>
+      </mitigations>
+    </pattern>
+
+    <pattern name="observe_hit_ratio">
+      <description>Monitor the cache hit ratio in production and alert when it drops below an expected threshold. A falling hit ratio is the leading indicator of a misconfigured key, an unexpectedly short effective TTL, or a stampede — visible before latency regresses.</description>
+    </pattern>
+  </caching>
 </performance>
 
 <error_handling>

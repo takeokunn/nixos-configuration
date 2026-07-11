@@ -1,7 +1,7 @@
 ---
 name: Org Ecosystem
 description: This skill should be used when the user asks to "write org", "org-mode", "org file", ".org file", "org syntax", "org document", "org babel", "org export", "org agenda", "org capture", "GTD", "literate programming", "org publishing", or "org-mode workflow". Provides comprehensive Org-mode patterns and best practices.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -50,8 +50,9 @@ version: 2.0.0
     <concept name="headings">
       <description>Hierarchical outline structure with stars</description>
       <example>
-        - Top-level heading
-        ** Second-level heading \*** Third-level heading
+        * Top-level heading
+        ** Second-level heading
+        *** Third-level heading
       </example>
     </concept>
 
@@ -200,11 +201,11 @@ version: 2.0.0
     <example>
       #+TODO: TODO(t) NEXT(n) WAITING(w@/!) | DONE(d!) CANCELLED(c@)
 
-      - TODO Buy groceries
-      - NEXT Write report
-      - WAITING Review from team :@john:
-      - DONE Complete project
-      - CANCELLED Obsolete task
+      * TODO Buy groceries
+      * NEXT Write report
+      * WAITING Review from team :@john:
+      * DONE Complete project
+      * CANCELLED Obsolete task
     </example>
     <note>@ prompts for note, ! records timestamp, | separates active from done states</note>
   </concept>
@@ -292,7 +293,7 @@ version: 2.0.0
         #+TAGS: @home(h) @work(w) @phone(p) @computer(c)
         #+TAGS: urgent(u) important(i)
 
-        - TODO Call dentist :@phone:urgent:
+        * TODO Call dentist :@phone:urgent:
 
         (setq org-tag-alist
         '((:startgroup)
@@ -386,7 +387,7 @@ version: 2.0.0
         def main():
         print("Generated from org file")
 
-        if **name** == "**main**":
+        if __name__ == "__main__":
         main()
         #+END_SRC
 
@@ -418,7 +419,7 @@ version: 2.0.0
 
         &lt;&lt;main&gt;&gt;
 
-        if **name** == "**main**":
+        if __name__ == "__main__":
         main()
         #+END_SRC
       </example>
@@ -556,13 +557,13 @@ version: 2.0.0
         #+BEAMER_THEME: Madrid
         #+BEAMER_COLOR_THEME: default
 
-        - Introduction
-        \*\* First Slide
+        * Introduction
+        ** First Slide
 
-        * Point one
-        * Point two
+        - Point one
+        - Point two
 
-        \*\* Second Slide
+        ** Second Slide
         #+ATTR_BEAMER: :overlay &lt;+->
 
         - Appears first
@@ -570,7 +571,7 @@ version: 2.0.0
         - Appears third
 
         * Conclusion
-        \*\* Summary
+        ** Summary
         Key takeaways here.
       </example>
       <note>H:2 means level-2 headings become frames</note>
@@ -629,7 +630,7 @@ version: 2.0.0
       <example>
         * Exported heading
 
-        - Not exported :noexport:
+        * Not exported :noexport:
 
         #+BEGIN_COMMENT
         This entire block is not exported.

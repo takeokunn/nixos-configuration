@@ -1,7 +1,7 @@
 ---
 name: Haskell Ecosystem
 description: This skill should be used when working with Haskell projects, "cabal.project", "stack.yaml", "ghc", "cabal build/test/run", "stack build/test/run", or Haskell language patterns. Provides comprehensive Haskell ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.0.1
 ---
 
 <purpose>
@@ -492,7 +492,7 @@ version: 2.0.0
 
     <version_bounds>
       -- Caret (^>=): major version compatible
-      base ^>=4.21        -- 4.21.x.x (GHC 9.14)
+      base ^>=4.22        -- 4.22.x.x (GHC 9.14; base 4.21 is GHC 9.12)
 
       -- Range
       text >=2.0 &amp;&amp; &lt;2.2
@@ -511,7 +511,7 @@ version: 2.0.0
         DerivingVia
         TypeFamilies
 
-      default-language: GHC2024  -- Recommended for new projects (default since GHC 9.12)
+      default-language: GHC2024  -- Recommended for new projects (available since GHC 9.10)
     </language_extensions>
   </cabal_file>
 
@@ -663,7 +663,7 @@ version: 2.0.0
     <language_standards>
       <standard name="Haskell2010">Legacy standard; avoid for new projects</standard>
       <standard name="GHC2021">Widely supported; enables common extensions</standard>
-      <standard name="GHC2024" recommended="true">Current recommended default (since GHC 9.12); extends GHC2021 with ExplicitNamespaces, TypeData, MonoLocalBinds, and others</standard>
+      <standard name="GHC2024" recommended="true">Recommended default-language for new projects (available since GHC 9.10; GHC's own default edition remains GHC2021); extends GHC2021 with ExplicitNamespaces, TypeData, MonoLocalBinds, and others</standard>
     </language_standards>
 
     <ghc_lts_policy>

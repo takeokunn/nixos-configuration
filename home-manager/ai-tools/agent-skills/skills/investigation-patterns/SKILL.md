@@ -1,7 +1,7 @@
 ---
 name: Investigation Patterns
 description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", or needs evidence-based code analysis and debugging. Provides systematic investigation and debugging methodology.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -288,6 +288,44 @@ version: 2.0.0
       Add test to prevent recurrence
     </example>
   </pattern>
+
+  <pattern name="architecture_analysis_before_feature">
+    <description>Before adding a feature to an unfamiliar codebase, produce a written architecture analysis that turns exploration into a concrete integration plan. This is the deliverable of the investigation and precedes any implementation.</description>
+    <template>
+      <section name="existing_patterns">Identify the codebase's governing patterns (state management, event flow, rendering or layering, module boundaries) with file:line evidence.</section>
+      <section name="reference_implementation">Find the existing feature that most resembles the one to be added and read it as the template to imitate. A near-neighbor already-solved feature is the strongest guide to the codebase's conventions.</section>
+      <section name="integration_points">List the exact file:line locations where new code attaches, and what data each point already has in scope.</section>
+      <section name="edge_cases_and_risks">Enumerate edge cases and rank technical risks (low/medium/high), each with a mitigation.</section>
+      <section name="change_surface">State explicitly both the files to create or modify AND the files that need no change. Naming the "no change needed" set bounds the blast radius and is as valuable as the change list.</section>
+      <section name="effort_and_confidence">Give a phased plan with a rough effort estimate and a confidence level with its basis.</section>
+    </template>
+    <note>Prefer reusing an existing abstraction over inventing one. If the existing abstraction is fundamentally incompatible with the new requirement, say so explicitly and justify a rewrite rather than forcing an ill-fitting extension.</note>
+  </pattern>
+
+  <pattern name="deferred_decision_record">
+    <description>When a feature or decision is blocked on an external dependency maturing, record it as a deferred decision instead of leaving an open loop or re-investigating from scratch each time.</description>
+    <structure>
+      <field name="status_and_dates">The decision, its date, and the next scheduled review date.</field>
+      <field name="revisit_conditions">A table of conditions that must ALL hold to unblock, each with a target and a concrete "how to check" (a release page, a changelog, a capability list).</field>
+      <field name="review_schedule">A periodic cadence (for example quarterly) plus event triggers (on a dependency release, on renewed demand).</field>
+      <field name="plan_when_unblocked">The implementation outline and the reference implementations to follow once unblocked.</field>
+      <field name="contingency">What to do if the dependency stalls (seek active forks, choose an alternative approach, or close with an explanation).</field>
+      <field name="review_log">An append-only log of each review: date, observed dependency version or state, and outcome.</field>
+    </structure>
+    <note>Make revisit conditions checkable without re-investigation: name the exact capability (for example a required protocol method) or version threshold, so a future review is a lookup rather than a fresh analysis.</note>
+  </pattern>
+
+  <pattern name="dead_code_removal_discipline">
+    <description>Remove dead code by confirming it is unreferenced, not by matching tokens</description>
+    <rule>Confirm no references with a semantic reference search, not a raw occurrence count: package-qualified names and re-exported symbols make token counting produce false positives.</rule>
+    <rule>Search across both source and tests: tests may reference private helpers directly, so a source-only search can wrongly mark a symbol dead.</rule>
+    <rule>Treat build-system definitions (component or module manifests, barrel or index files) as the boundary of the removal: deleting a file cleanly usually requires updating the manifest that lists it.</rule>
+    <rule>After removal, reload or build the affected unit (load the system, run the type or compile check, run the relevant test slice) to prove nothing dangles.</rule>
+    <candidates>
+      <candidate>Thin compatibility barrels that only re-export concrete modules: remove by pointing each consumer at the concrete module, then delete the barrel.</candidate>
+      <candidate>Single-use private helpers whose only call sites are local: inline them, keeping the public entry point as the sole behavioral surface.</candidate>
+    </candidates>
+  </pattern>
 </patterns>
 
 <best_practices>
@@ -299,6 +337,9 @@ version: 2.0.0
   <practice priority="high">Document information gaps and unclear points</practice>
   <practice priority="medium">Check multiple sources to increase confidence</practice>
   <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
+  <practice priority="high">Before adding a feature to an unfamiliar codebase, write an architecture analysis: existing patterns, a reference implementation, integration points, risks, and the explicit change surface including files that need no change (architecture_analysis_before_feature)</practice>
+  <practice priority="medium">Record work blocked on an external dependency as a deferred decision with checkable revisit conditions, not an open loop (deferred_decision_record)</practice>
+  <practice priority="medium">Remove dead code by semantic reference confirmation across source and tests, with a build or reload check after removal (dead_code_removal_discipline)</practice>
 </best_practices>
 
 <anti_patterns>
