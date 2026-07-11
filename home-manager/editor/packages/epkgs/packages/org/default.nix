@@ -3,6 +3,7 @@ let
   org-view-mode = epkgs.org-view-mode;
   org-dashboard = epkgs.org-dashboard;
   ox-typst = epkgs.ox-typst;
+  doclive = nurPkgs.emacs-doclive;
   org-volume = nurPkgs.emacs-org-volume;
   ob-phpstan = nurPkgs.emacs-ob-phpstan;
   ob-racket = nurPkgs.emacs-ob-racket;
@@ -23,6 +24,7 @@ with epkgs;
   org-ql
   org-sliced-images
   org-preview-html
+  doclive
 
   # Theme
   org-superstar
