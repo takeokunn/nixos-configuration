@@ -57,6 +57,8 @@
     context7-skills.flake = false;
     ast-grep-skill.url = "github:ast-grep/agent-skill";
     ast-grep-skill.flake = false;
+    paredit-cli-skills.url = "github:takeokunn/paredit-cli";
+    paredit-cli-skills.flake = false;
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
     zen-browser.inputs.home-manager.follows = "home-manager";
@@ -133,6 +135,7 @@
                   scientific-skills
                   context7-skills
                   ast-grep-skill
+                  paredit-cli-skills
                   ;
               };
             };

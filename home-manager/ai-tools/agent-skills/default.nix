@@ -8,6 +8,7 @@
   scientific-skills,
   context7-skills,
   ast-grep-skill,
+  paredit-cli-skills,
   ...
 }:
 {
@@ -40,6 +41,8 @@
   programs.agent-skills.sources.context7.subdir = "skills";
   programs.agent-skills.sources."ast-grep".path = ast-grep-skill;
   programs.agent-skills.sources."ast-grep".subdir = "ast-grep/skills";
+  programs.agent-skills.sources."paredit-cli".path = paredit-cli-skills;
+  programs.agent-skills.sources."paredit-cli".subdir = "skills";
 
   programs.agent-skills.skills.enableAll = [
     "custom"
@@ -52,6 +55,7 @@
     "scientific"
     "context7"
     "ast-grep"
+    "paredit-cli"
   ];
 
   programs.agent-skills.targets.claude.enable = true;

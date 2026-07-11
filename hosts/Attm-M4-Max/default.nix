@@ -93,6 +93,7 @@ nix-darwin.lib.darwinSystem {
           scientific-skills
           context7-skills
           ast-grep-skill
+          paredit-cli-skills
           emacs-overlay
           org-babel
           firefox-addons

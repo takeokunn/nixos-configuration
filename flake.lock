@@ -1077,6 +1077,22 @@
         "type": "github"
       }
     },
+    "paredit-cli-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783737169,
+        "narHash": "sha256-0thUau1ADHWm3X293p1MA3lL+PE0vKKyQzfNmXPOZL0=",
+        "owner": "takeokunn",
+        "repo": "paredit-cli",
+        "rev": "6ab35e973bc82e352698acd771f2fc181301fa19",
+        "type": "github"
+      },
+      "original": {
+        "owner": "takeokunn",
+        "repo": "paredit-cli",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agent-skills": "agent-skills",
@@ -1107,6 +1123,7 @@
         "nixvim": "nixvim",
         "nur-packages": "nur-packages_2",
         "org-babel": "org-babel",
+        "paredit-cli-skills": "paredit-cli-skills",
         "scientific-skills": "scientific-skills",
         "treefmt-nix": "treefmt-nix_3",
         "xremap": "xremap",

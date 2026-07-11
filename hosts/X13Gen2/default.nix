@@ -64,6 +64,7 @@ nixpkgs.lib.nixosSystem {
           scientific-skills
           context7-skills
           ast-grep-skill
+          paredit-cli-skills
           nur-packages
           emacs-overlay
           org-babel
