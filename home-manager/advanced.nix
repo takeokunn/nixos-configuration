@@ -12,6 +12,7 @@ let
   isDarwin = lib.hasSuffix "-darwin" system;
 
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
+  sketchybarOverlay = import ./mac/sketchybar/overlay.nix;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
@@ -68,7 +69,10 @@ in
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
+  # sketchybarOverlay must be listed here (home-manager's own pkgs), not only in
+  # the host overlays: without useGlobalPkgs, HM ignores the host's pkgs and
+  # builds programs.sketchybar.package from this nixpkgs instance.
+  nixpkgs.overlays = editorOverlay ++ sketchybarOverlay ++ [ mcp-servers-nix.overlays.default ];
 
   programs.nixvim.nixpkgs.source = nixpkgs;
 

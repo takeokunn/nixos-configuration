@@ -17,11 +17,12 @@ let
 
   editorOverlay = import ../../home-manager/editor/overlay.nix { inherit emacs-overlay; };
   shellOverlay = import ../../home-manager/shell/overlay.nix;
+  sketchybarOverlay = import ../../home-manager/mac/sketchybar/overlay.nix;
 
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
-    overlays = editorOverlay ++ shellOverlay;
+    overlays = editorOverlay ++ shellOverlay ++ sketchybarOverlay;
   };
 
   nurPkgs = import "${nur-packages}" {
