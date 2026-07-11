@@ -56,9 +56,12 @@ in
             # On Darwin 25.x (macOS 16), ObjC files (.m) fail to compile because
             # the compiler defaults to a pre-C11 standard where `bool` and `alignof`
             # are unknown. Force gnu11 standard and include stdbool.h explicitly.
-            env = (old.env or { }) // parallelBuildAttrs.env // lib.optionalAttrs pkgs.stdenv.isDarwin {
-              NIX_CFLAGS_COMPILE = "${(old.env or { }).NIX_CFLAGS_COMPILE or ""} -std=gnu11 -include stdbool.h";
-            };
+            env =
+              (old.env or { })
+              // parallelBuildAttrs.env
+              // lib.optionalAttrs pkgs.stdenv.isDarwin {
+                NIX_CFLAGS_COMPILE = "${(old.env or { }).NIX_CFLAGS_COMPILE or ""} -std=gnu11 -include stdbool.h";
+              };
           }
         );
         extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
