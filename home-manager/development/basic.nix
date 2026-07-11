@@ -9,5 +9,6 @@
   home.packages = [
     nurPkgs.devenv
     nurPkgs.kuro
+    nurPkgs.paredit-cli
   ];
 }
