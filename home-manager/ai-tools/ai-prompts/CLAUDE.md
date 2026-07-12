@@ -11,6 +11,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
   <rule>Follow serena-usage skill for all Serena MCP operations</rule>
   <rule>Use perl for all text processing; never use sed or awk</rule>
+  <rule>Use the paredit-cli skill (the `paredit` binary) for all AI-driven refactoring of Lisp-family source (Common Lisp, Emacs Lisp, Scheme, Clojure, Janet, Fennel) — renaming, moving, extracting/inlining, reshaping bindings/conditionals/calls; never hand-edit balanced parentheses</rule>
   <rule>Follow the active tool or session language directive; default to English only when no directive is configured</rule>
   <rule>NEVER run git commit, git push, gh pr create, or any git write operation without the user's EXPLICIT instruction in the current message. "Continue the task" or context-continuation prompts do NOT count as permission. When in doubt, ask.</rule>
   <rule>Always create a feature branch (git checkout -b feat/&lt;name&gt;) before starting work. PRs must target the project's default branch (check `gh repo view --json defaultBranchRef`). NEVER commit directly to the default branch.</rule>
@@ -179,6 +180,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <category name="tools">
     <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation, editing)</skill>
     <skill name="context7-usage">Context7 MCP documentation retrieval</skill>
+    <skill name="paredit-cli">Structural refactoring of Lisp-family source (Common Lisp, Emacs Lisp, Scheme, Clojure, Janet, Fennel) via the `paredit` binary; mandatory in place of hand-editing balanced-parenthesis code</skill>
   </category>
   <category name="methodology">
     <skill name="investigation-patterns">Evidence-based code analysis and debugging</skill>
