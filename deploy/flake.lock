@@ -57,11 +57,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783872242,
-        "narHash": "sha256-d0TA7V0xK8zjB0XDFvwoic0PPkmwVWMzj1PJ5BBRCO8=",
+        "lastModified": 1783919319,
+        "narHash": "sha256-cnHUcK1lK3v2LBoh0J6xI55iMnehw8plZxHGYnkSp3M=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "7131090fb311967dce18d8476d5f45fa27a90b8d",
+        "rev": "37b2225d0adcdaa7a275ab2991d46f7f11bfa7ce",
         "type": "github"
       },
       "original": {
