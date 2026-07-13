@@ -149,39 +149,41 @@ let
     fi
   '';
 
-  # Sleep-prevention (caffeinate) state file, shared by both scripts below.
-  # PID-file (not `pgrep -f caffeinate`) so a user-launched caffeinate elsewhere is never
-  # touched by the toggle. Session-scoped: doesn't survive logout/reboot, by design (no sudo).
-  caffeinatePidfile = "$HOME/.cache/sketchybar_caffeinate.pid";
+  # Sleep-prevention (pmset noidle) state file, shared by both scripts below.
+  # PID-file (not `pgrep -f pmset`) so a user-launched pmset elsewhere is never
+  # touched by the toggle. Session-scoped: doesn't survive logout/reboot, by design (no sudo,
+  # since `pmset noidle` only holds an IOPMAssertion like caffeinate -- it does not touch
+  # system-wide power settings and needs no elevated privileges).
+  sleepPreventPidfile = "$HOME/.cache/sketchybar_pmset_noidle.pid";
 
-  # Sleep-prevention display plugin script (reflects the actual caffeinate process state).
-  # Only trusts the pidfile if that PID is still actually a caffeinate process, since PIDs
+  # Sleep-prevention display plugin script (reflects the actual pmset process state).
+  # Only trusts the pidfile if that PID is still actually a pmset process, since PIDs
   # get reused by macOS and a stale entry could otherwise point at an unrelated process.
   sleepPreventPlugin = pkgs.writeShellScript "sleep_prevent.sh" ''
-    PIDFILE="${caffeinatePidfile}"
+    PIDFILE="${sleepPreventPidfile}"
 
-    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "caffeinate" ]; then
+    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "pmset" ]; then
       sketchybar --set "$NAME" icon.color=${colors.orange}
     else
       sketchybar --set "$NAME" icon.color=${colors.comment}
     fi
   '';
 
-  # Sleep-prevention toggle click script: starts/stops a detached caffeinate process (no sudo)
+  # Sleep-prevention toggle click script: starts/stops a detached `pmset noidle` process (no sudo)
   sleepPreventTogglePlugin = pkgs.writeShellScript "sleep_prevent_toggle.sh" ''
-    PIDFILE="${caffeinatePidfile}"
+    PIDFILE="${sleepPreventPidfile}"
     LOCKDIR="$PIDFILE.lock"
     mkdir -p "$(dirname "$PIDFILE")"
 
-    # Guard against a rapid double-click racing two toggles and orphaning a caffeinate process
+    # Guard against a rapid double-click racing two toggles and orphaning a pmset process
     mkdir "$LOCKDIR" 2>/dev/null || exit 0
     trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
 
-    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "caffeinate" ]; then
+    if [ -f "$PIDFILE" ] && [ "$(ps -p "$(cat "$PIDFILE")" -o comm= 2>/dev/null)" = "pmset" ]; then
       kill "$(cat "$PIDFILE")" 2>/dev/null
       rm -f "$PIDFILE"
     else
-      nohup caffeinate -d -i -s >/dev/null 2>&1 &
+      nohup pmset noidle >/dev/null 2>&1 &
       disown
       echo "$!" > "$PIDFILE"
     fi
@@ -343,7 +345,7 @@ let
                       icon.color="$GREEN" \
                       label.drawing=off
 
-    # Sleep prevention toggle (caffeinate, no sudo required; update_freq=5 since it's a cheap
+    # Sleep prevention toggle (pmset noidle, no sudo required; update_freq=5 since it's a cheap
     # kill -0 check, not a heavier poll like the 1s-interval items below). Icon-only (no label,
     # matching power_icon) to keep the right-side item group narrow enough to clear the notch.
     sketchybar --add item sleep_prevent right \
