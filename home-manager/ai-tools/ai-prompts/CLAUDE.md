@@ -14,7 +14,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <rule>Use the paredit-cli skill (the `paredit` binary) for all AI-driven refactoring of Lisp-family source (Common Lisp, Emacs Lisp, Scheme, Clojure, Janet, Fennel) — renaming, moving, extracting/inlining, reshaping bindings/conditionals/calls; never hand-edit balanced parentheses</rule>
   <rule>Follow the active tool or session language directive; default to English only when no directive is configured</rule>
   <rule>NEVER run git commit, git push, gh pr create, or any git write operation without the user's EXPLICIT instruction in the current message. "Continue the task" or context-continuation prompts do NOT count as permission. When in doubt, ask.</rule>
-  <rule>Always create a feature branch (git checkout -b feat/&lt;name&gt;) before starting work. PRs must target the project's default branch (check `gh repo view --json defaultBranchRef`). NEVER commit directly to the default branch.</rule>
+  <rule>Always create a feature branch before starting work: `git checkout -b feat/&lt;name&gt; origin/$DEFAULT` when the working tree is clean and already on the default branch; otherwise (uncommitted changes present, or already on a non-default branch) isolate in a worktree instead per ORCH-P006. PRs must target the project's default branch (check `gh repo view --json defaultBranchRef`). NEVER commit directly to the default branch.</rule>
   <rule>When a significant insight, pattern, convention, or architectural decision is discovered at any point during execution, immediately write it to Serena memory — do not defer until the consolidation phase. Check list_memories first to update an existing entry rather than creating a duplicate.</rule>
 </rules>
 
@@ -314,8 +314,13 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <response>HARD BLOCK: Before creating a feature branch, always run the following sequence:
         1. `DEFAULT=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`
         2. `git fetch origin $DEFAULT`
-        3. `git checkout -b feat/&lt;name&gt; origin/$DEFAULT`
-        This ensures the branch is cut from the latest remote state. NEVER create a PR from a non-feature branch (e.g., develop → main or main → release).</response>
+        3. Check risk signals: `git status --porcelain` is non-empty, OR the current branch (`git branch --show-current`) is not `$DEFAULT`. Use a lowercase kebab-case slug for `&lt;name&gt;` derived from the task description in every step below.
+        4. If NO risk signal: `git checkout -b feat/&lt;name&gt; origin/$DEFAULT` in the current directory, as before (this creates a brand-new branch and is distinct from ORCH-P005's prohibition on `git checkout [branch]`, which switches to an already-existing branch).
+        5. If ANY risk signal is present: isolate in a worktree instead of switching the shared HEAD, consistent with ORCH-P005's concurrent-session assumption.
+           First ensure `.worktrees/` is gitignored, guaranteeing a leading newline so a missing trailing newline in the existing file can never merge with the new entry: `grep -qxF '.worktrees/' .gitignore 2&gt;/dev/null || printf '\n.worktrees/\n' &gt;&gt; .gitignore`.
+           Then `git worktree add -b feat/&lt;name&gt; "$(git rev-parse --show-toplevel)/.worktrees/feat-&lt;name&gt;" origin/$DEFAULT` and perform all subsequent work (edits, tests, commits) inside that worktree path.
+           Report the worktree path to the user. Never auto-run `git worktree remove` — cleanup is the user's decision.
+        This ensures the branch is cut from the latest remote state and never disrupts another concurrent session's working tree. NEVER create a PR from a non-feature branch (e.g., develop → main or main → release).</response>
     </behavior>
     <behavior id="ORCH-P004" priority="critical">
       <trigger>When delegating to sub-agents</trigger>
