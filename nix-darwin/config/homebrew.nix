@@ -13,7 +13,6 @@
     "cleanshot"
     "claude"
     "clickup"
-    "discord"
     "drawio"
     "docker-desktop"
     "element"
