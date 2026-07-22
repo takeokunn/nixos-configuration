@@ -42,6 +42,21 @@
 
   programs.git.includes = [
     { path = "~/.config/git/config.d/maintenance.conf"; }
+    # Work account (takeokunn-attmcojp) scoped to ~/ghq/github.com/attmcojp/.
+    # Identity uses the GitHub noreply address so it is safe to commit in this
+    # public repo. Auth is delegated to gh over HTTPS for the work account, and
+    # the pushInsteadOf identity mapping cancels the global https->ssh rewrite
+    # for attmcojp URLs only (git resolves by longest-prefix match).
+    {
+      condition = "gitdir:~/ghq/github.com/attmcojp/";
+      contents = {
+        user.name = "takeokunn-attmcojp";
+        user.email = "307919810+takeokunn-attmcojp@users.noreply.github.com";
+        user.signingkey = "~/.ssh/work_signing_key.pub";
+        credential."https://github.com".username = "takeokunn-attmcojp";
+        url."https://github.com/attmcojp/".pushInsteadOf = "https://github.com/attmcojp/";
+      };
+    }
   ];
 
   programs.git.settings = {
@@ -135,6 +150,16 @@
     };
 
     url."git@github.com:".pushInsteadOf = "https://github.com/";
+
+    # Work (attmcojp) repos must transport over HTTPS so the gh work-account
+    # credential helper authenticates them (see the attmcojp includeIf above).
+    # This rewrites any SSH-form attmcojp URL to HTTPS at clone/fetch/push time,
+    # so `ghq get -p attmcojp/...` still lands on HTTPS. Scoped to attmcojp only,
+    # so personal repos keep using SSH exactly as before.
+    url."https://github.com/attmcojp/".insteadOf = [
+      "git@github.com:attmcojp/"
+      "ssh://git@github.com/attmcojp/"
+    ];
 
     init.defaultBranch = "main";
 
