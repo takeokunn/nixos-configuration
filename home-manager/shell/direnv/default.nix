@@ -8,5 +8,9 @@
     use_github_token() {
       export GITHUB_TOKEN=$(gh auth token)
     }
+
+    use_github_token_as() {
+      export GITHUB_TOKEN=$(gh auth token --user "$1")
+    }
   '';
 }
