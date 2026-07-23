@@ -50,16 +50,16 @@
     # public repo. Auth is delegated to gh over HTTPS for the work account, and
     # the pushInsteadOf identity mapping cancels the global https->ssh rewrite
     # for attmcojp URLs only (git resolves by longest-prefix match).
-    # {
-    #   condition = "gitdir:~/ghq/github.com/attmcojp/";
-    #   contents = {
-    #     user.name = "takeokunn-attmcojp";
-    #     user.email = "307919810+takeokunn-attmcojp@users.noreply.github.com";
-    #     user.signingkey = "~/.ssh/work_signing_key.pub";
-    #     credential."https://github.com".username = "takeokunn-attmcojp";
-    #     url."https://github.com/attmcojp/".pushInsteadOf = "https://github.com/attmcojp/";
-    #   };
-    # }
+    {
+      condition = "gitdir:~/ghq/github.com/attmcojp/";
+      contents = {
+        user.name = "takeokunn-attmcojp";
+        user.email = "307919810+takeokunn-attmcojp@users.noreply.github.com";
+        user.signingkey = "~/.ssh/work_signing_key.pub";
+        credential."https://github.com".username = "takeokunn-attmcojp";
+        url."https://github.com/attmcojp/".pushInsteadOf = "https://github.com/attmcojp/";
+      };
+    }
   ];
 
   programs.git.settings = {
