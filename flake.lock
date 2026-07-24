@@ -144,11 +144,11 @@
     "context7-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1784725426,
-        "narHash": "sha256-cmSw43HaGiFHA+ts4mF4/76wG/InRgHAXuSn5eZzdTA=",
+        "lastModified": 1784807398,
+        "narHash": "sha256-bwCWdQ7yFcI73lM4GMtA+vMxnrxMgDf2bzzthzJpsrI=",
         "owner": "upstash",
         "repo": "context7",
-        "rev": "d8885b2308c591bb74a1b8ff586b70d914a11e45",
+        "rev": "c82cc8afa0552ae75ab0026beea92f0120b3c830",
         "type": "github"
       },
       "original": {
@@ -271,11 +271,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784776486,
-        "narHash": "sha256-v89seroXz4A8sKxSWgJT0Wufy5zfLeNb0Vdvk5cWaNM=",
+        "lastModified": 1784863074,
+        "narHash": "sha256-Oy+uMLFK4EQ1bLyn6U82Lpz5yMgouFGMMCQ6JFXduxQ=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "9317a3e13c67cfe16c2827297e3b103fb4c26831",
+        "rev": "b2865e251c6ca6230cae22f5628c48a7a4c8c7a1",
         "type": "github"
       },
       "original": {
@@ -532,11 +532,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784790164,
-        "narHash": "sha256-woSpbXXGmy1zUnetetY6WiVdXz0WFGAsxHgCc+87oqU=",
+        "lastModified": 1784862776,
+        "narHash": "sha256-Hi41+61t2OmiB9MAq1sjeJ+HRw0T/isE3mL0um5Xmvc=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "de9fa923ea0ebed9093f758468d7ed7c5da09739",
+        "rev": "264604cc0580e87d34a10b82334cf52f8139053f",
         "type": "github"
       },
       "original": {
@@ -575,11 +575,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784589916,
-        "narHash": "sha256-RLVPc1M3ek1XENJjDv66TbHOPk8l5w/3dsJhYmK/TmU=",
+        "lastModified": 1784813398,
+        "narHash": "sha256-p0Qo2hUtOeCqjLZ8pIDCW8P69LkQHQAgEV4StIRiCPQ=",
         "owner": "natsukium",
         "repo": "mcp-servers-nix",
-        "rev": "76ef2115bcccfa8d3562ab7455c4b1f2f34d9001",
+        "rev": "f87c14091dccea78d4e3ee4c29af4184215cc28d",
         "type": "github"
       },
       "original": {
@@ -941,11 +941,11 @@
         "systems": "systems_4"
       },
       "locked": {
-        "lastModified": 1784772793,
-        "narHash": "sha256-59Gavj/9BFDmVVichswIvFRZwnWHhSdh8vsdg8oYzb0=",
+        "lastModified": 1784814601,
+        "narHash": "sha256-T32JXjZ7kIbhBn8/Har171yGg6IBdl97cxAWameqZDE=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "85d64907a9c132ecf2e8ebe46d0ad842381516ec",
+        "rev": "f316e949e0ed9df0e1e0bf645c6dce721d4e230e",
         "type": "github"
       },
       "original": {
@@ -1023,11 +1023,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784782992,
-        "narHash": "sha256-8UBj615vhNOt8uA8zUxODTuBN3gD1e1Sb0C0OOGeMO8=",
+        "lastModified": 1784863086,
+        "narHash": "sha256-KxnDRnCM0RRLxPZJ8QFii5lPdXsMs+p6wbPvz/XndEA=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "378fbb4f04ac9f161a9e5d12b80b2641025dde19",
+        "rev": "0a8e2621ec2c084c2dba4c957f4d0246731a828e",
         "type": "github"
       },
       "original": {
@@ -1054,11 +1054,11 @@
     "paredit-cli-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1784440580,
-        "narHash": "sha256-4BNrL/lfP+fOmOXZlaTcjrIhnruc6qWu9JhfRFb9P+w=",
+        "lastModified": 1784862675,
+        "narHash": "sha256-KfxEsl6TSDZwFhIyA2QP3BX+jLw6qJWEz/uMPDkYnKI=",
         "owner": "takeokunn",
         "repo": "paredit-cli",
-        "rev": "f5404152d79447c230646a2cbe6ffb575c5d2f7a",
+        "rev": "e321bbac6d25b181eaf286697d9761cc3e874091",
         "type": "github"
       },
       "original": {
@@ -1107,11 +1107,11 @@
     "scientific-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1784651546,
-        "narHash": "sha256-YY2Cg4EVack4uzHR30utT4WAjtwx7nEPWEdzi+d0n/M=",
+        "lastModified": 1784846740,
+        "narHash": "sha256-DBLnavZHSedbdf1PVYywEpo3MBYIaX15aG+x1xdw8cI=",
         "owner": "K-Dense-AI",
         "repo": "claude-scientific-skills",
-        "rev": "831d49eb77eed3c792be2970921b46764012ef00",
+        "rev": "70a0d595e54b8d92ca54f216d4315e0ab8c7d967",
         "type": "github"
       },
       "original": {
@@ -1303,11 +1303,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784586513,
-        "narHash": "sha256-ewIv3xH9bQK7uMkU3xK6NWFEW5oIuAtIny8ifJwcY/E=",
+        "lastModified": 1784834038,
+        "narHash": "sha256-7kFP+NUILPvdhO7mQk90h2MnseMNvYzGPpclhmJEKF0=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "0ea161e9ac257510acabfb6e9dbf13630298760d",
+        "rev": "35443b74c3481fb963ee0a53175ab0e8001f2967",
         "type": "github"
       },
       "original": {
