@@ -190,6 +190,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="testing-patterns">Test strategy and patterns</skill>
     <skill name="technical-documentation">README, API docs, design docs, user guides</skill>
     <skill name="technical-writing">Technical blogs and articles; canonical Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance)</skill>
+    <skill name="cognitive-rhythm-writing">Japanese prose pacing and engagement design: sentence rhythm, paragraph density, tension management, and a padding-vs-looseness diagnostic; companion to technical-writing's prose_norms</skill>
   </category>
   <category name="ecosystem">
     <skill name="nix-ecosystem">Nix language, flakes, and Home Manager patterns</skill>

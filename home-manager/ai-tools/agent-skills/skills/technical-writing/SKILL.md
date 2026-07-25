@@ -1,7 +1,7 @@
 ---
 name: Technical Writing
 description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese. Includes a Japanese prose-quality ruleset for drafting and revising Japanese manuscripts, plus a language-neutral long-form structure ruleset for books and serialized pieces.
-version: 2.2.0
+version: 2.3.0
 ---
 
 <purpose>
@@ -534,6 +534,7 @@ version: 2.2.0
   <skill name="context7-usage">Library documentation lookup for accurate technical references</skill>
   <skill name="investigation-patterns">Researching technical topics and verifying claims</skill>
   <skill name="technical-documentation">Creating reference documentation from blog content</skill>
+  <skill name="cognitive-rhythm-writing">Apply after this skill's japanese/prose_norms when the writing should also read as compelling/engaging, not just correct — Japanese sentence rhythm, pacing, and tension design</skill>
 </related_skills>
 
 <related_agents>
