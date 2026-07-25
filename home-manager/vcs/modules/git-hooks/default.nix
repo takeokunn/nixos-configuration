@@ -41,7 +41,36 @@ let
     if [ ! -f .editorconfig ]; then
       exit 0
     fi
-    ${pkgs.git}/bin/git diff --cached --name-only -z --diff-filter=ACMR | ${pkgs.findutils}/bin/xargs -0 --no-run-if-empty ${cfg.editorconfigCheckerPackage}/bin/editorconfig-checker
+
+    # editorconfig-checker's indentation/indent-size checks assume a fixed
+    # per-level indent multiple, which Lisp's vertical-alignment convention
+    # (continuation lines aligned to an enclosing form's column, not a fixed
+    # tab stop) routinely and correctly violates. Run those two checks only
+    # over non-Lisp staged files; everything else (charset, trailing
+    # whitespace, final newline, max line length) still applies to Lisp too.
+    RESULT=0
+    LISP_FILES=()
+    OTHER_FILES=()
+    while IFS= read -r -d "" FILE; do
+      case "$FILE" in
+        *.lisp | *.lispworks | *.asd | *.el)
+          LISP_FILES+=("$FILE")
+          ;;
+        *)
+          OTHER_FILES+=("$FILE")
+          ;;
+      esac
+    done < <(${pkgs.git}/bin/git diff --cached --name-only -z --diff-filter=ACMR)
+
+    if [ ''${#OTHER_FILES[@]} -gt 0 ]; then
+      ${cfg.editorconfigCheckerPackage}/bin/editorconfig-checker "''${OTHER_FILES[@]}" || RESULT=1
+    fi
+
+    if [ ''${#LISP_FILES[@]} -gt 0 ]; then
+      ${cfg.editorconfigCheckerPackage}/bin/editorconfig-checker -disable-indentation -disable-indent-size "''${LISP_FILES[@]}" || RESULT=1
+    fi
+
+    exit $RESULT
   '';
 
   gitleaksCheck = pkgs.writeShellScript "gitleaks-hook" ''
