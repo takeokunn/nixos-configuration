@@ -2,11 +2,11 @@
   "nodes": {
     "crane": {
       "locked": {
-        "lastModified": 1784564969,
-        "narHash": "sha256-TkTWNhJV/8Wk3czlbz4bwHZkFCaCHPsOy+oJe4PUiXg=",
+        "lastModified": 1785284101,
+        "narHash": "sha256-ghcXEpYEM4a7pbEkoqbn8c0ptJJqgGzuFiG3T6W5g4I=",
         "owner": "ipetkov",
         "repo": "crane",
-        "rev": "7930f6c291de6f83c257839d434592aa085f290a",
+        "rev": "756d6d07c3818ea95d1e2cdac63fa7d02fe3e61b",
         "type": "github"
       },
       "original": {
@@ -57,11 +57,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785214893,
-        "narHash": "sha256-MvM50FUn2RMIBjBocKB1pwBuWW5ePq7+5+BjMuKTVzc=",
+        "lastModified": 1785301356,
+        "narHash": "sha256-wcGHAM3Inqc905vM6Xt0WPUoS1Jlpi6g+6KRKLJNoJE=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "e95d6205a0ee92d8afeaaf525c2a57892a16b2b4",
+        "rev": "164e3a41d28aab25b554d6f1ab60f4c98be750d3",
         "type": "github"
       },
       "original": {
