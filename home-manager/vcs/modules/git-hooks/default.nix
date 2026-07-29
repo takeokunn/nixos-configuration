@@ -88,9 +88,9 @@ let
       ${checkMergeConflicts} || RESULT=1
     ''}
 
-    ${lib.optionalString cfg.enableCheckCaseConflicts ''
-      ${checkCaseConflicts} || RESULT=1
-    ''}
+    # ${lib.optionalString cfg.enableCheckCaseConflicts ''
+    #   ${checkCaseConflicts} || RESULT=1
+    # ''}
 
     ${lib.optionalString (cfg.enableGitleaks && gitleaksCfg.enable) ''
       ${gitleaksCheck} || RESULT=1

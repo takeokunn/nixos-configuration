@@ -37,6 +37,7 @@
     ".auth/"
     "playwright-report/"
     "test-results/"
+    ".playwright-mcp/"
   ];
 
   programs.git.signing.key = "~/.ssh/signing_key.pub";
