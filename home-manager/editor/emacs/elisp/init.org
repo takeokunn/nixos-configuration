@@ -4287,6 +4287,11 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
             #'(lambda ()
                 (when (require 'doom-themes)
                   (load-theme 'doom-dracula t)
+                  ;; Emacs 31 makes gnus-group-news-low inherit from its
+                  ;; empty variant; prevent themes from creating a cycle.
+                  (when (facep 'gnus-group-news-low-empty)
+                    (set-face-attribute 'gnus-group-news-low-empty nil
+                                        :inherit nil))
                   (set-cursor-color "#f8f8f2"))))
 
   (with-eval-after-load 'doom-themes
