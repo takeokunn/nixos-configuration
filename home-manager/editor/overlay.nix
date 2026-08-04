@@ -13,7 +13,8 @@
         # consumer -- nur-packages, emacs-lsp-booster, emacsPackagesFor -- picks
         # up the same fixed derivation instead of the plain nixpkgs one.
         dropMailutils =
-          name: prev.lib.optionalAttrs (prev ? ${name}) {
+          name:
+          prev.lib.optionalAttrs (prev ? ${name}) {
             ${name} = prev.${name}.override { withMailutils = false; };
           };
       in

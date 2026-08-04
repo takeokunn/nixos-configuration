@@ -1,4 +1,8 @@
-{ nurPkgs, pkgs, isDarwin ? false }:
+{
+  nurPkgs,
+  pkgs,
+  isDarwin ? false,
+}:
 epkgs:
 let
   ai = import ./packages/ai { inherit epkgs; };
