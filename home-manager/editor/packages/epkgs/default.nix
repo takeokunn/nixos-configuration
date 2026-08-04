@@ -1,10 +1,10 @@
-{ nurPkgs }:
+{ nurPkgs, pkgs, isDarwin ? false }:
 epkgs:
 let
   ai = import ./packages/ai { inherit epkgs; };
   awesome = import ./packages/awesome { inherit epkgs nurPkgs; };
   buffer = import ./packages/buffer { inherit epkgs; };
-  client = import ./packages/client { inherit epkgs nurPkgs; };
+  client = if isDarwin then [ ] else import ./packages/client { inherit epkgs nurPkgs pkgs; };
   coding = import ./packages/coding { inherit epkgs; };
   cursor = import ./packages/cursor { inherit epkgs; };
   dired = import ./packages/dired { inherit epkgs; };

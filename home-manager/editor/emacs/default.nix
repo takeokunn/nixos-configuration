@@ -33,7 +33,9 @@ in
   home.file.".emacs.d/init.el".text = tangle (builtins.readFile ./elisp/init.org);
   home.file.".emacs.d/early-init.el".text = tangle (builtins.readFile ./elisp/early-init.org);
   home.file.".emacs.d/misc/yasnippet.org".source = ./misc/yasnippet.org;
-  home.file.".emacs.d/misc/mu4e-dashboard.org".source = ./misc/mu4e-dashboard.org;
+  home.file.".emacs.d/misc/mu4e-dashboard.org" = lib.mkIf (!pkgs.stdenv.isDarwin) {
+    source = ./misc/mu4e-dashboard.org;
+  };
 
   home.packages = [
     emacsPkg

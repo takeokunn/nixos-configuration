@@ -40,7 +40,10 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
+    extraEmacsPackages = import ./epkgs {
+      inherit nurPkgs pkgs;
+      isDarwin = pkgs.stdenv.isDarwin;
+    };
     override = override;
   };
 
@@ -65,7 +68,10 @@ in
               };
           }
         );
-        extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
+        extraEmacsPackages = import ./epkgs {
+          inherit nurPkgs pkgs;
+          isDarwin = pkgs.stdenv.isDarwin;
+        };
         override = override;
       };
     in
@@ -98,7 +104,10 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
+    extraEmacsPackages = import ./epkgs {
+      inherit nurPkgs pkgs;
+      isDarwin = pkgs.stdenv.isDarwin;
+    };
     override = override;
   };
 
@@ -111,7 +120,10 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
+    extraEmacsPackages = import ./epkgs {
+      inherit nurPkgs pkgs;
+      isDarwin = pkgs.stdenv.isDarwin;
+    };
     override = override;
   };
 
@@ -124,7 +136,10 @@ in
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
-    extraEmacsPackages = import ./epkgs { inherit nurPkgs; };
+    extraEmacsPackages = import ./epkgs {
+      inherit nurPkgs pkgs;
+      isDarwin = pkgs.stdenv.isDarwin;
+    };
     override = override;
   };
 }

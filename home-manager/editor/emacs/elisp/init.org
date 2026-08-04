@@ -3792,54 +3792,57 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 :CUSTOM_ID: mu4e
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(mu4e) "mu4e" nil t)
+  (unless (eq system-type 'darwin)
+    (autoload-if-found '(mu4e) "mu4e" nil t)
 
-  (keymap-global-set "C-x C-w" #'mu4e)
+    (keymap-global-set "C-x C-w" #'mu4e)
 
-  (with-eval-after-load 'mu4e
-    ;; config
-    (setopt mail-user-agent 'mu4e-user-agent))
+    (with-eval-after-load 'mu4e
+      ;; config
+      (setopt mail-user-agent 'mu4e-user-agent))
 
-  (with-eval-after-load 'mu4e-update
-    ;; config
-    (setopt mu4e-get-mail-command "offlineimap")
-    (setopt mu4e-update-interval (* 1 60))
-    (setopt mu4e-index-cleanup nil)
-    (setopt mu4e-index-lazy-check t))
+    (with-eval-after-load 'mu4e-update
+      ;; config
+      (setopt mu4e-get-mail-command "offlineimap")
+      (setopt mu4e-update-interval (* 1 60))
+      (setopt mu4e-index-cleanup nil)
+      (setopt mu4e-index-lazy-check t))
 
-  (with-eval-after-load 'mu4e-view
-    ;; config
-    (setopt mu4e-split-view 'horizontal))
+    (with-eval-after-load 'mu4e-view
+      ;; config
+      (setopt mu4e-split-view 'horizontal))
 
-  (with-eval-after-load 'mu4e-folders
-    ;; config
-    (setopt mu4e-maildir-shortcuts '((:maildir "/Gmail/INBOX" :key ?i)
-                                     (:maildir "/Gmail/Emacs" :key ?e)
-                                     (:maildir "/Gmail/GitHub" :key ?h)
-                                     (:maildir "/Gmail/Guix" :key ?g)
-                                     (:maildir "/Gmail/PHP" :key ?p))))
+    (with-eval-after-load 'mu4e-folders
+      ;; config
+      (setopt mu4e-maildir-shortcuts '((:maildir "/Gmail/INBOX" :key ?i)
+                                       (:maildir "/Gmail/Emacs" :key ?e)
+                                       (:maildir "/Gmail/GitHub" :key ?h)
+                                       (:maildir "/Gmail/Guix" :key ?g)
+                                       (:maildir "/Gmail/PHP" :key ?p))))
 
-  (with-eval-after-load 'mm-decode
-    (add-to-list 'mm-discouraged-alternatives "text/html")
-    (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+    (with-eval-after-load 'mm-decode
+      (add-to-list 'mm-discouraged-alternatives "text/html")
+      (add-to-list 'mm-discouraged-alternatives "text/richtext")))
 #+end_src
 *** mu4e-views
 :PROPERTIES:
 :CUSTOM_ID: mu4e-views
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '() "mu4e-views" nil t)
+  (unless (eq system-type 'darwin)
+    (autoload-if-found '() "mu4e-views" nil t))
 #+end_src
 *** mu4e-dashboard
 :PROPERTIES:
 :CUSTOM_ID: mu4e-dashboard
 :END:
 #+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(mu4e-dashboard) "mu4e-dashboard" nil t)
+  (unless (eq system-type 'darwin)
+    (autoload-if-found '(mu4e-dashboard) "mu4e-dashboard" nil t)
 
-  (with-eval-after-load 'mu4e-dashboard
-    ;; config
-    (setopt mu4e-dashboard-file "~/.emacs.d/misc/mu4e-dashboard.org"))
+    (with-eval-after-load 'mu4e-dashboard
+      ;; config
+      (setopt mu4e-dashboard-file "~/.emacs.d/misc/mu4e-dashboard.org")))
 #+end_src
 ** Googling
 :PROPERTIES:
@@ -3990,11 +3993,11 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                   (set-fontset-font t 'balinese "Noto Sans Balinese")
                   (set-fontset-font t 'sundanese "Noto Sans Sundanese")
                   (set-fontset-font t 'vedic "Noto Sans Devanagari")
-                  (set-fontset-font t 'symbol "Noto Sans CJK JP")
+                  (set-fontset-font t 'symbol "Noto Color Emoji")
+                  (set-fontset-font t 'symbol "Noto Sans CJK JP" nil 'append)
                   (set-fontset-font t 'symbol "Noto Sans Symbols2" nil 'append)
                   (set-fontset-font t 'symbol "Noto Sans" nil 'append)
                   (set-fontset-font t 'symbol "Noto Sans Math" nil 'append)
-                  (set-fontset-font t 'symbol "Noto Emoji" nil 'append)
                   (set-fontset-font t 'symbol "Noto Sans Symbols" nil 'append)
                   (set-fontset-font t 'braille "Noto Sans Symbols2")
                   (set-fontset-font t 'batak "Noto Sans Batak")
@@ -4328,9 +4331,14 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
       (when (and (bound-and-true-p nskk-mode)
                  (fboundp 'nskk-modeline-indicator))
         (nskk-modeline-indicator)))
-    (doom-modeline-def-modeline 'main
-      '(eldoc bar window-state workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
-      '(compilation objed-state misc-info project-name persp-name battery grip irc mu4e gnus github debug repl lsp my/nskk minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))
+    (let ((main-segments
+           (append '(compilation objed-state misc-info project-name persp-name battery grip irc)
+                   (when (not (eq system-type 'darwin))
+                     '(mu4e))
+                   '(gnus github debug repl lsp my/nskk minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))))
+      (doom-modeline-def-modeline 'main
+        '(eldoc bar window-state workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
+        main-segments))
     ;; emacsclient -c でGUIフレームが生成されたとき modeline を再描画する
     (add-hook 'after-make-frame-functions
               #'(lambda (frame)
