@@ -5,6 +5,10 @@
   programs.kitty.font.name = "HackGen Console NF";
   programs.kitty.font.size = 13;
 
+  # HackGen Console NF has no emoji glyphs; route emoji/pictograph/flag
+  # ranges to Noto Color Emoji instead of falling back to a tofu glyph.
+  programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF Noto Color Emoji";
+
   programs.kitty.settings = {
     # Window size (don't remember previous size)
     remember_window_size = false;

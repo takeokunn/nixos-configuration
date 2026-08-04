@@ -1,6 +1,7 @@
 { pkgs }:
 {
   fonts.fontDir.enable = true;
+  fonts.fontconfig.defaultFonts.emoji = [ "Noto Color Emoji" ];
   fonts.packages = with pkgs; [
     noto-fonts
     noto-fonts-lgc-plus
