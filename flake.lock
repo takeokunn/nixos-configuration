@@ -294,11 +294,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785812440,
-        "narHash": "sha256-Ogo05bsUb3k0PSYYDeUbVfb3IcCzfaaFD6jhQ0uMcHo=",
+        "lastModified": 1785842884,
+        "narHash": "sha256-1uB+e7Lf3E0gFe86ccPyRbJSTRLz4Q4kMMQJlOw2dMQ=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "2011fb835af65a963c37dc1dd20765464c7a2dab",
+        "rev": "af19242c29b44518cf183b0ac5b54eaef5cafe90",
         "type": "github"
       },
       "original": {
@@ -486,11 +486,11 @@
     "hashicorp-agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1785354535,
-        "narHash": "sha256-rBNkDJYd3c0Le5kTEXF8VrLiWW4RxOZlgWsJulO6Upk=",
+        "lastModified": 1785861436,
+        "narHash": "sha256-JI0xMAOZ9xXl4ZrPnI8L2D3f4RGfrARFm3n4PwFA1Zk=",
         "owner": "hashicorp",
         "repo": "agent-skills",
-        "rev": "1d09fac00f47e08164b3cfcd03468475d56146df",
+        "rev": "146815e19decbb28252eebcf4125054e0a8783f1",
         "type": "github"
       },
       "original": {
@@ -614,11 +614,11 @@
     "microsoft-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1785275175,
-        "narHash": "sha256-A8TFvxmmGX83FI4wTGMXsyMteCBB4LMa2AaxLB3J4YE=",
+        "lastModified": 1785860145,
+        "narHash": "sha256-V5bl4FGzy43gIvML/XZmfQOlgO8aRoMRGTYcjIEzq9M=",
         "owner": "microsoft",
         "repo": "skills",
-        "rev": "4a2873faffc1b101a33a0b59c24713d4ed78142f",
+        "rev": "1f28ae4c5e5edc2cbe10b3756a20524fc92cee07",
         "type": "github"
       },
       "original": {
@@ -1077,11 +1077,11 @@
     "paredit-cli-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1785833058,
-        "narHash": "sha256-09/WN6jgQFY2DTfGrp2c++RZIq1U1wkPjx/gjN4LnL4=",
+        "lastModified": 1785835400,
+        "narHash": "sha256-0fzZc1+cMrgGdzPnK4BCqe0HG4cQnNa96MEeNqdyAas=",
         "owner": "takeokunn",
         "repo": "paredit-cli",
-        "rev": "e9fd5524247f6efab15332469029a6120441bc61",
+        "rev": "c9b1a66b3e8fec6f2461923c817501877e3b4d92",
         "type": "github"
       },
       "original": {
@@ -1301,11 +1301,11 @@
         "xremap": "xremap_2"
       },
       "locked": {
-        "lastModified": 1782757039,
-        "narHash": "sha256-4CuFwWsQxoNY4Cxz4+GVEmRrMTR5dUOTKN2eNk1KiEI=",
+        "lastModified": 1785858454,
+        "narHash": "sha256-hMJE6NyEVGbGFiYkUMH/0z9DedcmB0oSMamlvlljWdM=",
         "owner": "xremap",
         "repo": "nix-flake",
-        "rev": "7f161bede2961279dfde194add6aa53d80a9d26d",
+        "rev": "abbd07e92837c797ae1b98a1ff2c95fc805fe7b1",
         "type": "github"
       },
       "original": {
