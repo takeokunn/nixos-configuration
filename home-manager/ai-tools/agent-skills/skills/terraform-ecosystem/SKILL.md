@@ -1,7 +1,7 @@
 ---
 name: terraform-ecosystem
-description: This skill should be used when the user asks to "write terraform", "HCL", "terraform provider development", "terraform-plugin-framework", "custom provider", "state management", "terraform plan", "terraform apply", "lifecycle ignore_changes", "provider schema", "plan modifier", "acceptance test", or works with Terraform/OpenTofu configuration and provider authoring. Provides patterns for both custom provider development (Go, terraform-plugin-framework) and HCL configuration/operations.
-version: 2.0.0
+description: This skill should be used when the user asks to "write terraform", "HCL", "terraform provider development", "terraform-plugin-framework", "custom provider", "state management", "terraform plan", "terraform apply", "lifecycle ignore_changes", "provider schema", "plan modifier", "acceptance test", or works with Terraform/OpenTofu configuration and provider authoring. Also covers recovering after a failed apply, which is not transactional and did not roll back what already succeeded — state inspection and surgery (state list, state rm, state mv, show), pairing every address change with a moved block, import blocks versus the import CLI against a remote backend, why a provider alias change is not an ownership transfer, and reading the full plan body rather than the summary counts on policy and permission resources. Provides patterns for both custom provider development (Go, terraform-plugin-framework) and HCL configuration/operations.
+version: 2.2.0
 ---
 
 <purpose>
@@ -17,7 +17,7 @@ version: 2.0.0
     Development shell setup, languages.terraform/opentofu, git-hooks (tflint, terraform fmt) for Terraform projects.
   </defer_to>
   <unique_coverage>
-    Provider/Resource/DataSource interfaces, Schema and attribute definitions, plan modifiers, validators, CRUD lifecycle with 404 state removal, Configure/client injection, ImportState, HTTP retry/error classification for API-backed providers, acceptance testing (TF_ACC, protocol factories); HCL lifecycle meta-arguments, credential-scope troubleshooting, DNS + hosting two-resource composition, per-project state isolation, plan/apply validation chains.
+    Provider/Resource/DataSource interfaces, Schema and attribute definitions, plan modifiers, validators, CRUD lifecycle with 404 state removal, Configure/client injection, ImportState, HTTP retry/error classification for API-backed providers, acceptance testing (TF_ACC, protocol factories); HCL lifecycle meta-arguments, credential-scope troubleshooting, DNS + hosting two-resource composition, per-project state isolation, plan/apply validation chains, multi-owner provider aliases and the ownership-transfer trap, declarative import blocks versus the import CLI, partial-apply semantics and recovery, plan-body review and `moved`-block state refactors.
   </unique_coverage>
 </scope>
 
@@ -27,7 +27,10 @@ version: 2.0.0
   <tool name="terraform apply">Apply changes to real infrastructure</tool>
   <tool name="terraform fmt">Canonicalize HCL formatting</tool>
   <tool name="terraform validate">Validate configuration internally (no remote calls)</tool>
-  <tool name="terraform import">Bring existing infrastructure under management</tool>
+  <tool name="terraform import">Bring existing infrastructure under management (runs locally — see the import block guidance for why this often fails against a remote backend)</tool>
+  <tool name="terraform state list">Enumerate addresses currently tracked in state; the first thing to run after a failed apply</tool>
+  <tool name="terraform state rm">Drop a state entry without touching the real object; used to reconcile after an out-of-band change or deletion</tool>
+  <tool name="terraform show">Inspect the current state or a saved plan file in full, rather than trusting the plan summary</tool>
   <tool name="tflint">Lint HCL for provider-specific and generic issues</tool>
   <tool name="go test">Run provider unit and acceptance tests (acceptance requires TF_ACC=1)</tool>
   <tool name="Read">Analyze .tf files and Go provider source</tool>
@@ -40,6 +43,9 @@ version: 2.0.0
   <concept name="desired_state_reconciliation">Terraform reconciles configuration (desired) against state (last known) against the real world (Read). Providers must make Read authoritative so plans are accurate and drift is detected.</concept>
   <concept name="computed_vs_optional">Attributes are Required, Optional, and/or Computed. Computed values are supplied by the provider (unknown at plan time until stabilized). Correct plan behavior depends on marking these accurately.</concept>
   <concept name="credential_scope">The credential Terraform executes with defines what it can do. A config that is syntactically correct can still fail at apply because the token lacks scope for a specific endpoint. Diagnose by endpoint, not by config.</concept>
+  <concept name="apply_is_not_transactional">An apply is a sequence of independent operations, not a transaction. A failure stops the run; it does not undo the operations that already succeeded. Every recovery procedure has to start from "what is actually there now", never from "the apply failed, so nothing happened".</concept>
+  <concept name="state_address_vs_real_object">A state entry binds a configuration address to a real object's identity, which usually embeds an owner, account, zone, or project. Terraform can freely rewrite the address side (via `moved` blocks or `state mv`), but it cannot move the object between owners — no resource type expresses an ownership transfer. Confusing the two is how a routine-looking refactor becomes a destroy.</concept>
+  <concept name="operation_locality">Some subcommands run where you type them and some run in the backend. With a remote backend, provider credentials often exist only server-side as sensitive workspace variables, so a locally-executing subcommand cannot configure the provider at all. Before diagnosing a failure as a configuration bug, establish whether the operation ran here or there.</concept>
 </concepts>
 
 <!-- ============================================================= -->
@@ -340,6 +346,112 @@ version: 2.0.0
     <principle>Separate "the HCL is wrong" from "the credential cannot do this." The second class of failure is invisible in the config and only shows up at apply.</principle>
   </credential_scope_troubleshooting>
 
+  <multi_owner_provider_aliases>
+    <description>
+      One workspace frequently manages resources that live under two different owners — two accounts, two organisations, two regions, two credentials. The mechanism is a second `provider` block carrying an `alias`, plus an explicit `provider =` meta-argument on every resource belonging to it. Two conventions make this readable at scale: put the `provider =` line first in the resource body, and split resource files by owner. Ownership then never has to be inferred from a credential variable name several files away.
+    </description>
+    <example>
+      provider "example" {
+        # default owner: the workspace's primary credential
+        token = var.primary_token
+      }
+
+      provider "example" {
+        alias = "secondary"
+        owner = var.secondary_owner
+        token = var.secondary_token
+      }
+
+      resource "example_thing" "shared" {
+        provider = example.secondary
+        name     = "thing"
+      }
+    </example>
+
+    <critical_trap name="provider_change_is_not_an_ownership_transfer">
+      <description>
+        No Terraform resource performs an ownership *transfer* of the underlying object. Changing a resource's `provider =` meta-argument does not move the real object between owners — it only changes which credential Terraform uses to look for it. On the next refresh Terraform finds nothing at that address under the new owner, concludes the object is gone (silently orphaning the real one, which still exists and still holds its data), and plans to create a brand-new empty resource of the same name under the new owner.
+      </description>
+      <observed>A same-address owner change planned as "N to add, 0 to change, M to destroy" — never as an in-place move. The counts alone are the warning: an ownership change that produces adds and destroys instead of changes is proposing to replace live data with an empty object.</observed>
+      <safe_sequence>
+        <step order="1">Transfer the real object out-of-band using whatever transfer mechanism the platform itself provides (console, API). Terraform cannot do this step and no amount of configuration will make it able to.</step>
+        <step order="2">`terraform state rm` the resource address, so the stale entry stops driving a destroy.</step>
+        <step order="3">Re-import under the aliased provider — `terraform import -provider=example.secondary &lt;address&gt; &lt;id&gt;`, or an `import {}` block carrying `provider = example.secondary` when the CLI form is unavailable (see importing_existing_resources).</step>
+        <step order="4">Require a zero-diff plan before applying anything else. A non-empty plan here means the import did not match the real object; stop and reconcile rather than applying.</step>
+      </safe_sequence>
+      <generalization>The failure mode is provider-agnostic. Any resource whose identity includes an owner, account, organisation, project, or zone segment behaves this way when that segment moves. Read "the plan says destroy and create, but I only changed which provider manages it" as a data-loss signal, never as a rename.</generalization>
+    </critical_trap>
+  </multi_owner_provider_aliases>
+
+  <importing_existing_resources>
+    <description>
+      Two mechanisms bring an existing object under management: the `terraform import` CLI subcommand, and declarative `import {}` blocks (Terraform 1.5+). They are not stylistic alternatives. The difference that matters is where the provider gets configured.
+    </description>
+    <trap name="cli_import_against_a_remote_backend">
+      <description>
+        `terraform import` executes locally. Against a remote backend that holds credentials as server-side sensitive workspace variables, the local run has no values for them, so provider configuration cannot complete and the command fails with a diagnostic about the provider configuration depending on values "that cannot be determined until apply". The message points squarely at the configuration — it reads like an unresolvable expression in a provider block — but the configuration is fine. The credentials simply are not present on the machine running the command.
+      </description>
+      <instead>
+        Use a declarative import block. It is processed during an ordinary `plan`/`apply`, which runs remotely and therefore does have credential access:
+        import {
+          to = example_thing.shared
+          id = "thing-identifier"
+          # provider = example.secondary   # when importing under an aliased provider
+        }
+        Review the resulting plan (it should report the resource as imported with no changes), apply, then delete the import block.
+      </instead>
+      <note>Generalize the diagnosis rather than the fix: the same locality argument applies to every local-only subcommand run against a remote-backend workspace. When an error blames configuration that you can see is valid, ask which side of the backend boundary the operation executed on.</note>
+    </trap>
+  </importing_existing_resources>
+
+  <apply_atomicity>
+    <description>
+      A failed `terraform apply` does not roll back. Everything that completed before the failure stays created and stays in state; the run simply stops where it broke. This governs every recovery procedure, because after a red apply the world is in a partial state that neither the configuration nor the error message describes.
+    </description>
+    <observed_semantics>
+      <point>Resources created earlier in the run — variables, secrets, imports, creates — remain, and remain tracked. Re-running apply will not recreate them.</point>
+      <point>Resources that failed to *destroy* stay correctly tracked in state; Terraform does not silently drop them. State is therefore not corrupted by the failure, just incomplete relative to intent.</point>
+      <point>What is left is a state/real-world pair that is internally consistent but only partway through the intended change.</point>
+    </observed_semantics>
+    <recovery>
+      <step order="1">Read the actual state (`terraform state list`, `terraform show`) before re-running anything. Do not reason from the configuration you intended to apply.</step>
+      <step order="2">Where an object must go but the provider cannot destroy it, delete it out-of-band and reconcile the dangling entry with `terraform state rm`.</step>
+      <step order="3">Require a clean plan that matches your intent before the next apply.</step>
+    </recovery>
+    <principle>"The apply failed, so nothing happened" is the most expensive wrong assumption available in Terraform operations. The correct default after a failure is that an unknown prefix of the change is now live.</principle>
+  </apply_atomicity>
+
+  <plan_review_and_state_moves>
+    <read_the_plan_body>
+      <description>
+        `Plan: N to add, M to change, K to destroy` counts resource addresses; it does not describe what changes. A single "to change" can be an innocuous attribute edit or the removal of a live protection, and the two are indistinguishable in the summary. This is most dangerous on a shared policy resource driven by `for_each`, where every member is its own instance: drift on one member appears as one routine-looking change among many, and the summary looks entirely normal.
+      </description>
+      <rule>Read the full plan body — every `-` and `~` line — before approving an apply that touches a policy, ruleset, ACL, or permissions resource. Summary counts are a navigation aid, not a review artifact.</rule>
+      <symptom>Protections configured out-of-band through a web console appear in the plan as `-` lines removing them, because the configuration never knew they existed. Applying without reading strips them silently and reports success.</symptom>
+    </read_the_plan_body>
+
+    <absorbing_out_of_band_drift>
+      <description>
+        When one member of a `for_each` policy resource has legitimately diverged — someone added protections through a console that the shared shape cannot express — the goal is to absorb the live configuration into code without ever leaving the object unprotected, not to choose between the config and reality.
+      </description>
+      <procedure>
+        <step order="1">Copy the live values out of the plan's `-` lines. Those lines are the authoritative record of what exists right now.</step>
+        <step order="2">Write a dedicated resource for that member carrying the merged configuration: the shared rules plus the divergent ones.</step>
+        <step order="3">Remove that key from the shared `for_each` map.</step>
+        <step order="4">Add a `moved` block from the old instance address to the new one, so Terraform reassigns the existing state entry instead of destroying and recreating the object.</step>
+        <step order="5">Confirm the plan reports the instance as moved with zero changes before applying.</step>
+      </procedure>
+      <example>
+        moved {
+          from = example_policy.shared["member-key"]
+          to   = example_policy.member_key
+        }
+      </example>
+      <why_moved_matters>Without the `moved` block this refactor is a destroy followed by a create, and the policy is genuinely absent for the duration of the apply — a real protection gap on a real resource. With a correctly matched `moved` block and identical rule content, the plan shows the instance as having moved with 0 changes and there is no window in which the protection does not exist. Verified empirically, not inferred.</why_moved_matters>
+      <note>`moved` blocks are the general safe mechanism for renaming a resource or restructuring modules. A rename without one is always a destroy-and-create, whatever the diff looks like at a glance.</note>
+    </absorbing_out_of_band_drift>
+  </plan_review_and_state_moves>
+
   <dns_hosting_composition>
     <description>A recurring shape: exposing a service under a custom domain requires two coordinated resources across two providers — the hosting/platform resource that claims the domain, and a DNS record that routes to the platform's target. Model both; one without the other yields a broken or unverified domain.</description>
     <general_form>
@@ -418,6 +530,11 @@ version: 2.0.0
   <practice priority="high">Nil-check ProviderData in Configure and type-assert defensively.</practice>
   <practice priority="high">Diagnose apply-time 404/403 by credential scope, not only by configuration.</practice>
   <practice priority="high">Isolate independent infrastructure into separate state/workspaces; keep secrets out of state and config.</practice>
+  <practice priority="critical">Never change a resource's `provider =` as a way to move the real object between owners; transfer out-of-band, then state rm and re-import under the alias.</practice>
+  <practice priority="critical">Treat a failed apply as partially applied. Read state before re-running, never assume the run was a no-op.</practice>
+  <practice priority="high">Read the full plan body, not the summary counts, before approving any apply that touches policy, ruleset, ACL, or permissions resources.</practice>
+  <practice priority="high">Use `moved` blocks for every address change; a rename or `for_each` extraction without one is a destroy-and-create.</practice>
+  <practice priority="medium">Prefer declarative `import {}` blocks over the `terraform import` CLI whenever the backend holds credentials server-side.</practice>
   <practice priority="medium">Use ignore_changes narrowly for attributes managed out-of-band; never as a blanket.</practice>
   <practice priority="medium">Gate acceptance tests behind TF_ACC; run cheap checks (fmt/validate/lint) before plan in CI.</practice>
 </best_practices>
@@ -451,6 +568,26 @@ version: 2.0.0
     <description>One monolithic state for unrelated infrastructure, so every plan evaluates everything.</description>
     <instead>Split into per-concern workspaces/root modules with independent state.</instead>
   </avoid>
+  <avoid name="provider_alias_change_as_migration">
+    <description>Editing a resource's `provider =` meta-argument and applying, expecting Terraform to move the real object to the other owner.</description>
+    <instead>Transfer the object out-of-band, `terraform state rm`, re-import under the alias, and require a zero-diff plan. Terraform has no ownership-transfer operation; the apply would orphan the real object and create an empty replacement.</instead>
+  </avoid>
+  <avoid name="summary_only_plan_review">
+    <description>Approving an apply on the strength of "N to add, M to change, K to destroy" without reading the diff lines.</description>
+    <instead>Read every `-` and `~` line on policy-bearing resources. A `for_each` member whose out-of-band protections are about to be stripped is indistinguishable from a benign edit in the summary.</instead>
+  </avoid>
+  <avoid name="rename_without_moved">
+    <description>Renaming a resource or lifting one member out of a shared `for_each` and letting the plan destroy the old address and create the new one.</description>
+    <instead>Add a `moved` block so state is reassigned in place, leaving no window in which the object does not exist.</instead>
+  </avoid>
+  <avoid name="assume_failed_apply_rolled_back">
+    <description>Re-running or re-planning after a failed apply as though the previous run changed nothing.</description>
+    <instead>Inspect state first; everything that completed before the failure is live and tracked. Reconcile out-of-band deletions with `terraform state rm` before the next apply.</instead>
+  </avoid>
+  <avoid name="cli_import_blamed_on_config">
+    <description>Rewriting provider blocks to chase an "invalid provider configuration … cannot be determined until apply" error from `terraform import` against a remote backend.</description>
+    <instead>Recognize it as credential locality — the CLI import runs locally and cannot see server-side sensitive variables. Use an `import {}` block processed by the remote plan.</instead>
+  </avoid>
   <avoid name="dns_without_hosting_claim">
     <description>Adding a DNS record for a custom domain without claiming the domain on the hosting platform (or vice versa).</description>
     <instead>Provision both the platform custom-domain resource and the DNS record together.</instead>
@@ -462,12 +599,16 @@ version: 2.0.0
   <rule>Target terraform-plugin-framework for new providers; never mix SDKv2 idioms into a framework resource</rule>
   <rule>Keep secrets out of plaintext config and state; mark token attributes Sensitive</rule>
   <rule>Verify framework symbol names with Context7 before quoting exact helper APIs</rule>
+  <rule>Never treat a `provider =` change as an ownership move; never treat a failed apply as a no-op</rule>
 </rules>
 
 <rules priority="standard">
   <rule>Mark immutable attributes RequiresReplace; stable computed attributes UseStateForUnknown</rule>
   <rule>Validate config constraints in validators, not in CRUD</rule>
   <rule>Diagnose apply-time 404/403 as credential scope before rewriting HCL</rule>
+  <rule>Read the plan body, not the summary counts, on policy and permission resources</rule>
+  <rule>Pair every address change with a `moved` block</rule>
+  <rule>Use `import {}` blocks rather than the import CLI against remote-backend workspaces</rule>
   <rule>Use ignore_changes narrowly; isolate state per concern; run fmt/validate/lint before plan</rule>
 </rules>
 
@@ -523,7 +664,9 @@ version: 2.0.0
     <example severity="low">tflint style warning or fmt drift</example>
     <example severity="medium">Plan shows unexpected diff (often a missing plan modifier or over-broad ignore_changes)</example>
     <example severity="high">Apply fails with 404/403 on some resources — credential scope limit</example>
+    <example severity="high">Apply failed partway — an unknown prefix of the change is live and state must be read before any retry</example>
     <example severity="critical">Plan proposes destroying resources due to state divergence or a RequiresReplace on a data-bearing attribute</example>
+    <example severity="critical">Plan proposes add+destroy for what was intended as an owner change, or `-` lines removing protections nobody meant to remove</example>
   </examples>
 </error_escalation>
 
@@ -532,6 +675,10 @@ version: 2.0.0
   <must>Verify framework symbol names against current docs before asserting exact APIs</must>
   <must>Keep secrets out of config and state</must>
   <must>Distinguish credential-scope failures from configuration errors</must>
+  <must>Assume a failed apply left part of the change live, and read state before retrying</must>
+  <must>Transfer ownership out-of-band and re-import; never express it as a `provider =` edit</must>
+  <avoid>Approving an apply from summary counts alone on policy-bearing resources</avoid>
+  <avoid>Address changes without a `moved` block</avoid>
   <avoid>Mixing SDKv2 and plugin-framework idioms</avoid>
   <avoid>Blanket ignore_changes</avoid>
   <avoid>Monolithic state for unrelated infrastructure</avoid>

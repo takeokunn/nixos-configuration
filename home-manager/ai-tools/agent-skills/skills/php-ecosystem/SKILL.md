@@ -1,7 +1,7 @@
 ---
 name: PHP Ecosystem
-description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", or works with modern PHP language patterns and configuration. Provides comprehensive modern PHP ecosystem patterns and best practices.
-version: 2.1.0
+description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", "eloquent", "eager loading", "N+1", or works with modern PHP language patterns and configuration. Also covers ORM read design — why a dotted eager-load path through a polymorphic relation silently loads nothing beyond the parent, eager-loading breadth trading a query-count problem for a memory problem, giving a picker or autocomplete its own read shape rather than serving it from the rich domain read, and deciding the failure semantics of a concurrent fan-out before parallelizing independent I/O-bound reads. Provides comprehensive modern PHP ecosystem patterns and best practices.
+version: 2.3.0
 ---
 
 <purpose>
@@ -943,6 +943,35 @@ version: 2.1.0
     <description>Load relations explicitly with eager loading (with() / loadMissing()) instead of touching a relation inside a loop, which triggers one query per iteration. N+1 is the most common performance regression in ORM-backed code and is invisible until the collection grows.</description>
   </pattern>
 
+  <pattern name="polymorphic_breaks_nested_eager_loading">
+    <description>
+      A dotted eager-load path does not survive a polymorphic hop. `with('commentable.author')` is written and read as ordinary nested eager loading, but the ORM has no single relation to resolve after the polymorphic segment — the targets are heterogeneous types, each with its own relation definitions — so the nested part silently degrades to a query per concrete type. The N+1 the change was supposed to remove is still there, and it passes review precisely because the syntax is indistinguishable from the case that works. Load polymorphic children through the explicit construct that names each concrete type with its own relation list (`morphWith`-style), and confirm the fix with a query-count assertion rather than by reading the call site.
+    </description>
+    <example>
+      // Silently ineffective: nothing after the polymorphic hop is eager loaded
+      $comments = Comment::with('commentable.author')-&gt;get();
+
+      // Explicit: each concrete target type declares its own nested loads
+      $comments = Comment::with(['commentable' =&gt; static fn ($morphTo) =&gt; $morphTo-&gt;morphWith([
+          Article::class =&gt; ['author'],
+          Video::class   =&gt; ['author', 'channel'],
+      ])])-&gt;get();
+    </example>
+    <note>A convention-conformance review ("relations are eager loaded, not lazy") approves this line; only a behavioral check catches it. See execution-workflow on when a conformance pass is insufficient evidence.</note>
+  </pattern>
+
+  <pattern name="eager_loading_breadth_costs_memory">
+    <description>
+      Eager loading is taught as a pure win, so the reflex is to keep adding relations until the query log is clean. Query count and memory move in opposite directions: each added relation hydrates its rows into objects for every parent row, and the growth is multiplicative when a collection relation hangs off another collection relation — a page can end up holding several times the rows it held before the N+1 "fix". The check that keeps both under control is whether the consumer actually renders the relation. An unrendered relation is cheaper to delete than to load; for the ones you keep, constrain them (a closure that filters, orders, or limits, or a column list) instead of loading them whole.
+    </description>
+  </pattern>
+
+  <pattern name="read_shape_per_consumer">
+    <description>
+      A list, picker, or autocomplete endpoint needs identifiers and labels. Routing it through the rich domain read pays for a search-engine round trip, entity hydration, and relation loading whose results it immediately discards. Give that consumer its own repository method that goes to the query builder with an explicit column list and an early limit, returning plain id/label pairs. This is interface segregation at the read layer rather than a shortcut — the two methods have different contracts, not two implementations of one contract. State the cost when you take it: there are now two query paths over the same data, so a filter, scope, or visibility rule added to one must be added to the other. Keep them adjacent in the same repository and cover both with tests so the divergence is caught rather than discovered.
+    </description>
+  </pattern>
+
   <pattern name="collection_pipelines">
     <description>Prefer collection pipeline methods (map, filter, each, reduce) over manual foreach accumulation. The intent reads more directly and the transformations compose.</description>
   </pattern>
@@ -1583,6 +1612,23 @@ version: 2.1.0
       <description>Monitor the cache hit ratio in production and alert when it drops below an expected threshold. A falling hit ratio is the leading indicator of a misconfigured key, an unexpectedly short effective TTL, or a stampede — visible before latency regresses.</description>
     </pattern>
   </caching>
+
+  <concurrent_reads>
+    <principle>
+      A request that issues several independent reads one after another costs the sum of their latencies when it could cost the maximum. Fanning them out concurrently — through the framework's concurrency helper, or an async runtime built on Fibers — is a real and cheap win. What gets skipped is the second half: concurrency changes the request's failure semantics by default, and the change is silent.
+    </principle>
+
+    <pattern name="fan_out_applicability">
+      <description>Fan out only when all four conditions hold: the operations are independent of one another, they are I/O-bound rather than CPU-bound, they touch disjoint state (no shared connection, transaction, or mutable accumulator), and the response is bounded by the slowest branch rather than by the sum of work. If any one fails, sequential execution is both simpler and correct — and a fan-out over a shared database connection or inside an open transaction is a correctness bug, not a slower optimization.</description>
+    </pattern>
+
+    <pattern name="fan_out_failure_semantics">
+      <description>
+        Concurrent fan-out fails fast by default: one branch throwing discards the whole response, including branches that already succeeded. Decide which behavior you want instead of inheriting that default. For a search box, fail-fast is right — a silently incomplete result set is worse than an error, because the user reads absence as "no matches" and acts on it. For a dashboard of independent widgets, per-branch rescue is right — degrade the failed section to its own empty-with-error state and render the rest. Whichever you pick, make it visible in the code: wrap each branch in its own rescue, or state in the method's contract that the aggregate is all-or-nothing.
+      </description>
+      <note>The decision hinges on whether a partial result is distinguishable from a complete one by the person reading it. When it is not, degrade nothing.</note>
+    </pattern>
+  </concurrent_reads>
 </performance>
 
 <error_handling>
@@ -1786,6 +1832,26 @@ version: 2.1.0
       $stmt-&gt;execute([$email]);
     </example>
   </avoid>
+
+  <avoid name="dotted_path_through_polymorphic_relation">
+    <description>Eager loading with a dotted path whose first segment is polymorphic, which loads the polymorphic parent and nothing beyond it</description>
+    <instead>Name each concrete target type and its own relation list with the polymorphic eager-load construct, then assert the resulting query count</instead>
+  </avoid>
+
+  <avoid name="eager_load_everything">
+    <description>Adding relations until the query log is clean, without checking whether the consumer renders them — trading a query-count problem for a memory problem</description>
+    <instead>Load only relations the response actually uses; constrain or column-limit the ones you keep, and measure hydrated rows alongside query count</instead>
+  </avoid>
+
+  <avoid name="one_read_shape_for_every_consumer">
+    <description>Serving a picker or autocomplete from the rich domain read, paying for hydration and relation loading the response discards</description>
+    <instead>Add a narrow projection method returning id/label pairs; accept that two read paths now exist and keep them adjacent and both tested</instead>
+  </avoid>
+
+  <avoid name="implicit_fan_out_failure">
+    <description>Parallelizing independent reads for latency without deciding what a single branch failure should do, so one slow-path error silently discards a whole page of successful results</description>
+    <instead>Choose fail-fast or per-branch degradation deliberately, and express the choice in code rather than leaving it to the helper's default</instead>
+  </avoid>
 </anti_patterns>
 
 <rules priority="critical">
@@ -1802,6 +1868,9 @@ version: 2.1.0
   <rule>Use readonly classes for value objects</rule>
   <rule>Prefer property hooks over getters/setters (PHP 8.4+)</rule>
   <rule>Use pipe operator for functional-style chaining (PHP 8.5+)</rule>
+  <rule>Treat an eager-load change as behavioral: verify it by query count and hydrated-row count, not by reading the call site (see testing-patterns for query-count assertions)</rule>
+  <rule>Never eager load across a polymorphic relation with a dotted path; name each concrete type explicitly</rule>
+  <rule>Decide fail-fast versus per-branch degradation before parallelizing reads, and make the decision visible in the code</rule>
 </rules>
 
 <workflow>

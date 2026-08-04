@@ -1,7 +1,7 @@
 ---
 name: Workflow Patterns
 description: Patterns for output formats, reflection checkpoints, agent references, and self-evaluation shared across agents and commands.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -149,6 +149,23 @@ readonly attribute indicates whether agent can modify files.
     </example>
   </pattern>
 
+  <pattern name="convention_adoption_gate">
+    <description>A convention is not adopted until a machine gate enforces it. A rule that lives only in a document is advisory, and it erodes at the rate new code is written — so the definition of done for adding a rule includes its enforcement mechanism, not just the prose.</description>
+    <rule>When adding a coding or process convention, the task is complete only once a matching automated check exists and runs in the project's normal verification set.</rule>
+    <rule>If a rule cannot be mechanically checked, reconsider stating it. An unenforceable rule costs review attention on every change and buys compliance only while someone remembers it.</rule>
+    <gate_categories>
+      <category name="formatting_and_lint">Style and idiom rules, enforced by the project's formatter and linter configuration rather than by review comments</category>
+      <category name="boundary_checks">Import and layering constraints, enforced by a dependency or import-boundary checker</category>
+      <category name="unused_surface">Dead export and unreachable code detection, so a removal convention stays true over time</category>
+      <category name="project_policy">Rules no off-the-shelf tool knows about, written as a test in the normal suite (see quality-tools for how to author one without it becoming noisy)</category>
+    </gate_categories>
+    <example>
+      <note>Adding "all new modules must declare explicit exports"</note>
+      <note>Not done: the rule is written in the conventions document</note>
+      <note>Done: the rule is written down AND a lint rule or boundary check fails on a module that violates it</note>
+    </example>
+  </pattern>
+
   <pattern name="self_feedback_output">
     <description>Standard self-feedback output section for commands that include self-evaluation</description>
     <example>
@@ -170,6 +187,7 @@ readonly attribute indicates whether agent can modify files.
   <practice priority="high">Add self_evaluate_phase for agents producing reports or recommendations</practice>
   <practice priority="high">Use failure_handling phase in all workflows</practice>
   <practice priority="medium">Use agent_ref syntax for consistent agent references in commands</practice>
+  <practice priority="high">Treat a new convention as unadopted until a machine gate enforces it, and reconsider any rule that cannot be mechanically checked (convention_adoption_gate)</practice>
 </best_practices>
 
 <rules priority="critical">
@@ -198,6 +216,7 @@ readonly attribute indicates whether agent can modify files.
   <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
   <skill name="parallelization-patterns">Parallel execution and timeout configuration</skill>
   <skill name="serena-usage">Serena MCP operations (memory, symbol search, code navigation)</skill>
+  <skill name="quality-tools">Tool catalog and project-local policy gates that make a convention enforceable</skill>
 </related_skills>
 
 <related_agents>

@@ -1,7 +1,7 @@
 ---
 name: Technical Documentation
-description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Provides comprehensive documentation patterns for developers, teams, and end-users in both English and Japanese.
-version: 2.1.0
+description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Also covers auditing documentation against code in both directions — over-claims and, equally, shipped features still described as future work — confirming a documented capability is actually reachable rather than merely named by a function, publishing a registry of retired names alongside the current names that resemble them so nothing correct gets renamed, and recording the rationale at the change site when a previously-reasoned exception is reversed instead of leaving it in a commit message. Provides documentation patterns for developers, teams, and end-users in both English and Japanese.
+version: 2.3.0
 ---
 
 <purpose>
@@ -21,6 +21,8 @@ version: 2.1.0
   <concept name="audience_levels">Developer (technical depth), team member (context + depth), end user (no jargon, step-by-step)</concept>
   <concept name="progressive_disclosure">Start with quick start, then common cases, then advanced config, finally edge cases</concept>
   <concept name="documentation_lifecycle">Plan (outline) → Draft (write + examples) → Review (verify accuracy) → Maintain (update with code)</concept>
+  <concept name="bidirectional_drift">Documentation rots in two directions: it over-claims (describes capabilities that were never built or were removed) and it under-claims (still calls shipped work "planned"). Teams reliably audit only the first, so the second accumulates unchecked</concept>
+  <concept name="documentation_sites">Not all documentation lives in documents. A rationale belongs wherever the reader who needs it will be standing — a conventions file, a design doc, or a comment at the line itself</concept>
 </concepts>
 
 <patterns>
@@ -318,6 +320,65 @@ version: 2.1.0
       </glossary>
     </example>
   </pattern>
+
+  <pattern name="retired_vocabulary_registry">
+    <description>A conventions document lists superseded names — and, in the same place, the current names that resemble them</description>
+    <decision_tree name="when_to_use">
+      <question>Has a rename or refactor left names in circulation that should no longer be used?</question>
+      <if_yes>Add a retired-vocabulary section listing each retired term, its replacement, and the still-current names it can be confused with</if_yes>
+      <if_no>An ordinary glossary of current terms is sufficient</if_no>
+    </decision_tree>
+    <context>
+      <audience>Contributors and coding agents working from the conventions document</audience>
+      <when_to_use>After a vocabulary change large enough that old names persist in memory, old branches, or old examples</when_to_use>
+    </context>
+    <example>
+      <note>Vocabulary</note>
+
+      **Retired — do not reintroduce**
+
+      - `ItemRequest` → use `ItemCommand`
+      - `processItem()` → use `applyItem()`
+
+      **Still current, despite the resemblance**
+
+      - `ItemQuery` is current. It is not a retired name and must not be renamed to `ItemCommand`.
+      - `processItemEvent()` is current; only the non-event `processItem()` was retired.
+    </example>
+    <note>The second half is what makes the list safe to act on. Publishing retired terms alone reliably produces over-correction: readers and agents start "fixing" names that merely resemble the retired ones, which turns a documentation aid into a source of regressions.</note>
+  </pattern>
+
+  <pattern name="status_claim_audit">
+    <description>Auditing an implementation-status or capability document against the code in both directions</description>
+    <decision_tree name="when_to_use">
+      <question>Does a document assert what is or is not implemented — a status page, a roadmap, a security or compliance capability list?</question>
+      <if_yes>Audit every claim in both directions; over-claims and under-claims have different costs and both are present</if_yes>
+      <if_no>Ordinary accuracy review against the implementation is enough</if_no>
+    </decision_tree>
+    <example>
+      For each "we do X" claim: locate the implementing symbol, then confirm it is reachable from a live entry point. A function that exists but nothing calls is still an over-claim.
+      For each "X is not yet implemented" claim: search for it anyway. Shipped features routinely stay listed as future work.
+      For each named mechanism ("over WebSocket", "via the message queue"): verify the mechanism, not just the capability — docs commonly keep the right feature and the wrong transport.
+      Record the outcome per claim: confirmed, over-claimed, under-claimed, or wrong-mechanism.
+    </example>
+    <note>The asymmetry is the point. Over-claims are the dangerous kind — a stale line saying a safety control exists gets cited as evidence that it does. Under-claims are the wasteful kind — they cause already-shipped features to be re-planned and rebuilt. Because reviewers instinctively hunt only for the first, the second is where the surprises are.</note>
+  </pattern>
+
+  <pattern name="reversal_rationale_at_change_site">
+    <description>When a change deliberately reverses a previously-reasoned exception, the reasoning goes where the exception was recorded</description>
+    <decision_tree name="when_to_use">
+      <question>Does this change delete, invert, or narrow something that carried a documented rationale — an exemption, a suppression, a deliberate gate, a documented workaround?</question>
+      <if_yes>Write the reversal's reasoning at that site, in the same form the original rationale took</if_yes>
+      <if_no>The change speaks for itself; do not add a comment restating what the code does</if_no>
+    </decision_tree>
+    <example>
+      Trigger: you are removing a comment, an exemption entry, or a config exception that explained why something was the way it was.
+      Where it goes: the same file and line region, not the commit message, the pull request, or a session memory — none of those are visible to the person reading the code a year later.
+      What it says: that the removal was intentional and what changed to make the original reason no longer apply. Enough that a reader does not "fix" it back.
+      What it does not say: what the surrounding code does, or that the change is correct.
+    </example>
+    <note>This is the narrow case where a code comment earns its place: an absence carries no evidence, so a deliberately removed exception is indistinguishable from an accidental deletion. Reviewers converge on flagging it as a regression, which is a reliable signal that the reader needs the note more than the author expected.</note>
+  </pattern>
 </patterns>
 
 <language_guidelines>
@@ -478,6 +539,26 @@ version: 2.1.0
     <description>Using imprecise language like "simply" or "just" without concrete steps</description>
     <instead>Provide specific, numbered steps with expected outcomes</instead>
   </avoid>
+
+  <avoid name="retired_terms_without_look_alikes">
+    <description>Publishing a list of retired names without naming the current names that resemble them, which invites readers and agents to rename things that were never retired</description>
+    <instead>Pair every retired-vocabulary list with an explicit "still current despite the resemblance" set</instead>
+  </avoid>
+
+  <avoid name="one_directional_status_audit">
+    <description>Auditing a status document only for over-claims, leaving shipped features permanently described as future work</description>
+    <instead>Check both directions; verify "not yet implemented" claims by searching for the implementation anyway</instead>
+  </avoid>
+
+  <avoid name="capability_claim_without_reachability">
+    <description>Confirming a documented capability by finding a function with the right name, without checking that anything calls it</description>
+    <instead>Trace the symbol to a live entry point; unreachable code makes the claim false in exactly the way that matters</instead>
+  </avoid>
+
+  <avoid name="silent_exception_reversal">
+    <description>Removing a documented exception, exemption, or workaround and leaving the reasoning only in the commit message, the pull request, or a conversation</description>
+    <instead>Record the reversal's rationale at the site the exception occupied, where the next reader will actually be</instead>
+  </avoid>
 </anti_patterns>
 
 <rules priority="critical">
@@ -491,6 +572,10 @@ version: 2.1.0
   <rule>Include expected output for all code examples</rule>
   <rule>Define technical terms on first use or link to glossary</rule>
   <rule>Keep README under 500 lines; link to detailed docs for more</rule>
+  <rule>Audit status and capability claims in both directions; verify "not yet implemented" statements against the code, not only "we support X" statements</rule>
+  <rule>Trace each capability claim to a live entry point, not merely to a matching symbol</rule>
+  <rule>Pair any retired-terminology list with the current names it could be confused with</rule>
+  <rule>Record the reasoning for a deliberate reversal at the site the reversed decision occupied</rule>
 </rules>
 
 <error_escalation inherits="core-patterns#error_escalation">

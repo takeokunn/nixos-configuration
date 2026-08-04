@@ -1,7 +1,7 @@
 ---
 name: Investigation Patterns
-description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", or needs evidence-based code analysis and debugging. Provides systematic investigation and debugging methodology.
-version: 2.1.0
+description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", "bisect", or needs evidence-based code analysis and debugging. Also covers a counter or health check placed inside a conditionally-executed body measuring the gate rather than the phenomenon, bisecting a non-stationary symptom where a boundary that moves between runs invalidates the observation rather than the hypothesis, registries whose consumers break once a second member variant appears, and verifying a completion claim against the artifact it produced rather than a summary of it — including your own prior work. Provides systematic investigation and debugging methodology.
+version: 2.3.0
 ---
 
 <purpose>
@@ -76,6 +76,39 @@ version: 2.1.0
       Symptom: Intermittent failures, works sometimes
       Investigation: Look for shared mutable state, async operations
       Fix: Add synchronization or redesign for immutability
+    </example>
+  </concept>
+
+  <concept name="gated_measurement">
+    <description>A counter, sampler, or health check placed inside a conditionally-executed body measures the gate, not the phenomenon</description>
+    <example>
+      Symptom: A metric reads flat zero (or is stuck far below threshold) while the phenomenon it counts is obviously occurring
+      Investigation: Find where the instrumentation lives relative to the guard. If the increment is inside a rate-limited,
+        coalesced, debounced, or sampled body, its ceiling is the gate's rate, not the event's rate
+      Fix: Move the measurement outside the gate, or count gate-closed events explicitly as a separate signal
+
+      Compounding case: two independent limiters in the same path compose into a dead zone. Each is defensible alone —
+      a producer with its own rate limit calling a consumer with its own coalescing gate — and their product makes a
+      downstream threshold unreachable. Neither component is wrong; the composition is.
+
+      Why unit tests miss it: tests that call the detection function directly with synthetic counts bypass both gates,
+      so they pass while the live path never reaches the threshold at all.
+    </example>
+  </concept>
+
+  <concept name="heterogeneous_registry">
+    <description>A registry that gains a second member variant breaks consumers reading a variant-specific property</description>
+    <example>
+      Symptom: A consumer that iterates a registry works for most members and produces meaningless or empty results for some
+      Investigation: Check whether every member satisfies the property the consumer reads. A docstring or comment that
+        narrows the contract ("members must be defined with X") is documentation, not enforcement, and is routinely violated
+      Fix: Guard the variant-specific read, and give the discrimination a name
+
+      Duplication as the signal: when the same inline property-presence check appears at several call sites to tell variants
+      apart, the missing thing is a named predicate. The duplication is what makes the missing abstraction visible.
+
+      See testing-patterns for tests that enumerate a production registry; the investigation angle here is that a registry
+      with mixed member kinds is a likely source of "passes but tests nothing" behavior.
     </example>
   </concept>
 
@@ -245,6 +278,30 @@ version: 2.1.0
     </example>
   </pattern>
 
+  <pattern name="non_stationary_symptom">
+    <description>A bisection boundary that moves between runs invalidates the observation, not the hypothesis. Bisection — over commits, over input size, over a file's forms — assumes a deterministic oracle. Once the boundary shifts under re-probing, every subsequent narrowing step is fitting noise.</description>
+    <decision_tree name="when_to_use">
+      <question>Did the boundary you just narrowed to differ from the previous run's boundary?</question>
+      <if_yes>Stop narrowing and fix the measurement environment first</if_yes>
+      <if_no>Continue isolating, but re-confirm the boundary before each further reduction</if_no>
+    </decision_tree>
+    <rule>Before continuing to narrow, re-run the identical probe twice and require the identical boundary. If it moves, the oracle is noisy and the next reduction target is meaningless.</rule>
+    <interference_checklist>
+      <item>Concurrent instances of the same toolchain competing for CPU — check for other long-lived processes of the tool under test before trusting a timing-sensitive result</item>
+      <item>A shared build or artifact cache being written by another session</item>
+      <item>Fixed-name temporary files colliding between parallel probe sessions; give probe artifacts a process-unique path</item>
+    </interference_checklist>
+    <sunk_cost_note>A long log of "the next reduction target is..." entries with no reproducibility re-check is the failure signature. The accumulated narrowing feels like progress and creates pressure to continue, but every entry after the boundary first moved is unusable. Treat a resolved-without-a-fix outcome as confirmation that the symptom was environmental, and record that conclusion so the old reduction notes are not mistaken for live findings.</sunk_cost_note>
+  </pattern>
+
+  <pattern name="completion_claim_verification">
+    <description>Verify a completion claim against the artifact it produced, never against the summary of it. Applies to your own prior work and to any claim arriving as a summary.</description>
+    <rule>When a claim has a machine-readable artifact behind it — a coverage report, a directory listing, a lockfile, a build output — read the artifact. "The temporary directories were removed" and a listing showing them present is exactly the gap a skeptical check exists to close.</rule>
+    <rule>Read the number, not the rounding. A coverage figure reported as complete but measuring fractionally below it is hiding a small number of genuinely unexercised branches, and those branches are where the untested behavior lives.</rule>
+    <rule>Before accepting that a passing test validates a fix, confirm that test's fixtures route through the changed path. A test whose doubles substitute the component that was fixed passes for reasons unrelated to the fix, and is evidence of nothing.</rule>
+    <note>State which tier of verification was actually reached rather than implying the highest one; see execution-workflow for the completion-reporting form.</note>
+  </pattern>
+
   <pattern name="investigate">
     <description>Collect evidence systematically for debugging</description>
     <decision_tree name="when_to_use">
@@ -298,6 +355,7 @@ version: 2.1.0
       <section name="edge_cases_and_risks">Enumerate edge cases and rank technical risks (low/medium/high), each with a mitigation.</section>
       <section name="change_surface">State explicitly both the files to create or modify AND the files that need no change. Naming the "no change needed" set bounds the blast radius and is as valuable as the change list.</section>
       <section name="effort_and_confidence">Give a phased plan with a rough effort estimate and a confidence level with its basis.</section>
+      <section name="protected_differences">When the task is to align one project with a reference (a sibling service, a ported module, a second plugin in a family), enumerate the divergences that must survive before starting — a different auth scheme, a fixed rather than configurable endpoint, an extra handler the reference lacks, files the reference has that this project should not. The failure mode of conformance work is over-normalization: erasing a divergence that existed for a reason. Writing the protected list up front converts an implicit judgement call into a checkable constraint, the same way change_surface bounds the blast radius by naming what must not change.</section>
     </template>
     <note>Prefer reusing an existing abstraction over inventing one. If the existing abstraction is fundamentally incompatible with the new requirement, say so explicitly and justify a rewrite rather than forcing an ill-fitting extension.</note>
   </pattern>
@@ -321,6 +379,7 @@ version: 2.1.0
     <rule>Search across both source and tests: tests may reference private helpers directly, so a source-only search can wrongly mark a symbol dead.</rule>
     <rule>Treat build-system definitions (component or module manifests, barrel or index files) as the boundary of the removal: deleting a file cleanly usually requires updating the manifest that lists it.</rule>
     <rule>After removal, reload or build the affected unit (load the system, run the type or compile check, run the relevant test slice) to prove nothing dangles.</rule>
+    <rule>An unused-code warning on a symbol registered through an attribute macro, a plugin registry, or a foreign-function export is boundary noise, not proof: the compiler does not treat the generated registration path as a call site, so the true caller lies outside the language's reference graph. Verify the registration or export path before deleting.</rule>
     <candidates>
       <candidate>Thin compatibility barrels that only re-export concrete modules: remove by pointing each consumer at the concrete module, then delete the barrel.</candidate>
       <candidate>Single-use private helpers whose only call sites are local: inline them, keeping the public entry point as the sole behavioral surface.</candidate>
@@ -340,6 +399,10 @@ version: 2.1.0
   <practice priority="high">Before adding a feature to an unfamiliar codebase, write an architecture analysis: existing patterns, a reference implementation, integration points, risks, and the explicit change surface including files that need no change (architecture_analysis_before_feature)</practice>
   <practice priority="medium">Record work blocked on an external dependency as a deferred decision with checkable revisit conditions, not an open loop (deferred_decision_record)</practice>
   <practice priority="medium">Remove dead code by semantic reference confirmation across source and tests, with a build or reload check after removal (dead_code_removal_discipline)</practice>
+  <practice priority="critical">Verify a completion claim against the artifact it produced, and confirm a passing test actually routes through the changed path (completion_claim_verification)</practice>
+  <practice priority="high">Re-run a probe twice and require an identical boundary before narrowing further; a moving boundary means the measurement environment is the problem (non_stationary_symptom)</practice>
+  <practice priority="medium">When a counter reads zero while the phenomenon is clearly occurring, check whether the instrumentation sits inside a guard (gated_measurement)</practice>
+  <practice priority="medium">When aligning a project to a reference, enumerate the divergences that must survive before starting (architecture_analysis_before_feature)</practice>
 </best_practices>
 
 <anti_patterns>

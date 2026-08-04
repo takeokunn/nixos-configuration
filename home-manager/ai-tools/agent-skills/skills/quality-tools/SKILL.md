@@ -1,7 +1,7 @@
 ---
 name: Quality Tools
-description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Agents reference this skill instead of inline tool definitions.
-version: 2.1.0
+description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Also covers authoring project-local policy gates, supply-chain pinning of external build references, and the mechanics of running checks so their output is trustworthy. Agents reference this skill instead of inline tool definitions.
+version: 2.2.0
 ---
 
 <purpose>
@@ -222,6 +222,11 @@ version: 2.1.0
       <step>Point each consumer at the concrete module it actually needs.</step>
       <step>Once no consumer imports the barrel, delete it.</step>
     </steps>
+    <caveats>
+      <caveat>Confirm the file really is a barrel before deleting it. A package-root index that the package manifest names as the package's entry point is a config-bound public API, not a compatibility shim: retarget or remove the manifest export first, then delete the file.</caveat>
+      <caveat>A file that defines anything of its own — contracts, ownership assignments, types — is not a barrel even when it looks like one. Split those definitions into dedicated modules and move consumers, rather than deleting the file outright.</caveat>
+      <caveat>Keep an aggregation point that is the canonical public surface of a package until every caller has been migrated off it.</caveat>
+    </caveats>
   </operation>
 
   <operation name="helper_split_wiring_from_implementation">
@@ -234,6 +239,43 @@ version: 2.1.0
     </examples>
     <verify>Run the targeted test file and the type or compile check for the touched package after each extraction; behavior must be unchanged.</verify>
   </operation>
+
+  <operation name="static_data_logic_split">
+    <description>Move inert values — constants, thresholds, marker strings, copy and template text, and narrow exported type contracts — out of a behavior module into a sibling data module, leaving the original module holding only executable behavior.</description>
+    <when>A module mixes stable configuration values with the code that formats, parses, branches, or performs I/O.</when>
+    <boundary_rule>If the value is a stable constant, a display limit or threshold, an immutable marker or copy string, or a lightweight exported contract (including a narrowing type alias), move it to the data module. If it formats, parses payloads, touches the filesystem or network, coordinates async work, or changes session state, it stays in the logic module.</boundary_rule>
+    <result>The data module becomes the single place to change wording and limits, and the logic module becomes importable by tests without dragging static payloads along. This is a different axis from view_data_extraction, which moves display-decision branching: this one moves inert values and applies equally to server-side code that has no view at all.</result>
+  </operation>
+
+  <operation name="single_consumer_aggregator_inlining">
+    <description>Inline a wrapper whose only job is to bundle already-local state and actions for exactly one caller.</description>
+    <when>A composition module, factory, or wrapper forwards pieces the owning module already holds, and it has a single consumer.</when>
+    <result>One indirection layer fewer with no behavior lost. Unlike barrel_removal the target composes rather than re-exports, so searching for pure re-export files will not find it.</result>
+    <prohibition>Do not reintroduce a feature-root composition layer during a later split unless it carries logic beyond forwarding. This wrapper tends to come back, because adding one is the reflex when splitting a module — so the rule has to be stated as a standing prohibition, not only as a one-time cleanup.</prohibition>
+  </operation>
+
+  <operation name="over_abstraction_reversal">
+    <description>Collapse a seam that does not pay for itself: remove a named helper and restore direct branching, or decline to unify two implementations that only look alike.</description>
+    <when>A helper exists but relocates a step rather than owning a decision, or a proposed shared helper would span implementations whose semantics differ.</when>
+    <tests>
+      <test name="distinct_decision">Does the seam carry a decision of its own? A helper that only relocates a step costs a name, a call, and its own unit tests while making the control flow harder to follow at the call site.</test>
+      <test name="semantics_not_shape">Do the candidates share semantics, or only structure? Two handlers with matching shape but differing validation rules, payload decoding, side effects, and limits are a recurring false positive for DRY; a common helper there reduces readability instead of raising it.</test>
+    </tests>
+    <result>Fewer helpers and fewer dedicated tests, with control flow visible where it happens. This direction of travel needs to be in the catalog: every other operation here extracts, so without a reversal an over-eager split has no documented remedy.</result>
+  </operation>
+
+  <stop_rules>
+    <description>When to make no move at all. A catalog of extraction operations invites continuous splitting, so it needs criteria for declaring a module finished.</description>
+    <rule>A module that is already thin orchestration over dedicated helpers is done. Extracting further adds indirection without reducing complexity.</rule>
+    <rule>Target modules that hold concrete branching or mutable state. Do not sweep a subtree for candidates by structure alone.</rule>
+    <rule>Split further only when a concrete bug or a genuinely new responsibility appears, not on the general principle that smaller is better.</rule>
+    <rule>Apply coverage goals to the slices actually refactored rather than repo-wide as an undifferentiated target.</rule>
+    <signals_of_overrun>A wrapper deleted, reintroduced, and deleted again; or a data module created to hold two constants. Both mean the catalog is being applied past the point where it pays.</signals_of_overrun>
+  </stop_rules>
+
+  <new_boundary_coverage>
+    <rule>When an extraction creates a new boundary module, add a direct spec for that module. Relying on the public surface alone leaves the new seam exercised only incidentally, so coverage stays green while the boundary itself is untested.</rule>
+  </new_boundary_coverage>
 </refactoring_operations>
 
 <scored_review>
@@ -246,8 +288,53 @@ version: 2.1.0
   <honesty>
     <rule>State the analysis's basis and its limits: an architectural or static review is not runtime measurement. Do not present estimated improvements or scores as measured results.</rule>
     <rule>Give an explicit confidence level and its known limitations (what was not exercised: real workloads, low-resource systems, actual profiling).</rule>
+    <rule>A score is valid only for the tree state it was computed against, so record what that state was. A stored scorecard outlives the code it scored and reads as current evidence to whoever finds it next.</rule>
+    <rule>When an obsolete scorecard turns up, invalidate it explicitly rather than carrying it forward: state that it must not be used for current prioritization, and mark which of its items are resolved or superseded. Superseding a score requires re-measurement, not re-reading the old one — unbenchmarked estimates do not become evidence by ageing.</rule>
   </honesty>
+  <label_integrity>
+    <description>A check for the generated artifact itself, applicable to any report, dashboard, or evaluation table and not only to review output.</description>
+    <rule>Every label must be derived from the same key it displays. A column headed with one qualifier while reading a differently-qualified source key produces a confident wrong number, which is worse than a missing one, because downstream decisions rely on it.</rule>
+    <check>For each label in a report template, confirm the key it reads carries the same qualifier. This defect survives review because the code is locally correct and the label is locally reasonable — only the pairing is wrong.</check>
+  </label_integrity>
 </scored_review>
+
+<policy_gates>
+  <description>Project-local checks that enforce a rule the off-the-shelf tools above do not know about — typically finishing a mechanical migration or holding a layering boundary. Unlike the tool catalog, you author and maintain these, so their failure modes are yours too.</description>
+
+  <pattern name="migration_enforcement_check">
+    <description>A large mechanical migration does not finish when the last file is edited. It finishes when the old idiom becomes impossible to reintroduce.</description>
+    <rule>Ship the check as a test inside the normal suite, not as a separate tool that has to be remembered.</rule>
+    <rule>Scan emitted output — format strings and generated text — rather than whole-file text. A whole-file scan fails on comments and documentation, which is how a change that keeps runtime logic intact and merely renames surrounding prose ends up red.</rule>
+    <rule>Make it table-driven, one call site per migrated file, so coverage gaps are visible by inspection instead of inferred.</rule>
+    <rule>Ship a narrower variant for legitimate exceptions, so the escape hatch is explicit rather than achieved by weakening the rule for everyone.</rule>
+  </pattern>
+
+  <pattern name="regex_checker_false_positives">
+    <description>Home-grown layering and purity checkers are almost always regex or grep over source text, so they match identifiers, comments, and string literals indistinguishably from real API references.</description>
+    <rule>Treat a hit as evidence to investigate, not proof of a violation.</rule>
+    <rule>Inside directories governed by such a check, avoid naming local identifiers after the forbidden APIs. A slightly different local name costs far less than a permanently noisy gate that reviewers learn to ignore.</rule>
+    <note>A convention is not adopted until a machine gate enforces it (see workflow-patterns), and a gate is only worth having while its precision keeps it trusted. Those two pull in opposite directions when the check is textual.</note>
+  </pattern>
+</policy_gates>
+
+<supply_chain>
+  <description>Rules for external references a build resolves by name: CI action references, CDN asset URLs, container images, and any other dependency fetched at build or run time.</description>
+  <rule priority="critical">Pin every external reference to an immutable identifier — a full commit hash or an exact version — and keep the human-readable release or tag in an adjacent comment. A floating reference (a moving tag, an `@latest` alias, an unversioned path) can change what the build produces without any repository diff, which is what makes it worth a standing rule rather than case-by-case judgement.</rule>
+  <rule priority="high">Where the reference is data, assert the pinned form in a test — for example a test that matches asset URLs against an exact-version pattern. That turns an upgrade into a deliberate, reviewable edit instead of silent drift.</rule>
+  <rule priority="medium">Keep automation credentials at the narrowest scope by default and widen only where a specific job demonstrates the need.</rule>
+  <tooling>
+    <category name="secret_scanning">Scan the working tree, not only history, so an unstaged credential is caught before it is committed (for example gitleaks).</category>
+    <category name="workflow_linting">Validate CI workflow syntax and expressions statically (for example actionlint).</category>
+    <category name="workflow_static_analysis">Audit workflows for supply-chain weaknesses specifically — unpinned references, over-broad permissions, untrusted input reaching a shell (for example zizmor).</category>
+  </tooling>
+</supply_chain>
+
+<running_checks>
+  <description>Mechanics that decide whether a check's output is usable at all, independent of which tool produced it.</description>
+  <rule priority="high">Before inspecting diff output mechanically, neutralize any configured external diff driver. A repo-level or user-level `diff.external` / `diff.tool` setting (difftastic, delta, and similar) makes `git diff`, `git show`, and `git log -p` emit syntax-highlighted, structurally reformatted text rather than a parseable unified diff — so pass `--no-ext-diff`. The failure is silent: the command exits zero and the reader draws wrong conclusions from decorated output instead of hitting an error.</rule>
+  <rule priority="medium">Check this before concluding a diff is empty or a change is missing. A configuration set globally for the machine applies to every repository, not just the one that documents it.</rule>
+  <note>See git-ecosystem for the broader Git configuration and workflow surface. The rule appears here because it governs whether a verification step's output can be trusted.</note>
+</running_checks>
 
 <decision_tree name="tool_selection">
   <question>What type of quality check is needed?</question>
@@ -267,6 +354,11 @@ version: 2.1.0
   <practice priority="medium">Separate formatting from logic changes in commits</practice>
   <practice priority="medium">Prefer the smallest cohesion-raising refactor operation (view-data extraction, barrel removal, helper split) over a broad rewrite, and verify behavior with targeted tests after each move (refactoring_operations)</practice>
   <practice priority="medium">For scored reviews, separate Critical from Quick Wins, phase the rollout, and state the analysis basis and its limits honestly (scored_review)</practice>
+  <practice priority="high">Pin every external build reference to an immutable identifier, and assert the pin in a test where the reference is data (supply_chain)</practice>
+  <practice priority="high">Pass --no-ext-diff whenever diff output will be read mechanically; a configured external diff driver fails silently rather than erroring (running_checks)</practice>
+  <practice priority="medium">Before extracting further, apply the stop rules: a module that is already thin orchestration is done, and a seam that carries no decision should be collapsed rather than kept (refactoring_operations)</practice>
+  <practice priority="medium">Finish a mechanical migration with a table-driven policy check scoped to emitted output, with an explicit narrower variant for exceptions (policy_gates)</practice>
+  <practice priority="medium">Confirm every report label is derived from the key it displays, and invalidate obsolete scorecards instead of carrying them forward (scored_review)</practice>
 </best_practices>
 
 <anti_patterns>

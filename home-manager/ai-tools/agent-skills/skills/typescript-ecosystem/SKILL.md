@@ -1,7 +1,7 @@
 ---
 name: TypeScript Ecosystem
-description: This skill should be used when the user asks to "write typescript", "typescript config", "tsconfig", "type definition", "generics", "utility types", or works with TypeScript language patterns and configuration. Provides comprehensive TypeScript ecosystem patterns and best practices.
-version: 2.1.0
+description: This skill should be used when the user asks to "write typescript", "typescript config", "tsconfig", "project references", "type definition", "generics", "utility types", or works with TypeScript language patterns, monorepo build graphs, or package boundaries. Covers rootDir and package-boundary errors, separating the typecheck graph from the build graph, per-project tsbuildinfo, case-variant sibling filenames on case-insensitive filesystems, and source-aliased siblings needing full public exports. Also covers modelling data in types — exhaustive Record-keyed registries instead of a Partial map with a fallback, discriminated unions with one uniform terminal payload field, ordinal position as a persisted encoding, and parsers where an absent field is valid but a malformed one is fatal.
+version: 2.3.0
 ---
 
 <purpose>
@@ -138,6 +138,31 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
         <if_no>Stick with default module resolution for simple projects</if_no>
       </decision_tree>
     </pattern>
+
+    <pattern name="basenames_must_differ_by_more_than_case">
+      <description>
+        The default filesystems on macOS and Windows are case-INsensitive but
+        case-preserving. Two modules whose basenames differ only in case are distinct files to
+        the editor and to version control, but the same path to the resolver — so a helper
+        placed beside a component with a case-variant name can resolve to the component and
+        import itself.
+      </description>
+      <example>
+        // Same directory, case-insensitive filesystem:
+        //   NotificationBanner.tsx   (component)
+        //   notificationBanner.ts    (helper)  ← ./notificationBanner may resolve to the .tsx
+        //
+        // Safe: give the helper a distinct name.
+        //   NotificationBanner.tsx
+        //   notification-banner-format.ts
+      </example>
+      <warning>
+        The failure presents as a circular import or an undefined export, never as "file not
+        found", so it reads like a bug in the module rather than in its name. It is also
+        platform-dependent: it can pass on a case-sensitive CI runner and fail on developer
+        machines, or the reverse. Watch the common `Foo.tsx` component / `foo.ts` helper pairing.
+      </warning>
+    </pattern>
   </module_resolution>
 
   <project_references>
@@ -156,8 +181,103 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
       }
     </example>
     <note>Use tsc --build for incremental compilation</note>
+
+    <pattern name="separate_typecheck_and_build_graphs">
+      <description>
+        Typechecking and building want different file sets: the typecheck must include tests
+        (otherwise test code is never checked), and the production build must exclude them
+        (otherwise test types ship). Serving both from one config forces a choice between the
+        two. Run two configs — a test-inclusive one for `--noEmit` checking and a
+        production-only one for emit.
+      </description>
+      <example>
+        // tsconfig.json — typecheck graph: sources + tests, no emit
+        { "compilerOptions": { "noEmit": true, "incremental": true,
+        "tsBuildInfoFile": "./.tsbuildinfo.check" },
+        "include": ["src", "test"] }
+
+        // tsconfig.build.json — build graph: sources only
+        { "extends": "./tsconfig.json",
+        "compilerOptions": { "noEmit": false, "outDir": "./dist",
+        "tsBuildInfoFile": "./.tsbuildinfo.build" },
+        "include": ["src"] }
+      </example>
+      <warning>
+        Give each config its OWN tsBuildInfoFile. Two configs sharing one incremental state
+        file silently clobber each other, so every run is a cold rebuild — there is no error,
+        no warning, and the only symptom is that incremental builds are mysteriously slow. A
+        single hardcoded `.tsbuildinfo` is exactly the configuration that causes this.
+      </warning>
+    </pattern>
+
+    <pattern name="respect_the_package_boundary">
+      <description>
+        In a monorepo, TS6059 ("file is not under rootDir") and TS6307 ("file is not listed
+        within the file list") mean the compilation has reached outside the package root. The
+        instinctive fix — widening `rootDir` — dissolves the very boundary that produced the
+        error and turns one package's build into a build of its neighbours. Fix the entrypoints
+        instead.
+      </description>
+      <causes>
+        <cause>Importing a sibling package's subpath implementation file (`pkg/src/internal/x`) instead of its declared public entrypoint.</cause>
+        <cause>Importing another package's test tree (`pkg/test/helpers`) from this package's tests.</cause>
+        <cause>A test-only path alias that resolves outside the package root, dragging those files into the program.</cause>
+      </causes>
+      <rule>Route every cross-package import through the sibling's public entrypoint and wire packages together with project `references`. If a test helper is needed in two packages, either copy the small helper locally or promote it to a public export — never reach into a neighbour's test tree.</rule>
+    </pattern>
   </project_references>
 </tsconfig>
+
+<monorepo_version_skew>
+  <principle>
+    In a package graph, the code that runs is decided by where a value is CONSTRUCTED and by
+    what the installer actually resolved — neither of which is visible in the consumer's
+    dependency list. A graph that typechecks cleanly can still run two copies of the same
+    library, or run an older one than the manifest suggests. These bugs are expensive because
+    every artifact you would normally consult says the change was applied.
+  </principle>
+
+  <pattern name="runtime_version_follows_the_constructor">
+    <description>
+      A package that CONSTRUCTS a stateful service must itself depend on the exact API version
+      the host expects. Adding a newer direct dependency to the host does not upgrade an object
+      built inside a producer package that still resolves the older copy — the host holds a new
+      type and an old implementation. The same shape appears with data tables: the host is
+      pinned to the new table while the producer package that reads it resolves the previous
+      one.
+    </description>
+    <rule>When upgrading a shared API, bump it in every package that constructs values of that API, not only in the package that consumes them. Verify against the installed tree (the package manager's `why`/`ls` output), not against the manifests.</rule>
+    <note>
+      The type-level variant is equally common: two installed copies of a nominally identical
+      closed union are distinct types, so literals that share names produce incompatible public
+      unions and an error message that reads as if the two are unrelated.
+    </note>
+  </pattern>
+
+  <pattern name="source_aliased_siblings_need_full_public_exports">
+    <description>
+      Aliasing sibling packages to their SOURCE is the standard monorepo fast-feedback setup,
+      and its standard failure is a green typecheck with a runtime explosion: the dev-time
+      resolver reaches a symbol through source that the published entrypoint does not export.
+      Every symbol the running application touches must be exported from the sibling's public
+      entrypoint — a transitive dependency's internal export may typecheck in isolation and be
+      unreachable once the real resolution rules apply.
+    </description>
+    <note>Alias the package that OWNS a service as well as its consumer. A half-aliased graph lets stale nested declarations resolve alongside the aliased source, producing structurally incompatible versions of the same service type at the composition boundary.</note>
+  </pattern>
+
+  <pattern name="vocabulary_changes_are_vertical_and_bottom_up">
+    <description>
+      Adding a member to a closed vocabulary (a shared union of string literals, an id space, a
+      status set) is not a local edit. Add the canonical literal in the package that OWNS the
+      vocabulary, release it, update any mirrored vocabularies and rules in the intermediate
+      packages, release those, and only then pin and integrate at the host. Any other order
+      produces a window where the type and the runtime disagree about what values exist.
+    </description>
+    <rule>Never mirror a closed union downstream — including in runtime guards. Import both the type and its guard from the owning package, so a newly registered member is immediately valid everywhere without a synchronized multi-package edit.</rule>
+    <note>Adding a member to an exported closed union is an additive public API change (semver MINOR). While a package is on 0.x, a MINOR-classified change maps to a PATCH bump, which routinely surprises people reading the version alone.</note>
+  </pattern>
+</monorepo_version_skew>
 
 <native_typescript>
   <description>Node.js 24+ runs TypeScript natively without flags or external runners. Node.js 22.6+ required --experimental-strip-types.</description>
@@ -394,6 +514,71 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
     </pattern>
   </satisfies_operator>
 
+  <exhaustive_registries>
+    <principle>
+      When one logical variant must be registered in several parallel places — a renderer
+      table, a capability list, a serializer map — a checklist in a document decays and an
+      exhaustive mapped type does not. Type each registry as `Record&lt;Union, T&gt;` so that
+      adding a member to the union turns every unupdated registry into a compile error instead
+      of a runtime hole.
+    </principle>
+
+    <pattern name="record_over_partial_map">
+      <description>Prefer a total `Record&lt;Union, T&gt;` over a partial map or a lookup function with a fallback. The fallback is what converts a missing registration from a build failure into a silent default at runtime.</description>
+      <example>
+        type Shape = "circle" | "square" | "triangle";
+
+        // Total: omitting a member is a compile error.
+        const renderers: Record&lt;Shape, Renderer&gt; = {
+        circle: renderCircle,
+        square: renderSquare,
+        triangle: renderTriangle,
+        };
+
+        // Partial: a missing member is `undefined` at runtime, and nothing complains.
+        // const renderers: Partial&lt;Record&lt;Shape, Renderer&gt;&gt; = { circle: renderCircle };
+      </example>
+      <note>The same reasoning favors exhaustive `switch` with a `never`-typed default assertion over a `default` arm that quietly absorbs new members.</note>
+    </pattern>
+
+    <pattern name="ordinal_position_as_persisted_encoding">
+      <description>
+        When a union member's ORDINAL POSITION is the persisted encoding (an index into a
+        codec table, a wire tag derived from array order), inserting a member is a data
+        migration, not an edit — every previously stored value after the insertion point now
+        decodes as its neighbour.
+      </description>
+      <rule>Append only. Any parallel array keyed by that ordinal must be extended at the same index in the same change. If a member must be removed, retire the slot rather than compacting the list.</rule>
+      <note>List order also becomes observable wherever selection uses modulo or round-robin over the list, so even a pure append can perturb behavior and tests that depended on the cycle.</note>
+    </pattern>
+  </exhaustive_registries>
+
+  <discriminated_unions>
+    <principle>
+      A discriminated union that is consumed by GENERIC machinery — a reducer, an event bus, a
+      stream transition applicator — should carry its payload in a field named for the payload's
+      STRUCTURAL ROLE, not for its domain meaning. Naming the terminal payload after what it
+      happens to contain in one variant forces every generic consumer to branch on the
+      discriminant it was written specifically to avoid branching on.
+    </principle>
+
+    <pattern name="uniform_terminal_payload_field">
+      <description>Give every variant of a stream/result union the same terminal payload field, so one applicator can forward it for any variant.</description>
+      <example>
+        // Forces ad-hoc branching in every generic consumer:
+        // | { kind: "done"; outputPath: string }
+        // | { kind: "done"; summary: Summary }
+
+        // Uniform: the applicator forwards `value` for either stream.
+        type Transition&lt;T&gt; =
+        | { kind: "chunk"; text: string }
+        | { kind: "done"; value: T }
+        | { kind: "error"; error: Error };
+      </example>
+      <note>Domain-meaningful names still belong INSIDE the payload type. The rule is about the field the generic layer reads, not about erasing meaning from the data.</note>
+    </pattern>
+  </discriminated_unions>
+
   <schema_single_source>
     <principle>
       Define a value's shape once, as a runtime schema, and derive everything else from it. A schema library (e.g. Zod, Valibot, ArkType) produces both a runtime validator and the static type via inference, so the type and the validation can never drift apart. Never hand-maintain a separate interface alongside a validator — that is two sources of truth for one shape.
@@ -421,6 +606,18 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 
     <pattern name="normalize_validation_result">
       <description>When one endpoint accepts multiple input encodings, validate each branch against its schema and normalize all branches into a single validated result object of one shape, so downstream code never re-inspects which encoding arrived.</description>
+    </pattern>
+
+    <pattern name="absent_is_valid_malformed_is_fatal">
+      <description>
+        "Optional" is ambiguous between ABSENT and PRESENT-BUT-INVALID, and parsers routinely
+        collapse the two by omitting whatever fails to parse. That lenient reading turns a
+        producer's bug into silent data loss: the field disappears, the object still validates,
+        and nothing downstream can tell that anything was dropped. Decide explicitly, and
+        prefer the strict reading — absence is valid, malformed presence is an error.
+      </description>
+      <rule>An optional field that is present with the wrong type must fail the parse, not be dropped. In list processing this matters most: silently skipping malformed items yields a plausible-looking short result that no consumer can distinguish from a genuinely short one, so a malformed item should fail the whole read rather than shrink it.</rule>
+      <note>Where partial results genuinely are acceptable, return the rejected items alongside the accepted ones so the caller can decide. The rule is against dropping them invisibly, not against tolerance itself.</note>
     </pattern>
   </schema_single_source>
 </type_patterns>
@@ -495,7 +692,72 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
       </example>
       <note>Requires "lib": ["ESNext.Disposable"] or target ES2024+. Use DisposableStack for managing multiple resources.</note>
     </pattern>
+
+    <pattern name="guarded_subscription">
+      <description>
+        Subscribing to an event source has three races that the obvious code loses. Install the
+        release handle BEFORE subscribing, make release idempotent, and let only the currently
+        active release clear the shared handle.
+      </description>
+      <example>
+        // BAD: a source that emits synchronously during subscribe() fires before
+        // `release` has been assigned, so the handler runs with no way to tear down.
+        // const release = source.subscribe(handler);
+
+        // GOOD: the handle exists before any event can arrive.
+        const ref: { current: (() =&gt; void) | null } = { current: null };
+
+        const start = () =&gt; {
+        let unsubscribe: (() =&gt; void) | null = null;
+        const release = () =&gt; {
+        if (ref.current !== release) return; // a newer subscription owns the ref now
+        ref.current = null;
+        unsubscribe?.();                     // idempotent: safe to call twice
+        unsubscribe = null;
+        };
+        ref.current = release;                 // installed first
+        unsubscribe = source.subscribe(handler);
+        if (ref.current !== release) unsubscribe(); // cancelled while we were subscribing
+        return release;
+        };
+      </example>
+      <notes>
+        <item>Race 1 — synchronous emission during `subscribe()`: the source fires before the assignment completes, so the handle must be installed first.</item>
+        <item>Race 2 — cancellation during an awaited registration: teardown can run before registration resolves, so the late-registration branch must also release.</item>
+        <item>Race 3 — superseded teardown: if any release may clear the shared handle, an old subscription's cleanup tears down its replacement. Guard on identity, as above. This is the subtle one and it is rarely written down.</item>
+        <item>Stale events from a replaced subscription must be ignored by identity, not by a boolean flag that the replacement also sets.</item>
+      </notes>
+    </pattern>
   </resource_management>
+
+  <browser_storage>
+    <principle>
+      In a transactional browser store, request success and durability are different events.
+      A wrapper that resolves on the request's success callback reports "durable" when it only
+      knows "accepted", and the write can still be rolled back afterwards.
+    </principle>
+
+    <pattern name="resolve_writes_on_transaction_complete">
+      <description>
+        For IndexedDB, a write must resolve only after the enclosing readwrite `IDBTransaction`
+        fires `complete`. `IDBRequest.onsuccess` means the operation was accepted WITHIN the
+        transaction; a later `abort` or `error` on that transaction must surface to the caller
+        as a storage failure. Reads are the asymmetric case: a readonly request may resolve
+        from `onsuccess`, because there is nothing to roll back.
+      </description>
+      <example>
+        // Writes: wait for the transaction, not the request.
+        const put = (store: IDBObjectStore, value: unknown) =&gt;
+        new Promise&lt;void&gt;((resolve, reject) =&gt; {
+        store.put(value);
+        store.transaction.oncomplete = () =&gt; resolve();
+        store.transaction.onabort = () =&gt; reject(store.transaction.error);
+        store.transaction.onerror = () =&gt; reject(store.transaction.error);
+        });
+      </example>
+      <warning>The asymmetry is what makes a naive uniform wrapper wrong: applying the request-level resolution to both reads and writes looks consistent and reports false durability, while applying transaction-level resolution to reads needlessly serializes them.</warning>
+    </pattern>
+  </browser_storage>
 
   <async_patterns>
     <pattern name="promise_all">
@@ -661,6 +923,22 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
 
   <pattern name="cookie_auth_hardening">
     <description>Cookie-authenticated mutating routes need CSRF/Origin verification (return 403 on failure). Set JWTs in HTTPOnly cookies from the server; the client only navigates/redirects. Synchronize the JWT `exp` and the cookie Max-Age from one source so they cannot drift. Store only a hash (e.g. SHA-256) of refresh tokens and rotate them one-time (invalidate on use, issue a new one).</description>
+  </pattern>
+
+  <pattern name="one_rotation_recovery_window">
+    <description>
+      One-time rotation (invalidate the presented token, issue a new one) has a liveness hole:
+      if the response carrying the new token is lost — a dropped connection, a backgrounded
+      tab — the client is locked out holding a token the server has already consumed, and no
+      amount of retrying helps. Retain the hash of the IMMEDIATELY PREVIOUS token and accept it
+      for exactly one recovery rotation, which closes the hole without accepting unbounded
+      replay.
+    </description>
+    <rule>Store hashes only, keep exactly one generation of history (not a list), and reissue on a previous-generation hit rather than treating it as an attack. Anything beyond one generation is a replay window, not a recovery window.</rule>
+    <notes>
+      <item>The client half matters too: hold a registration/bootstrap secret in memory only until acceptance, and clear it from session storage at start-up, so a consumed secret cannot be replayed from disk.</item>
+      <item>Be explicit about the residual edge this does not fix: if the very FIRST issuance is lost, the client never held a token to recover with, and only an administrative path can re-provision it. Naming that limit is part of the design, not a gap in it.</item>
+    </notes>
   </pattern>
 
   <pattern name="decouple_optional_dependencies">
@@ -917,6 +1195,13 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <practice priority="medium">Export types separately with 'export type'</practice>
   <practice priority="medium">Use 'const' assertions for literal types</practice>
   <practice priority="medium">Prefer interfaces for public APIs, types for unions/utilities</practice>
+  <practice priority="high">Give every tsconfig its own tsBuildInfoFile; a shared one silently disables incremental builds</practice>
+  <practice priority="high">Fix rootDir/file-list errors by tightening cross-package entrypoints, never by widening rootDir</practice>
+  <practice priority="high">Type cross-cutting registries as Record&lt;Union, T&gt; so a new variant fails the build rather than the runtime</practice>
+  <practice priority="high">Treat an optional field that is present with the wrong type as a parse error, not as absent</practice>
+  <practice priority="medium">Bump a shared API in every package that constructs its values, not only in the consumer</practice>
+  <practice priority="medium">Resolve transactional-store writes on transaction completion, not on request success</practice>
+  <practice priority="medium">Install a subscription's release handle before subscribing, and make release idempotent</practice>
 </best_practices>
 
 <anti_patterns>
@@ -967,6 +1252,41 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
     <description>eslintrc configuration format is fully removed in ESLint 10</description>
     <instead>Use flat config with eslint.config.js and defineConfig()</instead>
   </avoid>
+
+  <avoid name="widening_rootdir_to_silence_boundary_errors">
+    <description>Raising rootDir (or adding a neighbour's sources to include) to make TS6059/TS6307 go away</description>
+    <instead>Import through the sibling package's public entrypoint and wire the packages with project references</instead>
+  </avoid>
+
+  <avoid name="shared_tsbuildinfo">
+    <description>Two tsconfigs pointing at the same tsBuildInfoFile</description>
+    <instead>One incremental state file per config; sharing one makes every build cold with no diagnostic</instead>
+  </avoid>
+
+  <avoid name="case_variant_sibling_filenames">
+    <description>Two modules in one directory whose basenames differ only in case</description>
+    <instead>Distinct basenames — on a case-insensitive filesystem the resolver treats them as one path and a module can import itself</instead>
+  </avoid>
+
+  <avoid name="partial_registry_with_fallback">
+    <description>A partial map plus a default arm for a variant registry</description>
+    <instead>A total Record&lt;Union, T&gt;, so an unregistered variant is a compile error rather than a silent default</instead>
+  </avoid>
+
+  <avoid name="mirrored_closed_union">
+    <description>Re-declaring a shared closed union (or its runtime guard) in a downstream package</description>
+    <instead>Import both from the owning package; a mirror guarantees a skew window on every addition</instead>
+  </avoid>
+
+  <avoid name="domain_named_terminal_payload">
+    <description>Naming a discriminated union's terminal payload after its domain meaning when generic machinery consumes it</description>
+    <instead>A uniform structural field across variants, with the domain names inside the payload type</instead>
+  </avoid>
+
+  <avoid name="dropping_malformed_optional_fields">
+    <description>Parsers that omit an optional field when it is present but the wrong type</description>
+    <instead>Fail the parse; silent omission converts a producer bug into invisible data loss</instead>
+  </avoid>
 </anti_patterns>
 
 <rules priority="critical">
@@ -980,6 +1300,9 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <rule>Export types separately with 'export type' for clarity</rule>
   <rule>Define types before implementation for better design</rule>
   <rule>Use satisfies operator to check types without widening</rule>
+  <rule>Keep cross-package imports on public entrypoints; never reach into a sibling's internals or test tree</rule>
+  <rule>Make registries exhaustive so cross-cutting additions fail at compile time</rule>
+  <rule>Verify a dependency upgrade against the installed tree, not against the manifests</rule>
 </rules>
 
 <workflow>
@@ -1055,6 +1378,8 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <avoid>Using any type without justification</avoid>
   <avoid>Type assertions without validation</avoid>
   <avoid>Ignoring TypeScript errors with ts-ignore</avoid>
+  <avoid>Widening rootDir or include to silence a package-boundary error</avoid>
+  <avoid>Restating framework-neutral state, durability, or untrusted-input rules that other skills own</avoid>
 </constraints>
 
 <related_skills>
@@ -1062,6 +1387,9 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   <skill name="context7-usage">Fetch latest TypeScript compiler and tooling documentation</skill>
   <skill name="investigation-patterns">Debug type errors and investigate compilation issues</skill>
   <skill name="effect-ts">Effect (Effect-TS) service, Layer, Schema, and error-channel patterns built on top of TypeScript</skill>
+  <skill name="state-transactions">Framework-neutral state ownership, atomicity, durability ordering, and schema-evolution rules — the browser-storage pattern here is the API mechanism, not the policy</skill>
+  <skill name="trust-boundaries">Untrusted-input discipline that the schema and auth patterns here implement</skill>
+  <skill name="quality-tools">Lint and refactoring gates that mechanically enforce the boundary rules above</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate code patterns and references in this skill domain</agent>

@@ -1,7 +1,7 @@
 ---
 name: sbcl-usage
-description: Practical SBCL (Steel Bank Common Lisp) operations guide. Use this skill whenever the user mentions SBCL execution/debugging, --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, or SLY-based Common Lisp development.
-version: 2.1.0
+description: Practical SBCL (Steel Bank Common Lisp) operations guide. Use this skill whenever the user mentions SBCL execution/debugging, --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, or SLY-based Common Lisp development. Also covers terminating an unresponsive SBCL — interrupt-disabled regions that only SIGKILL ends, timeouts with a kill grace period, subprocess process groups (inherited stdin, expired pgids, EPERM versus ESRCH) — plus isolating a hang by loading the system as a control rather than bisecting project files, sb-thread hazards (condition-wait with a timeout may return without the mutex; never call a user callback under the state lock), and sb-cover coverage being process-global and needing a source manifest to gate on.
+version: 2.3.0
 ---
 
 <purpose>
@@ -267,6 +267,41 @@ version: 2.1.0
   </observed_triggers>
 </compile_load_hang_triage>
 
+<asdf_plan_layer_hang_triage>
+  <description>
+    The sibling failure family to compile_load_hang_triage: a stall inside asdf:load-system
+    that never reaches your code at all. ASDF's operation/plan layer — system-definition
+    discovery, source-registry flattening, plan computation — runs before the first form of
+    the target system is compiled, and it can hang there. Rule the environment out before
+    spending any time bisecting project sources, because every technique in the previous
+    section assumes the stall is in a compile unit you own.
+  </description>
+
+  <principle name="load_system_asdf_as_a_control">
+    <statement>Run (asdf:load-system "asdf") as a control experiment. ASDF registers itself as a system, so loading it exercises the same find-system/operate machinery with none of your project's code in it. If (require :asdf) succeeds but (asdf:load-system "asdf") never returns, the fault is environmental and no amount of file-level bisection will find it.</statement>
+    <how_to_apply>
+      Probe the layers cheapest-first, each in a fresh timeout-bounded child process, and stop at
+      the first one that hangs: (require :asdf) → (asdf:load-system "asdf") → (asdf:find-system "proj" nil)
+      → (asdf:load-asd #p"/abs/path/proj.asd") → (asdf:operate 'asdf:load-op "proj"). The layer that
+      stalls names the fault. A plain (load "src/file.lisp") that returns promptly while find-system
+      hangs is direct evidence the stall is in discovery, not in the source.
+    </how_to_apply>
+    <why>Observed on Darwin/Nix with ASDF 3.3.7: (require :asdf) returned, then load-system, load-asd, find-system, and operate all hung after system-definition discovery, while direct load registered the same system immediately. Without the control experiment this reads as "our project hangs on load".</why>
+  </principle>
+
+  <principle name="ignore_inherited_configuration_does_not_disable_the_wrapper">
+    <statement>:ignore-inherited-configuration suppresses inherited user and system source-registry configuration, but it does not bypass the implementation's wrapping source registry. SBCL's wrapping configuration recursively registers the implementation directory, so a blocked descriptor somewhere under the SBCL contrib tree can stall registry flattening even when your own configuration is fully explicit.</statement>
+    <how_to_apply>When registry flattening is the suspect, inspect open descriptors of the stalled process (lsof/fs_usage on Darwin, /proc/PID/fd on Linux) rather than re-reading your configuration. A descriptor pinned inside the implementation's own contrib directory confirms the wrapper, not your project, is the traversal source. Reaching for a narrower :directory instead of a :tree does not help here either, because the wrapper is added independently of your entries.</how_to_apply>
+    <scope>Mechanism observed with ASDF 3.3.7 on an SBCL provisioned through a store-backed package manager; treat it as a hypothesis to confirm by descriptor inspection, not as a universal ASDF property.</scope>
+  </principle>
+
+  <principle name="interrupt_disabled_regions_need_sigkill">
+    <statement>A stall can sit inside a Lisp interrupt-disabled region, where SIGALRM and SIGTERM are deferred indefinitely. An in-image timeout, a handler-based deadline, and a TERM-only external watchdog all fail silently against it: the deadline "fires" and nothing happens.</statement>
+    <how_to_apply>Every watchdog over an ASDF load must escalate to SIGKILL after a grace period, and must report which signal actually ended the child. If a process survived TERM and needed KILL, that fact is itself evidence about where it was stuck — record it alongside the stall.</how_to_apply>
+    <note>This is the operational reason the harness below mandates an external parent process: an in-image timeout cannot be trusted to bound a load it is running inside.</note>
+  </principle>
+</asdf_plan_layer_hang_triage>
+
 <headless_verification_harness>
   <description>
     A sound, non-interactive harness is a prerequisite for diagnosing the stalls above: if the
@@ -318,6 +353,17 @@ version: 2.1.0
     <statement>Give each run a private, initialized output-translations / cache root before asdf:load-system. Parallel processes sharing an inherited default FASL cache can race and fail with "Failed to find the TRUENAME of ...fasl". Initialize output translations in the launcher itself, and set a fresh HOME/XDG_CACHE_HOME when reproducing in isolation.</statement>
   </principle>
 
+  <principle name="bound_timeout_with_a_kill_grace">
+    <statement>When the shell-level equivalent is coreutils timeout(1), always pass a kill grace: timeout --foreground -k 10s &lt;limit&gt;s &lt;command&gt;. Plain timeout sends only TERM, and SBCL can remain alive after its initial termination signal, so a nominally bounded run leaks past the job budget and the escaped child keeps holding the FASL cache and any ports it opened.</statement>
+    <why>Same root cause as the interrupt-disabled-region principle above: the first signal is a request, not a guarantee. -k converts the request into a bound by following up with KILL after the grace period.</why>
+    <how_to_apply>Set the grace long enough for an orderly exit to complete (a few seconds is usually ample) but short enough that the total — limit plus grace — still fits inside the enclosing CI step timeout. Budget the outer timeout against limit + grace, not limit.</how_to_apply>
+    <example>
+      # bounded: TERM at the limit, KILL 10s later if the child is still alive
+      timeout --foreground -k 10s 300s \
+        sbcl --no-sysinit --no-userinit --disable-debugger --script run-tests.lisp
+    </example>
+  </principle>
+
   <caveat name="timeout_threshold_vs_contention">
     <statement>Distinguish a genuine per-file stall from ambient machine contention. When many SBCL sessions run concurrently, baseline load latency can exceed a low per-file timeout and report every file as a timeout. Raise the threshold or reduce concurrency before attributing blame to any single file.</statement>
   </caveat>
@@ -360,11 +406,110 @@ version: 2.1.0
   </principle>
 </form_bisect_and_package_preflight>
 
+<subprocess_process_group_contract>
+  <description>
+    What sb-ext:run-program actually guarantees about the child's process group, and why
+    "I can kill the whole subprocess tree" is silently false for one specific input mode.
+    This matters for any library that spawns a pipeline and promises cancellation or cleanup:
+    the promise holds for most call sites and breaks for one, so it passes casual testing.
+  </description>
+
+  <principle name="inherited_stdin_suppresses_the_child_process_group">
+    <statement>run-program only puts the child in its own process group when the child's input descriptor is a real (nonnegative) descriptor. With :input t — inherited stdin — SBCL prepares the descriptor as -1 and the forked child calls tcsetpgrp instead of creating a new group, so the child stays in the caller's process group. Every other supported input mode (nil, a stream, a pathname, :stream) takes the nonnegative path and does create the group: setpgid(0, getpid()) on Darwin, setpgrp() on Linux.</statement>
+    <why>The dangerous half is not that the group is missing, but that a later kill of the "child's group" then targets the caller's own group. A cancellation routine written against the common case will signal the Lisp process itself the first time someone passes :input t.</why>
+    <how_to_apply>
+      Do not infer the process group from the spawn arguments. Verify it after spawn — compare
+      sb-posix:getpgid of the child pid against the pid itself — and store the verified pgid in
+      an opaque handle alongside the process. Public signal APIs consume the handle, never a
+      caller-supplied pid. If verification fails, degrade to single-process signalling and say so
+      in the handle rather than pretending group cancellation is available.
+    </how_to_apply>
+    <scope>Descriptor and syscall details observed on POSIX SBCL 2.6.x. The verify-then-record remedy is portable regardless of how a given release wires the modes.</scope>
+  </principle>
+
+  <principle name="a_saved_pgid_expires_with_its_leader">
+    <statement>A saved pgid is only authorization to signal while the group leader is alive. Once the leader has been reaped, the kernel is free to reuse that pid and pgid, so a later kill(-pgid, signal) can land on an unrelated process group. Treat a terminal leader as revoking the handle.</statement>
+    <how_to_apply>Public group-signal entry points must reject a handle whose leader has already reached a terminal state, rather than "cleaning up anyway". Best-effort cleanup paths that fire after reaping are exactly where reuse bites, so gate them on the same check.</how_to_apply>
+  </principle>
+
+  <principle name="distinguish_eperm_from_esrch">
+    <statement>Cleanup code must distinguish the two failure modes of a group signal: ESRCH means no such group, so the target is genuinely gone and the cleanup succeeded; EPERM means the group exists but is not signalable by this process, so the target is still running and the cleanup failed. Collapsing both into "kill failed, ignore" silently converts a leaked process tree into a clean shutdown report.</statement>
+    <how_to_apply>Return ESRCH as success from a reaper, and escalate EPERM as a real error carrying the pgid. This is POSIX-general and applies equally to a shell wrapper checking kill's exit status.</how_to_apply>
+  </principle>
+</subprocess_process_group_contract>
+
+<threading_contracts>
+  <description>
+    In-process concurrency contracts that differ from the textbook expectation, plus the lock
+    discipline that keeps a worker pool from deadlocking on its own error path. common-lisp-ecosystem
+    shows make-thread and with-mutex as basic forms; these are the caveats that apply once the
+    code actually has contention.
+  </description>
+
+  <principle name="condition_wait_with_timeout_may_return_without_the_mutex">
+    <statement>sb-thread:condition-wait with :timeout may return without having reacquired the mutex, when reacquisition itself cannot complete before the deadline expires. This violates the usual condition-variable contract — that the wait always returns holding the lock — and the damage surfaces later: exiting the surrounding sb-thread:with-mutex signals a mutex ownership error at a frame that has nothing to do with the timeout.</statement>
+    <why>The symptom is maximally misleading. Nobody reads "not the owner of the mutex" at a with-mutex exit as "a condition-wait timeout three lines up returned early", so the investigation starts in the wrong place.</why>
+    <how_to_apply>
+      Do not use :timeout to implement blocking semantics. Implement a blocking operation as a
+      timeout-free predicate loop — wait, re-test the predicate, wait again — and make every state
+      change that can satisfy the predicate signal the condition variable explicitly. That includes
+      the non-obvious ones: a dispatcher freeing capacity must wake blocked producers, and a
+      cancellation that changes the predicate must wake them too, or the loop sleeps through the
+      event it was waiting for.
+    </how_to_apply>
+    <example>
+      ;; blocking enqueue without :timeout — the predicate loop is the contract
+      (sb-thread:with-mutex (lock)
+        (loop until (or cancelled (&lt; count capacity))
+              do (sb-thread:condition-wait space-available lock))
+        (unless cancelled (push item queue) (incf count)))
+
+      ;; every predicate-changing site must wake the waiters, including cancellation
+      (sb-thread:with-mutex (lock)
+        (setf cancelled t)
+        (sb-thread:condition-broadcast space-available))
+    </example>
+  </principle>
+
+  <principle name="never_call_a_user_callback_under_the_state_lock">
+    <statement>Update the shared state while holding its mutex, release the mutex, and only then invoke the user callback. If the callback must be recorded as having failed, reacquire the mutex after it unwinds. Invoking a callback under the state lock hands arbitrary user code the power to block all state synchronization, and — the failure people actually hit — deadlocks on a recursive lock attempt when the callback signals and the handler tries to record the condition in the same state.</statement>
+    <why>The deadlock arrives through the error-recording path, not the happy path. Every test with a well-behaved callback passes; the first callback that signals hangs the pool. That asymmetry is why this survives review.</why>
+    <how_to_apply>Apply the same rule to any outward call from under a lock: joining a dispatcher thread, calling a logging hook, signalling a condition whose handler is user-supplied. The invariant is "no lock is held across a call whose implementation the module does not own."</how_to_apply>
+    <example>
+      ;; state mutation under the lock; the callback strictly outside it
+      (let ((snapshot nil))
+        (sb-thread:with-mutex (task-lock)
+          (setf (task-state task) :finished)
+          (setf snapshot (task-result task)))
+        (handler-case (funcall (task-callback task) snapshot)
+          (error (c)
+            (sb-thread:with-mutex (task-lock)
+              (setf (task-callback-error task) c)))))
+    </example>
+  </principle>
+</threading_contracts>
+
 <coverage_measurement_bias>
   <principle name="sb_cover_definition_bias">
     <statement>sb-cover reports low expression coverage for files dominated by top-level defining forms and metadata side effects (defpackage, define-condition, top-level documentation/table assignments), even when the runtime contracts they establish are fully tested. These forms are counted as expressions but are not all attributed as executed by ordinary test runs.</statement>
     <how_to_apply>Separate genuine runtime gaps from instrumentation bias by comparing a low-coverage file against its shape: definition-heavy files may warrant a few explicit contract tests but need not reach 100%; logic-heavy files are the higher-value targets for additional tests or refactoring. Do not distort public API design solely to satisfy sb-cover on top-level metadata; prefer explicit tests plus a documented exception.</how_to_apply>
     <note>sb-cover does not clean its own HTML output directory; after splitting or renaming source files, clear the stale report before reading a new one.</note>
+  </principle>
+
+  <principle name="coverage_instrumentation_is_process_global">
+    <statement>SB-COVER counters live in process-global mutable state. Running the suite across concurrent workers in one image produces nondeterministic per-file undercounts while every test still passes, so the coverage number moves run to run for reasons unrelated to the tests. Run coverage single-worker even when the ordinary suite runs in parallel.</statement>
+    <how_to_apply>Treat the coverage run as a distinct execution mode with its own runner settings, not as the normal run with a flag added. If parallelism is needed for suite runtime, keep it in the correctness run and accept a slower serial coverage run.</how_to_apply>
+  </principle>
+
+  <principle name="load_instrumented_sources_through_the_build_system">
+    <statement>After resetting SB-COVER, load the system under measurement through (asdf:load-system :proj :force t). Manually compiling and loading copied sources detaches the counters from the source identity SB-COVER reports against, and the affected files come back as a confident 0% instead of an error.</statement>
+    <why>A 0% file reads as "untested" and sends people to write tests for code that is already covered. The distinguishing symptom is that the 0% files are exactly the ones the runner handled specially — a copy step, a staging directory, a hand-rolled compile loop.</why>
+  </principle>
+
+  <principle name="gate_coverage_against_a_source_manifest">
+    <statement>An aggregate percentage is computed over the files that appear in the report, so it says nothing about files that never made it in. A report showing 100% across nine files when the system has twelve is still 100%. The gate must compare normalized report source filenames against a declared manifest of production components and reject the run when a row is missing, malformed, or has a zero total, before it accepts the percentage at all.</statement>
+    <how_to_apply>Derive the manifest from the ASDF component list rather than a hand-maintained second list, so a newly added component is covered by the gate on the commit that adds it. Normalize both sides (truename, case, store-path prefixes) before comparing, or the check fails open on path formatting alone.</how_to_apply>
+    <note>The manifest rule is language-neutral and applies to any coverage or lint report consumed as a gate; the SB-COVER specifics above are what make it easy to lose rows here.</note>
   </principle>
 </coverage_measurement_bias>
 
@@ -416,6 +561,14 @@ version: 2.1.0
       <item>Avoid safety 0 unless you have hard evidence and strong tests.</item>
     </caution>
   </pattern>
+
+  <note name="methodology_lives_elsewhere">
+    The patterns above are tool invocations: how to obtain a number from SBCL. They do not tell you
+    whether the number means anything. Paired A/B protocols, warmup and full-GC discipline, measuring
+    the noise floor before claiming a delta, gating on a confidence interval rather than a point
+    estimate, and proving you are measuring your working tree rather than a pre-registered store build
+    all belong to performance-benchmarking. Consult it before reporting any before/after comparison.
+  </note>
 </performance_profiling>
 
 <build_and_release>
@@ -495,6 +648,12 @@ version: 2.1.0
   <practice priority="high">Decompose a stalling compile unit into smaller serially-loaded files rather than reaching for per-form workarounds or whole-file evaluator-mode guards.</practice>
   <practice priority="high">Bisect compile/load stalls by complete top-level forms, never by line ranges; use a read/eval form-trace to name the offending form.</practice>
   <practice priority="medium">Run verification one unit per fresh SBCL process (--no-sysinit --no-userinit --disable-debugger) with an isolated FASL cache.</practice>
+  <practice priority="high">Run (asdf:load-system "asdf") as a control before blaming a project file for an ASDF hang; it separates an environment-level plan-layer stall from a project stall.</practice>
+  <practice priority="high">Escalate every external watchdog to SIGKILL after a grace period (timeout --foreground -k); a stall inside an interrupt-disabled region ignores TERM entirely.</practice>
+  <practice priority="high">Verify a spawned child's process group after run-program instead of assuming it; :input t leaves the child in the caller's group, so a later group kill targets your own process.</practice>
+  <practice priority="critical">Release the state mutex before invoking any user callback, and reacquire it to record failures; the deadlock arrives through the error-recording path, not the happy path.</practice>
+  <practice priority="high">Implement blocking waits as timeout-free predicate loops with explicit wakeups; sb-thread:condition-wait with :timeout can return without the mutex.</practice>
+  <practice priority="medium">Run coverage single-worker, load instrumented sources through asdf:load-system :force t, and gate the report against a component manifest rather than an aggregate percentage.</practice>
 </best_practices>
 
 <anti_patterns>
@@ -526,6 +685,36 @@ version: 2.1.0
   <avoid name="line_range_bisect">
     <description>Narrowing a compile/load stall by slicing raw line ranges, which can cut through a form and produce malformed Lisp that fails to read.</description>
     <instead>Bisect by complete top-level forms via a read/eval form-trace that stops on the first form that starts but never completes.</instead>
+  </avoid>
+
+  <avoid name="bisecting_project_files_for_a_plan_layer_hang">
+    <description>Splitting and re-splitting project sources to find an ASDF hang that is actually in system discovery or source-registry flattening, before running any control experiment.</description>
+    <instead>Probe the layers first: (require :asdf), (asdf:load-system "asdf"), find-system, load-asd, operate. The first probe that hangs names the layer; a direct (load ...) that returns promptly proves the sources are innocent.</instead>
+  </avoid>
+
+  <avoid name="term_only_watchdog">
+    <description>Bounding a run with plain timeout or a TERM-only kill, so a child stalled in an interrupt-disabled region survives its deadline and leaks past the job budget.</description>
+    <instead>timeout --foreground -k &lt;grace&gt; &lt;limit&gt;, and budget the enclosing CI step against limit plus grace.</instead>
+  </avoid>
+
+  <avoid name="assumed_child_process_group">
+    <description>Killing "the child's process group" using a pgid inferred from the spawn rather than verified after it — which signals the caller's own group when the child was spawned with :input t, and can hit an unrelated group once the leader has been reaped.</description>
+    <instead>Verify getpgid(pid) equals pid after spawn, keep the verified pgid in an opaque handle, and reject the handle once its leader reaches a terminal state.</instead>
+  </avoid>
+
+  <avoid name="callback_under_the_state_lock">
+    <description>Invoking a user-supplied callback while holding the mutex that guards the state it reports on; a callback that signals deadlocks on the recursive lock taken to record the failure.</description>
+    <instead>Mutate state under the lock, release it, call the callback, then reacquire only to record the outcome.</instead>
+  </avoid>
+
+  <avoid name="condition_wait_timeout_as_blocking_semantics">
+    <description>Implementing a bounded blocking operation with sb-thread:condition-wait :timeout, which may return without the mutex and surface as an ownership error at the enclosing with-mutex exit.</description>
+    <instead>Use a timeout-free predicate loop and signal the condition variable from every site that can change the predicate, including cancellation.</instead>
+  </avoid>
+
+  <avoid name="aggregate_coverage_without_a_manifest">
+    <description>Accepting a 100% aggregate coverage total without checking that every production component actually has a row in the report.</description>
+    <instead>Compare normalized report filenames against the ASDF component manifest and reject missing, malformed, or zero-total rows before reading the percentage.</instead>
   </avoid>
 
   <avoid name="evaluator_mode_guard_as_fix">
@@ -628,6 +817,9 @@ version: 2.1.0
   <skill name="nix-ecosystem">Pinned SBCL runtime environments with nix shell/flake</skill>
   <skill name="investigation-patterns">Evidence-driven root-cause methodology</skill>
   <skill name="quality-tools">Automated checks and CI quality discipline</skill>
+  <skill name="performance-benchmarking">Benchmark methodology: paired protocols, noise floor, interval-based gating — the discipline behind the profiling tools above</skill>
+  <skill name="test-integrity">False-green testing: suites that report success without exercising the contract</skill>
+  <skill name="state-transactions">Atomic publish and cleanup discipline for the process/resource lifecycles spawned here</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate code patterns and references in this skill domain</agent>

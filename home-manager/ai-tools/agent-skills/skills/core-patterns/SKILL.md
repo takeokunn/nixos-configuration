@@ -1,7 +1,7 @@
 ---
 name: Core Patterns
-description: Base templates for error escalation, decision criteria, and enforcement. Referenced by agents and commands to avoid duplication.
-version: 2.0.1
+description: Base templates for error escalation, decision criteria, and enforcement, referenced by agents and commands to avoid duplication. Also holds cross-cutting patterns worth loading directly — modelling absence structurally instead of with an in-range sentinel such as 0, -1, or the empty string, deriving a cost estimate from the emitter that actually produces the artifact rather than re-modelling it in a second place, resolving an apparent contradiction between two rulesets by finding the distinguishing condition instead of weakening either, and safe alternatives to destructive Git commands — including mirroring a worktree's state back into the shared checkout with a file sync rather than a branch switch, and the preconditions for removing a worktree.
+version: 2.2.0
 ---
 
 <purpose>
@@ -200,7 +200,46 @@ Use attribute values:
       <alternative>Branch isolation needed → git worktree add [path] [branch]</alternative>
       <alternative>Work-in-progress save → WIP commit instead of stash</alternative>
       <alternative>Use Claude Code's isolation: worktree mode for truly isolated work</alternative>
+      <alternative>Reflect a worktree's state back into the main checkout → mirror the files with a sync tool
+        (rsync in archive mode with delete, excluding the git metadata directory and any nested worktree
+        directory) instead of switching branches in the shared tree. This propagates unstaged, staged, and
+        untracked changes without touching Git metadata, which is exactly the moment someone otherwise
+        reaches for a prohibited command: the isolation guidance above says how to create a worktree but
+        nothing about how to get its state back.</alternative>
     </safe_alternatives>
+    <worktree_removal_preconditions>
+      <description>Removing a linked worktree destroys anything not reflected elsewhere, so it needs preconditions rather than a judgement call.</description>
+      <precondition>The main worktree has no unmerged paths.</precondition>
+      <precondition>The main worktree's complete working-tree diff against the selected target branch is empty — meaning the mirrored state is fully present, not merely believed to be.</precondition>
+      <precondition>Branch refs are retained until the reflected state is committed, so the work is recoverable if the mirror was incomplete.</precondition>
+    </worktree_removal_preconditions>
+  </pattern>
+
+  <pattern name="presence_vs_value">
+    <description>Absence and value are different facts, and an in-range value must never be read as "unset"</description>
+    <problem>Choosing a sentinel that lies inside the valid domain — 0, -1, the empty string — collapses two distinct cases. A guard like "apply the update only if the value is non-zero" silently drops every legitimate zero observation and leaves dependent state stale, and it fails as a dropped fact rather than as an error, so nothing surfaces it.</problem>
+    <rule>Model absence structurally: a nullable type, an option or maybe type, or an explicit supplied-p flag alongside the value.</rule>
+    <rule>Test optional numerics with a null or presence check, never with truthiness or a comparison against a domain value.</rule>
+    <rule>If an in-range sentinel is nonetheless chosen deliberately, record that every consumer now inherits the ambiguity and must branch on it. That downstream tax is the real cost of the choice, and it is paid at every call site rather than at the definition.</rule>
+  </pattern>
+
+  <pattern name="estimator_derived_from_emitter">
+    <description>A cost estimate that drives a strategy decision must come from the code that produces the artifact</description>
+    <problem>An independently-modeled cost function drifts from the emitter it models, because the emitter optimizes (batching, grouping, shared setup) in ways the model does not track. A per-unit accounting model can overestimate by an order of magnitude against what is actually emitted, and the strategy switch it feeds then picks the wrong branch with full confidence.</problem>
+    <rule>Derive the estimate from the emitter — call it, or have it report the size it produced — rather than re-modeling its behavior in a second place.</rule>
+    <rule>Have the threshold fixtures consume the same function the production decision consumes. If they diverge, the tests validate a number nobody uses.</rule>
+    <applies_to>Any size-based, cost-based, or budget-based strategy switch: choosing between a full and an incremental path, batching versus streaming, or a fast path selected by predicted output size.</applies_to>
+  </pattern>
+
+  <pattern name="apparent_rule_conflict_resolution">
+    <description>How to handle two related rulesets that appear to contradict each other</description>
+    <context>In a corpus of cross-referencing skills and agents, apparent conflicts arise as the corpus grows. The reflex is to pick a winner and weaken the loser, which loses real guidance.</context>
+    <procedure>
+      <step order="1">Assume both rules are correct and look for the distinguishing condition that separates their domains. Most apparent conflicts are two correct rules stated without their preconditions.</step>
+      <step order="2">Add a reconciling note to the affected category naming that condition. This restores consistency without changing the substance of either rule, which is the smallest edit that fixes the problem.</step>
+      <step order="3">Only if no distinguishing condition exists is one of the rules actually wrong. Weakening or removing a rule is the last resort, not the first move.</step>
+    </procedure>
+    <note>Prefer a condition that already exists in the material over one invented to settle the dispute; an invented axis tends to be unmemorable and will not be applied consistently later.</note>
   </pattern>
 </patterns>
 
@@ -278,6 +317,10 @@ Use attribute values:
   <practice priority="critical">Ensure decision criteria weights sum to 1.0</practice>
   <practice priority="high">Customize error_escalation examples to be domain-specific while keeping structure</practice>
   <practice priority="high">Use consistent behavior ID prefixes within each agent/command</practice>
+  <practice priority="high">Model absence structurally instead of with an in-range sentinel, and never infer "unset" from a value inside the valid domain (presence_vs_value)</practice>
+  <practice priority="medium">Mirror a worktree into the shared checkout with a file sync rather than a branch switch, and remove a worktree only once its diff against the target is empty (parallel_project_isolation)</practice>
+  <practice priority="medium">Derive a strategy-driving cost estimate from the emitter itself, and have tests consume the same function (estimator_derived_from_emitter)</practice>
+  <practice priority="medium">When two related rulesets appear to contradict, find the distinguishing condition and add a reconciling note before weakening either (apparent_rule_conflict_resolution)</practice>
 </best_practices>
 
 <rules priority="critical">

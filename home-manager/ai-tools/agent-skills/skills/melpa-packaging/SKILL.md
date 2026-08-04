@@ -1,7 +1,7 @@
 ---
 name: melpa-packaging
-description: This skill should be used when the user prepares an Emacs Lisp package for MELPA submission, writes or reviews a MELPA recipe, decides which files ship in a package, resolves package-lint or checkdoc findings, aligns package headers (Package-Requires, Version, URL, Author, Maintainer), or handles the period between opening a MELPA pull request and acceptance. Trigger on mentions of MELPA, recipe, :files, package-build, package-lint, checkdoc, or *-pkg.el.
-version: 2.0.0
+description: This skill should be used when the user prepares an Emacs Lisp package for MELPA submission, writes or reviews a MELPA recipe, decides which files ship in a package, resolves package-lint or checkdoc findings, aligns package headers (Package-Requires, Version, URL, Author, Maintainer), or handles the period between opening a MELPA pull request and acceptance. Also covers release-gate hygiene — a make check or lint target reports without mutating, with byte-compilation and autoload generation in a temporary directory so no .elc or generated autoload file lands in the tree, autoload validation that asserts the expected forms rather than inferring success from git diff, no archive refresh or package installation into the contributor's Emacs, and lint tooling supplied by the declared development environment because the gates run emacs -Q. Trigger on mentions of MELPA, recipe, :files, package-build, package-lint, checkdoc, *-pkg.el, or make check.
+version: 2.2.0
 ---
 
 <purpose>
@@ -214,6 +214,37 @@ version: 2.0.0
     </detail>
   </convention>
 
+  <convention name="release_gate_is_a_pure_check" confidence="scoped">
+    <rule>
+      A release gate (`make check`, `make lint`, the CI target contributors are told to run)
+      must not mutate the working tree or the contributor's Emacs package directory. It
+      reports; it does not install, refresh, or leave artifacts behind.
+    </rule>
+    <detail>
+      Three concrete obligations follow. Byte-compilation and autoload validation belong in a
+      temporary directory, so the gate does not deposit `.elc` files or a generated
+      `NAME-autoloads.el` in the tree — stale bytecode then shadows edited source in later
+      sessions, and a stray generated descriptor is exactly the committed-artifact problem the
+      recipe conventions exist to prevent. Validate autoloads by generating them
+      (`loaddefs-generate`) and asserting that the expected public autoload forms are present;
+      do not infer the result from `git diff`, because generated files are typically ignored or
+      untracked and the diff reads clean whether or not the autoloads are correct. And the gate
+      must never refresh a package archive or auto-install dependencies into the contributor's
+      package directory: a check that reaches out to the network and mutates a personal Emacs
+      installation is not a check. When a required tool is missing, fail with a message naming
+      it.
+    </detail>
+    <detail>
+      That last rule shifts an obligation onto the environment. Gates conventionally invoke
+      `emacs -Q` so no user configuration can influence the result, which also means no
+      user-installed packages are visible: package-lint and any other tooling the gate runs
+      must be supplied by the declared development environment (a project shell, container, or
+      an Emacs built with those packages). A plain Emacs binary makes the documented
+      `make package-lint` target fail even though the package itself is fine, so the tooling
+      dependency belongs in the environment definition next to the target that needs it.
+    </detail>
+  </convention>
+
   <convention name="test_files_are_not_package_features" confidence="scoped">
     <rule>
       Test files are not part of the package. They should not provide package features and
@@ -356,6 +387,9 @@ version: 2.0.0
   <item confidence="verified">Package byte-compiles cleanly.</item>
   <item confidence="verified">Recipe `:files` includes only what the feature needs; the default set is used unmodified where possible; tests and generated files are excluded.</item>
   <item confidence="scoped">Local compile/lint targets operate on the same file set the recipe ships.</item>
+  <item confidence="scoped">Release-gate targets leave the working tree unchanged: byte-compilation and autoload generation happen in a temporary directory, and no `.elc` or generated autoload file lands in the repository.</item>
+  <item confidence="scoped">Autoload validation asserts the expected public autoload forms from a generated file rather than inferring success from `git diff`.</item>
+  <item confidence="scoped">No gate refreshes a package archive or installs packages into the contributor's package directory; the development environment supplies package-lint and any other tooling the `emacs -Q` gates require.</item>
   <item confidence="scoped">Test files provide no package features; shared test helpers load by path, idempotently.</item>
   <item confidence="scoped">README/changelog make no MELPA-availability claim; a `package-vc`/`use-package :vc` install path is documented for the pre-acceptance window.</item>
   <item confidence="scoped">For stable-channel intent, an SCM tag exists in a form `version-to-list` accepts (add `:version-regexp` if the tag is prefixed).</item>
@@ -391,6 +425,16 @@ version: 2.0.0
     <description>Adding `provide`/feature coupling to test files so other tests can `require` them.</description>
     <instead>Load shared helpers by path idempotently; keep test files out of the package feature graph.</instead>
   </avoid>
+
+  <avoid name="gate_mutates_contributor_environment">
+    <description>A check target that byte-compiles in place, writes generated autoloads into the tree, refreshes package archives, or installs dependencies into the contributor's package directory.</description>
+    <instead>Run compilation and autoload generation in a temporary directory and fail with a clear message when tooling is missing; let the declared development environment provide it.</instead>
+  </avoid>
+
+  <avoid name="git_diff_as_autoload_check">
+    <description>Deciding whether autoloads are correct by looking for a `git diff` after generating them.</description>
+    <instead>Assert the expected autoload forms exist in the generated file; ignored and untracked generated files produce a clean diff regardless of the outcome.</instead>
+  </avoid>
 </anti_patterns>
 
 <decision_tree name="files_property">
@@ -412,6 +456,8 @@ version: 2.0.0
   <rule>Prefer `defvar-local`, imperative command docstrings, `https` URLs, and consistent GPL boilerplate.</rule>
   <rule>Keep test files out of the package feature graph.</rule>
   <rule>Separate blocking review findings from deferrable design calls; record why anything is deferred.</rule>
+  <rule>Release gates report without mutating: temporary-directory artifacts, no archive refresh, no package installation into the contributor's Emacs.</rule>
+  <rule>Supply lint tooling from the development environment, since gates run `emacs -Q` and cannot see user-installed packages.</rule>
 </rules>
 
 <related_skills>

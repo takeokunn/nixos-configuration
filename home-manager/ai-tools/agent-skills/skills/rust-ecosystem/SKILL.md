@@ -1,7 +1,7 @@
 ---
 name: Rust Ecosystem
-description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Provides comprehensive Rust ecosystem patterns and best practices.
-version: 2.1.0
+description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Covers splitting a borrow to resolve E0502 by passing the fields a helper needs instead of &mut self, named structs and newtypes over positional tuples outside a wire format, a registry of locks as Mutex<HashMap<K, Arc<Mutex<V>>>> with a one-directional lock order and asymmetric PoisonError::into_inner recovery, checked and saturating arithmetic on untrusted sizes (never wrapping), bounding a read by latency as well as length, allowlist-sanitizing configuration values rendered as ANSI escapes, preferring the expect lint attribute (#[expect]) to allow (#[allow]), and dead_code warnings at macro registration boundaries.
+version: 2.3.0
 ---
 
 <purpose>
@@ -55,6 +55,23 @@ version: 2.1.0
         <description>'static for values that live entire program</description>
       </pattern>
     </concept>
+
+    <pattern name="split_borrows_take_the_field_not_self">
+      <description>
+        "Extract a method" is the reflex refactor, and in Rust it routinely fails with E0502 the moment the extracted body writes one field while the caller still holds a read of another. A method taking &amp;mut self borrows the whole struct; the borrow checker only reasons about disjoint fields when those fields are named at the call site, and a method signature hides them.
+      </description>
+      <rule>When an extraction hits E0502, give the helper exactly the fields it needs — fn encode_row(pool: &amp;mut EncodePool, line: &amp;Line) — instead of &amp;mut self. The immutable borrow of one field and the mutable borrow of the other stay disjoint, and the call site keeps ownership of the composition.</rule>
+      <rule>A module-level free function taking two &amp;mut fields is sometimes the forced, correct design rather than a smell. Note at the definition site that the shape is borrow-checker-driven, so a later refactor does not "tidy" it back into a method and reintroduce the conflict.</rule>
+      <example>
+        // E0502: &amp;mut self borrows the whole struct while self.screen is still borrowed.
+        let line = self.screen.get_line(row);
+        self.encode_row(line);
+
+        // Compiles: disjoint field borrows, named at the call site.
+        let line = self.screen.get_line(row);
+        encode_row(&amp;mut self.pool, line);
+      </example>
+    </pattern>
   </ownership_borrowing>
 
   <traits>
@@ -139,6 +156,15 @@ version: 2.1.0
       </example>
     </pattern>
 
+    <pattern name="nominal_types_over_positional_tuples">
+      <description>
+        A type alias over a tuple makes a positional shape look intentional while leaving it entirely unchecked. In type EncodedLine = (usize, String, Vec&lt;(usize, usize, u32, u32, u64, u32)&gt;, Vec&lt;usize&gt;), every same-typed field is silently swappable and the compiler accepts any permutation — the alias supplies a name for the aggregate but no name for any of its parts, which is exactly where the ordering knowledge was needed. A cache key of three bare u64s has the same defect: transposing two of them still typechecks and produces a hash that matches the wrong row.
+      </description>
+      <rule>Positional shape belongs only at a serialization boundary, where an external wire format dictates it. Inside the call graph, use a struct with named fields, or a newtype per component, so an ordering mistake is unrepresentable rather than merely unlikely.</rule>
+      <rule>Keep tuple destructuring localized inside the codec functions that own the wire format. The external shape is preserved unchanged; no ordinary function ever receives a bare tuple.</rule>
+      <note>This is a different motivation from the trust-boundary newtypes below. validated_newtype_over_raw_string stops unvalidated data reaching an action site; this stops correctly-validated data arriving in the wrong position.</note>
+    </pattern>
+
     <pattern name="type_state">
       <description>Encode state in type system</description>
       <use_case>Prevent invalid state transitions at compile time</use_case>
@@ -149,6 +175,8 @@ version: 2.1.0
     <principle>
       A trust boundary is any point where data crosses from an unvalidated source (config files, external processes, network, shell) into code that acts on it. The general rule: never let a raw String or Map travel to the final action site (process spawn, shell emission, SQL) still typed as raw text. Wrap validated values in newtypes so the type system, not developer discipline, enforces that only validated data reaches the boundary.
     </principle>
+
+    <note>The language-neutral rules — enforce limits before allocating, validate before applying normalizing coercion, pin an identity rather than re-opening a path, never interpolate untrusted data into output — live in the trust-boundaries skill. What follows is the Rust expression of them: which types to choose, and which std APIs make the guarantee hold.</note>
 
     <pattern name="validated_newtype_over_raw_string">
       <description>Public/config model fields that carry constrained values should use validated newtypes instead of raw String / HashMap&lt;String, String&gt;, so direct Rust construction cannot bypass the serde/runtime validators.</description>
@@ -188,6 +216,25 @@ version: 2.1.0
 
     <pattern name="reject_non_utf8_before_validation">
       <description>Bytes read from external processes are not guaranteed UTF-8. Reject non-UTF-8 before constructing an execution handle; lossy conversion (from_utf8_lossy / to_string_lossy) is acceptable only for user-facing diagnostics, never for values that will be fed back into execution.</description>
+    </pattern>
+
+    <pattern name="sanitize_config_values_rendered_to_terminal">
+      <description>
+        Configuration files and environment variables become untrusted input the moment their values are rendered rather than merely compared. A colour or style string, a set of hint-label characters, a prompt loaded from a file — each reaches the terminal as bytes, and a terminal interprets the escape sequences it receives regardless of who authored them. A config value is therefore an injection surface with the same shape as untrusted network data: it can move the cursor, clear the screen, or drive a clipboard write.
+      </description>
+      <rule>Filter with an allowlist of exactly one escape family, never a denylist of known-bad ones. For style values, decode escapes only into ANSI SGR CSI sequences terminated by 'm'; drop OSC, cursor movement, clear-screen, embedded printable text, and every malformed sequence. A denylist cannot enumerate the terminal's dialect, and each terminal has a slightly different one.</rule>
+      <rule>Strip Unicode control characters, not only the ASCII C0 range, from any value that becomes an on-screen glyph. Preserve ordinary space where it is a legitimate input character (a search term); discard whitespace only where the value is a set of distinct single-character labels.</rule>
+      <rule>Filtering can empty the set. After discarding unsafe characters and deduplicating, assert that enough usable values remain — at least two distinct labels, for instance — and fall back to the built-in default rather than proceeding with a degenerate set. Silently operating on one label, or none, is a worse outcome than ignoring the configuration.</rule>
+      <rule>Reject a repeated singleton CLI option instead of letting the last occurrence win. Last-wins override lets a later argument quietly replace a value the caller believes is in effect, and nothing on the failure path is observable.</rule>
+    </pattern>
+
+    <pattern name="bound_latency_not_only_length">
+      <description>
+        A read capped at N bytes bounds how much you accept, not how long you wait. Opening a FIFO blocks inside open() before a single byte is read, so a size limit gives no protection at all to a startup path or a request handler pointed at a path that an attacker — or an ordinary mistake — controls. Length and latency are separate budgets and each needs its own enforcement.
+      </description>
+      <rule>On Unix, open with O_NONBLOCK and then interrogate the descriptor you actually got, via fstat, rejecting anything that is not a regular file. Checking the opened descriptor rather than stat-ing the path and then opening it also closes the path-replacement race between those two calls: you are asking about the object you hold, not the name you looked up.</rule>
+      <rule>Stream the read with a cap of limit + 1 bytes, not limit. Reading exactly limit cannot distinguish "the input is exactly at the limit" from "the input was truncated here"; the one extra byte is what makes over-limit detectable rather than inferred.</rule>
+      <rule>Validate UTF-8 at the same boundary and reject on failure. A read that respected both budgets but yielded invalid bytes is still invalid input, and deferring the check just moves the failure somewhere with less context.</rule>
     </pattern>
 
     <pattern name="deterministic_ordering">
@@ -234,6 +281,30 @@ version: 2.1.0
       <note>Because dispatch is exhaustive over the enum, the compiler flags every match that must handle the new variant — the type system drives completeness.</note>
     </pattern>
   </polymorphism>
+
+  <concurrency>
+    <principle>
+      A single lock around a collection of independently-usable resources converts concurrent work into serial work. When each entry can do meaningful work without touching its siblings, the collection lock should protect only the collection's shape, and each entry should carry its own lock.
+    </principle>
+
+    <pattern name="registry_of_locks">
+      <description>
+        Holding the guard of a Mutex&lt;HashMap&lt;K, V&gt;&gt; for the duration of the work done on one entry serializes every entry against every other. Polling, parsing, rendering, and transcoding on one session then block all other sessions even though they share no state — the map was never the contended resource, it was just the thing in the way. The fix is to make the map hold handles rather than values.
+      </description>
+      <rule>Use Mutex&lt;HashMap&lt;K, Arc&lt;Mutex&lt;V&gt;&gt;&gt;&gt;. Hold the map lock only long enough to clone, insert, remove, or snapshot an Arc; release it; then lock the selected entry. All real work happens under the entry lock and none of it under the map lock.</rule>
+      <rule>Fix the lock hierarchy in one direction and never invert it: never reacquire the map lock while holding an entry guard. This ordering is what keeps the design deadlock-free, and because it is invisible in the type system it has to be stated at the registry definition where a future caller will read it.</rule>
+      <rule>Removal from the map is the linearization point for shutdown. Once an entry is out of the map no new work can acquire it, and in-flight holders drain naturally through their Arc without needing a separate quiescence flag.</rule>
+      <rule>When pruning against a snapshot taken earlier, compare with Arc::ptr_eq before removing rather than trusting the key. Between the snapshot and the prune the map lock was released, so an entry may have been removed and a fresh one inserted under the same key; key equality alone would drop the replacement.</rule>
+    </pattern>
+
+    <pattern name="asymmetric_poison_recovery">
+      <description>
+        A poisoned mutex records that some thread panicked while holding it — it does not establish that the data is unusable. How to respond depends on the signature of the API doing the locking, and treating every case identically makes one of the two cases lie.
+      </description>
+      <rule>A fallible single-resource API (returning Result) should map both map-level and entry-level poison to an error. The caller asked about one resource whose invariants may genuinely be broken, and refusing is the honest answer.</rule>
+      <rule>An infallible enumerating API (list, count, snapshot) must recover a poisoned entry lock with PoisonError::into_inner() instead of skipping the entry. Omitting it reports a live resource as absent, and the caller has no way to distinguish "no such resource" from "that resource panicked once" — the enumeration becomes wrong rather than merely degraded.</rule>
+    </pattern>
+  </concurrency>
 
   <edition_2024_features>
     <feature name="async_closures">
@@ -304,6 +375,7 @@ version: 2.1.0
     <avoid name="arc_mutex_overuse">
       <description>Defaulting to Arc with Mutex with T for concurrency</description>
       <instead>Consider channels or ownership patterns first</instead>
+      <note>This warns against Arc + Mutex as the reflex answer; it does not apply once shared mutable state is genuinely required. When it is, see the concurrency section for the shape that keeps entries independent.</note>
     </avoid>
   </anti_patterns>
 </rust_language>
@@ -442,7 +514,27 @@ version: 2.1.0
       <lint name="clippy::pedantic">Stricter lints for cleaner code</lint>
       <lint name="clippy::nursery">Experimental but useful lints</lint>
     </common_lints>
+
+    <lint_suppression>
+      <description>
+        #[allow] and #[expect] both silence a lint, but they age in opposite ways. #[expect] additionally asserts that the lint would have fired; once the underlying code is fixed the annotation itself warns via unfulfilled_lint_expectations, which is the property that makes it self-cleaning. #[allow] is silent forever, so it accumulates and outlives whatever justified it. Note this is the attribute #[expect(...)], entirely unrelated to the clippy::expect_used lint above, which is about Option::expect.
+      </description>
+      <rule>Prefer #[expect(...)] over #[allow(...)] for anything you intend to fix. Treat it as suppression with an expiry attached, not as a permanent shield.</rule>
+      <rule>When unfulfilled_lint_expectations fires, delete the annotation — the lint is telling you the suppression is now dead. Re-broadening it to #[allow] to quiet the build discards exactly the signal you configured it to produce.</rule>
+      <rule>Do not attach #[expect] to a macro that expands at many call sites. The expectation can be fulfilled at some expansion sites and unfulfilled at others, leaving the annotation simultaneously necessary and stale with no edit that satisfies every site. Move it down onto the specific generated function, or the specific call site, that actually needs it.</rule>
+    </lint_suppression>
   </clippy>
+
+  <rustc_lints>
+    <pattern name="dead_code_at_registration_boundaries">
+      <description>
+        rustc computes reachability over the Rust call graph. A function whose only caller is an attribute macro's generated registration path — FFI entry points, #[no_mangle] exports, #[wasm_bindgen] or #[pyfunction] surfaces, inventory- and linkme-style distributed registries — has no in-language caller at all, so cargo check and cargo test report it as dead_code. The warning is an accurate statement about the reference graph and says nothing about whether the function is used.
+      </description>
+      <rule>Treat dead_code on an export or registration surface as boundary noise first, before treating it as a finding. Confirm the registration path — does the macro emit a static registration, an exported symbol, or a table entry that the host resolves at runtime? Deleting on the strength of the warning removes a live entry point, and the breakage surfaces only when the host loads the artifact, far from the edit.</rule>
+      <rule>Suppress it narrowly at the boundary function or type rather than crate-wide, so genuinely dead code elsewhere still surfaces. A crate-level allow buys silence at the cost of the lint's entire value.</rule>
+      <note>investigation-patterns covers dead-code removal discipline generally; its rules assume the true callers are findable within the program, which is exactly the assumption a registration macro breaks.</note>
+    </pattern>
+  </rustc_lints>
 
   <rustfmt>
     <description>Automatic code formatter</description>
@@ -521,6 +613,15 @@ version: 2.1.0
       #[should_panic]
       fn rejects_invalid_in_debug() { /* triggers a debug_assert! path */ }
     </example>
+  </pattern>
+
+  <pattern name="checked_or_saturating_on_untrusted_sizes">
+    <description>
+      Arithmetic on sizes derived from untrusted input — pane dimensions, match counts, display widths, byte lengths — must not use plain +, -, or *. The reason is the same debug/release divergence as above, read from the other direction: an overflowing expression panics in a debug build and silently wraps to a wrong value in release, so the failure mode differs between the build you test and the build that ships. Both halves are bad, and neither is visible from the other profile.
+    </description>
+    <rule>Choose the operation by whether failure carries information. Use checked_* (yielding Option or Result) where an out-of-range value means something has actually gone wrong and the caller must decide; use saturating_* where clamping to the bound is the correct answer and continuing is safe, as with a rendering coordinate that should stop at the screen edge.</rule>
+    <rule>Never reach for wrapping_* to silence an overflow warning. Wrapping is correct for hashes and deliberate modular arithmetic and for nothing else — on a size it converts a loud debug panic into a silent release-only wrong answer, which is precisely the outcome the other two operations exist to prevent.</rule>
+    <rule>Keep boundary tests at zero, at radix powers, at usize::MAX, and near coordinate limits. These are the inputs that discriminate between the two build profiles; without them the debug build stays green and the release wrap ships undetected.</rule>
   </pattern>
 
   <pattern name="sandbox_build_test_gating">
@@ -679,6 +780,7 @@ version: 2.1.0
   <skill name="serena-usage">Navigate trait implementations and module hierarchies</skill>
   <skill name="context7-usage">Fetch Rust book, cargo, and clippy documentation</skill>
   <skill name="investigation-patterns">Debug borrow checker errors, lifetime issues, and performance bottlenecks</skill>
+  <skill name="trust-boundaries">Language-neutral rules behind the trust_boundary_types section — limits before allocation, validation before normalizing coercion, pinning identity instead of re-opening a path, and never interpolating untrusted data into output</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate code patterns and references in this skill domain</agent>

@@ -1,7 +1,7 @@
 ---
 name: Nix Ecosystem
-description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", or works with Nix language, flakes, or Home Manager. Provides comprehensive Nix ecosystem patterns and best practices.
-version: 2.1.0
+description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", "nix flake check", "overlay", "activation script", or works with Nix language, flakes, or Home Manager. Covers vacuous flake checks that pass because the target platform is absent from the flake's system list (--all-systems), consuming a package through an overlay rather than system packages, pinning by tag enumeration instead of a latest-release endpoint, confirming which module system evaluates a file before concluding an option does not exist, import-from-derivation in cross-platform modules, deriving a version from the source manifest, symlink-safe privileged activation scripts, GC roots and daemon identity, and multicall-binary argv0.
+version: 2.3.0
 ---
 
 <purpose>
@@ -403,6 +403,42 @@ version: 2.1.0
         };
       </example>
     </pattern>
+
+    <pattern name="system_coverage_and_vacuous_checks">
+      <description>
+        Per-system outputs exist only for the systems a flake enumerates. `nix flake check` evaluates the outputs present for the *evaluating* system, so on a platform the flake never listed there may be nothing at all to check — and the command exits 0 having verified nothing. An empty check set is indistinguishable from a passing one at the exit code.
+      </description>
+      <symptom>`nix flake check` succeeds in seconds on a developer machine and then fails in CI on the platform the flake actually targets.</symptom>
+      <rule>Treat success on a platform absent from the flake's system list as non-evidence, not as a green gate. Either run the check natively on a supported system, or force full evaluation: `nix flake check --all-systems --no-write-lock-file --print-build-logs --keep-going`.</rule>
+      <note>`--all-systems` evaluates every system's outputs, but actually *building* foreign-platform derivations still needs a builder or a substituter (see darwin_linux_builder). Evaluation-only coverage already catches the common case: an output that does not evaluate on the target platform.</note>
+      <note>The same reasoning applies to a project whose real gate lives elsewhere — if the flake exposes Linux outputs only, the authoritative local check on a Darwin machine is the language toolchain directly, with the flake gate deferred to Linux CI. Say which of the two ran.</note>
+    </pattern>
+
+    <pattern name="consume_overlay_not_system_packages">
+      <description>
+        When depending on a package from another flake, prefer its `overlays.default` over `packages.${system}`. The `packages` output is keyed by system and only exists for the systems upstream enumerated, so `inputs.tool.packages.${system}.default` fails outright on any other platform. An overlay is system-agnostic by construction: it is a `final: prev:` function applied to the *consumer's* package set, so it builds for whatever system the consumer instantiated.
+      </description>
+      <example>
+        <note>Fragile: breaks as soon as the consumer's system is not in upstream's list</note>
+        packages = [ inputs.tool.packages.${system}.default ];
+
+        <note>Portable: the overlay builds against the consumer's own pkgs</note>
+        pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ inputs.tool.overlays.default ];
+        };
+        <note>then simply: pkgs.tool</note>
+      </example>
+      <note>The same asymmetry applies to any system-keyed output (`lib.${system}`, `apps.${system}`). A missing system key surfaces as `attribute '...' missing` during evaluation, which reads like a typo rather than a platform gap — check the upstream flake's system list before assuming the attribute path is wrong.</note>
+    </pattern>
+
+    <pattern name="pin_by_tag_enumeration">
+      <description>
+        When pinning an input (or a `fetchFromGitHub` rev) to "the latest version", enumerate the repository's tags. On forges that distinguish a git tag from a published Release object, a "latest release" endpoint reports only tagged commits that also have a Release attached; a maintainer who tags without publishing one is invisible to it, and the pin silently lands on an older version while looking authoritative.
+      </description>
+      <rule>Resolve versions from tag listings — `git ls-remote --tags &lt;url&gt;`, or the forge's tags endpoint — not from a "latest release" endpoint. Re-verify existing pins the same way when auditing for drift.</rule>
+      <note>This applies to any automation or agent asked to "bump to the newest version": the answer differs by which object it queried, and only the tag listing matches what a `github:owner/repo/vX.Y.Z` URL can actually resolve.</note>
+    </pattern>
   </patterns>
 
   <tools>
@@ -424,6 +460,7 @@ version: 2.1.0
     <tool name="nix flake check">
       <description>Validate flake and run checks</description>
       <use_case>CI/CD validation, pre-commit checks</use_case>
+      <caveat>Evaluates only the outputs that exist for the current system. On a platform the flake does not enumerate it can pass with nothing to check. See the system_coverage_and_vacuous_checks pattern below.</caveat>
     </tool>
   </tools>
 
@@ -549,6 +586,11 @@ version: 2.1.0
         '';
         };
       </example>
+      <tradeoff name="declared_settings_become_read_only">
+        A file placed with `source` or `text` is a symlink into the Nix store, and store files are read-only. For a GUI application whose settings file is managed this way, every key declared in Nix is enforced on every switch — but the application's own settings UI can no longer persist changes to those keys, because the write-back fails against a read-only symlink. More Nix-declared keys means less in-app control over exactly those toggles. Surface this tradeoff to the user *before* declaring more keys, rather than after they find a switch that will not stick.
+      </tradeoff>
+      <note>Some applications rewrite their whole settings file on quit; against a read-only symlink that write fails outright and can drop unrelated in-app state along with it. Prefer a `programs.*` module when one exists, and declare only the keys that genuinely must be pinned.</note>
+      <note>Home Manager modules whose settings option has a `freeformType` accept arbitrary undocumented keys without validating them, so a typo produces a silently ineffective key rather than an evaluation error. Verify key names against the application's own documentation.</note>
     </pattern>
 
     <pattern name="xdg.configFile">
@@ -672,6 +714,33 @@ version: 2.1.0
       </example>
     </concept>
   </common_modules>
+
+  <concept name="option_namespace_depends_on_the_importer">
+    <description>
+      `programs.*` and `services.*` exist in both the NixOS and the Home Manager module systems, under the same names but with genuinely different schemas. Which one an option path resolves to is decided by the module system that evaluated the file — not by the file, its directory, or its author's intent. A tree of "home" modules imported into a `nixosSystem` evaluates its `programs.foo` against NixOS's module, and any Home-Manager-only option inside it is an error.
+    </description>
+    <diagnostic>
+      An option you know the program supports is reported as not existing. Before doubting the option name, ask which module system evaluated the file: follow the import chain upward to either `nixosSystem` / `nixosModules` (NixOS) or `homeManagerConfiguration` / `home-manager.users.&lt;name&gt;` (Home Manager). The option is usually fine; the namespace is the wrong one.
+    </diagnostic>
+    <example>
+      <note>Home Manager: prefix/shell exist, plugins take { plugin; extraConfig; } submodules</note>
+      programs.tmux = {
+      prefix = "C-t";
+      plugins = [ { plugin = pkgs.tmuxPlugins.resurrect; extraConfig = "set -g @resurrect-strategy-nvim 'session'"; } ];
+      };
+
+      <note>NixOS: no prefix/shell — use shortcut; plugins is a plain package list,</note>
+      <note>so per-plugin @plugin-* variables must go into extraConfig instead</note>
+      programs.tmux = {
+      shortcut = "t";
+      plugins = with pkgs.tmuxPlugins; [ resurrect ];
+      extraConfig = "set -g @resurrect-strategy-nvim 'session'";
+      };
+    </example>
+    <warning>
+      A module tree can land on the NixOS side unintentionally — for example because it also sets `systemd.services` and was therefore imported as a NixOS module rather than through `home-manager.users.&lt;name&gt;`. Sharing one tree across both systems requires either restricting it to options that exist in both, or splitting the structurally divergent programs into per-system files. Assume divergence and check, rather than porting a working module and expecting it to evaluate.
+    </warning>
+  </concept>
 
   <best_practices>
     <practice priority="critical">
@@ -921,6 +990,11 @@ version: 2.1.0
     <warning name="double_import_of_ambient_module_args">
       If a bundle module internally imports a companion that sets `_module.args.foo`, importing that same companion AGAIN alongside the bundle in the same scope throws `error: attribute '...foo' is defined multiple times`. The module system does not dedupe two imports that both define a `_module.args` entry. Rely on the ambient one the bundle already provides; do not import it a second time. (This surfaces at build time, not always at eval time.)
     </warning>
+    <warning name="ifd_in_a_cross_platform_module">
+      Import-from-derivation — any `builtins.readFile` / `fromJSON` / `import` applied to a path *inside* a derivation output, e.g. `builtins.readFile "${nurPkgs.someTheme}/theme.conf"` — forces that derivation to be built during *evaluation*. In a module meant to be shared across systems this is a trap rather than a nicety: evaluating a Darwin configuration that imports the module triggers an `aarch64-linux` build merely to read a file, so evaluation now needs a Linux builder or fails outright, and a config that only wanted to render a text file drags in a foreign-platform closure.
+      The design rule that follows: a module intended for cross-platform consumption must be IFD-free. If a module genuinely needs IFD, keep it vendored per-platform instead of promoting it into shared infrastructure.
+    </warning>
+    <note>Make the failure explicit rather than mysterious by evaluating with `--option allow-import-from-derivation false`; IFD then errors at the offending expression instead of quietly starting a build. The other tell is an evaluation that pauses to build a derivation whose name carries a system you are not on.</note>
     <note>Modules pulled in via `imports = [ ./x ]` must take `...` in their signature so the module system can pass extra arguments (lib, the distributed specialArgs, etc.).</note>
   </pattern>
 
@@ -947,6 +1021,27 @@ version: 2.1.0
 </home_manager_module_design>
 
 <packaging_patterns>
+  <concept name="version_from_language_manifest">
+    <description>
+      When packaging a repository that already declares its version in a language manifest, derive the Nix `version` from that manifest instead of writing the number twice. A hardcoded copy drifts silently — the build keeps succeeding, but package metadata and the store path name carry a stale version and nothing ever fails to point it out. Observed in practice: a `flake.nix` still saying `0.1.0` long after the manifest had reached `0.1.7`.
+    </description>
+    <example>
+      let
+      cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+      in
+      rustPlatform.buildRustPackage {
+      pname = cargoToml.package.name;
+      version = cargoToml.package.version;
+      src = ./.;
+      cargoHash = "sha256-...";
+      }
+    </example>
+    <note>Per-ecosystem equivalents: `builtins.fromJSON (builtins.readFile ./package.json)`, `builtins.fromTOML (builtins.readFile ./pyproject.toml)` (`project.version`), a parsed `*.cabal` field, a `go.mod`-adjacent tag. Reading a file that is already part of the source tree is ordinary evaluation, not import-from-derivation — it is pure and costs nothing.</note>
+    <when_not_to>
+      This is for in-repo packages where `src = ./.`. When packaging a *foreign* release fetched by tag, the version is an input rather than an output: keep it a literal attribute (with `finalAttrs` or `rec` so `rev = "refs/tags/v${version}"` can interpolate it), because the manifest only becomes readable after the fetch has already been pinned by that same version.
+    </when_not_to>
+  </concept>
+
   <concept name="rust_current_pattern">
     <description>
       Package Rust with `rustPlatform.buildRustPackage`, providing a `cargoHash` computed over the vendored crate sources.
@@ -1064,6 +1159,19 @@ version: 2.1.0
     </description>
   </principle>
 
+  <activation_path_safety>
+    <description>
+      Activation scripts — nix-darwin and NixOS alike — run as root, and a great many of them write into the logged-in user's home: SSH material, agent sockets, per-user state directories. The user owns every component of that path, so anything running as that user can replace any directory along it with a symlink in the window between activation checking the path and writing to it. Path-based operations re-resolve the whole path on every call, so each call reopens the race; the check you performed a moment ago says nothing about the object you are about to write. This surface exists on every switch, by construction, which is what distinguishes it from ordinary untrusted-input handling.
+    </description>
+    <rule>Never use path-based `mkdir -p`, `chmod`, `chown`, `touch`, or `install` on user-controlled paths from a privileged activation script or a root helper it installs.</rule>
+    <rule>`O_NOFOLLOW` on the final component alone is insufficient — an attacker only needs an ancestor. Traverse descriptor-relatively: open each component with `openat(dirfd, name, O_DIRECTORY | O_NOFOLLOW)` and operate on the resulting descriptor (`mkdirat`, `openat`, `fchown`, `fchmod`), so the object you validated is the object you write.</rule>
+    <rule>Validating a descriptor and then invoking a subprocess with the original path throws the guarantee away: the subprocess re-resolves the path from scratch and reintroduces the race in full. Either do the work in-process against the descriptor, or pass the descriptor itself (`/dev/fd/N`) where the tool accepts it.</rule>
+    <darwin_specific>
+      On macOS several standard paths are system symlink aliases into `/private` — `/var`, `/tmp`, `/etc`. A blanket `O_NOFOLLOW` traversal therefore rejects entirely legitimate configuration such as a state directory under `/var/lib/...`, and the naive fix (drop `O_NOFOLLOW`) undoes the hardening. Canonicalize only an explicit allowlist of these fixed system aliases and keep strict traversal for everything else.
+    </darwin_specific>
+    <note>The same reasoning covers any privileged helper a Nix module installs (a root launchd daemon, a systemd unit running as root) that touches `$HOME`. For the general rules on handling untrusted input across a privilege boundary, see the trust-boundaries skill; what is Nix-specific here is that activation is privileged by construction and re-runs on every switch.</note>
+  </activation_path_safety>
+
   <concept name="cross_platform_substitution">
     <description>
       Building or substituting foreign-platform derivations from Darwin needs explicit flags, because NixOS `system.build.toplevel` sets preferLocalBuild (allowSubstitutes = false) and the daemon negatively caches narinfo 404s.
@@ -1088,6 +1196,15 @@ version: 2.1.0
     <note>Run the builder (and comparable long-lived agents) as a launchd job in the correct domain. A daemon that needs a graphical session must live in the `gui` domain; leaving it in the background/user domain can inject `LimitLoadToSessionType = Background` and cause flaky bootstrap where a process is alive but `launchctl print gui/$UID/...` shows nothing loaded. During migration from a previous user-domain job, explicitly boot out the old `user/$UID/...` job or launchd may respawn it.</note>
     <note>Raise file-descriptor limits in layers or you hit "Too many open files": a boot-time daemon for `kern.maxfiles` / `kern.maxfilesperproc` / `launchctl limit maxfiles`, per-agent `NumberOfFiles` (soft and hard), and — the commonly missed one — the GUI/user session's own `launchctl limit maxfiles`.</note>
     <note>On-demand socket activation (launchd listens on the build port and starts the VM only when a build connects, with a TTL idle-shutdown) keeps an idle builder from consuming resources.</note>
+  </operational>
+
+  <operational name="daemon_identity_and_gc_roots">
+    <note name="pid_liveness_is_not_process_identity">
+      A PID file tells you that *a* process exists, not that it is *your* process. PIDs are reused, and the state file itself can be replaced between the read and the signal. Persist a composite identity — canonical executable path, canonical state directory, and process start time — and require all three to match the PID record before acting on it. Re-read and revalidate that record immediately before every signal, including the SIGKILL fallback of a stop handshake: a slow shutdown escalation is exactly the window in which the original process exits and an unrelated one inherits the PID.
+    </note>
+    <note name="atomic_gc_root_refresh">
+      A long-lived VM or daemon whose closure must survive garbage collection needs an indirect GC root, and refreshing it must never leave a window with no root at all. Create the replacement symlink under a temporary name and `rename` it over the old one; never remove the valid root first, or a concurrent `nix-collect-garbage` can delete the closure of a running system. Accept only canonical `/nix/store/...` values as root targets, bound any external `nix-store` invocation with a timeout, and on expiry send SIGTERM, escalate to SIGKILL if needed, and always reap the child.
+    </note>
   </operational>
 </darwin_linux_builder>
 
@@ -1141,6 +1258,14 @@ version: 2.1.0
     <rule>Tests needing network or git must be `#[ignore]`d (or feature-gated) so the sandboxed `cargo test` still passes; run them outside the sandbox in a dev shell.</rule>
     <rule>The release profile strips `debug_assert!`, so a `#[should_panic]` test that asserts a `debug_assert!` fires must be gated with `#[cfg(debug_assertions)]`, or it fails under the Nix build even though it passes under a debug `cargo test`.</rule>
   </principle>
+
+  <trap name="multicall_binary_argv0">
+    <description>
+      In a Nix environment a large share of `PATH` entries are symlinks into multicall binaries: coreutils installs `echo`, `ls`, `cat` and dozens more as links to a single `coreutils` executable that dispatches on `argv[0]`. Code that "hardens" a resolved executable path by canonicalizing it (`realpath`, `readlink -f`, `Path::canonicalize`, `truename`) rewrites `argv[0]` to the dispatcher's own name, and the program then runs as the wrong tool entirely. The signature is a spawn that produces empty stdout, a usage message on stderr, and a nonzero exit — a failure that looks like a broken argument list, not a resolution bug.
+    </description>
+    <rule>Existence and executability checks may follow symlinks; the path handed to `exec`/spawn must keep the candidate's own basename. Canonicalize for comparison, never for invocation.</rule>
+    <note>This is near-certain to surface under `nix build` / `nix flake check` and may never surface on a distribution that ships separate binaries — a textbook "passes on my machine, fails in the sandbox" case. It is plain POSIX behavior, not a Nix quirk; Nix just makes the multicall layout the norm rather than the exception.</note>
+  </trap>
 </flake_parts_ci>
 
 <workflow>
@@ -1204,10 +1329,15 @@ version: 2.1.0
   <rule>Always verify flake.lock is updated after any input change</rule>
   <rule>Prefer `pkgs.lib` functions over inline Nix expressions for complex transformations</rule>
   <rule>Use `mkIf` and `mkMerge` for conditional module options, not plain `if` at top level</rule>
+  <rule>Never perform path-based file operations on user-controlled paths from a privileged activation script; traverse descriptor-relatively</rule>
 </rules>
 <rules priority="standard">
   <rule>Check nixpkgs-unstable before nixpkgs-stable for newer package versions</rule>
   <rule>Use `nix flake check` to validate flake outputs before committing</rule>
+  <rule>Pass `--all-systems` to `nix flake check` when the flake targets systems other than the one evaluating, and treat a check on an unenumerated platform as non-evidence</rule>
+  <rule>Derive a package's version from the source tree's own manifest rather than hardcoding it</rule>
+  <rule>Keep modules intended for cross-platform sharing free of import-from-derivation</rule>
+  <rule>Confirm which module system evaluates a file before concluding that a `programs.*` option does not exist</rule>
   <rule>Document non-obvious overlay and override rationale in comments</rule>
 </rules>
 
@@ -1235,6 +1365,8 @@ version: 2.1.0
   <skill name="investigation-patterns">Debug evaluation errors and understand derivation failures</skill>
   <skill name="ecosystem skills">Language-specific conventions for nixpkgs packaging via golang-ecosystem, rust-ecosystem, haskell-ecosystem, php-ecosystem, swift-ecosystem, c-ecosystem, cplusplus-ecosystem, common-lisp-ecosystem</skill>
   <skill name="devenv-ecosystem">Devenv 2.0 configuration patterns</skill>
+  <skill name="trust-boundaries">General rules for untrusted input and privilege boundaries; this skill covers only the Nix-specific activation surface</skill>
+  <skill name="testing-patterns">What constitutes acceptance for a declarative configuration change, and reporting which verification tier actually ran</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate code patterns and references in this skill domain</agent>

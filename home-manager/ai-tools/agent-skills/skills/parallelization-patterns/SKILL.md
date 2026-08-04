@@ -1,7 +1,7 @@
 ---
 name: Parallelization Patterns
-description: Patterns for parallel execution strategies, timeout configuration, retry policies, and consensus mechanisms.
-version: 2.0.0
+description: Patterns for parallel execution strategies, timeout configuration, retry policies, consensus mechanisms, and data-parallel work scheduling.
+version: 2.2.0
 ---
 
 <purpose>
@@ -169,6 +169,19 @@ version: 2.0.0
     </example>
   </pattern>
 
+  <pattern name="work_scheduling_on_skewed_inputs">
+    <description>Scheduling a data-parallel workload across workers, as opposed to the agent-level patterns above. Static contiguous chunking assumes the work per item is roughly uniform; when it is skewed, one oversized item strands most workers idle while a single worker finishes it.</description>
+    <strategy>
+      <step order="1">Sort the work units by descending estimated size, so the longest job starts first and the short ones backfill around it (longest-processing-time-first).</step>
+      <step order="2">Hand out units through a shared atomic cursor rather than pre-assigning ranges. Each worker claims the next index when it becomes free, so a slow unit delays only its own worker.</step>
+      <step order="3">Have each worker write its result into the slot for the unit's original index, claimed at the same time as the work.</step>
+      <step order="4">Read results back by index after all workers join — never by claim order or completion order.</step>
+    </strategy>
+    <ordering_caveat>Step 3 and step 4 are the part implementations get wrong. Deterministic output ordering was a free, accidental property of contiguous chunking, where a chunk's slot range equalled its input position. Size-descending claiming destroys that correspondence, so output order has to be re-established deliberately through pre-claimed index slots. Skipping this produces output whose order varies run to run — a change that looks unrelated to scheduling and is easy to misdiagnose.</ordering_caveat>
+    <expected_profile>On a size-skewed workload the change is a large win, and on an even workload it is neutral rather than a regression, because claiming overhead is small relative to per-unit work. That makes it a strict improvement rather than a tradeoff — but verify the neutral case rather than assuming it, and confirm the output is byte-identical either way. See performance-benchmarking for the measured numbers and for how to measure both arms defensibly.</expected_profile>
+    <when_not_to_use>Work units of genuinely uniform cost, or units so small that the atomic claim dominates the work itself.</when_not_to_use>
+  </pattern>
+
   <decision_tree name="timeout_selection">
     <question>What type of agent is this?</question>
     <branch condition="Fast read-only (explore)">180000ms</branch>
@@ -193,6 +206,7 @@ version: 2.0.0
   <practice priority="high">Group independent agents in parallel_groups for concurrent execution</practice>
   <practice priority="high">Define depends_on for validation agents that require prior results</practice>
   <practice priority="medium">Use retry_policy for critical operations</practice>
+  <practice priority="medium">For skewed data-parallel work, claim units size-descending through a shared cursor and re-establish output order explicitly through pre-claimed index slots (work_scheduling_on_skewed_inputs)</practice>
 </best_practices>
 
 <rules priority="critical">
@@ -218,6 +232,7 @@ version: 2.0.0
 <related_skills>
   <skill name="core-patterns">Base templates for error escalation, decision criteria, enforcement</skill>
   <skill name="workflow-patterns">Output formats, reflection checkpoints, self-evaluation</skill>
+  <skill name="performance-benchmarking">Source of the measured speedup pair behind work_scheduling_on_skewed_inputs (4.80x median on a size-skewed workload, 1.004x on an even one) and the protocol for measuring both arms before calling a scheduling change a strict improvement</skill>
 </related_skills>
 
 <related_agents>

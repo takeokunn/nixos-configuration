@@ -1,7 +1,7 @@
 ---
 name: Lisp Macro Architecture
-description: This skill should be used when the user asks to "write a macro", "defmacro", "design a DSL", "build a compiler-time code transformer", "hygienic macro", "macro hygiene", "code walker", "CPS transform", "anaphoric macro", "once-only", "g!-symbol", "duality of syntax", "pandoric macro", "On Lisp", "Let Over Lambda", or works with compile-time metaprogramming in Common Lisp or Emacs Lisp. Provides both the canonical macro-writing technique catalog (On Lisp, Let Over Lambda) and a rigorous engineering discipline — phase separation, hygiene, evaluation-order preservation, compile-time diagnostics — for turning those techniques into correct, production-quality macros and DSLs. For general CL/Elisp language basics, defer to common-lisp-ecosystem / emacs-ecosystem.
-version: 2.1.0
+description: This skill should be used when the user asks to "write a macro", "defmacro", "design a DSL", "build a compiler-time code transformer", "hygienic macro", "macro hygiene", "code walker", "CPS transform", "anaphoric macro", "once-only", "g!-symbol", "duality of syntax", "pandoric macro", "On Lisp", "Let Over Lambda", or works with compile-time metaprogramming in Common Lisp or Emacs Lisp. Provides the canonical technique catalog (On Lisp, Let Over Lambda) plus an engineering discipline — phase separation, hygiene, evaluation-order preservation, compile-time diagnostics — for production-quality macros and DSLs. Also covers auditing a source-to-source rewriter or formatter, where a clean reparse does not prove correctness — whitespace transformed inside atom spans, dialect-blind operator tables, discarded reader prefixes, comments absent from the node tree. For general CL/Elisp language basics, defer to common-lisp-ecosystem / emacs-ecosystem.
+version: 2.3.0
 ---
 
 <purpose>
@@ -27,6 +27,8 @@ version: 2.1.0
     <item>Compile-time diagnostics: turning malformed DSL input into macro-expansion-time errors</item>
     <item>Editor/DX metadata: &amp;body vs &amp;rest, (declare (indent ...) (debug ...)) in Elisp</item>
     <item>Self-verification of expansions (macroexpand-1 / macroexpand / pp-macroexpand-last-sexp)</item>
+    <item>Continuation contracts for CPS/callback layers: error-boundary scoping, exactly-once delivery, symbol-property arity annotations, presence-versus-value distinctions (see continuation_contracts)</item>
+    <item>Source-rewriting correctness for code walkers, formatters, and codemods that write source back out (see source_rewriting_correctness)</item>
   </in_scope>
   <out_of_scope>
     <item>CLOS, ASDF, condition system fundamentals — see common-lisp-ecosystem</item>
@@ -262,6 +264,32 @@ version: 2.1.0
     </example>
   </pattern>
 
+  <pattern name="derived_name_interning">
+    <description>A second hygiene axis the gensym rule does not cover: gensym hygiene protects against capture, this protects against misplacement. Any macro that builds a derived name — foo-p, make-foo, foo-supplied-p, with-foo — must choose the interning package deliberately rather than inheriting it from the input symbol.</description>
+    <why>
+      Deriving the package with (symbol-package slot) looks like the careful choice, and it is wrong
+      the moment a user-supplied name is an inherited symbol. Because packages :use #:cl, an
+      unqualified slot name that collides with a standard symbol — position, length, type, class —
+      resolves to the COMMON-LISP symbol. The macro then tries to intern POSITION-SUPPLIED-P into
+      COMMON-LISP, and SBCL signals a package-lock error from a definition that looks entirely
+      ordinary at the call site. The user wrote a field name; the error names a package lock.
+    </why>
+    <how_to_apply>
+      Intern derived names into a package the macro determines: *package* at expansion time (the
+      definition site), the package of the macro's own name argument, or an explicit package
+      argument to the macro. Never (symbol-package user-supplied-symbol). Record the user-side
+      escape hatch too — :shadow the colliding name in the defining package — for when the macro
+      is third-party and cannot be changed.
+    </how_to_apply>
+    <example>
+      ;; fragile: inherits the package from the caller's symbol, which may be COMMON-LISP
+      (intern (format nil "~A-SUPPLIED-P" (symbol-name slot)) (symbol-package slot))
+
+      ;; deliberate: the derived name lands where the definition lives
+      (intern (format nil "~A-SUPPLIED-P" (symbol-name slot)) (symbol-package record-name))
+    </example>
+  </pattern>
+
   <pattern name="no_runtime_resolution">
     <description>Push static analysis (dependency/lifetime graphs, non-deterministic branch enumeration) entirely into the analyzer stage (Law: no_runtime_resolution)</description>
     <example>
@@ -420,6 +448,7 @@ version: 2.1.0
       (=bind (result) (add1 41) (print result)) ; => prints 42
     </example>
     <note>This is the direct, textbook mechanism behind the "CPS transform" the Absolute Laws refer to: the continuation chain is built entirely by macro-defined plumbing (*cont*), and =defun/=bind read like ordinary function calls at every call site.</note>
+    <note>The mechanism is only half the problem. Once a CPS layer carries real error handling and more than one continuation per call, the contracts in continuation_contracts below govern whether it is correct.</note>
   </technique>
 
   <technique name="duality_of_syntax" source="Let Over Lambda, ch.4 (Duality of Syntax)">
@@ -441,6 +470,86 @@ version: 2.1.0
     <note>The full implementation (pandoriclet/plambda/pandoric-let/with-pandoric, built on dlambda and symbol-macrolet tricks) is intricate and easy to get subtly wrong from memory. Do not hand-roll it inline: pull in the tested let-over-lambda library implementation, or consult the book directly, before using this technique in production code.</note>
   </technique>
 </canonical_technique_library>
+
+<continuation_contracts>
+  <description>
+    The correctness contracts of a CPS or callback layer, as opposed to its mechanism. A macro
+    system that generates continuation-passing code owns these contracts on its users' behalf:
+    the user writes what looks like a direct call, so any way the generated plumbing can invoke
+    the wrong continuation, invoke two of them, or lose a distinction is invisible at the call
+    site. All three failures below were found in review of working, tested code.
+  </description>
+
+  <principle name="protect_the_computation_never_the_continuation_call">
+    <statement>An error-handling boundary in a CPS layer must wrap only the fallible local computation. If the continuation call is inside the handler's scope, an error raised by the continuation — that is, by everything downstream — is caught and misclassified as a local failure, and the failure continuation fires for a computation that already succeeded. That is a double delivery, and it violates exactly-once continuation invocation.</statement>
+    <why>The scoping error is nearly invisible because the natural way to write it is the wrong way: the whole body goes inside condition-case (Elisp) or handler-case (CL), and the continuation call happens to be the last form in the body. The bug only manifests when downstream code signals, which is a rare path in tests and a common path in production.</why>
+    <how_to_apply>
+      Compute the result inside the handler and return it; choose which continuation to call from
+      that result; invoke the chosen continuation outside the handler. Test three things explicitly:
+      that a local error selects the failure continuation, that an error raised by the success
+      continuation propagates unchanged (including quit/interrupt, which handler forms often swallow
+      by accident), and that exactly one continuation is invoked exactly once.
+    </how_to_apply>
+    <example>
+      ;; wrong: K is called inside the handler, so K's own errors select ON-ERROR
+      (condition-case err
+          (funcall k (parse-entry text))
+        (error (funcall on-error err)))
+
+      ;; right: the handler yields a result; the continuation call is outside it
+      (let ((outcome (condition-case err
+                         (cons :ok (parse-entry text))
+                       (error (cons :err err)))))
+        (if (eq (car outcome) :ok)
+            (funcall k (cdr outcome))
+          (funcall on-error (cdr outcome))))
+    </example>
+  </principle>
+
+  <principle name="annotate_generated_definitions_with_symbol_properties">
+    <statement>When two sibling macros generate functions with different continuation arities, the call-site macro cannot tell them apart from the symbol alone. Naming conventions are not a check — a hand-written pair that follows the convention without being generated will fool them. Record the contract as a symbol property on the generated name at expansion time, and have the call-site macro read that property to type-check the call.</statement>
+    <how_to_apply>
+      Each defining macro emits an eval-when / eval-and-compile form setting a property that names
+      the calling pattern; the call-site macro reads it during its own expansion and signals a
+      compile-time error when the pattern does not match the argument shape it is generating.
+      Hand-written definitions that participate in the protocol must set the property themselves —
+      make that an explicit, documented requirement, because it is an opt-in the compiler cannot
+      enforce and hand-written pairs have been found missing it.
+    </how_to_apply>
+    <limitation name="expansion_time_introspection_is_load_order_dependent">
+      A (get name 'property) read during macroexpansion only sees definitions already evaluated in
+      that image. If the guarded definition is compiled before the definition it refers to, the get
+      returns nil and the guard silently passes. This makes the check best-effort within a file and
+      unreliable across files — genuinely useful as an early-warning diagnostic, but it must never
+      be described or relied on as a guarantee. State the limitation wherever the guard is
+      documented, and keep a runtime or test-level check for the same contract.
+    </limitation>
+    <example>
+      ;; the defining macro records the calling pattern on the generated name
+      (eval-and-compile
+        (put 'my-op/k 'my-cps-pattern 'success-and-failure))
+
+      ;; the call-site macro checks it during ITS expansion — best effort, see limitation
+      (let ((pattern (get callee 'my-cps-pattern)))
+        (when (and pattern (not (eq pattern expected)))
+          (error "my-bind: %S expects the %S calling pattern" callee pattern)))
+    </example>
+  </principle>
+
+  <principle name="a_sync_wrapper_cannot_encode_a_two_outcome_contract">
+    <statement>Wrapping a success/failure continuation pair into a synchronous function by passing identity as success and a no-op as failure collapses two outcomes into one return value. It cannot distinguish "succeeded, and the value is nil" from "failed", and every caller of the wrapper silently inherits that conflation.</statement>
+    <why>In Emacs Lisp the collision is unavoidable rather than unlucky: nil is simultaneously false, the empty list, and a perfectly legitimate stored value. A cache or table lookup that branches on the value itself therefore reports a miss for every stored nil, and the caller re-computes or re-inserts — observed to make a capacity-one cache grow to two entries because eviction never recognized the existing key.</why>
+    <how_to_apply>
+      Do not branch on the value to decide presence; carry presence separately. Inside the CPS layer
+      that means an explicit found-p sentinel or a distinguished not-found object that no caller can
+      supply as data. In a sync wrapper, return two values (CL) or a cons of a status tag and the
+      value (Elisp) rather than the bare value. This is the null-conflation problem that motivates
+      option and maybe types, and the same rule applies to any key domain that includes the absence
+      marker.
+    </how_to_apply>
+    <note>The adjacent Elisp trap: 0 is truthy, so an (or cached-count default) idiom silently accepts a genuine zero. Use an explicit positive-count test.</note>
+  </principle>
+</continuation_contracts>
 
 <fasl_safe_expansion>
   <description>
@@ -510,6 +619,68 @@ version: 2.1.0
     <statement>define-modify-macro has an implicit leading place argument that precedes the user lambda-list parameters. Any call-site rewrite (add/remove/move/reorder an argument) must offset user arguments by one so the place argument is preserved.</statement>
   </special_rule>
 </binding_form_scope_reference>
+
+<source_rewriting_correctness>
+  <description>
+    Rules for any tool that reads Lisp, transforms it, and writes it back — a code walker, a
+    formatter, a codemod, a refactoring command, a macro that emits an edited copy of its input.
+    The governing fact is that corrupted Lisp is usually still valid Lisp, so the transformation
+    can change program meaning, report success, and pass its whole test suite. Every failure shape
+    below was found by running the built tool against adversarial input, never by a test.
+  </description>
+
+  <fallacy name="reparse_success_is_not_correctness">
+    <statement>A write-path guard that refuses any rewrite whose output fails to reparse is a real guard against one narrow failure — producing unreadable text — and no guard at all against meaning change. The output of a broken transform reparses cleanly, because the corruption is well-formed. A structural equivalence check on the parsed trees is stronger but inherits the same blindness: anything the node tree does not represent is invisible to it.</statement>
+    <why>Observed at its worst in a canonicalizing rewrite that silently deleted every comment in a file, wrote it, and exited zero. The renderer did not emit comments and the tree-equivalence guard did not represent them, so both the transform and its own verification agreed the output was identical.</why>
+    <how_to_apply>Enumerate what your node tree does not carry — comments, reader prefixes, whitespace significance, original numeric notation — and assert on the exact output text for each, since no tree-level check can see them.</how_to_apply>
+  </fallacy>
+
+  <failure_shape name="whitespace_transforms_inside_atom_spans">
+    <statement>The rule for whitespace normalization is "outside every atom span", not "outside strings". Multi-line block comments and character literals have exactly the same interior-text problem as strings: collapsing whitespace inside a block comment or rewriting the space in a space character literal changes or destroys the atom.</statement>
+    <how_to_apply>Compute atom spans once — strings, block comments, line comments, character literals, and any dialect-specific literal syntax — and make every textual transform consult that span map rather than a string-only check.</how_to_apply>
+  </failure_shape>
+
+  <failure_shape name="dialect_blind_operator_tables">
+    <statement>Spelling and meaning of core syntax vary by dialect, so a single hardcoded operator table corrupts code in every dialect it was not written for. The clearest case: in Common Lisp #' is a shorthand for the function special operator, while in Scheme, Racket, and Clojure #' is a syntax-object or var-quote reader macro and function is an ordinary symbol with no special meaning.</statement>
+    <how_to_apply>Key every operator and reader-macro table by dialect and require the dialect to be determined explicitly — from the file extension, an explicit flag, or a declared project setting — never inferred from content. A tool that cannot determine the dialect must refuse to rewrite rather than assume one.</how_to_apply>
+  </failure_shape>
+
+  <failure_shape name="reader_prefixes_discarded">
+    <statement>A rewrite that normalizes a form must carry its reader prefixes with it. Simplifying (quote x) to 'x is meaning-preserving; doing it to #+sbcl (quote x) and emitting 'x deletes a read-time conditional, so code that was excluded on other implementations becomes unconditionally present.</statement>
+    <how_to_apply>Represent reader prefixes as attributes of the node they precede, so any node-level rewrite carries them automatically. A prefix stored as a sibling node is a prefix that will be dropped by the first transform that replaces its neighbour.</how_to_apply>
+  </failure_shape>
+
+  <failure_shape name="folding_through_unevaluated_contexts">
+    <statement>Constant folding, simplification, and inlining must stop at quote and quasiquote boundaries. Under quote, the text is data: folding (+ 1 2) inside quoted data changes the data. Under quasiquote the same applies except where an unquote re-enters evaluation, so the walker must thread quasiquote depth rather than testing for a quote head.</statement>
+    <note>This is the same depth-threading discipline the rename rules in binding_form_scope_reference require; a rewriting tool needs it for every transform, not only for renames.</note>
+  </failure_shape>
+
+  <failure_shape name="host_language_escaping_leaks_into_output">
+    <statement>Re-emitting a string literal through the host language's own escaping routine injects escapes the target dialect does not use. Lisp string syntax escapes only the backslash and the double quote; a host that also escapes newlines, tabs, or non-ASCII characters will silently rewrite a literal containing a real newline into one containing a two-character escape sequence.</statement>
+    <how_to_apply>Write a dialect-specific serializer for every literal type rather than reusing the implementation language's debug or repr formatting. Round-trip every literal shape — embedded quotes, backslashes, real newlines, non-ASCII text — through parse and print, and assert byte equality.</how_to_apply>
+  </failure_shape>
+
+  <failure_shape name="numeric_tower_assumptions">
+    <statement>Arithmetic simplification performed in the tool's own numeric model, rather than the target dialect's, produces confidently wrong constants. Folding (/ 1.0 2) through an integer division path yields 0 — a valid, plausible, catastrophically wrong literal.</statement>
+    <how_to_apply>Fold only where the tool can reproduce the target's contagion and division rules exactly, and refuse to fold mixed-type or division expressions otherwise. Preserving the original expression is always an acceptable outcome for an optional optimization; emitting a wrong literal is not.</how_to_apply>
+  </failure_shape>
+
+  <failure_shape name="indentation_anchored_to_the_wrong_line">
+    <statement>Re-indenting a moved or extracted form against the indentation of the definition's own first line, rather than against the column the form is being placed at, produces output that is valid but progressively mis-shaped — and for a formatter, that is the entire product.</statement>
+  </failure_shape>
+
+  <failure_shape name="comments_absent_from_the_node_tree">
+    <statement>If comments are not nodes, every transform deletes them, and no tree-based verification notices. This is the most destructive shape because it fails silently across the whole file at once rather than at one site.</statement>
+    <how_to_apply>Attach comments to the tree as first-class nodes with an explicit attachment rule (leading, trailing, or own-line relative to a sibling), and add a comment-count and comment-text assertion to the tool's own output verification. If comments genuinely cannot be represented, the tool must refuse to write rather than write a lossy result with a zero exit status.</how_to_apply>
+  </failure_shape>
+
+  <verification_protocol>
+    <rule>Reparsing the output is necessary, not sufficient. Assert the exact expected text, byte for byte.</rule>
+    <rule>Run the built binary or the real command path. Several of these shapes appear only there — a unit test calling the transform function directly bypasses the renderer, the write path, and the exit-status logic, which is where the corruption and the false success both live.</rule>
+    <rule>Drive the tool with adversarial input, not tidy fixtures: block comments spanning lines, character literals for whitespace, reader conditionals, quoted and quasiquoted data, mixed-type arithmetic, strings holding quotes and real newlines, and files that are entirely comments.</rule>
+    <rule>Verify at the file level as well as the form level. A per-form test cannot detect a loss that is uniform across the file, which is exactly how comment deletion escaped.</rule>
+  </verification_protocol>
+</source_rewriting_correctness>
 
 <lambda_list_and_quasiquote_traps>
   <description>
@@ -581,6 +752,12 @@ version: 2.1.0
   <practice priority="high">Before mechanically renaming/extracting across a binding form, confirm its namespace (value vs callable) and which sub-forms it shadows</practice>
   <practice priority="medium">Thread quasiquote depth in code-walking rewrites; preserve , / ,@ prefixes and leave quoted data untouched</practice>
   <practice priority="medium">Reimplement standard binding macros (e.g. with-standard-io-syntax) against the full ANSI variable set, not a convenient subset</practice>
+  <practice priority="high">Intern macro-derived names (foo-p, make-foo, foo-supplied-p) into a package the macro determines, never (symbol-package user-supplied-symbol)</practice>
+  <practice priority="critical">In a CPS layer, wrap only the fallible computation in the error boundary; choose and invoke the continuation outside it, and test exactly-once delivery</practice>
+  <practice priority="high">Carry presence separately from value in continuation and lookup contracts; a sync wrapper over a success/failure pair cannot express both outcomes in one return value</practice>
+  <practice priority="medium">Annotate generated definitions with symbol properties so sibling macros can check call shapes at expansion time — and document that the check is load-order dependent, never a guarantee</practice>
+  <practice priority="critical">For any tool that writes source back out, assert the exact output text and run the built binary; a reparse or tree-equivalence guard cannot see comments, reader prefixes, or escaping</practice>
+  <practice priority="high">Compute atom spans (strings, block comments, character literals) before any textual transform, and key operator tables by an explicitly determined dialect</practice>
 </best_practices>
 
 <anti_patterns>
@@ -622,6 +799,26 @@ version: 2.1.0
   <avoid name="function_object_in_expansion">
     <description>Splicing a captured #'fn function object into macro output (e.g. as a default callback), which the file compiler cannot externalize and fails to dump to a FASL</description>
     <instead>Splice a function-designator symbol and funcall it, or resolve #'fn at the call site; keep the expansion source-serializable</instead>
+  </avoid>
+
+  <avoid name="reparse_guard_as_correctness_proof">
+    <description>Accepting a source rewrite because the output reparsed, or because the parsed trees compare equal — neither can see comment loss, dropped reader prefixes, or escaping damage, and corrupted Lisp is usually still valid Lisp</description>
+    <instead>Assert the exact output text against adversarial inputs, run the real command path, and enumerate what your node tree does not represent</instead>
+  </avoid>
+
+  <avoid name="inherited_package_for_derived_names">
+    <description>Interning a generated name with (symbol-package user-symbol), which lands in COMMON-LISP whenever the caller's unqualified name collides with a standard symbol, producing a package-lock error far from its cause</description>
+    <instead>Intern into a package the macro chooses: the definition site, the package of the macro's name argument, or an explicit package parameter</instead>
+  </avoid>
+
+  <avoid name="continuation_call_inside_the_error_boundary">
+    <description>Leaving the continuation call inside condition-case/handler-case, so an error from downstream code is misclassified as a local failure and a second continuation fires for a computation that already succeeded</description>
+    <instead>Compute the outcome inside the handler, select the continuation from it, and invoke the continuation outside the handler</instead>
+  </avoid>
+
+  <avoid name="value_as_presence_sentinel">
+    <description>Deciding found-versus-missing by testing the value, so a legitimately stored nil (or zero, in Elisp, where zero is truthy) is reported as absent</description>
+    <instead>Carry an explicit found-p sentinel or a distinguished not-found object no caller can supply; return a status tag alongside the value from any sync wrapper</instead>
   </avoid>
 
   <avoid name="uniform_binding_assumption">
@@ -690,6 +887,8 @@ version: 2.1.0
   <skill name="sbcl-usage">macroexpand/trace/inspect workflows for verifying and debugging expansions at runtime</skill>
   <skill name="investigation-patterns">Evidence-driven debugging methodology for tracking down capture/evaluation-order bugs</skill>
   <skill name="serena-usage">Symbol navigation across macro definitions and their call sites</skill>
+  <skill name="test-integrity">False-green testing — the general form of a rewriting tool that corrupts source and passes its own suite</skill>
+  <skill name="paredit-cli">Structural editing of balanced-parenthesis code; the correctness rules above govern any such transformation</skill>
 </related_skills>
 <related_agents>
   <agent name="explore">Locate existing macro definitions and call sites in this skill domain</agent>

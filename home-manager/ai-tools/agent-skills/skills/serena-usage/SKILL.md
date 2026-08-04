@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
-description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", or needs Serena MCP guidance. Provides Serena tool usage patterns and orchestration integration.
-version: 3.2.0
+description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", "serena memory", or needs Serena MCP guidance. Also covers organising a growing memory corpus as a reference graph — one root entry-point memory linking outward, references that describe what the target covers, and no memory stating when to read itself — instead of a flat set an agent must read entirely, and recovering a parallel subagent's report from its session transcript when the completion notification never arrives. Provides Serena tool usage patterns and orchestration integration.
+version: 3.4.0
 ---
 
 <purpose>
@@ -421,6 +421,33 @@ version: 3.2.0
     </task_type>
   </pattern>
 
+  <pattern name="memory_reference_graph">
+    <description>Structure a memory corpus as a reference graph with a single root, not a flat set. At small scale a flat set is fine, because listing it is cheap. Past a few dozen memories, an agent that must read everything to find what matters pays that cost on every task, so the corpus needs to be traversable instead.</description>
+    <structure>
+      <element name="root">One designated entry-point memory that every session reads first. It holds no domain detail of its own; it links outward to the domain memories.</element>
+      <element name="domain_memories">Linked from the root, each covering one area and linking on to more specific memories within it.</element>
+      <element name="leaf_memories">Specific patterns, traps, and decisions, reached by traversal rather than by scanning the whole index.</element>
+    </structure>
+    <rules>
+      <rule>A reference must carry a description of what the target covers, precise enough to decide whether to follow it. The target's name alone is not enough — a name tells you the topic, not whether the content bears on the question in hand.</rule>
+      <rule>A memory should not contain instructions about when to read itself. That guidance belongs to the referrer, which is the only place with the context to judge relevance. Self-describing read conditions duplicate across every referrer and go stale independently of each other.</rule>
+      <rule>When adding a memory, add the reference from its parent in the same edit. An unreferenced memory is unreachable by traversal and effectively invisible, however good its content.</rule>
+    </rules>
+    <reconciling_note>This does not replace memory_reading_by_task_type. The task-type priority lists are the selection heuristic for a flat corpus or when no root exists; the reference graph is how a corpus is navigated once one does. Where both apply, start at the root and let the task type decide which branches to follow.</reconciling_note>
+  </pattern>
+
+  <pattern name="parallel_subagent_result_recovery">
+    <description>Recovering a parallel subagent's report when its completion notification does not arrive. Placed here because a lost report usually means the knowledge it carried never reaches a memory — the corpus loses the finding, not just the message.</description>
+    <problem>Completion notifications for parallel subagents can be delayed or lost. The absence of a notification is therefore not evidence that the agent failed, and re-running on that assumption discards completed work and doubles the cost.</problem>
+    <recovery>
+      <step order="1">Look in the session directory's `subagents/` folder for the agent's `agent-*.jsonl` transcript. The final report survives there even when the notification did not arrive.</step>
+      <step order="2">Check the transcript's modification time and tail. A recent mtime and a terminal assistant message mean the agent finished; a stalled mtime mid-run means it did not.</step>
+      <step order="3">Extract the report as the longest assistant text message in the transcript. Agent reports are substantially longer than the intermediate status notes around them.</step>
+    </recovery>
+    <note>The sibling `.meta.json` records only spawn-time configuration — agent type, name, model, permission mode — and no completion state, so it cannot answer whether the agent finished. Read the transcript, not the metadata.</note>
+    <rule>Check the transcript before concluding an agent failed and re-running it.</rule>
+  </pattern>
+
   <pattern name="memory_content_format">
     <description>Standard YAML frontmatter for new Serena memory files, enabling structured filtering and lifecycle management</description>
     <frontmatter_template>
@@ -702,6 +729,8 @@ last-verified: YYYY-MM
   <practice priority="medium">Verify symbol changes with find_referencing_symbols before refactoring</practice>
   <practice priority="medium">Follow memory_reading_by_task_type to prioritize relevant memories</practice>
   <practice priority="medium">When a multi-language repo's language detection excludes the target file's language, fall back to Grep plus text edits instead of retrying symbol tools (symbol_tools_unavailable_fallback)</practice>
+  <practice priority="high">Give a growing memory corpus a single root and describe what each reference covers, so memories are reached by traversal rather than by reading everything (memory_reference_graph)</practice>
+  <practice priority="medium">When a parallel subagent's completion notification does not arrive, read its transcript before concluding it failed (parallel_subagent_result_recovery)</practice>
 </best_practices>
 
 <anti_patterns>

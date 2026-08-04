@@ -1,7 +1,7 @@
 ---
 name: Web UX
-description: This skill should be used when the user asks to "improve UX", "usability review", "web accessibility", "design a form/onboarding flow", "information architecture", or works on web/app user experience. Provides world-class web UX heuristics, accessibility (WCAG), and performance-perception best practices.
-version: 2.0.0
+description: This skill should be used when the user asks to "improve UX", "usability review", "web accessibility", "design a form/onboarding flow", "information architecture", or works on web/app user experience. Also covers interaction mechanics — focus ownership across stacked modals and overlays, focus traps that survive re-rendering and late-mounted content, the open/close contract of a dialog and when refusing to close is correct, one overlay serving both a busy and an error state needing opposite assistive-technology semantics, classifying each setting as immediate-apply or review-before-commit, keyboard shortcut ownership against text entry, and releasing held input on every discontinuity such as a window blur, tab switch, or overlay opening. Provides web UX heuristics, accessibility (WCAG), and performance-perception best practices.
+version: 2.2.0
 ---
 
 <purpose>
@@ -259,6 +259,25 @@ version: 2.0.0
   <guidance>Prevent errors, make consequences clear, and avoid dark patterns that exploit or deceive users</guidance>
   <when>Consent, pricing, subscriptions, cancellation, defaults</when>
 </concept>
+
+<concept name="focus_ownership">
+  <description>At any moment exactly one surface owns keyboard containment; when surfaces stack, ownership transfers to the topmost rather than accumulating across all of them</description>
+  <guidance>Give the topmost open surface sole ownership of Tab traversal and Escape; every surface beneath it must return from its key handler immediately while a higher one is open</guidance>
+  <when>Stacked dialogs, a settings panel over a pause screen, a drawer over a modal, confirmation inside a wizard</when>
+</concept>
+
+<concept name="commit_model">
+  <description>A commit model defines when a user's change takes effect: immediately on input, or on an explicit save the user can still abandon</description>
+  <guidance>Choose per setting based on reversibility and cost rather than applying one model uniformly to a whole panel; whichever you choose, the user must be able to tell whether the change is saved</guidance>
+  <when>Preferences, settings panels, filters, profile editing, configuration</when>
+</concept>
+
+<concept name="input_discontinuity">
+  <description>A discontinuity is any event that interrupts a held interaction without producing the release event the interaction is waiting for</description>
+  <guidance>Enumerate the discontinuity set explicitly and clear held state on every member of it; treat the list as a checklist rather than adding cases as bugs are reported</guidance>
+  <scope>Overlay or modal opening, pause, navigation, window blur, document visibility change, pointer capture loss, focus moving into an editable field</scope>
+  <when>Press-and-hold actions, drag, long-press, key repeat, continuous gestures</when>
+</concept>
 </concepts>
 
 <patterns>
@@ -366,6 +385,107 @@ version: 2.0.0
     - Breadcrumbs, search, and clear current-location cues support orientation
   </example>
   <use_case>Restructuring navigation for a growing content site or app</use_case>
+</pattern>
+
+<pattern name="modal_open_close_contract">
+  <description>The behavioral contract a modal or overlay must satisfy once the decision to use one has been made</description>
+  <decision_tree name="when_to_use">
+    <question>Have you established that a blocking overlay is the right pattern (see the modal_overuse anti-pattern first)?</question>
+    <if_yes>Implement the full open/close contract below; a partial implementation strands keyboard and assistive-technology users</if_yes>
+    <if_no>Prefer inline UI, a drawer, or a non-blocking notification</if_no>
+  </decision_tree>
+  <example>
+    On open: capture the element that had focus, then move focus to the first enabled focusable control inside the overlay.
+    While open: trap Tab and Shift+Tab over a live query of focusable descendants, not a snapshot taken at open time — anything rendered later (a lazily loaded list, an expanded section) must be reachable.
+    Escape: routes through the identical close path as the close button, so both run the same teardown.
+    On close: return focus to the captured element.
+    Throughout: keep `aria-hidden`, `aria-disabled`, and the native `disabled` attribute synchronized with the visual state, and expose `aria-haspopup="dialog"` plus `aria-controls` on the trigger.
+  </example>
+  <note>The snapshot-versus-live distinction is the one most often missed: a focus trap built from the descendants present at open time silently excludes every control the overlay renders afterwards.</note>
+  <use_case>Auditing a dialog, settings overlay, or command palette for keyboard and screen-reader completeness</use_case>
+</pattern>
+
+<pattern name="refusing_to_close">
+  <description>When a modal holds transient state that cannot be settled, refusing to close is correct — and every side effect that normally accompanies closing must be suppressed as a unit</description>
+  <decision_tree name="when_to_use">
+    <question>Can the overlay hold user state (a dragged item, an in-flight edit, an unassigned selection) that has nowhere to go if the overlay disappears?</question>
+    <if_yes>Make close conditional: on refusal, keep the overlay open, keep its key listener active, and suppress every accompanying close effect</if_yes>
+    <if_no>Close unconditionally and let the standard teardown run</if_no>
+  </decision_tree>
+  <example>
+    Closing typically bundles several effects: hide the overlay, tear down the key listener, play a sound, resume the underlying view, restore focus.
+    When close is refused, all of them must be suppressed together — decided once at the close path, not independently by each caller.
+    Explain the refusal in place ("Your inventory is full — free a slot to put this item away") rather than silently ignoring the Escape key.
+  </example>
+  <note>Leaving the key listener torn down while the overlay stays visible produces an overlay the keyboard cannot reach, which is worse than either outcome alone.</note>
+  <use_case>Editors, item pickers, and drag-and-drop surfaces where dismissal would destroy user work</use_case>
+</pattern>
+
+<pattern name="severity_switched_overlay">
+  <description>One overlay element serving both "work in progress" and "this failed" needs opposite assistive-technology semantics for each</description>
+  <decision_tree name="when_to_use">
+    <question>Does a single surface display both a loading state and a failure state?</question>
+    <if_yes>Reuse the element, but switch role, live-region politeness, modality, and focus behavior by severity</if_yes>
+    <if_no>Use the semantics appropriate to the single state the surface represents</if_no>
+  </decision_tree>
+  <example>
+    Loading: `role="status"`, `aria-live="polite"`, `aria-busy="true"`, no dialog semantics, focus left where the user put it.
+    Fatal error: `role="alertdialog"`, `aria-live="assertive"`, `aria-modal="true"`, focus moved to the overlay so the message is unavoidable.
+    The assertive announcement must carry the recovery path in the same message ("Couldn't load your session. Sign in again to continue."), not just the failure.
+  </example>
+  <note>Reusing the element is right; reusing its semantics is not. Announcing progress assertively interrupts for no reason, and announcing a fatal error politely lets it pass unnoticed.</note>
+  <use_case>Startup and session overlays, data-loading panels that also render load failures</use_case>
+</pattern>
+
+<pattern name="settings_commit_classification">
+  <description>Classify each setting as immediate-apply or review-before-commit rather than choosing one commit model for the whole panel</description>
+  <decision_tree name="when_to_use">
+    <question>Has someone proposed removing the Apply/Save button because it is friction?</question>
+    <if_yes>Classify each setting by reversibility and cost, then replace what the draft/cancel model provided</if_yes>
+    <if_no>Still audit the panel for settings whose current model does not match their cost</if_no>
+  </decision_tree>
+  <example>
+    Immediate-apply suits low-cost, reversible toggles whose effect is visible at once.
+    Review-before-commit suits expensive or disruptive options — anything that restarts a session, discards work, or takes visible time to undo.
+    Removing the Apply button removes three things the user relied on: the draft/cancel mental model, a visible signal of what is saved, and a rollback point. Replace them with persistence feedback ("Saved") and an undo affordance.
+    Define what a setting displays when the platform cannot honor it, so an option that silently does nothing is not indistinguishable from one that failed.
+    Coalesce or throttle continuous inputs; a slider drag must not become fifty writes.
+  </example>
+  <note>Immediate apply is not free convenience — it moves cost from the click to the recovery. Settings that are cheap to change and cheap to change back are the ones where that trade is worth making.</note>
+  <use_case>Redesigning a preferences surface, or reviewing a proposal to make settings apply instantly</use_case>
+</pattern>
+
+<pattern name="keyboard_shortcut_ownership">
+  <description>Rules that keep document-level keyboard shortcuts from colliding with each other and with text entry</description>
+  <decision_tree name="when_to_use">
+    <question>Does the product bind shortcuts on a document-level listener, or does the same key mean different things in different modes?</question>
+    <if_yes>Apply mode-gated ownership, an editable-target guard on keydown, and unconditional keyup processing</if_yes>
+    <if_no>Standard per-component key handling is sufficient</if_no>
+  </decision_tree>
+  <example>
+    Exactly one owner at a time: a key claimed by two features is consumed only by the currently visible one, gated on that surface being open. When it closes, the background feature gets the key back — the check belongs at the point of consumption, not in a registration table.
+    Editable-target guard: on keydown, return before mutating any shortcut state when the target is an `input`, `textarea`, `select`, or `contentEditable` element. Skipping only the action is not enough — recording the key as held is itself the leak.
+    Keyup is unconditional: process every release regardless of target. Focus can move into a field while a key is down, and if the release is filtered out the key stays held forever.
+    A shortcut that opens a text surface (a chat or search box) must consume its own event so the newly focused field does not also receive the character.
+  </example>
+  <note>These three rules cover the three recurring bugs: the wrong feature responds, typing leaks into the background, and a key sticks after focus moves.</note>
+  <use_case>Adding a global shortcut to an app that already has modal surfaces and text inputs</use_case>
+</pattern>
+
+<pattern name="held_input_lifecycle">
+  <description>A held interaction needs an explicit release on every discontinuity, and a completed action must not re-fire from the same unreleased press</description>
+  <decision_tree name="when_to_use">
+    <question>Does any interaction depend on an input staying held — press-and-hold, drag, long-press, key repeat?</question>
+    <if_yes>Define the discontinuity set and a completion latch, and clear both through the same reset path</if_yes>
+    <if_no>Ordinary click and tap handling is sufficient</if_no>
+  </decision_tree>
+  <example>
+    Release on discontinuity: clear held state when an overlay opens, the view pauses, the window blurs, the document becomes hidden, or navigation occurs. Without this the user returns to a UI that believes a button is still pressed.
+    Consume the whole gesture on completion: once a held action completes, latch it until the actual release. Resetting only the progress indicator is not enough — the target under the pointer has usually changed as a result of the action, and a still-held input immediately starts the next one.
+    Clear the latch through the same discontinuity and reset paths as the held state, so the two cannot drift apart.
+  </example>
+  <note>The two failure modes are complementary: missing discontinuity handling gives stuck input, and a missing completion latch gives unintended repeats against freshly changed state.</note>
+  <use_case>Press-and-hold delete, drag-to-reorder, long-press menus, hold-to-confirm actions</use_case>
 </pattern>
 </patterns>
 
@@ -532,6 +652,31 @@ version: 2.0.0
     <instead>Reserve modals for focused, blocking decisions; prefer inline UI, drawers, or non-blocking notifications otherwise</instead>
   </avoid>
 
+  <avoid name="nested_modal_focus_contention">
+    <description>Two stacked overlays both running a focus trap, so the lower one's bubbling Tab handler fights the upper one's traversal and the top dialog becomes unnavigable by keyboard</description>
+    <instead>Make focus ownership exclusive: while a higher surface is open, the lower surface's key handler and focus trap return immediately. The bug is invisible to mouse users and total for keyboard users, so it survives manual testing</instead>
+  </avoid>
+
+  <avoid name="focus_dropped_on_rerender">
+    <description>Re-rendering a list or panel replaces the DOM node that had focus, so focus falls to the document body and keyboard navigation restarts from the top</description>
+    <instead>After a re-render that replaces the active element, move focus to the corresponding new node. A re-render is a focus handover, not a neutral repaint</instead>
+  </avoid>
+
+  <avoid name="snapshot_focus_trap">
+    <description>Building a focus trap from the focusable elements present when the overlay opened, stranding anything rendered afterwards outside the tab cycle</description>
+    <instead>Query focusable descendants live on each traversal, filtered to visible and enabled controls</instead>
+  </avoid>
+
+  <avoid name="exact_target_identity_dispatch">
+    <description>Routing pointer or click events by comparing `event.target` against a registered element roster, which misses taps that land on an icon, span, or SVG nested inside the registered control</description>
+    <instead>Resolve the handler with `closest()` from the event target, or set `pointer-events: none` on decorative children. This breaks partially — the button works when tapped on its padding and not on its label — which makes it read as flakiness rather than a routing bug</instead>
+  </avoid>
+
+  <avoid name="unreleased_held_input">
+    <description>Clearing held-input state only on the matching release event, so an overlay opening, a window blur, or a tab switch leaves the input stuck down indefinitely</description>
+    <instead>Clear held state on every discontinuity, and process keyup and pointerup unconditionally even when focus has moved into an editable field</instead>
+  </avoid>
+
   <avoid name="infinite_scroll_for_findability">
     <description>Using infinite scroll where users need to find, return to, or compare specific items</description>
     <instead>Use pagination or load-more with stable URLs and reachable footers for findability-critical content</instead>
@@ -559,6 +704,10 @@ version: 2.0.0
   <rule>Treat WCAG conformance as a baseline, not the ceiling, for inclusive design</rule>
   <rule>Improve perceived performance alongside measured performance, never as a substitute for fixing real latency</rule>
   <rule>Respect existing product and platform conventions unless deviation has a clear, tested benefit</rule>
+  <rule>Give exactly one open surface ownership of keyboard containment; stacked traps must defer to the topmost, not run in parallel</rule>
+  <rule>Route every dismissal path (close button, Escape, backdrop) through one close implementation so teardown cannot diverge between them</rule>
+  <rule>Choose a commit model per setting from its reversibility and cost; never remove an explicit save without replacing the persistence feedback and rollback it provided</rule>
+  <rule>Treat a held interaction as unfinished until an explicit release or a discontinuity clears it, and verify the discontinuity set rather than fixing stuck-input reports one at a time</rule>
 </rules>
 
 <error_escalation inherits="core-patterns#error_escalation">

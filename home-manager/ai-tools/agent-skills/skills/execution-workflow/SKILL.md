@@ -1,7 +1,7 @@
 ---
 name: Execution Workflow
-description: This skill should be used when the user asks to "execute task", "implement feature", "delegate work", "run workflow", "review code", "code quality check", or needs task orchestration and code review guidance. Provides execution, delegation, and code review patterns.
-version: 2.0.0
+description: This skill should be used when the user asks to "execute task", "implement feature", "delegate work", "run workflow", "review code", "code quality check", "definition of done", or needs task orchestration and code review guidance. Also covers treating done as an enumerated set of verification commands exiting zero rather than a judgement call, reporting the verification tier actually reached and the exact command a later session must re-run, choosing between a convention-conformance review and a behavior review (the first approves what the second rejects), checking for surprise dirty state before committing in a checkout other sessions may share, and never skipping a failing hook or gate to get a commit through. Provides execution, delegation, and code review patterns.
+version: 2.2.0
 ---
 
 <purpose>
@@ -148,6 +148,66 @@ version: 2.0.0
       <questions>Clarifications needed</questions>
     </example>
   </pattern>
+
+  <pattern name="definition_of_done">
+    <description>Task completion is an enumerated set of verification commands exiting zero, not a subjective judgement</description>
+    <decision_tree name="when_to_use">
+      <question>Are you about to report a task as complete?</question>
+      <if_yes>Run the project's enumerated verification commands and report each one's result</if_yes>
+      <if_no>Continue implementation</if_no>
+    </decision_tree>
+    <rules>
+      <rule>Enumerate the project's verification commands — formatter, linter, type or compile check, test suite, and any project-specific gate — and treat "all of these exit zero" as the definition of done. Naming the list makes completion checkable without asking the user what counts.</rule>
+      <rule>A failing pre-push or pre-commit hook is evidence about the work, not an obstacle in front of it. The correct response is to fix the work. Never bypass the hook with a skip-verification flag, and apply the same reading to a red CI job.</rule>
+      <rule>A verification gate that selects and runs zero tests is a false green: assert a nonzero selected-test count before reading a pass as a pass. See test-integrity for the full treatment of selector, double, and teardown traps.</rule>
+      <rule>Name exactly one canonical gate for the project so a narrower subset run is never reported as if it were the whole gate.</rule>
+    </rules>
+  </pattern>
+
+  <pattern name="verification_ceiling_reporting">
+    <description>State the verification tier actually reached and the exact command a future session must re-run</description>
+    <tiers>
+      <tier order="1">Static read or parse check — the source was inspected, nothing was executed</tier>
+      <tier order="2">Interpreted or partial load — the code loaded but was not compiled or exercised</tier>
+      <tier order="3">Real compile, load, and run of the relevant tests locally</tier>
+      <tier order="4">The project's canonical gate green in CI, on a clean environment</tier>
+    </tiers>
+    <rules>
+      <rule>Name the tier actually achieved, and say plainly that a lower tier is not equivalent to a higher one even when it found real bugs. Hand-tracing catches genuine defects and is worth doing; it is still not a compile-and-run confirmation.</rule>
+      <rule>Record the exact command the next session should run first to close the gap, so resuming is a lookup rather than a reconstruction.</rule>
+      <rule>Report which checks ran and which could not run, with the reason. A silently omitted check reads as a passed check.</rule>
+    </rules>
+    <note>The tiers genuinely differ: bugs that survive extensive local smoke testing are routinely caught only by a full clean-environment run. Treat the gap between tiers as real risk, not as bookkeeping.</note>
+  </pattern>
+
+  <pattern name="review_lens_selection">
+    <description>Convention-conformance review and behavior review are different reviews, and the first will approve what the second rejects</description>
+    <decision_tree name="when_to_use">
+      <question>Is the change's stated purpose behavioral — performance, correctness, or concurrency?</question>
+      <if_yes>A conformance pass is not sufficient evidence; run a behavior review against what the code does at runtime</if_yes>
+      <if_no>A conformance review may be adequate on its own, but say which lens was applied</if_no>
+    </decision_tree>
+    <rules>
+      <rule>A reviewer working from a conformance checklist systematically cannot catch a correctness defect that is spelled like the convention. Every box ticks, and the change ships with the bug the convention was meant to prevent.</rule>
+      <rule>Do not report a high conformance score as approval. State which lens produced it, so a later reader does not treat a style pass as a behavioral clearance.</rule>
+      <rule>When two reviews of the same change disagree sharply, the disagreement is usually a lens difference rather than a judgement difference. Identify which lens each applied before trying to reconcile the verdicts.</rule>
+    </rules>
+  </pattern>
+
+  <pattern name="shared_repo_dirty_state_check">
+    <description>Check for surprise dirty state before committing into a repository other sessions may be using</description>
+    <decision_tree name="when_to_use">
+      <question>Are you about to stage or commit in a checkout that other sessions or people may share?</question>
+      <if_yes>Inspect working-tree state and attribute every hunk before staging</if_yes>
+      <if_no>Proceed, but still stage deliberately rather than staging everything</if_no>
+    </decision_tree>
+    <procedure>
+      <step order="1">Inspect status and the full diff before staging anything. Use the plain, non-decorated diff form so the output is actually parseable (see quality-tools on external diff drivers).</step>
+      <step order="2">If every hunk is cleanly attributable to your own work, stage only those.</step>
+      <step order="3">If a shared file — an export list, a build manifest, a lockfile — carries changes interleaved with someone else's, stop and ask. Do not bundle them and do not split them speculatively; whose-work-is-it is not inferable from the diff.</step>
+    </procedure>
+    <note>The counterpart rule is that destructive shared-tree operations (stash, hard reset, clean, switching a branch in place) are off the table entirely; core-patterns holds that list and the safe alternatives.</note>
+  </pattern>
 </patterns>
 
 <best_practices>
@@ -157,6 +217,10 @@ version: 2.0.0
   <practice priority="high">Balance critical feedback with positive observations of good practices</practice>
   <practice priority="high">Provide file:line references and concrete improvement suggestions</practice>
   <practice priority="medium">Check Serena memories for existing patterns before delegating implementation tasks</practice>
+  <practice priority="critical">Define done as an enumerated set of verification commands exiting zero, and treat a failing hook or gate as unfinished work rather than an obstacle (definition_of_done)</practice>
+  <practice priority="critical">Report the verification tier actually reached and name the exact command needed to close the gap (verification_ceiling_reporting)</practice>
+  <practice priority="high">Choose the review lens deliberately: a behavioral change needs a behavior review, and a conformance score is not approval (review_lens_selection)</practice>
+  <practice priority="high">Inspect working-tree state and attribute every hunk before staging in a shared checkout (shared_repo_dirty_state_check)</practice>
 </best_practices>
 
 <anti_patterns>
@@ -183,6 +247,18 @@ version: 2.0.0
   <avoid name="parallel_when_dependent">
     <description>Attempting to parallelize tasks with data dependencies</description>
     <instead>Analyze dependencies and execute dependent tasks sequentially</instead>
+  </avoid>
+  <avoid name="bypassing_a_failing_gate">
+    <description>Skipping a red hook or gate to get the commit through</description>
+    <instead>Read the failure as evidence that the work is unfinished and fix the work</instead>
+  </avoid>
+  <avoid name="implied_verification">
+    <description>Reporting completion without saying which checks ran and which did not</description>
+    <instead>Name the verification tier reached, list what could not run and why, and give the command to re-run</instead>
+  </avoid>
+  <avoid name="staging_everything_in_a_shared_tree">
+    <description>Staging all changes without attributing them, in a checkout others may be using</description>
+    <instead>Attribute each hunk, stage only your own, and ask when a shared file has interleaved changes</instead>
   </avoid>
 </anti_patterns>
 
@@ -222,6 +298,9 @@ version: 2.0.0
   <skill name="serena-usage">Use for memory checks and symbol operations during delegation</skill>
   <skill name="investigation-patterns">Use when code review reveals unclear implementation details</skill>
   <skill name="testing-patterns">Use to verify test coverage and quality during review</skill>
+  <skill name="test-integrity">Use when a gate reports green: selector, double, and teardown traps that make a suite pass without testing anything</skill>
+  <skill name="quality-tools">Use for the verification command catalog and for running checks so their output is trustworthy</skill>
+  <skill name="core-patterns">Use for shared working-tree constraints and safe alternatives to destructive Git operations</skill>
 </related_skills>
 
 <related_agents>

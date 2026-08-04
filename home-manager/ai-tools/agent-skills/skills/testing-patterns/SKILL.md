@@ -1,7 +1,7 @@
 ---
 name: Testing Patterns
-description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs testing guidance. Provides testing methodology and patterns.
-version: 2.1.0
+description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs guidance on designing, structuring, or isolating tests. Covers the unit/integration/e2e split and classifying a suite by the boundary it crosses, arrange-act-assert and given-when-then, stub/mock/spy/fake selection and seam design over global rebinding, fixture isolation with snapshot-and-restore, scenario-scoped identifiers for parallel runs, polling and settlement barriers for asynchronous outcomes, operation- and query-count assertions instead of wall-clock thresholds, property-based and snapshot testing, matcher design, evaluation as the acceptance gate for declarative-configuration repositories, and runner, compiler, and server traps that silently invalidate a result. Keywords — flaky test, test double, test fixture, teardown, parallel isolation, settlement barrier, query count, tooling trap. For whether a green result proves anything, see test-integrity.
+version: 2.3.0
 ---
 
 <purpose>
@@ -36,6 +36,7 @@ version: 2.1.0
   <scope>Single function, class, or module</scope>
   <characteristics>Fast, isolated, deterministic</characteristics>
   <when>Business logic, utility functions, transformations</when>
+  <boundary>Crosses none: no socket, filesystem, subprocess, or daemon lifecycle; everything runs inside the test process</boundary>
 </concept>
 
 <concept name="integration">
@@ -43,6 +44,7 @@ version: 2.1.0
   <scope>Multiple components working together</scope>
   <characteristics>Slower, may use real dependencies</characteristics>
   <when>API endpoints, database operations, service interactions</when>
+  <boundary>Crosses a real process, network, filesystem, or daemon-lifecycle boundary</boundary>
 </concept>
 
 <concept name="e2e">
@@ -50,6 +52,14 @@ version: 2.1.0
   <scope>Full application stack</scope>
   <characteristics>Slowest, tests real user scenarios</characteristics>
   <when>Critical user journeys, smoke tests</when>
+  <boundary>Crosses the program's outermost entry point: a command invocation, standard output, a browser session</boundary>
+</concept>
+
+<concept name="suite_classification">
+  <description>Which suite a test file belongs to is decided by the boundary the test crosses, and exactly one mechanism is authoritative for routing it there</description>
+  <guidance>Scope alone ("one function" versus "several components") does not settle the cases teams actually argue about, because both readings are defensible for the same file. The boundary crossed is decidable: does this test touch a socket, the filesystem, a subprocess, a daemon lifecycle, the program's standard output? Classify on that answer, and let the physical directory path carry it</guidance>
+  <guidance>A file that mixes deterministic helper checks with process-boundary checks is split along the boundary, not filed whole under whichever kind holds the majority; otherwise the fast suite inherits the slow file's flakiness or the slow suite hides fast checks nobody runs early</guidance>
+  <guidance>Prefer the directory path prefix over filename markers as the single source of truth. When the layer can be inferred from two mechanisms, a stray character in a manifest or a missed naming convention silently routes a file into a suite that never executes it, and the omission is invisible because nothing failed</guidance>
 </concept>
 
 <concept name="line_coverage">
@@ -292,6 +302,46 @@ version: 2.1.0
   <use_case>End-to-end pipeline tests, eventual-consistency checks, queue or worker completion</use_case>
 </pattern>
 
+<pattern name="settlement_barrier">
+  <description>Wait for the complete, ordered set of observable effects a change produces, rather than for a single readiness flag; and answer a race by strengthening the barrier, never by loosening the assertion</description>
+  <decision_tree name="when_to_use">
+    <question>Does the behavior under test settle through several stages, for example a transient in-flight state, then a published value, then a durable record?</question>
+    <if_yes>Wait for each observable effect in order, poll a second independent source for the durable consequence, and assert that untouched neighbors are still present</if_yes>
+    <if_no>A single-condition poll is sufficient; use poll_for_completion</if_no>
+  </decision_tree>
+  <example>
+    <note>A readiness flag read immediately can still carry the value computed before the change</note>
+    await waitForFlag(subject, "settled")      // necessary, not sufficient
+    await waitForDurableRecord(store, id)      // second, independent source
+    assertUnchanged(preexistingEntities)       // the change disturbed nothing else
+  </example>
+  <note>A single read of a single source is not settlement. The layered form is: retry the stimulus until the first observable effect appears, then poll a different, authoritative source for the consequence of that effect. A status published on the previous tick reads as ready while the durable value is still mid-flight, so the flag alone will sample a transient intermediate value some fraction of the time</note>
+  <note>When such a test proves flaky, the correct response is a stronger barrier, not a wider tolerance. Relaxing an exact expected value to a range, or dropping the durability check, converts a real race into a permanently silent one. Loosening is the default reflex under time pressure and is almost always the wrong move here</note>
+  <note>Include the negative half of the barrier: assert that entities and records the change was not supposed to affect are all still present. A settlement bug frequently manifests as collateral loss rather than as a wrong value at the target</note>
+  <use_case>Simulation- or physics-backed E2E, write-then-persist flows, pipelines with an intermediate published state ahead of the durable one</use_case>
+</pattern>
+
+<pattern name="operation_count_assertion">
+  <description>Express an efficiency guarantee as an assertion on the number of operations performed, not on elapsed wall-clock time</description>
+  <decision_tree name="when_to_use">
+    <question>Is the property you want to lock in "this now does less work" — fewer queries, one commit per batch, a single flush?</question>
+    <if_yes>Instrument the operation, then assert the exact count for several known input sizes</if_yes>
+    <if_no>Assert on the output value</if_no>
+  </decision_tree>
+  <example>
+    <note>Batching guarantee: exactly one registry commit per batch, whatever the batch size</note>
+    for (const size of [81, 289, 1089]) { applyBatch(size); assertEqual(commitCount(), 1) }
+
+    <note>Query-count guarantee: the read path issues a fixed number of queries whatever the row count</note>
+
+    assertEqual(queriesIssuedDuring(() =&gt; loadListPage()), 3)
+  </example>
+  <note>An efficiency fix has no natural test, because the observable output is identical before and after. A suite that only checks output stays green when the optimization is silently undone by the next change to a data relation or a call site, so the repeated-per-item-query problem returns unnoticed. The count assertion is the only thing that pins the fix in place</note>
+  <note>Wall-clock assertions are machine-dependent, so they get widened after each spurious failure until they no longer detect anything. An operation count is deterministic on any machine and names the regression directly</note>
+  <note>Assert at several input sizes rather than one: a count that is constant at one size may be linear at another, and the guarantee you care about is the shape of the curve, not one sample of it</note>
+  <use_case>Batching and coalescing guarantees, collapsing repeated per-item queries in a read path, single-flush or single-commit invariants</use_case>
+</pattern>
+
 <pattern name="parameterized_case_table">
   <description>Drive many related scenarios from one typed array of case records rather than copy-pasting near-identical test bodies</description>
   <decision_tree name="when_to_use">
@@ -355,7 +405,51 @@ version: 2.1.0
   </example>
   <note>The classic pollution bug is a fixture that restores one binding but not a second one the same code path also mutates (for example a lookup table populated as a side effect of loading a mode or style). A later test then inherits the leaked entries. Enumerate the complete write set of the body and snapshot all of it, not just the obvious binding</note>
   <note>For several globals, build a thin multi-binding wrapper over the single-binding helper rather than nesting many restore forms; accept both bare bindings and generalized places (such as a function cell) so simple and complex cases share one abstraction</note>
+  <note>Take the copy at setup, before the body runs, not at cleanup. Copying the originals during cleanup is too late when the body mutates a shared structure destructively: cleanup then publishes copies of the already-mutated state, and any alias held outside the fixture still points at the damage. The snapshot must be of the pre-body world, so it has to be made before the body exists</note>
+  <note>Restore to the prior value rather than resetting to a known default. A blanket reset destroys legitimate state that existed before the test and makes the suite order-dependent, because a test now depends on whether an earlier test happened to establish the state it silently relies on. Restoration also has to preserve identity-bearing structures — an index, a cache, a tail pointer — not merely equal values, or consumers holding references observe a different object than the one they registered against</note>
+  <note>Distinguish unbound from bound-to-nil. If a variable was originally unbound, cleanup must unbind it again rather than leaving it bound to a null value, since code that branches on boundness will take the wrong path for the rest of the run</note>
+  <note>Make the restoration itself uninterruptible. An unwind guarantee ensures cleanup is entered on a user interrupt, but a second interrupt arriving during cleanup can abandon it halfway, leaving exactly the partial restore this pattern exists to prevent. Where the host language allows it, inhibit interrupts around the whole restoration, not around each individual assignment</note>
+  <note>Do not rely on a later test's fixture, or on runner ordering, to absorb state this test leaked. That coupling is invisible and breaks the first time the suite runs in a different order or in parallel</note>
   <use_case>Registry mutations, dynamic-variable overrides, environment-variable tests, hash-table caches</use_case>
+</pattern>
+
+<pattern name="designed_injection_seam">
+  <description>Substitute a dependency through an indirection point the production code declares — a dynamically-scoped variable, a strategy slot, a constructor parameter — rather than overwriting a global function definition for the duration of a test</description>
+  <decision_tree name="when_to_use">
+    <question>Does the test need to replace a collaborator that the code under test currently calls by its global name?</question>
+    <if_yes>Add a declared seam and bind it for the scope of the test; if no seam can be added, drive the real collaborator's state instead of stubbing it</if_yes>
+    <if_no>Pass the double as an ordinary argument</if_no>
+  </decision_tree>
+  <example>
+    <note>The production module declares the seam; the test binds it, scoped and automatically unwound</note>
+    with-binding (*rate-source* test-rate-source) (run-entrypoint ...)
+
+    <note>Not: replacing the global definition of the rate-source function for the duration of the test</note>
+  </example>
+  <note>Overwriting a global function binding is process-wide and unscoped. Under a parallel runner it corrupts unrelated tests non-deterministically, and the resulting flake is nearly impossible to attribute because the failing test never mentions the test that did the overwriting. A declared seam is at worst thread-local and at best explicitly unwound</note>
+  <note>Local function shadowing does not intercept calls that were compiled to direct global references. A helper compiled against the global name keeps calling it, so the stub appears to install successfully and simply has no effect — the test then passes or fails for reasons unrelated to the substitution it believes it made. Verify the substitution actually took, or drive the real object's state and assert on the real path; test-integrity carries the audit procedure for proving which implementation the running code actually consulted</note>
+  <note>Where no seam exists and none can be added, prefer mutating the real subject into the state that selects the branch you want to exercise. That is slower to set up and far more honest than a stub whose effect was never applied</note>
+  <use_case>Entry-point tests with a swappable strategy, parallel suites sharing one process image, code whose collaborators are referenced by global name</use_case>
+</pattern>
+
+<pattern name="registry_variant_guard">
+  <description>A test that enumerates a production registry must guard every read of a variant-specific property, because a registry's members are not guaranteed to be homogeneous</description>
+  <decision_tree name="when_to_use">
+    <question>Does the test iterate a registry, plugin list, or handler table defined by production code and then read a property off each member?</question>
+    <if_yes>Guard the read with a predicate for the variant that actually carries that property, and assert the guard matched at least once</if_yes>
+    <if_no>Assert against a fixed, test-owned list</if_no>
+  </decision_tree>
+  <example>
+    <note>Guard the variant-specific read; an unguarded iteration tests a meaningless scenario for members of the other variant</note>
+    for (const member of registry) {
+      if (!hasCommandForm(member)) continue
+      assertValidCommand(member)
+    }
+  </example>
+  <note>A docstring or comment that narrows a registry's contract ("members must be created through this constructor") is documentation, not enforcement. A second variant registered through a different path will eventually appear, and every consumer that reads a property only the first variant carries then silently degrades: the loop still runs, the assertion still passes, and it proves nothing about the members it skipped over</note>
+  <note>When the same inline property-presence check appears at several call sites across tests and production alike, the duplication is the signal that a named predicate is missing. Introduce the predicate once and let both sides discriminate through it, so a third variant has one place to teach</note>
+  <note>Pair the guard with a count assertion so a registry whose members all fail the guard cannot pass as a fully-skipped loop; see the non-vacuity guidance in test-integrity</note>
+  <use_case>Plugin and checker registries, handler tables, tests that sweep every registered member of a production list</use_case>
 </pattern>
 
 <pattern name="namespaced_generated_test_names">
@@ -387,6 +481,104 @@ version: 2.1.0
   </example>
   <note>Under-modeled doubles are a common source of tests that are green yet meaningless: they assert against a fiction. When the contract includes deletion, consumption, or ordering, the double owns those semantics</note>
   <use_case>Process and IO shims, store deletion semantics, buffer-mutating calls</use_case>
+</pattern>
+
+<pattern name="registry_derived_double_set">
+  <description>When a test replaces every member of a dispatch chain, derive the set of doubles from the production registry, or make an omission fail loudly; do not enumerate the members by hand</description>
+  <decision_tree name="when_to_use">
+    <question>Does a test file replace all members of a chain or pipeline in order to isolate dispatch ordering?</question>
+    <if_yes>Build the double set from the same list production dispatches over, or assert the two sets are equal before running</if_yes>
+    <if_no>Replace only the collaborator under examination</if_no>
+  </decision_tree>
+  <example>
+    <note>Derive rather than list: a new production member is covered automatically</note>
+    for (const handler of productionChain) install(doubleFor(handler))
+
+    <note>Or make the gap explicit rather than letting the real implementation through</note>
+
+    assertSetEqual(doubled.keys(), productionChain.map(id), "every chain member must be doubled")
+  </example>
+  <note>A hand-enumerated double set quietly becomes a second registration list that nobody knows they own. Adding a member to the production chain leaves that member undoubled, so the real implementation runs against empty stubs — and the resulting failures land in unrelated cases elsewhere in the file, naming neither the new member nor the file that needed updating</note>
+  <note>This is about the completeness of a set of doubles, which is a different failure from the fidelity of any single one; contract_complete_test_double covers the latter. A set can be perfectly faithful member by member and still be wrong because it is missing one</note>
+  <use_case>Handler and middleware chains, dispatch tables, plugin pipelines isolated for ordering tests</use_case>
+</pattern>
+
+<pattern name="distinguishing_fixture_values">
+  <description>Choose fixture inputs that keep every value the code derives from them distinct, and that start strictly on the far side of any threshold under test</description>
+  <decision_tree name="when_to_use">
+    <question>Does the code under test derive several samples, indices, or positions from a single fixture input, or step toward a threshold?</question>
+    <if_yes>Pick an input for which the derived values are provably distinct, and begin more than one step away from the boundary</if_yes>
+    <if_no>Use the simplest legal value</if_no>
+  </decision_tree>
+  <example>
+    <note>An integral coordinate collapses two derived samples onto one cell; a fractional one separates them</note>
+    position.y = 64.3     // lower sample resolves to 64, upper to 65 -- not: 64
+
+    <note>Start strictly beyond the threshold so one step lands past it rather than exactly on it</note>
+
+    startAt(threshold + 2 * step)
+  </example>
+  <note>A legal but degenerate fixture value produces a test that appears to cover several paths while exercising one. It fails silently in both directions: the collapsed path is never checked, and the surviving path passes, so the suite reports coverage of a condition it never reached</note>
+  <note>Do not feed an already-normalized fixture constant back through its normalizer. Converting a converted value commonly yields nothing at all, and the fixture then falls back to its default, so the scenario the test claims to arrange was never built — the assertion runs against an empty or default subject</note>
+  <note>An advance that lands exactly on a boundary tests the wrong side of a strict comparison. Starting one step further out makes the crossing unambiguous regardless of whether the production comparison is strict or inclusive</note>
+  <use_case>Coordinate and index fixtures, threshold-crossing and accumulation tests, fixtures built from enumeration-to-index conversions</use_case>
+</pattern>
+
+<pattern name="restart_round_trip_fixture">
+  <description>To prove data survives a restart, restart against the same persistent profile directory; a fresh isolated context proves nothing about durability</description>
+  <decision_tree name="when_to_use">
+    <question>Is the behavior under test "state written in one session is still there in the next"?</question>
+    <if_yes>Launch a persistent context bound to an explicit profile directory, poll for the persisted record, close it, and launch a second context against the same directory</if_yes>
+    <if_no>An ordinary isolated context is fine and faster</if_no>
+  </decision_tree>
+  <example>
+    <note>The same profile directory across two sessions is what makes the round trip real</note>
+    ctx = launchPersistentContext(profileDir); save(); await waitForPersistedRecord(); await ctx.close()
+    ctx2 = launchPersistentContext(profileDir); assertRecordPresent()
+  </example>
+  <note>A default per-test context starts with empty storage regardless of whether the write ever succeeded. A test asserting presence can then only fail, never falsely pass — but the mirror-image test, asserting that data is gone after a reset, passes vacuously every time and will never detect a broken reset</note>
+  <note>Poll for the persisted record before closing the first session. Closing immediately after the save call races the storage layer's flush, and the resulting failure looks like a durability bug in the code under test rather than a missing barrier in the harness</note>
+  <note>Give each run its own temporary profile directory so parallel runs do not share state, and remove it in a cleanup block that runs even when the body throws; otherwise a failed run leaves a populated profile that makes the next run pass for the wrong reason</note>
+  <use_case>Client-side storage durability, session and cache persistence, reset and sign-out flows</use_case>
+</pattern>
+
+<pattern name="legacy_shape_regression_test">
+  <description>When adding an optional element to an existing contract, pin backward compatibility with a test that makes the old call and asserts the old result shape</description>
+  <decision_tree name="when_to_use">
+    <question>Are you adding an optional parameter, key, or field to a contract that existing callers already use?</question>
+    <if_yes>Write one test that calls the entry point without the addition and asserts the pre-existing output shape and decision fields are unchanged</if_yes>
+    <if_no>Cover the new behavior with ordinary tests</if_no>
+  </decision_tree>
+  <example>
+    <note>The new-feature tests all pass the new argument, so none of them ever exercises the old call shape</note>
+    result = entryPoint(existingArgs)          // no new argument at all
+    assertShapeEqual(result, legacyShape)
+  </example>
+  <note>Omitting the addition and passing it explicitly as null must produce identical behavior and identical output shape. When they differ, callers acquire an invisible dependency on argument-passing style, and the difference surfaces later as a bug in a caller that did nothing wrong</note>
+  <note>Exactly one layer owns the decision to forward the new key. When two layers each conditionally append it, the result carries the key twice, and which one wins depends on the consumer's parsing order</note>
+  <note>Prefer a stable output shape — the key always present, sometimes null — over a key that appears and disappears. A shape that varies forces every consumer and every test to handle both forms, and the branch that handles the absent form is the one that goes untested</note>
+  <use_case>Optional-parameter additions to widely-called entry points, additive schema evolution, decision records gaining a new field</use_case>
+</pattern>
+
+<pattern name="evaluation_as_acceptance_gate">
+  <description>In a declarative-configuration repository with no runtime test suite, successful evaluation and build of every affected output is the acceptance gate, supplemented by a repository-wide search for what the change was supposed to remove</description>
+  <decision_tree name="when_to_use">
+    <question>Does the repository describe desired state declaratively, with no place a unit test could meaningfully attach?</question>
+    <if_yes>Build each affected output as the gate, then grep the whole repository for the identifier being removed or renamed</if_yes>
+    <if_no>Write ordinary tests</if_no>
+  </decision_tree>
+  <example>
+    <note>Build every output the change touches, not just the one you edited</note>
+    build each affected target; a non-zero exit is the failing test
+
+    <note>Then confirm the old path is gone, which the build cannot tell you</note>
+
+    grep the repository for the removed identifier; zero hits is the second half of the gate
+  </example>
+  <note>Building is a strictly stronger gate than evaluating. Some errors — a duplicated module argument, a conflicting option definition — surface only when the output is realized, so an evaluation-only check reports success on a configuration that cannot build</note>
+  <note>The search half is the part people skip and the part that catches real defects. A successful build proves the new path works; it says nothing about whether the old path was fully removed, so a migration can leave both installed and appear entirely healthy</note>
+  <note>State the gate as an enumerated list of commands that must exit zero. "It builds" is not checkable by a reviewer; a list of targets is</note>
+  <use_case>Declarative infrastructure and machine configuration, manifest-driven deployments, provisioning repositories, any codebase whose product is configuration rather than a running program</use_case>
 </pattern>
 
 <pattern name="structured_failure_payload">
@@ -528,6 +720,37 @@ version: 2.1.0
     </example>
   </practice>
 
+  <practice priority="high">
+    <name>Suspect the fixture before the implementation</name>
+    <description>When a test unexpectedly gets nothing back — a null result, an empty collection, no side effect — verify the fixture satisfies every gate on the path before changing production logic</description>
+    <example>
+      <note>Code behind a chain of preconditions returns its null result for any unsatisfied one, so the symptom names none of them</note>
+      enumerate the guards on the path: session gate, feature-flag gate, permission gate
+      confirm the fixture satisfies all of them, not only the obvious first
+
+      <note>A generic fixture can satisfy the visible precondition and miss a second one; prefer the same builder the neighboring passing tests use</note>
+
+      <note>Worst outcome of skipping this check: "fixing" correct production code to accommodate an inadequate fixture</note>
+    </example>
+  </practice>
+
+  <practice priority="medium">
+    <name>Layer test helpers, and delete the ones that add nothing</name>
+    <description>Group test support by role — transport doubles, shared assertions, scenario setup, fixed fixtures — and delete any helper that only pre-binds arguments to another helper</description>
+    <example>
+      <note>Delete: a wrapper that forwards to a canonical builder with fixed arguments</note>
+      def setup_ready_session = build_session(state: :ready)   // callers should call build_session directly
+
+      <note>Keep: a helper that performs real orchestration callers would otherwise repeat</note>
+
+      def setup_ready_session = { s = build_session(state: :ready); attach_transport(s); await_ready(s); s }
+    </example>
+    <example>
+      <note>Do not lift a scenario setup into a shared module until several specs genuinely share the same bootstrap</note>
+      <note>Prefer a small helper local to the file over broader shared plumbing extracted speculatively</note>
+    </example>
+  </practice>
+
   <practice priority="medium">
     <name>Avoid magic numbers</name>
     <description>Use named constants for test values</description>
@@ -618,6 +841,46 @@ version: 2.1.0
     <description>A mock or fake that returns the right value but omits the real dependency's side effects such as deletion, consumption, or ordering</description>
     <instead>Implement the full observable contract in the double, or the test verifies behavior that cannot occur in production.</instead>
   </avoid>
+
+  <avoid name="loosened_assertion_for_race">
+    <description>Answering a settlement race by widening a tolerance, accepting a range instead of an exact value, or dropping the durability check</description>
+    <instead>Strengthen the barrier: wait for every observable effect in order and poll a second, authoritative source. Loosening converts an intermittent failure into a permanent blind spot, and the race it was hiding stays in production.</instead>
+  </avoid>
+
+  <avoid name="wall_clock_performance_assertion">
+    <description>Guarding an efficiency property with an elapsed-time threshold</description>
+    <instead>Assert the number of operations — queries, commits, flushes — at several input sizes. Time thresholds are machine-dependent, get widened after every spurious failure, and end up detecting nothing.</instead>
+  </avoid>
+
+  <avoid name="global_function_rebinding">
+    <description>Substituting a collaborator by overwriting its global function definition for the duration of a test</description>
+    <instead>Bind a seam the production code declares — a dynamic variable, a strategy slot, a constructor parameter. Global rebinding is process-wide and unscoped, so under a parallel runner it corrupts unrelated tests in ways nobody can attribute.</instead>
+  </avoid>
+
+  <avoid name="hand_enumerated_double_set">
+    <description>A test file that lists every member of a production dispatch chain by hand in order to replace them all</description>
+    <instead>Derive the double set from the production list, or assert the two sets are equal before running. A hand-written list is a second registration list nobody owns, and a new production member surfaces as failures in unrelated cases.</instead>
+  </avoid>
+
+  <avoid name="degenerate_fixture_value">
+    <description>A fixture input that is legal but collapses several derived values onto one, or that starts exactly on the threshold the test means to cross</description>
+    <instead>Choose an input whose derived samples are provably distinct and start strictly beyond the boundary. A degenerate value makes one path masquerade as several, and nothing about the result reveals it.</instead>
+  </avoid>
+
+  <avoid name="reset_instead_of_restore">
+    <description>Cleaning up by resetting shared state to a known default, or by copying the originals at teardown after the body has already mutated them</description>
+    <instead>Snapshot at setup and restore the prior values. A reset destroys legitimate pre-existing state and makes the suite order-dependent; a teardown-time copy publishes the damage rather than undoing it.</instead>
+  </avoid>
+
+  <avoid name="helper_alias_wrapper">
+    <description>A test helper that exists only to call another helper with fixed arguments</description>
+    <instead>Delete the wrapper and let tests call the canonical builder directly. Extract shared setup only once several specs genuinely need the same bootstrap, and keep single-use helpers local to their file.</instead>
+  </avoid>
+
+  <avoid name="indiscriminate_failure_monitor">
+    <description>An E2E harness that treats every logged error as a test failure</description>
+    <instead>Classify fatal signals explicitly — uncaught exceptions, unhandled rejections, named fatal error classes — and let ordinary non-fatal application logging pass. A monitor that fires on routine logs becomes noise the team mutes, at which point it detects nothing.</instead>
+  </avoid>
 </anti_patterns>
 
 <tooling_traps>
@@ -642,6 +905,19 @@ version: 2.1.0
     <cause>The runner is configured to reuse an already-running server on the target URL, a common local-only setting. When any independently-started server occupies that port, the runner reuses it and never launches the mock-backed command the test assumes, so the test exercises the wrong backend</cause>
     <mitigation>Ensure no unrelated server holds the port before a mock-dependent run, or disable server reuse for suites whose correctness depends on the launched command; keep reuse enabled only where it is safe. In CI, start fresh so a stale process cannot make the suite pass for the wrong reason</mitigation>
     <verified_note>Server-reuse settings reuse an independently-running server on the URL and skip the configured start command; the typical guard enables reuse only outside CI</verified_note>
+  </trap>
+
+  <trap name="batched_updates_collapse_intermediate_state">
+    <symptom>A multi-step component or hook test asserts a value from one transition ago, and the assertion fails against markup that looks correct in the running application</symptom>
+    <cause>The render-batching wrapper that component-testing libraries provide (the act-style helper) flushes all updates enqueued inside it as one pass. Dependent state transitions written inside a single wrapper collapse their intermediate renders, so the second transition computes from the state the first one was replacing rather than from its result</cause>
+    <mitigation>Give each dependent transition its own wrapper call, or its own step in a case sequence, so the rerender boundary between them is real. Independent updates may share one wrapper; dependent ones may not</mitigation>
+    <verified_note>Updates enqueued within one batching wrapper are flushed together and intermediate renders are not observable, which is the intended semantic rather than a defect</verified_note>
+  </trap>
+
+  <trap name="shared_render_helper_leaves_preliminary_state">
+    <symptom>An application-level test asserts against markup that was never mounted, and the failure names an element that does exist elsewhere in the codebase</symptom>
+    <cause>A shared render helper mounts the root in its initial, pre-ready state — a loading or splash phase driven by a mocked startup value. Assertions written for the ready view then target markup the component never reached, because nothing in the helper advanced the startup state</cause>
+    <mitigation>Set the startup state explicitly in the test when the assertions depend on the ready view, rather than assuming the shared helper leaves the tree in a usable phase. Read what a shared render helper actually produces before building assertions on top of it</mitigation>
   </trap>
 </tooling_traps>
 
@@ -680,4 +956,6 @@ version: 2.1.0
   <skill name="requirements-definition">Use to define test requirements and acceptance criteria</skill>
   <skill name="execution-workflow">Use to implement tests as part of feature development workflow</skill>
   <skill name="investigation-patterns">Use when debugging test failures or flaky tests</skill>
+  <skill name="performance-benchmarking">Use when the question is how fast something is rather than how to test it: benchmark methodology, measurement noise, warm-up, and statistical comparison of timings. The rule that a test asserts operation counts rather than elapsed time lives here, in operation_count_assertion; that skill points at it rather than restating it</skill>
+  <skill name="test-integrity">Use when the concern is whether a passing test proves anything: tests that never ran, vacuous or always-true assertions, guards nothing crosses, teardown failures that mask body failures, and auditing a suite for non-vacuity. This skill covers test design, fixtures, isolation, settlement, and suite classification; that one covers whether the resulting green is trustworthy</skill>
 </related_skills>
