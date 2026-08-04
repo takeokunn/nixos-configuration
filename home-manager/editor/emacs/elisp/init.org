@@ -4289,13 +4289,32 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'after-init-hook
             #'(lambda ()
                 (when (require 'doom-themes)
-                  (load-theme 'doom-dracula t)
-                  ;; Emacs 31 makes gnus-group-news-low inherit from its
-                  ;; empty variant; prevent themes from creating a cycle.
-                  (when (facep 'gnus-group-news-low-empty)
-                    (set-face-attribute 'gnus-group-news-low-empty nil
-                                        :inherit nil))
-                  (set-cursor-color "#f8f8f2"))))
+                  (let ((theme 'doom-dracula))
+                    (load-theme theme t)
+                    ;; Emacs 31's gnus.el makes `gnus-group-news-low' inherit
+                    ;; from `gnus-group-news-low-empty', while doom-themes'
+                    ;; own face table makes `gnus-group-news-low-empty'
+                    ;; inherit from `gnus-group-news-low' -- a mutual
+                    ;; face-inheritance cycle. This cycle is defined in
+                    ;; doom-themes-base.el and affects every doom theme, not
+                    ;; just this one -- `theme' is bound once above and
+                    ;; reused below so switching themes cannot leave this
+                    ;; fix only partially applied. gnus-group.el (which
+                    ;; defines these faces) loads lazily, often long after
+                    ;; this hook runs in a daemon session; the moment it
+                    ;; does, Emacs resolves the cycle synchronously inside
+                    ;; `custom-declare-face' and errors out before any
+                    ;; `with-eval-after-load' hook keyed on `gnus-group'
+                    ;; could ever run (verified: the require aborts before
+                    ;; reaching `(provide 'gnus-group)'). So the theme's own
+                    ;; registered face spec must be corrected here -- not
+                    ;; the (not yet defined) face's attributes -- so the
+                    ;; corrected, non-cyclic spec is already in place
+                    ;; whenever gnus-group.el eventually defines the face.
+                    (custom-theme-set-faces
+                     theme '(gnus-group-news-low-empty ((t :inherit nil))))
+                    (enable-theme theme)
+                    (set-cursor-color "#f8f8f2")))))
 
   (with-eval-after-load 'doom-themes
     ;; config
@@ -4335,7 +4354,14 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
            (append '(compilation objed-state misc-info project-name persp-name battery grip irc)
                    (when (not (eq system-type 'darwin))
                      '(mu4e))
-                   '(gnus github debug repl lsp my/nskk minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))))
+                   ;; Unlike the `mu4e' gate above (arm64 `mailutils' build
+                   ;; failure, see commit b3ebd7e7), this avoids loading
+                   ;; gnus-group.el on Darwin -- see the face-inheritance-cycle
+                   ;; fix in the doom-themes block above, which is what this
+                   ;; segment would otherwise trigger in a running daemon.
+                   (when (not (eq system-type 'darwin))
+                     '(gnus))
+                   '(github debug repl lsp my/nskk minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))))
       (doom-modeline-def-modeline 'main
         '(eldoc bar window-state workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
         main-segments))

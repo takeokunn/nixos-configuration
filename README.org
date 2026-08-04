@@ -30,3 +30,10 @@
 - [[file:docs/X13Gen2.org][docs/X13Gen2.org]] - NixOS installation guide (LUKS + Btrfs + Impermanence)
 - [[file:docs/Attm-M4-Max.org][docs/Attm-M4-Max.org]] - nix-darwin installation guide for macOS
 - [[file:docs/OPPO-A79.org][docs/OPPO-A79.org]] - nix-on-droid installation guide for Android
+
+** Testing
+
+Elisp regression tests for the Emacs config live in [[file:home-manager/editor/emacs/tests/][home-manager/editor/emacs/tests/]] (standalone ERT suites, not wired into CI). Run one manually with:
+#+begin_src shell
+  emacs --batch -l home-manager/editor/emacs/tests/gnus-face-cycle-and-modeline-darwin-gate-test.el -f ert-run-tests-batch-and-exit
+#+end_src
