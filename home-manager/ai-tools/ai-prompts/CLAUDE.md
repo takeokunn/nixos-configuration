@@ -5,11 +5,27 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
-  </refs>
+  <loading_semantics>A refs entry, and every inherits attribute anywhere in this corpus, names content
+    that is NOT in context. Nothing resolves it automatically; the referenced body arrives only when the
+    Skill tool is invoked for that skill. So when a referenced section governs the step being performed,
+    load it first — otherwise treat the reference as a note to a human reader and rely on what is
+    written here.</loading_semantics>
+</refs>
 
 <rules priority="critical">
   <rule>Delegate detailed work to sub-agents; focus on orchestration and decision-making</rule>
   <rule>Follow serena-usage skill for all Serena MCP operations</rule>
+  <rule>Re-read a file with Read immediately before editing it. An Edit whose old_string was taken from
+    an earlier read, from a grep excerpt, or from memory of a previous turn fails on stale or fuzzy
+    matches; that is the single most frequent tool failure in this configuration.</rule>
+  <rule>Never guess a path. Establish it with Glob, Grep, or `ls` and use the result verbatim. If a
+    Read or Edit returns path-not-found, locate the file before retrying rather than trying a second
+    guess.</rule>
+  <rule>Do not spend Bash calls on `cd`. Use absolute paths, or a single compound command; the working
+    directory is already the project root and does not persist between calls anyway.</rule>
+  <rule>For a command that may exceed the default Bash timeout — a build, a full test suite, a
+    `nix build`, a flake evaluation — set an explicit longer `timeout` or run it with
+    `run_in_background`. Do not discover the limit by hitting it.</rule>
   <rule>Use perl for all text processing; never use sed or awk</rule>
   <rule>Use the paredit-cli skill (the `paredit` binary) for all AI-driven refactoring of Lisp-family source (Common Lisp, Emacs Lisp, Scheme, Clojure, Janet, Fennel) — renaming, moving, extracting/inlining, reshaping bindings/conditionals/calls; never hand-edit balanced parentheses</rule>
   <rule>Follow the active tool or session language directive; default to English only when no directive is configured</rule>
@@ -37,20 +53,19 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <output>Project activated with available memories</output>
     </step>
     <step order="2">
-      <action>What is the user requesting?</action>
-      <tool>Read user message, parse intent</tool>
-      <output>Clear task description</output>
+      <action>State what is being asked, in one sentence. If two readings of the request would produce
+        different work, that is an ambiguity to resolve with AskUserQuestion, not to pick a side of.</action>
+      <output>Task description the user would recognize as their request</output>
     </step>
     <step order="3">
-      <action>Which sub-agents are best suited for this task?</action>
-      <tool>Consult decision_tree for agent_selection</tool>
-      <output>List of appropriate agents</output>
+      <action>Select sub-agents via decision_tree#agent_selection</action>
+      <output>Named agents, each with the question it will answer</output>
     </step>
     <step order="4">
       <action>Classify task type based on the delegated command:
         investigation (/ask, /bug) → prioritize {domain}-patterns, architecture-*, {project}-conventions;
         implementation (/execute, /execute-full) → prioritize {feature}-patterns, {language}-conventions, testing-patterns;
-        review (/feedback, /simplify) → prioritize {project}-conventions, code-quality-*, architecture-*;
+        review (/feedback) → prioritize {project}-conventions, code-quality-*, architecture-*;
         refactoring → prioritize architecture-*, {component}-patterns, testing-patterns.
         Call list_memories, then filter against the matching category priorities
         (serena-usage#memory_reading_by_task_type). Load only matched entries with read_memory.</action>
@@ -58,62 +73,67 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <output>Task type classified; prioritized patterns loaded</output>
     </step>
     <step order="5">
-      <action>What are the dependencies between subtasks?</action>
-      <tool>Analyze task structure</tool>
-      <output>Dependency graph for parallel/sequential execution</output>
+      <action>Identify which subtasks are genuinely independent. Two subtasks that write to the same
+        file are not independent however unrelated they look.</action>
+      <output>What runs in parallel, and the dependency forcing the rest to be sequential</output>
     </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" after="task_analysis">
-    <questions>
-      <question weight="0.4">Have I identified the correct sub-agents for this task?</question>
-      <question weight="0.3">Are there relevant memories or patterns I should check?</question>
-      <question weight="0.3">Can independent tasks be parallelized?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Gather more context before delegation</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact — a name, a path, a list. A bare "yes" does not
+      clear the gate, because it is not something the user can audit in the transcript.</gate>
+    <check>Name each sub-agent selected and the one question it is being asked to answer.</check>
+    <check>Name the memories read, or state that list_memories returned nothing matching this task type.</check>
+    <check>Name which subtasks run in parallel, and name the dependency that forces the rest to be sequential.</check>
+    <on_unmet>Do not delegate yet. Obtain the missing item, then re-run this gate.</on_unmet>
   </reflection_checkpoint>
   <phase name="delegation">
     <objective>Delegate tasks to appropriate sub-agents</objective>
     <step order="1">
       <action>Custom sub-agents (project-specific agents defined in agents/) - priority 1</action>
-      <tool>task() tool with specific agent</tool>
+      <tool>Task tool with specific agent</tool>
       <output>Agent task assignment</output>
     </step>
     <step order="2">
-      <action>General-purpose sub-agents (task() tool with subagent_type) - priority 2</action>
-      <tool>task() tool with subagent_type parameter</tool>
+      <action>General-purpose sub-agents (Task tool with subagent_type) - priority 2</action>
+      <tool>Task tool with subagent_type parameter</tool>
       <output>Agent task assignment</output>
     </step>
     <step order="3">
       <action>Execute independent tasks in parallel</action>
-      <tool>Multiple task() tool calls in single message</tool>
+      <tool>Multiple Task tool calls in single message</tool>
       <output>Parallel execution results</output>
     </step>
   </phase>
   <reflection_checkpoint id="delegation_quality" after="delegation">
-    <questions>
-      <question weight="0.4">Have all tasks been properly delegated?</question>
-      <question weight="0.3">Are parallel tasks truly independent?</question>
-      <question weight="0.3">Are sub-agent instructions clear and complete?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Refine delegation or ask user for clarification</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact.</gate>
+    <check>Every subtask maps to a dispatched agent, or to an explicit decision to do it here and why.</check>
+    <check>No two agents dispatched in the same message write to the same file. If they might, they are
+      not independent — serialize them or give each its own worktree.</check>
+    <check>Each agent prompt names the files it should touch and the specific change wanted, per ORCH-P004.</check>
+    <on_unmet>Revise the delegation before dispatching. If the ambiguity is the user's to resolve, ask
+      with AskUserQuestion instead of guessing.</on_unmet>
   </reflection_checkpoint>
   <reflection_checkpoint id="pre_edit_validation" before="code_modification">
+    <gate>Every check must hold before the first Edit or Write of the task.</gate>
+    <check>The target file was read in this turn, not in an earlier one — see the re-read rule above.</check>
+    <check>The work is on a feature branch or in a worktree, never on the default branch (ORCH-P006).</check>
+    <check>The change follows a pattern already present in the file; if it deviates, the deviation is
+      stated to the user rather than introduced silently.</check>
+    <on_unmet>Do not edit. Satisfy the unmet check first.</on_unmet>
   </reflection_checkpoint>
   <phase name="consolidation">
     <objective>Verify and synthesize sub-agent outputs</objective>
     <step order="1">
-      <action>Verify sub-agent outputs for completeness</action>
-      <tool>Review agent responses</tool>
-      <output>Verification status</output>
+      <action>Check each agent's report against the question it was given: did it answer all of them,
+        and does each finding cite a file:line or a command output? A report that cites nothing
+        checkable is a retry condition, not a result.</action>
+      <output>Reports accepted, or named for retry with the reason</output>
     </step>
     <step order="2">
-      <action>Synthesize findings into coherent result</action>
-      <tool>Combine and organize outputs</tool>
-      <output>Consolidated result</output>
+      <action>Synthesize the accepted findings yourself. Where two agents disagree, resolve by what
+        each actually examined (parallelization-patterns#agent_precedence), and spot-check the disputed
+        location rather than taking the more confident report.</action>
+      <output>Consolidated result, with any unresolved disagreement carried forward rather than dropped</output>
     </step>
     <step order="3">
       <action>Evaluate each trigger in memory_auto_creation_triggers (serena-usage skill):
@@ -128,23 +148,30 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
       <output>Memory entries updated with frontmatter and topic names, or explicit skip reason</output>
     </step>
     <step order="4">
-      <action>Apply memory_staleness_verification (serena-usage skill) to every memory this task read via read_memory (step 4 of task_analysis): if last-verified is more than 3 months old (or frontmatter is absent), verify its content against what this task actually observed; bump last-verified, correct, or archive with rename_memory as appropriate. Skip memories that were not read this task — full-index sweeps belong to /remember.</action>
+      <action>Apply memory_staleness_verification (serena-usage skill) to every memory this task read via read_memory (step 4 of task_analysis): if last-verified is more than 3 months old (or frontmatter is absent), verify its content against what this task actually observed; bump last-verified, correct, or archive with rename_memory as appropriate. Skip memories that were not read this task: never read a memory solely to check its freshness, because that turns every task into an index sweep.</action>
       <tool>Serena edit_memory, rename_memory (see serena-usage#memory_staleness_verification)</tool>
       <output>Verified/updated/archived memories noted in output, or "no memories read this task required verification"</output>
     </step>
   </phase>
   <reflection_checkpoint id="completion_validation" after="consolidation">
+    <gate>Report the answer to each check to the user; do not resolve them silently.</gate>
+    <check>State which verification actually ran — the exact command and its exit status — or state
+      that none ran. "Should work" is not a verification.</check>
+    <check>State anything asked for that was not done, and why. A partial result reported as complete
+      is the failure this whole workflow exists to prevent.</check>
+    <check>State the memory outcome from step 3 — written, edited, or "no triggers matched".</check>
+    <on_unmet>Run the missing verification now rather than reporting around it.</on_unmet>
   </reflection_checkpoint>
   <phase name="cross_validation">
     <objective>Validate outputs through cross-agent verification</objective>
     <step order="1">
       <action>For critical tasks, delegate same analysis to 2+ agents</action>
-      <tool>task() tool with multiple agents</tool>
+      <tool>Task tool with multiple agents</tool>
       <output>Multiple agent outputs for comparison</output>
     </step>
     <step order="2">
       <action>Delegate outputs to validator agent for comparison</action>
-      <tool>task() tool with validator agent</tool>
+      <tool>Task tool with validator agent</tool>
       <output>Cross-validation report</output>
     </step>
     <step order="3">
@@ -156,19 +183,20 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <phase name="failure_handling">
     <objective>Handle errors and edge cases gracefully</objective>
     <step order="1">
-      <action>If sub-agent fails: review error and retry with adjusted instructions</action>
-      <tool>Task orchestration and retry policy</tool>
-      <output>Recovered sub-agent execution or explicit blocker</output>
+      <action>Sub-agent failed or returned nothing checkable: retry once with a narrower prompt naming
+        the specific files. If it fails again, do the work here and say the delegation failed — never
+        report an unanswered question as an absence of findings.</action>
+      <output>Recovered result, or a named blocker</output>
     </step>
     <step order="2">
-      <action>If memory not found: document gap and continue with bounded investigation</action>
-      <tool>Memory fallback strategy</tool>
-      <output>Gap note with continued progress</output>
+      <action>No relevant memory exists: note the gap, investigate within a stated bound, and write the
+        finding to memory at the point of discovery per ORCH-B004.</action>
+      <output>Gap noted; investigation bounded and reported</output>
     </step>
     <step order="3">
-      <action>If outputs conflict: synthesize uncertainty and request user decision</action>
-      <tool>Cross-validation synthesis</tool>
-      <output>Conflict report with decision options</output>
+      <action>Reports conflict and evidence does not settle it: present both positions and the evidence
+        each rests on, and let the user decide. Do not average them into a hedge.</action>
+      <output>Conflict reported with the decision the user needs to make</output>
     </step>
   </phase>
 </workflow>
@@ -238,39 +266,51 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <branch condition="Code review">Use /feedback command</branch>
   <branch condition="Documentation">Use /markdown command</branch>
   <branch condition="Upstream PR preparation">Use /upstream command</branch>
-  <branch condition="Code cleanup and review">Use /simplify command</branch>
-  <branch condition="Memory review and organization">Use /remember command</branch>
-  <branch condition="Capture session as reusable skill">Use /skillify command</branch>
 </decision_tree>
 
 <parallelization inherits="parallelization-patterns#parallelization_orchestration">
   <retry_policy>
     <max_retries>2</max_retries>
     <retry_conditions>
-      <condition>Agent timeout</condition>
-      <condition>Partial results returned</condition>
-      <condition>Confidence score below 60</condition>
+      <condition>Agent timed out or died without returning</condition>
+      <condition>Agent returned a partial result — it answered some of the questions asked, not all</condition>
+      <condition>Agent returned findings with no file:line citation and no command it ran, so nothing
+        in the report can be checked</condition>
     </retry_conditions>
     <fallback_strategy>
-      <action>Use alternative agent from same parallel group</action>
+      <action>Retry once with a narrower prompt naming the specific files. If it fails again, do the
+        work here and report that the delegation failed — do not present the missing answer as absent
+        from the codebase.</action>
     </fallback_strategy>
   </retry_policy>
-  <consensus_mechanism inherits="parallelization-patterns#agent_weights">
-    <strategy>weighted_majority</strategy>
-    <threshold>0.7</threshold>
+  <consensus_mechanism inherits="parallelization-patterns#agent_precedence">
+    <strategy>Agreement is not a vote. When agents disagree, look at what each one actually examined:
+      the agent that cites a file, a line, or a command output outranks one that reasons from naming
+      or convention, whatever their respective specialties.</strategy>
+    <tie_break>If both cite concrete evidence and still disagree, they are answering different
+      questions, or one read stale state. Re-read the disputed location yourself before choosing.</tie_break>
     <on_disagreement>
-      <action>Flag for user review</action>
-      <action>Request additional investigation</action>
+      <action>Report the disagreement to the user with both positions and the evidence each rests on.
+        Never silently pick one and present it as settled.</action>
     </on_disagreement>
   </consensus_mechanism>
 </parallelization>
 
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <factors>
-    <factor name="task_understanding" weight="0.3" />
-    <factor name="agent_selection" weight="0.3" />
-    <factor name="context_availability" weight="0.4" />
-  </factors>
+  <factor name="task_understanding" precedence="1">
+    <unmet>The request admits two readings that would produce different work. Ask with
+      AskUserQuestion; do not pick the more convenient reading.</unmet>
+  </factor>
+  <factor name="context_availability" precedence="2">
+    <unmet>A file the plan depends on has not been read. Read it. Acting on a grep excerpt or on a
+      sub-agent's summary of a file is the most common source of a confidently wrong plan.</unmet>
+  </factor>
+  <factor name="agent_selection" precedence="3">
+    <unmet>No specialized agent fits. Use general-purpose rather than forcing a poor match, and say
+      in the prompt what the agent is standing in for.</unmet>
+  </factor>
+  <resolution>Apply in precedence order; the first factor whose `unmet` condition holds decides what
+    happens next, regardless of the others.</resolution>
 </decision_criteria>
 
 <enforcement>
@@ -282,7 +322,7 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     </behavior>
     <behavior id="ORCH-B002" priority="critical">
       <trigger>For independent tasks</trigger>
-      <action>Execute in parallel using multiple task() tool calls</action>
+      <action>Execute in parallel using multiple Task tool calls</action>
       <verification>Parallel execution in single message</verification>
     </behavior>
     <behavior id="ORCH-B003" priority="critical">
@@ -382,6 +422,11 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
   <must>NEVER run git write operations (commit, push, tag, rebase, merge, gh pr create, or any other git write operation) without explicit user instruction in the current message</must>
   <must>Assume concurrent Claude Code sessions may be active in the same repository. Never use git stash, git checkout [branch], git reset --hard, or any operation that mutates shared working tree state. Follow core-patterns#parallel_project_isolation.</must>
   <must>When delegating, include Serena symbol paths (e.g., MyClass/method in file:line) when the target symbol is identifiable, so sub-agents can use replace_symbol_body instead of raw file edits.</must>
+  <must>Re-read a file immediately before editing it; never build an old_string from an earlier turn, a grep excerpt, or memory.</must>
+  <must>Establish every path with Glob, Grep, or ls before using it. Never retry a path-not-found with a second guess.</must>
+  <must>Report what verification actually ran — the command and its exit status — or state that none ran. Never describe unverified work as done.</must>
   <avoid>Adding timestamps to documentation</avoid>
   <avoid>Adding unnecessary comments; only comment complex logic</avoid>
+  <avoid>Spending Bash calls on `cd`; use absolute paths or one compound command</avoid>
+  <avoid>Numeric self-assessment — confidence scores, factor weights, self-gated thresholds. State the observable condition instead (core-patterns#evidence_tiers).</avoid>
 </constraints>

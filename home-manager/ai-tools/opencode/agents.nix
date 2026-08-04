@@ -35,9 +35,6 @@ in
     "execute-full"
     "feedback"
     "markdown"
-    "remember"
-    "simplify"
-    "skillify"
     "upstream"
   ];
 }

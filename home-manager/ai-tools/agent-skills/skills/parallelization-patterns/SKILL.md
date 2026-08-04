@@ -1,7 +1,7 @@
 ---
 name: Parallelization Patterns
 description: Patterns for parallel execution strategies, timeout configuration, retry policies, consensus mechanisms, and data-parallel work scheduling.
-version: 2.2.0
+version: 3.0.0
 ---
 
 <purpose>
@@ -127,46 +127,57 @@ version: 2.2.0
 <retry_policy>
   <max_retries>2</max_retries>
   <retry_conditions>
-    <condition>Agent timeout</condition>
-    <condition>Partial results returned</condition>
-    <condition>Confidence score below 60</condition>
+    <condition>Agent timed out or died without returning</condition>
+    <condition>Agent answered some of the questions asked but not all</condition>
+    <condition>Agent returned findings with no file:line and no command output, so nothing in the
+      report can be checked</condition>
   </retry_conditions>
   <fallback_strategy>
-    <action>Use alternative agent from same parallel group</action>
+    <action>Retry once with a narrower prompt naming the specific files. If it fails again, do the work
+      in the orchestrator and report that the delegation failed — never present an unanswered question
+      as an absence of findings.</action>
   </fallback_strategy>
 </retry_policy>
     </example>
   </pattern>
 
   <pattern name="consensus_thresholds">
-    <description>Standard consensus thresholds for multi-agent validation</description>
-    <example>
-<consensus_thresholds>
-  <threshold level="high" value="0.9" action="Auto-accept without review"/>
-  <threshold level="medium" value="0.7" action="Accept with note"/>
-  <threshold level="low" value="0.5" action="Flag for user review"/>
-  <threshold level="conflict" value="0.5" action="Block, require user decision"/>
-</consensus_thresholds>
-    </example>
+    <description>What to do with a multi-agent result, decided by the shape of the agreement rather
+      than by a fraction. Agreement between agents that read the same file is one observation, not
+      several — so counting agreeing agents measures redundancy, not truth.</description>
+    <case name="agreed_and_evidenced" action="Accept and report">Every agent reached the same
+      conclusion and at least one cites a file:line or a command output that supports it.</case>
+    <case name="agreed_but_unevidenced" action="Accept with the gap named">Agents agree, but none of
+      them cites anything checkable. Report it as inferred, not verified, and say what would confirm it.
+      Unanimity among agents that all reasoned from the same naming convention is not evidence.</case>
+    <case name="split" action="Apply agent_precedence, then report">Agents disagree. Resolve by what
+      each examined; if still unresolved, present both positions with their evidence.</case>
+    <case name="blocking_minority" action="Act on it regardless of the count">One agent reports data
+      loss, credential exposure, or a destructive operation. Investigate before proceeding, even
+      against a majority.</case>
+    <rationale>This replaced numeric agreement thresholds (0.9 auto-accept, 0.7 accept-with-note).
+      Nothing computed the fraction, and the interesting distinction is not how many agents agreed but
+      whether anyone actually looked.</rationale>
   </pattern>
 
-  <pattern name="agent_weights">
-    <description>Standard agent weights for consensus mechanism</description>
-    <example>
-<weights>
-  <agent name="explore" weight="1.0"/>
-  <agent name="design" weight="1.2"/>
-  <agent name="database" weight="1.2"/>
-  <agent name="performance" weight="1.2"/>
-  <agent name="code-quality" weight="1.1"/>
-  <agent name="security" weight="1.5"/>
-  <agent name="test" weight="1.1"/>
-  <agent name="docs" weight="1.0"/>
-  <agent name="quality-assurance" weight="1.3"/>
-  <agent name="devops" weight="1.1"/>
-  <agent name="validator" weight="2.0"/>
-</weights>
-    </example>
+  <pattern name="agent_precedence">
+    <description>How to settle a disagreement between parallel agents. Not a vote: the deciding
+      question is what each agent actually examined, not which specialty it holds.</description>
+    <rule order="1">An agent that cites a file:line, a command it ran, or the command's output outranks
+      one that reasons from naming, convention, or plausibility — whatever their specialties.</rule>
+    <rule order="2">Within its own domain, a specialist outranks a generalist on interpretation: what
+      the observed evidence means for security, for schema design, for performance. It does not
+      outrank anyone on what the evidence says.</rule>
+    <rule order="3">A finding that would block work — data loss, a credential exposed, a destructive
+      operation — is acted on even if only one agent raised it. Being outnumbered is not disconfirmation;
+      the cost of checking it is small and the cost of ignoring it is not.</rule>
+    <tie_break>If both sides cite concrete evidence and still disagree, they are answering different
+      questions or one read stale state. Re-read the disputed location before choosing.</tie_break>
+    <rule order="4">Report an unresolved disagreement to the user with both positions and the evidence
+      each rests on. Never silently pick one and present it as settled.</rule>
+    <rationale>This replaced a numeric weight per agent feeding a weighted-majority threshold. Nothing
+      computed those weights, and their effect — "security outranks docs" — is stated directly here in
+      a form that can actually be applied.</rationale>
   </pattern>
 
   <pattern name="work_scheduling_on_skewed_inputs">

@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
 description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", "serena memory", or needs Serena MCP guidance. Also covers organising a growing memory corpus as a reference graph — one root entry-point memory linking outward, references that describe what the target covers, and no memory stating when to read itself — instead of a flat set an agent must read entirely, and recovering a parallel subagent's report from its session transcript when the completion notification never arrives. Provides Serena tool usage patterns and orchestration integration.
-version: 3.4.0
+version: 3.5.0
 ---
 
 <purpose>
@@ -474,7 +474,7 @@ last-verified: YYYY-MM
   </pattern>
 
   <pattern name="memory_lifecycle">
-    <description>Memory versioning, archival, and consolidation patterns. Freshness is maintained by two complementary mechanisms: memory_staleness_verification runs lazily during normal task execution against only the memories that task happened to read, while the /remember command performs a full periodic sweep across the entire memory index.</description>
+    <description>Memory versioning, archival, and consolidation patterns. Freshness is maintained lazily: memory_staleness_verification runs during normal task execution against only the memories that task happened to read. There is deliberately no automatic full-index sweep — a memory nothing has read in months is also a memory nothing has needed, and sweeping the whole index on a schedule costs more than the staleness it finds. Consolidating the index is a user-initiated activity, not a step any task performs on its own.</description>
     <versioning>
       <convention>Use date suffix for major updates: {name}-YYYY-MM</convention>
       <example>claude-code-architecture-2026-01</example>
@@ -496,7 +496,7 @@ last-verified: YYYY-MM
   </pattern>
 
   <pattern name="memory_staleness_verification">
-    <description>Lightweight, opportunistic freshness check applied only to memories actually read during a task — the lazy complement to the full sweep performed by the standalone /remember command. Piggybacks on read_memory calls already mandated by SERENA-B002, so it adds no extra memory reads of its own.</description>
+    <description>Lightweight, opportunistic freshness check applied only to memories actually read during a task. Piggybacks on read_memory calls already mandated by SERENA-B002, so it adds no extra memory reads of its own — which is the whole point: verification rides along with work that was happening anyway.</description>
     <trigger>A memory loaded via read_memory during this task was relied upon (its content informed a decision, an implementation choice, or an investigation finding)</trigger>
     <staleness_signal>
       <primary>Frontmatter last-verified field (see memory_content_format) — stale if more than 3 months old</primary>
@@ -509,7 +509,7 @@ last-verified: YYYY-MM
     </action_by_outcome>
     <scope_boundary>
       <in_scope>Only memories the task already read for its own purposes</in_scope>
-      <out_of_scope>Proactively reading additional memories solely to check their freshness — that full-index sweep belongs to the /remember command, not to task execution</out_of_scope>
+      <out_of_scope>Proactively reading additional memories solely to check their freshness. That turns every task into an index sweep, and the reads are charged to a task that never needed them</out_of_scope>
     </scope_boundary>
     <example>
       <note>During implementation, read_memory "nix-conventions" returns content with last-verified: 2026-02 (5 months old, current date 2026-07)</note>
@@ -781,7 +781,7 @@ last-verified: YYYY-MM
   <rule>Follow serena_first_tool_selection decision tree for tool choices</rule>
   <rule>Follow language_specific_symbol_operations for language-appropriate tools</rule>
   <rule>Follow memory_reading_by_task_type for prioritizing which memories to read</rule>
-  <rule>Follow memory_staleness_verification for memories read during a task; leave full-index sweeps to /remember</rule>
+  <rule>Follow memory_staleness_verification for memories read during a task; never read a memory solely to check its freshness</rule>
 </rules>
 
 <workflow>

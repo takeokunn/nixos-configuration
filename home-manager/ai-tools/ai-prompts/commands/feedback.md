@@ -62,93 +62,82 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
       <tool>Serena read_memory</tool>
       <output>Prioritized patterns loaded</output>
     </step>
-
   </phase>
   <phase name="analyze">
     <step order="1">
       <action>What was the previous command? (/define, /execute, /bug, /ask, other)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>The command named; if none of these, mode is general</output>
     </step>
     <step order="2">
       <action>What files/work need to be reviewed?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena find_symbol, get_symbols_overview on the files touched this session</tool>
+      <output>Explicit file list — paths, not "the recent changes"</output>
     </step>
     <step order="3">
       <action>Which agents should run in parallel?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Named agents from the selected mode, all dispatched in one message</output>
     </step>
     <step order="4">
       <action>What metrics are relevant for this mode?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>The aspects the selected mode evaluates</output>
     </step>
-
   </phase>
   <phase name="select">
     <step order="1">
       <action>Determine mode based on previous command</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>One mode selected from the modes section</output>
     </step>
     <step order="2">
       <action>After /define: Execution plan feedback</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Mode define; agents plan, estimation</output>
     </step>
     <step order="3">
       <action>After /execute: Work content feedback</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Mode execute; agents quality, security, design, docs, performance, test</output>
     </step>
     <step order="4">
       <action>After /bug: Investigation quality feedback</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Mode bug; agents quality-assurance, general-purpose, explore</output>
     </step>
     <step order="5">
       <action>After /ask: Answer accuracy feedback</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Mode ask; agents explore, quality-assurance, code-quality</output>
     </step>
     <step order="6">
       <action>Other: Recent work feedback</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Mode general; agents review, complexity, memory</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="execute">
     <step order="1">
       <action>Launch all agents in parallel</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task — every agent dispatched in a single message, never one per message</tool>
+      <output>All agents of the selected mode dispatched together</output>
     </step>
     <step order="2">
       <action>Collect agent results</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>One report per agent, or a named agent that returned nothing</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="review_quality">
-    <question>Did all agents complete successfully?</question>
-    <question>Is the feedback specific and actionable?</question>
-    <question>Have I assigned priority levels to all issues?</question>
-    <threshold>If confidence less than 70, gather additional context or re-run agents</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name every agent dispatched and what it returned. Name any that timed out or died without
+      returning — a missing report is not a clean review.</check>
+    <check>For each finding, name the file:line it cites and the concrete fix proposed. A finding with
+      neither is a retry condition (parallelization-patterns#retry_policy), not a result.</check>
+    <check>Name the severity assigned to each finding and the runtime impact justifying it — data loss
+      or security for critical, degraded behavior for warning, style for info.</check>
+    <on_unmet>Re-run the named agent once with a narrower prompt naming the specific files. If it fails
+      again, review that dimension here and report that the delegation failed.</on_unmet>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
       <action>Detect and classify failures during command execution</action>
-      <tool>Error analysis and severity assessment</tool>
       <output>Failure classification and impact summary</output>
     </step>
     <step order="2">
       <action>Apply recovery path or escalate with concrete blocker details</action>
-      <tool>Retry policy and fallback strategy</tool>
       <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
@@ -174,9 +163,10 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact.</gate>
+  <check>Name any required section that is absent or out of order, or state that all are present.</check>
+  <check>Confirm every dispatched agent is readonly — this command reviews work, it does not change it.</check>
+  <on_unmet>Stop and resolve the structural gap before dispatching.</on_unmet>
 </reflection_checkpoint>
 <modes>
   <mode name="define">
@@ -215,7 +205,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <mode name="bug">
     <target>Investigation results from conversation history</target>
     <aspects>Evidence collection, hypothesis validity, root cause accuracy, log utilization</aspects>
-    <metrics>Confidence (0-100), Log Utilization (0-100), Objectivity (0-100)</metrics>
+    <metrics>Evidence tier of the root-cause claim; which log lines were actually cited; which alternative hypotheses were ruled out and by what</metrics>
     <agents>
       <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">Investigation methodology evaluation</agent>
       <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis and dependency investigation evaluation</agent>
@@ -226,8 +216,8 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   </mode>
   <mode name="ask">
     <target>Answer and evidence from conversation history</target>
-    <aspects>Evidence citation quality, conclusion validity, reference accuracy, confidence calibration</aspects>
-    <metrics>Confidence (0-100), Evidence Coverage (0-100)</metrics>
+    <aspects>Evidence citation quality, conclusion validity, reference accuracy, and whether any claim is tagged verified without a command or file:line behind it</aspects>
+    <metrics>Evidence tier per claim; whether each cited file:line was read rather than inferred from naming</metrics>
     <note>Subset of ask.md agents focused on answer evaluation; design/performance agents omitted as they evaluate questions, not answers</note>
     <agents>
       <agent name="explore" subagent_type="explore" readonly="true">Evidence gathering evaluation</agent>
@@ -266,66 +256,27 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   </sequential_phase>
 </execution_graph>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="review_depth" weight="0.4">
-      <score range="90-100">All code paths and edge cases reviewed</score>
-      <score range="70-89">Main code paths reviewed</score>
-      <score range="50-69">Surface level review</score>
-      <score range="0-49">Minimal review</score>
-    </factor>
-    <factor name="feedback_actionability" weight="0.3">
-      <score range="90-100">All feedback is specific and actionable</score>
-      <score range="70-89">Most feedback actionable</score>
-      <score range="50-69">Some vague feedback</score>
-      <score range="0-49">Mostly vague feedback</score>
-    </factor>
-    <factor name="issue_prioritization" weight="0.3">
-      <score range="90-100">Clear priority levels with rationale</score>
-      <score range="70-89">Priority levels assigned</score>
-      <score range="50-69">Partial prioritization</score>
-      <score range="0-49">No prioritization</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>review_depth=93, feedback_actionability=92, issue_prioritization=92</input>
-      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>review_depth=80, feedback_actionability=80, issue_prioritization=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>review_depth=79, feedback_actionability=79, issue_prioritization=79</input>
-      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>review_depth=59, feedback_actionability=59, issue_prioritization=59</input>
-      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>review_depth=35, feedback_actionability=45, issue_prioritization=40</input>
-      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="review_depth" precedence="1">
+    <unmet>A file in the review scope was never opened by any agent, or an agent reported on a file it
+      did not read. Read it before reporting — a review of files nobody opened is not a review.</unmet>
+  </factor>
+  <factor name="feedback_actionability" precedence="2">
+    <unmet>A finding names no file:line, or proposes no concrete change. Anchor it or drop it; an
+      unanchored observation costs the reader more than it returns (FB-B001, FB-B002).</unmet>
+  </factor>
+  <factor name="issue_prioritization" precedence="3">
+    <unmet>A finding carries no severity, or its severity is justified by style preference rather than
+      runtime impact. Reclassify by impact: data loss and security are critical, degraded behavior is
+      warning, style is info.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
     <feedback_results mode="{Mode}">
-      <evaluation_scores>
-- {Metric1}: XX/100
-- {Metric2}: XX/100
-- Overall: XX/100</evaluation_scores>
+      <agents_run>Each agent dispatched and what it returned; name any that returned nothing</agents_run>
+      <verification>Any command run during review and its exit status, or "none run"</verification>
       <critical>Immediate Fix Required
 - [Category] Issue: Location
 - Problem: Description
@@ -336,16 +287,16 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 - Recommendation: Proposal</warning>
       <good_practice>[Category] Commendable aspects</good_practice>
       <fact_check_results>
-        <verified_claims>Claims confirmed against external sources (Context7, WebSearch)</verified_claims>
-        <flagged_claims>Claims with verification confidence below 80
+        <verified_claims>Claims confirmed against a named external source (Context7, WebSearch), each
+          carrying the source and the passage that confirms it</verified_claims>
+        <flagged_claims>Claims the source does not confirm, or confirms only by inference
 - Claim: {claim}
 - Source referenced: {source}
-- Verification result: {result}
-- Confidence: {XX}/100
-- Evidence: {evidence}
+- Evidence tier: inferred | assumed, and the inferential step taken
 - Recommendation: {correction}</flagged_claims>
         <unverifiable_claims>Claims that could not be checked due to unavailable sources</unverifiable_claims>
       </fact_check_results>
+      <gaps>Anything in scope that was not reviewed, and why</gaps>
       <recommended_actions>
 - [High] Action
 - [Medium] Action

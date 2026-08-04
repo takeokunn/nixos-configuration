@@ -29,46 +29,45 @@ description: Code review and quality evaluation
     <objective>Understand the scope and requirements of the quality review</objective>
     <step order="1">
       <action>What changes are being reviewed?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash (git diff, git log)</tool>
+      <output>Every changed file listed with its hunks</output>
     </step>
     <step order="2">
       <action>What is the impact scope?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena find_referencing_symbols on each changed symbol</tool>
+      <output>Callers outside the diff that the change reaches</output>
     </step>
     <step order="3">
       <action>Are there error handling gaps?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read (the changed functions), Grep for the project's error idiom</tool>
+      <output>Failure paths that are unhandled or silently swallowed</output>
     </step>
     <step order="4">
       <action>What accessibility requirements apply?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Grep for markup and component files in the diff</tool>
+      <output>The rendered surfaces in scope, or "no UI in this change"</output>
     </step>
     <step order="5">
-      <action>What evidence supports the findings?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>What evidence supports each finding?</action>
+      <output>Each finding paired with file:line or a command output</output>
     </step>
   </phase>
   <phase name="gather">
     <objective>Collect all relevant code, changes, and context</objective>
     <step order="1">
       <action>Get git diff to identify changes</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash (git diff, git status)</tool>
+      <output>Diff text and working-tree state</output>
     </step>
     <step order="2">
       <action>Identify changed and affected files</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash (git diff --name-only), Serena find_referencing_symbols</tool>
+      <output>Changed set plus the affected set beyond it</output>
     </step>
     <step order="3">
-      <action>Analyze affected files using Serena or Read</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>Analyze affected files</action>
+      <tool>Read, Serena find_symbol</tool>
+      <output>Each file read in full, or named as skipped with the reason</output>
     </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
@@ -76,80 +75,77 @@ description: Code review and quality evaluation
     <objective>Perform comprehensive quality assessment</objective>
     <step order="1">
       <action>Quality check for readability and maintainability</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read (the changed code alongside its neighbours)</tool>
+      <output>Deviations from the idiom already present in the file</output>
     </step>
     <step order="2">
       <action>Logic verification and correctness review</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read, Serena find_symbol on called functions</tool>
+      <output>Cases where the code does not do what the caller expects</output>
     </step>
     <step order="3">
       <action>Security and performance check</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Grep for the risky idioms; Task tool with the security agent when confirmation is needed</tool>
+      <output>Concerns raised, each with the agent or pattern that raised it</output>
     </step>
     <step order="4">
       <action>Error handling pattern evaluation</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read, Grep for catch/Result/Optional usage in the same module</tool>
+      <output>Consistency verdict against the module's existing strategy</output>
     </step>
   </phase>
   <reflection_checkpoint id="review_quality">
-    <question>Have I reviewed all files in scope?</question>
-    <question>Are my findings specific and actionable?</question>
-    <question>Is my confidence score justified by evidence?</question>
-    <threshold>If any answer is no, revisit evaluation phase</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>List every file in the diff and, for each, whether it was read in full, skimmed, or skipped — and why it was skipped. A file omitted silently reads as approved.</check>
+    <check>For each finding, give file:line and the concrete edit that resolves it. A finding without a location is an impression, not a review comment.</check>
+    <check>Name the checks run against the change — build, linter, test suite — with their exit status, or state that none were run.</check>
+    <on_unmet>Read the skipped files, locate the unlocated findings, or run the missing check before reporting.</on_unmet>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate actionable feedback and recommendations</objective>
     <step order="1">
       <action>Generate review comments with specific locations</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <output>Each comment carrying file:line</output>
     </step>
     <step order="2">
       <action>Propose fixes with code examples</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read (surrounding code, so the fix matches local idiom)</tool>
+      <output>Concrete edits, not directions to improve</output>
     </step>
     <step order="3">
       <action>Verify accessibility compliance if applicable</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>playwright browser_snapshot</tool>
+      <output>Accessibility tree, or a stated reason it could not be captured</output>
     </step>
   </phase>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
-      <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
-      <output>Recovered execution path or documented blocker</output>
+      <action>A file cannot be read or a check cannot be run: name it as unreviewed rather than letting the omission read as approval</action>
+      <output>Recovered review path, or the unreviewed surface named</output>
     </step>
   </phase>
   <phase name="report">
     <objective>Deliver comprehensive quality assessment results</objective>
     <step order="1">
       <action>Create summary with severity levels</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <output>Findings grouped by severity, each with its location</output>
     </step>
     <step order="2">
       <action>Provide improvement suggestions</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <output>Suggestions ordered by severity</output>
     </step>
     <step order="3">
-      <action>Include metrics and confidence score</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>Report file coverage and the evidence tier of every finding</action>
+      <output>Files reviewed vs. files in the diff, and each finding's tier</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact.</gate>
+  <check>State the count of files reviewed against the count in the diff. If they differ, name the difference.</check>
+  <check>Name any output field — root_cause, fix_proposal, accessibility verdict — that the gathered evidence cannot fill, rather than filling it from plausibility.</check>
+  <on_unmet>Gather the missing evidence before writing the report.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="code_review">
@@ -198,33 +194,23 @@ description: Code review and quality evaluation
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="review_coverage" weight="0.4">
-      <score range="90-100">All files and changes reviewed</score>
-      <score range="70-89">Core changes reviewed</score>
-      <score range="50-69">Partial review</score>
-      <score range="0-49">Minimal review</score>
-    </factor>
-    <factor name="issue_detection" weight="0.3">
-      <score range="90-100">Comprehensive issue identification</score>
-      <score range="70-89">Major issues identified</score>
-      <score range="50-69">Some issues found</score>
-      <score range="0-49">Unclear findings</score>
-    </factor>
-    <factor name="feedback_quality" weight="0.3">
-      <score range="90-100">Actionable feedback with examples</score>
-      <score range="70-89">Clear improvement suggestions</score>
-      <score range="50-69">General feedback</score>
-      <score range="0-49">Vague feedback</score>
-    </factor>
-  </criterion>
+  <factor name="review_coverage" precedence="1">
+    <unmet>A file in the diff has not been read. Read it, or state in the report that it was skipped and why — silent omission is indistinguishable from approval.</unmet>
+  </factor>
+  <factor name="issue_detection" precedence="2">
+    <unmet>A finding cannot be pinned to file:line. Locate it first; an unlocated finding can be neither acted on nor disputed.</unmet>
+  </factor>
+  <factor name="feedback_quality" precedence="3">
+    <unmet>A finding names a problem without the change that resolves it. Write the concrete edit rather than a direction to improve.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
     <behavior id="QA-B001" priority="critical">
       <trigger>Before review completion</trigger>
       <action>Verify all files in scope have been examined</action>
-      <verification>File coverage in output</verification>
+      <verification>Files reviewed vs. files in the diff, both counted in output</verification>
     </behavior>
     <behavior id="QA-B002" priority="critical">
       <trigger>When issues found</trigger>
@@ -245,23 +231,18 @@ description: Code review and quality evaluation
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
-  "summary": "QA results summary",
+  "summary": "What was reviewed, what was found, and what was left unreviewed",
+  "verification": "The exact command(s) run and their exit status, or \"none run\"",
   "metrics": {
+    "files_in_diff": 0,
     "files_reviewed": 0,
     "issues_detected": 0,
     "severity": {"critical": 0, "major": 0, "minor": 0}
   },
-  "details": [{
-    "type": "critical|major|minor|suggestion",
-    "category": "Error Handling|Readability|Performance|Accessibility",
-    "message": "...",
-    "location": "file:line",
-    "suggestion": "...",
-    "rationale": "..."
-  }],
+  "details": [{"type": "critical|major|minor|suggestion", "category": "Error Handling|Readability|Performance|Accessibility", "message": "...", "location": "file:line", "evidence_tier": "verified|inferred|assumed", "evidence": "file.ts:42, or the command whose output shows this", "suggestion": "...", "rationale": "..."}],
   "root_cause": "If debugging",
   "fix_proposal": {},
+  "gaps": ["Anything asked for that was not done, and why"],
   "next_actions": ["Recommended actions"]
 }
   </format>
@@ -270,50 +251,53 @@ description: Code review and quality evaluation
   <example name="code_review">
     <input>Review new function processUserData</input>
     <process>
-1. Gather context with git diff and serena find_symbol
-2. Use Serena for symbol-level impact analysis
-3. Verify input validation and error handling completeness
-4. Assess readability and maintainability
+1. git diff to enumerate the changed files
+2. serena find_referencing_symbols to find callers outside the diff
+3. Read the function and its neighbours for the module's error idiom
+4. Run the project's linter and type check
     </process>
     <output>
 {
-  "status": "success",
+  "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 80,
-  "summary": "1 file, 1 function reviewed. 2 improvements.",
-  "metrics": {"files_reviewed": 1, "severity": {"critical": 0, "major": 1, "minor": 1}},
-  "details": [
-    {"type": "major", "category": "Error Handling", "message": "Missing null check", "location": "user.ts:42", "suggestion": "if (!user?.contact?.email) { throw new Error(...) }"}
-  ],
-  "next_actions": ["Add error handling", "Consider unit tests"]
+  "summary": "1 file, 1 function reviewed; 2 findings. The two callers were read, the UI surface was not.",
+  "verification": "npx tsc --noEmit — exit 0; npx eslint src/user.ts — exit 0",
+  "metrics": {"files_in_diff": 1, "files_reviewed": 1, "issues_detected": 2, "severity": {"critical": 0, "major": 1, "minor": 1}},
+  "details": [{"type": "major", "category": "Error Handling", "message": "contact.email dereferenced without a null check; both callers can pass a partial user", "location": "src/user.ts:42", "evidence_tier": "verified", "evidence": "src/user.ts:42 dereference; callers src/api/profile.ts:88 and src/jobs/sync.ts:31 build the object without contact", "suggestion": "if (!user?.contact?.email) throw new MissingContactError(user.id)", "rationale": "Matches the MissingXError idiom already used at src/user.ts:17"}],
+  "root_cause": null,
+  "gaps": ["No test exercises the partial-user path; not added, out of scope for this review"],
+  "next_actions": ["Add the null check", "Add a unit test for the partial-user input"]
 }
     </output>
     <reasoning>
-Confidence is 80 because code structure is clear from git diff, error handling gaps are identifiable, but understanding all edge cases would require domain knowledge.
+The null-dereference finding is verified because the dereference and both call sites that reach it were read, and their line numbers are in the report. The status is warning because of the named test gap, not because the review felt incomplete.
     </reasoning>
   </example>
 
   <example name="debugging">
     <input>Debug: Cannot read property 'id' of undefined</input>
     <process>
-1. Analyze stack trace to find error location
-2. Check data flow to error point
-3. Identify where undefined is introduced
-4. Propose fix and prevention strategy
+1. Read the stack trace to the throwing frame
+2. Trace the value backward to where undefined enters
+3. Read the API client to see the unchecked response path
+4. Propose the validation point and the prevention
     </process>
     <output>
 {
   "status": "success",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 85,
-  "summary": "Root cause: insufficient API response validation",
-  "root_cause": "undefined passed to getUserData due to missing error handling",
-  "fix_proposal": {"file": "src/services/user.js", "line": 45, "change": "Add API response validation"},
-  "next_actions": ["Implement unified API response validation", "Strengthen null checks"]
+  "summary": "Root cause: the API client returns the parsed body without checking the error envelope",
+  "verification": "node scripts/repro-user-fetch.js — exit 1, reproduces the same stack trace",
+  "metrics": {"files_in_diff": 0, "files_reviewed": 3, "issues_detected": 1, "severity": {"critical": 0, "major": 1, "minor": 0}},
+  "details": [{"type": "major", "category": "Error Handling", "message": "A 404 body has no data field, so getUserData receives undefined and dereferences .id", "location": "src/services/user.js:45", "evidence_tier": "verified", "evidence": "repro script stack trace; src/services/user.js:45 returns res.body.data unchecked", "suggestion": "Return a Result and reject non-2xx before reading body.data", "rationale": "The other three clients in src/services already branch on res.ok"}],
+  "root_cause": "Unvalidated API response propagated undefined into getUserData",
+  "fix_proposal": {"file": "src/services/user.js", "line": 45, "change": "Branch on res.ok and return a typed error before reading body.data"},
+  "gaps": [],
+  "next_actions": ["Apply the response check", "Extract the shared check used by the other three clients"]
 }
     </output>
     <reasoning>
-Confidence is 85 because stack trace clearly identifies error location, data flow analysis reveals root cause, and fix is straightforward.
+The root cause is verified rather than hypothesized because the repro script reproduces the reported stack trace and the throwing line was read. Without that reproduction the same conclusion would be inferred, and the report would have to say what would confirm it.
     </reasoning>
   </example>
 </examples>
@@ -348,8 +332,9 @@ Confidence is 85 because stack trace clearly identifies error location, data flo
 </decision_tree>
 <constraints>
   <must>Identify root cause before proposing fixes</must>
-  <must>Provide evidence for findings</must>
+  <must>Provide evidence for findings, tagged verified, inferred, or assumed</must>
   <must>Use WCAG 2.1 AA as minimum standard</must>
+  <must>Name every file left unreviewed rather than omitting it silently</must>
   <avoid>Suggesting excessive refactoring beyond scope</avoid>
   <avoid>Proposing fixes without understanding root cause</avoid>
   <avoid>Adding complex ARIA to simple content</avoid>

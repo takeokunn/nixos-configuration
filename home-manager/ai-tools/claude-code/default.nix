@@ -24,7 +24,10 @@ in
 {
   programs.claude-code.enable = true;
   programs.claude-code.package = claude-code-fixed;
-  programs.claude-code.context = "${ai-prompts-path}/CLAUDE.md";
+  # readFile, not "${...}": the option type is `either lines path`, and interpolating a
+  # path yields a string, which is accepted as the content itself. That wrote the store
+  # path into CLAUDE.md instead of the prompt.
+  programs.claude-code.context = builtins.readFile "${ai-prompts-path}/CLAUDE.md";
   programs.claude-code.settings = {
     theme = "dark";
     model = "sonnet";
@@ -116,9 +119,6 @@ in
     "execute-full"
     "feedback"
     "markdown"
-    "remember"
-    "simplify"
-    "skillify"
     "upstream"
   ];
 

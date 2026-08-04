@@ -69,15 +69,14 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   </phase>
 
   <reflection_checkpoint id="feedback_quality" after="collect_feedback">
-      <questions>
-        <question weight="0.4">Did all feedback agents complete successfully?</question>
-        <question weight="0.3">Is the feedback specific and actionable?</question>
-        <question weight="0.3">Are there critical issues requiring regeneration?</question>
-      </questions>
-      <threshold min="70" action="proceed">
-        <below_threshold>Re-run failed agents or gather additional context</below_threshold>
-      </threshold>
-    </reflection_checkpoint>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name each feedback agent dispatched and whether it returned, so a silent failure is visible.</check>
+    <check>For each agent, quote one finding that names a section of the document or a file:line. An agent
+      that returned only general praise returned nothing actionable.</check>
+    <check>List the critical issues that the regenerate phase must address, or state that none was raised.</check>
+    <on_unmet>Re-run the agent that returned nothing usable, with the specific sections named in its prompt.
+      Do not enter regenerate on feedback that cannot be acted on.</on_unmet>
+  </reflection_checkpoint>
 
   <phase name="regenerate">
     <step order="1">
@@ -101,21 +100,23 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <output>Updated phased task list</output>
     </step>
     <step order="5">
-      <action>Calculate final confidence score</action>
-      <tool>Decision criteria evaluation</tool>
-      <output>Final confidence score</output>
+      <action>Tag each requirement in the final document verified, inferred, or assumed
+        (core-patterns#evidence_tiers); downgrade any marked verified that cannot name the command run or
+        the file:line read</action>
+      <output>Tagged requirements, over-claims downgraded</output>
     </step>
   </phase>
 
   <reflection_checkpoint id="regeneration_complete" after="regenerate">
-    <questions>
-      <question weight="0.4">Have all critical feedback items been addressed?</question>
-      <question weight="0.3">Is the regenerated specification internally consistent?</question>
-      <question weight="0.3">Is the final confidence score acceptable (>=70)?</question>
-    </questions>
-    <threshold min="70" action="complete">
-      <below_threshold>Flag remaining issues for user review</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>For each critical feedback item, name the section of the final document that changed in response,
+      or state why it was rejected. An unlisted item was dropped, not addressed.</check>
+    <check>Name any requirement that still contradicts another, or state that the pairs flagged by the
+      validator were re-read and are consistent.</check>
+    <check>Name every requirement still resting on `assumed` evidence — these belong in Outstanding Issues,
+      which is what the finalize gate reads.</check>
+    <on_unmet>Address the unmet item in the document before finishing, or move it to Outstanding Issues so
+      the finalize gate (DEFF-B007) puts it to the user.</on_unmet>
   </reflection_checkpoint>
 
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
@@ -128,15 +129,17 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>State that all three phases ran — define, feedback, regenerate — or name the one that did not and why.</check>
+  <check>State that no file was created or modified — this command is read-only — or name the file that was.</check>
+  <check>State that the finalize gate ran exactly once on the final document, or that Outstanding Issues read "none".</check>
+  <on_unmet>Resolve the structural gap before delivering the final document.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="design" subagent_type="design" readonly="true">
     <role>Evaluate architecture consistency, component dependencies, and API design feasibility</role>
     <receives>component_names[], request_context, existing_architecture_paths[]</receives>
-    <produces>architecture_assessment{consistency: 0-100, concerns[]}, dependency_impact[], design_alternatives[]</produces>
+    <produces>architecture_assessment{consistent: bool, concerns[]{file:line, description}}, dependency_impact[], design_alternatives[]</produces>
     <done_when>All affected architectural layers assessed; design alternatives identified for non-obvious decisions</done_when>
   </agent>
   <agent name="database" subagent_type="database" readonly="true">
@@ -160,13 +163,13 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <agent name="validator" subagent_type="validator" readonly="true">
     <role>Cross-validate requirements consistency and flag contradictions between specifications</role>
     <receives>requirements_document, technical_constraints[], agent_findings[]</receives>
-    <produces>consistency_report{consistent: bool, contradictions[]}, ambiguities[], validation_confidence: 0-100</produces>
+    <produces>consistency_report{consistent: bool, contradictions[]}, ambiguities[], unchecked_requirements[]</produces>
     <done_when>All requirements cross-checked; no unresolved contradictions in final document</done_when>
   </agent>
   <agent name="plan" subagent_type="general-purpose" readonly="true">
     <role>Review and evaluate the execution plan quality for implementability and completeness</role>
     <receives>requirements_document, task_breakdown, dependency_graph, effort_estimates[]</receives>
-    <produces>plan_assessment{score: 0-100, gaps[], risks[]}, phasing_recommendation, critical_path[]</produces>
+    <produces>plan_assessment{gaps[]{section, what_is_missing}, risks[]}, phasing_recommendation, critical_path[]</produces>
     <done_when>Plan assessed for completeness and implementability; critical path identified</done_when>
   </agent>
 </agents>
@@ -201,69 +204,24 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="requirement_clarity" weight="0.3">
-      <score range="90-100">All requirements clear and documented</score>
-      <score range="70-89">Core requirements clear</score>
-      <score range="50-69">Some ambiguity remains</score>
-      <score range="0-49">Many unclear requirements</score>
-    </factor>
-    <factor name="technical_feasibility" weight="0.25">
-      <score range="90-100">Feasibility confirmed with evidence</score>
-      <score range="70-89">Likely feasible</score>
-      <score range="50-69">Uncertain feasibility</score>
-      <score range="0-49">Likely infeasible</score>
-    </factor>
-    <factor name="stakeholder_alignment" weight="0.2">
-      <score range="90-100">All questions answered by user</score>
-      <score range="70-89">Most questions answered</score>
-      <score range="50-69">Some questions pending</score>
-      <score range="0-49">Many questions unanswered</score>
-    </factor>
-    <factor name="feedback_incorporation" weight="0.25">
-      <score range="90-100">All critical feedback addressed</score>
-      <score range="70-89">Most feedback addressed</score>
-      <score range="50-69">Some feedback addressed</score>
-      <score range="0-49">Feedback not incorporated</score>
-    </factor>
-  </criterion>
-  <criterion name="regeneration_validation">
-    <factor name="critical_issues_resolved" weight="0.5">All critical issues from feedback addressed</factor>
-    <factor name="internal_consistency" weight="0.3">No contradictions in regenerated specification</factor>
-    <factor name="completeness" weight="0.2">All required sections present and populated</factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>requirement_clarity=95, technical_feasibility=90, stakeholder_alignment=90, feedback_incorporation=95</input>
-      <calculation>(95*0.3)+(90*0.25)+(90*0.2)+(95*0.25) = 92.75</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>requirement_clarity=80, technical_feasibility=80, stakeholder_alignment=80, feedback_incorporation=80</input>
-      <calculation>(80*0.3)+(80*0.25)+(80*0.2)+(80*0.25) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>requirement_clarity=79, technical_feasibility=79, stakeholder_alignment=79, feedback_incorporation=79</input>
-      <calculation>(79*0.3)+(79*0.25)+(79*0.2)+(79*0.25) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>requirement_clarity=59, technical_feasibility=59, stakeholder_alignment=59, feedback_incorporation=59</input>
-      <calculation>(59*0.3)+(59*0.25)+(59*0.2)+(59*0.25) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>requirement_clarity=40, technical_feasibility=50, stakeholder_alignment=45, feedback_incorporation=40</input>
-      <calculation>(40*0.3)+(50*0.25)+(45*0.2)+(40*0.25) = 43.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="requirement_clarity" precedence="1">
+    <unmet>A requirement admits two readings that would produce different implementations. Ask with
+      AskUserQuestion; do not write the reading that is cheaper to specify.</unmet>
+  </factor>
+  <factor name="technical_feasibility" precedence="2">
+    <unmet>The document assumes a capability — a library, an API, a schema column — that was not located
+      in this codebase or confirmed via Context7. Verify it, or record it as an Outstanding Issue.</unmet>
+  </factor>
+  <factor name="stakeholder_alignment" precedence="3">
+    <unmet>A design decision the user has not answered is being written as settled. Put it back to the
+      user, or move it to Outstanding Issues so the finalize gate sees it.</unmet>
+  </factor>
+  <factor name="feedback_incorporation" precedence="4">
+    <unmet>A critical or warning item from collect_feedback cannot be traced to a changed section of the
+      final document or to a stated reason for rejection. Address it or record the rejection.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
@@ -286,12 +244,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       </task_breakdown>
     </initial_requirements_document>
     <feedback_summary>
-      <evaluation_scores>
-        <metric name="plan_quality">XX/100</metric>
-        <metric name="estimation_validity">XX/100</metric>
-        <metric name="internal_consistency">XX/100</metric>
-        <metric name="overall">XX/100</metric>
-      </evaluation_scores>
+      <agents_run>Each feedback agent named, with whether it returned and the one finding it contributed — a listed agent with no finding is a silent failure</agents_run>
       <critical_issues>
         <issue>
           <category>Category</category>
@@ -315,8 +268,8 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
         </practice>
       </good_practices>
       <fact_check_results>
-        <verified_claims>Claims confirmed against external sources</verified_claims>
-        <flagged_claims>Claims with verification confidence below 80</flagged_claims>
+        <verified_claims>Claims confirmed against external sources, each naming the source consulted</verified_claims>
+        <flagged_claims>Claims that could not be confirmed against any source, and what would confirm them</flagged_claims>
       </fact_check_results>
     </feedback_summary>
     <final_requirements_document>
@@ -339,7 +292,8 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
         <execute_handoff>Decisions, references, constraints</execute_handoff>
       </task_breakdown>
       <self_feedback>
-        <confidence>XX/100 (based on decision_criteria)</confidence>
+        <verification>The command(s) actually run during investigation and their exit status, or "none run" — never omitted</verification>
+        <weakest_claim>The requirement resting on the thinnest evidence, and what would confirm it</weakest_claim>
         <feedback_addressed>
           <item>
             <status>Addressed</status>
@@ -355,7 +309,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
         <remaining_issues>
           <item>
             <status>Note</status>
-            <description>Any unresolved items requiring user attention</description>
+            <description>Anything asked for that this document does not answer, with the reason — not attempted, blocked, or out of scope</description>
           </item>
         </remaining_issues>
       </self_feedback>

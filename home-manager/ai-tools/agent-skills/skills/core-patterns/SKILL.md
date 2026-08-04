@@ -1,7 +1,7 @@
 ---
 name: Core Patterns
 description: Base templates for error escalation, decision criteria, and enforcement, referenced by agents and commands to avoid duplication. Also holds cross-cutting patterns worth loading directly — modelling absence structurally instead of with an in-range sentinel such as 0, -1, or the empty string, deriving a cost estimate from the emitter that actually produces the artifact rather than re-modelling it in a second place, resolving an apparent contradiction between two rulesets by finding the distinguishing condition instead of weakening either, and safe alternatives to destructive Git commands — including mirroring a worktree's state back into the shared checkout with a file sync rather than a branch switch, and the preconditions for removing a worktree.
-version: 2.2.0
+version: 3.0.0
 ---
 
 <purpose>
@@ -19,18 +19,35 @@ version: 2.2.0
     </example>
   </concept>
 
-  <concept name="confidence_thresholds">
-    <description>Standard confidence score boundaries for status determination</description>
-    <example>
-      success: confidence >= 80
-      warning: confidence 60-79
-      error: confidence less than 60
+  <concept name="evidence_tiers">
+    <description>How a claim came to be known, reported as a tier rather than as a numeric confidence.
+      A model cannot measure its own certainty — a score it emits in the same pass that produced the
+      work is self-confirming and never contradicts that work. What it can do reliably is classify how
+      it knows something, and a reader can challenge that classification.</description>
+    <tier name="verified">A command was run, or the exact lines were read. The claim carries the command
+      and its output, or a file:line citation. Anyone can re-run it and get the same answer.</tier>
+    <tier name="inferred">Derived from evidence that was actually read, but the conclusion itself was
+      never observed. State the evidence and the inferential step, so the step can be disputed.</tier>
+    <tier name="assumed">Taken from convention, prior knowledge, or the user's framing. Nothing in this
+      repository was checked. State what would confirm it.</tier>
+    <rule>Every finding carries a tier. A report whose findings are all `assumed` is a hypothesis and
+      must say so in its summary rather than reading as a result.</rule>
+    <rule>Never promote a tier to make a report look stronger. `verified` without a re-runnable command
+      or a file:line citation is a false claim — the failure mode test-integrity calls a false green.</rule>
+  </concept>
 
-      Boundary tests required:
-      boundary_success_80: Exactly 80, yields success
-      boundary_warning_79: 78.5-79.9, yields warning
-      boundary_error_59: 58.5-59.9, yields error
-    </example>
+  <concept name="status_determination">
+    <description>Rules for the `status` field, stated so a reader can check the status against the
+      report itself rather than against a number the report asserts about itself.</description>
+    <status name="success">Every check the task set out to make was made, and none failed. Nothing the
+      task was supposed to verify is left at `assumed`.</status>
+    <status name="warning">The work completed, but at least one of: a check could not be run, a finding
+      the task was meant to verify rests on `assumed` evidence, or a known gap remains. The gap is
+      named in the summary — "warning" without a named gap is just an unexplained hedge.</status>
+    <status name="error">A blocker prevented the task's core question from being answered, or a check
+      failed. Name the blocker and what would clear it.</status>
+    <rule>Status describes the state of the evidence, not how the work felt. A task that ran no checks
+      cannot report success, however complete the work looks.</rule>
   </concept>
 
   <concept name="behavior_ids">
@@ -47,15 +64,18 @@ version: 2.2.0
     </example>
   </concept>
 
-  <concept name="weight_distribution">
-    <description>Decision criteria weights must sum to 1.0</description>
+  <concept name="factor_precedence">
+    <description>Decision factors are ordered, not weighted. A model can apply "if these disagree, this
+      one wins"; it cannot compute a calibrated weighted average of qualities it just judged. Ordering
+      is also auditable — a reader can check that the winning factor really was the first unmet one.</description>
     <example>
-      Standard distributions:
-      3-factor equal: 0.33, 0.34, 0.33
-      3-factor weighted: 0.4, 0.3, 0.3
-      2-factor equal: 0.5, 0.5
-      2-factor weighted: 0.6, 0.4
+      precedence="1" is checked first and overrides everything below it.
+      The first factor whose `unmet` condition holds decides the action; later factors are not consulted.
+      If two factors could each independently block, they are separate factors, not one weighted score.
     </example>
+    <note>This replaced a numeric-weight scheme in which every weight came from the same handful of
+      values and every gate used an identical threshold — which is what a set of numbers looks like
+      when nothing ever reads them.</note>
   </concept>
 </concepts>
 
@@ -85,63 +105,34 @@ version: 2.2.0
   </pattern>
 
   <pattern name="decision_criteria">
-    <description>Standard decision criteria with validation tests including boundary cases</description>
+    <description>Named factors that decide a course of action, written so a reader can check the
+      decision against the same facts the decider had. Each factor states an observable `unmet`
+      condition and the action it forces; factors are ordered by precedence.</description>
     <example>
 <decision_criteria>
-  <criterion name="confidence_calculation">
-    <factor name="factor1" weight="0.4">
-      <score range="90-100">Excellent condition</score>
-      <score range="70-89">Good condition</score>
-      <score range="50-69">Fair condition</score>
-      <score range="0-49">Poor condition</score>
-    </factor>
-    <factor name="factor2" weight="0.3">
-      <score range="90-100">Excellent</score>
-      <score range="70-89">Good</score>
-      <score range="50-69">Fair</score>
-      <score range="0-49">Poor</score>
-    </factor>
-    <factor name="factor3" weight="0.3">
-      <score range="90-100">Excellent</score>
-      <score range="70-89">Good</score>
-      <score range="50-69">Fair</score>
-      <score range="0-49">Poor</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>factor1=95, factor2=90, factor3=95</input>
-      <calculation>(95*0.4)+(90*0.3)+(95*0.3) = 38+27+28.5 = 93.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>factor1=85, factor2=75, factor3=80</input>
-      <calculation>(85*0.4)+(75*0.3)+(80*0.3) = 34+22.5+24 = 80.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Weighted average 80.5 meets success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>factor1=80, factor2=75, factor3=80</input>
-      <calculation>(80*0.4)+(75*0.3)+(80*0.3) = 32+22.5+24 = 78.5</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Weighted average 78.5 triggers warning</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>factor1=60, factor2=55, factor3=60</input>
-      <calculation>(60*0.4)+(55*0.3)+(60*0.3) = 24+16.5+18 = 58.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Weighted average 58.5 is below 60, triggers error</reasoning>
-    </test>
-    <test name="error_case">
-      <input>factor1=50, factor2=55, factor3=45</input>
-      <calculation>(50*0.4)+(55*0.3)+(45*0.3) = 20+16.5+13.5 = 50</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="evidence_completeness" precedence="1">
+    <unmet>A file the decision depends on has not been read in this session. Read it before deciding —
+      a summary of a file is not the file.</unmet>
+  </factor>
+  <factor name="scope_clarity" precedence="2">
+    <unmet>The request admits two readings that lead to different work. Ask with AskUserQuestion
+      rather than choosing the cheaper reading.</unmet>
+  </factor>
+  <factor name="reversibility" precedence="3">
+    <unmet>The action cannot be undone from the repository alone — it deletes, publishes, or mutates
+      shared state. Confirm with the user first.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
     </example>
+    <rationale>This pattern previously assigned each factor a numeric weight, had the agent compute a
+      weighted score, and gated on a threshold — with five worked arithmetic examples showing how to
+      multiply. Two things were wrong with it. The score was produced by the same pass that produced
+      the work being scored, so it never contradicted that work and no gate ever fired. And the
+      arithmetic displaced the judgement it was meant to encode: an agent that computes 80.5 has not
+      thought about whether it read the right files. Precedence is applicable and checkable; a
+      self-assessed weighted average is neither.</rationale>
   </pattern>
 
   <pattern name="enforcement">
@@ -271,15 +262,19 @@ Use attribute values:
     </behavior>
     <behavior id="CORE-B002" priority="critical">
       <trigger>When defining decision_criteria</trigger>
-      <action>Include all 5 validation tests with boundary cases</action>
-      <verification>Tests include boundary_success_80, boundary_warning_79, boundary_error_59</verification>
+      <action>Give every factor an observable `unmet` condition and a precedence, and state the
+        resolution rule</action>
+      <verification>Each factor names something a reader could check against the transcript, not a
+        quality to be rated</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="CORE-P001" priority="critical">
       <trigger>Always</trigger>
-      <action>Using non-standard confidence thresholds</action>
-      <response>Use 60/80 thresholds as defined in this skill</response>
+      <action>Introducing a numeric self-assessment — a confidence score, a factor weight, or a
+        threshold the agent gates itself on</action>
+      <response>Use evidence_tiers for how a claim is known and status_determination for the status
+        field. If a gate is wanted, write the condition that must hold, not the number it must beat.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -290,19 +285,27 @@ Use attribute values:
     <instead>Reference core-patterns and customize only examples</instead>
   </avoid>
 
-  <avoid name="inconsistent_thresholds">
-    <description>Using different confidence thresholds (75, 80, 85) across files</description>
-    <instead>Always use 60/80 boundaries as defined in core-patterns</instead>
+  <avoid name="numeric_self_assessment">
+    <description>Asking an agent to rate its own work on a scale and gate on the rating — a confidence
+      score, weighted factors, a threshold to clear. The rating comes from the same pass as the work,
+      so it agrees with the work by construction and the gate never fires.</description>
+    <instead>State the condition that must hold in observable terms, and the action when it does not
+      (decision_criteria, evidence_tiers).</instead>
   </avoid>
 
-  <avoid name="missing_boundary_tests">
-    <description>Omitting boundary validation tests (59/60, 79/80)</description>
-    <instead>Always include boundary_success_80, boundary_warning_79, boundary_error_59 tests</instead>
+  <avoid name="unfalsifiable_checkpoint">
+    <description>A checkpoint whose questions can all be answered "yes" without producing anything —
+      "Have I gathered sufficient evidence?" Nothing distinguishes a real pass from a nominal one.</description>
+    <instead>Require an artifact per check: name the files read, the command run, the agents dispatched.
+      A check that cannot fail is not a check.</instead>
   </avoid>
 
-  <avoid name="weight_sum_mismatch">
-    <description>Decision criteria weights not summing to 1.0</description>
-    <instead>Verify weights sum to exactly 1.0 (e.g., 0.4+0.3+0.3)</instead>
+  <avoid name="ceremonial_placeholder">
+    <description>Structure filled with generic text to satisfy a template — a `&lt;tool&gt;` element
+      reading "task-specific analysis tools", a step whose output is "Step completed". It costs context
+      on every load and teaches the pattern of emitting scaffolding in place of work.</description>
+    <instead>Name the actual tool, or drop the element. An empty slot is more honest than a filled one
+      that says nothing.</instead>
   </avoid>
 
   <avoid name="inconsistent_behavior_ids">
@@ -313,8 +316,8 @@ Use attribute values:
 
 <best_practices>
   <practice priority="critical">Reference core-patterns for error_escalation, decision_criteria, enforcement templates</practice>
-  <practice priority="critical">Always include all 5 validation tests: success, boundary_success_80, boundary_warning_79, boundary_error_59, error</practice>
-  <practice priority="critical">Ensure decision criteria weights sum to 1.0</practice>
+  <practice priority="critical">Tag every finding with an evidence tier — verified, inferred, or assumed — and never promote a tier to strengthen a report (evidence_tiers)</practice>
+  <practice priority="critical">Write gates as conditions that can fail, not as scores to clear (decision_criteria, numeric_self_assessment)</practice>
   <practice priority="high">Customize error_escalation examples to be domain-specific while keeping structure</practice>
   <practice priority="high">Use consistent behavior ID prefixes within each agent/command</practice>
   <practice priority="high">Model absence structurally instead of with an in-range sentinel, and never infer "unset" from a value inside the valid domain (presence_vs_value)</practice>
@@ -324,10 +327,10 @@ Use attribute values:
 </best_practices>
 
 <rules priority="critical">
-  <rule>Always include all 5 validation tests for decision_criteria</rule>
-  <rule>Boundary tests must use exact threshold values (80, 79.x, 59.x)</rule>
+  <rule>Every decision_criteria factor states an observable `unmet` condition and the action it forces</rule>
+  <rule>Factors carry a precedence, and the resolution rule says the first unmet factor decides</rule>
   <rule>Error escalation must have exactly 4 severity levels</rule>
-  <rule>Weights in decision_criteria must sum to 1.0</rule>
+  <rule>No numeric self-assessment: no confidence score, no factor weight, no self-gated threshold</rule>
 </rules>
 
 <rules priority="standard">
@@ -354,12 +357,11 @@ Use attribute values:
 
 <constraints>
   <must>Define exactly 4 severity levels for error_escalation</must>
-  <must>Include all 5 validation tests for decision_criteria</must>
-  <must>Ensure weights sum to 1.0</must>
-  <must>Use standard confidence thresholds (60/80)</must>
+  <must>Give every decision_criteria factor an observable unmet condition and a precedence</must>
+  <must>Report status by status_determination, and tag findings by evidence_tiers</must>
   <avoid>Inventing new severity levels</avoid>
-  <avoid>Omitting boundary tests</avoid>
-  <avoid>Using non-standard thresholds</avoid>
+  <avoid>Confidence scores, factor weights, and self-gated numeric thresholds</avoid>
+  <avoid>Checks that pass without producing a nameable artifact</avoid>
 </constraints>
 
 <related_skills>

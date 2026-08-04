@@ -68,27 +68,22 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <objective>Understand the task scope and identify required resources</objective>
     <step order="1">
       <action>Identify concrete tasks that need to be completed</action>
-      <tool>Task decomposition analysis</tool>
       <output>Task inventory</output>
     </step>
     <step order="2">
       <action>Select best-fit sub-agents for each task</action>
-      <tool>Agent capability mapping</tool>
       <output>Delegation map</output>
     </step>
     <step order="3">
       <action>Identify which tasks can run in parallel</action>
-      <tool>Dependency analysis</tool>
       <output>Parallelization plan</output>
     </step>
     <step order="4">
       <action>Determine task dependencies and execution order</action>
-      <tool>Dependency graphing</tool>
       <output>Ordered dependency chain</output>
     </step>
     <step order="5">
       <action>Define verification requirements for completion</action>
-      <tool>Quality gate planning</tool>
       <output>Verification checklist</output>
     </step>
   </phase>
@@ -96,12 +91,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <objective>Break down complex tasks into manageable units</objective>
     <step order="1">
       <action>Split work into manageable units</action>
-      <tool>Task decomposition</tool>
       <output>Atomic task units</output>
     </step>
     <step order="2">
       <action>Define boundaries for each task unit</action>
-      <tool>Scope boundary analysis</tool>
       <output>Task boundaries</output>
     </step>
   </phase>
@@ -109,12 +102,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <objective>Organize tasks for optimal execution</objective>
     <step order="1">
       <action>Classify tasks as parallel or sequential</action>
-      <tool>Execution strategy analysis</tool>
       <output>Execution classification</output>
     </step>
     <step order="2">
       <action>Define dependencies between structured tasks</action>
-      <tool>Dependency mapping</tool>
       <output>Dependency matrix</output>
     </step>
   </phase>
@@ -129,29 +120,27 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     </step>
     <step order="1">
       <action>Delegate tasks with detailed instructions</action>
-      <tool>Task orchestration</tool>
+      <tool>Task</tool>
       <output>Delegation requests issued</output>
     </step>
     <step order="2">
       <action>Provide complete context and constraints to assignees</action>
-      <tool>Context packaging</tool>
       <output>Execution-ready delegation context</output>
     </step>
   </phase>
   <reflection_checkpoint id="assignment_complete" after="assign">
-    <questions>
-      <question weight="0.4">Have all tasks been properly delegated?</question>
-      <question weight="0.3">Are the sub-agent instructions clear?</question>
-      <question weight="0.3">Are dependencies between tasks handled?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Refine task assignments or ask user</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name every task in the inventory and the agent it was dispatched to, or state it is being
+      done here and why. A task on neither list was dropped.</check>
+    <check>Quote the file paths and the expected deliverable given to each agent. A prompt naming no
+      path is not a delegation (EXEC-P001, ORCH-P004).</check>
+    <check>Name the tasks that must wait, and the specific output each one waits on.</check>
+    <on_unmet>Do not dispatch. Supply the missing item, or ask with AskUserQuestion if only the user
+      can resolve it.</on_unmet>
   </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
       <action>Handle execution errors and apply fallback strategy</action>
-      <tool>Error analysis and retry policy</tool>
       <output>Recovered execution path or documented blocker</output>
     </step>
   </phase>
@@ -170,12 +159,11 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     </step>
     <step order="3">
       <action>If tests fail: delegate one targeted fix to test/general-purpose agent for specific failing tests; re-run once to confirm; if still failing after one attempt, report remaining failures as blockers in follow_up and mark status FAIL</action>
-      <tool>Sub-agent delegation (conditional)</tool>
+      <tool>Task (test agent, or general-purpose)</tool>
       <output>All tests passing, or blocker report listing remaining failures</output>
     </step>
     <step order="4">
       <action>Combine all verified results and test outcomes into a cohesive final output</action>
-      <tool>Synthesis</tool>
       <output>Consolidated result including test execution status</output>
     </step>
   </phase>
@@ -210,21 +198,22 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact.</gate>
+  <check>Name any required section that is absent or out of order, or state that all are present.</check>
+  <check>Name the branch or worktree the work will happen in, and confirm it is not the default branch.</check>
+  <on_unmet>Stop and resolve the structural gap before executing any step.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="quality" subagent_type="quality-assurance" readonly="false">
     <role>Verify syntax correctness, type safety, and code format compliance for implemented changes</role>
     <receives>file_paths[], change_description, project_language, style_config_path</receives>
-    <produces>issues[]{severity: critical|warning|info, location: file:line, message, suggestion}, confidence: 0-100</produces>
+    <produces>issues[]{severity: critical|warning|info, location: file:line, message, suggestion, evidence: file:line or command output}</produces>
     <done_when>All modified files checked; no critical issues remain or all critical issues documented</done_when>
   </agent>
   <agent name="security" subagent_type="security" readonly="false">
     <role>Detect security vulnerabilities introduced by the implementation</role>
     <receives>file_paths[], change_description, threat_context</receives>
-    <produces>vulnerabilities[]{severity: critical|high|medium|low, cwe, location: file:line, description, remediation}, risk_score: 0-100</produces>
+    <produces>vulnerabilities[]{severity: critical|high|medium|low, cwe, location: file:line, description, remediation, evidence: file:line or command output}</produces>
     <done_when>All security-relevant code paths analyzed; OWASP top-10 categories checked for applicable patterns</done_when>
   </agent>
   <agent name="test" subagent_type="test" readonly="false">
@@ -248,7 +237,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <agent name="review" subagent_type="quality-assurance" readonly="false">
     <role>Perform holistic post-implementation review across all quality dimensions</role>
     <receives>all_changed_files[], implementation_summary, test_results, agent_reports[]</receives>
-    <produces>review_summary{score: 0-100, critical_findings[], warnings[], commendations[]}, go_no_go: bool</produces>
+    <produces>review_summary{critical_findings[], warnings[], commendations[]}, go_no_go: bool</produces>
     <done_when>All implementation artifacts reviewed; go/no-go decision made with rationale</done_when>
   </agent>
   <agent name="debug" subagent_type="general-purpose" readonly="false">
@@ -322,7 +311,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <agent name="validator" subagent_type="validator" readonly="true">
     <role>Cross-validate findings from multiple agents to detect contradictions and confirm consensus</role>
     <receives>agent_reports[], implementation_claims[], expected_outcomes[]</receives>
-    <produces>consensus_report{agreed: [], disputed: [], confidence: 0-100}, contradiction_flags[]</produces>
+    <produces>consensus_report{agreed: [], disputed: [], unevidenced: []}, contradiction_flags[]</produces>
     <done_when>All agent outputs cross-checked; contradictions resolved or flagged for user review</done_when>
   </agent>
 </agents>
@@ -351,58 +340,22 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <requirement>Memory check: `list_memories` for patterns</requirement>
 </delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="task_clarity" weight="0.3">
-      <score range="90-100">Clear requirements with acceptance criteria</score>
-      <score range="70-89">Clear requirements</score>
-      <score range="50-69">Some ambiguity</score>
-      <score range="0-49">Unclear requirements</score>
-    </factor>
-    <factor name="implementation_quality" weight="0.4">
-      <score range="90-100">All tests pass, code reviewed</score>
-      <score range="70-89">Tests pass</score>
-      <score range="50-69">Some issues remain</score>
-      <score range="0-49">Major issues</score>
-    </factor>
-    <factor name="verification_completeness" weight="0.3">
-      <score range="90-100">Full verification by sub-agents</score>
-      <score range="70-89">Core verification done</score>
-      <score range="50-69">Partial verification</score>
-      <score range="0-49">Minimal verification</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>task_clarity=95, implementation_quality=90, verification_completeness=90</input>
-      <calculation>(95*0.3)+(90*0.4)+(90*0.3) = 91.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>task_clarity=80, implementation_quality=80, verification_completeness=80</input>
-      <calculation>(80*0.3)+(80*0.4)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>task_clarity=79, implementation_quality=79, verification_completeness=79</input>
-      <calculation>(79*0.3)+(79*0.4)+(79*0.3) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>task_clarity=59, implementation_quality=59, verification_completeness=59</input>
-      <calculation>(59*0.3)+(59*0.4)+(59*0.3) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>task_clarity=40, implementation_quality=50, verification_completeness=45</input>
-      <calculation>(40*0.3)+(50*0.4)+(45*0.3) = 45.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="task_clarity" precedence="1">
+    <unmet>The request admits two readings that would produce different implementations. Ask with
+      AskUserQuestion before delegating; do not implement the cheaper reading.</unmet>
+  </factor>
+  <factor name="verification_completeness" precedence="2">
+    <unmet>No test command was run against the change, or the run is not recorded with its exit status.
+      Run it before claiming completion. If no command can be inferred from package.json, Makefile,
+      pyproject.toml, or go.mod, report that as a blocker rather than completing unverified.</unmet>
+  </factor>
+  <factor name="implementation_quality" precedence="3">
+    <unmet>A test failed, or get_diagnostics_for_file reports an error on a modified file. Delegate one
+      targeted fix and re-run once; if it still fails, report the failure as a blocker in follow_up
+      rather than completing.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
@@ -412,20 +365,19 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
         <change path="path/to/file">Description of targeted change</change>
       </changes>
       <verification>
-        <check command="command run">Observed result</check>
+        <check command="exact command run">Exit status and observed result</check>
         <test_execution>
-          <command>test command used</command>
+          <command>test command used, or "none run" with the reason</command>
           <status>PASS / FAIL</status>
           <failures>failing test names if any</failures>
         </test_execution>
       </verification>
       <follow_up>Remaining risks or next actions, if any</follow_up>
       <self_feedback>
-        <confidence>XX/100</confidence>
-        <dimension name="task_clarity">XX/100: one-line rationale</dimension>
-        <dimension name="implementation_quality">XX/100: one-line rationale</dimension>
-        <dimension name="verification_completeness">XX/100: one-line rationale</dimension>
-        <gaps>What additional verification or context would raise confidence</gaps>
+        <evidence>Each claim above tagged verified, inferred, or assumed. A claim tagged verified names
+          the command or the file:line that backs it; if it cannot, downgrade it.</evidence>
+        <weakest_claim>The finding resting on the thinnest evidence, and what would confirm it</weakest_claim>
+        <gaps>Anything asked for that was not done, and why — not attempted, blocked, or out of scope</gaps>
       </self_feedback>
     </execution_result>
   </format>
@@ -500,6 +452,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <must>Verify outputs before integration</must>
   <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
   <must>Run all test commands after test creation; attempt one fix for failures; report any remaining failures as blockers rather than silently completing</must>
+  <must>Define done as an enumerated set of commands that exit zero — the project's test command, plus its lint, build, or type-check command where one exists — and report which of them actually ran with its exit status. A completion claim naming no command is not a completion claim</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Unnecessary comments about past implementations</avoid>
   <avoid>Marking implementation complete without corresponding tests</avoid>

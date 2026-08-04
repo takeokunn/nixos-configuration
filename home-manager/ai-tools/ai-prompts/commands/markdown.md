@@ -38,75 +38,68 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
   <phase name="prepare">
     <step order="1">
       <action>Activate Serena project with activate_project</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena activate_project</tool>
+      <output>Project activated</output>
     </step>
     <step order="2">
       <action>Check list_memories for documentation patterns</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena list_memories</tool>
+      <output>Named shortlist, or an explicit "nothing matched"</output>
     </step>
     <step order="3">
       <action>Load applicable memories with read_memory</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Serena read_memory</tool>
+      <output>The memories read, named in the report</output>
     </step>
-
   </phase>
   <phase name="analyze">
     <step order="1">
       <action>What was the previous command?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Command name, and where its output sits in the session</output>
     </step>
     <step order="2">
       <action>What is the appropriate output file?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>file_mapping table in this command</tool>
+      <output>Target filename</output>
     </step>
     <step order="3">
       <action>Was a specific file path provided?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>User-supplied path, or none</output>
     </step>
     <step order="4">
       <action>What content should be included/excluded?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Content kept (conclusions, specifications, decisions) and content dropped (deliberation, revision history)</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="analyze_quality">
-    <question>Have I correctly identified the previous command and its output?</question>
-    <question>Do I understand what content needs to be documented?</question>
-    <threshold>If confidence less than 70, seek more evidence or ask user</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name the previous command and the section of its output being documented.</check>
+    <check>Name the target path, and say whether it came from the user or from file_mapping.</check>
+    <check>Name what is being dropped as deliberation or revision history.</check>
+    <on_unmet>Do not write. Re-read the previous command's output, or ask for the path with AskUserQuestion.</on_unmet>
   </reflection_checkpoint>
   <phase name="gather">
     <step order="1">
       <action>Retrieve previous command results</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Full text of the prior command's output</output>
     </step>
     <step order="2">
       <action>Collect relevant context</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Read, Grep</tool>
+      <output>Source files backing each code example and claim</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="determine">
     <step order="1">
       <action>Determine output filename based on command type</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>file_mapping table in this command</tool>
+      <output>Resolved filename</output>
     </step>
     <step order="2">
       <action>Check if user specified file path</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Final path; a user-specified path wins</output>
     </step>
-
   </phase>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
@@ -123,9 +116,10 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name the path about to be written, and state whether it already exists and what it currently holds.</check>
+  <check>Quote the document's headings, and confirm none of them introduces a timestamp, revision history, or discussion trace (MD-P001).</check>
+  <on_unmet>Do not write. Resolve the conflict or strip the prohibited content first.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="docs" subagent_type="docs" readonly="false">Documentation management</agent>
@@ -142,58 +136,20 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
   </sequential_phase>
 </execution_graph>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="content_accuracy" weight="0.4">
-      <score range="90-100">All content verified against source</score>
-      <score range="70-89">Core content verified</score>
-      <score range="50-69">Partial verification</score>
-      <score range="0-49">Unverified content</score>
-    </factor>
-    <factor name="structure_quality" weight="0.3">
-      <score range="90-100">Clear hierarchy, proper formatting</score>
-      <score range="70-89">Good structure</score>
-      <score range="50-69">Basic structure</score>
-      <score range="0-49">Poor structure</score>
-    </factor>
-    <factor name="completeness" weight="0.3">
-      <score range="90-100">All requested content included</score>
-      <score range="70-89">Main content included</score>
-      <score range="50-69">Partial content</score>
-      <score range="0-49">Incomplete</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>content_accuracy=93, structure_quality=92, completeness=92</input>
-      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>content_accuracy=80, structure_quality=80, completeness=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>content_accuracy=79, structure_quality=79, completeness=79</input>
-      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>content_accuracy=59, structure_quality=59, completeness=59</input>
-      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>content_accuracy=35, structure_quality=45, completeness=40</input>
-      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="content_accuracy" precedence="1">
+    <unmet>A statement or code example in the draft traces to neither the previous command's output nor
+      a file read this session. Verify it against the source, or cut it — do not soften it into a hedge.</unmet>
+  </factor>
+  <factor name="completeness" precedence="2">
+    <unmet>A conclusion, specification, or decision present in the previous command's output is absent
+      from the draft. Add it, or name it in the gaps section with the reason it was excluded.</unmet>
+  </factor>
+  <factor name="structure_quality" precedence="3">
+    <unmet>A section's content does not match its heading, or the document has no heading hierarchy.
+      Restructure before writing.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
@@ -202,6 +158,10 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
       <content>Cleaned, formatted output from previous command</content>
       <footer>Optional: Related references</footer>
     </markdown_file>
+    <report_to_user>
+      <verification>The exact command(s) run against the written file and their exit status, or "none run"</verification>
+      <gaps>Content from the previous command that was deliberately excluded, and why</gaps>
+    </report_to_user>
   </format>
 </output>
 <enforcement>

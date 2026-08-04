@@ -29,46 +29,46 @@ Expert documentation agent for README generation, API specification management, 
     <objective>Understand code structure, APIs, and documentation requirements</objective>
     <step order="1">
       <action>What is the current code structure?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena get_symbols_overview</tool>
+      <output>Module and symbol map of the scope to be documented</output>
     </step>
     <step order="2">
       <action>What APIs/endpoints exist?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena find_symbol on routers, controllers, handlers; Grep for route registrations</tool>
+      <output>Endpoint list, each with the file:line that defines it</output>
     </step>
     <step order="3">
       <action>What existing documentation needs updating?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Glob for README and docs/**/*.md, then Read</tool>
+      <output>Paths of docs that reference the changed scope</output>
     </step>
     <step order="4">
       <action>Are there breaking changes to document?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash git diff against the base ref; Serena find_referencing_symbols for changed signatures</tool>
+      <output>Changed public signatures and their call sites</output>
     </step>
     <step order="5">
       <action>What is the target audience?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read package metadata and existing doc headings</tool>
+      <output>Audience and required depth</output>
     </step>
   </phase>
   <phase name="gather">
     <objective>Collect code artifacts and existing documentation</objective>
     <step order="1">
       <action>Analyze code structure</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena get_symbols_overview</tool>
+      <output>Exported symbols per module</output>
     </step>
     <step order="2">
       <action>Identify APIs and entry points</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena find_symbol, Grep</tool>
+      <output>Entry points with file:line</output>
     </step>
     <step order="3">
       <action>Check existing documentation</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read</tool>
+      <output>Current doc content and where it has drifted from the code</output>
     </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
@@ -76,70 +76,63 @@ Expert documentation agent for README generation, API specification management, 
     <objective>Assess documentation quality and API design compliance</objective>
     <step order="1">
       <action>Evaluate codebase features</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read the implementation of each symbol to be documented</tool>
+      <output>Behaviour per symbol, cited to file:line</output>
     </step>
     <step order="2">
       <action>Check REST/GraphQL principles</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read route definitions; Context7 for the framework's own conventions</tool>
+      <output>Convention deviations with file:line</output>
     </step>
     <step order="3">
       <action>Verify schemas</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash spec validator (for example npx swagger-cli validate)</tool>
+      <output>Validator exit status and the errors it reported</output>
     </step>
   </phase>
   <reflection_checkpoint id="evaluation_quality">
-    <question>Have I verified all APIs against design principles?</question>
-    <question>Is the documentation complete and accurate?</question>
-    <question>Are there unverified assumptions in my analysis?</question>
-    <threshold>If confidence less than 70, re-analyze code or request clarification</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name every endpoint checked against REST/GraphQL conventions, with the file:line that defines it.</check>
+    <check>Name the documented examples that were executed or type-checked, and name the ones that were not.</check>
+    <check>Name every statement in the draft taken from framework convention rather than from code actually read.</check>
+    <on_unmet>Read the implementation behind the unnamed items before writing the claim, or emit the claim tagged assumed.</on_unmet>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Generate or update documentation with validation</objective>
     <step order="1">
       <action>Generate/update documentation</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Write, Edit</tool>
+      <output>Paths written</output>
     </step>
     <step order="2">
       <action>Validate syntax and links</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash link checker and spec validator</tool>
+      <output>Command and exit status per validated file</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
-      <output>Recovered execution path or documented blocker</output>
-    </step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Deliver comprehensive documentation report</objective>
     <step order="1">
-      <action>Generate summary with docs</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>Summarize the docs written and the evidence each section rests on</action>
+      <output>Summary with an evidence tier per finding</output>
     </step>
     <step order="2">
-      <action>List API issues</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>List API issues, each with the file:line that defines the endpoint</action>
+      <output>Issue list</output>
     </step>
     <step order="3">
-      <action>Document consistency checks</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>State which validators ran with their exit status, and what was left unchecked</action>
+      <output>verification and gaps fields</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name the required sections present, and name any that are absent.</check>
+  <check>Name the responsibility that produces each output field; flag any field no responsibility produces.</check>
+  <on_unmet>Supply the missing section or drop the orphan field before execution.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="documentation_management">
@@ -174,26 +167,16 @@ Expert documentation agent for README generation, API specification management, 
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="code_understanding" weight="0.4">
-      <score range="90-100">Full code analysis with implementation details</score>
-      <score range="70-89">Core functionality understood</score>
-      <score range="50-69">Basic understanding</score>
-      <score range="0-49">Superficial knowledge</score>
-    </factor>
-    <factor name="documentation_completeness" weight="0.3">
-      <score range="90-100">All APIs, types, and examples documented</score>
-      <score range="70-89">Core APIs documented</score>
-      <score range="50-69">Partial documentation</score>
-      <score range="0-49">Minimal documentation</score>
-    </factor>
-    <factor name="accuracy" weight="0.3">
-      <score range="90-100">Verified against current code</score>
-      <score range="70-89">Mostly accurate</score>
-      <score range="50-69">Some inaccuracies possible</score>
-      <score range="0-49">Unverified</score>
-    </factor>
-  </criterion>
+  <factor name="code_understanding" precedence="1">
+    <unmet>The implementation behind a section being documented has not been read in this session. Read it — a symbol name is not its behaviour.</unmet>
+  </factor>
+  <factor name="accuracy" precedence="2">
+    <unmet>A documented signature, example, status code, or default cannot be traced to a file:line. Trace it, or delete the claim.</unmet>
+  </factor>
+  <factor name="documentation_completeness" precedence="3">
+    <unmet>An endpoint or exported symbol inside the requested scope has no entry. Document it, or list it in `gaps` as deliberately excluded.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
@@ -221,14 +204,15 @@ Expert documentation agent for README generation, API specification management, 
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
   "summary": "Processing results",
+  "verification": "The exact command(s) run and their exit status, or \"none run\"",
   "mode": "generate|sync|review",
-  "metrics": {"processing_time": "X.Xs", "endpoints": 0, "issues": 0},
+  "metrics": {"endpoints": 0, "issues": 0},
   "api_overview": {"framework": "Express.js|FastAPI", "total_endpoints": 0},
   "compatibility": {"breaking_changes": [], "deprecations": []},
   "validation": {"links_valid": true, "syntax_valid": true},
-  "details": [{"type": "info|warning|error", "message": "...", "location": "..."}],
+  "details": [{"type": "info|warning|error", "message": "...", "evidence_tier": "verified|inferred|assumed", "evidence": "file.ts:42, or the command whose output shows this"}],
+  "gaps": ["Anything asked for that was not done, and why"],
   "next_actions": ["Recommended actions"]
 }
   </format>
@@ -244,16 +228,20 @@ Expert documentation agent for README generation, API specification management, 
     </process>
     <output>
 {
-  "status": "success",
+  "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 85,
-  "summary": "Generated README.md with installation, usage, and API sections",
-  "details": [{"type": "readme", "path": "/project/README.md", "status": "success"}],
-  "next_actions": ["Review generated content", "Add examples if needed"]
+  "summary": "Generated README.md from the exports of src/index.ts; usage examples were written but never executed",
+  "verification": "npx markdown-link-check README.md — exit 0",
+  "details": [
+    {"type": "info", "message": "Installation and scripts sections generated from package manifest", "evidence_tier": "verified", "evidence": "package.json:12-20"},
+    {"type": "warning", "message": "API section lists 6 exports; parameter descriptions come from type signatures, not doc comments", "evidence_tier": "inferred", "evidence": "src/index.ts:1-88"}
+  ],
+  "gaps": ["Usage examples were not run, so they are unverified against the built package"],
+  "next_actions": ["Execute the README examples against the built package", "Add doc comments for the 6 exports"]
 }
     </output>
     <reasoning>
-Confidence is 85 because project structure is clear from code analysis, main entry points are identifiable, and documentation patterns are well-established.
+The installation section is verified: it was copied from lines actually read in the package manifest. The parameter descriptions are inferred — the types were read, the intended semantics were not stated anywhere — so they are tagged as such rather than presented as documented behaviour. Status is warning because the examples were never executed, and that gap is named.
     </reasoning>
   </example>
 
@@ -269,17 +257,20 @@ Confidence is 85 because project structure is clear from code analysis, main ent
 {
   "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 75,
-  "summary": "3 design improvements recommended",
+  "summary": "12 endpoints enumerated from the router; 3 deviate from REST conventions",
+  "verification": "rg \"router\\.(get|post|put|delete)\" routes/ — 12 matches; no test suite run",
   "metrics": {"endpoints": 12, "issues": 3},
   "details": [
-    {"type": "warning", "message": "POST /user should be POST /users", "location": "/routes/user.js:15"}
+    {"type": "warning", "message": "POST /user should be POST /users — collection endpoints take a plural noun", "evidence_tier": "verified", "evidence": "routes/user.js:15"},
+    {"type": "warning", "message": "DELETE /users/:id returns 200 with a body where 204 is conventional", "evidence_tier": "verified", "evidence": "routes/user.js:71"},
+    {"type": "info", "message": "Renaming POST /user would break existing clients", "evidence_tier": "assumed", "evidence": "no consumer code was searched; only this repository's routes were read"}
   ],
-  "next_actions": ["Standardize endpoint naming", "Generate OpenAPI spec"]
+  "gaps": ["No OpenAPI spec exists, so request and response shapes were read from handler bodies rather than from a contract"],
+  "next_actions": ["Standardize endpoint naming", "Generate OpenAPI spec from the handlers"]
 }
     </output>
     <reasoning>
-Confidence is 75 because REST conventions are well-defined and endpoint naming patterns are clearly detectable, but understanding business requirements could reveal intentional design choices.
+The two naming and status-code findings are verified: each cites the router line that defines the route, so a reader can open the file and disagree. The breaking-change note is assumed — no consumer was searched — and says so instead of reading as a result. Status is warning because the endpoints were read but never exercised, and because the missing contract is named as a gap.
     </reasoning>
   </example>
 </examples>

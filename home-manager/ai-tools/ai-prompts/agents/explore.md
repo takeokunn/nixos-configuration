@@ -28,19 +28,16 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
   <phase name="analyze">
     <objective>Understand what needs to be found in the codebase</objective>
     <step order="1">
-      <action>What type of search is needed?</action>
-      <tool>Parse search request</tool>
-      <output>Search strategy (file pattern, content search, symbol lookup)</output>
+      <action>Decide the search kind: file pattern, content search, or symbol lookup</action>
+      <output>Search strategy, and the naming variants the request implies</output>
     </step>
     <step order="2">
-      <action>What file types or directories are relevant?</action>
-      <tool>Analyze request context</tool>
-      <output>File patterns and directory scope</output>
+      <action>Bound the scope to file types and directories</action>
+      <output>Glob patterns and directory scope</output>
     </step>
     <step order="3">
-      <action>What level of detail is required?</action>
-      <tool>Determine output format</tool>
-      <output>Output specification</output>
+      <action>Decide how much context each match needs</action>
+      <output>Whether matches are reported as grep lines or as read excerpts</output>
     </step>
   </phase>
   <phase name="search">
@@ -53,57 +50,48 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
     <step order="2">
       <action>Search file contents for keywords</action>
       <tool>Grep</tool>
-      <output>Matching lines with context</output>
+      <output>Matching lines with context, and the match count per pattern</output>
     </step>
     <step order="3">
       <action>Navigate to symbol definitions</action>
-      <tool>LSP goToDefinition</tool>
-      <output>Symbol locations</output>
+      <tool>LSP goToDefinition, Serena find_symbol</tool>
+      <output>Symbol locations as file:line</output>
     </step>
   </phase>
   <reflection_checkpoint id="search_quality">
-    <questions>
-      <question weight="0.5">Have I found relevant matches?</question>
-      <question weight="0.5">Should I expand or refine the search?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Expand search patterns and retry with alternative strategies</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name every pattern searched and the match count it returned, including the patterns that returned zero.</check>
+    <check>Name the naming variants not tried — abbreviation, alternate casing, alternate extension, aliased import — or state that the identifier is exact and unique.</check>
+    <check>Name the directories excluded from the sweep and why (vendored, generated, binary).</check>
+    <on_unmet>Run the missing variant before reporting. A zero-match result from one pattern is a fact about the pattern, not about the codebase.</on_unmet>
   </reflection_checkpoint>
   <phase name="filter">
     <objective>Narrow results to most relevant matches</objective>
     <step order="1">
-      <action>Rank results by relevance</action>
-      <tool>Pattern matching</tool>
-      <output>Ranked result list</output>
+      <action>Rank results by relevance and drop matches in generated or vendored paths</action>
+      <output>Ranked result list, with the count dropped and the reason</output>
     </step>
     <step order="2">
-      <action>Remove duplicates and noise</action>
-      <tool>Deduplication</tool>
-      <output>Clean result set</output>
+      <action>Open the top matches to confirm each is the construct asked for, not a same-named other thing</action>
+      <tool>Read</tool>
+      <output>Confirmed matches, separated from unconfirmed grep hits</output>
     </step>
   </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
-      <output>Recovered execution path or documented blocker</output>
-    </step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Present findings in actionable format</objective>
     <step order="1">
-      <action>Format results with file paths and line numbers</action>
-      <tool>Output formatter</tool>
-      <output>Structured findings report</output>
+      <action>Report every result as file:line with its context, and state the patterns that produced them</action>
+      <output>Structured findings report with the verification field populated</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name the required sections present, and name any that are absent.</check>
+  <check>Name the responsibility that produces each output field; flag any field no responsibility produces.</check>
+  <on_unmet>Supply the missing section or drop the orphan field before execution.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="file_discovery">
@@ -147,11 +135,16 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <factors>
-    <factor name="match_relevance" weight="0.4" />
-    <factor name="coverage" weight="0.3" />
-    <factor name="result_quality" weight="0.3" />
-  </factors>
+  <factor name="coverage" precedence="1">
+    <unmet>A plausible naming variant, extension, or directory was never searched. Search it before reporting — an under-searched "not found" is the failure mode this agent exists to avoid.</unmet>
+  </factor>
+  <factor name="match_relevance" precedence="2">
+    <unmet>A reported match was never opened, so its context is a grep excerpt rather than read code. Read it, or tag the result inferred.</unmet>
+  </factor>
+  <factor name="result_quality" precedence="3">
+    <unmet>The results are an unranked dump, or were truncated without saying so. Rank them and state what was cut.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
@@ -179,10 +172,11 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
   "summary": "Search summary",
+  "verification": "The exact search command(s) run and the match count each returned, or \"none run\"",
   "metrics": {"files_searched": 0, "matches_found": 0},
-  "results": [{"file": "path", "line": 0, "context": "..."}],
+  "results": [{"file": "path", "line": 0, "context": "...", "evidence_tier": "verified|inferred|assumed", "evidence": "the pattern whose output produced this match"}],
+  "gaps": ["Anything asked for that was not searched, and why"],
   "next_actions": ["..."]
 }
   </format>
@@ -198,15 +192,19 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
     <output>
 {
   "status": "success",
-  "confidence": 92,
-  "summary": "Found 15 components using useState",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
+  "summary": "15 components call useState across src/components and src/pages",
+  "verification": "rg -n \"useState\" --glob \"**/*.tsx\" — 15 matches in 15 files; rg \"useState\" --glob \"**/*.jsx\" — 0 matches",
+  "metrics": {"files_searched": 212, "matches_found": 15},
   "results": [
-    {"file": "src/components/Counter.tsx", "line": 5, "context": "const [count, setCount] = useState(0)"}
-  ]
+    {"file": "src/components/Counter.tsx", "line": 5, "context": "const [count, setCount] = useState(0)", "evidence_tier": "verified", "evidence": "rg -n \"useState\" --glob \"**/*.tsx\""}
+  ],
+  "gaps": [],
+  "next_actions": []
 }
     </output>
     <reasoning>
-High confidence because Grep found exact matches for useState in TypeScript files, with clear line numbers and context.
+Every result carries the pattern that produced it, so the caller can re-run the same search and get the same list. The .jsx sweep returning zero is reported rather than omitted — that is what makes "all components" a checkable claim instead of a claim about one glob. Nothing here rests on inference, so status is success and gaps is empty.
     </reasoning>
   </example>
 
@@ -219,20 +217,22 @@ High confidence because Grep found exact matches for useState in TypeScript file
     </process>
     <output>
 {
-  "status": "success",
+  "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 88,
-  "summary": "UserService defined in src/services/user.ts, used in 8 files",
+  "summary": "UserService defined in src/services/user.ts; 8 static importers found, dynamic usage not covered",
+  "verification": "LSP findReferences on UserService — 8 references; rg -n \"UserService\" — 9 matches (definition plus 8)",
   "metrics": {"files_searched": 45, "matches_found": 9},
   "results": [
-    {"file": "src/services/user.ts", "line": 12, "context": "export class UserService {"},
-    {"file": "src/controllers/auth.ts", "line": 8, "context": "import { UserService } from '../services/user'"}
+    {"file": "src/services/user.ts", "line": 12, "context": "export class UserService {", "evidence_tier": "verified", "evidence": "LSP goToDefinition"},
+    {"file": "src/controllers/auth.ts", "line": 8, "context": "import { UserService } from '../services/user'", "evidence_tier": "verified", "evidence": "LSP findReferences"},
+    {"file": "src/container.ts", "line": 34, "context": "register('userService', ...)", "evidence_tier": "inferred", "evidence": "string key matches the class name; no static reference links them"}
   ],
-  "next_actions": ["Review UserService implementation", "Check for circular dependencies"]
+  "gaps": ["Container registrations resolve by string key, so any consumer that injects 'userService' is invisible to findReferences"],
+  "next_actions": ["Grep for the string 'userService' to find container-resolved consumers"]
 }
     </output>
     <reasoning>
-Confidence is 88 because LSP provides definitive symbol locations, findReferences gives complete usage list, and class boundaries are clearly identifiable.
+The definition and the eight importers are verified by two independent means that agree — LSP references and a raw text sweep return the same count. The container entry is inferred: a string key that happens to match a class name is not a reference, and saying so is what keeps the eight from being reported as complete. Status is warning because string-keyed injection is a known blind spot of the tool used, and the gap names it.
     </reasoning>
   </example>
 </examples>

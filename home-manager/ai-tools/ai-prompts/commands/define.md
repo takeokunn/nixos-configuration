@@ -103,153 +103,99 @@ Conduct detailed requirements definition before implementation, clarifying techn
 <parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <workflow inherits="define-core#workflow" />
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name any workflow phase that was skipped, and why.</check>
+  <check>State that no file was created or modified — this command is read-only — or name the file that was.</check>
+  <on_unmet>Resolve the structural gap before delivering the requirements document.</on_unmet>
 </reflection_checkpoint>
 <common_investigation_workflows>
   <playbook id="A" name="New Feature Definition">
     <step order="1">
       <action>Identify which L0 systems are affected (new vs. extending existing)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Task tool (explore, design)</tool>
     </step>
     <step order="2">
       <action>Find similar existing implementations as reference patterns</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Grep, Glob, Serena find_symbol</tool>
     </step>
     <step order="3">
       <action>Map data model changes (L1) and API changes (L2)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Task tool (database), Serena find_referencing_symbols</tool>
     </step>
     <step order="4">
       <action>Identify acceptance criteria from the user's goal, not their proposed solution</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>AskUserQuestion when the goal is not derivable from the request</tool>
     </step>
   </playbook>
   <playbook id="B" name="Refactor / Architecture Change">
     <step order="1">
       <action>Map current boundaries, dependencies, and change reasons (change-axis analysis)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Task tool (design), Serena get_symbols_overview</tool>
     </step>
     <step order="2">
       <action>Identify what stays the same (stable) vs. what changes (variable)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Read, Grep</tool>
     </step>
     <step order="3">
       <action>Detect invariants that must not break across the refactor</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Read the existing tests; Grep for assertions on the affected behavior</tool>
     </step>
     <step order="4">
       <action>Estimate blast radius: how many modules are affected by each design choice</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Serena find_referencing_symbols, Grep</tool>
     </step>
   </playbook>
   <playbook id="C" name="Bug Fix Specification">
     <step order="1">
       <action>Reproduce and confirm the failure mode with evidence from code/logs</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Bash (read-only reproduction), Read</tool>
     </step>
     <step order="2">
       <action>Distinguish root cause from symptoms</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Task tool (quality-assurance)</tool>
     </step>
     <step order="3">
       <action>Identify all places where the same root cause could recur</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Grep, Serena find_referencing_symbols</tool>
     </step>
     <step order="4">
       <action>Specify acceptance criteria as observable behavior, not internal mechanism</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
     </step>
   </playbook>
   <playbook id="D" name="Integration / External System">
     <step order="1">
       <action>Verify external system capabilities via Context7 or documentation (don't assume)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Context7 MCP, WebSearch</tool>
     </step>
     <step order="2">
       <action>Map authentication, rate limits, and error contracts</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Context7 MCP, Read (existing client code)</tool>
     </step>
     <step order="3">
       <action>Identify data translation boundaries (what transforms, what passes through)</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>Read, Serena find_symbol</tool>
     </step>
     <step order="4">
       <action>Define fallback behavior for external failures</action>
-      <tool>Requirements analysis and evidence gathering tools</tool>
-      <output>Investigation step result</output>
+      <tool>AskUserQuestion when the fallback is a product decision</tool>
     </step>
   </playbook>
 </common_investigation_workflows>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="requirement_clarity" weight="0.4">
-      <score range="90-100">All requirements clear and documented</score>
-      <score range="70-89">Core requirements clear</score>
-      <score range="50-69">Some ambiguity remains</score>
-      <score range="0-49">Many unclear requirements</score>
-    </factor>
-    <factor name="technical_feasibility" weight="0.3">
-      <score range="90-100">Feasibility confirmed with evidence</score>
-      <score range="70-89">Likely feasible</score>
-      <score range="50-69">Uncertain feasibility</score>
-      <score range="0-49">Likely infeasible</score>
-    </factor>
-    <factor name="stakeholder_alignment" weight="0.3">
-      <score range="90-100">All questions answered by user</score>
-      <score range="70-89">Most questions answered</score>
-      <score range="50-69">Some questions pending</score>
-      <score range="0-49">Many questions unanswered</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>requirement_clarity=95, technical_feasibility=90, stakeholder_alignment=90</input>
-      <calculation>(95*0.4)+(90*0.3)+(90*0.3) = 92</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>requirement_clarity=80, technical_feasibility=80, stakeholder_alignment=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>requirement_clarity=80, technical_feasibility=78, stakeholder_alignment=78</input>
-      <calculation>(80*0.4)+(78*0.3)+(78*0.3) = 78.8</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>Score below 80 but above 60 triggers warning</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>requirement_clarity=60, technical_feasibility=58, stakeholder_alignment=58</input>
-      <calculation>(60*0.4)+(58*0.3)+(58*0.3) = 58.8</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Score below 60 triggers error status</reasoning>
-    </test>
-    <test name="error_case">
-      <input>requirement_clarity=40, technical_feasibility=30, stakeholder_alignment=30</input>
-      <calculation>(40*0.4)+(30*0.3)+(30*0.3) = 34</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores across all factors result in error</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="requirement_clarity" precedence="1">
+    <unmet>A requirement admits two readings that would produce different implementations. Ask with
+      AskUserQuestion; do not write the reading that is cheaper to specify.</unmet>
+  </factor>
+  <factor name="technical_feasibility" precedence="2">
+    <unmet>The document assumes a capability — a library, an API, a schema column — that was not located
+      in this codebase or confirmed via Context7. Verify it, or record it as an Outstanding Issue.</unmet>
+  </factor>
+  <factor name="stakeholder_alignment" precedence="3">
+    <unmet>A design decision the user has not answered is being written as settled. Put it back to the
+      user, or move it to Outstanding Issues so the finalize gate sees it.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <anti_patterns>
   <pattern id="AP-001" name="Solution acceptance without problem validation">
@@ -328,7 +274,8 @@ Conduct detailed requirements definition before implementation, clarifying techn
       </section>
       <section name="Constraints" required="always">Technical, operational</section>
       <section name="Test Requirements" required="always">Unit, integration, acceptance criteria as observable behavior</section>
-      <section name="Outstanding Issues" required="always">Unresolved questions; "none" must be explicitly stated</section>
+      <section name="Verification Performed" required="always">The exact command(s) run during investigation and their exit status, or "none run". A feasibility claim with no command and no file:line behind it is inferred, not verified (core-patterns#evidence_tiers)</section>
+      <section name="Outstanding Issues" required="always">Unresolved questions and anything asked for that this document does not specify, with the reason; "none" must be explicitly stated</section>
     </requirements_document>
     <task_breakdown>
       <dependency_graph>Task dependencies visualization (Mermaid preferred for complex graphs)</dependency_graph>
@@ -434,13 +381,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <command name="bug">When defining fix requirements for known issues</command>
   <command name="execute">Handoff point after requirements are defined</command>
   <command name="define-full">Full version with automatic feedback and regeneration cycle</command>
-  <command name="simplify">Code cleanup after implementation</command>
 </related_commands>
 <agents>
   <agent name="design" subagent_type="design" readonly="true">
     <role>Evaluate architecture consistency, component dependencies, and API design feasibility</role>
     <receives>component_names[], request_context, existing_architecture_paths[]</receives>
-    <produces>architecture_assessment{consistency: 0-100, concerns[]}, dependency_impact[], design_alternatives[]</produces>
+    <produces>architecture_assessment{consistent: bool, concerns[]{file:line, description}}, dependency_impact[], design_alternatives[]</produces>
     <done_when>All affected architectural layers assessed; design alternatives identified for non-obvious decisions</done_when>
   </agent>
   <agent name="database" subagent_type="database" readonly="true">
@@ -464,7 +410,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <agent name="validator" subagent_type="validator" readonly="true">
     <role>Cross-validate requirements consistency and flag contradictions between specifications</role>
     <receives>requirements_document, technical_constraints[], agent_findings[]</receives>
-    <produces>consistency_report{consistent: bool, contradictions[]}, ambiguities[], validation_confidence: 0-100</produces>
+    <produces>consistency_report{consistent: bool, contradictions[]}, ambiguities[], unchecked_requirements[]</produces>
     <done_when>All requirements cross-checked; no unresolved contradictions in final document</done_when>
   </agent>
 </agents>

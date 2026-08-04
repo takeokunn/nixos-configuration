@@ -1,7 +1,7 @@
 ---
 name: Define Core
 description: Shared workflow phases and patterns for requirements definition commands. Use this skill when implementing /define or /define-full commands to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -95,14 +95,12 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   </phase>
 
   <reflection_checkpoint id="investigation_complete" after="investigate">
-    <questions>
-      <question weight="0.4">Have all relevant files and patterns been identified?</question>
-      <question weight="0.3">Is the scope clearly understood?</question>
-      <question weight="0.3">Are there any technical blockers identified?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Expand investigation scope or ask user</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name the files and existing patterns the requirement will build on.</check>
+    <check>State the scope boundary — what is explicitly out of scope for this requirement.</check>
+    <check>Name any technical blocker found, or state that none was found and what was checked.</check>
+    <on_unmet>Widen the investigation, or ask the user if only they can supply the missing item. Do not
+      write a requirement around an unexamined area.</on_unmet>
   </reflection_checkpoint>
 
   <phase name="clarify" id="core_clarify">

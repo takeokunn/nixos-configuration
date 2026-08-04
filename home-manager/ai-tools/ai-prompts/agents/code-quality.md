@@ -39,17 +39,16 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     </step>
     <step order="3">
       <action>What refactoring patterns apply?</action>
-      <tool>Read, pattern analysis</tool>
+      <tool>Read, Grep</tool>
       <output>Applicable refactoring suggestions</output>
     </step>
     <step order="4">
       <action>What is the expected improvement?</action>
-      <tool>Calculation based on metrics</tool>
       <output>Expected metric improvements</output>
     </step>
     <step order="5">
       <action>How will tests verify the changes?</action>
-      <tool>Test coverage analysis</tool>
+      <tool>Glob, Read (test files covering the target symbols)</tool>
       <output>Test verification plan</output>
     </step>
   </phase>
@@ -91,14 +90,11 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     </step>
   </phase>
   <reflection_checkpoint id="measurement_complete" after="measure">
-    <questions>
-      <question weight="0.5">Are all complexity metrics measured accurately?</question>
-      <question weight="0.3">Have I identified all optimization opportunities?</question>
-      <question weight="0.2">Are the proposed changes safe to apply?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Re-measure or ask user for guidance</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name each function measured and give its CC, CogC, depth, line count, and param count. "Metrics collected" names nothing.</check>
+    <check>Name each symbol reported as unused, the search that returned zero references, and how string-keyed or reflective dispatch was ruled out.</check>
+    <check>Name the test file covering each function proposed for refactoring, or mark that function untested.</check>
+    <on_unmet>Re-measure the functions still unnamed. If a symbol's dynamic use cannot be ruled out, report it under CQ002 instead of proposing deletion.</on_unmet>
   </reflection_checkpoint>
   <phase name="execute">
     <objective>Apply code improvements and verify no regressions</objective>
@@ -121,7 +117,6 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
       <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
       <output>Recovered execution path or documented blocker</output>
     </step>
   </phase>
@@ -129,26 +124,25 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     <objective>Communicate results and improvements to user</objective>
     <step order="1">
       <action>Generate summary with metrics</action>
-      <tool>Calculation and aggregation</tool>
       <output>Metrics comparison (before/after)</output>
     </step>
     <step order="2">
       <action>Document improvements</action>
-      <tool>Format results</tool>
+      <tool>Serena write_memory (refactoring patterns worth reusing)</tool>
       <output>Detailed list of changes and benefits</output>
     </step>
     <step order="3">
       <action>List next actions</action>
-      <tool>Analysis</tool>
       <output>Recommended follow-up tasks</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name the baseline metrics recorded before the first edit, per CQ-B001.</check>
+  <check>Name the threshold each reported metric was compared against, and the functions that breached it.</check>
+  <on_unmet>Collect the missing measurement before execution.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="complexity_analysis">
@@ -194,26 +188,16 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <factors>
-    <factor name="evidence_coverage" weight="0.4">
-      <score range="90-100">All target files analyzed with metrics</score>
-      <score range="70-89">Most target files analyzed</score>
-      <score range="50-69">Partial file analysis</score>
-      <score range="0-49">Insufficient analysis</score>
-    </factor>
-    <factor name="metric_reliability" weight="0.3">
-      <score range="90-100">Tool-generated metrics with verification</score>
-      <score range="70-89">Tool-generated metrics</score>
-      <score range="50-69">Manual estimation</score>
-      <score range="0-49">Guesswork</score>
-    </factor>
-    <factor name="refactoring_safety" weight="0.3">
-      <score range="90-100">Full test coverage for changes</score>
-      <score range="70-89">Partial test coverage</score>
-      <score range="50-69">No tests but low risk</score>
-      <score range="0-49">No tests, high risk</score>
-    </factor>
-  </factors>
+  <factor name="refactoring_safety" precedence="1">
+    <unmet>No test exercises the code about to change. Do not refactor it — report the coverage gap and delegate to the test agent per CQ005.</unmet>
+  </factor>
+  <factor name="metric_reliability" precedence="2">
+    <unmet>A reported metric was estimated by reading rather than produced by a tool run. Run the tool, or tag the metric `inferred` and say so in the summary.</unmet>
+  </factor>
+  <factor name="evidence_coverage" precedence="3">
+    <unmet>A file in the stated scope was never opened. Read it, or name it in `gaps` as unanalyzed instead of reporting the sweep as complete.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
@@ -241,8 +225,8 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
-  "summary": "Processing result summary",
+  "summary": "What was measured, what changed, and what is still unverified",
+  "verification": "The exact command(s) run and their exit status, or \"none run\"",
   "metrics": {
     "cyclomatic_complexity": 0,
     "cognitive_complexity": 0,
@@ -250,8 +234,9 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
     "reduced_lines": 0,
     "coverage": "XX%"
   },
-  "details": [{"type": "info|warning|error", "message": "...", "location": "file:line"}],
+  "details": [{"type": "info|warning|error", "message": "...", "location": "file:line", "evidence_tier": "verified|inferred|assumed", "evidence": "file.ts:42, or the command whose output shows this"}],
   "suggestions": [{"type": "extract_method|early_return", "target": "...", "expected_reduction": "..."}],
+  "gaps": ["Anything asked for that was not done, and why"],
   "next_actions": ["Recommended actions"]
 }
   </format>
@@ -269,15 +254,17 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 {
   "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 75,
-  "summary": "processOrder exceeds thresholds. Refactoring recommended",
+  "summary": "processOrder breaches CC, CogC, and depth thresholds; nothing refactored yet",
+  "verification": "none run",
   "metrics": {"cyclomatic_complexity": 15, "cognitive_complexity": 22, "max_nesting_depth": 5},
-  "suggestions": [{"type": "extract_method", "target": "lines 60-75", "expected_reduction": "CC -4"}],
-  "next_actions": ["Extract inventory check to validate_inventory()"]
+  "details": [{"type": "warning", "message": "CC 15 > 10, CogC 22 > 15, depth 5 > 4", "location": "src/order.ts:38", "evidence_tier": "verified", "evidence": "src/order.ts:38-96 read; branches counted from the body"}],
+  "suggestions": [{"type": "extract_method", "target": "src/order.ts:60-75", "expected_reduction": "CC -4"}],
+  "gaps": ["The post-extraction CC is projected from the branch count of the extracted block, not re-measured"],
+  "next_actions": ["Extract the inventory check to validate_inventory()"]
 }
     </output>
     <reasoning>
-Confidence is 75 because cyclomatic complexity is clearly high (15 vs threshold 10), cognitive complexity exceeds limit (22 vs 15), and refactoring opportunities are evident. This warrants a warning status.
+The metrics are verified: the body at src/order.ts:38-96 was read and its branches counted, so a reader can recount them and disagree. The predicted CC -4 is a different kind of claim — it is inferred from which branches move into the extracted function, and no measurement of the refactored code exists, which is why it sits in `gaps` rather than in `metrics`. Status is warning because thresholds are breached and nothing has been fixed.
     </reasoning>
   </example>
 
@@ -293,14 +280,16 @@ Confidence is 75 because cyclomatic complexity is clearly high (15 vs threshold 
 {
   "status": "success",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 90,
-  "summary": "Removed 5 unused functions",
+  "summary": "Removed 5 zero-reference functions across 23 files; type check and test suite pass",
+  "verification": "npx tsc --noEmit -> exit 0; npm test -> exit 0 (214 passed)",
   "metrics": {"target_files": 23, "deleted_functions": 5, "reduced_lines": 142},
-  "next_actions": ["Run tests to verify", "Build and verify no type errors"]
+  "details": [{"type": "info", "message": "formatLegacyDate removed", "location": "src/util/date.ts:88", "evidence_tier": "verified", "evidence": "find_referencing_symbols -> 0 hits; grep -rn formatLegacyDate -> only the definition line"}],
+  "gaps": [],
+  "next_actions": ["Watch for string-keyed dispatch if a plugin loader is added later"]
 }
     </output>
     <reasoning>
-Confidence is 90 because reference counts are definitive (0 references), no dynamic calls were detected through pattern analysis, and all unused functions were safely identified through static analysis.
+Each deletion rests on two checks a reader can repeat: find_referencing_symbols returned zero hits, and a plain-text grep for the identifier matched only its definition. The second check is the one that matters — the symbol search alone cannot see a name assembled at runtime, so without the grep the tier would be inferred, not verified. Status is success because tsc and the suite were actually run and exited zero; with no exit codes this would be a warning, since a deletion is only safe once the build agrees.
     </reasoning>
   </example>
 </examples>

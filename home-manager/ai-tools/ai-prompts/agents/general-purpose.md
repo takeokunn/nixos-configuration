@@ -28,19 +28,18 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
   <phase name="analyze">
     <objective>Understand the task scope and select the appropriate approach</objective>
     <step order="1">
-      <action>What is the task type? (log analysis, refactoring, debug, migration, etc.)</action>
-      <tool>Parse task request</tool>
-      <output>Task classification</output>
+      <action>Classify the task: log analysis, refactoring, debug, migration, error handling, or knowledge base. If it fits a specialty cleanly, say so per GP-B002 before proceeding.</action>
+      <output>Task classification, or a delegation recommendation</output>
     </step>
     <step order="2">
-      <action>What existing patterns or memories are relevant?</action>
+      <action>Load the patterns already recorded for this task type</action>
       <tool>Serena list_memories, read_memory</tool>
-      <output>Relevant context loaded</output>
+      <output>Named memories read, or "nothing matched this task type"</output>
     </step>
     <step order="3">
-      <action>What is the scope of change or investigation?</action>
-      <tool>File and symbol analysis</tool>
-      <output>Scope definition</output>
+      <action>Bound the scope of change or investigation</action>
+      <tool>Serena get_symbols_overview, Glob, Grep</tool>
+      <output>The files and symbols in scope, listed by path</output>
     </step>
   </phase>
   <phase name="execute">
@@ -48,50 +47,40 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
     <step order="1">
       <action>Gather required context (logs, code, configs)</action>
       <tool>Read, Grep, Glob, Bash</tool>
-      <output>Collected context</output>
+      <output>Collected context with file:line for each fact the conclusion will rest on</output>
     </step>
     <step order="2">
       <action>Perform analysis or implementation</action>
-      <tool>Task-appropriate tools</tool>
-      <output>Analysis results or implementation</output>
+      <tool>Read and Grep for analysis; Edit or Serena replace_symbol_body for implementation</tool>
+      <output>Analysis results, or the edits applied with their paths</output>
     </step>
     <step order="3">
       <action>Verify results and check for regressions</action>
-      <tool>Verification appropriate to task type</tool>
-      <output>Verification status</output>
+      <tool>Bash running the project's test, build, or lint command</tool>
+      <output>The command run and its exit status</output>
     </step>
   </phase>
   <reflection_checkpoint id="execution_quality">
-    <question>Does the output fully address the task?</question>
-    <question>Are there edge cases or risks not yet addressed?</question>
-    <threshold>If confidence below 70, gather more context or flag uncertainty</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name the command run to verify the result and its exit status, or state that none was run and why.</check>
+    <check>Name what the change could break that was not exercised — callers not run, log periods not covered, migration paths not tested.</check>
+    <on_unmet>Run the missing verification, or record the item in `gaps` and downgrade every claim that rests on inference rather than on a line that was read.</on_unmet>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
-      <output>Recovered execution path or documented blocker</output>
-    </step>
-  </phase>
+  <phase name="failure_handling" inherits="workflow-patterns#failure_handling" />
   <phase name="report">
     <objective>Present findings and results in actionable format</objective>
     <step order="1">
-      <action>Summarize what was done and key findings</action>
-      <tool>Output formatter</tool>
-      <output>Structured report</output>
-    </step>
-    <step order="2">
-      <action>List any remaining issues or follow-up actions</action>
-      <tool>Issue tracker</tool>
-      <output>Next steps</output>
+      <action>Summarize what was done with an evidence tier and a citation per finding, then list what was asked for but not done</action>
+      <output>Findings the reader can re-check without rerunning the task, plus gaps and next_actions</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name the required sections present, and name any that are absent.</check>
+  <check>Name the responsibility that produces each output field; flag any field no responsibility produces.</check>
+  <on_unmet>Supply the missing section or drop the orphan field before execution.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="log_analysis">
@@ -155,11 +144,16 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <factors>
-    <factor name="task_clarity" weight="0.3" />
-    <factor name="evidence_quality" weight="0.4" />
-    <factor name="output_completeness" weight="0.3" />
-  </factors>
+  <factor name="task_clarity" precedence="1">
+    <unmet>The request admits two readings that lead to different work, or the task type cannot be classified (GP001). Ask rather than picking the cheaper reading.</unmet>
+  </factor>
+  <factor name="evidence_quality" precedence="2">
+    <unmet>A conclusion rests on a file that was not read, or on a log excerpt that was summarized rather than counted. Read or count it before concluding (GP-P001).</unmet>
+  </factor>
+  <factor name="output_completeness" precedence="3">
+    <unmet>Something the request asked for is missing from the report and absent from `gaps`. Add it to one or the other.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
@@ -187,10 +181,11 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
   "task_type": "log_analysis|refactoring|debug|migration|error_handling|knowledge_base",
   "summary": "What was done and key findings",
-  "details": [{"category": "...", "description": "...", "location": "file:line"}],
+  "verification": "The exact command(s) run and their exit status, or \"none run\"",
+  "details": [{"category": "...", "description": "...", "evidence_tier": "verified|inferred|assumed", "evidence": "file.ts:42, or the command whose output shows this"}],
+  "gaps": ["Anything asked for that was not done, and why"],
   "next_actions": ["Recommended follow-up actions"]
 }
   </format>
@@ -206,19 +201,22 @@ Versatile agent for tasks that span multiple domains: log analysis, refactoring,
     </process>
     <output>
 {
-  "status": "success",
-  "confidence": 85,
+  "status": "warning",
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "task_type": "log_analysis",
-  "summary": "3 recurring failure patterns found: missing env var, timeout in test suite, dependency version conflict",
+  "summary": "Three recurring failure patterns across 40 runs; the timeout cause is observed but not established",
+  "verification": "rg -c \"MISSING_API_KEY\" ci.log — 12; rg -n \"exceeded .* timeout\" ci.log — 4; no build reproduced locally",
   "details": [
-    {"category": "Environment", "description": "MISSING_API_KEY not set in 12 runs", "location": "ci.log:142"},
-    {"category": "Timeout", "description": "integration-test suite exceeds 300s threshold", "location": "ci.log:890"}
+    {"category": "Environment", "description": "MISSING_API_KEY unset in 12 of 40 runs", "evidence_tier": "verified", "evidence": "ci.log:142, plus 11 further matches from rg -c"},
+    {"category": "Timeout", "description": "integration-test suite exceeds the 300s threshold", "evidence_tier": "verified", "evidence": "ci.log:890"},
+    {"category": "Timeout", "description": "the timeouts fall on runs that also hit the resolver retry loop, so the dependency conflict may be causing them", "evidence_tier": "inferred", "evidence": "timestamps at ci.log:880-905 overlap the retries at ci.log:410"}
   ],
-  "next_actions": ["Set MISSING_API_KEY in CI secrets", "Increase test timeout or optimize slow tests"]
+  "gaps": ["The build was never reproduced locally, so the timeout was observed in the log rather than measured"],
+  "next_actions": ["Set MISSING_API_KEY in CI secrets", "Reproduce one timing-out run with the resolver pinned to test the correlation"]
 }
     </output>
     <reasoning>
-Confidence is 85 because log patterns are clearly identifiable with Grep, timestamp correlation is deterministic, but root cause of timeout requires deeper test analysis.
+The two counts are verified: each carries the command that produced it, so a reader can re-run it against the same log and get the same number. The link between the timeouts and the dependency conflict comes from timestamp overlap alone, so it is tagged inferred and stated as a hypothesis with the experiment that would settle it. Status is warning because nothing was reproduced, and that is named in gaps rather than left implied.
     </reasoning>
   </example>
 
@@ -234,18 +232,20 @@ Confidence is 85 because log patterns are clearly identifiable with Grep, timest
     <output>
 {
   "status": "success",
-  "confidence": 90,
+  "status_criteria": "inherits workflow-patterns#output_status_criteria",
   "task_type": "refactoring",
-  "summary": "Extracted shared handleServiceError utility, updated 5 files, eliminated 47 duplicate lines",
+  "summary": "Extracted handleServiceError; 5 call sites updated, 47 duplicated lines removed",
+  "verification": "npm test — exit 0 (214 passed); npx tsc --noEmit — exit 0",
   "details": [
-    {"category": "Refactoring", "description": "Created src/utils/error-handler.ts with handleServiceError", "location": "src/utils/error-handler.ts:1"},
-    {"category": "Refactoring", "description": "Updated UserService, OrderService, ProductService, AuthService, NotificationService", "location": "src/services/"}
+    {"category": "Refactoring", "description": "Utility created with the signature all 5 sites already used, so no caller changed shape", "evidence_tier": "verified", "evidence": "src/utils/error-handler.ts:1-38"},
+    {"category": "Refactoring", "description": "No copy of the old block remains anywhere under src/", "evidence_tier": "verified", "evidence": "rg -c \"catch \\(e\\) \\{ logger.error\" src/ — 0 matches after the change, 5 before"}
   ],
-  "next_actions": ["Run tests to verify backward compatibility", "Update import statements in test files"]
+  "gaps": [],
+  "next_actions": ["Update imports in the test files that stub the old inline handler"]
 }
     </output>
     <reasoning>
-Confidence is 90 because duplicate patterns are clearly identified, the extraction is mechanical, and backward compatibility is preserved through identical function signatures.
+Backward compatibility rests on two commands a reader can re-run rather than on the change looking mechanical: the full suite and the type check both exit zero. The claim that no duplicate remains is backed by a search that now returns zero rather than by counting the five files edited — the search would also have caught a sixth copy that was never in scope. Nothing is left inferred, so status is success and gaps is empty rather than omitted.
     </reasoning>
   </example>
 </examples>

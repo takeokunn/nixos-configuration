@@ -58,7 +58,8 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Upstream URL (prefer upstream remote, fallback to origin)</output>
     </step>
     <step order="4">
-      <action>If multiple remotes or detection confidence below 80, ask user</action>
+      <action>If more than one remote could be the upstream, or the detected URL does not match the
+        repository given in the command argument, ask the user rather than picking one</action>
       <tool>AskUserQuestion</tool>
       <output>Confirmed upstream URL</output>
     </step>
@@ -74,14 +75,13 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </step>
   </phase>
   <reflection_checkpoint id="preflight_complete" after="prepare">
-    <questions>
-      <question weight="0.4">Is gh CLI authenticated?</question>
-      <question weight="0.3">Is upstream repository clearly identified?</question>
-      <question weight="0.3">Are there changes to review?</question>
-    </questions>
-    <threshold min="70" action="stop">
-      <below_threshold>Stop and report to user</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Paste the account line from `gh auth status`. An unauthenticated shell fails every later
+      gh call, and the failure surfaces as an empty PR sample rather than as an error.</check>
+    <check>State the resolved owner/repo and the remote it came from.</check>
+    <check>State the file count and line count from `git diff upstream/&lt;default&gt;...HEAD --stat`.
+      Zero means there is nothing to review.</check>
+    <on_unmet>Stop and report to the user. Do not proceed on an assumed remote or an empty diff.</on_unmet>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect all necessary information in parallel</objective>
@@ -112,15 +112,15 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     </step>
   </phase>
   <reflection_checkpoint id="gather_complete" after="gather">
-    <questions>
-      <question weight="0.3">Were contribution guidelines successfully fetched?</question>
-      <question weight="0.2">Was PR template fetched or confirmed absent?</question>
-      <question weight="0.25">Have code changes been analyzed?</question>
-      <question weight="0.25">Were PR samples retrieved for pattern learning?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Document gaps and proceed with available data</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Give the URL CONTRIBUTING.md was fetched from, or name all three locations tried and the
+      status each returned.</check>
+    <check>State whether .github/PULL_REQUEST_TEMPLATE.md was fetched or confirmed absent, and by which URL.</check>
+    <check>State how many merged PRs came back and give their numbers. Fewer than 10 is a gap to record,
+      not a detail to round up.</check>
+    <check>Name the files the changes agent reviewed and the files the tests agent reviewed.</check>
+    <on_unmet>Record each unmet item in the report's gaps section and proceed on what was actually
+      retrieved. Never present a convention inferred from no sample as a learned upstream pattern.</on_unmet>
   </reflection_checkpoint>
   <phase name="synthesize">
     <objective>Generate PR metadata, verification steps, and comprehensive task breakdown</objective>
@@ -160,27 +160,28 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Complete execute_handoff for /execute command consumption</output>
     </step>
   </phase>
-  <phase name="self_evaluate">
-    <objective>Brief quality assessment of review output</objective>
+  <phase name="self_evaluate" inherits="workflow-patterns#self_evaluate_phase">
+    <objective>Find what the review claims but did not establish</objective>
     <step order="1">
       <action>Cross-validate guideline compliance with code review findings</action>
       <tool>validator agent</tool>
       <output>Validation report with consistency check</output>
     </step>
     <step order="2">
-      <action>Calculate confidence using decision_criteria: guideline_compliance (40%), code_quality (30%), test_coverage (30%)</action>
-      <tool>Decision criteria evaluation</tool>
-      <output>Confidence score</output>
+      <action>Tag every checklist item and finding verified, inferred, or assumed. A `verified` item must
+        name the guideline line it came from, the file:line it was checked against, or the command that
+        produced it. If it cannot, downgrade it — an item marked pass because it looked fine is `assumed`.</action>
+      <output>Findings tagged, over-claims downgraded</output>
     </step>
     <step order="3">
-      <action>Identify top 1-2 critical issues if confidence below 80 or review gaps detected</action>
-      <tool>Gap analysis</tool>
-      <output>Issue list</output>
+      <action>List what the review was asked for but did not deliver, and why: guidelines that could not be
+        fetched, checks not run, placeholders left uninjected, PR samples not retrieved.</action>
+      <output>Gap list, possibly empty</output>
     </step>
     <step order="4">
-      <action>Append self_feedback section to output</action>
-      <tool>Output formatting</tool>
-      <output>Self-feedback section</output>
+      <action>Set status per core-patterns#status_determination from what steps 2 and 3 found, and append
+        the self_feedback section naming the weakest claim and what would confirm it.</action>
+      <output>Status and self_feedback</output>
     </step>
   </phase>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
@@ -193,9 +194,14 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name every tool call made and show that none wrote to the repository under review and none created
+    a PR (UP-P001, UP-P002). The verification-environment files under /tmp are the only writes permitted.</check>
+  <check>Name the output sections produced: checklist, pr_metadata, local_reproduction, manual_verification,
+    task_breakdown with execute_handoff. Name any that is missing.</check>
+  <check>Quote any placeholder still present in a qa_step command — [endpoint-path], [component-name],
+    [table-name], [repo-name]. An unreplaced placeholder makes the step unrunnable (UP-B007).</check>
+  <on_unmet>Stop and resolve the gap before returning the report.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="guidelines" subagent_type="docs" readonly="true">Parse CONTRIBUTING.md and extract requirements</agent>
@@ -234,64 +240,30 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
 </delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="guideline_compliance" weight="0.4">
-      <score range="90-100">All contribution guidelines verified and followed</score>
-      <score range="70-89">Core guidelines followed, minor gaps</score>
-      <score range="50-69">Some guidelines unclear or not followed</score>
-      <score range="0-49">Major guideline violations</score>
-    </factor>
-    <factor name="code_quality" weight="0.3">
-      <score range="90-100">Code review passed, patterns consistent</score>
-      <score range="70-89">Minor style issues only</score>
-      <score range="50-69">Several quality issues found</score>
-      <score range="0-49">Major quality issues</score>
-    </factor>
-    <factor name="test_coverage" weight="0.3">
-      <score range="90-100">Tests appropriate and comprehensive</score>
-      <score range="70-89">Tests present and adequate</score>
-      <score range="50-69">Tests incomplete or unclear</score>
-      <score range="0-49">Tests missing or failing</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>guideline_compliance=93, code_quality=92, test_coverage=92</input>
-      <calculation>(93*0.4)+(92*0.3)+(92*0.3) = 92.4</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>guideline_compliance=80, code_quality=80, test_coverage=80</input>
-      <calculation>(80*0.4)+(80*0.3)+(80*0.3) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>guideline_compliance=79, code_quality=79, test_coverage=79</input>
-      <calculation>(79*0.4)+(79*0.3)+(79*0.3) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>guideline_compliance=59, code_quality=59, test_coverage=59</input>
-      <calculation>(59*0.4)+(59*0.3)+(59*0.3) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>guideline_compliance=35, code_quality=45, test_coverage=40</input>
-      <calculation>(35*0.4)+(45*0.3)+(40*0.3) = 39.5</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="guideline_compliance" precedence="1">
+    <unmet>A requirement stated in CONTRIBUTING.md is not met by the change, or CONTRIBUTING.md could not
+      be fetched at all. Report the specific requirement and the file that violates it; if the guidelines
+      are missing, say the compliance section rests on sampled PRs rather than on stated rules.</unmet>
+  </factor>
+  <factor name="test_coverage" precedence="2">
+    <unmet>The change alters behavior and no test exercises the new path, or the test command was never
+      run. Name the untested behavior, and give the command a reviewer should run.</unmet>
+  </factor>
+  <factor name="code_quality" precedence="3">
+    <unmet>The change departs from a pattern used elsewhere in the upstream repository, and the departing
+      location can be cited alongside the prevailing one. Report both file:line references.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
-  <status_criteria>
-    <status name="ready">Confidence score >= 80, no critical issues</status>
-    <status name="needs_work">Confidence score 60-79, or has warning-level issues</status>
-    <status name="blocked">Confidence score below 60, or has critical issues</status>
+  <status_criteria inherits="core-patterns#status_determination">
+    <status name="ready">Every check the review set out to make was made and none failed. No checklist
+      item the review was meant to verify is left at `assumed`.</status>
+    <status name="needs_work">The review completed, but a check could not be run, an item rests on
+      `assumed` evidence, or a warning-level finding stands. The gap is named in the summary.</status>
+    <status name="blocked">A critical finding stands, or a blocker stopped the review's core question from
+      being answered — gh auth failure, no upstream detected, or an empty diff.</status>
   </status_criteria>
   <format>
     <upstream_review>
@@ -299,8 +271,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
         <upstream_repo>owner/repo</upstream_repo>
         <branch>feature-branch</branch>
         <changes_summary>Brief description of changes</changes_summary>
-        <overall_score>XX/100</overall_score>
         <status>ready|needs_work|blocked</status>
+        <verification>The exact commands run during the review and their exit status, or "none run" —
+          never omitted</verification>
       </summary>
       <checklist>
         <section name="Contribution Guidelines">
@@ -329,7 +302,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
           </sections>
           <raw_markdown>Full PR description in markdown matching upstream conventions</raw_markdown>
         </description>
-        <pattern_confidence>0-100 based on template availability (40%) and sample quality (60%)</pattern_confidence>
+        <pattern_basis>What the title and section structure were derived from: the upstream template
+          (name the URL), the sampled PRs (give their numbers), or neither — in which case say the
+          structure is a general convention and was not learned from this repository</pattern_basis>
       </pr_metadata>
       <local_reproduction>
         <ecosystem_detection>
@@ -457,15 +432,15 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
             <expected_output>Change works as expected</expected_output>
           </step>
         </reproduction_steps>
-        <reproduction_confidence>
-          <score>0-100 based on detection completeness</score>
-          <factors>
-            <factor name="ecosystem_detected" weight="0.3">Was ecosystem clearly identified</factor>
-            <factor name="services_documented" weight="0.3">Are service dependencies clear</factor>
-            <factor name="commands_verified" weight="0.4">Do verification commands exist in project</factor>
-          </factors>
+        <reproduction_gaps>
+          <gap name="ecosystem_detected">The indicator file the ecosystem was identified from, or "none found"</gap>
+          <gap name="services_documented">The source each service dependency came from, or "no service
+            source inspected"</gap>
+          <gap name="commands_verified">For each verification command, the file that defines it — a flake
+            output, Makefile target, or package.json script. A command with no such definition is a guess
+            and must be labelled one.</gap>
           <fallback_guidance>If reproduction not feasible locally, suggest: CI-based testing, containerized environment, or ask maintainers</fallback_guidance>
-        </reproduction_confidence>
+        </reproduction_gaps>
       </local_reproduction>
       <manual_verification>
         <description>Create a reproducible verification environment using devenv</description>
@@ -646,14 +621,13 @@ Install devenv: `nix profile install github:cachix/devenv`
           <placeholder name="[pr-title]">Generated PR title</placeholder>
           <placeholder name="[pr-description]">Generated PR description</placeholder>
         </context_injection>
-        <verification_confidence>
-          <score>0-100 based on environment reproducibility</score>
-          <factors>
-            <factor name="ecosystem_detected" weight="0.3">Was ecosystem clearly identified</factor>
-            <factor name="devenv_completeness" weight="0.4">Does devenv.nix include all required tools</factor>
-            <factor name="readme_clarity" weight="0.3">Are verification steps clear and executable</factor>
-          </factors>
-        </verification_confidence>
+        <verification_gaps>
+          <gap name="ecosystem_detected">The indicator file the ecosystem was identified from, or "none found"</gap>
+          <gap name="devenv_completeness">Any tool the reproduction steps invoke that devenv.nix does not
+            provide. The environment fails at that command, not at build time.</gap>
+          <gap name="readme_clarity">Any verification step that still contains an unreplaced placeholder,
+            or whose expected output is not stated concretely enough to compare against</gap>
+        </verification_gaps>
         <empty_state>If no verification environment needed, skip directory creation</empty_state>
       </manual_verification>
       <task_breakdown>
@@ -677,8 +651,6 @@ Phase 4: Final Verification (depends on all)
             <description>Lint errors, style issues, code quality improvements identified in review</description>
             <step order="1">
               <action>Apply code fix tasks in this phase according to their dependencies</action>
-              <tool>Task orchestration guidance</tool>
-              <output>Phase execution guidance emitted</output>
             </step>
             <responsibility name="code_fix_tasks">
               <task id="CF-001">
@@ -692,8 +664,6 @@ Phase 4: Final Verification (depends on all)
             <description>Missing tests, coverage gaps, test improvements</description>
             <step order="1">
               <action>Apply test update tasks in this phase according to their dependencies</action>
-              <tool>Task orchestration guidance</tool>
-              <output>Phase execution guidance emitted</output>
             </step>
             <responsibility name="test_update_tasks">
               <task id="TU-001">
@@ -707,8 +677,6 @@ Phase 4: Final Verification (depends on all)
             <description>README, inline docs, changelog, API documentation</description>
             <step order="1">
               <action>Apply documentation tasks in this phase according to their dependencies</action>
-              <tool>Task orchestration guidance</tool>
-              <output>Phase execution guidance emitted</output>
             </step>
             <responsibility name="documentation_tasks">
               <task id="DOC-001">
@@ -722,8 +690,6 @@ Phase 4: Final Verification (depends on all)
             <description>Commit message formatting per contribution guidelines, rebasing onto upstream, squashing commits if required</description>
             <step order="1">
               <action>Prepare git-related task guidance without performing git write operations</action>
-              <tool>Task orchestration guidance</tool>
-              <output>Phase execution guidance emitted</output>
             </step>
             <responsibility name="commit_preparation_tasks">
               <task id="GIT-001">
@@ -746,8 +712,6 @@ Phase 4: Final Verification (depends on all)
             <description>Running lint, test, build commands before PR</description>
             <step order="1">
               <action>Run final verification tasks after all dependent phases complete</action>
-              <tool>Task orchestration guidance</tool>
-              <output>Phase execution guidance emitted</output>
             </step>
             <responsibility name="final_verification_tasks">
               <task id="VER-001">
@@ -794,12 +758,15 @@ Phase 4: Final Verification (depends on all)
           </constraints>
         </execute_handoff>
       </task_breakdown>
-      <self_feedback>
-        <confidence>XX/100 (based on guideline_compliance, code_quality, test_coverage)</confidence>
+      <self_feedback inherits="workflow-patterns#self_feedback_output">
+        <verification>The commands actually run and their exit status, or "none run"</verification>
+        <weakest_claim>The checklist item or finding resting on the thinnest evidence, and what would
+          confirm it — a guideline line, a file:line, or a command</weakest_claim>
         <issues>
           <issue severity="critical">Issue description (if any, max 2 total)</issue>
           <issue severity="warning">Issue description (if any)</issue>
         </issues>
+        <gaps>Asked for but not done, with the reason (omit only if there are none)</gaps>
       </self_feedback>
     </upstream_review>
   </format>
@@ -839,7 +806,9 @@ Phase 4: Final Verification (depends on all)
     <behavior id="UP-B007" priority="critical">
       <trigger>When generating manual_verification section</trigger>
       <action>Inject actual values from diff analysis into qa_step commands replacing all placeholders</action>
-      <verification>All placeholders ([endpoint-path], [component-name], [table-name], etc.) replaced with actual detected values; qa_confidence score reflects injection completeness</verification>
+      <verification>No placeholder token ([endpoint-path], [component-name], [table-name], etc.) remains
+        anywhere in the emitted qa_steps. Any that could not be resolved from the diff is listed in
+        verification_gaps rather than left in the command.</verification>
     </behavior>
     <behavior id="UP-B005" priority="critical">
       <trigger>When generating final output</trigger>
@@ -898,12 +867,12 @@ Phase 4: Final Verification (depends on all)
   <must>Verify gh CLI authentication before operations</must>
   <must>Check CONTRIBUTING.md in all three locations</must>
   <must>Fetch .github/PULL_REQUEST_TEMPLATE.md from upstream (no fallback) and sample 10 merged PRs for pattern learning</must>
-  <must>Generate PR metadata with template_source (upstream_template, sampled_patterns, none) and pattern_confidence score</must>
+  <must>Generate PR metadata with template_source (upstream_template, sampled_patterns, none) and a pattern_basis naming the template URL or the sampled PR numbers it was derived from</must>
   <must>Provide structured checklist output</must>
   <must>Include comprehensive local_reproduction section with Nix-first ecosystem detection</must>
   <must>Include manual QA checklist with structured qa_steps when ui, api, database, config, security, or integration changes detected</must>
   <must>Inject actual paths, endpoints, and component names into qa_step commands from diff analysis</must>
-  <must>Include qa_confidence score with weighted factors in manual_verification section</must>
+  <must>Include a verification_gaps section listing every unresolved placeholder, missing tool, and unverifiable step in manual_verification</must>
   <must>Generate comprehensive task_breakdown with phased_tasks for /execute handoff</must>
   <must>Include execute_handoff section with decisions, references, and constraints</must>
   <avoid>Modifying any files</avoid>

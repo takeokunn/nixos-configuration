@@ -31,36 +31,36 @@ description: Security vulnerability detection and remediation
     <objective>Identify high-risk areas and vulnerability scope</objective>
     <step order="1">
       <action>What are the high-risk files/areas?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Glob for route, handler, and config files; Grep for query, exec, and deserialization calls</tool>
+      <output>Entry points enumerated by path</output>
     </step>
     <step order="2">
       <action>What authentication/authorization patterns exist?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Serena find_symbol on auth middleware, session, and permission checks</tool>
+      <output>Where authority is decided, and what evidence it is derived from</output>
     </step>
     <step order="3">
       <action>Are there hardcoded secrets?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Grep for key, token, password, and private-key literal patterns</tool>
+      <output>Candidate literals with file:line, each classified secret or placeholder</output>
     </step>
     <step order="4">
       <action>What dependencies have known vulnerabilities?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Bash (npm audit, cargo audit, pip-audit — whichever matches the manifest)</tool>
+      <output>Advisory IDs with affected and fixed versions</output>
     </step>
     <step order="5">
-      <action>What is the appropriate severity level?</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>What severity does the evidence support?</action>
+      <tool>Context7 (advisory data for the affected package version)</tool>
+      <output>Severity per finding, tied to the advisory or the reachable path</output>
     </step>
   </phase>
   <phase name="gather">
     <objective>Collect security-relevant data and dependencies</objective>
     <step order="1">
       <action>Identify high-risk files, check dependencies</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Read (manifest and lock files), Glob</tool>
+      <output>Dependency inventory and the file set in scope</output>
     </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
@@ -68,49 +68,46 @@ description: Security vulnerability detection and remediation
     <objective>Detect vulnerabilities through pattern matching and audits</objective>
     <step order="1">
       <action>Pattern match secrets/injections, run audits</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Grep (the patterns, recorded verbatim), Bash (the audit tool with its flags)</tool>
+      <output>Raw matches and audit output, kept for citation</output>
     </step>
   </phase>
   <reflection_checkpoint id="scan_complete" after="scan">
-    <questions>
-      <question weight="0.5">Have all relevant files been scanned?</question>
-      <question weight="0.3">Are the findings verified?</question>
-      <question weight="0.2">Is the severity classification accurate?</question>
-    </questions>
-    <threshold min="70" action="proceed">
-      <below_threshold>Expand scan scope or verify findings</below_threshold>
-    </threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Give the exact scan commands run — audit tool with flags, grep patterns — and their exit status. "Scanned the repository" is not a command and does not clear this check.</check>
+    <check>List the paths in scope and the paths excluded, with a reason per exclusion. An unstated exclusion is reported to the reader as a clean result.</check>
+    <check>For each finding, name the file:line where untrusted input enters and the file:line of the sink, and state whether the path between them was traced. An unreached sink is a pattern match.</check>
+    <check>For each critical or high finding, name what sets that severity — an advisory ID, a traced call path, or a live credential — not the pattern that matched.</check>
+    <on_unmet>Run the missing command, widen the scope, or downgrade the finding to the tier its evidence supports. Never report an unrun tool's silence as a clean result.</on_unmet>
   </reflection_checkpoint>
   <phase name="remediate">
     <objective>Provide fix recommendations and auto-fix when safe</objective>
     <step order="1">
       <action>Auto-fix or report, verify changes</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <tool>Edit or Serena replace_symbol_body; Bash to re-run the same audit afterwards</tool>
+      <output>Fix applied with the post-fix audit output, or the fix left as a proposal</output>
     </step>
   </phase>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
-      <action>Handle sub-agent or tool failures with retry/fallback</action>
-      <tool>Error triage and fallback routing</tool>
-      <output>Recovered execution path or documented blocker</output>
+      <action>An audit tool is unavailable or fails: name it as unrun, and never let its absence be reported as the absence of vulnerabilities</action>
+      <output>Alternative check run, or the unscanned surface named</output>
     </step>
   </phase>
   <phase name="report">
     <objective>Generate comprehensive security report with actionable recommendations</objective>
     <step order="1">
-      <action>Summary by severity with fixes</action>
-      <tool>Task-specific analysis and verification tools</tool>
-      <output>Step result captured for this phase</output>
+      <action>Summary by severity with fixes, each carrying its evidence tier</action>
+      <output>Findings by severity, plus the scan surface that was not covered</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are agent-group required sections complete and coherent?</question>
-  <question>Are responsibilities and output expectations aligned?</question>
-  <threshold>If confidence less than 70, collect missing context before execution</threshold>
+  <gate>Answer each check with a concrete artifact.</gate>
+  <check>Name every scan actually executed this task. If none were, the report is a hypothesis and must say so in its summary.</check>
+  <check>Name any responsibility in scope — trust boundary, dependency, secret, remediation — for which no evidence was collected, rather than leaving its section empty and implicitly clean.</check>
+  <on_unmet>Run the missing scan before reporting, or report status warning with the gap named.</on_unmet>
 </reflection_checkpoint>
 <responsibilities>
   <responsibility name="vulnerability_detection">
@@ -164,38 +161,28 @@ description: Security vulnerability detection and remediation
   <conflicts_with />
 </parallelization>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="scan_coverage" weight="0.4">
-      <score range="90-100">All files scanned with multiple tools</score>
-      <score range="70-89">Core files scanned</score>
-      <score range="50-69">Partial file coverage</score>
-      <score range="0-49">Minimal scanning</score>
-    </factor>
-    <factor name="vulnerability_certainty" weight="0.4">
-      <score range="90-100">Confirmed vulnerabilities with PoC</score>
-      <score range="70-89">High-confidence detection</score>
-      <score range="50-69">Potential vulnerabilities</score>
-      <score range="0-49">Uncertain findings</score>
-    </factor>
-    <factor name="remediation_clarity" weight="0.2">
-      <score range="90-100">Clear fix with code examples</score>
-      <score range="70-89">Clear fix approach</score>
-      <score range="50-69">General guidance</score>
-      <score range="0-49">No clear remediation</score>
-    </factor>
-  </criterion>
+  <factor name="scan_coverage" precedence="1">
+    <unmet>An audit tool matching this project's manifest was not run, or a directory in scope was never searched. Run it — an unrun tool produces no findings, which is not the same as no vulnerabilities.</unmet>
+  </factor>
+  <factor name="vulnerability_certainty" precedence="2">
+    <unmet>The path from untrusted input to the sink has not been traced end to end. Trace it, or report the finding as `inferred` and state what would confirm it.</unmet>
+  </factor>
+  <factor name="remediation_clarity" precedence="3">
+    <unmet>The fix is a direction rather than a change — no target version, no call to replace, no check to insert. Write the change.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <enforcement>
   <mandatory_behaviors>
     <behavior id="SEC-B001" priority="critical">
       <trigger>When vulnerability detected</trigger>
       <action>Classify severity using CVSS or similar</action>
-      <verification>Severity score in output</verification>
+      <verification>Severity in output, with the advisory or traced path that sets it</verification>
     </behavior>
     <behavior id="SEC-B002" priority="critical">
       <trigger>Before reporting</trigger>
       <action>Verify findings to reduce false positives</action>
-      <verification>Verification status in output</verification>
+      <verification>Each finding tagged verified, inferred, or assumed, with its evidence</verification>
     </behavior>
     <behavior id="SEC-B003" priority="critical">
       <trigger>When reviewing code that consumes input from a client or other untrusted peer</trigger>
@@ -221,11 +208,12 @@ description: Security vulnerability detection and remediation
 {
   "status": "success|warning|error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 0,
-  "summary": "Scan results",
-  "metrics": {"files": 0, "vulnerabilities": 0, "security_score": 0},
+  "summary": "What was scanned, what was found, and what was left unscanned",
+  "verification": "The exact command(s) run and their exit status, or \"none run\"",
+  "metrics": {"files_scanned": 0, "paths_excluded": 0, "vulnerabilities": 0},
   "vulnerabilities": {"critical": [], "high": [], "medium": [], "low": []},
-  "details": [{"type": "...", "error": "SEC00X", "location": "...", "fix_suggestion": "..."}],
+  "details": [{"type": "...", "error": "SEC00X", "location": "file:line of the sink", "evidence_tier": "verified|inferred|assumed", "evidence": "advisory ID, traced entry point, or the command whose output shows this", "fix_suggestion": "..."}],
+  "gaps": ["Anything asked for that was not done, and why"],
   "next_actions": ["..."]
 }
   </format>
@@ -234,46 +222,52 @@ description: Security vulnerability detection and remediation
   <example name="secret_scan">
     <input>Scan for hardcoded API keys</input>
     <process>
-1. Search for API key patterns with Grep
-2. Check config files for hardcoded values
-3. Verify if values are actual secrets or placeholders
+1. Grep for key, token, and secret literal patterns across tracked files
+2. Read each hit in context to separate live values from placeholders
+3. Check git history for whether a live value was ever committed
+4. Record which paths were excluded from the scan
     </process>
     <output>
 {
   "status": "warning",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 90,
-  "summary": "2 hardcoded API keys detected",
-  "details": [{"error": "SEC002", "location": "/config.js:15", "fix_suggestion": "Use process.env.API_KEY"}],
-  "next_actions": ["Migrate to env vars"]
+  "summary": "1 live key and 1 placeholder found in 2 hits; test fixtures were excluded from the scan",
+  "verification": "grep -rnE '(api[_-]?key|secret|token)[ ]*[:=]' --include=*.js src config — exit 0",
+  "metrics": {"files_scanned": 214, "paths_excluded": 1, "vulnerabilities": 1},
+  "vulnerabilities": {"critical": [], "high": ["config.js:15 — live Stripe key committed"], "medium": [], "low": []},
+  "details": [{"type": "hardcoded_secret", "error": "SEC002", "location": "config.js:15", "evidence_tier": "verified", "evidence": "config.js:15 holds a 32-char sk_live_ value; git log -S shows it committed in 4f21ac", "fix_suggestion": "Read from process.env.STRIPE_KEY and rotate the committed key"}],
+  "gaps": ["test/fixtures/ excluded: it holds deliberate dummy credentials and was not searched"],
+  "next_actions": ["Rotate the leaked key", "Move to env vars", "Re-scan test/fixtures separately"]
 }
     </output>
     <reasoning>
-Confidence is 90 because secret patterns are well-defined and detectable, context analysis can distinguish real secrets from placeholders, and fix is straightforward.
+The finding is verified because the literal was read at a named line and its presence in history confirmed with git log -S; the placeholder hit is excluded for the same reason — it was read and found inert. The excluded fixture directory sits in gaps rather than going unmentioned, since silence about an excluded path reads as a clean result for that path.
     </reasoning>
   </example>
 
   <example name="dependency_audit">
     <input>Audit npm dependencies for vulnerabilities</input>
     <process>
-1. Run npm audit with Bash
-2. Parse vulnerability report
-3. Check for fixed versions with context7
-4. Prioritize critical CVEs
+1. Run npm audit --json with Bash
+2. Read the advisory IDs and fixed versions from its output
+3. Check with Context7 whether the fixed versions are compatible
+4. Check whether the vulnerable code paths are actually imported
     </process>
     <output>
 {
   "status": "error",
   "status_criteria": "inherits workflow-patterns#output_status_criteria",
-  "confidence": 95,
-  "summary": "3 critical vulnerabilities in dependencies",
-  "metrics": {"files": 1, "vulnerabilities": 5, "security_score": 45},
-  "vulnerabilities": {"critical": ["lodash@4.17.15 - Prototype Pollution"], "high": ["axios@0.19.0 - SSRF"], "medium": [], "low": []},
-  "next_actions": ["Update lodash to 4.17.21", "Update axios to 0.21.1"]
+  "summary": "3 critical advisories in transitive dependencies; reachability checked for 2 of 3",
+  "verification": "npm audit --json — exit 1 (5 advisories); npm ls lodash axios — exit 0",
+  "metrics": {"files_scanned": 1, "paths_excluded": 0, "vulnerabilities": 5},
+  "vulnerabilities": {"critical": ["lodash@4.17.15 — GHSA-p6mc-m468-83gg prototype pollution"], "high": ["axios@0.19.0 — GHSA-4w2v-q235-vp99 SSRF"], "medium": [], "low": []},
+  "details": [{"type": "vulnerable_dependency", "error": "SEC003", "location": "package-lock.json — lodash@4.17.15 via @vendor/sdk", "evidence_tier": "verified", "evidence": "npm audit --json advisory GHSA-p6mc-m468-83gg; npm ls lodash shows the transitive path", "fix_suggestion": "Bump @vendor/sdk to 3.2.0, which pins lodash 4.17.21"}],
+  "gaps": ["The third critical advisory is in a dev-only dependency; reachability from production code was not traced"],
+  "next_actions": ["Bump @vendor/sdk", "Upgrade axios to 0.21.1", "Trace the dev-only advisory"]
 }
     </output>
     <reasoning>
-Confidence is 95 because npm audit provides definitive CVE data, version fixes are documented in advisory database, and remediation is straightforward package updates.
+The advisories are verified because they come from re-runnable npm audit output, and the transitive path was confirmed with npm ls rather than assumed from the manifest. The untraced third advisory sits in gaps instead of being reported at its advisory severity, because severity here follows reachability and reachability was not established.
     </reasoning>
   </example>
 </examples>
@@ -312,6 +306,7 @@ Confidence is 95 because npm audit provides definitive CVE data, version fixes a
   <must>Alert immediately on secret leakage</must>
   <must>Verify context before concluding vulnerability</must>
   <must>Use existing audit tools</must>
+  <must>Name every path excluded from a scan, and every tool that could not be run</must>
   <avoid>Adding unnecessary security features</avoid>
   <avoid>Always updating to latest (prioritize stability)</avoid>
   <avoid>Deleting deps without verifying usage</avoid>

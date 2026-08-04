@@ -93,58 +93,59 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <phase name="investigate">
     <step order="1">
       <action>Delegate to quality-assurance agent: analyze stack trace, error patterns</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (quality-assurance)</tool>
+      <output>Error classification and ranked hypotheses</output>
     </step>
     <step order="2">
       <action>Delegate to explore agent: find error location and related code paths</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (explore)</tool>
+      <output>Error site with file:line, call chain, recurrence locations</output>
     </step>
     <step order="3">
       <action>Delegate to general-purpose agent: analyze logs and dependencies</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (general-purpose)</tool>
+      <output>Log timeline, dependency issues</output>
     </step>
     <step order="4">
       <action>Use fact-check skill patterns: verify external documentation references via Context7</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Context7 MCP, WebSearch</tool>
+      <output>Verified external claims, flagged claims</output>
     </step>
     <step order="5">
       <action>Analyze error location details from agent findings</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Read, Serena find_symbol</tool>
+      <output>The failing code read in full, with the line that fails identified</output>
     </step>
     <step order="6">
       <action>Review dependencies and imports</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Read, Grep, Serena find_referencing_symbols</tool>
+      <output>Dependency and import chain of the failing module</output>
     </step>
     <step order="7">
       <action>Check config files and recent changes</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Read, Grep, Bash (git log, git diff — read-only inspection)</tool>
+      <output>Config values in effect and the recent changes touching them</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="investigation_quality">
-    <question>Have I built a complete evidence chain from symptom to cause?</question>
-    <question>Can I explain the error mechanism with concrete evidence?</question>
-    <threshold>If confidence less than 70, continue investigation or flag uncertainty</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>State the evidence chain as symptom → mechanism → cause, citing a file:line or log line at each link.</check>
+    <check>Name the link in that chain that was inferred rather than read, or state that every link was read.</check>
+    <check>Name the other locations sharing this root cause, or state that the search was run and found none.</check>
+    <on_unmet>Continue investigating the unsupported link. If it cannot be established from the repository,
+      say so in the report rather than presenting the chain as complete.</on_unmet>
   </reflection_checkpoint>
   <phase name="gather">
     <step order="1">
       <action>Collect runtime info (OS, versions, env vars)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Bash (read-only inspection commands)</tool>
+      <output>Runtime environment, with the command that produced each value</output>
     </step>
     <step order="2">
       <action>Check resources (disk, memory, network)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Bash (read-only inspection commands)</tool>
+      <output>Resource state, or "not checked" with the reason</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
@@ -161,21 +162,20 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   </phase>
   <phase name="self_evaluate">
     <step order="1">
-      <action>Calculate confidence using decision_criteria: root_cause_certainty (50%), evidence_chain (30%), fix_viability (20%)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Re-read the report and tag each finding verified, inferred, or assumed. A finding tagged
+        verified must name the command run or the file:line read; if it cannot, downgrade it.</action>
+      <output>Findings tagged, over-claims downgraded</output>
     </step>
     <step order="2">
-      <action>Identify top 1-2 critical issues if confidence below 80 or evidence gaps detected</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>List anything the reported error asked about that this report does not answer, and why —
+        not attempted, blocked by missing logs, or judged out of scope</action>
+      <output>Gap list, possibly empty</output>
     </step>
     <step order="3">
-      <action>Append self_feedback section to output</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Set status per core-patterns#status_determination from what steps 1 and 2 found, then append
+        the self_feedback section naming the weakest claim and what would confirm it</action>
+      <output>Status and self_feedback</output>
     </step>
-
   </phase>
   <phase name="persist">
     <objective>Capture reusable debugging insights to Serena memory</objective>
@@ -200,16 +200,17 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name any workflow phase that was skipped, and why.</check>
+  <check>State that no file was modified and no fix was applied — this command investigates only — or name what was changed.</check>
+  <on_unmet>Resolve the structural gap before returning the report.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">
     <role>Analyze error patterns, stack traces, and code defects to identify failure mechanisms</role>
     <receives>error_message, stack_trace, file_paths[], reproduction_steps</receives>
-    <produces>error_classification{type, mechanism}, defects[]{location: file:line, description}, hypotheses[]{cause, confidence: 0-100}</produces>
-    <done_when>Evidence chain from symptom to root cause established; confidence >= 70 or competing hypotheses explicitly ranked</done_when>
+    <produces>error_classification{type, mechanism}, defects[]{location: file:line, description}, hypotheses[]{cause, evidence_tier, evidence}</produces>
+    <done_when>Evidence chain from symptom to root cause established with a citation at each link, or competing hypotheses ranked with the evidence separating them</done_when>
   </agent>
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">
     <role>Analyze logs, runtime environment, and dependency relationships for contextual evidence</role>
@@ -244,58 +245,20 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <requirement>Explicit edit prohibition</requirement>
 </delegation>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="root_cause_certainty" weight="0.5">
-      <score range="90-100">Root cause confirmed with reproduction</score>
-      <score range="70-89">Likely root cause identified</score>
-      <score range="50-69">Possible causes identified</score>
-      <score range="0-49">Root cause unclear</score>
-    </factor>
-    <factor name="evidence_chain" weight="0.3">
-      <score range="90-100">Complete evidence chain from symptom to cause</score>
-      <score range="70-89">Strong evidence trail</score>
-      <score range="50-69">Partial evidence</score>
-      <score range="0-49">Weak evidence</score>
-    </factor>
-    <factor name="fix_viability" weight="0.2">
-      <score range="90-100">Clear, tested fix available</score>
-      <score range="70-89">Fix approach defined</score>
-      <score range="50-69">Possible fix identified</score>
-      <score range="0-49">No clear fix</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>root_cause_certainty=95, evidence_chain=90, fix_viability=90</input>
-      <calculation>(95*0.5)+(90*0.3)+(90*0.2) = 92.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>root_cause_certainty=80, evidence_chain=80, fix_viability=80</input>
-      <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>root_cause_certainty=79, evidence_chain=79, fix_viability=79</input>
-      <calculation>(79*0.5)+(79*0.3)+(79*0.2) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>root_cause_certainty=59, evidence_chain=59, fix_viability=59</input>
-      <calculation>(59*0.5)+(59*0.3)+(59*0.2) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>root_cause_certainty=40, evidence_chain=50, fix_viability=30</input>
-      <calculation>(40*0.5)+(50*0.3)+(30*0.2) = 41</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="root_cause_certainty" precedence="1">
+    <unmet>The named cause was never observed producing the symptom — no reproduction, no log line, no
+      code path read end to end. Present it as a ranked hypothesis, not as the root cause.</unmet>
+  </factor>
+  <factor name="evidence_chain" precedence="2">
+    <unmet>A link between symptom and cause has no file:line or log line behind it. Read that link, or
+      mark it inferred and say what would close it.</unmet>
+  </factor>
+  <factor name="fix_viability" precedence="3">
+    <unmet>The suggested fix has not been checked against every location sharing the root cause. Run the
+      recurrence search before recommending it, or state that the recommendation covers only the reported site.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
@@ -306,23 +269,15 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 - Direct cause
 - Underlying cause
 - Conditions</root_cause>
-    <metrics>
-- Confidence: 0-100
-- Log Utilization: 0-100
-- Objectivity: 0-100</metrics>
+    <evidence_tiers>Each link of the chain tagged verified | inferred | assumed (core-patterns#evidence_tiers), with the file:line, log line, or command that backs it</evidence_tiers>
     <impact>Scope, similar errors</impact>
     <recommendations>Fix suggestions (no implementation), prevention</recommendations>
     <further_investigation>Unclear points, next steps</further_investigation>
     <self_feedback>
-      <confidence>XX/100</confidence>
-      <dimension name="root_cause_certainty">XX/100: one-line rationale</dimension>
-      <dimension name="evidence_chain">XX/100: one-line rationale</dimension>
-      <dimension name="fix_viability">XX/100: one-line rationale</dimension>
-      <gaps>What additional evidence or context would raise confidence above current score</gaps>
-      <issues>
-- [Critical] Issue description (if any, max 2 total)
-- [Warning] Issue description (if any)
-      </issues>
+      <verification>The command(s) actually run — reproduction attempt, log inspection, git history — and their exit status, or "none run"</verification>
+      <downgrades>Any link first written as verified that could not name its evidence, and the tier it was moved to</downgrades>
+      <weakest_claim>The link in the chain resting on the thinnest evidence, and what would confirm it</weakest_claim>
+      <gaps>Anything the reported error raises that this report does not answer, and why</gaps>
     </self_feedback>
   </format>
 </output>
@@ -376,6 +331,7 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <must>Keep all operations read-only</must>
   <must>Prioritize logs as primary information source</must>
   <must>Report honestly if cause cannot be identified</must>
+  <must>Tag every link of the evidence chain with its tier, and report the verification actually run</must>
   <avoid>Implementing fixes</avoid>
   <avoid>Accepting user speculation without verification</avoid>
   <avoid>Forcing contrived causes when evidence is insufficient</avoid>

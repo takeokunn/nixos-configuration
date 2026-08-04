@@ -17,7 +17,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <rule>NEVER modify, create, or delete files</rule>
   <rule>NEVER implement fixes; provide analysis and suggestions only</rule>
   <rule>ALWAYS base answers on factual investigation from code and documentation</rule>
-  <rule>ALWAYS report confidence levels and unclear points honestly</rule>
+  <rule>ALWAYS tag each finding verified, inferred, or assumed (core-patterns#evidence_tiers) and state unclear points honestly</rule>
   <rule>NEVER justify user assumptions; prioritize technical accuracy</rule>
 </rules>
 <rules priority="standard">
@@ -67,73 +67,69 @@ Provide accurate, evidence-based answers to project questions through fact-based
   </phase>
   <phase name="analyze">
     <step order="1">
-      <action>What is the user's core question?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Restate the user's core question in one sentence, and name the claim that would answer it</action>
+      <output>Restated question</output>
     </step>
     <step order="2">
-      <action>Which code/documentation sources are relevant?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Locate the code and documentation that could bear on the question</action>
+      <tool>Glob, Grep, Serena get_symbols_overview</tool>
+      <output>Candidate file list</output>
     </step>
     <step order="3">
-      <action>What scope of investigation is appropriate?</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>State the investigation boundary: what will be read and what is deliberately out of scope</action>
+      <output>Scope boundary</output>
     </step>
     <step order="4">
       <action>Classify question type (architecture, implementation, debugging, design)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <output>Question type, which selects the agents below</output>
     </step>
-
   </phase>
   <phase name="investigate">
     <step order="1">
       <action>Delegate to explore agent: find relevant files and codebase structure</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (explore)</tool>
+      <output>File paths and code excerpts with file:line</output>
     </step>
     <step order="2">
       <action>Delegate to design agent: evaluate architecture and component relationships</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (design)</tool>
+      <output>Architecture analysis and dependency map</output>
     </step>
     <step order="3">
       <action>Delegate to performance agent: identify performance-related aspects (if applicable)</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (performance)</tool>
+      <output>Bottleneck locations, or an explicit "not applicable"</output>
     </step>
     <step order="4">
       <action>Use fact-check skill patterns: verify external references via Context7 and WebSearch</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Context7 MCP, WebSearch</tool>
+      <output>Verified external claims, flagged claims</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="investigation_quality">
-    <question>Have I gathered sufficient evidence from investigation?</question>
-    <question>Do findings from different agents align?</question>
-    <question>Are there conflicting signals that require deeper analysis?</question>
-    <threshold>If confidence less than 70, expand investigation scope or seek clarification</threshold>
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name the files read and the specific lines the answer will rest on.</check>
+    <check>Name each agent dispatched and the one claim it returned, or say it returned nothing usable.</check>
+    <check>Name any point where two agents disagree, and which one cited a file:line.</check>
+    <on_unmet>Widen the investigation or re-dispatch the agent with the specific paths. If only the user
+      can settle it, ask with AskUserQuestion rather than picking a reading.</on_unmet>
   </reflection_checkpoint>
   <phase name="synthesize">
     <step order="1">
       <action>Delegate to quality-assurance agent: evaluate code quality findings</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (quality-assurance)</tool>
+      <output>Issue list with severity and file:line</output>
     </step>
     <step order="2">
       <action>Delegate to code-quality agent: analyze complexity metrics</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <tool>Task tool (code-quality)</tool>
+      <output>Complexity metrics and refactoring candidates</output>
     </step>
     <step order="3">
-      <action>Compile agent findings with confidence metrics</action>
-      <tool>Task tool and Serena read/search tools as needed</tool>
-      <output>Step result recorded for the phase</output>
+      <action>Compile agent findings, tagging each verified, inferred, or assumed per
+        core-patterns#evidence_tiers; downgrade any verified claim that cannot name a command or file:line</action>
+      <output>Tagged finding list</output>
     </step>
-
   </phase>
   <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
@@ -171,16 +167,17 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <question>Are command-group required sections complete and ordered?</question>
-  <question>Is the command safe to execute within stated constraints?</question>
-  <threshold>If confidence less than 70, stop and resolve structural gaps first</threshold>
+  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+  <check>Name any workflow phase that was skipped, and why.</check>
+  <check>State that no file was modified — this command is read-only — or name the file that was.</check>
+  <on_unmet>Resolve the structural gap before returning the answer.</on_unmet>
 </reflection_checkpoint>
 <agents>
   <agent name="explore" subagent_type="explore" readonly="true">
     <role>Discover and map codebase structure relevant to the question</role>
     <receives>question_topic, suspected_file_paths[], search_keywords[]</receives>
     <produces>file_paths[], code_excerpts[]{path: file:line, content}, structure_summary</produces>
-    <done_when>All relevant files and code paths identified; confidence >= 70 or explicit uncertainty reported</done_when>
+    <done_when>All relevant files and code paths identified, each with a file:line; anything searched for and not found is reported as not found</done_when>
   </agent>
   <agent name="design" subagent_type="design" readonly="true">
     <role>Evaluate system design, architectural decisions, and component relationships</role>
@@ -197,13 +194,13 @@ Provide accurate, evidence-based answers to project questions through fact-based
   <agent name="quality-assurance" subagent_type="quality-assurance" readonly="true">
     <role>Evaluate code quality, best practices compliance, and correctness</role>
     <receives>file_paths[], code_excerpts[], quality_dimensions[]</receives>
-    <produces>quality_assessment{score: 0-100, issues[]{severity, location: file:line, description}}, gaps[]</produces>
-    <done_when>All provided files assessed; quality score and issue list produced with evidence</done_when>
+    <produces>quality_assessment{issues[]{severity, location: file:line, description}}, gaps[]</produces>
+    <done_when>All provided files assessed; every issue carries a file:line</done_when>
   </agent>
   <agent name="code-quality" subagent_type="code-quality" readonly="true">
     <role>Analyze code complexity metrics and structural maintainability</role>
     <receives>file_paths[], complexity_threshold</receives>
-    <produces>complexity_metrics{cyclomatic, cognitive}, refactoring_candidates[], maintainability_score: 0-100</produces>
+    <produces>complexity_metrics{cyclomatic, cognitive}, refactoring_candidates[], maintainability_notes{hotspots[]{file:line}, rationale}</produces>
     <done_when>Complexity metrics computed for all provided files; candidates ranked by impact</done_when>
   </agent>
 </agents>
@@ -219,58 +216,20 @@ Provide accurate, evidence-based answers to project questions through fact-based
   </parallel_group>
 </execution_graph>
 <decision_criteria inherits="core-patterns#decision_criteria">
-  <criterion name="confidence_calculation">
-    <factor name="evidence_quality" weight="0.5">
-      <score range="90-100">Direct code evidence found</score>
-      <score range="70-89">Strong inference from code</score>
-      <score range="50-69">Indirect evidence</score>
-      <score range="0-49">Speculation only</score>
-    </factor>
-    <factor name="answer_completeness" weight="0.3">
-      <score range="90-100">All aspects of question addressed</score>
-      <score range="70-89">Main question answered</score>
-      <score range="50-69">Partial answer</score>
-      <score range="0-49">Incomplete answer</score>
-    </factor>
-    <factor name="source_verification" weight="0.2">
-      <score range="90-100">Multiple sources confirm answer</score>
-      <score range="70-89">Single reliable source</score>
-      <score range="50-69">Unverified source</score>
-      <score range="0-49">No source cited</score>
-    </factor>
-  </criterion>
-  <validation_tests>
-    <test name="success_case">
-      <input>evidence_quality=95, answer_completeness=90, source_verification=90</input>
-      <calculation>(95*0.5)+(90*0.3)+(90*0.2) = 92.5</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>High scores across all factors yield success</reasoning>
-    </test>
-    <test name="boundary_success_80">
-      <input>evidence_quality=80, answer_completeness=80, source_verification=80</input>
-      <calculation>(80*0.5)+(80*0.3)+(80*0.2) = 80</calculation>
-      <expected_status>success</expected_status>
-      <reasoning>Exactly 80 is success threshold</reasoning>
-    </test>
-    <test name="boundary_warning_79">
-      <input>evidence_quality=79, answer_completeness=79, source_verification=79</input>
-      <calculation>(79*0.5)+(79*0.3)+(79*0.2) = 79</calculation>
-      <expected_status>warning</expected_status>
-      <reasoning>79 is below success threshold</reasoning>
-    </test>
-    <test name="boundary_error_59">
-      <input>evidence_quality=59, answer_completeness=59, source_verification=59</input>
-      <calculation>(59*0.5)+(59*0.3)+(59*0.2) = 59</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>59 is at error threshold</reasoning>
-    </test>
-    <test name="error_case">
-      <input>evidence_quality=40, answer_completeness=50, source_verification=30</input>
-      <calculation>(40*0.5)+(50*0.3)+(30*0.2) = 41</calculation>
-      <expected_status>error</expected_status>
-      <reasoning>Low scores yield error status</reasoning>
-    </test>
-  </validation_tests>
+  <factor name="evidence_quality" precedence="1">
+    <unmet>A claim in the answer names no file:line and no command whose output shows it. Read the source
+      and cite it, or tag the claim inferred or assumed and say what would confirm it.</unmet>
+  </factor>
+  <factor name="answer_completeness" precedence="2">
+    <unmet>Part of the question is unanswered. Investigate it, or list it under unclear_points with the
+      reason it was not answered — never let it drop silently.</unmet>
+  </factor>
+  <factor name="source_verification" precedence="3">
+    <unmet>An external claim (library behavior, API contract, version support) rests on recall rather than
+      on Context7 or the vendored source. Verify it before stating it as fact.</unmet>
+  </factor>
+  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
+    happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
   <format>
@@ -279,21 +238,14 @@ Provide accurate, evidence-based answers to project questions through fact-based
 - Source 1: `path/to/file.ts:42` - finding
 - Source 2: `path/to/other.ts:15` - finding</investigation>
     <conclusion>Direct answer based on evidence</conclusion>
-    <metrics>
-- Confidence: 0-100 (based on evidence quality)
-- Evidence Coverage: 0-100 (how much relevant code was examined)</metrics>
+    <evidence_tiers>Each finding tagged verified | inferred | assumed (core-patterns#evidence_tiers), with the file:line or command that backs it</evidence_tiers>
     <recommendations>Optional: Suggested actions without implementation</recommendations>
     <unclear_points>Information gaps that would improve the answer</unclear_points>
     <self_feedback>
-      <confidence>XX/100</confidence>
-      <dimension name="evidence_quality">XX/100: one-line rationale</dimension>
-      <dimension name="answer_completeness">XX/100: one-line rationale</dimension>
-      <dimension name="source_verification">XX/100: one-line rationale</dimension>
-      <gaps>What additional evidence or context would raise confidence above current score</gaps>
-      <issues>
-- [Critical] Issue description (if any, max 2 total)
-- [Warning] Issue description (if any)
-      </issues>
+      <verification>The command(s) actually run and their exit status, or "none run"</verification>
+      <downgrades>Any claim first written as verified that could not name a command or file:line, and the tier it was moved to</downgrades>
+      <weakest_claim>The finding resting on the thinnest evidence, and what would confirm it</weakest_claim>
+      <gaps>Anything the question asked for that this answer does not address, and why — not attempted, blocked, or out of scope</gaps>
     </self_feedback>
   </format>
 </output>
@@ -305,9 +257,9 @@ Provide accurate, evidence-based answers to project questions through fact-based
       <verification>References included in answer</verification>
     </behavior>
     <behavior id="ASK-B002" priority="critical">
-      <trigger>When uncertain</trigger>
-      <action>Explicitly state uncertainty level</action>
-      <verification>Confidence level in output</verification>
+      <trigger>When a claim was not directly observed</trigger>
+      <action>Tag it inferred or assumed per core-patterns#evidence_tiers and state what would confirm it</action>
+      <verification>Every finding in the answer carries a tier; no verified finding lacks a file:line or command</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
@@ -346,8 +298,8 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Provide file:line references for findings</must>
-  <must>Report confidence levels honestly</must>
-  <must>Distinguish between facts and inferences</must>
+  <must>Tag every finding verified, inferred, or assumed, and name the evidence</must>
+  <must>Report the verification actually run, or "none run"</must>
   <avoid>Implementing or modifying any code</avoid>
   <avoid>Guessing when evidence is insufficient</avoid>
   <avoid>Confirming user assumptions without verification</avoid>
