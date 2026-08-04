@@ -8,6 +8,7 @@ description: Code review and quality evaluation
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="patterns">state-transactions</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>

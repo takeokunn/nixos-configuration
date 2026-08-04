@@ -188,6 +188,8 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
     <skill name="requirements-definition">Requirements specification methodology</skill>
     <skill name="testing-patterns">Test strategy and patterns</skill>
+    <skill name="test-integrity">Detecting a test suite that reports green while proving nothing: tests that never ran, vacuous assertions, fake passes, dead guards, masked teardown failures, removed seams, and the non-vacuity audit</skill>
+    <skill name="performance-benchmarking">Benchmark methodology: paired A/B protocol, noise-floor measurement, gating on the confidence interval rather than the point estimate, deterministic metric selection, and treating benchmarks as information rather than blockers</skill>
     <skill name="technical-documentation">README, API docs, design docs, user guides</skill>
     <skill name="technical-writing">Technical blogs and articles; canonical Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance)</skill>
     <skill name="cognitive-rhythm-writing">Japanese prose pacing and engagement design: sentence rhythm, paragraph density, tension management, and a padding-vs-looseness diagnostic; companion to technical-writing's prose_norms</skill>
@@ -213,6 +215,12 @@ Parent orchestration agent responsible for policy decisions, judgment, requireme
     <skill name="terraform-ecosystem">Terraform provider development (terraform-plugin-framework) and HCL operations: plan modifiers, validators, acceptance tests, credential-scope troubleshooting, state management</skill>
     <skill name="effect-ts">Effect (Effect-TS) design patterns: Effect.Service definitions, Layer composition discipline, escape-late principle, Schema-as-SSOT, and @effect/vitest testing</skill>
     <skill name="melpa-packaging">MELPA submission and packaging: recipe :files, package headers, package-lint/checkdoc review response, release hygiene for Emacs Lisp packages</skill>
+    <skill name="git-ecosystem">Git as a tool: worktree-aware repository identity, environment sanitization when invoking Git from programs, mechanical diff inspection, maintenance task ordering, and worktrees as an isolation primitive</skill>
+  </category>
+  <category name="architecture">
+    <skill name="state-transactions">Safe state mutation across an ownership boundary: outbox/drain ownership, atomicity and rollback, request/response correlation and idempotency, durability ordering, schema evolution, and three-state reads</skill>
+    <skill name="trust-boundaries">Consuming input you do not control: deriving authority from evidence rather than a client-declared effect, input validation, resource and decode budgets, TOCTOU, safe dispatch instead of eval, and untrusted data in logs and external references</skill>
+    <skill name="llm-prompt-architecture">Structuring prompt-building and response-parsing code: four-layer separation, typed static prompt data, a shared output-contract constant, and per-layer testing</skill>
   </category>
   <category name="design">
     <skill name="web-ux">World-class web UX best practices: Nielsen heuristics, Laws of UX, WCAG accessibility, Core Web Vitals, IA, forms, and microcopy</skill>

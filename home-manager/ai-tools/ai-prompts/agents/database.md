@@ -8,6 +8,7 @@ Expert database agent for schema design, index optimization, query performance, 
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="patterns">state-transactions</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
   <skill use="domain">sql-ecosystem</skill>

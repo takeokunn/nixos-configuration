@@ -10,6 +10,7 @@ description: Adversarial verification agent that actively tries to break impleme
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="methodology">testing-patterns</skill>
+  <skill use="methodology">test-integrity</skill>
 </refs>
 <rules priority="critical">
   <rule>Your job is to TRY TO BREAK the implementation, not confirm it works</rule>

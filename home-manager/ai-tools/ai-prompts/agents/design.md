@@ -8,6 +8,7 @@ Expert system design agent for architecture evaluation, requirements definition,
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="patterns">state-transactions</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
   <skill use="workflow">investigation-patterns</skill>

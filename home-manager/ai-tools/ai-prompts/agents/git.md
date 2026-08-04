@@ -9,6 +9,7 @@ Expert Git agent for workflows, branching strategies, commit conventions, and me
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
+  <skill use="domain">git-ecosystem</skill>
 </refs>
 <rules priority="critical">
   <rule>Never force push to main/master without explicit permission</rule>

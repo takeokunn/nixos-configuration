@@ -8,6 +8,7 @@ description: Security vulnerability detection and remediation
 </purpose>
 <refs>
   <skill use="patterns">core-patterns</skill>
+  <skill use="patterns">trust-boundaries</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
@@ -16,6 +17,8 @@ description: Security vulnerability detection and remediation
   <rule>Stop build on critical vulnerabilities</rule>
   <rule>Verify context before concluding vulnerability exists</rule>
   <rule>Use existing audit tools (npm audit, cargo audit)</rule>
+  <rule>Flag any client-supplied magnitude or outcome applied without server-side derivation from verifiable evidence</rule>
+  <rule>Flag any allocation, decode, or read performed before its size, count, or depth limit is enforced</rule>
 </rules>
 <rules priority="standard">
   <rule>Use Serena MCP for pattern detection</rule>
@@ -118,6 +121,15 @@ description: Security vulnerability detection and remediation
     <task>Security headers (CORS, CSP)</task>
   </responsibility>
 
+  <responsibility name="trust_boundary">
+    <task>Client-declared effects accepted as authoritative instead of derived from server-side evidence</task>
+    <task>Validation of protocol and message input at the boundary (shape, range, encoding)</task>
+    <task>Resource, size, and decode budgets enforced before allocation</task>
+    <task>TOCTOU gaps between validation and use</task>
+    <task>Dynamic dispatch through eval or reflection driven by untrusted input</task>
+    <task>Untrusted data reaching logs, error messages, and external reference resolution</task>
+  </responsibility>
+
   <responsibility name="dependency_security">
     <task>Known vulnerability scanning</task>
     <task>Fixed version recommendations</task>
@@ -184,6 +196,16 @@ description: Security vulnerability detection and remediation
       <trigger>Before reporting</trigger>
       <action>Verify findings to reduce false positives</action>
       <verification>Verification status in output</verification>
+    </behavior>
+    <behavior id="SEC-B003" priority="critical">
+      <trigger>When reviewing code that consumes input from a client or other untrusted peer</trigger>
+      <action>Trace each resulting state change back to its source and flag any magnitude or outcome taken from the caller rather than derived from evidence the authoritative side can verify; apply the authority-derivation patterns in the trust-boundaries skill</action>
+      <verification>Authority derivation reported for each untrusted input path examined</verification>
+    </behavior>
+    <behavior id="SEC-B004" priority="critical">
+      <trigger>When reviewing code that allocates, decodes, or reads an amount influenced by the caller</trigger>
+      <action>Flag any allocation, decode, or read reached before its size, count, or depth limit is enforced; apply the resource-budget patterns in the trust-boundaries skill</action>
+      <verification>Budget-before-allocation status reported for each such path</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
@@ -278,6 +300,7 @@ Confidence is 95 because npm audit provides definitive CVE data, version fixes a
 <related_skills>
   <skill name="investigation-patterns">Essential for vulnerability detection and secret scanning</skill>
   <skill name="serena-usage">Critical for managing security updates and CVE mitigation</skill>
+  <skill name="trust-boundaries">Authoritative source for trust-boundary patterns: authority derivation, input validation, resource budgets, TOCTOU, and safe dispatch</skill>
 </related_skills>
 
 <decision_tree name="agent_usage">

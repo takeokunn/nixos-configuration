@@ -10,6 +10,7 @@ Expert performance agent for bottleneck identification, algorithm optimization, 
   <skill use="patterns">core-patterns</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
+  <skill use="workflow">performance-benchmarking</skill>
 </refs>
 <rules priority="critical">
   <rule>Always measure before optimizing</rule>

@@ -9,6 +9,7 @@ description: Test strategy and quality management
 <refs>
   <skill use="patterns">core-patterns</skill>
   <skill use="workflow">testing-patterns</skill>
+  <skill use="workflow">test-integrity</skill>
   <skill use="tools">serena-usage</skill>
   <skill use="tools">context7-usage</skill>
 </refs>
