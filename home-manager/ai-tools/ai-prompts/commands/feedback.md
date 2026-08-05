@@ -14,7 +14,10 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <skill use="tools">context7-usage</skill>
 </refs>
 <rules priority="critical">
-  <rule>Launch all Task tools simultaneously in one message (timeout avoidance)</rule>
+  <rule>Launch all Task tools simultaneously in one message (timeout avoidance). This scopes to a
+    single dispatch wave — the selected mode's specialist agents, or the refute phase's
+    per-critical-finding validator dispatches. The refute phase itself is a separate, later wave that
+    runs after specialist findings exist; that sequencing is not the prohibited pattern.</rule>
   <rule>Auto-select mode based on previous command</rule>
   <rule>Review only changed code in execute mode, not existing issues</rule>
   <rule>Provide concrete fix proposals, not abstract theories</rule>
@@ -131,6 +134,58 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
     <on_unmet>Re-run the named agent once with a narrower prompt naming the specific files. If it fails
       again, review that dimension here and report that the delegation failed.</on_unmet>
   </reflection_checkpoint>
+  <phase name="refute" inherits="core-patterns#adversarial_verification_escalation">
+    <objective>Independently refute critical-severity findings before they reach the user</objective>
+    <step order="1">
+      <action>From the findings collected in execute, select only those classified critical — the
+        severity taxonomy (critical/warning/info) already used by this command's issue_prioritization
+        factor, distinct from the good_practice category reserved for positive observations. Warning
+        and info findings are not sent for refutation; refutation is reserved for critical findings
+        because an independent adversarial pass costs materially more than a single review pass
+        (reports in the wild cite roughly 3-10x, treat as assumed not verified), so it must stay
+        proportionate to what is actually consequential</action>
+      <output>The critical-finding subset, or an explicit "no critical findings" result</output>
+    </step>
+    <step order="2">
+      <action>For each critical finding, dispatch exactly one validator agent instance in a fresh
+        context containing only that finding's text and its cited file:line or command output — never
+        the specialist agent's full report or reasoning, so the refutation is genuinely independent of
+        the agent that raised it. When multiple critical findings exist, dispatch all their validator
+        instances together in one message, not sequentially. Frame the task explicitly as "attempt to
+        refute this finding," not "review this finding" — a reviewer tends to confirm, a refuter is
+        asked to find the flaw. Because validator's own default framing expects multiple existing
+        reports to compare, state explicitly in the dispatch prompt that this is a single-claim
+        independent-verification task: instruct validator to disregard its usual single-source-means-
+        unvalidated framing for this dispatch and instead independently re-derive whether the finding
+        holds, using Read/Grep/Bash as needed — the deliverable is a refutation attempt, not a
+        single-source label</action>
+      <tool>Task (validator)</tool>
+      <output>One refutation attempt per critical finding, each independent of the others, or an
+        explicit record that a dispatch failed or returned nothing checkable</output>
+    </step>
+    <step order="3">
+      <action>If a validator dispatch fails, times out, or returns nothing checkable, do not retry
+        silently and do not drop the finding: report it in refutation_results as "refutation attempted,
+        outcome unavailable" so the finding still carries a visible trace rather than silently reaching
+        the user unrefuted and unmarked</action>
+      <output>Every critical finding accounted for in refutation_results, including failed attempts</output>
+    </step>
+    <step order="4">
+      <action>If the refutation succeeds, downgrade the finding's evidence tier (e.g. verified to
+        inferred) and carry both the original finding and the refuting evidence forward to the user —
+        never drop the disagreement silently. If the refutation does not overturn the finding, keep it
+        as reported and annotate that an independent refutation was attempted and did not succeed</action>
+      <output>Each critical finding annotated with its refutation outcome</output>
+    </step>
+  </phase>
+  <reflection_checkpoint id="refutation_quality" after="refute">
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name every critical finding and whether it was sent for refutation, or state there were none.</check>
+    <check>For each refutation dispatched, name the outcome — survived or downgraded — and the evidence
+      the refuting agent cited.</check>
+    <check>Confirm no warning- or info-severity finding was sent for refutation.</check>
+    <on_unmet>Dispatch the missing refutation, or correct the scope before reporting.</on_unmet>
+  </reflection_checkpoint>
   <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
     <step order="1">
       <action>Detect and classify failures during command execution</action>
@@ -243,6 +298,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Log analysis and dependency investigation evaluation</agent>
   <agent name="explore" subagent_type="explore" readonly="true">Evidence and code path coverage evaluation</agent>
   <agent name="code-quality" subagent_type="code-quality" readonly="true">Reference precision and conclusion validity</agent>
+  <agent name="validator" subagent_type="validator" readonly="true">Independent refutation of critical-severity findings (refute phase)</agent>
 </agents>
 <execution_graph>
   <sequential_phase id="mode_selection" depends_on="none">
@@ -251,7 +307,11 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <parallel_group id="selected_review" depends_on="mode_selection">
     <agent>Agents listed in the selected mode</agent>
   </parallel_group>
-  <sequential_phase id="synthesis" depends_on="selected_review">
+  <sequential_phase id="refutation" depends_on="selected_review">
+    <agent>validator</agent>
+    <reason>Independently refute critical-severity findings before synthesis (one dispatch per critical finding, run in parallel with each other)</reason>
+  </sequential_phase>
+  <sequential_phase id="synthesis" depends_on="selected_review,refutation">
     <action>Compile the review report with metrics, findings, and recommended actions</action>
   </sequential_phase>
 </execution_graph>
@@ -269,6 +329,13 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
       runtime impact. Reclassify by impact: data loss and security are critical, degraded behavior is
       warning, style is info.</unmet>
   </factor>
+  <factor name="refutation_scope" precedence="4">
+    <unmet>A critical-severity finding reached the final report without an independent refutation
+      attempt, or a warning/info finding was sent for refutation anyway. This factor governs the refute
+      phase specifically, evaluated after review_quality has already gated severity classification —
+      it is not bypassed by an earlier factor firing during a different phase. Dispatch the missing
+      refutation, or narrow the scope back to critical-only, before reporting.</unmet>
+  </factor>
   <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
     happens next; later factors are not consulted.</resolution>
 </decision_criteria>
@@ -281,6 +348,9 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 - [Category] Issue: Location
 - Problem: Description
 - Fix: Proposal</critical>
+      <refutation_results>Per critical finding: attempted (yes/no), outcome (survived | downgraded |
+        unavailable), and the refuting evidence — or "no critical findings this run" when the set was
+        empty</refutation_results>
       <warning>Fix Recommended
 - [Category] Issue: Location
 - Problem: Description
@@ -316,12 +386,22 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
       <action>Provide suggested improvements</action>
       <verification>Suggestions for each issue</verification>
     </behavior>
+    <behavior id="FB-B003" priority="critical">
+      <trigger>When a finding is classified critical</trigger>
+      <action>Dispatch one independent validator refutation attempt before including it in the final report</action>
+      <verification>refutation_results entry present for every critical finding</verification>
+    </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="FB-P001" priority="critical">
       <trigger>Always</trigger>
       <action>Providing feedback without code analysis</action>
       <response>Block feedback, require analysis first</response>
+    </behavior>
+    <behavior id="FB-P002" priority="critical">
+      <trigger>Always</trigger>
+      <action>Sending a warning- or info-severity finding for independent refutation</action>
+      <response>Reserve refutation for critical findings only, to keep its token cost proportionate</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
@@ -344,7 +424,7 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
 <related_agents>
   <agent name="explore">Codebase discovery for uncertain implementation details</agent>
   <agent name="quality-assurance">Cross-check result quality before finalization</agent>
-  <agent name="validator">Cross-validation when findings may conflict</agent>
+  <agent name="validator">Cross-validation when findings may conflict, and independent refutation of critical findings (refute phase)</agent>
 </related_agents>
 <related_skills>
   <skill name="execution-workflow">Understanding work review methodology</skill>
@@ -353,10 +433,10 @@ Multi-faceted review of Claude Code's work within the same session, automaticall
   <skill name="fact-check">Verifying external source claims</skill>
 </related_skills>
 <constraints>
-  <must>Launch all agents simultaneously (no sequential execution)</must>
+  <must>Launch all agents simultaneously (no sequential execution) within a single dispatch wave; the refute phase is a separate, later wave and is not this pattern</must>
   <must>Review only changed code in execute mode</must>
   <must>Provide concrete, actionable feedback</must>
   <avoid>Abstract theories without specific proposals</avoid>
   <avoid>Reviewing existing code quality issues</avoid>
-  <avoid>Sequential agent execution (causes timeout)</avoid>
+  <avoid>Sequential agent execution (causes timeout) within a single dispatch wave</avoid>
 </constraints>
