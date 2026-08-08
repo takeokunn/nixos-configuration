@@ -130,7 +130,7 @@ let
     } server;
 
   codexSettings = {
-    model = "gpt-5.4-mini";
+    model = "gpt-5.6-luna";
     model_provider = "openai";
     approval_policy = "on-request";
     sandbox_mode = "danger-full-access";
