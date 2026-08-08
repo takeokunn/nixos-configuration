@@ -6,15 +6,6 @@ description: Requirements definition command
 <purpose>
 Conduct detailed requirements definition before implementation, clarifying technical constraints, design policies, and specifications.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="patterns">parallelization-patterns</skill>
-  <skill use="workflow">requirements-definition</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="workflow">define-core</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
 <scope>
   <when_to_use>
     <case>Unclear scope with multiple design choices (e.g., "add authentication", "refactor data layer")</case>
@@ -31,22 +22,26 @@ Conduct detailed requirements definition before implementation, clarifying techn
   </when_not_to_use>
 </scope>
 <rules priority="critical">
-  <rule>Never modify, create, or delete files</rule>
-  <rule>Never implement code; requirements definition only</rule>
-  <rule>Clearly identify technically impossible requests</rule>
-  <rule>Prioritize technical validity over user preferences</rule>
-  <rule>Technical evidence over speculation</rule>
-  <rule>Challenge the user's framing — the stated problem may not be the real problem</rule>
-  <rule>Form hypotheses before concluding; signal detection → hypothesis → verification → conclusion</rule>
+  <rule>Never modify a file and never write code. This command produces the specification the user
+    approves before work starts; implementing during it removes the approval step it exists to create.</rule>
+  <rule>Say plainly when a request is technically impossible or rests on a capability that is not
+    there. A specification that assumes it becomes wasted implementation, discovered late.</rule>
+  <rule>Prefer technical validity to the user's stated preference, and say which one a decision came
+    from when they conflict.</rule>
+  <rule>Challenge the framing before accepting it: the stated problem is often the user's first
+    solution, and specifying it forecloses the better one.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use requirements-definition skill for methodology</rule>
-  <rule>Delegate investigations to sub-agents</rule>
-  <rule>Ask questions without limit until requirements are clear</rule>
-  <rule>Investigate and question before concluding</rule>
-  <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
-  <rule>Think in Why → How → What order (Golden Circle); output may differ, but reasoning must start from Why</rule>
-  <rule>Specify only what is necessary; do not over-specify obvious implementation details</rule>
+  <rule>Move from signal to hypothesis to verification before concluding — never from signal straight
+    to a question, because a question that investigation could have answered spends the user's turn.</rule>
+  <rule>Keep asking until the requirements are unambiguous; there is no question budget here, and an
+    ambiguity resolved now costs a sentence rather than a rewrite.</rule>
+  <rule>Mark one option (Recommended) whenever AskUserQuestion presents choices, so the user is
+    reviewing a proposal rather than doing the analysis themselves.</rule>
+  <rule>Reason in Why → How → What order; the output may be structured differently, but reasoning that
+    starts at What specifies the solution already in hand.</rule>
+  <rule>Specify only what is load-bearing. Detail spent on what any competent implementer would choose
+    anyway crowds out the decisions that actually need deciding.</rule>
 </rules>
 <ai_principles>
   <inapplicable_traditional_practices>
@@ -100,8 +95,34 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <correction>Before designing around a framework feature, library, or system capability, verify it exists in the current codebase. Memory about past states may be stale.</correction>
   </known_bias>
 </bias_correction>
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
-<workflow inherits="define-core#workflow" />
+<workflow>
+  <phase name="load">
+    <objective>Put the workflow this command runs into context, since it lives in a skill</objective>
+    <step order="1">
+      <action>Load define-core and requirements-definition with the Skill tool, before anything else.
+        define-core holds the phase sequence this command executes — prepare, analyze, investigate,
+        clarify, verify, document, finalize — and requirements-definition holds the methodology inside
+        those phases: question scoring, FR format, acceptance-criteria shape. Neither is in context
+        until the Skill tool loads it, so skipping this step leaves the command with no workflow at
+        all. Load fact-check as well when the requirements depend on an external library or service
+        whose behavior has to be confirmed rather than recalled.</action>
+      <tool>Skill</tool>
+      <output>The skills loaded, named; and the phase list define-core returned, so the rest of this
+        command can be checked against it</output>
+    </step>
+  </phase>
+  <phase name="run_core_workflow">
+    <objective>Execute define-core's phases under this command's constraints</objective>
+    <step order="1">
+      <action>Run the phases define-core defines, in its order. At each phase apply what this file adds
+        on top: the Why → How → What ordering and L0-before-L4 depth from thinking_framework, the five
+        known biases in bias_correction, the signal table in request_signals, minimum_viable_scope when
+        bounding, and the output contract below. Where define-core and this file both speak to the same
+        decision, this file governs, because it is the narrower context.</action>
+      <output>The phases run, and any phase skipped with its reason</output>
+    </step>
+  </phase>
+</workflow>
 <reflection_checkpoint id="group_consistency">
   <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
   <check>Name any workflow phase that was skipped, and why.</check>
@@ -181,7 +202,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
     </step>
   </playbook>
 </common_investigation_workflows>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="requirement_clarity" precedence="1">
     <unmet>A requirement admits two readings that would produce different implementations. Ask with
       AskUserQuestion; do not write the reading that is cheaper to specify.</unmet>
@@ -268,14 +289,10 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <section name="Architecture Impact" required="when-multi-layer">System diagram (Mermaid) if 2+ layers affected; dependency changes</section>
       <section name="Data / Schema Changes" required="when-applicable">ERD or schema diff if data model changes</section>
       <section name="Interface / API Changes" required="when-applicable">Endpoint table or contract diff if public interfaces change</section>
-      <section name="Metrics" required="always">
-        <metric name="feasibility">0-100 with evidence</metric>
-        <metric name="objectivity">0-100</metric>
-      </section>
       <section name="Constraints" required="always">Technical, operational</section>
       <section name="Test Requirements" required="always">Unit, integration, acceptance criteria as observable behavior</section>
-      <section name="Verification Performed" required="always">The exact command(s) run during investigation and their exit status, or "none run". A feasibility claim with no command and no file:line behind it is inferred, not verified (core-patterns#evidence_tiers)</section>
-      <section name="Outstanding Issues" required="always">Unresolved questions and anything asked for that this document does not specify, with the reason; "none" must be explicitly stated</section>
+      <section name="Verification Performed" required="always">The exact command(s) run during investigation and their exit status, or "none run". A feasibility claim with no command and no file:line behind it is inferred, not verified. State feasibility as the observable condition that supports it — which capability was located where, which one was not found — never as a score</section>
+      <section name="Outstanding Issues" required="always">Unresolved questions and anything asked for that this document does not specify, with the reason; "none" must be explicitly stated. This section is also where a disagreement with the user goes: when the investigation reaches a different severity or priority than the user assigned, record both assessments and what each rests on, and hand the decision back. Silently deferring buries the risk; silently escalating overrides a call that was the user's to make</section>
     </requirements_document>
     <task_breakdown>
       <dependency_graph>Task dependencies visualization (Mermaid preferred for complex graphs)</dependency_graph>
@@ -299,17 +316,17 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <action>Investigate existing codebase patterns</action>
       <verification>Codebase analysis in output</verification>
     </behavior>
-    <behavior id="DEF-B002" priority="critical">
+    <behavior id="DEF-B002" priority="high">
       <trigger>For design decisions</trigger>
       <action>Use AskUserQuestion tool with structured options</action>
       <verification>User responses recorded</verification>
     </behavior>
-    <behavior id="DEF-B003" priority="critical">
+    <behavior id="DEF-B003" priority="high">
       <trigger>Before finalizing requirements</trigger>
       <action>Run pre-completion self-check (see completion_conditions)</action>
       <verification>All checklist items answered</verification>
     </behavior>
-    <behavior id="DEF-B004" priority="critical">
+    <behavior id="DEF-B004" priority="standard">
       <trigger>After completing requirements definition</trigger>
       <action>Evaluate memory_auto_creation_triggers (serena-usage skill); if any trigger matched
         (architectural decisions discovered, conventions identified, novel patterns found),
@@ -317,7 +334,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
         Note: write_memory is Serena memory only — this does not violate the read-only file constraint.</action>
       <verification>Memory operation recorded in output, or "persist: no triggers matched — skip"</verification>
     </behavior>
-    <behavior id="DEF-B005" priority="high">
+    <behavior id="DEF-B005" priority="standard">
       <trigger>After completing requirements definition</trigger>
       <action>Apply memory_staleness_verification (serena-usage skill) to any memory read via read_memory during this task; bump last-verified, correct, or archive as appropriate. Skip if no memories were read.</action>
       <verification>Staleness check outcome recorded in output, or "no memories read this task"</verification>
@@ -334,7 +351,15 @@ Conduct detailed requirements definition before implementation, clarifying techn
       <action>Proceeding without answering critical questions</action>
       <response>Block operation, require clarification first</response>
     </behavior>
-    <behavior id="DEF-P003" priority="critical">
+    <behavior id="DEF-P004" priority="critical">
+      <trigger>Always</trigger>
+      <action>Scoring the document — feasibility, objectivity, confidence, completeness — on a numeric
+        scale</action>
+      <response>Block. A score has no derivation, so it cannot be checked or disputed, and it reads as
+        a measurement. State the observable condition instead: which capability was found at which
+        file:line, which one was not found and where it was searched for.</response>
+    </behavior>
+    <behavior id="DEF-P003" priority="high">
       <trigger>Always</trigger>
       <action>Copying investigation findings directly into the requirements document without synthesis</action>
       <response>Internal analysis stays internal. The output must be a synthesized, coherent document — not a dump of agent outputs.</response>
@@ -368,7 +393,7 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <criterion>Outstanding-issues disposition resolved with the user via the finalize gate (resolve / defer / stop) when any outstanding issues remain; gate correctly skipped when "none"</criterion>
   </done_when>
 </completion_conditions>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor ambiguity in non-critical feature detail</example>
     <example severity="medium">Unclear requirement or ambiguous scope</example>
@@ -399,7 +424,12 @@ Conduct detailed requirements definition before implementation, clarifying techn
     <role>Analyze requirements completeness, estimate implementation effort, and identify dependency risks</role>
     <receives>functional_requirements[], technical_constraints[], existing_codebase_context</receives>
     <produces>effort_estimate{level: low|medium|high, rationale}, risk_assessment[], missing_requirements[], dependency_graph</produces>
-    <done_when>All requirements analyzed for completeness; effort estimate justified with evidence</done_when>
+    <done_when>All requirements analyzed for completeness; effort estimate justified with evidence, and
+      expressed in quantities that were counted — files touched, call sites returned by
+      find_referencing_symbols, layers crossed, tests affected — never in clock hours. Wall-clock
+      effort depends on who does the work and what interrupts them, neither of which is observable
+      from here, so an hour figure can only be borrowed from a training-data average and will be
+      stated confidently beside the admission that the complexity is unknown</done_when>
   </agent>
   <agent name="explore" subagent_type="explore" readonly="true">
     <role>Find existing implementations, patterns, and code relevant to the requirements</role>

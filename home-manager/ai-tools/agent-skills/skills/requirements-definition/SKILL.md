@@ -1,7 +1,7 @@
 ---
 name: Requirements Definition
 description: This skill should be used when the user asks to "define requirements", "create specification", "clarify requirements", "write requirements document", or mentions requirement analysis. Provides comprehensive requirements definition methodology.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -264,7 +264,7 @@ version: 2.0.0
   <rule>Map requirements to test scenarios</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor ambiguity in non-critical detail</example>
     <example severity="medium">Unclear requirement affecting scope</example>

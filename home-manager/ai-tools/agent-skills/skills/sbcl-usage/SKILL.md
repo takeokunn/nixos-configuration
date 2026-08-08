@@ -1,7 +1,7 @@
 ---
 name: sbcl-usage
 description: Practical SBCL (Steel Bank Common Lisp) operations guide. Use this skill whenever the user mentions SBCL execution/debugging, --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, or SLY-based Common Lisp development. Also covers terminating an unresponsive SBCL — interrupt-disabled regions that only SIGKILL ends, timeouts with a kill grace period, subprocess process groups (inherited stdin, expired pgids, EPERM versus ESRCH) — plus isolating a hang by loading the system as a control rather than bisecting project files, sb-thread hazards (condition-wait with a timeout may return without the mutex; never call a user callback under the state lock), and sb-cover coverage being process-global and needing a source manifest to gate on.
-version: 2.3.0
+version: 2.5.0
 ---
 
 <purpose>
@@ -264,7 +264,14 @@ version: 2.3.0
     <trigger>Top-level (setf (symbol-function 'name) (lambda ...)) with a substantial body. Mitigation: plain defun.</trigger>
     <trigger>Predicates branching on implementation Unicode category/width tables via member/case under a bootstrap-loaded image. Mitigation observed: bind the return value and compare with explicit eq/or checks.</trigger>
     <trigger>Forcing sb-ext:*evaluator-mode* to :interpret across a whole file to dodge a compile stall — frequently just relocates the stall to a later file or to execution time. Treat evaluator-mode guards as a dead end for a durable fix unless paired with a structural decomposition and fresh verification.</trigger>
+    <trigger>A large defun whose small helper is a candidate for open-coding. Adding (declaim (notinline %helper)) has been observed to let a runner load past the stalling boundary, which points at inlining as the trigger rather than the helper's own body. Treat it as a diagnostic that localises the cause, not as the fix — the durable answer is still to shrink the compile unit.</trigger>
+    <trigger>Unresolved forward references in a definition-heavy file. A top-level (declaim (ftype function ...)) for the remaining forward references has cleared a load stall that no per-form change reached.</trigger>
   </observed_triggers>
+
+  <in_image_timeouts_do_not_guard_this>
+    <statement>sb-ext:with-timeout does not reliably interrupt the compiler, so an in-image timeout is not a valid guard against a compile or load stall. The timeout simply never fires and the session hangs exactly as it would have without it.</statement>
+    <why>This is why the subprocess harness is mandatory rather than merely convenient — see headless_verification_harness. A stall has to be bounded from outside the image, by a process-level timeout with a kill grace, because the process being bounded may be in a state where nothing inside it can run.</why>
+  </in_image_timeouts_do_not_guard_this>
 </compile_load_hang_triage>
 
 <asdf_plan_layer_hang_triage>
@@ -795,7 +802,7 @@ version: 2.3.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor SBCL warning during compilation</example>
     <example severity="medium">Unhandled condition or ASDF load failure</example>

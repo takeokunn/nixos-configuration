@@ -1,7 +1,7 @@
 ---
 name: git-ecosystem
-description: This skill should be used when Git is invoked by a program rather than typed by a person — sanitizing the environment of Git subprocesses (GIT_CONFIG_PARAMETERS, GIT_CONFIG_GLOBAL, GIT_CONFIG_COUNT, GIT_CEILING_DIRECTORIES), identifying a repository with git rev-parse --git-common-dir when linked worktrees exist, parsing diff or status output mechanically (--no-ext-diff, --porcelain, -z, plumbing commands), scheduling git maintenance tasks such as loose-objects and incremental-repack, or using git worktree add/list/remove as an isolation primitive — including mirroring a worktree's state back into the shared checkout and the preconditions for removing one. Covers repository identity, hardening Git invocations against config injection, machine-readable inspection, and repository maintenance; branching strategy, conflict resolution, and PR submission belong to the git agent.
-version: 2.1.0
+description: This skill should be used when Git is invoked by a program rather than typed by a person — sanitizing the environment of Git subprocesses (GIT_CONFIG_PARAMETERS, GIT_CONFIG_GLOBAL, GIT_CONFIG_COUNT, GIT_CEILING_DIRECTORIES), identifying a repository with git rev-parse --git-common-dir when linked worktrees exist, parsing diff or status output mechanically (--no-ext-diff, --porcelain, -z, plumbing commands), scheduling git maintenance tasks such as loose-objects and incremental-repack, or using git worktree add/list/remove as an isolation primitive — including mirroring a worktree's state back into the shared checkout and the preconditions for removing one. Covers repository identity, hardening Git invocations against config injection, machine-readable inspection, and repository maintenance; branching strategy, worktree placement, and pull-request submission are governed by the execution-workflow skill's branch isolation procedure and the project's Git write rules rather than by this skill.
+version: 2.3.0
 ---
 
 <purpose>
@@ -15,8 +15,8 @@ version: 2.1.0
 
 <scope>
   <focus>Git as a tool: repository identity, invoking Git safely from programs, machine-readable inspection of history, repository maintenance, and worktrees as an isolation primitive</focus>
-  <defer_to agent="git">
-    Branching strategy, conflict resolution, commit organization, and hooks as quality gates. This skill covers the tool surface underneath those decisions, not the decisions.
+  <defer_to skill="execution-workflow#branch_isolation_procedure">
+    Where work is placed before it starts: determining the default branch, cutting a feature branch from fetched remote state, and the risk signals that force a worktree instead of an in-place branch. This skill supplies the worktree mechanics; that procedure decides when to invoke them.
   </defer_to>
   <defer_to command="upstream#git_mechanics">
     Pull-request submission mechanics: branch naming from an issue, rebasing onto the upstream default branch, squashing to one reviewable commit, closing keywords, and the --force-with-lease vs --force-if-includes distinction. Not restated here.
@@ -24,6 +24,9 @@ version: 2.1.0
   <defer_to skill="core-patterns#parallel_project_isolation">
     The prohibition on shared-tree mutation across concurrent sessions and the list of prohibited operations. This skill adds only the worktree mechanics that pattern depends on.
   </defer_to>
+  <out_of_scope>
+    Conflict resolution, commit organization, and hooks as quality gates are workflow decisions rather than tool surface. This skill covers the tool surface underneath them and does not state the decisions.
+  </out_of_scope>
   <unique_coverage>
     Worktree-aware repository identity via --git-common-dir, environment sanitization for Git subprocesses and the config-injection execution vector, format-pinning for parsed Git output, and git maintenance task preconditions.
   </unique_coverage>
@@ -434,7 +437,7 @@ version: 2.1.0
   </avoid>
 </anti_patterns>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">A repository skipped because it is empty or shallow, reported as such</example>
     <example severity="medium">Maintenance run redundantly across worktrees of one repository through --git-dir deduplication</example>
@@ -458,10 +461,10 @@ version: 2.1.0
   <skill name="investigation-patterns">Evidence-gathering discipline for history inspection, where an unpinned output format silently invalidates the evidence</skill>
   <skill name="quality-tools">The layer that runs checks; diff-parsing checks in particular depend on the format-pinning rules here</skill>
   <skill name="testing-patterns">Asserting on process exit status, the same class of failure as a check that reads nothing and passes</skill>
+  <skill name="execution-workflow">Owns branch_isolation_procedure: when to cut a feature branch versus isolate in a worktree, and the rule that a pull request targets only the default branch</skill>
 </related_skills>
 
 <related_agents>
-  <agent name="git">Branching strategy, conflict resolution, and commit organization — the workflow decisions above this tool surface</agent>
   <agent name="devops">CI runners and automation that invoke Git with environments assembled from job configuration</agent>
   <agent name="security">Review of config-injection exposure in code that shells out to Git</agent>
   <agent name="explore">Locating every site in a codebase where Git is invoked as a subprocess</agent>

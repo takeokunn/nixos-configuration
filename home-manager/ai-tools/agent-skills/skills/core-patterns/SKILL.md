@@ -1,7 +1,7 @@
 ---
 name: Core Patterns
 description: Base templates for error escalation, decision criteria, and enforcement, referenced by agents and commands to avoid duplication. Also holds cross-cutting patterns worth loading directly — modelling absence structurally instead of with an in-range sentinel such as 0, -1, or the empty string, deriving a cost estimate from the emitter that actually produces the artifact rather than re-modelling it in a second place, resolving an apparent contradiction between two rulesets by finding the distinguishing condition instead of weakening either, and safe alternatives to destructive Git commands — including mirroring a worktree's state back into the shared checkout with a file sync rather than a branch switch, and the preconditions for removing a worktree — and when a single-pass review should escalate into an independent, skeptical refutation pass, plus that escalation's own failure modes — false positives, lazy rubber-stamp validation, token cost, and shared blindspots between identical models.
-version: 3.1.0
+version: 3.2.0
 ---
 
 <purpose>
@@ -157,23 +157,34 @@ version: 3.1.0
     </example>
   </pattern>
 
-  <pattern name="refs_syntax">
-    <description>Standard syntax for referencing skills from agents and commands</description>
+  <pattern name="skill_loading">
+    <description>How an agent or command actually obtains a skill's content. Nothing resolves a
+      reference automatically: a skill reaches the model only through an explicit Skill tool call. So a
+      dependency has to be registered where the orchestrator will see it, and then loaded in the
+      workflow that depends on it.</description>
+    <registration>Add a row to the load table in the orchestrator instructions, naming the condition
+      that fires the load and the skill to load. The trigger is an observable moment in the work —
+      "Writing or evaluating tests", "Any Serena memory or symbol operation" — not a taxonomy the skill
+      belongs to. A category label cannot fire; a condition can.</registration>
+    <loading>Load the governing skill in the workflow's first phase, before any step that depends on it,
+      and record in the output that it was loaded.</loading>
     <example>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="patterns">parallelization-patterns</skill>
-  <skill use="patterns">workflow-patterns</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="domain">nix-ecosystem</skill>
-</refs>
-
-Use attribute values:
-  patterns: Shared templates (core-patterns, parallelization-patterns, workflow-patterns)
-  tools: Tool-specific usage patterns (serena-usage, context7-usage)
-  workflow: How-to guides and methodologies (investigation-patterns, execution-workflow)
-  domain: Domain knowledge and best practices (nix-ecosystem, typescript-ecosystem)
+<phase name="prepare">
+  <step order="1">
+    <action>Load the execution-workflow skill with the Skill tool. It governs the delegation contract
+      and the definition of done that this command depends on. A skill that is named but not loaded
+      contributes nothing to this run.</action>
+    <tool>Skill (execution-workflow)</tool>
+    <output>Skill loaded</output>
+  </step>
+</phase>
     </example>
+    <rationale>This pattern previously taught a `refs` block with `use="patterns|tools|workflow|domain"`
+      attributes, alongside an `inherits="skill#anchor"` attribute for composing one file out of another's
+      sections. Both were markup that nothing ever read. The referenced body never entered the context,
+      so an agent applied whatever the referencing file happened to restate and the reference itself was
+      decoration that read as if it were content. A trigger row plus an explicit Skill call is checkable:
+      either the call appears in the transcript, or the content was never there.</rationale>
   </pattern>
 
   <pattern name="parallel_project_isolation">
@@ -286,8 +297,10 @@ Use attribute values:
     <action>Document issue, add missing test</action>
   </level>
   <level severity="high">
-    <example>Decision criteria weights do not sum to 1.0</example>
-    <action>STOP, fix weight distribution before proceeding</action>
+    <example>A decision_criteria factor names a quality to be rated rather than an observable `unmet`
+      condition, so no reader can check which factor decided</example>
+    <action>STOP, restate the factor as a condition that can fail and give it a precedence before
+      proceeding</action>
   </level>
   <level severity="critical">
     <example>Error escalation missing critical level</example>
@@ -298,9 +311,11 @@ Use attribute values:
 <enforcement>
   <mandatory_behaviors>
     <behavior id="CORE-B001" priority="critical">
-      <trigger>When creating new agent or command</trigger>
-      <action>Reference core-patterns skill in refs section</action>
-      <verification>refs tag contains core-patterns</verification>
+      <trigger>When a new agent or command depends on a skill</trigger>
+      <action>Register the skill in the orchestrator's load table against the condition that triggers it,
+        and load it with the Skill tool in the workflow's first phase (skill_loading)</action>
+      <verification>The load table carries a row whose trigger this run met, and the transcript shows the
+        Skill call that loaded it</verification>
     </behavior>
     <behavior id="CORE-B002" priority="critical">
       <trigger>When defining decision_criteria</trigger>
@@ -322,9 +337,14 @@ Use attribute values:
 </enforcement>
 
 <anti_patterns>
-  <avoid name="inline_error_escalation">
-    <description>Duplicating full error_escalation in each file</description>
-    <instead>Reference core-patterns and customize only examples</instead>
+  <avoid name="reference_in_place_of_content">
+    <description>Writing a bare cross-reference — an `inherits="skill#anchor"` attribute, a `refs` entry,
+      a "see core-patterns" note — where the content itself belongs, on the assumption that something
+      resolves it. Nothing does. The file is then carrying an empty slot that reads to every later
+      reader as if it were filled, which is worse than an obviously missing section.</description>
+    <instead>State the four levels and their domain-specific examples in the file itself, and load
+      core-patterns with the Skill tool when the shared template is what you actually need
+      (skill_loading).</instead>
   </avoid>
 
   <avoid name="numeric_self_assessment">
@@ -357,7 +377,7 @@ Use attribute values:
 </anti_patterns>
 
 <best_practices>
-  <practice priority="critical">Reference core-patterns for error_escalation, decision_criteria, enforcement templates</practice>
+  <practice priority="critical">Load core-patterns with the Skill tool and write the error_escalation, decision_criteria, and enforcement structures into the file itself — a reference left in their place delivers nothing (skill_loading)</practice>
   <practice priority="critical">Tag every finding with an evidence tier — verified, inferred, or assumed — and never promote a tier to strengthen a report (evidence_tiers)</practice>
   <practice priority="critical">Write gates as conditions that can fail, not as scores to clear (decision_criteria, numeric_self_assessment)</practice>
   <practice priority="high">Customize error_escalation examples to be domain-specific while keeping structure</practice>
@@ -377,7 +397,7 @@ Use attribute values:
 </rules>
 
 <rules priority="standard">
-  <rule>Use refs tag to reference this skill from agents and commands</rule>
+  <rule>Register this skill in the load table against a trigger condition, and load it with the Skill tool before applying its templates</rule>
   <rule>Customize examples in error_escalation while keeping structure</rule>
   <rule>Use consistent behavior ID naming convention</rule>
 </rules>

@@ -1,7 +1,7 @@
 ---
 name: mdq
 description: This skill should be used when the user asks to parse, search, grep, query, filter, or extract headings, sections, tasks, code blocks, links, or tables from Markdown files. Use when working with mdq, jq-style Markdown querying, section extraction, checklist validation, CI task scripts, or documentation automation pipelines.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -220,7 +220,7 @@ version: 2.0.1
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">No matches found (exit code 1 in --quiet mode)</example>
     <example severity="medium">Unexpected output format or extra content extracted</example>

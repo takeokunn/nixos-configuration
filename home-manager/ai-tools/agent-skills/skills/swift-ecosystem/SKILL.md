@@ -1,7 +1,7 @@
 ---
 name: Swift Ecosystem
 description: This skill should be used when working with Swift projects, "Package.swift", "swift build/test/run", "swiftc", SwiftLint, SwiftFormat, or Swift language patterns. Provides comprehensive Swift 6.3 ecosystem patterns and best practices for cross-platform CLI and library development.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -857,7 +857,7 @@ version: 2.0.0
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="concurrency"</action>
+  <action>query-docs libraryId="/swiftlang/swift" query="concurrency"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -865,7 +865,7 @@ version: 2.0.0
 
     <pattern name="package_configuration">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/swiftlang/swift" topic="Package.swift"</action>
+  <action>query-docs libraryId="/swiftlang/swift" query="Package.swift"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -873,7 +873,7 @@ version: 2.0.0
 
     <pattern name="library_usage">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/alamofire/alamofire" topic="request"</action>
+  <action>query-docs libraryId="/alamofire/alamofire" query="request"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -987,7 +987,7 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">SwiftLint warning about style</example>
     <example severity="medium">Type safety error or optional handling issue</example>

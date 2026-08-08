@@ -1,7 +1,7 @@
 ---
 name: Common Lisp Ecosystem
 description: This skill should be used when the user asks to "write common lisp", "CLOS", "ASDF", "defpackage", "defsystem", or works with Common Lisp, SBCL, or Coalton. Covers package hygiene (export interns a symbol but does not define it; stub packages contaminating a shared image), condition design with define-condition and a bounded retained payload, never passing data as a format control string, Unicode-aware standard character predicates, validating before normalizing, read-time evaluation via the sharp-dot reader macro and its load-order limits, publishing a file atomically by rename within the target directory, and hash-table keys that must not be caller-owned mutable strings. Also covers ASDF dependency changes across every affected surface and keeping a mutable structure's derived index rebuilt through its mutators.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -942,12 +942,12 @@ version: 2.3.0
   </tool>
 
   <pattern name="retrieve_documentation">
-    <description>Use resolve-library-id then get-library-docs for latest documentation.</description>
+    <description>Use resolve-library-id then query-docs for latest documentation.</description>
     <example>
       ;; Get ASDF documentation
       mcp__plugin_claude-code-home-manager_context7__query-docs
-        context7CompatibleLibraryID="/websites/asdf_common-lisp_dev"
-        topic="defsystem"
+        libraryId="/websites/asdf_common-lisp_dev"
+        query="defsystem"
     </example>
   </pattern>
 </context7_integration>
@@ -1147,7 +1147,7 @@ version: 2.3.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Style inconsistency</example>
     <example severity="medium">Compilation warning or type error</example>

@@ -1,7 +1,7 @@
 ---
 name: Serena Usage
-description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", "serena memory", or needs Serena MCP guidance. Also covers organising a growing memory corpus as a reference graph — one root entry-point memory linking outward, references that describe what the target covers, and no memory stating when to read itself — instead of a flat set an agent must read entirely, and recovering a parallel subagent's report from its session transcript when the completion notification never arrives. Provides Serena tool usage patterns and orchestration integration.
-version: 3.5.0
+description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", "serena memory", or needs Serena MCP guidance. Also covers organising a growing memory corpus as a reference graph — one root entry-point memory linking outward, references that describe what the target covers, and no memory stating when to read itself — instead of a flat set an agent must read entirely, and recovering a parallel subagent's report from its session transcript when the completion notification never arrives. Provides Serena tool usage patterns and orchestration integration. Keywords — a memory body stating current state rather than a changelog, storing the command instead of the count it produced, checking whether what a memory names still exists, stacked frontmatter blocks from a partial edit, finding a duplicate by symptom wording, and a shared active-project pointer misrouting a parallel session's lookup.
+version: 3.7.0
 ---
 
 <purpose>
@@ -387,7 +387,13 @@ version: 3.5.0
       <trigger>User-specific temporary preferences</trigger>
       <trigger>Workarounds that should be replaced later</trigger>
       <trigger>Information already documented elsewhere</trigger>
+      <trigger>A note that names one file and would not change what you do in a different file. That is a commit message. The trigger list above is monotone — every extraction is "a refactoring approach", every fix is "a bug insight" — so it can only ever argue for writing, and a corpus grown from it alone becomes an index no agent can afford to read, which pushes the next session toward reading nothing at all.</trigger>
+      <trigger>Anything volatile enough to be wrong within weeks — line numbers, file counts, current status, an in-flight branch's state. Volatility is the load-bearing exclusion because it rejects at write time exactly the entries the staleness check would otherwise have to catch later.</trigger>
+      <trigger>Generic language or framework knowledge, and facts a single quick read would establish. A memory earns its place by preventing an expensive rediscovery, not by recording something true.</trigger>
     </should_not_create>
+    <register>
+      <rule>Write dense agent notes, not prose documentation — invariants and terse bullets, with rationale and worked examples omitted unless they prevent a likely mistake. A maintained corpus looks like a handful of short files; an accumulated one looks like dozens of long ones.</rule>
+    </register>
     <example>
       <note>Good: After discovering project uses specific error handling pattern</note>
       write_memory "error-handling-pattern" "# Error Handling Convention\n\nThis project uses Result type pattern with custom Error enum..."
@@ -432,6 +438,8 @@ version: 3.5.0
       <rule>A reference must carry a description of what the target covers, precise enough to decide whether to follow it. The target's name alone is not enough — a name tells you the topic, not whether the content bears on the question in hand.</rule>
       <rule>A memory should not contain instructions about when to read itself. That guidance belongs to the referrer, which is the only place with the context to judge relevance. Self-describing read conditions duplicate across every referrer and go stale independently of each other.</rule>
       <rule>When adding a memory, add the reference from its parent in the same edit. An unreferenced memory is unreachable by traversal and effectively invisible, however good its content.</rule>
+      <rule>When writing a link, confirm the target exists, or say in the same line that it is a placeholder for a memory not yet written. A dangling reference reads exactly like a valid one until someone follows it, so the graph degrades silently rather than loudly.</rule>
+      <rule>When a task finds itself reading more than a handful of memories on one topic, that is the signal to write the linking entry that gathers them — not to add another leaf. A cluster held together only by a shared filename prefix is not a graph.</rule>
     </rules>
     <reconciling_note>This does not replace memory_reading_by_task_type. The task-type priority lists are the selection heuristic for a flat corpus or when no root exists; the reference graph is how a corpus is navigated once one does. Where both apply, start at the root and let the task type decide which branches to follow.</reconciling_note>
   </pattern>
@@ -471,6 +479,47 @@ last-verified: YYYY-MM
       <rule>On write_memory: set last-verified = created</rule>
       <rule>On edit_memory: update last-verified to current YYYY-MM; leave created unchanged</rule>
     </rules>
+    <body_rules>
+      <description>The frontmatter above constrains metadata only. These rules constrain the body, which is what a reader actually loads.</description>
+      <rule name="body_states_current_state">A memory body is a document describing the present state, not a change log. If an addition invalidates something already written, rewriting or deleting that passage is part of the same edit. Appending looks like the safe move — it destroys no prior observation — but memories are read top-down under a context budget, so an append-only file becomes a document whose truth value decreases with reading order, and the part most likely to be read is the part most likely to be wrong.</rule>
+      <rule name="retraction_goes_in_the_lead">When a task's observations contradict a memory, rewrite that memory's opening line to say so before doing anything else with it. A retraction buried under sixteen dated update markers does not reach a reader who stops after the first paragraph. This is also what makes a status field expendable — if the lead always states current status, nothing depends on a taxonomy that has to be maintained separately. Treat a status value that has never taken anything but its default across the whole corpus as decoration to route around, not a filter to trust.</rule>
+      <rule name="store_the_command_not_the_count">Never write a figure that moves with the tree — test counts, file counts, lines of code, coverage percentage, dependency totals. It is stale one commit later, and a date stamp cannot protect it: last-verified is honest about when someone looked and useless for deciding whether to trust the number today. Store the selector and the runner instead. "The full unit suite is &lt;command&gt;, and it is expected to report zero unexpected results" survives every commit that a number does not.</rule>
+      <rule name="record_the_re_verification_command">Record the exact command that establishes the memory's claim, verbatim, next to the claim. A date tells a later reader when someone was satisfied and offers them only two options, trust or re-derive; the command makes re-verification a paste. Where the memory records an audit or a survey, add the commit or date the audit covered and the command that reveals what has changed since, so a re-audit becomes a diff instead of a re-derivation.</rule>
+      <rule name="name_what_decays_fastest">State explicitly which parts of the memory decay first — line numbers and counts always do — so a reader knows which sentences to re-check and which to rely on. A memory that does not distinguish its durable claims from its perishable ones gets discarded whole once any part of it is found wrong.</rule>
+      <rule name="record_the_verification_set">When a memory covers an area of work, record what constituted done for it — the commands that had to pass, and any non-zero output that was accepted as normal. That accepted-warning detail is written nowhere else, and without it the next agent reads a pre-existing warning as a fresh regression.</rule>
+    </body_rules>
+  </pattern>
+
+  <pattern name="memory_edit_hygiene">
+    <description>Mechanical rules for editing an existing memory. These exist because each one has a recorded failure behind it, and each failure is silent — the edit reports success and the damage is only visible to a later reader.</description>
+    <rules>
+      <rule>Read the whole memory before editing it, not just the region being changed. Editing from a partial view is how a second complete frontmatter block ends up stacked on top of the first, after which a consumer parsing the first block and one parsing the last get different answers. This is the re-read-before-editing rule applied to memory rather than to source.</rule>
+      <rule>After the edit, the file must contain exactly one frontmatter block. Check it rather than assuming it.</rule>
+      <rule>Any programmatic in-place substitution whose replacement text contains a metacharacter must be verified by reading the result, not by the command's exit status. A replacement containing a capture-group reference with no corresponding group in the pattern substitutes the empty string silently and truncates the sentence; a replacement written through a layer that does not interpret escapes emits the escape sequence as literal characters. Neither fails loudly, and both destroy content in a file nobody will re-read.</rule>
+    </rules>
+  </pattern>
+
+  <pattern name="memory_duplicate_detection">
+    <description>How to find the existing entry before writing a new one. "Check list_memories first" stops working the moment the namespace is split by domain prefix, which is exactly when the corpus is large enough for duplication to matter.</description>
+    <problem>Working inside one domain, the natural name for a new memory carries that domain's prefix, so the identical fact already filed under a different domain never comes into view. The bodies diverge in vocabulary too, so neither a name scan nor a full-text grep for the obvious term finds the existing entry. The observed cost is a fact recorded in seven places where the sum of the seven carries less information than the best single copy — each partial, and the decisive detail present in only one.</problem>
+    <rules>
+      <rule>Search by the words describing the symptom, not by the words you would use to name the file. "Tests run stale logic", "the edit did not take effect" — a reader hits the memory through the problem they are having, never through the taxonomy someone else chose.</rule>
+      <rule>A fact that crosses domains goes in one cross-cutting place, not under whichever domain happened to hit it first.</rule>
+      <rule>When you do find the duplicate, merge rather than adding another copy, and keep the detail that appears in only one of them. That detail is usually the reason the memory is worth having.</rule>
+    </rules>
+  </pattern>
+
+  <pattern name="shared_active_project_pointer">
+    <description>Serena's active-project pointer is shared, so concurrent sessions can move it out from under each other. A memory operation that fails or comes back short during a heavy parallel dispatch is usually a routing problem, not missing data.</description>
+    <symptoms>
+      <symptom>edit_memory returns a not-found error for a memory known to exist.</symptom>
+      <symptom>list_memories returns a small, unrelated set instead of the expected corpus.</symptom>
+    </symptoms>
+    <recovery>
+      <step order="1">Re-run activate_project with this session's own absolute project path.</step>
+      <step order="2">Retry the memory operation. The files on disk were never touched; only the pointer moved.</step>
+    </recovery>
+    <rule>A subagent reporting "no relevant memory exists" or "list_memories returned only unrelated entries" during a parallel-worktree session may be hitting the same routing confusion. Do not treat that negative as authoritative — acting on it means writing a duplicate of an entry that already exists under the project the pointer drifted away from.</rule>
   </pattern>
 
   <pattern name="memory_lifecycle">
@@ -484,6 +533,8 @@ last-verified: YYYY-MM
       <trigger>When pattern is superseded by new approach</trigger>
       <action>Rename with -archived suffix using rename_memory OR delete if no historical value</action>
       <example>rename_memory "old-pattern" "old-pattern-archived"</example>
+      <forward_pointer>A rename reaches only whoever consults the index next. It leaves nothing behind for the session that already loaded the old memory, and nothing for the other memories that cite it. So the superseding memory should name the old one and state what it wrongly claimed. Recording the wrong claim, not just the name, is what lets a reader match it against what they remember reading — a bare name leaves them at "I think I read that, but I cannot recall what it said".</forward_pointer>
+      <keep_the_correction_visible>Where the old claim is likely to be re-derived from the same code, keep it visible with its correction and date rather than deleting it outright. A silently overwritten memory has a specific recurring cost: the next session re-derives the superseded claim, reaches the same wrong conclusion, and has no way to know it has been here before. This applies with particular force to a recorded rejection — "we evaluated this and decided against it" — which should be stored with its reasoning, not just its verdict, because a rejection goes stale when its premise is invalidated even though its conclusion still sounds right.</keep_the_correction_visible>
     </archival>
     <consolidation>
       <trigger>When multiple small memories cover related topics</trigger>
@@ -501,7 +552,22 @@ last-verified: YYYY-MM
     <staleness_signal>
       <primary>Frontmatter last-verified field (see memory_content_format) — stale if more than 3 months old</primary>
       <fallback>If frontmatter is absent, treat the memory as a stale candidate on this basis alone and add frontmatter when editing (see memory_content_format rules)</fallback>
+      <named_predicate>For a memory that names something checkable — a symbol, a file, a path, a condition — the test that matters is not how old it is but whether the thing it names still exists. Those two questions have different answers: a memory verified two months ago can name a symbol deleted last week and pass the date gate untouched. Checking costs one search, far less than the review round that re-derives the item and re-files it as an action. Apply this in particular to any memory that carries forward a deferred work item, because that item is re-proposed on the strength of a name that may no longer resolve.</named_predicate>
     </staleness_signal>
+    <verification_is_a_comparison>
+      <rule>Bumping last-verified is one edit; verifying content requires actually reading the code. If only the first happens, the stamp comes to mean "recently touched" rather than "checked", which is worse for a reader than no stamp at all — an unmarked memory invites suspicion, a freshly-dated one invites trust. State what was compared against what, naming a file path or a command output, whenever the date is bumped.</rule>
+    </verification_is_a_comparison>
+    <partial_verification>
+      <description>The three outcomes above — still accurate, partially outdated, fully superseded — are all whole-file verdicts, and a task rarely touches a whole memory. Partial re-verification is the normal case, not the exception, so it needs its own form.</description>
+      <rule>Record the boundary of what was checked, in the memory body, naming both sides. Bumping last-verified for the whole file after confirming one section lends false freshness to everything else in it; not bumping it at all sends the confirmed part back through verification next time. Neither is right, and the boundary statement is what makes the date honest.</rule>
+      <rule>Record a discrepancy found during a scoped check at the moment it is found, even when it lies outside what the task set out to verify. Noting that a named function or path no longer exists costs a line and closes the finding; deferring it means an independent investigation later that starts from nothing.</rule>
+    </partial_verification>
+    <superseded_banner>
+      <description>An alternative to the correct-in-place and archive-by-rename outcomes, for a memory whose value is mixed — some claims still hold, others are dead. Correcting in place erases the audit trail; archiving discards the parts that were confirmed.</description>
+      <form>Keep the file. Put a dated banner at the top stating which claims are still true, and explicitly invalidating the point-in-time facts — scores, counts, line numbers — as historical rather than current. Where the split is substantial, divide the body into what was re-verified and what is retained as history.</form>
+      <why>A later session quoting a stale number is stopped at the moment it opens the file, rather than after it has built on the number. The banner also gives the memory a status that a metadata field will not reliably carry, because the banner is in the text a reader actually loads.</why>
+      <numbers_with_provenance>Where a figure genuinely must be recorded, write it as an observation made at a stated time by a stated command, never in the present tense as a current fact. "Reported N at &lt;date&gt; via &lt;command&gt;" ages honestly; "the suite contains N tests" does not, and a corpus accumulates several mutually contradictory values of N, each confident and each correct when written.</numbers_with_provenance>
+    </superseded_banner>
     <action_by_outcome>
       <outcome name="still_accurate">edit_memory to bump last-verified to the current YYYY-MM; add frontmatter first if it was missing</outcome>
       <outcome name="partially_outdated">edit_memory to correct the stale section and bump last-verified</outcome>
@@ -731,6 +797,13 @@ last-verified: YYYY-MM
   <practice priority="medium">When a multi-language repo's language detection excludes the target file's language, fall back to Grep plus text edits instead of retrying symbol tools (symbol_tools_unavailable_fallback)</practice>
   <practice priority="high">Give a growing memory corpus a single root and describe what each reference covers, so memories are reached by traversal rather than by reading everything (memory_reference_graph)</practice>
   <practice priority="medium">When a parallel subagent's completion notification does not arrive, read its transcript before concluding it failed (parallel_subagent_result_recovery)</practice>
+  <practice priority="critical">Keep a memory body describing the current state; an addition that invalidates existing text rewrites that text in the same edit, and a retraction goes in the opening line (memory_content_format body_rules)</practice>
+  <practice priority="high">Store the command that produces a figure, never the figure itself, and record the exact command a later reader can re-run to re-establish the claim (memory_content_format body_rules)</practice>
+  <practice priority="high">Read the whole memory before edit_memory, and confirm the result carries exactly one frontmatter block (memory_edit_hygiene)</practice>
+  <practice priority="high">Search for an existing duplicate by the symptom wording rather than by the name you would give the file (memory_duplicate_detection)</practice>
+  <practice priority="medium">For a memory that names a symbol or path, check that the name still resolves — that is a different question from how old the memory is (memory_staleness_verification)</practice>
+  <practice priority="high">When re-verification is partial, write the boundary of what was checked into the body; a whole-file date bump after a section-level check lends false freshness to the rest (memory_staleness_verification)</practice>
+  <practice priority="medium">During heavy parallel dispatch, re-activate the project before believing a memory lookup that came back empty (shared_active_project_pointer)</practice>
 </best_practices>
 
 <anti_patterns>
@@ -835,7 +908,7 @@ last-verified: YYYY-MM
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Symbol not found with exact match</example>
     <example severity="medium">Memory file not found</example>

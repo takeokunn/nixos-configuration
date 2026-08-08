@@ -6,26 +6,17 @@ description: Question and inquiry command
 <purpose>
 Provide accurate, evidence-based answers to project questions through fact-based investigation. Operates in read-only mode; never modifies files.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">investigation-patterns</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
 <rules priority="critical">
-  <rule>NEVER modify, create, or delete files</rule>
-  <rule>NEVER implement fixes; provide analysis and suggestions only</rule>
-  <rule>ALWAYS base answers on factual investigation from code and documentation</rule>
-  <rule>ALWAYS tag each finding verified, inferred, or assumed (core-patterns#evidence_tiers) and state unclear points honestly</rule>
-  <rule>NEVER justify user assumptions; prioritize technical accuracy</rule>
+  <rule>Never modify, create, or delete a file, and never implement a fix. The user invoked a question,
+    not a change; an answer that edits the codebase removes their decision.</rule>
+  <rule>Never justify the user's assumption. If the evidence contradicts the question's premise, say so
+    and answer the question the evidence supports, naming both.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use investigation-patterns skill for systematic analysis</rule>
-  <rule>Delegate to appropriate agents in parallel</rule>
-  <rule>Provide file:line references for all findings</rule>
+  <rule>Give a file:line for every finding, because the reader's next move is to look at it, and a
+    finding they cannot locate costs them the same investigation over again.</rule>
+  <rule>Dispatch independent investigation agents in one message so they run in parallel.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Investigating files one at a time before synthesizing — AI can survey all relevant files in a single parallel investigation pass</practice>
@@ -36,34 +27,36 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <principle>Map the full evidence surface (all relevant files, cross-references, documentation) before forming any conclusion</principle>
     <principle>Distinguish facts (from code evidence) from inferences (deduced) from speculation (no evidence) — label each finding explicitly</principle>
     <principle>Always verify claimed patterns exist in the current codebase; memory and training data about past states can be stale</principle>
+    <principle>When a committed document and the thing that generates it both exist in the repository,
+      the generator is the evidence and the document is a claim. A schema snapshot, a checked-in
+      OpenAPI file, a generated client, or an architecture diagram answers the question in exactly the
+      form it was asked and is the first thing found, which is what makes it dangerous: it goes stale
+      silently. A verified tier requires citing the migration, the handler, or the model — not the
+      document that describes them.</principle>
+    <principle>A call site found by search tells you a code path exists, not what role it plays. Debug
+      hooks, QA controls, and preview entry points are simpler and more findable than the production
+      implementation, so "the only calls I can find are manual" is a common route to concluding a
+      feature is unimplemented when it is merely owned elsewhere. Before reporting an absence, name
+      where the production owner would be registered and check there.</principle>
   </applicable_ai_principles>
 </ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
+      <action>Load the investigation-patterns skill with the Skill tool. It governs how evidence is
+        gathered and how a hypothesis is discharged, which is the whole substance of this command, and
+        it is not in context until loaded — a skill named in a reference attribute never loads itself.
+        If the question turns on external library or API behavior, load fact-check as well.</action>
+      <tool>Skill</tool>
+      <output>The skills loaded, named; and if fact-check was skipped, the reason</output>
     </step>
     <step order="2">
-      <action>Check list_memories for relevant patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Full memory index</output>
+      <action>Initialize Serena, then classify this task as "investigation" and load only the memories
+        matching that type's priority categories — {domain}-patterns, architecture-*,
+        {project}-conventions — following the serena-usage skill for the filter procedure</action>
+      <tool>Serena activate_project, list_memories, read_memory</tool>
+      <output>The memories read, named; or an explicit "nothing in the index matched investigation"</output>
     </step>
-    <step order="3">
-      <action>Classify task type as "investigation". Apply memory_reading_by_task_type filter
-        (serena-usage skill): prioritize {domain}-patterns → architecture-* → {project}-conventions.
-        Filter the memory index from step 2 against these categories; record matched names.</action>
-      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
-      <output>Filtered priority memory list for investigation tasks</output>
-    </step>
-    <step order="4">
-      <action>Load only memories matching the prioritized categories with read_memory;
-        skip categories absent from the index</action>
-      <tool>Serena read_memory</tool>
-      <output>Prioritized patterns loaded</output>
-    </step>
-
   </phase>
   <phase name="analyze">
     <step order="1">
@@ -126,22 +119,12 @@ Provide accurate, evidence-based answers to project questions through fact-based
       <output>Complexity metrics and refactoring candidates</output>
     </step>
     <step order="3">
-      <action>Compile agent findings, tagging each verified, inferred, or assumed per
-        core-patterns#evidence_tiers; downgrade any verified claim that cannot name a command or file:line</action>
-      <output>Tagged finding list</output>
-    </step>
-  </phase>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Detect and classify failures during command execution</action>
-      <tool>Error analysis and severity assessment</tool>
-      <output>Failure classification and impact summary</output>
-    </step>
-    <step order="2">
-      <action>Apply recovery path or escalate with concrete blocker details</action>
-      <tool>Retry policy and fallback strategy</tool>
-      <output>Recovered flow or explicit blocker report</output>
+      <action>Compile agent findings and attach an evidence tier to each. Attach the tier to the passage
+        cited, not to the file it came from: one document can be accurate in its first half and
+        describe classes, columns, and features that exist nowhere in its second, and a specification
+        section can be aspirational rather than descriptive. A check that lands in a sound section
+        raises the tier of that section only.</action>
+      <output>Tagged finding list, each tier scoped to the passage it was checked against</output>
     </step>
   </phase>
   <phase name="persist">
@@ -149,9 +132,13 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <step order="1">
       <action>Evaluate memory_auto_creation_triggers: did this investigation reveal an architectural pattern,
         a significant convention, or a reusable design insight?
-        Call list_memories to check if a memory for this topic already exists.</action>
+        Call list_memories to check if a memory for this topic already exists. Search it specifically for
+        a prior recording of the same finding: an investigation finding produces no work, so the same
+        conclusion is reached and written down repeatedly by sessions that never find each other. If a
+        prior recording exists, say in the answer that this is a repeat and cite the earlier memory —
+        that a finding has now been reached N times is itself the argument for acting on it.</action>
       <tool>Serena list_memories, evaluation against trigger list</tool>
-      <output>Trigger match: yes/no; existing memory: yes/no</output>
+      <output>Trigger match: yes/no; existing memory: yes/no, and if yes, whether this finding is a repeat</output>
     </step>
     <step order="2">
       <action>If trigger matched: use edit_memory (existing topic) or write_memory (new topic).
@@ -215,7 +202,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
     <agent>code-quality</agent>
   </parallel_group>
 </execution_graph>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="evidence_quality" precedence="1">
     <unmet>A claim in the answer names no file:line and no command whose output shows it. Read the source
       and cite it, or tag the claim inferred or assumed and say what would confirm it.</unmet>
@@ -238,11 +225,11 @@ Provide accurate, evidence-based answers to project questions through fact-based
 - Source 1: `path/to/file.ts:42` - finding
 - Source 2: `path/to/other.ts:15` - finding</investigation>
     <conclusion>Direct answer based on evidence</conclusion>
-    <evidence_tiers>Each finding tagged verified | inferred | assumed (core-patterns#evidence_tiers), with the file:line or command that backs it</evidence_tiers>
+    <evidence_tiers>Each finding tagged, with the file:line or command that backs it, and the passage the
+      tier was checked against when the source is a document rather than code</evidence_tiers>
     <recommendations>Optional: Suggested actions without implementation</recommendations>
     <unclear_points>Information gaps that would improve the answer</unclear_points>
     <self_feedback>
-      <verification>The command(s) actually run and their exit status, or "none run"</verification>
       <downgrades>Any claim first written as verified that could not name a command or file:line, and the tier it was moved to</downgrades>
       <weakest_claim>The finding resting on the thinnest evidence, and what would confirm it</weakest_claim>
       <gaps>Anything the question asked for that this answer does not address, and why — not attempted, blocked, or out of scope</gaps>
@@ -251,26 +238,22 @@ Provide accurate, evidence-based answers to project questions through fact-based
 </output>
 <enforcement>
   <mandatory_behaviors>
-    <behavior id="ASK-B001" priority="critical">
-      <trigger>When answering questions</trigger>
-      <action>Cite specific file:line references</action>
-      <verification>References included in answer</verification>
-    </behavior>
-    <behavior id="ASK-B002" priority="critical">
-      <trigger>When a claim was not directly observed</trigger>
-      <action>Tag it inferred or assumed per core-patterns#evidence_tiers and state what would confirm it</action>
-      <verification>Every finding in the answer carries a tier; no verified finding lacks a file:line or command</verification>
+    <behavior id="ASK-B001" priority="high">
+      <trigger>When the question is answered by a committed document</trigger>
+      <action>Find and read whatever generates that document before stating its content as fact</action>
+      <verification>The answer cites the generator, or states that the document has no generator in the repo</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="ASK-P001" priority="critical">
       <trigger>Always</trigger>
       <action>Answering without code investigation</action>
-      <response>Block answer, require investigation first</response>
+      <response>Block the answer. An answer assembled from training data is indistinguishable in tone
+        from one assembled from this repository, so the reader has no way to discount it.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor inconsistency in documentation or comments</example>
     <example severity="medium">Unclear code pattern or ambiguous architecture</example>
@@ -298,8 +281,7 @@ Provide accurate, evidence-based answers to project questions through fact-based
 <constraints>
   <must>Keep all operations read-only</must>
   <must>Provide file:line references for findings</must>
-  <must>Tag every finding verified, inferred, or assumed, and name the evidence</must>
-  <must>Report the verification actually run, or "none run"</must>
+  <must>Scope each evidence tier to the passage it was checked against, not to the whole file</must>
   <avoid>Implementing or modifying any code</avoid>
   <avoid>Guessing when evidence is insufficient</avoid>
   <avoid>Confirming user assumptions without verification</avoid>

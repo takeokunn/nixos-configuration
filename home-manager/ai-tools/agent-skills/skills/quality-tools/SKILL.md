@@ -1,7 +1,7 @@
 ---
 name: Quality Tools
-description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Also covers authoring project-local policy gates, supply-chain pinning of external build references, and the mechanics of running checks so their output is trustworthy. Agents reference this skill instead of inline tool definitions.
-version: 2.2.0
+description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Also covers authoring project-local policy gates, supply-chain pinning of external build references, and the mechanics of running checks so their output is trustworthy. Agents reference this skill instead of inline tool definitions. Keywords — gating a coverage report against a declared source manifest rather than on its aggregate percentage.
+version: 2.4.0
 ---
 
 <purpose>
@@ -329,6 +329,13 @@ version: 2.2.0
   </tooling>
 </supply_chain>
 
+<coverage_gates>
+  <description>What a coverage percentage does and does not certify, for any tool that emits a per-file report and an aggregate total.</description>
+  <rule priority="high">An aggregate percentage is computed over the files that appear in the report, so it says nothing about a file that was dropped from it. A production file that failed to instrument, or was never loaded by the run, contributes nothing to the denominator — and a hundred percent over nine of ten files reads exactly like a hundred percent over ten.</rule>
+  <rule priority="high">Gate on a declared source manifest, not on the total alone. Compare the report's normalized source filenames against the list of files that are supposed to be covered, and reject the run when a declared file is missing from the report, when a row is malformed, or when a row's total is zero. A zero-total row means the file was seen but never executed, which is the same news as its absence and just as easy to overlook.</rule>
+  <note>This is the coverage form of the empty-selector problem: the check passes because it found nothing to disagree with. See testing-patterns for the suite-level version.</note>
+</coverage_gates>
+
 <running_checks>
   <description>Mechanics that decide whether a check's output is usable at all, independent of which tool produced it.</description>
   <rule priority="high">Before inspecting diff output mechanically, neutralize any configured external diff driver. A repo-level or user-level `diff.external` / `diff.tool` setting (difftastic, delta, and similar) makes `git diff`, `git show`, and `git log -p` emit syntax-highlighted, structurally reformatted text rather than a parseable unified diff — so pass `--no-ext-diff`. The failure is silent: the command exits zero and the reader draws wrong conclusions from decorated output instead of hitting an error.</rule>
@@ -387,7 +394,7 @@ version: 2.2.0
   <avoid>Running only subset of quality tools</avoid>
 </constraints>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor linting warning with no functional impact</example>
     <example severity="medium">Type error or test failure blocking CI</example>

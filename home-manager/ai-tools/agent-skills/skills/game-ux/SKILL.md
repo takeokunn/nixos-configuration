@@ -1,7 +1,7 @@
 ---
 name: Game UX
 description: This skill should be used when the user asks to "improve game UX", "game feel / juice", "player onboarding", "difficulty/pacing", "HUD/UI design", "game accessibility", or designs player experience. Provides world-class game UX best practices grounded in MDA, game feel, flow, and player-motivation frameworks.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -440,7 +440,7 @@ version: 2.0.0
   <rule>Reject exploitative dark patterns; design for player benefit and long-term trust</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor HUD clutter or inconsistent visual language in a non-critical element</example>
     <example severity="medium">Onboarding teaches too much at once; early friction likely raises churn</example>

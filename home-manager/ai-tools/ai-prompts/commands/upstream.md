@@ -6,27 +6,22 @@ description: Upstream PR preparation and review command
 <purpose>
 Review and prepare changes before submitting PRs to upstream OSS repositories, auto-fetching contribution guidelines, analyzing code changes, evaluating tests, and generating compliant PR metadata.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-  <skill use="ecosystem">devenv-ecosystem</skill>
-</refs>
 <rules priority="critical">
-  <rule>Read-only operation: analyze and report only, no file modifications</rule>
-  <rule>Auto-fetch CONTRIBUTING.md from upstream with fallback hierarchy (root, .github/, docs/)</rule>
-  <rule>Launch all gather-phase agents in parallel</rule>
-  <rule>Verify gh CLI authentication before PR history operations</rule>
+  <rule>Read-only: analyze and report, never modify the repository under review and never open a PR.
+    Everything this command produces is a handoff the user decides to act on.</rule>
 </rules>
-<rules priority="standard">
-  <rule>Use gh CLI for all GitHub API operations</rule>
-  <rule>Check Serena memories for existing contribution patterns</rule>
-  <rule>Provide structured checklist output with actionable items</rule>
-  <rule>Include comprehensive local reproduction steps with Nix-first ecosystem detection</rule>
-  <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
+<rules priority="important">
+  <rule>Verify gh CLI authentication before any PR history operation, because an unauthenticated shell
+    surfaces as an empty PR sample rather than as an error.</rule>
+  <rule>Auto-fetch CONTRIBUTING.md from upstream with the fallback hierarchy (root, .github/, docs/).</rule>
+  <rule>Launch all gather-phase agents in parallel; they are independent.</rule>
+  <rule>Check Serena memories for existing contribution patterns for this upstream.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
+<rules priority="advisory">
+  <rule>Use the gh CLI for GitHub API operations.</rule>
+  <rule>Produce a structured checklist with actionable items and Nix-first local reproduction steps.</rule>
+  <rule>Include a (Recommended) option when presenting choices via AskUserQuestion.</rule>
+</rules>
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Fetching contribution guidelines, reviewing code, and sampling merged PRs sequentially — all gather-phase agents (guidelines, pr_template, changes, tests, pr_samples) are independent and must run in parallel</practice>
@@ -42,6 +37,14 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
 <workflow>
   <phase name="prepare">
     <objective>Verify environment and detect upstream repository</objective>
+    <step order="0">
+      <action>Load the git-ecosystem skill with the Skill tool when the change will need commit-history
+        work planned — a rebase onto the upstream default branch, a squash, or a re-push after either.
+        It holds the mechanical diff-inspection and worktree-isolation patterns the commit_prep phase
+        plans against. Skip the load for a review that only produces PR metadata.</action>
+      <tool>Skill (git-ecosystem)</tool>
+      <output>Skill loaded, or the reason it was not needed</output>
+    </step>
     <step order="1">
       <action>Check Serena memories for contribution patterns of upstream repo</action>
       <tool>Serena list_memories, read_memory</tool>
@@ -81,7 +84,16 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     <check>State the resolved owner/repo and the remote it came from.</check>
     <check>State the file count and line count from `git diff upstream/&lt;default&gt;...HEAD --stat`.
       Zero means there is nothing to review.</check>
-    <on_unmet>Stop and report to the user. Do not proceed on an assumed remote or an empty diff.</on_unmet>
+    <check>Judge the diff's scope in both directions and name what you find. Over-inclusion: files in
+      the diff that this change does not need — incidental tooling, unrelated documentation, or CI
+      edits picked up along the way — which a maintainer has to untangle before reviewing anything.
+      Under-inclusion: surfaces the change requires but does not touch, most often a dependency
+      manifest or lockfile left behind when only the source moved. Both come from the same missing
+      step, so enumerate every surface this change must touch to hold together and compare that list
+      against the diff.</check>
+    <on_unmet>Stop and report to the user. Do not proceed on an assumed remote or an empty diff. When
+      the scope is mixed, report the split and let the user decide what belongs in this PR rather than
+      preparing metadata for a change that will be rejected on composition.</on_unmet>
   </reflection_checkpoint>
   <phase name="gather">
     <objective>Collect all necessary information in parallel</objective>
@@ -160,12 +172,15 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Complete execute_handoff for /execute command consumption</output>
     </step>
   </phase>
-  <phase name="self_evaluate" inherits="workflow-patterns#self_evaluate_phase">
+  <phase name="self_evaluate">
     <objective>Find what the review claims but did not establish</objective>
     <step order="1">
-      <action>Cross-validate guideline compliance with code review findings</action>
-      <tool>validator agent</tool>
-      <output>Validation report with consistency check</output>
+      <action>Cross-check the guideline-compliance items against the code review findings yourself. They
+        are two readings of the same diff, and a compliance item marked pass on a file the changes agent
+        flagged is the contradiction worth catching. Dispatch the validator agent only when that
+        cross-check leaves a consequential disagreement you cannot settle from what each side actually
+        examined; an independent pass is not a routine phase here.</action>
+      <output>Contradictions found and how each was settled, or "none"</output>
     </step>
     <step order="2">
       <action>Tag every checklist item and finding verified, inferred, or assumed. A `verified` item must
@@ -179,16 +194,9 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
       <output>Gap list, possibly empty</output>
     </step>
     <step order="4">
-      <action>Set status per core-patterns#status_determination from what steps 2 and 3 found, and append
+      <action>Set the status from what steps 2 and 3 found, using the status_criteria below, and append
         the self_feedback section naming the weakest claim and what would confirm it.</action>
       <output>Status and self_feedback</output>
-    </step>
-  </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle execution errors and apply fallback strategy</action>
-      <tool>Error analysis and retry policy</tool>
-      <output>Recovered execution path or documented blocker</output>
     </step>
   </phase>
 </workflow>
@@ -211,7 +219,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <agent name="pr_samples" subagent_type="general-purpose" readonly="true">Sample 10 recently merged PRs from upstream via gh CLI; extract title patterns, description structure, and common sections for pattern learning</agent>
   <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns; set template_source accordingly</agent>
   <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
-  <agent name="validator" subagent_type="validator" readonly="true">Cross-validate guideline compliance and code review findings</agent>
+  <agent name="validator" subagent_type="validator" readonly="true" dispatch="on_demand">Independently re-derive a disputed claim, when the guideline-compliance and code-review readings disagree and their evidence does not settle it</agent>
 </agents>
 <execution_graph>
   <parallel_group id="gather" depends_on="none">
@@ -225,9 +233,10 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     <agent>metadata</agent>
     <agent>verify</agent>
   </parallel_group>
-  <sequential_phase id="validation" depends_on="post_gather">
-    <agent>validator</agent>
-    <reason>Cross-validate all findings before final output</reason>
+  <sequential_phase id="self_evaluation" depends_on="post_gather">
+    <action>Cross-check guideline compliance against the code review findings, tag evidence tiers, and list gaps</action>
+    <conditional_agent>validator</conditional_agent>
+    <reason>Dispatched only for a disagreement the cross-check could not settle, since an independent pass costs materially more than the reports it checks</reason>
   </sequential_phase>
 </execution_graph>
 <delegation>
@@ -239,7 +248,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
   <requirement>Explicit no-modification prohibition</requirement>
   <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
 </delegation>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="guideline_compliance" precedence="1">
     <unmet>A requirement stated in CONTRIBUTING.md is not met by the change, or CONTRIBUTING.md could not
       be fetched at all. Report the specific requirement and the file that violates it; if the guidelines
@@ -257,7 +266,7 @@ Review and prepare changes before submitting PRs to upstream OSS repositories, a
     happens next; later factors are not consulted.</resolution>
 </decision_criteria>
 <output>
-  <status_criteria inherits="core-patterns#status_determination">
+  <status_criteria>
     <status name="ready">Every check the review set out to make was made and none failed. No checklist
       item the review was meant to verify is left at `assumed`.</status>
     <status name="needs_work">The review completed, but a check could not be run, an item rests on
@@ -702,7 +711,9 @@ Phase 4: Final Verification (depends on all)
               <description>Principles the commit_prep tasks must encode for the /execute handoff. This command plans these steps; it never runs them (read-only, UP-P001/UP-P002).</description>
               <principle name="branch_naming">Name the branch after the issue it addresses, cut from the upstream default branch (e.g. fix/&lt;issue-number&gt;-&lt;slug&gt; for a bug, feat/&lt;slug&gt; for a feature).</principle>
               <principle name="rebase_onto_upstream">Rebase the work onto the freshly fetched upstream default branch so the PR applies cleanly and contains only the intended changes, not merge-commit noise.</principle>
-              <principle name="single_reviewable_commit">Organize the change into one reviewable, logically complete commit (squash incidental fixups). Reviewers read a coherent diff, not the authoring history.</principle>
+              <principle name="commit_split_from_precedent">Derive the number of commits from how the last analogous change landed rather than from habit. The 10 merged PRs already sampled in the gather phase are the evidence: find the one closest in shape, read how it was split, and mirror that. Where a repository consistently lands a change of this shape as an ordered series — the interface first, then the implementation and its migration, then the public surface together with the rules that guard it — a single squashed commit is harder to review, not easier. Every commit in such a series should stand on its own, and a security-relevant surface should never be introduced before the rule that guards it.</principle>
+              <principle name="single_reviewable_commit">Absent such a precedent, organize the change into one reviewable, logically complete commit and squash incidental fixups. Reviewers read a coherent diff, not the authoring history.</principle>
+              <principle name="scope_is_exact">Plan the commit to contain every surface the change needs and nothing else. Unrelated tooling or documentation swept in along the way makes a reviewer untangle the diff before reading it; a source change whose dependency manifest or lockfile was left behind does not build for anyone but its author.</principle>
               <principle name="issue_reference">Reference the issue in the commit message and PR body with a closing keyword (Fixes #N / Closes #N) so the merge auto-closes it.</principle>
               <principle name="force_with_lease">When the branch was rebased and must be re-pushed, plan git push --force-with-lease, never --force. --force-with-lease updates the remote only if its current tip still matches your remote-tracking ref, so it refuses to clobber commits someone else pushed since your last fetch; plain --force overwrites them silently and disables that check. Caveat: a background git fetch can invalidate the lease, and --force-if-includes closes that gap by requiring the fetched remote updates to be integrated locally first.</principle>
               <principle name="compat_and_tests_as_a_set">Design a backward-compatibility fallback together with its test coverage. Gate new behavior behind an opt-in (a new enum variant, mode flag, or config key) that preserves the old default, and pair it with tests that exercise both the old default path and the new path. Compatibility without a test pinning the old behavior is unverified.</principle>
@@ -733,7 +744,7 @@ Phase 4: Final Verification (depends on all)
             <reference type="pr_patterns">Title and description patterns learned from 10 sampled merged PRs</reference>
             <reference type="code_patterns">Relevant upstream code patterns to follow (specific file paths)</reference>
             <reference type="past_feedback">Patterns from past PR reviews to address</reference>
-            <reference type="git_mechanics">Branch naming from the issue, rebase onto the upstream default branch, squash to one reviewable commit, Fixes #N reference, and force-with-lease re-push (see commit_prep git_mechanics)</reference>
+            <reference type="git_mechanics">Branch naming from the issue, rebase onto the upstream default branch, the commit split mirrored from the closest analogous merged PR (or one reviewable commit where there is no precedent), Fixes #N reference, and force-with-lease re-push (see commit_prep git_mechanics)</reference>
           </references>
           <deliverables>
             <deliverable task="CF-001">Expected output: fixed files passing lint</deliverable>
@@ -758,7 +769,7 @@ Phase 4: Final Verification (depends on all)
           </constraints>
         </execute_handoff>
       </task_breakdown>
-      <self_feedback inherits="workflow-patterns#self_feedback_output">
+      <self_feedback>
         <verification>The commands actually run and their exit status, or "none run"</verification>
         <weakest_claim>The checklist item or finding resting on the thinnest evidence, and what would
           confirm it — a guideline line, a file:line, or a command</weakest_claim>
@@ -773,49 +784,53 @@ Phase 4: Final Verification (depends on all)
 </output>
 <enforcement>
   <mandatory_behaviors>
-    <behavior id="UP-B001" priority="critical">
+    <behavior id="UP-B001" priority="important">
       <trigger>Before any GitHub operations</trigger>
-      <action>Verify gh CLI authentication</action>
+      <action>Verify gh CLI authentication, because an unauthenticated shell returns an empty PR sample
+        rather than an error and the review then invents conventions from nothing</action>
       <verification>Auth check in preflight phase</verification>
     </behavior>
-    <behavior id="UP-B002" priority="critical">
+    <behavior id="UP-B002" priority="important">
       <trigger>When fetching CONTRIBUTING.md</trigger>
       <action>Check all three locations with fallback</action>
       <verification>Fallback hierarchy in gather phase</verification>
     </behavior>
-    <behavior id="UP-B003" priority="critical">
+    <behavior id="UP-B003" priority="important">
       <trigger>When providing PR metadata</trigger>
       <action>Use PR template structure (if available) and patterns learned from 10 sampled merged PRs</action>
       <verification>Metadata matches upstream PR template sections and learned patterns; template_source indicates data source used</verification>
     </behavior>
-    <behavior id="UP-B008" priority="critical">
+    <behavior id="UP-B008" priority="advisory">
       <trigger>When fetching PR template</trigger>
       <action>Fetch .github/PULL_REQUEST_TEMPLATE.md only (no fallback hierarchy)</action>
       <verification>Template fetched from exact path or confirmed absent</verification>
     </behavior>
-    <behavior id="UP-B009" priority="critical">
+    <behavior id="UP-B009" priority="important">
       <trigger>When sampling PRs for patterns</trigger>
-      <action>Sample 10 most recently merged PRs from any author via gh pr list --state merged --limit 10</action>
+      <action>Sample 10 most recently merged PRs from any author via gh pr list --state merged --limit 10.
+        These samples are also the evidence for the commit split planned in commit_prep</action>
       <verification>PR samples retrieved with title, body, number, author fields</verification>
     </behavior>
-    <behavior id="UP-B004" priority="critical">
+    <behavior id="UP-B004" priority="important">
       <trigger>When generating final output</trigger>
       <action>Include manual QA checklist with structured qa_steps based on detected change types (ui, api, database, config, security, integration)</action>
       <verification>Manual verification section present with ordered qa_steps containing action, tool, command, expected_output for each detected change type</verification>
     </behavior>
-    <behavior id="UP-B007" priority="critical">
+    <behavior id="UP-B007" priority="important">
       <trigger>When generating manual_verification section</trigger>
-      <action>Inject actual values from diff analysis into qa_step commands replacing all placeholders</action>
+      <action>Inject actual values from diff analysis into qa_step commands replacing all placeholders,
+        since a step with an unreplaced placeholder cannot be run by the reviewer it was written for</action>
       <verification>No placeholder token ([endpoint-path], [component-name], [table-name], etc.) remains
         anywhere in the emitted qa_steps. Any that could not be resolved from the diff is listed in
         verification_gaps rather than left in the command.</verification>
     </behavior>
-    <behavior id="UP-B005" priority="critical">
+    <behavior id="UP-B005" priority="important">
       <trigger>When generating final output</trigger>
-      <action>Generate comprehensive task_breakdown with phased_tasks and execute_handoff</action>
+      <action>Generate comprehensive task_breakdown with phased_tasks and execute_handoff, so /execute
+        can consume the result without another planning pass</action>
       <verification>task_breakdown section present with all task categories populated</verification>
     </behavior>
-    <behavior id="UP-B006" priority="critical">
+    <behavior id="UP-B006" priority="important">
       <trigger>When generating final output</trigger>
       <action>Generate local_reproduction section with Nix-first ecosystem detection, environment setup, service dependencies, and step-by-step reproduction instructions</action>
       <verification>local_reproduction section present with ecosystem_detection, environment_setup, service_dependencies, verification_commands, and reproduction_steps</verification>
@@ -839,7 +854,7 @@ Phase 4: Final Verification (depends on all)
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor style inconsistency with upstream</example>
     <example severity="medium">CONTRIBUTING.md not found or gh CLI rate limited</example>
@@ -859,6 +874,8 @@ Phase 4: Final Verification (depends on all)
   <agent name="validator">Cross-validation when findings may conflict</agent>
 </related_agents>
 <related_skills>
+  <skill name="git-ecosystem">Rebase, squash, and diff-inspection mechanics; loaded in prepare when commit-history work is planned</skill>
+  <skill name="devenv-ecosystem">devenv.nix options for the verification environment; loaded at the point of use in manual_verification</skill>
   <skill name="execution-workflow">Understanding PR review methodology</skill>
   <skill name="testing-patterns">Evaluating test appropriateness</skill>
   <skill name="fact-check">Verifying contribution guideline compliance</skill>

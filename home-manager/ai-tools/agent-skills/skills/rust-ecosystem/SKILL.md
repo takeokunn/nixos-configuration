@@ -1,7 +1,7 @@
 ---
 name: Rust Ecosystem
 description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Covers splitting a borrow to resolve E0502 by passing the fields a helper needs instead of &mut self, named structs and newtypes over positional tuples outside a wire format, a registry of locks as Mutex<HashMap<K, Arc<Mutex<V>>>> with a one-directional lock order and asymmetric PoisonError::into_inner recovery, checked and saturating arithmetic on untrusted sizes (never wrapping), bounding a read by latency as well as length, allowlist-sanitizing configuration values rendered as ANSI escapes, preferring the expect lint attribute (#[expect]) to allow (#[allow]), and dead_code warnings at macro registration boundaries.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -651,7 +651,7 @@ version: 2.3.0
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/book" topic="ownership"</action>
+  <action>query-docs libraryId="/rust-lang/book" query="ownership"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -659,7 +659,7 @@ version: 2.3.0
 
     <pattern name="cargo_configuration">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/cargo.git" topic="workspace"</action>
+  <action>query-docs libraryId="/rust-lang/cargo.git" query="workspace"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -667,7 +667,7 @@ version: 2.3.0
 
     <pattern name="clippy_lints">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/rust-lang/rust-clippy" topic="lints configuration"</action>
+  <action>query-docs libraryId="/rust-lang/rust-clippy" query="lints configuration"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -758,7 +758,7 @@ version: 2.3.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Clippy warning about style</example>
     <example severity="medium">Borrow checker error</example>

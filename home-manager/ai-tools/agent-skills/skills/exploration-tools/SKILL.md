@@ -1,7 +1,7 @@
 ---
 name: Exploration Tools
 description: Tool definitions and usage patterns for codebase exploration (Glob, Grep, Read, LSP). Agents reference this skill instead of inline tool definitions.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -185,7 +185,7 @@ version: 2.0.0
   <rule>Prefer project conventions over generic defaults</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor inconsistency</example>
     <example severity="medium">Ambiguous guidance</example>

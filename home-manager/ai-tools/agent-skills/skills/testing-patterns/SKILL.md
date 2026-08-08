@@ -1,7 +1,7 @@
 ---
 name: Testing Patterns
 description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs guidance on designing, structuring, or isolating tests. Covers the unit/integration/e2e split and classifying a suite by the boundary it crosses, arrange-act-assert and given-when-then, stub/mock/spy/fake selection and seam design over global rebinding, fixture isolation with snapshot-and-restore, scenario-scoped identifiers for parallel runs, polling and settlement barriers for asynchronous outcomes, operation- and query-count assertions instead of wall-clock thresholds, property-based and snapshot testing, matcher design, evaluation as the acceptance gate for declarative-configuration repositories, and runner, compiler, and server traps that silently invalidate a result. Keywords — flaky test, test double, test fixture, teardown, parallel isolation, settlement barrier, query count, tooling trap. For whether a green result proves anything, see test-integrity.
-version: 2.3.0
+version: 2.5.0
 ---
 
 <purpose>
@@ -612,6 +612,47 @@ version: 2.3.0
   <use_case>Matcher libraries, fluent assertion DSLs</use_case>
 </pattern>
 
+<pattern name="one_transition_per_settle_step">
+  <description>When a scenario drives several dependent state transitions, settle each one separately instead of batching them into a single flush; a batched update collapses the intermediate renders and the assertion reads the value from one transition ago</description>
+  <decision_tree name="when_to_use">
+    <question>Does the test perform update B whose input is the result of update A, inside one settle or flush boundary?</question>
+    <if_yes>Split them into separate steps, so B is dispatched against A's committed result rather than against the state captured when the batch opened</if_yes>
+    <if_no>Independent updates may share a settle step</if_no>
+  </decision_tree>
+  <note>The companion trap is a shared render or bootstrap helper that leaves the subject in a pre-ready state. Assertions then target markup that was never mounted, and the failure reads as a missing feature rather than a setup gap. When a scenario depends on a particular startup state, set that state explicitly instead of relying on the helper's default</note>
+  <use_case>Hook and component tests with batched update semantics, reducer sequences, any framework where updates within one flush boundary are coalesced</use_case>
+</pattern>
+
+<pattern name="fixture_adequacy_before_logic">
+  <description>Code guarded by a chain of preconditions returns its null result for any unsatisfied one, so a fixture that satisfies the obvious gate but not a second one produces a null indistinguishable from a logic bug</description>
+  <decision_tree name="when_to_use">
+    <question>Did a test unexpectedly return nothing, or return the empty or default result?</question>
+    <if_yes>Enumerate every gate on the path and confirm the fixture satisfies all of them before touching the implementation. Prefer building the fixture from the same helper the passing tests use rather than assembling a plausible-looking one by hand</if_yes>
+    <if_no>Proceed with ordinary triage</if_no>
+  </decision_tree>
+  <note>The outcome this prevents is the worst one available: changing correct production code to accommodate an inadequate fixture. Weakening a guard makes the test pass and removes the behavior the guard existed for. This is the triage-order rule; the authoring-side rule — assert in the test that the precondition holds, so a silently-unsatisfied gate cannot masquerade as a pass — belongs to test-integrity</note>
+  <use_case>Strategy and rule engines, request pipelines with authorization and validation gates, any function whose null return is overloaded across several rejection reasons</use_case>
+</pattern>
+
+<pattern name="test_framework_authoring_hazards">
+  <description>Hazards that appear when building or extending a test framework rather than using one. Each presents as slowness or a hang rather than as a failure, which is why they survive so long</description>
+  <hazard name="trial_loop_ownership">A property-trial loop needs exactly one owner. Nesting iteration in both the runner and the property macro multiplies the trial count silently — fifty by fifty becomes two and a half thousand — and presents as an inexplicably slow suite, never as an error</hazard>
+  <hazard name="bounded_generator_failure">A generator combinator constrained by a predicate must reject an impossible or empty domain with a bounded failure after a finite, configurable number of attempts. An unsatisfiable predicate otherwise becomes an unbounded hang, which in CI is indistinguishable from an infrastructure stall</hazard>
+  <note>Name re-registration is the third hazard in this family, and it is a test-integrity concern rather than a design one — see that skill's registration_collisions_remove_tests, which owns both the helper-file and legacy-cases-beside-a-generator sources. namespaced_generated_test_names above covers the distinct case of two generators deriving the same name</note>
+  <use_case>Custom property-testing DSLs, in-house runners, table macros, framework extensions</use_case>
+</pattern>
+
+<pattern name="delete_the_forwarding_test_helper">
+  <description>Test helper layering earns its place by carrying orchestration, not by pre-binding arguments. An alias that only forwards to a canonical builder is pure indirection, and shared setup extracted for a single caller is premature</description>
+  <decision_tree name="when_to_use">
+    <question>Does the helper do anything beyond forwarding to another helper with some arguments fixed?</question>
+    <if_yes>Keep it</if_yes>
+    <if_no>Delete it and call the canonical builder directly, passing the arguments at the call site where a reader can see them</if_no>
+  </decision_tree>
+  <note>Where a taxonomy helps — transport doubles, shared assertions, scenario setup, fixed fixtures each in their own module — treat it as a convention rather than a rule. The restraint half is the durable part: do not lift a scenario setup into a shared helper until several specs genuinely share the same bootstrap, because a shared helper with one caller is a second place to read before understanding the first</note>
+  <use_case>Test support directories, scenario builders, feature-local helper modules</use_case>
+</pattern>
+
 </patterns>
 
 <best_practices>
@@ -929,7 +970,7 @@ version: 2.3.0
   <rule>Prefer project conventions over generic defaults</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor coverage gap in non-critical path</example>
     <example severity="medium">Test flakiness detected</example>

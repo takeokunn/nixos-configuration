@@ -1,7 +1,7 @@
 ---
 name: Nix Ecosystem
 description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", "nix flake check", "overlay", "activation script", or works with Nix language, flakes, or Home Manager. Covers vacuous flake checks that pass because the target platform is absent from the flake's system list (--all-systems), consuming a package through an overlay rather than system packages, pinning by tag enumeration instead of a latest-release endpoint, confirming which module system evaluates a file before concluding an option does not exist, import-from-derivation in cross-platform modules, deriving a version from the source manifest, symlink-safe privileged activation scripts, GC roots and daemon identity, and multicall-binary argv0.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -906,7 +906,7 @@ version: 2.3.0
   <decision_tree name="packaging_approach">
     <question>Is the target language listed in context7_topics above?</question>
     <if_yes>Use the corresponding Context7 topic query with library ID /nixos/nixpkgs</if_yes>
-    <if_no>Use get-library-docs with context7CompatibleLibraryID="/nixos/nixpkgs" and topic="LANGUAGE packaging" as a fallback</if_no>
+    <if_no>Use query-docs with libraryId="/nixos/nixpkgs" and query="LANGUAGE packaging" as a fallback</if_no>
   </decision_tree>
 
   <best_practices>
@@ -1341,7 +1341,7 @@ version: 2.3.0
   <rule>Document non-obvious overlay and override rationale in comments</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Style inconsistency in Nix expression</example>
     <example severity="medium">Evaluation error or type mismatch</example>

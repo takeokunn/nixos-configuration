@@ -1,7 +1,7 @@
 ---
 name: Technical Documentation
 description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Also covers auditing documentation against code in both directions — over-claims and, equally, shipped features still described as future work — confirming a documented capability is actually reachable rather than merely named by a function, publishing a registry of retired names alongside the current names that resemble them so nothing correct gets renamed, and recording the rationale at the change site when a previously-reasoned exception is reversed instead of leaving it in a commit message. Provides documentation patterns for developers, teams, and end-users in both English and Japanese.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -578,7 +578,7 @@ version: 2.3.0
   <rule>Record the reasoning for a deliberate reversal at the site the reversed decision occupied</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor formatting inconsistency</example>
     <example severity="medium">Outdated information detected</example>

@@ -1,7 +1,7 @@
 ---
 name: Org Ecosystem
 description: This skill should be used when the user asks to "write org", "org-mode", "org file", ".org file", "org syntax", "org document", "org babel", "org export", "org agenda", "org capture", "GTD", "literate programming", "org publishing", or "org-mode workflow". Provides comprehensive Org-mode patterns and best practices.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -664,7 +664,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
     <step order="1">
-  <action>2. get-library-docs with resolved ID for specific topics (babel, export, cite, agenda)</action>
+  <action>2. query-docs with resolved ID for specific topics (babel, export, cite, agenda)</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -813,7 +813,7 @@ version: 2.0.1
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor formatting inconsistency</example>
     <example severity="medium">Babel block execution error</example>

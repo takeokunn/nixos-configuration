@@ -1,7 +1,7 @@
 ---
 name: Emacs Ecosystem
 description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", or "magit". Use it also for Emacs runtime hazards — hook and lifecycle ordering, error boundaries and why `condition-case` does not catch `quit`, overlays versus text properties, indirect buffers, buffer-local state lost across a major-mode change, keymap precedence and minor-mode shadowing, subprocess handling with `make-process` and `accept-process-output`, remote paths that block or that subprocesses do not follow, and untrusted input reaching Emacs APIs that look inert. Provides comprehensive Emacs ecosystem patterns and best practices. For org-mode, use org-ecosystem skill.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -1339,7 +1339,7 @@ version: 2.3.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Byte-compilation warning</example>
     <example severity="medium">Configuration error on startup</example>

@@ -1,7 +1,7 @@
 ---
 name: Workflow Patterns
 description: Patterns for output formats, reflection checkpoints, agent references, and self-evaluation shared across agents and commands.
-version: 3.0.0
+version: 3.1.0
 ---
 
 <purpose>
@@ -39,7 +39,11 @@ version: 3.0.0
   <format>
 {
   "status": "success|warning|error",
-  "status_criteria": "inherits core-patterns#status_determination",
+  "status_criteria": {
+    "success": "Every check the task set out to make was made, and none failed",
+    "warning": "Completed, but a check could not be run or a gap remains — the gap is named in summary",
+    "error": "A blocker prevented the core question from being answered, or a check failed"
+  },
   "summary": "What was asked, what was found, and what remains unchecked",
   "verification": "The exact command(s) run and their exit status, or \"none run\" — never omitted",
   "findings": [
@@ -58,11 +62,16 @@ version: 3.0.0
     </example>
     <rule>`gaps` is not optional. An empty array is a claim that nothing was left undone, and it is
       checkable; omitting the field hides the question.</rule>
+    <rule>Write the status criteria into the output as literal text. A pointer to where they are defined
+      is not the definition: nothing resolves it on the reader's behalf, so the field ends up asserting
+      a standard neither the writer nor the reader ever saw.</rule>
   </pattern>
 
   <pattern name="output_status_criteria">
     <description>Status criteria for agent output, defined by the state of the evidence rather than by
-      a self-assigned score. Full definitions in core-patterns#status_determination.</description>
+      a self-assigned score. core-patterns carries the same definitions with the reasoning behind them;
+      load it with the Skill tool when that reasoning is what you need, and copy the criteria below into
+      the output either way.</description>
     <example>
 "status_criteria": {
   "success": "Every check the task set out to make was made, and none failed",
@@ -89,27 +98,40 @@ version: 3.0.0
   </pattern>
 
   <pattern name="prepare_phase">
-    <description>Standard Serena initialization phase for workflows</description>
+    <description>Opening phase for a workflow: load the skill that governs it, then initialize Serena
+      and read the memories that apply to this task type. The skill load comes first because the steps
+      after it are written against guidance that has not arrived yet.</description>
     <example>
 <phase name="prepare">
-  <objective>Initialize Serena and load the memories that apply to this task type</objective>
+  <objective>Load the governing skill, initialize Serena, and read task-appropriate memories</objective>
   <step order="1">
+    <action>Load the skill this workflow depends on with the Skill tool, and load serena-usage if the
+      workflow performs memory or symbol operations. A skill that is named but not loaded contributes
+      nothing to this run.</action>
+    <tool>Skill</tool>
+    <output>The skills loaded, by name</output>
+  </step>
+  <step order="2">
     <action>Activate the project</action>
     <tool>Serena activate_project, check_onboarding_performed</tool>
     <output>Project active; onboarding status known</output>
   </step>
-  <step order="2">
-    <action>List memories and filter by task type per serena-usage#memory_reading_by_task_type</action>
+  <step order="3">
+    <action>List memories and filter the index by task type, using the categories serena-usage gives for
+      this task type — implementation, investigation, review, or refactoring</action>
     <tool>Serena list_memories</tool>
     <output>Named shortlist, or an explicit "nothing matched"</output>
   </step>
-  <step order="3">
+  <step order="4">
     <action>Read only the shortlisted entries</action>
     <tool>Serena read_memory</tool>
     <output>The memories read, named in the report so the reader knows what informed the work</output>
   </step>
 </phase>
     </example>
+    <rule>Name the loaded skills in the phase output. "Loaded the governing skill" with no name is not
+      checkable against the transcript, which is the only thing that distinguishes a real load from an
+      intention to load.</rule>
   </pattern>
 
   <pattern name="failure_handling">
@@ -154,8 +176,8 @@ readonly attribute indicates whether agent can modify files.
     <output>Gap list, possibly empty</output>
   </step>
   <step order="3">
-    <action>Set status per core-patterns#status_determination from what steps 1 and 2 found, and append
-      the self_feedback section.</action>
+    <action>Set status from what steps 1 and 2 found, by the output_status_criteria the report itself
+      states, and append the self_feedback section.</action>
     <output>Status and self_feedback</output>
   </step>
 </phase>
@@ -198,7 +220,7 @@ readonly attribute indicates whether agent can modify files.
 <best_practices>
   <practice priority="critical">Use output_format for all agents that return structured results</practice>
   <practice priority="critical">Include reflection_checkpoint at key workflow decision points</practice>
-  <practice priority="critical">Include prepare_phase for Serena initialization in commands</practice>
+  <practice priority="critical">Include prepare_phase in commands, loading the governing skill with the Skill tool before Serena initialization</practice>
   <practice priority="high">Add self_evaluate_phase for agents producing reports or recommendations</practice>
   <practice priority="high">Use failure_handling phase in all workflows</practice>
   <practice priority="medium">Use agent_ref syntax for consistent agent references in commands</practice>
@@ -206,9 +228,9 @@ readonly attribute indicates whether agent can modify files.
 </best_practices>
 
 <rules priority="critical">
-  <rule>Output status follows core-patterns#status_determination — the state of the evidence, not a score</rule>
+  <rule>Output status reports the state of the evidence, not a score, and the criteria are written into the output rather than pointed at</rule>
   <rule>Every reflection checkpoint check must be answerable with an artifact, and must be able to fail</rule>
-  <rule>Commands must include prepare_phase for Serena initialization</rule>
+  <rule>Commands must include prepare_phase, which loads the governing skill by an explicit Skill call before initializing Serena</rule>
 </rules>
 
 <rules priority="standard">
@@ -221,7 +243,7 @@ readonly attribute indicates whether agent can modify files.
   <must>Use output_status_criteria as defined here for every structured output</must>
   <must>Tag every finding with an evidence tier and the evidence itself</must>
   <must>Include the verification field — the command run, or "none run"</must>
-  <must>Include prepare_phase in command workflows</must>
+  <must>Include prepare_phase in command workflows, and name the skills it loaded</must>
   <avoid>Confidence scores and numeric self-gating in any output or checkpoint</avoid>
   <avoid>Omitting failure_handling in complex workflows</avoid>
   <avoid>Omitting Serena initialization in commands</avoid>
