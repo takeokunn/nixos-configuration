@@ -1,7 +1,7 @@
 ---
 name: test-integrity
 description: This skill should be used when a test suite is green but its value is in doubt — auditing whether a passing test proves anything, investigating a "false green", a suite that silently collected zero tests, a runner glob or manifest that dropped a test file, an assertion that no outcome could violate, a mock or seed that makes the code under test unnecessary, a guard or threshold with no test proving it can fire, a teardown failure masking a real one, a substitution that was installed but never consulted, a test running against an implementation loaded from outside the tree being changed, or before trusting a green run as evidence that a change is correct. Keywords — false green, vacuous test, tautological assertion, test not registered, zero tests collected, test discovery, dead guard, unreachable branch, mutation check, teardown masking, implementation provenance, test double, exit status not asserted.
-version: 2.1.0
+version: 2.2.0
 ---
 
 <purpose>
@@ -550,6 +550,19 @@ version: 2.1.0
       error metadata finds mismatches in the low percent range — the ratio is the argument for
       comparing everything rather than for running more cases.
     </why>
+    <degeneration>
+      Confirm the two arms are still two implementations. Part-way through a migration the
+      usual tidying move is to make the old entry point delegate to the new one, and at that
+      moment the comparison becomes an implementation compared against itself. The difference
+      is then zero by construction, the test stays green forever, and nothing marks the
+      instant it stopped testing anything — a regression present in both paths passes. This is
+      a specific risk for agent-driven refactoring, because collapsing a superseded
+      implementation into a wrapper around its replacement is exactly the cleanup an agent
+      reaches for. Read the old arm's body and check it still computes rather than forwards;
+      where it no longer does, replace the comparison with table-driven expected values or an
+      independent reference calculation. It is the same defect as subject_as_oracle, arrived
+      at by refactoring rather than by writing the test that way.
+    </degeneration>
   </step>
 
   <step order="6" name="audit_the_assertions">

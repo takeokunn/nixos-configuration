@@ -1,20 +1,22 @@
 ---
 name: Define Core
 description: Shared workflow phases and patterns for requirements definition commands. Use this skill when implementing /define or /define-full commands to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
-version: 2.1.0
+version: 2.2.0
 ---
 
 <purpose>
 Provide shared workflow phases, agent definitions, and patterns that are common to all requirements definition commands (define, define-full). This skill eliminates duplication and ensures consistency across requirements definition workflows.
 </purpose>
 
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">requirements-definition</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
+<companion_skills>
+  <description>These carry guidance this workflow depends on. None of them arrives on its own — load the
+    ones a given run needs with the Skill tool, in the prepare phase, before the step that uses them.</description>
+  <skill name="requirements-definition">Question design and requirement formatting; load it whenever this workflow runs</skill>
+  <skill name="serena-usage">Load before any memory or symbol operation</skill>
+  <skill name="fact-check">Load when a claim needs verification against an external source</skill>
+  <skill name="context7-usage">Load when a library's current API or version behavior is in question</skill>
+  <skill name="core-patterns">Load when the shared escalation, decision-criteria, or enforcement structures are needed</skill>
+</companion_skills>
 
 <tools>
   <tool name="Read">Read requirements, related prompts, and existing specifications</tool>
@@ -23,7 +25,13 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
 
 <workflow>
   <phase name="prepare" id="core_prepare">
-    <objective>Initialize Serena and check existing patterns</objective>
+    <objective>Load the companion skills, initialize Serena, and check existing patterns</objective>
+    <step number="0">
+      <action>Load requirements-definition with the Skill tool, plus serena-usage before any memory
+        operation and any other companion skill this run needs</action>
+      <tool>Skill</tool>
+      <output>The skills loaded, by name</output>
+    </step>
     <step number="1">
       <action>Activate Serena project with activate_project</action>
       <tool>Serena activate_project</tool>
@@ -315,7 +323,7 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   </prohibited_behaviors>
 </enforcement>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor ambiguity in non-critical feature detail</example>
     <example severity="medium">Unclear requirement or ambiguous scope</example>
@@ -350,20 +358,23 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
 </related_agents>
 
 <usage_in_commands>
+  <description>Each command loads this skill with the Skill tool in its prepare phase and then applies
+    the sections below. What a command applies is a decision it makes at run time, not a composition
+    performed for it by markup.</description>
   <command name="define">
-    <inherits>All phases (prepare, analyze, investigate, clarify, verify, document, finalize)</inherits>
-    <inherits>All agents</inherits>
-    <inherits>Core execution graph</inherits>
-    <inherits>All delegation requirements</inherits>
-    <inherits>All rules and enforcement</inherits>
+    <applies>All phases (prepare, analyze, investigate, clarify, verify, document, finalize)</applies>
+    <applies>All agents</applies>
+    <applies>Core execution graph</applies>
+    <applies>All delegation requirements</applies>
+    <applies>All rules and enforcement</applies>
     <note>finalize gate runs immediately after document, since /define produces a single document</note>
   </command>
   <command name="define-full">
-    <inherits>Full workflow via &lt;phase name="core_workflow" inherits="define-core#workflow" /&gt;</inherits>
-    <inherits>All agents plus plan agent</inherits>
-    <inherits>Core execution graph as base, extended with collect_feedback and regenerate phases</inherits>
-    <inherits>All delegation requirements</inherits>
-    <inherits>All rules and enforcement, plus feedback-specific behaviors</inherits>
+    <applies>The full workflow, loaded in the prepare phase and followed phase by phase</applies>
+    <applies>All agents plus plan agent</applies>
+    <applies>Core execution graph as base, extended with collect_feedback and regenerate phases</applies>
+    <applies>All delegation requirements</applies>
+    <applies>All rules and enforcement, plus feedback-specific behaviors</applies>
     <note>finalize gate is DEFERRED until after the regenerate phase and evaluates the final document's remaining issues; "Resolve now" patches the final document without triggering a second feedback/regenerate cycle (preserves the maximum-one-iteration rule)</note>
   </command>
 </usage_in_commands>

@@ -1,7 +1,7 @@
 ---
 name: Investigation Patterns
 description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", "bisect", or needs evidence-based code analysis and debugging. Also covers a counter or health check placed inside a conditionally-executed body measuring the gate rather than the phenomenon, bisecting a non-stationary symptom where a boundary that moves between runs invalidates the observation rather than the hypothesis, registries whose consumers break once a second member variant appears, and verifying a completion claim against the artifact it produced rather than a summary of it — including your own prior work. Provides systematic investigation and debugging methodology.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -441,7 +441,7 @@ version: 2.3.0
   <rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Evidence trail incomplete</example>
     <example severity="medium">Conflicting evidence found</example>

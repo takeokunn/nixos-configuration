@@ -1,7 +1,7 @@
 ---
 name: Haskell Ecosystem
 description: This skill should be used when working with Haskell projects, "cabal.project", "stack.yaml", "ghc", "cabal build/test/run", "stack build/test/run", or Haskell language patterns. Provides comprehensive Haskell ecosystem patterns and best practices.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -872,7 +872,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_optics-0_4_2_1" topic="lenses"</action>
+  <action>query-docs libraryId="/websites/hackage_haskell_package_optics-0_4_2_1" query="lenses"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -880,7 +880,7 @@ version: 2.0.1
 
     <pattern name="testing_framework">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/hackage_haskell_package_hspec-2_11_12" topic="expectations"</action>
+  <action>query-docs libraryId="/websites/hackage_haskell_package_hspec-2_11_12" query="expectations"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -888,7 +888,7 @@ version: 2.0.1
 
     <pattern name="web_framework">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/haskell-servant/servant" topic="server"</action>
+  <action>query-docs libraryId="/haskell-servant/servant" query="server"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -995,7 +995,7 @@ version: 2.0.1
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">HLint suggestion about style</example>
     <example severity="medium">Type error or missing instance</example>

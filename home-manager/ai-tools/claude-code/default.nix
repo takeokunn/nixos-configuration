@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   nurPkgs,
   mcp-servers-nix,
@@ -7,6 +8,8 @@
 }:
 let
   ai-prompts-path = ../ai-prompts;
+
+  hooksDir = "${config.programs.claude-code.configDir}/hooks";
 
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (_: {
     doInstallCheck = false;
@@ -88,6 +91,31 @@ in
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
     };
 
+    # programs.claude-code.hooks only installs the script into hooks/ and marks it
+    # executable; it writes nothing to settings.json. Without this block Claude Code
+    # never invokes them, which is why enforce-perl sat inert while cclens counted
+    # 1,943 sed calls. Each script re-checks tool_name itself, so the Bash matcher
+    # is a filter rather than the only guard.
+    hooks.PreToolUse = [
+      {
+        matcher = "Bash";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/block-destructive-git";
+          }
+          {
+            type = "command";
+            command = "${hooksDir}/block-bare-cd";
+          }
+          {
+            type = "command";
+            command = "${hooksDir}/enforce-perl";
+          }
+        ];
+      }
+    ];
+
     statusLine.type = "command";
     statusLine.command = "${ai-prompts-path}/scripts/statusline.sh";
     statusLine.padding = 0;
@@ -101,7 +129,6 @@ in
     "docs"
     "explore"
     "general-purpose"
-    "git"
     "performance"
     "quality-assurance"
     "security"
@@ -122,6 +149,8 @@ in
     "upstream"
   ];
 
+  programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
+  programs.claude-code.hooks.block-bare-cd = builtins.readFile "${ai-prompts-path}/hooks/block-bare-cd.sh";
   programs.claude-code.hooks.enforce-perl = builtins.readFile "${ai-prompts-path}/hooks/enforce-perl.sh";
   programs.claude-code.hooks.rtk-rewrite =
     builtins.replaceStrings [ "@RTK_BIN@" ] [ "${llmAgentsPkgs.rtk}/bin/rtk" ]

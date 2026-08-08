@@ -6,28 +6,21 @@ description: Root cause investigation command
 <purpose>
 Identify root causes from error messages and anomalous behavior, providing fact-based analysis without performing fixes.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">investigation-patterns</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
 <rules priority="critical">
-  <rule>Never modify, create, or delete files</rule>
-  <rule>Never implement fixes; provide suggestions only</rule>
-  <rule>Prioritize log analysis as primary information source</rule>
-  <rule>Judge from facts, not user speculation</rule>
-  <rule>Logs as primary information source</rule>
+  <rule>Never modify a file and never implement a fix. This command produces an explanation the user
+    decides what to do with; applying a change forecloses that decision while the cause is still a
+    hypothesis.</rule>
+  <rule>Judge from the logs and the code, not from the user's account of the failure. The reported
+    location is where the symptom surfaced, which is frequently not where the defect lives.</rule>
+  <rule>Report honestly when the cause cannot be identified. A named-but-unevidenced cause is worse
+    than an open question, because it ends the search.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use investigation-patterns skill for debugging methodology</rule>
-  <rule>Delegate investigations to debug agent</rule>
-  <rule>Report honestly if cause cannot be identified</rule>
-  <rule>Verify similar implementations nearby</rule>
-  <rule>Track occurrence path chronologically</rule>
+  <rule>Treat logs as the primary source: they record what actually happened, where code records only
+    what can happen.</rule>
+  <rule>Track the occurrence path chronologically, and check whether the same defect shape appears
+    elsewhere before recommending anything.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Reproducing bugs manually in isolation — AI can trace all call paths and state transitions from a stack trace in a single pass</practice>
@@ -38,52 +31,64 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <principle>Build a complete evidence chain (symptom → mechanism → root cause) before concluding — never jump from signal to verdict</principle>
     <principle>Verify hypotheses against code evidence, not user description alone — the reported location is often not the true source</principle>
     <principle>Map all recurrence locations in a single investigation pass — don't fix only the reported instance</principle>
+    <principle>A call site found by search tells you a code path exists, not what role it plays. Debug
+      hooks and QA controls are simpler and more findable than the production implementation, so
+      "the only calls I can find are manual" is a common route to declaring a feature unimplemented
+      when it is merely owned elsewhere — and the resulting recommendation is to build a second one.</principle>
+    <principle>When a committed document and its generator both exist in the repository, the generator
+      is the evidence and the document is a claim. A checked-in schema snapshot or generated client
+      answers the question in the exact form it was asked and goes stale silently.</principle>
   </applicable_ai_principles>
 </ai_principles>
 <workflow>
   <phase name="prepare">
     <step order="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
+      <action>Load the investigation-patterns skill with the Skill tool. It governs hypothesis
+        discharge, bisection, and evidence handling — the substance of this command — and it is not in
+        context until loaded; a skill named in a reference attribute never loads itself. If the failure
+        implicates an external library or API contract, load fact-check as well.</action>
+      <tool>Skill</tool>
+      <output>The skills loaded, named; and if fact-check was skipped, the reason</output>
     </step>
     <step order="2">
-      <action>Check list_memories for relevant patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Full memory index</output>
+      <action>Initialize Serena, then classify this task as "investigation" and load only the memories
+        matching that type's priority categories — {domain}-patterns, architecture-*,
+        {project}-conventions — following the serena-usage skill for the filter procedure</action>
+      <tool>Serena activate_project, list_memories, read_memory</tool>
+      <output>The memories read, named; or an explicit "nothing in the index matched investigation"</output>
     </step>
-    <step order="3">
-      <action>Classify task type as "investigation". Apply memory_reading_by_task_type filter
-        (serena-usage skill): prioritize {domain}-patterns → architecture-* → {project}-conventions.
-        Filter the memory index from step 2 against these categories; record matched names.</action>
-      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
-      <output>Filtered priority memory list for investigation tasks</output>
-    </step>
-    <step order="4">
-      <action>Load only memories matching the prioritized categories with read_memory;
-        skip categories absent from the index</action>
-      <tool>Serena read_memory</tool>
-      <output>Prioritized patterns loaded</output>
-    </step>
-
   </phase>
   <phase name="analyze">
     <step order="1">
+      <observe>The artifact the symptom was actually observed against — the loaded module, binary, or
+        daemon and its path, mtime, or hash — against the build output in the working tree. Also how
+        many failures arrived together, against how many things changed.</observe>
+      <reason>The investigation's subject is not established until these two are. Whenever the runtime
+        loads from an install prefix, a long-lived daemon, a container image, a compiled bundle, or a
+        package cache rather than the working tree, the code about to be read may not be the code that
+        ran, and every later step will read consistently to a confident wrong answer because the line
+        that was removed is still in the artifact. The failure-count ratio is the harness-versus-code
+        question in its cheapest form.</reason>
+      <act>Name the artifact and state whether it matches current source; if it does not, stop and
+        report that instead of investigating, because nothing read afterwards describes what ran. State
+        whether the subject of this investigation is the code or the harness, and what decided it.</act>
+    </step>
+    <step order="2">
       <observe>Error message text, exception type, and any provided stack trace or logs</observe>
       <reason>Error classification (syntax / runtime / logic / config) determines the investigation branch and which agents are most relevant</reason>
       <act>Classify error type; record classification as input to investigate phase delegation</act>
     </step>
-    <step order="2">
+    <step order="3">
       <observe>Stack trace line numbers, file names, and call chain depth</observe>
       <reason>The deepest non-library frame is the symptom location — not necessarily the root cause; the full chain reveals how control flow reached the failure point</reason>
       <act>Record primary error location (file:line) and call chain; flag the distinction between symptom site and likely root cause site</act>
     </step>
-    <step order="3">
+    <step order="4">
       <observe>Available log output: timestamps, log levels, preceding events</observe>
       <reason>Logs provide temporal context to distinguish a new failure from a recurring pattern, and reveal system state at failure time</reason>
       <act>Identify log lines directly preceding and surrounding the error; note any state anomalies</act>
     </step>
-    <step order="4">
+    <step order="5">
       <observe>Events immediately before, during, and after the error occurrence</observe>
       <reason>Temporal context distinguishes transient conditions (race, resource exhaustion) from deterministic bugs (logic error, missing null check)</reason>
       <act>Record the error trigger sequence; classify as deterministic or condition-dependent</act>
@@ -126,6 +131,24 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <tool>Read, Grep, Bash (git log, git diff — read-only inspection)</tool>
       <output>Config values in effect and the recent changes touching them</output>
     </step>
+    <step order="8">
+      <action>Whenever a reproduction, probe, or narrowed slice is built and it fails, decide before
+        recording the failure whether it is telling you about the subject or about the reproduction.
+        A slice can cut through an incomplete form, a wrapper can resolve a relative path against its
+        own location, a probe can reference a symbol that was never defined in the reduced file. The
+        useful tell: a failure arriving immediately, before any of the suspect work could have
+        started, is nearly always the reproduction's own. Name the observation that rules out the
+        other explanation.</action>
+      <output>Each recorded failure labelled subject-side or reproduction-side, with what settled it</output>
+    </step>
+    <iteration_limit>3</iteration_limit>
+    <iteration_rationale>Narrowing assumes a stable oracle. If the boundary moves between probes —
+      a different file, form, or line each time — the oracle is noisy and every further step is
+      fitting that noise, and a narrowing loop never runs out of plausible next moves, so it will not
+      stop on its own. After three narrowing steps without a boundary that reproduces, stop narrowing:
+      re-run one identical probe to test reproducibility, then report what has been ruled out and hand
+      the scope decision to the user. This mirrors the single-iteration limits /execute-full and
+      /define-full already impose, for the same reason.</iteration_rationale>
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
@@ -147,24 +170,13 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <output>Resource state, or "not checked" with the reason</output>
     </step>
   </phase>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Detect and classify failures during command execution</action>
-      <tool>Error analysis and severity assessment</tool>
-      <output>Failure classification and impact summary</output>
-    </step>
-    <step order="2">
-      <action>Apply recovery path or escalate with concrete blocker details</action>
-      <tool>Retry policy and fallback strategy</tool>
-      <output>Recovered flow or explicit blocker report</output>
-    </step>
-  </phase>
   <phase name="self_evaluate">
     <step order="1">
-      <action>Re-read the report and tag each finding verified, inferred, or assumed. A finding tagged
-        verified must name the command run or the file:line read; if it cannot, downgrade it.</action>
-      <output>Findings tagged, over-claims downgraded</output>
+      <action>Re-read the report and tag each finding. A finding tagged verified must name the command
+        run or the file:line read; if it cannot, downgrade it. Where a link rests on a document rather
+        than on code, scope the tier to the passage checked — a document can be accurate in one section
+        and describe classes, columns, or features that exist nowhere in another.</action>
+      <output>Findings tagged, over-claims downgraded, document-sourced tiers scoped to their passage</output>
     </step>
     <step order="2">
       <action>List anything the reported error asked about that this report does not answer, and why —
@@ -172,8 +184,8 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       <output>Gap list, possibly empty</output>
     </step>
     <step order="3">
-      <action>Set status per core-patterns#status_determination from what steps 1 and 2 found, then append
-        the self_feedback section naming the weakest claim and what would confirm it</action>
+      <action>Set the status from what steps 1 and 2 found, then append the self_feedback section
+        naming the weakest claim and what would confirm it</action>
       <output>Status and self_feedback</output>
     </step>
   </phase>
@@ -182,9 +194,14 @@ Identify root causes from error messages and anomalous behavior, providing fact-
     <step order="1">
       <action>Evaluate memory_auto_creation_triggers: did this investigation reveal a reusable debugging pattern,
         an architectural insight, or a recurring bug class?
-        Call list_memories to check if a memory for this topic already exists.</action>
+        Call list_memories to check if a memory for this topic already exists, and search it for a prior
+        recording of this same finding. An investigation produces a finding rather than a change, so
+        nothing forces the finding to be acted on, and the next investigation reads the same code to the
+        same conclusion without ever meeting the earlier note. If a prior recording exists, say in the
+        report that this is a repeat and cite it: that the same conclusion has now been reached more
+        than once is the argument for acting on it, and it is not visible from any single run.</action>
       <tool>Serena list_memories, evaluation against trigger list</tool>
-      <output>Trigger match: yes/no; existing memory: yes/no</output>
+      <output>Trigger match: yes/no; existing memory: yes/no, and whether this finding is a repeat</output>
     </step>
     <step order="2">
       <action>If trigger matched: use edit_memory (existing topic) or write_memory (new topic).
@@ -244,10 +261,14 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <requirement>Related file paths</requirement>
   <requirement>Explicit edit prohibition</requirement>
 </delegation>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="root_cause_certainty" precedence="1">
     <unmet>The named cause was never observed producing the symptom — no reproduction, no log line, no
-      code path read end to end. Present it as a ranked hypothesis, not as the root cause.</unmet>
+      code path read end to end. Present it as a ranked hypothesis, not as the root cause. A changed
+      error message is not evidence either: an attempted fix that turns one error into a different one
+      has usually cleared a surface obstacle in front of the real constraint, and reading the change as
+      progress is what produces the loop of trying successive flags and tokens. The test is whether the
+      condition originally identified as the cause is gone, not whether the output differs.</unmet>
   </factor>
   <factor name="evidence_chain" precedence="2">
     <unmet>A link between symptom and cause has no file:line or log line behind it. Read that link, or
@@ -269,12 +290,19 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 - Direct cause
 - Underlying cause
 - Conditions</root_cause>
-    <evidence_tiers>Each link of the chain tagged verified | inferred | assumed (core-patterns#evidence_tiers), with the file:line, log line, or command that backs it</evidence_tiers>
+    <evidence_tiers>Each link of the chain tagged, with the file:line, log line, or command that backs it</evidence_tiers>
     <impact>Scope, similar errors</impact>
     <recommendations>Fix suggestions (no implementation), prevention</recommendations>
+    <fix_scope_bracket>The smallest change that could resolve the cause, and the largest change the
+      evidence would justify — named as two ends, with everything between them conditioned on what
+      would have to be shown first ("include the storage change only if evidence shows cross-world
+      reads are involved"). State the failure at each end: what an under-fix would leave wrong, and
+      what an over-fix would put at risk. The reader's next decision is how far to go, not what the
+      cause is, and this investigation holds the evidence that decision needs.</fix_scope_bracket>
     <further_investigation>Unclear points, next steps</further_investigation>
     <self_feedback>
-      <verification>The command(s) actually run — reproduction attempt, log inspection, git history — and their exit status, or "none run"</verification>
+      <subject>Whether the investigation treated the code or the harness as its subject, the artifact
+        the symptom was observed against, and whether that artifact matched current source</subject>
       <downgrades>Any link first written as verified that could not name its evidence, and the tier it was moved to</downgrades>
       <weakest_claim>The link in the chain resting on the thinnest evidence, and what would confirm it</weakest_claim>
       <gaps>Anything the reported error raises that this report does not answer, and why</gaps>
@@ -284,25 +312,29 @@ Identify root causes from error messages and anomalous behavior, providing fact-
 <enforcement>
   <mandatory_behaviors>
     <behavior id="BUG-B001" priority="critical">
-      <trigger>Before concluding root cause</trigger>
-      <action>Build evidence chain from symptom to cause</action>
-      <verification>Evidence chain in output</verification>
+      <trigger>Before reading any source in the analyze phase</trigger>
+      <action>Name the artifact the symptom was observed against and establish whether it was built
+        from the source about to be read</action>
+      <verification>The artifact and its provenance appear in the report, or an explicit statement that
+        the runtime loads directly from the working tree</verification>
     </behavior>
-    <behavior id="BUG-B002" priority="critical">
-      <trigger>When proposing fix</trigger>
-      <action>Identify all affected code paths</action>
-      <verification>Impact analysis in output</verification>
+    <behavior id="BUG-B002" priority="high">
+      <trigger>When proposing a fix</trigger>
+      <action>Search for every location sharing the same defect shape, and bracket the fix scope at
+        both ends</action>
+      <verification>Impact analysis and fix_scope_bracket in output</verification>
     </behavior>
   </mandatory_behaviors>
   <prohibited_behaviors>
     <behavior id="BUG-P001" priority="critical">
       <trigger>Always</trigger>
       <action>Concluding without evidence</action>
-      <response>Block conclusion, require investigation</response>
+      <response>Block the conclusion. A named cause ends the search, so an unevidenced one costs more
+        than an open question — the next reader inherits it as settled.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor log warning without impact</example>
     <example severity="medium">Unclear error context or missing stack trace</example>
@@ -331,7 +363,8 @@ Identify root causes from error messages and anomalous behavior, providing fact-
   <must>Keep all operations read-only</must>
   <must>Prioritize logs as primary information source</must>
   <must>Report honestly if cause cannot be identified</must>
-  <must>Tag every link of the evidence chain with its tier, and report the verification actually run</must>
+  <must>Name the artifact the symptom was observed against before reading source to explain it</must>
+  <must>Bracket the recommended fix scope at both ends rather than naming only the cause</must>
   <avoid>Implementing fixes</avoid>
   <avoid>Accepting user speculation without verification</avoid>
   <avoid>Forcing contrived causes when evidence is insufficient</avoid>

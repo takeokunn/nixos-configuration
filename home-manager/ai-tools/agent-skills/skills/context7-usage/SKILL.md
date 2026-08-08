@@ -1,7 +1,7 @@
 ---
 name: context7-usage
 description: Context7 MCP documentation retrieval patterns for up-to-date library and API references. Use this skill whenever current library docs, API signatures, version-specific behavior, or migration notes are needed.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -127,7 +127,7 @@ Provide consistent, efficient usage patterns for Context7 MCP so agents can retr
   <rule>Specify the exact version when querying version-sensitive behavior</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Library ID not found — try alternative name or resolve-library-id</example>
     <example severity="medium">Context7 returns empty or irrelevant results — refine topic string</example>

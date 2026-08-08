@@ -6,22 +6,20 @@ description: Markdown text update command
 <purpose>
 Output results from other commands (/define, /ask, /bug, etc.) as markdown files.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="domain">technical-documentation</skill>
-  <skill use="tools">serena-usage</skill>
-</refs>
 <rules priority="critical">
-  <rule>Retrieve previous command execution results</rule>
-  <rule>Determine output filename based on context</rule>
-  <rule>Use specified file path if provided</rule>
-  <rule>Never include revision history or discussion process</rule>
+  <rule>Never include revision history, change logs, or discussion traces, because the document is read
+    later as a statement of what is true, and a preserved deliberation trail is read as current fact.</rule>
+  <rule>Write to the user-specified path when one was given, because the user's path is a decision, not
+    a default to be improved on.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Keep output reproducible and file-scoped</rule>
-  <rule>Preserve existing section semantics while formatting</rule>
+  <rule>Resolve the output filename from the file_mapping table when the user gave no path, so that two
+    runs of the same command land in the same file instead of accumulating near-duplicates.</rule>
+  <rule>Keep the output reproducible and file-scoped: everything written traces to the previous
+    command's output or to a file read this session.</rule>
+  <rule>Preserve existing section semantics while formatting. Reformatting may change presentation; it
+    may not change what a section claims.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_execution" />
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Manually reformatting content section by section — AI can analyze the entire previous command output and determine the correct structure in a single analysis pass</practice>
@@ -37,19 +35,19 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
 <workflow>
   <phase name="prepare">
     <step order="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
+      <action>If the output is more than a transcription of the previous command — that is, if it needs
+        a heading hierarchy, section ordering, or presented code examples — load the
+        technical-documentation skill with the Skill tool, because that skill governs those decisions
+        and nothing else in context does. A skill named in a reference attribute is not loaded; only
+        the Skill tool loads it.</action>
+      <tool>Skill</tool>
+      <output>Skill loaded, or the statement that this run is a plain transcription and does not need it</output>
     </step>
     <step order="2">
-      <action>Check list_memories for documentation patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Named shortlist, or an explicit "nothing matched"</output>
-    </step>
-    <step order="3">
-      <action>Load applicable memories with read_memory</action>
-      <tool>Serena read_memory</tool>
-      <output>The memories read, named in the report</output>
+      <action>Initialize Serena and load the documentation-pattern memories that match, following the
+        serena-usage skill for the procedure</action>
+      <tool>Serena activate_project, list_memories, read_memory</tool>
+      <output>The memories read, named; or an explicit "nothing matched"</output>
     </step>
   </phase>
   <phase name="analyze">
@@ -89,7 +87,6 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
       <output>Source files backing each code example and claim</output>
     </step>
   </phase>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
   <phase name="determine">
     <step order="1">
       <action>Determine output filename based on command type</action>
@@ -99,18 +96,6 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     <step order="2">
       <action>Check if user specified file path</action>
       <output>Final path; a user-specified path wins</output>
-    </step>
-  </phase>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Detect and classify failures during command execution</action>
-      <tool>Error analysis and severity assessment</tool>
-      <output>Failure classification and impact summary</output>
-    </step>
-    <step order="2">
-      <action>Apply recovery path or escalate with concrete blocker details</action>
-      <tool>Retry policy and fallback strategy</tool>
-      <output>Recovered flow or explicit blocker report</output>
     </step>
   </phase>
 </workflow>
@@ -135,7 +120,7 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     <reason>Records to knowledge base after file creation</reason>
   </sequential_phase>
 </execution_graph>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="content_accuracy" precedence="1">
     <unmet>A statement or code example in the draft traces to neither the previous command's output nor
       a file read this session. Verify it against the source, or cut it — do not soften it into a hedge.</unmet>
@@ -159,21 +144,23 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
       <footer>Optional: Related references</footer>
     </markdown_file>
     <report_to_user>
-      <verification>The exact command(s) run against the written file and their exit status, or "none run"</verification>
+      <path>The file written, and whether it was created or overwritten</path>
       <gaps>Content from the previous command that was deliberately excluded, and why</gaps>
     </report_to_user>
   </format>
 </output>
 <enforcement>
   <mandatory_behaviors>
-    <behavior id="MD-B001" priority="critical">
+    <behavior id="MD-B001" priority="standard">
       <trigger>Before writing documentation</trigger>
-      <action>Understand the source material</action>
+      <action>Read the source material the document will restate, rather than working from a summary of
+        it, so that the written claims can be traced back rather than reconstructed</action>
       <verification>Source analysis in output</verification>
     </behavior>
-    <behavior id="MD-B002" priority="critical">
+    <behavior id="MD-B002" priority="high">
       <trigger>When including code examples</trigger>
-      <action>Verify examples are correct and runnable</action>
+      <action>Check each example against the file it came from. An example that no longer matches the
+        source is worse than no example, because a reader trusts it and acts on it</action>
       <verification>Example validation noted</verification>
     </behavior>
   </mandatory_behaviors>
@@ -181,11 +168,12 @@ Output results from other commands (/define, /ask, /bug, etc.) as markdown files
     <behavior id="MD-P001" priority="critical">
       <trigger>Always</trigger>
       <action>Adding timestamps to documents</action>
-      <response>Block operation, timestamps are prohibited</response>
+      <response>Block operation. A timestamp makes the document look dated rather than wrong once it
+        drifts, so the reader discounts current content and trusts stale content.</response>
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor formatting inconsistency in output</example>
     <example severity="medium">Unclear output destination or ambiguous file mapping</example>

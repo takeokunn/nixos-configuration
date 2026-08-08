@@ -1,7 +1,7 @@
 ---
 name: state-transactions
 description: This skill should be used when a mutation must cross a boundary to reach the component that owns the state, and the question is what makes the crossing safe — outbox and drain contracts, who may consume an emitted collection, atomicity and rollback above a store that offers neither, teardown where a cleanup failure must not replace the original error, idempotency keys and duplicate delivery, correlating an async response with its request, the commit point and acknowledged-versus-durable, coalescing write queues, migration defaults for absent versus invalid fields, present/absent/unknown reads, and clock-paced throttles, budgets, and accumulators. Keywords — outbox, drain, exactly-once, idempotency key, correlation ID, rollback, snapshot, ownership flag, commit point, durable, fsync, write queue, debounce, migration default, three-state read, fail closed, catch-up burst, clock regression, decrementing budget, accumulator.
-version: 2.1.0
+version: 2.2.0
 ---
 
 <purpose>
@@ -634,7 +634,7 @@ version: 2.1.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Cleanup ordering that is safe but harder to read than necessary</example>
     <example severity="medium">Correlation by natural key with only one request in flight today</example>

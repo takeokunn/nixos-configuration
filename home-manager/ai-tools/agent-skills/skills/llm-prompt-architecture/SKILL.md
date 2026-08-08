@@ -1,7 +1,7 @@
 ---
 name: llm-prompt-architecture
 description: This skill should be used when structuring the source code of an LLM-driven feature - splitting prompt builders, static prompt data, and response parsers into separate modules; replacing inline template-literal prompt blobs with typed data definitions plus a formatter; sharing one output-contract constant between the prompt that requests a JSON shape and the parser that validates it; stripping code fences and rejecting malformed model responses; or deciding what to assert at each prompt layer. The subject is source structure and testability, never prompt wording, so do not load this for requests to improve, reword, shorten, or tune the text of a prompt, to pick a model, or to fix model behavior. Triggers include prompt module, prompt fragment, prompt builder, prompt data, output contract, response parser, fence stripping, LLM JSON output, table-driven parser tests, and "this prompt can only be tested by calling the model".
-version: 2.1.0
+version: 2.2.0
 ---
 
 <purpose>
@@ -638,7 +638,7 @@ version: 2.1.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">A fragment that could be split further but is already independently assertable</example>
     <example severity="medium">Builder tests containing copied prose literals, so copy edits break selection tests</example>

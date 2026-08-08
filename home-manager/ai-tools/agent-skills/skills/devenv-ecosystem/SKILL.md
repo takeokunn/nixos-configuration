@@ -1,7 +1,7 @@
 ---
 name: Devenv Ecosystem
 description: This skill should be used when the user asks to "devenv", "devenv.nix", "languages.*", "services.*", "git-hooks", "devenv shell", "devenv up", "devenv build", or works with devenv development environments. Provides comprehensive devenv configuration patterns.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -1451,7 +1451,7 @@ Provide comprehensive patterns for devenv configuration, focusing on language se
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Missing optional configuration attribute</example>
     <example severity="medium">Service configuration incomplete or enterShell too slow</example>

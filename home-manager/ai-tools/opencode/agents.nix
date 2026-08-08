@@ -18,7 +18,6 @@ in
     "docs"
     "explore"
     "general-purpose"
-    "git"
     "performance"
     "quality-assurance"
     "security"

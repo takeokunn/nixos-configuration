@@ -401,10 +401,27 @@ fi
 
 echo "== additive-only edits =="
 
-# Extending an existing skill is supposed to be purely additive: a harvest pass adds
-# knowledge, it does not silently rewrite or drop what is already there. Frontmatter
-# (`version`, `description`) is exempt because updating it is how an addition announces
-# itself. Anything else disappearing is a regression worth a human look.
+# Additivity is a property of one task type, not of this tree: a harvest pass adds
+# knowledge and must not silently rewrite or drop what is already there, but a freshness
+# or restructuring pass exists precisely to rewrite stale claims. Enforcing additivity
+# unconditionally therefore fails legitimate corrections, which is what happened when the
+# reference-notation abolition and the skill-doc freshness pass both landed. So the check
+# has two modes: with ADDITIVE_ONLY=1 in the environment (harvest workflows set it) a
+# genuine removal FAILS as before; without it the same classifier still runs and the
+# removal count is printed for the reviewer, because the diff magnitude is worth a human
+# glance either way. Frontmatter (`version`, `description`) is exempt because updating it
+# is how an addition announces itself.
+#
+# Two further classes are exempt because they are notation being retired, not knowledge:
+#   * the abolished `inherits="slug#anchor"` attribute, the `<refs>` block, and the
+#     `<skill use="...">` entries inside it. Nothing ever resolved these at runtime, so
+#     removing them deletes an empty slot rather than any content — the same reasoning the
+#     cross-reference check below applies, and its `inherits=` pattern is matched here so
+#     the two cannot drift apart.
+#   * two Context7 identifiers renamed upstream. This is deliberately a fixed two-token
+#     list and NOT a general "renames are fine" rule: a general rule would excuse any
+#     removal whose replacement happens to be spelled differently. Each token below was
+#     confirmed to have its renamed form present on a corresponding added line.
 #
 # `--no-ext-diff` is load-bearing, not decoration. This repository configures difftastic
 # as an external diff driver, which emits side-by-side structural output with no leading
@@ -438,10 +455,31 @@ for line in sys.stdin:
 def norm(s):
     return re.sub(r"[^0-9a-z]+", "", s.lower())
 
-exempt = re.compile(r"^\s*(version|description|name):")
+frontmatter = re.compile(r"^\s*(version|description|name):")
+# The abolished reference notation, in the three spellings it takes. The `inherits=`
+# pattern is the same one the cross-reference check uses, so a line exempted here is
+# exactly a line that check would reject if it came back.
+# This program is embedded in a single-quoted shell string, so a Python literal may not
+# contain a single quote; chr(34) supplies the double quote without needing one.
+Q = chr(34)
+abolished = (
+    re.compile(r"\binherits=" + Q + r"[a-z0-9-]+#[a-z0-9_]+" + Q),
+    re.compile(r"^\s*</?refs>\s*$"),
+    re.compile(r"^\s*<skill\s+use="),
+)
+# Renamed upstream by Context7; the renamed form appears on the corresponding added line.
+RENAMED = ("get-library-docs", "context7CompatibleLibraryID")
+
+def is_exempt(r):
+    if frontmatter.match(r):
+        return True
+    if any(p.search(r) for p in abolished):
+        return True
+    return any(tok in r for tok in RENAMED)
+
 added_norm = [norm(a) for a in added]
 for r in removed:
-    if not r.strip() or exempt.match(r):
+    if not r.strip() or is_exempt(r):
         continue
     body = norm(r)
     if not body:
@@ -453,62 +491,80 @@ for r in removed:
     if any(probe in a for a in added_norm):
         continue
     print(r)
-' || true)"
-  if [ "${changed:-0}" -eq 0 ]; then
+')"
+  # An empty result means "nothing was removed" only if the classifier actually ran. It is
+  # embedded in a shell string, so a quoting slip makes it die and print nothing — which,
+  # swallowed, reads as a clean additive edit. Check the status separately, as every other
+  # helper in this file does.
+  removed_status=$?
+  if [ $removed_status -ne 0 ]; then
+    fail "additive-only check did not run" "$removed"
+  elif [ "${changed:-0}" -eq 0 ]; then
     printf '  --   no tracked changes against %s to check\n' "$base"
   elif [ -z "$removed" ]; then
     pass "edits to $changed tracked file(s) are additive (frontmatter aside)"
-  else
+  elif [ "${ADDITIVE_ONLY:-0}" = "1" ]; then
+    # Report the total before the sample. Showing 20 lines with no count reads as a small
+    # localized slip even when the real figure is in the thousands, and a reader who sizes
+    # the problem from the sample will reach for an exemption instead of a review.
     fail "existing content was removed, not just added" \
-      "$(printf '%s' "$removed" | head -20)"
+      "$(printf '%s\n' "$removed" | wc -l | tr -d ' ') removed line(s) have no surviving counterpart; first 20:
+$(printf '%s' "$removed" | head -20)"
+  else
+    pass "non-additive edit: $(printf '%s\n' "$removed" | wc -l | tr -d ' ') removed line(s) across $changed file(s) — review the diff; set ADDITIVE_ONLY=1 to enforce (harvest passes)"
   fi
 fi
 
 echo "== cross-references =="
 
-# ai-prompts composes agent and command definitions out of skill sections via
-# inherits="skill#anchor". A dangling anchor silently degrades the prompt instead of erroring,
-# so it has to be checked mechanically. This class of breakage has occurred before.
+# Two invariants, both of which have degraded silently before.
+#
+# `inherits="skill#anchor"` used to compose one file out of another's sections. Nothing ever
+# resolved it at runtime: the referenced body never entered the context, so the referencing file
+# carried an empty slot that read to every later reader as though it were filled. The notation is
+# abolished in favour of the load table plus an explicit Skill call, so what is checked now is that
+# it has not crept back into the skills tree. verify-prompts.sh owns the same check for ai-prompts
+# and it is deliberately not duplicated here.
+#
+# `defer_to` and `related_skills` name another skill by slug. A typo sends a reader nowhere and
+# errors nothing, so both spellings of the reference are resolved against the tree.
 ref_out="$(
-  python3 - "$prompts_dir" "$skills_dir" <<'PY'
+  python3 - "$skills_dir" <<'PY'
 import re, os, sys, glob
-prompts, skills = sys.argv[1], sys.argv[2]
+skills = sys.argv[1]
 
 def read(p):
     return open(p, encoding='utf-8', errors='replace').read()
 
-prompt_files = glob.glob(os.path.join(prompts, '**', '*.md'), recursive=True)
-skill_files = glob.glob(os.path.join(skills, '*', 'SKILL.md'))
-if not prompt_files or not skill_files:
-    raise SystemExit('found no prompt or skill files to cross-check')
+skill_files = sorted(glob.glob(os.path.join(skills, '*', 'SKILL.md')))
+if not skill_files:
+    raise SystemExit('found no skill files to cross-check')
+
+present = {os.path.basename(os.path.dirname(p)) for p in skill_files}
+# Supplied by external flake inputs rather than by this directory.
+external = {'paredit-cli', 'mcp-builder', 'skill-creator', 'webapp-testing'}
 
 bad = []
-
-# inherits="skill#anchor" composes agent and command definitions out of skill sections.
-refs = {}
-for f in prompt_files:
-    for m in re.finditer(r'inherits[= ]"?([a-z0-9-]+)#([a-z0-9_]+)', read(f)):
-        refs.setdefault((m.group(1), m.group(2)), set()).add(os.path.basename(f))
-for (sk, anc), files in sorted(refs.items()):
-    p = os.path.join(skills, sk, 'SKILL.md')
-    src = ', '.join(sorted(files))
-    if not os.path.exists(p):
-        bad.append(f'inherits {sk}#{anc} -> no such skill (from {src})')
-        continue
-    if not re.search(rf'<{re.escape(anc)}[\s>]|id="{re.escape(anc)}"|name="{re.escape(anc)}"', read(p)):
-        bad.append(f'inherits {sk}#{anc} -> no such anchor (from {src})')
-
-# defer_to / related_skills name another skill. A typo here silently sends a reader nowhere.
-present = {os.path.basename(os.path.dirname(p)) for p in skill_files}
-external = {'paredit-cli', 'mcp-builder', 'skill-creator', 'webapp-testing'}
-for p in sorted(skill_files):
+targets = 0
+for p in skill_files:
     owner = os.path.basename(os.path.dirname(p))
     body = read(p)
-    for m in re.finditer(r'<(?:defer_to|skill)\s+skill="([a-z0-9-]+)"', body):
+    # Only a real attribute counts. core-patterns documents the abolished notation on purpose, in
+    # prose and inside backticks, and a check that cannot tell an example from a use would force
+    # the one file explaining the migration to stop explaining it. Requiring the match to sit
+    # inside an opening tag — no `<` or `>` between the tag name and the attribute — draws that
+    # line mechanically.
+    for m in re.finditer(r'<[a-z_][a-z0-9_]*[^<>]*\binherits="[a-z0-9-]+#[a-z0-9_]+"', body):
+        bad.append(f'{owner}: {m.group(0)[:70]} -> abolished notation, nothing resolves it')
+    for m in re.finditer(r'<(?:defer_to|skill)\s+(?:skill|name)="([a-z0-9-]+)"', body):
+        targets += 1
         target = m.group(1)
         if target not in present and target not in external:
-            bad.append(f'{owner}: defer_to skill="{target}" -> no such skill')
-print(f'REFS {len(refs)}')
+            bad.append(f'{owner}: reference to "{target}" -> no such skill')
+# A tree with no cross-references would satisfy every check above by having nothing to check.
+if targets < 50:
+    raise SystemExit(f'only {targets} skill cross-references found; the check would be vacuous')
+print(f'TARGETS {targets}')
 for b in bad:
     print('BAD ' + b)
 PY
@@ -517,36 +573,34 @@ status=$?
 if [ $status -ne 0 ]; then
   fail "cross-reference check did not run" "$ref_out"
 elif printf '%s' "$ref_out" | grep -q '^BAD '; then
-  fail "dangling cross-references" "$(printf '%s' "$ref_out" | grep '^BAD ' | sed 's/^BAD //')"
+  fail "abolished or dangling cross-references" \
+    "$(printf '%s' "$ref_out" | grep '^BAD ' | perl -pe 's/^BAD //')"
 else
-  pass "every inherits anchor and defer_to target resolves ($(printf '%s' "$ref_out" | sed -n 's/^REFS //p') inherits refs)"
+  pass "no inherits= survives and every skill reference resolves ($(printf '%s' "$ref_out" | perl -ne 'print $1 if /^TARGETS (\d+)/') references)"
 fi
 
-# Every name advertised in the CLAUDE.md registry must exist on disk, or the model is told
-# about a skill it cannot load.
-ghost=""
-for s in $(grep -o 'skill name="[a-z0-9-]*"' "$prompts_dir/CLAUDE.md" | sed 's/skill name="//;s/"//'); do
-  case "$s" in
-  aws-* | paredit-cli) continue ;; # supplied by external flake inputs, not this directory
-  esac
-  [ -d "$skills_dir/$s" ] || ghost="$ghost $s"
-done
-[ -z "$ghost" ] && pass "registry lists no non-existent skill" ||
-  fail "registry advertises skills that do not exist" "$ghost"
+echo "== registry fossil =="
 
-echo "== registry coverage (informational) =="
-
-# These six are consumed only through inherits= by agents and commands; they are deliberately
-# absent from the user-facing catalogue. Anything else missing from the registry is an omission.
-exempt=" define-core exploration-tools mdq parallelization-patterns quality-tools workflow-patterns "
-unlisted=""
-for d in "$skills_dir"/*/; do
-  name="$(basename "$d")"
-  case "$exempt" in *" $name "*) continue ;; esac
-  grep -q "skill name=\"$name\"" "$prompts_dir/CLAUDE.md" || unlisted="$unlisted $name"
-done
-[ -z "$unlisted" ] && pass "every user-facing skill is registered in CLAUDE.md" ||
-  fail "user-facing skills missing from the registry" "$unlisted"
+# CLAUDE.md used to carry a hand-maintained <skills> catalogue naming every skill in this
+# directory. It is gone: the harness injects the list of available skills into the context by
+# itself, so a second copy maintained here could only drift out of step and start advertising
+# skills that no longer exist. What remains checkable is that the copy has not come back — a
+# reappearing registry spends resident context on every session to contradict the injected list.
+#
+# The complementary direction, that every skill the load table names actually exists, belongs to
+# verify-prompts.sh, which owns CLAUDE.md's structure. It is deliberately not repeated here.
+claude_md="$prompts_dir/CLAUDE.md"
+if [ ! -r "$claude_md" ]; then
+  fail "registry-fossil check could not run" "CLAUDE.md is not readable at $claude_md"
+else
+  registry="$(grep -c 'skill name="[a-z0-9-]*"' "$claude_md")"
+  if [ "${registry:-0}" -eq 0 ]; then
+    pass "CLAUDE.md carries no hand-maintained skill registry"
+  else
+    fail "a skill registry has reappeared in CLAUDE.md" \
+      "$registry entries matching 'skill name=\"...\"' in $claude_md; the harness injects the catalogue"
+  fi
+fi
 
 if [ "${1:-}" = "--eval" ]; then
   echo "== nix evaluation =="

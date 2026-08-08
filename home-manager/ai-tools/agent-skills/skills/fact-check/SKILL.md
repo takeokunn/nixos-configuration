@@ -1,7 +1,7 @@
 ---
 name: Fact Check
 description: This skill should be used when the user asks to "verify claims", "fact check", "validate documentation", "check sources", or needs verification of external source references. Provides patterns for systematic fact verification using Context7 and WebSearch.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -203,7 +203,7 @@ version: 2.0.1
   <rule>Cross-reference disputed claims with multiple sources</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Claim cannot be verified due to missing documentation</example>
     <example severity="medium">Conflicting information from different sources</example>

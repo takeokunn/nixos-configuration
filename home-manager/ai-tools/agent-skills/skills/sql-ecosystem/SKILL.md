@@ -1,7 +1,7 @@
 ---
 name: SQL Ecosystem
 description: This skill should be used when working with SQL databases, "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE TABLE", "JOIN", "INDEX", "EXPLAIN", transactions, or database migrations. Provides comprehensive SQL patterns across PostgreSQL, MySQL, and SQLite.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -1585,7 +1585,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/postgresql" topic="window functions"</action>
+  <action>query-docs libraryId="/websites/postgresql" query="window functions"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -1598,7 +1598,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/dev_mysql_doc_refman_9_4_en" topic="JSON functions"</action>
+  <action>query-docs libraryId="/websites/dev_mysql_doc_refman_9_4_en" query="JSON functions"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -1611,7 +1611,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/sqlite/sqlite" topic="query optimization"</action>
+  <action>query-docs libraryId="/sqlite/sqlite" query="query optimization"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -1912,7 +1912,7 @@ ORDER BY total_spent DESC LIMIT 100;
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Missing index on infrequently queried column</example>
     <example severity="medium">Query performance degradation under load</example>

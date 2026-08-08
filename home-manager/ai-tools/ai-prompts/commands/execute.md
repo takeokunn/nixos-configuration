@@ -6,126 +6,111 @@ description: Task execution command
 <purpose>
 Execute tasks by delegating detailed work to sub-agents while focusing on policy decisions and orchestration. Includes test self-healing: if written tests fail, one targeted fix attempt is made before completion. For comprehensive multi-agent quality review across all dimensions, use /execute-full.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">execution-workflow</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-</refs>
 <rules priority="critical">
-  <rule>Delegate detailed work to specialized sub-agents</rule>
-  <rule>Focus on orchestration and policy decisions</rule>
-  <rule>Execute independent tasks in parallel</rule>
-  <rule>Verify sub-agent outputs before integration</rule>
-  <rule>Write tests for all implemented functionality; test creation is mandatory, not optional</rule>
-  <rule>Maximum one fix iteration for test failures in consolidate phase; report remaining failures as blockers</rule>
+  <rule>Write tests for all implemented functionality and run them. An implementation whose tests were
+    never executed is not complete, however clean it reads.</rule>
+  <rule>At most one fix iteration for failing tests. Report what still fails as a blocker — a second
+    automated pass hides a scope problem the user needs to decide on.</rule>
 </rules>
-<rules priority="standard">
-  <rule>Use execution-workflow skill for delegation patterns</rule>
-  <rule>Check Serena memories before implementation</rule>
+<rules priority="important">
+  <rule>Delegate detailed work to specialized sub-agents; run independent units in parallel and
+    dependent units in order.</rule>
+  <rule>Verify sub-agent outputs before integrating them, because a report citing nothing checkable is
+    not a result.</rule>
+  <rule>Check Serena memories before implementing, so an existing utility or convention is reused
+    rather than re-created beside itself.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_orchestration" />
 <ai_principles>
   <inapplicable_traditional_practices>
-    <practice>Implementing all logic in a single agent pass without delegation — every specialized concern (quality, security, tests, docs) must be delegated to the appropriate sub-agent with full context and explicit deliverables</practice>
-    <practice>Treating test creation as optional or deferrable — tests are mandatory for all implemented functionality; no implementation is considered complete without corresponding tests</practice>
-    <practice>Silently completing when tests fail after a fix attempt — remaining test failures after one targeted fix must be surfaced as explicit blockers in the follow_up section, not hidden</practice>
+    <practice>Implementing every specialized concern in a single pass — quality, security, tests, and docs each go to their agent with full context and an explicit deliverable</practice>
+    <practice>Treating test creation as deferrable — no implementation is complete without corresponding tests</practice>
+    <practice>Completing silently when tests still fail after the fix attempt — remaining failures belong in follow_up as blockers</practice>
   </inapplicable_traditional_practices>
   <applicable_ai_principles>
-    <principle>Decompose tasks into atomic units with clear boundaries before delegating; independent units run in parallel while dependent units run sequentially — never serialize what can be parallelized</principle>
-    <principle>Check Serena memories for existing patterns before every implementation; implementing what already exists as a utility or convention wastes effort and creates divergence</principle>
-    <principle>After test creation, run the inferred test command immediately; if tests fail, attempt exactly one targeted fix and re-run; report any remaining failures as blockers rather than suppressing them</principle>
+    <principle>Decompose into atomic units with clear boundaries before delegating; never serialize what can be parallelized</principle>
+    <principle>Check Serena memories for existing patterns before every implementation</principle>
+    <principle>Run the inferred test command immediately after test creation; on failure, attempt exactly one targeted fix and re-run</principle>
   </applicable_ai_principles>
 </ai_principles>
 <workflow>
   <phase name="prepare">
-    <objective>Initialize Serena and load task-type-appropriate patterns</objective>
+    <objective>Load the governing skill, initialize Serena, and read task-appropriate patterns</objective>
     <step order="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
+      <action>Load the execution-workflow skill with the Skill tool. It governs the delegation contract,
+        the definition of done, and the review criteria this command depends on. A skill that is named
+        but not loaded contributes nothing to this run.</action>
+      <tool>Skill (execution-workflow)</tool>
+      <output>Skill loaded</output>
     </step>
     <step order="2">
-      <action>Check list_memories for relevant patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Full memory index</output>
+      <action>Activate the Serena project and call list_memories.</action>
+      <tool>Serena activate_project, list_memories</tool>
+      <output>Project activated; full memory index</output>
     </step>
     <step order="3">
-      <action>Classify task type as "implementation". Apply memory_reading_by_task_type filter
-        (serena-usage skill): prioritize {feature}-patterns → {language}-conventions → testing-patterns.
-        Filter the memory index from step 2 against these categories; record matched names.</action>
-      <tool>serena-usage#memory_reading_by_task_type (reference only)</tool>
-      <output>Filtered priority memory list for implementation tasks</output>
-    </step>
-    <step order="4">
-      <action>Load only memories matching the prioritized categories with read_memory;
-        skip categories absent from the index</action>
+      <action>Classify the task as "implementation" and filter the memory index to the categories that
+        matter here: {feature}-patterns, {language}-conventions, testing-patterns, and any
+        completion-checklist or verification-command memory for this project. Load only the matches with
+        read_memory. The completion-checklist category is what tells you which commands constitute
+        "done" here without re-deriving it from build files.</action>
       <tool>Serena read_memory</tool>
-      <output>Prioritized patterns loaded</output>
+      <output>Matched memory names, and the ones loaded</output>
     </step>
   </phase>
   <phase name="analyze">
-    <objective>Understand the task scope and identify required resources</objective>
+    <objective>Establish the task inventory, its touch points, and what will prove it done</objective>
     <step order="1">
-      <action>Identify concrete tasks that need to be completed</action>
-      <output>Task inventory</output>
+      <action>Identify the concrete tasks to be completed, split them into atomic units, and state the
+        boundary of each.</action>
+      <output>Task inventory with boundaries</output>
     </step>
     <step order="2">
-      <action>Select best-fit sub-agents for each task</action>
-      <output>Delegation map</output>
+      <action>If the task adds one more of something that already exists — a module, an entity, a test,
+        a command — enumerate its registration surfaces before the first edit. Pick the nearest existing
+        sibling, grep its identifier across the whole repository, and treat every hit outside its own
+        module as a required touch point; the sites that name no sibling are convention-discovered and
+        need no edit. Skipping this produces the failure that looks like success: everything compiles
+        and the feature is unreachable because one explicit list was never updated.</action>
+      <tool>Grep</tool>
+      <output>Required touch points, and the sites confirmed convention-discovered</output>
     </step>
     <step order="3">
-      <action>Identify which tasks can run in parallel</action>
-      <output>Parallelization plan</output>
+      <action>Select the best-fit sub-agent per task, mark which tasks are independent, and order the
+        rest by the specific output each waits on.</action>
+      <output>Delegation map with parallel groups and the dependency behind each sequential step</output>
     </step>
     <step order="4">
-      <action>Determine task dependencies and execution order</action>
-      <output>Ordered dependency chain</output>
-    </step>
-    <step order="5">
-      <action>Define verification requirements for completion</action>
-      <output>Verification checklist</output>
-    </step>
-  </phase>
-  <phase name="decompose">
-    <objective>Break down complex tasks into manageable units</objective>
-    <step order="1">
-      <action>Split work into manageable units</action>
-      <output>Atomic task units</output>
-    </step>
-    <step order="2">
-      <action>Define boundaries for each task unit</action>
-      <output>Task boundaries</output>
+      <action>Define what will prove the work done, in two separate lists: items a command discharges
+        (name the command) and items an artifact discharges (name the file:line it will point at). An
+        item that can carry neither is a discussion point, not a checklist entry — a prose checkbox gets
+        ticked by impression rather than by evidence.</action>
+      <output>Verification checklist, split by what discharges each item</output>
     </step>
   </phase>
-  <phase name="structure">
-    <objective>Organize tasks for optimal execution</objective>
-    <step order="1">
-      <action>Classify tasks as parallel or sequential</action>
-      <output>Execution classification</output>
-    </step>
-    <step order="2">
-      <action>Define dependencies between structured tasks</action>
-      <output>Dependency matrix</output>
-    </step>
-  </phase>
-  <reflection_checkpoint id="analysis_quality" inherits="workflow-patterns#reflection_checkpoint" />
+  <reflection_checkpoint id="analysis_quality" after="analyze">
+    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
+    <check>Name each task in the inventory and the agent it is going to.</check>
+    <check>Name the registration surfaces found in step 2, or state that this task adds no new member of
+      an existing family.</check>
+    <check>Name which tasks run in parallel and the dependency forcing the rest to be sequential.</check>
+    <on_unmet>Obtain the missing item before delegating.</on_unmet>
+  </reflection_checkpoint>
   <phase name="assign">
-    <objective>Delegate tasks to appropriate sub-agents with clear instructions</objective>
-    <step order="0">
-      <action>For tasks that modify existing symbols: call find_referencing_symbols (Serena) to assess blast radius;
-        embed reference count and affected file list into the delegation prompt (EXEC-B005)</action>
-      <tool>Serena find_referencing_symbols</tool>
-      <output>Blast radius: N references in M files; included in delegation context</output>
-    </step>
+    <objective>Delegate with enough context that the assignee does not have to guess</objective>
     <step order="1">
-      <action>Delegate tasks with detailed instructions</action>
+      <action>For tasks that modify existing symbols: call find_referencing_symbols to assess blast
+        radius, and embed the reference count and affected file list in the delegation prompt (EXEC-B005).
+        When a definition is being removed or migrated, grep the identifier itself rather than the shape
+        it is usually called in — forward declarations, differently-shaped call sites, comments, and test
+        doubles share only the name.</action>
+      <tool>Serena find_referencing_symbols, Grep</tool>
+      <output>Blast radius: N references in M files, included in the delegation context</output>
+    </step>
+    <step order="2">
+      <action>Delegate each task with its scope, its target file paths, the expected deliverable, and any
+        reference implementation to follow.</action>
       <tool>Task</tool>
       <output>Delegation requests issued</output>
-    </step>
-    <step order="2">
-      <action>Provide complete context and constraints to assignees</action>
-      <output>Execution-ready delegation context</output>
     </step>
   </phase>
   <reflection_checkpoint id="assignment_complete" after="assign">
@@ -133,66 +118,101 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <check>Name every task in the inventory and the agent it was dispatched to, or state it is being
       done here and why. A task on neither list was dropped.</check>
     <check>Quote the file paths and the expected deliverable given to each agent. A prompt naming no
-      path is not a delegation (EXEC-P001, ORCH-P004).</check>
+      path is not a delegation (EXEC-P001).</check>
     <check>Name the tasks that must wait, and the specific output each one waits on.</check>
     <on_unmet>Do not dispatch. Supply the missing item, or ask with AskUserQuestion if only the user
       can resolve it.</on_unmet>
   </reflection_checkpoint>
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle execution errors and apply fallback strategy</action>
-      <output>Recovered execution path or documented blocker</output>
-    </step>
-  </phase>
   <phase name="consolidate">
-    <objective>Integrate sub-agent outputs into cohesive result</objective>
+    <objective>Integrate sub-agent outputs and establish that the verification actually verified this change</objective>
     <step order="1">
-      <action>Verify sub-agent outputs for completeness; call get_diagnostics_for_file (min_severity=2)
-        on each modified file to catch LSP errors before test execution</action>
-      <tool>Output validation, Serena get_diagnostics_for_file</tool>
-      <output>Verified sub-agent results; any LSP errors reported as blockers</output>
+      <action>Check each agent's output for completeness, then call get_diagnostics_for_file
+        (min_severity=2) on every modified file to catch language-server errors before running tests.</action>
+      <tool>Serena get_diagnostics_for_file</tool>
+      <output>Verified sub-agent results; any diagnostics reported as blockers</output>
     </step>
     <step order="2">
-      <action>Run test commands for all written tests; infer command from project language/framework (pytest, go test, npm test, etc.); if command cannot be inferred, check package.json/Makefile/pyproject.toml/go.mod; if still undetermined, report as blocker</action>
-      <tool>Bash (test runner)</tool>
-      <output>Test execution results: pass/fail status, failing test names if any</output>
+      <action>Before running the project's verification command, establish what it actually covers. A
+        command's name is not its scope, and it diverges in three ways beyond the baseline check: the
+        configuration excludes part of the tree, the editor or language server reads a different
+        configuration than the command does so the two disagree about the same file, and a narrowed
+        filter still pulls in shared fixtures so a failure need not belong to this change. Answer one
+        question before running it — does this command include what was changed?</action>
+      <output>The command's covered scope, and which configuration file defines it</output>
     </step>
     <step order="3">
-      <action>If tests fail: delegate one targeted fix to test/general-purpose agent for specific failing tests; re-run once to confirm; if still failing after one attempt, report remaining failures as blockers in follow_up and mark status FAIL</action>
-      <tool>Task (test agent, or general-purpose)</tool>
-      <output>All tests passing, or blocker report listing remaining failures</output>
+      <action>Name what the gate itself writes into the working tree — build output, coverage data,
+        generated loaders — before reading its result. An artifact it drops makes the later change
+        report unreadable, and an ignored one will not even appear in a diff, so route generated output
+        to a temporary directory. On the reading side, confirm the run started its own service or
+        fixture rather than attaching to one an earlier session left running.</action>
+      <output>What the gate writes, and whether it started its own dependencies</output>
     </step>
     <step order="4">
-      <action>Combine all verified results and test outcomes into a cohesive final output</action>
-      <output>Consolidated result including test execution status</output>
+      <action>Run the test commands for all written tests. Infer the command from the project's language
+        and framework; if it cannot be inferred, check the package, build, or project manifest; if it
+        still cannot, report that as a blocker. Confirm the run's input set included the new work — a
+        tool that snapshots from version control, honors an ignore file, or reads an explicit entry
+        manifest silently skips a file created this session and not yet tracked. Check that the new file
+        appears in the tool's own file list, or that the new test appears in the run count.</action>
+      <tool>Bash (test runner)</tool>
+      <output>Test results with the command run, and confirmation the run saw the new files</output>
+    </step>
+    <step order="5">
+      <action>If tests fail, delegate one targeted fix for the specific failing tests and re-run once.
+        If failures remain after that single attempt, report them as blockers in follow_up and set the
+        status to FAIL.</action>
+      <tool>Task (test agent, or general-purpose)</tool>
+      <output>All tests passing, or a blocker report listing what still fails</output>
+    </step>
+    <step order="6">
+      <action>Before reporting that something could not be verified in this environment, grep the
+        environment variables the application reads and its scripts directory for a substitute backend,
+        an in-memory adapter, or a recorded-fixture mode. A codebase mature enough to have a test suite
+        usually has a runnable driver behind that seam, and an unverifiable claim reported as a gap is
+        rarely revisited.</action>
+      <output>The substitute mode found and exercised, or confirmation that none exists</output>
+    </step>
+    <step order="7">
+      <action>Combine the verified results and test outcomes into the final output.</action>
+      <output>Consolidated result including verification status</output>
     </step>
   </phase>
   <!-- persist phase: orchestrator-synthesized insights visible only after all agents complete.
        The memory agent in execution_graph captures patterns sourced from implementation sub-agents.
        These two mechanisms are complementary: agent-sourced findings → memory agent; orchestrator-level synthesis → this phase. -->
   <phase name="persist">
-    <objective>Capture orchestrator-level synthesis insights to Serena memory</objective>
+    <objective>Capture orchestrator-level synthesis to Serena memory</objective>
     <step order="1">
-      <action>Evaluate each trigger in memory_auto_creation_triggers (serena-usage skill):
-        architectural pattern / feature pattern / user-stated convention / refactoring approach.
-        Call list_memories to check if a memory for this topic already exists.</action>
-      <tool>Serena list_memories, evaluation against trigger list</tool>
-      <output>Trigger match: yes/no for each; existing memory: yes/no</output>
+      <action>Evaluate the memory_auto_creation_triggers (serena-usage skill): architectural pattern,
+        feature pattern, user-stated convention, refactoring approach. Add three triggers that this
+        command produces and that are expensive to re-derive:
+        (a) the verification command in the exact form that exited zero, including any environment
+        prefix and path flags, since a bare tool name costs the next session the same trial and error;
+        (b) the project's canonical gate and what it deliberately does not cover, as a
+        completion-checklist memory;
+        (c) an abstraction deliberately not built, together with the condition that should re-open it —
+        a deferral without its trigger gets re-argued from scratch with less information than the first
+        time.
+        Call list_memories to check whether the topic already has an entry.</action>
+      <tool>Serena list_memories</tool>
+      <output>Trigger match per item; existing memory yes/no</output>
     </step>
     <step order="2">
-      <action>If trigger matched: use edit_memory (existing topic) or write_memory (new topic)
-        following memory_lifecycle convention ({topic}-YYYY-MM or {topic}-patterns).
-        For write_memory: prepend memory_content_format frontmatter (serena-usage skill)
-        with domain, status=active, created=YYYY-MM, last-verified=YYYY-MM.
-        For edit_memory on a memory lacking frontmatter: add it at that time, updating last-verified.
-        If no triggers matched: output "persist: no triggers matched — skip"</action>
+      <action>On a match, use edit_memory for an existing topic or write_memory for a new one, following
+        the memory_lifecycle naming convention. Prepend the memory_content_format frontmatter
+        (serena-usage skill); when editing a memory that lacks it, add it and update last-verified.
+        Replace superseded content rather than appending to it, so the entry stays a statement of fact
+        rather than becoming a changelog. If nothing matched, output "persist: no triggers matched — skip".</action>
       <tool>Serena edit_memory or write_memory</tool>
-      <output>Memory entries updated with frontmatter (names listed), or explicit skip reason</output>
+      <output>Memory names written or edited, or the explicit skip</output>
     </step>
     <step order="3">
-      <action>Apply memory_staleness_verification (serena-usage skill) to memories loaded in the prepare phase (step 4): bump last-verified if still accurate, correct if partially outdated, or rename_memory with an -archived suffix if fully superseded. Do not read additional memories solely for this check.</action>
+      <action>Apply memory_staleness_verification to the memories loaded in prepare: bump last-verified
+        if still accurate, correct it if partly outdated, or rename with an -archived suffix if fully
+        superseded. Do not read further memories only to check their freshness.</action>
       <tool>Serena edit_memory, rename_memory</tool>
-      <output>Verified/updated/archived memories noted, or "no memories read this task required verification"</output>
+      <output>Memories verified, updated, or archived — or "none read this task required verification"</output>
     </step>
   </phase>
 </workflow>
@@ -221,6 +241,10 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <receives>implementation_files[], acceptance_criteria[], existing_test_paths[], test_framework</receives>
     <produces>test_files_created[], test_cases[]{name, type: unit|integration|e2e, coverage_target}, test_run_command</produces>
     <done_when>Tests written for all acceptance criteria; test_run_command confirmed executable</done_when>
+    <constraint>Never write a test that always passes together with a comment explaining why the
+      behavior cannot be verified here. Before concluding it cannot, read the existing test helpers:
+      the harness usually already has the capability, and the stale rationale left behind suppresses
+      the next attempt as well.</constraint>
   </agent>
   <agent name="refactor" subagent_type="general-purpose" readonly="false">
     <role>Improve code structure and reduce tech debt without changing observable behavior</role>
@@ -294,25 +318,19 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     <produces>instrumentation_added[]{type: log|metric|trace, location: file:line}, dashboard_updates[]</produces>
     <done_when>All critical code paths instrumented; log levels consistent with project policy</done_when>
   </agent>
-  <agent name="git" subagent_type="git" readonly="false">
-    <role>Design branching strategy, commit structure, and merge workflows</role>
-    <receives>change_scope, team_workflow, target_branches[], parallel_isolation_required: true</receives>
-    <produces>branch_strategy, commit_plan[], pr_description_template</produces>
-    <done_when>Branch strategy aligned with team workflow; commit history logical and reviewable</done_when>
-    <constraint>Never use git stash, git checkout [branch], git reset --hard, or git clean.
-      For branch isolation use git worktree add. Follow core-patterns#parallel_project_isolation.</constraint>
-  </agent>
   <agent name="memory" subagent_type="general-purpose" readonly="false">
     <role>Capture significant architectural decisions and novel patterns to persistent memory</role>
     <receives>implementation_summary, novel_patterns[], architectural_decisions[]</receives>
     <produces>memory_entries_created[], memory_paths[]</produces>
     <done_when>All non-obvious decisions and patterns captured; memory entries verified writable</done_when>
   </agent>
-  <agent name="validator" subagent_type="validator" readonly="true">
-    <role>Cross-validate findings from multiple agents to detect contradictions and confirm consensus</role>
-    <receives>agent_reports[], implementation_claims[], expected_outcomes[]</receives>
-    <produces>consensus_report{agreed: [], disputed: [], unevidenced: []}, contradiction_flags[]</produces>
-    <done_when>All agent outputs cross-checked; contradictions resolved or flagged for user review</done_when>
+  <agent name="validator" subagent_type="validator" readonly="true" dispatch="on_demand">
+    <role>Independently re-derive a disputed claim. Dispatch only when two agents disagree and their
+      evidence does not settle it, or when a consequential claim rests on no citation — not as a
+      routine step, since an independent pass costs materially more than the report it checks.</role>
+    <receives>the disputed claim and its cited file:line or command output, without the originating agent's reasoning</receives>
+    <produces>independent verdict with the evidence it rests on</produces>
+    <done_when>The disputed claim is confirmed, overturned, or reported as unresolved with both positions</done_when>
   </agent>
 </agents>
 <execution_graph>
@@ -339,15 +357,15 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
   <requirement>Reference implementations (specific paths)</requirement>
   <requirement>Memory check: `list_memories` for patterns</requirement>
 </delegation>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="task_clarity" precedence="1">
     <unmet>The request admits two readings that would produce different implementations. Ask with
       AskUserQuestion before delegating; do not implement the cheaper reading.</unmet>
   </factor>
   <factor name="verification_completeness" precedence="2">
-    <unmet>No test command was run against the change, or the run is not recorded with its exit status.
-      Run it before claiming completion. If no command can be inferred from package.json, Makefile,
-      pyproject.toml, or go.mod, report that as a blocker rather than completing unverified.</unmet>
+    <unmet>No test command was run against the change. Run it before claiming completion. If no command
+      can be inferred from the project's manifests, report that as a blocker rather than completing
+      unverified.</unmet>
   </factor>
   <factor name="implementation_quality" precedence="3">
     <unmet>A test failed, or get_diagnostics_for_file reports an error on a modified file. Delegate one
@@ -370,12 +388,12 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
           <command>test command used, or "none run" with the reason</command>
           <status>PASS / FAIL</status>
           <failures>failing test names if any</failures>
+          <scope>What the command covered, and confirmation it saw the files created this session</scope>
         </test_execution>
       </verification>
       <follow_up>Remaining risks or next actions, if any</follow_up>
       <self_feedback>
-        <evidence>Each claim above tagged verified, inferred, or assumed. A claim tagged verified names
-          the command or the file:line that backs it; if it cannot, downgrade it.</evidence>
+        <evidence>Each claim above tagged per the evidence tiers in CLAUDE.md</evidence>
         <weakest_claim>The finding resting on the thinnest evidence, and what would confirm it</weakest_claim>
         <gaps>Anything asked for that was not done, and why — not attempted, blocked, or out of scope</gaps>
       </self_feedback>
@@ -384,30 +402,34 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 </output>
 <enforcement>
   <mandatory_behaviors>
-    <behavior id="EXEC-B001" priority="critical">
+    <behavior id="EXEC-B001" priority="important">
       <trigger>Before implementation</trigger>
-      <action>Check Serena memories for existing patterns</action>
+      <action>Check Serena memories for existing patterns, so an existing convention is reused rather
+        than duplicated</action>
       <verification>Pattern check in output</verification>
     </behavior>
-    <behavior id="EXEC-B002" priority="critical">
+    <behavior id="EXEC-B002" priority="important">
       <trigger>After implementation</trigger>
-      <action>Delegate verification to quality and security agents</action>
+      <action>Delegate verification to the quality and security agents</action>
       <verification>Agent reports in output</verification>
     </behavior>
     <behavior id="EXEC-B003" priority="critical">
       <trigger>During implementation</trigger>
-      <action>Delegate test creation to test agent for all implemented functionality; use acceptance criteria from /define output as test targets</action>
+      <action>Delegate test creation to the test agent for all implemented functionality, using the
+        acceptance criteria from /define output as targets</action>
       <verification>Test files created and listed in output</verification>
     </behavior>
     <behavior id="EXEC-B004" priority="critical">
-      <trigger>After test creation in consolidate phase (step 2)</trigger>
-      <action>Run all test commands; if any fail, delegate one targeted fix then re-run once; if still failing, report as blockers — do not silently complete with failing tests</action>
-      <verification>Test execution results in output; either all-pass confirmation or explicit blocker list</verification>
+      <trigger>After test creation, in the consolidate phase</trigger>
+      <action>Run all test commands. On failure, delegate one targeted fix and re-run once; if failures
+        remain, report them as blockers rather than completing silently</action>
+      <verification>Test execution results in output: an all-pass confirmation or an explicit blocker list</verification>
     </behavior>
-    <behavior id="EXEC-B005" priority="critical">
-      <trigger>Before modifying any existing symbol (function, class, method)</trigger>
-      <action>Use Serena find_referencing_symbols to assess blast radius;
-        include reference count and affected files in delegation prompt to sub-agents</action>
+    <behavior id="EXEC-B005" priority="important">
+      <trigger>Before modifying any existing symbol</trigger>
+      <action>Use find_referencing_symbols to assess blast radius and include the reference count and
+        affected files in the delegation prompt, because a caller missed here surfaces as a failure the
+        fix iteration has no budget for</action>
       <verification>Blast radius assessment included in sub-agent instructions</verification>
     </behavior>
   </mandatory_behaviors>
@@ -419,7 +441,7 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
     </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor code style inconsistency</example>
     <example severity="medium">Test failure or unclear implementation approach</example>
@@ -439,20 +461,19 @@ Execute tasks by delegating detailed work to sub-agents while focusing on policy
 <related_agents>
   <agent name="explore">Codebase discovery for uncertain implementation details</agent>
   <agent name="quality-assurance">Cross-check result quality before finalization</agent>
-  <agent name="validator">Cross-validation when findings may conflict</agent>
 </related_agents>
 <related_skills>
-  <skill name="execution-workflow">Core delegation and orchestration patterns</skill>
+  <skill name="execution-workflow">Core delegation and orchestration patterns; loaded in the prepare phase</skill>
   <skill name="serena-usage">Check memories for existing patterns before implementation</skill>
   <skill name="testing-patterns">Ensure proper test coverage</skill>
 </related_skills>
 <constraints>
-  <must>Delegate detailed work to sub-agents</must>
-  <must>Execute independent tasks in parallel</must>
-  <must>Verify outputs before integration</must>
+  <must>Delegate detailed work to sub-agents and run independent tasks in parallel</must>
   <must>Write tests for all implemented functionality; skipping tests is not acceptable</must>
   <must>Run all test commands after test creation; attempt one fix for failures; report any remaining failures as blockers rather than silently completing</must>
-  <must>Define done as an enumerated set of commands that exit zero — the project's test command, plus its lint, build, or type-check command where one exists — and report which of them actually ran with its exit status. A completion claim naming no command is not a completion claim</must>
+  <must>Define done as an enumerated set of commands that exit zero — the project's test command, plus its lint, build, or type-check command where one exists — and report which of them actually ran</must>
+  <must>When a mechanical gate rejects an edit — an additive-only check, a formatter, a lint rule — add a new sibling element rather than rewording the existing one. The original stays byte-identical and the new behavior stops depending on the old wording; reword only when a sibling would be genuinely redundant</must>
+  <must>When aligning something with a reference implementation, treat alignment as one-directional for anything that fails closed: security gates, verification strictness, and fail-closed defaults move from the looser side to the stricter one and never the reverse. A strictness the reference lacks is an asset, not a divergence to erase</must>
   <avoid>Implementing detailed logic directly</avoid>
   <avoid>Unnecessary comments about past implementations</avoid>
   <avoid>Marking implementation complete without corresponding tests</avoid>

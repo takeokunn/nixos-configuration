@@ -1,7 +1,7 @@
 ---
 name: Go Ecosystem
 description: This skill should be used when the user asks to "write go", "golang", "go.mod", "go module", "go test", "go build", or works with Go language development. Provides comprehensive Go ecosystem patterns and best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -721,7 +721,7 @@ version: 2.0.0
     <pattern name="module_reference">
       <description>Retrieve Go module documentation from Context7.</description>
       <example>
-        get-library-docs context7CompatibleLibraryID="/golang/website" topic="go.mod modules"
+        query-docs libraryId="/golang/website" query="go.mod modules"
       </example>
     </pattern>
   </usage_patterns>
@@ -845,7 +845,7 @@ version: 2.0.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">golangci-lint style warning</example>
     <example severity="medium">Compilation error</example>

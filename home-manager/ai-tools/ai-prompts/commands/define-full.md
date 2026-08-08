@@ -6,30 +6,24 @@ description: Full requirements definition with feedback loop
 <purpose>
 Conduct detailed requirements definition with automatic feedback and regeneration cycle. Executes the complete define workflow, collects feedback from multiple agents, and regenerates an improved specification in a single automated flow.
 </purpose>
-<refs>
-  <skill use="patterns">core-patterns</skill>
-  <skill use="workflow">requirements-definition</skill>
-  <skill use="workflow">execution-workflow</skill>
-  <skill use="workflow">fact-check</skill>
-  <skill use="tools">serena-usage</skill>
-  <skill use="tools">context7-usage</skill>
-  <skill use="workflow">define-core</skill>
-</refs>
 <rules priority="critical">
-  <rule>Never modify, create, or delete files</rule>
-  <rule>Never implement code; requirements definition only</rule>
-  <rule>Complete full cycle: define -> feedback -> regenerate</rule>
-  <rule>Maximum one iteration (no infinite loops)</rule>
-  <rule>Automatic flow between phases (no user confirmation at inter-phase transitions). EXCEPTION: the terminal finalize gate (define-core#core_finalize) runs after the last phase, not between phases — it is permitted to prompt the user when Outstanding Issues remain.</rule>
+  <rule>Never modify a file and never write code. This command produces the specification the user
+    approves before work starts; implementing during it removes the approval step it exists to create.</rule>
+  <rule>Run the whole cycle — define, then feedback, then regenerate. The regenerated document is the
+    deliverable; the initial one is an intermediate that has not yet been critiqued.</rule>
+  <rule>One iteration, no more. A second regeneration pass means the initial clarification was
+    insufficient or the scope moved, and both are decisions for the user rather than problems to
+    automate around.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use requirements-definition skill for methodology</rule>
-  <rule>Delegate investigations to sub-agents</rule>
-  <rule>Ask questions without limit until requirements are clear</rule>
-  <rule>Investigate and question before concluding</rule>
-  <rule>Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
+  <rule>Move between phases automatically, without asking the user to confirm each transition — the
+    point of this command over /define is that the cycle completes in one flow. The terminal finalize
+    gate is not an inter-phase transition: it runs after the last phase and may prompt.</rule>
+  <rule>Keep asking until the requirements are unambiguous; there is no question budget here, and an
+    ambiguity resolved now costs a sentence rather than a rewrite.</rule>
+  <rule>Mark one option (Recommended) whenever AskUserQuestion presents choices, so the user is
+    reviewing a proposal rather than doing the analysis themselves.</rule>
 </rules>
-<parallelization inherits="parallelization-patterns#parallelization_readonly" />
 <ai_principles>
   <inapplicable_traditional_practices>
     <practice>Conducting a single requirements review pass before finalizing — AI runs the full define → feedback → regenerate cycle automatically in one flow, incorporating multi-agent critique before the specification is considered complete</practice>
@@ -43,7 +37,30 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   </applicable_ai_principles>
 </ai_principles>
 <workflow>
-  <phase name="core_workflow" inherits="define-core#workflow" />
+  <phase name="load">
+    <objective>Put the workflow this command runs into context, since it lives in a skill</objective>
+    <step order="1">
+      <action>Load define-core and requirements-definition with the Skill tool, before anything else.
+        define-core holds the phase sequence the first third of this command executes — prepare,
+        analyze, investigate, clarify, verify, document — plus the terminal finalize gate that
+        DEFF-B007 runs at the very end. requirements-definition holds the methodology inside those
+        phases. Neither is in context until the Skill tool loads it, so skipping this step leaves the
+        command with no core workflow and no gate. Load fact-check as well, since the collect_feedback
+        phase runs an external-claim check that depends on it.</action>
+      <tool>Skill</tool>
+      <output>The skills loaded, named; and the phase list define-core returned</output>
+    </step>
+  </phase>
+
+  <phase name="core_workflow">
+    <objective>Produce the initial requirements document</objective>
+    <step order="1">
+      <action>Run define-core's phases in its order, stopping before its finalize gate — the gate runs
+        once at the end of this command against the regenerated document, never against this initial
+        one. This phase's output is an intermediate artifact.</action>
+      <output>Initial requirements document, marked as not yet critiqued</output>
+    </step>
+  </phase>
 
   <phase name="collect_feedback">
     <step order="1">
@@ -100,9 +117,8 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <output>Updated phased task list</output>
     </step>
     <step order="5">
-      <action>Tag each requirement in the final document verified, inferred, or assumed
-        (core-patterns#evidence_tiers); downgrade any marked verified that cannot name the command run or
-        the file:line read</action>
+      <action>Tag each requirement in the final document; downgrade any marked verified that cannot name
+        the command run or the file:line read</action>
       <output>Tagged requirements, over-claims downgraded</output>
     </step>
   </phase>
@@ -119,13 +135,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       the finalize gate (DEFF-B007) puts it to the user.</on_unmet>
   </reflection_checkpoint>
 
-  <phase name="failure_handling" inherits="workflow-patterns#failure_handling">
-    <step order="1">
-      <action>Handle execution errors and apply fallback strategy</action>
-      <tool>Error analysis and retry policy</tool>
-      <output>Recovered execution path or documented blocker</output>
-    </step>
-  </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
@@ -152,7 +161,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     <role>Analyze requirements completeness, estimate implementation effort, and identify dependency risks</role>
     <receives>functional_requirements[], technical_constraints[], existing_codebase_context</receives>
     <produces>effort_estimate{level: low|medium|high, rationale}, risk_assessment[], missing_requirements[], dependency_graph</produces>
-    <done_when>All requirements analyzed for completeness; effort estimate justified with evidence</done_when>
+    <done_when>All requirements analyzed for completeness; effort estimate justified with evidence, and
+      expressed in quantities that were counted — files touched, call sites returned by
+      find_referencing_symbols, layers crossed, tests affected — never in clock hours. Wall-clock
+      effort depends on who does the work and what interrupts them, neither observable from here, so
+      an hour figure can only be borrowed from a training-data average and will be stated confidently
+      beside the admission that the complexity is unknown</done_when>
   </agent>
   <agent name="explore" subagent_type="explore" readonly="true">
     <role>Find existing implementations, patterns, and code relevant to the requirements</role>
@@ -203,7 +217,7 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
   <requirement>Explicit edit prohibition</requirement>
   <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
 </delegation>
-<decision_criteria inherits="core-patterns#decision_criteria">
+<decision_criteria>
   <factor name="requirement_clarity" precedence="1">
     <unmet>A requirement admits two readings that would produce different implementations. Ask with
       AskUserQuestion; do not write the reading that is cheaper to specify.</unmet>
@@ -231,10 +245,6 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
       <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
       <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-      <metrics>
-        <metric name="feasibility">0-100</metric>
-        <metric name="objectivity">0-100</metric>
-      </metrics>
       <constraints>Technical, operational</constraints>
       <test_requirements>Unit, integration, acceptance criteria</test_requirements>
       <outstanding_issues>Unresolved questions</outstanding_issues>
@@ -279,20 +289,18 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
       <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
       <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-      <metrics>
-        <metric name="feasibility">0-100</metric>
-        <metric name="objectivity">0-100</metric>
-      </metrics>
       <constraints>Technical, operational</constraints>
       <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-      <outstanding_issues>Unresolved questions (if any remain); state "none" explicitly when there are none. This is the canonical section the finalize gate (DEFF-B007) inspects.</outstanding_issues>
+      <verification_performed>The exact command(s) run during investigation and their exit status, or
+        "none run". State feasibility as the observable condition that supports it — which capability
+        was located where, which one was not found — never as a score.</verification_performed>
+      <outstanding_issues>Unresolved questions (if any remain); state "none" explicitly when there are none. This is the canonical section the finalize gate (DEFF-B007) inspects. It is also where a disagreement with the user goes: when the investigation reaches a different severity or priority than the user assigned, record both assessments and what each rests on, and hand the decision back rather than deferring silently (which buries the risk) or escalating silently (which overrides a call that was the user's).</outstanding_issues>
       <task_breakdown>
         <dependency_graph>Task dependencies visualization</dependency_graph>
         <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
         <execute_handoff>Decisions, references, constraints</execute_handoff>
       </task_breakdown>
       <self_feedback>
-        <verification>The command(s) actually run during investigation and their exit status, or "none run" — never omitted</verification>
         <weakest_claim>The requirement resting on the thinnest evidence, and what would confirm it</weakest_claim>
         <feedback_addressed>
           <item>
@@ -323,27 +331,27 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <action>Investigate existing codebase patterns</action>
       <verification>Codebase analysis in output</verification>
     </behavior>
-    <behavior id="DEFF-B002" priority="critical">
+    <behavior id="DEFF-B002" priority="high">
       <trigger>For design decisions</trigger>
       <action>Use AskUserQuestion tool with structured options</action>
       <verification>User responses recorded</verification>
     </behavior>
-    <behavior id="DEFF-B003" priority="critical">
+    <behavior id="DEFF-B003" priority="high">
       <trigger>After initial requirements document</trigger>
       <action>Execute feedback collection phase</action>
       <verification>Feedback results in output</verification>
     </behavior>
-    <behavior id="DEFF-B004" priority="critical">
+    <behavior id="DEFF-B004" priority="high">
       <trigger>After feedback collection</trigger>
       <action>Execute regeneration phase</action>
       <verification>Regenerated specification in output</verification>
     </behavior>
-    <behavior id="DEFF-B005" priority="critical">
+    <behavior id="DEFF-B005" priority="high">
       <trigger>During feedback phase</trigger>
       <action>Launch all feedback agents in parallel</action>
       <verification>Parallel execution confirmed</verification>
     </behavior>
-    <behavior id="DEFF-B006" priority="critical">
+    <behavior id="DEFF-B006" priority="standard">
       <trigger>After completing each requirements definition cycle (including regeneration cycles)</trigger>
       <action>Evaluate memory_auto_creation_triggers (serena-usage skill); if any trigger matched
         (architectural decisions discovered, conventions identified, novel patterns found),
@@ -353,10 +361,11 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
     </behavior>
     <behavior id="DEFF-B007" priority="critical">
       <trigger>After the regenerate phase, when the final requirements document's remaining/outstanding issues are non-empty</trigger>
-      <action>Run the inherited terminal finalize gate (define-core#core_finalize) EXACTLY ONCE, evaluating the FINAL (regenerated) document — never the initial document. The CANONICAL trigger section is the final document's &lt;outstanding_issues&gt; element (not the &lt;self_feedback&gt;&lt;remaining_issues&gt; summary, which is non-authoritative); fire when it is non-empty (not "none"). Offer "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope". If the user picks "Resolve now", collect answers and patch the final document directly; do NOT trigger a second feedback/regenerate cycle (preserves DEFF-P004 maximum-one-iteration).</action>
+      <action>Run the terminal finalize gate that define-core defines (core_finalize, available because
+        the load phase loaded that skill) EXACTLY ONCE, evaluating the FINAL (regenerated) document — never the initial document. The CANONICAL trigger section is the final document's &lt;outstanding_issues&gt; element (not the &lt;self_feedback&gt;&lt;remaining_issues&gt; summary, which is non-authoritative); fire when it is non-empty (not "none"). Offer "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope". If the user picks "Resolve now", collect answers and patch the final document directly; do NOT trigger a second feedback/regenerate cycle (preserves DEFF-P004 maximum-one-iteration).</action>
       <verification>Finalize gate appears once at the end of output when final outstanding issues >= 1; no second regeneration cycle is run</verification>
     </behavior>
-    <behavior id="DEFF-B008" priority="high">
+    <behavior id="DEFF-B008" priority="standard">
       <trigger>After completing each requirements definition cycle (including regeneration cycles)</trigger>
       <action>Apply memory_staleness_verification (serena-usage skill) to any memory read via read_memory during this cycle; bump last-verified, correct, or archive as appropriate. Skip if no memories were read.</action>
       <verification>Staleness check outcome recorded in output, or "no memories read this cycle"</verification>
@@ -368,12 +377,12 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <action>Modifying or creating code files</action>
       <response>Block operation, this is read-only command</response>
     </behavior>
-    <behavior id="DEFF-P002" priority="critical">
+    <behavior id="DEFF-P002" priority="high">
       <trigger>Always</trigger>
       <action>Proceeding without answering critical questions</action>
       <response>Block operation, require clarification first</response>
     </behavior>
-    <behavior id="DEFF-P003" priority="critical">
+    <behavior id="DEFF-P003" priority="high">
       <trigger>Always</trigger>
       <action>Skipping feedback or regeneration phases</action>
       <response>Block operation, full cycle required</response>
@@ -383,14 +392,22 @@ Conduct detailed requirements definition with automatic feedback and regeneratio
       <action>Multiple regeneration iterations</action>
       <response>Block operation, maximum one iteration. EXCEPTION: the finalize gate's "Resolve now" path (DEFF-B007) edits the already-final document in place and is NOT a regeneration iteration — it does not re-run collect_feedback/regenerate, so it is permitted.</response>
     </behavior>
-    <behavior id="DEFF-P005" priority="critical">
+    <behavior id="DEFF-P005" priority="standard">
       <trigger>Between phases (inter-phase transitions only; NOT the terminal finalize gate)</trigger>
       <action>Requesting user confirmation to proceed</action>
       <response>Proceed automatically between phases. This does not apply to the terminal finalize gate (define-core#core_finalize), which runs after the final phase and is allowed to prompt when Outstanding Issues remain.</response>
     </behavior>
+    <behavior id="DEFF-P006" priority="critical">
+      <trigger>Always</trigger>
+      <action>Scoring either document — feasibility, objectivity, confidence, completeness — on a
+        numeric scale</action>
+      <response>Block. A score has no derivation, so it cannot be checked or disputed, and it reads as
+        a measurement. State the observable condition instead: which capability was found at which
+        file:line, which one was not found and where it was searched for.</response>
+    </behavior>
   </prohibited_behaviors>
 </enforcement>
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor ambiguity in non-critical feature detail</example>
     <example severity="medium">Unclear requirement or ambiguous scope</example>

@@ -1,7 +1,7 @@
 ---
 name: C Ecosystem
 description: This skill should be used when working with C projects, "C11", "C17", "C23", "Makefile", "gcc", "clang", "valgrind", "getopt", or C language patterns. Provides comprehensive C23 and modern C patterns, memory management, and CLI development best practices.
-version: 2.0.0
+version: 2.1.0
 ---
 
 <purpose>
@@ -903,7 +903,7 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="stdatomic.h"</action>
+  <action>query-docs libraryId="/websites/cppreference_com" query="stdatomic.h"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -911,7 +911,7 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
 
     <pattern name="standard_library">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="malloc"</action>
+  <action>query-docs libraryId="/websites/cppreference_com" query="malloc"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -994,7 +994,7 @@ fprintf(stderr, ": %s\n", strerror(saved_errno));
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Compiler warning about unused variable</example>
     <example severity="medium">Valgrind reports minor memory leak</example>

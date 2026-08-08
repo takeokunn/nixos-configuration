@@ -1,7 +1,7 @@
 ---
 name: terraform-ecosystem
 description: This skill should be used when the user asks to "write terraform", "HCL", "terraform provider development", "terraform-plugin-framework", "custom provider", "state management", "terraform plan", "terraform apply", "lifecycle ignore_changes", "provider schema", "plan modifier", "acceptance test", or works with Terraform/OpenTofu configuration and provider authoring. Also covers recovering after a failed apply, which is not transactional and did not roll back what already succeeded — state inspection and surgery (state list, state rm, state mv, show), pairing every address change with a moved block, import blocks versus the import CLI against a remote backend, why a provider alias change is not an ownership transfer, and reading the full plan body rather than the summary counts on policy and permission resources. Provides patterns for both custom provider development (Go, terraform-plugin-framework) and HCL configuration/operations.
-version: 2.2.0
+version: 2.3.0
 ---
 
 <purpose>
@@ -659,7 +659,7 @@ version: 2.2.0
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">tflint style warning or fmt drift</example>
     <example severity="medium">Plan shows unexpected diff (often a missing plan modifier or over-broad ignore_changes)</example>

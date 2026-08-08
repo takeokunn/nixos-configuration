@@ -1,7 +1,7 @@
 ---
 name: C++ Ecosystem
 description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++20/23/26) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
-version: 2.0.1
+version: 2.1.0
 ---
 
 <purpose>
@@ -923,7 +923,7 @@ version: 2.0.1
   <output>Step completed</output>
 </step>
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/websites/cppreference_com" topic="std::unique_ptr"</action>
+  <action>query-docs libraryId="/websites/cppreference_com" query="std::unique_ptr"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -931,7 +931,7 @@ version: 2.0.1
 
     <pattern name="cmake_reference">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/Kitware/CMake" topic="target_link_libraries"</action>
+  <action>query-docs libraryId="/Kitware/CMake" query="target_link_libraries"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -939,7 +939,7 @@ version: 2.0.1
 
     <pattern name="testing_reference">
       <step order="1">
-  <action>get-library-docs context7CompatibleLibraryID="/google/googletest" topic="assertions"</action>
+  <action>query-docs libraryId="/google/googletest" query="assertions"</action>
   <tool>Workflow guidance</tool>
   <output>Step completed</output>
 </step>
@@ -1031,7 +1031,7 @@ version: 2.0.1
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Compiler warning about unused variable</example>
     <example severity="medium">Compilation error</example>

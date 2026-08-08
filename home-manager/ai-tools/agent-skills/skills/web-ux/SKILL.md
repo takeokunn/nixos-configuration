@@ -1,7 +1,7 @@
 ---
 name: Web UX
 description: This skill should be used when the user asks to "improve UX", "usability review", "web accessibility", "design a form/onboarding flow", "information architecture", or works on web/app user experience. Also covers interaction mechanics — focus ownership across stacked modals and overlays, focus traps that survive re-rendering and late-mounted content, the open/close contract of a dialog and when refusing to close is correct, one overlay serving both a busy and an error state needing opposite assistive-technology semantics, classifying each setting as immediate-apply or review-before-commit, keyboard shortcut ownership against text entry, and releasing held input on every discontinuity such as a window blur, tab switch, or overlay opening. Provides web UX heuristics, accessibility (WCAG), and performance-perception best practices.
-version: 2.2.0
+version: 2.3.0
 ---
 
 <purpose>
@@ -710,7 +710,7 @@ version: 2.2.0
   <rule>Treat a held interaction as unfinished until an explicit release or a discontinuity clears it, and verify the discontinuity set rather than fixing stuck-input reports one at a time</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor inconsistency in spacing or label casing</example>
     <example severity="medium">Form lacks inline validation or recovery guidance</example>

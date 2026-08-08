@@ -1,7 +1,7 @@
 ---
 name: TypeScript Ecosystem
 description: This skill should be used when the user asks to "write typescript", "typescript config", "tsconfig", "project references", "type definition", "generics", "utility types", or works with TypeScript language patterns, monorepo build graphs, or package boundaries. Covers rootDir and package-boundary errors, separating the typecheck graph from the build graph, per-project tsbuildinfo, case-variant sibling filenames on case-insensitive filesystems, and source-aliased siblings needing full public exports. Also covers modelling data in types — exhaustive Record-keyed registries instead of a Partial map with a fallback, discriminated unions with one uniform terminal payload field, ordinal position as a persisted encoding, and parsers where an absent field is valid but a malformed one is fatal.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -1362,7 +1362,7 @@ Provide comprehensive patterns for TypeScript language, configuration, type syst
   </phase>
 </workflow>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Minor type inference issue</example>
     <example severity="medium">Type error in implementation</example>

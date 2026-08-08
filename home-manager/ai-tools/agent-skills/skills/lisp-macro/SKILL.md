@@ -1,7 +1,7 @@
 ---
 name: Lisp Macro Architecture
 description: This skill should be used when the user asks to "write a macro", "defmacro", "design a DSL", "build a compiler-time code transformer", "hygienic macro", "macro hygiene", "code walker", "CPS transform", "anaphoric macro", "once-only", "g!-symbol", "duality of syntax", "pandoric macro", "On Lisp", "Let Over Lambda", or works with compile-time metaprogramming in Common Lisp or Emacs Lisp. Provides the canonical technique catalog (On Lisp, Let Over Lambda) plus an engineering discipline — phase separation, hygiene, evaluation-order preservation, compile-time diagnostics — for production-quality macros and DSLs. Also covers auditing a source-to-source rewriter or formatter, where a clean reparse does not prove correctness — whitespace transformed inside atom spans, dialect-blind operator tables, discarded reader prefixes, comments absent from the node tree. For general CL/Elisp language basics, defer to common-lisp-ecosystem / emacs-ecosystem.
-version: 2.3.0
+version: 2.4.0
 ---
 
 <purpose>
@@ -842,7 +842,7 @@ version: 2.3.0
   <rule>Avoid reader macros unless no defmacro-based design is viable</rule>
 </rules>
 
-<error_escalation inherits="core-patterns#error_escalation">
+<error_escalation>
   <examples>
     <example severity="low">Missing &amp;body/indent metadata causing cosmetic mis-indentation</example>
     <example severity="medium">Multiple evaluation of a side-effecting argument form</example>
