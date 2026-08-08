@@ -1,23 +1,23 @@
 { models }:
 {
-  # ── Tier 0 (gpt55Full): ultra-complex, security, architecture ────────────
+  # ── DeepSeek-V4-Pro: ultra-complex, security, architecture ────────────────
   ultra = {
-    model = models.gpt55Full.model;
-    fallback_models = models.gpt55Full.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "xhigh";
     prompt_append = models.promptLang;
     description = "Default lane for ultra-complex, mission-critical tasks requiring maximum quality.";
   };
   security = {
-    model = models.gpt55Full.model;
-    fallback_models = models.gpt55Full.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "xhigh";
     prompt_append = models.promptLang;
     description = "Security-focused analysis, vulnerability review, and threat modeling.";
   };
   architecture = {
-    model = models.gpt55Full.model;
-    fallback_models = models.gpt55Full.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "xhigh";
     prompt_append = models.promptLang;
     description = "Cross-system or long-horizon architectural decisions requiring written rationale. Use ultrabrain for single-system tradeoffs; use architecture for irreversible structural choices.";
@@ -39,38 +39,38 @@
     description = "Documentation, ADRs, changelogs, and technical writing.";
   };
 
-  # ── Tier 2 (gptFast): coding, implementation, reasoning ──────────────────
+  # ── DeepSeek-V4-Pro: coding, implementation, reasoning ───────────────────
   ultrabrain = {
-    model = models.gptFast.model;
-    fallback_models = models.gptFast.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "medium";
     prompt_append = models.promptLang;
     description = "Hard reasoning, architecture, tradeoff analysis, and bug forensics.";
   };
   deep = {
-    model = models.gptFast.model;
-    fallback_models = models.gptFast.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "medium";
     prompt_append = models.promptLang;
     description = "Autonomous deep implementation, non-trivial debugging, and complex multi-file changes.";
   };
   "unspecified-high" = {
-    model = models.gptFast.model;
-    fallback_models = models.gptFast.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "medium";
     prompt_append = models.promptLang;
     description = "Default lane for complex general work.";
   };
   "visual-engineering" = {
-    model = models.gptFast.model;
-    fallback_models = models.gptFast.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "medium";
     prompt_append = models.promptLang;
     description = "Frontend UI implementation, styling, and component refactors.";
   };
   refactor = {
-    model = models.gptFast.model;
-    fallback_models = models.gptFast.fallback;
+    model = models.deepseekPro.model;
+    fallback_models = models.deepseekPro.fallback;
     variant = "high";
     prompt_append = models.promptLang;
     description = "Routine refactors, cleanup, repetitive edits, and test generation.";

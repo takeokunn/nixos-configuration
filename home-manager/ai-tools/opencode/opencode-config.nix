@@ -21,9 +21,11 @@ mcp-servers-nix.lib.mkConfig pkgs {
   settings = {
     theme = "dark";
     plugin = [ "oh-my-openagent" ];
-    model = "openai/gpt-5.5";
+    model = "opencode-go/deepseek-v4-pro";
+    small_model = "opencode-go/deepseek-v4-flash";
     share = "disabled";
 
+    provider."opencode-go".options = providerTimeoutOpts;
     provider.openai.options = providerTimeoutOpts;
     provider.anthropic.options = providerTimeoutOpts;
     provider."github-copilot".options = providerTimeoutOpts;
