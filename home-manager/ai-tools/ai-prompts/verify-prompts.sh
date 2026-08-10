@@ -8,6 +8,12 @@
 #
 # Usage:  ./verify-prompts.sh
 #
+# The hook-behavior gate (10) runs the hooks in this tree. Point VERIFY_HOOKS_DIR at a
+# directory of hooks extracted from another ref — `git show <ref>:path/to/hooks/x.sh` — to
+# watch those cases fail against the unfixed versions. That is how a case in section (10) is
+# shown to be a guard rather than a claim; the default is this directory's hooks/, never the
+# installed copy under ~/.claude/hooks, which is a /nix/store symlink from the last switch.
+#
 # The confidentiality gate needs a denylist of tokens that must never reach this public
 # repository. That list is itself confidential — it names clients and employers — so it
 # lives outside the tree and is NOT committed. Point AGENT_SKILLS_DENYLIST at it, or place
@@ -558,8 +564,12 @@ echo "== (9) hooks are registered, not merely installed =="
 # would match the install line and report ok for precisely the broken state — installed,
 # registered nowhere, silent.
 #
-# rtk-rewrite is deliberately absent from the required set: it rewrites a command and emits
-# JSON on stdout rather than blocking, so it is not part of the enforcement layer.
+# rtk-rewrite is deliberately NOT required: it is installed and left unregistered on purpose,
+# so it is exempted below rather than demanded. The reason is in the EXEMPT comment.
+#
+# What this check cannot see: a registered rewriter whose stdout does not match the
+# hookSpecificOutput contract is discarded silently, with no error and no exit-code signal.
+# The registration count below therefore proves wiring, never behaviour.
 reg_out="$(
   python3 - "$ai_tools_dir/claude-code/default.nix" "$here/hooks" <<'PY'
 import glob, os, re, sys
@@ -570,7 +580,14 @@ if not os.path.exists(nix_path):
 text = open(nix_path, encoding='utf-8', errors='replace').read()
 
 REQUIRED = {'block-destructive-git', 'block-bare-cd', 'enforce-perl'}
-# Registered nowhere on purpose; see the comment above.
+# Hooks allowed to be installed without being registered. An entry here silences the
+# inert-hook complaint for one name, so add one only with its reason written beside it.
+#
+# rtk-rewrite: unregistered on purpose. The script itself is fixed and its behaviour is
+# tested by section (10), but rtk is not on PATH for the harness, so every command it
+# rewrote would reach the tool as `rtk ...` and die with exit 127 — strictly worse than not
+# compressing at all. It stays installed and exempt until that PATH problem is solved; the
+# entry comes out of this set and goes back into REQUIRED in the same change that fixes it.
 EXEMPT = {'rtk-rewrite'}
 
 def basename(cmd):
@@ -638,7 +655,7 @@ elif printf '%s' "$reg_out" | grep -q '^BAD '; then
   fail "hooks are not wired up to fire" \
     "$(printf '%s' "$reg_out" | grep '^BAD ' | perl -pe 's/^BAD //')"
 else
-  pass "every enforcing hook is registered under a Bash matcher ($(printf '%s' "$reg_out" | perl -ne 'print $1 if /^REGISTERED (\d+)/') commands)"
+  pass "every installed hook is registered under a Bash matcher, wiring only ($(printf '%s' "$reg_out" | perl -ne 'print $1 if /^REGISTERED (\d+)/') commands)"
 fi
 
 echo "== hooks parse =="
@@ -671,6 +688,277 @@ elif [ -z "$hook_problems" ]; then
   pass "all $hook_count hooks parse under /bin/bash"
 else
   fail "hook scripts have problems" "$hook_problems"
+fi
+
+echo "== (10) hook behavior =="
+
+# Everything above is static: check (9) parses default.nix as text, and the parse check runs
+# `bash -n`. Neither feeds a hook anything, and that gap is not cosmetic. A PreToolUse hook whose
+# stdout does not match the hookSpecificOutput contract is discarded by the harness silently — no
+# error, no change in exit status, nothing anywhere to grep. rtk-rewrite spent its whole life
+# emitting the wrong schema while also corrupting the command it produced into
+# `rtk ls -la /tmpls -la /tmp`, and every static check in this file reported ok the entire time.
+# So the count in check (9) proves wiring; only this section proves behaviour.
+#
+# Hermetic by construction. The real rtk is replaced by a stub, and the stub reproduces the one
+# property of the binary the hook must not get wrong: rtk 0.45.0 exits 3 while printing a valid
+# rewrite and exits 1 with empty output when it has no mapping, contradicting its own --help. A
+# stub that exited 0 on success would let both historical defects — `$(rtk rewrite "$c") || exit 0`
+# (discards every rewrite) and `$(rtk rewrite "$c" || echo "$c")` (concatenates both strings) —
+# look correct here, so the odd exit statuses are the load-bearing part of the fixture.
+#
+# The hooks under test are read from this tree, never from ~/.claude/hooks: the installed copy is
+# a symlink into /nix/store from the last `switch` and cannot reflect an edit made here. Point
+# VERIFY_HOOKS_DIR at hooks extracted from another ref (`git show <ref>:...`) to watch these cases
+# fail against the unfixed versions; a regression test nobody has seen fail is a claim about a
+# fix, not a guard on it.
+bh_hooks_dir="${VERIFY_HOOKS_DIR:-$here/hooks}"
+bh_expected_cases=10
+bh_ran=0
+bh_nonempty=0
+bh_problems=""
+bh_perm_hits=""
+bh_tmp=""
+
+bh_note() {
+  bh_problems="$bh_problems
+$1"
+}
+
+# The fixture lives under TMPDIR, not in the repository: a scratch directory inside the tree
+# is one `.gitignore` edit away from being committed, and an interrupted run leaves it behind
+# where the next `git status` has to explain it. The trap covers the interrupt path; the
+# explicit call below covers the normal path and is the one that can still fail the gate,
+# because it runs before the pass/fail decision. A cleanup that silently fails is how a
+# leaked fixture becomes invisible.
+bh_cleanup() {
+  [ -n "${bh_tmp:-}" ] || return 0
+  rm -rf "${bh_tmp:?}" 2>/dev/null || return 1
+  bh_tmp=""
+}
+trap bh_cleanup EXIT INT TERM
+
+# Runs one hook copy against one payload. stdout, stderr and exit status are three separate
+# surfaces here and are kept apart: rtk-rewrite speaks on stdout and always exits 0, while
+# block-destructive-git speaks on stderr and answers with the exit status alone.
+bh_run() {
+  bh_out="$(printf '%s' "$2" | /bin/bash "$1" 2>"$bh_tmp/stderr")"
+  bh_status=$?
+  bh_err="$(cat "$bh_tmp/stderr" 2>/dev/null)"
+  if [ -n "$bh_out" ]; then
+    bh_nonempty=$((bh_nonempty + 1))
+    # A permissionDecision would auto-approve whatever command it names, and this hook cannot
+    # tell an already-approved command from one still awaiting confirmation. Checked on every
+    # non-empty payload rather than on one chosen case.
+    case "$bh_out" in
+    *permissionDecision*) bh_perm_hits="$bh_perm_hits $3" ;;
+    esac
+  fi
+}
+
+# Exact string equality, never a prefix or a substring test: `rtk ls -la /tmpls -la /tmp` starts
+# with "rtk " and contains the input, so any weaker comparison passes on the corrupted output
+# this case exists to catch.
+bh_case_rewrite() {
+  bh_ran=$((bh_ran + 1))
+  bh_run "$bh_tmp/rtk-rewrite.sh" "$2" "$1"
+  bh_got="$(printf '%s' "$bh_out" | jq -r '.hookSpecificOutput.updatedInput.command // ""' 2>/dev/null)"
+  bh_evt="$(printf '%s' "$bh_out" | jq -r '.hookSpecificOutput.hookEventName // ""' 2>/dev/null)"
+  if [ "$bh_got" != "$3" ]; then
+    bh_note "$1: updatedInput.command is [$bh_got], expected exactly [$3]"
+  elif [ "$bh_evt" != "PreToolUse" ]; then
+    bh_note "$1: hookSpecificOutput.hookEventName is [$bh_evt], expected PreToolUse"
+  elif [ "$bh_status" != "0" ]; then
+    bh_note "$1: stdout is correct but the hook exited $bh_status, expected 0"
+  fi
+}
+
+# stdout and exit status are two independent surfaces and both are asserted. A rewriter that
+# stays silent while exiting non-zero is not passing: PreToolUse treats any status other than
+# 0 or 2 as a non-blocking error and shows it to the user on every command. Checking stdout
+# alone accepts a hook that handles one input and errors on all the rest.
+bh_case_silent() {
+  bh_ran=$((bh_ran + 1))
+  bh_run "$bh_tmp/rtk-rewrite.sh" "$2" "$1"
+  if [ -n "$bh_out" ]; then
+    bh_note "$1: expected no stdout, got: $(printf '%s' "$bh_out" | head -3 | tr '\n' ' ')"
+  elif [ "$bh_status" != "0" ]; then
+    bh_note "$1: stdout was empty as expected, but the hook exited $bh_status, expected 0
+(stderr: $(printf '%s' "$bh_err" | head -1))"
+  fi
+}
+
+# $4 is a substring the block message must contain. Exit 2 alone is ambiguous — /bin/bash also
+# exits 2 on a syntax error — so a blocking case has to show its reason as well.
+bh_case_git() {
+  bh_ran=$((bh_ran + 1))
+  bh_run "$bh_tmp/block-destructive-git.sh" "$2" "$1"
+  if [ "$bh_status" != "$3" ]; then
+    bh_note "$1: exit status $bh_status, expected $3 (stderr: $(printf '%s' "$bh_err" | head -1))"
+  elif [ -n "${4:-}" ]; then
+    case "$bh_err" in
+    *"$4"*) : ;;
+    *) bh_note "$1: exited $3 but the message does not mention $4" ;;
+    esac
+  fi
+}
+
+bh_rewrite_src="$bh_hooks_dir/rtk-rewrite.sh"
+bh_git_src="$bh_hooks_dir/block-destructive-git.sh"
+bh_rewrite_bytes="$(wc -c <"$bh_rewrite_src" 2>/dev/null | tr -d ' ')"
+bh_git_bytes="$(wc -c <"$bh_git_src" 2>/dev/null | tr -d ' ')"
+
+if ! command -v jq >/dev/null 2>&1; then
+  # Both hooks stand aside when they cannot parse their input, so without jq every case would
+  # report an empty stdout and a zero exit — nine of the ten would pass having tested nothing.
+  fail "hook behavior gate could not run" \
+    "jq is not on PATH. Both hooks exit 0 without it, which would turn this gate green
+while exercising nothing. It fails closed instead."
+elif [ "${bh_rewrite_bytes:-0}" -lt 200 ] || [ "${bh_git_bytes:-0}" -lt 200 ]; then
+  # A missing or empty hook is the vacuous-pass trap for this section: /bin/bash on a nonexistent
+  # file writes nothing to stdout, so every silent case would pass against nothing at all.
+  fail "hook behavior gate has nothing to run" \
+    "rtk-rewrite.sh is ${bh_rewrite_bytes:-0} bytes and block-destructive-git.sh is
+${bh_git_bytes:-0} bytes under $bh_hooks_dir; expected both to be substantial files."
+else
+  bh_tmp="$(mktemp -d "${TMPDIR:-/tmp}/verify-hook-behavior.XXXXXX")"
+
+  # Stand-in for rtk 0.45.0. Prints WITHOUT a trailing newline, as the real binary does — that is
+  # what turned the old `|| echo "$c"` fallback into a concatenation rather than two lines.
+  cat >"$bh_tmp/rtk" <<'STUB'
+#!/bin/bash
+# Every invocation is recorded before anything else, so the count below is a count of calls
+# that reached THIS binary. Without it, "the substitution produced no @RTK_BIN@" is the only
+# evidence the stub was used, and that says nothing about which rtk actually ran.
+printf '%s\n' "$*" >>"${0}.calls" 2>/dev/null
+[ "${1:-}" = "rewrite" ] || exit 1
+cmd="${2:-}"
+set -f
+set -- $cmd
+set +f
+case "${1:-}" in
+rtk)
+  # Measured against rtk 0.45.0: `rtk rewrite "rtk ls"` exits 3 and prints `rtk ls` — the
+  # input, unchanged. Returning empty here instead would let case (4) exit on the
+  # `-z $rewritten` branch and never reach the guard it exists to test.
+  printf '%s' "$cmd"
+  exit 3
+  ;;
+ls | tree | grep | rg | diff | find | cat | git | gh | docker | kubectl)
+  printf '%s' "rtk $cmd"
+  exit 3
+  ;;
+esac
+exit 1
+STUB
+  chmod +x "$bh_tmp/rtk"
+
+  # The same transformation claude-code/default.nix applies:
+  #   builtins.replaceStrings [ "@RTK_BIN@" ] [ "${llmAgentsPkgs.rtk}/bin/rtk" ]
+  # so the bytes under test differ from the installed hook only in that one path.
+  # The placeholder has to be there BEFORE the substitution, not merely absent after it.
+  # Absence afterwards is equally consistent with a hook that hardcodes an rtk path, in which
+  # case the perl below is a silent no-op, the real rtk on PATH answers every case, and this
+  # whole section reports on a binary it never installed.
+  if ! grep -q '@RTK_BIN@' "$bh_rewrite_src"; then
+    bh_note "rtk-rewrite.sh contains no @RTK_BIN@ placeholder, so substituting the stub is a
+no-op and the cases below would run against whatever rtk the hook names itself"
+  fi
+  BH_STUB="$bh_tmp/rtk" perl -pe 's{\@RTK_BIN\@}{$ENV{BH_STUB}}g' "$bh_rewrite_src" >"$bh_tmp/rtk-rewrite.sh"
+  perl -pe 's{\@RTK_BIN\@}{$ENV{BH_STUB}}g' "$bh_git_src" >"$bh_tmp/block-destructive-git.sh"
+  if grep -q '@RTK_BIN@' "$bh_tmp/rtk-rewrite.sh"; then
+    bh_note "rtk-rewrite.sh still holds @RTK_BIN@ after substitution: the stub was never wired in"
+  fi
+  for bh_h in rtk-rewrite block-destructive-git; do
+    bh_syn="$(/bin/bash -n "$bh_tmp/$bh_h.sh" 2>&1)" ||
+      bh_note "$bh_h.sh does not parse, so every status below is a shell error: $bh_syn"
+  done
+
+  # (1) The rewrite actually happens, and the command survives intact.
+  bh_case_rewrite "ls is rewritten" \
+    '{"tool_name":"Bash","tool_input":{"command":"ls -la /tmp"}}' \
+    'rtk ls -la /tmp'
+
+  # (2) rtk has no mapping: stdout empty, no half-formed payload.
+  bh_case_silent "unsupported command is left alone" \
+    '{"tool_name":"Bash","tool_input":{"command":"python3 script.py"}}'
+
+  # (3) A non-Bash tool must never be touched. The payload carries a command field that WOULD
+  # be rewritten under a Bash tool_name, so the only thing keeping this silent is the
+  # tool_name guard. A payload without that field exits on the `-z $command` branch instead,
+  # and stays green with the tool_name guard deleted.
+  bh_case_silent "non-Bash tool is left alone" \
+    '{"tool_name":"Read","tool_input":{"command":"ls -la /tmp"}}'
+
+  # (4) Already routed through rtk: rewriting again would nest the proxy inside itself.
+  bh_case_silent "rtk-prefixed command is not rewritten twice" \
+    '{"tool_name":"Bash","tool_input":{"command":"rtk ls"}}'
+
+  # (5) Inside a pipeline the output feeds another program, not the model. rtk's formatting is
+  # not the native tool's, so a rewrite here breaks the consumer and compresses nothing.
+  #
+  # The head of the pipeline is `ls`, which the allowlist admits. A head outside the allowlist
+  # — `cat`, say — would be caught by Exclusion 3 further down whatever the pipeline guard
+  # did, so the case would pass with that guard removed and prove nothing about it.
+  bh_case_silent "pipeline is not rewritten" \
+    '{"tool_name":"Bash","tool_input":{"command":"ls foo | grep bar"}}'
+
+  # (6) rtk DOES map `git push`, so the stub returns a rewrite for this one and the hook has to
+  # refuse it on its own. Rewriting changes the string the permission layer matches and the
+  # confirmation prompt displays: a permissions.deny rule written against `git push --force`
+  # stops matching once the command reaches the tool as `rtk git push --force`, and a destructive
+  # command slips past a rule that is still sitting there looking correct.
+  bh_case_silent "supported-but-destructive command is not rewritten" \
+    '{"tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}'
+
+  # (7) No emitted payload may carry permissionDecision. Asserted against every non-empty output
+  # produced above, and requiring at least one, so it cannot pass by nothing having been emitted.
+  bh_ran=$((bh_ran + 1))
+  if [ "$bh_nonempty" -eq 0 ]; then
+    bh_note "no case emitted any stdout: the rewriter never fired, so the silent cases and the
+permissionDecision assertion are all vacuous"
+  elif [ -n "$bh_perm_hits" ]; then
+    bh_note "hook emitted permissionDecision, which auto-approves the command it names:$bh_perm_hits"
+  fi
+
+  # (8) The wrapper-stripping regression guard. rtk-rewrite puts `rtk` in front of commands
+  # routinely, so the model reproduces the form from its own transcript; without rtk in %WRAPPER
+  # this reads as an unclassified command rather than a git one and goes straight through.
+  bh_case_git "rtk git stash is blocked" \
+    '{"tool_name":"Bash","tool_input":{"command":"rtk git stash"}}' 2 ORCH-P005
+
+  # (9) The unwrapped form still blocks: adding a wrapper must not have moved the classifier off
+  # the case it already handled.
+  bh_case_git "git stash is blocked" \
+    '{"tool_name":"Bash","tool_input":{"command":"git stash"}}' 2 ORCH-P005
+
+  # (10) Stripping rtk must not make its non-git subcommands look destructive.
+  bh_case_git "rtk ls is allowed" \
+    '{"tool_name":"Bash","tool_input":{"command":"rtk ls -la"}}' 0
+
+  if [ "$bh_ran" -ne "$bh_expected_cases" ]; then
+    bh_note "ran $bh_ran cases, expected $bh_expected_cases: a case was dropped or never reached"
+  fi
+
+  # The stub has to have been called. Every case above is consistent with a hook that resolved
+  # some other rtk entirely — one on PATH, one at a hardcoded store path — and the outputs
+  # would look much the same, because the real binary rewrites the same commands. A recorded
+  # call is the only thing that distinguishes "the substitution was consulted" from "the
+  # substitution was installed and ignored". Asserted as non-zero rather than as an exact
+  # figure, so re-ordering the cases does not turn a wiring assertion into a brittle one.
+  bh_calls="$(wc -l <"$bh_tmp/rtk.calls" 2>/dev/null | tr -d ' ')"
+  if [ "${bh_calls:-0}" -eq 0 ]; then
+    bh_note "the rtk stub was never invoked: the hook reached some other binary, so nothing
+above describes the stub's behaviour"
+  fi
+
+  bh_cleanup || bh_note "could not remove the fixture directory $bh_tmp: it is still on disk"
+
+  if [ -z "$bh_problems" ]; then
+    pass "hooks behave to contract on fed JSON ($bh_ran cases, $bh_nonempty payload(s) emitted, ${bh_calls:-0} stub call(s))"
+  else
+    fail "hook behavior does not match the contract" "$bh_problems"
+  fi
 fi
 
 echo

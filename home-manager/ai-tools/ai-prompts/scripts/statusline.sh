@@ -42,9 +42,15 @@ else
   # Default to 0 if no valid result
   total_tokens=${total_tokens:-0}
 
-  # max token count: 200k
-  # compaction threshold: 80% (160k)
-  COMPACTION_THRESHOLD=160000
+  # Not 80% of the window — that formula is ours, not Claude Code's. Recovered from the
+  # claude-code 2.1.226 binary, where the budget is derived in three steps:
+  #   usable  = min(modelMax, autoCompactWindow) - min(maxOutput, 20000) = 200000 - 20000 = 180000
+  #   compact = usable - 13000                                          = 167000
+  #   arm     = min(usable - round(usable * 0.2), compact)              = 144000
+  # 167000 is where auto-compaction actually fires; 144000 only arms it, so the bar is measured
+  # against the former. autoCompactWindow is set in home-manager/ai-tools/claude-code/default.nix
+  # and feeds the first line above — changing it there invalidates every number here.
+  COMPACTION_THRESHOLD=167000
   # Calculate percentage
   percentage=$((total_tokens * 100 / COMPACTION_THRESHOLD))
 

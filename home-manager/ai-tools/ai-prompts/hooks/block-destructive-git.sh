@@ -72,9 +72,14 @@ my $cmd = defined $ENV{HOOK_CMD} ? $ENV{HOOK_CMD} : q{};
 
 # Wrappers that run their operand as a command. Stripping one leaves the real command at the
 # front of the segment, so `xargs git stash` classifies the same as `git stash`.
+#
+# rtk belongs here because the rtk-rewrite hook puts it in front of commands routinely, so the
+# model sees rtk-prefixed forms in its own transcript and reproduces them. Without the entry,
+# `rtk git stash` is an unclassified command rather than a git one. Stripping it is safe for
+# rtk's non-git subcommands too: `rtk ls -la` reduces to `ls -la`, which is not git.
 my %WRAPPER = map { $_ => 1 } qw(
     sudo doas command builtin exec env nohup timeout nice ionice chrt
-    time stdbuf setsid unbuffer xargs
+    time stdbuf setsid unbuffer xargs rtk
 );
 
 # Wrappers whose command arrives as a string operand and has to be re-parsed.
