@@ -1,7 +1,7 @@
 #+STARTUP: fold
-* First Installation (Attm-M4-Max)
+* First Installation (M4-Max)
 
-Attm-M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-app-util integration.
+M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-app-util integration.
 
 ** Prerequisites
 
@@ -38,7 +38,7 @@ Or use the official installer:
 ** Step 4: First nix-darwin Installation
 
 #+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
+  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 
 ** Step 5: Restart Terminal
@@ -50,7 +50,7 @@ Close and reopen your terminal to ensure all environment variables are loaded.
 After installation, use this command to apply configuration changes:
 
 #+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
+  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 
 ** Notes

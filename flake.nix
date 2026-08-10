@@ -88,7 +88,7 @@
 
       imports = [ treefmt-nix.flakeModule ];
 
-      flake.darwinConfigurations.Attm-M4-Max = import ./hosts/Attm-M4-Max { inherit inputs; };
+      flake.darwinConfigurations.M4-Max = import ./hosts/M4-Max { inherit inputs; };
       flake.nixosConfigurations.X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
       flake.nixOnDroidConfigurations.OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
 

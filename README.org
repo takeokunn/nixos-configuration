@@ -5,16 +5,16 @@
 
 ** Target
 
-| machine          | name        | os      | system         | stable |
-|------------------+-------------+---------+----------------+--------|
-| Mac M4 Max       | Attm-M4-Max | OSX     | aarch64-darwin | ◎      |
-| Thinkpad X13Gen2 | X13Gen2     | NixOS   | x86_64-linux   | ◎      |
-| Android OPPO-A79 | OPPO-A79    | Android | aarch64-linux  | △      |
+| machine          | name     | os      | system         | stable |
+|------------------+----------+---------+----------------+--------|
+| Mac M4 Max       | M4-Max   | OSX     | aarch64-darwin | ◎      |
+| Thinkpad X13Gen2 | X13Gen2  | NixOS   | x86_64-linux   | ◎      |
+| Android OPPO-A79 | OPPO-A79 | Android | aarch64-linux  | △      |
 
 ** Usage
-*** for Attm-M4-Max
+*** for M4-Max
 #+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#Attm-M4-Max --show-trace
+  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 *** for X13Gen2
 #+begin_src shell
@@ -28,7 +28,7 @@
 ** Documentation
 
 - [[file:docs/X13Gen2.org][docs/X13Gen2.org]] - NixOS installation guide (LUKS + Btrfs + Impermanence)
-- [[file:docs/Attm-M4-Max.org][docs/Attm-M4-Max.org]] - nix-darwin installation guide for macOS
+- [[file:docs/M4-Max.org][docs/M4-Max.org]] - nix-darwin installation guide for macOS
 - [[file:docs/OPPO-A79.org][docs/OPPO-A79.org]] - nix-on-droid installation guide for Android
 
 ** Testing

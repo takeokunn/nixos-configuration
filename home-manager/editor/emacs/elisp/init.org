@@ -2389,9 +2389,9 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
       (setopt lsp-nix-nixd-nixpkgs-expr
               (format "import (%s).inputs.nixpkgs { }" flake-path))
       (setopt lsp-nix-nixd-nixos-options-expr
-              (format "(%s).darwinConfigurations.Attm-M4-Max.options" flake-path))
+              (format "(%s).darwinConfigurations.M4-Max.options" flake-path))
       (setopt lsp-nix-nixd-home-manager-options-expr
-              (format "(%s).darwinConfigurations.Attm-M4-Max.options.home-manager.users.type.getSubOptions []" flake-path))))
+              (format "(%s).darwinConfigurations.M4-Max.options.home-manager.users.type.getSubOptions []" flake-path))))
 
   (with-eval-after-load 'lsp-copilot
     ;; config
@@ -6007,7 +6007,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
                                    "* %T\n%?")
                                   ("j" "Journal" entry (file+olp+datetree ,(expand-file-name "journal.org" org-directory))
                                    "* %U\n%?\n%i\n")
-                                  ("1" "Attm" entry (file+headline ,(expand-file-name "task/attm.org" org-directory) "Backlog")
+                                  ("1" "Work" entry (file+headline ,(expand-file-name "task/work.org" org-directory) "Backlog")
                                    "** TODO Capture %U\n%?")
                                   ("2" "Other" entry (file+headline ,(expand-file-name "task/other.org" org-directory) "Backlog")
                                    "** TODO Capture %U\n%?"))))

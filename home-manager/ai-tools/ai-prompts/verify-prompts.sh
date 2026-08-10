@@ -298,6 +298,12 @@ echo "== (6) confidentiality =="
 # normalized before matching so ordinary prose formatting cannot defeat the gate, and the
 # matcher proves it ran by matching a canary and asserting a non-zero file count.
 #
+# Scope is every git-tracked file in the repository, not just this directory: a leak is a
+# leak wherever it is published, and the identifiers that actually had to be removed lived in
+# a host directory name, a nix module, and an org document — none of them under ai-prompts.
+# Paths are matched as well as contents, because a directory or filename carrying the token
+# is published by `git ls-files` just as visibly as a line inside one.
+#
 # It remains a denylist, which by construction only catches names someone thought of. Human
 # review is the real control; this is a backstop.
 if [ ! -r "$denylist_file" ]; then
@@ -307,10 +313,10 @@ set AGENT_SKILLS_DENYLIST, or create the file (one token per line).
 This check fails closed on purpose: the list is confidential and is never committed here."
 else
   leak_out="$(
-    python3 - "$denylist_file" "$here" <<'PY'
-import os, re, sys, unicodedata
+    python3 - "$denylist_file" "$repo_root" "${here#"$repo_root"/}" <<'PY'
+import os, re, subprocess, sys, unicodedata
 
-denylist_path, root = sys.argv[1], sys.argv[2]
+denylist_path, root, prompts_rel = sys.argv[1], sys.argv[2], sys.argv[3]
 
 # Latin lookalikes for the Cyrillic and Greek characters most often used to evade a text
 # filter. Not exhaustive — a denylist never is — but it costs nothing.
@@ -360,37 +366,87 @@ for p, raw in zip(patterns, sources):
 if any(p.search('should add local paths') for p in patterns):
     raise SystemExit('canary failed: matcher fires on ordinary prose')
 
-scanned, hits = 0, []
-for dirpath, dirnames, filenames in os.walk(root):
-    dirnames[:] = [d for d in dirnames if d not in {'.git', 'result'}]
-    for name in filenames:
-        path = os.path.join(dirpath, name)
-        try:
-            text = open(path, encoding='utf-8', errors='replace').read()
-        except (OSError, ValueError):
-            continue
-        scanned += 1
-        for i, line in enumerate(text.splitlines(), 1):
-            folded = fold(line)
-            if not folded:
-                continue
-            if any(p.search(folded) for p in patterns):
-                hits.append(f'{os.path.relpath(path, root)}:{i}: matches a denylist token')
+def matches(text):
+    folded = fold(text)
+    return bool(folded) and any(p.search(folded) for p in patterns)
+
+# A path is published as plainly as a line of prose, so the same matcher runs over it. Prove
+# that separately: content matching could work perfectly while a bug in the path branch left
+# a renamed-but-not-renamed-enough directory unreported.
+probe_core = re.sub(r'[^0-9a-z]+', '', fold(sources[0]))
+if not matches(os.path.join('docs', probe_core + '-note.org')):
+    raise SystemExit('canary failed: a denylist token inside a path is not detected')
+
+def safe(rel):
+    # Never echo a matching path verbatim: printing it reproduces the very token in a
+    # terminal, a log, or a CI transcript. Redact only the components that matched, so the
+    # report still says where to look.
+    return '/'.join(
+        re.sub(r'[0-9A-Za-z]', '*', c) if matches(c) else c
+        for c in rel.split('/')
+    )
+
+# Tracked files are the published surface. An untracked scratch file in the working tree is
+# not published and is not this gate's business; a tracked one is, wherever it lives.
+try:
+    listing = subprocess.run(['git', '-C', root, 'ls-files', '-z'],
+                             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                             check=True).stdout
+    mode = 'git ls-files'
+    rels = [p.decode('utf-8', 'replace') for p in listing.split(b'\0') if p]
+except (OSError, subprocess.CalledProcessError):
+    # Running from an export rather than a checkout. Walk instead, rather than failing: the
+    # fail-closed condition this gate cares about is a missing denylist, not a missing .git.
+    mode = 'filesystem walk'
+    skip = {'.git', 'result', '.direnv', '.devenv', '.worktrees', 'node_modules'}
+    rels = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in skip]
+        rels += [os.path.relpath(os.path.join(dirpath, n), root) for n in filenames]
+
+scanned, prompts_seen, hits = 0, 0, []
+for rel in rels:
+    if rel == prompts_rel or rel.startswith(prompts_rel + '/'):
+        prompts_seen += 1
+    if matches(rel):
+        hits.append(f'{safe(rel)}: the path itself matches a denylist token')
+    try:
+        text = open(os.path.join(root, rel), encoding='utf-8', errors='replace').read()
+    except (OSError, ValueError):
+        continue                      # tracked but deleted, or unreadable; path still checked
+    scanned += 1
+    for i, line in enumerate(text.splitlines(), 1):
+        if matches(line):
+            hits.append(f'{safe(rel)}:{i}: matches a denylist token')
+
 if scanned == 0:
-    raise SystemExit(f'scanned 0 files under {root}: the gate read nothing')
+    raise SystemExit(f'scanned 0 files under {root} via {mode}: the gate read nothing')
+# The prompt tree is what this suite exists for. If the repo-wide listing somehow excludes
+# it, the gate is broader on paper and narrower in fact.
+if prompts_seen == 0:
+    raise SystemExit(f'scanned {scanned} files via {mode} but none under {prompts_rel}: '
+                     'the prompt tree fell out of scope')
 for h in hits:
     print(h)
+print(f'SCANNED {scanned} tracked files via {mode}')
 PY
   )"
   leak_status=$?
+  leak_hits="$(printf '%s\n' "$leak_out" | grep -v '^SCANNED ')"
+  leak_scope="$(printf '%s\n' "$leak_out" | perl -ne 'print $1 if /^SCANNED (.*)/')"
   if [ $leak_status -ne 0 ]; then
     fail "confidentiality gate did not run" "$leak_out"
-  elif [ -z "$leak_out" ]; then
-    pass "confidentiality gate returns zero hits"
+  elif [ -z "$leak_scope" ]; then
+    # The scope line is the gate's proof of work. Without it the scan did not reach its end,
+    # and an empty hit list means nothing.
+    fail "confidentiality gate reported no scope" "$leak_out"
+  elif [ -z "$leak_hits" ]; then
+    pass "confidentiality gate returns zero hits ($leak_scope)"
   else
     # Deliberately does not echo the matched text: printing it would reproduce the very
-    # token in a terminal, a log, or a CI transcript.
-    fail "client/company identifiers found in published content" "$leak_out"
+    # token in a terminal, a log, or a CI transcript. Matching path components arrive
+    # already redacted for the same reason.
+    fail "client/company identifiers found in published content" "$leak_hits"
   fi
 fi
 
