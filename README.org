@@ -25,6 +25,24 @@
   nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
 
+** Getting the Repository for Development
+
+The commands above apply this configuration to a host in a single shot. For ongoing development (editing, testing, opening PRs), this repository is managed as a bare git clone plus a set of worktrees rather than a single working tree.
+
+Clone it as a bare repository with [[https://github.com/x-motemen/ghq][ghq]] (installed via ~pkgs.ghq~, see [[file:home-manager/vcs/basic.nix][home-manager/vcs/basic.nix]]):
+#+begin_src shell
+  ghq get --bare <repository-url>
+#+end_src
+This repository sets git's ~ghq.root~ to ~~/ghq~ (see [[file:home-manager/vcs/git/default.nix][home-manager/vcs/git/default.nix]]), so the clone lands under that directory with no working tree of its own.
+
+Create a worktree to actually edit in, either manually:
+#+begin_src shell
+  git worktree add <path> <ref>
+#+end_src
+or with the bundled ~fzf_ghq~ fish function (bound to Ctrl-O, see [[file:home-manager/shell/fish/functions/fzf_ghq.fish][home-manager/shell/fish/functions/fzf_ghq.fish]]), which lists repositories via ~ghq list --full-path~, detects bare repositories, and lets you pick an existing worktree or create a new one under ~.worktrees/<timestamp>-<short-sha>~, then opens a tmux session in it.
+
+Serena memories and Claude settings are shared across a repository's worktrees via a ~.state/~ directory linked into each new worktree, so editor/agent context carries over between them.
+
 ** Documentation
 
 - [[file:docs/X13Gen2.org][docs/X13Gen2.org]] - NixOS installation guide (LUKS + Btrfs + Impermanence)
