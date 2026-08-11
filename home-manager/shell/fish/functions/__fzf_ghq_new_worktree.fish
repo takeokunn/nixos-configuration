@@ -82,6 +82,19 @@ function __fzf_ghq_new_worktree
     # which the repository's own HEAD symref points at. The first two candidates
     # only become available once something has written the refspec and fetched.
     if test -z "$base_ref"
+        # An explicit refspec on this one call, rather than a persisted
+        # remote.origin.fetch config, keeps a `ghq get --bare` clone from
+        # permanently gaining refs/remotes/* it never asked for. A failed
+        # fetch is not fatal here -- the three-step chain below still has
+        # local refs to fall back to.
+        if git -C $repo_path remote get-url origin >/dev/null 2>&1
+            set -l fetch_output (git -C $repo_path fetch origin '+refs/heads/main:refs/remotes/origin/main' 2>&1)
+            if test $status -ne 0
+                echo "fzf_ghq: fetch of origin/main failed ($fetch_output); falling back to local refs" >&2
+            end
+        end
+    end
+    if test -z "$base_ref"
         set base_ref (git -C $repo_path symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | string replace 'refs/remotes/' '')
     end
     if test -z "$base_ref"
