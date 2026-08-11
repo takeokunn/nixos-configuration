@@ -2384,8 +2384,8 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"])
     ;; nixd completion configuration
     (let ((flake-path (concat "builtins.getFlake \""
-                              (string-trim (shell-command-to-string "ghq root"))
-                              "/github.com/takeokunn/nixos-configuration\"")))
+                              (my/ghq-repo-path "github.com/takeokunn/nixos-configuration")
+                              "\"")))
       (setopt lsp-nix-nixd-nixpkgs-expr
               (format "import (%s).inputs.nixpkgs { }" flake-path))
       (setopt lsp-nix-nixd-nixos-options-expr
@@ -3568,6 +3568,27 @@ Tests for the absence of a .git entry rather than a .git suffix on the
 directory name, so the answer does not depend on ghq's naming convention."
     (not (file-exists-p (expand-file-name ".git" dir))))
 
+  (defun my/ghq-repo-path (relative)
+    "Return a directory holding the working files of RELATIVE.
+RELATIVE is a ghq-style path such as \"github.com/takeokunn/blog\".  Under the
+bare layout the repository is <root>/RELATIVE.git and contains no file to
+visit, so resolve instead to one of its worktrees: the fixed `main' one, or
+failing that the newest timestamped one — those names sort chronologically.
+A repository still checked out normally resolves to its own path, so this is
+safe to use for every repository regardless of which layout it is in."
+    (let* ((root (string-trim (shell-command-to-string "ghq root")))
+           (plain (expand-file-name relative root))
+           (worktrees (expand-file-name ".worktrees" (concat plain ".git")))
+           (main (expand-file-name "main" worktrees)))
+      (cond
+       ((file-directory-p plain) plain)
+       ((file-directory-p main) main)
+       ((file-directory-p worktrees)
+        (let ((dirs (seq-filter #'file-directory-p
+                                (directory-files worktrees t directory-files-no-dot-files-regexp))))
+          (if dirs (car (last dirs)) plain)))
+       (t plain))))
+
   (defun my/ghq-project-roots ()
     "Return the directories projectile should treat as projects.
 `ghq list --full-path' reports one path per repository, but under the bare
@@ -4593,7 +4614,7 @@ checked out normally contributes its own path, plus any worktrees it carries."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pass pass-view-mode) "pass" nil t)
 
-  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/private/password-store/.*\\.gpg") 'pass-view-mode))
+  (add-to-list 'auto-mode-alist (cons (concat (regexp-quote (my/ghq-repo-path "github.com/takeokunn/private")) "/password-store/.*\\.gpg") 'pass-view-mode))
 
   (with-eval-after-load 'pass
     (setopt pass-suppress-confirmations t))
@@ -5665,7 +5686,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'elfeed-org
     ;; config
-    (setopt rmh-elfeed-org-files '("~/ghq/github.com/takeokunn/private/project/elfeed.org"))
+    (setopt rmh-elfeed-org-files (list (expand-file-name "project/elfeed.org" (my/ghq-repo-path "github.com/takeokunn/private"))))
     (setopt rmh-elfeed-org-auto-ignore-invalid-feeds t))
 #+end_src
 ** elfeed-dashboard
@@ -5916,7 +5937,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-tags-match-list-sublevels nil)
 
     ;; directory
-    (setq org-directory "~/ghq/github.com/takeokunn/private/agenda")
+    (setq org-directory (expand-file-name "agenda" (my/ghq-repo-path "github.com/takeokunn/private")))
 
     ;; todo
     (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "REVIEW(r)" "QA(q)" "|" "DONE(d)")))
@@ -6869,8 +6890,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-roam
     ;; config
-    (setopt org-roam-directory `,(concat (s-trim-right (shell-command-to-string "ghq root"))
-                                         "/github.com/takeokunn/blog")))
+    (setopt org-roam-directory `,(my/ghq-repo-path "github.com/takeokunn/blog")))
 #+end_src
 *** org-roam-mode
 :PROPERTIES:
@@ -7120,8 +7140,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'citar
     ;; config
     (setopt citar-bibliography
-            `,(list (concat (s-trim-right (shell-command-to-string "ghq root"))
-                            "/github.com/takeokunn/blog/hugo/references.bib")))
+            `,(list (expand-file-name "hugo/references.bib" (my/ghq-repo-path "github.com/takeokunn/blog"))))
 
     ;; org-cite integration
     (setopt org-cite-insert-processor 'citar)
