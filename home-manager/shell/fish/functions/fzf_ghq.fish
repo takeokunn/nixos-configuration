@@ -109,6 +109,56 @@ function __fzf_ghq_new_worktree
         return 1
     end
 
+    # Serena's activate_project tool permanently and unboundedly appends the
+    # activated project's absolute path to ~/.serena/serena_config.yml's
+    # `projects:` list, and no git hook fires on `git worktree remove` to undo
+    # that -- so every worktree this function has ever created stays
+    # registered forever, even after its directory is gone. There is no
+    # deletion-time hook to attach a fix to, so prune on the next worktree
+    # creation instead: garbage-collect dead entries here, before `git
+    # worktree add` below, so this runs regardless of whether that add
+    # succeeds. The guard mirrors the one in
+    # home-manager/ai-tools/serena/default.nix so a machine that has never
+    # run Serena does not fail here.
+    set -l serena_config "$HOME/.serena/serena_config.yml"
+    if test -f "$serena_config"
+        # A failed read (transient I/O error, malformed YAML, a schema change)
+        # must not be treated as "zero projects": that would fall through to
+        # the empty-list branch below and silently wipe the real list. Capture
+        # the read's own exit status before anything else can overwrite
+        # $status, and skip the prune entirely -- no write at all -- unless
+        # the read cleanly succeeded.
+        set -l yq_read_output (yq-go eval '.projects[]' "$serena_config" 2>/dev/null)
+        set -l yq_read_status $status
+
+        if test $yq_read_status -ne 0
+            echo "fzf_ghq: could not read '$serena_config' (yq-go exited $yq_read_status); skipping Serena project prune" >&2
+        else
+            set -l kept_projects
+            for project in $yq_read_output
+                test -d "$project"; and set -a kept_projects $project
+            end
+
+            # Rebuild the whole `projects:` list in one write rather than
+            # deleting entries one at a time, and pass it as a single yq
+            # expression string (the same pattern default.nix uses for
+            # `ignored_paths`) rather than interpolating each path as its own
+            # shell argument. Escape backslashes before quotes so an escaped
+            # quote's own backslash is not re-escaped.
+            if test (count $kept_projects) -eq 0
+                yq-go eval -i '.projects = []' "$serena_config"
+            else
+                set -l quoted_projects
+                for project in $kept_projects
+                    set -a quoted_projects (string replace -a '"' '\\"' -- (string replace -a '\\' '\\\\' -- $project))
+                end
+                set -l joined_projects (string join '", "' -- $quoted_projects)
+                set -l prune_expr ".projects = [\"$joined_projects\"]"
+                yq-go eval -i "$prune_expr" "$serena_config"
+            end
+        end
+    end
+
     # A repository produced by `ghq get --bare` carries no refs/remotes/* at
     # all and no remote.origin.fetch refspec, so neither refs/remotes/origin/HEAD
     # nor origin/main resolves there — the only ref present is refs/heads/main,
@@ -172,6 +222,17 @@ function __fzf_ghq_new_worktree
     # yielding .claude/.claude rather than failing. Where the path is tracked the
     # checkout is authoritative, so the shared copy must not shadow it.
     set -l state_dir "$repo_path/.state"
+
+    # The loop below only links a $pair it finds under $state_dir (`test -d
+    # "$src"; or continue`), so on a machine where .state/ has never been
+    # populated every pair would silently skip instead of linking. Create
+    # both targets up front so the first worktree ever created for a repo
+    # bootstraps them automatically. mkdir -p is idempotent, so this is a
+    # no-op once .state/ is already populated, and it only ever touches
+    # $state_dir -- never $target_path -- so it cannot trip the
+    # checkout-shadowing guard in the loop below.
+    mkdir -p "$state_dir/.serena/memories" "$state_dir/.claude"
+
     for pair in ".serena/memories" ".claude"
         set -l src "$state_dir/$pair"
         set -l dst "$target_path/$pair"
