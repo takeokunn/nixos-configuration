@@ -32,7 +32,6 @@
     ".serena/"
     ".sisyphus/"
     ".cache/"
-    ".claude"
     "coverage.out"
     ".auth/"
     "playwright-report/"
