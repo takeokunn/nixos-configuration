@@ -128,9 +128,9 @@ fi
 
 wrapper_path="$tmp/result/bin/codex"
 if [ -x "$wrapper_path" ]; then
-  pass "\$out/bin/codex exists and is executable"
+  pass '$out/bin/codex exists and is executable'
 else
-  fail "\$out/bin/codex is missing or not executable" "checked: $wrapper_path"
+  fail '$out/bin/codex is missing or not executable' "checked: $wrapper_path"
 fi
 
 wrapper_content="$(cat "$wrapper_path" 2>/dev/null)"
