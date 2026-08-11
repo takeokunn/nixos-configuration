@@ -129,6 +129,14 @@ let
       url = null;
     } server;
 
+  # Codex has no `programs.codex.hooks`-style module option and this file takes no `config`
+  # argument (unlike claude-code/default.nix), so each script is built as a standalone Nix
+  # store executable and referenced by its store path directly in codexSettings.hooks below.
+  # A store path needs no $HOME/config-dir expansion, unlike claude-code's
+  # `${config.programs.claude-code.configDir}/hooks/<name>` scheme.
+  codexHookScript =
+    name: pkgs.writeShellScript name (builtins.readFile (aiPromptsPath + "/hooks/${name}.sh"));
+
   codexSettings = {
     model = "gpt-5.6-luna";
     model_provider = "openai";
@@ -143,6 +151,39 @@ let
     };
     feedback = {
       enabled = false;
+    };
+    # Same three guardrails claude-code/default.nix registers (lines 135-153 there), ported to
+    # Codex's native hook mechanism. Both engines auto-detect exact-string vs. regex matchers
+    # from the same character-class rule, so "^Bash$" and "Bash" are equivalent here; "^Bash$"
+    # is used just to spell it out as an explicit regex.
+    hooks = {
+      PreToolUse = [
+        {
+          matcher = "^Bash$";
+          hooks = [
+            {
+              type = "command";
+              command = "${codexHookScript "block-destructive-git"}";
+            }
+            {
+              type = "command";
+              command = "${codexHookScript "block-bare-cd"}";
+            }
+            {
+              type = "command";
+              command = "${codexHookScript "enforce-perl"}";
+            }
+          ];
+        }
+      ];
+    };
+    # Manual escape hatch for a capacity-limited primary model: `codex --profile fallback`.
+    # No CLI-level auto-retry exists, so this is a documented quick switch rather than an
+    # automatic one.
+    profiles = {
+      fallback = {
+        model = "gpt-5.4-mini";
+      };
     };
   };
 
