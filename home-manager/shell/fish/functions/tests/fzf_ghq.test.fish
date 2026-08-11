@@ -107,9 +107,9 @@ function test_prune_skips_write_on_read_failure
         echo 'if contains -- -i $argv'
         echo '    touch "$YQ_STUB_WRITE_MARKER"'
         echo '    exit 0'
-        echo 'else'
+        echo else
         echo '    exit 1'
-        echo 'end'
+        echo end
     end >"$stub_dir/yq-go"
     chmod +x "$stub_dir/yq-go"
     set -lx PATH $stub_dir $PATH
