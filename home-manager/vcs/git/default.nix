@@ -32,7 +32,7 @@
     ".serena/"
     ".sisyphus/"
     ".cache/"
-    "**/.claude/settings.local.json"
+    ".claude/"
     "coverage.out"
     ".auth/"
     "playwright-report/"

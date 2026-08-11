@@ -8,6 +8,13 @@
   xdg.configFile."fish/functions/".source = ./functions;
   xdg.configFile."fish/functions/".recursive = true;
 
+  # yq-go under its own PATH name: pkgs.yq (python-yq) is already installed
+  # elsewhere as bare `yq`, and yq-go's own binary is also named `yq`, so
+  # adding pkgs.yq-go directly here would collide. fzf_ghq.fish's
+  # __fzf_ghq_new_worktree needs yq-go's `eval`/`eval -i` syntax to prune
+  # stale Serena project entries.
+  home.packages = [ (pkgs.writeShellScriptBin "yq-go" ''exec ${pkgs.lib.getExe pkgs.yq-go} "$@"'') ];
+
   home.sessionVariables.COLORTERM = "truecolor";
   home.sessionVariables.LANG = "en_US.UTF-8";
   home.sessionVariables.LC_ALL = "en_US.UTF-8";
