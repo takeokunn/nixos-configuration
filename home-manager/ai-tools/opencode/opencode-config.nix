@@ -24,6 +24,7 @@ mcp-servers-nix.lib.mkConfig pkgs {
     model = "opencode-go/deepseek-v4-pro";
     small_model = "opencode-go/deepseek-v4-flash";
     share = "disabled";
+    autoupdate = false;
 
     provider."opencode-go".options = providerTimeoutOpts;
     provider.openai.options = providerTimeoutOpts;
