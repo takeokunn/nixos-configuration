@@ -213,10 +213,4 @@ in
       metabase-mcp.type = "local";
       metabase-mcp.command = "${nurPkgs.metabase-mcp}/bin/metabase-mcp";
     };
-
-  programs.serena.ignoredPaths = [
-    "**/.devenv/**"
-    "**/.direnv/**"
-    "**/.terraform/**"
-  ];
 }

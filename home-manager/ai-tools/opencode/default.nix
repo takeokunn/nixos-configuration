@@ -63,10 +63,4 @@ in
   };
 
   home.sessionVariables = import ./env.nix;
-
-  programs.serena.ignoredPaths = [
-    "**/.devenv/**"
-    "**/.direnv/**"
-    "**/.terraform/**"
-  ];
 }
