@@ -131,8 +131,10 @@
           "g"
           "n"
         ];
-        run = "cd ~/ghq/github.com/takeokunn/nixos-configuration";
-        desc = "Go to nixos-config";
+        # The repository is bare, so its own directory holds no file to browse.
+        # What is navigable is the set of worktrees hanging off it.
+        run = "cd ~/ghq/github.com/takeokunn/nixos-configuration.git/.worktrees";
+        desc = "Go to nixos-config worktrees";
       }
 
       # Toggle hidden files

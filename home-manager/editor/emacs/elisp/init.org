@@ -2384,8 +2384,8 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (setopt lsp-nix-nixd-formatting-command ["nixfmt-rfc-style"])
     ;; nixd completion configuration
     (let ((flake-path (concat "builtins.getFlake \""
-                              (string-trim (shell-command-to-string "ghq root"))
-                              "/github.com/takeokunn/nixos-configuration\"")))
+                              (my/ghq-repo-path "github.com/takeokunn/nixos-configuration")
+                              "\"")))
       (setopt lsp-nix-nixd-nixpkgs-expr
               (format "import (%s).inputs.nixpkgs { }" flake-path))
       (setopt lsp-nix-nixd-nixos-options-expr
@@ -3562,14 +3562,59 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (add-hook 'after-init-hook #'projectile-mode)
   (add-hook 'after-init-hook #'my/update-projectile-known-projects)
 
+  (defun my/ghq-bare-repository-p (dir)
+    "Return non-nil when DIR is a bare repository.
+Tests for the absence of a .git entry rather than a .git suffix on the
+directory name, so the answer does not depend on ghq's naming convention."
+    (not (file-exists-p (expand-file-name ".git" dir))))
+
+  (defun my/ghq-repo-path (relative)
+    "Return a directory holding the working files of RELATIVE.
+RELATIVE is a ghq-style path such as \"github.com/takeokunn/blog\".  Under the
+bare layout the repository is <root>/RELATIVE.git and contains no file to
+visit, so resolve instead to one of its worktrees: the fixed `main' one, or
+failing that the newest timestamped one — those names sort chronologically.
+A repository still checked out normally resolves to its own path, so this is
+safe to use for every repository regardless of which layout it is in."
+    (let* ((root (string-trim (shell-command-to-string "ghq root")))
+           (plain (expand-file-name relative root))
+           (worktrees (expand-file-name ".worktrees" (concat plain ".git")))
+           (main (expand-file-name "main" worktrees)))
+      (cond
+       ((file-directory-p plain) plain)
+       ((file-directory-p main) main)
+       ((file-directory-p worktrees)
+        (let ((dirs (seq-filter #'file-directory-p
+                                (directory-files worktrees t directory-files-no-dot-files-regexp))))
+          (if dirs (car (last dirs)) plain)))
+       (t plain))))
+
+  (defun my/ghq-project-roots ()
+    "Return the directories projectile should treat as projects.
+`ghq list --full-path' reports one path per repository, but under the bare
+layout that path is <repo>.git, which holds no working tree and therefore no
+file to visit.  What is navigable there are its worktrees, so a bare entry
+contributes its .worktrees/* children and nothing else.  A repository still
+checked out normally contributes its own path, plus any worktrees it carries."
+    (let (roots)
+      (dolist (repo (split-string (shell-command-to-string "ghq list --full-path") "\n" t))
+        (unless (my/ghq-bare-repository-p repo)
+          (push repo roots))
+        (let ((worktrees (expand-file-name ".worktrees" repo)))
+          (when (file-directory-p worktrees)
+            (dolist (dir (directory-files worktrees t directory-files-no-dot-files-regexp))
+              (when (file-directory-p dir)
+                (push dir roots))))))
+      (nreverse roots)))
+
   (defun my/update-projectile-known-projects ()
     (interactive)
     (projectile-clear-known-projects)
     (projectile-cleanup-known-projects)
     (setopt projectile-known-projects (mapcar
                                        (lambda (x)
-                                         (abbreviate-file-name (concat x "/")))
-                                       (split-string (shell-command-to-string "ghq list --full-path")))))
+                                         (abbreviate-file-name (file-name-as-directory x)))
+                                       (my/ghq-project-roots))))
   (with-eval-after-load 'projectile
     ;; advice
     (advice-add 'projectile-switch-project :before #'my/update-projectile-known-projects)
@@ -4569,7 +4614,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pass pass-view-mode) "pass" nil t)
 
-  (add-to-list 'auto-mode-alist (cons (substitute-in-file-name "$HOME/ghq/github.com/takeokunn/private/password-store/.*\\.gpg") 'pass-view-mode))
+  (add-to-list 'auto-mode-alist (cons (concat (regexp-quote (my/ghq-repo-path "github.com/takeokunn/private")) "/password-store/.*\\.gpg") 'pass-view-mode))
 
   (with-eval-after-load 'pass
     (setopt pass-suppress-confirmations t))
@@ -5641,7 +5686,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'elfeed-org
     ;; config
-    (setopt rmh-elfeed-org-files '("~/ghq/github.com/takeokunn/private/elfeed.org"))
+    (setopt rmh-elfeed-org-files (list (expand-file-name "project/elfeed.org" (my/ghq-repo-path "github.com/takeokunn/private"))))
     (setopt rmh-elfeed-org-auto-ignore-invalid-feeds t))
 #+end_src
 ** elfeed-dashboard
@@ -5892,7 +5937,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-tags-match-list-sublevels nil)
 
     ;; directory
-    (setq org-directory "~/ghq/github.com/takeokunn/private/agenda")
+    (setq org-directory (expand-file-name "agenda" (my/ghq-repo-path "github.com/takeokunn/private")))
 
     ;; todo
     (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "REVIEW(r)" "QA(q)" "|" "DONE(d)")))
@@ -6845,8 +6890,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'org-roam
     ;; config
-    (setopt org-roam-directory `,(concat (s-trim-right (shell-command-to-string "ghq root"))
-                                         "/github.com/takeokunn/blog")))
+    (setopt org-roam-directory `,(my/ghq-repo-path "github.com/takeokunn/blog")))
 #+end_src
 *** org-roam-mode
 :PROPERTIES:
@@ -7096,8 +7140,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'citar
     ;; config
     (setopt citar-bibliography
-            `,(list (concat (s-trim-right (shell-command-to-string "ghq root"))
-                            "/github.com/takeokunn/blog/hugo/references.bib")))
+            `,(list (expand-file-name "hugo/references.bib" (my/ghq-repo-path "github.com/takeokunn/blog"))))
 
     ;; org-cite integration
     (setopt org-cite-insert-processor 'citar)
@@ -7413,7 +7456,14 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
            (file-path (file-relative-name (buffer-file-name) project-root))
            (line-number (line-number-at-pos))
            (remote-url (string-trim (shell-command-to-string "git config --get remote.origin.url")))
-           (branch (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD")))
+           ;; A worktree created under the bare layout is detached, and
+           ;; --abbrev-ref then reports the literal string "HEAD", which would
+           ;; put GitHub's default branch in the URL instead of the commit
+           ;; actually being read.  Name the commit in that case.
+           (branch (let ((ref (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD"))))
+                     (if (string= ref "HEAD")
+                         (string-trim (shell-command-to-string "git rev-parse HEAD"))
+                       ref)))
            (https-remote
             (cond
              ;; ssh://git@github.com/ORG/REPO

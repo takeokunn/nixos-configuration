@@ -19,6 +19,15 @@ pointer are all shared state that another session can be writing while you read 
 
 Repositories under this account are public unless you have established otherwise.
 
+Every ghq-managed repository is a bare clone at `<repo>.git/`, so that path holds no working tree — `cd`-ing
+into it directly lands in what looks like an empty directory, and that emptiness is the layout, not a broken
+checkout. All editing happens inside a worktree created under `<repo>.git/.worktrees/<timestamp>-<short-sha>`,
+where the timestamp is a local `date +%Y%m%dT%H%M%S` and the short SHA anchors the name to the base ref; the
+branch-isolation procedure in the execution-workflow skill produces this path. A bare clone does not set
+`remote.origin.fetch` the way a normal clone does, so `git fetch` there reports success while updating no
+remote-tracking refs until that refspec is configured — a silent no-op, not an error, so verify the refspec
+before trusting a fetch to have moved anything.
+
 The catalog of available skills and sub-agents is injected into your context automatically by the harness.
 This file does not restate it; read the injected listing for what exists.
 </environment_facts>
