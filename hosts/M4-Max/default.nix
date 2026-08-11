@@ -70,11 +70,17 @@ nix-darwin.lib.darwinSystem {
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
         {
-          # Keep the git-bulk-clean clone lean via a background launchd agent.
+          # Maintain every ghq-managed repository via a background launchd agent.
           services.git-maintenance = {
             enable = true;
-            repositories = [ "/Users/${username}/ghq/github.com/takeokunn/git-bulk-clean.git" ];
+            ghq.enable = true;
+            interval = 3600; # 1 hour
           };
+
+          # launchd agents don't inherit home.sessionVariables (shell-only), so
+          # SSH-remote repos fail fetch without the agent socket set explicitly.
+          launchd.agents.git-maintenance.config.EnvironmentVariables.SSH_AUTH_SOCK =
+            "/Users/${username}/.gnupg/S.gpg-agent.ssh";
         }
       ];
       home-manager.extraSpecialArgs = {
