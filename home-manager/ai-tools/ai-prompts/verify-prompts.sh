@@ -458,11 +458,12 @@ fi
 
 echo "== (7) nix enumerations match the tree =="
 
-# claude-code/default.nix and opencode/agents.nix each enumerate agents and commands by
-# name. A file added to the tree but absent from a list is simply never installed, and
-# nothing fails — the prompt just does not exist for that tool. A name listed but deleted
-# from the tree is the opposite: readFile aborts evaluation. Both are checked here so the
-# first one cannot pass silently.
+# claude-code/default.nix enumerates agents and commands by name in a hardcoded list. A
+# file added to the tree but absent from the list is simply never installed, and nothing
+# fails — the prompt just does not exist for that tool. A name listed but deleted from the
+# tree is the opposite: readFile aborts evaluation. Both are checked here so the first one
+# cannot pass silently. opencode/agent-translation.nix instead discovers agents/commands via
+# builtins.readDir, so it cannot drift from the tree by construction and is not checked here.
 nix_out="$(
   python3 - "$ai_tools_dir" "$agents_dir" "$commands_dir" <<'PY'
 import glob, os, re, sys
@@ -476,8 +477,7 @@ on_disk = {
 if not on_disk['agents'] or not on_disk['commands']:
     raise SystemExit('found no agent or command files on disk')
 
-nix_files = [os.path.join(ai_tools, 'claude-code', 'default.nix'),
-             os.path.join(ai_tools, 'opencode', 'agents.nix')]
+nix_files = [os.path.join(ai_tools, 'claude-code', 'default.nix')]
 
 found_any = False
 for nf in nix_files:
@@ -505,7 +505,7 @@ nix_status=$?
 if [ $nix_status -ne 0 ]; then
   fail "nix enumeration check did not run" "$nix_out"
 elif [ -z "$nix_out" ]; then
-  pass "claude-code and opencode enumerations match agents/ and commands/"
+  pass "claude-code enumeration matches agents/ and commands/ (opencode is readDir-based and structurally exempt)"
 else
   fail "nix enumerations disagree with the tree" "$nix_out"
 fi

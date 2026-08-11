@@ -18,7 +18,7 @@ let
     inherit pkgs models;
   };
 
-  opencodeAgents = import ./agents.nix { inherit ai-prompts-path; };
+  opencodeAgents = import ./agent-translation.nix { inherit pkgs ai-prompts-path; };
 in
 {
   # oh-my-openagent evaluates to null on aarch64-linux (darwin-only in the
@@ -31,10 +31,23 @@ in
   home.file.".opencode/CLAUDE.md".force = true;
 
   xdg.configFile."opencode/opencode.json".source = opencodeConfig;
-  xdg.configFile."opencode/opencode.json".force = true;
 
   xdg.configFile."opencode/oh-my-opencode.json".source = ohMyOpencodeConfig;
-  xdg.configFile."opencode/oh-my-opencode.json".force = true;
+
+  # programs.opencode.agents/commands dispatches on builtins.isPath at the
+  # module's implementation, not on the option's declared `either` type: a
+  # derivation (e.g. from pkgs.linkFarm) is builtins.isAttrs, so it falls
+  # into the attrset-of-content branch and mapAttrs' over the derivation's
+  # own attrs (outPath, drvPath, ...) instead of being symlinked whole.
+  # xdg.configFile.recursive sidesteps that dispatch entirely.
+  xdg.configFile."opencode/agents" = {
+    source = opencodeAgents.agents;
+    recursive = true;
+  };
+  xdg.configFile."opencode/commands" = {
+    source = opencodeAgents.commands;
+    recursive = true;
+  };
 
   programs.opencode = {
     enable = true;
@@ -47,8 +60,7 @@ in
     tui.keybinds.messages_half_page_up = "ctrl+u";
     tui.keybinds.messages_next = "]";
     tui.keybinds.messages_previous = "[";
-  }
-  // opencodeAgents;
+  };
 
   home.sessionVariables = import ./env.nix;
 
