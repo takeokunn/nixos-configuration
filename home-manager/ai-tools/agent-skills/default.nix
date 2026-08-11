@@ -18,10 +18,14 @@
   programs.agent-skills.sources.custom.filter.maxDepth = 1;
   programs.agent-skills.sources.anthropic.path = anthropic-skills;
   programs.agent-skills.sources.anthropic.subdir = "skills";
+  # Declared but left out of enableAll below, same mechanism as scientific further down: the
+  # catalog is built from every declared source regardless of what enableAll selects, so the
+  # source block has to stay even though nothing from it is installed.
   programs.agent-skills.sources.cloudflare.path = cloudflare-skills;
   programs.agent-skills.sources.cloudflare.subdir = "skills";
   programs.agent-skills.sources.hashicorp.path = hashicorp-agent-skills;
   programs.agent-skills.sources.hashicorp.filter.maxDepth = 4;
+  # Declared but left out of enableAll below; see the cloudflare comment above.
   programs.agent-skills.sources.deno.path = deno-skills;
   programs.agent-skills.sources.deno.subdir = "skills";
   programs.agent-skills.sources.aws.path = aws-agent-skills;
@@ -56,9 +60,7 @@
   programs.agent-skills.skills.enableAll = [
     "custom"
     "anthropic"
-    "cloudflare"
     "hashicorp"
-    "deno"
     "aws"
     "microsoft"
     "context7"
