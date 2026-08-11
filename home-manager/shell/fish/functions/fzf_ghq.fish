@@ -158,6 +158,22 @@ function __fzf_ghq_new_worktree
         return 1
     end
 
+    # A fresh worktree carries no accumulated project knowledge. Serena memories
+    # and .claude settings describe the repository rather than any one checkout,
+    # so point them at a single copy held beside the bare repo. Linking rather
+    # than copying means a memory written in one worktree is visible from the
+    # others, and that removing a worktree does not take it away. Serena's cache
+    # is deliberately left unlinked: it indexes paths, so sharing it across
+    # concurrent worktrees would have them overwrite each other's index.
+    set -l state_dir "$repo_path/.state"
+    if test -d "$state_dir/.serena/memories"
+        mkdir -p "$target_path/.serena"
+        ln -sfn "$state_dir/.serena/memories" "$target_path/.serena/memories"
+    end
+    if test -d "$state_dir/.claude"
+        ln -sfn "$state_dir/.claude" "$target_path/.claude"
+    end
+
     echo "fzf_ghq: created worktree $target_path" >&2
     echo $target_path
 end

@@ -5665,7 +5665,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   (with-eval-after-load 'elfeed-org
     ;; config
-    (setopt rmh-elfeed-org-files '("~/ghq/github.com/takeokunn/private/elfeed.org"))
+    (setopt rmh-elfeed-org-files '("~/ghq/github.com/takeokunn/private/project/elfeed.org"))
     (setopt rmh-elfeed-org-auto-ignore-invalid-feeds t))
 #+end_src
 ** elfeed-dashboard
