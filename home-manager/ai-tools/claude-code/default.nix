@@ -37,18 +37,6 @@ in
     autoUpdates = false;
     includeCoAuthoredBy = false;
     autoCompactEnabled = true;
-    # Left unset the window is a model-tuned default, which for Sonnet 5 on this entrypoint is
-    # 967000. Cache-read per request grows with session length until compaction caps it, and the
-    # long sessions that reach that cap carry most of a week's tokens, so the cap is the lever.
-    # Re-derive rather than trusting a remembered figure: `ccusage claude weekly --json` for the
-    # totals, and a per-turn scan of ~/.claude/projects/**/*.jsonl for the growth curve — noting
-    # that one assistant turn spans several lines sharing a message id, and only the line with the
-    # largest output_tokens may be counted.
-    #
-    # This value is the ceiling, not the trigger. Claude Code subtracts the output reserve and a
-    # further margin, so compaction actually arms below it and fires below that; statusline.sh
-    # carries the derived numbers and has to move whenever this one does.
-    autoCompactWindow = 200000;
     enableAllProjectMcpServers = true;
     feedbackSurveyState.lastShownTime = 1754089004345;
     outputStyle = "Explanatory";
