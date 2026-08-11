@@ -73,7 +73,7 @@ nix-darwin.lib.darwinSystem {
           # Keep the git-bulk-clean clone lean via a background launchd agent.
           services.git-maintenance = {
             enable = true;
-            repositories = [ "/Users/${username}/ghq/github.com/takeokunn/git-bulk-clean" ];
+            repositories = [ "/Users/${username}/ghq/github.com/takeokunn/git-bulk-clean.git" ];
           };
         }
       ];
