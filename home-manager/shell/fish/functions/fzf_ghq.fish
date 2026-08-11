@@ -165,13 +165,23 @@ function __fzf_ghq_new_worktree
     # others, and that removing a worktree does not take it away. Serena's cache
     # is deliberately left unlinked: it indexes paths, so sharing it across
     # concurrent worktrees would have them overwrite each other's index.
+    #
+    # Link only where the checkout does not already provide the path. A
+    # repository that tracks .claude has it checked out as a real directory, and
+    # `ln -sfn <src> <existing-dir>` silently creates the link *inside* it —
+    # yielding .claude/.claude rather than failing. Where the path is tracked the
+    # checkout is authoritative, so the shared copy must not shadow it.
     set -l state_dir "$repo_path/.state"
-    if test -d "$state_dir/.serena/memories"
-        mkdir -p "$target_path/.serena"
-        ln -sfn "$state_dir/.serena/memories" "$target_path/.serena/memories"
-    end
-    if test -d "$state_dir/.claude"
-        ln -sfn "$state_dir/.claude" "$target_path/.claude"
+    for pair in ".serena/memories" ".claude"
+        set -l src "$state_dir/$pair"
+        set -l dst "$target_path/$pair"
+        test -d "$src"; or continue
+        if test -e "$dst"; or test -L "$dst"
+            echo "fzf_ghq: $pair is provided by the checkout; leaving it unlinked" >&2
+            continue
+        end
+        mkdir -p (dirname "$dst")
+        ln -sfn "$src" "$dst"
     end
 
     echo "fzf_ghq: created worktree $target_path" >&2
