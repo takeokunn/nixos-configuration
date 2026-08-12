@@ -163,9 +163,58 @@ function test_no_origin_remote_regression
     end
 end
 
+function test_fetch_prunes_deleted_remote_branch
+    set -lx HOME (mktemp -d)
+    set -l pair (make_scratch_repo_pair)
+    set -l bare $pair[1]
+    set -l clone $pair[2]
+
+    git -C "$bare" remote add origin "$clone"
+
+    # Create a second branch directly on the clone (no checkout needed --
+    # `branch <name> <start-point>` just creates the ref) so the bare repo's
+    # first fetch below picks up refs/remotes/origin/feature-doomed
+    # alongside refs/remotes/origin/main.
+    git -C "$clone" branch -q feature-doomed HEAD
+
+    git -C "$bare" fetch -q origin '+refs/heads/*:refs/remotes/origin/*'
+    if git -C "$bare" rev-parse --verify --quiet refs/remotes/origin/feature-doomed >/dev/null 2>&1
+        pass "prune: precondition -- refs/remotes/origin/feature-doomed exists after the first fetch"
+    else
+        fail "prune: precondition violated -- refs/remotes/origin/feature-doomed missing after the first fetch"
+        return
+    end
+
+    # Simulate the branch being deleted upstream between the bare repo's
+    # first fetch and this second worktree-creation call.
+    git -C "$clone" branch -q -D feature-doomed
+
+    set -l result (__fzf_ghq_new_worktree $bare)
+    set -l exit_code $status
+
+    if test $exit_code -eq 0
+        pass "prune: __fzf_ghq_new_worktree exits 0"
+    else
+        fail "prune: __fzf_ghq_new_worktree exit code (expected 0, got $exit_code)"
+    end
+
+    if git -C "$bare" rev-parse --verify --quiet refs/remotes/origin/feature-doomed >/dev/null 2>&1
+        fail "prune: refs/remotes/origin/feature-doomed still present after the guarded fetch -- --prune with the widened refspec did not take effect"
+    else
+        pass "prune: refs/remotes/origin/feature-doomed is gone after the guarded fetch (--prune + widened refspec both took effect)"
+    end
+
+    if git -C "$bare" rev-parse --verify --quiet refs/remotes/origin/main >/dev/null 2>&1
+        pass "prune: refs/remotes/origin/main is unaffected by the prune"
+    else
+        fail "prune: refs/remotes/origin/main unexpectedly missing after the guarded fetch"
+    end
+end
+
 test_fetch_freshness
 test_fetch_failure_fallback
 test_no_origin_remote_regression
+test_fetch_prunes_deleted_remote_branch
 
 echo ""
 echo "Summary: $TESTS_PASSED passed, $TESTS_FAILED failed"
