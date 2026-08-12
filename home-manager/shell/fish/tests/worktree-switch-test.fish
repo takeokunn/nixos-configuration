@@ -38,7 +38,7 @@ function make_fzf_stub -a stub_dir
         echo 'set -l lines (cat)'
         echo 'if test -n "$FZF_STUB_SELECT"'
         echo '    printf "%s\n" $lines[1]'
-        echo 'end'
+        echo end
     end >"$stub_dir/fzf"
     chmod +x "$stub_dir/fzf"
 end
