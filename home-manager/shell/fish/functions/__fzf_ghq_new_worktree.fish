@@ -2,7 +2,13 @@
 # Not named ghq_* so it stays out of the command namespace and off the
 # ghq_* glob used elsewhere to manage those functions.
 #
-#   __fzf_ghq_new_worktree [<repo-path>] [<base-ref>]
+#   __fzf_ghq_new_worktree [<repo-path>] [<base-ref>] [<naming-mode>]
+#
+# <naming-mode>, when it is exactly the literal string `branch`, names the
+# created directory <timestamp>-<sanitized-default-branch> (leading
+# `origin/` stripped, remaining `/` replaced with `-`) instead of the
+# default <timestamp>-<short-sha>. Any other value, including empty/absent,
+# keeps the default sha-based naming.
 #
 # Prints the created absolute path to stdout as the ONLY stdout output, so
 # callers — fzf_ghq (fzf_ghq.fish) and the public wrapper worktree_new
@@ -11,6 +17,7 @@
 function __fzf_ghq_new_worktree
     set -l repo_path $argv[1]
     set -l base_ref $argv[2]
+    set -l naming_mode $argv[3]
 
     if test -z "$repo_path"
         set -l git_common_dir (git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
@@ -88,7 +95,7 @@ function __fzf_ghq_new_worktree
         # fetch is not fatal here -- the three-step chain below still has
         # local refs to fall back to.
         if git -C $repo_path remote get-url origin >/dev/null 2>&1
-            set -l fetch_output (git -C $repo_path fetch origin '+refs/heads/main:refs/remotes/origin/main' 2>&1)
+            set -l fetch_output (git -C $repo_path fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' 2>&1)
             if test $status -ne 0
                 echo "fzf_ghq: fetch of origin/main failed ($fetch_output); falling back to local refs" >&2
             end
@@ -118,7 +125,13 @@ function __fzf_ghq_new_worktree
 
     set -l timestamp (date +%Y%m%dT%H%M%S)
     set -l worktrees_dir "$repo_path/.worktrees"
-    set -l base_name "$timestamp-$base_sha"
+    set -l base_name
+    if test "$naming_mode" = branch
+        set -l sanitized_branch_name (string replace -a '/' '-' -- (string replace -r '^origin/' '' -- $base_ref))
+        set base_name "$timestamp-$sanitized_branch_name"
+    else
+        set base_name "$timestamp-$base_sha"
+    end
     set -l target_name $base_name
     set -l suffix 2
     while test -e "$worktrees_dir/$target_name"
