@@ -2018,6 +2018,18 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (let ((default-directory (locate-dominating-file default-directory ".git")))
       (magit-status)))
 
+  (defun my/update-magit-repository-directories (&optional roots)
+    "Populate `magit-repository-directories' from the same ghq-aware root set
+that backs `projectile-known-projects' (bare repos contribute only their
+worktree children; non-bare repos contribute themselves), each paired with
+depth 0 per Magit's (DIRECTORY . DEPTH) format (magit-repository-directories
+docstring / magit.vc Repository List manual).  ROOTS, when supplied, is used
+directly instead of recomputing via `my/ghq-project-roots'."
+    (interactive)
+    (setopt magit-repository-directories
+            (mapcar (lambda (d) (cons (abbreviate-file-name (file-name-as-directory d)) 0))
+                    (or roots (my/ghq-project-roots)))))
+
   (with-eval-after-load 'magit
     ;; config
     (setopt magit-refresh-status-buffer nil))
@@ -3560,7 +3572,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                        projectile-cleanup-known-projects) "projectile" nil t)
 
   (add-hook 'after-init-hook #'projectile-mode)
-  (add-hook 'after-init-hook #'my/update-projectile-known-projects)
+  (add-hook 'after-init-hook #'my/update-ghq-project-state)
 
   (defun my/ghq-bare-repository-p (dir)
     "Return non-nil when DIR is a bare repository.
@@ -3597,7 +3609,7 @@ file to visit.  What is navigable there are its worktrees, so a bare entry
 contributes its .worktrees/* children and nothing else.  A repository still
 checked out normally contributes its own path, plus any worktrees it carries."
     (let (roots)
-      (dolist (repo (split-string (shell-command-to-string "ghq list --full-path") "\n" t))
+      (dolist (repo (my/ghq-repo-list))
         (unless (my/ghq-bare-repository-p repo)
           (push repo roots))
         (let ((worktrees (expand-file-name ".worktrees" repo)))
@@ -3607,17 +3619,131 @@ checked out normally contributes its own path, plus any worktrees it carries."
                 (push dir roots))))))
       (nreverse roots)))
 
-  (defun my/update-projectile-known-projects ()
+  (defun my/ghq-repo-list ()
+    "Return the list of ghq-managed repository paths (bare and non-bare)."
+    (split-string (shell-command-to-string "ghq list --full-path") "\n" t))
+
+  (defun my/ghq--git (repo-path &rest args)
+    "Run git ARGS in REPO-PATH; return trimmed stdout, or nil on nonzero exit.
+Uses `call-process' with an argument list rather than a shell command string,
+so a value in ARGS or REPO-PATH can never be reinterpreted as shell syntax."
+    (with-temp-buffer
+      (let ((exit (apply #'call-process "git" nil (list t nil) nil "-C" repo-path args)))
+        (when (zerop exit)
+          (string-trim (buffer-string))))))
+
+  (defun my/ghq-repo-worktrees (repo-path)
+    "Return REPO-PATH's existing worktree paths, excluding its own bare
+git-common-dir entry."
+    (let ((common-dir (my/ghq--git repo-path "rev-parse" "--path-format=absolute" "--git-common-dir"))
+          (worktrees nil))
+      (dolist (line (split-string (or (my/ghq--git repo-path "worktree" "list" "--porcelain") "") "\n" t))
+        (when (string-prefix-p "worktree " line)
+          (let ((wt (substring line (length "worktree "))))
+            (unless (string= wt common-dir)
+              (push wt worktrees)))))
+      (nreverse worktrees)))
+
+  (defun my/ghq--resolve-base-ref (repo-path)
+    "Resolve a base ref in REPO-PATH via the same fallback chain as
+__fzf_ghq_new_worktree.fish: an explicit-refspec fetch of origin/main
+\(tolerating failure), refs/remotes/origin/HEAD, origin/main, then local HEAD."
+    (when (my/ghq--git repo-path "remote" "get-url" "origin")
+      (my/ghq--git repo-path "fetch" "origin" "+refs/heads/main:refs/remotes/origin/main"))
+    (or (let ((ref (my/ghq--git repo-path "symbolic-ref" "refs/remotes/origin/HEAD")))
+          (and ref (string-remove-prefix "refs/remotes/" ref)))
+        (and (my/ghq--git repo-path "rev-parse" "--verify" "--quiet" "origin/main") "origin/main")
+        (my/ghq--git repo-path "symbolic-ref" "--short" "HEAD")
+        (error "my/ghq--resolve-base-ref: cannot resolve a base ref in %s" repo-path)))
+
+  (defun my/ghq--link-state (repo-path target-path)
+    "Symlink REPO-PATH's shared .state/.serena/memories and .state/.claude into
+TARGET-PATH, mirroring __fzf_ghq_new_worktree.fish. Skips (with a message)
+any target the checkout already provides as a real path or existing symlink,
+matching fish's `test -e \"$dst\"; or test -L \"$dst\"' shadow guard exactly
+\(file-exists-p alone would miss a broken symlink; file-symlink-p covers it)."
+    (let ((state-dir (expand-file-name ".state" repo-path)))
+      (make-directory (expand-file-name ".serena/memories" state-dir) t)
+      (make-directory (expand-file-name ".claude" state-dir) t)
+      (dolist (pair '(".serena/memories" ".claude"))
+        (let ((src (expand-file-name pair state-dir))
+              (dst (expand-file-name pair target-path)))
+          (if (or (file-exists-p dst) (file-symlink-p dst))
+              (message "my/ghq--link-state: %s is provided by the checkout; leaving it unlinked" pair)
+            (when (file-directory-p src)
+              (make-directory (file-name-directory dst) t)
+              (make-symbolic-link src dst)))))))
+
+  (defun my/ghq-create-worktree (repo-path &optional base-ref)
+    "Create a new worktree of the bare repository at REPO-PATH, Elisp-native
+equivalent of __fzf_ghq_new_worktree.fish (fish's Serena serena_config.yml
+projects: prune step is deliberately NOT reimplemented here — it needs YAML
+parsing this Emacs config has no library for; that cleanup remains fish's
+job for worktrees created there). BASE-REF, when omitted, is resolved via
+`my/ghq--resolve-base-ref'. Returns the created worktree's absolute path."
+    (let* ((base-ref (or base-ref (my/ghq--resolve-base-ref repo-path)))
+           (base-sha (or (my/ghq--git repo-path "rev-parse" "--short" base-ref)
+                         (error "my/ghq-create-worktree: cannot resolve base ref %s in %s" base-ref repo-path)))
+           (worktrees-dir (expand-file-name ".worktrees" repo-path))
+           (base-name (format "%s-%s" (format-time-string "%Y%m%dT%H%M%S") base-sha))
+           (target-name base-name)
+           (suffix 2))
+      (while (file-exists-p (expand-file-name target-name worktrees-dir))
+        (setq target-name (format "%s-%d" base-name suffix))
+        (setq suffix (1+ suffix)))
+      (let ((target-path (expand-file-name target-name worktrees-dir)))
+        (with-temp-buffer
+          (unless (zerop (call-process "git" nil t nil "-C" repo-path "worktree" "add" "--detach" target-path base-sha))
+            (error "my/ghq-create-worktree: failed to create worktree at %s: %s" target-path (buffer-string))))
+        (my/ghq--link-state repo-path target-path)
+        target-path)))
+
+  (defun my/ghq-switch-project ()
+    "Two-stage project switch mirroring fish's fzf_ghq: pick a repository,
+then (for a bare repository) pick an existing worktree or create a new one,
+then hand off to Projectile's own switch machinery so
+`projectile-switch-project-action' and existing hooks fire unchanged."
+    (interactive)
+    ;; The :before advice on `projectile-switch-project' can never reach this
+    ;; code path (`:override' on the same symbol discards it, and this
+    ;; function never calls `projectile-switch-project' anyway), so the
+    ;; refresh has to happen explicitly here instead.
+    (my/update-ghq-project-state)
+    (let* ((repo (completing-read "Repository: " (my/ghq-repo-list) nil t))
+           (target
+            (if (my/ghq-bare-repository-p repo)
+                (let ((worktrees (my/ghq-repo-worktrees repo)))
+                  (if (null worktrees)
+                      (my/ghq-create-worktree repo)
+                    (let ((choice (completing-read "Worktree: " (cons "[new worktree]" worktrees) nil t)))
+                      (if (string= choice "[new worktree]")
+                          (my/ghq-create-worktree repo)
+                        choice))))
+              repo)))
+      (projectile-switch-project-by-name target)))
+
+  (defun my/update-projectile-known-projects (&optional roots)
+    "Rebuild `projectile-known-projects' from ROOTS, or from
+`my/ghq-project-roots' if ROOTS is nil."
     (interactive)
     (projectile-clear-known-projects)
     (projectile-cleanup-known-projects)
     (setopt projectile-known-projects (mapcar
                                        (lambda (x)
                                          (abbreviate-file-name (file-name-as-directory x)))
-                                       (my/ghq-project-roots))))
+                                       (or roots (my/ghq-project-roots)))))
+
+  (defun my/update-ghq-project-state ()
+    "Compute the ghq-aware project roots once per invocation and refresh both
+Projectile's known-projects list and Magit's repository-directories from that
+single computation, instead of each recomputing it independently."
+    (interactive)
+    (let ((roots (my/ghq-project-roots)))
+      (my/update-projectile-known-projects roots)
+      (my/update-magit-repository-directories roots)))
+
   (with-eval-after-load 'projectile
     ;; advice
-    (advice-add 'projectile-switch-project :before #'my/update-projectile-known-projects)
     (advice-add 'projectile-replace :around #'my/advice-disable-buffer-readonly)
     (advice-add 'projectile-replace-regexp :around #'my/advice-disable-buffer-readonly)
 
@@ -3658,7 +3784,7 @@ checked out normally contributes its own path, plus any worktrees it carries."
     (advice-add 'projectile-find-file-other-window :override #'consult-projectile-find-file-other-window)
     (advice-add 'projectile-find-file-other-frame :override #'consult-projectile-find-file-other-frame)
     (advice-add 'projectile-recentf :override #'consult-projectile-recentf)
-    (advice-add 'projectile-switch-project :override #'consult-projectile-switch-project)
+    (advice-add 'projectile-switch-project :override #'my/ghq-switch-project)
 
     ;; keybind
     (keymap-global-set "C-x C-b" #'consult-projectile-switch-to-buffer))
@@ -7249,7 +7375,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'copilot-chat
     ;; config
     (setopt copilot-chat-frontend 'shell-maker)
-    (setopt copilot-chat-default-model "claude-haiku-4.5"))
+    (setopt copilot-chat-default-model "claude-sonnet-5"))
 
   (with-eval-after-load 'copilot-chat-prompts
     (let ((my/copilot-chat-prompt "日本語で解答してください。\nあなたは一流のコーディングチューターです。コードの説明は、高レベルな概念と詳細な内容のバランスが完璧です。あなたのアプローチにより、学習者はコードの書き方だけでなく、効果的なプログラミングを導く基本原理も理解できます。\n名前を尋ねられた場合、必ず「GitHub Copilot」と答えてください。\nユーザーの要件を正確かつ厳密に守ってください。\n専門知識はソフトウェア開発トピックに厳密に限定されています。\nMicrosoft のコンテンツポリシーに従ってください。\n著作権を侵害する内容は避けてください。\nソフトウェア開発に関連しない質問には、AIプログラミングアシスタントであることを簡単に伝えるだけにしてください。\n回答は簡潔かつ非個人的なものにしてください。\nMarkdown形式を使用して回答してください。\nコードブロックの最初にプログラミング言語名を必ず記述してください。\n全体を三重バッククオートで囲まないようにしてください。\nユーザーは Neovim という IDE を使用しています。この IDE には、開いているファイルのエディタ、統合ユニットテストサポート、コード実行結果を表示する出力ペイン、統合ターミナルがあります。\nアクティブなドキュメントは、ユーザーが現在見ているソースコードです。\n1 回の会話で 1 つの回答しかできません。\n\n追加ルール\nステップごとに考えてください：\n1. 提供されたコード選択部分やユーザーの質問、関連するエラー、プロジェクトの詳細、クラス定義などを確認します。\n2. コードや概念、ユーザーの質問が不明確な場合は、明確化する質問を行います。\n3. ユーザーが特定の質問やエラーを提供している場合は、選択されたコードと追加のコンテキストに基づいて答えてください。それ以外の場合は、選択されたコードの説明に集中します。\n4. コードの可読性やパフォーマンス向上の機会があれば、提案を行ってください。\n\n簡潔でわかりやすく、かつ徹底的な説明を心がけ、広範な予備知識があると仮定しないでください。\n開発者に親しみやすい用語やアナロジーを使用してください。\n注意すべき点や、初心者が見落としがちな部分を指摘してください。\n提供されたコンテキストに沿った具体的で関連性の高い例を示してください。\n"))

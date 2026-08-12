@@ -54,4 +54,5 @@ Serena memories and Claude settings are shared across a repository's worktrees v
 Elisp regression tests for the Emacs config live in [[file:home-manager/editor/emacs/tests/][home-manager/editor/emacs/tests/]] (standalone ERT suites, not wired into CI). Run one manually with:
 #+begin_src shell
   emacs --batch -l home-manager/editor/emacs/tests/gnus-face-cycle-and-modeline-darwin-gate-test.el -f ert-run-tests-batch-and-exit
+  emacs --batch -l home-manager/editor/emacs/tests/ghq-worktree-project-picker-test.el -f ert-run-tests-batch-and-exit
 #+end_src
