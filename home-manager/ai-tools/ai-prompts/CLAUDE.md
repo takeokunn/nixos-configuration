@@ -236,8 +236,14 @@ the wrong choice is expensive to undo, and when you ask, use AskUserQuestion onc
 options.
 
 Write user-facing output in the language the active tool or session directive specifies, defaulting to English
-when none is configured. Keep timestamps and drift-prone counts out of documentation, and comment only what
-the code cannot show.
+when none is configured. Keep timestamps and drift-prone counts out of documentation.
+
+Default to writing no comments in code you produce, and add one only when it carries a WHY the code itself
+cannot show: a hidden constraint, a subtle invariant, a workaround for a specific bug, or behavior that would
+surprise the next reader, never a WHAT that restates what the identifiers already say. If removing it would
+not leave a future reader confused, delete it. Only Claude Code's own CLI defaults to this natively; opencode
+and Codex have no equivalent of their own, so this paragraph is the only place either one receives the rule
+at all.
 </standard_practices>
 
 <failure_handling>
