@@ -1,214 +1,51 @@
 ---
-name: Exploration Tools
-description: Tool definitions and usage patterns for codebase exploration (Glob, Grep, Read, LSP) — a tool-definition register, not a methodology skill.
-version: 2.1.0
+name: exploration-tools
+description: Search discipline for codebase exploration — scope, ranking, and the read-only boundary. Tool parameter schemas are injected by the harness and are not restated here; for symbol-level navigation load serena-usage instead.
+version: 3.0.0
 ---
 
-<purpose>
-  Provide standardized tool definitions and usage patterns for codebase exploration. This skill centralizes tool knowledge that was previously duplicated across agents, ensuring consistent search strategies and result formatting.
-</purpose>
+Glob, Grep, Read, and the LSP operations have their parameters injected by the harness. What is not injected is
+when each is the right choice and what a result licenses you to claim.
 
-<tools>
-  <tool name="Glob">
-    <description>Fast file pattern matching for finding files by name</description>
-    <params>
-      <param name="pattern" required="true">Glob pattern (e.g., **/*.ts, src/**/*.md)</param>
-      <param name="path" required="false">Directory to search in (defaults to cwd)</param>
-    </params>
-    <use_case>Find files by name pattern when you know the file extension or naming convention</use_case>
-    <example>
-      Pattern: **/*.tsx
-      Result: All TypeScript React files in the project
-    </example>
-  </tool>
+## Choosing
 
-  <tool name="Grep">
-    <description>Content search with regex support across files</description>
-    <params>
-      <param name="pattern" required="true">Regex pattern to search for</param>
-      <param name="path" required="false">File or directory to search in</param>
-      <param name="glob" required="false">Filter files by glob pattern</param>
-      <param name="type" required="false">File type filter (js, py, rust, etc.)</param>
-      <param name="output_mode" required="false">content, files_with_matches (default), or count</param>
-      <param name="-A" required="false">Lines after match</param>
-      <param name="-B" required="false">Lines before match</param>
-      <param name="-C" required="false">Lines of context around match</param>
-      <param name="-i" required="false">Case insensitive search</param>
-      <param name="multiline" required="false">Enable multiline matching for cross-line patterns</param>
-    </params>
-    <use_case>Search file contents for patterns, keywords, or code constructs</use_case>
-    <example>
-      Pattern: useState
-      Glob: **/*.tsx
-      Result: All useState usages in React components
-    </example>
-  </tool>
+- **Glob** for file discovery by name or extension.
+- **Grep** for content. Prefer it to a shell `grep`/`rg` invocation, so behavior is consistent across
+  environments and the output shape is predictable.
+- **Read** after locating, never before. Reading files you have not first located is how a search turns into a
+  sweep.
+- **LSP `goToDefinition` / `findReferences` / `documentSymbol`**, or Serena's equivalents, whenever a language
+  server is active. Text search cannot tell a definition from a mention, and cannot see a dynamically
+  constructed reference. When you fall back to text search, say so and name the claim it weakens — see
+  [serena-usage](../serena-usage/SKILL.md).
 
-  <tool name="Read">
-    <description>Read file contents with optional line range</description>
-    <params>
-      <param name="file_path" required="true">Absolute path to file</param>
-      <param name="offset" required="false">Starting line number</param>
-      <param name="limit" required="false">Number of lines to read</param>
-    </params>
-    <use_case>View file contents after locating with Glob or Grep</use_case>
-    <example>
-      file_path: /path/to/file.ts
-      offset: 50
-      limit: 30
-      Result: Lines 50-80 of the file
-    </example>
-  </tool>
+## Scope
 
-  <tool name="LSP_goToDefinition">
-    <description>Navigate to symbol definition using Language Server Protocol</description>
-    <params>
-      <param name="file" required="true">File containing the symbol reference</param>
-      <param name="line" required="true">Line number of the reference</param>
-      <param name="character" required="true">Column position of the reference</param>
-    </params>
-    <use_case>Find where a function, class, or variable is defined</use_case>
-  </tool>
+Start narrow — one file or directory, then a file type across the project, then everything — and expand only
+when the results are insufficient. Filter binary and generated paths out rather than ranking them down. Bound
+the result size rather than returning a dump.
 
-  <tool name="LSP_findReferences">
-    <description>Find all references to a symbol using Language Server Protocol</description>
-    <params>
-      <param name="file" required="true">File containing the symbol definition</param>
-      <param name="line" required="true">Line number of the definition</param>
-      <param name="character" required="true">Column position of the definition</param>
-    </params>
-    <use_case>Find all usages of a function, class, or variable across the codebase</use_case>
-  </tool>
+## What a result means
 
-  <tool name="LSP_documentSymbol">
-    <description>Get all symbols in a document using Language Server Protocol</description>
-    <params>
-      <param name="file" required="true">File to analyze</param>
-    </params>
-    <use_case>Get an overview of classes, functions, and variables in a file</use_case>
-  </tool>
-</tools>
+Rank by what the caller can act on: exact matches and definition sites first, usage sites next, comments and
+test files last.
 
-<concepts>
-  <concept name="search_scope">
-    <description>Choosing appropriate search boundaries to balance speed and completeness</description>
-    <example>
-      Narrow: Single file or directory
-      Medium: File type across project
-      Broad: All files in project
+**A match is a location, not a behavior.** It proves the text exists; it does not prove the code is reached,
+correctly ordered, or correctly parameterised. When the question underneath was behavioural, return the
+locations and name the run that would settle it.
 
-      Start narrow, expand only if results are insufficient
-    </example>
-  </concept>
+**A zero-match result is a fact about the pattern, not about the codebase.** Try the naming variants —
+abbreviation, alternate casing, alternate extension, aliased import — before reporting an absence, and report
+the patterns that returned nothing alongside the ones that hit.
 
-  <concept name="result_ranking">
-    <description>Prioritizing search results by relevance</description>
-    <example>
-      High relevance: Exact matches, definition sites
-      Medium relevance: Usage sites, related patterns
-      Low relevance: Comments, test files, generated code
-    </example>
-  </concept>
-</concepts>
+Return every finding as file:line with enough surrounding context to judge it. A match with no context sends
+the caller back to the file to reconstruct what you already had in front of you.
 
-<patterns>
-  <pattern name="file_discovery">
-    <description>Pattern for finding files by name or extension</description>
-    <example>
-      1. Use Glob with pattern to find candidate files
-      2. Filter results by relevance
-      3. Read specific files for details
-    </example>
-  </pattern>
+## Boundary
 
-  <pattern name="content_search">
-    <description>Pattern for searching file contents</description>
-    <example>
-      1. Use Grep with pattern and file type filter
-      2. Review matches with context (-C flag)
-      3. Follow up with Read for full file context
-    </example>
-  </pattern>
+Exploration is read-only. Never modify a file during a search.
 
-  <pattern name="symbol_navigation">
-    <description>Pattern for navigating code symbols</description>
-    <example>
-      1. Use LSP_goToDefinition to find symbol source
-      2. Use LSP_findReferences to find usages
-      3. Use LSP_documentSymbol for file overview
-    </example>
-  </pattern>
-</patterns>
+## Related
 
-<decision_tree name="tool_selection">
-  <question>What type of search is needed?</question>
-  <branch condition="Find files by name pattern">Use Glob</branch>
-  <branch condition="Search file contents">Use Grep</branch>
-  <branch condition="Find symbol definition">Use LSP_goToDefinition or Serena find_symbol</branch>
-  <branch condition="Find symbol usages">Use LSP_findReferences or Serena find_referencing_symbols</branch>
-  <branch condition="View file contents">Use Read</branch>
-</decision_tree>
-
-<best_practices>
-  <practice priority="critical">Use Glob for file discovery, Grep for content search</practice>
-  <practice priority="critical">Always return file:line references for findings</practice>
-  <practice priority="high">Start with narrow search scope, expand if needed</practice>
-  <practice priority="high">Use LSP tools when available for accurate symbol navigation</practice>
-  <practice priority="medium">Filter out binary and generated files</practice>
-  <practice priority="medium">Limit results to manageable size using head_limit</practice>
-</best_practices>
-
-<anti_patterns>
-  <avoid name="blind_broad_search">
-    <description>Searching entire codebase without filters</description>
-    <instead>Start with file type or directory filters</instead>
-  </avoid>
-
-  <avoid name="reading_without_searching">
-    <description>Reading files without first using Glob/Grep to locate them</description>
-    <instead>Use search tools to find relevant files first</instead>
-  </avoid>
-
-  <avoid name="ignoring_context">
-    <description>Returning matches without surrounding context</description>
-    <instead>Use -C flag with Grep or read surrounding lines</instead>
-  </avoid>
-</anti_patterns>
-
-<rules priority="critical">
-  <rule>Exploration operations must be read-only; never modify files during search</rule>
-  <rule>Always use absolute file paths in Read tool calls</rule>
-  <rule>Keep guidance evidence-based and version-aware</rule>
-</rules>
-<rules priority="standard">
-  <rule>Prefer Grep over shell grep/rg commands for consistent behavior</rule>
-  <rule>Prefer project conventions over generic defaults</rule>
-</rules>
-
-<error_escalation>
-  <examples>
-    <example severity="low">Minor inconsistency</example>
-    <example severity="medium">Ambiguous guidance</example>
-    <example severity="high">Conflicting constraints</example>
-    <example severity="critical">Unsafe or misleading retrieval guidance</example>
-  </examples>
-</error_escalation>
-
-<related_agents>
-  <agent name="explore">Locate relevant code patterns</agent>
-  <agent name="quality-assurance">Review output consistency</agent>
-</related_agents>
-
-<constraints>
-  <must>Return file paths with line numbers for all findings</must>
-  <must>Limit results to manageable size</must>
-  <must>Maintain read-only operations during exploration</must>
-  <avoid>Modifying files during exploration</avoid>
-  <avoid>Returning raw dumps without filtering</avoid>
-  <avoid>Searching binary or generated files</avoid>
-</constraints>
-
-<related_skills>
-  <skill name="serena-usage">Alternative symbol navigation via Serena MCP</skill>
-  <skill name="investigation-patterns">Evidence collection methodology using these tools</skill>
-</related_skills>
+- [serena-usage](../serena-usage/SKILL.md) — symbol-level navigation, and what to do when it is unavailable
+- [investigation-patterns](../investigation-patterns/SKILL.md) — the evidence methodology these tools serve

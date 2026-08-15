@@ -1,372 +1,111 @@
 ---
-name: Define Core
+name: define-core
 description: Shared workflow phases and patterns for the /define command. Use this skill when implementing /define to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
-version: 2.2.0
+version: 3.0.0
 ---
 
-<purpose>
-Provide the shared workflow phases, agent definitions, and patterns that /define depends on, so the command file does not have to restate them.
-</purpose>
+The phase sequence /define executes, so the command file does not restate it. Question design and requirement
+formatting live in [requirements-definition](../requirements-definition/SKILL.md), loaded alongside this one.
 
-<companion_skills>
-  <description>These carry guidance this workflow depends on. None of them arrives on its own — load the
-    ones a given run needs with the Skill tool, in the prepare phase, before the step that uses them.</description>
-  <skill name="requirements-definition">Question design and requirement formatting; load it whenever this workflow runs</skill>
-  <skill name="serena-usage">Load before any memory or symbol operation</skill>
-  <skill name="fact-check">Load when a claim needs verification against an external source</skill>
-  <skill name="context7-usage">Load when a library's current API or version behavior is in question</skill>
-  <skill name="core-patterns">Load when the shared escalation, decision-criteria, or enforcement structures are needed</skill>
-</companion_skills>
+Read-only throughout: no file is created or modified, and no code is written. That is what makes the approval
+step this command exists to create meaningful.
 
-<tools>
-  <tool name="Read">Read requirements, related prompts, and existing specifications</tool>
-  <tool name="Grep">Search for requirement patterns and terminology consistency</tool>
-</tools>
+## Phases
 
-<workflow>
-  <phase name="prepare" id="core_prepare">
-    <objective>Load the companion skills, initialize Serena, and check existing patterns</objective>
-    <step number="0">
-      <action>Load requirements-definition with the Skill tool, plus serena-usage before any memory
-        operation and any other companion skill this run needs</action>
-      <tool>Skill</tool>
-      <output>The skills loaded, by name</output>
-    </step>
-    <step number="1">
-      <action>Activate Serena project with activate_project</action>
-      <tool>Serena activate_project</tool>
-      <output>Project activated</output>
-    </step>
-    <step number="2">
-      <action>Check list_memories for relevant patterns</action>
-      <tool>Serena list_memories</tool>
-      <output>Available memory list</output>
-    </step>
-    <step number="3">
-      <action>Load applicable memories with read_memory</action>
-      <tool>Serena read_memory</tool>
-      <output>Relevant patterns loaded</output>
-    </step>
-  </phase>
+**prepare** — Load requirements-definition, plus serena-usage before any memory operation and any other
+companion this run needs: [fact-check](../fact-check/SKILL.md) when a claim needs an external source,
+[context7-usage](../context7-usage/SKILL.md) when a library's current behavior is in question,
+[core-patterns](../core-patterns/SKILL.md) for the shared decision-criteria structure. Then activate the
+project, list memories, and read only the entries this task type calls for.
 
-  <phase name="analyze" id="core_analyze">
-    <objective>Understand the user's request and identify technical constraints</objective>
-    <step number="1">
-      <action>Parse user request to extract core requirements</action>
-      <tool>Text analysis</tool>
-      <output>Initial requirements list</output>
-    </step>
-    <step number="2">
-      <action>Identify technical constraints from request context</action>
-      <tool>Codebase knowledge</tool>
-      <output>Constraint list</output>
-    </step>
-    <step number="3">
-      <action>Determine design decisions requiring user input</action>
-      <tool>Requirements analysis</tool>
-      <output>Question candidates list</output>
-    </step>
-    <step number="4">
-      <action>Assess technical feasibility at high level</action>
-      <tool>Technical knowledge</tool>
-      <output>Initial feasibility assessment</output>
-    </step>
-  </phase>
+**analyze** — Extract the core requirements from the request, identify the technical constraints its context
+implies, name the design decisions that will need user input, and take a first read on feasibility.
 
-  <phase name="investigate" id="core_investigate">
-    <objective>Gather evidence from codebase and analyze architecture impact</objective>
-    <step number="1">
-      <action>Delegate to explore agent: find relevant files and existing patterns</action>
-      <tool>Sub-agent delegation</tool>
-      <output>File paths, patterns, code samples</output>
-    </step>
-    <step number="2">
-      <action>Delegate to design agent: evaluate architecture consistency and dependencies</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Architecture analysis, dependency graph</output>
-    </step>
-    <step number="3">
-      <action>Delegate to database agent: analyze database design (if applicable)</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Schema analysis, query patterns</output>
-    </step>
-    <step number="4">
-      <action>Delegate to general-purpose agent: analyze requirements and estimate effort</action>
-      <tool>Sub-agent delegation</tool>
-      <output>Effort estimation, risk analysis</output>
-    </step>
-    <step number="5">
-      <action>Use fact-check skill patterns: verify external documentation and standard references via Context7</action>
-      <tool>Context7 MCP, WebSearch</tool>
-      <output>Verification report, flagged claims</output>
-    </step>
-  </phase>
+**investigate** — Dispatch in one message: explore for the relevant files and existing patterns, design for
+architectural consistency and dependencies, database for schema implications where they exist. Then
+general-purpose for completeness and dependency risk, which needs the others' output. Verify any external
+claim against Context7 rather than recall.
 
-  <reflection_checkpoint id="investigation_complete" after="investigate">
-    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
-    <check>Name the files and existing patterns the requirement will build on.</check>
-    <check>State the scope boundary — what is explicitly out of scope for this requirement.</check>
-    <check>Name any technical blocker found, or state that none was found and what was checked.</check>
-    <on_unmet>Widen the investigation, or ask the user if only they can supply the missing item. Do not
-      write a requirement around an unexamined area.</on_unmet>
-  </reflection_checkpoint>
+**clarify** — Score the candidate questions by design branching, irreversibility, whether investigation could
+have answered them, and effort impact. Classify each as spec confirmation, design choice, constraint, scope, or
+priority. Ask the highest-scoring first, through AskUserQuestion with two to four structured options and one
+marked (Recommended) — including follow-ups, which go through the same tool rather than dropping to plain text.
+Do not proceed on an assumption where a critical question is unanswered.
 
-  <phase name="clarify" id="core_clarify">
-    <objective>Resolve ambiguities through structured user interaction</objective>
-    <step number="1">
-      <action>Score questions by: design branching, irreversibility, investigation impossibility, effort impact (1-5 each)</action>
-      <tool>Question scoring algorithm</tool>
-      <output>Prioritized question list</output>
-    </step>
-    <step number="2">
-      <action>Classify questions: spec confirmation, design choice, constraint, scope, priority</action>
-      <tool>Question taxonomy</tool>
-      <output>Categorized questions</output>
-    </step>
-    <step number="3">
-      <action>Use AskUserQuestion tool for all user interactions (2-4 structured options per question)</action>
-      <tool>AskUserQuestion</tool>
-      <output>User responses</output>
-    </step>
-    <step number="4">
-      <action>For follow-up clarifications, continue using AskUserQuestion tool rather than plain text</action>
-      <tool>AskUserQuestion</tool>
-      <output>Additional user responses</output>
-    </step>
-    <step number="5">
-      <action>Present high-score questions first; do not proceed without clear answers</action>
-      <tool>Priority ordering</tool>
-      <output>Confirmed requirements</output>
-    </step>
-  </phase>
+**verify** — Cross-check the user's answers against what the agents actually found, and read the
+implementations the chosen approach depends on.
 
-  <phase name="verify" id="core_verify">
-    <objective>Validate user decisions against technical evidence</objective>
-    <step number="1">
-      <action>Verify constraints from answers using agent findings</action>
-      <tool>Cross-reference analysis</tool>
-      <output>Validated constraints</output>
-    </step>
-    <step number="2">
-      <action>Check implementations related to chosen approach</action>
-      <tool>Code analysis</tool>
-      <output>Implementation validation</output>
-    </step>
-  </phase>
+**document** — Produce the requirements document and the phased task breakdown for /execute.
 
-  <phase name="document" id="core_document">
-    <objective>Create comprehensive requirements documentation and task breakdown</objective>
-    <step number="1">
-      <action>Create comprehensive requirements document</action>
-      <tool>Requirements template</tool>
-      <output>Complete requirements specification</output>
-    </step>
-    <step number="2">
-      <action>Break down tasks for /execute handoff</action>
-      <tool>Task decomposition</tool>
-      <output>Phased task list with dependencies</output>
-    </step>
-  </phase>
+**finalize** — The gate below.
 
-  <phase name="finalize" id="core_finalize">
-    <objective>Gate on unresolved Outstanding Issues before terminating; let the user choose how to dispose of them rather than silently documenting and ending</objective>
-    <step number="1">
-      <action>Evaluate the Outstanding Issues section of the FINAL requirements document — the document produced in the document phase, since /define produces a single document and this finalize phase runs immediately after it.</action>
-      <tool>Document inspection</tool>
-      <output>Outstanding Issues count (0 means the section reads "none")</output>
-    </step>
-    <step number="2">
-      <action>If the count is 0 ("none"), skip the gate entirely and finish normally — do not prompt. If the count is >= 1 (any non-empty Outstanding Issues), invoke the disposition gate in step 3.</action>
-      <tool>Conditional branch</tool>
-      <output>Gate fired or skipped</output>
-    </step>
-    <step number="3">
-      <action>Invoke AskUserQuestion with exactly three options for how to dispose of the remaining Outstanding Issues:
-        "Resolve now (Recommended)" — re-enter the clarify phase, ask the outstanding questions via AskUserQuestion, and patch the requirements document with the answers;
-        "Defer to /execute" — keep the issues documented as-is and carry them explicitly into the execute_handoff so the downstream implementer inherits them;
-        "Stop &amp; revise scope" — halt without finalizing the /execute handoff; leave the already-produced (read-only) document visible so the user can revise their request.</action>
-      <tool>AskUserQuestion</tool>
-      <output>User-selected disposition</output>
-    </step>
-    <step number="4">
-      <action>Act on the selected disposition. For "Resolve now", apply the answers, then re-evaluate the Outstanding Issues section. This resolution loop is BOUNDED: re-present the gate at most once more, after which only "Defer to /execute" and "Stop &amp; revise scope" remain. Never loop unbounded. The clarify-phase "block until answered" rule (DC-P002) is SATISFIED, not bypassed, by offering Defer/Stop on the bounded re-check — choosing a disposition IS a valid resolution of an issue that cannot be answered.</action>
-      <tool>Bounded resolution loop</tool>
-      <output>Updated document, deferred handoff, or terminal stop</output>
-    </step>
-  </phase>
-</workflow>
+## Gate after investigation
 
-<agents>
-  <agent name="design" subagent_type="design" readonly="true">Architecture consistency, dependency analysis, API design</agent>
-  <agent name="database" subagent_type="database" readonly="true">Database design and optimization</agent>
-  <agent name="general-purpose" subagent_type="general-purpose" readonly="true">Requirements analysis, estimation, dependency analysis</agent>
-  <agent name="explore" subagent_type="explore" readonly="true">Finding relevant files and existing patterns</agent>
-  <agent name="validator" subagent_type="validator" readonly="true">Cross-validation and consensus verification</agent>
-</agents>
+- The files and existing patterns the requirement will build on.
+- The scope boundary — what is explicitly out of scope.
+- Any technical blocker found, or that none was and what was checked.
 
-<execution_graph id="core_execution_graph">
-  <parallel_group id="investigation" depends_on="none">
-    <agent>explore</agent>
-    <agent>design</agent>
-    <agent>database</agent>
-  </parallel_group>
-  <sequential_step id="analysis" depends_on="investigation">
-    <agent>general-purpose</agent>
-  </sequential_step>
-</execution_graph>
+Unmet: widen the investigation, or ask if only the user can supply it. **Never write a requirement around an
+unexamined area.**
 
-<delegation>
-  <requirement>Scope overview</requirement>
-  <requirement>Target file paths</requirement>
-  <requirement>Explicit edit prohibition</requirement>
-  <requirement>Sub-agents must use AskUserQuestion tool for any user interactions</requirement>
-</delegation>
+## The finalize gate
 
-<output>
-  <format id="requirements_document">
-    <summary>One-sentence request, background, expected outcomes</summary>
-    <current_state>Existing system, tech stack</current_state>
-    <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
-    <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
-    <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-    <feasibility>State feasibility as the observable condition that supports it — which capability was
-      located at which file:line, which one was not found and where it was searched for — never as a
-      numeric score (DEF-P004). Note explicitly where a requirement rests on an assumption rather than
-      on investigation, in place of an objectivity score.</feasibility>
-    <test_requirements>Unit, integration, acceptance criteria</test_requirements>
-    <outstanding_issues>Unresolved questions; "none" must be explicitly stated when there are none (the finalize gate's skip-branch keys off this "none" sentinel)</outstanding_issues>
-  </format>
-  <format id="task_breakdown">
-    <dependency_graph>Task dependencies visualization</dependency_graph>
-    <phased_tasks>Files, overview, dependencies per phase</phased_tasks>
-    <execute_handoff>Decisions, references, constraints</execute_handoff>
-  </format>
-</output>
+Read the Outstanding Issues section of the document just produced.
 
-<best_practices>
-  <practice priority="critical">Always initialize Serena and check memories before starting requirements definition</practice>
-  <practice priority="critical">Investigate existing codebase patterns before documenting any requirements</practice>
-  <practice priority="critical">Use AskUserQuestion tool with structured options (2-4 choices) for all user interactions</practice>
-  <practice priority="critical">Always include a (Recommended) option when presenting choices</practice>
-  <practice priority="high">Score questions using 4-criteria system (design branching, irreversibility, investigation impossibility, effort impact)</practice>
-  <practice priority="high">Delegate investigation tasks to specialized agents in parallel</practice>
-  <practice priority="high">Verify external documentation claims via Context7 and fact-check patterns</practice>
-  <practice priority="medium">Classify questions by type (spec confirmation, design choice, constraint, scope, priority)</practice>
-  <practice priority="medium">Document all assumptions explicitly when requirements are unclear</practice>
-</best_practices>
+If it reads "none", **skip the gate entirely and finish** — do not prompt.
 
-<anti_patterns>
-  <avoid name="code_modification">
-    <description>Modifying or creating code files during requirements definition</description>
-    <instead>Keep all operations read-only; this is a requirements-only phase</instead>
-  </avoid>
-  <avoid name="skipping_investigation">
-    <description>Documenting requirements without investigating existing codebase</description>
-    <instead>Always investigate existing patterns and code before defining requirements</instead>
-  </avoid>
-  <avoid name="unstructured_questions">
-    <description>Using plain text output for questions instead of AskUserQuestion tool</description>
-    <instead>Use AskUserQuestion tool with 2-4 structured options for all user interactions</instead>
-  </avoid>
-  <avoid name="proceeding_without_answers">
-    <description>Proceeding with assumptions when critical questions are unanswered</description>
-    <instead>Block progress until clear answers to critical questions are obtained</instead>
-  </avoid>
-</anti_patterns>
+If it holds one or more items, ask with AskUserQuestion, offering exactly three dispositions:
 
-<rules priority="critical">
-  <rule id="DC-C001">Never modify, create, or delete files</rule>
-  <rule id="DC-C002">Never implement code; requirements definition only</rule>
-  <rule id="DC-C003">Clearly identify technically impossible requests</rule>
-  <rule id="DC-C004">Prioritize technical validity over user preferences</rule>
-  <rule id="DC-C005">Technical evidence over speculation</rule>
-</rules>
+- **Resolve now (Recommended)** — re-enter clarify, ask the outstanding questions, and patch the document.
+- **Defer to /execute** — keep the issues documented and carry them explicitly into the handoff, so the
+  implementer inherits them.
+- **Stop and revise scope** — halt without finalizing the handoff, leaving the document visible so the user can
+  revise the request.
 
-<rules priority="standard">
-  <rule id="DC-S001">Use requirements-definition skill for methodology</rule>
-  <rule id="DC-S002">Delegate investigations to sub-agents</rule>
-  <rule id="DC-S003">Ask questions without limit until requirements are clear</rule>
-  <rule id="DC-S004">Investigate and question before concluding</rule>
-  <rule id="DC-S005">Always include a (Recommended) option when presenting choices via AskUserQuestion</rule>
-  <rule id="DC-S006">When the final requirements document has non-empty Outstanding Issues, do not silently end — run the finalize gate (core_finalize) so the user chooses to resolve, defer, or stop</rule>
-</rules>
+**The resolution loop is bounded.** After "Resolve now", re-evaluate Outstanding Issues and re-present the gate
+at most once more, after which only Defer and Stop remain. Never loop unbounded.
 
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="DC-B001" priority="critical">
-      <trigger>Before requirements documentation</trigger>
-      <action>Investigate existing codebase patterns</action>
-      <verification>Codebase analysis in output</verification>
-    </behavior>
-    <behavior id="DC-B002" priority="critical">
-      <trigger>For design decisions</trigger>
-      <action>Use AskUserQuestion tool with structured options</action>
-      <verification>User responses recorded</verification>
-    </behavior>
-    <behavior id="DC-B003" priority="critical">
-      <trigger>After the final requirements document is produced, when its Outstanding Issues section is non-empty (>= 1 item, not "none")</trigger>
-      <action>Run the finalize gate (core_finalize): invoke AskUserQuestion offering "Resolve now (Recommended)" / "Defer to /execute" / "Stop &amp; revise scope", then act on the choice. Bounded to at most one additional resolution pass.</action>
-      <verification>Disposition gate recorded in output whenever Outstanding Issues >= 1; gate skipped when "none"</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="DC-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Modifying or creating code files</action>
-      <response>Block operation, this is read-only command</response>
-    </behavior>
-    <behavior id="DC-P002" priority="critical">
-      <trigger>Always</trigger>
-      <action>Proceeding without answering critical questions</action>
-      <response>Block operation, require clarification first</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
+Choosing a disposition *is* a valid resolution of an issue that cannot be answered — so the rule that clarify
+blocks until critical questions are answered is satisfied by this gate, not bypassed by it.
 
-<error_escalation>
-  <examples>
-    <example severity="low">Minor ambiguity in non-critical feature detail</example>
-    <example severity="medium">Unclear requirement or ambiguous scope</example>
-    <example severity="high">Technically infeasible request or breaking change</example>
-    <example severity="critical">Request violates security policy or data integrity</example>
-  </examples>
-</error_escalation>
+The purpose of the gate is that /define never ends by silently documenting a gap. Documenting an unresolved
+question and stopping looks identical, in the output, to having resolved it.
 
-<constraints>
-  <must>Keep all operations read-only</must>
-  <must>Delegate detailed investigation to sub-agents</must>
-  <must>Use AskUserQuestion tool for structured user interactions</must>
-  <must>Present questions before making assumptions</must>
-  <avoid>Implementing or modifying code</avoid>
-  <avoid>Justifying user requests over technical validity</avoid>
-  <avoid>Proceeding without clear answers to critical questions</avoid>
-  <avoid>Using plain text output for questions instead of AskUserQuestion tool</avoid>
-</constraints>
+## Agents
 
-<related_skills>
-  <skill name="requirements-definition">Core methodology for specification (question scoring, requirement formatting)</skill>
-  <skill name="investigation-patterns">Evidence gathering for feasibility assessment</skill>
-  <skill name="serena-usage">Check existing patterns and memories via Serena MCP</skill>
-  <skill name="fact-check">External source verification using Context7 and WebSearch</skill>
-  <skill name="execution-workflow">Handoff methodology after requirements are defined</skill>
-</related_skills>
+All read-only. Every delegation carries the scope, the target paths, the explicit prohibition on editing, and
+the instruction to use AskUserQuestion for any user interaction rather than emitting a question as text.
 
-<related_agents>
-  <agent name="explore">Locate existing requirement patterns and similar feature implementations</agent>
-  <agent name="design">Evaluate architecture consistency and dependency impact during requirements definition</agent>
-  <agent name="validator">Cross-validate requirements for completeness, consistency, and feasibility</agent>
-</related_agents>
+- **explore** — relevant files and existing patterns
+- **design** — architectural consistency, dependencies, API design
+- **database** — schema design and query implications
+- **general-purpose** — requirements completeness, dependency risk, effort in tree-derived units
+- **validator** — cross-validation when findings conflict
 
-<usage_in_commands>
-  <description>Each command loads this skill with the Skill tool in its prepare phase and then applies
-    the sections below. What a command applies is a decision it makes at run time, not a composition
-    performed for it by markup.</description>
-  <command name="define">
-    <applies>All phases (prepare, analyze, investigate, clarify, verify, document, finalize)</applies>
-    <applies>All agents</applies>
-    <applies>Core execution graph</applies>
-    <applies>All delegation requirements</applies>
-    <applies>All rules and enforcement</applies>
-    <note>finalize gate runs immediately after document, since /define produces a single document</note>
-  </command>
-</usage_in_commands>
+explore, design, and database are independent and dispatch together; general-purpose consumes their output and
+follows.
+
+## Output
+
+A requirements document carrying: the request in one sentence with its background and expected outcomes; the
+current system and stack; functional requirements in FR-001 form marked mandatory or optional; non-functional
+requirements; technical specifications with each decision's rationale; test requirements as observable
+behavior; and Outstanding Issues.
+
+Feasibility is stated as **the observable condition supporting it** — which capability was located at which
+file:line, which was not found and where it was searched for — never as a score. Where a requirement rests on
+an assumption rather than on investigation, say so at that requirement.
+
+Outstanding Issues states "none" explicitly when there are none: **the finalize gate's skip branch keys off
+that sentinel**, so an omitted section and an empty one are not the same thing.
+
+Then the task breakdown: the dependency graph, phased tasks with files and dependencies, and the handoff
+carrying the decisions made, the references, and the constraints — including what /execute must not assume.
+
+## Related
+
+- [requirements-definition](../requirements-definition/SKILL.md) — question scoring and requirement formatting
+- [investigation-patterns](../investigation-patterns/SKILL.md) — evidence gathering for feasibility
+- [serena-usage](../serena-usage/SKILL.md) — the memory operations in prepare
+- [fact-check](../fact-check/SKILL.md) — verifying an external claim
+- [execution-workflow](../execution-workflow/SKILL.md) — what happens to the handoff afterwards

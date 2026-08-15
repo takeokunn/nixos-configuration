@@ -1,1026 +1,144 @@
 ---
-name: Haskell Ecosystem
+name: haskell-ecosystem
 description: Use for Haskell projects, covering cabal.project, stack.yaml, ghc, cabal or stack build/test/run, and Haskell language patterns.
-version: 2.1.0
+version: 3.0.0
 ---
 
-<purpose>
-  Provide comprehensive patterns for Haskell language, GHC toolchain, Cabal/Stack build systems, and type-level programming.
-</purpose>
-
-<tools>
-  <tool>Read - Analyze cabal files, stack.yaml, and Haskell source files</tool>
-  <tool>Edit - Modify Haskell code and build configuration</tool>
-  <tool>Bash - Run cabal build, stack build, ghci commands</tool>
-  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Haskell documentation</tool>
-</tools>
-
-<concepts>
-  <concept name="purity">Functions have no side effects; same input always produces same output</concept>
-  <concept name="laziness">Expressions evaluated only when needed; enables infinite data structures</concept>
-  <concept name="type_inference">Hindley-Milner type system; explicit signatures recommended for top-level definitions</concept>
-  <concept name="monads">Compose computations with effects; IO, Maybe, Either, State, Reader, Writer</concept>
-  <concept name="type_classes">Ad-hoc polymorphism; define operations for types (Eq, Ord, Show, Functor, Applicative, Monad)</concept>
-</concepts>
-
-<haskell_language>
-  <type_system>
-    <concept name="algebraic_data_types">
-      <description>Sum types (Either, Maybe) and product types (tuples, records)</description>
-      <example>
-        data Maybe a = Nothing | Just a
-        data Either a b = Left a | Right b
-        data Person = Person { name :: Text, age :: Int }
-      </example>
-    </concept>
-
-    <concept name="type_classes">
-      <description>Define behavior for types; similar to interfaces but more powerful</description>
-      <common_classes>
-        <class name="Eq">Equality comparison (==, /=)</class>
-        <class name="Ord">Ordering comparison (compare, &lt;, &gt;, &lt;=, &gt;=)</class>
-        <class name="Show">String representation (show)</class>
-        <class name="Read">Parse from string (read)</class>
-        <class name="Functor">Mappable containers (fmap, &lt;$&gt;)</class>
-        <class name="Applicative">Apply functions in context (&lt;*&gt;, pure)</class>
-        <class name="Monad">Sequence computations (&gt;&gt;=, return, do-notation)</class>
-        <class name="Foldable">Reducible structures (foldr, foldl, toList)</class>
-        <class name="Traversable">Traverse with effects (traverse, sequenceA)</class>
-        <class name="Semigroup">Associative binary operation (&lt;&gt;)</class>
-        <class name="Monoid">Semigroup with identity (mempty, mappend)</class>
-      </common_classes>
-      <example>
-        class Eq a where
-          (==) :: a -> a -> Bool
-          (/=) :: a -> a -> Bool
-
-        instance Eq Person where
-          p1 == p2 = p1.name == p2.name &amp;&amp; p1.age == p2.age
-      </example>
-    </concept>
-
-    <concept name="type_level_programming">
-      <description>Advanced type system features for compile-time guarantees</description>
-
-      <pattern name="gadts">
-        <description>Generalized Algebraic Data Types - refine types in pattern matching</description>
-        <pragma>GADTs</pragma>
-        <example>
-          {-# LANGUAGE GADTs #-}
-          data Expr a where
-            LitInt  :: Int -> Expr Int
-            LitBool :: Bool -> Expr Bool
-            Add     :: Expr Int -> Expr Int -> Expr Int
-            If      :: Expr Bool -> Expr a -> Expr a -> Expr a
-
-          eval :: Expr a -> a
-          eval (LitInt n)    = n
-          eval (LitBool b)   = b
-          eval (Add e1 e2)   = eval e1 + eval e2
-          eval (If c t e)    = if eval c then eval t else eval e
-        </example>
-      </pattern>
-
-      <pattern name="type_families">
-        <description>Type-level functions; compute types from types</description>
-        <pragma>TypeFamilies</pragma>
-        <example>
-          {-# LANGUAGE TypeFamilies #-}
-          type family Element c where
-            Element [a]       = a
-            Element (Set a)   = a
-            Element Text      = Char
-
-          class Container c where
-            type Elem c
-            empty :: c
-            insert :: Elem c -> c -> c
-        </example>
-      </pattern>
-
-      <pattern name="data_kinds">
-        <description>Promote data types to kinds for type-level programming</description>
-        <pragma>DataKinds</pragma>
-        <example>
-          {-# LANGUAGE DataKinds, KindSignatures #-}
-          data Nat = Zero | Succ Nat
-
-          data Vec (n :: Nat) a where
-            VNil  :: Vec 'Zero a
-            VCons :: a -> Vec n a -> Vec ('Succ n) a
-        </example>
-      </pattern>
-
-      <pattern name="phantom_types">
-        <description>Type parameters that don't appear in value constructors</description>
-        <example>
-          newtype Tagged tag a = Tagged { unTagged :: a }
-
-          data Validated
-          data Unvalidated
-
-          validateEmail :: Tagged Unvalidated Text -> Maybe (Tagged Validated Text)
-        </example>
-      </pattern>
-    </concept>
-
-    <concept name="higher_kinded_types">
-      <description>Type constructors as parameters; enables Functor, Monad abstractions</description>
-      <example>
-        class Functor f where
-          fmap :: (a -> b) -> f a -> f b
-
-        -- f is a type constructor (* -> *)
-        -- Functor operates on type constructors, not concrete types
-      </example>
-    </concept>
-  </type_system>
-
-  <monad_transformers>
-    <description>Compose monadic effects using transformers from mtl/transformers</description>
-
-    <pattern name="transformers_stack">
-      <description>Build custom monad stacks with transformers</description>
-      <example>
-        import Control.Monad.Trans.Reader
-        import Control.Monad.Trans.State
-        import Control.Monad.Trans.Except
-
-        type App a = ReaderT Config (StateT AppState (ExceptT AppError IO)) a
-
-        runApp :: Config -> AppState -> App a -> IO (Either AppError (a, AppState))
-        runApp cfg st app = runExceptT (runStateT (runReaderT app cfg) st)
-      </example>
-    </pattern>
-
-    <pattern name="mtl_style">
-      <description>Use mtl type classes for polymorphic effect handling</description>
-      <example>
-        import Control.Monad.Reader
-        import Control.Monad.State
-        import Control.Monad.Except
-
-        doSomething :: (MonadReader Config m, MonadState AppState m, MonadError AppError m) => m Result
-        doSomething = do
-          cfg &lt;- ask
-          st &lt;- get
-          when (invalid cfg) $ throwError InvalidConfig
-          pure (compute cfg st)
-      </example>
-    </pattern>
-
-    <common_transformers>
-      <transformer name="ReaderT">Read-only environment; ask, local</transformer>
-      <transformer name="StateT">Mutable state; get, put, modify</transformer>
-      <transformer name="ExceptT">Error handling; throwError, catchError</transformer>
-      <transformer name="WriterT">Accumulate output; tell, listen</transformer>
-      <transformer name="MaybeT">Short-circuit on Nothing</transformer>
-      <transformer name="ListT">Non-determinism (use list-t or logict for correct semantics)</transformer>
-    </common_transformers>
-  </monad_transformers>
-
-  <effect_systems>
-    <description>Modern alternatives to mtl monad transformer stacks</description>
-
-    <system name="effectful">
-      <description>Fast extensible effects library; recommended modern alternative to mtl for new projects</description>
-      <example>
-        import Effectful
-        import Effectful.Reader.Static
-        import Effectful.State.Static.Local
-        import Effectful.Error.Static
-
-        doSomething :: (Reader Config :> es, State AppState :> es, Error AppError :> es) => Eff es Result
-        doSomething = do
-          cfg &lt;- ask
-          st &lt;- get
-          when (invalid cfg) $ throwError InvalidConfig
-          pure (compute cfg st)
-
-        runApp :: Config -> AppState -> Eff '[Reader Config, State AppState, Error AppError, IOE] a -> IO (Either (CallStack, AppError) a)
-        runApp cfg st = runEff . runError . runState st . runReader cfg
-      </example>
-      <note>Better performance than mtl due to no newtype wrapping; better error messages; supports static and dynamic dispatch</note>
-    </system>
-
-    <system name="bluefin">
-      <description>Effect system using linearity for safety; alternative to effectful</description>
-      <note>Uses a different approach based on handles rather than type-level effect lists</note>
-    </system>
-
-    <decision_tree name="effect_system_choice">
-      <question>Which effect system should I use?</question>
-      <branch condition="Existing mtl codebase">Keep mtl; migrate incrementally if needed</branch>
-      <branch condition="New project, performance matters">effectful (best performance)</branch>
-      <branch condition="Simple application">mtl is still fine</branch>
-      <branch condition="Experimental, novel approach">bluefin</branch>
-    </decision_tree>
-  </effect_systems>
-
-  <linear_types>
-    <description>LinearTypes extension (stable since GHC 9.0); ensures values are used exactly once</description>
-    <example>
-      {-# LANGUAGE LinearTypes #-}
-      -- A linear function: argument must be used exactly once
-      dup :: a %1 -> (a, a)  -- This would NOT type-check
-
-      -- Useful for resource management
-      withFile :: FilePath -> (Handle %1 -> IO a) %1 -> IO a
-    </example>
-    <note>Primarily useful for resource-safe APIs and performance-critical code. Not needed for most application code.</note>
-  </linear_types>
-
-  <optics>
-    <description>Composable getters, setters, and traversals using lens library</description>
-
-    <pattern name="lens_basics">
-      <description>Focus on parts of data structures</description>
-      <example>
-        import Control.Lens
-
-        data Person = Person { _name :: Text, _age :: Int }
-        makeLenses ''Person
-
-        -- name :: Lens' Person Text
-        -- age :: Lens' Person Int
-
-        getName :: Person -> Text
-        getName p = p ^. name
-
-        setName :: Text -> Person -> Person
-        setName n p = p &amp; name .~ n
-
-        modifyAge :: (Int -> Int) -> Person -> Person
-        modifyAge f p = p &amp; age %~ f
-      </example>
-    </pattern>
-
-    <pattern name="optic_types">
-      <description>Different optic types for different access patterns</description>
-      <optics_hierarchy>
-        <optic name="Lens">Get and set exactly one value</optic>
-        <optic name="Prism">Focus on one branch of a sum type</optic>
-        <optic name="Traversal">Focus on zero or more values</optic>
-        <optic name="Iso">Bidirectional transformation</optic>
-        <optic name="Getter">Read-only access</optic>
-        <optic name="Fold">Read-only traversal</optic>
-      </optics_hierarchy>
-    </pattern>
-
-    <pattern name="lens_operators">
-      <description>Common lens operators</description>
-      <operators>
-        <operator name="^.">View through lens (view)</operator>
-        <operator name=".~">Set value (set)</operator>
-        <operator name="%~">Modify value (over)</operator>
-        <operator name="&amp;">Apply function (flip ($))</operator>
-        <operator name="^?">View through prism (preview)</operator>
-        <operator name="^..">View all through traversal (toListOf)</operator>
-      </operators>
-    </pattern>
-
-    <alternative name="optics">
-      <description>Alternative to lens with better type errors and composition</description>
-      <package>optics</package>
-      <note>Considered more modern; lens has larger ecosystem</note>
-    </alternative>
-  </optics>
-
-  <error_handling>
-    <pattern name="maybe">
-      <description>Optional values; prefer over null</description>
-      <example>
-        findUser :: UserId -> Maybe User
-        findUser uid = lookup uid users
-
-        -- Safe chaining with Monad
-        getUserEmail :: UserId -> Maybe Email
-        getUserEmail uid = do
-          user &lt;- findUser uid
-          pure (userEmail user)
-      </example>
-    </pattern>
-
-    <pattern name="either">
-      <description>Computations that may fail with error information</description>
-      <example>
-        parseConfig :: Text -> Either ParseError Config
-        parseConfig input = do
-          json &lt;- parseJSON input
-          validateConfig json
-      </example>
-    </pattern>
-
-    <pattern name="exceptt">
-      <description>Error handling in monadic contexts</description>
-      <example>
-        import Control.Monad.Except
-
-        data AppError = NotFound | InvalidInput Text | IOError IOException
-
-        loadUser :: MonadError AppError m => UserId -> m User
-        loadUser uid = do
-          mUser &lt;- findUser uid
-          case mUser of
-            Nothing -> throwError NotFound
-            Just u  -> pure u
-      </example>
-    </pattern>
-  </error_handling>
-
-  <common_patterns>
-    <pattern name="newtype">
-      <description>Zero-cost wrapper for type safety; use DerivingStrategies and DerivingVia</description>
-      <example>
-        {-# LANGUAGE DerivingStrategies #-}
-        {-# LANGUAGE DerivingVia #-}
-        newtype UserId = UserId Int
-          deriving stock (Show)
-          deriving newtype (Eq, Ord)
-
-        newtype Email = Email Text
-          deriving stock (Show)
-          deriving newtype (Eq, IsString)
-
-        -- DerivingVia for custom instances
-        newtype Dollars = Dollars Int
-          deriving (Semigroup, Monoid) via (Sum Int)
-      </example>
-    </pattern>
-
-    <pattern name="smart_constructors">
-      <description>Validate data at construction time</description>
-      <example>
-        module Email (Email, mkEmail, unEmail) where
-
-        newtype Email = Email Text
-
-        mkEmail :: Text -> Maybe Email
-        mkEmail t
-          | isValidEmail t = Just (Email t)
-          | otherwise      = Nothing
-      </example>
-    </pattern>
-
-    <pattern name="records">
-      <description>Modern record pattern using NoFieldSelectors + OverloadedRecordDot (since GHC 9.2)</description>
-      <example>
-        {-# LANGUAGE NoFieldSelectors #-}
-        {-# LANGUAGE OverloadedRecordDot #-}
-        data Config = Config
-          { host :: Text
-          , port :: Int
-          , timeout :: Int
-          }
-
-        -- Using OverloadedRecordDot (dot syntax for field access)
-        mkConnection :: Config -> IO Connection
-        mkConnection cfg = connect cfg.host cfg.port
-
-        -- Record update syntax still works
-        withTimeout :: Int -> Config -> Config
-        withTimeout t cfg = cfg { timeout = t }
-      </example>
-      <note>NoFieldSelectors prevents generating top-level field accessor functions, avoiding name clashes. OverloadedRecordDot enables dot-syntax field access. This is the modern standard replacing prefixed field names (configHost, configPort).</note>
-    </pattern>
-  </common_patterns>
-
-  <anti_patterns>
-    <avoid name="partial_functions">
-      <description>Functions that crash on some inputs (head, tail, fromJust, read)</description>
-      <instead>Use safe alternatives (headMay, listToMaybe) or pattern matching</instead>
-    </avoid>
-
-    <avoid name="string_type">
-      <description>Using String ([Char]) for text processing</description>
-      <instead>Use Text or ByteString for performance</instead>
-    </avoid>
-
-    <avoid name="lazy_io">
-      <description>Using lazy IO (readFile, getContents) in production</description>
-      <instead>Use strict IO or streaming (conduit, pipes, streaming)</instead>
-    </avoid>
-
-    <avoid name="orphan_instances">
-      <description>Defining type class instances outside the module of the type or class</description>
-      <instead>Use newtype wrappers or define instances in appropriate modules</instead>
-    </avoid>
-
-    <avoid name="existential_overuse">
-      <description>Overusing ExistentialQuantification to simulate OOP-style polymorphism</description>
-      <instead>Use sum types, type classes with concrete types, or the Handle pattern. Existentials hide type information and make code harder to reason about.</instead>
-      <example_bad>
-        -- Anti-pattern: existential wrapper for heterogeneous collection
-        data AnyShow = forall a. Show a => AnyShow a
-        items :: [AnyShow]
-        items = [AnyShow (1 :: Int), AnyShow "hello"]
-      </example_bad>
-      <example_good>
-        -- Prefer: explicit sum type
-        data Item = ItemInt Int | ItemText Text
-          deriving stock (Show)
-      </example_good>
-    </avoid>
-
-    <avoid name="old_style_records">
-      <description>Using prefixed field names (configHost, personName) to avoid name clashes</description>
-      <instead>Use NoFieldSelectors + OverloadedRecordDot for modern record access</instead>
-    </avoid>
-  </anti_patterns>
-</haskell_language>
-
-<cabal>
-  <project_structure>
-    <standard_layout>
-      .
-      ├── my-project.cabal
-      ├── cabal.project          # Multi-package configuration
-      ├── cabal.project.local    # Local overrides (gitignored)
-      ├── src/
-      │   └── MyProject.hs
-      ├── app/
-      │   └── Main.hs
-      ├── test/
-      │   └── Spec.hs
-      └── bench/
-          └── Bench.hs
-    </standard_layout>
-  </project_structure>
-
-  <cabal_file>
-    <basic_structure>
-      cabal-version: 3.0
-      name:          my-project
-      version:       0.1.0.0
-      synopsis:      Short description
-      license:       MIT
-      author:        Your Name
-      maintainer:    your@email.com
-
-      common warnings
-        ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates
-                     -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
-
-      library
-        import:           warnings
-        exposed-modules:  MyProject
-        build-depends:    base ^>=4.21,
-                          text ^>=2.0,
-                          containers ^>=0.6
-        hs-source-dirs:   src
-        default-language: GHC2024
-
-      executable my-project
-        import:           warnings
-        main-is:          Main.hs
-        build-depends:    base ^>=4.21,
-                          my-project
-        hs-source-dirs:   app
-        default-language: GHC2024
-
-      test-suite my-project-test
-        import:           warnings
-        type:             exitcode-stdio-1.0
-        main-is:          Spec.hs
-        build-depends:    base ^>=4.21,
-                          my-project,
-                          hspec ^>=2.11,
-                          QuickCheck ^>=2.14
-        hs-source-dirs:   test
-        default-language: GHC2024
-    </basic_structure>
-
-    <version_bounds>
-      -- Caret (^>=): major version compatible
-      base ^>=4.22        -- 4.22.x.x (GHC 9.14; base 4.21 is GHC 9.12)
-
-      -- Range
-      text >=2.0 &amp;&amp; &lt;2.2
-
-      -- Any version (avoid in published packages)
-      containers
-    </version_bounds>
-
-    <language_extensions>
-      default-extensions:
-        OverloadedStrings
-        OverloadedRecordDot
-        NoFieldSelectors
-        LambdaCase
-        DerivingStrategies
-        DerivingVia
-        TypeFamilies
-
-      default-language: GHC2024  -- Recommended for new projects (available since GHC 9.10)
-    </language_extensions>
-  </cabal_file>
-
-  <cabal_project>
-    <description>Multi-package project configuration</description>
-    <example>
-      packages: .
-                ./subpackage
-
-      -- Use local package
-      optional-packages: ../local-dependency
-
-      -- Optimization
-      optimization: 2
-
-      -- Documentation
-      documentation: True
-
-      -- Test options
-      tests: True
-
-      -- Allow newer dependencies
-      allow-newer: base
-    </example>
-  </cabal_project>
-
-  <commands>
-    <command name="cabal build">Compile the project</command>
-    <command name="cabal build all">Build all targets</command>
-    <command name="cabal run">Build and run executable</command>
-    <command name="cabal test">Run test suites</command>
-    <command name="cabal repl">Start GHCi with project loaded</command>
-    <command name="cabal haddock">Generate documentation</command>
-    <command name="cabal update">Update package index</command>
-    <command name="cabal freeze">Lock dependency versions</command>
-    <command name="cabal gen-bounds">Generate version bounds</command>
-    <command name="cabal outdated">Check for outdated dependencies</command>
-  </commands>
-
-  <cabal_install>
-    <current_version>cabal-install 3.14+</current_version>
-    <note>Use cabal.project files for multi-package projects and dependency configuration</note>
-  </cabal_install>
-</cabal>
-
-<stack>
-  <project_structure>
-    <standard_layout>
-      .
-      ├── stack.yaml           # Stack project configuration
-      ├── stack.yaml.lock      # Locked dependency versions
-      ├── package.yaml         # hpack format (generates .cabal)
-      └── ... (same as cabal)
-    </standard_layout>
-  </project_structure>
-
-  <stack_yaml>
-    <basic_structure>
-      resolver: lts-23.0  # Stackage LTS snapshot
-
-      packages:
-        - .
-        - ./subpackage
-
-      extra-deps:
-        - some-package-1.0.0
-        - github: owner/repo
-          commit: abc123
-
-      ghc-options:
-        "$locals": -Wall -Werror
-    </basic_structure>
-  </stack_yaml>
-
-  <package_yaml>
-    <description>hpack format; generates .cabal file</description>
-    <example>
-      name: my-project
-      version: 0.1.0.0
-
-      dependencies:
-        - base >= 4.21 &amp;&amp; &lt; 5
-        - text
-        - containers
-
-      ghc-options:
-        - -Wall
-        - -Wcompat
-
-      default-extensions:
-        - OverloadedStrings
-        - LambdaCase
-
-      library:
-        source-dirs: src
-
-      executables:
-        my-project:
-          main: Main.hs
-          source-dirs: app
-          dependencies:
-            - my-project
-
-      tests:
-        my-project-test:
-          main: Spec.hs
-          source-dirs: test
-          dependencies:
-            - my-project
-            - hspec
-            - QuickCheck
-    </example>
-  </package_yaml>
-
-  <commands>
-    <command name="stack build">Compile the project</command>
-    <command name="stack test">Run tests</command>
-    <command name="stack run">Build and run executable</command>
-    <command name="stack ghci">Start GHCi with project loaded</command>
-    <command name="stack haddock">Generate documentation</command>
-    <command name="stack clean">Clean build artifacts</command>
-    <command name="stack upgrade">Upgrade Stack itself</command>
-  </commands>
-
-  <decision_tree name="cabal_vs_stack">
-    <question>Which build tool should I use?</question>
-    <branch condition="Need reproducible builds with Stackage">Stack with LTS resolver</branch>
-    <branch condition="Publishing to Hackage">Cabal (native format)</branch>
-    <branch condition="Complex dependency overrides">Cabal with cabal.project</branch>
-    <branch condition="New to Haskell">Stack (simpler getting started)</branch>
-    <branch condition="Nix integration">Cabal with haskell.nix or nixpkgs</branch>
-  </decision_tree>
-</stack>
-
-<toolchain>
-  <ghc>
-    <description>Glasgow Haskell Compiler</description>
-    <current_version>GHC 9.14.1 (latest major/LTS), GHC 9.12.4 (latest 9.12 bugfix)</current_version>
-
-    <common_options>
-      <option name="-Wall">Enable all warnings</option>
-      <option name="-Werror">Treat warnings as errors</option>
-      <option name="-O2">Optimization level 2</option>
-      <option name="-threaded">Enable threaded runtime</option>
-      <option name="-rtsopts">Enable runtime system options</option>
-      <option name="-with-rtsopts">Set default RTS options</option>
-    </common_options>
-
-    <language_standards>
-      <standard name="Haskell2010">Legacy standard; avoid for new projects</standard>
-      <standard name="GHC2021">Widely supported; enables common extensions</standard>
-      <standard name="GHC2024" recommended="true">Recommended default-language for new projects (available since GHC 9.10; GHC's own default edition remains GHC2021); extends GHC2021 with ExplicitNamespaces, TypeData, MonoLocalBinds, and others</standard>
-    </language_standards>
-
-    <ghc_lts_policy>
-      <description>Starting with GHC 9.14, designated major versions receive LTS status with minimum 2 years of bugfix support. No new features are backported to LTS releases.</description>
-      <current_lts>GHC 9.14 (first LTS release)</current_lts>
-    </ghc_lts_policy>
-
-    <release_cadence>Major releases are made twice a year.</release_cadence>
-  </ghc>
-
-  <hls>
-    <description>Haskell Language Server - IDE support via LSP</description>
-    <features>
-      <feature>Code completion</feature>
-      <feature>Type information on hover</feature>
-      <feature>Go to definition</feature>
-      <feature>Find references</feature>
-      <feature>Code actions (import, qualify)</feature>
-      <feature>Diagnostics (errors, warnings, hlint)</feature>
-      <feature>Code formatting (fourmolu, ormolu, stylish-haskell)</feature>
-    </features>
-
-    <configuration>
-      <file_reference>hls.yaml or hie.yaml</file_reference>
-      cradle:
-        cabal:
-          - path: "src"
-            component: "lib:my-project"
-          - path: "app"
-            component: "exe:my-project"
-          - path: "test"
-            component: "test:my-project-test"
-    </configuration>
-  </hls>
-
-  <formatters>
-    <formatter name="fourmolu" recommended="true">
-      <description>Standard Haskell formatter; ormolu fork with more configuration options. Recommended for new projects.</description>
-      <usage>fourmolu -i src/**/*.hs</usage>
-      <config_file>fourmolu.yaml</config_file>
-    </formatter>
-
-    <formatter name="ormolu">
-      <description>Minimal configuration formatter; fourmolu is preferred for most projects</description>
-      <usage>ormolu -i src/**/*.hs</usage>
-    </formatter>
-
-    <formatter name="stylish-haskell" status="legacy">
-      <description>Configurable import organization and formatting; largely superseded by fourmolu</description>
-      <usage>stylish-haskell -i src/**/*.hs</usage>
-    </formatter>
-  </formatters>
-
-  <linters>
-    <linter name="hlint">
-      <description>Suggest idiomatic Haskell improvements</description>
-      <usage>hlint src/</usage>
-      <configuration>
-        <file_reference>.hlint.yaml</file_reference>
-        - ignore: {name: "Use camelCase"}
-        - warn: {name: "Use head"}
-        - error: {name: "Use String"}
-      </configuration>
-    </linter>
-
-    <linter name="stan">
-      <description>Static analysis for Haskell</description>
-      <usage>stan</usage>
-    </linter>
-
-    <linter name="weeder">
-      <description>Detect dead code</description>
-      <usage>weeder</usage>
-    </linter>
-  </linters>
-</toolchain>
-
-<testing>
-  <hspec>
-    <description>BDD-style testing framework</description>
-    <example>
-      import Test.Hspec
-
-      main :: IO ()
-      main = hspec $ do
-        describe "Calculator" $ do
-          it "adds two numbers" $ do
-            add 1 2 `shouldBe` 3
-
-          it "handles negative numbers" $ do
-            add (-1) 1 `shouldBe` 0
-
-        describe "Parser" $ do
-          context "when input is valid" $ do
-            it "parses successfully" $ do
-              parse "valid" `shouldSatisfy` isRight
-
-          context "when input is invalid" $ do
-            it "returns error" $ do
-              parse "invalid" `shouldSatisfy` isLeft
-    </example>
-
-    <matchers>
-      <matcher name="shouldBe">Equality check</matcher>
-      <matcher name="shouldSatisfy">Predicate check</matcher>
-      <matcher name="shouldReturn">IO action result</matcher>
-      <matcher name="shouldThrow">Exception check</matcher>
-      <matcher name="shouldContain">List containment</matcher>
-    </matchers>
-  </hspec>
-
-  <quickcheck>
-    <description>Property-based testing; generate random test cases</description>
-    <example>
-      import Test.QuickCheck
-
-      prop_reverseReverse :: [Int] -> Bool
-      prop_reverseReverse xs = reverse (reverse xs) == xs
-
-      prop_sortIdempotent :: [Int] -> Bool
-      prop_sortIdempotent xs = sort (sort xs) == sort xs
-
-      -- With preconditions
-      prop_headLast :: NonEmptyList Int -> Bool
-      prop_headLast (NonEmpty xs) = head xs == head xs
-
-      -- Custom generators
-      newtype PositiveInt = PositiveInt Int deriving Show
-
-      instance Arbitrary PositiveInt where
-        arbitrary = PositiveInt . abs &lt;$> arbitrary
-    </example>
-
-    <integration>
-      -- With HSpec
-      describe "reverse" $ do
-        it "is its own inverse" $ property $
-          \xs -> reverse (reverse xs) == (xs :: [Int])
-    </integration>
-  </quickcheck>
-
-  <tasty>
-    <description>Flexible test framework that unifies HUnit, QuickCheck, and other test providers under one runner</description>
-    <example>
-      import Test.Tasty
-      import Test.Tasty.HUnit
-      import Test.Tasty.QuickCheck as QC
-
-      main :: IO ()
-      main = defaultMain tests
-
-      tests :: TestTree
-      tests = testGroup "Tests"
-        [ testCase "Addition" $ 1 + 1 @?= 2
-        , QC.testProperty "reverse/reverse" $ \xs ->
-            reverse (reverse xs) == (xs :: [Int])
-        ]
-    </example>
-    <note>Good choice when combining multiple test providers; hspec is better for BDD-style tests</note>
-  </tasty>
-
-  <hedgehog>
-    <description>Modern property-based testing with integrated shrinking</description>
-    <example>
-      import Hedgehog
-      import qualified Hedgehog.Gen as Gen
-      import qualified Hedgehog.Range as Range
-
-      prop_reverse :: Property
-      prop_reverse = property $ do
-        xs &lt;- forAll $ Gen.list (Range.linear 0 100) Gen.alpha
-        reverse (reverse xs) === xs
-    </example>
-  </hedgehog>
-
-  <best_practices>
-    <practice priority="critical">Use QuickCheck for properties; HSpec for examples</practice>
-    <practice priority="high">Test edge cases: empty lists, zero, negative numbers</practice>
-    <practice priority="high">Use type-driven development; write types first</practice>
-    <practice priority="medium">Use doctest for documentation examples</practice>
-  </best_practices>
-</testing>
-
-<context7_integration>
-  <description>Use Context7 MCP for up-to-date Haskell documentation</description>
-
-  <haskell_libraries>
-    <!-- Verified Context7 IDs (Hackage format) -->
-    <library name="Servant" id="/haskell-servant/servant" />
-    <library name="Optics" id="/websites/hackage_haskell_package_optics-0_4_2_1" />
-    <library name="HSpec" id="/websites/hackage_haskell_package_hspec-2_11_12" />
-    <library name="Hedgehog" id="/websites/hackage-content_haskell_package_hedgehog-1_7" />
-    <library name="Aeson" id="/websites/hackage_haskell_package_aeson-2_2_3_0" />
-    <library name="Criterion" id="/haskell/criterion" />
-    <library name="Haskell LSP" id="/haskell/lsp" />
-    <library name="HTTP Client" id="/snoyberg/http-client" />
-    <!-- Note: mtl, transformers, lens, QuickCheck not indexed in Context7 -->
-    <!-- Use Hackage directly for these: hackage.haskell.org/package/{name} -->
-  </haskell_libraries>
-
-  <usage_patterns>
-    <pattern name="optics_usage">
-      <step order="1">
-  <action>resolve-library-id libraryName="optics haskell"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-      <step order="1">
-  <action>query-docs libraryId="/websites/hackage_haskell_package_optics-0_4_2_1" query="lenses"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    </pattern>
-
-    <pattern name="testing_framework">
-      <step order="1">
-  <action>query-docs libraryId="/websites/hackage_haskell_package_hspec-2_11_12" query="expectations"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    </pattern>
-
-    <pattern name="web_framework">
-      <step order="1">
-  <action>query-docs libraryId="/haskell-servant/servant" query="server"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    </pattern>
-  </usage_patterns>
-</context7_integration>
-
-<best_practices>
-  <practice priority="critical">Let types guide design; use the type system to prevent errors</practice>
-  <practice priority="critical">Avoid partial functions; use safe alternatives</practice>
-  <practice priority="critical">Run hlint and fix suggestions before committing</practice>
-  <practice priority="high">Use Text/ByteString instead of String for performance</practice>
-  <practice priority="high">Prefer mtl-style or effectful constraints over concrete monad stacks</practice>
-  <practice priority="high">Write property-based tests for core logic</practice>
-  <practice priority="medium">Document exported functions with Haddock comments</practice>
-  <practice priority="medium">Use newtypes for type safety</practice>
-  <practice priority="medium">Enable GHC2024 as default-language for new projects</practice>
-  <practice priority="medium">Use NoFieldSelectors + OverloadedRecordDot for records</practice>
-  <practice priority="medium">Use DerivingStrategies and DerivingVia for deriving instances</practice>
-</best_practices>
-
-<rules priority="critical">
-  <rule>Run hlint before committing; address all suggestions</rule>
-  <rule>Avoid partial functions (head, tail, fromJust); use safe alternatives</rule>
-  <rule>Use types to encode invariants; make illegal states unrepresentable</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use fourmolu for consistent formatting (standard formatter)</rule>
-  <rule>Prefer Text over String for text processing</rule>
-  <rule>Write HSpec tests for behavior; QuickCheck for properties</rule>
-  <rule>Use explicit type signatures for top-level definitions</rule>
-</rules>
-
-<workflow>
-  <phase name="analyze">
-    <objective>Understand Haskell code requirements</objective>
-    <step order="1">
-  <action>1. Check cabal file or package.yaml for project configuration</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Review existing types and type classes</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Identify monad transformer requirements</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>4. Check for type-level programming needs</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="implement">
-    <objective>Write pure, type-safe Haskell code</objective>
-    <step order="1">
-  <action>1. Design with types first; let types guide implementation</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Use appropriate abstractions (Functor, Applicative, Monad)</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Handle errors with Maybe/Either/ExceptT</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>4. Write property-based tests for core logic</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="validate">
-    <objective>Verify Haskell code correctness</objective>
-    <step order="1">
-  <action>1. Run cabal build or stack build</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Run hlint for suggestions</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Run cabal test or stack test</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>4. Check formatting with fourmolu/ormolu</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-</workflow>
-
-<error_escalation>
-  <examples>
-    <example severity="low">HLint suggestion about style</example>
-    <example severity="medium">Type error or missing instance</example>
-    <example severity="high">Breaking change in public API</example>
-    <example severity="critical">Partial function usage or unsafe code in library</example>
-  </examples>
-</error_escalation>
-
-<constraints>
-  <must>Use types to encode invariants</must>
-  <must>Avoid partial functions in library code</must>
-  <must>Follow Haskell style conventions</must>
-  <avoid>Using String for text processing</avoid>
-  <avoid>Lazy IO in production code</avoid>
-  <avoid>Orphan instances</avoid>
-</constraints>
-
-<related_skills>
-  <skill name="serena-usage">Navigate type class hierarchies and module structure</skill>
-  <skill name="context7-usage">Fetch Haskell documentation and library references</skill>
-  <skill name="investigation-patterns">Debug type errors, missing instances, and performance issues</skill>
-  <skill name="nix-ecosystem">haskell.nix integration and nixpkgs Haskell infrastructure</skill>
-</related_skills>
-<related_agents>
-  <agent name="explore">Locate code patterns and references in this skill domain</agent>
-  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
-  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
-</related_agents>
+Patterns for the GHC toolchain and Cabal/Stack build hazards, version-specific language behavior, and the traps
+that break Haskell code silently rather than at compile time.
+
+## Type-level programming
+
+GADTs, type families, and DataKinds refine what the compiler can prove; reach for them only when a plain ADT
+plus a smart constructor cannot express the invariant — each one narrows what compiles, so an overused one turns
+ordinary refactors into type-level puzzles for the next reader.
+
+```haskell
+{-# LANGUAGE GADTs #-}
+data Expr a where
+  LitInt  :: Int -> Expr Int
+  LitBool :: Bool -> Expr Bool
+  Add     :: Expr Int -> Expr Int -> Expr Int
+  If      :: Expr Bool -> Expr a -> Expr a -> Expr a
+```
+
+**Existentials erase type information at the point they're packed**, so prefer an explicit sum type
+(`data Item = ItemInt Int | ItemText Text`) over `data AnyShow = forall a. Show a => AnyShow a` for
+heterogeneous collections — the sum type keeps pattern matching exhaustive and GHC's -Wincomplete-patterns
+useful; the existential does not.
+
+## Effect systems and monad transformers
+
+mtl-style constraints (`MonadReader`, `MonadState`, `MonadError`) still work but **each transformer layer wraps
+the next in a newtype**, and every `lift` through that wrapping costs allocation. `effectful` avoids the
+wrapping and gives sharper error messages — prefer it for new projects where performance matters; keep mtl in an
+existing codebase rather than migrating wholesale. `bluefin` trades the type-level effect list for
+handle-passing; treat it as experimental rather than a default choice.
+
+`ListT` from `transformers` has broken semantics for non-determinism (it does not commute with the inner monad
+correctly) — use `list-t` or `logict` instead.
+
+## Linear types
+
+`LinearTypes` has been stable since GHC 9.0 and enforces exactly-once use at the type level (`a %1 -> b`,
+`Handle %1 -> IO a`). It matters for resource-safe APIs and hot paths; the annotation overhead is not worth
+paying in ordinary application code.
+
+## Records: NoFieldSelectors + OverloadedRecordDot
+
+Since GHC 9.2 this is the standard replacing prefixed field names (`configHost`, `personName`).
+**`NoFieldSelectors` suppresses the top-level accessor functions that would otherwise clash** across records
+sharing a field name; `OverloadedRecordDot` restores access via `cfg.host`. Mixing the old prefixed convention
+into a codebase that has already adopted this pattern reintroduces the exact clash the extension exists to
+avoid.
+
+## Silent traps
+
+- **Partial functions** (`head`, `tail`, `fromJust`, `read`) crash at a call site the type signature gives no
+  warning about, because the type checker cannot see the missing case — pattern-match or use
+  `listToMaybe`/`headMay` instead.
+- **`String` (`[Char]`)** is a linked list of boxed `Char` cons cells, so every character costs a heap
+  allocation; use `Text`/`ByteString` once volume matters.
+- **Lazy IO** (`readFile`, `getContents`) ties the file handle's lifetime to how the caller happens to force the
+  result, not to where the code appears to close it — the handle can stay open (or the read can throw) well
+  past the function that looks like it owns the resource. Use strict IO or streaming (`conduit`, `pipes`,
+  `streaming`) in production.
+- **Orphan instances** (defined outside the module of both the class and the type) compile cleanly in isolation
+  and conflict silently the instant two libraries define the same orphan — GHC accepts one without a
+  disambiguation error unless `-Wall`'s `-Worphans` catches it first.
+- **Unbounded dependencies** (a bare `containers` with no version constraint) build today and break on the next
+  `cabal update`/`stack build` the moment a future major release changes an API in use, with no local diff to
+  explain why.
+
+## Cabal
+
+`cabal.project` scope hazards:
+
+```
+packages: .
+          ./subpackage
+optional-packages: ../local-dependency   -- silently skipped if missing; packages: fails hard instead
+allow-newer: base                        -- overrides ALL bounds mentioning base, not just the direct dependency
+```
+
+Version bounds use `^>=` (PVP-compatible caret: pins the major version) — `base ^>=4.22` means `4.22.x.x` and
+maps to GHC 9.14; `base ^>=4.21` maps to GHC 9.12.
+
+Commands:
+```
+cabal build all      # builds every target, not just the default component
+cabal freeze          # locks the resolved plan into cabal.project.freeze
+cabal gen-bounds       # proposes PVP bounds from the resolved plan
+cabal outdated
+```
+
+cabal-install 3.14+.
+
+## Stack
+
+`stack.yaml` pins a Stackage LTS resolver; `extra-deps` adds packages the resolver excludes, including Git pins
+(`github: owner/repo` + `commit:`). **`ghc-options: "$locals": -Wall -Werror` applies only to packages under
+`packages:`, not to `extra-deps`** — a warning that would fail the build in local code passes silently in a
+vendored extra-dep with the identical warning.
+
+`package.yaml` (hpack) regenerates the `.cabal` file on every build; editing the generated `.cabal` directly is
+overwritten on the next `stack build` with no warning that the edit was lost.
+
+Cabal vs Stack: Stack for Stackage-pinned reproducibility or onboarding simplicity; Cabal (`cabal.project`) for
+Hackage publishing or fine-grained dependency overrides; `haskell.nix`/nixpkgs for Nix-integrated builds under
+either.
+
+## Toolchain
+
+GHC 9.14.1 is the latest major and the first release under the LTS policy (minimum two years of bugfix-only
+support, no backported features); GHC 9.12.4 is the latest 9.12 bugfix. Majors release twice a year.
+
+`default-language: GHC2024` (available since GHC 9.10) extends GHC2021 with `ExplicitNamespaces`, `TypeData`,
+`MonoLocalBinds`, and others. **GHC's own compiler default is still GHC2021**, not GHC2024 — set the language
+edition explicitly per package rather than relying on the compiler default.
+
+Formatters: `fourmolu` (ormolu fork, configured via `fourmolu.yaml`) is the recommended default; `ormolu` for
+zero-configuration formatting; `stylish-haskell` is legacy, superseded by fourmolu.
+
+Linters: `hlint src/` for idiomatic suggestions (per-rule severity in `.hlint.yaml`); `weeder` for dead code;
+`stan` for broader static analysis.
+
+## Testing
+
+`cabal test` / `stack test` run whichever `test-suite`/`tests:` stanza is declared — a stanza that exists but is
+never referenced by `packages:`/`tests: True` builds nothing and reports no failure. Use QuickCheck or Hedgehog
+for properties, HSpec for example-based behavior, Tasty when one runner must unify HUnit, QuickCheck, and other
+providers. Hedgehog's generators shrink automatically via integrated `Range`s; QuickCheck's `Arbitrary`
+instances need a manually written `shrink` for anything beyond the types with built-in instances, or a failing
+case reports itself unshrunk and much harder to read.
+
+## Related
+
+- [context7-usage](../context7-usage/SKILL.md) — fetch current Hackage/library docs. `mtl`, `transformers`,
+  `lens`, and `QuickCheck` are not indexed in Context7; use hackage.haskell.org/package/{name} directly for
+  those instead.
+- [investigation-patterns](../investigation-patterns/SKILL.md) — debug type errors, missing instances, and
+  performance issues.
+- [nix-ecosystem](../nix-ecosystem/SKILL.md) — haskell.nix integration and nixpkgs Haskell infrastructure.
+- [serena-usage](../serena-usage/SKILL.md) — navigate type class hierarchies and module structure by symbol
+  rather than by text search.
