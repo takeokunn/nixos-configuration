@@ -1,1052 +1,379 @@
 ---
-name: C Ecosystem
+name: c-ecosystem
 description: Use for C projects - C11/C17/C23 language patterns, Makefile, gcc/clang toolchain, valgrind, getopt, memory management, and CLI development.
-version: 2.1.0
+version: 3.0.0
 ---
 
-<purpose>
-Provide comprehensive patterns for C23 and modern C language, memory management, toolchain configuration, and CLI tool development.
-</purpose>
+Patterns for C23 and modern C: language features, memory management, toolchain configuration, and CLI
+development. Assumes familiarity with C syntax and pointers.
 
-<toolchain>
-  <compilers>
-    <compiler name="gcc">
-      <description>GNU Compiler Collection. GCC 15: C23 (gnu23) is the default mode. C23 support is essentially feature-complete. GCC 8-14 defaulted to C17 (gnu17).</description>
-      <flags>
-        <flag name="-std=c23">Enable C23 standard (recommended default)</flag>
-        <flag name="-std=gnu23">C23 with GNU extensions (GCC 15 default)</flag>
-        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
-        <flag name="-Werror">Treat warnings as errors</flag>
-        <flag name="-Wshadow">Warn on variable shadowing</flag>
-        <flag name="-Wconversion">Warn on implicit conversions</flag>
-        <flag name="-Wstrict-prototypes">Require function prototypes</flag>
-        <flag name="-fanalyzer">Static analysis (GCC 10+)</flag>
-      </flags>
-    </compiler>
+## Toolchain
 
-    <compiler name="clang">
-      <description>LLVM C compiler. Clang 18+: supports -std=c23. Clang 19+: supports -std=c2y (post-C23).</description>
-      <flags>
-        <flag name="-std=c23">Enable C23 standard (recommended default, Clang 18+)</flag>
-        <flag name="-std=c2y">Enable post-C23 draft standard (Clang 19+)</flag>
-        <flag name="-Wall -Wextra -Wpedantic">Comprehensive warnings</flag>
-        <flag name="-Werror">Treat warnings as errors</flag>
-        <flag name="-Weverything">All warnings (use selectively)</flag>
-      </flags>
-    </compiler>
-  </compilers>
+**gcc**: GCC 15 defaults to `-std=gnu23`; C23 support is feature-complete there. GCC 8-14 default to
+`gnu17`. Use `-std=c23` (or `gnu23`) explicitly rather than relying on the default across compiler versions.
+Flags: `-Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wstrict-prototypes -fanalyzer` (GCC 10+
+static analysis).
 
-  <sanitizers>
-    <sanitizer name="AddressSanitizer">
-      <description>Memory error detection (buffer overflow, use-after-free)</description>
-      <flags>-fsanitize=address -fno-omit-frame-pointer</flags>
-      <example>
-gcc -fsanitize=address -fno-omit-frame-pointer -g -o myapp myapp.c
-      </example>
-    </sanitizer>
+**clang**: `-std=c23` from Clang 18+, `-std=c2y` (post-C23 draft) from Clang 19+. Same warning set;
+`-Weverything` is useful for one-off audits but too noisy to run in CI unbounded.
 
-    <sanitizer name="UndefinedBehaviorSanitizer">
-      <description>Undefined behavior detection</description>
-      <flags>-fsanitize=undefined</flags>
-      <example>
-gcc -fsanitize=undefined -g -o myapp myapp.c
-      </example>
-    </sanitizer>
+### Sanitizers
 
-    <sanitizer name="ThreadSanitizer">
-      <description>Data race detection</description>
-      <flags>-fsanitize=thread</flags>
-      <note>Cannot be combined with AddressSanitizer</note>
-    </sanitizer>
+- **AddressSanitizer** (`-fsanitize=address -fno-omit-frame-pointer -g`): catches buffer overflow,
+  use-after-free. Cannot combine with ThreadSanitizer.
+- **UndefinedBehaviorSanitizer** (`-fsanitize=undefined -g`): catches signed overflow, misaligned access,
+  null-pointer UB that a normal build silently miscompiles around instead of crashing on.
+- **ThreadSanitizer** (`-fsanitize=thread`): data-race detection. Mutually exclusive with ASan.
+- **MemorySanitizer** (`-fsanitize=memory`, Clang only): flags reads of uninitialized memory, which ASan
+  and UBSan do not catch because uninitialized-but-in-bounds reads are not memory-safety violations to them.
 
-    <sanitizer name="MemorySanitizer">
-      <description>Uninitialized memory read detection (Clang only)</description>
-      <flags>-fsanitize=memory</flags>
-    </sanitizer>
-  </sanitizers>
+### Static and runtime analysis
 
-  <static_analysis>
-    <tool name="clang-format">
-      <description>Clang-based code formatter for consistent style</description>
-      <usage>clang-format -i src/*.c include/*.h</usage>
-      <configuration>
-        <file_reference>.clang-format</file_reference>
-BasedOnStyle: LLVM
-IndentWidth: 4
-ColumnLimit: 100
-SortIncludes: CaseInsensitive
-      </configuration>
-    </tool>
+- `clang-format -i src/*.c include/*.h` — formatter; project `.clang-format` sets style, indent, column
+  limit, include ordering.
+- `clang-tidy src/*.c -- -std=c23` — linter; project `.clang-tidy` scopes checks and can mark them
+  `WarningsAsErrors`.
+- `cppcheck --enable=all --error-exitcode=1 src/` — separate static-analysis engine, catches classes of bug
+  clang-tidy's checks don't cover (e.g. some resource-leak patterns).
+- `valgrind --leak-check=full --show-leak-kinds=all ./myapp` (memcheck, the default tool) finds leaks and
+  invalid accesses **at runtime, on the exact code path exercised** — it proves nothing about paths not
+  run, unlike a sanitizer instrumented into every path at compile time. `helgrind` for thread errors,
+  `cachegrind`/`callgrind` for profiling.
 
-    <tool name="clang-tidy">
-      <description>Clang-based linter and static analyzer</description>
-      <usage>clang-tidy src/*.c -- -std=c23</usage>
-      <configuration>
-        <file_reference>.clang-tidy</file_reference>
-Checks: > -*,
-bugprone-_,
-clang-analyzer-_,
-misc-_,
-performance-_,
-readability-\*,
--readability-identifier-length
+### Testing
 
-WarningsAsErrors: '\*'
-      </configuration>
-    </tool>
+Check or Unity for minimal-dependency unit testing, Unity specifically for embedded/resource-constrained
+targets, cmocka for BDD style.
 
-    <tool name="cppcheck">
-      <description>Static analysis tool for C/C++</description>
-      <usage>cppcheck --enable=all --error-exitcode=1 src/</usage>
-    </tool>
-
-    <tool name="valgrind">
-      <description>Runtime memory error detection</description>
-      <usage>valgrind --leak-check=full --show-leak-kinds=all ./myapp</usage>
-      <tools>
-        <tool name="memcheck">Memory error detection (default)</tool>
-        <tool name="helgrind">Thread error detection</tool>
-        <tool name="cachegrind">Cache profiling</tool>
-        <tool name="callgrind">Call graph profiling</tool>
-      </tools>
-    </tool>
-  </static_analysis>
-
-  <testing>
-    <decision_tree name="framework_selection">
-      <question>What testing style do you prefer?</question>
-      <branch condition="Simple, minimal dependencies">Use Check or Unity</branch>
-      <branch condition="BDD-style">Use cmocka</branch>
-      <branch condition="Embedded/resource-constrained">Use Unity (smallest footprint)</branch>
-    </decision_tree>
-
-    <framework name="Check">
-      <description>Unit testing framework for C</description>
-      <example>
-#include &lt;check.h&gt;
+```c
+#include <check.h>
 
 START_TEST(test_addition) {
-ck_assert_int_eq(1 + 1, 2);
+    ck_assert_int_eq(1 + 1, 2);
 }
 END_TEST
 
 Suite *math_suite(void) {
-Suite *s = suite_create("Math");
-TCase \*tc = tcase_create("Core");
-tcase_add_test(tc, test_addition);
-suite_add_tcase(s, tc);
-return s;
+    Suite *s = suite_create("Math");
+    TCase *tc = tcase_create("Core");
+    tcase_add_test(tc, test_addition);
+    suite_add_tcase(s, tc);
+    return s;
 }
 
 int main(void) {
-Suite *s = math_suite();
-SRunner *sr = srunner_create(s);
-srunner_run_all(sr, CK_NORMAL);
-int failed = srunner_ntests_failed(sr);
-srunner_free(sr);
-return failed ? EXIT_FAILURE : EXIT_SUCCESS;
+    Suite *s = math_suite();
+    SRunner *sr = srunner_create(s);
+    srunner_run_all(sr, CK_NORMAL);
+    int failed = srunner_ntests_failed(sr);
+    srunner_free(sr);
+    return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-      </example>
-    </framework>
-  </testing>
-</toolchain>
+```
 
-<build_systems>
-  <decision_tree name="build_system_selection">
-    <question>What is your project's complexity and portability needs?</question>
-    <branch condition="Simple project, Unix-only">Use Make</branch>
-    <branch condition="Cross-platform, dependencies">Use CMake or Meson</branch>
-    <branch condition="Modern, fast builds">Use Meson</branch>
-  </decision_tree>
+## Build systems
 
-  <make>
-    <pattern name="simple_makefile">
-      <description>Basic Makefile for C projects</description>
-      <example>
-CC := gcc
-CFLAGS := -std=c23 -Wall -Wextra -Wpedantic -g
-LDFLAGS :=
-LDLIBS :=
+Make for simple Unix-only projects, CMake or Meson for cross-platform/dependency-heavy projects, Meson
+specifically when build speed matters.
 
-SRCS := $(wildcard src/\*.c)
-OBJS := $(SRCS:.c=.o)
-TARGET := myapp
+The flag set worth pinning in any of them is `-std=c23 -Wall -Wextra -Wpedantic -Werror`; the skeleton around
+it is not worth restating.
 
-.PHONY: all clean
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-%.o: %.c
-$(CC) $(CFLAGS) -c -o $@ $&lt;
-
-clean:
-rm -f $(OBJS) $(TARGET)
-      </example>
-    </pattern>
-  </make>
-
-  <cmake>
-    <pattern name="modern_cmake">
-      <description>Modern CMake for C projects</description>
-      <example>
+```cmake
 cmake_minimum_required(VERSION 3.30)
 project(myapp VERSION 1.0.0 LANGUAGES C)
-
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
-
 add_executable(myapp src/main.c src/utils.c)
-target_include_directories(myapp PRIVATE include)
-
 target_compile_options(myapp PRIVATE
-$&lt;$&lt;C_COMPILER_ID:GNU,Clang&gt;:
--Wall -Wextra -Wpedantic -Werror
-&gt;
-)
-      </example>
-      <note>For detailed CMake patterns, see cplusplus-ecosystem skill</note>
-    </pattern>
-  </cmake>
+  $<$<C_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>)
+```
 
-  <meson>
-    <pattern name="meson_build">
-      <description>Meson build for C projects</description>
-      <example>
-# meson.build
+For detailed CMake patterns see the cplusplus-ecosystem skill.
+
+```meson
 project('myapp', 'c',
-version: '1.0.0',
-default_options: [
-'c_std=c23',
-'warning_level=3',
-'werror=true',
-]
-)
+  version: '1.0.0',
+  default_options: ['c_std=c23', 'warning_level=3', 'werror=true'])
+executable('myapp', files('src/main.c', 'src/utils.c'), include_directories: include_directories('include'))
+```
 
-src = files('src/main.c', 'src/utils.c')
-inc = include_directories('include')
+## Language: version-specific behavior
 
-executable('myapp', src, include_directories: inc)
-      </example>
-    </pattern>
-  </meson>
-</build_systems>
+**C11** (ISO/IEC 9899:2011): `_Generic` type-generic selection, `_Atomic`, `_Thread_local`, `_Static_assert`,
+`_Alignas`/`_Alignof`, `_Noreturn`, anonymous struct/union members.
 
-<c_language>
-  <standards_evolution>
-    <standard name="C11">
-      <description>ISO/IEC 9899:2011 - Major modernization with threading and type-generic features</description>
-      <features>
-        <feature name="_Generic">Type-generic selection for polymorphic macros</feature>
-        <feature name="_Atomic">Atomic types and operations for lock-free programming</feature>
-        <feature name="_Thread_local">Thread-local storage duration</feature>
-        <feature name="_Static_assert">Compile-time assertions</feature>
-        <feature name="_Alignas">Alignment specifier for variables and types</feature>
-        <feature name="_Alignof">Query alignment requirements</feature>
-        <feature name="_Noreturn">Function that does not return</feature>
-        <feature name="anonymous_structs_unions">Unnamed struct/union members</feature>
-      </features>
-    </standard>
+**C17** (ISO/IEC 9899:2018): bugfix-only release, no new features. `__STDC_VERSION__` is `201710L`.
+`ATOMIC_VAR_INIT` deprecated.
 
-    <standard name="C17">
-      <description>ISO/IEC 9899:2018 - Bug fix release with no new features</description>
-      <changes>
-        <change>__STDC_VERSION__ updated to 201710L</change>
-        <change>Defect reports resolved</change>
-        <change>ATOMIC_VAR_INIT deprecated</change>
-      </changes>
-    </standard>
+**C23** (ISO/IEC 9899:2024, published 2024-10-31, GCC 15 default): the current standard, with meaningful
+C++-alignment changes that change what "correct" code looks like.
 
-    <standard name="C23">
-      <description>ISO/IEC 9899:2024 - Published October 31, 2024. Current C standard. Default in GCC 15 (gnu23). Significant modernization with C++ alignment.</description>
-      <features>
-        <feature name="nullptr">Null pointer constant with nullptr_t type</feature>
-        <feature name="typeof">Type inference operator</feature>
-        <feature name="constexpr">Compile-time constant objects</feature>
-        <feature name="auto">Type inference for variables</feature>
-        <feature name="binary_literals">0b prefix for binary literals</feature>
-        <feature name="digit_separators">Single quote separator in numeric literals</feature>
-        <feature name="attributes">[[nodiscard]], [[maybe_unused]], [[deprecated]], [[fallthrough]], [[noreturn]]</feature>
-        <feature name="bool_true_false">bool, true, false as keywords</feature>
-        <feature name="embed">#embed directive for binary resource inclusion</feature>
-        <feature name="static_assert">Single argument form (no message required)</feature>
-        <feature name="typeof_unqual">typeof_unqual for unqualified type inference</feature>
-        <feature name="elifdef">#elifdef and #elifndef preprocessor directives</feature>
-        <feature name="labels_end_of_block">Labels allowed at end of compound statements</feature>
-      </features>
-    </standard>
-  </standards_evolution>
+- `nullptr` / `nullptr_t` — **use this over `NULL`**: `NULL` is an integer-constant macro, so it participates
+  in integer promotion and varargs ambiguity in ways `nullptr` cannot.
+- `auto` now performs type inference for variable declarations, not just as a storage-class no-op.
+- `constexpr` applies **only to object definitions**, not functions (unlike C++) — `constexpr int MAX = 1024;`
+  is compile-time-constant in a way `#define` and even `const` are not (no memory, no runtime read).
+- `typeof` / `typeof_unqual` standardized.
+- `{}` performs zero-initialization for any type, including VLAs.
+- `#embed` directive (plus `__has_embed`) embeds a binary resource as an initializer list at translate time,
+  replacing the old objcopy/xxd-into-header workaround.
+- `static_assert` takes a single argument (message no longer required).
+- Digit separators: `1'000'000`, `0xFF'FF'FF'FF`.
+- `#elifdef` / `#elifndef` preprocessor directives.
+- Labels are now permitted at the end of a compound statement (before the closing brace) — previously a
+  `label:` immediately before `}` was a constraint violation.
+- Attributes: `[[nodiscard]]`, `[[maybe_unused]]`, `[[deprecated("...")]]`, `[[fallthrough]]`, `[[noreturn]]`,
+  `[[reproducible]]`, `[[unsequenced]]`. `[[nodiscard]]` on a function whose return value encodes an error
+  (e.g. an allocation result) turns a silently-ignored failure into a compiler warning.
+- `bool`/`true`/`false` are keywords, not `stdbool.h` macros.
+- **Implicit function declarations are a hard error in C23** (removed as a feature in C99, but many
+  toolchains still only warned until C23 made it a constraint violation) — a call to an undeclared function
+  that previously default-returned `int` and often crashed at link time or worse at runtime now fails to
+  compile instead.
 
-  <c23_features>
-    <description>C23 (ISO/IEC 9899:2024) is the current C standard. Default in GCC 15.</description>
-    <feature name="embed_directive">
-      <description>#embed directive for binary resource inclusion and __has_embed for availability checking.</description>
-      <example>
-        const unsigned char icon[] = {
-          #embed "icon.png"
-        };
-      </example>
-    </feature>
-    <feature name="auto_type_inference">
-      <description>auto keyword now causes type inference (in addition to storage class specifier).</description>
-      <example>
-        auto x = 42; // x is int
-      </example>
-    </feature>
-    <feature name="zero_initialization">
-      <description>Zero initialization with {} for any type including VLAs.</description>
-      <example>
-        int arr[10] = {};
-      </example>
-    </feature>
-    <feature name="typeof_operator">
-      <description>typeof and typeof_unqual operators standardized.</description>
-    </feature>
-    <feature name="nullptr">
-      <description>nullptr constant and nullptr_t type (replacing NULL macro ambiguity).</description>
-    </feature>
-    <feature name="bool_true_false">
-      <description>bool, true, false are now keywords (no longer macros from stdbool.h).</description>
-    </feature>
-    <feature name="elifdef">
-      <description>#elifdef and #elifndef preprocessor directives.</description>
-    </feature>
-    <feature name="constexpr">
-      <description>constexpr for object definitions (compile-time constants). Unlike C++, only applies to objects, not functions.</description>
-      <example>
-        constexpr int MAX_SIZE = 1024;
-      </example>
-    </feature>
-    <feature name="attributes">
-      <description>Standard attributes: [[nodiscard]], [[maybe_unused]], [[deprecated]], [[fallthrough]], [[noreturn]], [[reproducible]], [[unsequenced]].</description>
-      <example>
-        [[nodiscard]] int compute(int x);
-        [[maybe_unused]] static void helper(void) { }
-        [[deprecated("use new_func instead")]] void old_func(void);
-      </example>
-    </feature>
-    <feature name="static_assert_single_arg">
-      <description>static_assert with single argument (no message string required).</description>
-      <example>
-        static_assert(sizeof(int) >= 4);
-      </example>
-    </feature>
-    <feature name="digit_separators">
-      <description>Single quote as digit separator in numeric literals for readability.</description>
-      <example>
-        int million = 1'000'000;
-        unsigned hex = 0xFF'FF'FF'FF;
-      </example>
-    </feature>
-    <feature name="labels_end_of_block">
-      <description>Labels are now allowed at end of compound statements (before closing brace).</description>
-      <example>
-        void f(void) {
-            goto done;
-            // ...
-        done:
-        }
-      </example>
-    </feature>
-  </c23_features>
+### Type system
 
-  <type_system>
-    <concept name="integer_types">
-      <description>Fixed-width integer types from stdint.h</description>
-      <types>
-        <type name="int8_t, int16_t, int32_t, int64_t">Exact-width signed integers</type>
-        <type name="uint8_t, uint16_t, uint32_t, uint64_t">Exact-width unsigned integers</type>
-        <type name="intptr_t, uintptr_t">Pointer-sized integers</type>
-        <type name="size_t">Unsigned size type for memory operations</type>
-        <type name="ptrdiff_t">Signed pointer difference type</type>
-      </types>
-      <example>
-#include &lt;stdint.h&gt;
-#include &lt;stddef.h&gt;
+Fixed-width types from `<stdint.h>` (`int8_t`…`uint64_t`, `intptr_t`/`uintptr_t`, `size_t`, `ptrdiff_t`) —
+use these over `int`/`long` whenever a wire format, struct layout, or overflow boundary matters.
 
-uint32_t compute_hash(const uint8_t \*data, size_t len);
-      </example>
-    </concept>
+`_Generic` dispatches by argument type at compile time, giving a type-safe generic interface without `void*`:
 
-    <concept name="type_generic_selection">
-      <description>_Generic for type-based dispatch (C11)</description>
-      <example>
+```c
 #define print_value(x) _Generic((x), \
-int: print_int, \
-double: print_double, \
-char *: print_string, \
-default: print_unknown \
-)(x)
-      </example>
-      <use_case>Implement type-safe generic interfaces without void pointers</use_case>
-    </concept>
+    int: print_int, double: print_double, char *: print_string, default: print_unknown)(x)
+```
 
-    <concept name="compound_literals">
-      <description>Anonymous compound literals for in-place struct/array creation</description>
-      <example>
-struct point { int x, y; };
-void draw(struct point p);
+Compound literals create anonymous struct/array values in place: `draw((struct point){.x = 10, .y = 20});`,
+`int *arr = (int[]){1, 2, 3, 4, 5};`. Designated initializers name fields explicitly and leave the rest
+zero-initialized, which is why they should be preferred over positional struct literals — a field added to
+the struct later doesn't silently shift every positional initializer after it.
 
-draw((struct point){.x = 10, .y = 20});
+### Concurrency
 
-int \*arr = (int[]){1, 2, 3, 4, 5};
-      </example>
-    </concept>
+`_Atomic` for lock-free counters, pthreads for anything needing real synchronization primitives (mutexes,
+condition variables). `atomic_fetch_add`/`atomic_load` operate on `_Atomic int` without a lock. `_Thread_local`
+gives per-thread storage duration, e.g. a thread-local `errno`-style value.
 
-    <concept name="designated_initializers">
-      <description>Named field initialization for structs and arrays</description>
-      <example>
-struct config {
-int timeout;
-bool verbose;
-const char *name;
-};
+### Undefined behavior
 
-struct config cfg = {
-.name = "myapp",
-.timeout = 30,
-.verbose = true,
-};
-      </example>
-    </concept>
-  </type_system>
+The categories that matter because **the compiler is licensed to assume they never happen**, and optimizes
+on that assumption rather than trapping it:
 
-  <concurrency>
-    <decision_tree name="when_to_use">
-      <question>Do you need thread-safe operations?</question>
-      <if_yes>Use _Atomic for simple counters, pthreads for complex synchronization</if_yes>
-      <if_no>Single-threaded sequential execution</if_no>
-    </decision_tree>
+- **Memory**: null-pointer dereference, use-after-free, buffer overflow, double-free.
+- **Arithmetic**: signed integer overflow (unlike unsigned, which wraps by defined semantics), division by
+  zero, shift by an amount ≥ the type's width.
+- **Aliasing**: strict-aliasing violations, type punning through anything other than a union.
+- **Sequencing**: modifying the same object twice between sequence points (e.g. `i = i++ + 1;`).
 
-    <concept name="atomics">
-      <description>Lock-free atomic operations (C11)</description>
-      <example>
-#include &lt;stdatomic.h&gt;
+ASan/UBSan turn these from silent miscompilation into a crash at the point of violation — run them during
+development, not just before release, since the failure point they report is often far from where the bug
+would otherwise first manifest.
 
-\_Atomic int counter = 0;
+### Traps that don't announce themselves
 
-void increment(void) {
-atomic_fetch_add(&amp;counter, 1);
-}
+- `strncpy` does **not** null-terminate the destination when the source is `>=` the given size — it is not
+  a safe drop-in for `strcpy`. Use `snprintf` for string construction instead.
+- `sprintf` has no bounds checking; use `snprintf` with an explicit buffer size.
+- `gets()` has no bounds checking and is removed from the standard; use `fgets()`.
+- `scanf("%s", buf)` is as unbounded as `gets()`; use a width specifier (`%Ns`) or `fgets` + `sscanf`.
+- Passing user input as a format string (`printf(user_input)`) is a format-string vulnerability; always
+  `printf("%s", user_input)`.
+- An unchecked `malloc` return doesn't crash immediately — the crash happens later, at the first dereference,
+  far from the allocation site.
 
-int get_count(void) {
-return atomic_load(&amp;counter);
-}
-      </example>
-    </concept>
+## Memory management
 
-    <concept name="thread_local">
-      <description>Thread-local storage (C11)</description>
-      <example>
-#include &lt;threads.h&gt;
+Choice of allocator follows lifetime and access pattern: stack/VLA for short-lived function-scoped data,
+`malloc`/`free` with a single clear owner for long-lived single-owner data, an arena for many allocations
+freed together (parsers, compilers, per-request state), a pool for fixed-size objects needing O(1)
+alloc/free (game entities, connections).
 
-\_Thread_local int errno_local;
-      </example>
-    </concept>
-  </concurrency>
-
-  <undefined_behavior>
-    <description>Common undefined behavior to avoid in C</description>
-    <categories>
-      <category name="memory">Null pointer dereference, use-after-free, buffer overflow, double-free</category>
-      <category name="arithmetic">Signed integer overflow, division by zero, shift beyond type width</category>
-      <category name="aliasing">Strict aliasing violations, type punning without union</category>
-      <category name="sequence">Modifying variable twice between sequence points</category>
-    </categories>
-    <mitigation>Use sanitizers (ASan, UBSan) during development to detect UB</mitigation>
-  </undefined_behavior>
-
-  <anti_patterns>
-    <avoid name="void_pointer_abuse">
-      <description>Overusing void\* for generic programming</description>
-      <instead>Use \_Generic macros or code generation</instead>
-    </avoid>
-
-    <avoid name="magic_numbers">
-      <description>Hardcoded numeric values without explanation</description>
-      <instead>Use named constants with define or enum</instead>
-    </avoid>
-
-    <avoid name="strcpy_strcat">
-      <description>Using unbounded string functions</description>
-      <instead>Use snprintf for strings. Note: strncpy does NOT null-terminate if source exceeds size</instead>
-    </avoid>
-
-    <avoid name="sprintf">
-      <description>Using sprintf without bounds checking</description>
-      <instead>Use snprintf with explicit buffer size</instead>
-    </avoid>
-
-    <avoid name="gets">
-      <description>Using gets() which has no bounds checking</description>
-      <instead>Use fgets() with explicit buffer size</instead>
-    </avoid>
-
-    <avoid name="scanf_unbounded">
-      <description>Using scanf with unbounded %s format</description>
-      <instead>Use %Ns with explicit width or fgets followed by sscanf</instead>
-    </avoid>
-
-    <avoid name="unchecked_malloc">
-      <description>Not checking malloc return value</description>
-      <instead>Always check for NULL after allocation</instead>
-    </avoid>
-
-    <avoid name="format_string_vuln">
-      <description>Using user input as format string (printf(user_input))</description>
-      <instead>Always use printf("%s", user_input) or puts()</instead>
-    </avoid>
-
-    <avoid name="null_macro">
-      <description>Using NULL macro instead of nullptr (C23)</description>
-      <instead>Use nullptr for null pointer constants (type-safe, no integer ambiguity)</instead>
-    </avoid>
-
-    <avoid name="implicit_function_declarations">
-      <description>Calling functions without prior declaration or prototype</description>
-      <instead>Always include proper headers or forward-declare functions. Implicit declarations were removed in C99 and are errors in C23.</instead>
-    </avoid>
-
-    <avoid name="manual_memory_no_ownership">
-      <description>Manual memory management without clear ownership semantics</description>
-      <instead>Document ownership in function comments (caller-owned vs callee-owned). Use naming conventions like _new/_free pairs.</instead>
-    </avoid>
-  </anti_patterns>
-</c_language>
-
-<memory_management>
-  <decision_tree name="allocation_strategy">
-    <question>What is the lifetime and access pattern of the memory?</question>
-    <branch condition="Short-lived, function-scoped">Use stack allocation or VLA (with size limit)</branch>
-    <branch condition="Long-lived, single owner">Use malloc/free with clear ownership</branch>
-    <branch condition="Many small allocations">Use arena allocator</branch>
-    <branch condition="Fixed-size objects">Use pool allocator</branch>
-  </decision_tree>
-
-  <pattern name="basic_allocation">
-    <description>Standard malloc/calloc/realloc/free patterns</description>
-    <example>
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-
+```c
 char *duplicate_string(const char *src) {
-if (!src) return NULL;
-
-size_t len = strlen(src) + 1;
-char *dst = malloc(len);
-if (!dst) return NULL;
-
-memcpy(dst, src, len);
-return dst;
-
+    if (!src) return NULL;
+    size_t len = strlen(src) + 1;
+    char *dst = malloc(len);
+    if (!dst) return NULL;
+    memcpy(dst, src, len);
+    return dst;
 }
-    </example>
-    <rules priority="critical">
-      <rule>Always check malloc/calloc/realloc return value for NULL</rule>
-      <rule>Use calloc for zero-initialized memory</rule>
-      <rule>After realloc, use the returned pointer (original may be invalid)</rule>
-      <rule>Set pointer to NULL after free to prevent use-after-free</rule>
-    </rules>
-  </pattern>
+```
 
-  <pattern name="arena_allocator">
-    <description>Bulk allocation with single-point deallocation</description>
-    <example>
-typedef struct {
-char *base;
-size_t size;
-size_t offset;
-} Arena;
+Rules: always check `malloc`/`calloc`/`realloc` for `NULL`; use `calloc` when zero-initialization is needed;
+after `realloc`, the original pointer may already be freed even on failure paths that return the old block
+unchanged, so only ever dereference the returned pointer; set a pointer to `NULL` after `free` so a stray
+use-after-free at least becomes a null-deref instead of silently reading freed memory.
+
+### Arena allocator
+
+Bulk allocation with a single deallocation point — nothing is freed individually, so there is no
+per-object leak to track, only whether `arena_destroy` runs.
+
+```c
+typedef struct { char *base; size_t size; size_t offset; } Arena;
 
 Arena arena_create(size_t size) {
-Arena a = {0};
-a.base = malloc(size);
-if (a.base) a.size = size;
-return a;
+    Arena a = {0};
+    a.base = malloc(size);
+    if (a.base) a.size = size;
+    return a;
 }
 
 void *arena_alloc(Arena *a, size_t bytes) {
-size_t aligned = (bytes + 7) &amp; ~7; // 8-byte alignment
-if (a-&gt;offset + aligned &gt; a-&gt;size) return NULL;
-void \*ptr = a-&gt;base + a-&gt;offset;
-a-&gt;offset += aligned;
-return ptr;
+    size_t aligned = (bytes + 7) & ~7;  // 8-byte alignment
+    if (a->offset + aligned > a->size) return NULL;
+    void *ptr = a->base + a->offset;
+    a->offset += aligned;
+    return ptr;
 }
 
-void arena_reset(Arena \*a) {
-a-&gt;offset = 0;
-}
+void arena_reset(Arena *a) { a->offset = 0; }
+void arena_destroy(Arena *a) { free(a->base); *a = (Arena){0}; }
+```
 
-void arena_destroy(Arena *a) {
-free(a-&gt;base);
-*a = (Arena){0};
-}
-    </example>
-    <use_case>Parsing, compilers, request handling - many allocations freed together</use_case>
-  </pattern>
+### Pool allocator
 
-  <pattern name="pool_allocator">
-    <description>Fixed-size object allocation with O(1) alloc/free</description>
-    <example>
-typedef struct PoolBlock {
-struct PoolBlock *next;
-} PoolBlock;
+Fixed-size objects via an intrusive free list threaded through the unused blocks themselves, giving O(1)
+alloc/free with no search.
 
-typedef struct {
-PoolBlock *free_list;
-char *memory;
-size_t object_size;
-size_t capacity;
-} Pool;
+```c
+typedef struct PoolBlock { struct PoolBlock *next; } PoolBlock;
+typedef struct { PoolBlock *free_list; char *memory; size_t object_size; size_t capacity; } Pool;
 
 Pool pool_create(size_t object_size, size_t count) {
-Pool p = {0};
-size_t size = object_size &gt; sizeof(PoolBlock) ? object_size : sizeof(PoolBlock);
-p.memory = malloc(size \* count);
-if (!p.memory) return p;
-
-p.object_size = size;
-p.capacity = count;
-
-// Build free list
-for (size_t i = 0; i &lt; count; i++) {
-PoolBlock *block = (PoolBlock *)(p.memory + i * size);
-block-&gt;next = p.free_list;
-p.free_list = block;
-}
-return p;
-
+    Pool p = {0};
+    size_t size = object_size > sizeof(PoolBlock) ? object_size : sizeof(PoolBlock);
+    p.memory = malloc(size * count);
+    if (!p.memory) return p;
+    p.object_size = size;
+    p.capacity = count;
+    for (size_t i = 0; i < count; i++) {
+        PoolBlock *block = (PoolBlock *)(p.memory + i * size);
+        block->next = p.free_list;
+        p.free_list = block;
+    }
+    return p;
 }
 
 void *pool_alloc(Pool *p) {
-if (!p-&gt;free_list) return NULL;
-PoolBlock \*block = p-&gt;free_list;
-p-&gt;free_list = block-&gt;next;
-return block;
+    if (!p->free_list) return NULL;
+    PoolBlock *block = p->free_list;
+    p->free_list = block->next;
+    return block;
 }
 
 void pool_free(Pool *p, void *ptr) {
-PoolBlock \*block = ptr;
-block-&gt;next = p-&gt;free_list;
-p-&gt;free_list = block;
+    PoolBlock *block = ptr;
+    block->next = p->free_list;
+    p->free_list = block;
 }
 
-void pool_destroy(Pool *p) {
-free(p-&gt;memory);
-*p = (Pool){0};
-}
-    </example>
-    <use_case>Game entities, network connections, fixed-size records</use_case>
-  </pattern>
+void pool_destroy(Pool *p) { free(p->memory); *p = (Pool){0}; }
+```
 
-  <pattern name="goto_cleanup">
-    <description>Resource cleanup with goto for error handling</description>
-    <example>
+### goto cleanup
+
+A single exit path for error handling avoids the combinatorial leak risk of freeing at every early return:
+
+```c
 int process_file(const char *path) {
-int result = -1;
-FILE *fp = NULL;
-char *buffer = NULL;
+    int result = -1;
+    FILE *fp = NULL;
+    char *buffer = NULL;
 
-fp = fopen(path, "r");
-if (!fp) goto cleanup;
-
-buffer = malloc(BUFFER_SIZE);
-if (!buffer) goto cleanup;
-
-// ... process file ...
-
-result = 0;  // Success
+    fp = fopen(path, "r");
+    if (!fp) goto cleanup;
+    buffer = malloc(BUFFER_SIZE);
+    if (!buffer) goto cleanup;
+    // ... process file ...
+    result = 0;
 
 cleanup:
-free(buffer);
-if (fp) fclose(fp);
-return result;
+    free(buffer);
+    if (fp) fclose(fp);
+    return result;
 }
-    </example>
-    <note>Single cleanup point prevents resource leaks on error paths</note>
-  </pattern>
+```
 
-  <anti_patterns>
-    <avoid name="memory_leak">
-      <description>Forgetting to free allocated memory</description>
-      <instead>Use Valgrind/ASan, establish clear ownership rules</instead>
-    </avoid>
+`free(NULL)` and passing `NULL` to `fclose` guard-checked above are both why the cleanup label works
+unconditionally on partially-initialized state.
 
-    <avoid name="double_free">
-      <description>Freeing the same pointer twice</description>
-      <instead>Set pointer to NULL after free, use ownership tracking</instead>
-    </avoid>
+## CLI development
 
-    <avoid name="use_after_free">
-      <description>Accessing memory after it has been freed</description>
-      <instead>Clear pointers after free, use ASan for detection</instead>
-    </avoid>
+`getopt()` for simple short flags, `getopt_long()` once long options are needed, `argp` (GNU extension) when
+you also want generated `--help` output.
 
-    <avoid name="buffer_overflow">
-      <description>Writing beyond allocated buffer bounds</description>
-      <instead>Always track buffer sizes, use bounded functions</instead>
-    </avoid>
-  </anti_patterns>
-</memory_management>
-
-<cli_development>
-  <decision_tree name="argument_parsing">
-    <question>What complexity of argument parsing is needed?</question>
-    <branch condition="Simple flags and options">Use getopt()</branch>
-    <branch condition="Long options needed">Use getopt_long()</branch>
-    <branch condition="GNU-style with help generation">Use argp (GNU extension)</branch>
-  </decision_tree>
-
-  <pattern name="getopt">
-    <description>POSIX standard option parsing</description>
-    <example>
-#include &lt;unistd.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-
-int main(int argc, char *argv[]) {
-int verbose = 0;
-const char *output = NULL;
-int opt;
-
+```c
 while ((opt = getopt(argc, argv, "vo:h")) != -1) {
-switch (opt) {
-case 'v':
-verbose = 1;
-break;
-case 'o':
-output = optarg;
-break;
-case 'h':
-printf("Usage: %s [-v] [-o output] [file...]\n", argv[0]);
-return 0;
-default:
-fprintf(stderr, "Usage: %s [-v] [-o output] [file...]\n", argv[0]);
-return 1;
+    switch (opt) {
+    case 'v': verbose = 1; break;
+    case 'o': output = optarg; break;
+    case 'h': printf("Usage: %s [-v] [-o output] [file...]\n", argv[0]); return 0;
+    default:  fprintf(stderr, "Usage: %s [-v] [-o output] [file...]\n", argv[0]); return 1;
+    }
 }
-}
+// Remaining positional args: argv[optind] .. argv[argc-1]
+```
 
-// Remaining arguments: argv[optind] to argv[argc-1]
-for (int i = optind; i &lt; argc; i++) {
-printf("Processing: %s\n", argv[i]);
-}
-
-return 0;
-
-}
-    </example>
-  </pattern>
-
-  <pattern name="getopt_long">
-    <description>GNU extension for long options</description>
-    <example>
-#include &lt;getopt.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-
+```c
 static struct option long_options[] = {
-{"verbose", no_argument, NULL, 'v'},
-{"output", required_argument, NULL, 'o'},
-{"help", no_argument, NULL, 'h'},
-{NULL, 0, NULL, 0 }
+    {"verbose", no_argument, NULL, 'v'},
+    {"output", required_argument, NULL, 'o'},
+    {"help", no_argument, NULL, 'h'},
+    {NULL, 0, NULL, 0},
 };
+while ((opt = getopt_long(argc, argv, "vo:h", long_options, NULL)) != -1) { /* same switch */ }
+```
 
-int main(int argc, char *argv[]) {
-int verbose = 0;
-const char *output = NULL;
-int opt;
+Exit codes: `0` (`EXIT_SUCCESS`), `1` (`EXIT_FAILURE`, general error), `2` (usage error), `126` (found but
+not executable), `127` (not found), `128+N` (killed by signal N). `<sysexits.h>` gives finer-grained codes
+(`EX_USAGE` 64, `EX_NOINPUT` 66, etc.) for scripts and other programs that branch on exit status.
 
-while ((opt = getopt_long(argc, argv, "vo:h", long_options, NULL)) != -1) {
-switch (opt) {
-case 'v': verbose = 1; break;
-case 'o': output = optarg; break;
-case 'h':
-printf("Usage: %s [--verbose] [--output FILE] [file...]\n", argv[0]);
-return 0;
-default:
-return 1;
-}
-}
+Signal handling: use `sigaction()`, not `signal()` — `signal()`'s semantics (whether the handler resets,
+whether it blocks the same signal) vary across platforms, `sigaction()`'s don't. Keep the handler itself to
+setting a flag; anything more risks calling a non-async-signal-safe function from signal context. The flag
+must be `_Atomic` (or `volatile sig_atomic_t`) since the handler can fire between any two instructions of the
+main flow.
 
-return 0;
-
-}
-    </example>
-  </pattern>
-
-  <pattern name="exit_codes">
-    <description>Standard exit code conventions</description>
-    <codes>
-      <code value="0" name="EXIT_SUCCESS">Successful execution</code>
-      <code value="1" name="EXIT_FAILURE">General error</code>
-      <code value="2">Command line usage error</code>
-      <code value="126">Command found but not executable</code>
-      <code value="127">Command not found</code>
-      <code value="128+N">Terminated by signal N</code>
-    </codes>
-    <example>
-#include &lt;stdlib.h&gt;
-#include &lt;sysexits.h&gt;  // EX_USAGE, EX_DATAERR, etc.
-
-int main(int argc, char \*argv[]) {
-if (argc &lt; 2) {
-fprintf(stderr, "Usage: %s &lt;file&gt;\n", argv[0]);
-return EX_USAGE; // 64
-}
-
-FILE *fp = fopen(argv[1], "r");
-if (!fp) {
-perror(argv[1]);
-return EX_NOINPUT;  // 66
-}
-
-// ...
-
-return EXIT_SUCCESS;
-
-}
-    </example>
-  </pattern>
-
-  <pattern name="signal_handling">
-    <description>Graceful signal handling for clean shutdown</description>
-    <example>
-#include &lt;signal.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;stdatomic.h&gt;
-
+```c
 static atomic_int running = 1;
-
-static void handle_signal(int sig) {
-(void)sig;
-running = 0;
-}
+static void handle_signal(int sig) { (void)sig; running = 0; }
 
 int main(void) {
-struct sigaction sa = {0};
-sa.sa_handler = handle_signal;
-sigemptyset(&amp;sa.sa_mask);
-sa.sa_flags = 0;
-
-sigaction(SIGINT, &amp;sa, NULL);
-sigaction(SIGTERM, &amp;sa, NULL);
-
-while (running) {
-// Main loop work
+    struct sigaction sa = {0};
+    sa.sa_handler = handle_signal;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    while (running) { /* main loop */ }
+    return 0;
 }
+```
 
-printf("Shutting down gracefully...\n");
-return 0;
+Error reporting: prefix messages with the program name (derived from `argv[0]` via `strrchr(argv0, '/')`),
+and separate the "no errno" case from the "has errno" case so the latter appends `strerror(errno)` — capture
+`errno` into a local **before** calling any other libc function (including `fprintf`), since those can
+clobber it.
 
+```c
+void error_errno(const char *fmt, ...) {
+    int saved_errno = errno;
+    fprintf(stderr, "%s: ", progname);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    fprintf(stderr, ": %s\n", strerror(saved_errno));
 }
-    </example>
-    <rules priority="critical">
-      <rule>Use sigaction() instead of signal() for portability</rule>
-      <rule>Keep signal handlers minimal - set flag only</rule>
-      <rule>Use volatile sig_atomic_t or atomic types for signal flags</rule>
-    </rules>
-  </pattern>
+```
 
-  <pattern name="error_reporting">
-    <description>Consistent error message format</description>
-    <example>
-#include &lt;errno.h&gt;
-#include &lt;stdarg.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
+## Related
 
-static const char \*progname = "myapp";
-
-void set_progname(const char *argv0) {
-const char *p = strrchr(argv0, '/');
-progname = p ? p + 1 : argv0;
-}
-
-void error(const char \*fmt, ...) {
-fprintf(stderr, "%s: ", progname);
-va_list ap;
-va_start(ap, fmt);
-vfprintf(stderr, fmt, ap);
-va_end(ap);
-fprintf(stderr, "\n");
-}
-
-void error_errno(const char \*fmt, ...) {
-int saved_errno = errno;
-fprintf(stderr, "%s: ", progname);
-va_list ap;
-va_start(ap, fmt);
-vfprintf(stderr, fmt, ap);
-va_end(ap);
-fprintf(stderr, ": %s\n", strerror(saved_errno));
-}
-    </example>
-  </pattern>
-</cli_development>
-
-<context7_integration>
-  <description>Use Context7 MCP for up-to-date C documentation</description>
-
-  <c_libraries>
-    <library name="cppreference" id="/websites/cppreference_com" />
-  </c_libraries>
-
-  <usage_patterns>
-    <pattern name="language_reference">
-      <step order="1">
-  <action>resolve-library-id libraryName="cppreference"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-      <step order="1">
-  <action>query-docs libraryId="/websites/cppreference_com" query="stdatomic.h"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    </pattern>
-
-    <pattern name="standard_library">
-      <step order="1">
-  <action>query-docs libraryId="/websites/cppreference_com" query="malloc"</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    </pattern>
-  </usage_patterns>
-</context7_integration>
-
-<best_practices>
-  <practice priority="critical">Always check return values of malloc/calloc/realloc</practice>
-  <practice priority="critical">Enable -Wall -Wextra -Werror for all builds</practice>
-  <practice priority="critical">Run with AddressSanitizer during development</practice>
-  <practice priority="critical">Use Valgrind before release</practice>
-  <practice priority="high">Use fixed-width integer types from stdint.h</practice>
-  <practice priority="high">Prefer snprintf over sprintf for buffer safety</practice>
-  <practice priority="high">Use designated initializers for struct clarity</practice>
-  <practice priority="high">Document ownership semantics in function comments</practice>
-  <practice priority="medium">Use static for file-local functions and variables</practice>
-  <practice priority="medium">Prefer const for read-only parameters</practice>
-  <practice priority="medium">Use enum for related constants instead of define</practice>
-  <practice priority="medium">Include what you use - minimize header dependencies</practice>
-  <practice priority="high">Use nullptr instead of NULL in C23 code</practice>
-  <practice priority="high">Use [[nodiscard]] on functions whose return value must be checked</practice>
-  <practice priority="medium">Use clang-format for consistent code formatting</practice>
-</best_practices>
-
-<workflow>
-  <phase name="analyze">
-    <objective>Understand C code requirements</objective>
-    <step order="1">
-  <action>1. Check for existing code patterns and conventions</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Identify memory ownership requirements</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Review header dependencies</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="implement">
-    <objective>Write safe, portable C code</objective>
-    <step order="1">
-  <action>1. Use C23 as the default standard (C11 minimum for legacy compatibility)</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Follow memory management patterns</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Handle all error conditions</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="validate">
-    <objective>Verify C code correctness</objective>
-    <step order="1">
-  <action>1. Compile with warnings enabled</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Run with sanitizers</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Test with Valgrind</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-</workflow>
-
-<error_escalation>
-  <examples>
-    <example severity="low">Compiler warning about unused variable</example>
-    <example severity="medium">Valgrind reports minor memory leak</example>
-    <example severity="high">AddressSanitizer detects buffer overflow</example>
-    <example severity="critical">Use-after-free or double-free detected</example>
-  </examples>
-</error_escalation>
-
-<tools>
-  <tool name="Read">Read relevant source files and docs</tool>
-  <tool name="Grep">Search for patterns and references</tool>
-</tools>
-
-<patterns>
-  <pattern name="usage">
-    <description>Apply this skill when task keywords and domain match</description>
-    <example>Use the canonical workflow and verify with project conventions</example>
-  </pattern>
-</patterns>
-
-<rules priority="critical">
-  <rule>Target C23 (-std=c23) by default; never write new code targeting C11 or older without documented justification</rule>
-</rules>
-
-<decision_tree name="skill_activation">
-  <question>Does the task clearly match this skill domain?</question>
-  <branch condition="Yes">Use this skill workflow and constraints</branch>
-  <branch condition="No">Use a more appropriate domain skill</branch>
-</decision_tree>
-
-<related_agents>
-  <agent name="explore">Locate code patterns and references in this skill domain</agent>
-  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
-  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
-</related_agents>
-
-<constraints>
-  <must>Check all allocation return values</must>
-  <must>Use bounded string functions (snprintf, strncpy)</must>
-  <must>Enable compiler warnings</must>
-  <must>Run sanitizers during development</must>
-  <avoid>Using gets(), sprintf(), or other unsafe functions</avoid>
-  <avoid>Using NULL instead of nullptr in C23 code</avoid>
-  <avoid>Implicit function declarations (always include headers or forward-declare)</avoid>
-  <avoid>Raw pointer arithmetic without bounds checking</avoid>
-  <avoid>Implicit type conversions that may lose data</avoid>
-  <avoid>Global mutable state when possible</avoid>
-</constraints>
-
-<related_skills>
-  <skill name="serena-usage">Navigate C codebases and header hierarchies</skill>
-  <skill name="context7-usage">C documentation via /websites/cppreference_com</skill>
-  <skill name="cplusplus-ecosystem">CMake patterns and clang-tidy configuration</skill>
-  <skill name="investigation-patterns">Debugging with Valgrind, GDB, and sanitizers</skill>
-</related_skills>
+- [cplusplus-ecosystem](../cplusplus-ecosystem/SKILL.md) — detailed CMake patterns and clang-tidy configuration
+  shared across C and C++ builds
+- [context7-usage](../context7-usage/SKILL.md) — fetch current C documentation via the `cppreference_com`
+  Context7 library id, for `<stdatomic.h>`, `malloc`, and other standard-library lookups
+- [investigation-patterns](../investigation-patterns/SKILL.md) — debugging with Valgrind, GDB, and sanitizers
+- [serena-usage](../serena-usage/SKILL.md) — navigating C codebases and header hierarchies by symbol

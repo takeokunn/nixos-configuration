@@ -1,875 +1,218 @@
 ---
-name: Go Ecosystem
+name: golang-ecosystem
 description: Use for Go, covering go.mod, go modules, go test, go build, and Go language development patterns.
-version: 2.1.0
+version: 3.0.0
 ---
 
-<purpose>
-  Provide comprehensive patterns for Go language development, modules, testing, and idiomatic coding practices.
-</purpose>
-
-<tools>
-  <tool>Read - Analyze go.mod and Go source files</tool>
-  <tool>Edit - Modify Go code and module configuration</tool>
-  <tool>Bash - Run go build, go test, go mod commands</tool>
-  <tool>mcp__plugin_claude-code-home-manager_context7__query-docs - Fetch latest Go documentation</tool>
-</tools>
-
-<concepts>
-  <concept name="error_values">Errors are values, not exceptions; handle explicitly at each call site with if err != nil</concept>
-  <concept name="interfaces">Accept interfaces, return concrete types; define interfaces where used, not implemented</concept>
-  <concept name="goroutines_channels">Use goroutines for concurrency, channels for communication, context.Context for cancellation</concept>
-  <concept name="zero_values">Zero values are meaningful (0, "", nil, false); design types so zero value is useful</concept>
-</concepts>
-
-<go_language>
-  <naming_conventions>
-    <pattern name="packages">
-      <description>Lowercase, single-word names. No underscores or mixedCaps.</description>
-      <example>
-        package httputil
-      </example>
-    </pattern>
-
-    <pattern name="exported">
-      <description>PascalCase for exported (public) identifiers.</description>
-      <example>
-        func ReadFile()
-        type Handler
-        var MaxRetries
-      </example>
-    </pattern>
-
-    <pattern name="unexported">
-      <description>camelCase for unexported (private) identifiers.</description>
-      <example>
-        func parseConfig()
-        type handler
-        var maxRetries
-      </example>
-    </pattern>
-
-    <pattern name="interfaces">
-      <description>Single-method interfaces: method name + "er" suffix.</description>
-      <example>
-        Reader, Writer, Closer, Stringer, Handler
-      </example>
-    </pattern>
-
-    <pattern name="acronyms">
-      <description>Keep acronyms uppercase: URL, HTTP, ID, API.</description>
-      <example>
-        func ServeHTTP()
-        type HTTPClient
-        var userID
-      </example>
-    </pattern>
-
-    <pattern name="getters">
-      <description>No "Get" prefix for getters.</description>
-      <example>
-        func (u *User) Name() string // not GetName()
-      </example>
-    </pattern>
-  </naming_conventions>
-
-  <formatting>
-    <rules priority="standard">
-      <rule>Use gofmt/goimports - no manual formatting debates</rule>
-      <rule>Tabs for indentation, spaces for alignment</rule>
-      <rule>No semicolons except in for loops and multi-statement lines</rule>
-      <rule>Opening brace on same line as declaration</rule>
-    </rules>
-  </formatting>
-
-  <type_system>
-    <pattern name="zero_values">
-      <description>Zero values are meaningful: 0, "", nil, false.</description>
-      <example>
-        var buf bytes.Buffer // ready to use, no initialization needed
-      </example>
-    </pattern>
-
-    <pattern name="type_assertion">
-      <description>Safe type assertion with ok pattern vs unsafe panic.</description>
-      <example>
-        value, ok := x.(Type) // safe
-        value := x.(Type) // panics if wrong type
-      </example>
-    </pattern>
-
-    <pattern name="type_switch">
-      <description>Type switch for handling multiple types.</description>
-      <example>
-        switch v := x.(type) {
-        case string: // v is string
-        case int:    // v is int
-        default:     // v is any
-        }
-      </example>
-    </pattern>
-  </type_system>
-</go_language>
-
-<error_handling>
-  <principles>
-    <principle>Errors are values, not exceptions</principle>
-    <principle>Handle errors explicitly at each call site</principle>
-    <principle>Return errors, don't panic</principle>
-    <principle>Add context when propagating errors</principle>
-  </principles>
-
-  <pattern name="basic_check">
-    <description>Basic error checking pattern with context wrapping.</description>
-    <example>
-      result, err := doSomething()
-      if err != nil {
-      return fmt.Errorf("failed to do something: %w", err)
-      }
-    </example>
-  </pattern>
-
-  <pattern name="wrap_with_context">
-    <description>Use %w verb to wrap errors for later inspection</description>
-    <example>
-      if err != nil {
-      return fmt.Errorf("processing user %s: %w", userID, err)
-      }
-    </example>
-    <decision_tree name="when_to_use">
-      <question>Do callers need to inspect or unwrap the error?</question>
-      <if_yes>Use %w to wrap errors for errors.Is and errors.As</if_yes>
-      <if_no>Use %v to format error without wrapping</if_no>
-    </decision_tree>
-  </pattern>
-
-  <pattern name="sentinel_errors">
-    <description>Define package-level error variables</description>
-    <example>
-      var ErrNotFound = errors.New("not found")
-      var ErrInvalidInput = errors.New("invalid input")
-    </example>
-  </pattern>
-
-  <pattern name="custom_error_type">
-    <description>Define custom error types implementing the error interface for structured error information.</description>
-    <example>
-      type ValidationError struct {
-      Field   string
-      Message string
-      }
-
-      func (e \*ValidationError) Error() string {
-      return fmt.Sprintf("validation failed for %s: %s", e.Field, e.Message)
-      }
-    </example>
-  </pattern>
-
-  <pattern name="error_inspection">
-    <description>Inspect and unwrap errors using errors.Is and errors.As for type-safe error handling.</description>
-    <example>
-      // Check for specific error
-      if errors.Is(err, ErrNotFound) { ... }
-
-      // Extract custom error type
-      var valErr \*ValidationError
-      if errors.As(err, &amp;valErr) {
-      log.Printf("field: %s", valErr.Field)
-      }
-    </example>
-  </pattern>
-
-  <pattern name="multiple_errors">
-    <description>Go 1.20+ errors.Join</description>
-    <example>
-      err := errors.Join(err1, err2, err3)
-    </example>
-  </pattern>
-</error_handling>
-
-<modern_go_features>
-  <feature name="green_tea_gc">
-    <description>Green Tea garbage collector is now enabled by default in Go 1.26, improving GC performance.</description>
-  </feature>
-  <feature name="new_with_value">
-    <description>The built-in new function now allows an expression specifying the initial value (Go 1.26).</description>
-    <example>
-      p := new(MyStruct{Field: "value"})
-    </example>
-  </feature>
-  <feature name="self_referential_generics">
-    <description>Generic types may now refer to themselves in their own type parameter list (Go 1.26).</description>
-  </feature>
-  <feature name="range_over_int">
-    <description>Range over integers for simple iteration (Go 1.22+).</description>
-    <example>
-      for i := range 10 {
-      fmt.Println(i)
-      }
-    </example>
-  </feature>
-  <feature name="range_over_func">
-    <description>Range over iterator functions (Go 1.23+).</description>
-    <example>
-      for v := range slices.Values(s) {
-      fmt.Println(v)
-      }
-    </example>
-  </feature>
-  <feature name="cgo_overhead_reduction">
-    <description>Baseline cgo overhead reduced by approximately 30% in Go 1.26.</description>
-  </feature>
-</modern_go_features>
-
-<interfaces>
-  <principles>
-    <principle>Accept interfaces, return concrete types</principle>
-    <principle>Keep interfaces small (1-3 methods)</principle>
-    <principle>Define interfaces where they are used, not implemented</principle>
-    <principle>Implicit satisfaction - no "implements" keyword</principle>
-  </principles>
-
-  <common_interfaces>
-    <interface name="io.Reader">Read(p []byte) (n int, err error)</interface>
-    <interface name="io.Writer">Write(p []byte) (n int, err error)</interface>
-    <interface name="io.Closer">Close() error</interface>
-    <interface name="error">Error() string</interface>
-    <interface name="fmt.Stringer">String() string</interface>
-  </common_interfaces>
-
-  <pattern name="interface_definition">
-    <description>Define interfaces with method signatures.</description>
-    <example>
-      type Handler interface {
-      Handle(ctx context.Context, req Request) (Response, error)
-      }
-    </example>
-    <decision_tree name="when_to_use">
-      <question>Do you have multiple implementations or need to decouple packages?</question>
-      <if_yes>Define interface where it is used for abstraction</if_yes>
-      <if_no>Use concrete types until abstraction is needed</if_no>
-    </decision_tree>
-  </pattern>
-
-  <pattern name="interface_composition">
-    <description>Compose larger interfaces from smaller ones.</description>
-    <example>
-      type ReadWriteCloser interface {
-      io.Reader
-      io.Writer
-      io.Closer
-      }
-    </example>
-  </pattern>
-
-  <pattern name="empty_interface">
-    <description>interface{} or any (Go 1.18+) accepts all types. Avoid when possible - loses type safety.</description>
-    <example>
-      func process(data any) { ... }
-    </example>
-  </pattern>
-</interfaces>
-
-<modules>
-  <pattern name="go_mod_structure">
-    <description>Standard go.mod file structure with module, go version, toolchain, and dependencies.</description>
-    <example>
-      module github.com/user/project
-
-      go 1.26
-
-      toolchain go1.26.0
-
-      require (
-      github.com/pkg/errors v0.9.1
-      golang.org/x/sync v0.3.0
-      )
-
-      require (
-      golang.org/x/sys v0.10.0 // indirect
-      )
-    </example>
-  </pattern>
-
-  <commands>
-    <tool name="go mod init">
-      <description>Initialize new module</description>
-      <use_case>Start a new Go project with module support</use_case>
-    </tool>
-    <tool name="go mod tidy">
-      <description>Add missing, remove unused dependencies</description>
-      <use_case>Clean up go.mod and go.sum files</use_case>
-    </tool>
-    <tool name="go get">
-      <description>Add or update dependency</description>
-      <param name="package-name@version">Package name and optional version</param>
-      <use_case>Install or update a specific package version</use_case>
-    </tool>
-    <tool name="go mod download">
-      <description>Download dependencies to cache</description>
-      <use_case>Pre-download modules for offline work</use_case>
-    </tool>
-    <tool name="go mod vendor">
-      <description>Create vendor directory</description>
-      <use_case>Copy dependencies into vendor/ for vendoring</use_case>
-    </tool>
-    <tool name="go mod verify">
-      <description>Verify dependencies</description>
-      <use_case>Check that downloaded modules haven't been modified</use_case>
-    </tool>
-  </commands>
-
-  <pattern name="toolchain_directive">
-    <description>Suggest specific Go toolchain version (Go 1.21+); current is 1.26. Used when module requires newer toolchain than default.</description>
-    <example>
-      toolchain go1.26.0
-    </example>
-  </pattern>
-
-  <versioning>
-    <pattern name="semantic_import">
-      <description>v0.x.x and v1.x.x: no path suffix.</description>
-      <example>
-        import "github.com/user/project"
-      </example>
-    </pattern>
-    <pattern name="v2_plus">
-      <description>v2+: include version in import path.</description>
-      <example>
-        import "github.com/user/project/v2"
-      </example>
-    </pattern>
-  </versioning>
-
-  <pattern name="replace_directive">
-    <description>Override module location for local development.</description>
-    <example>
-      replace github.com/user/lib => ../lib
-      replace github.com/user/lib v1.0.0 => ./local-lib
-    </example>
-  </pattern>
-</modules>
-
-<project_structure>
-  <standard_layout>
-    <directory name="cmd/">Main applications (cmd/myapp/main.go)</directory>
-    <directory name="internal/">Private packages, not importable externally</directory>
-    <directory name="pkg/">Public library code (optional, controversial)</directory>
-    <directory name="api/">API definitions (OpenAPI, protobuf)</directory>
-    <directory name="configs/">Configuration files</directory>
-    <directory name="scripts/">Build/install scripts</directory>
-    <directory name="testdata/">Test fixtures</directory>
-  </standard_layout>
-
-  <best_practices>
-    <practice priority="critical">cmd/myapp/main.go should be minimal - call into internal packages</practice>
-    <practice priority="critical">internal/ packages cannot be imported from outside parent module</practice>
-    <practice priority="high">Each directory = one package (except \_test packages)</practice>
-  </best_practices>
-</project_structure>
-
-<testing>
-  <file_naming>
-    <pattern name="test_files">
-      <description>foo.go → foo_test.go</description>
-    </pattern>
-    <pattern name="test_functions">
-      <description>Test functions: func TestXxx(t *testing.T)</description>
-    </pattern>
-    <pattern name="benchmark_functions">
-      <description>Benchmark functions: func BenchmarkXxx(b *testing.B)</description>
-    </pattern>
-    <pattern name="example_functions">
-      <description>Example functions: func ExampleXxx()</description>
-    </pattern>
-  </file_naming>
-
-  <pattern name="table_driven_tests">
-    <description>Table-driven tests for comprehensive test coverage with multiple test cases.</description>
-    <example>
-      func TestAdd(t *testing.T) {
-      tests := []struct {
-      name     string
-      a, b     int
-      expected int
-      }{
-      {"positive", 1, 2, 3},
-      {"negative", -1, -2, -3},
-      {"zero", 0, 0, 0},
-      }
-      for _, tt := range tests {
-      t.Run(tt.name, func(t *testing.T) {
-      if got := Add(tt.a, tt.b); got != tt.expected {
-      t.Errorf("Add(%d, %d) = %d, want %d", tt.a, tt.b, got, tt.expected)
-      }
-      })
-      }
-      }
-    </example>
-    <decision_tree name="when_to_use">
-      <question>Do you need to test same logic with multiple inputs and outputs?</question>
-      <if_yes>Use table-driven tests for comprehensive coverage</if_yes>
-      <if_no>Write simple individual test functions</if_no>
-    </decision_tree>
-  </pattern>
-
-  <pattern name="test_helpers">
-    <description>Test helper functions with t.Helper() and t.Cleanup() for better test organization.</description>
-    <example>
-      func setupTestDB(t *testing.T) *DB {
-      t.Helper()
-      db := NewDB()
-      t.Cleanup(func() { db.Close() })
-      return db
-      }
-    </example>
-  </pattern>
-
-  <pattern name="testdata_directory">
-    <description>testdata/ directory is ignored by go build and used for test fixtures.</description>
-    <example>
-      mypackage/
-      ├── main.go
-      ├── main_test.go
-      └── testdata/
-      ├── input.json
-      └── expected.txt
-    </example>
-  </pattern>
-
-  <commands>
-    <tool name="go test">
-      <description>Run tests in current package</description>
-      <use_case>Execute tests for the current directory</use_case>
-    </tool>
-    <tool name="go test ./...">
-      <description>Run all tests recursively</description>
-      <use_case>Test entire project including subpackages</use_case>
-    </tool>
-    <tool name="go test -v">
-      <description>Verbose output</description>
-      <use_case>See detailed test execution output</use_case>
-    </tool>
-    <tool name="go test -run">
-      <description>Run specific test</description>
-      <param name="TestName">Name pattern to match</param>
-      <use_case>Run only tests matching the pattern</use_case>
-    </tool>
-    <tool name="go test -cover">
-      <description>Show coverage percentage</description>
-      <use_case>Get quick coverage summary</use_case>
-    </tool>
-    <tool name="go test -coverprofile">
-      <description>Generate coverage profile</description>
-      <param name="c.out">Output file path</param>
-      <use_case>Create detailed coverage report for analysis</use_case>
-    </tool>
-    <tool name="go test -bench">
-      <description>Run benchmarks</description>
-      <param name=".">Pattern to match (. for all)</param>
-      <use_case>Execute performance benchmarks</use_case>
-    </tool>
-    <tool name="go test -race">
-      <description>Enable race detector</description>
-      <use_case>Detect data races during test execution</use_case>
-    </tool>
-  </commands>
-</testing>
-
-<concurrency>
-  <goroutines>
-    <pattern name="launch">
-      <description>Launch a goroutine for concurrent work.</description>
-      <example>
-        go func() {
-        // concurrent work
-        }()
-      </example>
-    </pattern>
-
-    <pattern name="with_waitgroup">
-      <description>Use sync.WaitGroup to wait for multiple goroutines to complete.</description>
-      <example>
-        var wg sync.WaitGroup
-        for _, item := range items {
-        wg.Add(1)
-        go func(item Item) {
-        defer wg.Done()
-        process(item)
-        }(item)
-        }
-        wg.Wait()
-      </example>
-    </pattern>
-  </goroutines>
-
-  <channels>
-    <pattern name="unbuffered">
-      <description>Unbuffered channels provide synchronous communication.</description>
-      <example>
-        ch := make(chan int)
-      </example>
-    </pattern>
-
-    <pattern name="buffered">
-      <description>Buffered channels allow asynchronous communication up to buffer size.</description>
-      <example>
-        ch := make(chan int, 10)
-      </example>
-    </pattern>
-
-    <pattern name="receive_only">
-      <description>Receive-only channel parameter.</description>
-      <example>
-        func consumer(ch &lt;-chan int)
-      </example>
-    </pattern>
-
-    <pattern name="send_only">
-      <description>Send-only channel parameter.</description>
-      <example>
-        func producer(ch chan&lt;- int)
-      </example>
-    </pattern>
-
-    <pattern name="select">
-      <description>Select statement for multiplexing channel operations.</description>
-      <example>
-        select {
-        case msg := &lt;-ch1:
-        handle(msg)
-        case ch2 &lt;- value:
-        // sent
-        case &lt;-ctx.Done():
-        return ctx.Err()
-        default:
-        // non-blocking
-        }
-      </example>
-    </pattern>
-
-    <pattern name="close_channel">
-      <description>Closing channels signals no more values will be sent.</description>
-      <example>
-        close(ch)
-        for v := range ch { } // receive until closed
-      </example>
-    </pattern>
-  </channels>
-
-  <pattern name="context_usage">
-    <description>Use context.Context for cancellation and timeouts.</description>
-    <example>
-      ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-      defer cancel()
-
-      select {
-      case result := &lt;-doWork(ctx):
-      return result, nil
-      case &lt;-ctx.Done():
-      return nil, ctx.Err()
-      }
-    </example>
-  </pattern>
-
-  <sync_package>
-    <concept name="sync.Mutex">
-      <description>Mutual exclusion lock</description>
-    </concept>
-    <concept name="sync.RWMutex">
-      <description>Read-write lock</description>
-    </concept>
-    <concept name="sync.Once">
-      <description>Execute exactly once</description>
-    </concept>
-    <concept name="sync.WaitGroup">
-      <description>Wait for goroutine completion</description>
-    </concept>
-    <concept name="sync.Map">
-      <description>Concurrent map (specialized use cases)</description>
-    </concept>
-  </sync_package>
-</concurrency>
-
-<standard_library_additions>
-  <pattern name="slog">
-    <description>Structured logging with log/slog (Go 1.21+). Recommended over log and third-party loggers for new projects.</description>
-    <example>
-      import "log/slog"
-
-      slog.Info("user logged in",
-      "user_id", userID,
-      "ip", request.RemoteAddr,
-      )
-
-      // With structured logger
-      logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-      logger.Info("request", "method", r.Method, "path", r.URL.Path)
-    </example>
-  </pattern>
-
-  <pattern name="slices_maps">
-    <description>Generic slices and maps packages (Go 1.21+). Replace hand-rolled loops and sort.Slice.</description>
-    <example>
-      import (
-      "slices"
-      "maps"
-      )
-
-      slices.Sort(names)
-      if slices.Contains(names, "alice") { ... }
-      idx := slices.Index(names, "bob")
-      keys := slices.Collect(maps.Keys(m))
-    </example>
-  </pattern>
-
-  <pattern name="cmp_package">
-    <description>cmp package for comparison and defaults (Go 1.22+).</description>
-    <example>
-      import "cmp"
-
-      // Default value pattern
-      name := cmp.Or(userInput, envVar, "default")
-
-      // Ordered comparison
-      result := cmp.Compare(a, b)
-    </example>
-  </pattern>
-
-  <pattern name="http_routing">
-    <description>Enhanced net/http routing with method and path patterns (Go 1.22+). Reduces need for third-party routers.</description>
-    <example>
-      mux := http.NewServeMux()
-      mux.HandleFunc("GET /api/users/{id}", getUser)
-      mux.HandleFunc("POST /api/users", createUser)
-      mux.HandleFunc("DELETE /api/users/{id}", deleteUser)
-
-      func getUser(w http.ResponseWriter, r *http.Request) {
-      id := r.PathValue("id")
-      // ...
-      }
-    </example>
-  </pattern>
-
-  <pattern name="tool_directive">
-    <description>Tool dependencies in go.mod (Go 1.24+). Replaces tools.go blank-import hack.</description>
-    <example>
-      // In go.mod:
-      tool (
-      golang.org/x/tools/cmd/stringer
-      github.com/golangci/golangci-lint/cmd/golangci-lint
-      )
-    </example>
-  </pattern>
-</standard_library_additions>
-
-<build_commands>
-  <tool name="go build">
-    <description>Compile package</description>
-    <use_case>Build executable from current package</use_case>
-  </tool>
-  <tool name="go build -o">
-    <description>Specify output name</description>
-    <param name="name">Output binary name</param>
-    <use_case>Build with custom binary name</use_case>
-  </tool>
-  <tool name="go install">
-    <description>Compile and install to GOPATH/bin</description>
-    <use_case>Install package for global use</use_case>
-  </tool>
-  <tool name="go run">
-    <description>Compile and run</description>
-    <param name="main.go">Go file to execute</param>
-    <use_case>Quick compile and execute for development</use_case>
-  </tool>
-  <tool name="go fmt">
-    <description>Format all code</description>
-    <param name="./...">All packages recursively</param>
-    <use_case>Standardize code formatting</use_case>
-  </tool>
-  <tool name="go vet">
-    <description>Static analysis</description>
-    <param name="./...">All packages recursively</param>
-    <use_case>Detect suspicious code constructs</use_case>
-  </tool>
-  <tool name="go generate">
-    <description>Run code generators</description>
-    <use_case>Execute //go:generate directives</use_case>
-  </tool>
-  <tool name="golangci-lint">
-    <description>Standard meta-linter aggregating multiple linters</description>
-    <use_case>Run comprehensive linting with golangci-lint run</use_case>
-  </tool>
-  <tool name="cross-compile">
-    <description>Cross-compile for different platforms</description>
-    <example>
-      GOOS=linux GOARCH=amd64 go build
-    </example>
-    <use_case>Build binaries for different operating systems and architectures</use_case>
-  </tool>
-</build_commands>
-
-<context7_integration>
-  <description>Use Context7 MCP for up-to-date Go documentation</description>
-
-  <go_libraries>
-    <library name="Go Website" id="/golang/website" trust="8.3" />
-    <library name="Go Tools" id="/golang/tools" trust="8.3" />
-  </go_libraries>
-
-  <usage_patterns>
-    <pattern name="module_reference">
-      <description>Retrieve Go module documentation from Context7.</description>
-      <example>
-        query-docs libraryId="/golang/website" query="go.mod modules"
-      </example>
-    </pattern>
-  </usage_patterns>
-</context7_integration>
-
-<best_practices>
-  <practice priority="high">Use gofmt/goimports for consistent code formatting</practice>
-  <practice priority="high">Handle errors explicitly at each call site</practice>
-  <practice priority="high">Accept interfaces, return concrete types</practice>
-  <practice priority="high">Keep interfaces small (1-3 methods)</practice>
-  <practice priority="high">Use context.Context for cancellation and timeouts</practice>
-  <practice priority="medium">Prefer table-driven tests for comprehensive coverage</practice>
-  <practice priority="medium">Use t.Helper() in test helper functions</practice>
-  <practice priority="medium">Run tests with -race flag to detect data races</practice>
-  <practice priority="medium">Define interfaces where they are used, not implemented</practice>
-  <practice priority="medium">Use go mod tidy regularly to maintain clean dependencies</practice>
-</best_practices>
-
-<anti_patterns>
-  <avoid name="init_overuse">
-    <description>Overusing init() functions makes code harder to test and reason about.</description>
-    <instead>Prefer explicit initialization functions that can be called with parameters.</instead>
-  </avoid>
-  <avoid name="global_state">
-    <description>Package-level mutable variables create hidden dependencies and concurrency issues.</description>
-    <instead>Pass dependencies explicitly through function parameters or struct fields.</instead>
-  </avoid>
-  <avoid name="interface_pollution">
-    <description>Defining interfaces prematurely adds unnecessary abstraction.</description>
-    <instead>Define interfaces when you have multiple implementations or need to decouple packages.</instead>
-  </avoid>
-  <avoid name="naked_returns">
-    <description>Naked returns in long functions reduce code clarity.</description>
-    <instead>Use explicit return statements for functions longer than a few lines.</instead>
-  </avoid>
-  <avoid name="panic_for_errors">
-    <description>Using panic for recoverable errors violates Go's error handling philosophy.</description>
-    <instead>Return errors as values and handle them explicitly at each call site.</instead>
-  </avoid>
-  <avoid name="goroutine_leak">
-    <description>Goroutines that never exit waste resources and can cause memory leaks.</description>
-    <instead>Use context.Context or done channels to ensure goroutines can be cancelled.</instead>
-  </avoid>
-  <avoid name="data_race">
-    <description>Data races lead to unpredictable behavior and bugs.</description>
-    <instead>Use sync primitives (Mutex, RWMutex) or channels, and always run tests with -race flag.</instead>
-  </avoid>
-  <avoid name="empty_interface_overuse">
-    <description>Overusing interface{}/any loses type safety and requires type assertions.</description>
-    <instead>Use concrete types or small, focused interfaces when possible.</instead>
-  </avoid>
-</anti_patterns>
-
-<rules priority="critical">
-  <rule>Handle all errors explicitly; never ignore returned errors</rule>
-  <rule>Run go vet and go test before committing</rule>
-  <rule>Use context.Context for cancellation and timeouts in concurrent code</rule>
-</rules>
-
-<rules priority="standard">
-  <rule>Use gofmt/goimports for consistent formatting</rule>
-  <rule>Follow Go naming conventions (exported vs unexported)</rule>
-  <rule>Prefer table-driven tests for comprehensive coverage</rule>
-  <rule>Run tests with -race flag to detect data races</rule>
-</rules>
-
-<workflow>
-  <phase name="analyze">
-    <objective>Understand Go code requirements</objective>
-    <step order="1">
-  <action>1. Check go.mod for module and dependencies</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Review existing code patterns in project</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Identify interface and struct designs</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="implement">
-    <objective>Write idiomatic Go code</objective>
-    <step order="1">
-  <action>1. Follow Go naming conventions</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Use interfaces for abstraction</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Handle errors explicitly</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-  <phase name="validate">
-    <objective>Verify Go code correctness</objective>
-    <step order="1">
-  <action>1. Run go build for compilation</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>2. Run go vet for static analysis</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-    <step order="1">
-  <action>3. Run go test for testing</action>
-  <tool>Workflow guidance</tool>
-  <output>Step completed</output>
-</step>
-  </phase>
-</workflow>
-
-<error_escalation>
-  <examples>
-    <example severity="low">golangci-lint style warning</example>
-    <example severity="medium">Compilation error</example>
-    <example severity="high">Breaking change in exported API</example>
-    <example severity="critical">Data race or unsafe memory operation</example>
-  </examples>
-</error_escalation>
-
-<constraints>
-  <must>Handle all errors explicitly</must>
-  <must>Follow Go naming conventions (exported vs unexported)</must>
-  <must>Use interfaces for testability</must>
-  <avoid>Ignoring returned errors</avoid>
-  <avoid>Using init() without strong justification</avoid>
-  <avoid>Overusing global variables</avoid>
-</constraints>
-
-<related_skills>
-  <skill name="serena-usage">Navigate Go packages and symbol definitions efficiently</skill>
-  <skill name="context7-usage">Access latest Go standard library and toolchain documentation</skill>
-  <skill name="investigation-patterns">Debug goroutine leaks, race conditions, and performance issues</skill>
-</related_skills>
-<related_agents>
-  <agent name="explore">Locate code patterns and references in this skill domain</agent>
-  <agent name="quality-assurance">Review implementation quality against this skill guidance</agent>
-  <agent name="code-quality">Analyze code complexity and suggest refactoring improvements</agent>
-</related_agents>
+Patterns for Go module management, testing, concurrency, and error handling that go beyond what a
+competent Go developer already knows — silent failure modes, capture traps, and exact toolchain
+invocations.
+
+## Naming and formatting
+
+Exported identifiers use PascalCase, unexported use camelCase; acronyms stay uppercase (`ServeHTTP`,
+`HTTPClient`, `userID`). Single-method interfaces take the method name plus "er" (`Reader`, `Closer`,
+`Stringer`). Getters drop the `Get` prefix: `func (u *User) Name() string`, not `GetName()`. Run
+gofmt/goimports rather than debating formatting by hand.
+
+## Error handling
+
+**Errors are values inspected at each call site, not exceptions** — a swallowed `if err != nil` is the
+single most common Go defect. Wrap with `%w` only when a caller needs `errors.Is`/`errors.As` to unwrap
+it; use `%v` when the error is purely for a human and wrapping would leak an implementation detail into
+the caller's error-matching surface.
+
+```go
+if err != nil {
+    return fmt.Errorf("processing user %s: %w", userID, err)
+}
+```
+
+Sentinel errors (`var ErrNotFound = errors.New(...)`) and custom error types implementing `Error() string`
+compose with `errors.Is`/`errors.As`:
+
+```go
+if errors.Is(err, ErrNotFound) { ... }
+
+var valErr *ValidationError
+if errors.As(err, &valErr) {
+    log.Printf("field: %s", valErr.Field)
+}
+```
+
+`errors.Join(err1, err2, err3)` (Go 1.20+) combines multiple errors without picking one to lose.
+
+Never panic for a recoverable error — panic unwinds past deferred cleanup in ways callers do not expect
+and turns a local failure into a process-wide one.
+
+## Interfaces and nil
+
+Accept interfaces, return concrete types; define the interface at the consumer, not the implementer, so
+the producer package stays decoupled from every caller's abstraction. Keep interfaces to 1-3 methods —
+a wide interface forces every implementer to satisfy methods it does not need.
+
+**A nil concrete type wrapped in an interface is a non-nil interface.** `var p *MyError; var err error = p;
+err != nil` is true even though `p` is nil, because the interface value carries a non-nil type descriptor
+alongside the nil pointer. This breaks `if err != nil` checks when a function returns a typed nil pointer
+through an `error`-typed return — always return a bare `nil`, not a nil-valued typed variable, when there
+is no error.
+
+## Loop variables and closures
+
+**Go 1.22 changed loop-variable semantics**: each iteration now gets a fresh variable, so `go func() {
+use(item) }()` inside `for _, item := range items` is safe without the pre-1.22 `item := item` shadow or
+passing `item` as a parameter. On Go <1.22 (check `go.mod`'s `go` directive before assuming this is safe),
+every closure captures the same variable and all goroutines can observe the final iteration's value:
+
+```go
+// pre-1.22: bug — every goroutine may print the same, final i
+for i, item := range items {
+    go func() { process(item) }()
+}
+// pre-1.22 fix: pass as a parameter to bind per-iteration
+for i, item := range items {
+    go func(item Item) { process(item) }(item)
+}
+```
+
+This same trap applies to `defer` inside a loop and to slices of function values built in a loop body.
+
+## Concurrency
+
+`context.Context` is the cancellation and timeout primitive; a goroutine with no way to observe `ctx.Done()`
+or a done channel **leaks for the life of the process** because nothing ever unblocks it:
+
+```go
+ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+defer cancel()
+
+select {
+case result := <-doWork(ctx):
+    return result, nil
+case <-ctx.Done():
+    return nil, ctx.Err()
+}
+```
+
+A `select` with no `default` blocks until one case is ready; adding `default` makes it non-blocking and
+is the difference between "wait for a channel" and "poll a channel." Closing a channel signals "no more
+values" to every receiver — closing a channel with active senders, or closing it twice, panics; only the
+sender should close, and only once.
+
+`sync.WaitGroup.Add` must happen before the goroutine starts (not inside it) or `Wait` can return before
+all goroutines have been counted. `sync.Once` runs its function exactly once even under concurrent callers.
+Run tests with `-race` — a data race that a bare `go test` never catches will surface intermittently in
+production instead.
+
+## Module resolution
+
+`go.mod` pins the module path, Go version, and dependencies; the `go` directive sets the language version
+the compiler accepts, and `toolchain` pins the exact toolchain binary used to build:
+
+```
+module github.com/user/project
+
+go 1.26
+toolchain go1.26.0
+
+require (
+    github.com/pkg/errors v0.9.1
+)
+```
+
+v0/v1 modules import with no suffix; **v2 and above require the major version in the import path**
+(`import "github.com/user/project/v2"`) — omitting it is a common source of "module not found" errors
+after a v2 tag. `replace` overrides resolution for local development (`replace github.com/user/lib =>
+../lib`) but must not ship in a published module's go.mod, since it silently redirects every consumer.
+
+`go mod tidy` adds missing and removes unused requires — run it after any import change, since a stale
+go.mod/go.sum pair fails `go mod verify` in CI even when the code compiles locally. `go mod vendor`
+copies dependencies into `vendor/`; once a vendor directory exists, `go build` uses it automatically and
+ignores the module cache, which is a frequent source of "I updated go.mod but the old code still runs."
+
+`internal/` packages are import-blocked from outside their parent module at compile time, not by
+convention — the compiler enforces it.
+
+## Testing
+
+Table-driven tests are the idiomatic structure for multiple input/output cases:
+
+```go
+func TestAdd(t *testing.T) {
+    tests := []struct {
+        name     string
+        a, b     int
+        expected int
+    }{
+        {"positive", 1, 2, 3},
+        {"zero", 0, 0, 0},
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := Add(tt.a, tt.b); got != tt.expected {
+                t.Errorf("Add(%d, %d) = %d, want %d", tt.a, tt.b, got, tt.expected)
+            }
+        })
+    }
+}
+```
+
+`t.Helper()` in a test helper attributes failures to the caller's line, not the helper's; `t.Cleanup()`
+runs teardown even if the test fails partway, unlike a bare deferred close that a `t.Fatal` can skip past.
+`testdata/` is excluded from `go build` automatically — anything under it is safe for fixtures without a
+build tag.
+
+Exact invocations:
+- `go test ./...` — recurse all packages; a bare `go test` only covers the current directory and silently
+  skips the rest, which is easy to mistake for "the suite passed."
+- `go test -run TestName` — run only matching tests, by regex against the test name.
+- `go test -race` — enables the race detector; several times slower, but the only way to catch a data race
+  reliably.
+- `go test -coverprofile=c.out` then `go tool cover -html=c.out` — coverage percentage alone hides which
+  lines are untested; the HTML view does not.
+- `go vet ./...` — catches suspicious constructs (format-string/argument mismatches, unreachable code,
+  lock-copying) that compile cleanly but are wrong.
+
+## Modern stdlib (verify version against the target go.mod before relying on these)
+
+- `log/slog` (1.21+): structured logging, preferred over `log` for new code — `slog.Info("user logged in",
+  "user_id", userID)`.
+- `slices` / `maps` (1.21+): `slices.Sort`, `slices.Contains`, `slices.Index`, `maps.Keys` replace
+  hand-rolled loops and `sort.Slice`.
+- `cmp` (1.22+): `cmp.Or(userInput, envVar, "default")` for first-non-zero-value defaulting; `cmp.Compare`
+  for ordered comparison.
+- `net/http` method/path patterns (1.22+): `mux.HandleFunc("GET /api/users/{id}", getUser)` with
+  `r.PathValue("id")` reduces the need for a third-party router.
+- `tool` directive in go.mod (1.24+): declares tool dependencies, replacing the `tools.go` blank-import
+  hack.
+- Go 1.26: Green Tea GC is default; `new(MyStruct{Field: "value"})` allows an initial value; generic types
+  may self-reference in their own type parameter list; cgo call overhead is reduced roughly 30%.
+
+## Build and lint
+
+`go build -o name` sets the output binary name; `GOOS=linux GOARCH=amd64 go build` cross-compiles without
+a toolchain switch. `go generate` executes `//go:generate` directives but does not run automatically —
+nothing detects a stale generated file for you. `golangci-lint run` aggregates linters beyond `go vet`;
+treat a lint failure as informative rather than blocking unless the project's CI already gates on it.
+
+## Anti-patterns
+
+- **Package-level mutable state** creates hidden cross-call dependencies and is a race condition waiting on
+  concurrent access — pass dependencies explicitly instead.
+- **Interface pollution**: defining an interface before a second implementation or a decoupling need exists
+  adds indirection with no payoff; wait for the second caller.
+- **Naked returns** in anything longer than a few lines force the reader to scroll back to the signature to
+  know what is returned — use explicit `return` values.
+- **`interface{}`/`any` overuse** discards the compiler's type checking and pushes the failure to a runtime
+  type assertion; prefer concrete types or a small interface.
+- **`init()` overuse** makes initialization order implicit and hard to test in isolation; prefer an
+  explicit constructor function that takes parameters.
+
+## Related
+
+- [serena-usage](../serena-usage/SKILL.md) — navigate Go packages and symbol definitions by symbol rather
+  than by grep, especially across a large module.
+- [context7-usage](../context7-usage/SKILL.md) — pull current stdlib and toolchain documentation instead
+  of relying on a possibly stale training-data snapshot of Go's fast-moving standard library.
+- [investigation-patterns](../investigation-patterns/SKILL.md) — bisecting a goroutine leak, a data race,
+  or a performance regression once `-race` or profiling has located a symptom but not its cause.

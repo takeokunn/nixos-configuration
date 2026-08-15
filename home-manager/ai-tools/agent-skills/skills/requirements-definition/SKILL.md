@@ -1,296 +1,104 @@
 ---
-name: Requirements Definition
+name: requirements-definition
 description: This skill should be used when the user asks to "define requirements", "create specification", "clarify requirements", "write requirements document", or mentions requirement analysis. Provides comprehensive requirements definition methodology.
-version: 2.1.0
+version: 3.0.0
 ---
 
-<purpose>
-  Provide structured methodology for requirements definition, ensuring comprehensive specification before implementation.
-</purpose>
+Question design and requirement formatting. The phase sequence belongs to
+[define-core](../define-core/SKILL.md).
 
-<tools>
-  <tool name="Glob">Directory structure analysis</tool>
-  <tool name="get_symbols_overview">Symbol analysis via Serena</tool>
-  <tool name="Grep">Keyword search</tool>
-  <tool name="find_symbol">Symbol search via Serena</tool>
-  <tool name="find_referencing_symbols">Dependency mapping via Serena</tool>
-  <tool name="Read">Specific content details</tool>
-  <tool name="Context7">Latest API documentation and best practices</tool>
-</tools>
+## Investigate before asking
 
-<patterns>
-  <pattern name="investigation_workflow">
-    <description>Sequential investigation process for gathering requirements context</description>
-    <decision_tree name="when_to_use">
-      <question>Is the current system state unclear or unknown?</question>
-      <if_yes>Apply investigation workflow to gather context before requirements definition</if_yes>
-      <if_no>Proceed directly to functional requirements if context is clear</if_no>
-    </decision_tree>
-    <steps>
-      <step>Directory structure analysis using Glob</step>
-      <step>Symbol analysis using get_symbols_overview</step>
-      <step>Keyword search using Grep or find_symbol</step>
-      <step>Dependency mapping using find_referencing_symbols</step>
-      <step>Specific content details using Read</step>
-      <step>Latest API documentation using Context7</step>
-    </steps>
-  </pattern>
+Establish the current state first: directory structure, the symbol overview of the affected area, keyword and
+symbol search for the feature's existing neighbours, the reference graph around anything that will change, then
+the specific files. Verify external library behavior against Context7 rather than recall.
 
-  <pattern name="question_scoring">
-    <description>Score each question by these criteria (1-5 each) to prioritize requirement clarification</description>
-    <decision_tree name="when_to_use">
-      <question>Have unclear or ambiguous requirements been identified?</question>
-      <if_yes>Apply question scoring to prioritize critical clarifications</if_yes>
-      <if_no>Proceed with documenting clear requirements</if_no>
-    </decision_tree>
-    <criteria>
-      <criterion name="design_branching">How much does the answer affect design direction?</criterion>
-      <criterion name="irreversibility">How difficult to change after implementation?</criterion>
-      <criterion name="investigation_impossibility">Cannot be determined through code investigation alone?</criterion>
-      <criterion name="effort_impact">How much does it affect implementation effort?</criterion>
-    </criteria>
-    <note>Present high-score questions first. Do not proceed without clear answers to critical questions (score >= 15)</note>
-    <example>
-      Question: "Should we use TypeScript's strict mode?"
-      - Design Branching: 5 (affects all type decisions)
-      - Irreversibility: 4 (hard to change later)
-      - Investigation Impossibility: 3 (requires policy decision)
-      - Effort Impact: 4 (affects development effort)
-      Total: 16 (critical - must answer before proceeding)
-    </example>
-  </pattern>
+**A question that investigation could have answered spends the user's turn.** The point of investigating first
+is not thoroughness for its own sake — it is that the remaining questions are then exactly the ones only the
+user can settle.
 
-  <pattern name="question_classification">
-    <description>Categories of questions that arise during requirements definition</description>
-    <decision_tree name="when_to_use">
-      <question>Do you need to categorize questions for stakeholder communication?</question>
-      <if_yes>Apply question classification to organize by type</if_yes>
-      <if_no>Use question scoring to prioritize by impact</if_no>
-    </decision_tree>
-    <types>
-      <type name="spec_confirmation">Confirming existing behavior or constraints</type>
-      <type name="design_choice">Choosing between valid alternatives</type>
-      <type name="constraint">Technical or business limitations</type>
-      <type name="scope">Boundaries of implementation</type>
-      <type name="priority">Order and importance of features</type>
-    </types>
-    <example>
-      - Spec Confirmation: "Does the API return null or empty array for no results?"
-      - Design Choice: "Should we use REST or GraphQL?"
-      - Constraint: "Must support IE11 browsers?"
-      - Scope: "Should admin features be included in v1?"
-      - Priority: "Which feature should be implemented first?"
-    </example>
-  </pattern>
+## Which questions to ask first
 
-  <pattern name="functional_requirements">
-    <description>Format functional requirements with clear identifiers and acceptance criteria</description>
-    <decision_tree name="when_to_use">
-      <question>Are feature behaviors and capabilities clearly defined?</question>
-      <if_yes>Apply functional requirements format with acceptance criteria</if_yes>
-      <if_no>Use question scoring to clarify unclear behaviors first</if_no>
-    </decision_tree>
-    <example>
-      FR-001: User Authentication
-      Priority: mandatory
-      - Users must be able to log in with email and password
-      - Session must expire after 24 hours of inactivity
-      - Failed login attempts must be rate-limited (max 5 per hour)
-    </example>
-  </pattern>
+Rank a candidate question by four considerations, in this order:
 
-  <pattern name="non_functional_requirements">
-    <description>Specify measurable non-functional requirements across key dimensions</description>
-    <decision_tree name="when_to_use">
-      <question>Are quality attributes and constraints important for this feature?</question>
-      <if_yes>Apply non-functional requirements with measurable targets</if_yes>
-      <if_no>Focus on functional requirements only</if_no>
-    </decision_tree>
-    <example>
-      Performance:
-      - API response time &lt; 200ms for 95th percentile
-      - Support 1000 concurrent users
+1. **Design branching** — how much the answer changes the shape of the solution.
+2. **Irreversibility** — how expensive the wrong choice is to undo after implementation.
+3. **Investigation impossibility** — whether code investigation could settle it instead. If it could,
+   investigate rather than ask.
+4. **Effort impact** — how much the answer moves the size of the work.
 
-      Security:
+A question is **critical** when it branches the design *and* the wrong answer is expensive to undo. Ask those
+first, and do not proceed on an assumption while one is unanswered.
 
-      - All data encrypted at rest using AES-256
-      - JWT tokens for authentication
+*This deliberately carries no arithmetic.* An earlier form scored each consideration 1–5 and gated on a total
+of 15, which is the self-gated numeric threshold the corpus prohibits elsewhere — the scales were unanchored,
+so the total encoded nothing the ordering above does not, while looking like a measurement. The prohibition on
+numeric self-assessment is about rating *your own work*, which is self-confirming; ranking questions is a
+different act, and the fix here is to drop the false precision rather than the ranking.
 
-      Maintainability:
+### Classify each question
 
-      - Test coverage >= 80%
-      - Documentation for all public APIs
-    </example>
-  </pattern>
+- **Spec confirmation** — "does the API return null or an empty array for no results?"
+- **Design choice** — "REST or GraphQL?"
+- **Constraint** — "must this support the legacy client?"
+- **Scope** — "are admin features in the first version?"
+- **Priority** — "which of these ships first?"
 
-  <pattern name="technical_specifications">
-    <description>Document design policies, patterns, and key decisions with rationale</description>
-    <decision_tree name="when_to_use">
-      <question>Have key technical decisions been made or identified?</question>
-      <if_yes>Apply technical specifications pattern with rationale and impact analysis</if_yes>
-      <if_no>Continue requirements gathering to identify decision points</if_no>
-    </decision_tree>
-    <example>
-      Design Decision: Use React Query for data fetching
-      Rationale:
-      - Built-in caching reduces API calls
-      - Automatic background refetching
-      - TypeScript support
-      - Widely adopted in existing codebase
+Ask through AskUserQuestion with two to four concrete options and one marked (Recommended), so the user reviews
+a proposal rather than doing the analysis. Follow-ups go through the same tool.
 
-      Impact Scope:
+## Writing the requirements
 
-      - All components making API calls
-      - Testing utilities need to mock React Query
-    </example>
-  </pattern>
+**Functional requirements** carry an identifier, a priority, and acceptance criteria specific enough to test:
 
-  <pattern name="requirement_quality_evidence">
-    <description>State requirement quality as the observable condition that supports it, never as a
-      score. A feasibility or objectivity number produced in the same pass that wrote the requirement
-      never contradicts that requirement, so nothing downstream ever reads a low score and investigates
-      further (CLAUDE.md evidence_and_reporting, DEF-P004, core-patterns evidence_tiers).</description>
-    <decision_tree name="when_to_use">
-      <question>Are all requirements documented and ready for handoff?</question>
-      <if_yes>State feasibility and evidence for each requirement before considering it complete</if_yes>
-      <if_no>Continue requirements definition until complete</if_no>
-    </decision_tree>
-    <example>
-      Feasibility: which capability was located at which file:line, and which one was not found and
-      where it was searched for. Never reduce this to a number.
-      Example: "Feasible — the export pipeline this depends on exists at src/export/pipeline.ts:42.
-      No rate-limiting primitive exists in the codebase (searched src/lib, src/middleware), so that
-      remains an open constraint recorded in Outstanding Issues."
+```
+FR-001: User Authentication
+Priority: mandatory
+- Users log in with email and password
+- A session expires after 24 hours of inactivity
+- Failed attempts are rate-limited to 5 per hour
+```
 
-      Evidence: tag each requirement verified (grounded in direct investigation), inferred (derived
-      from something verified but not directly observed), or assumed (taken from the user's framing,
-      not checked). A requirement still `assumed` at handoff time is not ready.
-    </example>
-  </pattern>
-</patterns>
+Mark every requirement mandatory or optional **with the reason** — treating all requirements as equally
+important is the same as prioritizing none.
 
-<output>
-  <format>
-    <summary>
-      - One-sentence request description
-      - Background and context
-      - Expected outcomes
-    </summary>
-    <current_state>
-      - Existing system description
-      - Technology stack
-      - Relevant patterns and conventions
-    </current_state>
-    <functional_requirements>
-      Format: FR-XXX (FR-001, FR-002, ...)
-      - Priority: mandatory or optional
-      - Clear acceptance criteria
-    </functional_requirements>
-    <non_functional_requirements>
-      - Performance: response time, throughput
-      - Security: authentication, authorization, data protection
-      - Maintainability: code quality, documentation
-    </non_functional_requirements>
-    <technical_specifications>
-      - Design policies and patterns
-      - Impact scope analysis
-      - Key design decisions with rationale
-    </technical_specifications>
-    <feasibility_and_evidence>
-      - Feasibility: which capability was located at which file:line, which one was not found and
-        where it was searched for — never a numeric score (requirement_quality_evidence)
-      - Evidence: each requirement tagged verified / inferred / assumed
-    </feasibility_and_evidence>
-    <constraints>
-      - Technical constraints: platform, language, framework
-      - Operational constraints: deployment, maintenance
-    </constraints>
-    <test_requirements>
-      - Unit test coverage expectations
-      - Integration test scenarios
-      - Acceptance criteria verification
-    </test_requirements>
-    <task_breakdown>
-      - Dependency graph: task dependencies and execution order
-      - Phased tasks: files to modify/create, overview of changes, dependencies
-      - Execute handoff: key decisions, reference implementations, constraints
-    </task_breakdown>
-  </format>
-</output>
+**Non-functional requirements** carry a measurable target, not an adjective: a response-time percentile and its
+threshold, a concurrency figure, the encryption at rest, the documented surface. "Fast" and "secure" are not
+requirements.
 
-<best_practices>
-  <practice priority="critical">Always investigate current state before defining requirements using Serena's symbol-level operations</practice>
-  <practice priority="critical">Score questions using the 4-criteria scoring system and prioritize high-score questions (>= 15)</practice>
-  <practice priority="critical">Clearly distinguish mandatory from optional requirements with explicit rationale</practice>
-  <practice priority="high">Document all assumptions when requirements are unclear or incomplete</practice>
-  <practice priority="high">Map each requirement to specific test scenarios for verification</practice>
-  <practice priority="high">Include rationale for key design decisions in technical specifications</practice>
-  <practice priority="medium">Use Context7 to verify latest library documentation and best practices</practice>
-  <practice priority="medium">Create dependency graphs showing task execution order</practice>
-</best_practices>
+**Technical specifications** carry each design decision *with its rationale and its impact scope* — what the
+decision was, why it beat the alternatives, and which parts of the system now depend on it.
 
-<anti_patterns>
-  <avoid name="vague_requirements">
-    <description>Requirements that are unclear or unmeasurable</description>
-    <instead>Write specific, testable requirements with clear acceptance criteria</instead>
-  </avoid>
-  <avoid name="implementation_details">
-    <description>Specifying implementation details instead of requirements</description>
-    <instead>Describe what needs to be achieved, not how to implement it</instead>
-  </avoid>
-  <avoid name="skipping_investigation">
-    <description>Writing requirements without investigating existing code</description>
-    <instead>Always investigate current state before defining requirements</instead>
-  </avoid>
-  <avoid name="missing_constraints">
-    <description>Not identifying technical or operational constraints</description>
-    <instead>Explicitly document all constraints that affect implementation</instead>
-  </avoid>
-  <avoid name="undefined_priorities">
-    <description>Treating all requirements as equally important</description>
-    <instead>Clearly mark requirements as mandatory or optional with rationale</instead>
-  </avoid>
-</anti_patterns>
+Describe **what must be achieved, not how to implement it.** A requirement that names function names or
+algorithms has taken a decision away from the implementer under the guise of specifying it.
 
-<rules priority="critical">
-  <rule>Never proceed without clear answers to critical questions (score >= 15)</rule>
-  <rule>All requirements must be verifiable and measurable</rule>
-  <rule>Distinguish mandatory from optional requirements</rule>
-</rules>
+Document every assumption explicitly where a requirement is unclear, and identify the technical and operational
+constraints rather than leaving them to be discovered.
 
-<rules priority="standard">
-  <rule>Present high-score questions first in requirement discussions</rule>
-  <rule>Document assumptions explicitly when requirements are unclear</rule>
-  <rule>Include rationale for key design decisions</rule>
-  <rule>Map requirements to test scenarios</rule>
-</rules>
+## Feasibility is a condition, not a score
 
-<error_escalation>
-  <examples>
-    <example severity="low">Minor ambiguity in non-critical detail</example>
-    <example severity="medium">Unclear requirement affecting scope</example>
-    <example severity="high">Technically infeasible requirement</example>
-    <example severity="critical">Requirement violates security or ethics</example>
-  </examples>
-</error_escalation>
+State which capability was located at which file:line, and which was not found and where it was searched for.
 
-<constraints>
-  <must>Investigate before concluding</must>
-  <must>Ask questions before making assumptions</must>
-  <must>Include (Recommended) option in AskUserQuestion</must>
-  <avoid>Proceeding without answering critical questions</avoid>
-  <avoid>Justifying user preferences over technical validity</avoid>
-  <avoid>Documenting requirements without evidence</avoid>
-</constraints>
+> Feasible — the export pipeline this depends on exists at `src/export/pipeline.ts:42`. No rate-limiting
+> primitive exists in the codebase (searched `src/lib`, `src/middleware`), so that remains an open constraint
+> recorded in Outstanding Issues.
 
-<related_skills>
-  <skill name="investigation-patterns">Use to understand current system state before requirements definition</skill>
-  <skill name="execution-workflow">Use after requirements approval to delegate implementation</skill>
-  <skill name="testing-patterns">Use to define test requirements and acceptance criteria</skill>
-</related_skills>
+A feasibility number produced in the same pass that wrote the requirement never contradicts that requirement,
+so nothing downstream ever reads a low score and investigates further.
 
-<related_agents>
-  <agent name="explore">Locate existing implementations and patterns to ground requirements in evidence</agent>
-  <agent name="design">Evaluate architectural feasibility and consistency of proposed requirements</agent>
-  <agent name="validator">Cross-validate requirements document for completeness and consistency</agent>
-</related_agents>
+Tag each requirement **verified** (grounded in direct investigation), **inferred** (derived from something
+verified but not directly observed), or **assumed** (from the user's framing, unchecked). **A requirement still
+assumed at handoff time is not ready.**
+
+## Map every requirement to a test
+
+Unit coverage expectations, integration scenarios, and the acceptance criteria as observable behavior. A
+requirement with no test scenario is a requirement nobody will notice going unmet.
+
+## Related
+
+- [define-core](../define-core/SKILL.md) — the phase sequence this methodology runs inside
+- [investigation-patterns](../investigation-patterns/SKILL.md) — establishing current state before specifying
+- [testing-patterns](../testing-patterns/SKILL.md) — turning acceptance criteria into tests
+- [execution-workflow](../execution-workflow/SKILL.md) — delegating implementation once approved
+- [core-patterns](../core-patterns/SKILL.md) — the evidence tiers and the numeric-self-assessment prohibition

@@ -4,897 +4,237 @@ description: Upstream PR preparation and review command
 ---
 
 <purpose>
-Review and prepare changes before submitting PRs to upstream OSS repositories, auto-fetching contribution guidelines, analyzing code changes, evaluating tests, and generating compliant PR metadata.
+Review changes before they are submitted to an upstream OSS repository: fetch the contribution guidelines,
+learn the repository's actual conventions from merged PRs, assess the diff, and emit PR metadata plus a task
+breakdown that /execute can consume. Everything produced is a handoff the user decides to act on.
 </purpose>
+
 <rules priority="critical">
-  <rule>Read-only: analyze and report, never modify the repository under review and never open a PR.
-    Everything this command produces is a handoff the user decides to act on.</rule>
+  <rule>Read-only. Never modify the repository under review. The verification-environment files under /tmp are
+    the only writes permitted.</rule>
+  <rule>NEVER create a pull request, by `gh pr create` or any other means, even when the user asks for one in
+    this command. Refuse, emit the task breakdown, and say that /execute runs the tasks and the user opens the
+    PR. SSOT-EXEMPT: restated as a hard block because the action is externally visible and irreversible.</rule>
 </rules>
 <rules priority="important">
-  <rule>Verify gh CLI authentication before any PR history operation, because an unauthenticated shell
-    surfaces as an empty PR sample rather than as an error.</rule>
-  <rule>Auto-fetch CONTRIBUTING.md from upstream with the fallback hierarchy (root, .github/, docs/).</rule>
-  <rule>Launch all gather-phase agents in parallel; they are independent.</rule>
-  <rule>Check Serena memories for existing contribution patterns for this upstream.</rule>
+  <rule>Verify `gh auth status` before any PR-history operation. An unauthenticated shell returns an empty PR
+    sample rather than an error, and the review then invents conventions from nothing.</rule>
+  <rule>Dispatch the gather-phase agents in one message; they are independent.</rule>
+  <rule>Every command in an emitted QA step carries real values from the diff. A step still holding
+    `[endpoint-path]`, `[component-name]`, or `[table-name]` cannot be run by the reviewer it was written for;
+    list what could not be resolved under gaps instead of leaving it in the command.</rule>
 </rules>
-<rules priority="advisory">
-  <rule>Use the gh CLI for GitHub API operations.</rule>
-  <rule>Produce a structured checklist with actionable items and Nix-first local reproduction steps.</rule>
-  <rule>Include a (Recommended) option when presenting choices via AskUserQuestion.</rule>
-</rules>
-<ai_principles>
-  <inapplicable_traditional_practices>
-    <practice>Fetching contribution guidelines, reviewing code, and sampling merged PRs sequentially — all gather-phase agents (guidelines, pr_template, changes, tests, pr_samples) are independent and must run in parallel</practice>
-    <practice>Writing PR descriptions from memory of common conventions — AI must fetch CONTRIBUTING.md and sample 10 real merged PRs from the upstream repo to learn actual patterns before generating metadata</practice>
-    <practice>Making any file modifications during review — this command is strictly read-only; all output feeds into an /execute handoff, never direct file writes</practice>
-  </inapplicable_traditional_practices>
-  <applicable_ai_principles>
-    <principle>Learn upstream conventions empirically: sample 10 recently merged PRs to extract title patterns, description structure, and required sections rather than guessing from general OSS norms</principle>
-    <principle>Inject actual values (file paths, endpoint names, component names) from diff analysis into every qa_step command; placeholder text in verification steps is a quality failure</principle>
-    <principle>Generate the complete task_breakdown with phased_tasks and execute_handoff so /execute can consume the output directly without requiring another planning pass</principle>
-  </applicable_ai_principles>
-</ai_principles>
+
 <workflow>
   <phase name="prepare">
-    <objective>Verify environment and detect upstream repository</objective>
-    <step order="0">
-      <action>Load the git-ecosystem skill with the Skill tool when the change will need commit-history
-        work planned — a rebase onto the upstream default branch, a squash, or a re-push after either.
-        It holds the mechanical diff-inspection and worktree-isolation patterns the commit_prep phase
-        plans against. Skip the load for a review that only produces PR metadata.</action>
-      <tool>Skill (git-ecosystem)</tool>
-      <output>Skill loaded, or the reason it was not needed</output>
-    </step>
+    <objective>Establish the upstream, the diff, and that gh can talk to it</objective>
     <step order="1">
-      <action>Check Serena memories for contribution patterns of upstream repo</action>
-      <tool>Serena list_memories, read_memory</tool>
-      <output>Relevant patterns and past contribution experiences</output>
+      <action>Load git-ecosystem only if commit-history work will be planned — a rebase onto the upstream
+        default branch, a squash, or a re-push. Skip it for a review that produces PR metadata alone.</action>
+      <tool>Skill (git-ecosystem)</tool>
     </step>
     <step order="2">
-      <action>Verify gh CLI authentication status</action>
-      <tool>Bash: gh auth status</tool>
-      <output>Authentication confirmation or error</output>
+      <action>Run `gh auth status`, resolve owner/repo from `git remote -v` (prefer an `upstream` remote), and
+        take the diff against the upstream default branch. If more than one remote could be the upstream, or
+        the detected URL contradicts the command argument, ask rather than picking.</action>
+      <tool>Bash, AskUserQuestion</tool>
+      <output>Account line, resolved owner/repo and its remote, diff --stat</output>
     </step>
     <step order="3">
-      <action>Detect upstream repository from git remotes</action>
-      <tool>Bash: git remote -v</tool>
-      <output>Upstream URL (prefer upstream remote, fallback to origin)</output>
-    </step>
-    <step order="4">
-      <action>If more than one remote could be the upstream, or the detected URL does not match the
-        repository given in the command argument, ask the user rather than picking one</action>
-      <tool>AskUserQuestion</tool>
-      <output>Confirmed upstream URL</output>
-    </step>
-    <step order="5">
-      <action>Get current branch and pending changes</action>
-      <tool>Bash: git status, git diff</tool>
-      <output>Branch name, change summary</output>
-    </step>
-    <step order="6">
-      <action>Compare local branch with upstream default branch</action>
-      <tool>Bash: git diff upstream/main...HEAD --stat</tool>
-      <output>Summary of divergent changes</output>
+      <action>Read Serena memories for this upstream's contribution patterns only if the index names
+        one — a repository reviewed for the first time has nothing to load.</action>
+      <tool>Serena list_memories, read_memory</tool>
+      <output>Matched memories, or "no entry for this upstream"</output>
     </step>
   </phase>
   <reflection_checkpoint id="preflight_complete" after="prepare">
-    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
-    <check>Paste the account line from `gh auth status`. An unauthenticated shell fails every later
-      gh call, and the failure surfaces as an empty PR sample rather than as an error.</check>
-    <check>State the resolved owner/repo and the remote it came from.</check>
-    <check>State the file count and line count from `git diff upstream/&lt;default&gt;...HEAD --stat`.
-      Zero means there is nothing to review.</check>
-    <check>Judge the diff's scope in both directions and name what you find. Over-inclusion: files in
-      the diff that this change does not need — incidental tooling, unrelated documentation, or CI
-      edits picked up along the way — which a maintainer has to untangle before reviewing anything.
-      Under-inclusion: surfaces the change requires but does not touch, most often a dependency
-      manifest or lockfile left behind when only the source moved. Both come from the same missing
-      step, so enumerate every surface this change must touch to hold together and compare that list
-      against the diff.</check>
-    <on_unmet>Stop and report to the user. Do not proceed on an assumed remote or an empty diff. When
-      the scope is mixed, report the split and let the user decide what belongs in this PR rather than
-      preparing metadata for a change that will be rejected on composition.</on_unmet>
+    <gate>Per gate_discipline in CLAUDE.md.</gate>
+    <check>The account line from `gh auth status`, the resolved owner/repo with its remote, and the file and
+      line counts from the diff. Zero files means there is nothing to review.</check>
+    <check>Judge the diff's scope in both directions. Over-inclusion: files the change does not need —
+      incidental tooling, unrelated docs, CI edits picked up along the way — which a maintainer must untangle
+      before reviewing anything. Under-inclusion: surfaces the change requires but does not touch, most often a
+      dependency manifest or lockfile left behind when only the source moved. Both come from the same missing
+      step, so enumerate every surface this change must touch to hold together and compare it against the
+      diff.</check>
+    <on_unmet>Stop and report. Never proceed on an assumed remote or an empty diff. When the scope is mixed,
+      report the split and let the user decide what belongs in this PR.</on_unmet>
   </reflection_checkpoint>
+
   <phase name="gather">
-    <objective>Collect all necessary information in parallel</objective>
+    <objective>Collect the evidence, in parallel</objective>
     <step order="1">
-      <action>Fetch CONTRIBUTING.md from upstream</action>
-      <tool>guidelines agent (WebFetch with fallback: root, .github/, docs/)</tool>
-      <output>Contribution guidelines content</output>
-    </step>
-    <step order="2">
-      <action>Fetch .github/PULL_REQUEST_TEMPLATE.md from upstream</action>
-      <tool>pr_template agent (WebFetch: https://raw.githubusercontent.com/{owner}/{repo}/{default_branch}/.github/PULL_REQUEST_TEMPLATE.md)</tool>
-      <output>PR template structure with required sections, or null if not found</output>
-    </step>
-    <step order="3">
-      <action>Analyze code changes against upstream patterns</action>
-      <tool>changes agent (quality-assurance)</tool>
-      <output>Code quality assessment</output>
-    </step>
-    <step order="4">
-      <action>Evaluate test coverage and appropriateness</action>
-      <tool>tests agent</tool>
-      <output>Test evaluation report</output>
-    </step>
-    <step order="5">
-      <action>Sample 10 recently merged PRs from upstream for pattern learning</action>
-      <tool>pr_samples agent (gh pr list --repo {owner}/{repo} --state merged --limit 10 --json title,body,number,author)</tool>
-      <output>PR title patterns, description structure, common sections</output>
+      <action>Dispatch guidelines, pr_template, changes, tests, and pr_samples in one message.</action>
+      <tool>Task</tool>
+      <output>Five reports</output>
     </step>
   </phase>
   <reflection_checkpoint id="gather_complete" after="gather">
-    <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
-    <check>Give the URL CONTRIBUTING.md was fetched from, or name all three locations tried and the
-      status each returned.</check>
-    <check>State whether .github/PULL_REQUEST_TEMPLATE.md was fetched or confirmed absent, and by which URL.</check>
-    <check>State how many merged PRs came back and give their numbers. Fewer than 10 is a gap to record,
-      not a detail to round up.</check>
-    <check>Name the files the changes agent reviewed and the files the tests agent reviewed.</check>
-    <on_unmet>Record each unmet item in the report's gaps section and proceed on what was actually
-      retrieved. Never present a convention inferred from no sample as a learned upstream pattern.</on_unmet>
+    <gate>Per gate_discipline in CLAUDE.md.</gate>
+    <check>The URL CONTRIBUTING.md came from, or all three locations tried with the status each returned.</check>
+    <check>Whether .github/PULL_REQUEST_TEMPLATE.md was fetched or confirmed absent, and by which URL.</check>
+    <check>How many merged PRs came back, with their numbers. Fewer than ten is a gap to record, not a detail
+      to round up.</check>
+    <check>The files the changes agent reviewed and the files the tests agent reviewed.</check>
+    <on_unmet>Record each unmet item under gaps and proceed on what was actually retrieved. Never present a
+      convention inferred from no sample as a learned upstream pattern.</on_unmet>
   </reflection_checkpoint>
+
   <phase name="synthesize">
-    <objective>Generate PR metadata, verification steps, and comprehensive task breakdown</objective>
+    <objective>Turn the evidence into a handoff</objective>
     <step order="1">
-      <action>Generate PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns</action>
-      <tool>metadata agent with pr_template output (if found) and pr_samples patterns as fallback</tool>
-      <output>Template-compliant PR metadata; template_source indicates whether upstream_template, sampled_patterns, or none was used</output>
+      <action>Generate the PR title and description from the upstream template where one exists, otherwise from
+        the structure the sampled PRs share. Record which of the two it was, and name the template URL or the
+        PR numbers it was derived from.</action>
+      <output>PR metadata with its basis named</output>
     </step>
     <step order="2">
-      <action>Detect project ecosystem and generate local reproduction steps</action>
-      <tool>Analyze flake.nix, Makefile, Cargo.toml, go.mod, package.json with Nix-first priority</tool>
-      <output>Ecosystem detection, environment setup, service dependencies, verification commands</output>
+      <action>Derive local reproduction from the repository's own definitions — a flake output, Makefile
+        target, or package script — Nix first where a flake exists. A command with no such definition is a
+        guess and is labelled one. Name the indicator file the ecosystem was identified from, and take service
+        dependencies from compose files, .env.example, or the CI service block rather than from habit.</action>
+      <output>Setup, services, and verification commands, each with the file that defines it</output>
     </step>
     <step order="3">
-      <action>Detect change types and generate context-injected manual QA checklist</action>
-      <tool>Analyze diff for UI components, API endpoints, database migrations, config changes, security files, integration points using detection_rules</tool>
-      <output>Change type detection (ui, api, database, config, security, integration) with actual paths, endpoints, and component names injected into qa_step commands</output>
+      <action>Classify what the diff touches — UI, API, database, config, security, integration — from the
+        paths and contents themselves, and write QA steps whose commands carry the real paths, endpoints, and
+        component names. Where a verification environment helps, build it under
+        /tmp/&lt;repo&gt;/&lt;branch-or-issue&gt;/ with a devenv.nix, a .envrc using devenv, fixtures for the change
+        types found, and a README stating expected results concretely enough to compare against; load
+        devenv-ecosystem at that point for the option surface. Name any tool the steps invoke that devenv.nix
+        does not provide — the environment fails at that command, not at build time.</action>
+      <output>QA steps with injected values; the verification environment path, or why none was needed</output>
     </step>
     <step order="4">
-      <action>Compile checklist with all findings</action>
-      <tool>Consolidate agent outputs</tool>
-      <output>Structured checklist report</output>
-    </step>
-    <step order="5">
-      <action>Generate comprehensive task breakdown for /execute handoff</action>
-      <tool>Categorize all identified issues into phased_tasks phases (code_fixes, test_updates, documentation, commit_prep, final_verification)</tool>
-      <output>Phased task list with dependencies using ID format: CF-XXX, TU-XXX, DOC-XXX, GIT-XXX, VER-XXX</output>
-    </step>
-    <step order="6">
-      <action>Build dependency graph for parallel execution optimization</action>
-      <tool>Analyze task dependencies to identify parallel-safe phases</tool>
-      <output>Dependency graph with parallel groups</output>
-    </step>
-    <step order="7">
-      <action>Compile execute_handoff section with decisions, references, and constraints</action>
-      <tool>Consolidate contribution guidelines, code patterns, and past feedback into actionable references</tool>
-      <output>Complete execute_handoff for /execute command consumption</output>
+      <action>Break the work into phased tasks for /execute: code fixes (CF-nnn), test updates (TU-nnn),
+        documentation (DOC-nnn), commit preparation (GIT-nnn), final verification (VER-nnn). Give each task its
+        files, its deliverable, its verification criterion, and its dependencies, and mark which phases are
+        parallel-safe. Commit-preparation tasks encode the principles in git_mechanics below; this command
+        plans them and never runs them.</action>
+      <output>Phased tasks with dependencies, and the decisions and references /execute needs</output>
     </step>
   </phase>
+
   <phase name="self_evaluate">
     <objective>Find what the review claims but did not establish</objective>
     <step order="1">
-      <action>Cross-check the guideline-compliance items against the code review findings yourself. They
-        are two readings of the same diff, and a compliance item marked pass on a file the changes agent
-        flagged is the contradiction worth catching. Dispatch the validator agent only when that
-        cross-check leaves a consequential disagreement you cannot settle from what each side actually
-        examined; an independent pass is not a routine phase here.</action>
-      <output>Contradictions found and how each was settled, or "none"</output>
+      <action>Cross-check the guideline-compliance items against the code-review findings yourself; they are
+        two readings of the same diff, and a compliance item marked pass on a file the changes agent flagged is
+        the contradiction worth catching. Dispatch validator only when that leaves a consequential disagreement
+        you cannot settle from what each side examined.</action>
+      <output>Contradictions and how each was settled, or "none"</output>
     </step>
     <step order="2">
-      <action>Tag every checklist item and finding verified, inferred, or assumed. A `verified` item must
-        name the guideline line it came from, the file:line it was checked against, or the command that
-        produced it. If it cannot, downgrade it — an item marked pass because it looked fine is `assumed`.</action>
-      <output>Findings tagged, over-claims downgraded</output>
-    </step>
-    <step order="3">
-      <action>List what the review was asked for but did not deliver, and why: guidelines that could not be
-        fetched, checks not run, placeholders left uninjected, PR samples not retrieved.</action>
-      <output>Gap list, possibly empty</output>
-    </step>
-    <step order="4">
-      <action>Set the status from what steps 2 and 3 found, using the status_criteria below, and append
-        the self_feedback section naming the weakest claim and what would confirm it.</action>
-      <output>Status and self_feedback</output>
+      <action>Tag every checklist item per the evidence rules in CLAUDE.md. A verified item names the guideline
+        line, the file:line, or the command behind it; an item marked pass because it looked fine is assumed.
+        Then set the status from status_criteria and name the weakest claim with what would confirm it.</action>
+      <output>Tagged findings, status, weakest claim</output>
     </step>
   </phase>
 </workflow>
 
 <reflection_checkpoint id="group_consistency">
-  <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>
-  <check>Name every tool call made and show that none wrote to the repository under review and none created
-    a PR (UP-P001, UP-P002). The verification-environment files under /tmp are the only writes permitted.</check>
-  <check>Name the output sections produced: checklist, pr_metadata, local_reproduction, manual_verification,
-    task_breakdown with execute_handoff. Name any that is missing.</check>
-  <check>Quote any placeholder still present in a qa_step command — [endpoint-path], [component-name],
-    [table-name], [repo-name]. An unreplaced placeholder makes the step unrunnable (UP-B007).</check>
-  <on_unmet>Stop and resolve the gap before returning the report.</on_unmet>
+  <gate>Per gate_discipline in CLAUDE.md.</gate>
+  <check>Name every tool call made and show that none wrote to the repository under review and none created a
+    PR. Writes under /tmp are the only exception.</check>
+  <check>Name the output sections produced, and any that is missing.</check>
+  <check>Quote any placeholder still present in a QA step command.</check>
+  <on_unmet>Resolve the gap before returning the report.</on_unmet>
 </reflection_checkpoint>
+
 <agents>
-  <agent name="guidelines" subagent_type="docs" readonly="true">Parse CONTRIBUTING.md and extract requirements</agent>
-  <agent name="pr_template" subagent_type="docs" readonly="true">Fetch and parse .github/PULL_REQUEST_TEMPLATE.md from upstream; extract required sections and structure; return null if not found (no fallback)</agent>
-  <agent name="changes" subagent_type="quality-assurance" readonly="true">Review code changes for quality and patterns</agent>
-  <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness</agent>
-  <agent name="pr_samples" subagent_type="general-purpose" readonly="true">Sample 10 recently merged PRs from upstream via gh CLI; extract title patterns, description structure, and common sections for pattern learning</agent>
-  <agent name="metadata" subagent_type="docs" readonly="true">Generate compliant PR title and description: use PR template sections if available; otherwise derive structure from 10 sampled merged PR patterns; set template_source accordingly</agent>
-  <agent name="verify" subagent_type="devops" readonly="true">Detect ecosystem (Nix-first), service dependencies, generate local reproduction steps, detect change types (ui, api, database, config, security, integration) using detection_rules, and inject actual paths/endpoints/component names into manual QA steps</agent>
-  <agent name="validator" subagent_type="validator" readonly="true" dispatch="on_demand">Independently re-derive a disputed claim, when the guideline-compliance and code-review readings disagree and their evidence does not settle it</agent>
+  <agent name="guidelines" subagent_type="docs" readonly="true">Fetch CONTRIBUTING.md, trying root, then .github/, then docs/; extract the stated requirements</agent>
+  <agent name="pr_template" subagent_type="docs" readonly="true">Fetch .github/PULL_REQUEST_TEMPLATE.md at that exact path only, no fallback; return its required sections, or absent</agent>
+  <agent name="changes" subagent_type="quality-assurance" readonly="true">Review the diff for quality and for departure from patterns prevailing in the upstream repository</agent>
+  <agent name="tests" subagent_type="test" readonly="true">Evaluate test coverage and appropriateness for the change</agent>
+  <agent name="pr_samples" subagent_type="general-purpose" readonly="true">`gh pr list --repo {owner}/{repo} --state merged --limit 10 --json title,body,number,author`; extract title patterns, description structure, and how each change was split into commits</agent>
+  <agent name="metadata" subagent_type="docs" readonly="true">Compose the PR title and description from the template where present, otherwise from the sampled patterns, recording which</agent>
+  <agent name="verify" subagent_type="devops" readonly="true">Derive the reproduction steps and the verification environment, and inject diff values into the QA steps</agent>
+  <agent name="validator" subagent_type="validator" readonly="true" dispatch="on_demand">Re-derive one disputed claim, only when the cross-check could not settle it</agent>
 </agents>
 <execution_graph>
-  <parallel_group id="gather" depends_on="none">
-    <agent>guidelines</agent>
-    <agent>pr_template</agent>
-    <agent>changes</agent>
-    <agent>tests</agent>
-    <agent>pr_samples</agent>
-  </parallel_group>
-  <parallel_group id="post_gather" depends_on="gather">
-    <agent>metadata</agent>
-    <agent>verify</agent>
-  </parallel_group>
+  <parallel_group id="gather" depends_on="none">guidelines, pr_template, changes, tests, pr_samples</parallel_group>
+  <parallel_group id="post_gather" depends_on="gather">metadata, verify</parallel_group>
   <sequential_phase id="self_evaluation" depends_on="post_gather">
-    <action>Cross-check guideline compliance against the code review findings, tag evidence tiers, and list gaps</action>
+    <action>Cross-check compliance against review findings, tag evidence tiers, list gaps</action>
     <conditional_agent>validator</conditional_agent>
-    <reason>Dispatched only for a disagreement the cross-check could not settle, since an independent pass costs materially more than the reports it checks</reason>
+    <reason>An independent pass costs materially more than the reports it checks, so it is dispatched for an unsettled disagreement rather than as a routine phase</reason>
   </sequential_phase>
 </execution_graph>
-<delegation>
-  <requirement>Upstream repository URL or detection</requirement>
-  <requirement>Current branch and pending changes</requirement>
-  <requirement>Contribution guidelines (if available)</requirement>
-  <requirement>PR template from .github/PULL_REQUEST_TEMPLATE.md (if available)</requirement>
-  <requirement>10 sampled merged PRs for pattern learning</requirement>
-  <requirement>Explicit no-modification prohibition</requirement>
-  <requirement>Sub-agents must use AskUserQuestion for user interactions</requirement>
-</delegation>
+
 <decision_criteria>
   <factor name="guideline_compliance" precedence="1">
-    <unmet>A requirement stated in CONTRIBUTING.md is not met by the change, or CONTRIBUTING.md could not
-      be fetched at all. Report the specific requirement and the file that violates it; if the guidelines
-      are missing, say the compliance section rests on sampled PRs rather than on stated rules.</unmet>
+    <unmet>A stated CONTRIBUTING.md requirement is not met, or CONTRIBUTING.md could not be fetched. Report the
+      requirement and the violating file; if the guidelines are missing, say the compliance section rests on
+      sampled PRs rather than on stated rules.</unmet>
   </factor>
   <factor name="test_coverage" precedence="2">
-    <unmet>The change alters behavior and no test exercises the new path, or the test command was never
-      run. Name the untested behavior, and give the command a reviewer should run.</unmet>
+    <unmet>Behavior changed and no test exercises the new path, or the test command was never run. Name the
+      untested behavior and the command a reviewer should run.</unmet>
   </factor>
   <factor name="code_quality" precedence="3">
-    <unmet>The change departs from a pattern used elsewhere in the upstream repository, and the departing
-      location can be cited alongside the prevailing one. Report both file:line references.</unmet>
+    <unmet>The change departs from a pattern used elsewhere upstream and both locations can be cited. Report
+      both file:line references.</unmet>
   </factor>
-  <resolution>Apply in precedence order. The first factor whose `unmet` condition holds decides what
-    happens next; later factors are not consulted.</resolution>
+  <resolution>First factor whose `unmet` holds decides; later factors are not consulted.</resolution>
 </decision_criteria>
+
+<git_mechanics>
+  The principles the commit_prep tasks encode. This command plans them and never runs them. Referenced by
+  git-ecosystem, which deliberately does not restate them.
+
+  <principle name="branch_naming">Name the branch after the issue it addresses, cut from the upstream default
+    branch — fix/&lt;issue-number&gt;-&lt;slug&gt; for a bug, feat/&lt;slug&gt; for a feature.</principle>
+  <principle name="rebase_onto_upstream">Rebase onto the freshly fetched upstream default branch so the PR
+    applies cleanly and carries only the intended changes, not merge-commit noise.</principle>
+  <principle name="commit_split_from_precedent">Derive the number of commits from how the closest analogous
+    change landed, using the ten sampled merged PRs as the evidence, rather than from habit. Where a repository
+    consistently lands a change of this shape as an ordered series — interface first, then implementation and
+    migration, then the public surface together with the rules guarding it — one squashed commit is harder to
+    review, not easier. Every commit in such a series stands on its own, and a security-relevant surface is
+    never introduced before the rule that guards it.</principle>
+  <principle name="single_reviewable_commit">Absent such a precedent, organize the change into one reviewable,
+    logically complete commit and squash incidental fixups. Reviewers read a coherent diff, not the authoring
+    history.</principle>
+  <principle name="scope_is_exact">Plan the commit to contain every surface the change needs and nothing else.
+    Unrelated tooling or documentation swept in makes a reviewer untangle the diff before reading it; a source
+    change whose dependency manifest or lockfile was left behind does not build for anyone but its author.</principle>
+  <principle name="issue_reference">Reference the issue with a closing keyword — Fixes #N / Closes #N — so the
+    merge auto-closes it.</principle>
+  <principle name="force_with_lease">A rebased branch is re-pushed with --force-with-lease, never --force.
+    --force-with-lease updates the remote only if its tip still matches your remote-tracking ref, so it refuses
+    to clobber commits pushed since your last fetch; plain --force overwrites them silently. A background
+    `git fetch` can invalidate the lease, and --force-if-includes closes that gap by requiring the fetched
+    updates to be integrated locally first.</principle>
+  <principle name="compat_and_tests_as_a_set">Design a backward-compatibility fallback together with its test
+    coverage. Gate new behavior behind an opt-in — a new enum variant, mode flag, or config key — that
+    preserves the old default, and pair it with tests exercising both paths. Compatibility without a test
+    pinning the old behavior is unverified.</principle>
+</git_mechanics>
+
 <output>
+  Follows output_contract in CLAUDE.md, with these sections:
+
+  <section name="summary">Upstream owner/repo, branch, what the change does, status.</section>
+  <section name="checklist">Findings grouped as contribution guidelines, code quality, test coverage, and
+    recurring patterns from past reviews. Each item carries pass/fail/warn and its location.</section>
+  <section name="pr_metadata">Title, description in markdown matching upstream conventions, and the basis it
+    was derived from — the template URL, the sampled PR numbers, or neither, in which case say the structure is
+    a general convention and was not learned from this repository.</section>
+  <section name="local_reproduction">Ecosystem and the indicator file it was identified from, setup, service
+    dependencies with their source, and verification commands each with the file that defines it. A command
+    with no definition is labelled a guess.</section>
+  <section name="manual_verification">The QA steps with injected values, the verification-environment path if
+    one was built, and every unresolved placeholder or missing tool.</section>
+  <section name="task_breakdown">The phased tasks with dependencies, and the decisions, references, and
+    constraints /execute needs to run them without another planning pass.</section>
+
   <status_criteria>
-    <status name="ready">Every check the review set out to make was made and none failed. No checklist
-      item the review was meant to verify is left at `assumed`.</status>
-    <status name="needs_work">The review completed, but a check could not be run, an item rests on
-      `assumed` evidence, or a warning-level finding stands. The gap is named in the summary.</status>
-    <status name="blocked">A critical finding stands, or a blocker stopped the review's core question from
-      being answered — gh auth failure, no upstream detected, or an empty diff.</status>
+    <status name="ready">Every check the review set out to make was made and none failed; nothing it was meant
+      to verify is left at assumed.</status>
+    <status name="needs_work">The review completed, but a check could not run, an item rests on assumed
+      evidence, or a warning-level finding stands. The gap is named.</status>
+    <status name="blocked">A critical finding stands, or a blocker stopped the central question from being
+      answered — gh auth failure, no upstream detected, or an empty diff.</status>
   </status_criteria>
-  <format>
-    <upstream_review>
-      <summary>
-        <upstream_repo>owner/repo</upstream_repo>
-        <branch>feature-branch</branch>
-        <changes_summary>Brief description of changes</changes_summary>
-        <status>ready|needs_work|blocked</status>
-        <verification>The exact commands run during the review and their exit status, or "none run" —
-          never omitted</verification>
-      </summary>
-      <checklist>
-        <section name="Contribution Guidelines">
-          <item status="pass|fail|warn">Guideline item description</item>
-        </section>
-        <section name="Code Quality">
-          <item status="pass|fail|warn" priority="high|medium|low">Issue description with location</item>
-        </section>
-        <section name="Test Coverage">
-          <item status="pass|fail|warn">Test evaluation item</item>
-        </section>
-        <section name="Past Review Patterns">
-          <item status="info">Recurring feedback pattern to address</item>
-        </section>
-      </checklist>
-      <pr_metadata>
-        <template_source>upstream_template|sampled_patterns|none</template_source>
-        <title>
-          <value>Suggested PR title following learned patterns from sampled PRs</value>
-          <pattern_notes>Pattern observed from 10 sampled PRs (e.g., [type]: description, feat(scope): description)</pattern_notes>
-        </title>
-        <description>
-          <sections>
-            <section name="Summary" required="true">Content based on template or sampled patterns</section>
-            <section name="Test Plan" required="false">Content if template requires or patterns suggest</section>
-          </sections>
-          <raw_markdown>Full PR description in markdown matching upstream conventions</raw_markdown>
-        </description>
-        <pattern_basis>What the title and section structure were derived from: the upstream template
-          (name the URL), the sampled PRs (give their numbers), or neither — in which case say the
-          structure is a general convention and was not learned from this repository</pattern_basis>
-      </pr_metadata>
-      <local_reproduction>
-        <ecosystem_detection>
-          <description>Auto-detect project ecosystem from configuration files</description>
-          <priority_order>
-            <ecosystem priority="1" indicator="flake.nix">Nix (flake-based)</ecosystem>
-            <ecosystem priority="2" indicator="shell.nix or default.nix">Nix (legacy)</ecosystem>
-            <ecosystem priority="3" indicator="Makefile">Make</ecosystem>
-            <ecosystem priority="4" indicator="Cargo.toml">Rust/Cargo</ecosystem>
-            <ecosystem priority="5" indicator="go.mod">Go</ecosystem>
-            <ecosystem priority="6" indicator="package.json">Node.js/npm</ecosystem>
-            <ecosystem priority="7" indicator="pyproject.toml or setup.py">Python</ecosystem>
-            <ecosystem priority="8" indicator="Gemfile">Ruby</ecosystem>
-          </priority_order>
-          <detected_ecosystem>Ecosystem name based on files found</detected_ecosystem>
-        </ecosystem_detection>
-        <environment_setup>
-          <description>Prerequisites and environment initialization</description>
-          <prerequisite_commands ecosystem="nix-flake">
-            <command order="1" purpose="enter-shell">nix develop</command>
-            <command order="2" purpose="build-check">nix flake check</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="nix-legacy">
-            <command order="1" purpose="enter-shell">nix-shell</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="make">
-            <command order="1" purpose="setup">make setup or make deps (if target exists)</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="cargo">
-            <command order="1" purpose="fetch">cargo fetch</command>
-            <command order="2" purpose="build-check">cargo check</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="go">
-            <command order="1" purpose="fetch">go mod download</command>
-            <command order="2" purpose="build-check">go build ./...</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="npm">
-            <command order="1" purpose="install">npm install or npm ci</command>
-          </prerequisite_commands>
-          <prerequisite_commands ecosystem="python">
-            <command order="1" purpose="venv">python -m venv .venv and source .venv/bin/activate</command>
-            <command order="2" purpose="install">pip install -e . or uv sync</command>
-          </prerequisite_commands>
-          <environment_requirements>
-            <requirement type="env_var">List of required environment variables detected from .env.example or config</requirement>
-            <requirement type="tool">List of required tools (detected from CI config or README)</requirement>
-          </environment_requirements>
-        </environment_setup>
-        <service_dependencies>
-          <description>External services required for local testing</description>
-          <detection_sources>
-            <source>docker-compose.yml or compose.yml</source>
-            <source>.env.example (DATABASE_URL, REDIS_URL patterns)</source>
-            <source>CI workflow files (services section)</source>
-            <source>README.md (development setup section)</source>
-          </detection_sources>
-          <detected_services>
-            <service name="service-name" start_command="docker compose up -d service-name">Service description</service>
-          </detected_services>
-          <startup_command>docker compose up -d (if docker-compose.yml exists)</startup_command>
-        </service_dependencies>
-        <verification_commands>
-          <description>Ecosystem-specific verification commands</description>
-          <commands ecosystem="nix-flake">
-            <command purpose="check">nix flake check</command>
-            <command purpose="build">nix build</command>
-            <command purpose="test">nix flake check (if tests defined in flake outputs)</command>
-          </commands>
-          <commands ecosystem="cargo">
-            <command purpose="lint">cargo clippy</command>
-            <command purpose="test">cargo test</command>
-            <command purpose="build">cargo build --release</command>
-          </commands>
-          <commands ecosystem="go">
-            <command purpose="lint">go vet ./...</command>
-            <command purpose="test">go test ./...</command>
-            <command purpose="build">go build ./...</command>
-          </commands>
-          <commands ecosystem="npm">
-            <command purpose="lint">npm run lint</command>
-            <command purpose="test">npm test</command>
-            <command purpose="build">npm run build</command>
-          </commands>
-          <commands ecosystem="make">
-            <command purpose="lint">make lint (if target exists)</command>
-            <command purpose="test">make test</command>
-            <command purpose="build">make build or make all</command>
-          </commands>
-          <commands ecosystem="python">
-            <command purpose="lint">ruff check . or flake8</command>
-            <command purpose="test">pytest</command>
-            <command purpose="build">python -m build or pip install -e .</command>
-          </commands>
-        </verification_commands>
-        <reproduction_steps>
-          <description>Step-by-step local reproduction procedure</description>
-          <step order="1">
-            <action>Checkout branch</action>
-            <command>git checkout [branch-name]</command>
-            <expected_output>Switched to branch [branch-name]</expected_output>
-          </step>
-          <step order="2">
-            <action>Setup environment</action>
-            <command>Ecosystem-specific setup command from environment_setup</command>
-            <expected_output>Dependencies installed, environment ready</expected_output>
-          </step>
-          <step order="3">
-            <action>Start services (if needed)</action>
-            <command>Commands from service_dependencies</command>
-            <expected_output>All required services running</expected_output>
-          </step>
-          <step order="4">
-            <action>Run verification</action>
-            <command>Commands from verification_commands</command>
-            <expected_output>All checks pass (lint, test, build)</expected_output>
-          </step>
-          <step order="5">
-            <action>Manual testing</action>
-            <command>Start application locally (e.g., npm run dev, cargo run, go run .)</command>
-            <expected_output>Application running at expected URL/port</expected_output>
-          </step>
-          <step order="6">
-            <action>Verify change behavior</action>
-            <steps>Context-specific steps based on change type (UI, API, integration)</steps>
-            <expected_output>Change works as expected</expected_output>
-          </step>
-        </reproduction_steps>
-        <reproduction_gaps>
-          <gap name="ecosystem_detected">The indicator file the ecosystem was identified from, or "none found"</gap>
-          <gap name="services_documented">The source each service dependency came from, or "no service
-            source inspected"</gap>
-          <gap name="commands_verified">For each verification command, the file that defines it — a flake
-            output, Makefile target, or package.json script. A command with no such definition is a guess
-            and must be labelled one.</gap>
-          <fallback_guidance>If reproduction not feasible locally, suggest: CI-based testing, containerized environment, or ask maintainers</fallback_guidance>
-        </reproduction_gaps>
-      </local_reproduction>
-      <manual_verification>
-        <description>Create a reproducible verification environment using devenv</description>
-        <directory_structure>
-          <base_path>/tmp/[repo-name]/[branch-name-or-issue-number]/</base_path>
-          <files>
-            <file name="devenv.nix">Ecosystem-specific development environment</file>
-            <file name=".envrc">direnv integration with use devenv</file>
-            <file name="README.md">Detailed verification instructions</file>
-            <file name="fixtures/">Test fixtures and sample data directory</file>
-            <file name=".git/">Initialized git repository</file>
-          </files>
-        </directory_structure>
-        <procedure>
-          <step order="1" action="create_directory">
-            <command>mkdir -p /tmp/[repo-name]/[branch-name-or-issue-number]</command>
-            <expected_output>Directory created at /tmp/[repo-name]/[branch-name-or-issue-number]</expected_output>
-          </step>
-          <step order="2" action="generate_devenv">
-            <description>Generate ecosystem-specific devenv.nix based on detected ecosystem</description>
-            <tool>Write tool</tool>
-            <output_file>devenv.nix</output_file>
-          </step>
-          <step order="3" action="generate_envrc">
-            <description>Generate .envrc for direnv integration</description>
-            <tool>Write tool</tool>
-            <output_file>.envrc</output_file>
-            <content>eval "$(devenv direnvrc)"
-use devenv</content>
-          </step>
-          <step order="4" action="generate_fixtures">
-            <description>Generate verification files based on change type</description>
-            <tool>Write tool</tool>
-            <output_directory>fixtures/</output_directory>
-          </step>
-          <step order="5" action="generate_readme">
-            <description>Generate README.md with detailed verification steps</description>
-            <tool>Write tool</tool>
-            <output_file>README.md</output_file>
-          </step>
-          <step order="6" action="initialize_git">
-            <command>cd /tmp/[repo-name]/[branch-name-or-issue-number] &amp;&amp; git init &amp;&amp; git add .</command>
-            <expected_output>Initialized git repository with all files staged</expected_output>
-          </step>
-        </procedure>
-        <devenv_templates>
-          <description>Generate devenv.nix configuration for verification environments based on detected ecosystem</description>
-          <skill_reference>
-            <skill>devenv-ecosystem</skill>
-            <usage>Consult devenv-ecosystem skill for language configuration patterns, version pinning, package manager selection, services (databases, caches), git-hooks, scripts, processes, profiles, env/dotenv configuration, and all devenv.nix options</usage>
-          </skill_reference>
-        </devenv_templates>
-        <fixtures_generation>
-          <fixture_type change_type="api">
-            <directory>fixtures/api/</directory>
-            <files>
-              <file name="request.json">Sample API request body</file>
-              <file name="response.json">Expected API response</file>
-              <file name="test.sh">curl commands for API testing</file>
-            </files>
-          </fixture_type>
-          <fixture_type change_type="database">
-            <directory>fixtures/data/</directory>
-            <files>
-              <file name="seed.sql">Test data seed script</file>
-              <file name="verify.sql">Verification queries</file>
-            </files>
-          </fixture_type>
-          <fixture_type change_type="config">
-            <directory>fixtures/config/</directory>
-            <files>
-              <file name=".env.test">Test environment variables</file>
-              <file name="config.test.json">Test configuration</file>
-            </files>
-          </fixture_type>
-          <fixture_type change_type="ui">
-            <directory>fixtures/screenshots/</directory>
-            <files>
-              <file name="expected/">Expected screenshot directory</file>
-              <file name="viewports.json">Viewport configurations for testing</file>
-            </files>
-          </fixture_type>
-          <fixture_type change_type="security">
-            <directory>fixtures/security/</directory>
-            <files>
-              <file name="test_tokens.json">Test authentication tokens (non-production)</file>
-              <file name="permissions.json">Permission matrix for testing</file>
-              <file name="auth_test.sh">Authentication flow test script</file>
-            </files>
-          </fixture_type>
-          <fixture_type change_type="integration">
-            <directory>fixtures/integration/</directory>
-            <files>
-              <file name="mock_services.json">Mock service configurations</file>
-              <file name="event_payloads.json">Sample event and webhook payloads</file>
-              <file name="sequence.md">Integration test sequence documentation</file>
-            </files>
-          </fixture_type>
-        </fixtures_generation>
-        <readme_template>
-          <sections>
-            <section name="Overview">
-              <description>PR summary and change description</description>
-              <template>
-# Verification Environment for [pr-title]
-
-**Branch:** [branch-name-or-issue-number]
-**Upstream:** [upstream-url]
-**Ecosystem:** [detected-ecosystem]
-
-[pr-description]
-              </template>
-            </section>
-            <section name="Prerequisites">
-              <description>Required tools and environment setup</description>
-              <template>
-## Prerequisites
-
-- nix (with flakes enabled)
-- direnv (for automatic environment activation)
-- devenv
-              </template>
-            </section>
-            <section name="Setup">
-              <description>Step-by-step environment initialization</description>
-              <template>
-## Setup
-
-1. Navigate to this directory
-2. Run `direnv allow` to activate the environment
-3. Wait for devenv to initialize
-              </template>
-            </section>
-            <section name="Verification Steps">
-              <description>Detailed manual verification procedures</description>
-              <template>
-## Verification Steps
-
-(Generated based on detected change types)
-              </template>
-            </section>
-            <section name="Expected Results">
-              <description>What success looks like</description>
-              <template>
-## Expected Results
-
-(Generated based on change analysis)
-              </template>
-            </section>
-            <section name="Troubleshooting">
-              <description>Common issues and solutions</description>
-              <template>
-## Troubleshooting
-
-### direnv not activating
-Run `direnv allow` in the directory.
-
-### devenv not found
-Install devenv: `nix profile install github:cachix/devenv`
-              </template>
-            </section>
-          </sections>
-        </readme_template>
-        <detection_rules>
-          <rule type="ui">Changes to *.css, *.scss, *.sass, *.less, *.html, *.jsx, *.tsx, *.vue, *.svelte, **/components/**, **/pages/**, **/views/**</rule>
-          <rule type="api">Changes to **/api/**, **/routes/**, **/handlers/**, **/controllers/**, **/endpoints/**, *.openapi.*, *.swagger.*, **/graphql/**</rule>
-          <rule type="database">Changes to **/migrations/**, **/schema/**, **/models/**, *.sql, **/prisma/**, **/drizzle/**, **/typeorm/**, **/sequelize/**</rule>
-          <rule type="config">Changes to *.env*, *.config.*, docker-compose.*, compose.*, *.yaml, *.yml, *.toml, *.json (config), **/config/**, Dockerfile*, .docker/**</rule>
-          <rule type="security">Changes to **/auth/**, **/authentication/**, **/authorization/**, **/permission/**, **/security/**, **/middleware/auth*, **/guards/**, *.key, *.pem, *.cert, **/crypto/**</rule>
-          <rule type="integration">Changes spanning 3+ modules, external service configurations, message queue handlers, event emitters/listeners, webhook handlers</rule>
-        </detection_rules>
-        <context_injection>
-          <description>The synthesize phase MUST replace these placeholders with actual values from diff analysis</description>
-          <placeholder name="[repo-name]">Repository name extracted from git remote (e.g., owner/repo becomes repo)</placeholder>
-          <placeholder name="[branch-name-or-issue-number]">Current branch name or related issue number</placeholder>
-          <placeholder name="[detected-ecosystem]">Ecosystem detected from project files</placeholder>
-          <placeholder name="[upstream-url]">Upstream repository URL</placeholder>
-          <placeholder name="[pr-title]">Generated PR title</placeholder>
-          <placeholder name="[pr-description]">Generated PR description</placeholder>
-        </context_injection>
-        <verification_gaps>
-          <gap name="ecosystem_detected">The indicator file the ecosystem was identified from, or "none found"</gap>
-          <gap name="devenv_completeness">Any tool the reproduction steps invoke that devenv.nix does not
-            provide. The environment fails at that command, not at build time.</gap>
-          <gap name="readme_clarity">Any verification step that still contains an unreplaced placeholder,
-            or whose expected output is not stated concretely enough to compare against</gap>
-        </verification_gaps>
-        <empty_state>If no verification environment needed, skip directory creation</empty_state>
-      </manual_verification>
-      <task_breakdown>
-        <dependency_graph>
-          <description>Visual representation of task dependencies for parallel/sequential execution</description>
-          <example>
-Phase 1: Code Fixes (independent)
-Phase 2: Test Updates (independent)
-Phase 3: Documentation (depends on Phase 1)
-Phase 4: Final Verification (depends on all)
-          </example>
-        </dependency_graph>
-        <phased_tasks>
-          <dependency_format>
-            <description>Valid dependency formats for task dependencies field</description>
-            <format type="none">None</format>
-            <format type="list">CF-001, CF-002</format>
-            <format type="phase">All previous phases</format>
-          </dependency_format>
-          <phase name="code_fixes" order="1" parallel_safe="true">
-            <description>Lint errors, style issues, code quality improvements identified in review</description>
-            <step order="1">
-              <action>Apply code fix tasks in this phase according to their dependencies</action>
-            </step>
-            <responsibility name="code_fix_tasks">
-              <task id="CF-001">
-                <files>List of files to modify</files>
-                <overview>Brief description of what needs to be done</overview>
-                <dependencies>None</dependencies>
-              </task>
-            </responsibility>
-          </phase>
-          <phase name="test_updates" order="2" parallel_safe="true">
-            <description>Missing tests, coverage gaps, test improvements</description>
-            <step order="1">
-              <action>Apply test update tasks in this phase according to their dependencies</action>
-            </step>
-            <responsibility name="test_update_tasks">
-              <task id="TU-001">
-                <files>List of test files</files>
-                <overview>Test task description</overview>
-                <dependencies>CF-001</dependencies>
-              </task>
-            </responsibility>
-          </phase>
-          <phase name="documentation" order="3" parallel_safe="true">
-            <description>README, inline docs, changelog, API documentation</description>
-            <step order="1">
-              <action>Apply documentation tasks in this phase according to their dependencies</action>
-            </step>
-            <responsibility name="documentation_tasks">
-              <task id="DOC-001">
-                <files>Documentation files</files>
-                <overview>Documentation task description</overview>
-                <dependencies>CF-001</dependencies>
-              </task>
-            </responsibility>
-          </phase>
-          <phase name="commit_prep" order="4" parallel_safe="false">
-            <description>Commit message formatting per contribution guidelines, rebasing onto upstream, squashing commits if required</description>
-            <step order="1">
-              <action>Prepare git-related task guidance without performing git write operations</action>
-            </step>
-            <responsibility name="commit_preparation_tasks">
-              <task id="GIT-001">
-                <files>N/A (git operations)</files>
-                <overview>Git preparation task description</overview>
-                <dependencies>All previous phases</dependencies>
-              </task>
-            </responsibility>
-            <git_mechanics>
-              <description>Principles the commit_prep tasks must encode for the /execute handoff. This command plans these steps; it never runs them (read-only, UP-P001/UP-P002).</description>
-              <principle name="branch_naming">Name the branch after the issue it addresses, cut from the upstream default branch (e.g. fix/&lt;issue-number&gt;-&lt;slug&gt; for a bug, feat/&lt;slug&gt; for a feature).</principle>
-              <principle name="rebase_onto_upstream">Rebase the work onto the freshly fetched upstream default branch so the PR applies cleanly and contains only the intended changes, not merge-commit noise.</principle>
-              <principle name="commit_split_from_precedent">Derive the number of commits from how the last analogous change landed rather than from habit. The 10 merged PRs already sampled in the gather phase are the evidence: find the one closest in shape, read how it was split, and mirror that. Where a repository consistently lands a change of this shape as an ordered series — the interface first, then the implementation and its migration, then the public surface together with the rules that guard it — a single squashed commit is harder to review, not easier. Every commit in such a series should stand on its own, and a security-relevant surface should never be introduced before the rule that guards it.</principle>
-              <principle name="single_reviewable_commit">Absent such a precedent, organize the change into one reviewable, logically complete commit and squash incidental fixups. Reviewers read a coherent diff, not the authoring history.</principle>
-              <principle name="scope_is_exact">Plan the commit to contain every surface the change needs and nothing else. Unrelated tooling or documentation swept in along the way makes a reviewer untangle the diff before reading it; a source change whose dependency manifest or lockfile was left behind does not build for anyone but its author.</principle>
-              <principle name="issue_reference">Reference the issue in the commit message and PR body with a closing keyword (Fixes #N / Closes #N) so the merge auto-closes it.</principle>
-              <principle name="force_with_lease">When the branch was rebased and must be re-pushed, plan git push --force-with-lease, never --force. --force-with-lease updates the remote only if its current tip still matches your remote-tracking ref, so it refuses to clobber commits someone else pushed since your last fetch; plain --force overwrites them silently and disables that check. Caveat: a background git fetch can invalidate the lease, and --force-if-includes closes that gap by requiring the fetched remote updates to be integrated locally first.</principle>
-              <principle name="compat_and_tests_as_a_set">Design a backward-compatibility fallback together with its test coverage. Gate new behavior behind an opt-in (a new enum variant, mode flag, or config key) that preserves the old default, and pair it with tests that exercise both the old default path and the new path. Compatibility without a test pinning the old behavior is unverified.</principle>
-            </git_mechanics>
-          </phase>
-          <phase name="final_verification" order="5" parallel_safe="false">
-            <description>Running lint, test, build commands before PR</description>
-            <step order="1">
-              <action>Run final verification tasks after all dependent phases complete</action>
-            </step>
-            <responsibility name="final_verification_tasks">
-              <task id="VER-001">
-                <files>N/A (verification commands)</files>
-                <overview>Run all verification commands</overview>
-                <dependencies>All previous phases</dependencies>
-              </task>
-            </responsibility>
-          </phase>
-        </phased_tasks>
-        <execute_handoff>
-          <description>This section is parsed by /execute command to initialize task context</description>
-          <decisions>
-            <decision id="D-001">Design decision description affecting implementation</decision>
-          </decisions>
-          <references>
-            <reference type="upstream_guidelines">Link or content of CONTRIBUTING.md requirements</reference>
-            <reference type="pr_template">Structure and required sections from .github/PULL_REQUEST_TEMPLATE.md</reference>
-            <reference type="pr_patterns">Title and description patterns learned from 10 sampled merged PRs</reference>
-            <reference type="code_patterns">Relevant upstream code patterns to follow (specific file paths)</reference>
-            <reference type="past_feedback">Patterns from past PR reviews to address</reference>
-            <reference type="git_mechanics">Branch naming from the issue, rebase onto the upstream default branch, the commit split mirrored from the closest analogous merged PR (or one reviewable commit where there is no precedent), Fixes #N reference, and force-with-lease re-push (see commit_prep git_mechanics)</reference>
-          </references>
-          <deliverables>
-            <deliverable task="CF-001">Expected output: fixed files passing lint</deliverable>
-            <deliverable task="TU-001">Expected output: new/updated tests passing</deliverable>
-            <deliverable task="DOC-001">Expected output: updated documentation</deliverable>
-            <deliverable task="GIT-001">Expected output: clean commit history ready for PR</deliverable>
-            <deliverable task="VER-001">Expected output: all verification commands pass</deliverable>
-          </deliverables>
-          <memory_hints>
-            <hint>Check serena memory for: contribution patterns of this upstream repo</hint>
-            <hint>Check serena memory for: past PR feedback patterns</hint>
-          </memory_hints>
-          <verification_criteria>
-            <criterion task="CF-001">Lint passes with zero errors</criterion>
-            <criterion task="TU-001">Test suite passes, coverage not decreased</criterion>
-            <criterion task="VER-001">All verification_commands exit 0</criterion>
-          </verification_criteria>
-          <constraints>
-            <constraint>Must maintain read-only until /execute is invoked</constraint>
-            <constraint>All tasks must be completable without PR creation</constraint>
-            <constraint>Tasks should be atomic and independently executable</constraint>
-          </constraints>
-        </execute_handoff>
-      </task_breakdown>
-      <self_feedback>
-        <verification>The commands actually run and their exit status, or "none run"</verification>
-        <weakest_claim>The checklist item or finding resting on the thinnest evidence, and what would
-          confirm it — a guideline line, a file:line, or a command</weakest_claim>
-        <issues>
-          <issue severity="critical">Issue description (if any, max 2 total)</issue>
-          <issue severity="warning">Issue description (if any)</issue>
-        </issues>
-        <gaps>Asked for but not done, with the reason (omit only if there are none)</gaps>
-      </self_feedback>
-    </upstream_review>
-  </format>
 </output>
-<enforcement>
-  <mandatory_behaviors>
-    <behavior id="UP-B001" priority="important">
-      <trigger>Before any GitHub operations</trigger>
-      <action>Verify gh CLI authentication, because an unauthenticated shell returns an empty PR sample
-        rather than an error and the review then invents conventions from nothing</action>
-      <verification>Auth check in preflight phase</verification>
-    </behavior>
-    <behavior id="UP-B002" priority="important">
-      <trigger>When fetching CONTRIBUTING.md</trigger>
-      <action>Check all three locations with fallback</action>
-      <verification>Fallback hierarchy in gather phase</verification>
-    </behavior>
-    <behavior id="UP-B003" priority="important">
-      <trigger>When providing PR metadata</trigger>
-      <action>Use PR template structure (if available) and patterns learned from 10 sampled merged PRs</action>
-      <verification>Metadata matches upstream PR template sections and learned patterns; template_source indicates data source used</verification>
-    </behavior>
-    <behavior id="UP-B008" priority="advisory">
-      <trigger>When fetching PR template</trigger>
-      <action>Fetch .github/PULL_REQUEST_TEMPLATE.md only (no fallback hierarchy)</action>
-      <verification>Template fetched from exact path or confirmed absent</verification>
-    </behavior>
-    <behavior id="UP-B009" priority="important">
-      <trigger>When sampling PRs for patterns</trigger>
-      <action>Sample 10 most recently merged PRs from any author via gh pr list --state merged --limit 10.
-        These samples are also the evidence for the commit split planned in commit_prep</action>
-      <verification>PR samples retrieved with title, body, number, author fields</verification>
-    </behavior>
-    <behavior id="UP-B004" priority="important">
-      <trigger>When generating final output</trigger>
-      <action>Include manual QA checklist with structured qa_steps based on detected change types (ui, api, database, config, security, integration)</action>
-      <verification>Manual verification section present with ordered qa_steps containing action, tool, command, expected_output for each detected change type</verification>
-    </behavior>
-    <behavior id="UP-B007" priority="important">
-      <trigger>When generating manual_verification section</trigger>
-      <action>Inject actual values from diff analysis into qa_step commands replacing all placeholders,
-        since a step with an unreplaced placeholder cannot be run by the reviewer it was written for</action>
-      <verification>No placeholder token ([endpoint-path], [component-name], [table-name], etc.) remains
-        anywhere in the emitted qa_steps. Any that could not be resolved from the diff is listed in
-        verification_gaps rather than left in the command.</verification>
-    </behavior>
-    <behavior id="UP-B005" priority="important">
-      <trigger>When generating final output</trigger>
-      <action>Generate comprehensive task_breakdown with phased_tasks and execute_handoff, so /execute
-        can consume the result without another planning pass</action>
-      <verification>task_breakdown section present with all task categories populated</verification>
-    </behavior>
-    <behavior id="UP-B006" priority="important">
-      <trigger>When generating final output</trigger>
-      <action>Generate local_reproduction section with Nix-first ecosystem detection, environment setup, service dependencies, and step-by-step reproduction instructions</action>
-      <verification>local_reproduction section present with ecosystem_detection, environment_setup, service_dependencies, verification_commands, and reproduction_steps</verification>
-    </behavior>
-  </mandatory_behaviors>
-  <prohibited_behaviors>
-    <behavior id="UP-P001" priority="critical">
-      <trigger>Always</trigger>
-      <action>Modifying any files</action>
-      <response>Block operation, this is read-only command</response>
-    </behavior>
-    <behavior id="UP-P002" priority="critical">
-      <trigger>Always</trigger>
-      <action>Creating PR via gh pr create or any other method</action>
-      <response>HARD BLOCK: This command NEVER creates PRs. Output task breakdown for /execute handoff instead. User must create PR manually after completing all pre-PR tasks.</response>
-    </behavior>
-    <behavior id="UP-P003" priority="critical">
-      <trigger>When user explicitly requests PR creation</trigger>
-      <action>Creating PR even when user requests it</action>
-      <response>HARD BLOCK: Refuse PR creation. Explain that /upstream is review-only and output the task breakdown. Instruct user to run /execute on tasks first, then create PR manually.</response>
-    </behavior>
-  </prohibited_behaviors>
-</enforcement>
-<error_escalation>
-  <examples>
-    <example severity="low">Minor style inconsistency with upstream</example>
-    <example severity="medium">CONTRIBUTING.md not found or gh CLI rate limited</example>
-    <example severity="high">Major guideline violation or breaking change detected</example>
-    <example severity="critical">gh auth failure or no upstream detected</example>
-  </examples>
-</error_escalation>
-<related_commands>
-  <command name="execute">After upstream review, implement recommended fixes</command>
-  <command name="feedback">Additional review after fixes applied</command>
-  <command name="define">If requirements for contribution unclear</command>
-</related_commands>
-
-<related_agents>
-  <agent name="explore">Codebase discovery for uncertain implementation details</agent>
-  <agent name="quality-assurance">Cross-check result quality before finalization</agent>
-  <agent name="validator">Cross-validation when findings may conflict</agent>
-</related_agents>
-<related_skills>
-  <skill name="git-ecosystem">Rebase, squash, and diff-inspection mechanics; loaded in prepare when commit-history work is planned</skill>
-  <skill name="devenv-ecosystem">devenv.nix options for the verification environment; loaded at the point of use in manual_verification</skill>
-  <skill name="execution-workflow">Understanding PR review methodology</skill>
-  <skill name="testing-patterns">Evaluating test appropriateness</skill>
-  <skill name="fact-check">Verifying contribution guideline compliance</skill>
-</related_skills>
-<constraints>
-  <must>Verify gh CLI authentication before operations</must>
-  <must>Check CONTRIBUTING.md in all three locations</must>
-  <must>Fetch .github/PULL_REQUEST_TEMPLATE.md from upstream (no fallback) and sample 10 merged PRs for pattern learning</must>
-  <must>Generate PR metadata with template_source (upstream_template, sampled_patterns, none) and a pattern_basis naming the template URL or the sampled PR numbers it was derived from</must>
-  <must>Provide structured checklist output</must>
-  <must>Include comprehensive local_reproduction section with Nix-first ecosystem detection</must>
-  <must>Include manual QA checklist with structured qa_steps when ui, api, database, config, security, or integration changes detected</must>
-  <must>Inject actual paths, endpoints, and component names into qa_step commands from diff analysis</must>
-  <must>Include a verification_gaps section listing every unresolved placeholder, missing tool, and unverifiable step in manual_verification</must>
-  <must>Generate comprehensive task_breakdown with phased_tasks for /execute handoff</must>
-  <must>Include execute_handoff section with decisions, references, and constraints</must>
-  <avoid>Modifying any files</avoid>
-  <avoid>Creating PR via any method (HARD BLOCK)</avoid>
-  <avoid>Creating PR even when user explicitly requests it (HARD BLOCK)</avoid>
-  <avoid>Proceeding without upstream confirmation when ambiguous</avoid>
-  <avoid>Using fallback hierarchy for PR template (only .github/ location)</avoid>
-</constraints>
