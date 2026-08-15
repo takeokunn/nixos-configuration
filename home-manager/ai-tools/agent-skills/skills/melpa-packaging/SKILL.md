@@ -1,6 +1,6 @@
 ---
 name: melpa-packaging
-description: This skill should be used when the user prepares an Emacs Lisp package for MELPA submission, writes or reviews a MELPA recipe, decides which files ship in a package, resolves package-lint or checkdoc findings, aligns package headers (Package-Requires, Version, URL, Author, Maintainer), or handles the period between opening a MELPA pull request and acceptance. Also covers release-gate hygiene — a make check or lint target reports without mutating, with byte-compilation and autoload generation in a temporary directory so no .elc or generated autoload file lands in the tree, autoload validation that asserts the expected forms rather than inferring success from git diff, no archive refresh or package installation into the contributor's Emacs, and lint tooling supplied by the declared development environment because the gates run emacs -Q. Trigger on mentions of MELPA, recipe, :files, package-build, package-lint, checkdoc, *-pkg.el, or make check.
+description: Use when preparing an Emacs Lisp package for MELPA submission - recipe review, :files selection, package-lint/checkdoc findings, package header alignment (Package-Requires, Version, URL), and release-gate hygiene (non-mutating lint/compile targets, isolated byte-compilation).
 version: 2.2.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: Exploration Tools
-description: Tool definitions and usage patterns for codebase exploration (Glob, Grep, Read, LSP). Agents reference this skill instead of inline tool definitions.
+description: Tool definitions and usage patterns for codebase exploration (Glob, Grep, Read, LSP) — a tool-definition register, not a methodology skill.
 version: 2.1.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: Game UX
-description: This skill should be used when the user asks to "improve game UX", "game feel / juice", "player onboarding", "difficulty/pacing", "HUD/UI design", "game accessibility", or designs player experience. Provides world-class game UX best practices grounded in MDA, game feel, flow, and player-motivation frameworks.
+description: Use for game player-experience design - game feel/juice, onboarding, difficulty pacing, HUD/UI readability, and accessibility, grounded in MDA, flow, and player-motivation frameworks.
 version: 2.1.0
 ---
 

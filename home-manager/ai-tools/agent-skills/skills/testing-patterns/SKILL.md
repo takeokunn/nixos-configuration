@@ -1,6 +1,6 @@
 ---
 name: Testing Patterns
-description: This skill should be used when the user asks to "write tests", "test strategy", "coverage", "unit test", "integration test", or needs guidance on designing, structuring, or isolating tests. Covers the unit/integration/e2e split and classifying a suite by the boundary it crosses, arrange-act-assert and given-when-then, stub/mock/spy/fake selection and seam design over global rebinding, fixture isolation with snapshot-and-restore, scenario-scoped identifiers for parallel runs, polling and settlement barriers for asynchronous outcomes, operation- and query-count assertions instead of wall-clock thresholds, property-based and snapshot testing, matcher design, evaluation as the acceptance gate for declarative-configuration repositories, and runner, compiler, and server traps that silently invalidate a result. Keywords — flaky test, test double, test fixture, teardown, parallel isolation, settlement barrier, query count, tooling trap. For whether a green result proves anything, see test-integrity.
+description: Use when writing, structuring, or reviewing tests - test strategy, coverage, unit/integration/e2e split, mocks/fixtures/fakes, flaky-test isolation, async settlement. For whether a green suite actually proves anything, see test-integrity instead.
 version: 2.5.0
 ---
 

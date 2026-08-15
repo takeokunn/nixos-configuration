@@ -2,6 +2,8 @@
 let
   inherit (pkgs) lib;
 
+  shared = import ../shared { inherit lib; };
+
   commandPromptsPath = ai-prompts-path + "/commands";
   agentPromptsPath = ai-prompts-path + "/agents";
 
@@ -23,36 +25,37 @@ let
     command:
     let
       content = builtins.readFile (commandPromptsPath + "/${command}.md");
-      lines = lib.splitString "\n" content;
-      descriptionLine = builtins.elemAt lines 2;
-      body = lib.concatStringsSep "\n" (lib.drop 4 lines);
+      parsed = shared.parseFrontmatter content;
+      descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
     in
-    assert lib.hasPrefix "description: " descriptionLine;
     pkgs.writeText "opencode-command-${command}.md" ''
       ---
       ${descriptionLine}
       ---
-      ${body}
+      ${parsed.body}
     '';
 
   agentPromptToOpencodeAgent =
     agent:
     let
       content = builtins.readFile (agentPromptsPath + "/${agent}.md");
-      lines = lib.splitString "\n" content;
-      nameLine = builtins.elemAt lines 1;
-      descriptionLine = builtins.elemAt lines 2;
-      body = lib.concatStringsSep "\n" (lib.drop 4 lines);
+      parsed = shared.parseFrontmatter content;
+      # opencode's own frontmatter here does not carry the name, but the shape must still be
+      # validated as an agent prompt (name: + description:), matching codex's converter. A
+      # plain let-binding would never force this assert, since nameLine is otherwise unused
+      # and Nix is lazy, so builtins.seq below forces it explicitly.
+      nameLine = shared.findLineWithPrefix "name: " parsed.frontmatterLines;
+      descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
     in
-    assert lib.hasPrefix "name: " nameLine;
-    assert lib.hasPrefix "description: " descriptionLine;
-    pkgs.writeText "opencode-agent-${agent}.md" ''
-      ---
-      ${descriptionLine}
-      mode: subagent
-      ---
-      ${body}
-    '';
+    builtins.seq nameLine (
+      pkgs.writeText "opencode-agent-${agent}.md" ''
+        ---
+        ${descriptionLine}
+        mode: subagent
+        ---
+        ${parsed.body}
+      ''
+    );
 in
 {
   agents = pkgs.linkFarm "opencode-agents" (

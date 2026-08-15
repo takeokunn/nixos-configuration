@@ -147,6 +147,31 @@ fi
 
 echo "== (B) parsing the -c flags makeWrapper actually baked in =="
 
+# shared/default.nix's guardrailHookNames is the single source of truth for which hooks must be
+# wired (claude-code/default.nix asserts against this exact list). This section used to restate
+# the same three names as its own hardcoded literal, both for the count assertion below and for
+# extracting each hook's store path. The two copies could drift silently: a guardrail hook added
+# to guardrailHookNames — and fully wired into codex/default.nix, which maps over that same list —
+# would leave this gate checking (and reporting green for) only the original three, forever. Parse
+# the roster out of the shared file instead, and fail loudly on a broken parse rather than falling
+# back to an empty roster that would pass every check below vacuously.
+shared_nix="$here/../shared/default.nix"
+guardrail_names="$(
+  if [ -f "$shared_nix" ]; then
+    perl -0777 -ne 'if (/guardrailHookNames\s*=\s*\[(.*?)\]/s) { my $body = $1; while ($body =~ /"([^"]+)"/g) { print "$1\n" } }' "$shared_nix"
+  fi
+)"
+guardrail_count="$(printf '%s\n' "$guardrail_names" | grep -c .)"
+if [ ! -f "$shared_nix" ]; then
+  fail "could not read shared/default.nix to derive the guardrail hook roster" "expected at: $shared_nix"
+elif [ "${guardrail_count:-0}" -eq 0 ]; then
+  fail "parsed an empty guardrailHookNames list from shared/default.nix" \
+    "the parser found no quoted entries inside guardrailHookNames = [ ... ] -- that is a broken
+parse, not an empty roster, and must not silently degrade into a REQUIRED set of zero"
+else
+  pass "guardrail hook roster derived from shared/default.nix ($guardrail_count names: $(printf '%s' "$guardrail_names" | tr '\n' ' '))"
+fi
+
 # Each codexSettings key becomes one `-c 'key=value'` word in the exec line (see
 # codexSettingFlags in default.nix). No value here contains a literal single quote — string
 # leaves are JSON-double-quoted via toTomlInline's builtins.toJSON branch — so the first `'`
@@ -166,35 +191,43 @@ case "$hooks_flag" in
 *) fail 'hooks flag does not carry matcher = "^Bash$"' "$hooks_flag" ;;
 esac
 
-# Extract the three hook store paths from the flag text itself, so the scripts executed in
-# section (C) are the exact ones Nix wired in — never a path re-derived from source, which
-# would test the test's own assumption about writeShellScript's naming rather than the wiring.
-git_hook_path="$(printf '%s' "$hooks_flag" | perl -ne 'print $1 if m{command = "(/nix/store/[^"]*-block-destructive-git)"}')"
-cd_hook_path="$(printf '%s' "$hooks_flag" | perl -ne 'print $1 if m{command = "(/nix/store/[^"]*-block-bare-cd)"}')"
-perl_hook_path="$(printf '%s' "$hooks_flag" | perl -ne 'print $1 if m{command = "(/nix/store/[^"]*-enforce-perl)"}')"
-
-for entry in "block-destructive-git:$git_hook_path" "block-bare-cd:$cd_hook_path" "enforce-perl:$perl_hook_path"; do
-  name="${entry%%:*}"
-  path="${entry#*:}"
+# Extract each roster hook's store path from the flag text itself, so the scripts executed in
+# section (C) are the exact ones Nix wired in — never a path re-derived from source, which would
+# test the test's own assumption about writeShellScript's naming rather than the wiring. This
+# loop scales with the roster derived above: a name added to guardrailHookNames but never wired
+# into codexSettings.hooks.PreToolUse is now caught generically, rather than staying invisible to
+# a check that only ever knew about three hardcoded names.
+git_hook_path=""
+cd_hook_path=""
+perl_hook_path=""
+for name in $guardrail_names; do
+  path="$(printf '%s' "$hooks_flag" | perl -ne "print \$1 if m{command = \"(/nix/store/[^\"]*-$name)\"}")"
   if [ -n "$path" ] && [ -x "$path" ]; then
     pass "hooks flag names an executable store path for $name"
   else
     fail "hooks flag does not name an executable store path for $name" "extracted: [$path]"
   fi
+  case "$name" in
+  block-destructive-git) git_hook_path="$path" ;;
+  block-bare-cd) cd_hook_path="$path" ;;
+  enforce-perl) perl_hook_path="$path" ;;
+  esac
 done
 
-# The three checks above are positive-only: each proves one *known* hook name is present, but
-# none of them would catch a 4th script silently added to codexSettings.hooks.PreToolUse[0].hooks
-# in a future edit to default.nix — most plausibly rtk-rewrite, which ../claude-code/default.nix
-# deliberately excludes from Claude Code's own registration (rtk is not on PATH there, so every
-# rewritten command would exit 127) and which a future edit could just as easily forget to
-# exclude here. Close the world: assert the exact count of `command = "` occurrences in the
-# flag, so an unexpected extra hook fails this check even if nobody ever names it explicitly.
+# The loop above is positive-only: it proves every *known-roster* name is present, but none of
+# it would catch a script silently added to codexSettings.hooks.PreToolUse[0].hooks that is not in
+# shared/default.nix's guardrailHookNames at all — most plausibly rtk-rewrite, which
+# ../claude-code/default.nix deliberately excludes from Claude Code's own registration (rtk is not
+# on PATH there, so every rewritten command would exit 127) and which a future edit could just as
+# easily forget to exclude here. Close the world: assert the exact count of `command = "`
+# occurrences in the flag against the roster size derived above, so an unexpected extra hook fails
+# this check even if nobody ever names it explicitly, and a roster that grew in shared/default.nix
+# without being fully wired here is caught by the same count mismatch.
 hook_command_count="$(printf '%s' "$hooks_flag" | grep -o 'command = "' | wc -l | tr -d ' ')"
-if [ "${hook_command_count:-0}" -eq 3 ]; then
-  pass "hooks flag wires exactly 3 hook commands (closed-world: no unexpected 4th hook, e.g. rtk-rewrite)"
+if [ "${guardrail_count:-0}" -gt 0 ] && [ "${hook_command_count:-0}" -eq "${guardrail_count:-0}" ]; then
+  pass "hooks flag wires exactly $guardrail_count hook commands (closed-world, from shared/default.nix's guardrailHookNames)"
 else
-  fail "hooks flag wires ${hook_command_count:-0} hook commands, expected exactly 3" "$hooks_flag"
+  fail "hooks flag wires ${hook_command_count:-0} hook commands, expected exactly ${guardrail_count:-0} (from shared/default.nix)" "$hooks_flag"
 fi
 
 if [ "$profiles_flag" = 'profiles={ fallback = { model = "gpt-5.4-mini" } }' ]; then
@@ -208,6 +241,13 @@ echo "== (C) hook behavior, driven with codex-rs's PreToolUse stdin shape =="
 # codex-rs sends more fields than these scripts read (session/call metadata, cwd, ...); each
 # case below carries decoys so a pass proves the scripts pick tool_name/tool_input.command out
 # of the real shape rather than out of a stripped-down fixture that happens to match.
+#
+# Unlike section (B), this section is NOT derived from the guardrailHookNames roster: each case
+# encodes the specific stdin shape and expected block reason for one named hook, which cannot be
+# generated generically for an arbitrary future name. A hook added to the roster gets structural
+# coverage automatically from section (B) (wired, executable, counted); it gets no behavioral
+# coverage here until a case is written for it by name, same as block-destructive-git,
+# block-bare-cd and enforce-perl each were.
 hb_run() {
   # $1 = script path, $2 = stdin json
   hb_out="$(printf '%s' "$2" | "$1" 2>"$tmp/stderr")"

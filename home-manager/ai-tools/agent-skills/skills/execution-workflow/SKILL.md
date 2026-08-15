@@ -1,6 +1,6 @@
 ---
 name: Execution Workflow
-description: Load at the start of any implementation or execution task, and whenever the norms for delegating, verifying, or judging completion are needed. Triggers include "execute task", "implement feature", "delegate work", "run workflow", "review code", "definition of done", "create a feature branch", "worktree isolation", "parallel agents", and "is this done". Provides the orchestration phases (task analysis, delegation, consolidation, cross-validation, failure handling), the reflection checkpoints gating each phase, the branch and worktree isolation procedure, the ORCH behavior identifiers, and code review standards. Also covers treating done as an enumerated set of verification commands exiting zero rather than a judgement call, asserting a gate is non-vacuous before trusting it, reporting the verification tier reached and the command a later session must re-run, choosing between a convention-conformance review and a behavior review, and never skipping a failing hook to get a commit through.
+description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, worktree and branch isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
 version: 3.0.0
 ---
 

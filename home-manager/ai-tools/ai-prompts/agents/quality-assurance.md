@@ -246,58 +246,6 @@ description: Use to review a diff for correctness, error handling, readability, 
 }
   </format>
 </output>
-<examples>
-  <example name="code_review">
-    <input>Review new function processUserData</input>
-    <process>
-1. git diff to enumerate the changed files
-2. serena find_referencing_symbols to find callers outside the diff
-3. Read the function and its neighbours for the module's error idiom
-4. Run the project's linter and type check
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "1 file, 1 function reviewed; 2 findings. The two callers were read, the UI surface was not.",
-  "verification": "npx tsc --noEmit — exit 0; npx eslint src/user.ts — exit 0",
-  "metrics": {"files_in_diff": 1, "files_reviewed": 1, "issues_detected": 2, "severity": {"critical": 0, "major": 1, "minor": 1}},
-  "details": [{"type": "major", "category": "Error Handling", "message": "contact.email dereferenced without a null check; both callers can pass a partial user", "location": "src/user.ts:42", "evidence_tier": "verified", "evidence": "src/user.ts:42 dereference; callers src/api/profile.ts:88 and src/jobs/sync.ts:31 build the object without contact", "suggestion": "if (!user?.contact?.email) throw new MissingContactError(user.id)", "rationale": "Matches the MissingXError idiom already used at src/user.ts:17"}],
-  "root_cause": null,
-  "gaps": ["No test exercises the partial-user path; not added, out of scope for this review"],
-  "next_actions": ["Add the null check", "Add a unit test for the partial-user input"]
-}
-    </output>
-    <reasoning>
-The null-dereference finding is verified because the dereference and both call sites that reach it were read, and their line numbers are in the report. The status is warning because of the named test gap, not because the review felt incomplete.
-    </reasoning>
-  </example>
-
-  <example name="debugging">
-    <input>Debug: Cannot read property 'id' of undefined</input>
-    <process>
-1. Read the stack trace to the throwing frame
-2. Trace the value backward to where undefined enters
-3. Read the API client to see the unchecked response path
-4. Propose the validation point and the prevention
-    </process>
-    <output>
-{
-  "status": "success",
-  "summary": "Root cause: the API client returns the parsed body without checking the error envelope",
-  "verification": "node scripts/repro-user-fetch.js — exit 1, reproduces the same stack trace",
-  "metrics": {"files_in_diff": 0, "files_reviewed": 3, "issues_detected": 1, "severity": {"critical": 0, "major": 1, "minor": 0}},
-  "details": [{"type": "major", "category": "Error Handling", "message": "A 404 body has no data field, so getUserData receives undefined and dereferences .id", "location": "src/services/user.js:45", "evidence_tier": "verified", "evidence": "repro script stack trace; src/services/user.js:45 returns res.body.data unchecked", "suggestion": "Return a Result and reject non-2xx before reading body.data", "rationale": "The other three clients in src/services already branch on res.ok"}],
-  "root_cause": "Unvalidated API response propagated undefined into getUserData",
-  "fix_proposal": {"file": "src/services/user.js", "line": 45, "change": "Branch on res.ok and return a typed error before reading body.data"},
-  "gaps": [],
-  "next_actions": ["Apply the response check", "Extract the shared check used by the other three clients"]
-}
-    </output>
-    <reasoning>
-The root cause is verified rather than hypothesized because the repro script reproduces the reported stack trace and the throwing line was read. Without that reproduction the same conclusion would be inferred, and the report would have to say what would confirm it.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="QA001" condition="Change scope identification failure">Recommend manual verification</code>
   <code id="QA002" condition="Unhandled exception detected">Add error handling</code>

@@ -1,6 +1,6 @@
 ---
 name: Technical Writing
-description: This skill should be used when the user asks to "write blog post", "technical article", "tutorial", "explain concept", or needs guidance on technical writing for external audiences. Provides patterns for technical blogs and articles in both English and Japanese. Includes a Japanese prose-quality ruleset for drafting and revising Japanese manuscripts, plus a language-neutral long-form structure ruleset for books and serialized pieces.
+description: Use when writing a blog post, technical article, or tutorial for external audiences, in English or Japanese — includes a Japanese prose-quality ruleset and a long-form structure ruleset for books and serials.
 version: 2.4.0
 ---
 

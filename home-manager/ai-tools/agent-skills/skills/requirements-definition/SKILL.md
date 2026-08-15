@@ -145,26 +145,26 @@ version: 2.1.0
     </example>
   </pattern>
 
-  <pattern name="requirement_quality_metrics">
-    <description>Quantitative measures of requirement quality</description>
+  <pattern name="requirement_quality_evidence">
+    <description>State requirement quality as the observable condition that supports it, never as a
+      score. A feasibility or objectivity number produced in the same pass that wrote the requirement
+      never contradicts that requirement, so nothing downstream ever reads a low score and investigates
+      further (CLAUDE.md evidence_and_reporting, DEF-P004, core-patterns evidence_tiers).</description>
     <decision_tree name="when_to_use">
       <question>Are all requirements documented and ready for handoff?</question>
-      <if_yes>Apply quality metrics to assess requirement completeness</if_yes>
+      <if_yes>State feasibility and evidence for each requirement before considering it complete</if_yes>
       <if_no>Continue requirements definition until complete</if_no>
     </decision_tree>
     <example>
-      Feasibility (0-100): Technical achievability given constraints
-      - 90-100: Straightforward with existing tools
-      - 70-89: Requires some research or new libraries
-      - 50-69: Significant technical challenges
-      - Below 50: May need architecture changes
+      Feasibility: which capability was located at which file:line, and which one was not found and
+      where it was searched for. Never reduce this to a number.
+      Example: "Feasible — the export pipeline this depends on exists at src/export/pipeline.ts:42.
+      No rate-limiting primitive exists in the codebase (searched src/lib, src/middleware), so that
+      remains an open constraint recorded in Outstanding Issues."
 
-      Objectivity (0-100): Evidence-based vs. assumption-based
-
-      - 90-100: All requirements verified through investigation
-      - 70-89: Most requirements verified, some assumptions documented
-      - 50-69: Mix of verification and assumptions
-      - Below 50: Mostly assumptions, needs more investigation
+      Evidence: tag each requirement verified (grounded in direct investigation), inferred (derived
+      from something verified but not directly observed), or assumed (taken from the user's framing,
+      not checked). A requirement still `assumed` at handoff time is not ready.
     </example>
   </pattern>
 </patterns>
@@ -196,10 +196,11 @@ version: 2.1.0
       - Impact scope analysis
       - Key design decisions with rationale
     </technical_specifications>
-    <metrics>
-      - Feasibility (0-100): Technical achievability
-      - Objectivity (0-100): Evidence-based specification
-    </metrics>
+    <feasibility_and_evidence>
+      - Feasibility: which capability was located at which file:line, which one was not found and
+        where it was searched for — never a numeric score (requirement_quality_evidence)
+      - Evidence: each requirement tagged verified / inferred / assumed
+    </feasibility_and_evidence>
     <constraints>
       - Technical constraints: platform, language, framework
       - Operational constraints: deployment, maintenance

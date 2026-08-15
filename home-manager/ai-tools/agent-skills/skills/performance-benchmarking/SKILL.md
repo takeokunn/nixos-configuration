@@ -1,6 +1,6 @@
 ---
 name: performance-benchmarking
-description: This skill should be used when producing, gating, or reviewing performance numbers — running a before/after benchmark, claiming a speedup or a regression, writing a CI benchmark gate, comparing two stochastic or randomized arms, deciding whether a measured difference is real, choosing between wall-clock time and allocation/operation counts as the asserted metric, setting timing thresholds in tests, recording a rejected optimization experiment, or wording a performance claim for a README or changelog. Keywords — benchmark, noise floor, confidence interval, point estimate, paired measurement, warmup, regression gate, speedup, throughput, allocation count, A/B measurement, common random numbers, performance budget, flaky timing test.
+description: Use when producing, gating, or reviewing performance numbers - before/after benchmarks, speedup/regression claims, CI benchmark gates, noise floor and confidence interval, wall-clock vs allocation-count metrics, and wording a performance claim.
 version: 2.1.0
 ---
 

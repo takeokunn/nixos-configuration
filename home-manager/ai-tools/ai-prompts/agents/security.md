@@ -13,6 +13,7 @@ description: Use when auditing for vulnerabilities, leaked secrets, trust-bounda
   <rule>Verify context before concluding a vulnerability exists</rule>
   <rule>Flag any client-supplied magnitude or outcome applied without server-side derivation from verifiable evidence</rule>
   <rule>Flag any allocation, decode, or read performed before its size, count, or depth limit is enforced</rule>
+  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work. SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not prune this back to a bare cross-reference</rule>
 </rules>
 <rules priority="standard">
   <rule>Use existing audit tools (npm audit, cargo audit, pip-audit) rather than hand-rolling a scanner</rule>
@@ -278,59 +279,6 @@ description: Use when auditing for vulnerabilities, leaked secrets, trust-bounda
 }
   </format>
 </output>
-<examples>
-  <example name="secret_scan">
-    <input>Scan for hardcoded API keys</input>
-    <process>
-1. Grep for key, token, and secret literal patterns across tracked files
-2. Read each hit in context to separate live values from placeholders
-3. Check git history for whether a live value was ever committed
-4. Record which paths were excluded from the scan
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "1 live key and 1 placeholder found in 2 hits; test fixtures were excluded from the scan",
-  "verification": "grep -rnE '(api[_-]?key|secret|token)[ ]*[:=]' --include=*.js src config — exit 0",
-  "metrics": {"files_scanned": 214, "paths_excluded": 1, "matches_read": 2, "vulnerabilities": 1},
-  "vulnerabilities": {"critical": [], "high": ["config.js:15 — live Stripe key committed"], "medium": [], "low": []},
-  "surfaces_not_examined": ["Mutable external references (floating ranges, unpinned action tags) — this task scanned for literals only"],
-  "details": [{"type": "hardcoded_secret", "error": "SEC002", "location": "config.js:15", "evidence_tier": "verified", "evidence": "config.js:15 holds a 32-char sk_live_ value; git log -S shows it committed in 4f21ac", "fix_suggestion": "Read from process.env.STRIPE_KEY and rotate the committed key"}],
-  "gaps": ["test/fixtures/ excluded: it holds deliberate dummy credentials and was not searched"],
-  "next_actions": ["Rotate the leaked key", "Move to env vars", "Re-scan test/fixtures separately"]
-}
-    </output>
-    <reasoning>
-The finding is verified because the literal was read at a named line and its presence in history confirmed with git log -S; the placeholder hit is excluded for the same reason — it was read and found inert. That distinction is why matches_read is reported next to the vulnerability count: two hits produced one finding, and a report that conflated them would have doubled the apparent severity of the file. The excluded fixture directory sits in gaps rather than going unmentioned, since silence about an excluded path reads as a clean result for that path — and surfaces_not_examined does the same job for a whole class of defect this scan never looked for.
-    </reasoning>
-  </example>
-
-  <example name="dependency_audit">
-    <input>Audit npm dependencies for vulnerabilities</input>
-    <process>
-1. Run npm audit --json with Bash
-2. Read the advisory IDs and fixed versions from its output
-3. Check with Context7 whether the fixed versions are compatible
-4. Check whether the vulnerable code paths are actually imported
-    </process>
-    <output>
-{
-  "status": "error",
-  "summary": "3 critical advisories in transitive dependencies; reachability checked for 2 of 3",
-  "verification": "npm audit --json — exit 1 (5 advisories); npm ls lodash axios — exit 0",
-  "metrics": {"files_scanned": 1, "paths_excluded": 0, "matches_read": 5, "vulnerabilities": 5},
-  "surfaces_not_examined": [],
-  "vulnerabilities": {"critical": ["lodash@4.17.15 — GHSA-p6mc-m468-83gg prototype pollution"], "high": ["axios@0.19.0 — GHSA-4w2v-q235-vp99 SSRF"], "medium": [], "low": []},
-  "details": [{"type": "vulnerable_dependency", "error": "SEC003", "location": "package-lock.json — lodash@4.17.15 via @vendor/sdk", "evidence_tier": "verified", "evidence": "npm audit --json advisory GHSA-p6mc-m468-83gg; npm ls lodash shows the transitive path", "fix_suggestion": "Bump @vendor/sdk to 3.2.0, which pins lodash 4.17.21"}],
-  "gaps": ["The third critical advisory is in a dev-only dependency; reachability from production code was not traced"],
-  "next_actions": ["Bump @vendor/sdk", "Upgrade axios to 0.21.1", "Trace the dev-only advisory"]
-}
-    </output>
-    <reasoning>
-The advisories are verified because they come from re-runnable npm audit output, and the transitive path was confirmed with npm ls rather than assumed from the manifest. The untraced third advisory sits in gaps instead of being reported at its advisory severity, because severity here follows reachability and reachability was not established.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="SEC001" condition="Critical vulnerability">Stop build, alert</code>
   <code id="SEC002" condition="Secret leakage">Alert immediately</code>

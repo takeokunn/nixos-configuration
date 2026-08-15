@@ -405,7 +405,6 @@ Conduct detailed requirements definition before implementation, clarifying techn
   <command name="ask">When requirements raise technical questions</command>
   <command name="bug">When defining fix requirements for known issues</command>
   <command name="execute">Handoff point after requirements are defined</command>
-  <command name="define-full">Full version with automatic feedback and regeneration cycle</command>
 </related_commands>
 <agents>
   <agent name="design" subagent_type="design" readonly="true">

@@ -1,6 +1,6 @@
 ---
 name: Swift Ecosystem
-description: This skill should be used when working with Swift projects, "Package.swift", "swift build/test/run", "swiftc", SwiftLint, SwiftFormat, or Swift language patterns. Provides comprehensive Swift 6.3 ecosystem patterns and best practices for cross-platform CLI and library development.
+description: Use for Swift projects, covering Package.swift, swift build/test/run, swiftc, SwiftLint, SwiftFormat, and cross-platform CLI or library development patterns.
 version: 2.1.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: Rust Ecosystem
-description: This skill should be used when working with Rust projects, "Cargo.toml", "rustc", "cargo build/test/run", "clippy", "rustfmt", or Rust language patterns. Covers splitting a borrow to resolve E0502 by passing the fields a helper needs instead of &mut self, named structs and newtypes over positional tuples outside a wire format, a registry of locks as Mutex<HashMap<K, Arc<Mutex<V>>>> with a one-directional lock order and asymmetric PoisonError::into_inner recovery, checked and saturating arithmetic on untrusted sizes (never wrapping), bounding a read by latency as well as length, allowlist-sanitizing configuration values rendered as ANSI escapes, preferring the expect lint attribute (#[expect]) to allow (#[allow]), and dead_code warnings at macro registration boundaries.
+description: Use when working with Rust projects — Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns.
 version: 2.4.0
 ---
 

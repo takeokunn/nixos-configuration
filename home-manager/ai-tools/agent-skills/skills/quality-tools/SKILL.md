@@ -1,6 +1,6 @@
 ---
 name: Quality Tools
-description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters), plus a language-neutral catalog of cohesion-raising refactor operations and a skeleton for multi-dimensional scored reviews. Also covers authoring project-local policy gates, supply-chain pinning of external build references, and the mechanics of running checks so their output is trustworthy. Agents reference this skill instead of inline tool definitions. Keywords — gating a coverage report against a declared source manifest rather than on its aggregate percentage.
+description: Tool definitions and usage patterns for code quality tools (ESLint, Prettier, tsc, linters) plus cohesion-raising refactor operations and scored-review skeletons. A tool-definition register, not a methodology skill.
 version: 2.4.0
 ---
 
@@ -281,13 +281,13 @@ version: 2.4.0
 <scored_review>
   <description>Output skeleton for a multi-dimensional quality review (performance, documentation, or general design). It turns a diffuse "review" into a prioritized, actionable report.</description>
   <structure>
-    <step order="1">Score each dimension separately on a fixed scale (for example N dimensions each out of 100) with a one-line status per dimension, so weak areas stay visible rather than being averaged away.</step>
+    <step order="1">Report each dimension separately as a one-line observable status — what was checked, what it returned, and what was not exercised — so weak areas stay visible rather than being averaged into one number.</step>
     <step order="2">Separate findings into Critical (must fix before release) and Quick Wins (high impact, low effort), each with an effort estimate.</step>
     <step order="3">Sequence remediation into phases (for example reliability first, then performance, then testing, then advanced), so the report reads as a rollout plan rather than a flat list.</step>
   </structure>
   <honesty>
     <rule>State the analysis's basis and its limits: an architectural or static review is not runtime measurement. Do not present estimated improvements or scores as measured results.</rule>
-    <rule>Give an explicit confidence level and its known limitations (what was not exercised: real workloads, low-resource systems, actual profiling).</rule>
+    <rule>Tag the review's basis with its evidence tier (verified, inferred, or assumed) and name what was not exercised (real workloads, low-resource systems, actual profiling).</rule>
     <rule>A score is valid only for the tree state it was computed against, so record what that state was. A stored scorecard outlives the code it scored and reads as current evidence to whoever finds it next.</rule>
     <rule>When an obsolete scorecard turns up, invalidate it explicitly rather than carrying it forward: state that it must not be used for current prioritization, and mark which of its items are resolved or superseded. Superseding a score requires re-measurement, not re-reading the old one — unbenchmarked estimates do not become evidence by ageing.</rule>
   </honesty>

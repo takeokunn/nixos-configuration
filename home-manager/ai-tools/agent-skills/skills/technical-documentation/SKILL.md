@@ -1,6 +1,6 @@
 ---
 name: Technical Documentation
-description: This skill should be used when the user asks to "write documentation", "create README", "API docs", "design document", "specification", "user guide", or needs documentation guidance. Also covers auditing documentation against code in both directions — over-claims and, equally, shipped features still described as future work — confirming a documented capability is actually reachable rather than merely named by a function, publishing a registry of retired names alongside the current names that resemble them so nothing correct gets renamed, and recording the rationale at the change site when a previously-reasoned exception is reversed instead of leaving it in a commit message. Provides documentation patterns for developers, teams, and end-users in both English and Japanese.
+description: Use when writing or auditing technical documentation - README, API docs, design docs, specifications, user guides, in English or Japanese. Also covers auditing docs against code for both over-claims and stale future-work claims, and retired-name registries.
 version: 2.4.0
 ---
 

@@ -77,29 +77,36 @@ version: 2.1.0
     </example>
   </pattern>
 
-  <pattern name="confidence_assessment">
-    <description>Calculate verification confidence based on evidence quality</description>
+  <pattern name="evidence_tier_assignment">
+    <description>Classify how a claim's verification came to be known, rather than scoring it. A tier
+      is checkable — a reader can re-run the same source query and see whether it holds. A confidence
+      number produced in the same pass that did the verification never contradicts that verification,
+      so nothing downstream ever reads a low score and stops trusting the claim (CLAUDE.md
+      evidence_and_reporting, core-patterns evidence_tiers, CORE-P001).</description>
     <decision_tree name="when_to_use">
       <question>Has verification evidence been collected?</question>
-      <if_yes>Apply confidence assessment to rate verification quality</if_yes>
+      <if_yes>Apply evidence tier assignment to classify how the claim is now known</if_yes>
       <if_no>Continue evidence collection before assessment</if_no>
     </decision_tree>
     <example>
-      Confidence levels:
-      90-100: Exact match with authoritative source
-      80-89: Strong match with minor wording differences
-      70-79: Partial match, some details unverified
-      60-69: Weak match, significant uncertainty
-      0-59: No match or contradictory evidence
+      verified: The source was queried (Context7, WebFetch, or WebSearch against an authoritative
+        domain) and its content directly supports the claim as stated. Cite the source and the
+        matching text.
+      inferred: The source was queried and supports a related claim, but the claim under review adds a
+        step the source did not state directly. Name that step so it can be disputed.
+      assumed: No source could be located or queried for this claim. State what would confirm it —
+        which library, which spec, which command — rather than marking it verified.
 
-      Threshold: Flag claims with confidence below 80
+      Disposition: a claim resting on `assumed` evidence is unverified, not confirmed, until a source
+      is actually queried.
     </example>
   </pattern>
 
   <pattern name="discrepancy_reporting">
     <description>Format and report verification failures with evidence</description>
     <decision_tree name="when_to_use">
-      <question>Is the verification confidence below 80?</question>
+      <question>Does the claim's evidence tier come out as inferred, assumed, or disputed rather than
+        verified?</question>
       <if_yes>Apply discrepancy reporting to document the issue</if_yes>
       <if_no>Mark claim as verified</if_no>
     </decision_tree>
@@ -109,7 +116,7 @@ version: 2.1.0
       Source: Where claim was made
       Verification source: Context7/WebSearch result
       Evidence: Actual information from source
-      Confidence: 0-100 score
+      Evidence tier: verified / inferred / assumed / disputed, with what would raise it
       Recommendation: Suggested correction or note
     </example>
   </pattern>
@@ -146,20 +153,26 @@ version: 2.1.0
     </example>
   </concept>
 
-  <concept name="confidence_thresholds">
-    <description>Confidence score interpretation</description>
+  <concept name="evidence_tier_disposition">
+    <description>What each evidence tier means for a fact-check result, and what happens to the claim
+      next — the concrete disposition a tier implies, not a number to interpret</description>
     <example>
-      80+: Verified - Claim matches authoritative source
-      60-79: Uncertain - Partial verification, review recommended
-      Below 60: Disputed - Claim contradicts or unsupported by source
-      Unverifiable: No authoritative source available
+      verified: Claim matches the queried source. Report it as confirmed and cite the source.
+      inferred: The source supports a related claim; the claim under review extends it by a step that
+        was never directly observed. Report it with that step named, so a reader can dispute the step
+        rather than the source.
+      assumed: No source was queried, or none was available. Report the claim as unverifiable, state
+        what would confirm it, and do not present it as fact-checked.
+      disputed: A queried source directly contradicts the claim. This is a distinct outcome from
+        `assumed` — the source was checked and it disagrees, which is worse news than absence and must
+        be surfaced as a contradiction, not filed alongside the merely-unchecked claims.
     </example>
   </concept>
 </concepts>
 
 <best_practices>
   <practice priority="critical">Use Context7 as primary source for library documentation claims</practice>
-  <practice priority="critical">Flag all claims with verification confidence below 80</practice>
+  <practice priority="critical">Flag every claim whose evidence tier is inferred, assumed, or disputed; a tier of verified needs no flag</practice>
   <practice priority="critical">Document evidence source for each verification</practice>
   <practice priority="high">Prefer libraries with High Source Reputation and a strong Benchmark Score in Context7 for verification</practice>
   <practice priority="high">Use WebSearch fallback when Context7 unavailable</practice>
@@ -175,7 +188,7 @@ version: 2.1.0
 
   <avoid name="single_source_reliance">
     <description>Relying on only one source for disputed claims</description>
-    <instead>Cross-reference with multiple sources when confidence is borderline (70-85)</instead>
+    <instead>Cross-reference with multiple sources when the evidence tier is inferred rather than verified</instead>
   </avoid>
 
   <avoid name="ignoring_version_context">
@@ -192,7 +205,7 @@ version: 2.1.0
 <rules priority="critical">
   <rule>Always verify claims against authoritative sources before flagging</rule>
   <rule>Use Context7 as primary source for library and framework claims</rule>
-  <rule>Flag claims with confidence below 80 in fact check results</rule>
+  <rule>Flag claims whose evidence tier is inferred, assumed, or disputed in fact check results</rule>
   <rule>Document evidence source for every verification</rule>
 </rules>
 
@@ -215,7 +228,7 @@ version: 2.1.0
 <constraints>
   <must>Query authoritative sources before verification</must>
   <must>Document evidence for all verification results</must>
-  <must>Flag discrepancies with confidence scores</must>
+  <must>Flag discrepancies with their evidence tier (verified/inferred/assumed/disputed), never a numeric confidence score</must>
   <avoid>Marking claims verified without source check</avoid>
   <avoid>Verifying claims based on assumption or memory</avoid>
   <avoid>Ignoring version context in verification</avoid>

@@ -1,6 +1,6 @@
 ---
 name: terraform-ecosystem
-description: This skill should be used when the user asks to "write terraform", "HCL", "terraform provider development", "terraform-plugin-framework", "custom provider", "state management", "terraform plan", "terraform apply", "lifecycle ignore_changes", "provider schema", "plan modifier", "acceptance test", or works with Terraform/OpenTofu configuration and provider authoring. Also covers recovering after a failed apply, which is not transactional and did not roll back what already succeeded — state inspection and surgery (state list, state rm, state mv, show), pairing every address change with a moved block, import blocks versus the import CLI against a remote backend, why a provider alias change is not an ownership transfer, and reading the full plan body rather than the summary counts on policy and permission resources. Provides patterns for both custom provider development (Go, terraform-plugin-framework) and HCL configuration/operations.
+description: Use for Terraform or OpenTofu HCL configuration and provider development (Go, terraform-plugin-framework). Covers state management, plan and apply, failed-apply recovery, moved blocks, import, and provider schema design.
 version: 2.3.0
 ---
 
@@ -48,9 +48,9 @@ version: 2.3.0
   <concept name="operation_locality">Some subcommands run where you type them and some run in the backend. With a remote backend, provider credentials often exist only server-side as sensitive workspace variables, so a locally-executing subcommand cannot configure the provider at all. Before diagnosing a failure as a configuration bug, establish whether the operation ran here or there.</concept>
 </concepts>
 
-<!-- ============================================================= -->
+<!-- ------------------------------------------------------------- -->
 <!-- PILLAR 1: PROVIDER DEVELOPMENT (terraform-plugin-framework)    -->
-<!-- ============================================================= -->
+<!-- ------------------------------------------------------------- -->
 
 <provider_development>
   <description>Authoring a custom provider with terraform-plugin-framework. Provider code is Go; see golang-ecosystem for language idioms. Verify exact symbol names with Context7 (/hashicorp/terraform-plugin-framework) before relying on them, as helper package names differ from the pre-1.0 design docs.</description>
@@ -304,9 +304,9 @@ version: 2.3.0
   </acceptance_testing>
 </provider_development>
 
-<!-- ============================================================= -->
+<!-- ------------------------------------------------------------- -->
 <!-- PILLAR 2: HCL AUTHORING AND OPERATIONS                         -->
-<!-- ============================================================= -->
+<!-- ------------------------------------------------------------- -->
 
 <hcl_and_operations>
   <description>Writing HCL and operating Terraform in practice: lifecycle control, credential-scope diagnosis, composing multi-provider resources, state isolation, and CI validation.</description>

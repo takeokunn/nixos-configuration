@@ -1,6 +1,6 @@
 ---
 name: Web UX
-description: This skill should be used when the user asks to "improve UX", "usability review", "web accessibility", "design a form/onboarding flow", "information architecture", or works on web/app user experience. Also covers interaction mechanics — focus ownership across stacked modals and overlays, focus traps that survive re-rendering and late-mounted content, the open/close contract of a dialog and when refusing to close is correct, one overlay serving both a busy and an error state needing opposite assistive-technology semantics, classifying each setting as immediate-apply or review-before-commit, keyboard shortcut ownership against text entry, and releasing held input on every discontinuity such as a window blur, tab switch, or overlay opening. Provides web UX heuristics, accessibility (WCAG), and performance-perception best practices.
+description: Use for web/app UX work - usability review, accessibility (WCAG), form and onboarding design, information architecture, and interaction mechanics like modal focus ownership, dialog open/close contracts, and keyboard-shortcut ownership.
 version: 2.3.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: mdq
-description: This skill should be used when the user asks to parse, search, grep, query, filter, or extract headings, sections, tasks, code blocks, links, or tables from Markdown files. Use when working with mdq, jq-style Markdown querying, section extraction, checklist validation, CI task scripts, or documentation automation pipelines.
+description: Use for querying Markdown with mdq - jq-style selectors to extract headings, sections, tasks, code blocks, links, or tables; checklist validation and CI documentation scripts.
 version: 2.1.0
 ---
 

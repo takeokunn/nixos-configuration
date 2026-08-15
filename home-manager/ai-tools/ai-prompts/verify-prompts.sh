@@ -80,10 +80,11 @@ fi
 
 echo "== (2) command frontmatter shape =="
 
-# codex/default.nix converts each command into a codex skill by taking line 2 (0-indexed)
-# verbatim as the description and dropping the first four lines as frontmatter. Its `assert
-# lib.hasPrefix "description: "` makes a wrong shape a build failure — but only for the one
-# file Nix happens to evaluate first, and only at build time. Check the whole set here.
+# codex/default.nix converts each command into a codex skill via shared.parseFrontmatter, which
+# reads the description off the frontmatter line starting "description: " (found with
+# shared.findLineWithPrefix, itself asserting a match) rather than a hardcoded line index. Its
+# `assert` still makes a wrong shape a build failure — but only for the one file Nix happens to
+# evaluate first, and only at build time. Check the whole set here.
 shape_out="$(
   python3 - "$commands_dir" "$agents_dir" <<'PY'
 import glob, os, sys
@@ -393,7 +394,11 @@ def safe(rel):
     )
 
 # Tracked files are the published surface. An untracked scratch file in the working tree is
-# not published and is not this gate's business; a tracked one is, wherever it lives.
+# not published and lies outside the scope of this gate; a tracked one is in scope, wherever
+# it lives. NOTE: keep apostrophes out of this heredoc. It sits inside a $(...) substitution,
+# and bash 3.2 -- the only bash on macOS, which the shebang resolves to -- scans for the
+# closing paren without honouring the quoted heredoc, so one stray apostrophe opens a string
+# that swallows the rest of the file. That defect silently disabled checks (6) through (10).
 try:
     listing = subprocess.run(['git', '-C', root, 'ls-files', '-z'],
                              stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -571,15 +576,31 @@ echo "== (9) hooks are registered, not merely installed =="
 # hookSpecificOutput contract is discarded silently, with no error and no exit-code signal.
 # The registration count below therefore proves wiring, never behaviour.
 reg_out="$(
-  python3 - "$ai_tools_dir/claude-code/default.nix" "$here/hooks" <<'PY'
+  python3 - "$ai_tools_dir/claude-code/default.nix" "$here/hooks" "$ai_tools_dir/shared/default.nix" <<'PY'
 import glob, os, re, sys
 
-nix_path, hooks_dir = sys.argv[1], sys.argv[2]
+nix_path, hooks_dir, shared_path = sys.argv[1], sys.argv[2], sys.argv[3]
 if not os.path.exists(nix_path):
     raise SystemExit('claude-code/default.nix not found at ' + nix_path)
 text = open(nix_path, encoding='utf-8', errors='replace').read()
 
-REQUIRED = {'block-destructive-git', 'block-bare-cd', 'enforce-perl'}
+# REQUIRED used to restate the guardrailHookNames list from shared/default.nix as its own
+# hardcoded literal. The two could drift silently: a guardrail hook added to guardrailHookNames
+# (and wired into claude-code/default.nix, which asserts against that same list) would leave this
+# check verifying only the original names forever, still green. Parse the roster out of the shared
+# file instead, and fail loudly on a broken parse rather than falling back to an empty REQUIRED
+# set that would pass this whole check vacuously.
+if not os.path.exists(shared_path):
+    raise SystemExit('shared/default.nix not found at ' + shared_path +
+                      ': cannot derive the guardrail hook roster')
+shared_text = open(shared_path, encoding='utf-8', errors='replace').read()
+m = re.search(r'guardrailHookNames\s*=\s*\[(.*?)\]', shared_text, re.S)
+if not m:
+    raise SystemExit('could not parse guardrailHookNames = [ ... ] out of ' + shared_path)
+REQUIRED = set(re.findall(r'"([^"]+)"', m.group(1)))
+if not REQUIRED:
+    raise SystemExit('parsed an empty guardrailHookNames list from ' + shared_path +
+                      ': that is a broken parse, not an empty roster')
 # Hooks allowed to be installed without being registered. An entry here silences the
 # inert-hook complaint for one name, so add one only with its reason written beside it.
 #
@@ -959,6 +980,221 @@ above describes the stub's behaviour"
   else
     fail "hook behavior does not match the contract" "$bh_problems"
   fi
+fi
+
+echo "== (11) this gate parses, and cannot be silently truncated again =="
+
+# This file spent an unknown stretch exiting 2 partway through. A single apostrophe in a comment
+# inside a python heredoc -- nested in a $(...) substitution -- made bash 3.2 read the quote as a
+# string opener and swallow the rest of the file. Checks (6) through (10) never ran. Nothing said
+# so: the surviving checks still printed ok, and a caller reading the status through a pipe gets
+# the pipeline tail. bash 3.2 is not incidental here, it is the only bash on macOS and the one
+# /usr/bin/env resolves to.
+# An earlier draft of this check tried to spot the shape instead of the failure: find a heredoc
+# nested in a command substitution, then flag an odd apostrophe count inside it. It was wrong. The
+# nesting test counted every ")" in the file, including the ones closing a case pattern or a
+# function header, so the running depth went negative and the test never fired. Injecting the real
+# defect into a hook proved it: the hook stopped parsing and the check still reported ok.
+#
+# So this asks the question directly instead. bash 3.2 IS what runs these -- it is the only bash on
+# macOS and what /usr/bin/env resolves to -- which makes `bash -n` under that binary the ground
+# truth rather than a proxy for it. Every shell script in the tree is covered, gates included: the
+# gates were the ones nothing checked, and one of them had been dead for an unknown stretch.
+parse_problems=""
+parse_count=0
+for s in "${BASH_SOURCE[0]}" "$ai_tools_dir/agent-skills/verify-skills.sh" \
+  "$ai_tools_dir/codex/verify-codex-hooks.sh" "$here"/scripts/*.sh; do
+  [ -f "$s" ] || continue
+  parse_count=$((parse_count + 1))
+  if ! out="$(/bin/bash -n "$s" 2>&1)"; then
+    parse_problems="$parse_problems
+$(basename "$s"): $(printf '%s' "$out" | head -2 | tr '\n' ' ')"
+  fi
+done
+if [ "$parse_count" -lt 3 ]; then
+  fail "script-parse check found almost nothing to parse" \
+    "checked $parse_count scripts; expected at least 3 (this gate, verify-skills, verify-codex-hooks)"
+elif [ -n "$parse_problems" ]; then
+  fail "a gate script does not parse under /bin/bash, so it dies partway and reports nothing" \
+    "$parse_problems
+A script that stops here still prints the ok lines it already emitted, and a caller reading the
+status through a pipe sees the pipeline tail. Check the summary line, not the last ok."
+else
+  pass "all $parse_count gate scripts parse under /bin/bash $(/bin/bash --version | perl -ne 'print $1 if /version (\S+)/')"
+fi
+
+echo "== (12) no numeric self-assessment survives =="
+
+# CLAUDE.md forbids a numeric self-assessment, and commands/define.md blocks it as a critical
+# prohibition -- but the rule had drifted into four skills that still prescribed 0-100 feasibility
+# scales and 80/60 confidence thresholds. Neither this gate nor verify-skills.sh could see it: both
+# resolve a skill NAME to a directory and never read the body. That is the gap this check closes.
+#
+# There is deliberately no negative filter. One used to strip any matched LINE containing a word
+# like "forbidden" or "prohibit" -- but that swallowed the whole line, not just the prohibition
+# text, so "Other agents are forbidden from using the old workflow; instead Rate confidence (0-100)
+# here." matched the positive pattern and then vanished, violation and all. Confirmed before
+# deleting it: the positive pattern alone, run with no filter against ai-prompts/ and
+# agent-skills/skills/, returns zero hits -- the corpus's actual prohibition text (CLAUDE.md, this
+# file's own comments, core-patterns CORE-P001, define.md DEF-P004) does not contain any of the
+# positive alternatives below, so nothing needs excluding.
+#
+# "out of 100" is bounded to exclude a closing quote immediately after the match. POSIX ERE (this
+# grep -E) has no lookahead, so `([^"]|$)` does the same job: agent-skills/skills/workflow-patterns/
+# SKILL.md itself explains this very prohibition with `"how good is this out of 100" does not` as a
+# REJECTED example, immediately followed by a closing quote -- an unbounded "out of 100" would flag
+# the rejection alongside the two real prescriptions it was added to catch
+# (agent-skills/skills/quality-tools/SKILL.md:284 and :290).
+score_hits="$(
+  grep -rnE '\(0-100\)|>0-100<|confidence below [0-9]|Rate confidence|[0-9]{2}\+: Verified|out of 100([^"]|$)|confidence level' \
+    "$here" "$skills_dir" --include='*.md' 2>/dev/null
+)"
+score_scanned="$(find "$here" "$skills_dir" -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
+if [ "${score_scanned:-0}" -lt 40 ]; then
+  fail "numeric-self-assessment check had almost nothing to read" \
+    "found ${score_scanned:-0} markdown files across the prompt and skill trees; expected 40+"
+elif [ -z "$score_hits" ]; then
+  pass "no numeric self-assessment scale in the corpus ($score_scanned markdown files)"
+else
+  n="$(printf '%s\n' "$score_hits" | wc -l | tr -d ' ')"
+  fail "a numeric self-assessment scale is prescribed in $n place(s)" \
+    "$(printf '%s\n' "$score_hits" | head -10 | perl -pe "s{^\Q$repo_root\E/}{}")
+State the observable condition instead -- which capability was found at which file:line, and which
+was not found and where it was searched for."
+fi
+
+echo "== (13) frontmatter is exactly four lines =="
+
+# Check (2) already pins index 3 to '---', so a fifth frontmatter line no longer produces the
+# failure this check originally targeted: the old hardcoded `lib.drop 4` left a stray --- at the
+# top of the generated body on a 5-line frontmatter, but shared.parseFrontmatter (see
+# shared/default.nix) derives the body from the position of the CLOSING --- instead of a fixed
+# drop count, so it does not reproduce that defect. Checked directly: neither codex/default.nix nor
+# opencode/agent-translation.nix reads a frontmatter line by fixed index at all — both look a line
+# up by prefix via shared.findLineWithPrefix ("description: ", "name: "), which tolerates a
+# frontmatter of any length as long as the wanted line is present somewhere in it. Claude Code's
+# own consumer (claude-code/default.nix) does not parse frontmatter at all; it reads each file
+# verbatim and lets the Claude Code CLI parse it. So no converter's correctness actually depends on
+# this shape any more, and check (2)'s index-3 pin already catches what this check was written to
+# catch.
+#
+# What is left: this is now a convention check, not a defect guard. It holds every command and
+# agent to the same four-line frontmatter shape so the corpus stays uniform and check (2)'s own
+# fixed-index reads — which do still assume index 3 is the close — stay a description of the whole
+# corpus rather than of most of it. Kept as its own check, rather than folded into check (2), so a
+# future loosening of check (2)'s indices does not silently also loosen this invariant.
+fm_out="$(
+  python3 - "$commands_dir" "$agents_dir" <<'PY'
+import glob, os, sys
+
+seen, bad = 0, []
+for d in sys.argv[1:]:
+    for f in sorted(glob.glob(os.path.join(d, '*.md'))):
+        seen += 1
+        label = os.path.basename(os.path.dirname(f)) + '/' + os.path.basename(f)
+        lines = open(f, encoding='utf-8', errors='replace').read().split('\n')
+        if not lines or lines[0].strip() != '---':
+            bad.append(f'{label}: does not open with ---')
+            continue
+        close = next((i for i, l in enumerate(lines[1:], 1) if l.strip() == '---'), None)
+        if close is None:
+            bad.append(f'{label}: frontmatter is never closed')
+        elif close != 3:
+            bad.append(f'{label}: closing --- is on line {close + 1}, expected line 4')
+if seen == 0:
+    raise SystemExit('found no command or agent files: the check would be vacuous')
+print('\n'.join(bad))
+print(f'SEEN {seen}')
+PY
+)"
+fm_status=$?
+fm_bad="$(printf '%s\n' "$fm_out" | grep -v '^SEEN ')"
+if [ $fm_status -ne 0 ]; then
+  fail "frontmatter length check did not run" "$fm_out"
+elif [ -n "$fm_bad" ]; then
+  fail "frontmatter is not exactly four lines" \
+    "$fm_bad
+The shared parser derives the body from the closing ---, but codex and opencode both assert on
+fixed indices. A fifth line corrupts the generated body without failing any other check."
+else
+  pass "every command and agent frontmatter closes on line 4 ($(printf '%s' "$fm_out" | perl -ne 'print $1 if /^SEEN (\d+)/') files)"
+fi
+
+echo "== (14) the shared nix module is the only definition =="
+
+# MCP servers, the dangerous-Bash deny list, the guardrail hook roster, and the frontmatter parser
+# were each written out separately per tool, and two of them had already drifted in production:
+# codex was missing metabase-mcp entirely, and opencode was missing seven deny patterns including
+# rm -rf on the ssh directory. They now live in shared/default.nix. This check is what stops a tool
+# from quietly reintroducing its own copy.
+shared_out="$(
+  python3 - "$ai_tools_dir" <<'PY'
+import os, re, sys
+
+root = sys.argv[1]
+shared = os.path.join(root, 'shared', 'default.nix')
+if not os.path.exists(shared):
+    raise SystemExit('shared/default.nix is missing: the single definition it holds is gone')
+
+consumers = {
+    'claude-code/default.nix': ['mcpServers', 'bashDenyPatterns'],
+    'codex/default.nix': ['mcpServers', 'guardrailHookNames'],
+    # opencode consumes the deny list through bashDenyPatternsOpencode, not bashDenyPatterns
+    # directly: shared/default.nix defines it as bashDenyPatterns translated into the pattern
+    # spelling opencode itself expects (the same shape mcpServerToOpencode uses for mcpServers),
+    # so this is still the single source of truth, just named for what this consumer actually reads.
+    'opencode/opencode-config.nix': ['mcpServers', 'bashDenyPatternsOpencode'],
+    'opencode/agent-translation.nix': ['parseFrontmatter'],
+}
+problems, checked = [], 0
+for rel, attrs in consumers.items():
+    path = os.path.join(root, rel)
+    if not os.path.exists(path):
+        problems.append(f'{rel}: not found')
+        continue
+    text = open(path, encoding='utf-8', errors='replace').read()
+    checked += 1
+    if not re.search(r'\bshared\b', text):
+        problems.append(f'{rel}: never references the shared module')
+    for a in attrs:
+        # A bare substring test on the attribute NAME is true by construction: every consumer
+        # declares its own option of that same name (claude-code/default.nix has both
+        # `programs.claude-code.mcpServers = ...` and, separately, `shared.mcpServers`), so `a not
+        # in text` can never fail. Require the dotted form actually read off the shared module,
+        # bounded with \b so `shared.bashDenyPatterns` does not also match a longer sibling name
+        # like `shared.bashDenyPatternsOpencode`.
+        if not re.search(r'\bshared\.' + re.escape(a) + r'\b', text):
+            problems.append(f'{rel}: does not consume shared.{a} (no dotted shared.{a} reference found)')
+
+# A local re-declaration is the drift this check exists to catch. serena is the marker: it is a
+# stdio server whose command lives in the shared module and nowhere else. Matching only inside a
+# `serena = { ... start-mcp-server ... }` block used to require a `[^}]*` class that stops at the
+# first `}` -- which is exactly the `}` closing `${nurPkgs.serena}` in a verbatim copy-paste of the
+# serena block already declared in the shared module, the one scenario this check exists to catch.
+# Search for the marker directly instead: none of the consumer files below is shared/default.nix
+# itself (that is the one place `start-mcp-server` legitimately lives), so a plain substring search
+# cannot be defeated by an interpolation the brace-spanning class choked on, and cannot
+# false-positive against a correct tree either.
+for rel in list(consumers) + ['codex/default.nix']:
+    path = os.path.join(root, rel)
+    if os.path.exists(path):
+        text = open(path, encoding='utf-8', errors='replace').read()
+        if 'start-mcp-server' in text:
+            problems.append(f'{rel}: declares its own serena server again (start-mcp-server marker found outside shared/default.nix)')
+if checked < 4:
+    raise SystemExit(f'only {checked} of 4 consumers were readable: the check would be weak')
+print('\n'.join(problems))
+print(f'CHECKED {checked}')
+PY
+)"
+shared_status=$?
+shared_bad="$(printf '%s\n' "$shared_out" | grep -v '^CHECKED ')"
+if [ $shared_status -ne 0 ]; then
+  fail "shared-module check did not run" "$shared_out"
+elif [ -n "$shared_bad" ]; then
+  fail "a tool no longer derives from the shared module" "$shared_bad"
+else
+  pass "all $(printf '%s' "$shared_out" | perl -ne 'print $1 if /^CHECKED (\d+)/') consumers derive from shared/default.nix"
 fi
 
 echo

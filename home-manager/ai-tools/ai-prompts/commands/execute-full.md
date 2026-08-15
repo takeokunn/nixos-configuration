@@ -609,7 +609,6 @@ Execute tasks with automatic feedback collection and conditional fix phase. Runs
   <command name="execute">Basic execution without feedback loop</command>
   <command name="feedback">Standalone feedback command for reviewing work</command>
   <command name="define">When implementation reveals unclear requirements</command>
-  <command name="define-full">When detailed requirements definition is needed</command>
   <command name="ask">When implementation requires investigation</command>
   <command name="bug">When implementation encounters unexpected errors</command>
   <command name="upstream">When preparing changes for upstream OSS contribution</command>

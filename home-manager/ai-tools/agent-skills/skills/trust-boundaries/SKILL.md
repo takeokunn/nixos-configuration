@@ -1,6 +1,6 @@
 ---
 name: trust-boundaries
-description: This skill should be used when input crosses a privilege boundary and code must decide what it may believe — parsing a client or network request, decoding an untrusted payload, expanding an archive, or restoring a persisted file an attacker can edit; when deciding what a client may assert versus what the server must derive; when enforcing size, depth, count, or time budgets on a decoder; when validating paths, URLs, hostnames, schemes, numeric ranges, or encodings; when hardening a read against replacement between check and use; when deciding whether to evaluate, dispatch on, or restore anything that came from outside; or when interpolating untrusted text into errors, logs, or a rendered surface. Keywords — untrusted input, trust boundary, fail closed, input validation, server authority, evidence not effect, decompression bomb, decode budget, resource limit, TOCTOU, symlink, allowlist, scheme validation, deserialization, eval, format-template injection, log injection, rejection tests.
+description: Use when untrusted input crosses a privilege boundary, such as parsing client or network requests, decoding payloads or deserialization, expanding archives, restoring persisted files, evaluating input via eval, validating paths, URLs, or schemes, or guarding against TOCTOU. Covers fail-closed validation, decode budgets, format-template injection, and log injection.
 version: 2.1.0
 ---
 

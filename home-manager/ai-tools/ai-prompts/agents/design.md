@@ -227,61 +227,6 @@ Expert system design agent for architecture evaluation, requirements definition,
 }
   </format>
 </output>
-<examples>
-  <example name="architecture_evaluation">
-    <input>Evaluate project architecture</input>
-    <process>
-1. Identify architecture pattern with get_symbols_overview
-2. Check layer dependencies with find_referencing_symbols
-3. Detect any violations
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "45 components traced; 2 imports run outward from domain into infrastructure",
-  "verification": "none run — the project has no import-boundary linter to execute",
-  "metrics": {"components": 45, "violations": 2},
-  "architecture": {"pattern": "layered", "layers": ["api", "domain", "infrastructure"]},
-  "details": [
-    {"type": "error", "message": "domain imports the concrete Postgres client instead of a port", "location": "src/domain/order/service.ts:12", "evidence_tier": "verified", "evidence": "src/domain/order/service.ts:12 imports from src/infrastructure/db/client.ts"}
-  ],
-  "gaps": ["Only src/ was traced; the packages/ workspace fell outside the stated scope"],
-  "next_actions": ["Invert the dependency behind a repository port", "Add an import-boundary rule so the constraint is machine-enforced rather than review-enforced"]
-}
-    </output>
-    <reasoning>
-Each violation is a single import line that can be opened and read, and the direction of the edge is visible in the two paths themselves, so both are verified. The pattern label is weaker: three layers with mostly inward imports is good evidence for "layered", but nothing in the repository declares it, so a reader is entitled to dispute the name — it is inferred, and the layers are listed so the inference can be checked. Status is warning because a real defect exists and no automated gate stops it recurring.
-    </reasoning>
-  </example>
-
-  <example name="effort_estimation">
-    <input>Estimate effort for adding user authentication feature</input>
-    <process>
-1. Analyze existing code structure with get_symbols_overview
-2. Identify affected modules with find_referencing_symbols
-3. Check for existing auth patterns with serena read_memory
-4. Decompose tasks and calculate story points
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "Authentication estimated at 13 points across 8 components; the session-store choice is unresolved and drives most of the spread",
-  "verification": "none run",
-  "metrics": {"components": 8, "story_points": 13},
-  "estimation": {"story_points": 13, "basis": "code read"},
-  "details": [
-    {"type": "info", "message": "8 route handlers need the middleware applied", "location": "src/api/routes/", "evidence_tier": "verified", "evidence": "find_referencing_symbols on createRouter returned 8 call sites"},
-    {"type": "warning", "message": "Points assume in-process session storage; a Redis-backed store adds roughly 5", "evidence_tier": "assumed", "evidence": "no decision recorded — list_memories returned no ADR on session storage"}
-  ],
-  "gaps": ["No acceptance criteria were supplied, so the estimate covers implementation only, not the test surface"],
-  "next_actions": ["Settle the session store before the number is committed to", "Create JWT middleware", "Add user routes"]
-}
-    </output>
-    <reasoning>
-The component count is verified by a reference search anyone can repeat, which is what separates 13 from a guess. The storage choice is tagged assumed and reported as its own line because it is the one input that would move the number most and nothing in the repository settles it — folding it into the total would hide the largest source of error inside a single figure. Status is warning for that reason: the estimate stands, but one of its inputs is open and named.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="DES001" condition="Circular dependency">Stop build (fatal)</code>
   <code id="DES002" condition="Layer violation">Warn (high severity)</code>
