@@ -3,7 +3,6 @@ with epkgs;
 [
   # check
   flycheck
-  # flycheck-elsa
   flycheck-projectile
   flycheck-cfn
 
@@ -47,7 +46,6 @@ with epkgs;
   lsp-ui
   lsp-scheme
   lsp-dart
-  # lsp-bridge
 
   # Syntax
   syntax-subword

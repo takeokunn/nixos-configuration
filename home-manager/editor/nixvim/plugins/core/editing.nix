@@ -20,7 +20,6 @@
   };
 
   keymaps = [
-    # undotree
     {
       mode = "n";
       key = "<leader>u";

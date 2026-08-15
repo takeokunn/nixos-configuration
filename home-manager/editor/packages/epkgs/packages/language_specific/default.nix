@@ -22,7 +22,6 @@ with epkgs;
 
   # Emacs Lisp
   eros
-  # elsa
   lispxmp
   macrostep
   elisp-slime-nav
@@ -63,7 +62,6 @@ with epkgs;
   composer
   php-runtime
   psysh
-  # laravel-tinker-repl
   emacs-php-doc-block
   phpstan
   phpunit

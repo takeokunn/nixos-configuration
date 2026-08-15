@@ -1,4 +1,3 @@
-# option
 complete -c cmigemo -s d -l dict -d "Use a file <dict> for dictionary."
 complete -c cmigemo -s s -l subdict -d "Sub dictionary files. (MAX 8 times)"
 complete -c cmigemo -s q -l quiet -d "Show no message except results."

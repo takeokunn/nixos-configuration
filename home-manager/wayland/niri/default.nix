@@ -6,9 +6,6 @@ let
 in
 {
   xdg.configFile."niri/config.kdl".text = ''
-    // Niri Configuration - Modern Scrolling Tiling Compositor
-    // Vi-style keybindings (hjkl navigation)
-
     input {
         keyboard {
             xkb {
@@ -28,9 +25,7 @@ in
         }
     }
 
-    // Native gesture support
     gestures {
-        // Workspace switching with drag-and-drop
         dnd-edge-workspace-switch {
             trigger-height 50
             delay-ms 100
@@ -150,60 +145,48 @@ in
     }
 
     binds {
-        // Terminal (kitty)
         Mod+Return { spawn "kitty"; }
         Mod+Shift+Return { spawn "kitty" "-e" "tmux"; }
 
-        // Application Launcher
         Mod+D { spawn "fuzzel"; }
 
-        // Clipboard History (clipse in kitty)
         Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
 
         // Emacs Scratchpad (vime-like)
         Mod+I { spawn "sh" "-c" "${emacsScratchpadToggle}"; }
 
-        // Screenshot
         Mod+P { screenshot; }
         Mod+Shift+P { screenshot-screen; }
         Mod+Ctrl+P { screenshot-window; }
 
-        // Close Window
         Mod+Shift+Q { close-window; }
 
-        // Vi-style Focus Navigation (hjkl)
         Mod+H { focus-column-left; }
         Mod+J { focus-window-down; }
         Mod+K { focus-window-up; }
         Mod+L { focus-column-right; }
 
-        // Vi-style Window Movement (Shift + hjkl)
         Mod+Shift+H { move-column-left; }
         Mod+Shift+J { move-window-down; }
         Mod+Shift+K { move-window-up; }
         Mod+Shift+L { move-column-right; }
 
-        // Vi-style Workspace Navigation (Ctrl + j/k)
         Mod+Ctrl+K { focus-workspace-up; }
         Mod+Ctrl+J { focus-workspace-down; }
 
-        // Move Window to Workspace (Ctrl + Shift + j/k)
         Mod+Ctrl+Shift+K { move-column-to-workspace-up; }
         Mod+Ctrl+Shift+J { move-column-to-workspace-down; }
 
-        // Monitor Focus (Alt + hjkl)
         Mod+Alt+H { focus-monitor-left; }
         Mod+Alt+L { focus-monitor-right; }
         Mod+Alt+K { focus-monitor-up; }
         Mod+Alt+J { focus-monitor-down; }
 
-        // Move Window to Monitor
         Mod+Alt+Shift+H { move-column-to-monitor-left; }
         Mod+Alt+Shift+L { move-column-to-monitor-right; }
         Mod+Alt+Shift+K { move-column-to-monitor-up; }
         Mod+Alt+Shift+J { move-column-to-monitor-down; }
 
-        // Workspace Number Keys
         Mod+1 { focus-workspace 1; }
         Mod+2 { focus-workspace 2; }
         Mod+3 { focus-workspace 3; }
@@ -224,68 +207,52 @@ in
         Mod+Shift+8 { move-column-to-workspace 8; }
         Mod+Shift+9 { move-column-to-workspace 9; }
 
-        // Window Layout
         Mod+F { fullscreen-window; }
         Mod+Shift+Space { toggle-window-floating; }
 
-        // Column Width Adjustment
         Mod+Minus { set-column-width "-10%"; }
         Mod+Equal { set-column-width "+10%"; }
 
-        // Window Height Adjustment
         Mod+Shift+Minus { set-window-height "-10%"; }
         Mod+Shift+Equal { set-window-height "+10%"; }
 
-        // Consume/Expel Windows (Tab columns)
         Mod+BracketLeft { consume-window-into-column; }
         Mod+BracketRight { expel-window-from-column; }
 
-        // Column Presets
         Mod+R { switch-preset-column-width; }
         Mod+Alt+R { reset-window-height; }
         Mod+Ctrl+R { switch-preset-window-height; }
 
-        // Maximize Column
         Mod+Shift+F { maximize-column; }
         Mod+Ctrl+F { center-column; }
 
-        // Overview Mode
         Mod+Tab { toggle-overview; }
 
-        // Volume Control (with swayosd)
         XF86AudioRaiseVolume { spawn "swayosd-client" "--output-volume" "raise"; }
         XF86AudioLowerVolume { spawn "swayosd-client" "--output-volume" "lower"; }
         XF86AudioMute { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
 
-        // Brightness Control (with swayosd)
         XF86MonBrightnessUp { spawn "swayosd-client" "--brightness" "raise"; }
         XF86MonBrightnessDown { spawn "swayosd-client" "--brightness" "lower"; }
 
-        // Media Control
         XF86AudioPlay { spawn "playerctl" "play-pause"; }
         XF86AudioPause { spawn "playerctl" "play-pause"; }
         XF86AudioNext { spawn "playerctl" "next"; }
         XF86AudioPrev { spawn "playerctl" "previous"; }
 
-        // Screen Recording
         Mod+Shift+R { spawn "wl-screenrec" "-f" "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"; }
 
-        // Notifications (mako)
         Mod+N { spawn "makoctl" "dismiss"; }
         Mod+Shift+N { spawn "makoctl" "dismiss" "-a"; }
         Mod+Ctrl+N { spawn "makoctl" "restore"; }
 
-        // Lock Screen
         Mod+Escape { spawn "hyprlock"; }
 
-        // Quit Niri
         Mod+Shift+E { quit; }
 
-        // Power Off Monitors
         Mod+Shift+O { power-off-monitors; }
     }
 
-    // Hotkey Overlay
     hotkey-overlay {
         skip-at-startup
     }

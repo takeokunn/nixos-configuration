@@ -50,22 +50,12 @@ mcp-servers-nix.lib.mkConfig pkgs {
       "flake.lock"
     ];
 
-    # FR-008: serena/deepwiki/metabase-mcp come from shared/default.nix, converted into
-    # mcp-servers-nix's "opencode" flavor shape (explicit type, single argv command list).
-    # ast-grep stays opencode-local, matching claude-code and codex each declaring their own
-    # extra servers.
     servers = lib.mapAttrs (_: shared.mcpServerToOpencode) sharedServers // {
       "ast-grep".type = "local";
       "ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
     };
 
     permission = {
-      # FR-008: the raw pattern list is shared/default.nix's bashDenyPatterns (the union of
-      # this list and claude-code's own, see that file), run through
-      # `shared.bashDenyPatternToOpencode` first because opencode's matcher reads a literal
-      # ":" rather than expanding claude-code's trailing ":*" spelling — see that function's
-      # comment. Each translated, de-duplicated pattern becomes a `<p> = "deny"` attr here;
-      # "*" = "allow" stays as the explicit default this permission set had before.
       bash = {
         "*" = "allow";
       }

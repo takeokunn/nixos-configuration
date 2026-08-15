@@ -8,7 +8,6 @@ let
   cfg = config.programs.gitleaks;
   tomlFormat = pkgs.formats.toml { };
 
-  # ルール定義の型
   ruleType = lib.types.submodule {
     options = {
       id = lib.mkOption {
@@ -57,7 +56,6 @@ let
     };
   };
 
-  # allowlist定義の型
   allowlistType = lib.types.submodule {
     options = {
       description = lib.mkOption {
@@ -114,7 +112,6 @@ let
     };
   };
 
-  # ルールをTOML形式に変換
   ruleToToml =
     rule:
     let
@@ -130,7 +127,6 @@ let
     in
     base;
 
-  # allowlistをTOML形式に変換
   allowlistToToml =
     al:
     lib.filterAttrs (_: v: v != null && v != [ ] && v != "") {
@@ -144,7 +140,6 @@ let
         ;
     };
 
-  # 設定全体を構築
   configToToml =
     let
       extend = lib.optionalAttrs cfg.settings.extend.useDefault {

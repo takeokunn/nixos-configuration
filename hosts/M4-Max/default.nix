@@ -70,7 +70,6 @@ nix-darwin.lib.darwinSystem {
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
         {
-          # Maintain every ghq-managed repository via a background launchd agent.
           services.git-maintenance = {
             enable = true;
             ghq.enable = true;

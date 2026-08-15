@@ -1,6 +1,4 @@
 { pkgs, nurPkgs, ... }:
-# Note: Emacs socket path is defined in lib/emacs-constants.nix as single source of truth
-# Fish uses (id -u) syntax while bash uses $(id -u), so we can't directly reference the constant
 {
   xdg.configFile."fish/completions/".source = ./completions;
   xdg.configFile."fish/completions/".recursive = true;
@@ -8,11 +6,6 @@
   xdg.configFile."fish/functions/".source = ./functions;
   xdg.configFile."fish/functions/".recursive = true;
 
-  # yq-go under its own PATH name: pkgs.yq (python-yq) is already installed
-  # elsewhere as bare `yq`, and yq-go's own binary is also named `yq`, so
-  # adding pkgs.yq-go directly here would collide. fzf_ghq.fish's
-  # __fzf_ghq_new_worktree needs yq-go's `eval`/`eval -i` syntax to prune
-  # stale Serena project entries.
   home.packages = [ (pkgs.writeShellScriptBin "yq-go" ''exec ${pkgs.lib.getExe pkgs.yq-go} "$@"'') ];
 
   home.sessionVariables.COLORTERM = "truecolor";
@@ -22,19 +15,15 @@
   programs.fish.enable = true;
 
   programs.fish.shellInit = ''
-    # for tmux
     if type -q tmux && test -z $TMUX
         tmux attach-session || tmux new-session
     end
 
-    # suppress fish_greeting
     set fish_greeting
 
     # macOS: fish launched from launchd may not inherit TMPDIR
     set -x TMPDIR /tmp
 
-    # for emacs daemon socket (uses path from lib/emacs-constants.nix)
-    # Note: fish uses (id -u) syntax, constants use $(id -u) for bash compatibility
     ${
       if pkgs.stdenv.isDarwin then
         "set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server"
@@ -51,7 +40,6 @@
   '';
 
   programs.fish.shellInitLast = ''
-    # for private.fish
     if test -e ~/.config/fish/private.fish
         source ~/.config/fish/private.fish
     end

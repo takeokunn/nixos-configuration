@@ -1,23 +1,12 @@
 #!/bin/bash
-# PreToolUse:Bash hook — block a standalone `cd` that does nothing.
-#
-# Each Bash tool call starts in the project directory; shell state does not carry over. A
-# `cd` on its own therefore changes nothing that the next call can observe — it costs a
-# round trip and returns no information. Across the measured transcript corpus `cd` is the
-# single most-invoked command at 43,749 calls, despite a standing prose rule against it.
-#
-# Blocked: `cd <path>` as the entire command.
-# Allowed: `cd <path> && <work>` and any other compound form, because there the directory
-#          change actually scopes the work that follows.
-#
-# Escape hatch: prefix with ALLOW_BARE_CD=1 to override deliberately.
+# PreToolUse:Bash hook — blocks a standalone `cd`, which has no effect since shell state
+# does not persist between tool calls. Override with ALLOW_BARE_CD=1.
 
 set -euo pipefail
 
 input=$(cat)
 
-# Input that does not parse yields an empty command and the hook stands aside; only exit 2
-# blocks, so exiting non-zero there would report an error without preventing anything.
+# Unparsed input yields an empty command, so stand aside rather than error.
 if command -v jq &>/dev/null; then
   tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
   command=$(echo "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
@@ -34,9 +23,7 @@ fi
 
 trimmed="$(printf '%s' "$command" | perl -0pe 's/\A\s+//; s/\s+\z//')"
 
-# An explicit override, or anything that is not literally a `cd` invocation, passes.
-# Written as an if rather than `[[ ... ]] && exit 0`, because that list returns 1 on the
-# common path and `set -e` would turn it into a spurious non-zero exit from the hook.
+# if, not `[[ ... ]] && exit 0` — that form returns 1 on the common path and set -e would abort.
 if [[ $trimmed == ALLOW_BARE_CD=1\ * ]]; then
   exit 0
 fi
@@ -44,7 +31,7 @@ if [[ $trimmed != "cd" && $trimmed != cd\ * ]]; then
   exit 0
 fi
 
-# A compound command is the legitimate use: the cd scopes the work that follows it.
+# A compound command is allowed: the cd scopes the work that follows it.
 if printf '%s' "$trimmed" | perl -0ne 'exit(/(?:&&|\|\||[;|&\n])/ ? 0 : 1)'; then
   exit 0
 fi

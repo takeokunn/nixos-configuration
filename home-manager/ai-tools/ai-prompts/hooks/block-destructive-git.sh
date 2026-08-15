@@ -1,51 +1,15 @@
 #!/bin/bash
-# PreToolUse:Bash hook — block Git commands that mutate shared working-tree state.
-#
-# Concurrent sessions may share this checkout, so switching HEAD or discarding the tree
-# under another session is destructive in a way no single session can see. The prose rule
-# (ORCH-P005) has existed for a long time; the measured transcript corpus shows prose rules
-# being broken thousands of times and hook blocks being respected. This is that rule moved
-# into the layer that actually holds.
-#
-# Blocked: git stash (except list/show), git switch, git reset --hard, git clean -f,
-#          git checkout <ref>.
-# Allowed: git checkout -b / -B / --orphan (creates a branch, permitted by ORCH-P006),
-#          git checkout -- <path> (restores a file, touches no ref),
-#          git stash list / git stash show (read-only: they report on the stash without
-#          creating an entry or touching the working tree, so they are not the hazard the
-#          rest of `git stash` is).
-#
-# The classifier looks through two indirections, because both are ordinary here rather than
-# evasive: a shell payload (`bash -c '...'`, `sh -c`, `zsh -c`, `fish -c`, `eval`), which
-# this configuration positively recommends since the login shell is fish and bash syntax
-# must be run through `bash -c`; and a plain wrapper (`xargs`, `env`, `timeout`, `nohup`,
-# `command`, `sudo`, `nice`, ...), where the wrapper is incidental to the git command it
-# runs. A recommended procedure that doubles as a bypass is the worst kind, so both are
-# resolved to the git invocation underneath.
-#
-# It deliberately does NOT look at data positions: an argument to `echo`/`printf`, a commit
-# message, a grep pattern, or a heredoc body that contains the words "git stash" is text,
-# not a command, and blocking it would train the reader to route around the hook.
-#
-# THIS HOOK FAILS OPEN BY DESIGN. It is a guardrail against the accident — the reflexive
-# `git stash` before a checkout — not a security boundary. Full shell semantics (parameter
-# expansion, aliases, functions, `$(...)` producing a command name, base64-decoded payloads)
-# cannot be reproduced in a pre-execution matcher, so anything the heuristic cannot resolve
-# is allowed through rather than guessed at. Someone who wants past this hook gets past it;
-# the point is that they have to mean it. A false block costs more than a miss here, because
-# it makes the hook the obstacle instead of the rule.
-#
-# Escape hatch: prefix the command with ALLOW_DESTRUCTIVE_GIT=1. That makes the override
-# deliberate and visible in the transcript instead of silent. Tell the user why first. The
-# prefix is honoured at the position it is written, including inside a `bash -c` payload.
+# PreToolUse:Bash hook — blocks git commands that mutate shared working-tree state, since
+# concurrent sessions may share this checkout: stash (except list/show), switch,
+# reset --hard, clean -f, checkout <ref>. Allows checkout -b/-B/--orphan and checkout -- <path>.
+# Looks through shell wrappers (bash -c, xargs, sudo, ...) to find the underlying git command,
+# and fails open on anything it cannot classify. Override: ALLOW_DESTRUCTIVE_GIT=1 <command>.
 
 set -euo pipefail
 
 input=$(cat)
 
-# Input that does not parse yields an empty command and the hook stands aside. Exiting
-# non-zero there would report a hook error on every malformed payload without blocking
-# anything, since only exit 2 blocks.
+# Unparsed input yields an empty command, so stand aside rather than error.
 if command -v jq &>/dev/null; then
   tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
   command=$(echo "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
@@ -61,22 +25,15 @@ if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
-# The classifier is bound to a variable rather than heredoc-fed inside a command
-# substitution. /bin/bash on macOS is 3.2, which mis-parses a heredoc containing a backtick
-# inside $( ) and aborts the whole script with "unexpected EOF while looking for matching `".
+# Bound to a variable, not heredoc-fed via $(...) — macOS's bash 3.2 mis-parses a heredoc
+# containing a backtick inside $(...).
 read -r -d '' perl_prog <<'PERL' || true
 use strict;
 use warnings;
 
 my $cmd = defined $ENV{HOOK_CMD} ? $ENV{HOOK_CMD} : q{};
 
-# Wrappers that run their operand as a command. Stripping one leaves the real command at the
-# front of the segment, so `xargs git stash` classifies the same as `git stash`.
-#
-# rtk belongs here because the rtk-rewrite hook puts it in front of commands routinely, so the
-# model sees rtk-prefixed forms in its own transcript and reproduces them. Without the entry,
-# `rtk git stash` is an unclassified command rather than a git one. Stripping it is safe for
-# rtk's non-git subcommands too: `rtk ls -la` reduces to `ls -la`, which is not git.
+# Wrappers whose operand is the real command, e.g. `xargs git stash` classifies as `git stash`.
 my %WRAPPER = map { $_ => 1 } qw(
     sudo doas command builtin exec env nohup timeout nice ionice chrt
     time stdbuf setsid unbuffer xargs rtk
@@ -85,10 +42,8 @@ my %WRAPPER = map { $_ => 1 } qw(
 # Wrappers whose command arrives as a string operand and has to be re-parsed.
 my %SHELL = map { $_ => 1 } qw(bash sh zsh fish dash ksh mksh ash);
 
-# Split a command line into segments of words, keeping quotes intact instead of blanking
-# them. Blanking is what let a `bash -c` payload disappear before it could be inspected;
-# carrying the unquoted text forward is what lets it be re-parsed. Separators only separate
-# when they are unquoted, so a commit message or a grep pattern stays one word.
+# Keeps quotes intact rather than blanking, so a `bash -c` payload can still be re-parsed;
+# separators only separate when unquoted.
 sub lex_segments {
     my ($s) = @_;
     my @segments;
@@ -348,8 +303,7 @@ sub verdict_for_segment {
 
 sub classify {
     my ($text, $depth) = @_;
-    # Bounded so a self-referential payload cannot spin; four levels is far past anything
-    # written on purpose, and exceeding it falls open like every other unresolved case.
+    # Bounded to 4 levels so a self-referential payload cannot spin; falls open past that.
     return q{} if $depth > 4;
     for my $seg (lex_segments($text)) {
         my $v = verdict_for_segment($seg, $depth);

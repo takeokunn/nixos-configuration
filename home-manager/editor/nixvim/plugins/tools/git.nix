@@ -1,7 +1,4 @@
 {
-  # mini.diff and mini.git are configured in ui/mini.nix
-  # Keep neogit and diffview for advanced git UI
-
   plugins.neogit.enable = true;
   plugins.neogit.settings.integrations.diffview = true;
   plugins.neogit.settings.integrations.mini_pick = true;

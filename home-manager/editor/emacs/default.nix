@@ -26,7 +26,6 @@ in
     startupNotify = true;
   };
 
-  # Override vim.defaultEditor from programs/basic.nix for advanced configurations
   home.sessionVariables.EDITOR = lib.mkForce "emacsclient -t";
   home.sessionVariables.VISUAL = lib.mkForce "emacsclient -c";
 

@@ -11,7 +11,7 @@ let
   checkMergeConflicts = pkgs.writeShellScript "check-merge-conflicts" ''
     RESULT=0
     while IFS= read -r -d "" FILE; do
-      if ${pkgs.gnugrep}/bin/grep -qnE '(<{7}|={7}|>{7})' "$FILE" 2>/dev/null; then
+      if ${pkgs.gnugrep}/bin/grep -qnE '^(<{7}([[:space:]]|$)|={7}$|>{7}([[:space:]]|$))' "$FILE" 2>/dev/null; then
         printf 'Merge conflict markers found in: %s\n' "$FILE"
         RESULT=1
       fi

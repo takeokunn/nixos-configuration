@@ -38,7 +38,6 @@
         set -g @dracula-show-left-icon " #S"
         set -g @dracula-left-icon-padding 1
 
-        # Plugins: git only (branch name)
         set -g @dracula-plugins "git"
         set -g @dracula-show-flags true
         set -g @dracula-show-empty-plugins false
@@ -54,7 +53,6 @@
         # Purple-based palette (replace loud green/yellow)
         set -g @dracula-colors "green='#bd93f9' yellow='#bd93f9'"
 
-        # Border contrast
         set -g @dracula-border-contrast true
       '';
     }

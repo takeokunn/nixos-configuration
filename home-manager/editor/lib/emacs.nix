@@ -4,7 +4,6 @@
   emacsPkg,
 }:
 let
-  # Import constants (single source of truth)
   constants = import ./emacs-constants.nix;
   inherit (constants)
     defaultWindowWidth
@@ -14,11 +13,9 @@ let
   socketPath =
     if pkgs.stdenv.isDarwin then constants.socketPath else "/run/user/$(id -u)/emacs/server";
 
-  # Scratchpad toggle script generator
-  # Generates platform-specific scripts for aerospace (macOS) and niri (NixOS)
   mkScratchpadToggle =
     {
-      windowManager, # "aerospace" | "niri"
+      windowManager,
       windowWidth ? defaultWindowWidth,
       windowHeight ? defaultWindowHeight,
       appId ? defaultAppId,

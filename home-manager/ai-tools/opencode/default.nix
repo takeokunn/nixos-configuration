@@ -21,8 +21,6 @@ let
   opencodeAgents = import ./agent-translation.nix { inherit pkgs ai-prompts-path; };
 in
 {
-  # oh-my-openagent evaluates to null on aarch64-linux (darwin-only in the
-  # NUR), so guard it for the Linux containers.
   home.packages = pkgs.lib.optionals (nurPkgs.oh-my-openagent != null) [
     nurPkgs.oh-my-openagent
   ];
@@ -34,12 +32,6 @@ in
 
   xdg.configFile."opencode/oh-my-opencode.json".source = ohMyOpencodeConfig;
 
-  # programs.opencode.agents/commands dispatches on builtins.isPath at the
-  # module's implementation, not on the option's declared `either` type: a
-  # derivation (e.g. from pkgs.linkFarm) is builtins.isAttrs, so it falls
-  # into the attrset-of-content branch and mapAttrs' over the derivation's
-  # own attrs (outPath, drvPath, ...) instead of being symlinked whole.
-  # xdg.configFile.recursive sidesteps that dispatch entirely.
   xdg.configFile."opencode/agents" = {
     source = opencodeAgents.agents;
     recursive = true;

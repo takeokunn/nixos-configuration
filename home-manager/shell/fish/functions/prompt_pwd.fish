@@ -25,7 +25,6 @@ function prompt_pwd --description 'ref: https://hotoolong.hatenablog.com/entry/2
     or set -l fish_prompt_pwd_full_dirs 1
 
     for path in $argv
-        # Replace $HOME with "~"
         set -l realhome ~
         set -l tmp (string replace -r '^'"$realhome"'($|/)' '~$1' $path)
 

@@ -1,20 +1,9 @@
-# ════════════════════════════════════════════════════════════════════════════════
-# Mini.nvim Git Integration Modules
-# ════════════════════════════════════════════════════════════════════════════════
-# Git integration: diff (gitsigns replacement) and git (additional features).
-# Note: neogit and diffview are kept separately for advanced git UI.
-# ════════════════════════════════════════════════════════════════════════════════
-
 let
   utils = import ./utils.nix;
   inherit (utils) mkMiniKeymap;
 in
 {
   plugins.mini.modules = {
-    # ══════════════════════════════════════════════════════════════════════════
-    # Diff (replaces gitsigns)
-    # ══════════════════════════════════════════════════════════════════════════
-    # Shows git diff in sign column
     diff = {
       view = {
         style = "sign";
@@ -26,14 +15,10 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Git (additional git features)
-    # ══════════════════════════════════════════════════════════════════════════
     git = { };
   };
 
   keymaps = [
-    # mini.diff keymaps
     {
       mode = "n";
       key = "]h";

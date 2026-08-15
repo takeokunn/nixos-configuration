@@ -47,12 +47,6 @@
 
   programs.git.includes = [
     { path = "~/.config/git/config.d/maintenance.conf"; }
-    # Work-specific identity and URL rewrites live outside this public repo,
-    # because the account and namespace names are themselves work identifiers.
-    # Git ignores a missing include silently, so a machine without the file is
-    # simply left with the personal identity and needs no conditional here. The
-    # gitdir scoping that used to live in this list now lives inside that file,
-    # which home-manager cannot express: it emits only an unconditional include.
     { path = "~/.config/git/work.gitconfig"; }
   ];
 
@@ -146,11 +140,6 @@
       blame.markIgnoredLines = true;
     };
 
-    # Work namespaces need the opposite rewrite (SSH form to HTTPS, so the gh
-    # credential helper can authenticate them). That rule names the namespace,
-    # so it lives in ~/.config/git/work.gitconfig instead of here. Git resolves
-    # url.* by longest-prefix match rather than by file order, so the narrower
-    # rule in the included file still wins over this one.
     url."git@github.com:".pushInsteadOf = "https://github.com/";
 
     init.defaultBranch = "main";

@@ -1,7 +1,5 @@
-# global option
 complete -f -c waypoint -s h -l help
 
-# subcommand
 complete -f -c waypoint -n __fish_use_subcommand -xa login -d "Log in to a Waypoint server"
 complete -f -c waypoint -n __fish_use_subcommand -xa build -d "Build a new versioned artifact from source"
 complete -f -c waypoint -n __fish_use_subcommand -xa deploy -d "Deploy a pushed artifact"
@@ -33,7 +31,6 @@ complete -f -c waypoint -n __fish_use_subcommand -xa user -d "User information a
 complete -f -c waypoint -n __fish_use_subcommand -xa version -d "Prints the version of this Waypoint CLI"
 complete -f -c waypoint -n __fish_use_subcommand -xa workspace -d "Manage workspaces"
 
-# login option
 complete -c waypoint -n '__fish_seen_subcommand_from login' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from login' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from login' -l project -s p
@@ -48,7 +45,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from login' -l from-kubernetes-s
 complete -c waypoint -n '__fish_seen_subcommand_from login' -l from-kubernetes-service
 complete -c waypoint -n '__fish_seen_subcommand_from login' -l token
 
-# build option
 complete -c waypoint -n '__fish_seen_subcommand_from build' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from build' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from build' -l project -s p
@@ -60,7 +56,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from build' -l var
 complete -c waypoint -n '__fish_seen_subcommand_from build' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from build' -l push
 
-# deploy option
 complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l project -s p
@@ -74,10 +69,8 @@ complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l prune
 complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l prune-retain
 complete -c waypoint -n '__fish_seen_subcommand_from deploy' -l release
 
-# release subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from release' -xa list
 
-# release option
 complete -c waypoint -n '__fish_seen_subcommand_from release' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from release' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from release' -l project -s p
@@ -92,7 +85,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from release' -l prune
 complete -c waypoint -n '__fish_seen_subcommand_from release' -l prune-retain
 complete -c waypoint -n '__fish_seen_subcommand_from release' -l repeat
 
-# status
 complete -c waypoint -n '__fish_seen_subcommand_from status' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from status' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from status' -l project -s p
@@ -107,7 +99,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from status' -l json
 complete -c waypoint -n '__fish_seen_subcommand_from status' -l refresh
 complete -c waypoint -n '__fish_seen_subcommand_from status' -l verbose
 
-# up option
 complete -c waypoint -n '__fish_seen_subcommand_from up' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from up' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from up' -l project -s p
@@ -120,26 +111,22 @@ complete -c waypoint -n '__fish_seen_subcommand_from up' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from up' -l prune
 complete -c waypoint -n '__fish_seen_subcommand_from up' -l prune-retain
 
-# artifact subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from artifact' -xa build -d "Build a new versioned artifact from source"
 complete -c waypoint -n '__fish_seen_subcommand_from artifact' -xa list -d "List pushed artifacts."
 complete -c waypoint -n '__fish_seen_subcommand_from artifact' -xa list-builds -d "List builds."
 complete -c waypoint -n '__fish_seen_subcommand_from artifact' -xa push -d "Push a build's artifact to a registry"
 
-# auth-method subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from auth-method' -xa delete -d "Delete a previously configured auth method."
 complete -c waypoint -n '__fish_seen_subcommand_from auth-method' -xa inspect -d "Show detailed information about a configured auth method"
 complete -c waypoint -n '__fish_seen_subcommand_from auth-method' -xa list -d "List all configured auth methods"
 complete -c waypoint -n '__fish_seen_subcommand_from auth-method' -xa set -d "Create or update an auth method"
 
-# config subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from config' -xa get -d "Get config variables."
 complete -c waypoint -n '__fish_seen_subcommand_from config' -xa set -d "Set a config variable."
 complete -c waypoint -n '__fish_seen_subcommand_from config' -xa source-get -d "Get the configuration for a dynamic source plugin"
 complete -c waypoint -n '__fish_seen_subcommand_from config' -xa source-set -d "Set the configuration for a dynamic source plugin"
 complete -c waypoint -n '__fish_seen_subcommand_from config' -xa sync -d "Synchronize declared variables and pipeline configs in a waypoint.hcl"
 
-# context subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from context' -xa clear -d "Unset the default context."
 complete -c waypoint -n '__fish_seen_subcommand_from context' -xa create -d "Create a context."
 complete -c waypoint -n '__fish_seen_subcommand_from context' -xa delete -d "Output context info."
@@ -150,12 +137,10 @@ complete -c waypoint -n '__fish_seen_subcommand_from context' -xa set -d "Set a 
 complete -c waypoint -n '__fish_seen_subcommand_from context' -xa use -d "Set the default context."
 complete -c waypoint -n '__fish_seen_subcommand_from context' -xa verify -d "Verify server access with a context"
 
-# deployment subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from deployment' -xa deploy -d "Deploy a pushed artifact"
 complete -c waypoint -n '__fish_seen_subcommand_from deployment' -xa destroy -d "Destroy one or more deployments."
 complete -c waypoint -n '__fish_seen_subcommand_from deployment' -xa list -d "List deployments."
 
-# destroy option
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l project -s p
@@ -167,7 +152,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l var
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from destroy' -l auto-approve
 
-# docs option
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l project -s p
@@ -183,7 +167,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from docs' -l markdown
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l plugin
 complete -c waypoint -n '__fish_seen_subcommand_from docs' -l type
 
-# exec option
 complete -c waypoint -n '__fish_seen_subcommand_from exec' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from exec' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from exec' -l project -s p
@@ -195,7 +178,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from exec' -l var
 complete -c waypoint -n '__fish_seen_subcommand_from exec' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from exec' -l instance
 
-# fmt option
 complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l project -s p
@@ -203,12 +185,10 @@ complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l workspace -s w
 complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l check
 complete -c waypoint -n '__fish_seen_subcommand_from fmt' -l write
 
-# hostname subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from hostname' -xa delete -d "Delete a previously registered hostname."
 complete -c waypoint -n '__fish_seen_subcommand_from hostname' -xa list -d "List all registered hostnames."
 complete -c waypoint -n '__fish_seen_subcommand_from hostname' -xa register -d "Register a hostname to route to your apps."
 
-# init option
 complete -c waypoint -n '__fish_seen_subcommand_from init' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from init' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from init' -l project -s p
@@ -217,7 +197,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from init' -l from-project
 complete -c waypoint -n '__fish_seen_subcommand_from init' -l into
 complete -c waypoint -n '__fish_seen_subcommand_from init' -l update
 
-# install option
 complete -c waypoint -n '__fish_seen_subcommand_from install' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from install' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from install' -l project -s p
@@ -299,13 +278,11 @@ complete -c waypoint -n '__fish_seen_subcommand_from install' -l nomad-service-b
 complete -c waypoint -n '__fish_seen_subcommand_from install' -l nomad-service-provider
 complete -c waypoint -n '__fish_seen_subcommand_from install' -l nomad-service-ui-tags
 
-# job option
 complete -c waypoint -n '__fish_seen_subcommand_from job' -xa cancel -d "Cancel a running a job by id"
 complete -c waypoint -n '__fish_seen_subcommand_from job' -xa get-stream -d "Attach a local CLI to a job stream by id"
 complete -c waypoint -n '__fish_seen_subcommand_from job' -xa inspect -d "Inspect the details of a job by id in Waypoint"
 complete -c waypoint -n '__fish_seen_subcommand_from job' -xa list -d "List all jobs in Waypoint"
 
-# logs option
 complete -c waypoint -n '__fish_seen_subcommand_from logs' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from logs' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from logs' -l project -s p
@@ -317,18 +294,15 @@ complete -c waypoint -n '__fish_seen_subcommand_from logs' -l var
 complete -c waypoint -n '__fish_seen_subcommand_from logs' -l var-file
 complete -c waypoint -n '__fish_seen_subcommand_from logs' -l deployment-seq
 
-# pipeline subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from pipeline' -xa inspect -d "Inspect the full details of a pipeline by id"
 complete -c waypoint -n '__fish_seen_subcommand_from pipeline' -xa list -d "List all pipelines for a project."
 complete -c waypoint -n '__fish_seen_subcommand_from pipeline' -xa run -d "Manually execute a pipeline by name."
 
-# project subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from project' -xa apply -d "Create or update a project."
 complete -c waypoint -n '__fish_seen_subcommand_from project' -xa destroy -d "Delete the specified project and optionally destroy its resources."
 complete -c waypoint -n '__fish_seen_subcommand_from project' -xa inspect -d "Inspect the details of a project."
 complete -c waypoint -n '__fish_seen_subcommand_from project' -xa list -d "List all registered projects."
 
-# runner subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa adopt -d "Adopt a pending runner"
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa agent -d "Run a runner for executing remote operations."
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa forget -d "Forget a previously registered runner"
@@ -340,7 +314,6 @@ complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa reject -d "Reje
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa token -d "Request a new token to run a runner"
 complete -c waypoint -n '__fish_seen_subcommand_from runner' -xa uninstall -d "Uninstall a Waypoint runner from Kubernetes, Nomad, ECS, or Docker"
 
-# server subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from server' -xa bootstrap -d "Bootstrap the server and retrieve the initial auth token"
 complete -c waypoint -n '__fish_seen_subcommand_from server' -xa config-set -d "Set the server online configuration"
 complete -c waypoint -n '__fish_seen_subcommand_from server' -xa cookie -d "Output server cookie value"
@@ -351,32 +324,27 @@ complete -c waypoint -n '__fish_seen_subcommand_from server' -xa snapshot -d "Wr
 complete -c waypoint -n '__fish_seen_subcommand_from server' -xa uninstall -d "Uninstall the Waypoint server"
 complete -c waypoint -n '__fish_seen_subcommand_from server' -xa upgrade -d "Upgrades Waypoint server in the current context to the latest version"
 
-# task subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from task' -xa cancel -d "Cancel an On-Demand Runner Task running in Waypoint"
 complete -c waypoint -n '__fish_seen_subcommand_from task' -xa inspect -d "Inspect an On-Demand Runner Task from Waypoint"
 complete -c waypoint -n '__fish_seen_subcommand_from task' -xa list -d "List all On-Demand Runner Tasks in Waypoint"
 
-# trigger subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from trigger' -xa create -d "Create and register a trigger URL."
 complete -c waypoint -n '__fish_seen_subcommand_from trigger' -xa delete -d "Delete a registered trigger URL."
 complete -c waypoint -n '__fish_seen_subcommand_from trigger' -xa inspect -d "Inspect a registered trigger URL configuration."
 complete -c waypoint -n '__fish_seen_subcommand_from trigger' -xa list -d "List registered trigger URL configurations."
 complete -c waypoint -n '__fish_seen_subcommand_from trigger' -xa update -d "Update a registered trigger URL."
 
-# ui option
 complete -c waypoint -n '__fish_seen_subcommand_from ui' -l app -s a
 complete -c waypoint -n '__fish_seen_subcommand_from ui' -l plain
 complete -c waypoint -n '__fish_seen_subcommand_from ui' -l project -s p
 complete -c waypoint -n '__fish_seen_subcommand_from ui' -l workspace -s w
 complete -c waypoint -n '__fish_seen_subcommand_from ui' -l authenticate
 
-# user subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from user' -xa inspect -d "Show details about a single user"
 complete -c waypoint -n '__fish_seen_subcommand_from user' -xa invite -d "Invite a user to join the Waypoint server"
 complete -c waypoint -n '__fish_seen_subcommand_from user' -xa modify -d "Modify details about a user"
 complete -c waypoint -n '__fish_seen_subcommand_from user' -xa token -d "Request a new token to access the server"
 
-# workspace subcommand
 complete -c waypoint -n '__fish_seen_subcommand_from workspace' -xa create -d "Create a workspace with a given name."
 complete -c waypoint -n '__fish_seen_subcommand_from workspace' -xa inspect -d "Output information for a given Workspace."
 complete -c waypoint -n '__fish_seen_subcommand_from workspace' -xa list -d "List workspaces for the current context."

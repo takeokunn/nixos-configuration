@@ -3,7 +3,6 @@ let
   inherit (import ./lanes.nix) mkLane;
 in
 {
-  # ── DeepSeek-V4-Pro: ultra-complex, security, architecture ────────────────
   ultra = mkLane {
     modelTier = models.deepseekPro;
     variant = "xhigh";
@@ -23,7 +22,6 @@ in
     description = "Cross-system or long-horizon architectural decisions requiring written rationale. Use ultrabrain for single-system tradeoffs; use architecture for irreversible structural choices.";
   };
 
-  # ── Tier 1 (deepseekPro): planning, research, writing ────────────────────
   research = mkLane {
     modelTier = models.deepseekPro;
     variant = "xhigh";
@@ -37,7 +35,6 @@ in
     description = "Documentation, ADRs, changelogs, and technical writing.";
   };
 
-  # ── DeepSeek-V4-Pro: coding, implementation, reasoning ───────────────────
   ultrabrain = mkLane {
     modelTier = models.deepseekPro;
     variant = "medium";
@@ -69,7 +66,6 @@ in
     description = "Routine refactors, cleanup, repetitive edits, and test generation.";
   };
 
-  # ── Tier 3 (deepseekFlash): quick, trivial tasks ─────────────────────────
   quick = mkLane {
     modelTier = models.deepseekFlash;
     variant = "xhigh";

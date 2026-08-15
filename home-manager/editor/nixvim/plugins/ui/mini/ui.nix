@@ -1,35 +1,16 @@
-# ════════════════════════════════════════════════════════════════════════════════
-# Mini.nvim UI Enhancement Modules
-# ════════════════════════════════════════════════════════════════════════════════
-# Visual interface components: icons, statusline, tabline, starter, notify,
-# indentscope, and clue (which-key replacement).
-# ════════════════════════════════════════════════════════════════════════════════
-
 {
   # Disable web-devicons in favor of mini.icons
   plugins.web-devicons.enable = false;
 
   plugins.mini.modules = {
-    # ══════════════════════════════════════════════════════════════════════════
-    # Icons (replaces web-devicons)
-    # ══════════════════════════════════════════════════════════════════════════
     icons = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Statusline (replaces lualine)
-    # ══════════════════════════════════════════════════════════════════════════
     statusline = {
       use_icons = true;
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Tabline (replaces bufferline)
-    # ══════════════════════════════════════════════════════════════════════════
     tabline = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Starter (replaces dashboard)
-    # ══════════════════════════════════════════════════════════════════════════
     starter = {
       header.__raw = ''
         function()
@@ -53,26 +34,17 @@
       footer = "Happy Coding with NixVim!";
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Notify (replaces noice/notify)
-    # ══════════════════════════════════════════════════════════════════════════
     notify = {
       lsp_progress = {
         enable = false;
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Indentscope (replaces indent-blankline)
-    # ══════════════════════════════════════════════════════════════════════════
     indentscope = {
       symbol = "│";
       options.try_as_border = true;
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Clue (replaces which-key)
-    # ══════════════════════════════════════════════════════════════════════════
     # Displays available keybindings in a popup after pressing leader/trigger keys
     clue = {
       triggers.__raw = ''
@@ -114,7 +86,6 @@
   };
 
   keymaps = [
-    # Buffer navigation (using mini.tabline)
     {
       mode = "n";
       key = "<Tab>";

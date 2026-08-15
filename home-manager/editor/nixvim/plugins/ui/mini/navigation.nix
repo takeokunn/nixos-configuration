@@ -1,10 +1,3 @@
-# ════════════════════════════════════════════════════════════════════════════════
-# Mini.nvim Navigation & File Management Modules
-# ════════════════════════════════════════════════════════════════════════════════
-# File navigation and search: pick (telescope replacement), extra pickers,
-# files (oil replacement), visits (harpoon replacement), and sessions.
-# ════════════════════════════════════════════════════════════════════════════════
-
 let
   utils = import ./utils.nix;
   inherit (utils) mkPickKeymap mkExtraPickKeymap mkMiniKeymap;
@@ -23,9 +16,6 @@ let
 in
 {
   plugins.mini.modules = {
-    # ══════════════════════════════════════════════════════════════════════════
-    # Pick (replaces telescope)
-    # ══════════════════════════════════════════════════════════════════════════
     # Fuzzy finder with centered floating window
     pick = {
       mappings = {
@@ -51,19 +41,10 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Extra (additional pickers for mini.pick)
-    # ══════════════════════════════════════════════════════════════════════════
     extra = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Fuzzy (fuzzy matching for mini.pick)
-    # ══════════════════════════════════════════════════════════════════════════
     fuzzy = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Files (replaces oil)
-    # ══════════════════════════════════════════════════════════════════════════
     # File tree with vim-like navigation (h/l for out/in)
     files = {
       mappings = {
@@ -88,10 +69,6 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Visits (replaces harpoon)
-    # ══════════════════════════════════════════════════════════════════════════
-    # File bookmarking system with auto-tracking
     visits = {
       store = {
         autowrite = true;
@@ -102,9 +79,6 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Sessions (session management)
-    # ══════════════════════════════════════════════════════════════════════════
     sessions = {
       autowrite = true;
       autoread = false;
@@ -114,7 +88,6 @@ in
   };
 
   keymaps = [
-    # mini.pick keymaps (replacing telescope)
     (mkPickKeymap "f" "files({ tool = 'git' })" "Find Git Files")
     (mkPickKeymap "o" "buf_lines()" "Find in Current Buffer")
     (mkPickKeymap "g" "grep_live()" "Live Grep")
@@ -129,7 +102,6 @@ in
     }
     (mkPickKeymap "/" "resume()" "Resume last picker")
 
-    # mini.files keymaps (replacing oil)
     {
       mode = "n";
       key = "<leader>e";
@@ -145,7 +117,6 @@ in
       options.silent = true;
     }
 
-    # mini.visits keymaps (replacing harpoon)
     # ha/hh/hr keymaps for harpoon muscle memory
     {
       mode = "n";
@@ -166,7 +137,6 @@ in
       options.desc = "Harpoon: remove file";
     }
 
-    # mini.sessions keymaps
     (mkMiniKeymap "n" "<leader>ss" "sessions" "write" "Save session")
     (mkMiniKeymap "n" "<leader>sl" "sessions" "select" "Load session")
     (mkMiniKeymap "n" "<leader>sd" "sessions" "delete" "Delete session")

@@ -34,17 +34,14 @@
       background: #bd93f9;
     }
 
-    /* Volume muted */
     progressbar.volume.muted progress {
       background: #ff5555;
     }
 
-    /* Brightness */
     progressbar.brightness progress {
       background: #f1fa8c;
     }
 
-    /* Caps Lock indicator */
     .capslock image {
       color: #50fa7b;
     }

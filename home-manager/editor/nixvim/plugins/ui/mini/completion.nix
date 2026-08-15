@@ -1,20 +1,9 @@
-# ════════════════════════════════════════════════════════════════════════════════
-# Mini.nvim Completion & Visual Aids Modules
-# ════════════════════════════════════════════════════════════════════════════════
-# Completion system and visual aids: completion (nvim-cmp replacement), hipatterns
-# (TODO highlighting), cursorword, trailspace, bufremove, bracketed, map, misc, snippets.
-# ════════════════════════════════════════════════════════════════════════════════
-
 let
   utils = import ./utils.nix;
   inherit (utils) mkMiniKeymap;
 in
 {
   plugins.mini.modules = {
-    # ══════════════════════════════════════════════════════════════════════════
-    # Completion (replaces nvim-cmp)
-    # ══════════════════════════════════════════════════════════════════════════
-    # LSP-integrated completion with debounced delays
     completion = {
       delay = {
         completion = 100;
@@ -39,9 +28,6 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Hipatterns (TODO highlighting, partial replacement for todo-comments)
-    # ══════════════════════════════════════════════════════════════════════════
     # delay.text_change adds debounce to reduce CPU usage in large files
     hipatterns = {
       delay = {
@@ -59,29 +45,14 @@ in
       '';
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Cursorword (highlight word under cursor)
-    # ══════════════════════════════════════════════════════════════════════════
     cursorword = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Trailspace (highlight trailing whitespace)
-    # ══════════════════════════════════════════════════════════════════════════
     trailspace = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Bufremove (for buffer deletion)
-    # ══════════════════════════════════════════════════════════════════════════
     bufremove = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Bracketed (navigate by brackets)
-    # ══════════════════════════════════════════════════════════════════════════
     bracketed = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Map (code minimap)
-    # ══════════════════════════════════════════════════════════════════════════
     map = {
       integrations.__raw = ''
         {
@@ -101,14 +72,8 @@ in
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Misc (miscellaneous utilities)
-    # ══════════════════════════════════════════════════════════════════════════
     misc = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Snippets (snippet engine - replaces luasnip)
-    # ══════════════════════════════════════════════════════════════════════════
     snippets = {
       snippets.__raw = ''
         {
@@ -119,7 +84,6 @@ in
   };
 
   keymaps = [
-    # mini.bufremove
     {
       mode = "n";
       key = "<leader>bc";
@@ -128,15 +92,12 @@ in
       options.silent = true;
     }
 
-    # mini.map keymaps
     (mkMiniKeymap "n" "<leader>mm" "map" "toggle" "Toggle minimap")
     (mkMiniKeymap "n" "<leader>mf" "map" "toggle_focus" "Toggle minimap focus")
     (mkMiniKeymap "n" "<leader>mr" "map" "refresh" "Refresh minimap")
 
-    # mini.misc utilities
     (mkMiniKeymap "n" "<leader>z" "misc" "zoom" "Toggle zoom current window")
 
-    # mini.trailspace
     (mkMiniKeymap "n" "<leader>tw" "trailspace" "trim" "Trim trailing whitespace")
   ];
 }

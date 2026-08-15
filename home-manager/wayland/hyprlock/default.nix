@@ -56,7 +56,6 @@
     ];
 
     label = [
-      # Time
       {
         monitor = "";
         text = "$TIME";
@@ -68,7 +67,6 @@
         halign = "center";
         valign = "center";
       }
-      # Date
       {
         monitor = "";
         text = "cmd[update:60000] date '+%A, %B %d'";
