@@ -3,6 +3,7 @@
   customPackages,
 }:
 let
+  # Foundational editing tools not handled by mini.nvim
   coreEditing = import ./core/editing.nix { inherit pkgs; };
 
   languageLsp = import ./language/lsp.nix;

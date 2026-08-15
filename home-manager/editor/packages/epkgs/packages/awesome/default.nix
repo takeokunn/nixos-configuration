@@ -10,21 +10,28 @@ with epkgs;
 [
   dumb-jump
 
+  # Cursor
   avy
   avy-zap
   expand-region
   multiple-cursors
 
+  # Dictionary
   define-word
 
+  # EWW
   eww-lnum
 
+  # GC
   gcmh
 
+  # GPG
   pinentry-el
 
+  # Help
   helpful
 
+  # Joke
   hacker-typer
   power-mode
   sudden-death
@@ -33,20 +40,26 @@ with epkgs;
   zalgo-mode
   emacs-arto
 
+  # Minor Modes
   command-log-mode
   soft-narrow
 
+  # Shell
   exec-path-from-shell
 
+  # Utility
   lte
 
+  # Password
   password-store
   password-store-otp
   pass
   password-generator
   sops
 
+  # pdf
   pdf-tools
 
+  # Mouse
   inhibit-mouse
 ]

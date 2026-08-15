@@ -21,6 +21,7 @@
 
     set fish_greeting
 
+    # macOS: fish launched from launchd may not inherit TMPDIR
     set -x TMPDIR /tmp
 
     ${
@@ -30,6 +31,7 @@
         "set -gx EMACS_SOCKET_NAME $XDG_RUNTIME_DIR/emacs/server"
     }
 
+    # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)
     set -gx FZF_CTRL_R_COMMAND ""
 
     if test -d /etc/profiles/per-user/(whoami)/bin

@@ -8,6 +8,7 @@ in
   promptOrchestrator = "Assess the full picture, identify task dependencies, and delegate independent tasks in parallel to appropriate subagents. Always specify run_in_background when spawning subagents (false for delegation, true for parallel exploration only). ${promptLang}";
   promptLibrarian = "Verify specifications via Web search and context7 MCP before answering. ${promptLang}";
 
+  # DeepSeek-V4-Pro — orchestration, security, architecture, coding, and review
   deepseekPro = {
     model = deepseekProModel;
     fallback = [
@@ -15,6 +16,7 @@ in
     ];
   };
 
+  # DeepSeek-V4-Flash — quick and routine tasks, with Pro as the Go-only fallback
   deepseekFlash = {
     model = deepseekFlashModel;
     fallback = [

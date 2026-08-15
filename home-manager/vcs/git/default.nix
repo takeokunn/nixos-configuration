@@ -92,6 +92,7 @@
 
     diff.patience = true;
 
+    # thanks https://github.com/dracula/git/blob/master/config/gitconfig
     color = {
       ui = "auto";
       status = {

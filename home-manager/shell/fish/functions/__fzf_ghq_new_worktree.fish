@@ -1,3 +1,6 @@
+# Private helper: create a new worktree under a bare repo's .worktrees/. Not
+# named ghq_* to stay out of the ghq_* function glob. Prints the created path
+# to stdout; all other messages go to stderr.
 function __fzf_ghq_new_worktree
     set -l repo_path $argv[1]
     set -l base_ref $argv[2]
@@ -17,8 +20,13 @@ function __fzf_ghq_new_worktree
         return 1
     end
 
+    # Serena never removes an activated project from serena_config.yml, so
+    # prune dead entries here before creating the worktree.
     set -l serena_config "$HOME/.serena/serena_config.yml"
     if test -f "$serena_config"
+        # Capture the read's own exit status before it can be overwritten --
+        # a failed read must not be mistaken for "zero projects" and wipe
+        # the list.
         set -l yq_read_output (yq-go eval '.projects[]' "$serena_config" 2>/dev/null)
         set -l yq_read_status $status
 
@@ -30,6 +38,8 @@ function __fzf_ghq_new_worktree
                 test -d "$project"; and set -a kept_projects $project
             end
 
+            # Escape backslashes before quotes so an escaped quote's own
+            # backslash isn't re-escaped.
             if test (count $kept_projects) -eq 0
                 yq-go eval -i '.projects = []' "$serena_config"
             else
@@ -44,7 +54,11 @@ function __fzf_ghq_new_worktree
         end
     end
 
+    # A `ghq get --bare` clone has no refs/remotes/* until something fetches,
+    # so origin/main won't resolve without this.
     if test -z "$base_ref"
+        # Explicit refspec here (not persisted remote.origin.fetch) avoids
+        # leaving refs/remotes/* on the clone permanently.
         if git -C $repo_path remote get-url origin >/dev/null 2>&1
             set -l fetch_output (git -C $repo_path fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' 2>&1)
             if test $status -ne 0
@@ -83,14 +97,22 @@ function __fzf_ghq_new_worktree
     end
     set -l target_path "$worktrees_dir/$target_name"
 
+    # Detached, not the branch name: `git worktree add <path> <branch>` fails
+    # once a sibling worktree already holds that branch.
     set -l worktree_add_output (git -C $repo_path worktree add --detach $target_path $base_sha 2>&1)
     if test $status -ne 0
         echo "fzf_ghq: failed to create worktree: $worktree_add_output" >&2
         return 1
     end
 
+    # Symlinked (not copied) so all worktrees share Serena memories and
+    # .claude settings, except where the checkout already tracks the path --
+    # `ln -sfn` would otherwise link *inside* an existing directory instead
+    # of failing.
     set -l state_dir "$repo_path/.state"
 
+    # mkdir -p first so the first worktree for a repo bootstraps $state_dir
+    # instead of silently skipping the link below.
     mkdir -p "$state_dir/.serena/memories" "$state_dir/.claude"
 
     for pair in ".serena/memories" ".claude"
@@ -105,6 +127,8 @@ function __fzf_ghq_new_worktree
         ln -sfn "$src" "$dst"
     end
 
+    # Copied, not symlinked: direnv/dotenv tooling expect a real file, and
+    # each worktree needs to edit its own env independently.
     for name in .envrc .env
         set -l src "$state_dir/$name"
         set -l dst "$target_path/$name"

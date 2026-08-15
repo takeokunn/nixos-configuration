@@ -36,6 +36,7 @@
       };
     };
 
+    # Enhanced around/inside textobjects: o=block, f=function, c=class, t=tag, d=digit, e=word, u=function_call
     ai = {
       n_lines = 500;
       custom_textobjects.__raw = ''
@@ -55,6 +56,7 @@
       '';
     };
 
+    # Using Shift modifier to avoid conflict with LSP (Alt+j/k)
     move = {
       mappings = {
         left = "<M-h>";
@@ -103,6 +105,7 @@
       };
     };
 
+    # cursor/resize disabled for performance (constant CPU overhead)
     animate = {
       cursor = {
         enable = false;
@@ -131,6 +134,7 @@
   };
 
   keymaps = [
+    # mini.jump2d keymap - using gj to avoid conflict with window navigation (sh/sj/sk/sl)
     {
       mode = [
         "n"

@@ -1,16 +1,19 @@
 { epkgs }:
 with epkgs;
 [
+  # check
   flycheck
   flycheck-projectile
   flycheck-cfn
 
+  # completion
   corfu
   corfu-terminal
   cape
   prescient
   kind-icon
 
+  # git
   magit
   git-gutter
   git-gutter-fringe
@@ -19,17 +22,21 @@ with epkgs;
   blamer
   git-auto-commit-mode
 
+  # keyboard
   key-chord
   key-combo
   dmacro
   god-mode
   which-key
 
+  # refactor
   emr
 
+  # snippet
   yasnippet
   consult-yasnippet
 
+  # LSP
   eglot-booster
   lsp-mode
   lsp-sourcekit
@@ -40,10 +47,13 @@ with epkgs;
   lsp-scheme
   lsp-dart
 
+  # Syntax
   syntax-subword
 
+  # Undo
   undo-tree
 
+  # Utility
   crux
   dogears
   embark

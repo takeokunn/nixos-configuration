@@ -129,6 +129,8 @@
           "g"
           "n"
         ];
+        # The repository is bare, so its own directory holds no file to browse.
+        # What is navigable is the set of worktrees hanging off it.
         run = "cd ~/ghq/github.com/takeokunn/nixos-configuration.git/.worktrees";
         desc = "Go to nixos-config worktrees";
       }
@@ -644,6 +646,7 @@
   };
 
   home.packages = with pkgs; [
+    # Preview dependencies
     file
     unar
     poppler

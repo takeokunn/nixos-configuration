@@ -15,6 +15,7 @@
     xremap.inputs.nixpkgs.follows = "nixpkgs";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    # Pinned to a specific nixpkgs commit: newer nixpkgs breaks pty permissions here.
     nix-on-droid.url = "github:nix-community/nix-on-droid";
     nix-on-droid.inputs.nixpkgs.url = "github:NixOS/nixpkgs/2bceeb45e516fc6956714014c92ddfdafe4c9da3";
     nix-on-droid.inputs.home-manager.follows = "home-manager";
@@ -90,14 +91,20 @@
       flake.nixosConfigurations.X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
       flake.nixOnDroidConfigurations.OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
 
+      # Category bundles auto-import nur; consumers must NOT set
+      # _module.args.nurPkgs themselves.
       flake.homeManagerModules =
         let
+          # Evaluates the nur-packages input against the consumer's pkgs and
+          # exposes it as `nurPkgs` to every module in the tree.
           nur =
             { pkgs, ... }:
             {
               _module.args.nurPkgs = import inputs.nur-packages { inherit pkgs; };
             };
 
+          # Requires the agent-skills home module
+          # (inputs.agent-skills.homeManagerModules.default) alongside this.
           ai-tools =
             { pkgs, ... }:
             {
@@ -105,6 +112,7 @@
                 nur
                 ./home-manager/ai-tools
               ];
+              # per-user pkgs only; useGlobalPkgs consumers must add this overlay at the system level.
               nixpkgs.overlays = [ inputs.mcp-servers-nix.overlays.default ];
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
@@ -127,9 +135,9 @@
         {
           inherit nur ai-tools;
 
-          fish = ./home-manager/shell/fish;
-          tmux = ./home-manager/shell/tmux;
-          bat = ./home-manager/shell/bat;
+          fish = ./home-manager/shell/fish; # needs nur
+          tmux = ./home-manager/shell/tmux; # needs nur
+          bat = ./home-manager/shell/bat; # needs nur
           bottom = ./home-manager/shell/bottom;
           direnv = ./home-manager/shell/direnv;
           dust = ./home-manager/shell/dust;
@@ -147,7 +155,7 @@
           git = ./home-manager/vcs/git;
           gh = ./home-manager/vcs/gh;
           gh-dash = ./home-manager/vcs/gh-dash;
-          tig = ./home-manager/vcs/tig;
+          tig = ./home-manager/vcs/tig; # needs nur
           git-hooks = ./home-manager/vcs/modules/git-hooks;
 
           gnupg = ./home-manager/security/gnupg;
@@ -161,6 +169,7 @@
           lnav = ./home-manager/development/lnav;
           pandoc = ./home-manager/development/pandoc;
 
+          # `nixvim` requires inputs.nixvim.homeModules.nixvim + nur.
           nixvim = ./home-manager/editor/nixvim;
           vim = ./home-manager/editor/vim;
           editorconfig = ./home-manager/editor/editorconfig;

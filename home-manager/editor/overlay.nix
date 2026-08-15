@@ -5,6 +5,10 @@
     _: prev:
     if prev.stdenv.isDarwin then
       let
+        # mailutils 3.21 fails to link on aarch64-darwin: the libmu_sieve
+        # extension modules reference _mu_url_* without linking libmailutils,
+        # which the two-level namespace linker rejects. Emacs only needs it at
+        # runtime to locate `movemail`, so drop it and let Emacs build its own.
         dropMailutils =
           name:
           prev.lib.optionalAttrs (prev ? ${name}) {

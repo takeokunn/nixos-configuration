@@ -15,7 +15,7 @@ in
 
         touchpad {
             tap
-            dwt
+            dwt  // disable-while-typing
             natural-scroll
             accel-speed 0.2
         }
@@ -31,6 +31,7 @@ in
             delay-ms 100
         }
 
+        // Hot corners for overview toggle
         hot-corners {
             top-left
         }
@@ -151,6 +152,7 @@ in
 
         Mod+V { spawn "kitty" "--class" "clipse" "-e" "clipse"; }
 
+        // Emacs Scratchpad (vime-like)
         Mod+I { spawn "sh" "-c" "${emacsScratchpadToggle}"; }
 
         Mod+P { screenshot; }

@@ -22,6 +22,8 @@ in
 
   programs.nixvim.enable = true;
   programs.nixvim.version.enableNixpkgsReleaseCheck = false;
+  # nixpkgs' pandoc lacks Lua support on this cache, which nixvim's man-docs
+  # build needs (`pandoc --lua-filter`); disable manpage generation to unblock builds.
   programs.nixvim.enableMan = false;
 
   programs.nixvim.editorconfig.enable = true;

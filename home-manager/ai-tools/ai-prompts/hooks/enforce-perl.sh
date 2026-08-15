@@ -16,6 +16,7 @@ if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
+# Check for sed or awk usage (word boundary to avoid false positives)
 if echo "$command" | grep -qE '\b(sed|awk)\b'; then
   cat >&2 <<'EOF'
 ❌ sed/awk detected - Use perl instead

@@ -28,10 +28,12 @@
   programs.agent-skills.sources.aws.subdir = "skills";
   programs.agent-skills.sources.microsoft.path = microsoft-skills;
   programs.agent-skills.sources.microsoft.subdir = ".github/skills";
+  # Exclude mcp-builder and skill-creator which conflict with anthropic source
   programs.agent-skills.sources.microsoft.filter.nameRegex =
     "cloud-solution-architect|continual-learning|copilot-sdk|entra-agent-id|frontend-design-review|github-issue-creator|podcast-generation";
   programs.agent-skills.sources.scientific.path = scientific-skills;
   programs.agent-skills.sources.scientific.subdir = "skills";
+  # Exclude docx, pdf, pptx, xlsx which conflict with anthropic source
   programs.agent-skills.sources.scientific.filter.nameRegex =
     "[^p]..|.[^d].|..[^f]|[^dpx]...|d[^o]..|do[^c].|doc[^x]|p[^p]..|pp[^t].|ppt[^x]|x[^l]..|xl[^s].|xls[^x]|.{5,}";
   programs.agent-skills.sources.context7.path = context7-skills;

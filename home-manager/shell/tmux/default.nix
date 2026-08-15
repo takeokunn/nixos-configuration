@@ -28,11 +28,13 @@
     {
       plugin = tmuxPlugins.dracula;
       extraConfig = ''
+        # Powerline with rounded separators (pill style)
         set -g @dracula-show-powerline true
         set -g @dracula-show-left-sep ""
         set -g @dracula-show-right-sep ""
         set -g @dracula-transparent-powerline-bg true
 
+        # Left icon: session name
         set -g @dracula-show-left-icon " #S"
         set -g @dracula-left-icon-padding 1
 
@@ -40,6 +42,7 @@
         set -g @dracula-show-flags true
         set -g @dracula-show-empty-plugins false
 
+        # Git widget (branch name only)
         set -g @dracula-git-disable-status true
         set -g @dracula-git-show-current-symbol ""
         set -g @dracula-git-show-diff-symbol ""
@@ -47,6 +50,7 @@
         set -g @dracula-git-show-remote-status false
         set -g @dracula-git-colors "light_purple dark_gray"
 
+        # Purple-based palette (replace loud green/yellow)
         set -g @dracula-colors "green='#bd93f9' yellow='#bd93f9'"
 
         set -g @dracula-border-contrast true
@@ -60,10 +64,13 @@
     set-option -g status-position top
     set-option -g status-interval 1
 
+    # OSC 52 clipboard integration for proper UTF-8/Japanese text handling
     set-option -s set-clipboard on
 
+    # Disable focus events to prevent escape sequences (overrides sensible plugin)
     set-option -g focus-events off
 
+    # OSC 10/11/12 passthrough for active pane only (prevents escape sequence leaks)
     set-option -g allow-passthrough all
 
     bind-key C-g display-panes

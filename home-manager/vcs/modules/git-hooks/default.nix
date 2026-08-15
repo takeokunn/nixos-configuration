@@ -42,6 +42,12 @@ let
       exit 0
     fi
 
+    # editorconfig-checker's indentation/indent-size checks assume a fixed
+    # per-level indent multiple, which Lisp's vertical-alignment convention
+    # (continuation lines aligned to an enclosing form's column, not a fixed
+    # tab stop) routinely and correctly violates. Run those two checks only
+    # over non-Lisp staged files; everything else (charset, trailing
+    # whitespace, final newline, max line length) still applies to Lisp too.
     RESULT=0
     LISP_FILES=()
     OTHER_FILES=()

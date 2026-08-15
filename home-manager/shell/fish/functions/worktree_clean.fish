@@ -1,9 +1,15 @@
+# Sweeps every bare repo's worktrees for ones safe to delete -- merged or
+# idle -- and offers them in one cross-repo fzf multi-select.
 function worktree_clean
+    # Capture before mutating anything, so a worktree removed later in this
+    # loop can't be mistaken for "current".
     set -l own_worktree (git rev-parse --show-toplevel 2>/dev/null)
 
-    set -l idle_threshold_seconds 259200
+    set -l idle_threshold_seconds 259200 # 3 days, not configurable
     set -l now_epoch (date +%s)
 
+    # fish doesn't escape-interpret \t inside quotes; route it through this
+    # var so the picker lines get a real tab byte.
     set -l tab \t
 
     set -l candidate_signals
@@ -13,6 +19,8 @@ function worktree_clean
         set -l is_bare (git -C $repo rev-parse --is-bare-repository 2>/dev/null)
         test "$is_bare" = true; or continue
 
+        # Refresh remote-tracking refs before checking merged-status. A
+        # failed fetch isn't fatal -- falls back to existing local refs.
         if git -C $repo remote get-url origin >/dev/null 2>&1
             set -l fetch_output (git -C $repo fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' 2>&1)
             if test $status -ne 0
@@ -26,6 +34,8 @@ function worktree_clean
             continue
         end
 
+        # Exclude $own_worktree: the invoking shell's own worktree must
+        # never be offered as a deletion candidate.
         set -l worktree_paths
         for wt in (__fzf_ghq_worktree_paths $repo)
             test "$wt" != "$own_worktree"; and set -a worktree_paths $wt

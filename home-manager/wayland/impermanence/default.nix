@@ -1,6 +1,7 @@
 {
   home.persistence."/persist" = {
     directories = [
+      # XDG directories
       "Downloads"
       "Documents"
       "Pictures"
@@ -8,14 +9,17 @@
       "Music"
       "Desktop"
 
+      # Development
       "ghq"
       "Projects"
       "src"
 
+      # Shell & terminal
       ".local/share/fish"
       ".local/share/direnv"
       ".local/share/zoxide"
 
+      # Security (with restricted permissions)
       {
         directory = ".gnupg";
         mode = "0700";
@@ -33,6 +37,7 @@
         mode = "0700";
       }
 
+      # Editors
       ".config/emacs"
       ".local/share/emacs"
       ".local/state/emacs"
@@ -40,13 +45,16 @@
       ".local/share/nvim"
       ".local/state/nvim"
 
+      # Browsers
       ".mozilla"
       ".config/chromium"
       ".config/google-chrome"
 
+      # Communication
       ".config/discord"
       ".config/Slack"
 
+      # Development tools
       ".cargo"
       ".rustup"
       ".npm"
@@ -56,17 +64,24 @@
       ".config/gh"
       ".docker"
 
+      # Containers & VMs
       ".local/share/containers"
       ".local/share/libvirt"
 
+      # Nix
       ".local/state/nix"
 
+      # Application data
       ".local/share/applications"
       ".local/share/mime"
       ".config/dconf"
 
+      # Audio
       ".config/easyeffects"
 
+      # Wayland/niri specific
+      # Note: .config/niri is managed by Home Manager, not persisted
+      # to prevent stale configs (e.g., duplicate waybar spawns)
       ".config/mako"
     ];
     files = [

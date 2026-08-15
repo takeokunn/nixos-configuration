@@ -8,9 +8,13 @@ let
 in
 with epkgs;
 [
+  # Client
   md4rd
 
+  # Googling
   google-translate
+
+  # Mail
 ]
 ++ pkgs.lib.optionals (!pkgs.stdenv.isDarwin) [
   mu4e

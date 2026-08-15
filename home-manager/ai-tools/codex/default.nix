@@ -159,6 +159,7 @@ let
     approval_policy = "on-request";
     sandbox_mode = "danger-full-access";
     model_auto_compact_token_limit = 50000;
+    # Nix manages the codex package; disable the built-in updater.
     check_for_update_on_startup = false;
     suppress_unstable_features_warning = true;
     analytics = {
@@ -178,6 +179,7 @@ let
         }
       ];
     };
+    # Manual escape hatch for a capacity-limited primary model: `codex --profile fallback`.
     profiles = {
       fallback = {
         model = "gpt-5.4-mini";

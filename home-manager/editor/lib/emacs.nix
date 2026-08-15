@@ -164,6 +164,8 @@ let
 
         start_emacs_service
 
+        # Keep hotkey startup on AeroSpace/kitty/emacsclient only. AppleScript/System Events
+        # adds a fixed delay and can race with Accessibility permissions during login.
         "$KITTY" \
           --single-instance=no \
           -o close_on_child_death=yes \

@@ -5,6 +5,8 @@
   programs.kitty.font.name = "HackGen Console NF";
   programs.kitty.font.size = 13;
 
+  # HackGen Console NF has no emoji glyphs; route emoji/pictograph/flag
+  # ranges to Noto Color Emoji instead of falling back to a tofu glyph.
   programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF Noto Color Emoji";
 
   programs.kitty.settings = {
@@ -12,6 +14,7 @@
     initial_window_width = 800;
     initial_window_height = 600;
 
+    # OSC 52 clipboard support for tmux integration
     clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
     hide_window_decorations = true;
 
@@ -35,8 +38,10 @@
     enable_audio_bell = false;
     visual_bell_duration = 0;
 
+    # Focus reporting (disable to prevent OI escape sequences in terminal apps)
     focus_reporting_protocol = "none";
 
+    # Splits/Windows (not covered by Dracula theme)
     active_border_color = "#f8f8f2";
     inactive_border_color = "#6272a4";
   };

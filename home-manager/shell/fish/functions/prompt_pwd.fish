@@ -31,12 +31,15 @@ function prompt_pwd --description 'ref: https://hotoolong.hatenablog.com/entry/2
         if test "$fish_prompt_pwd_dir_length" -eq 0
             echo $tmp
         else
+            # Shorten to at most $fish_prompt_pwd_dir_length characters per directory
+            # with full-length-dirs components left at full length.
             set -l full
             if test $fish_prompt_pwd_full_dirs -gt 0
                 set -l all (string split -m (math $fish_prompt_pwd_full_dirs - 1) -r / $tmp)
                 set tmp $all[1]
                 set full $all[2..]
             else if test $fish_prompt_pwd_full_dirs -eq 0
+                # 0 means not even the last component is kept
                 string replace -ar '(\.?[^/]{'"$fish_prompt_pwd_dir_length"'})[^/]*' '$1' $tmp
                 continue
             end

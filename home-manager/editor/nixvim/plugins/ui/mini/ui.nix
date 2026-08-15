@@ -1,4 +1,5 @@
 {
+  # Disable web-devicons in favor of mini.icons
   plugins.web-devicons.enable = false;
 
   plugins.mini.modules = {
@@ -44,6 +45,7 @@
       options.try_as_border = true;
     };
 
+    # Displays available keybindings in a popup after pressing leader/trigger keys
     clue = {
       triggers.__raw = ''
         {

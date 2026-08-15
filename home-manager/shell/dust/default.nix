@@ -16,6 +16,7 @@
 
     ignore-hidden=true
 
+    # print sizes in powers of 1000 (e.g., 1.1G)
     output-format="si"
   '';
 }

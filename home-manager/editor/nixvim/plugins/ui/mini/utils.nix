@@ -1,4 +1,6 @@
 {
+  # Helper for mini.pick keymaps (builtin pickers)
+  # Usage: mkPickKeymap "f" "files({ tool = 'git' })" "Find Git Files"
   mkPickKeymap = key: picker: desc: {
     mode = "n";
     key = "<leader>f${key}";
@@ -6,6 +8,8 @@
     options.desc = desc;
   };
 
+  # Helper for mini.extra pickers (extended pickers)
+  # Usage: mkExtraPickKeymap "r" "registers()" "Find Registers"
   mkExtraPickKeymap = key: picker: desc: {
     mode = "n";
     key = "<leader>f${key}";
@@ -13,6 +17,8 @@
     options.desc = desc;
   };
 
+  # Helper for generic mini module actions
+  # Usage: mkMiniKeymap "n" "<leader>mm" "map" "toggle" "Toggle minimap"
   mkMiniKeymap = mode: key: module: func: desc: {
     inherit mode key;
     action.__raw = "function() require('mini.${module}').${func}() end";

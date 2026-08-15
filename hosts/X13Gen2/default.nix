@@ -34,6 +34,7 @@ nixpkgs.lib.nixosSystem {
       boot.initrd.luks.devices."cryptroot".allowDiscards = true;
       boot.initrd.luks.devices."cryptroot".bypassWorkqueues = true;
 
+      # Enable systemd in initrd for LUKS and impermanence
       boot.initrd.systemd.enable = true;
     }
     {

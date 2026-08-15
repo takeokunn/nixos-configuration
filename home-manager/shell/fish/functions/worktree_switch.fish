@@ -1,3 +1,5 @@
+# Lists the current repo's worktrees via fzf and cds to the pick. Never
+# creates a worktree -- reports and returns if none exist.
 function worktree_switch
     set -l git_common_dir (git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
     if test -z "$git_common_dir"

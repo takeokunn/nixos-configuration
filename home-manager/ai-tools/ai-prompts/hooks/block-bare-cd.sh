@@ -1,9 +1,12 @@
 #!/bin/bash
+# PreToolUse:Bash hook — blocks a standalone `cd`, which has no effect since shell state
+# does not persist between tool calls. Override with ALLOW_BARE_CD=1.
 
 set -euo pipefail
 
 input=$(cat)
 
+# Unparsed input yields an empty command, so stand aside rather than error.
 if command -v jq &>/dev/null; then
   tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
   command=$(echo "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
@@ -20,6 +23,7 @@ fi
 
 trimmed="$(printf '%s' "$command" | perl -0pe 's/\A\s+//; s/\s+\z//')"
 
+# if, not `[[ ... ]] && exit 0` — that form returns 1 on the common path and set -e would abort.
 if [[ $trimmed == ALLOW_BARE_CD=1\ * ]]; then
   exit 0
 fi
@@ -27,6 +31,7 @@ if [[ $trimmed != "cd" && $trimmed != cd\ * ]]; then
   exit 0
 fi
 
+# A compound command is allowed: the cd scopes the work that follows it.
 if printf '%s' "$trimmed" | perl -0ne 'exit(/(?:&&|\|\||[;|&\n])/ ? 0 : 1)'; then
   exit 0
 fi

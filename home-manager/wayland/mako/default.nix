@@ -9,6 +9,7 @@
     border-size = 2;
     border-radius = 8;
 
+    # Dracula colors with transparency
     background-color = "#282a36ee";
     text-color = "#f8f8f2";
     border-color = "#bd93f9";

@@ -28,6 +28,7 @@ in
       };
     };
 
+    # delay.text_change adds debounce to reduce CPU usage in large files
     hipatterns = {
       delay = {
         text_change = 200;

@@ -159,6 +159,7 @@
 :CUSTOM_ID: compat
 :END:
 #+begin_src emacs-lisp :tangle yes
+  ;; load compat-31 explicitly; it appears after compat-30 in load-path otherwise
   (when (version< emacs-version "31")
     (require 'compat-31))
 #+end_src
@@ -288,20 +289,25 @@
 :END:
 #+begin_src emacs-lisp :tangle yes
 
+  ;; daemon evaluates (display-graphic-p) once at start, not per-frame, so hook per-frame instead
   (defun my/setup-terminal-escape-sequences (&optional frame)
     "Set up terminal-specific keybindings for FRAME.
 Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (with-selected-frame (or frame (selected-frame))
       (unless (display-graphic-p frame)
+        ;; Focus reporting - prevents 'OI' characters
         (define-key input-decode-map "\e[I" [focus-in])
         (define-key input-decode-map "\e[O" [focus-out])
         (define-key special-event-map [focus-in] #'ignore)
         (define-key special-event-map [focus-out] #'ignore)
+        ;; Bracketed paste - prevents '^[[200~' and '^[[201~' characters
         (require 'term/xterm)
         (define-key input-decode-map "\e[200~" #'xterm-translate-bracketed-paste))))
 
+  ;; Apply to new frames (handles emacsclient connections to daemon)
   (add-hook 'after-make-frame-functions #'my/setup-terminal-escape-sequences)
 
+  ;; Apply to current frame if not running as daemon
   (unless (daemonp)
     (my/setup-terminal-escape-sequences))
 #+end_src
@@ -1193,6 +1199,7 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   (define-derived-mode phel-mode clojure-mode "Phel"
     "Major mode for editing Phel language source files."
     (setq-local comment-start "#")
+    ;; disable lockfiles: they touch buffer-file-name in a way that confuses the running Phel process during ILT evaluation
     (setq-local create-lockfiles nil)
     )
 
@@ -2299,13 +2306,13 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
     "Prepend emacs-lsp-booster command to lsp CMD."
     (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and (not test?)
-               (not (file-remote-p default-directory))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
                lsp-use-plists
-               (not (functionp 'json-rpc-connection))
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
                (executable-find "emacs-lsp-booster"))
           (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))
+            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
               (setcar orig-result command-from-exec-path))
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
@@ -3531,6 +3538,7 @@ then (for a bare repository) pick an existing worktree or create a new one,
 then hand off to Projectile's own switch machinery so
 `projectile-switch-project-action' and existing hooks fire unchanged."
     (interactive)
+    ;; :override advice on this symbol discards the :before advice above, so refresh explicitly here
     (my/update-ghq-project-state)
     (let* ((repo (completing-read "Repository: " (my/ghq-repo-list) nil t))
            (target
@@ -3709,6 +3717,7 @@ single computation, instead of each recomputing it independently."
     (setopt tab-bar-tab-name-truncated-max 12)
     (setopt tab-bar-separator " | ")
 
+    ;; close neotree when tab bar action
     (advice-add 'tab-new :before #'(lambda (&rest _) (neotree-hide)))
     (advice-add 'tab-next :before #'(lambda (&rest _) (neotree-hide)))
     (advice-add 'tab-bar-switch-to-tab :before #'(lambda (&rest _) (neotree-hide))))
@@ -3903,10 +3912,12 @@ single computation, instead of each recomputing it independently."
       (ignore-errors
         (funcall set-fontset-font name target font-spec frame add))))
 
+  ;; reset all settings in default fontset
   (add-hook 'after-init-hook
             #'(lambda ()
                 (advice-add 'set-fontset-font :around #'set-fontset-font:around)
 
+                ;; Set default font size to 13pt (height is in 1/10pt units, match kitty)
                 (set-face-attribute 'default nil :height 130)
 
                 (when (functionp 'set-fontset-font)
@@ -4098,6 +4109,7 @@ single computation, instead of each recomputing it independently."
                   (set-fontset-font t 'latin "HackGenNerd" nil 'append)
                   (set-fontset-font t 'symbol "HackGenNerd" nil 'append)
 
+                  ;; Nerd Font (defined thru -#xfd46)
                   (set-fontset-font t '( #xe000 .  #xf136) "Inconsolata Nerd Font"))))
 #+end_src
 *** font-lock-studio
@@ -4247,6 +4259,8 @@ single computation, instead of each recomputing it independently."
                 (when (require 'doom-themes)
                   (let ((theme 'doom-dracula))
                     (load-theme theme t)
+                    ;; workaround a mutual face-inheritance cycle between gnus-group-news-low(-empty) in doom-themes;
+                    ;; must fix here since gnus-group.el loads lazily and would error before any hook could run
                     (custom-theme-set-faces
                      theme '(gnus-group-news-low-empty ((t :inherit nil))))
                     (enable-theme theme)
@@ -4274,6 +4288,7 @@ single computation, instead of each recomputing it independently."
     (setopt doom-modeline-major-mode-icon t)
     (setopt doom-modeline-minor-modes nil)
     (setopt doom-modeline-check-icon nil)
+    ;; doom-modeline-def-segment is a macro; with-eval-after-load doesn't defer compile-time macroexpansion
     (eval-when-compile (require 'doom-modeline))
     (doom-modeline-def-segment my/nskk
       "NSKK input mode indicator."
@@ -4290,6 +4305,7 @@ single computation, instead of each recomputing it independently."
       (doom-modeline-def-modeline 'main
         '(eldoc bar window-state workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
         main-segments))
+    ;; emacsclient -c でGUIフレームが生成されたとき modeline を再描画する
     (add-hook 'after-make-frame-functions
               #'(lambda (frame)
                   (when (display-graphic-p frame)
@@ -4642,11 +4658,13 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(exec-path-from-shell-initialize) "exec-path-from-shell")
 
+  ;; Configure variables BEFORE initialization
   (setopt exec-path-from-shell-arguments '("-l"))
   (setopt exec-path-from-shell-variables '("PATH" "TERM" "COPILOT_LANGUAGE_SERVER_PATH"))
 
   (exec-path-from-shell-initialize)
 
+  ;; Explicitly set SSH_AUTH_SOCK for GPG agent (exec-path-from-shell doesn't handle this correctly on macOS)
   (setenv "SSH_AUTH_SOCK" (expand-file-name "~/.gnupg/S.gpg-agent.ssh"))
 #+END_SRC
 ** Utility
@@ -7177,14 +7195,17 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
            (file-path (file-relative-name (buffer-file-name) project-root))
            (line-number (line-number-at-pos))
            (remote-url (string-trim (shell-command-to-string "git config --get remote.origin.url")))
+           ;; a detached worktree reports literal "HEAD" here; name the commit instead
            (branch (let ((ref (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD"))))
                      (if (string= ref "HEAD")
                          (string-trim (shell-command-to-string "git rev-parse HEAD"))
                        ref)))
            (https-remote
             (cond
+             ;; ssh://git@github.com/ORG/REPO
              ((string-match "^ssh://git@\\(.*?\\)/\\(.*\\)$" remote-url)
               (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
+             ;; git@github.com:ORG/REPO.git
              ((string-match "^git@\\(.*?\\):\\(.*\\)$" remote-url)
               (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
              (t remote-url)))

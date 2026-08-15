@@ -2,6 +2,7 @@ let
   utils = import ./utils.nix;
   inherit (utils) mkPickKeymap mkExtraPickKeymap mkMiniKeymap;
 
+  # Generate visit file keymaps (<leader>1-4) for quick harpoon-style file access
   visitKeymaps = builtins.genList (i: {
     mode = "n";
     key = "<leader>${toString (i + 1)}";
@@ -15,6 +16,7 @@ let
 in
 {
   plugins.mini.modules = {
+    # Fuzzy finder with centered floating window
     pick = {
       mappings = {
         choose_marked = "<C-q>";
@@ -43,6 +45,7 @@ in
 
     fuzzy = { };
 
+    # File tree with vim-like navigation (h/l for out/in)
     files = {
       mappings = {
         close = "q";
@@ -114,6 +117,7 @@ in
       options.silent = true;
     }
 
+    # ha/hh/hr keymaps for harpoon muscle memory
     {
       mode = "n";
       key = "<leader>ha";

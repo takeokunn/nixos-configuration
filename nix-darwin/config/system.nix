@@ -1,5 +1,9 @@
 { username }:
 {
+  # kern.maxfiles/kern.maxfilesperproc are independent of launchd's own default
+  # process rlimit (256 soft), so raising only the sysctl ceiling does nothing
+  # for launchd-spawned processes; sysctl must run before launchctl limit,
+  # hence one ordered daemon.
   launchd.daemons.sysctl-max-files = {
     serviceConfig = {
       Label = "org.nixos.sysctl-max-files";
@@ -12,8 +16,11 @@
     };
   };
 
+  # Disabled: nix-darwin's manual-html build fails on current nixpkgs-unstable
+  # (uses a removed nixos-render-docs flag). man/info pages are unaffected.
   documentation.doc.enable = false;
 
+  # Also disabled: its internal rollback eval hits the same doc-build failure.
   system.tools.darwin-uninstaller.enable = false;
 
   time.timeZone = "Asia/Tokyo";

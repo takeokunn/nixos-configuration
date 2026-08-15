@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  # Pin the host nix-daemon to this flake's nixpkgs nix, matching the
+  # darwin-vz-nix guest's Nix version for a consistent distributed-build protocol.
   nix.package = pkgs.nix;
 
   nix.optimise.automatic = true;

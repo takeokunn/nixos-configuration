@@ -5,12 +5,17 @@
 }:
 let
   override = _: super: {
+    # copilot-0.5.0 bundles an old copilot-chat.el that shadows the
+    # standalone copilot-chat package in load-path, causing autoloads like
+    # copilot-chat-insert-commit-message to fail at runtime.
     copilot = super.copilot.overrideAttrs (old: {
       postInstall = (old.postInstall or "") + ''
         rm -f $out/share/emacs/site-lisp/elpa/copilot-*/copilot-chat.el
         rm -f $out/share/emacs/site-lisp/elpa/copilot-*/copilot-chat.elc
       '';
     });
+    # projectile ≥ 20260627 requires consult at byte-compile time but the
+    # generated nixpkgs derivation does not yet declare it as a dependency.
     projectile = super.projectile.overrideAttrs (old: {
       propagatedBuildInputs = (old.propagatedBuildInputs or [ ]) ++ [ super.consult ];
     });
@@ -56,6 +61,9 @@ in
               (old.env or { })
               // parallelBuildAttrs.env
               // lib.optionalAttrs pkgs.stdenv.isDarwin {
+                # On Darwin 25.x (macOS 16), ObjC files (.m) fail to compile because
+                # the compiler defaults to a pre-C11 standard where `bool` and `alignof`
+                # are unknown. Force gnu11 standard and include stdbool.h explicitly.
                 NIX_CFLAGS_COMPILE = "${(old.env or { }).NIX_CFLAGS_COMPILE or ""} -std=gnu11 -include stdbool.h";
               };
           }

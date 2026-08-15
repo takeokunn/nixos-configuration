@@ -89,6 +89,10 @@ let
       bootout_emacs_agent "$LEGACY_DOMAIN"
     }
   '';
+  # Use the emacsWithPackages derivation (before the open-a-Emacs wrapper replaces
+  # Emacs.app/Contents/MacOS/Emacs with an emacsclient script).  The daemon must
+  # use the real Cocoa binary so NSApp is initialised with proper bundle context,
+  # allowing emacsclient -c to create GUI frames.
   cocoaEmacs =
     if isDarwin && emacsPkg ? passthru && emacsPkg.passthru ? withPackages then
       emacsPkg.passthru.withPackages
@@ -101,6 +105,9 @@ in
   services.emacs.client.enable = true;
   services.emacs.startWithUserSession = lib.mkIf isDarwin "graphical";
 
+  # Linux: start emacs daemon after WAYLAND_DISPLAY is available in the systemd
+  # user environment (niri exports it to systemd via dbus-update-activation-environment
+  # as part of graphical-session.target activation).
   systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
     Unit.After = [ "graphical-session.target" ];
     Unit.PartOf = [ "graphical-session.target" ];
@@ -108,11 +115,15 @@ in
     Service.RestartSec = 10;
   };
 
+  # macOS: Set TMPDIR so emacs daemon creates socket in /tmp
   launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf isDarwin {
     TMPDIR = "/tmp";
   };
   launchd.agents.emacs.domain = lib.mkIf isDarwin (lib.mkForce "gui");
 
+  # macOS: Launch daemon via Emacs.app binary directly, not the bin/emacs shell
+  # wrapper.  The shell wrapper lacks .app bundle context, so NSApp does not
+  # initialise properly and emacsclient -c cannot create GUI frames.
   launchd.agents.emacs.config.ProgramArguments = lib.mkIf isDarwin (
     lib.mkForce [
       "${cocoaEmacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
@@ -122,9 +133,21 @@ in
   launchd.agents.emacs.config.KeepAlive = lib.mkIf isDarwin (lib.mkForce true);
   launchd.agents.emacs.config.ThrottleInterval = lib.mkIf isDarwin 10;
 
+  # macOS: launchd hands every agent a 256-file soft rlimit by default, which Emacs
+  # (native-comp .eln files alone keep ~500 FDs open at idle, plus LSP servers and many
+  # buffers/processes) exhausts -> "too many open files".  Pin the agent itself so it does
+  # not depend on the global launchctl limit (a separate launchd domain).  65536 is ~130x
+  # measured idle usage -- ample headroom without an enormous soft rlimit.
   launchd.agents.emacs.config.SoftResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
   launchd.agents.emacs.config.HardResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
 
+  # Install the Nix-built kuro native module into kuro-module.el's XDG default
+  # location (~/.local/share/kuro/). kuro-module.el validates the module file
+  # itself: it must be mode 0600, a single hard link, and not a symlink -- a
+  # raw /nix/store path fails all three (store files are read-only, often
+  # hardlink-deduplicated, and this activation would symlink rather than
+  # copy). A real copy with `install -m 600` is the only way to satisfy that
+  # check, which is also exactly the layout upstream's own installer produces.
   home.activation.installKuroModule =
     let
       libName = if pkgs.stdenv.isDarwin then "libkuro_core.dylib" else "libkuro_core.so";
@@ -138,6 +161,8 @@ in
       '';
     };
 
+  # macOS: Gracefully stop Emacs before setupLaunchAgents to prevent I/O error 5
+  # (upstream bootoutAgent sleeps only 1s, insufficient for Emacs shutdown)
   home.activation.preStopEmacsDaemon = lib.mkIf isDarwin {
     after = [ "writeBoundary" ];
     before = [ "setupLaunchAgents" ];
@@ -166,6 +191,7 @@ in
     '';
   };
 
+  # macOS: Restart Emacs daemon after setupLaunchAgents to pick up config changes
   home.activation.restartEmacsDaemon = lib.mkIf isDarwin {
     after = [ "setupLaunchAgents" ];
     before = [ ];

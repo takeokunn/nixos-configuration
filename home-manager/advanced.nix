@@ -62,6 +62,9 @@ in
   };
 
   nixpkgs.config.allowUnfree = true;
+  # sketchybarOverlay must be listed here (home-manager's own pkgs), not only in
+  # the host overlays: without useGlobalPkgs, HM ignores the host's pkgs and
+  # builds programs.sketchybar.package from this nixpkgs instance.
   nixpkgs.overlays = editorOverlay ++ sketchybarOverlay ++ [ mcp-servers-nix.overlays.default ];
 
   programs.nixvim.nixpkgs.source = nixpkgs;
