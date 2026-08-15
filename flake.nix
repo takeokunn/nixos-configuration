@@ -15,8 +15,6 @@
     xremap.inputs.nixpkgs.follows = "nixpkgs";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    # TODO: Pinned to specific nixpkgs commit as workaround for nix-community/nix-on-droid#495
-    # Issue: "getting pseudoterminal attributes: Permission denied" with nixpkgs after 2026-01-24
     nix-on-droid.url = "github:nix-community/nix-on-droid";
     nix-on-droid.inputs.nixpkgs.url = "github:NixOS/nixpkgs/2bceeb45e516fc6956714014c92ddfdafe4c9da3";
     nix-on-droid.inputs.home-manager.follows = "home-manager";
@@ -92,25 +90,14 @@
       flake.nixosConfigurations.X13Gen2 = import ./hosts/X13Gen2 { inherit inputs; };
       flake.nixOnDroidConfigurations.OPPO-A79 = import ./hosts/OPPO-A79 { inherit inputs; };
 
-      # Externally-consumable home-manager modules. System-agnostic, so exported
-      # at flake level (not perSystem). Category bundles auto-import `nur`;
-      # consumers must NOT set `_module.args.nurPkgs` themselves. Standalone
-      # per-program modules marked (needs nur) consume `nurPkgs`, so import `nur`
-      # alongside them (or just use the bundle).
       flake.homeManagerModules =
         let
-          # Evaluates the nur-packages input against the consumer's pkgs and
-          # exposes it as `nurPkgs` to every module in the tree.
           nur =
             { pkgs, ... }:
             {
               _module.args.nurPkgs = import inputs.nur-packages { inherit pkgs; };
             };
 
-          # Self-contained AI tooling bundle: closes over this flake's skill
-          # sources, mcp-servers-nix and llm-agents so a consumer only supplies
-          # pkgs. Requires the agent-skills home module (inputs.agent-skills.
-          # homeManagerModules.default) and, for nixvim-free setups, nothing else.
           ai-tools =
             { pkgs, ... }:
             {
@@ -118,9 +105,6 @@
                 nur
                 ./home-manager/ai-tools
               ];
-              # mcp-servers-nix.lib.evalModule/mkConfig resolve MCP server
-              # packages from this overlay (per-user pkgs only; useGlobalPkgs
-              # consumers must add it at the system level).
               nixpkgs.overlays = [ inputs.mcp-servers-nix.overlays.default ];
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
@@ -143,10 +127,9 @@
         {
           inherit nur ai-tools;
 
-          # ── Shell programs ──────────────────────────────────────────────
-          fish = ./home-manager/shell/fish; # needs nur
-          tmux = ./home-manager/shell/tmux; # needs nur
-          bat = ./home-manager/shell/bat; # needs nur
+          fish = ./home-manager/shell/fish;
+          tmux = ./home-manager/shell/tmux;
+          bat = ./home-manager/shell/bat;
           bottom = ./home-manager/shell/bottom;
           direnv = ./home-manager/shell/direnv;
           dust = ./home-manager/shell/dust;
@@ -161,36 +144,27 @@
           kitty = ./home-manager/shell/kitty;
           wget = ./home-manager/shell/wget;
 
-          # ── Version control ─────────────────────────────────────────────
-          # `git` sets programs.gitHooks/gitleaks, whose option modules live in
-          # vcs/modules/git-hooks and security/modules/gitleaks — import those
-          # (the `vcs` bundle does).
           git = ./home-manager/vcs/git;
           gh = ./home-manager/vcs/gh;
           gh-dash = ./home-manager/vcs/gh-dash;
-          tig = ./home-manager/vcs/tig; # needs nur
+          tig = ./home-manager/vcs/tig;
           git-hooks = ./home-manager/vcs/modules/git-hooks;
 
-          # ── Security ────────────────────────────────────────────────────
           gnupg = ./home-manager/security/gnupg;
           gpg-agent = ./home-manager/security/gpg-agent;
           ssh = ./home-manager/security/ssh;
           password-store = ./home-manager/security/password-store;
           gitleaks = ./home-manager/security/modules/gitleaks;
 
-          # ── Development ─────────────────────────────────────────────────
           cargo = ./home-manager/development/cargo;
           doggo = ./home-manager/development/doggo;
           lnav = ./home-manager/development/lnav;
           pandoc = ./home-manager/development/pandoc;
 
-          # ── Editor ──────────────────────────────────────────────────────
-          # `nixvim` requires inputs.nixvim.homeModules.nixvim + nur.
           nixvim = ./home-manager/editor/nixvim;
           vim = ./home-manager/editor/vim;
           editorconfig = ./home-manager/editor/editorconfig;
 
-          # ── Category bundles (auto-import nur) ──────────────────────────
           shell = {
             imports = [
               nur

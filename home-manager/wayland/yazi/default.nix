@@ -66,10 +66,8 @@
     };
   };
 
-  # Vim-style keybindings (mostly default, with custom additions)
   programs.yazi.keymap = {
     manager.prepend_keymap = [
-      # Quick navigation
       {
         on = [
           "g"
@@ -131,20 +129,16 @@
           "g"
           "n"
         ];
-        # The repository is bare, so its own directory holds no file to browse.
-        # What is navigable is the set of worktrees hanging off it.
         run = "cd ~/ghq/github.com/takeokunn/nixos-configuration.git/.worktrees";
         desc = "Go to nixos-config worktrees";
       }
 
-      # Toggle hidden files
       {
         on = [ "." ];
         run = "hidden toggle";
         desc = "Toggle hidden files";
       }
 
-      # Create
       {
         on = [ "a" ];
         run = "create";
@@ -156,7 +150,6 @@
         desc = "Create directory";
       }
 
-      # Rename
       {
         on = [
           "c"
@@ -182,7 +175,6 @@
         desc = "Rename (end)";
       }
 
-      # Selection
       {
         on = [ "V" ];
         run = "select_all --state=true";
@@ -194,7 +186,6 @@
         desc = "Unselect all";
       }
 
-      # Shell commands
       {
         on = [ "!" ];
         run = "shell --interactive";
@@ -206,7 +197,6 @@
         desc = "Shell command (block)";
       }
 
-      # Sorting
       {
         on = [
           "s"
@@ -256,14 +246,12 @@
         desc = "Sort by modified (reverse)";
       }
 
-      # Filter
       {
         on = [ "f" ];
         run = "filter --smart";
         desc = "Filter";
       }
 
-      # Linemode toggle
       {
         on = [
           "m"
@@ -364,7 +352,6 @@
     ];
   };
 
-  # Dracula theme
   programs.yazi.theme = {
     manager = {
       cwd = {
@@ -657,7 +644,6 @@
   };
 
   home.packages = with pkgs; [
-    # Preview dependencies
     file
     unar
     poppler

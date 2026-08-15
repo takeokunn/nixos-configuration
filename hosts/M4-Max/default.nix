@@ -66,19 +66,15 @@ nix-darwin.lib.darwinSystem {
       home-manager.sharedModules = [
         nixvim.homeModules.nixvim
         mac-app-util.homeManagerModules.default
-        # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
         {
-          # Maintain every ghq-managed repository via a background launchd agent.
           services.git-maintenance = {
             enable = true;
             ghq.enable = true;
-            interval = 3600; # 1 hour
+            interval = 3600;
           };
 
-          # launchd agents don't inherit home.sessionVariables (shell-only), so
-          # SSH-remote repos fail fetch without the agent socket set explicitly.
           launchd.agents.git-maintenance.config.EnvironmentVariables.SSH_AUTH_SOCK =
             "/Users/${username}/.gnupg/S.gpg-agent.ssh";
         }

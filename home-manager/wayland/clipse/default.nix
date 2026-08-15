@@ -9,7 +9,6 @@
     tempDir = "/tmp/clipse";
     logFile = "clipse.log";
 
-    # Vi-style keybindings
     keyBindings = {
       choose = "enter";
       clearSelected = "S";
@@ -33,7 +32,6 @@
       yank = "y";
     };
 
-    # Dracula theme
     theme = {
       useCustomTheme = true;
       DimmedDesc = "#6272a4";

@@ -2,11 +2,9 @@
 {
   plugins.lz-n.enable = true;
 
-  # Undotree - no mini.nvim equivalent, keep it
   plugins.undotree.enable = true;
   plugins.undotree.settings.WindowLayout = 3;
 
-  # Rainbow delimiters - no mini.nvim equivalent, keep it
   plugins.rainbow-delimiters.enable = true;
 
   extraPlugins = [
@@ -20,7 +18,6 @@
   };
 
   keymaps = [
-    # undotree
     {
       mode = "n";
       key = "<leader>u";

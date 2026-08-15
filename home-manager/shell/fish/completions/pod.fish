@@ -1,4 +1,3 @@
-# subcommands
 complete -f -c pod -n __fish_use_subcommand -xa cache -d "Manipulate the CocoaPods cache"
 complete -f -c pod -n __fish_use_subcommand -xa deintegrate -d "Deintegrate CocoaPods from your project"
 complete -f -c pod -n __fish_use_subcommand -xa env -d "Display pod environment"
@@ -17,7 +16,6 @@ complete -f -c pod -n __fish_use_subcommand -xa trunk -d "Interact with the Coco
 complete -f -c pod -n __fish_use_subcommand -xa try -d "Try a Pod!"
 complete -f -c pod -n __fish_use_subcommand -xa update -d "Update outdated project dependencies and create new Podfile.lock"
 
-# options
 complete -c pod -l allow-root -d "Allows CocoaPods to run as root"
 complete -c pod -l silent -d "Show nothing"
 complete -c pod -l version -d "Show the version of the tool"

@@ -1,5 +1,3 @@
-# fish completion for tbls                                 -*- shell-script -*-
-
 function __tbls_debug
     set -l file "$BASH_COMP_DEBUG_FILE"
     if test -n "$file"
@@ -10,29 +8,21 @@ end
 function __tbls_perform_completion
     __tbls_debug "Starting __tbls_perform_completion"
 
-    # Extract all args except the last one
     set -l args (commandline -opc)
-    # Extract the last arg and escape it in case it is a space
     set -l lastArg (string escape -- (commandline -ct))
 
     __tbls_debug "args: $args"
     __tbls_debug "last arg: $lastArg"
 
-    # Disable ActiveHelp which is not supported for fish shell
     set -l requestComp "TBLS_ACTIVE_HELP=0 $args[1] __complete $args[2..-1] $lastArg"
 
     __tbls_debug "Calling $requestComp"
     set -l results (eval $requestComp 2> /dev/null)
 
-    # Some programs may output extra empty lines after the directive.
-    # Let's ignore them or else it will break completion.
-    # Ref: https://github.com/spf13/cobra/issues/1279
     for line in $results[-1..1]
         if test (string trim -- $line) = ""
-            # Found an empty line, remove it
             set results $results[1..-2]
         else
-            # Found non-empty line, we have our proper output
             break
         end
     end
@@ -40,8 +30,6 @@ function __tbls_perform_completion
     set -l comps $results[1..-2]
     set -l directiveLine $results[-1]
 
-    # For Fish, when completing a flag with an = (e.g., <program> -n=<TAB>)
-    # completions must be prefixed with the flag
     set -l flagPrefix (string match -r -- '-.*=' "$lastArg")
 
     __tbls_debug "Comps: $comps"
@@ -55,7 +43,6 @@ function __tbls_perform_completion
     printf "%s\n" "$directiveLine"
 end
 
-# this function limits calls to __tbls_perform_completion, by caching the result behind $__tbls_perform_completion_once_result
 function __tbls_perform_completion_once
     __tbls_debug "Starting __tbls_perform_completion_once"
 
@@ -74,7 +61,6 @@ function __tbls_perform_completion_once
     return 0
 end
 
-# this function is used to clear the $__tbls_perform_completion_once_result variable after completions are run
 function __tbls_clear_perform_completion_once_result
     __tbls_debug ""
     __tbls_debug "========= clearing previously set __tbls_perform_completion_once_result variable =========="
@@ -108,14 +94,10 @@ function __tbls_requires_order_preservation
     return 1
 end
 
-# This function does two things:
-# - Obtain the completions and store them in the global __tbls_comp_results
-# - Return false if file completion should be performed
 function __tbls_prepare_completions
     __tbls_debug ""
     __tbls_debug "========= starting completion logic =========="
 
-    # Start fresh
     set --erase __tbls_comp_results
 
     __tbls_perform_completion_once
@@ -123,7 +105,6 @@ function __tbls_prepare_completions
 
     if test -z "$__tbls_perform_completion_once_result"
         __tbls_debug "No completion, probably due to a failure"
-        # Might as well do file completion, in case it helps
         return 1
     end
 
@@ -146,7 +127,6 @@ function __tbls_prepare_completions
     set -l compErr (math (math --scale 0 $directive / $shellCompDirectiveError) % 2)
     if test $compErr -eq 1
         __tbls_debug "Received error directive: aborting."
-        # Might as well do file completion, in case it helps
         return 1
     end
 
@@ -154,7 +134,6 @@ function __tbls_prepare_completions
     set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDirs) % 2)
     if test $filefilter -eq 1; or test $dirfilter -eq 1
         __tbls_debug "File extension filtering or directory filtering not supported"
-        # Do full file completion instead
         return 1
     end
 
@@ -163,11 +142,6 @@ function __tbls_prepare_completions
 
     __tbls_debug "nospace: $nospace, nofiles: $nofiles"
 
-    # If we want to prevent a space, or if file completion is NOT disabled,
-    # we need to count the number of valid completions.
-    # To do so, we will filter on prefix as the completions we have received
-    # may not already be filtered so as to allow fish to match on different
-    # criteria than the prefix.
     if test $nospace -ne 0; or test $nofiles -eq 0
         set -l prefix (commandline -t | string escape --style=regex)
         __tbls_debug "prefix: $prefix"
@@ -176,23 +150,14 @@ function __tbls_prepare_completions
         set --global __tbls_comp_results $completions
         __tbls_debug "Filtered completions are: $__tbls_comp_results"
 
-        # Important not to quote the variable for count to work
         set -l numComps (count $__tbls_comp_results)
         __tbls_debug "numComps: $numComps"
 
         if test $numComps -eq 1; and test $nospace -ne 0
-            # We must first split on \t to get rid of the descriptions to be
-            # able to check what the actual completion will be.
-            # We don't need descriptions anyway since there is only a single
-            # real completion which the shell will expand immediately.
             set -l split (string split --max 1 \t $__tbls_comp_results[1])
 
-            # Fish won't add a space if the completion ends with any
-            # of the following characters: @=/:.,
             set -l lastChar (string sub -s -1 -- $split)
             if not string match -r -q "[@=/:.,]" -- "$lastChar"
-                # In other cases, to support the "nospace" directive we trick the shell
-                # by outputting an extra, longer completion.
                 __tbls_debug "Adding second completion to perform nospace directive"
                 set --global __tbls_comp_results $split[1] $split[1].
                 __tbls_debug "Completions are now: $__tbls_comp_results"
@@ -200,8 +165,6 @@ function __tbls_prepare_completions
         end
 
         if test $numComps -eq 0; and test $nofiles -eq 0
-            # To be consistent with bash and zsh, we only trigger file
-            # completion when there are no other completions
             __tbls_debug "Requesting file completion"
             return 1
         end
@@ -210,25 +173,12 @@ function __tbls_prepare_completions
     return 0
 end
 
-# Since Fish completions are only loaded once the user triggers them, we trigger them ourselves
-# so we can properly delete any completions provided by another script.
-# Only do this if the program can be found, or else fish may print some errors; besides,
-# the existing completions will only be loaded if the program can be found.
 if type -q tbls
-    # The space after the program name is essential to trigger completion for the program
-    # and not completion of the program name itself.
-    # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
     complete --do-complete "tbls " >/dev/null 2>&1
 end
 
-# Remove any pre-existing completions for the program since we will be handling all of them.
 complete -c tbls -e
 
-# this will get called after the two calls below and clear the $__tbls_perform_completion_once_result global
 complete -c tbls -n __tbls_clear_perform_completion_once_result
-# The call to __tbls_prepare_completions will setup __tbls_comp_results
-# which provides the program's completion choices.
-# If this doesn't require order preservation, we don't use the -k flag
 complete -c tbls -n 'not __tbls_requires_order_preservation && __tbls_prepare_completions' -f -a '$__tbls_comp_results'
-# otherwise we use the -k flag
 complete -k -c tbls -n '__tbls_requires_order_preservation && __tbls_prepare_completions' -f -a '$__tbls_comp_results'

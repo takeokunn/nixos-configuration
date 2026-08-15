@@ -1,5 +1,3 @@
-# Linux-only. Imported conditionally from home-manager/advanced.nix so the
-# module system never evaluates it (and its Linux-only options) on Darwin.
 { pkgs, ... }:
 {
   imports = [

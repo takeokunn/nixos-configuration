@@ -1,4 +1,3 @@
-###-begin-pnpm-completion-###
 function _pnpm_completion
     set cmd (commandline -o)
     set cursor (commandline -C)
@@ -19,4 +18,3 @@ function _pnpm_completion
 end
 
 complete -f -d pnpm -c pnpm -a "(_pnpm_completion)"
-###-end-pnpm-completion-###

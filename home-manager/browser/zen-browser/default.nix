@@ -22,28 +22,7 @@ in
     ];
 
     userChrome = ''
-      /*
-       * Dracula Theme for Zen Browser
-       * Source: https://draculatheme.com
-       * Adapted from: https://github.com/ceuk/firefox-moonlight-dracula
-       *
-       * Color Palette:
-       * Background:    #282a36
-       * Current Line:  #44475a
-       * Foreground:    #f8f8f2
-       * Comment:       #6272a4
-       * Cyan:          #8be9fd
-       * Green:         #50fa7b
-       * Orange:        #ffb86c
-       * Pink:          #ff79c6
-       * Purple:        #bd93f9
-       * Red:           #ff5555
-       * Yellow:        #f1fa8c
-       * Black:         #21222c
-       */
-
       :root {
-        /* Dracula Color Variables */
         --dracula-background: #282a36;
         --dracula-current-line: #44475a;
         --dracula-foreground: #f8f8f2;
@@ -57,7 +36,6 @@ in
         --dracula-yellow: #f1fa8c;
         --dracula-black: #21222c;
 
-        /* Firefox/Zen Theme Overrides */
         --toolbar-bgcolor: var(--dracula-background) !important;
         --toolbar-color: var(--dracula-foreground) !important;
         --toolbar-field-background-color: var(--dracula-current-line) !important;
@@ -79,17 +57,14 @@ in
         --autocomplete-popup-highlight-background: var(--dracula-current-line) !important;
         --autocomplete-popup-highlight-color: var(--dracula-cyan) !important;
 
-        /* Transition timing */
         --dracula-transition: 300ms cubic-bezier(0.645, 0.045, 0.355, 1);
       }
 
-      /* ========== Navigator Toolbox ========== */
       #navigator-toolbox {
         background-color: var(--dracula-background) !important;
         border-bottom: 1px solid var(--dracula-current-line) !important;
       }
 
-      /* ========== Tab Bar ========== */
       #tabbrowser-tabs {
         background-color: var(--dracula-background) !important;
       }
@@ -130,12 +105,10 @@ in
         background-color: transparent !important;
       }
 
-      /* Tab line indicator */
       .tab-line {
         background-color: var(--dracula-purple) !important;
       }
 
-      /* ========== Navigation Bar / URL Bar ========== */
       #nav-bar {
         background-color: var(--dracula-background) !important;
         border-bottom: none !important;
@@ -163,7 +136,6 @@ in
         color: var(--dracula-foreground) !important;
       }
 
-      /* URL bar buttons */
       #urlbar-container .urlbar-icon,
       #urlbar-container .urlbar-icon-wrapper {
         fill: var(--dracula-comment) !important;
@@ -175,7 +147,6 @@ in
         fill: var(--dracula-purple) !important;
       }
 
-      /* ========== Toolbar Buttons ========== */
       toolbarbutton {
         transition: all var(--dracula-transition) !important;
       }
@@ -193,7 +164,6 @@ in
         fill: var(--dracula-cyan) !important;
       }
 
-      /* ========== Sidebar (Zen Browser specific) ========== */
       #sidebar-box {
         background-color: var(--dracula-background) !important;
         border-right: 1px solid var(--dracula-current-line) !important;
@@ -219,7 +189,6 @@ in
         color: var(--dracula-foreground) !important;
       }
 
-      /* Vertical Tabs (Zen Browser) */
       #zen-sidebar-top-buttons,
       #zen-sidebar-bottom-buttons {
         background-color: var(--dracula-background) !important;
@@ -235,7 +204,6 @@ in
         background-color: var(--dracula-current-line) !important;
       }
 
-      /* Workspaces (Zen Browser) */
       #zen-workspaces-button {
         background-color: var(--dracula-current-line) !important;
         border-radius: 6px !important;
@@ -246,7 +214,6 @@ in
         background-color: var(--dracula-comment) !important;
       }
 
-      /* ========== Menus and Popups ========== */
       menupopup,
       panel {
         background-color: var(--dracula-background) !important;
@@ -273,12 +240,10 @@ in
         border-color: var(--dracula-current-line) !important;
       }
 
-      /* Context menu */
       #context-navigation {
         background-color: var(--dracula-background) !important;
       }
 
-      /* ========== Findbar ========== */
       findbar {
         background-color: var(--dracula-background) !important;
         border-top: 1px solid var(--dracula-current-line) !important;
@@ -295,7 +260,6 @@ in
         border-color: var(--dracula-purple) !important;
       }
 
-      /* ========== Autocomplete Popup ========== */
       #PopupAutoComplete,
       #PopupSearchAutoComplete {
         background-color: var(--dracula-background) !important;
@@ -315,7 +279,6 @@ in
         color: var(--dracula-cyan) !important;
       }
 
-      /* ========== Bookmark Bar ========== */
       #PersonalToolbar {
         background-color: var(--dracula-background) !important;
         border-bottom: 1px solid var(--dracula-current-line) !important;
@@ -331,7 +294,6 @@ in
         color: var(--dracula-cyan) !important;
       }
 
-      /* ========== Scrollbars in Chrome ========== */
       scrollbar {
         background-color: var(--dracula-background) !important;
       }
@@ -345,13 +307,11 @@ in
         background-color: var(--dracula-purple) !important;
       }
 
-      /* ========== Selection ========== */
       ::selection {
         background-color: var(--dracula-current-line) !important;
         color: var(--dracula-foreground) !important;
       }
 
-      /* ========== Focus Outline ========== */
       :focus-visible {
         outline: 2px solid var(--dracula-purple) !important;
         outline-offset: 2px !important;
@@ -359,12 +319,6 @@ in
     '';
 
     userContent = ''
-      /*
-       * Dracula Theme for Zen Browser - Content Styles
-       * Source: https://draculatheme.com
-       * Applies to: New tab page, about: pages, scrollbars
-       */
-
       :root {
         --dracula-background: #282a36;
         --dracula-current-line: #44475a;
@@ -380,14 +334,12 @@ in
         --dracula-black: #21222c;
       }
 
-      /* ========== New Tab Page ========== */
       @-moz-document url("about:blank"), url("about:newtab"), url("about:home") {
         body {
           background-color: var(--dracula-background) !important;
           color: var(--dracula-foreground) !important;
         }
 
-        /* Search box on new tab */
         .search-wrapper input,
         .search-handoff-button {
           background-color: var(--dracula-current-line) !important;
@@ -401,7 +353,6 @@ in
           box-shadow: 0 0 0 2px rgba(189, 147, 249, 0.3) !important;
         }
 
-        /* Top sites */
         .top-site-outer {
           background-color: transparent !important;
         }
@@ -419,7 +370,6 @@ in
           color: var(--dracula-foreground) !important;
         }
 
-        /* Highlights and pocket stories */
         .card-outer {
           background-color: var(--dracula-current-line) !important;
           border-radius: 8px !important;
@@ -434,13 +384,11 @@ in
           color: var(--dracula-foreground) !important;
         }
 
-        /* Section titles */
         .section-title span {
           color: var(--dracula-comment) !important;
         }
       }
 
-      /* ========== About Pages ========== */
       @-moz-document url-prefix("about:") {
         body,
         #errorPageContainer,
@@ -486,7 +434,6 @@ in
         }
       }
 
-      /* ========== Scrollbars (All Pages) ========== */
       * {
         scrollbar-width: thin !important;
         scrollbar-color: var(--dracula-comment) var(--dracula-background) !important;
@@ -515,7 +462,6 @@ in
         background-color: var(--dracula-background) !important;
       }
 
-      /* ========== Selection ========== */
       ::selection {
         background-color: var(--dracula-current-line) !important;
         color: var(--dracula-foreground) !important;
@@ -523,22 +469,16 @@ in
     '';
 
     settings = {
-      # Disable close warning for cleaner UX (tabs can be restored with Ctrl+Shift+T)
       "browser.tabs.warnOnClose" = false;
 
-      # Enable userChrome.css and userContent.css
       "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
 
-      # Smooth scrolling
       "general.smoothScroll" = true;
 
-      # Enable GPU acceleration for better CSS performance
       "layers.acceleration.force-enabled" = true;
 
-      # UI density (compact is recommended for Dracula theme)
       "browser.uidensity" = 1;
 
-      # Disable pocket (cleaner new tab)
       "extensions.pocket.enabled" = false;
     };
   };

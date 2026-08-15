@@ -8,8 +8,6 @@
   xdg.configFile."tig/config".source =
     let
       base = pkgs.writeText "tig-config-base" ''
-        # config
-
         set main-view = id date author:email-user commit-title:graph=yes,refs=yes
         set blame-view = date:default author:email-user id:yes,color line-number:yes,interval=1 text
         set log-view = line-number:yes,interval=1 text
@@ -30,8 +28,6 @@
         set diff-options = -m --first-parent
         set diff-highlight = true
 
-        # keybind
-
         bind generic g move-first-line
         bind generic E view-grep
         bind generic G move-last-line
@@ -48,8 +44,6 @@
 
         bind status P !git push origin
         bind branch L !git pull origin %(branch)
-
-        # dracula theme
       '';
     in
     pkgs.runCommand "tig-config" { } ''

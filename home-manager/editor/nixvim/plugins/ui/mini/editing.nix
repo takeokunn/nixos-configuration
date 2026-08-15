@@ -1,21 +1,7 @@
-# ════════════════════════════════════════════════════════════════════════════════
-# Mini.nvim Editing Enhancement Modules
-# ════════════════════════════════════════════════════════════════════════════════
-# Text manipulation and editing utilities: pairs, surround, jump, ai textobjects,
-# move, splitjoin, operators, align, comment, and animate.
-# ════════════════════════════════════════════════════════════════════════════════
-
 {
   plugins.mini.modules = {
-    # ══════════════════════════════════════════════════════════════════════════
-    # Pairs (replaces nvim-autopairs)
-    # ══════════════════════════════════════════════════════════════════════════
     pairs = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Surround (replaces vim-sandwich)
-    # ══════════════════════════════════════════════════════════════════════════
-    # sa=add, sd=delete, sf=find, sF=find_left, sh=highlight, sr=replace, sn=update_n_lines
     surround = {
       mappings = {
         add = "sa";
@@ -30,10 +16,6 @@
       respect_selection_type = true;
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Jump (replaces hop for f/F/t/T)
-    # ══════════════════════════════════════════════════════════════════════════
-    # Enhanced single-character jump with repeat support
     jump = {
       mappings = {
         forward = "f";
@@ -44,10 +26,6 @@
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Jump2d (for 2-character jumps)
-    # ══════════════════════════════════════════════════════════════════════════
-    # EasyMotion-style word jumping with visual dimming
     jump2d = {
       spotter = {
         __raw = "require('mini.jump2d').builtin_opts.word_start.spotter";
@@ -58,10 +36,6 @@
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # AI (textobjects for treesitter)
-    # ══════════════════════════════════════════════════════════════════════════
-    # Enhanced around/inside textobjects: o=block, f=function, c=class, t=tag, d=digit, e=word, u=function_call
     ai = {
       n_lines = 500;
       custom_textobjects.__raw = ''
@@ -81,10 +55,6 @@
       '';
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Move (move lines and selections)
-    # ══════════════════════════════════════════════════════════════════════════
-    # Using Shift modifier to avoid conflict with LSP (Alt+j/k)
     move = {
       mappings = {
         left = "<M-h>";
@@ -98,19 +68,12 @@
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Splitjoin (split/join arguments)
-    # ══════════════════════════════════════════════════════════════════════════
     splitjoin = {
       mappings = {
         toggle = "gS";
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Operators (additional operators)
-    # ══════════════════════════════════════════════════════════════════════════
-    # g==evaluate, gx=exchange, gm=multiply, gr=replace, gs=sort
     operators = {
       evaluate = {
         prefix = "g=";
@@ -129,14 +92,8 @@
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Align (align text by delimiter)
-    # ══════════════════════════════════════════════════════════════════════════
     align = { };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Comment (code commenting)
-    # ══════════════════════════════════════════════════════════════════════════
     comment = {
       mappings = {
         comment = "gc";
@@ -146,10 +103,6 @@
       };
     };
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Animate (smooth animations)
-    # ══════════════════════════════════════════════════════════════════════════
-    # cursor/resize disabled for performance (constant CPU overhead)
     animate = {
       cursor = {
         enable = false;
@@ -178,7 +131,6 @@
   };
 
   keymaps = [
-    # mini.jump2d keymap - using gj to avoid conflict with window navigation (sh/sj/sk/sl)
     {
       mode = [
         "n"

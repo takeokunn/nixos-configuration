@@ -1,7 +1,6 @@
 {
   services.mako.enable = true;
   services.mako.settings = {
-    # Appearance
     font = "HackGen Console NF 14";
     width = 350;
     height = 150;
@@ -10,13 +9,11 @@
     border-size = 2;
     border-radius = 8;
 
-    # Dracula colors with transparency
     background-color = "#282a36ee";
     text-color = "#f8f8f2";
     border-color = "#bd93f9";
     progress-color = "over #44475a";
 
-    # Behavior
     default-timeout = 5000;
     layer = "overlay";
     anchor = "top-right";

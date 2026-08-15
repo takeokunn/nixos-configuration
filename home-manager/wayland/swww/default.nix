@@ -2,16 +2,13 @@
 {
   home.packages = [ pkgs.swww ];
 
-  # Wallpaper script
   xdg.configFile."swww/wallpaper.sh".executable = true;
   xdg.configFile."swww/wallpaper.sh".text = ''
     #!/usr/bin/env bash
 
-    # Default wallpaper directory
     WALLPAPER_DIR="''${HOME}/Pictures/Wallpapers"
     CURRENT_WALLPAPER="''${XDG_STATE_HOME:-$HOME/.local/state}/swww/current"
 
-    # Transition settings (Dracula-inspired)
     TRANSITION_TYPE="wipe"
     TRANSITION_DURATION="1"
     TRANSITION_FPS="60"
@@ -33,7 +30,6 @@
         --transition-angle "$TRANSITION_ANGLE" \
         --transition-bezier "$TRANSITION_BEZIER"
 
-      # Save current wallpaper path
       mkdir -p "$(dirname "$CURRENT_WALLPAPER")"
       echo "$wallpaper" > "$CURRENT_WALLPAPER"
     }
@@ -86,7 +82,6 @@
     esac
   '';
 
-  # Dracula NixOS wallpaper
   home.file."Pictures/Wallpapers/dracula-nixos.png".source =
     "${nurPkgs.dracula-wallpaper}/first-collection/nixos.png";
 }

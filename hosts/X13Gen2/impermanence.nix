@@ -21,7 +21,6 @@
         mv /mnt/@root "/mnt/@old_roots/@root_$timestamp"
       fi
 
-      # Delete old roots older than 7 days
       for old in /mnt/@old_roots/@root_*; do
         if [[ -e "$old" ]]; then
           create_time=$(stat -c %Y "$old")

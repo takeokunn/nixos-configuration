@@ -17,7 +17,6 @@
       inner-pad = 8;
     };
 
-    # Vi-style keybindings
     key-bindings = {
       prev = "Up Control+k Control+p";
       next = "Down Control+j Control+n";
@@ -40,7 +39,6 @@
       cancel = "Escape Control+c Control+bracketleft";
     };
 
-    # Dracula color scheme
     colors = {
       background = "282a36ee";
       text = "f8f8f2ff";

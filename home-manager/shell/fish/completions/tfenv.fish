@@ -1,4 +1,3 @@
-# subcommands
 complete -f -c tfenv -n __fish_use_subcommand -xa install -d "Install a specific version of Terraform"
 complete -f -c tfenv -n __fish_use_subcommand -xa use -d "Switch a version to use"
 complete -f -c tfenv -n __fish_use_subcommand -xa uninstall -d "Uninstall a specific version of Terraform"

@@ -1,7 +1,4 @@
 {
-  # mini.completion is configured in ui/mini.nix
-  # Just keep LSP and lspsaga here
-
   plugins.lsp.enable = true;
   plugins.lsp.keymaps.lspBuf.gd = "definition";
   plugins.lsp.servers.nil_ls.enable = true;

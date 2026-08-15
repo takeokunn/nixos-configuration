@@ -1,6 +1,5 @@
 { pkgs, ... }:
 let
-  # Dracula Color Palette
   colors = {
     background = "0xff282a36";
     backgroundTransparent = "0xcc282a36";
@@ -14,20 +13,15 @@ let
     purple = "0xffbd93f9";
     red = "0xffff5555";
     yellow = "0xfff1fa8c";
-    # Derived colors
     transparent = "0x00000000";
     black = "0xff21222c";
   };
 
-  # Aerospace workspace plugin script
-  # 各space itemが自分自身の状態のみを更新（イベント駆動 + ポーリング両対応）
   aerospacePlugin = pkgs.writeShellScript "aerospace.sh" ''
     AEROSPACE="/run/current-system/sw/bin/aerospace"
 
-    # 自分のspace ID（space.1, space.2, ... から数字を抽出）
     SID=$(echo "$NAME" | sed 's/space\.//')
 
-    # フォーカス中のワークスペースを取得（イベント時は環境変数、ポーリング時はコマンド実行）
     if [ -n "$FOCUSED_WORKSPACE" ]; then
       FOCUSED="$FOCUSED_WORKSPACE"
     else
@@ -52,19 +46,16 @@ let
     fi
   '';
 
-  # CPU plugin script
   cpuPlugin = pkgs.writeShellScript "cpu.sh" ''
     CPU=$(top -l 1 -n 0 | grep "CPU usage" | awk '{print $3}' | tr -d '%')
     sketchybar --set "$NAME" label="$CPU%"
   '';
 
-  # Memory plugin script
   memoryPlugin = pkgs.writeShellScript "memory.sh" ''
     MEMORY=$(memory_pressure | grep "System-wide memory free percentage:" | awk '{print 100-$5}' | tr -d '%')
     sketchybar --set "$NAME" label="$MEMORY%"
   '';
 
-  # Volume plugin script
   volumePlugin = pkgs.writeShellScript "volume.sh" ''
     VOLUME=$(osascript -e 'output volume of (get volume settings)')
     MUTED=$(osascript -e 'output muted of (get volume settings)')
@@ -84,9 +75,7 @@ let
     fi
   '';
 
-  # Wi-Fi plugin script
   wifiPlugin = pkgs.writeShellScript "wifi.sh" ''
-    # ipconfig getsummary で SSID を取得
     SSID=$(ipconfig getsummary en0 2>/dev/null | grep "^  SSID" | awk -F ' : ' '{print $2}')
 
     if [ -z "$SSID" ]; then
@@ -96,17 +85,14 @@ let
     fi
   '';
 
-  # Date plugin script
   datePlugin = pkgs.writeShellScript "date.sh" ''
     sketchybar --set "$NAME" label="$(date '+%m/%d %a')"
   '';
 
-  # Time plugin script
   timePlugin = pkgs.writeShellScript "time.sh" ''
     sketchybar --set "$NAME" label="$(date '+%H:%M')"
   '';
 
-  # Battery plugin script
   batteryPlugin = pkgs.writeShellScript "power.sh" ''
     PERCENTAGE=$(pmset -g batt | grep -Eo "[0-9]+%" | cut -d% -f1)
     CHARGING=$(pmset -g batt | grep 'AC Power')
@@ -142,23 +128,14 @@ let
                 --set "$NAME" label="$PERCENTAGE%"
   '';
 
-  # Front app plugin script
   frontAppPlugin = pkgs.writeShellScript "front_app.sh" ''
     if [ "$SENDER" = "front_app_switched" ]; then
       sketchybar --set "$NAME" label="$INFO"
     fi
   '';
 
-  # Sleep-prevention (pmset noidle) state file, shared by both scripts below.
-  # PID-file (not `pgrep -f pmset`) so a user-launched pmset elsewhere is never
-  # touched by the toggle. Session-scoped: doesn't survive logout/reboot, by design (no sudo,
-  # since `pmset noidle` only holds an IOPMAssertion like caffeinate -- it does not touch
-  # system-wide power settings and needs no elevated privileges).
   sleepPreventPidfile = "$HOME/.cache/sketchybar_pmset_noidle.pid";
 
-  # Sleep-prevention display plugin script (reflects the actual pmset process state).
-  # Only trusts the pidfile if that PID is still actually a pmset process, since PIDs
-  # get reused by macOS and a stale entry could otherwise point at an unrelated process.
   sleepPreventPlugin = pkgs.writeShellScript "sleep_prevent.sh" ''
     PIDFILE="${sleepPreventPidfile}"
 
@@ -169,13 +146,11 @@ let
     fi
   '';
 
-  # Sleep-prevention toggle click script: starts/stops a detached `pmset noidle` process (no sudo)
   sleepPreventTogglePlugin = pkgs.writeShellScript "sleep_prevent_toggle.sh" ''
     PIDFILE="${sleepPreventPidfile}"
     LOCKDIR="$PIDFILE.lock"
     mkdir -p "$(dirname "$PIDFILE")"
 
-    # Guard against a rapid double-click racing two toggles and orphaning a pmset process
     mkdir "$LOCKDIR" 2>/dev/null || exit 0
     trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
 
@@ -191,11 +166,9 @@ let
     sketchybar --update
   '';
 
-  # Main configuration
   sketchybarConfig = ''
     #!/bin/bash
 
-    ##### Dracula Color Palette #####
     BACKGROUND="${colors.background}"
     BACKGROUND_TRANSPARENT="${colors.backgroundTransparent}"
     CURRENT_LINE="${colors.currentLine}"
@@ -210,8 +183,6 @@ let
     YELLOW="${colors.yellow}"
     BLACK="${colors.black}"
     TRANSPARENT="${colors.transparent}"
-
-    ############## BAR - Island Style ##############
 
     bar=(
       height=40
@@ -228,8 +199,6 @@ let
       y_offset=4
                 )
     sketchybar --bar "''${bar[@]}"
-
-    ############## GLOBAL DEFAULTS ##############
 
     default=(
       icon.font="Hack Nerd Font:Bold:14.0"
@@ -248,13 +217,8 @@ let
         )
     sketchybar --default "''${default[@]}"
 
-    ############## AEROSPACE EVENT ##############
-
     sketchybar --add event aerospace_workspace_change
 
-    ############## LEFT ITEMS ##############
-
-    # Apple Logo
     sketchybar --add item apple_logo left \
                 --set apple_logo \
                       icon="􀣺" \
@@ -265,12 +229,10 @@ let
                       background.color="$TRANSPARENT" \
                       click_script="sketchybar --update"
 
-    # Aerospace Workspaces
     SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
 
     for i in "''${!SPACE_ICONS[@]}"; do
       sid="''${SPACE_ICONS[$i]}"
-      # 10番目は表示を "0" にする
       if [ "$sid" = "10" ]; then
         display_icon="0"
       else
@@ -293,7 +255,6 @@ let
                   --subscribe space.$sid aerospace_workspace_change
     done
 
-    # Front App (Window Title)
     sketchybar --add item front_app left \
                 --set front_app \
                       icon.drawing=off \
@@ -303,9 +264,6 @@ let
                       script="${frontAppPlugin}" \
                 --subscribe front_app front_app_switched
 
-    ############## RIGHT ITEMS ##############
-
-    # Time
     sketchybar --add item time right \
                 --set time \
                       icon="󰥔" \
@@ -314,7 +272,6 @@ let
                       update_freq=1 \
                       script="${timePlugin}"
 
-    # Date
     sketchybar --add item date right \
                 --set date \
                       icon="󰃭" \
@@ -323,7 +280,6 @@ let
                       update_freq=1 \
                       script="${datePlugin}"
 
-    # Separator
     sketchybar --add item separator_datetime right \
                 --set separator_datetime \
                       icon=│ \
@@ -332,7 +288,6 @@ let
                       icon.padding_right=4 \
                       background.drawing=off
 
-    # Battery
     sketchybar --add item battery right \
                 --set battery \
                       update_freq=1 \
@@ -345,9 +300,6 @@ let
                       icon.color="$GREEN" \
                       label.drawing=off
 
-    # Sleep prevention toggle (pmset noidle, no sudo required; update_freq=5 since it's a cheap
-    # kill -0 check, not a heavier poll like the 1s-interval items below). Icon-only (no label,
-    # matching power_icon) to keep the right-side item group narrow enough to clear the notch.
     sketchybar --add item sleep_prevent right \
                 --set sleep_prevent \
                       icon=󰅶 \
@@ -358,7 +310,6 @@ let
                       script="${sleepPreventPlugin}" \
                       click_script="${sleepPreventTogglePlugin}"
 
-    # Separator
     sketchybar --add item separator_power right \
                 --set separator_power \
                       icon=│ \
@@ -367,7 +318,6 @@ let
                       icon.padding_right=4 \
                       background.drawing=off
 
-    # Volume
     sketchybar --add item volume right \
                 --set volume \
                       icon=󰕾 \
@@ -377,7 +327,6 @@ let
                       script="${volumePlugin}" \
                 --subscribe volume volume_change
 
-    # Wi-Fi
     sketchybar --add item wifi right \
                 --set wifi \
                       icon=󰖩 \
@@ -386,7 +335,6 @@ let
                       update_freq=1 \
                       script="${wifiPlugin}"
 
-    # Separator
     sketchybar --add item separator_network right \
                 --set separator_network \
                       icon=│ \
@@ -395,7 +343,6 @@ let
                       icon.padding_right=4 \
                       background.drawing=off
 
-    # Memory
     sketchybar --add item memory right \
                 --set memory \
                       icon=󰍛 \
@@ -404,7 +351,6 @@ let
                       update_freq=1 \
                       script="${memoryPlugin}"
 
-    # CPU
     sketchybar --add item cpu right \
                 --set cpu \
                       icon=󰻠 \
@@ -413,46 +359,36 @@ let
                       update_freq=1 \
                       script="${cpuPlugin}"
 
-    ############## BRACKETS - Island Groups ##############
-
-    # Spaces bracket
     sketchybar --add bracket spaces_bracket '/space\..*/' \
                 --set spaces_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
                       background.height=32
 
-    # System info bracket
     sketchybar --add bracket system_bracket cpu memory \
                 --set system_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
                       background.height=32
 
-    # Network bracket
     sketchybar --add bracket network_bracket wifi volume \
                 --set network_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
                       background.height=32
 
-    # Power bracket
     sketchybar --add bracket power_bracket power_icon battery sleep_prevent \
                 --set power_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
                       background.height=32
 
-    # DateTime bracket
     sketchybar --add bracket datetime_bracket date time \
                 --set datetime_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
                       background.height=32
 
-    ############## FINALIZE ##############
-
-    # 初期状態を設定 (現在のワークスペースを取得してハイライト)
     AEROSPACE="/run/current-system/sw/bin/aerospace"
     FOCUSED=$("$AEROSPACE" list-workspaces --focused 2>/dev/null || echo "1")
     sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE="$FOCUSED"

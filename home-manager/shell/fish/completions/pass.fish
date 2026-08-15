@@ -1,6 +1,3 @@
-# Copyright (C) 2012-2014 Dmitry Medvinsky <me@dmedvinsky.name>. All Rights Reserved.
-# This file is licensed under the GPLv2+. Please see COPYING for more information.
-
 set -l PROG pass
 
 function __fish_pass_get_prefix
@@ -53,7 +50,7 @@ end
 function __fish_pass_git_complete
     set -l prefix (__fish_pass_get_prefix)
     set -l git_cmd (commandline -opc) (commandline -ct)
-    set -e git_cmd[1 2] # Drop "pass git".
+    set -e git_cmd[1 2]
     complete -C"git -C $prefix $git_cmd"
 end
 
@@ -98,7 +95,6 @@ complete -c $PROG -f -n '__fish_pass_uses_command edit' -a "(__fish_pass_print_e
 complete -c $PROG -f -n __fish_pass_needs_command -a show -d 'Command: show existing password'
 complete -c $PROG -f -n '__fish_pass_uses_command show' -s c -l clip -d 'Put password in clipboard'
 complete -c $PROG -f -n '__fish_pass_uses_command show' -a "(__fish_pass_print_entries)"
-# When no command is given, `show` is defaulted.
 complete -c $PROG -f -n __fish_pass_needs_command -s c -l clip -d 'Put password in clipboard'
 complete -c $PROG -f -n __fish_pass_needs_command -a "(__fish_pass_print_entries)"
 complete -c $PROG -f -n '__fish_pass_uses_command -c' -a "(__fish_pass_print_entries)"
@@ -110,7 +106,7 @@ complete -c $PROG -f -n __fish_pass_needs_command -a find -d 'Command: find a pa
 complete -c $PROG -f -n __fish_pass_needs_command -a grep -d 'Command: search inside of decrypted password files for matching pattern'
 complete -c $PROG -f -n '__fish_pass_uses_command grep' -a '(begin
     set -l cmd (commandline -opc) (commandline -ct)
-    set -e cmd[1 2] # Drop "pass grep".
+    set -e cmd[1 2]
     complete -C"grep $cmd"
 end)'
 

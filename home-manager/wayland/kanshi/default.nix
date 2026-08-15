@@ -1,7 +1,6 @@
 {
   services.kanshi.enable = true;
   services.kanshi.settings = [
-    # Laptop only (ThinkPad X13 Gen2)
     {
       profile.name = "laptop";
       profile.outputs = [
@@ -15,7 +14,6 @@
       ];
     }
 
-    # External monitor only (docked, lid closed)
     {
       profile.name = "docked";
       profile.outputs = [
@@ -32,7 +30,6 @@
       ];
     }
 
-    # Laptop + External monitor (extended)
     {
       profile.name = "dual";
       profile.outputs = [
@@ -52,7 +49,6 @@
       ];
     }
 
-    # Laptop + External monitor (mirror)
     {
       profile.name = "mirror";
       profile.outputs = [

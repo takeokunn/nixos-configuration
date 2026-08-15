@@ -1,10 +1,8 @@
 { pkgs, customPackages }:
 {
   extraPlugins = [
-    # Japanese documentation
     pkgs.vimPlugins.vim-manpager
     customPackages.vimdoc-ja
-    # Skkeleton (Japanese IME)
     pkgs.vimPlugins.denops-vim
     customPackages.skkeleton
     customPackages.skkeleton-azik

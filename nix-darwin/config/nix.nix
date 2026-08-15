@@ -1,12 +1,5 @@
 { pkgs, ... }:
 {
-  # Pin the host nix-daemon to this flake's nixpkgs `nix` so the host and the
-  # darwin-vz-nix guest — a tightly-coupled ssh-ng distributed-build pair —
-  # run the same Nix version, giving consistent protocol and tooling and
-  # closing nix-darwin's default-package version lag. (This is version
-  # alignment for its own sake; it was NOT the fix for the distributed-build
-  # failures — that root cause was the guest `builder` user being in the
-  # `nixbld` group, fixed in darwin-vz-nix itself.)
   nix.package = pkgs.nix;
 
   nix.optimise.automatic = true;

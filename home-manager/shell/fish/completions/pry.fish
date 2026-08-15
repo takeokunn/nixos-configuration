@@ -1,4 +1,3 @@
-### options
 complete -c pry -s e -d "A line of code to execute in context before the session starts"
 complete -c pry -l exec -d "A line of code to execute in context before the session starts"
 complete -c pry -l no-pager -d "Disable pager for long output"

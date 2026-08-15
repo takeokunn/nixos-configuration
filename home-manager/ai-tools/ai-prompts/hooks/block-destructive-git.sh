@@ -1,51 +1,9 @@
 #!/bin/bash
-# PreToolUse:Bash hook — block Git commands that mutate shared working-tree state.
-#
-# Concurrent sessions may share this checkout, so switching HEAD or discarding the tree
-# under another session is destructive in a way no single session can see. The prose rule
-# (ORCH-P005) has existed for a long time; the measured transcript corpus shows prose rules
-# being broken thousands of times and hook blocks being respected. This is that rule moved
-# into the layer that actually holds.
-#
-# Blocked: git stash (except list/show), git switch, git reset --hard, git clean -f,
-#          git checkout <ref>.
-# Allowed: git checkout -b / -B / --orphan (creates a branch, permitted by ORCH-P006),
-#          git checkout -- <path> (restores a file, touches no ref),
-#          git stash list / git stash show (read-only: they report on the stash without
-#          creating an entry or touching the working tree, so they are not the hazard the
-#          rest of `git stash` is).
-#
-# The classifier looks through two indirections, because both are ordinary here rather than
-# evasive: a shell payload (`bash -c '...'`, `sh -c`, `zsh -c`, `fish -c`, `eval`), which
-# this configuration positively recommends since the login shell is fish and bash syntax
-# must be run through `bash -c`; and a plain wrapper (`xargs`, `env`, `timeout`, `nohup`,
-# `command`, `sudo`, `nice`, ...), where the wrapper is incidental to the git command it
-# runs. A recommended procedure that doubles as a bypass is the worst kind, so both are
-# resolved to the git invocation underneath.
-#
-# It deliberately does NOT look at data positions: an argument to `echo`/`printf`, a commit
-# message, a grep pattern, or a heredoc body that contains the words "git stash" is text,
-# not a command, and blocking it would train the reader to route around the hook.
-#
-# THIS HOOK FAILS OPEN BY DESIGN. It is a guardrail against the accident — the reflexive
-# `git stash` before a checkout — not a security boundary. Full shell semantics (parameter
-# expansion, aliases, functions, `$(...)` producing a command name, base64-decoded payloads)
-# cannot be reproduced in a pre-execution matcher, so anything the heuristic cannot resolve
-# is allowed through rather than guessed at. Someone who wants past this hook gets past it;
-# the point is that they have to mean it. A false block costs more than a miss here, because
-# it makes the hook the obstacle instead of the rule.
-#
-# Escape hatch: prefix the command with ALLOW_DESTRUCTIVE_GIT=1. That makes the override
-# deliberate and visible in the transcript instead of silent. Tell the user why first. The
-# prefix is honoured at the position it is written, including inside a `bash -c` payload.
 
 set -euo pipefail
 
 input=$(cat)
 
-# Input that does not parse yields an empty command and the hook stands aside. Exiting
-# non-zero there would report a hook error on every malformed payload without blocking
-# anything, since only exit 2 blocks.
 if command -v jq &>/dev/null; then
   tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
   command=$(echo "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
@@ -53,7 +11,6 @@ elif command -v python3 &>/dev/null; then
   tool_name=$(printf '%s' "$input" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_name",""))' 2>/dev/null || echo "")
   command=$(printf '%s' "$input" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))' 2>/dev/null || echo "")
 else
-  # No JSON parser: cannot classify the command, so do not pretend to have checked it.
   exit 0
 fi
 
@@ -61,34 +18,19 @@ if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
-# The classifier is bound to a variable rather than heredoc-fed inside a command
-# substitution. /bin/bash on macOS is 3.2, which mis-parses a heredoc containing a backtick
-# inside $( ) and aborts the whole script with "unexpected EOF while looking for matching `".
 read -r -d '' perl_prog <<'PERL' || true
 use strict;
 use warnings;
 
 my $cmd = defined $ENV{HOOK_CMD} ? $ENV{HOOK_CMD} : q{};
 
-# Wrappers that run their operand as a command. Stripping one leaves the real command at the
-# front of the segment, so `xargs git stash` classifies the same as `git stash`.
-#
-# rtk belongs here because the rtk-rewrite hook puts it in front of commands routinely, so the
-# model sees rtk-prefixed forms in its own transcript and reproduces them. Without the entry,
-# `rtk git stash` is an unclassified command rather than a git one. Stripping it is safe for
-# rtk's non-git subcommands too: `rtk ls -la` reduces to `ls -la`, which is not git.
 my %WRAPPER = map { $_ => 1 } qw(
     sudo doas command builtin exec env nohup timeout nice ionice chrt
     time stdbuf setsid unbuffer xargs rtk
 );
 
-# Wrappers whose command arrives as a string operand and has to be re-parsed.
 my %SHELL = map { $_ => 1 } qw(bash sh zsh fish dash ksh mksh ash);
 
-# Split a command line into segments of words, keeping quotes intact instead of blanking
-# them. Blanking is what let a `bash -c` payload disappear before it could be inspected;
-# carrying the unquoted text forward is what lets it be re-parsed. Separators only separate
-# when they are unquoted, so a commit message or a grep pattern stays one word.
 sub lex_segments {
     my ($s) = @_;
     my @segments;
@@ -116,8 +58,6 @@ sub lex_segments {
         return;
     };
 
-    # Read a word from position $i, honouring quotes; used for heredoc delimiters and for
-    # redirection targets, neither of which is a command.
     my $skip_word = sub {
         while ($i < $n) {
             my $d = substr($s, $i, 1);
@@ -167,10 +107,7 @@ sub lex_segments {
             next;
         }
 
-        # Redirections. The operator and its target are not commands, and a heredoc body is
-        # data — `cat <<EOF` followed by the words "git stash" must not read as an invocation.
         if ($c eq q{<} or $c eq q{>}) {
-            # A leading file descriptor number belongs to the redirection, not to a word.
             $tok = undef if defined $tok and !$tok->{quoted} and $tok->{text} =~ /^\d+$/;
             $flush_tok->();
 
@@ -196,15 +133,12 @@ sub lex_segments {
             next;
         }
 
-        # Command substitution opens a fresh command position.
         if ($c eq q{$} and substr($s, $i, 2) eq q{$(}) {
             $flush_seg->();
             $i += 2;
             next;
         }
 
-        # A brace is only a group delimiter when it stands alone as a word; inside one it is
-        # an ordinary character, so `xargs -I{}` does not fracture into two segments.
         if ($c eq '{' or $c eq '}') {
             my $next = ($i + 1 < $n) ? substr($s, $i + 1, 1) : q{ };
             if (defined $tok or $next !~ /[\s;]/) { $add->($c, 0); $i++; next; }
@@ -245,8 +179,6 @@ sub lex_segments {
     return @segments;
 }
 
-# Peel environment assignments, wrappers, and shell payloads off the front of a segment
-# until a real command name is exposed, then classify it if it is git.
 sub verdict_for_segment {
     my ($tokens, $depth) = @_;
     my @t = @{$tokens};
@@ -258,14 +190,11 @@ sub verdict_for_segment {
 
         if (!$t[0]{quoted} and $raw =~ /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/) {
             my ($key, $val) = ($1, $2);
-            # The override is honoured where it is written, so it also works one level down
-            # inside a shell payload.
             return q{} if $key =~ /^(?:CLAUDE_)?ALLOW_DESTRUCTIVE_GIT$/ and $val eq '1';
             shift @t;
             next;
         }
 
-        # eval takes its command as the concatenation of the remaining words.
         if ($w eq 'eval') {
             shift @t;
             return classify(join(q{ }, map { $_->{text} } @t), $depth + 1);
@@ -275,7 +204,6 @@ sub verdict_for_segment {
             shift @t;
             while (@t) {
                 my $a = $t[0]{text};
-                # -c, and combined short forms such as -lc, take the command string next.
                 if ($a =~ /^-[A-Za-z]*c$/) {
                     shift @t;
                     return @t ? classify($t[0]{text}, $depth + 1) : q{};
@@ -284,7 +212,6 @@ sub verdict_for_segment {
                 if ($a =~ /^[-+]/) { shift @t; next; }
                 last;
             }
-            # No -c: the operand is a script path whose contents this hook cannot see.
             return q{};
         }
 
@@ -294,7 +221,6 @@ sub verdict_for_segment {
                 my $a = $t[0]{text};
                 if ($a =~ /^-/)                            { shift @t; next; }
                 if ($a =~ /^[A-Za-z_][A-Za-z0-9_]*=/)      { shift @t; next; }
-                # timeout/nice and friends take a numeric operand before the command.
                 if ($w =~ /^(?:timeout|nice|ionice|chrt)$/ and $a =~ /^\d+(?:\.\d+)?[smhd]?$/) {
                     shift @t;
                     next;
@@ -316,7 +242,6 @@ sub verdict_for_segment {
 
     my @a = map { $_->{text} } @t;
 
-    # Global options precede the subcommand; some of them take a separate value.
     while (@a and $a[0] =~ /^-/) {
         my $opt = shift @a;
         shift @a if @a and $opt =~ /^(?:-C|-c|--git-dir|--work-tree|--namespace|--exec-path)$/;
@@ -348,8 +273,6 @@ sub verdict_for_segment {
 
 sub classify {
     my ($text, $depth) = @_;
-    # Bounded so a self-referential payload cannot spin; four levels is far past anything
-    # written on purpose, and exceeding it falls open like every other unresolved case.
     return q{} if $depth > 4;
     for my $seg (lex_segments($text)) {
         my $v = verdict_for_segment($seg, $depth);
@@ -367,8 +290,6 @@ PERL
 
 verdict="$(HOOK_CMD="$command" perl -e "$perl_prog")"
 
-# An `[[ ... ]] && exit 0` here would leave the whole list returning 1 on the common path,
-# which `set -e` turns into a spurious non-zero exit from the hook itself.
 if [[ -z $verdict ]]; then
   exit 0
 fi

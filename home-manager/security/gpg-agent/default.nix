@@ -15,10 +15,6 @@ in
   services.gpg-agent.enableSshSupport = true;
   services.gpg-agent.enableExtraSocket = true;
 
-  # macOS: Override --supervised mode (exits code 2; launchd socket activation
-  # places sockets at /private/var/run/ which is unwritable for user agents,
-  # causing gpg-agent to never receive LISTEN_FDS). Use --daemon so gpg-agent
-  # creates sockets directly in ~/.gnupg/ where gpg, ssh, and git expect them.
   launchd.agents.gpg-agent.config.ProgramArguments = lib.mkIf isDarwin (
     lib.mkForce [
       "/bin/sh"
@@ -27,9 +23,6 @@ in
     ]
   );
 
-  # macOS: After home-manager switch, kill the old agent (launchd loses the
-  # forked daemon PID and cannot restart it) and start a fresh one from the
-  # new Nix store generation.
   home.activation.restartGpgAgent = lib.mkIf isDarwin {
     after = [ "setupLaunchAgents" ];
     before = [ ];
@@ -39,7 +32,6 @@ in
     '';
   };
 
-  # Backup: fish-specific SSH_AUTH_SOCK initialization
   programs.fish.interactiveShellInit = ''
     set -x SSH_AUTH_SOCK $(gpgconf --list-dirs agent-ssh-socket)
   '';

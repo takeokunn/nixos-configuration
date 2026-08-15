@@ -40,10 +40,6 @@ let
     let
       content = builtins.readFile (agentPromptsPath + "/${agent}.md");
       parsed = shared.parseFrontmatter content;
-      # opencode's own frontmatter here does not carry the name, but the shape must still be
-      # validated as an agent prompt (name: + description:), matching codex's converter. A
-      # plain let-binding would never force this assert, since nameLine is otherwise unused
-      # and Nix is lazy, so builtins.seq below forces it explicitly.
       nameLine = shared.findLineWithPrefix "name: " parsed.frontmatterLines;
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
     in

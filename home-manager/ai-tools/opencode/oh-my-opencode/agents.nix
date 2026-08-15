@@ -3,7 +3,6 @@ let
   inherit (import ./lanes.nix) mkLane;
 in
 {
-  # ── DeepSeek-V4-Pro: ultra-premium, security, architecture ──────────────────
   zeus = mkLane {
     modelTier = models.deepseekPro;
     variant = "xhigh";
@@ -29,7 +28,6 @@ in
     description = "Complex debugger. Multi-system root cause analysis spanning services, hard-to-reproduce failures. Use oracle for single-system debug; use heracles for cross-system investigations.";
   };
 
-  # ── Tier 1 (deepseekPro): orchestration, planning, research ─────────────
   sisyphus = mkLane {
     modelTier = models.deepseekPro;
     variant = "xhigh";
@@ -55,7 +53,6 @@ in
     description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
   };
 
-  # ── DeepSeek-V4-Pro: coding, implementation, review, reasoning ────────────
   hephaestus = mkLane {
     modelTier = models.deepseekPro;
     variant = "high";

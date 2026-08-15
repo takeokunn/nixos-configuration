@@ -13,7 +13,6 @@ let
 in
 with epkgs;
 [
-  # Basic
   org-journal
   org-generate
   org-pomodoro
@@ -26,27 +25,20 @@ with epkgs;
   org-preview-html
   doclive
 
-  # Theme
   org-superstar
 
-  # Content
   toc-org
 
-  # Presentation
   org-tree-slide
 
-  # Org Link
   orgit
 
-  # Org Agenda
   org-super-agenda
   org-hyperscheduler
 
-  # Org External Tools
   org-redmine
   org-ai
 
-  # Org Babel
   ob-async
   ob-fish
   ob-rust
@@ -70,7 +62,6 @@ with epkgs;
   ob-prolog
   org-nix-shell
 
-  # Org Publish
   ox-gfm
   ox-zenn
   ox-hatena
@@ -78,7 +69,6 @@ with epkgs;
   ox-hugo
   ox-typst
 
-  # Org Roam
   org-roam
   consult-org-roam
   org-roam-ui
@@ -86,7 +76,6 @@ with epkgs;
   org-roam-ql
   org-roam-ql-ql
 
-  # Citar (Bibliography)
   citar
   citar-embark
   citar-org-roam
