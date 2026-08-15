@@ -3657,11 +3657,23 @@ __fzf_ghq_new_worktree.fish: an explicit-refspec fetch of origin/main
         (error "my/ghq--resolve-base-ref: cannot resolve a base ref in %s" repo-path)))
 
   (defun my/ghq--link-state (repo-path target-path)
-    "Symlink REPO-PATH's shared .state/.serena/memories and .state/.claude into
-TARGET-PATH, mirroring __fzf_ghq_new_worktree.fish. Skips (with a message)
-any target the checkout already provides as a real path or existing symlink,
+    "Link or copy REPO-PATH's shared .state/ contents into TARGET-PATH,
+mirroring __fzf_ghq_new_worktree.fish. .state/.serena/memories and
+.state/.claude are symlinked, so a memory written in one worktree stays
+visible from every other worktree of the same repository. .state/.envrc and
+.state/.env are instead copied: unlike the symlinked pair, per-worktree
+environment settings are meant to diverge from that shared file
+independently once created — a one-shot snapshot rather than something
+every worktree must keep seeing live. Every target the checkout already
+provides as a real path or existing symlink is skipped (with a message),
 matching fish's `test -e \"$dst\"; or test -L \"$dst\"' shadow guard exactly
-\(file-exists-p alone would miss a broken symlink; file-symlink-p covers it)."
+\(file-exists-p alone would miss a broken symlink; file-symlink-p covers it).
+A missing .envrc/.env source is skipped silently, since most repositories
+have neither. Immediately after a successful .envrc copy specifically (not
+.env), runs `direnv allow' on TARGET-PATH when a `direnv' executable is
+available; a failed or unavailable direnv is non-fatal, and a failure (as
+opposed to unavailability) is reported via `message', mirroring fish's
+stderr warning on the same failure."
     (let ((state-dir (expand-file-name ".state" repo-path)))
       (make-directory (expand-file-name ".serena/memories" state-dir) t)
       (make-directory (expand-file-name ".claude" state-dir) t)
@@ -3672,20 +3684,44 @@ matching fish's `test -e \"$dst\"; or test -L \"$dst\"' shadow guard exactly
               (message "my/ghq--link-state: %s is provided by the checkout; leaving it unlinked" pair)
             (when (file-directory-p src)
               (make-directory (file-name-directory dst) t)
-              (make-symbolic-link src dst)))))))
+              (make-symbolic-link src dst)))))
+      (dolist (name '(".envrc" ".env"))
+        (let ((src (expand-file-name name state-dir))
+              (dst (expand-file-name name target-path)))
+          (cond
+           ((or (file-exists-p dst) (file-symlink-p dst))
+            (message "my/ghq--link-state: %s is provided by the checkout; leaving it uncopied" name))
+           ((not (file-exists-p src)) nil)
+           (t
+            (copy-file src dst)
+            (when (and (string= name ".envrc") (executable-find "direnv"))
+              (condition-case err
+                  (let ((direnv-exit (call-process "direnv" nil nil nil "allow" target-path)))
+                    (unless (eq direnv-exit 0)
+                      (message "my/ghq--link-state: direnv allow failed for %s (exit %s)" target-path direnv-exit)))
+                (error
+                 (message "my/ghq--link-state: direnv allow failed for %s (%s)" target-path (error-message-string err)))))))))))
 
-  (defun my/ghq-create-worktree (repo-path &optional base-ref)
+  (defun my/ghq-create-worktree (repo-path &optional base-ref naming-mode)
     "Create a new worktree of the bare repository at REPO-PATH, Elisp-native
 equivalent of __fzf_ghq_new_worktree.fish (fish's Serena serena_config.yml
 projects: prune step is deliberately NOT reimplemented here — it needs YAML
 parsing this Emacs config has no library for; that cleanup remains fish's
 job for worktrees created there). BASE-REF, when omitted, is resolved via
-`my/ghq--resolve-base-ref'. Returns the created worktree's absolute path."
+`my/ghq--resolve-base-ref'. NAMING-MODE, when the symbol `branch', names the
+created directory <timestamp>-<sanitized-base-ref> (leading \"origin/\"
+stripped, remaining \"/\" replaced with \"-\") instead of the default
+<timestamp>-<short-sha>, mirroring __fzf_ghq_new_worktree.fish's
+naming_mode = branch case. Returns the created worktree's absolute path."
     (let* ((base-ref (or base-ref (my/ghq--resolve-base-ref repo-path)))
            (base-sha (or (my/ghq--git repo-path "rev-parse" "--short" base-ref)
                          (error "my/ghq-create-worktree: cannot resolve base ref %s in %s" base-ref repo-path)))
            (worktrees-dir (expand-file-name ".worktrees" repo-path))
-           (base-name (format "%s-%s" (format-time-string "%Y%m%dT%H%M%S") base-sha))
+           (base-name (if (eq naming-mode 'branch)
+                          (format "%s-%s"
+                                  (format-time-string "%Y%m%dT%H%M%S")
+                                  (string-replace "/" "-" (string-remove-prefix "origin/" base-ref)))
+                        (format "%s-%s" (format-time-string "%Y%m%dT%H%M%S") base-sha)))
            (target-name base-name)
            (suffix 2))
       (while (file-exists-p (expand-file-name target-name worktrees-dir))
@@ -3697,6 +3733,34 @@ job for worktrees created there). BASE-REF, when omitted, is resolved via
             (error "my/ghq-create-worktree: failed to create worktree at %s: %s" target-path (buffer-string))))
         (my/ghq--link-state repo-path target-path)
         target-path)))
+
+  (defun my/ghq--current-repo-path ()
+    "Resolve the repository path containing `default-directory', mirroring
+__fzf_ghq_new_worktree.fish's no-arg repo-path resolution: ask git for the
+absolute git-common-dir and strip a trailing \"/.git\" suffix, if present, so
+REPO-PATH names the bare repository itself rather than its .git contents."
+    (let (common-dir)
+      (with-temp-buffer
+        (unless (zerop (call-process "git" nil t nil
+                                      "rev-parse" "--path-format=absolute" "--git-common-dir"))
+          (error "my/ghq--current-repo-path: not inside a git repository"))
+        (setq common-dir (string-trim (buffer-string))))
+      (string-remove-suffix "/.git" common-dir)))
+
+  (defun my/ghq-create-worktree-default-branch ()
+    "Create a new worktree of the current repository named after its resolved
+default branch rather than a commit sha, then switch to it via Projectile.
+Elisp equivalent of fish's `worktree_default_branch', which is exactly
+`__fzf_ghq_new_worktree \"\" \"\" branch' — the same base-ref resolution as
+the default flow, with only the created directory's naming changed. This is
+deliberately a standalone command rather than an option inside
+`my/ghq-switch-project's \"[new worktree]\" picker, mirroring fish's own
+separate-command precedent: `worktree_default_branch' is not reachable from
+`fzf_ghq's picker either."
+    (interactive)
+    (let* ((repo-path (my/ghq--current-repo-path))
+           (target (my/ghq-create-worktree repo-path nil 'branch)))
+      (projectile-switch-project-by-name target)))
 
   (defun my/ghq-switch-project ()
     "Two-stage project switch mirroring fish's fzf_ghq: pick a repository,
@@ -3715,10 +3779,19 @@ then hand off to Projectile's own switch machinery so
                 (let ((worktrees (my/ghq-repo-worktrees repo)))
                   (if (null worktrees)
                       (my/ghq-create-worktree repo)
-                    (let ((choice (completing-read "Worktree: " (cons "[new worktree]" worktrees) nil t)))
+                    ;; Raw worktree paths are long and near-identical, so the
+                    ;; picker shows each abbreviated the same way
+                    ;; `my/update-projectile-known-projects' and
+                    ;; `my/update-magit-repository-directories' already
+                    ;; display project roots, while resolving the selection
+                    ;; back to its real, non-abbreviated path via this alist.
+                    (let* ((abbrev-alist (mapcar (lambda (w) (cons (abbreviate-file-name w) w)) worktrees))
+                           (choice (completing-read "Worktree: "
+                                                     (cons "[new worktree]" (mapcar #'car abbrev-alist))
+                                                     nil t)))
                       (if (string= choice "[new worktree]")
                           (my/ghq-create-worktree repo)
-                        choice))))
+                        (or (cdr (assoc choice abbrev-alist)) choice)))))
               repo)))
       (projectile-switch-project-by-name target)))
 

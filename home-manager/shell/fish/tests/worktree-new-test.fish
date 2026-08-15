@@ -48,6 +48,7 @@ set -l expected_full_sha (git -C $ok_root/repo.git rev-parse HEAD)
 set -l repo_git (path resolve $ok_root/repo.git)
 
 set -l ok_lines (fish -c "
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/__fzf_ghq_new_worktree.fish
     source $func_dir/worktree_new.fish
     cd $repo_git
@@ -101,6 +102,7 @@ if git -C $fail_dir rev-parse --show-toplevel >/dev/null 2>&1
     _fail "precondition violated: $fail_dir is unexpectedly inside a git repository, cannot exercise the failure path"
 else
     set -l fail_lines (fish -c "
+        source $func_dir/__fzf_ghq_resolve_default_ref.fish
         source $func_dir/__fzf_ghq_new_worktree.fish
         source $func_dir/worktree_new.fish
         cd $fail_dir

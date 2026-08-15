@@ -102,15 +102,7 @@ function __fzf_ghq_new_worktree
         end
     end
     if test -z "$base_ref"
-        set base_ref (git -C $repo_path symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | string replace 'refs/remotes/' '')
-    end
-    if test -z "$base_ref"
-        if git -C $repo_path rev-parse --verify --quiet origin/main >/dev/null 2>&1
-            set base_ref origin/main
-        end
-    end
-    if test -z "$base_ref"
-        set base_ref (git -C $repo_path symbolic-ref --short HEAD 2>/dev/null)
+        set base_ref (__fzf_ghq_resolve_default_ref $repo_path)
     end
     if test -z "$base_ref"
         echo "fzf_ghq: cannot resolve a base ref in '$repo_path'" >&2
@@ -186,6 +178,31 @@ function __fzf_ghq_new_worktree
         end
         mkdir -p (dirname "$dst")
         ln -sfn "$src" "$dst"
+    end
+
+    # .envrc and .env are copied rather than symlinked: direnv and dotenv
+    # tooling expect a real file, and a per-worktree copy lets one worktree
+    # edit its own environment without affecting siblings. Same
+    # checkout-shadowing guard as the symlink loop above -- a repository that
+    # tracks its own .envrc/.env must not have it overwritten by the shared
+    # copy.
+    for name in .envrc .env
+        set -l src "$state_dir/$name"
+        set -l dst "$target_path/$name"
+        if test -e "$dst"; or test -L "$dst"
+            echo "fzf_ghq: $name is provided by the checkout; leaving it un-copied" >&2
+            continue
+        end
+        test -f "$src"; or continue
+        cp "$src" "$dst"
+        if test "$name" = .envrc
+            if command -v direnv >/dev/null 2>&1
+                set -l direnv_allow_output (direnv allow "$target_path" 2>&1)
+                if test $status -ne 0
+                    echo "fzf_ghq: direnv allow failed ($direnv_allow_output)" >&2
+                end
+            end
+        end
     end
 
     echo "fzf_ghq: created worktree $target_path" >&2

@@ -36,39 +36,25 @@ function worktree_clean
             end
         end
 
-        # Same three-step fallback chain as __fzf_ghq_new_worktree.fish,
-        # replicated rather than called: that helper also creates worktrees
-        # and prunes Serena state, neither of which belongs here.
-        set -l default_ref (git -C $repo symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | string replace 'refs/remotes/' '')
-        if test -z "$default_ref"
-            if git -C $repo rev-parse --verify --quiet origin/main >/dev/null 2>&1
-                set default_ref origin/main
-            end
-        end
-        if test -z "$default_ref"
-            set default_ref (git -C $repo symbolic-ref --short HEAD 2>/dev/null)
-        end
+        # Same three-step fallback chain as __fzf_ghq_new_worktree.fish, now
+        # shared via __fzf_ghq_resolve_default_ref.fish rather than replicated.
+        set -l default_ref (__fzf_ghq_resolve_default_ref $repo)
         if test -z "$default_ref"
             echo "worktree_clean: cannot resolve a default ref in '$repo'; skipping" >&2
             continue
         end
 
-        # Exclude the bare repo's own entry by comparing against git's own
-        # canonical path for it, not $repo verbatim -- mirrors the same
-        # symlink-resolution caveat documented in fzf_ghq.fish/worktree_switch.fish
-        # (git's porcelain output can disagree after symlink resolution, e.g.
-        # /tmp vs /private/tmp). Also exclude $own_worktree unconditionally:
-        # the invoking shell's own current worktree must never be offered as
-        # a deletion candidate.
-        set -l repo_git_dir (git -C $repo rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+        # __fzf_ghq_worktree_paths already excludes the bare repo's own entry
+        # (comparing against git's own canonical path, not $repo verbatim --
+        # mirrors the symlink-resolution caveat documented in
+        # fzf_ghq.fish/worktree_switch.fish, e.g. /tmp vs /private/tmp).
+        # Also exclude $own_worktree unconditionally here: the invoking
+        # shell's own current worktree must never be offered as a deletion
+        # candidate, and the helper has no notion of "own worktree" to do
+        # that exclusion itself.
         set -l worktree_paths
-        for line in (git -C $repo worktree list --porcelain)
-            if string match -q 'worktree *' -- $line
-                set -l wt_path (string replace -r '^worktree ' '' -- $line)
-                if test "$wt_path" != "$repo_git_dir" -a "$wt_path" != "$own_worktree"
-                    set -a worktree_paths $wt_path
-                end
-            end
+        for wt in (__fzf_ghq_worktree_paths $repo)
+            test "$wt" != "$own_worktree"; and set -a worktree_paths $wt
         end
 
         for wt in $worktree_paths
