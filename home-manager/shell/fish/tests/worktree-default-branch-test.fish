@@ -51,6 +51,7 @@ set -l expected_full_sha (git -C $repo_git rev-parse HEAD)
 set -l branches_before (git -C $repo_git branch --list)
 
 set -l ok_lines (fish -c "
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/__fzf_ghq_new_worktree.fish
     source $func_dir/worktree_default_branch.fish
     cd $repo_git
@@ -130,6 +131,7 @@ else
 end
 
 set -l slash_lines (fish -c "
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/__fzf_ghq_new_worktree.fish
     source $func_dir/worktree_default_branch.fish
     cd $slash_repo_git
@@ -173,6 +175,7 @@ git clone -q --bare $coll_root/src $coll_root/repo.git
 set -l coll_repo_git (path resolve $coll_root/repo.git)
 
 set -l coll_lines (fish -c "
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/__fzf_ghq_new_worktree.fish
     source $func_dir/worktree_default_branch.fish
     cd $coll_repo_git

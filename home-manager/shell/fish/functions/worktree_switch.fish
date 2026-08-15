@@ -11,19 +11,11 @@ function worktree_switch
     end
     set -l repo_path (string replace -r '/\.git$' '' -- $git_common_dir)
 
-    # Exclude the bare repo's own entry by comparing against git's own
-    # canonical path for it, not $repo_path verbatim -- mirrors the same
-    # symlink-resolution caveat documented in fzf_ghq.fish.
-    set -l repo_git_dir (git -C $repo_path rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
-    set -l worktree_paths
-    for line in (git -C $repo_path worktree list --porcelain)
-        if string match -q 'worktree *' -- $line
-            set -l wt_path (string replace -r '^worktree ' '' -- $line)
-            if test "$wt_path" != "$repo_git_dir"
-                set -a worktree_paths $wt_path
-            end
-        end
-    end
+    # __fzf_ghq_worktree_paths already excludes the bare repo's own entry
+    # (comparing against git's own canonical path, not $repo_path verbatim --
+    # see that function for the symlink-resolution rationale, e.g. /tmp vs
+    # /private/tmp).
+    set -l worktree_paths (__fzf_ghq_worktree_paths $repo_path)
 
     if test (count $worktree_paths) -eq 0
         echo "worktree_switch: no worktrees found for this repository" >&2

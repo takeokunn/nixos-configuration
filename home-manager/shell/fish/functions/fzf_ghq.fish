@@ -16,23 +16,10 @@ function fzf_ghq
 
     if test "$is_bare" = true
         # Stage 2: bare repos hold no working files themselves, so route to
-        # one of their worktrees instead. Enumerate via `git worktree list`
-        # rather than globbing .worktrees/ so externally registered
-        # worktrees are also picked up. Exclude the bare repo's own entry by
-        # comparing against git's own canonical path for it, not $repo
-        # verbatim: `ghq list --full-path` and git's porcelain output can
-        # disagree after symlink resolution (e.g. /tmp vs /private/tmp),
-        # which would otherwise leak the bare repo itself into the picker.
-        set -l repo_git_dir (git -C $repo rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
-        set -l worktree_paths
-        for line in (git -C $repo worktree list --porcelain)
-            if string match -q 'worktree *' -- $line
-                set -l wt_path (string replace -r '^worktree ' '' -- $line)
-                if test "$wt_path" != "$repo_git_dir"
-                    set -a worktree_paths $wt_path
-                end
-            end
-        end
+        # one of their worktrees instead. __fzf_ghq_worktree_paths enumerates
+        # via `git worktree list` and excludes the bare repo's own entry; see
+        # that function for the symlink-safety rationale.
+        set -l worktree_paths (__fzf_ghq_worktree_paths $repo)
 
         if test (count $worktree_paths) -eq 0
             set target (__fzf_ghq_new_worktree $repo)

@@ -6,6 +6,7 @@
 # against a scratch $HOME and scratch bare+clone git repos under mktemp.
 
 set -l script_dir (status dirname)
+source $script_dir/../__fzf_ghq_resolve_default_ref.fish
 source $script_dir/../__fzf_ghq_new_worktree.fish
 
 set -g TESTS_PASSED 0

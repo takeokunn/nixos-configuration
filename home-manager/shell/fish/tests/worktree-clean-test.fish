@@ -123,6 +123,8 @@ set -l s1_lines (fish -c "
     set -lx PATH $s1_stub_dir \$PATH
     set -lx GHQ_ROOT $s1_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s1_root
     worktree_clean
@@ -175,6 +177,8 @@ set -l s2_lines (fish -c "
     set -lx PATH $s2_stub_dir \$PATH
     set -lx GHQ_ROOT $s2_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s2_root
     worktree_clean
@@ -219,6 +223,8 @@ set -l s3_lines (fish -c "
     set -lx PATH $s3_stub_dir \$PATH
     set -lx GHQ_ROOT $s3_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s3_root
     worktree_clean
@@ -269,6 +275,8 @@ set -l s4_lines (fish -c "
     set -lx PATH $s4_stub_dir \$PATH
     set -lx GHQ_ROOT $s4_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s4_wt
     worktree_clean
@@ -322,6 +330,8 @@ make_fzf_stub $s5_stub_dir
 set -l s5_lines (fish -c "
     set -lx PATH $s5_stub_dir \$PATH
     set -lx GHQ_ROOT $s5_ghq_root
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s5_root
     worktree_clean
@@ -371,6 +381,8 @@ set -l s6_lines (fish -c "
     set -lx PATH $s6_stub_dir \$PATH
     set -lx GHQ_ROOT $s6_ghq_root
     set -lx FZF_STUB_SELECT_INDICES '1 2'
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s6_root
     worktree_clean
@@ -427,6 +439,8 @@ set -l s7_lines (fish -c "
     set -lx PATH $s7_stub_dir \$PATH
     set -lx GHQ_ROOT $s7_ghq_root
     set -lx FZF_STUB_SELECT_INDICES '1 2'
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s7_root
     worktree_clean
@@ -487,6 +501,8 @@ set -l s8_lines (fish -c "
     set -lx PATH $s8_stub_dir \$PATH
     set -lx GHQ_ROOT $s8_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s8_root
     worktree_clean
@@ -543,6 +559,8 @@ set -l s9_lines (fish -c "
     set -lx PATH $s9_stub_dir \$PATH
     set -lx GHQ_ROOT $s9_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s9_root
     worktree_clean
@@ -588,6 +606,8 @@ set -l s10_lines (fish -c "
     set -lx PATH $s10_stub_dir \$PATH
     set -lx GHQ_ROOT $s10_ghq_root
     set -lx FZF_STUB_SELECT_INDICES 1
+    source $func_dir/__fzf_ghq_worktree_paths.fish
+    source $func_dir/__fzf_ghq_resolve_default_ref.fish
     source $func_dir/worktree_clean.fish
     cd $s10_root
     worktree_clean
