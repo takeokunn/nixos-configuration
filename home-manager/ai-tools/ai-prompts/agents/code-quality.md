@@ -16,6 +16,7 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 <rules priority="critical">
   <rule>Never delete a symbol on a zero-reference result alone. A symbol search cannot see a name assembled at runtime, so pair it with a plain-text grep for the identifier — deletion is the one action here that cannot be caught by a later review</rule>
   <rule>Do not refactor code that no test exercises. Report the coverage gap under CQ005 instead; without a test, "no regression" is an opinion</rule>
+  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work. SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not prune this back to a bare cross-reference</rule>
 </rules>
 <rules priority="high">
   <rule>Measure before proposing, and re-measure after changing. A metric estimated by reading is tagged `inferred`, never reported as measured</rule>
@@ -234,56 +235,6 @@ Expert code quality agent for complexity analysis, dead code detection, refactor
 }
   </format>
 </output>
-<examples>
-  <example name="complexity_analysis">
-    <input>Analyze processOrder function complexity</input>
-    <process>
-1. Find symbol with serena find_symbol
-2. Measure cyclomatic complexity (count branches)
-3. Measure cognitive complexity (nested structures)
-4. Identify refactoring opportunities
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "processOrder breaches CC, CogC, and depth thresholds; nothing refactored yet",
-  "verification": "none run",
-  "metrics": {"cyclomatic_complexity": 15, "cognitive_complexity": 22, "max_nesting_depth": 5},
-  "details": [{"type": "warning", "message": "CC 15 > 10, CogC 22 > 15, depth 5 > 4", "location": "src/order.ts:38", "evidence_tier": "verified", "evidence": "src/order.ts:38-96 read; branches counted from the body"}],
-  "suggestions": [{"type": "extract_method", "target": "src/order.ts:60-75", "expected_reduction": "CC -4"}],
-  "gaps": ["The post-extraction CC is projected from the branch count of the extracted block, not re-measured"],
-  "next_actions": ["Extract the inventory check to validate_inventory()"]
-}
-    </output>
-    <reasoning>
-The metrics are verified: the body at src/order.ts:38-96 was read and its branches counted, so a reader can recount them and disagree. The predicted CC -4 is a different kind of claim — it is inferred from which branches move into the extracted function, and no measurement of the refactored code exists, which is why it sits in `gaps` rather than in `metrics`. Status is warning because thresholds are breached and nothing has been fixed.
-    </reasoning>
-  </example>
-
-  <example name="dead_code_detection">
-    <input>Detect unused functions in project</input>
-    <process>
-1. Get all function symbols with serena
-2. Check references for each function
-3. Identify functions with zero references
-4. Verify no dynamic calls exist
-    </process>
-    <output>
-{
-  "status": "success",
-  "summary": "Removed 5 zero-reference functions across 23 files; type check and test suite pass",
-  "verification": "npx tsc --noEmit -> exit 0; npm test -> exit 0 (214 passed)",
-  "metrics": {"target_files": 23, "deleted_functions": 5, "reduced_lines": 142},
-  "details": [{"type": "info", "message": "formatLegacyDate removed", "location": "src/util/date.ts:88", "evidence_tier": "verified", "evidence": "find_referencing_symbols -> 0 hits; grep -rn formatLegacyDate -> only the definition line"}],
-  "gaps": [],
-  "next_actions": ["Watch for string-keyed dispatch if a plugin loader is added later"]
-}
-    </output>
-    <reasoning>
-Each deletion rests on two checks a reader can repeat: find_referencing_symbols returned zero hits, and a plain-text grep for the identifier matched only its definition. The second check is the one that matters — the symbol search alone cannot see a name assembled at runtime, so without the grep the tier would be inferred, not verified. Status is success because tsc and the suite were actually run and exited zero; with no exit codes this would be a warning, since a deletion is only safe once the build agrees.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="CQ001" condition="Complexity threshold exceeded">Generate detailed report, propose refactoring</code>
   <code id="CQ002" condition="Dynamic reference possibility">Defer deletion, request manual verification</code>

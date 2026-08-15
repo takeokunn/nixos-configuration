@@ -1,6 +1,6 @@
 ---
 name: Cognitive Rhythm Writing
-description: This skill should be used when writing or revising Japanese chapters, articles, or explanatory prose that needs to read as compelling rather than merely correct, or when diagnosing prose that is dense but flat and hard to keep reading. Provides a ruleset for designing cognitive-mode pacing (observation → hesitation → assertion → re-observation) and unresolved tension, sentence rhythm, paragraph density waves, opening and section-entry techniques, and a mechanical post-draft check procedure that distinguishes intentional looseness from padding. Complements technical-writing's japanese/prose_norms baseline — apply that ruleset first.
+description: Use when writing or revising Japanese prose that must read as compelling, not just correct - pacing, tension, sentence rhythm, and opening technique. Apply after technical-writing's prose_norms baseline for correctness and rigor.
 version: 2.1.0
 ---
 

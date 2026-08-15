@@ -1,11 +1,11 @@
 ---
 name: Define Core
-description: Shared workflow phases and patterns for requirements definition commands. Use this skill when implementing /define or /define-full commands to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
+description: Shared workflow phases and patterns for the /define command. Use this skill when implementing /define to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
 version: 2.2.0
 ---
 
 <purpose>
-Provide shared workflow phases, agent definitions, and patterns that are common to all requirements definition commands (define, define-full). This skill eliminates duplication and ensures consistency across requirements definition workflows.
+Provide the shared workflow phases, agent definitions, and patterns that /define depends on, so the command file does not have to restate them.
 </purpose>
 
 <companion_skills>
@@ -171,7 +171,7 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
   <phase name="finalize" id="core_finalize">
     <objective>Gate on unresolved Outstanding Issues before terminating; let the user choose how to dispose of them rather than silently documenting and ending</objective>
     <step number="1">
-      <action>Evaluate the Outstanding Issues section of the FINAL requirements document. For commands that produce a single document (/define), this is the document from the document phase. SUPPRESSION RULE: when this workflow is inherited as a NON-terminal phase (e.g. /define-full declares it as the `core_workflow` phase that precedes collect_feedback/regenerate), this finalize phase MUST NOT fire at the end of that inherited phase; it is suppressed there and re-invoked EXACTLY ONCE by the consuming command's own terminal step (e.g. /define-full's DEFF-B007 after the regenerate phase), evaluating that command's final document.</action>
+      <action>Evaluate the Outstanding Issues section of the FINAL requirements document — the document produced in the document phase, since /define produces a single document and this finalize phase runs immediately after it.</action>
       <tool>Document inspection</tool>
       <output>Outstanding Issues count (0 means the section reads "none")</output>
     </step>
@@ -229,10 +229,10 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
     <functional_requirements>FR-001 format (mandatory/optional)</functional_requirements>
     <non_functional_requirements>Performance, security, maintainability</non_functional_requirements>
     <technical_specifications>Design policies, impact scope, decisions</technical_specifications>
-    <metrics>
-      <metric name="feasibility">0-100</metric>
-      <metric name="objectivity">0-100</metric>
-    </metrics>
+    <feasibility>State feasibility as the observable condition that supports it — which capability was
+      located at which file:line, which one was not found and where it was searched for — never as a
+      numeric score (DEF-P004). Note explicitly where a requirement rests on an assumption rather than
+      on investigation, in place of an objectivity score.</feasibility>
     <test_requirements>Unit, integration, acceptance criteria</test_requirements>
     <outstanding_issues>Unresolved questions; "none" must be explicitly stated when there are none (the finalize gate's skip-branch keys off this "none" sentinel)</outstanding_issues>
   </format>
@@ -368,13 +368,5 @@ Provide shared workflow phases, agent definitions, and patterns that are common 
     <applies>All delegation requirements</applies>
     <applies>All rules and enforcement</applies>
     <note>finalize gate runs immediately after document, since /define produces a single document</note>
-  </command>
-  <command name="define-full">
-    <applies>The full workflow, loaded in the prepare phase and followed phase by phase</applies>
-    <applies>All agents plus plan agent</applies>
-    <applies>Core execution graph as base, extended with collect_feedback and regenerate phases</applies>
-    <applies>All delegation requirements</applies>
-    <applies>All rules and enforcement, plus feedback-specific behaviors</applies>
-    <note>finalize gate is DEFERRED until after the regenerate phase and evaluates the final document's remaining issues; "Resolve now" patches the final document without triggering a second feedback/regenerate cycle (preserves the maximum-one-iteration rule)</note>
   </command>
 </usage_in_commands>

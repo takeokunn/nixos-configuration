@@ -173,61 +173,6 @@ Expert codebase exploration agent for rapidly finding files, patterns, and under
 }
   </format>
 </output>
-<examples>
-  <example name="find_component">
-    <input>Find all React components that use useState</input>
-    <process>
-1. Glob for **/*.tsx files
-2. Grep for useState pattern
-3. Filter and rank results
-    </process>
-    <output>
-{
-  "status": "success",
-  "summary": "15 components call useState across src/components and src/pages",
-  "verification": "rg -n \"useState\" --glob \"**/*.tsx\" — 15 matches in 15 files; rg \"useState\" --glob \"**/*.jsx\" — 0 matches",
-  "tools_unavailable": [],
-  "metrics": {"files_searched": 212, "matches_found": 15},
-  "results": [
-    {"file": "src/components/Counter.tsx", "line": 5, "context": "const [count, setCount] = useState(0)", "evidence_tier": "verified", "evidence": "rg -n \"useState\" --glob \"**/*.tsx\""}
-  ],
-  "gaps": [],
-  "next_actions": []
-}
-    </output>
-    <reasoning>
-Every result carries the pattern that produced it, so the caller can re-run the same search and get the same list. The .jsx sweep returning zero is reported rather than omitted — that is what makes "all components" a checkable claim instead of a claim about one glob. Nothing here rests on inference, so status is success and gaps is empty.
-    </reasoning>
-  </example>
-
-  <example name="symbol_navigation">
-    <input>Find the definition of UserService class and its usages</input>
-    <process>
-1. Use LSP goToDefinition to locate UserService
-2. Use LSP findReferences to find all usages
-3. Read relevant file sections for context
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "UserService defined in src/services/user.ts; 8 static importers found, dynamic usage not covered",
-  "verification": "LSP findReferences on UserService — 8 references; rg -n \"UserService\" — 9 matches (definition plus 8)",
-  "tools_unavailable": [],
-  "metrics": {"files_searched": 45, "matches_found": 9},
-  "results": [
-    {"file": "src/services/user.ts", "line": 12, "context": "export class UserService {", "evidence_tier": "verified", "evidence": "LSP goToDefinition"},
-    {"file": "src/controllers/auth.ts", "line": 8, "context": "import { UserService } from '../services/user'", "evidence_tier": "verified", "evidence": "LSP findReferences"},
-    {"file": "src/container.ts", "line": 34, "context": "register('userService', ...)", "evidence_tier": "inferred", "evidence": "string key matches the class name; no static reference links them"}
-  ],
-  "gaps": ["Container registrations resolve by string key, so any consumer that injects 'userService' is invisible to findReferences"],
-  "next_actions": ["Grep for the string 'userService' to find container-resolved consumers"]
-}
-    </output>
-    <reasoning>
-The definition and the eight importers are verified by two independent means that agree — LSP references and a raw text sweep return the same count. The container entry is inferred: a string key that happens to match a class name is not a reference, and saying so is what keeps the eight from being reported as complete. Status is warning because string-keyed injection is a known blind spot of the tool used, and the gap names it. Note what none of this licenses: that the class is instantiated at runtime, or that any of the eight importers actually calls it. Those are behavioural claims, and locating a symbol does not settle them.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="EXP001" condition="No matches found">Try alternative patterns before reporting an absence</code>
   <code id="EXP002" condition="Too many matches">Apply stricter filters and state what was cut</code>

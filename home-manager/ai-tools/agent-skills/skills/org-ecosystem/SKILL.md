@@ -1,6 +1,6 @@
 ---
 name: Org Ecosystem
-description: This skill should be used when the user asks to "write org", "org-mode", "org file", ".org file", "org syntax", "org document", "org babel", "org export", "org agenda", "org capture", "GTD", "literate programming", "org publishing", or "org-mode workflow". Provides comprehensive Org-mode patterns and best practices.
+description: Use for Org-mode, covering org files, syntax, babel, export, agenda, capture, GTD, literate programming, and publishing workflows.
 version: 2.1.0
 ---
 

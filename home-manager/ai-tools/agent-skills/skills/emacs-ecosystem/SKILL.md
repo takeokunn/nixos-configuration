@@ -1,6 +1,6 @@
 ---
 name: Emacs Ecosystem
-description: This skill should be used when the user asks to "write elisp", "emacs config", "init.el", "use-package", ".el file", "emacs lisp", or "magit". Use it also for Emacs runtime hazards — hook and lifecycle ordering, error boundaries and why `condition-case` does not catch `quit`, overlays versus text properties, indirect buffers, buffer-local state lost across a major-mode change, keymap precedence and minor-mode shadowing, subprocess handling with `make-process` and `accept-process-output`, remote paths that block or that subprocesses do not follow, and untrusted input reaching Emacs APIs that look inert. Provides comprehensive Emacs ecosystem patterns and best practices. For org-mode, use org-ecosystem skill.
+description: Use for Emacs Lisp, init.el, use-package, and Emacs runtime hazards such as hook ordering, condition-case versus quit, overlays versus text properties, buffer-local state, keymap precedence, and subprocess handling. For org-mode, see org-ecosystem.
 version: 2.4.0
 ---
 

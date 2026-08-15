@@ -1,6 +1,6 @@
 ---
 name: Go Ecosystem
-description: This skill should be used when the user asks to "write go", "golang", "go.mod", "go module", "go test", "go build", or works with Go language development. Provides comprehensive Go ecosystem patterns and best practices.
+description: Use for Go, covering go.mod, go modules, go test, go build, and Go language development patterns.
 version: 2.1.0
 ---
 

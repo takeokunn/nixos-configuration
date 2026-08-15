@@ -1,6 +1,6 @@
 ---
 name: context7-usage
-description: Context7 MCP documentation retrieval patterns for up-to-date library and API references. Use this skill whenever current library docs, API signatures, version-specific behavior, or migration notes are needed.
+description: Use for Context7 MCP documentation retrieval — current library docs, API signatures, version-specific behavior, or migration notes, to avoid stale API assumptions.
 version: 2.1.0
 ---
 

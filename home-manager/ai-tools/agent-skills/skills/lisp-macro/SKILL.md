@@ -1,6 +1,6 @@
 ---
 name: Lisp Macro Architecture
-description: This skill should be used when the user asks to "write a macro", "defmacro", "design a DSL", "build a compiler-time code transformer", "hygienic macro", "macro hygiene", "code walker", "CPS transform", "anaphoric macro", "once-only", "g!-symbol", "duality of syntax", "pandoric macro", "On Lisp", "Let Over Lambda", or works with compile-time metaprogramming in Common Lisp or Emacs Lisp. Provides the canonical technique catalog (On Lisp, Let Over Lambda) plus an engineering discipline — phase separation, hygiene, evaluation-order preservation, compile-time diagnostics — for production-quality macros and DSLs. Also covers auditing a source-to-source rewriter or formatter, where a clean reparse does not prove correctness — whitespace transformed inside atom spans, dialect-blind operator tables, discarded reader prefixes, comments absent from the node tree. For general CL/Elisp language basics, defer to common-lisp-ecosystem / emacs-ecosystem.
+description: Use when writing a macro, defmacro, DSL, hygienic macro, code walker, CPS transform, anaphoric macro, once-only, g!-symbol, or pandoric macro in Common Lisp or Emacs Lisp — including auditing a source-to-source rewriter. Defer to common-lisp-ecosystem / emacs-ecosystem for language basics.
 version: 2.4.0
 ---
 

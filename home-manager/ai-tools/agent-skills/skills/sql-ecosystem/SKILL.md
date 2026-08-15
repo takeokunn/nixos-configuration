@@ -1,6 +1,6 @@
 ---
 name: SQL Ecosystem
-description: This skill should be used when working with SQL databases, "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE TABLE", "JOIN", "INDEX", "EXPLAIN", transactions, or database migrations. Provides comprehensive SQL patterns across PostgreSQL, MySQL, and SQLite.
+description: Use when working with SQL databases — SELECT/INSERT/UPDATE/DELETE, CREATE TABLE, JOIN, INDEX, EXPLAIN, transactions, or migrations — across PostgreSQL, MySQL, and SQLite.
 version: 2.1.0
 ---
 

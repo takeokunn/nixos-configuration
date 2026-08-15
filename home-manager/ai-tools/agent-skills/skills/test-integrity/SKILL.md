@@ -1,6 +1,6 @@
 ---
 name: test-integrity
-description: This skill should be used when a test suite is green but its value is in doubt — auditing whether a passing test proves anything, investigating a "false green", a suite that silently collected zero tests, a runner glob or manifest that dropped a test file, an assertion that no outcome could violate, a mock or seed that makes the code under test unnecessary, a guard or threshold with no test proving it can fire, a teardown failure masking a real one, a substitution that was installed but never consulted, a test running against an implementation loaded from outside the tree being changed, or before trusting a green run as evidence that a change is correct. Keywords — false green, vacuous test, tautological assertion, test not registered, zero tests collected, test discovery, dead guard, unreachable branch, mutation check, teardown masking, implementation provenance, test double, exit status not asserted.
+description: Use when a test suite is green but its value is in doubt — false greens, zero tests collected, vacuous assertions, dead guards, or mocks that make the code under test unnecessary. Contrast testing-patterns (designing tests); this skill asks whether a passing suite proves anything.
 version: 2.2.0
 ---
 

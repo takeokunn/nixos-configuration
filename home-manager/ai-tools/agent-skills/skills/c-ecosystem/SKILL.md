@@ -1,6 +1,6 @@
 ---
 name: C Ecosystem
-description: This skill should be used when working with C projects, "C11", "C17", "C23", "Makefile", "gcc", "clang", "valgrind", "getopt", or C language patterns. Provides comprehensive C23 and modern C patterns, memory management, and CLI development best practices.
+description: Use for C projects - C11/C17/C23 language patterns, Makefile, gcc/clang toolchain, valgrind, getopt, memory management, and CLI development.
 version: 2.1.0
 ---
 

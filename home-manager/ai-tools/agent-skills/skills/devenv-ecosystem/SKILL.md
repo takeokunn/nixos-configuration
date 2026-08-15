@@ -1,6 +1,6 @@
 ---
 name: Devenv Ecosystem
-description: This skill should be used when the user asks to "devenv", "devenv.nix", "languages.*", "services.*", "git-hooks", "devenv shell", "devenv up", "devenv build", or works with devenv development environments. Provides comprehensive devenv configuration patterns.
+description: Use when working with devenv.nix, languages.*/services.* options, git-hooks, devenv shell/up/build, or devenv development environments.
 version: 2.1.0
 ---
 

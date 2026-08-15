@@ -147,8 +147,8 @@ Identify root causes from error messages and anomalous behavior, providing fact-
       fitting that noise, and a narrowing loop never runs out of plausible next moves, so it will not
       stop on its own. After three narrowing steps without a boundary that reproduces, stop narrowing:
       re-run one identical probe to test reproducibility, then report what has been ruled out and hand
-      the scope decision to the user. This mirrors the single-iteration limits /execute-full and
-      /define-full already impose, for the same reason.</iteration_rationale>
+      the scope decision to the user. This mirrors the single-iteration limit /execute-full already
+      imposes, for the same reason.</iteration_rationale>
   </phase>
   <reflection_checkpoint id="investigation_quality">
     <gate>Answer each check with a concrete artifact. A bare "yes" does not clear the gate.</gate>

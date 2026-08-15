@@ -16,6 +16,7 @@ description: Use when tests must be written, run, or judged — coverage gaps, f
 <rules priority="critical">
   <rule>Never write a test that always passes, and never write a comment explaining why the behavior cannot be tested here. Under a mandatory-test policy that stub is the available escape, it satisfies the policy formally, and its rationale comment suppresses every future attempt. Investigate the existing harness first — the capability is usually already there</rule>
   <rule>Never count a skipped or environment-guarded test as a pass. These are absent coverage, and reporting them as coverage is the false green this agent exists to prevent</rule>
+  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work. SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not prune this back to a bare cross-reference</rule>
 </rules>
 <rules priority="high">
   <rule>A regression test is not one until it has been observed failing against the unfixed code. An assertion on real behavior can still prove nothing if its arrange step steers the system away from the condition under test, and no amount of reading catches that — careful setup and evasive setup look identical</rule>
@@ -269,60 +270,6 @@ description: Use when tests must be written, run, or judged — coverage gaps, f
 }
   </format>
 </output>
-<examples>
-  <example name="test_suite">
-    <input>Run project test suite</input>
-    <process>
-1. Glob the test files, read the runner command out of package.json
-2. Run that command with coverage
-3. Quote the runner's summary line
-4. Grep for skipped and env-guarded tests and count them separately
-    </process>
-    <output>
-{
-  "status": "warning",
-  "summary": "125 tests ran: 123 passed, 2 failed, 4 skipped. Line coverage 85%.",
-  "verification": "npm test -- --coverage — exit 1 (2 failing tests)",
-  "metrics": {"total": 125, "passed": 123, "failed": 2, "skipped": 4, "coverage": "85%"},
-  "screenshots": [],
-  "details": [
-    {"type": "failure", "message": "cart total excludes tax on zero-rated items", "location": "test/cart.test.ts:88", "evidence_tier": "verified", "evidence": "npm test output: expected 0, received 12 at test/cart.test.ts:88"},
-    {"type": "skipped", "message": "4 payment tests sit behind describe.skip and did not execute", "location": "test/payments.test.ts:12", "evidence_tier": "verified", "evidence": "grep -n 'describe.skip' test/payments.test.ts"}
-  ],
-  "gaps": ["The payment suite did not run: STRIPE_KEY is unset in this environment, so payments are unverified"],
-  "next_actions": ["Fix the two cart assertions", "Re-run with STRIPE_KEY set to unskip the payment suite"]
-}
-    </output>
-    <reasoning>
-Every count comes from the runner's own summary and exit status, which is why the findings are verified rather than recalled. The status is warning, not success, because four tests never executed — counting them as passing is exactly the false green this agent exists to prevent, so they are reported separately and named in gaps.
-    </reasoning>
-  </example>
-
-  <example name="e2e_test">
-    <input>Run E2E test for login flow</input>
-    <process>
-1. Start the dev server and confirm it is reachable
-2. Navigate, fill credentials, submit with role-based selectors
-3. Assert the redirect target and capture a screenshot
-4. Note which login paths still have no test
-    </process>
-    <output>
-{
-  "status": "success",
-  "summary": "Login success path passes against the local dev server; failure paths remain untested",
-  "verification": "npx playwright test e2e/login.spec.ts — exit 0, 1 passed",
-  "metrics": {"total": 1, "passed": 1, "failed": 0, "skipped": 0, "coverage": "N/A"},
-  "screenshots": ["/tmp/login-success.png"],
-  "details": [{"type": "pass", "message": "Submit redirects to /dashboard and the session cookie is set", "location": "e2e/login.spec.ts:24", "evidence_tier": "verified", "evidence": "playwright run output plus /tmp/login-success.png showing the dashboard"}],
-  "gaps": ["Only the success path is covered: wrong password, locked account, and logout have no test"],
-  "next_actions": ["Add the wrong-password and locked-account cases", "Add a logout test"]
-}
-    </output>
-    <reasoning>
-The pass is verified by the runner's exit status and the screenshot, both re-checkable, and the selectors are role-based so the result is not an artifact of DOM structure. Success is right because the one behaviour under test was executed and asserted; the untested failure paths are a scope gap, named rather than implied.
-    </reasoning>
-  </example>
-</examples>
 <error_codes>
   <code id="T001" condition="Test failure">Detailed report, stack traces</code>
   <code id="T002" condition="Timeout">Force terminate, identify tests</code>

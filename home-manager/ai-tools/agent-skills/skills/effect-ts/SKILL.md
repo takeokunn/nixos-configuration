@@ -1,6 +1,6 @@
 ---
 name: effect-ts
-description: This skill should be used when the user works with Effect (Effect-TS) — writing or reviewing Effect.Service definitions, Layer composition (Layer.provide/provideMerge/mergeAll), Effect.scoped resource handling, converting imperative try/catch/async code to the Effect error channel, deriving types from Schema (Schema-as-SSOT), or testing Effect code with @effect/vitest, TestClock, and Layer-based mocks. Also covers Layer memoization being per provision graph and the cost of Effect.provide inside an iteration, defects versus typed errors (catchAll does not catch a defect), atomic Ref updates that fold the decision into the update instead of get-decide-set, Queue backpressure choices, fiber lifecycle traps (a start that joins its own fiber, repeat over a level-triggered condition), choosing a safe concurrency width, and Schema traps such as the curried filter and decodeSync throwing before sanitization. Generalized design principles and minimal reference patterns for Effect 3.x.
+description: Use when writing or reviewing Effect (Effect-TS) code — Effect.Service definitions, Layer composition, Effect.scoped resource handling, converting try/catch/async to the Effect error channel, Schema-as-SSOT type derivation, or testing with @effect/vitest and TestClock.
 version: 2.3.0
 ---
 

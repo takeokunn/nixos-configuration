@@ -1,6 +1,6 @@
 ---
 name: PHP Ecosystem
-description: This skill should be used when the user asks to "write php", "php 8", "composer", "phpunit", "pest", "phpstan", "psalm", "psr", "eloquent", "eager loading", "N+1", or works with modern PHP language patterns and configuration. Also covers ORM read design — why a dotted eager-load path through a polymorphic relation silently loads nothing beyond the parent, eager-loading breadth trading a query-count problem for a memory problem, giving a picker or autocomplete its own read shape rather than serving it from the rich domain read, and deciding the failure semantics of a concurrent fan-out before parallelizing independent I/O-bound reads. Provides comprehensive modern PHP ecosystem patterns and best practices.
+description: Use for modern PHP, covering Composer, PHPUnit or Pest, PHPStan or Psalm, PSR, and Eloquent. Also covers eager-loading pitfalls (polymorphic relations, N+1 versus memory tradeoffs), read-shape design, and concurrent fan-out failure semantics.
 version: 2.4.0
 ---
 

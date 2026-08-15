@@ -1,6 +1,6 @@
 ---
 name: sbcl-usage
-description: Practical SBCL (Steel Bank Common Lisp) operations guide. Use this skill whenever the user mentions SBCL execution/debugging, --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, or SLY-based Common Lisp development. Also covers terminating an unresponsive SBCL — interrupt-disabled regions that only SIGKILL ends, timeouts with a kill grace period, subprocess process groups (inherited stdin, expired pgids, EPERM versus ESRCH) — plus isolating a hang by loading the system as a control rather than bisecting project files, sb-thread hazards (condition-wait with a timeout may return without the mutex; never call a user callback under the state lock), and sb-cover coverage being process-global and needing a source manifest to gate on.
+description: Use for SBCL execution and debugging — --script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, SLY development, terminating an unresponsive SBCL, or sb-thread/sb-cover hazards. Complements common-lisp-ecosystem's runtime operations.
 version: 2.5.0
 ---
 

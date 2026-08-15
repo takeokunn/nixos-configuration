@@ -1,6 +1,6 @@
 ---
 name: Common Lisp Ecosystem
-description: This skill should be used when the user asks to "write common lisp", "CLOS", "ASDF", "defpackage", "defsystem", or works with Common Lisp, SBCL, or Coalton. Covers package hygiene (export interns a symbol but does not define it; stub packages contaminating a shared image), condition design with define-condition and a bounded retained payload, never passing data as a format control string, Unicode-aware standard character predicates, validating before normalizing, read-time evaluation via the sharp-dot reader macro and its load-order limits, publishing a file atomically by rename within the target directory, and hash-table keys that must not be caller-owned mutable strings. Also covers ASDF dependency changes across every affected surface and keeping a mutable structure's derived index rebuilt through its mutators.
+description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, defpackage and defsystem. Also covers package hygiene, condition design, format-string injection, Unicode predicates, reader macros, atomic file publishing, and hash-table key safety.
 version: 2.4.0
 ---
 

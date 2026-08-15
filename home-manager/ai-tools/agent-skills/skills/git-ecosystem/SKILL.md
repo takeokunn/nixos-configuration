@@ -1,6 +1,6 @@
 ---
 name: git-ecosystem
-description: This skill should be used when Git is invoked by a program rather than typed by a person — sanitizing the environment of Git subprocesses (GIT_CONFIG_PARAMETERS, GIT_CONFIG_GLOBAL, GIT_CONFIG_COUNT, GIT_CEILING_DIRECTORIES), identifying a repository with git rev-parse --git-common-dir when linked worktrees exist, parsing diff or status output mechanically (--no-ext-diff, --porcelain, -z, plumbing commands), scheduling git maintenance tasks such as loose-objects and incremental-repack, or using git worktree add/list/remove as an isolation primitive — including mirroring a worktree's state back into the shared checkout and the preconditions for removing one. Covers repository identity, hardening Git invocations against config injection, machine-readable inspection, and repository maintenance; branching strategy, worktree placement, and pull-request submission are governed by the execution-workflow skill's branch isolation procedure and the project's Git write rules rather than by this skill.
+description: Use when Git is invoked programmatically — sanitizing subprocess environment against config injection, identifying a repo with git rev-parse --git-common-dir, parsing diff/status machine-readably, or using git worktree for isolation. Branching and PR submission belong to execution-workflow.
 version: 2.3.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: Haskell Ecosystem
-description: This skill should be used when working with Haskell projects, "cabal.project", "stack.yaml", "ghc", "cabal build/test/run", "stack build/test/run", or Haskell language patterns. Provides comprehensive Haskell ecosystem patterns and best practices.
+description: Use for Haskell projects, covering cabal.project, stack.yaml, ghc, cabal or stack build/test/run, and Haskell language patterns.
 version: 2.1.0
 ---
 

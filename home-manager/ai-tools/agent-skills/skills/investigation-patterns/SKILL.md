@@ -1,11 +1,11 @@
 ---
 name: Investigation Patterns
-description: This skill should be used when the user asks to "investigate code", "analyze implementation", "find patterns", "understand codebase", "debug issue", "find bug", "troubleshoot", "bisect", or needs evidence-based code analysis and debugging. Also covers a counter or health check placed inside a conditionally-executed body measuring the gate rather than the phenomenon, bisecting a non-stationary symptom where a boundary that moves between runs invalidates the observation rather than the hypothesis, registries whose consumers break once a second member variant appears, and verifying a completion claim against the artifact it produced rather than a summary of it — including your own prior work. Provides systematic investigation and debugging methodology.
+description: Use when tracing a symptom to its cause — debugging, bisecting, or working out how an unfamiliar implementation behaves. Covers evidence-based analysis, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, and checking a completion claim against the artifact instead of the summary.
 version: 2.4.0
 ---
 
 <purpose>
-  Provide systematic patterns for codebase investigation and debugging, ensuring evidence-based analysis with proper confidence assessment.
+  Provide systematic patterns for codebase investigation and debugging, ensuring evidence-based analysis with every finding tagged by how it is known rather than scored.
 </purpose>
 
 <tools>
@@ -41,23 +41,28 @@ version: 2.4.0
 
 <concepts>
   <concept name="evidence_standards">
-    <description>Standards for collecting and reporting evidence</description>
+    <description>Standards for collecting and reporting evidence, stated as a tier and an observable
+      boundary rather than a self-assessed score. A confidence number produced in the same pass that
+      did the investigation never contradicts that investigation, so nothing downstream ever reads a
+      low score and looks further (CLAUDE.md evidence_and_reporting, core-patterns evidence_tiers).</description>
     <example>
       Citation: Always provide file:line references (path/to/file.ext:line_number)
 
-      Confidence levels:
+      Evidence tier — how a finding is known, never a number:
 
-      - 90-100: Direct code evidence, explicit documentation
-      - 70-89: Strong inference from multiple sources
-      - 50-69: Reasonable inference with some gaps
-      - 0-49: Speculation, insufficient evidence
+      - verified: A command was run, or the exact lines were read; the finding carries the command and
+        its output, or the file:line citation. Anyone can re-run it and get the same answer.
+      - inferred: Derived from evidence that was actually read, but the conclusion itself was never
+        directly observed. State the evidence and the inferential step, so the step can be disputed.
+      - assumed: Taken from convention, prior knowledge, or the user's framing. Nothing in this
+        repository was checked. State what would confirm it.
 
-      Coverage levels:
+      Coverage — the observable boundary of what was examined, not a percentage:
 
-      - 90-100: All relevant files examined
-      - 70-89: Most relevant files examined
-      - 50-69: Key files examined, some gaps
-      - 0-49: Limited examination
+      - Name the files and symbols actually read.
+      - Name what was NOT examined and why (out of scope, not found, deferred).
+      - Name the query that established the boundary — the Grep pattern, the find_referencing_symbols
+        call, the directory walked — so a reader can re-run it and check whether it was exhaustive.
     </example>
   </concept>
 
@@ -167,9 +172,8 @@ version: 2.4.0
         - Source 1: path/to/file.ts:42 - finding description
         - Source 2: path/to/other.ts:15 - finding description</investigation>
       <conclusion>Direct answer based on evidence</conclusion>
-      <metrics>
-        - Confidence: 0-100
-        - Evidence Coverage: 0-100</metrics>
+      <coverage>Evidence tier per finding (verified/inferred/assumed); what was examined, what was not,
+        and the query that established that boundary (evidence_standards)</coverage>
       <recommendations>Suggested actions without implementation</recommendations>
       <unclear_points>Information gaps that would improve the answer</unclear_points>
     </example>
@@ -236,16 +240,16 @@ version: 2.4.0
   </pattern>
 
   <pattern name="synthesis">
-    <description>Synthesize findings with confidence metrics</description>
+    <description>Synthesize findings, each tagged by evidence tier rather than scored</description>
     <decision_tree name="when_to_use">
       <question>Have you collected sufficient evidence from multiple sources?</question>
-      <if_yes>Apply synthesis to combine findings with confidence metrics</if_yes>
-      <if_no>Continue evidence collection to increase coverage</if_no>
+      <if_yes>Apply synthesis to combine findings, each carrying its evidence tier</if_yes>
+      <if_no>Continue evidence collection; name what remains unexamined before concluding</if_no>
     </decision_tree>
     <example>
       Combine evidence from multiple sources
-      Rate confidence based on evidence quality (0-100)
-      Report coverage of relevant code examined (0-100)
+      Tag each finding verified, inferred, or assumed (evidence_standards)
+      Report coverage as what was examined and what was not, with the query that bounded the search
       Identify and document information gaps
     </example>
   </pattern>
@@ -354,7 +358,7 @@ version: 2.4.0
       <section name="integration_points">List the exact file:line locations where new code attaches, and what data each point already has in scope.</section>
       <section name="edge_cases_and_risks">Enumerate edge cases and rank technical risks (low/medium/high), each with a mitigation.</section>
       <section name="change_surface">State explicitly both the files to create or modify AND the files that need no change. Naming the "no change needed" set bounds the blast radius and is as valuable as the change list.</section>
-      <section name="effort_and_confidence">Give a phased plan with a rough effort estimate and a confidence level with its basis.</section>
+      <section name="effort_and_confidence">Give a phased plan with a rough effort estimate, and state the estimate's evidence tier (verified/inferred/assumed) with the basis for that tier — never a numeric confidence.</section>
       <section name="protected_differences">When the task is to align one project with a reference (a sibling service, a ported module, a second plugin in a family), enumerate the divergences that must survive before starting — a different auth scheme, a fixed rather than configurable endpoint, an extra handler the reference lacks, files the reference has that this project should not. The failure mode of conformance work is over-normalization: erasing a divergence that existed for a reason. Writing the protected list up front converts an implicit judgement call into a checkable constraint, the same way change_surface bounds the blast radius by naming what must not change.</section>
     </template>
     <note>Prefer reusing an existing abstraction over inventing one. If the existing abstraction is fundamentally incompatible with the new requirement, say so explicitly and justify a rewrite rather than forcing an ill-fitting extension.</note>
@@ -389,12 +393,12 @@ version: 2.4.0
 
 <best_practices>
   <practice priority="critical">Always provide file:line references for all findings using format path/to/file.ext:line_number</practice>
-  <practice priority="critical">Rate confidence and coverage metrics for all investigation results</practice>
+  <practice priority="critical">Tag every investigation finding with its evidence tier (verified/inferred/assumed) and state coverage as what was examined and what was not, with the query that bounded the search (evidence_standards)</practice>
   <practice priority="critical">Complete investigation before proposing solutions</practice>
   <practice priority="high">Use Serena symbol tools before reading entire files</practice>
   <practice priority="high">Independently verify claims rather than confirming assumptions</practice>
   <practice priority="high">Document information gaps and unclear points</practice>
-  <practice priority="medium">Check multiple sources to increase confidence</practice>
+  <practice priority="medium">Check multiple sources when a finding is still inferred, to see whether it can be raised to verified</practice>
   <practice priority="medium">Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</practice>
   <practice priority="high">Before adding a feature to an unfamiliar codebase, write an architecture analysis: existing patterns, a reference implementation, integration points, risks, and the explicit change surface including files that need no change (architecture_analysis_before_feature)</practice>
   <practice priority="medium">Record work blocked on an external dependency as a deferred decision with checkable revisit conditions, not an open loop (deferred_decision_record)</practice>
@@ -408,7 +412,7 @@ version: 2.4.0
 <anti_patterns>
   <avoid name="speculation">
     <description>Guessing or making claims when evidence is insufficient</description>
-    <instead>Clearly state confidence levels and information gaps; request additional context if needed</instead>
+    <instead>Tag the finding `assumed` and state what would confirm it; request additional context if needed</instead>
   </avoid>
 
   <avoid name="confirming_assumptions">
@@ -429,7 +433,7 @@ version: 2.4.0
 
 <rules priority="critical">
   <rule>Always provide file:line references for all findings using format path/to/file.ext:line_number</rule>
-  <rule>Rate confidence and coverage metrics for all investigation results</rule>
+  <rule>Tag every finding with its evidence tier (verified/inferred/assumed) and state coverage as an observable boundary, never as a numeric metric</rule>
   <rule>Complete investigation before proposing solutions</rule>
 </rules>
 
@@ -437,7 +441,7 @@ version: 2.4.0
   <rule>Use Serena symbol tools before reading entire files</rule>
   <rule>Independently verify claims rather than confirming assumptions</rule>
   <rule>Document information gaps and unclear points</rule>
-  <rule>Check multiple sources to increase confidence</rule>
+  <rule>Check multiple sources when a finding is still inferred, to see whether it can be raised to verified</rule>
   <rule>Use systematic debugging phases (reproduce, isolate, investigate, hypothesize, fix)</rule>
 </rules>
 
@@ -453,10 +457,11 @@ version: 2.4.0
 <constraints>
   <must>Build evidence chains before conclusions</must>
   <must>Cite specific file:line references</must>
-  <must>State confidence levels explicitly</must>
+  <must>Tag every finding's evidence tier explicitly (verified/inferred/assumed)</must>
   <avoid>Speculation without evidence</avoid>
   <avoid>Confirmation bias in hypothesis testing</avoid>
   <avoid>Concluding without exploring alternatives</avoid>
+  <avoid>Numeric confidence or coverage scores in place of an evidence tier</avoid>
 </constraints>
 
 <related_skills>

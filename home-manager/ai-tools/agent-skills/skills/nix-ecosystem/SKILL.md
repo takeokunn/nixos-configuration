@@ -1,6 +1,6 @@
 ---
 name: Nix Ecosystem
-description: This skill should be used when the user asks to "write nix", "nix expression", "flake.nix", "home-manager config", "programs.*", "services.*", "nixpkgs packaging", "buildGoModule", "buildRustPackage", "nix flake check", "overlay", "activation script", or works with Nix language, flakes, or Home Manager. Covers vacuous flake checks that pass because the target platform is absent from the flake's system list (--all-systems), consuming a package through an overlay rather than system packages, pinning by tag enumeration instead of a latest-release endpoint, confirming which module system evaluates a file before concluding an option does not exist, import-from-derivation in cross-platform modules, deriving a version from the source manifest, symlink-safe privileged activation scripts, GC roots and daemon identity, and multicall-binary argv0.
+description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check — including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards.
 version: 2.4.0
 ---
 

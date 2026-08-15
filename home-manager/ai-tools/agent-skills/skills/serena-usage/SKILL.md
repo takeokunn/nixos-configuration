@@ -1,6 +1,6 @@
 ---
 name: Serena Usage
-description: This skill should be used when the user asks to "use serena", "semantic search", "symbol analysis", "find references", "code navigation", "serena memory", or needs Serena MCP guidance. Also covers organising a growing memory corpus as a reference graph — one root entry-point memory linking outward, references that describe what the target covers, and no memory stating when to read itself — instead of a flat set an agent must read entirely, and recovering a parallel subagent's report from its session transcript when the completion notification never arrives. Provides Serena tool usage patterns and orchestration integration. Keywords — a memory body stating current state rather than a changelog, storing the command instead of the count it produced, checking whether what a memory names still exists, stacked frontmatter blocks from a partial edit, finding a duplicate by symptom wording, and a shared active-project pointer misrouting a parallel session's lookup.
+description: Use for Serena MCP work - semantic symbol search, find references, code navigation, memory read/write, and organizing memory as a linked reference graph rather than a flat list. Also covers recovering a subagent's report from its session transcript when a completion notification is lost.
 version: 3.7.0
 ---
 

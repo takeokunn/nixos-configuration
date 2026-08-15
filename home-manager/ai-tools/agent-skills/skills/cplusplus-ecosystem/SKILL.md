@@ -1,6 +1,6 @@
 ---
 name: C++ Ecosystem
-description: This skill should be used when working with C++ projects, CMakeLists.txt, Ninja, clang-tidy, clang-format, GoogleTest, Catch2, or Modern C++ (C++20/23/26) language patterns. Provides comprehensive C++ ecosystem patterns and best practices.
+description: Use for C++ projects - CMake/Ninja build, clang-tidy/clang-format, GoogleTest/Catch2, and Modern C++ (C++20/23/26) language patterns.
 version: 2.1.0
 ---
 

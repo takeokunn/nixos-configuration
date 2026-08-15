@@ -1,6 +1,6 @@
 ---
 name: Core Patterns
-description: Base templates for error escalation, decision criteria, and enforcement, referenced by agents and commands to avoid duplication. Also holds cross-cutting patterns worth loading directly — modelling absence structurally instead of with an in-range sentinel such as 0, -1, or the empty string, deriving a cost estimate from the emitter that actually produces the artifact rather than re-modelling it in a second place, resolving an apparent contradiction between two rulesets by finding the distinguishing condition instead of weakening either, and safe alternatives to destructive Git commands — including mirroring a worktree's state back into the shared checkout with a file sync rather than a branch switch, and the preconditions for removing a worktree — and when a single-pass review should escalate into an independent, skeptical refutation pass, plus that escalation's own failure modes — false positives, lazy rubber-stamp validation, token cost, and shared blindspots between identical models.
+description: Use when authoring an agent or command that needs the shared error-escalation, decision-criteria, or enforcement template — copy them in, since a bare reference to this skill resolves to nothing at runtime. Also covers modelling absence without an in-range sentinel, safe alternatives to destructive Git commands, and when to escalate a review into an independent refutation pass.
 version: 3.2.0
 ---
 
@@ -81,25 +81,21 @@ version: 3.2.0
 
 <patterns>
   <pattern name="error_escalation">
-    <description>Standard 4-level error escalation template</description>
+    <description>Standard 4-level error escalation shape. This follows its consumers rather than
+      leading them: measured across the 13 files under ai-prompts/agents/, all 13 use this flatter
+      `&lt;examples&gt;&lt;example severity="..."&gt;` shape with no `&lt;action&gt;` element, not the
+      nested `&lt;level&gt;` shape this template previously prescribed. The action each severity implies
+      is already stated once, generically, in the `severity_levels` concept above — a per-domain
+      `&lt;action&gt;` here would only restate it with domain wording swapped in, which is what the 13
+      consumers independently decided not to do.</description>
     <example>
 <error_escalation>
-  <level severity="low">
-    <example>Minor issue description</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Unclear or ambiguous situation</example>
-    <action>Document issue, use AskUserQuestion for clarification</action>
-  </level>
-  <level severity="high">
-    <example>Breaking change or blocker</example>
-    <action>STOP, present options to user</action>
-  </level>
-  <level severity="critical">
-    <example>Security risk or data loss</example>
-    <action>BLOCK operation, require explicit user acknowledgment</action>
-  </level>
+  <examples>
+    <example severity="low">Minor issue description</example>
+    <example severity="medium">Unclear or ambiguous situation</example>
+    <example severity="high">Breaking change or blocker</example>
+    <example severity="critical">Security risk or data loss</example>
+  </examples>
 </error_escalation>
     </example>
   </pattern>
@@ -288,24 +284,13 @@ version: 3.2.0
 </patterns>
 
 <error_escalation>
-  <level severity="low">
-    <example>Minor inconsistency in behavior ID format</example>
-    <action>Note in report, proceed</action>
-  </level>
-  <level severity="medium">
-    <example>Missing one boundary test</example>
-    <action>Document issue, add missing test</action>
-  </level>
-  <level severity="high">
-    <example>A decision_criteria factor names a quality to be rated rather than an observable `unmet`
-      condition, so no reader can check which factor decided</example>
-    <action>STOP, restate the factor as a condition that can fail and give it a precedence before
-      proceeding</action>
-  </level>
-  <level severity="critical">
-    <example>Error escalation missing critical level</example>
-    <action>BLOCK operation, require complete 4-level structure</action>
-  </level>
+  <examples>
+    <example severity="low">Minor inconsistency in behavior ID format</example>
+    <example severity="medium">Missing one boundary test</example>
+    <example severity="high">A decision_criteria factor names a quality to be rated rather than an
+      observable `unmet` condition, so no reader can check which factor decided</example>
+    <example severity="critical">Error escalation missing critical level</example>
+  </examples>
 </error_escalation>
 
 <enforcement>

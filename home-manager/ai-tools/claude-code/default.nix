@@ -9,6 +9,8 @@
 let
   ai-prompts-path = ../ai-prompts;
 
+  shared = import ../shared { inherit (pkgs) lib; };
+
   hooksDir = "${config.programs.claude-code.configDir}/hooks";
 
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (_: {
@@ -42,30 +44,10 @@ in
     outputStyle = "Explanatory";
 
     permissions = {
-      deny = [
-        "Bash(rm -rf /*)"
-        "Bash(rm -rf /)"
-        "Bash(sudo rm -:*)"
-        "Bash(chmod 777 /*)"
-        "Bash(chmod -R 777 /*)"
-        "Bash(dd if=:*)"
-        "Bash(mkfs.:*)"
-        "Bash(fdisk -:*)"
-        "Bash(format -:*)"
-        "Bash(shutdown -:*)"
-        "Bash(reboot -:*)"
-        "Bash(halt -:*)"
-        "Bash(poweroff -:*)"
-        "Bash(killall -:*)"
-        "Bash(pkill -:*)"
-        "Bash(nc -l -:*)"
-        "Bash(ncat -l -:*)"
-        "Bash(netcat -l -:*)"
-        "Bash(rm -rf ~:*)"
-        "Bash(rm -rf $HOME:*)"
-        "Bash(rm -rf ~/.ssh*)"
-        "Bash(rm -rf ~/.config*)"
-      ];
+      # FR-008: the raw pattern list is shared/default.nix's bashDenyPatterns (the union of
+      # this list and opencode's own, see that file). Each pattern is wrapped in Claude Code's
+      # own "Bash(<p>)" permission-rule syntax here.
+      deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
     };
 
     env = {
@@ -123,20 +105,33 @@ in
     hooks.PreToolUse = [
       {
         matcher = "Bash";
-        hooks = [
-          {
-            type = "command";
-            command = "${hooksDir}/block-destructive-git";
-          }
-          {
-            type = "command";
-            command = "${hooksDir}/block-bare-cd";
-          }
-          {
-            type = "command";
-            command = "${hooksDir}/enforce-perl";
-          }
-        ];
+        # FR-008: shared/default.nix's guardrailHookNames is the single source of truth for
+        # this roster (codex/default.nix registers the same list, generated with `map`). The
+        # entries here stay spelled out, so the assert below is the whole guard against them
+        # drifting from the shared list -- it fails the build rather than shipping a hook that
+        # is installed and never fires, which is the failure mode this roster exists to prevent
+        # and which went unnoticed once before.
+        hooks =
+          assert
+            shared.guardrailHookNames == [
+              "block-destructive-git"
+              "block-bare-cd"
+              "enforce-perl"
+            ];
+          [
+            {
+              type = "command";
+              command = "${hooksDir}/block-destructive-git";
+            }
+            {
+              type = "command";
+              command = "${hooksDir}/block-bare-cd";
+            }
+            {
+              type = "command";
+              command = "${hooksDir}/enforce-perl";
+            }
+          ];
       }
     ];
 
@@ -165,7 +160,6 @@ in
     "ask"
     "bug"
     "define"
-    "define-full"
     "execute"
     "execute-full"
     "feedback"
@@ -187,18 +181,5 @@ in
       programs.slite.enable = true;
       programs.clickup.enable = true;
     }).config.settings.servers
-    // {
-      serena.command = "${nurPkgs.serena}/bin/serena";
-      serena.args = [
-        "start-mcp-server"
-        "--context"
-        "claude-code"
-        "--enable-web-dashboard"
-        "false"
-      ];
-      deepwiki.type = "http";
-      deepwiki.url = "https://mcp.deepwiki.com/mcp";
-      metabase-mcp.type = "local";
-      metabase-mcp.command = "${nurPkgs.metabase-mcp}/bin/metabase-mcp";
-    };
+    // shared.mcpServers { inherit nurPkgs; };
 }

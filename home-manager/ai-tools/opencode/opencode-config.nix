@@ -4,6 +4,11 @@
   nurPkgs,
 }:
 let
+  inherit (pkgs) lib;
+
+  shared = import ../shared { inherit lib; };
+  sharedServers = shared.mcpServers { inherit nurPkgs; };
+
   providerTimeoutOpts = {
     timeout = 600000;
     chunkTimeout = 60000;
@@ -45,41 +50,26 @@ mcp-servers-nix.lib.mkConfig pkgs {
       "flake.lock"
     ];
 
-    servers.serena.type = "local";
-    servers.serena.command = [
-      "${nurPkgs.serena}/bin/serena"
-      "start-mcp-server"
-      "--context"
-      "claude-code"
-      "--enable-web-dashboard"
-      "false"
-    ];
-
-    servers.deepwiki.type = "http";
-    servers.deepwiki.url = "https://mcp.deepwiki.com/mcp";
-
-    servers."ast-grep".type = "local";
-    servers."ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
-
-    servers.metabase-mcp.type = "local";
-    servers.metabase-mcp.command = [ "${nurPkgs.metabase-mcp}/bin/metabase-mcp" ];
+    # FR-008: serena/deepwiki/metabase-mcp come from shared/default.nix, converted into
+    # mcp-servers-nix's "opencode" flavor shape (explicit type, single argv command list).
+    # ast-grep stays opencode-local, matching claude-code and codex each declaring their own
+    # extra servers.
+    servers = lib.mapAttrs (_: shared.mcpServerToOpencode) sharedServers // {
+      "ast-grep".type = "local";
+      "ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
+    };
 
     permission = {
+      # FR-008: the raw pattern list is shared/default.nix's bashDenyPatterns (the union of
+      # this list and claude-code's own, see that file), run through
+      # `shared.bashDenyPatternToOpencode` first because opencode's matcher reads a literal
+      # ":" rather than expanding claude-code's trailing ":*" spelling — see that function's
+      # comment. Each translated, de-duplicated pattern becomes a `<p> = "deny"` attr here;
+      # "*" = "allow" stays as the explicit default this permission set had before.
       bash = {
         "*" = "allow";
-        "rm -rf /*" = "deny";
-        "rm -rf /" = "deny";
-        "sudo rm -rf *" = "deny";
-        "dd if=*" = "deny";
-        "mkfs.*" = "deny";
-        "fdisk *" = "deny";
-        "shutdown *" = "deny";
-        "reboot *" = "deny";
-        "halt *" = "deny";
-        "poweroff *" = "deny";
-        "killall *" = "deny";
-        "pkill -f *" = "deny";
-      };
+      }
+      // lib.genAttrs shared.bashDenyPatternsOpencode (_: "deny");
       edit = "allow";
       write = "allow";
       read = "allow";
