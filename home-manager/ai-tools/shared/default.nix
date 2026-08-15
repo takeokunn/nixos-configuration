@@ -109,8 +109,7 @@ rec {
   # the colon and keeping the bare "*" (opencode's own "match anything" spelling) restores the
   # intended reach. Entries with no trailing ":*" are already opencode-native and pass through
   # unchanged.
-  bashDenyPatternToOpencode =
-    p: if lib.hasSuffix ":*" p then (lib.removeSuffix ":*" p) + "*" else p;
+  bashDenyPatternToOpencode = p: if lib.hasSuffix ":*" p then (lib.removeSuffix ":*" p) + "*" else p;
 
   # bashDenyPatterns translated into opencode's spelling and de-duplicated: several translated
   # forms (e.g. "dd if=:*" -> "dd if=*") collide with a pattern that was already bare-star in

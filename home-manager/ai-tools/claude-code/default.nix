@@ -106,19 +106,18 @@ in
       {
         matcher = "Bash";
         # FR-008: shared/default.nix's guardrailHookNames is the single source of truth for
-        # this roster (codex/default.nix registers the same list). The entries below stay
-        # spelled out individually rather than generated via `map` over that list: ../ai-prompts/
-        # verify-prompts.sh check (9) statically greps this file's source text for a literal,
-        # per-hook command-string assignment, and a `map`-generated list collapses that down to
-        # one textual occurrence, which reads as every hook unregistered to that check. The
-        # assert below is what keeps this list from silently drifting out of sync with the
-        # shared one instead.
+        # this roster (codex/default.nix registers the same list, generated with `map`). The
+        # entries here stay spelled out, so the assert below is the whole guard against them
+        # drifting from the shared list -- it fails the build rather than shipping a hook that
+        # is installed and never fires, which is the failure mode this roster exists to prevent
+        # and which went unnoticed once before.
         hooks =
-          assert shared.guardrailHookNames == [
-            "block-destructive-git"
-            "block-bare-cd"
-            "enforce-perl"
-          ];
+          assert
+            shared.guardrailHookNames == [
+              "block-destructive-git"
+              "block-bare-cd"
+              "enforce-perl"
+            ];
           [
             {
               type = "command";

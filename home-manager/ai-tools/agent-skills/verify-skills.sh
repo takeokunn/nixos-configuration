@@ -523,8 +523,8 @@ echo "== cross-references =="
 # resolved it at runtime: the referenced body never entered the context, so the referencing file
 # carried an empty slot that read to every later reader as though it were filled. The notation is
 # abolished in favour of the load table plus an explicit Skill call, so what is checked now is that
-# it has not crept back into the skills tree. verify-prompts.sh owns the same check for ai-prompts
-# and it is deliberately not duplicated here.
+# it has not crept back into the skills tree. The scope really is the skills tree only: the gate that
+# used to run this same check over ai-prompts/ has been removed, so nothing covers that side now.
 #
 # `defer_to` and `related_skills` name another skill by slug. A typo sends a reader nowhere and
 # errors nothing, so both spellings of the reference are resolved against the tree.
@@ -587,8 +587,9 @@ echo "== registry fossil =="
 # skills that no longer exist. What remains checkable is that the copy has not come back — a
 # reappearing registry spends resident context on every session to contradict the injected list.
 #
-# The complementary direction, that every skill the load table names actually exists, belongs to
-# verify-prompts.sh, which owns CLAUDE.md's structure. It is deliberately not repeated here.
+# The complementary direction -- that every skill the load table names actually exists -- is not
+# checked anywhere any more. The gate that owned CLAUDE.md's structure has been removed, so a
+# load_table entry naming a skill that was renamed or deleted now fails silently at read time.
 claude_md="$prompts_dir/CLAUDE.md"
 if [ ! -r "$claude_md" ]; then
   fail "registry-fossil check could not run" "CLAUDE.md is not readable at $claude_md"

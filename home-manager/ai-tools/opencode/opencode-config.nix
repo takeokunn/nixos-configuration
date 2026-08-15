@@ -68,7 +68,8 @@ mcp-servers-nix.lib.mkConfig pkgs {
       # "*" = "allow" stays as the explicit default this permission set had before.
       bash = {
         "*" = "allow";
-      } // lib.genAttrs shared.bashDenyPatternsOpencode (_: "deny");
+      }
+      // lib.genAttrs shared.bashDenyPatternsOpencode (_: "deny");
       edit = "allow";
       write = "allow";
       read = "allow";

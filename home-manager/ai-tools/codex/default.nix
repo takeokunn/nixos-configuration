@@ -121,9 +121,9 @@ let
   # double-register every one of those names under opencode. codex has no such overlap:
   # $CODEX_HOME/skills is codex-only.
   customSkillDirEntries = builtins.readDir customSkillsPath;
-  customSkillNames = builtins.filter (
-    name: customSkillDirEntries.${name} == "directory"
-  ) (builtins.attrNames customSkillDirEntries);
+  customSkillNames = builtins.filter (name: customSkillDirEntries.${name} == "directory") (
+    builtins.attrNames customSkillDirEntries
+  );
 
   # A custom skill and a command-derived codex skill both resolve to
   # codex/skills/<name>/SKILL.md; a name collision would have the second xdg.configFile entry
@@ -133,9 +133,7 @@ let
   customSkillFileAttrs =
     if customSkillCollisions != [ ] then
       throw ''
-        codex: skill name collision between agent-skills/skills/ and ai-prompts/commands/: ${
-          lib.concatStringsSep ", " customSkillCollisions
-        }. Rename the skill directory or the command file so the two do not both resolve to
+        codex: skill name collision between agent-skills/skills/ and ai-prompts/commands/: ${lib.concatStringsSep ", " customSkillCollisions}. Rename the skill directory or the command file so the two do not both resolve to
         codex/skills/<name>/SKILL.md.''
     else
       builtins.listToAttrs (
@@ -219,7 +217,8 @@ let
   codexMcpServers = {
     context7 = pickMcpServer nixMcpServers.context7;
     playwright = pickMcpServer nixMcpServers.playwright;
-  } // shared.mcpServers { inherit nurPkgs; };
+  }
+  // shared.mcpServers { inherit nurPkgs; };
 
   cleanAttrs = lib.filterAttrs (_: v: v != null && v != [ ] && v != { });
 
