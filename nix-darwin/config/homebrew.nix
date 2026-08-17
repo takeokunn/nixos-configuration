@@ -9,6 +9,7 @@
     "docker-credential-helper"
   ];
   homebrew.casks = [
+    "amical"
     "aquaskk"
     "cleanshot"
     "claude"
