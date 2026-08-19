@@ -1,13 +1,34 @@
 ---
 name: technical-writing
-description: Use when writing a blog post, technical article, or tutorial for external audiences, in English or Japanese — includes a Japanese prose-quality ruleset and a long-form structure ruleset for books and serials.
-version: 3.0.0
+description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese — includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials.
+version: 3.1.0
 ---
 
 Structured patterns for writing technical blogs, articles, and tutorials that communicate technical concepts
 to external audiences, in English or Japanese. Pick the article type that matches the reader's need below,
 apply the language-specific conventions, and for book chapters or serials layer the long-form structure
-ruleset on top.
+ruleset on top. The general prose mechanics below apply to any human-facing writing, not only the article
+types — reach for them alone when revising a report, a PR/issue body, or documentation prose.
+
+## General prose mechanics
+
+Classify each passage before writing it, and do not mix the two in one passage:
+
+- **Procedural** — tells the reader what to do; imperative mood, one instruction per sentence.
+- **Descriptive** — explains what a thing is or does; no imperative, one new point per sentence.
+
+Put the condition before the command ("If the build fails, read the log" — a trailing condition gets dropped
+by a skimming reader). Describe an action with a verb, not a nominalization ("compress the file", not
+"perform compression"). A requirement is "must"; a capability is "can"; do not write "should" in
+instructions — readers treat it as optional. Never convert genuine uncertainty into assertion: a hedge that
+carries real epistemic content (an unverified fact, an inference, a reader's likely doubt) keeps its
+uncertainty, and is deleted only once the text grounds the claim. Delete filler — announcements ("In this
+section..."), empty intensifiers ("robust", "comprehensive"), padding connectives — by removing it, not by
+rephrasing around it.
+
+The Japanese-specific rules under Language guidelines extend this same rigor (argument structure, redundancy,
+LLM-tell avoidance) with additional detail; apply them together when writing Japanese. To test whether any of
+this prose actually reads clearly to its intended audience once written, see [cold-read](../cold-read/SKILL.md).
 
 ## Article types
 
@@ -379,6 +400,8 @@ Reduce the bloat that accumulates across a long piece:
 
 ## Related
 
+- [cold-read](../cold-read/SKILL.md) — dispatch a context-free reviewer to test whether the written prose
+  actually reads clearly to its audience
 - [serena-usage](../serena-usage/SKILL.md) — symbol operations for extracting code examples from projects
 - [context7-usage](../context7-usage/SKILL.md) — library documentation lookup for accurate technical
   references
