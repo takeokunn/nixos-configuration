@@ -116,6 +116,7 @@ delegation failed — never present an unanswered question as an absence of find
 Tag every finding: verified (you ran a command or read the line and can cite it), inferred (follows from
 something verified but unobserved), assumed (otherwise). Never give a numeric self-assessment — confidence
 score, percent complete, dev-hour figure — because none has a derivation; state the observable condition.
+A dismissal is a claim too: "probably fine" needs the same evidence backing it as "broken" would.
 
 A zero exit is the most over-trusted signal here. It proves the harness ran, not that the check ran:
 
@@ -198,7 +199,8 @@ govern costs its full body on every later request in the session.
 | Editing Common Lisp, Emacs Lisp, Scheme, Clojure, Fennel, or Janet source | paredit-cli |
 | Nix, flake, or Home Manager work | nix-ecosystem |
 | Needing a library's current API, version behavior, or migration notes | context7-usage |
-| Writing prose for an external audience | technical-writing, technical-documentation |
+| Writing prose for an external audience, a report, or documentation | technical-writing, technical-documentation |
+| Docs, README, comment blocks, commit messages, or PR/issue bodies were written or revised, at task completion | cold-read |
 | Other language or domain work | the matching skill in the injected listing |
 
 Content belongs in exactly one layer: a fact needed every session stays here, a rule decidable mechanically
