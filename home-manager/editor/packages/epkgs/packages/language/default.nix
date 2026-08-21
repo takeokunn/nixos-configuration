@@ -80,7 +80,9 @@ with epkgs;
   slim-mode
   solidity-mode
   ssh-config-mode
-  swift-mode
+  # swift-mode: disabled, emacs-unstable-31.1-rc1's elpa2nix installer aborts
+  # (SIGABRT) after byte-compiling swift-mode-20260801.1244, before writing
+  # the package; re-enable once emacs-unstable or the swift-mode snapshot moves.
   syslog-mode
   systemd-mode
   terraform-mode
