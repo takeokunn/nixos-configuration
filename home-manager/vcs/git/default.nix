@@ -16,6 +16,7 @@
     "*.fasl"
     "*.elc"
     "*~"
+    "="
     ".DS_Store"
     ".dir-locals-2.el"
     "TAGS"
