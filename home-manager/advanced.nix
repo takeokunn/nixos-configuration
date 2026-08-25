@@ -67,7 +67,8 @@ in
   # pkgs), not only in the host overlays: without useGlobalPkgs, HM ignores the
   # host's pkgs and builds programs.sketchybar.package / programs.tmux.package
   # from this nixpkgs instance.
-  nixpkgs.overlays = editorOverlay ++ shellOverlay ++ sketchybarOverlay ++ [ mcp-servers-nix.overlays.default ];
+  nixpkgs.overlays =
+    editorOverlay ++ shellOverlay ++ sketchybarOverlay ++ [ mcp-servers-nix.overlays.default ];
 
   programs.nixvim.nixpkgs.source = nixpkgs;
 
