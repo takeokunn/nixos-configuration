@@ -8,6 +8,9 @@
     "pdfpc"
     "docker-credential-helper"
   ];
+  homebrew.taps = [
+    "stablyai/orca"
+  ];
   homebrew.casks = [
     "amical"
     "aquaskk"
@@ -28,6 +31,7 @@
     "sf-symbols"
     "slack"
     "slite"
+    "stablyai/orca/orca"
     "sublime-text"
   ];
 }
