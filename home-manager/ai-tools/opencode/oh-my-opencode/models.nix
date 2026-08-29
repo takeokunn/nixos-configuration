@@ -2,13 +2,14 @@ let
   promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
   deepseekProModel = "opencode-go/deepseek-v4-pro";
   deepseekFlashModel = "opencode-go/deepseek-v4-flash";
+  kimiVisionModel = "opencode-go/kimi-k2.6";
 in
 {
   inherit promptLang;
-  promptOrchestrator = "Assess the full picture, identify task dependencies, and delegate independent tasks in parallel to appropriate subagents. Always specify run_in_background when spawning subagents (false for delegation, true for parallel exploration only). ${promptLang}";
-  promptLibrarian = "Verify specifications via Web search and context7 MCP before answering. ${promptLang}";
 
-  # DeepSeek-V4-Pro — orchestration, security, architecture, coding, and review
+  # DeepSeek-V4-Pro — default tier for most agents/categories: orchestration, planning, review,
+  # and deep implementation. Fallback is the Go-only Flash tier, so it stays within the same
+  # (text-only) capability class.
   deepseekPro = {
     model = deepseekProModel;
     fallback = [
@@ -16,11 +17,20 @@ in
     ];
   };
 
-  # DeepSeek-V4-Flash — quick and routine tasks, with Pro as the Go-only fallback
+  # DeepSeek-V4-Flash — fast, low-cost tier for routine work (quick/unspecified-low) and
+  # lighter-weight lookups (librarian/explore).
   deepseekFlash = {
     model = deepseekFlashModel;
     fallback = [
       deepseekProModel
     ];
+  };
+
+  # Kimi-K2.6 — vision-capable, for agents that must interpret images (DeepSeek V4 is text-only).
+  # No fallback: DeepSeek can't substitute for a vision task, so an outage should fail loudly
+  # rather than silently return text-only analysis of an image it never saw.
+  kimiVision = {
+    model = kimiVisionModel;
+    fallback = [ ];
   };
 }
