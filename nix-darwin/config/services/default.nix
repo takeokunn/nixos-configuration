@@ -4,6 +4,7 @@ let
   darwin-vz = import ./darwin-vz;
   dnsmasq = import ./dnsmasq;
   nextdns = import ./nextdns;
+  tailscale = import ./tailscale;
 in
 {
   imports = [
@@ -11,5 +12,6 @@ in
     darwin-vz
     dnsmasq
     nextdns
+    tailscale
   ];
 }
