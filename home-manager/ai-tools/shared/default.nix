@@ -17,9 +17,6 @@ rec {
         type = "http";
         url = "https://mcp.deepwiki.com/mcp";
       };
-      metabase-mcp = {
-        command = "${nurPkgs.metabase-mcp}/bin/metabase-mcp";
-      };
     };
 
   mcpServerToOpencode =
