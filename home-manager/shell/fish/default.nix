@@ -15,10 +15,6 @@
   programs.fish.enable = true;
 
   programs.fish.shellInit = ''
-    if type -q tmux && test -z $TMUX
-        tmux attach-session || tmux new-session
-    end
-
     set fish_greeting
 
     # macOS: fish launched from launchd may not inherit TMPDIR
