@@ -167,6 +167,34 @@ let
     sketchybar --update
   '';
 
+  # Tailscale-serve display plugin script: reflects whether Mediator
+  # (127.0.0.1:43100) is currently proxied onto the tailnet.
+  tailscaleServePlugin = pkgs.writeShellScript "tailscale_serve.sh" ''
+    TAILSCALE="/run/current-system/sw/bin/tailscale"
+
+    if "$TAILSCALE" serve status 2>/dev/null | grep -q '43100'; then
+      sketchybar --set "$NAME" icon.color=${colors.green}
+    else
+      sketchybar --set "$NAME" icon.color=${colors.comment}
+    fi
+  '';
+
+  # Tailscale-serve toggle click script: flips `tailscale serve` for Mediator
+  # on/off. Requires the NOPASSWD sudoers grant in nix-darwin/config/security.nix
+  # (scoped to exactly these two invocations), since this click_script has no
+  # TTY to answer a password/Touch ID prompt.
+  tailscaleServeTogglePlugin = pkgs.writeShellScript "tailscale_serve_toggle.sh" ''
+    TAILSCALE="/run/current-system/sw/bin/tailscale"
+
+    if "$TAILSCALE" serve status 2>/dev/null | grep -q '43100'; then
+      sudo "$TAILSCALE" serve --https=443 off
+    else
+      sudo "$TAILSCALE" serve --bg 43100
+    fi
+
+    sketchybar --update
+  '';
+
   sketchybarConfig = ''
     #!/bin/bash
 
@@ -315,6 +343,18 @@ let
                       script="${sleepPreventPlugin}" \
                       click_script="${sleepPreventTogglePlugin}"
 
+    # Tailscale-serve toggle for Mediator (127.0.0.1:43100). Icon-only, matching
+    # sleep_prevent, in the same power_bracket group.
+    sketchybar --add item tailscale_serve right \
+                --set tailscale_serve \
+                      icon=󰛳 \
+                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.color="$COMMENT" \
+                      label.drawing=off \
+                      update_freq=5 \
+                      script="${tailscaleServePlugin}" \
+                      click_script="${tailscaleServeTogglePlugin}"
+
     sketchybar --add item separator_power right \
                 --set separator_power \
                       icon=│ \
@@ -382,7 +422,7 @@ let
                       background.corner_radius=10 \
                       background.height=32
 
-    sketchybar --add bracket power_bracket power_icon battery sleep_prevent \
+    sketchybar --add bracket power_bracket power_icon battery sleep_prevent tailscale_serve \
                 --set power_bracket \
                       background.color="$CURRENT_LINE" \
                       background.corner_radius=10 \
