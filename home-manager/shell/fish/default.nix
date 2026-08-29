@@ -33,6 +33,10 @@
     if test -d /etc/profiles/per-user/(whoami)/bin
         fish_add_path /etc/profiles/per-user/(whoami)/bin
     end
+
+    if test -d /run/current-system/sw/bin
+        fish_add_path /run/current-system/sw/bin
+    end
   '';
 
   programs.fish.shellInitLast = ''
