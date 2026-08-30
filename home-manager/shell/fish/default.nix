@@ -37,6 +37,26 @@
     if test -d /run/current-system/sw/bin
         fish_add_path /run/current-system/sw/bin
     end
+
+    # KITTY_INSTALLATION_DIR is set once by kitty at process launch and then
+    # frozen into tmux's long-lived environment; a later kitty rebuild moves
+    # the Nix store path and GC can remove the old one, so re-derive it from
+    # the kitty currently on PATH before home-manager's fish integration
+    # sources $KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d.
+    if set -q KITTY_INSTALLATION_DIR; and not test -d "$KITTY_INSTALLATION_DIR"
+        set -l kitty_bin (command -v kitty)
+        set -l candidate
+        if test -n "$kitty_bin"
+            set -l resolved (realpath "$kitty_bin")
+            set -l root (string replace -r '/Applications/kitty\.app/Contents/MacOS/kitty$' "" $resolved)
+            set candidate "$root/Applications/kitty.app/Contents/Resources/kitty"
+        end
+        if test -n "$candidate"; and test -d "$candidate"
+            set -gx KITTY_INSTALLATION_DIR $candidate
+        else
+            set -e KITTY_INSTALLATION_DIR
+        end
+    end
   '';
 
   programs.fish.shellInitLast = ''
