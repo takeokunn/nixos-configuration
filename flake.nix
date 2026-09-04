@@ -38,6 +38,8 @@
     agent-skills.url = "github:Kyure-A/agent-skills-nix";
     agent-skills.inputs.nixpkgs.follows = "nixpkgs";
     agent-skills.inputs.home-manager.follows = "home-manager";
+    guard-and-guide.url = "github:kawarimidoll/guard-and-guide";
+    guard-and-guide.inputs.nixpkgs.follows = "nixpkgs";
     anthropic-skills.url = "github:anthropics/skills";
     anthropic-skills.flake = false;
     cloudflare-skills.url = "github:cloudflare/skills";
@@ -116,6 +118,7 @@
               nixpkgs.overlays = [ inputs.mcp-servers-nix.overlays.default ];
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+                guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills

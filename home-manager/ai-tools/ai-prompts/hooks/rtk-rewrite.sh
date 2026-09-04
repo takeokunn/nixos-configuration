@@ -8,8 +8,9 @@
 # rtk's exit status is not a success flag — only stdout (empty, or equal to the input) decides
 # whether a rewrite happened.
 #
-# Not registered in settings.json yet: the emitted command names a bare `rtk`, which would not
-# resolve to RTK_BIN's absolute path.
+# rtk emits a bare `rtk` prefix, which resolves only if rtk is on PATH — it is not in
+# home.packages. The leading token is rewritten to RTK_BIN's absolute store path before the
+# command is handed back, so the hook carries its own dependency.
 
 set -euo pipefail
 
@@ -123,9 +124,15 @@ if [[ $allowed -ne 1 ]]; then
 fi
 
 # Nothing downstream re-checks this, so a rewrite that is not a single rtk invocation is dropped
-# rather than handed to the tool.
+# rather than handed to the tool. A bare `rtk` prefix is bound to RTK_BIN here: the Bash tool
+# resolves the command against PATH, where rtk is absent. The bare arm must be tested first —
+# an absolute-path rewrite also contains `/rtk `, and matching that arm would hand back a command
+# naming an rtk that does not resolve. Today rtk only ever emits the bare form; the second arm
+# exists so a future rtk that emits its own absolute path passes through unaltered instead of
+# being dropped.
 case $rewritten in
-"rtk "* | *"/rtk "*) : ;;
+"rtk "*) rewritten="$RTK_BIN ${rewritten#rtk }" ;;
+*"/rtk "*) : ;;
 *) exit 0 ;;
 esac
 

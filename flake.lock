@@ -333,6 +333,22 @@
     "flake-compat": {
       "flake": false,
       "locked": {
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-compat_2": {
+      "flake": false,
+      "locked": {
         "lastModified": 1766808011,
         "narHash": "sha256-s83BS0abtIj7vzUf8JE0209KphfHA6qRw/92D9k/F+0=",
         "owner": "hraban",
@@ -484,6 +500,49 @@
         "type": "github"
       }
     },
+    "git-hooks": {
+      "inputs": {
+        "flake-compat": "flake-compat",
+        "nixpkgs": [
+          "guard-and-guide",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788267358,
+        "narHash": "sha256-nt+lUqYVpc9Y6JeMd2WmXzCDojasdadKo0mWcluvY2Y=",
+        "owner": "cachix",
+        "repo": "git-hooks.nix",
+        "rev": "27555e2624241fb116b49095df4caaee85a25691",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cachix",
+        "repo": "git-hooks.nix",
+        "type": "github"
+      }
+    },
+    "guard-and-guide": {
+      "inputs": {
+        "git-hooks": "git-hooks",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788444655,
+        "narHash": "sha256-JrHMNCFi3Xbl71jJfyhWzW4yC/g6VQgVXJ2YBWQlvDM=",
+        "owner": "kawarimidoll",
+        "repo": "guard-and-guide",
+        "rev": "1d81256a46d7ffa52015cd61d9a41010f844d133",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kawarimidoll",
+        "repo": "guard-and-guide",
+        "type": "github"
+      }
+    },
     "hashicorp-agent-skills": {
       "flake": false,
       "locked": {
@@ -572,7 +631,7 @@
     "mac-app-util": {
       "inputs": {
         "cl-nix-lite": "cl-nix-lite",
-        "flake-compat": "flake-compat",
+        "flake-compat": "flake-compat_2",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs_3",
         "systems": "systems_4",
@@ -1106,6 +1165,7 @@
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts",
         "git-bulk-clean": "git-bulk-clean",
+        "guard-and-guide": "guard-and-guide",
         "hashicorp-agent-skills": "hashicorp-agent-skills",
         "home-manager": "home-manager",
         "impermanence": "impermanence",

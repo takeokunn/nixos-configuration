@@ -18,6 +18,10 @@ when each is the right choice and what a result licenses you to claim.
   server is active. Text search cannot tell a definition from a mention, and cannot see a dynamically
   constructed reference. When you fall back to text search, say so and name the claim it weakens — see
   [serena-usage](../serena-usage/SKILL.md).
+- **`tu`** (`llmAgentsPkgs.terminal-use`) for verifying TUI or other interactive terminal program behavior — spawn
+  the program in a virtual terminal, then drive and observe it with its `screenshot`, `wait`, `type`, and
+  `press` subcommands. Neither Glob/Grep/Read nor the LSP operations can exercise a running terminal program;
+  the `playwright` MCP server covers the equivalent verification for browser-based UIs, not this case.
 
 ## Scope
 
@@ -44,6 +48,10 @@ the caller back to the file to reconstruct what you already had in front of you.
 ## Boundary
 
 Exploration is read-only. Never modify a file during a search.
+
+`tu` is the one tool above that acts rather than reads, and it stays inside the boundary because the
+boundary is about the working tree: driving a program you spawned changes that program's terminal,
+not the repository. A `tu` session that writes files is no longer exploration.
 
 ## Related
 

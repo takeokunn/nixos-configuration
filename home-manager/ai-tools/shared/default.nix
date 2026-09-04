@@ -71,6 +71,10 @@ rec {
 
   bashDenyPatternsOpencode = lib.unique (map bashDenyPatternToOpencode bashDenyPatterns);
 
+  # The catalog of guardrail scripts, not the wiring. Codex wires all three; Claude Code wires the
+  # first two and covers enforce-perl through guard-and-guide's rules.toml instead. Removing
+  # enforce-perl here to match Claude Code would disarm Codex, which runs danger-full-access and
+  # has no guard-and-guide agent mode available to it.
   guardrailHookNames = [
     "block-destructive-git"
     "block-bare-cd"

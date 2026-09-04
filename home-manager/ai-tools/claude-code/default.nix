@@ -4,6 +4,7 @@
   nurPkgs,
   mcp-servers-nix,
   llmAgentsPkgs,
+  guardAndGuide,
   ...
 }:
 let
@@ -12,6 +13,13 @@ let
   shared = import ../shared { inherit (pkgs) lib; };
 
   hooksDir = "${config.programs.claude-code.configDir}/hooks";
+
+  # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
+  # cannot silently fail to fire here. enforce-perl is the one deliberate omission: guard-and-guide
+  # carries its sed/awk rule for Claude Code, while Codex still wires the script itself.
+  claudeBashHookNames = builtins.filter (n: n != "enforce-perl") shared.guardrailHookNames ++ [
+    "rtk-rewrite"
+  ];
 
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (_: {
     doInstallCheck = false;
@@ -67,30 +75,39 @@ in
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
     };
 
+    # Claude Code fans one event out to every matching hook in parallel and merges the results
+    # afterwards, so position in this list confers nothing: no hook runs before another and none
+    # sees another's updatedInput. Every hook here judges the command as issued. rtk-rewrite is
+    # currently the only one emitting updatedInput — adding a second would make precedence between
+    # them non-deterministic, and this list could not resolve it.
     hooks.PreToolUse = [
+      # The empty matcher is what reaches Read, Write, and Edit; the Bash entry below cannot see
+      # them, which is the gap guard-and-guide was added to close.
+      {
+        matcher = "";
+        hooks = [
+          {
+            type = "command";
+            command = "${guardAndGuide}/bin/guard-and-guide --config ${ai-prompts-path}/hooks/rules.toml";
+          }
+        ];
+      }
       {
         matcher = "Bash";
+        # The assert fails the build if the derived wiring stops matching what this file expects —
+        # a guardrail renamed or added in the shared catalog would otherwise be installed and never
+        # fire, which has gone unnoticed here once before.
         hooks =
           assert
-            shared.guardrailHookNames == [
+            claudeBashHookNames == [
               "block-destructive-git"
               "block-bare-cd"
-              "enforce-perl"
+              "rtk-rewrite"
             ];
-          [
-            {
-              type = "command";
-              command = "${hooksDir}/block-destructive-git";
-            }
-            {
-              type = "command";
-              command = "${hooksDir}/block-bare-cd";
-            }
-            {
-              type = "command";
-              command = "${hooksDir}/enforce-perl";
-            }
-          ];
+          map (name: {
+            type = "command";
+            command = "${hooksDir}/${name}";
+          }) claudeBashHookNames;
       }
     ];
 
@@ -128,7 +145,6 @@ in
 
   programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
   programs.claude-code.hooks.block-bare-cd = builtins.readFile "${ai-prompts-path}/hooks/block-bare-cd.sh";
-  programs.claude-code.hooks.enforce-perl = builtins.readFile "${ai-prompts-path}/hooks/enforce-perl.sh";
   programs.claude-code.hooks.rtk-rewrite =
     builtins.replaceStrings [ "@RTK_BIN@" ] [ "${llmAgentsPkgs.rtk}/bin/rtk" ]
       (builtins.readFile "${ai-prompts-path}/hooks/rtk-rewrite.sh");

@@ -1,0 +1,75 @@
+version = 1
+
+# guard-and-guide rules for Claude Code. Registered with an empty matcher so these reach every
+# tool, which is what the `File` rules below need — the sibling shell hooks bind to Bash only and
+# cannot see a Read, Write, or Edit at all.
+#
+# Only rules with no allow-exception live here. guard-and-guide matches with the Rust `regex`
+# crate, which has no lookahead, so "block X except Y" is not expressible; block-destructive-git.sh
+# keeps those cases because it parses the command instead of matching it.
+#
+# Two limits worth knowing before relying on this file:
+#
+#   - `File` resolves to Read|Write|Edit only. Grep and Glob are not canonical tool names upstream,
+#     so the credential rules below do not see them, and Grep can read a file's contents.
+#   - If this file is ever unreadable or unparseable, guard-and-guide exits 1 without emitting a
+#     decision, which Claude Code treats as a hook error rather than a block — the whole layer
+#     fails open. It is a store path baked in at build time, so that needs a build to go wrong.
+
+# --- Credentials and keys: unreachable by the Bash-only hooks, so this is new coverage ---
+
+[[rules]]
+matcher = "File"
+regex = '\.env$'
+message = "Access to .env files is prohibited. Ask the user to check or provide the values you need."
+
+[[rules]]
+matcher = "File"
+regex = '\.ssh/'
+message = "Access to SSH keys is prohibited. Ask the user to handle SSH-related operations."
+
+[[rules]]
+matcher = "File"
+regex = '\.aws/'
+message = "Access to AWS credentials is prohibited. Ask the user to check or provide AWS configuration."
+
+[[rules]]
+matcher = "File"
+regex = 'id_rsa|id_ed25519'
+message = "Access to private keys is prohibited. Ask the user to handle key-related operations."
+
+[[rules]]
+matcher = "File"
+regex = '\.git-credentials$|\.netrc$|\.npmrc$'
+message = "Access to credential files is prohibited. Ask the user to handle credentials."
+
+# --- Text substitution: mirrors enforce-perl.sh, which stays on disk for Codex ---
+
+[[rules]]
+matcher = "Bash"
+regex = '\bsed\b'
+message = "Use of 'sed' is prohibited. Use 'perl' instead. Example: perl -pi -e 's/old/new/g' file.txt"
+
+[[rules]]
+matcher = "Bash"
+regex = '\bawk\b'
+message = "Use of 'awk' is prohibited. Use 'perl' instead. Example: perl -lane 'print $F[0]' file.txt"
+
+# --- Bypass by absolute path ---
+#
+# Upstream's example is '(/usr)?/(s?bin|local/bin)/', which matches any path merely containing
+# /bin/ — on this machine that is every /nix/store/*/bin/* entry, including the store path
+# rtk-rewrite.sh substitutes into the command it hands back. Anchoring the match to a path that
+# actually starts at /usr or /bin fixes that, but a bare (^|\s) anchor is then evaded by ordinary
+# quoting and assignment, so the leading class also admits the characters a shell puts in front of
+# an argument, and /+ absorbs the redundant slash in /usr//bin.
+#
+# Residual, accepted: `cd /usr/bin && ./killall` still passes — there is no trailing slash to match
+# and the invocation that follows carries no path at all. A regex cannot close that; only a
+# tokenizer like block-destructive-git.sh's could. Treat this rule as friction against a casual
+# bypass, not as a boundary.
+
+[[rules]]
+matcher = "Bash"
+regex = '''(^|[\s"'=;&|(])/+(usr/+)?(s?bin|local/+bin)/'''
+message = "Do not invoke system binaries by absolute path to work around a blocked command. Use the command name directly, and if it is blocked, ask the user."
