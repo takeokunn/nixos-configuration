@@ -43,10 +43,4 @@ Or use the official installer:
 
 Close and reopen your terminal to ensure all environment variables are loaded.
 
-** Update Configuration
-
-After installation, use this command to apply configuration changes:
-
-#+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
-#+end_src
+Re-run the Step 4 command to apply later configuration changes.

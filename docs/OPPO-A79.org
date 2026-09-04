@@ -7,7 +7,6 @@ OPPO-A79 is an Android device running nix-on-droid for a Nix-based environment o
 
 - Android device (OPPO-A79 or compatible)
 - F-Droid or direct APK installation capability
-- Network connectivity (WiFi recommended)
 
 ** Step 1: Install nix-on-droid App
 
@@ -43,13 +42,7 @@ Edit the nix-on-droid configuration to enable flakes:
   nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
 
-** Update Configuration
-
-After installation, use this command to apply configuration changes:
-
-#+begin_src shell
-  nix-on-droid switch --flake .#OPPO-A79 --show-trace
-#+end_src
+Re-run this command to apply later configuration changes.
 
 ** Notes
 

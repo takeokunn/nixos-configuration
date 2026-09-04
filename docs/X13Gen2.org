@@ -7,7 +7,6 @@ X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for
 
 - NixOS installation USB
 - Another machine with Nix installed (Mac, Linux, etc.)
-- Network connectivity (Ethernet or WiFi)
 - LUKS passphrase (strong, memorable)
 
 ** Step 1: Boot NixOS Installer USB
