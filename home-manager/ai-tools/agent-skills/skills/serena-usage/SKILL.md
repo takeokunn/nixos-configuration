@@ -42,10 +42,27 @@ In a multi-language repository, language detection may fix the project's active 
 Symbol tools then fail for files of a secondary language, with an error naming the active languages and
 refusing to extract symbols for the target. `get_current_config` confirms it.
 
+**Read `get_current_config`'s active language before trusting any empty symbol result**, because the failure
+is not always loud. Detection routinely settles on a language the repository merely contains — build or
+configuration files are enough to swing it — and the symbol tools then return *nothing* rather than erroring.
+An empty `find_symbol` is then indistinguishable from a symbol that genuinely does not exist, and the
+conclusion drawn from it ("no references, safe to delete", "this module is unreachable") is wrong in the most
+expensive direction. This is the single most re-derived trap in the memory corpus: sessions across a dozen
+repositories each recorded it separately, which means each one paid for it first.
+
+The control is the same one an empty grep needs. Before reading an empty result as an absence, run the query
+against a symbol you already know is there; if that comes back empty too, the tool is not answering your
+question and no result from it counts as evidence.
+
 **Treat this as an ongoing constraint of that repository, not a transient glitch to retry against.** Confirm it
 once, then commit to the text-based path: locate definitions and references with Grep across source *and*
 tests, edit with `replace_content` or the standard Edit tool, and verify with the language's own build or load
 step — `get_diagnostics_for_file` is unavailable for an inactive language too.
+
+Failure can also be per-symbol rather than wholesale. When the tree is changing under a concurrent session, a
+lookup can succeed for one symbol and come back empty for the next in the same session; that pattern indicts
+the moment rather than the repository, so name the fallback for the symbol that failed instead of abandoning
+symbol operations entirely.
 
 ## The active-project pointer is shared
 
@@ -152,6 +169,18 @@ lacks it.
 
 The frontmatter constrains metadata; these rules constrain what a reader actually loads.
 
+**Correct in place because this store is a cache of current truth, not an audit trail.** The distinction is
+the store's purpose, not a universal rule: a decision log that exists to show how a position was arrived at is
+append-only, and reversing an entry there means adding a new one rather than rewriting the old. A memory store
+read under a context budget is the opposite — the reader loads the top of the file and acts on it, so a
+superseded first paragraph is worse than no file. Know which kind you are writing into before editing it, and
+do not carry one discipline into the other.
+
+**A correction propagates to every memory carrying the same claim, not just the one you are editing.** Search
+the stale claim's distinctive words before you finish, because the sibling that still asserts the old version
+is the one the next session will read. Quote the wrong claim verbatim inside the correction while negating it,
+so a reader who half-remembers it can still find the file that settles it.
+
 - **A memory body describes the present state, not a change log.** If an addition invalidates something already
   written, rewriting or deleting that passage is part of the same edit. Appending looks like the safe move — it
   destroys no prior observation — but memories are read top-down under a context budget, so an append-only file
@@ -171,7 +200,9 @@ The frontmatter constrains metadata; these rules constrain what a reader actuall
 - **Record the re-verification command verbatim, next to the claim.** A date tells a later reader when someone
   was satisfied and offers only two options, trust or re-derive; the command makes re-verification a paste.
   Where the memory records an audit, add the commit or date it covered and the command revealing what has
-  changed since, so a re-audit becomes a diff.
+  changed since, so a re-audit becomes a diff. This applies past the numbers: an architectural or behavioural
+  claim earns a command too, because it is exactly the kind of claim that stays plausible after it stops being
+  true, and so gets re-read and believed long after a stale count would have been caught.
 - **Name what decays fastest** — line numbers and counts always do — so a reader knows which sentences to
   re-check. A memory that does not distinguish its durable claims from its perishable ones gets discarded whole
   once any part is found wrong.
@@ -214,6 +245,17 @@ single copy — each partial, and the decisive detail present in only one.
   first.
 - When you find the duplicate, merge rather than adding another copy, and keep the detail that appears in only
   one of them. That detail is usually the reason the memory is worth having.
+- **Record that the search happened and came back empty**, in the memory you then write. A later reader
+  otherwise cannot tell a genuinely new fact from one whose author never looked, and re-runs the search you
+  already paid for.
+
+### Point at an external standard rather than copying it
+
+A convention owned outside this repository — an organization-wide policy document, a sibling repository's
+standard — is named and located, never restated. A restated policy is a copy that stops tracking its original
+the day either changes, and the copy is what the next session reads. Give the document's name and the command
+that fetches it. Where a project's own docs already restate such a policy, say so in the memory: the restating
+sites are the ones that go stale, and nothing else records that they exist.
 
 ### Which memories to read
 

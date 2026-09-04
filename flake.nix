@@ -42,20 +42,8 @@
     guard-and-guide.inputs.nixpkgs.follows = "nixpkgs";
     anthropic-skills.url = "github:anthropics/skills";
     anthropic-skills.flake = false;
-    cloudflare-skills.url = "github:cloudflare/skills";
-    cloudflare-skills.flake = false;
-    hashicorp-agent-skills.url = "github:hashicorp/agent-skills";
-    hashicorp-agent-skills.flake = false;
-    deno-skills.url = "github:denoland/skills";
-    deno-skills.flake = false;
     aws-agent-skills.url = "github:itsmostafa/aws-agent-skills";
     aws-agent-skills.flake = false;
-    microsoft-skills.url = "github:microsoft/skills";
-    microsoft-skills.flake = false;
-    scientific-skills.url = "github:K-Dense-AI/claude-scientific-skills";
-    scientific-skills.flake = false;
-    context7-skills.url = "github:upstash/context7";
-    context7-skills.flake = false;
     ast-grep-skill.url = "github:ast-grep/agent-skill";
     ast-grep-skill.flake = false;
     paredit-cli-skills.url = "github:takeokunn/paredit-cli";
@@ -122,13 +110,7 @@
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills
-                  cloudflare-skills
-                  hashicorp-agent-skills
-                  deno-skills
                   aws-agent-skills
-                  microsoft-skills
-                  scientific-skills
-                  context7-skills
                   ast-grep-skill
                   paredit-cli-skills
                   ;

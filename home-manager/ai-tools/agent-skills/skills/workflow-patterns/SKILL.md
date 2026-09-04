@@ -112,8 +112,15 @@ definition of done for adding a convention includes its enforcement mechanism, n
 - Style and idiom → the project's formatter and linter configuration, not review comments.
 - Import and layering constraints → a dependency or import-boundary checker.
 - Dead exports and unreachable code → a detector, so a removal convention stays true over time.
-- Rules no off-the-shelf tool knows → a test in the normal suite. See
-  [quality-tools](../quality-tools/SKILL.md) for authoring one without it becoming noisy.
+- Rules no off-the-shelf tool knows → a test in the normal suite, scanning emitted output — format strings,
+  generated text — rather than whole-file text, since a whole-file scan flags a comment or doc line that merely
+  describes the old idiom as if it were the idiom itself.
+
+A check built as regex over source text cannot distinguish a real violation from an identifier, comment, or
+string literal that only mentions it, so treat a hit as evidence to investigate rather than proof of one — and
+avoid naming local identifiers after whatever the check forbids, in directories it governs. A gate is only
+worth having while its precision keeps it trusted: a check that produces false positives loses that trust
+faster than it earns it, and one reviewers have learned to skip past is worse than no gate at all.
 
 If a rule cannot be mechanically checked, reconsider stating it: an unenforceable rule costs review attention
 on every change and buys compliance only while someone remembers it.
@@ -127,4 +134,3 @@ it.
 - [core-patterns](../core-patterns/SKILL.md) — decision criteria, evidence tiers, and the escalation shape
 - [parallelization-patterns](../parallelization-patterns/SKILL.md) — independence, consensus, and retry
 - [serena-usage](../serena-usage/SKILL.md) — the memory and symbol operations the prepare phase performs
-- [quality-tools](../quality-tools/SKILL.md) — the gates that make a convention enforceable

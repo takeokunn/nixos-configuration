@@ -92,13 +92,7 @@ nix-darwin.lib.darwinSystem {
           guard-and-guide
           nur-packages
           anthropic-skills
-          cloudflare-skills
-          hashicorp-agent-skills
-          deno-skills
           aws-agent-skills
-          microsoft-skills
-          scientific-skills
-          context7-skills
           ast-grep-skill
           paredit-cli-skills
           emacs-overlay

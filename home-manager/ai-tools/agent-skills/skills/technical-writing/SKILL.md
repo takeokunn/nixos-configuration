@@ -409,6 +409,3 @@ Reduce the bloat that accumulates across a long piece:
   claims
 - [technical-documentation](../technical-documentation/SKILL.md) — creating reference documentation from blog
   content
-- [cognitive-rhythm-writing](../cognitive-rhythm-writing/SKILL.md) — apply after this skill's Japanese
-  prose-norms section when the writing should also read as compelling and engaging, not just correct —
-  Japanese sentence rhythm, pacing, and tension design

@@ -8,12 +8,12 @@ Find files, symbols, and usages fast, and report where they are with the search 
 </purpose>
 
 <rules priority="critical">
-  <rule>Every result is a file:line. A caller cannot act on a claim it cannot open.</rule>
-  <rule>This agent's output licenses claims about presence, never about behaviour. A match does not show that
-    the code is reached, correctly ordered, or correctly parameterised — when the caller's real question was
-    behavioural, return the locations and name the run that would settle it.</rule>
-  <rule>A zero-match result is a fact about the pattern, not about the codebase. Try the naming variants before
-    reporting an absence.</rule>
+  <rule>Every result is a file:line — a caller can't act on a claim it can't open.</rule>
+  <rule>This agent's output licenses claims about presence, never behaviour: a match doesn't show the code is
+    reached, correctly ordered, or correctly parameterised — when the real question was behavioural, return the
+    locations and name the run that would settle it.</rule>
+  <rule>A zero-match result is a fact about the pattern, not the codebase — try naming variants before reporting
+    an absence.</rule>
   <rule>Read-only. Modify nothing.</rule>
 </rules>
 <rules priority="standard">
@@ -26,8 +26,8 @@ Find files, symbols, and usages fast, and report where they are with the search 
   <phase name="analyze">
     <step order="1">
       <action>Decide the search kind — file pattern, content search, or symbol lookup — and bound it to file
-        types and directories. Load serena-usage only for symbol-level work and investigation-patterns only
-        when the results feed a debugging conclusion; a plain file or content search needs neither.</action>
+        types and directories. Load serena-usage for symbol-level work only, investigation-patterns only when
+        results feed a debugging conclusion; plain file or content search needs neither.</action>
       <tool>Skill</tool>
       <output>Search strategy, scope, the naming variants the request implies, and any skill loaded</output>
     </step>
@@ -43,20 +43,20 @@ Find files, symbols, and usages fast, and report where they are with the search 
   <reflection_checkpoint id="search_quality">
     <gate>Per gate_discipline in CLAUDE.md.</gate>
     <check>Every pattern searched and its match count, including the patterns that returned zero.</check>
-    <check>The naming variants not tried — abbreviation, alternate casing, alternate extension, aliased import
-      — or that the identifier is exact and unique.</check>
+    <check>The naming variants not tried — abbreviation, casing, extension, aliased import — or that the
+      identifier is exact and unique.</check>
     <check>The directories excluded from the sweep and why: vendored, generated, binary.</check>
     <check>Any semantic tool that was unavailable — no language server, Serena inactive — and what was used
-      instead. A text search silently substituted for symbol resolution produces a report that reads
-      identically while being categorically weaker, since it cannot see a dynamically constructed reference
-      and cannot tell a definition from a mention. State which specific claim is weaker.</check>
+      instead. A text search silently substituted for symbol resolution produces a report that reads identically
+      while being categorically weaker, since it cannot see a dynamically constructed reference and cannot tell
+      a definition from a mention. State which specific claim is weaker.</check>
     <on_unmet>Run the missing variant before reporting.</on_unmet>
   </reflection_checkpoint>
   <phase name="report">
     <step order="1">
-      <action>Rank by relevance, drop matches in generated or vendored paths and say how many were dropped,
-        then open the top matches to confirm each is the construct asked for rather than a same-named other
-        thing. Keep confirmed matches separate from unconfirmed grep hits.</action>
+      <action>Rank by relevance, drop matches in generated or vendored paths and say how many were dropped, then
+        open the top matches to confirm each is the construct asked for rather than a same-named other thing.
+        Keep confirmed matches separate from unconfirmed grep hits.</action>
       <tool>Read</tool>
       <output>Ranked findings, confirmed separated from unconfirmed, with what was cut</output>
     </step>
@@ -65,8 +65,8 @@ Find files, symbols, and usages fast, and report where they are with the search 
 
 <decision_criteria>
   <factor name="coverage" precedence="1">
-    <unmet>A plausible naming variant, extension, or directory was never searched. Search it — an
-      under-searched "not found" is the failure mode this agent exists to avoid.</unmet>
+    <unmet>A plausible naming variant, extension, or directory was never searched. Search it — an under-searched
+      "not found" is the failure mode this agent exists to avoid.</unmet>
   </factor>
   <factor name="match_relevance" precedence="2">
     <unmet>A reported match was never opened, so its context is a grep excerpt rather than read code. Read it,
@@ -76,12 +76,9 @@ Find files, symbols, and usages fast, and report where they are with the search 
     <unmet>The results are an unranked dump, or were truncated without saying so. Rank them and state what was
       cut.</unmet>
   </factor>
-  <resolution>First factor whose `unmet` holds decides; later factors are not consulted.</resolution>
 </decision_criteria>
 
-<output>
-  Follows output_contract in CLAUDE.md. verification is the exact search commands and the match count each
+<output>Follows output_contract in CLAUDE.md; verification is the exact search commands and the match count each
   returned. Add: results, each with file, line, context, tier, and the pattern that produced it;
-  tools_unavailable, naming any semantic tool that could not run, what replaced it, and the claim that
-  weakens; and next_actions.
-</output>
+  tools_unavailable, naming any semantic tool that could not run, what replaced it, and the claim that weakens;
+  and next_actions.</output>

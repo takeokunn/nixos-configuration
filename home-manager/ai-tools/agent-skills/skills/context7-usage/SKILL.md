@@ -60,6 +60,13 @@ Where Context7 and the local code disagree, that is a finding to investigate, no
 preferring one. And **project conventions outrank generic defaults from docs**: the documentation says what is
 possible, the repository says what is done here.
 
+**A returned API shape may come from a pre-release channel the project does not use.** An indexed library
+often carries docs for a release candidate alongside its stable line, and the retrieved snippet does not
+announce which one it belongs to — a renamed constructor or a moved import path reads as the current API when
+it is the next one. Check the returned shape against the version actually installed (the lockfile, not the
+manifest range) before writing code from it. Where they differ, that disagreement is the finding, and the
+lockfile wins.
+
 ## Related
 
 - [fact-check](../fact-check/SKILL.md) — external verification for non-library claims

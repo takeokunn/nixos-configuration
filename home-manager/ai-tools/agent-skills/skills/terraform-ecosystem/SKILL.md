@@ -319,11 +319,6 @@ validators-package APIs, `ProtoV5`/`ProtoV6ProviderFactories` and `providerserve
 
 ## Related
 
-- [golang-ecosystem](../golang-ecosystem/SKILL.md) — Go language syntax, error handling idioms, module
-  layout, table-driven tests, goroutines/context; provider code is Go, this skill covers only the
-  Terraform-specific surface on top of it.
-- [devenv-ecosystem](../devenv-ecosystem/SKILL.md) — development shell setup, `languages.terraform`/`opentofu`,
-  git-hooks (tflint, terraform fmt) for Terraform projects.
 - [serena-usage](../serena-usage/SKILL.md) — navigate provider Go symbols and HCL references efficiently.
 - [context7-usage](../context7-usage/SKILL.md) — fetch current terraform-plugin-framework and Terraform
   documentation.

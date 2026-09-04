@@ -10,6 +10,24 @@ mechanics are assumed; this file carries only what gets it wrong.
 
 ## Flakes
 
+### A flake build reads the git tree, not the working tree
+
+`nix build .#pkg`, `nix flake check`, and `nix eval .#x` all resolve `self` through the git-tree fetcher, which
+walks `git ls-files` rather than the raw filesystem. A **tracked** file's uncommitted edits are still visible —
+Nix prints `warning: Git tree '...' is dirty` to say so — but an **untracked** file does not exist in that tree
+at all, no matter what is on disk. A path-based evaluation that never goes through `getFlake`/`fetchTree` —
+`nix-instantiate --eval`, `import ./x`, `nix build -f default.nix` — reads the raw filesystem instead, so
+untracked files and uncommitted edits are both visible there. Getting this backwards costs real time either
+direction: assuming a flake build sees everything on disk, or assuming it sees only what is committed.
+
+The tell for the untracked half: a path referenced from the flake evaluates to `error: opening file '...':
+No such file or directory` against a `/nix/store/...-source/` path, even though `ls` on the working tree shows
+the file present. Settle which case a command is in with `git status --porcelain -- <path>`: `??` means
+untracked and invisible to a flake build; anything else, including a bare `M`, is tracked and visible with its
+on-disk content. Observed in this repo: a newly created module directory not yet `git add`ed vanished from
+flake evaluation with a "path does not exist" error — the untracked half of this same rule; see the `readDir`
+case below.
+
 ### `nix flake check` passes vacuously off-platform
 
 Per-system outputs exist only for the systems a flake enumerates, and `nix flake check` evaluates the outputs
@@ -185,9 +203,8 @@ in
 ```
 
 `readDir` returns name-to-type (`"directory"` | `"regular"` | `"symlink"`); filter by type rather than assuming
-all entries are files. **Flakes only see git-tracked files**, so a newly created path is invisible to evaluation
-until `git add`ed — "works with `nix build` locally but the file is missing after switch" is almost always an
-un-added path.
+all entries are files. This is exactly the untracked half of the git-tree rule above — "works with `nix build`
+locally but the file is missing after switch" is almost always an un-added path.
 
 Modules pulled in via `imports = [ ./x ]` must take `...` in their signature so the module system can pass extra
 arguments.
@@ -425,13 +442,21 @@ applying can be needed to avoid EEXIST races on redeploy.
 
 ## Sandbox discipline
 
-The build sandbox has no network and a minimal toolset (no git), and Nix builds Rust in the release profile.
+The build sandbox has no network, no conventional absolute paths (no `/bin/sleep`, no `/bin/echo`), and a
+minimal toolset (no git); Nix also builds Rust in the release profile.
 
 - Tests needing network or git must be `#[ignore]`d or feature-gated so the sandboxed `cargo test` still passes;
   run them outside the sandbox in a dev shell.
 - The release profile strips `debug_assert!`, so a `#[should_panic]` test asserting that a `debug_assert!` fires
   must be gated with `#[cfg(debug_assertions)]`, or it fails under the Nix build while passing under a debug
   `cargo test`.
+- A hardcoded conventional path — `/bin/sleep`, `/bin/echo`, `/usr/bin/env` — does not exist in the sandbox;
+  only `PATH` entries from `buildInputs` and their store paths do. Such a test passes on the host and fails only
+  under `nix build` / `nix flake check`, and the failure can present as a bare nonzero exit with the underlying
+  signal swallowed, so the symptom itself never names the missing binary. Resolve every tool through `PATH`
+  (bare `sleep`, `echo`) or an explicit store path from `buildInputs` (`"${coreutils}/bin/sleep"`), never a
+  conventional absolute path. The same rule holds for any other hermetic runner — Bazel, a minimal container
+  image — wherever the toolset is not the host's.
 
 ### The multicall `argv[0]` trap
 
@@ -465,13 +490,9 @@ behavior; Nix just makes the multicall layout the norm.
 ## Related
 
 - [trust-boundaries](../trust-boundaries/SKILL.md) — general untrusted-input and privilege-boundary rules
-- [devenv-ecosystem](../devenv-ecosystem/SKILL.md) — devenv 2.0 configuration
 - [context7-usage](../context7-usage/SKILL.md) — fetching current nixpkgs and Home Manager documentation
 - [investigation-patterns](../investigation-patterns/SKILL.md) — debugging evaluation and derivation failures
 - [serena-usage](../serena-usage/SKILL.md) — navigating Nix expressions by symbol
 - [testing-patterns](../testing-patterns/SKILL.md) — what acceptance means for a declarative change
-- Language conventions for nixpkgs packaging: [golang-ecosystem](../golang-ecosystem/SKILL.md),
-  [rust-ecosystem](../rust-ecosystem/SKILL.md), [haskell-ecosystem](../haskell-ecosystem/SKILL.md),
-  [php-ecosystem](../php-ecosystem/SKILL.md), [swift-ecosystem](../swift-ecosystem/SKILL.md),
-  [c-ecosystem](../c-ecosystem/SKILL.md), [cplusplus-ecosystem](../cplusplus-ecosystem/SKILL.md),
+- Language conventions for nixpkgs packaging: [rust-ecosystem](../rust-ecosystem/SKILL.md) and
   [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md)

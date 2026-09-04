@@ -281,7 +281,10 @@ before trying to reconcile the verdicts.
 ### Staging in a shared checkout
 
 1. Inspect status and the full diff before staging anything, using the plain non-decorated diff form so the
-   output is parseable (see [quality-tools](../quality-tools/SKILL.md) on external diff drivers).
+   output is parseable. A configured external differ — difftastic here — makes `git diff`, `git show`, and
+   `git log -p` emit syntax-highlighted, restructured text instead of a parseable unified diff, silently: the
+   command exits zero and the reader draws conclusions from decorated output rather than hitting an error. Pass
+   `--no-ext-diff` to neutralize it before concluding a diff is empty or a change is missing.
 2. If every hunk is cleanly attributable to your own work, stage only those.
 3. If a shared file — an export list, a build manifest, a lockfile — carries changes interleaved with someone
    else's, **stop and ask.** Do not bundle them and do not split them speculatively; whose-work-is-it is not
@@ -298,5 +301,4 @@ Naming a skill here does not load it. Invoke the Skill tool when the condition h
 - [investigation-patterns](../investigation-patterns/SKILL.md) — when review reveals behavior that is unclear
 - [testing-patterns](../testing-patterns/SKILL.md) — when verifying coverage or designing a suite
 - [test-integrity](../test-integrity/SKILL.md) — when a gate reports green
-- [quality-tools](../quality-tools/SKILL.md) — for the verification command catalog
 - [core-patterns](../core-patterns/SKILL.md) — for the refutation pass, and safe alternatives to destructive Git

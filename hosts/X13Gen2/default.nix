@@ -54,13 +54,7 @@ nixpkgs.lib.nixosSystem {
           llm-agents
           guard-and-guide
           anthropic-skills
-          cloudflare-skills
-          hashicorp-agent-skills
-          deno-skills
           aws-agent-skills
-          microsoft-skills
-          scientific-skills
-          context7-skills
           ast-grep-skill
           paredit-cli-skills
           nur-packages

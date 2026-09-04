@@ -231,8 +231,15 @@ post-read size limit or identity comparison gets a chance to run. The denial of 
 the code you believed was guarded. Require a regular file explicitly, and note that "is a regular file"
 predicates commonly follow symlinks, so a separate symlink check is still needed.
 
-Writing safely into the same space — atomic publish, temporary-file lifecycle, pointer-last ordering — belongs
-to [state-transactions](../state-transactions/SKILL.md).
+Writing into that same space safely follows one more rule beyond the read-side ones above: write the new
+content under a private temporary name first, verify it there — checksum, signature, structural validation —
+then publish by moving it into place, a rename or the platform's atomic pointer swap, as the single
+irreversible step. A crash before that step leaves the previous, complete content reachable; publishing before
+the content is fully written and verified leaves a pointer to something incomplete or unverified, restored only
+by deletion rather than by simply never having happened. Clean up the temporary artifact on failure and the
+superseded one on success, but treat both as best-effort — a cleanup failure must never be reported as a
+failure of the write that already succeeded. Nothing observable changes until the publish step, so a failed
+attempt is safe to retry from the top: the sequence is idempotent under retry, not merely crash-safe.
 
 ## Never let external data select code
 
@@ -346,12 +353,10 @@ reintroduced as a missing feature.
 
 ## Related
 
-- [state-transactions](../state-transactions/SKILL.md) — how an authorized mutation is applied and persisted
 - [test-integrity](../test-integrity/SKILL.md) — integrity of the rejection tests themselves
 - [testing-patterns](../testing-patterns/SKILL.md) — the strategy the rejection-tests-first method plugs into
 - [investigation-patterns](../investigation-patterns/SKILL.md) — tracing a suspected boundary to the failing input
 - [core-patterns](../core-patterns/SKILL.md) — shared decision-criteria and escalation structures
-- [typescript-ecosystem](../typescript-ecosystem/SKILL.md) — branded types and schema decoding
 - [rust-ecosystem](../rust-ecosystem/SKILL.md) — newtypes carrying a validated value
 - [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md) — conditions, and standard-predicate character classes
 - [emacs-ecosystem](../emacs-ecosystem/SKILL.md) — document-directed evaluation and string presentation metadata

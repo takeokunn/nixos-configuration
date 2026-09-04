@@ -46,6 +46,13 @@ Write a meta-test reconciling the registries against the filesystem and against 
 test source is unreachable from the canonical entry point. That test is the only thing standing between a suite
 and slow invisible erosion; adding a file must fail loudly until every registry names it.
 
+The common single-registry case is a manifest checked in beside the directory it enumerates — ASDF
+`:components`, a CMake test list, a CI YAML test matrix, an explicit `__init__` export list. A file dropped into
+the directory without a matching manifest entry compiles alone and passes under a manual invocation, so nothing
+about running it by hand reveals the gap; only the canonical entry point's silence does. Diff the manifest
+against a directory listing of the same tree and assert the difference is empty or explicitly deliberate — an
+exclusion list checked in beside the manifest, not something held in one reviewer's memory.
+
 ### Two naming conventions, one glob
 
 Two conventions commonly coexist in one repository — a suffix for unit specs and a different one for
@@ -253,6 +260,23 @@ all of them. Where the resource is a process tree or external system, distinguis
 from "the release call succeeded but the resource is still present" — only the second is a leak, and only an
 explicit post-condition check finds it.
 
+## A coarser grammar is not the compiler's grammar
+
+A structural linter, a formatter, or a bare parser answers "is this parseable" — a strictly weaker question
+than "does this compile" or "does this evaluate as intended". An unclosed `let*` binding list can absorb the
+form that follows it while leaving the file balanced at every delimiter check a linter performs, so a
+paren-balance or lint pass reports zero errors on input the real toolchain rejects outright. **The general
+shape: whenever a checker runs a coarser grammar than the tool that actually produces the artifact, the checker
+can pass on input the real toolchain rejects — and the coarser check is usually the one wired into the gate,
+because it is the faster one.**
+
+Never cite a lint, format, or bare-parse pass as evidence that a file builds. The canonical gate is whatever the
+deployed artifact is actually produced from — `compile-file`, the real interpreter, the linker, the type
+checker — run that, not a faster stand-in, and treat every structural-only pass as advisory input to review.
+Where a structural pass is kept for its speed on every keystroke, pair it with a periodic run of the real
+toolchain over the same tree; a lint-clean file that has never been compiled is unverified regardless of how
+many times the linter has passed.
+
 ## Which implementation actually loaded
 
 This extends the stale-compiled-artifact trap to the multi-location case, which that mitigation does not reach.
@@ -331,5 +355,4 @@ needs no infrastructure, and is where most vacuity is actually found.
 - [testing-patterns](../testing-patterns/SKILL.md) — the design decisions whose results this skill audits
 - [performance-benchmarking](../performance-benchmarking/SKILL.md) — benchmark methodology and measurement noise
 - [investigation-patterns](../investigation-patterns/SKILL.md) — tracing *why* a test behaves as it does
-- [quality-tools](../quality-tools/SKILL.md) — review scoring, and the shelf life of a stored verdict
 - [execution-workflow](../execution-workflow/SKILL.md) — where the canonical gate runs and what counts as having run it

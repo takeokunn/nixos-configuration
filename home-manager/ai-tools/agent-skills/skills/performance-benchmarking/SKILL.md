@@ -38,6 +38,17 @@ that did not exist.**
 Run the benchmark twice on the same commit and record the spread. That spread is the floor for that harness, on
 that machine, for that workload — and it is re-established when any of the three changes.
 
+A harvest across 19 real repositories supplies a concrete case of skipping this. An allocation-only change,
+benchmarked once — a single before/after run per input size, not alternating, not repeated — produced results
+that were internally incoherent in a way that indicted the harness rather than the change. Sibling benchmarks
+reported a confirmed regression, a near-threshold miss, and a confirmed win simultaneously, and one measurement
+swung from +9.5% to -28% between two adjacent input sizes. An allocation-only change cannot produce all three
+verdicts at once, and it cannot flip sign between adjacent input sizes exercising the same code path —
+**the incoherence is the diagnostic, and it indicts the harness, not three independent findings to report one by
+one.** The missing discipline is procedural: alternate A/B/A/B instead of running one arm to completion before
+the other, and require the effect's sign to replicate across at least two runs before reporting it — a single
+run cannot distinguish a real effect from the harness's own spread.
+
 **Below the floor is unmeasured, not absent.** "We measured no regression" and "the regression, if any, is
 smaller than our noise floor" are different statements, and only the second is supportable. Reporting the first
 converts a limitation of the instrument into a property of the code. If it matters, raise the resolution — more
@@ -273,4 +284,3 @@ after a 250 ms grace period and running it at most once per 250 ms while leaving
 - [parallelization-patterns](../parallelization-patterns/SKILL.md) — the scheduling strategy this measures
 - [sbcl-usage](../sbcl-usage/SKILL.md) — runtime-specific profiler invocation and instrumentation caveats
 - [investigation-patterns](../investigation-patterns/SKILL.md) — when a result contradicts the expected mechanism
-- [quality-tools](../quality-tools/SKILL.md) — review gates and honesty rules for reported measurements

@@ -1,6 +1,6 @@
 ---
 name: emacs-ecosystem
-description: Use for Emacs Lisp, init.el, use-package, and Emacs runtime hazards such as hook ordering, condition-case versus quit, overlays versus text properties, buffer-local state, keymap precedence, and subprocess handling. For org-mode, see org-ecosystem.
+description: Use for Emacs Lisp, init.el, use-package, and Emacs runtime hazards such as hook ordering, condition-case versus quit, overlays versus text properties, buffer-local state, keymap precedence, and subprocess handling. Also covers macro hygiene and MELPA recipe and release gates.
 version: 3.0.0
 ---
 
@@ -216,11 +216,30 @@ stop `package--compile` descending into tests, so compilation fails on files req
 repo-side approach that has worked: `test/.dir-locals.el` binding `((emacs-lisp-mode . ((no-byte-compile . t))))`.
 Verify against your target version rather than assuming.
 
+## Macro hygiene
+
+A `defmacro` needs three protections Elisp does not give automatically. A helper function the macro calls
+*during expansion* must exist at compile time, which means wrapping it in `eval-and-compile`; a plain `defun`
+is not evaluated while the calling file is being byte-compiled, so expansion fails with `void-function` at
+compile time rather than at runtime (the cross-file recompilation trap above is the sibling failure of the same
+root cause). Every symbol the macro introduces that the caller did not write must be uninterned — prefer
+`(cl-gensym "prefix-")`, whose counter suffix keeps repeated expansions distinguishable in a backtrace, over
+`(make-symbol "prefix")`, which returns exactly the name given, so every call site shares one print name. And
+Elisp derives neither indentation nor Edebug support from a macro's lambda list: a macro taking a body argument
+needs `(declare (indent N) (debug FORM))` as its first form, or callers get flat default indentation and no
+step-debugging into the body. Finally, a macro must never evaluate a caller-supplied argument form more than
+once or reorder its evaluation relative to other arguments — bind each one exactly once through a gensym'd
+`let` before referencing it, since `cl-lib` has no `once-only` helper to reach for.
+
 ## Lifecycle and error boundaries
 
-The language-neutral rules for ownership, atomicity, and rollback ordering belong to
-[state-transactions](../state-transactions/SKILL.md); these are the Emacs mechanisms those rules must be built
-on.
+A cleanup or teardown boundary is a rollback. Two ownership rules extend the condition-handling discipline in
+the next section. A teardown loop must isolate per-item failure rather than aborting on the first one, since an
+aborted loop leaves every later resource fully live — held, registered, retained — while the caller's aggregate
+state already reports "shut down," with no remaining owner positioned to retry. And restoring state recovers
+values, not the identity of any reference a
+caller already holds: a caller that captured a handle before the transaction still observes the mutated
+original through that handle even after "rollback" completes, unless the restore mutates the original in place.
 
 ### `quit` is not an error
 
@@ -526,14 +545,29 @@ Discover a project's conventions from its own artifacts rather than guessing:
 - **Formatting commits** — whether whitespace-only changes must be separate and recorded in
   `.git-blame-ignore-revs`.
 
-MELPA submission specifics belong to [melpa-packaging](../melpa-packaging/SKILL.md).
+Publishing to MELPA means keeping the recipe, the main library's headers, and the local lint/compile targets in
+agreement with what package-build actually generates rather than with the working tree verbatim.
+
+- **Recipe** — a single Lisp form in the archive's `recipes/` directory, named exactly after the package
+  (`(foo :fetcher github :repo "owner/foo")`). A submission is a pull request adding only that file, built
+  against the current repository HEAD.
+- **Version** — computed, not the `Version:` header you wrote. The unstable channel is stamped from the date of
+  the latest commit touching a selected file, the stable channel from a matching SCM tag parsed by
+  `version-to-list`. The header is a floor that package-lint and package.el read literally, so it must still be
+  present and monotonic.
+- **Generated files** — never commit `NAME-pkg.el` or autoloads. Anything package-build generates and you also
+  commit either gets overwritten or ships stale.
+- **`:files`** — the exact boundary of what an installed user receives. The default set already covers
+  top-level and `lisp/*.el` plus docs and excludes test files, so most packages need no override at all.
+- **package-lint / checkdoc** — package-lint checks that the declared `emacs` minimum in `Package-Requires`
+  matches the newest built-in symbol the code actually calls, and that every defined symbol carries the package
+  prefix. checkdoc governs docstring form: imperative-mood first sentence, `` `symbol' `` quoting.
+- **Release gate** — must not mutate the contributor's tree or personal package directory. Byte-compile and
+  validate generated autoloads in a temporary directory, and never infer success from `git diff` against
+  ignored generated files.
 
 ## Related
 
-- [org-ecosystem](../org-ecosystem/SKILL.md) — Org mode, babel, agenda, export
-- [lisp-macro](../lisp-macro/SKILL.md) — writing and auditing macros
-- [melpa-packaging](../melpa-packaging/SKILL.md) — recipe review and release gates
-- [state-transactions](../state-transactions/SKILL.md) — the ownership and rollback rules these mechanisms serve
 - [trust-boundaries](../trust-boundaries/SKILL.md) — the general untrusted-input discipline
 - [test-integrity](../test-integrity/SKILL.md) — proving which implementation a test actually loaded
 - [testing-patterns](../testing-patterns/SKILL.md) — seam design and fixture isolation

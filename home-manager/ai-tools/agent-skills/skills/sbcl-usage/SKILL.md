@@ -461,10 +461,7 @@ Always define explicit process exit codes, and validate ASDF load and tests befo
 - [nix-ecosystem](../nix-ecosystem/SKILL.md) — pinned SBCL runtime environments with nix shell/flake.
 - [investigation-patterns](../investigation-patterns/SKILL.md) — evidence-driven root-cause methodology
   behind the debugging workflow above.
-- [quality-tools](../quality-tools/SKILL.md) — automated checks and CI quality discipline.
 - [performance-benchmarking](../performance-benchmarking/SKILL.md) — benchmark methodology (paired protocols,
   noise floor, interval-based gating) behind the profiling tools above.
 - [test-integrity](../test-integrity/SKILL.md) — false-green testing: suites that report success without
   exercising the contract.
-- [state-transactions](../state-transactions/SKILL.md) — atomic publish and cleanup discipline for the
-  process/resource lifecycles spawned here.

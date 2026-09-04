@@ -9,8 +9,16 @@ composition, escaping the Effect runtime as late as possible, converting imperat
 channel, deriving types from Schema, and testing with @effect/vitest. Each rule leads with the mechanism
 that makes it necessary, then the fix.
 
-This skill covers only the Effect-specific surface built on top of TypeScript — base compiler configuration,
-generics, and utility types belong to [typescript-ecosystem](../typescript-ecosystem/SKILL.md).
+This skill covers only the Effect-specific surface; two TypeScript mechanics recur below without restatement.
+`Effect<A, E, R>` is not a Promise: `Awaited<ReturnType<typeof fn>>`, the usual idiom for unwrapping an async
+function's return, does nothing to an Effect-returning function — it yields the `Effect<A, E, R>` type itself,
+not `A`. Extract with Effect's own type-level utilities instead: `Effect.Effect.Success<T>`,
+`Effect.Effect.Error<T>`, `Effect.Effect.Context<T>`. And `Schema.brand` (used throughout below for
+EntityId-style identifiers) is the standard TypeScript nominal-typing trick applied to Schema: intersecting a
+primitive with a brand marker so structurally identical primitives stop being mutually assignable. The marker's
+identity is what carries the guarantee: a brand keyed by a string label collides silently with any other
+package that chose the same label, while one keyed by a `unique symbol` stays distinct across module and
+package boundaries. Reach for the symbol form whenever the branded type crosses a package boundary.
 
 ## Version
 
@@ -405,9 +413,17 @@ yield* Ref.set(engagedRef, false)           // reached only on success
 
 Rollback is the fallback for transitions whose steps genuinely cannot be ordered — try ordering first.
 
-These are the Effect-shaped expressions of general state-ownership rules. For the framework-neutral versions —
-who owns a piece of state, request/response correlation, idempotency keys, durability ordering, and
-three-state reads — see [state-transactions](../state-transactions/SKILL.md) rather than restating them here.
+These are the Effect-shaped expressions of general state-ownership rules.
+
+**A cross-boundary read has three outcomes, not two.** A `Ref` backed by storage, or a service call to another
+process, can succeed, succeed with nothing, or fail to determine anything at all — the store is unreachable,
+the region is unloaded. Collapsing the third into the second treats "I could not tell" as "it is absent", which
+is the permissive branch in nearly every design: state gets dropped because it "wasn't there", or a check
+passes because nothing contradicted it. Model the third outcome in the type rather than folding it into
+`Option` — `Effect<Option<A>, StorageUnavailable>`, not `Effect<Option<A>, never>` with unavailability silently
+decoded as `None`. On the unknown outcome, take the conservative branch: preserve existing state, skip the
+effect, retry later. Confirming that something changed requires positive evidence of the new value, never the
+absence of the old one.
 
 ## Hot-path allocation
 
@@ -591,17 +607,12 @@ in strict Effect codebases, flagged as domain-layer violations.
 
 ## Related
 
-- [typescript-ecosystem](../typescript-ecosystem/SKILL.md) — base TypeScript compiler config, generics, and
-  utility types that Effect builds on
 - [testing-patterns](../testing-patterns/SKILL.md) — general test strategy that @effect/vitest patterns plug
   into
 - [context7-usage](../context7-usage/SKILL.md) — verify current Effect / @effect/vitest APIs and
   version-specific behavior
 - [investigation-patterns](../investigation-patterns/SKILL.md) — evidence-based tracing of requirement leaks
   and runtime-boundary issues
-- [state-transactions](../state-transactions/SKILL.md) — framework-neutral rules for state ownership,
-  atomicity, request/response correlation, idempotency, durability ordering, schema evolution, and
-  three-state reads; this skill covers only the Effect-shaped expression of them
 - [trust-boundaries](../trust-boundaries/SKILL.md) — discipline for untrusted input crossing into a service;
   Schema decoding here is the mechanism, not the policy
 - [test-integrity](../test-integrity/SKILL.md) — whether a test genuinely exercises the code it claims to;

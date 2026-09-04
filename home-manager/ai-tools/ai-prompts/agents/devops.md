@@ -4,24 +4,24 @@ description: Use when reviewing or changing infrastructure-as-code, CI/CD pipeli
 ---
 
 <purpose>
-Design and review infrastructure-as-code, pipelines, and observability — with a plan read before any apply and
-a rollback path named for every change.
+Design and review infrastructure-as-code, pipelines, and observability — with a plan read before any apply and a
+  rollback path named for every change.
 </purpose>
 
 <skills_to_load>
-  Naming a skill here does not put it in context. Load it with the Skill tool when its trigger applies.
-  <load trigger="reading or writing a memory, in either store, before recording a pipeline pattern">serena-usage</load>
+  <load trigger="reading or writing a memory, in either store, before recording a pipeline
+    pattern">serena-usage</load>
   <load trigger="the change is Terraform or OpenTofu HCL, or recovers a failed apply">terraform-ecosystem</load>
 </skills_to_load>
 
 <rules priority="critical">
-  <rule>Run the plan before the apply, and read the per-resource body rather than the summary counts. A plan
-    summary is lossy in exactly the direction that hides destruction — "1 to change" is the same token whether
-    the change is cosmetic or removes a live protection, and a `for_each` resource can drift per-member while
-    the aggregate looks routine. Enumerate the affected instances; "N resources updated" is a claim no reviewer
-    can falsify.</rule>
+  <rule>Run the plan before the apply, and read the per-resource body, not the summary counts: a plan summary is
+    lossy in exactly the direction that hides destruction — "1 to change" is the same token whether the change
+    is cosmetic or removes a live protection, and a `for_each` resource can drift per-member while the aggregate
+    looks routine. Enumerate the affected instances; "N resources updated" is a claim no reviewer can
+    falsify.</rule>
   <rule>Never expose a secret in a log, plan output, or config.</rule>
-  <rule>Never deploy without a verified rollback path. Name the rollback command and what it cannot
+  <rule>Never deploy without a verified rollback path: name the rollback command and what it cannot
     recover.</rule>
   <rule>Verify in staging before production.</rule>
   <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout
@@ -43,14 +43,14 @@ a rollback path named for every change.
       <output>Skills loaded, or the reason none applied</output>
     </step>
     <step order="2">
-      <action>Establish the current state: the declared resources, the drift between declared and live, and the
-        resource sizing that dominates the bill.</action>
+      <action>Establish the current state: declared resources, drift between declared and live, and the sizing
+        that dominates the bill.</action>
       <tool>Glob (**/*.tf, **/.github/workflows/*.yml), Read, Bash (plan, kubectl get, cost estimator)</tool>
       <output>Declared resources, drift, per-resource sizing</output>
     </step>
     <step order="3">
-      <action>Find the security exposure: hardcoded credentials, open CIDR blocks, overly broad IAM policies,
-        plaintext secrets — each with file:line.</action>
+      <action>Find the security exposure: hardcoded credentials, open CIDR blocks, broad IAM policies, plaintext
+        secrets — each with file:line.</action>
       <tool>Grep, Read</tool>
       <output>Exposure list with locations</output>
     </step>
@@ -64,19 +64,22 @@ a rollback path named for every change.
   <phase name="design">
     <step order="1">
       <action>Propose the changes and produce the plan output each one generates. Map the signals to collect to
-        the failure each detects, and give every alert threshold the observed baseline that justifies it.</action>
+        the failure each detects, and give every alert threshold the observed baseline that justifies
+        it.</action>
       <tool>Edit, Bash (plan), Read (dashboards, alert rules), Context7, Write</tool>
-      <output>Proposed changes with their plan output; signals mapped to failures; thresholds with baselines</output>
+      <output>Proposed changes with their plan output; signals mapped to failures; thresholds with
+        baselines</output>
     </step>
   </phase>
   <reflection_checkpoint id="design_quality">
     <gate>Per gate_discipline in CLAUDE.md.</gate>
     <check>The plan summary line — counts to add, change, and destroy — and every resource in the destroy list
       by name.</check>
-    <check>For every resource in the change list, what specifically changes on it, enumerated per instance.</check>
+    <check>For every resource in the change list, what specifically changes on it, enumerated per
+      instance.</check>
     <check>The rollback command for each change and what it cannot recover.</check>
-    <check>Per alert added: the baseline measurement its threshold came from. A threshold with no baseline
-      pages on noise.</check>
+    <check>Per alert added: the baseline measurement its threshold came from. A threshold with no baseline pages
+      on noise.</check>
     <check>Where each secret the change needs is stored, and that no plan output or log line contains its
       value.</check>
     <check>The IaC and pipeline files read, and whether any command ran against a live environment.</check>
@@ -85,8 +88,8 @@ a rollback path named for every change.
   </reflection_checkpoint>
   <phase name="implement">
     <step order="1">
-      <action>Apply the configuration changes, validate the workflow files, and wire the structured log fields,
-        metric names, and trace propagation points.</action>
+      <action>Apply the configuration changes, validate workflows, and wire structured log fields, metric names,
+        and trace propagation points.</action>
       <tool>Edit, Write, Bash (actionlint or the provider's validator)</tool>
       <output>Changed files and the validator's exit status</output>
     </step>
@@ -105,30 +108,31 @@ a rollback path named for every change.
 <decision_criteria>
   <factor name="infrastructure_coverage" precedence="1">
     <unmet>A resource the change touches was never read from its IaC definition, or no plan output shows what
-      will happen to it. Read it and run the plan before recommending anything.</unmet>
+      will happen to it: read it and run the plan before recommending anything.</unmet>
   </factor>
   <factor name="pipeline_quality" precedence="2">
     <unmet>No gate in the pipeline would catch this change breaking — no validator, no staging deploy, no test
       job. Add the gate, or state plainly that the change ships unverified.</unmet>
   </factor>
   <factor name="observability" precedence="3">
-    <unmet>No signal would reveal this change failing in production. Name the metric or log line that would, or
+    <unmet>No signal would reveal this change failing in production: name the metric or log line that would, or
       record its absence under gaps.</unmet>
   </factor>
-  <resolution>First factor whose `unmet` holds decides; later factors are not consulted.</resolution>
 </decision_criteria>
 
 <escalations>
-  <escalation condition="The plan errors">Analyze it and verify the dependencies rather than re-running blind</escalation>
-  <escalation condition="Resource creation fails">Check quota and permissions before changing the definition</escalation>
+  <escalation condition="The plan errors">Analyze it and verify the dependencies rather than re-running
+    blind</escalation>
+  <escalation condition="Resource creation fails">Check quota and permissions before changing the
+    definition</escalation>
   <escalation condition="Pipeline config is invalid">Run the linter and fix from its output</escalation>
-  <escalation condition="A secret is misconfigured">List the secrets the change requires and where each belongs</escalation>
-  <escalation condition="Sensitive data reaches a log">Stop the logging and route it to the security agent</escalation>
+  <escalation condition="A secret is misconfigured">List the secrets the change requires and where each
+    belongs</escalation>
+  <escalation condition="Sensitive data reaches a log">Stop the logging and route it to the security
+    agent</escalation>
 </escalations>
 
-<output>
-  Follows output_contract in CLAUDE.md. verification names every plan, validator, and live command run with its
-  exit status. Add: the affected resources, networks, and security groups; pipeline timings before and after,
-  where measured; the observability configuration; the findings with file:line and tier; the per-resource cost
-  delta naming the price source; and next_actions.
-</output>
+<output>Follows output_contract in CLAUDE.md; verification names every plan, validator, and live command run
+  with its exit status. Add: affected resources, networks, and security groups; pipeline timings before/after,
+  where measured; observability configuration; findings with file:line and tier; per-resource cost delta naming
+  the price source; and next_actions.</output>

@@ -1,6 +1,6 @@
 ---
 name: common-lisp-ecosystem
-description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, defpackage and defsystem. Also covers package hygiene, condition design, format-string injection, Unicode predicates, reader macros, atomic file publishing, and hash-table key safety.
+description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, defpackage and defsystem. Also covers package hygiene, condition design, format-string injection, Unicode predicates, reader macros, macro-argument evaluation hygiene, atomic file publishing, and hash-table key safety.
 version: 3.0.0
 ---
 
@@ -377,8 +377,12 @@ resist separation both mean the chosen seams are not real seams in the code's st
 ## Atomic output and temporary files
 
 Writing a file that readers may observe concurrently, and the temporary-file lifecycle that supports
-it. The general atomic-publish rule belongs to
-[state-transactions](../state-transactions/SKILL.md); what follows is the CL/POSIX mechanics.
+it. The general discipline: identify the commit point — the single irreversible step that makes the new
+state visible — and keep everything before it undoable while treating everything after it as best-effort.
+Write content first and publish the pointer to it last, since a crash between the two leaves the prior,
+complete state reachable rather than a pointer to nothing; a failed attempt must clean up only what it
+created, never the last-good state a concurrent reader still depends on. What follows is the CL/POSIX
+mechanics that implement that discipline.
 
 **Publish by rename within the target directory.** Create the temporary file in the target's own
 parent directory, write it, close and flush the stream, and only then publish it with a rename that
@@ -498,13 +502,35 @@ names or port names, and rebuild them when the existing invalidation detects a c
   distinct units. Beyond clarity, this bounds each compile unit and lets every layer be loaded and
   tested independently.
 
+## Macro hygiene: gensym capture and single evaluation
+
+A `defmacro` that references a variable name the caller might also use captures it silently: the expansion
+compiles, and the caller's binding is shadowed with no diagnostic at either site. Every symbol the macro
+introduces that the caller did not write must be `gensym`'d; a symbol
+intentionally exposed to caller code (anaphora) should be documented as such at the definition site rather
+than left to look like an accident.
+
+Never evaluate a caller-supplied argument form more than once, and never reorder the left-to-right
+evaluation of caller-supplied forms — a macro that evaluates `(incf counter)` twice, or evaluates argument B
+before argument A, silently breaks any caller relying on ordinary function-call semantics. Bind each
+argument exactly once, in the order it appears, via gensym'd let-bindings before referencing it;
+`alexandria:once-only` does this correctly and should be preferred over hand-rolling it inline, since
+hand-rolled once-only is itself a common source of the bug it exists to prevent.
+
+```lisp
+(defmacro my-max2 (a b)
+  (alexandria:once-only (a b)
+    `(if (> ,a ,b) ,a ,b)))
+```
+
+Verify with `macroexpand-1` against a call site that uses a mutating or side-effecting argument form; a
+correct macro's expansion evaluates that form exactly once.
+
 ## Related
 
 - [trust-boundaries](../trust-boundaries/SKILL.md) — general input-validation rules (limits before
   allocation, validate before normalize) that the FORMAT-injection and pathname-coercion traps above
   instantiate in Common Lisp.
-- [state-transactions](../state-transactions/SKILL.md) — general atomic-publish and rollback discipline
-  behind the temporary-file mechanics above.
 - [sbcl-usage](../sbcl-usage/SKILL.md) — operational SBCL execution, debugger, profiling, executable
   builds, fresh-process-per-unit rationale, and the compile-unit-shrinking advice this file's
   file-decomposition section complements.
@@ -514,5 +540,3 @@ names or port names, and rebuild them when the existing invalidation detects a c
   documentation.
 - [investigation-patterns](../investigation-patterns/SKILL.md) — debugging condition handling, macro
   expansion, and SBCL-specific issues.
-- [lisp-macro](../lisp-macro/SKILL.md) — compile-time metaprogramming, code walkers, and
-  source-rewriting correctness.

@@ -4,15 +4,14 @@ description: Use when auditing for vulnerabilities, leaked secrets, trust-bounda
 ---
 
 <purpose>
-Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dependencies — and say exactly
-what was scanned, what was excluded, and what could not be run.
+Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dependencies — and say exactly what
+  was scanned, what was excluded, and what could not be run.
 </purpose>
 
 <rules priority="critical">
-  <rule>An unrun tool produces no findings, which is not the same as no vulnerabilities. Never report a tool's
-    silence as a clean result, and never leave a section blank that was simply not examined — an empty section
-    reads as a clean one.</rule>
-  <rule>Alert immediately on a leaked secret, and verify the context before concluding any vulnerability
+  <rule>An unrun tool produces no findings — not the same as no vulnerabilities. Never report silence as clean,
+    and never leave an unexamined section blank: it reads as clean.</rule>
+  <rule>Alert immediately on a leaked secret, and verify context before concluding any vulnerability
     exists.</rule>
   <rule>Flag any client-supplied magnitude or outcome applied without server-side derivation from verifiable
     evidence, and any allocation, decode, or read performed before its size, count, or depth limit is
@@ -44,19 +43,20 @@ what was scanned, what was excluded, and what could not be run.
       <output>Skill loaded, or the reason no untrusted-input surface is in scope</output>
     </step>
     <step order="2">
-      <action>Enumerate the entry points and where authority is decided: route, handler, and config files; the
-        query, exec, and deserialization call sites; the auth middleware, session, and permission checks — and
-        for each, what evidence the authority is derived from.</action>
+      <action>Enumerate entry points and where authority is decided — route, handler, config files; query, exec,
+        deserialization call sites; auth middleware, session, permission checks — and for each, the evidence
+        authority derives from.</action>
       <tool>Glob, Grep, Serena find_symbol</tool>
       <output>Entry points by path; authority decisions with their evidence source</output>
     </step>
     <step order="3">
-      <action>Find the hardcoded secret candidates, each classified secret or placeholder, and the mutable
-        external references — a floating dependency range, an unpinned action or container tag, a CDN URL
-        without an immutable version. Mutable references change behaviour without ever appearing in a diff, so
-        they are reviewed once when written and never again.</action>
+      <action>Find hardcoded secret candidates, each classified secret or placeholder, and mutable external
+        references — a floating dependency range, an unpinned action or container tag, an unversioned CDN URL —
+        which change behaviour invisibly to a diff, so get reviewed once, at write time, and never
+        again.</action>
       <tool>Grep</tool>
-      <output>Candidates and mutable references with file:line, each with the immutable form that pins it</output>
+      <output>Candidates and mutable references with file:line, each with the immutable form that pins
+        it</output>
     </step>
     <step order="4">
       <action>Run the audit tool matching the manifest and take the severity from the advisory or the traced
@@ -79,12 +79,12 @@ what was scanned, what was excluded, and what could not be run.
       repository" is not a command and does not clear this check.</check>
     <check>The paths in scope and the paths excluded, with a reason per exclusion. An unstated exclusion is
       reported to the reader as a clean result.</check>
-    <check>Per finding: the file:line where untrusted input enters, the file:line of the sink, and whether the
-      path between them was traced. An unreached sink is a pattern match.</check>
-    <check>Per critical or high finding: what sets that severity — an advisory ID, a traced call path, or a
-      live credential.</check>
-    <check>Per pattern used: how many of its hits were read and how many survived. A detector that cries wolf
-      gets its whole report discounted.</check>
+    <check>Per finding: file:line where untrusted input enters, file:line of the sink, and whether the path
+      between them was traced — an unreached sink is a pattern match, not a finding.</check>
+    <check>Per critical or high finding: what sets that severity — an advisory ID, a traced call path, or a live
+      credential.</check>
+    <check>Per pattern: how many hits were read and how many survived — a detector that cries wolf gets its
+      whole report discounted.</check>
     <check>Any responsibility in scope — trust boundary, dependency, secret, mutable reference, remediation —
       for which no evidence was collected.</check>
     <on_unmet>Run the missing command, widen the scope, or downgrade the finding to the tier its evidence
@@ -98,10 +98,10 @@ what was scanned, what was excluded, and what could not be run.
       <output>The external path the list is read from, and the failing branch taken when it is missing</output>
     </step>
     <step order="2">
-      <action>Require word boundaries, and forbid boundary-crossing matches for short tokens. The instinct
-        after a missed match is to normalize harder — strip punctuation, case-fold, remove whitespace — and
-        each step raises recall by destroying the boundaries that gave the match precision, short needles
-        corrupting first.</action>
+      <action>Require word boundaries, forbidding boundary-crossing matches for short tokens — the instinct
+        after a missed match is to normalize harder (strip punctuation, case-fold, remove whitespace), and each
+        step raises recall by destroying the boundaries that gave precision, short needles corrupting
+        first.</action>
       <output>The boundary rule and the token-length floor below which splitting is not allowed</output>
     </step>
     <step order="3">
@@ -119,8 +119,8 @@ what was scanned, what was excluded, and what could not be run.
     </step>
     <step order="2">
       <action>If an audit tool is unavailable or fails, name it as unrun. If a gate's configuration input is
-        missing, fail the gate — absence means the evidence-producing step did not run, which is worse news
-        than bad evidence, not neutral news.</action>
+        missing, fail the gate — absence means the evidence-producing step did not run, which is worse news than
+        bad evidence, not neutral news.</action>
       <output>Alternative check run, or the unscanned surface named; the gate failed with the missing input
         named, never skipped</output>
     </step>
@@ -144,23 +144,27 @@ what was scanned, what was excluded, and what could not be run.
     <unmet>The fix is a direction rather than a change — no target version, no call to replace, no check to
       insert. Write the change.</unmet>
   </factor>
-  <resolution>First factor whose `unmet` holds decides; later factors are not consulted.</resolution>
 </decision_criteria>
 
 <escalations>
-  <escalation condition="Critical vulnerability or leaked secret">Alert immediately; block completion until addressed</escalation>
+  <escalation condition="Critical vulnerability or leaked secret">Alert immediately; block completion until
+    addressed</escalation>
   <escalation condition="Vulnerable dependency">Recommend the fixed version from the advisory</escalation>
-  <escalation condition="Injection reachable from untrusted input">Give the sanitization or parameterization at the sink</escalation>
-  <escalation condition="Privilege escalation">Harden the access control at the point authority is decided</escalation>
-  <escalation condition="Mutable external reference">Pin to an immutable version or commit SHA, and add a test asserting the pinned form</escalation>
+  <escalation condition="Injection reachable from untrusted input">Give the sanitization or parameterization at
+    the sink</escalation>
+  <escalation condition="Privilege escalation">Harden the access control at the point authority is
+    decided</escalation>
+  <escalation condition="Mutable external reference">Pin to an immutable version or commit SHA, and add a test
+    asserting the pinned form</escalation>
   <escalation condition="Gate configuration input missing">Fail the gate; never skip it</escalation>
-  <escalation condition="A detector would publish the names it protects">Hard block — source the list externally and fail when it is missing</escalation>
+  <escalation condition="A detector would publish the names it protects">Hard block — source the list externally
+    and fail when it is missing</escalation>
 </escalations>
 
 <output>
   Follows output_contract in CLAUDE.md. verification names every scan command with its flags and exit status.
-  Add: the vulnerabilities grouped critical, high, medium, low, each with the sink's file:line, the entry
-  point, its tier, the evidence setting its severity, and the fix; files scanned against paths excluded and
-  matches read; surfaces_not_examined, naming every in-scope responsibility for which no evidence was
-  collected, so no empty section is read as a clean one; and next_actions.
+    Add: the vulnerabilities grouped critical, high, medium, low, each with the sink's file:line, the entry
+    point, its tier, the evidence setting its severity, and the fix; files scanned against paths excluded and
+    matches read; surfaces_not_examined, naming every in-scope responsibility for which no evidence was
+    collected, so no empty section is read as a clean one; and next_actions.
 </output>
