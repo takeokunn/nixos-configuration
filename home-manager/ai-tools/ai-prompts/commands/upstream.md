@@ -65,7 +65,7 @@ breakdown that /execute can consume. Everything produced is a handoff the user d
     <objective>Collect the evidence, in parallel</objective>
     <step order="1">
       <action>Dispatch guidelines, pr_template, changes, tests, and pr_samples in one message.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
       <output>Five reports</output>
     </step>
   </phase>

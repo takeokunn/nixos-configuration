@@ -101,7 +101,7 @@ quality review across every dimension, use /execute-full.
     <step order="2">
       <action>Dispatch each task with its scope, target paths, expected deliverable, the command that verifies
         it, and any reference implementation to follow.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
     </step>
   </phase>
   <reflection_checkpoint id="assignment_complete" after="assign">
@@ -146,7 +146,7 @@ quality review across every dimension, use /execute-full.
     <step order="4">
       <action>If tests fail, delegate one targeted fix for the specific failing tests and re-run once. If
         failures remain, report them as blockers and set the status to error.</action>
-      <tool>Task (test agent, or general-purpose)</tool>
+      <tool>Agent (test agent, or general-purpose)</tool>
     </step>
     <step order="5">
       <action>Before reporting that something could not be verified in this environment, grep the environment
@@ -154,6 +154,15 @@ quality review across every dimension, use /execute-full.
         adapter, or a recorded-fixture mode. A codebase mature enough to have a test suite usually has a
         runnable driver behind that seam, and an unverifiable claim reported as a gap is rarely revisited.</action>
       <output>The substitute mode found and exercised, or confirmation none exists</output>
+    </step>
+    <step order="6">
+      <action>Once the suite is green, dispatch verification against the claim that the change works. A green
+        suite is the evidence most often offered and least often attacked: it reports that the paths someone
+        thought to write still behave, which is a different claim from the one being made. Hand over the
+        commands that exited zero and the claim each supports rather than the diff — an agent handed a diff
+        reviews the diff, which the review agents have already done.</action>
+      <tool>Agent (verification)</tool>
+      <output>What survived the attack and what broke</output>
     </step>
   </phase>
 
@@ -197,8 +206,12 @@ quality review across every dimension, use /execute-full.
     stale references left.</agent>
   <agent name="review" subagent_type="quality-assurance">Holistic post-implementation review across the agent
     reports and test results; go/no-go with rationale.</agent>
+  <agent name="verification" subagent_type="verification">Attacks the claim that the change works, once the
+    suite is green: boundary values, interrupted operations, idempotency, the error paths a passing suite never
+    entered. Give it the commands claimed to exit zero and the claim each supports, not the diff — an agent
+    handed a diff reviews the diff, which the review agents have already done.</agent>
   <agent name="memory" subagent_type="general-purpose">Patterns and decisions surfaced by the implementation
-    agents, written to Serena.</agent>
+    agents, written to whichever store memory_policy assigns them.</agent>
   <agent name="validator" subagent_type="validator" dispatch="on_demand">Re-derive one disputed claim from its
     citation alone, without the originating agent's reasoning. Dispatch only when two agents disagree and their
     evidence does not settle it, or a consequential claim rests on no citation.</agent>
@@ -211,7 +224,8 @@ quality review across every dimension, use /execute-full.
   <parallel_group id="quality_assurance" depends_on="none">quality, security</parallel_group>
   <parallel_group id="implementation" depends_on="none">test, docs</parallel_group>
   <sequential_step id="review_phase" depends_on="quality_assurance,implementation">review</sequential_step>
-  <sequential_step id="persist_phase" depends_on="review_phase">memory</sequential_step>
+  <sequential_step id="claim_attack" depends_on="review_phase">verification, against the settled artifact</sequential_step>
+  <sequential_step id="persist_phase" depends_on="claim_attack">memory</sequential_step>
 </execution_graph>
 
 <decision_criteria>

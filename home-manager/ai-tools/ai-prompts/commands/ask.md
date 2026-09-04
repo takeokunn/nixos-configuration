@@ -86,7 +86,7 @@ Answer a question about this project from evidence in it. Read-only: never modif
     <step order="1">
       <action>Execute the plan. Verify any external claim — library behavior, API contract, version support —
         against Context7 or the vendored source rather than recall.</action>
-      <tool>Task, Grep, Read, Context7</tool>
+      <tool>Agent, Grep, Read, Context7</tool>
       <output>Findings with file:line</output>
     </step>
   </phase>

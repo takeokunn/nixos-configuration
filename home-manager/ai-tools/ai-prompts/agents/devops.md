@@ -8,6 +8,12 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
 a rollback path named for every change.
 </purpose>
 
+<skills_to_load>
+  Naming a skill here does not put it in context. Load it with the Skill tool when its trigger applies.
+  <load trigger="reading or writing a memory, in either store, before recording a pipeline pattern">serena-usage</load>
+  <load trigger="the change is Terraform or OpenTofu HCL, or recovers a failed apply">terraform-ecosystem</load>
+</skills_to_load>
+
 <rules priority="critical">
   <rule>Run the plan before the apply, and read the per-resource body rather than the summary counts. A plan
     summary is lossy in exactly the direction that hides destruction — "1 to change" is the same token whether
