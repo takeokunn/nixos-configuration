@@ -9,8 +9,9 @@ specialists in parallel, refute the critical findings, and report what to do abo
 </purpose>
 
 <rules priority="critical">
-  <rule>Every agent this command dispatches is read-only. It reviews work; it does not change it.</rule>
-  <rule>Launch all Task calls of one dispatch wave in a single message. A wave is the selected mode's
+  <rule>Every agent this command dispatches is read-only. It reviews work; it does not change it. Writing this
+    review's own memory entries is not a change to the work under review, so the persist phase proceeds.</rule>
+  <rule>Launch all Agent calls of one dispatch wave in a single message. A wave is the selected mode's
     specialists, or the refute phase's per-finding validator dispatches. The refute wave running after the
     specialist wave is sequencing, not the prohibited pattern.</rule>
   <rule>A finding is complete only when it carries four things: the defect's file:line; the existing test that
@@ -22,7 +23,9 @@ specialists in parallel, refute the critical findings, and report what to do abo
 </rules>
 <rules priority="important">
   <rule>Review the work this session did, targeting session operations rather than the git diff — the diff
-    includes work this session did not do.</rule>
+    includes work this session did not do. That bars the diff's contents as the thing reviewed, not the commit
+    as a way to learn which files to open: where this session holds no Edit or Write history, take the file
+    list from the commit pinned in prepare and review those files directly.</rule>
   <rule>Severity is calibrated by runtime impact, not style preference: critical is data loss or security,
     warning is degraded behavior, info is style.</rule>
   <rule>State a quantitative claim as a direction unless it was measured on both sides — whichever agent
@@ -40,16 +43,21 @@ specialists in parallel, refute the critical findings, and report what to do abo
       <output>Skills loaded</output>
     </step>
     <step order="2">
-      <action>Activate the Serena project, call list_memories, and read the entries matching this review —
-        {project}-conventions, code-quality-*, architecture-*, and any stored review of this component.</action>
-      <tool>Serena activate_project, list_memories, read_memory</tool>
-      <output>Matched memory names and the ones loaded</output>
+      <action>Read the review history from auto-memory first: its MEMORY.md index names every entry, and the
+        ledger this command's persist phase writes lives there. Then read the Serena entries matching this
+        review — {project}-conventions, code-quality-*, architecture-* — for the conventions anchored to a
+        symbol or a file position. The two stores are not interchangeable, and memory_policy in CLAUDE.md says
+        which one holds what.</action>
+      <tool>Read (auto-memory MEMORY.md and the entries it names), Serena activate_project, list_memories, read_memory</tool>
+      <output>Matched memory names per store, and the ones loaded</output>
     </step>
     <step order="3">
-      <action>Retrieve the previous review's findings, from the stored review memories or earlier in the
-        session, with each identifier and location. This command otherwise re-diagnoses from scratch every
-        time, so an unfixed finding is either rediscovered as new or missed entirely — and an item raised twice
-        and still standing is a decision the user needs to make, not a line to repeat.</action>
+      <action>Retrieve the previous review's findings from the auto-memory ledger this command's persist phase
+        writes, or from earlier in the session, with each identifier and location. This command otherwise
+        re-diagnoses from scratch every time, so an unfixed finding is either rediscovered as new or missed
+        entirely — and an item raised twice and still standing is a decision the user needs to make, not a line
+        to repeat. Looking for that ledger in Serena returns nothing, which is the wrong store rather than an
+        absence of prior reviews.</action>
       <output>Prior findings with identifiers and locations, or "no prior review found"</output>
     </step>
     <step order="4">
@@ -63,9 +71,12 @@ specialists in parallel, refute the critical findings, and report what to do abo
   <phase name="select">
     <step order="1">
       <action>Identify the previous command and select its mode from the modes table. Establish the files in
-        scope as explicit paths, not "the recent changes".</action>
-      <tool>Serena find_symbol, get_symbols_overview</tool>
-      <output>Mode, the command that selected it, and the file list</output>
+        scope as explicit paths, not "the recent changes". Where this session carries no Edit or Write history
+        — the command was invoked fresh, which the previous-command argument anticipates — take the paths from
+        the commit pinned in prepare with git show --stat, and report that scope came from the commit rather
+        than from session operations, so a reader knows which one the findings describe.</action>
+      <tool>Serena find_symbol, get_symbols_overview, Bash: git show --stat</tool>
+      <output>Mode, the command that selected it, the file list, and the source the list came from</output>
     </step>
   </phase>
   <reflection_checkpoint id="analysis_quality" after="select">
@@ -80,7 +91,7 @@ specialists in parallel, refute the critical findings, and report what to do abo
     <step order="1">
       <action>Dispatch the selected mode's agents in one message, each carrying the four-part finding
         requirement from the critical rules.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
       <output>One report per agent, or a named agent that returned nothing</output>
     </step>
     <step order="2">
@@ -129,7 +140,7 @@ specialists in parallel, refute the critical findings, and report what to do abo
         refuter is asked to find the flaw. Validator's own default framing expects several reports to compare,
         so state in the prompt that this is a single-claim independent-verification task and that it should
         disregard its usual single-source-means-unvalidated framing and re-derive whether the finding holds.</action>
-      <tool>Task (validator)</tool>
+      <tool>Agent (validator)</tool>
       <output>One refutation attempt per critical finding</output>
     </step>
     <step order="3">
@@ -152,12 +163,17 @@ specialists in parallel, refute the critical findings, and report what to do abo
 
   <phase name="persist">
     <step order="1">
-      <action>Against the memory_policy triggers in CLAUDE.md, record a recurring quality issue, a reusable
-        review pattern, or a project convention as a rule the next session can apply, pinned to the revision it
-        was found in. Search list_memories by topic substring first. Output "persist: no triggers matched —
-        skip" when none apply.</action>
-      <tool>Serena list_memories, write_memory or edit_memory</tool>
-      <output>Memory name written or edited, or the explicit skip</output>
+      <action>Write the ledger of findings still unresolved at the end of this run to auto-memory, one entry per
+        finding carrying its identifier, file:line, and severity. That ledger is what prepare step 3 reads next
+        time, so a run that skips it leaves the next review to start from nothing — memory_policy in CLAUDE.md
+        states why a ledger of locations is not the review verdict it also forbids. Alongside it, and against
+        the same memory_policy triggers, record a recurring quality issue, a reusable review pattern, or a
+        project convention as a rule the next session can apply, pinned to the revision it was found in. Search
+        the auto-memory index and Serena's list_memories by topic substring before writing either, so an
+        existing entry is edited rather than duplicated. Output "persist: no triggers matched — skip" only when
+        the ledger is empty as well.</action>
+      <tool>Read and Write (auto-memory MEMORY.md and its entries), Serena list_memories, write_memory or edit_memory</tool>
+      <output>The ledger entries written, the memory names written or edited, or the explicit skip</output>
     </step>
   </phase>
 </workflow>
@@ -171,7 +187,11 @@ specialists in parallel, refute the critical findings, and report what to do abo
 
 <modes>
   Selected from the previous command. Every mode dispatches its agents in one message, and loads fact-check
-  where the work under review makes external claims.
+  where the work under review makes external claims. Loading it injects the method without running it, so name
+  the agent that applies it in that mode's dispatch — docs where the claims are about a documented interface,
+  quality-assurance otherwise — and have that agent check each external claim against Context7 or the vendored
+  source. Without that assignment the fact_check_results section has no step that produces it and comes back
+  empty from a review that did read external claims.
 
   <mode name="define" after="/define" target="the execution plan from the session">
     Step granularity, dependencies, risk identification, completeness, feasibility.

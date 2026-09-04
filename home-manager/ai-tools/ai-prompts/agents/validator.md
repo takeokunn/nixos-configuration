@@ -120,7 +120,7 @@ attempt to break that claim instead. Read-only: reports on outputs, never modifi
         findings with no file:line and no command output. Retry at most twice with a narrower prompt naming the
         specific files, or suggest an alternative agent. Document every attempt and outcome — never present an
         unanswered question as an absence of findings.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
       <output>Retry log with outcomes, or the reason retry was not attempted</output>
     </step>
   </phase>

@@ -89,6 +89,25 @@ global/{topic}          shared across all projects — only when the user explic
                         a project-independent memory
 ```
 
+### Which store, before what to write
+
+Serena is not the only memory store, and choosing between them comes before choosing what to say. **Serena
+holds what is anchored to a symbol or a file position** — the code is what makes the entry true, so the entry
+is re-checkable by navigating to that code. **Claude auto-memory** — the per-project directory the harness
+injects, indexed by its `MEMORY.md` — holds what outlives the session that learned it and is anchored to
+nothing in the tree: review history and unresolved findings, a trap with the command that reproduces it, a
+policy the user stated, an option declined and why.
+
+The split is not cosmetic. An agent that reaches for review history in Serena finds an empty result and reads
+it as "no prior review", which is indistinguishable in the output from having checked and found none — so the
+next review starts from scratch and re-reports what was already raised. Getting the store wrong therefore
+fails silently and looks like a clean result.
+
+Write a fact to one store and link to it from the other. **A fact living in both drifts apart**, and the reader
+who finds the stale copy has no way to tell which one is current — the duplicate-hunting rules below apply
+across the two stores, not only within Serena, and the duplicate is hardest to see exactly when it spans them,
+because neither store's index lists the other's entries.
+
 ### What earns a memory
 
 Write for: a significant architectural pattern, a reusable debugging insight from a hard bug, a reusable
@@ -96,6 +115,9 @@ implementation pattern, a convention or preference the user stated, a transferab
 
 Do **not** write:
 
+- Anything the split above assigns to auto-memory — review history, a finding ledger, a trap, a user-stated
+  policy, a rejected option. Those belong there whatever their subject matter, and filing one here is the
+  silent failure named above rather than a tidy-up someone will notice.
 - A note that names one file and would not change what you do in a different file. That is a commit message.
 - Anything volatile enough to be wrong within weeks — line numbers, file counts, current status, an in-flight
   branch's state. **Volatility is the load-bearing exclusion**, because it rejects at write time exactly the

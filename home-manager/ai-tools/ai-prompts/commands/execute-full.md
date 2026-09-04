@@ -34,12 +34,16 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
       <tool>Skill (execution-workflow)</tool>
     </step>
     <step order="2">
-      <action>Activate the Serena project, call list_memories, and read the entries matching this task —
-        {feature}-patterns, {language}-conventions, testing-patterns, and any completion-checklist or
-        canonical-gate memory for this project. That last category tells you which commands constitute done
-        here, and what they deliberately leave uncovered, without re-deriving it from build files.</action>
-      <tool>Serena activate_project, list_memories, read_memory</tool>
-      <output>Matched memory names and the ones loaded</output>
+      <action>Read both memory stores, because memory_policy in CLAUDE.md splits them and this command needs
+        entries from each. From auto-memory, whose MEMORY.md indexes it: the traps this project has already
+        cost someone, and the issues a previous run of this command deferred instead of fixing — those are
+        this run's inherited work, not a clean slate. From Serena: {feature}-patterns,
+        {language}-conventions, testing-patterns, and any completion-checklist or canonical-gate memory for
+        this project. That last category tells you which commands constitute done here, and what they
+        deliberately leave uncovered, without re-deriving it from build files. Querying one store alone
+        returns an empty result that is indistinguishable from having checked and found nothing.</action>
+      <tool>Read (auto-memory MEMORY.md and the entries it names), Serena activate_project, list_memories, read_memory</tool>
+      <output>Matched memory names per store, the ones loaded, and the deferred issues inherited</output>
     </step>
   </phase>
 
@@ -67,7 +71,7 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
         the implementation, because the fix is moving code and its dependencies rather than rewriting it — and
         with one fix iteration available, discovering a layering violation in the review wave leaves no budget
         to correct it.</action>
-      <tool>Task (design)</tool>
+      <tool>Agent (design)</tool>
       <output>Placement approved, or the layer violation named before implementation</output>
     </step>
     <step order="4">
@@ -75,7 +79,7 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
         removes or migrates a definition, instruct the assignee to grep the identifier itself rather than the
         shape it is usually called in: forward declarations, differently-shaped call sites, comments, and test
         doubles share only the name.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
     </step>
     <step order="5">
       <action>Establish what the verification command covers before running it. Its name is not its scope: the
@@ -102,7 +106,7 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
       <action>Dispatch all six review agents in one message — quality-assurance, security, design, docs,
         performance, test. They evaluate independent dimensions of the same output, so serializing them only
         costs wall time.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
       <output>Six reports</output>
     </step>
   </phase>
@@ -132,7 +136,7 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
       <action>Prioritize the still-present issues critical before warning before info, delegate each to the
         agent matching its category, then verify each fix against the issue it addressed and re-run the
         verification commands.</action>
-      <tool>Task, Bash</tool>
+      <tool>Agent, Bash</tool>
       <output>Fixes with verification results</output>
     </step>
   </phase>
@@ -155,16 +159,36 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
     <on_unmet>Report the unaddressed issues as deferred, with reasons. Do not open a second fix iteration.</on_unmet>
   </reflection_checkpoint>
 
+  <phase name="verify">
+    <step order="1">
+      <action>Dispatch verification against the completion claim itself, after the fixes have landed and before
+        anything is reported done. This is not a seventh review dimension: collect_feedback asks whether the
+        work is good, and this asks whether the claim that it works survives an attempt to break it — boundary
+        values, interrupted operations, idempotency, the error paths the happy-path suite never entered. Give
+        it the enumerated commands said to exit zero and the claim each one supports, since an agent handed a
+        diff re-reviews the diff.</action>
+      <tool>Agent (verification)</tool>
+      <output>The claim attacked and what survived, or the input that broke it</output>
+    </step>
+  </phase>
+
   <phase name="persist">
     <step order="1">
-      <action>Against the memory_policy triggers in CLAUDE.md, capture what this cycle produced that is
+      <action>Write the issues the fix phase left unaddressed to auto-memory as a ledger, one entry per issue
+        carrying its identifier, file:line, severity, and the reason it was deferred. The fix_complete gate
+        demands they survive "in a form the next review can reconcile against", and with one fix iteration
+        there is no other mechanism — an unwritten deferral is rediscovered as a new finding or not at all.
+        Then, against the memory_policy triggers in CLAUDE.md, capture what this cycle produced that is
         expensive to re-derive and undiscoverable by grep: the project's canonical verification command with
         what it deliberately does not cover; the exact invocation that exited zero, including environment
         prefix and path flags; and any abstraction deliberately not built, paired with the condition that
         should re-open it — a deferral recorded without its trigger is re-argued next session with less
-        information than this one had. Then verify the memories read in prepare: bump, correct, or archive.</action>
-      <tool>Serena list_memories, write_memory or edit_memory, rename_memory</tool>
-      <output>Memories written, edited, or archived — or "persist: no triggers matched — skip"</output>
+        information than this one had. memory_policy decides which store each of these goes to; the ledger
+        and the traps are auto-memory's, the pattern anchored to a symbol is Serena's. Then verify the
+        memories read in prepare: bump, correct, or archive.</action>
+      <tool>Read and Write (auto-memory MEMORY.md and its entries), Serena list_memories, write_memory or edit_memory, rename_memory</tool>
+      <output>The ledger entries written, the memories written, edited, or archived — or "persist: no
+        triggers matched — skip", which requires the deferred-issue list to be empty as well</output>
     </step>
   </phase>
 </workflow>
@@ -205,8 +229,11 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
     <constraint>When removing or migrating a definition, grep the identifier itself across every file rather
       than the usage shape it typically appears in — the identifier is the only invariant shared by forward
       declarations, differently-shaped call sites, comments, and test doubles.</constraint></agent>
-  <agent name="memory" subagent_type="general-purpose">Decisions and patterns to Serena, and freshness of the
-    memories consulted this task.</agent>
+  <agent name="verification" subagent_type="verification">Attacks the completion claim after the fixes land,
+    rather than reviewing the diff a seventh time. Give it the commands claimed to exit zero and the claim each
+    supports, not the diff.</agent>
+  <agent name="memory" subagent_type="general-purpose">Decisions and patterns to whichever store memory_policy
+    assigns them, and freshness of the memories consulted this task.</agent>
   <agent name="validator" subagent_type="validator" dispatch="on_demand">Re-derive one disputed claim from its
     citation alone, without the originating agent's reasoning. Only when two agents disagree and their evidence
     does not settle it, or a consequential claim carries no citation.</agent>
@@ -231,7 +258,8 @@ confirmation between phases. Eliminating those hand-offs is what this command bu
     <pass_forward>The consolidated issues with the file:line each cites, the agent reports, and the test
       failures</pass_forward>
   </conditional_phase>
-  <sequential_step id="persist_phase" depends_on="fix">memory</sequential_step>
+  <sequential_step id="verify" depends_on="fix">verification, against the settled post-fix artifact</sequential_step>
+  <sequential_step id="persist_phase" depends_on="verify">memory</sequential_step>
 </execution_graph>
 
 <decision_criteria>

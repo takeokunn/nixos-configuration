@@ -163,11 +163,19 @@ stated, an architectural decision, a trap that cost you time, an option the user
 you rejected with the measurement that rejected it, or a verified absence with the query that established it.
 Do not defer this to the end of the task.
 
+Two stores hold these memories — auto-memory and Serena — and which one receives a fact is settled before the
+fact is written. serena-usage holds the boundary, the rule for a fact that already sits in both, and why
+choosing wrong fails silently rather than loudly.
+
 Do not write: what changed in one file this session (that is a commit message); a review's verdict or score; an
 intermediate observation from a verification still in progress, because it will outlive the run and contradict
 you; anything the repository already records. Never put an absolute path or a raw count in a memory body —
 store the command that reproduces the count, since the number is stale tomorrow and the path is wrong on the
 next machine.
+
+A ledger of unresolved findings — an identifier, a file:line, and a severity for each — records locations
+rather than judgement, so it is written despite the prohibition on verdicts above. What stays out is the score,
+the overall assessment, and the account of how the review went.
 
 Search existing memories by topic substring, not by exact name; a name-only duplicate check fails as soon as
 the naming scheme drifts, which is how one fact ends up in seven files.
@@ -195,7 +203,7 @@ govern costs its full body on every later request in the session.
 | A finding severe enough that being wrong about it is expensive | core-patterns, for the refutation pass |
 | Writing or evaluating tests | testing-patterns; test-integrity when a suite reports green |
 | Debugging, bisecting, or tracing a symptom to a cause | investigation-patterns |
-| Any Serena memory or symbol operation | serena-usage |
+| Writing or reading a memory in either store, or any Serena symbol operation | serena-usage |
 | Editing Common Lisp, Emacs Lisp, Scheme, Clojure, Fennel, or Janet source | paredit-cli |
 | Nix, flake, or Home Manager work | nix-ecosystem |
 | Needing a library's current API, version behavior, or migration notes | context7-usage |
