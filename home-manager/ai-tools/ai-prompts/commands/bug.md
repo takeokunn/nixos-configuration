@@ -89,7 +89,7 @@ to do with; applies no fix.
         agent's work. Where the failure spans subsystems, dispatch in one message: quality-assurance for the
         failure mechanism and ranked hypotheses, explore for the error site and every recurrence, and
         general-purpose for the log timeline and dependency state. Name what you skipped and why.</action>
-      <tool>Task</tool>
+      <tool>Agent</tool>
       <output>Findings with file:line, or the reason no agent was needed</output>
     </step>
     <step order="2">

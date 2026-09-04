@@ -8,6 +8,12 @@ Find where the time actually goes, change it, and prove the change with the same
 the baseline.
 </purpose>
 
+<skills_to_load>
+  Naming a skill here does not put it in context. Load it with the Skill tool when its trigger applies.
+  <load trigger="reading or writing a memory, in either store, before recording a rejected candidate">serena-usage</load>
+  <load trigger="a figure is about to be stated as a speedup, a regression, or a gate threshold">performance-benchmarking</load>
+</skills_to_load>
+
 <rules priority="critical">
   <rule>Measure before optimizing and measure again after. An improvement derived from a complexity argument is
     a prediction, not a result.</rule>

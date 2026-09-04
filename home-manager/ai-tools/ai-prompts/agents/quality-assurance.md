@@ -73,7 +73,7 @@ to its cause — and say plainly what was read, what was run, and what was left 
     <step order="2">
       <action>Where the change touches a risky idiom, raise the concern and dispatch the security agent when
         confirmation is needed. Where a rendered surface is in scope, capture the accessibility tree.</action>
-      <tool>Grep, Task (security), Playwright browser_snapshot</tool>
+      <tool>Grep, Agent (security), Playwright browser_snapshot</tool>
       <output>Concerns with what raised each; accessibility tree, or why it could not be captured</output>
     </step>
   </phase>
