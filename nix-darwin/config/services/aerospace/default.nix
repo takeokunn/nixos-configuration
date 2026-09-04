@@ -1,4 +1,4 @@
-{ pkgs, emacsLib }:
+{ emacsLib }:
 let
   emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
     windowManager = "aerospace";

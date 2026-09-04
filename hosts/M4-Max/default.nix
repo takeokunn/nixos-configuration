@@ -36,7 +36,7 @@ let
   emacsPkg = emacs.emacs-unstable;
 
   emacsLib = import ../../home-manager/editor/lib/emacs.nix {
-    inherit lib pkgs emacsPkg;
+    inherit pkgs emacsPkg;
   };
 
   configuration = _: {

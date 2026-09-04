@@ -34,7 +34,7 @@ let
   };
   emacsPkg = if isDarwin then emacsPkgSet.emacs-unstable else emacsPkgSet.emacs-unstable-pgtk;
   emacsLib = import ./editor/lib/emacs.nix {
-    inherit lib pkgs emacsPkg;
+    inherit pkgs emacsPkg;
   };
 in
 {

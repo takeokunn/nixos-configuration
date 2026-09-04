@@ -1,5 +1,4 @@
 {
-  # Timing: faster CursorHold events (250ms) and key sequence timeout (300ms)
   updatetime = 250;
   timeoutlen = 300;
 
@@ -9,10 +8,8 @@
   # Virtual edit: allow cursor beyond line end in visual block mode
   virtualedit = "block";
 
-  # Confirmation dialogs instead of errors for unsaved changes
   confirm = true;
 
-  # Enable mouse support in all modes
   mouse = "a";
 
   completeopt = "menu,menuone,noselect";

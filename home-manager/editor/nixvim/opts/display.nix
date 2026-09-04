@@ -15,7 +15,6 @@
   showcmd = true;
   title = true;
 
-  # True color support (required for modern colorschemes)
   termguicolors = true;
 
   cursorline = true;

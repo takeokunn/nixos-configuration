@@ -15,6 +15,5 @@
   # D-Bus policy for swayosd (allows root to own org.erikreider.swayosd bus name)
   services.dbus.packages = [ pkgs.swayosd ];
 
-  # Ensure udev rules for input device access
   services.udev.packages = [ pkgs.swayosd ];
 }

@@ -5,6 +5,5 @@ let
   performance = import ./performance.nix;
   clipboard = import ./clipboard.nix;
   backup = import ./backup.nix;
-  filetype = import ./filetype.nix;
 in
-display // editing // search // performance // clipboard // backup // filetype
+display // editing // search // performance // clipboard // backup
