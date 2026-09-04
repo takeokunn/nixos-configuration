@@ -7,8 +7,6 @@ M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-a
 
 - macOS (Apple Silicon)
 - Xcode Command Line Tools
-- Nix installed (multi-user installation recommended)
-- Network connectivity
 
 ** Step 1: Install Xcode Command Line Tools
 
@@ -52,9 +50,3 @@ After installation, use this command to apply configuration changes:
 #+begin_src shell
   sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
-
-** Notes
-
-- This configuration includes home-manager for user environment management
-- brew-nix is integrated for Homebrew package management through Nix
-- mac-app-util ensures macOS applications are properly linked

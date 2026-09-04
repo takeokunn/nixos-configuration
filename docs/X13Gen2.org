@@ -113,7 +113,5 @@ After installation, use this command to apply configuration changes:
 
 ** Notes
 
-- This configuration uses LUKS encryption for full disk encryption
-- Btrfs filesystem with subvolumes for efficient snapshots
-- Impermanence module for stateless system management
+- On each boot the ~@root~ subvolume is deleted and recreated blank ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]); ~@persist~, ~@home~, and ~@nix~ survive
 - home-manager is integrated with advanced profile
