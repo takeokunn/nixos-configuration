@@ -9,7 +9,7 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang;
-    description = "Default lane for ultra-complex, mission-critical tasks requiring maximum quality.";
+    description = "Lane for multi-system tasks that need additional planning and review.";
   };
   security = mkLane {
     modelTier = models.deepseekPro;
@@ -41,7 +41,7 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/ultrabrain.md;
-    description = "Hard reasoning, architecture, tradeoff analysis, and bug forensics.";
+    description = "Reasoning about architecture, tradeoffs, and bug forensics.";
   };
   deep = mkLane {
     modelTier = models.deepseekPro;
@@ -85,6 +85,6 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang;
-    description = "Complex problem-solving with unconventional, creative approaches - beyond standard patterns.";
+    description = "Uses unconventional approaches when standard patterns do not fit.";
   };
 }

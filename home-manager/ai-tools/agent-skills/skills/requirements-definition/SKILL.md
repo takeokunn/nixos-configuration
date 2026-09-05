@@ -1,6 +1,6 @@
 ---
 name: requirements-definition
-description: This skill should be used when the user asks to "define requirements", "create specification", "clarify requirements", "write requirements document", or mentions requirement analysis. Provides a requirements definition methodology.
+description: Use for requirement analysis, specification, and clarification.
 version: 3.0.0
 ---
 

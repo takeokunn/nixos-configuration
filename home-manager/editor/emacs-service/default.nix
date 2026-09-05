@@ -216,7 +216,7 @@ in
       bootstrap_emacs_agent() {
         stop_conflicting_emacs_daemon
         run /bin/launchctl bootstrap "$DOMAIN" "$PLIST_PATH" || {
-          warnEcho "Bootstrap failed — check: launchctl print gui/\$UID/$AGENT_NAME"
+          warnEcho "Bootstrap failed; check: launchctl print gui/\$UID/$AGENT_NAME"
         }
       }
 

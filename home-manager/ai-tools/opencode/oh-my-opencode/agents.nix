@@ -12,13 +12,13 @@ in
       models.promptLang
       + "\n\n"
       + "Assess the full picture, identify task dependencies, and delegate independent tasks in parallel to appropriate subagents. Always specify run_in_background when spawning subagents (false for delegation, true for parallel exploration only).";
-    description = "Ultra orchestrator. Handles the highest-stakes multi-system tasks where quality outweighs speed.";
+    description = "Orchestrates high-stakes multi-system tasks and delegates independent work.";
   };
   themis = mkLane {
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang;
-    description = "Security specialist. Vulnerability analysis, threat modeling, and security-critical code review requiring exhaustive coverage.";
+    description = "Analyzes vulnerabilities, threat models, and security-sensitive code.";
   };
   daedalus = mkLane {
     modelTier = models.deepseekPro;
@@ -37,7 +37,7 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/sisyphus.md;
-    description = "Primary orchestrator. Plans tasks, delegates to specialist agents and categories, ensures quality.";
+    description = "Plans tasks, delegates work, and consolidates results.";
   };
   atlas = mkLane {
     modelTier = models.deepseekPro;
@@ -62,7 +62,7 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/hephaestus.md;
-    description = "Autonomous deep worker. Handles complex multi-file implementations and thorough exploration.";
+    description = "Implements complex multi-file changes and explores the codebase.";
     extra = {
       allow_non_gpt_model = true;
     };
@@ -77,7 +77,7 @@ in
     modelTier = models.deepseekPro;
     variant = "xhigh";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/momus.md;
-    description = "Strict reviewer. Thorough critical code and design review.";
+    description = "Reviews code and design for defects, compatibility risks, and missed requirements.";
   };
   metis = mkLane {
     modelTier = models.deepseekPro;

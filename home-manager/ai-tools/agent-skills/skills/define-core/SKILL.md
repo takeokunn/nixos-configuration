@@ -8,7 +8,7 @@ The phase sequence /define executes, so the command file does not restate it. Qu
 formatting live in [requirements-definition](../requirements-definition/SKILL.md), loaded alongside this one.
 
 Read-only throughout: no file is created or modified, and no code is written. That is what makes the approval
-step this command exists to create meaningful.
+step meaningful.
 
 ## Phases
 

@@ -171,7 +171,7 @@ against it resolves under the cache and fails.
 `*load-truename*` may even be unbound inside a test file.
 
 ```lisp
-;; robust: anchored to the system's source directory
+;; anchored to the system's source directory
 (asdf:system-relative-pathname :my-project "tests/fixtures/data.txt")
 
 ;; fragile under FASL loads: *load-truename* points into the cache

@@ -78,7 +78,7 @@ each measured sample**, or a collection triggered by arm A's allocation pattern 
 is attributed to B.
 
 Report the **median of the paired differences plus the win count**: "B was faster in 13 of 15 pairs". The win
-count is robust to a single outlier pair in a way a mean of ratios is not, and it is immediately interpretable.
+count is less affected by a single outlier pair than a mean of ratios, and it is immediately interpretable.
 
 A complete disclosure looks like: 15 paired samples, alternating order, warmup 2, full collection before each
 sample, output signature verified identical in all 120 samples.
@@ -131,7 +131,7 @@ indicator.**
 
 Worked examples: a roughly 5.1% wall-clock improvement recorded as "observation including noise" while the
 confirmed effect was stated as a bounded reduction of at most eight cons cells per operation; a comparison
-where the timing was a single-sample indicator while the removed allocation slope was the robust result; and a
+where the timing was a single-sample indicator while the removed allocation slope was the confirmed result; and a
 wall-clock comparison rejected outright because all arms showed correlated load spikes and per-trial spreads of
 3.6x to 7.1x: **a noise floor larger than any plausible effect.**
 

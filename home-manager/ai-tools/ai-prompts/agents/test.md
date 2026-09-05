@@ -51,7 +51,7 @@ Write, run, and judge tests, and answer the question underneath all three: would
     one.</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use robust selectors for E2E: data-testid or role-based, never positional.</rule>
+  <rule>For E2E, use data-testid or role-based selectors, never positional selectors.</rule>
   <rule>Investigate a flaky test rather than ignoring it, and collect the stack trace on every failure.</rule>
   <rule>Record what was examined and judged already covered, so a short finding list still carries evidence of
     the work.</rule>
