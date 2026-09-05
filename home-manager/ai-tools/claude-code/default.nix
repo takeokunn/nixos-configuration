@@ -139,6 +139,7 @@ in
     "ask"
     "bug"
     "define"
+    "design-best-of-n"
     "execute"
     "execute-full"
     "markdown"
