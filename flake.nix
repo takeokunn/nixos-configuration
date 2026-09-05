@@ -198,6 +198,55 @@
 
       perSystem =
         { pkgs, ... }:
+        let
+          sharedAiTools = import ./home-manager/ai-tools/shared { inherit (pkgs) lib; };
+
+          # lib.debug.runTests returns [] when every case passes, else the failing cases.
+          sharedAiToolsTestFailures = pkgs.lib.debug.runTests {
+            testMcpServerToOpencodeHttp = {
+              expr = sharedAiTools.mcpServerToOpencode {
+                type = "http";
+                url = "https://example.com/mcp";
+              };
+              expected = {
+                type = "http";
+                url = "https://example.com/mcp";
+              };
+            };
+            testMcpServerToOpencodeLocalNoArgs = {
+              expr = sharedAiTools.mcpServerToOpencode { command = "/bin/foo"; };
+              expected = {
+                type = "local";
+                command = [ "/bin/foo" ];
+              };
+            };
+            testMcpServerToOpencodeLocalWithArgs = {
+              expr = sharedAiTools.mcpServerToOpencode {
+                command = "/bin/foo";
+                args = [
+                  "a"
+                  "b"
+                ];
+              };
+              expected = {
+                type = "local";
+                command = [
+                  "/bin/foo"
+                  "a"
+                  "b"
+                ];
+              };
+            };
+            testBashDenyPatternToOpencodeStripsTerminatorSuffix = {
+              expr = sharedAiTools.bashDenyPatternToOpencode "sudo rm -:*";
+              expected = "sudo rm -*";
+            };
+            testBashDenyPatternToOpencodeLeavesOtherPatternsUnchanged = {
+              expr = sharedAiTools.bashDenyPatternToOpencode "rm -rf /*";
+              expected = "rm -rf /*";
+            };
+          };
+        in
         {
           treefmt.projectRootFile = "flake.nix";
           treefmt.programs.actionlint.enable = true;
@@ -207,6 +256,20 @@
           treefmt.programs.fish_indent.enable = true;
           treefmt.programs.stylua.enable = true;
           treefmt.programs.shfmt.enable = true;
+
+          checks.shared-ai-tools-lib =
+            pkgs.runCommand "shared-ai-tools-lib-tests"
+              {
+                failuresJson = builtins.toJSON sharedAiToolsTestFailures;
+              }
+              ''
+                if [ "$failuresJson" != "[]" ]; then
+                  echo "home-manager/ai-tools/shared regression tests failed:" >&2
+                  echo "$failuresJson" >&2
+                  exit 1
+                fi
+                touch $out
+              '';
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [ nixd ];
