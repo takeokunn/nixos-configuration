@@ -247,11 +247,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788490948,
-        "narHash": "sha256-d8fF/qfPC/4V0T/+FBK3jsLhl+HJ5IsUlbQonpAaWqI=",
+        "lastModified": 1788580231,
+        "narHash": "sha256-bskwQSQCYzHaRfylelRDMmLGoGEiKyoE7gCCnqKATs4=",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "e5dd8d11067a0733efedfbaa3e6c17d2c855193a",
+        "rev": "bf4d38d57a5d08ee54625b1b97b1db1d62841512",
         "type": "github"
       },
       "original": {
@@ -268,11 +268,11 @@
       },
       "locked": {
         "dir": "pkgs/firefox-addons",
-        "lastModified": 1788494578,
-        "narHash": "sha256-u++Hq1RJDYMvQw2WEBFlW029n5Y9RimOpYrsdK8V/EY=",
+        "lastModified": 1788581480,
+        "narHash": "sha256-SXd7V3KE7DALG3TVUf2oZJGXS9QGBPhkQIKNlbkvOzA=",
         "owner": "rycee",
         "repo": "nur-expressions",
-        "rev": "f6f8cd6a1d31925cbf0e0e8b6420321b9bd5790e",
+        "rev": "8f383bcc9d61bf3153cb8e6254dda1eb19289b7c",
         "type": "gitlab"
       },
       "original": {
@@ -482,11 +482,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788499141,
-        "narHash": "sha256-G2q5XVyWN7FrlFmmTOhnEECtpmPLhDDxYm9FlJLVwcs=",
+        "lastModified": 1788588401,
+        "narHash": "sha256-hVj13FG0yZ19Gt2kUOdT5TmKGtQjBAMZGUVNUYb7fOo=",
         "owner": "kawarimidoll",
         "repo": "guard-and-guide",
-        "rev": "309d758d509b38dd7b8e2f49e4de65f4ef5e8d59",
+        "rev": "4dc81d7ae203445ac17032b373b75435efe096da",
         "type": "github"
       },
       "original": {
@@ -551,11 +551,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788494135,
-        "narHash": "sha256-AXj37NDrvBUK5bAgqhPRakqcv+7VuwjLAfRksxsmsCg=",
+        "lastModified": 1788596286,
+        "narHash": "sha256-Rvf9UTEEzXpE+cRAtrHqIRju0+vnmp56eUMwpX8lfbo=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "10e3dca999e12a0d07f1e9e470707f4386dc3178",
+        "rev": "2b0d2723e51098d42204f65120c76d60ae51fefc",
         "type": "github"
       },
       "original": {
@@ -594,11 +594,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788467186,
-        "narHash": "sha256-NmDBnUaLH/gh9Oq6j/CNydgju5SQuItcJ0zpZOMbCNE=",
+        "lastModified": 1788535939,
+        "narHash": "sha256-mCo/II1IhCSnWZC3PuGcAUSRdzKrE4CrQ+butl+EaqA=",
         "owner": "natsukium",
         "repo": "mcp-servers-nix",
-        "rev": "ce64aff50b29eb66f8f88f5a774d2641edcfb520",
+        "rev": "ba9d1f61db2ecab6cebad320e219235f1fcd0f74",
         "type": "github"
       },
       "original": {
@@ -921,11 +921,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1788372231,
-        "narHash": "sha256-7aqErvrAEz/5OcPA5p3M+tVOqeYc4oJXkNIPXfCqxAw=",
+        "lastModified": 1788400875,
+        "narHash": "sha256-JIHQ6xNAN53cdo6zZ72LRcQ9lpvnABCnNE4hldJ5uZU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "9387b3fcc0c23c86661636da63faabad4235a0a6",
+        "rev": "5545adfad2e98de106a5544ca7067e03010410bd",
         "type": "github"
       },
       "original": {
@@ -1026,11 +1026,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788494588,
-        "narHash": "sha256-BPJy3NI//j8jWwyj0gqM3ueMRSTuKFdt8j2lKCllsRA=",
+        "lastModified": 1788582094,
+        "narHash": "sha256-MaEDB1jlgWgYmJFtsRg+4uQBI9R/XcwAYWPTfqD9bx8=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "39ea7bb502a2ec2b21f387d427532fb16d3162de",
+        "rev": "35d466a28d3a089938c8c1003a289de77a5286f0",
         "type": "github"
       },
       "original": {
@@ -1057,11 +1057,11 @@
     "paredit-cli-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1788503617,
-        "narHash": "sha256-vUBvl89F2YAF/KnQ02niibpnV16I5ePi9y0X0/wcfL0=",
+        "lastModified": 1788567709,
+        "narHash": "sha256-RrTU+4HNyo80P8ISPsBIsvfOb9HLxvFcSt8X8o6J87Y=",
         "owner": "takeokunn",
         "repo": "paredit-cli",
-        "rev": "dcd00e70398506bc67c68c07c57b259caf250f9c",
+        "rev": "febeb26f3ba650c3ea33625a4f3b15c2a4f9294a",
         "type": "github"
       },
       "original": {
