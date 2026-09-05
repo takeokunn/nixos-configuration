@@ -1,6 +1,6 @@
 ---
 name: rust-ecosystem
-description: Use when working with Rust projects: Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns.
+description: Use when working with Rust projects (Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns).
 version: 3.0.0
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese: includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials.
+description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese (includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials).
 version: 3.1.0
 ---
 

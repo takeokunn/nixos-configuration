@@ -1,6 +1,6 @@
 ---
 name: parallelization-patterns
-description: Patterns for parallel execution: deciding what is genuinely independent, settling disagreement between concurrent agents, retry policy, and scheduling data-parallel work across skewed inputs.
+description: Patterns for parallel execution (deciding what is genuinely independent, settling disagreement between concurrent agents, retry policy, and scheduling data-parallel work across skewed inputs).
 version: 4.0.0
 ---
 

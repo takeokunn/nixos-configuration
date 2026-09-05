@@ -29,9 +29,20 @@ system prompt requires. The hook scripts under `ai-prompts/hooks/` likewise use 
 functional status markers in their stderr, not as decoration.
 
 Two of these patterns need a judgment pass on top of the match rather than being read as findings directly.
-The intensifier row fires on any use of its words, but the ban is on a word standing in for evidence, so a
-sentence reporting an observed fact next to the fact itself is not a hit. The parallelism row cannot tell a
-formulaic antithesis from a sentence that genuinely contrasts two things.
+The parallelism row cannot tell a formulaic antithesis from a sentence that genuinely contrasts two things.
+The intensifier row fires on any use of its words, and on this corpus most of its hits are not defects. Three
+buckets, only the last of which is a finding:
+
+- **The rule quoting its own subject**, covered in the next section.
+- **A domain term of art**, where the word carries a technical meaning no synonym replaces. "Robust to a
+  single outlier" is a statistics term in `performance-benchmarking/SKILL.md`, "robust selectors" is an
+  established test-automation term in `agents/test.md`, and "exited successfully" beside the exit status it
+  reports is a fact. None of these stand in for evidence.
+- **The word asserting quality with nothing behind it.** "Successfully implemented a robust solution", or a
+  self-description like "provides a comprehensive methodology". This is the only bucket to report.
+
+The discriminator is whether deleting the word removes information. In the second bucket it does, and in the
+third it does not.
 
 Two tells resist a pattern. "Any sentence carrying no fact the reader lacked" is a judgment call, not a string:
 for each sentence, ask what the reader loses if it is deleted, and cut it if the answer is nothing. That is

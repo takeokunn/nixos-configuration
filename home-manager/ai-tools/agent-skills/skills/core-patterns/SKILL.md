@@ -1,6 +1,6 @@
 ---
 name: core-patterns
-description: Use when authoring an agent or command that needs the shared decision-criteria or escalation template: copy them in, since a bare reference to this skill resolves to nothing at runtime. Also covers modelling absence without an in-range sentinel, safe alternatives to destructive Git commands, and when to escalate a review into an independent refutation pass.
+description: Use when authoring an agent or command that needs the shared decision-criteria or escalation template (copy them in, since a bare reference to this skill resolves to nothing at runtime). Also covers modelling absence without an in-range sentinel, safe alternatives to destructive Git commands, and when to escalate a review into an independent refutation pass.
 version: 4.0.0
 ---
 
