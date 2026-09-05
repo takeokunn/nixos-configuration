@@ -24,6 +24,13 @@ Executes a task by delegating detail to sub-agents while holding policy and orch
     correctness rule, not a style preference: padding is what makes an unverified claim read as a finished one,
     and "successfully implemented a robust solution" is the exact shape of a completion claim that names no
     command and no file:line.</rule>
+  <rule>A commit message or PR body holds only what its reader needs to approve and cannot get anywhere else.
+    Not the diff — it already shows every changed file, line, and function name. Not the commit history — it
+    already shows how the work evolved. Not a CI check that already ran — the checks tab already shows its
+    pass/fail and count. Write instead the judgment the diff can't show: why a workaround stands in for a root
+    fix, what was deliberately left out of scope, and which verification no CI gate runs and had to be done by
+    hand — name what was actually checked, not that it passed, since a selector matching nothing exits zero the
+    same as a real one.</rule>
 </rules>
 <rules priority="important">
   <rule>Delegate detail: run independent units in parallel, dependent ones in order, and verify output before
