@@ -3,7 +3,7 @@ let
   inherit (import ./lanes.nix) mkLane;
 in
 # prompt_append values sourced from ./prompts/<name>.md are live prompt text, loaded via
-# builtins.readFile — not documentation.
+# builtins.readFile, not documentation.
 {
   ultra = mkLane {
     modelTier = models.deepseekPro;

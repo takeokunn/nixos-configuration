@@ -13,7 +13,7 @@ is silently wrong.**
 Emacs 30.x is the baseline; defer to the active package set for the exact point release.
 
 - `lexical-binding: t` in the file header, always.
-- **eglot** for LSP — built-in since 29 and the recommended default.
+- **eglot** for LSP: built-in since 29 and the recommended default.
 - **Tree-sitter `*-ts-mode`** variants where available (29+, improved in 30.2).
 - The modern completion stack: vertico, orderless, marginalia, consult, corfu, cape.
 - `use-package` is built-in since 29; prefer `:custom` over `setq`, `:hook` over `add-hook`, and defer with
@@ -28,7 +28,7 @@ regardless of whether the grammar shared library is installed. `(fboundp 'json-t
 when activating the mode fails with "language grammar for LANG is unavailable". **`fboundp` answers "is this
 mode defined?", not "can this mode run?"**
 
-Use `treesit-language-available-p`, which takes a *language* symbol rather than a mode symbol — so a
+Use `treesit-language-available-p`, which takes a *language* symbol rather than a mode symbol, so a
 mode-to-language mapping is required, because the language name is not always the mode prefix
 (`js-ts-mode` → `javascript`). `treesit-ready-p` is the higher-level form that also emits the standard
 user-facing warning.
@@ -54,7 +54,7 @@ deterministic failure.
 ### Asserting contents
 
 `lookup-key` and `where-is-internal` are **lossy for test assertions**. For a key sequence that is only a
-prefix of a longer binding, `lookup-key` returns an integer — the number of events consumed — which is easy to
+prefix of a longer binding, `lookup-key` returns an integer (the number of events consumed), which is easy to
 misread as "bound to something". Bindings inside a composed keymap or a nested prefix keymap can also be missed
 depending on how the lookup is issued.
 
@@ -73,14 +73,14 @@ yourself:
 ```
 
 **Named function keys need angle brackets.** `(kbd "<left>")` returns `[left]`, which is what keymaps store.
-`(kbd "[left]")` returns the six literal characters — and because `[` is itself a self-inserting prefix,
+`(kbd "[left]")` returns the six literal characters, and because `[` is itself a self-inserting prefix,
 `lookup-key` can return an integer partial-match that disguises the mistake.
 
 Code dispatching via `call-interactively` requires the target to satisfy `commandp`. A test replacing a real
 command with a plain lambda gets `(wrong-type-argument commandp ...)`; give mock lambdas an `(interactive)`
 form.
 
-A mode's keymap and its entry point are frequently in **different files** — the keymap via `defvar-keymap` in
+A mode's keymap and its entry point are frequently in **different files**: the keymap via `defvar-keymap` in
 the main feature file, helper commands in a sibling. A test requiring only the helper feature observes an
 unbound or empty keymap and asserts against nothing. Require the feature that actually defines the keymap.
 
@@ -89,7 +89,7 @@ unbound or empty keymap and asserts against nothing. Require the feature that ac
 Emacs consults keymaps in a fixed order, and **the major-mode map sits near the bottom**: overriding and
 terminal-local maps, then `emulation-mode-map-alists`, then `minor-mode-overriding-map-alist`, then
 `minor-mode-map-alist`, then the local (major-mode) map, then global. Any package installing bindings through
-the minor-mode layers — every modal editing package does — **shadows a major-mode map unconditionally**,
+the minor-mode layers (every modal editing package does) **shadows a major-mode map unconditionally**,
 however that map is populated. A feature that must see raw keys cannot achieve it with a major-mode keymap.
 
 Install bindings that must outrank other minor modes through `emulation-mode-map-alists`, and **re-assert your
@@ -99,7 +99,7 @@ equivalent and the smaller hammer.
 
 **Never mutate a shared keymap for local state.** The map created by `define-minor-mode` or bound by
 `defvar-keymap` is a single global object reached by every buffer using that mode. Mutating it to reflect
-buffer-local state — most commonly `set-keymap-parent` to select an input mode or layout — **changes the
+buffer-local state (most commonly `set-keymap-parent` to select an input mode or layout) **changes the
 effective bindings of every other buffer using that mode**, and the symptom appears far from the cause.
 Compose per buffer instead:
 
@@ -108,7 +108,7 @@ Compose per buffer instead:
 ```
 
 Composition allocates a fresh object per buffer and leaves the shared map untouched. This is the keymap
-instance of a wider rule — **buffer-local state belongs in an object the buffer owns** — which also governs
+instance of a wider rule (**buffer-local state belongs in an object the buffer owns**), which also governs
 overlays versus text properties below.
 
 ## Verification lies
@@ -133,8 +133,8 @@ result contradicts a source change, suspect stale bytecode first.**
 ### Candidate order beats timestamp
 
 `load-prefer-newer` chooses between `.el` and `.elc` **within a single directory. It says nothing about which
-directory is consulted first.** When the same feature exists in both the worktree and an installed location — a
-Nix site-lisp path, a `package.el` tree — the first matching candidate in `load-path` wins regardless of
+directory is consulted first.** When the same feature exists in both the worktree and an installed location (a
+Nix site-lisp path, a `package.el` tree), the first matching candidate in `load-path` wins regardless of
 modification time, so an installed `.elc` shadows the source you just edited even with `load-prefer-newer` set.
 In one investigation, **ten of fifteen apparent test failures were this loader false negative** rather than a
 regression.
@@ -150,12 +150,12 @@ Place every worktree source directory ahead of any installed location explicitly
 route around it **silently**. The compiler lowers many primitives to dedicated opcodes: a compiled caller of
 `set`, `setcar`, `setcdr`, `car`, `cdr`, or `aref` emits the opcode and never consults the function cell. And a
 `defsubst` is inlined into its compiled callers, so a stub on its own symbol is never consulted. In both cases
-**the stub installs without complaint and the real implementation runs** — a green result for an injection that
+**the stub installs without complaint and the real implementation runs**: a green result for an injection that
 never happened, or a red one attributed to the wrong cause.
 
 Inject faults at a named, non-inlinable boundary you own: put the primitive mutation behind an ordinary
 `defun`, or expose an injectable hook variable. **Never promote a function tests rely on as a seam to
-`defsubst` for speed.** Assert the injected fault actually fired — a counter, a sentinel — rather than only the
+`defsubst` for speed.** Assert the injected fault actually fired (a counter, a sentinel) rather than only the
 downstream outcome, and run that assertion in both the interpreted and byte-compiled configurations, because
 the interpreted run is the one where the stub does work.
 
@@ -170,24 +170,24 @@ feature's directory is absent. Transitive requires matter: pass one `-L` per dir
 feature, including test-support helpers.
 
 **Macro expansion shape.** A `defun`-generating macro can expand to `(defalias NAME #'(lambda ...))` rather
-than a literal `defun`, and `macroexpand` is a top-level contract only — it may expand the outermost macro into
+than a literal `defun`, and `macroexpand` is a top-level contract only: it may expand the outermost macro into
 a `progn` while leaving nested calls inside `let` untouched. Normalize to a canonical shape before asserting.
 
 **Warning suppression has specific correct forms.** Under `byte-compile-error-on-warn`, a runtime
 `(boundp 'other-package-var)` guard does **not** suppress the free-variable warning, because the compiler sees
 the direct reference inside the guarded branch whether or not it runs. Read an optional late-bound global
-through `(symbol-value 'other-package-var)` after the `boundp` check — but use `symbol-value` only for optional
+through `(symbol-value 'other-package-var)` after the `boundp` check, but use `symbol-value` only for optional
 *data access*; when the variable is a genuine cross-module mutation contract, declare it with a value-less
 `(defvar other-package-var)` so the contract stays visible. On Emacs 29 a many-slot `cl-defstruct` generates a
 constructor docstring exceeding the width limit, and `with-suppressed-warnings ((docstrings) ...)` does not
-suppress it there — wrap only the offending form in `with-no-warnings`.
+suppress it there: wrap only the offending form in `with-no-warnings`.
 
 ### Dynamic modules
 
 **The loaded artifact is usually not the built artifact.** A module's load path is typically hardcoded to an
 install prefix rather than the build output, so a successful build does not imply the running Emacs sees the
 new code. A stale installed library keeps executing code deleted from the source, surfacing as doubled effects,
-rendering artifacts, or empty output — **with no error anywhere.** Compare modification times of built and
+rendering artifacts, or empty output, **with no error anywhere.** Compare modification times of built and
 installed artifacts as the *first* check, not the last.
 
 **On macOS, copying a dynamic library invalidates its ad-hoc signature.** AMFI refuses the load and the kernel
@@ -199,8 +199,8 @@ load as a signature problem until proven otherwise.
 
 `loaddefs-generate` copies the form after a `;;;###autoload` cookie **verbatim** into loaddefs, *except* for a
 fixed set it converts into safe `autoload` calls: `defun`, `defmacro`, `cl-defun`, `cl-defmacro`,
-`define-overloadable-function`. Put a cookie before anything else — a custom macro invocation, a side-effecting
-top-level form — and **the whole form is copied raw and executed at load time**, running side effects
+`define-overloadable-function`. Put a cookie before anything else (a custom macro invocation, a side-effecting
+top-level form) and **the whole form is copied raw and executed at load time**, running side effects
 unconditionally and possibly failing if the macro is not yet defined.
 
 Place a bare cookie only before a recognized definition form. To autoload a name produced by a custom macro,
@@ -222,20 +222,20 @@ A `defmacro` needs three protections Elisp does not give automatically. A helper
 *during expansion* must exist at compile time, which means wrapping it in `eval-and-compile`; a plain `defun`
 is not evaluated while the calling file is being byte-compiled, so expansion fails with `void-function` at
 compile time rather than at runtime (the cross-file recompilation trap above is the sibling failure of the same
-root cause). Every symbol the macro introduces that the caller did not write must be uninterned — prefer
+root cause). Every symbol the macro introduces that the caller did not write must be uninterned: prefer
 `(cl-gensym "prefix-")`, whose counter suffix keeps repeated expansions distinguishable in a backtrace, over
 `(make-symbol "prefix")`, which returns exactly the name given, so every call site shares one print name. And
 Elisp derives neither indentation nor Edebug support from a macro's lambda list: a macro taking a body argument
 needs `(declare (indent N) (debug FORM))` as its first form, or callers get flat default indentation and no
 step-debugging into the body. Finally, a macro must never evaluate a caller-supplied argument form more than
-once or reorder its evaluation relative to other arguments — bind each one exactly once through a gensym'd
+once or reorder its evaluation relative to other arguments: bind each one exactly once through a gensym'd
 `let` before referencing it, since `cl-lib` has no `once-only` helper to reach for.
 
 ## Lifecycle and error boundaries
 
 A cleanup or teardown boundary is a rollback. Two ownership rules extend the condition-handling discipline in
 the next section. A teardown loop must isolate per-item failure rather than aborting on the first one, since an
-aborted loop leaves every later resource fully live — held, registered, retained — while the caller's aggregate
+aborted loop leaves every later resource fully live (held, registered, retained) while the caller's aggregate
 state already reports "shut down," with no remaining owner positioned to retry. And restoring state recovers
 values, not the identity of any reference a
 caller already holds: a caller that captured a handle before the transaction still observes the mutated
@@ -245,12 +245,12 @@ original through that handle even after "rollback" completes, unless the restore
 
 `C-g` signals `quit`, and **`quit` is not a subtype of `error`.** A `condition-case` naming only `error` does
 not run for a user interrupt: the non-local exit passes straight through and skips whatever the handler was
-going to do. Because `C-g` is a routine user action, this supposedly rare path is common — and an adversarially
+going to do. Because `C-g` is a routine user action, this supposedly rare path is common, and an adversarially
 injected `quit` walks out of a cleanup helper instead of making it fail closed.
 
 Every cleanup, teardown, or fault-isolating boundary handles **both `error` and `quit`**: capture the first
-condition, keep running every remaining step, then re-signal the captured condition unchanged — same symbol,
-same payload — so callers observe the original failure rather than a cleanup artefact.
+condition, keep running every remaining step, then re-signal the captured condition unchanged (same symbol,
+same payload) so callers observe the original failure rather than a cleanup artefact.
 
 ```elisp
 (defun my-run-cleanup-steps (steps)
@@ -267,14 +267,14 @@ Bind `inhibit-quit` around the whole restoration when a second pending `C-g` cou
 ### A major-mode change erases buffer-local state
 
 Changing a buffer's major mode calls `kill-all-local-variables`, which runs `change-major-mode-hook` **first**
-and erases buffer-local bindings afterwards. A buffer-local minor mode recording its resources — overlays,
-markers, timers, processes, registry entries — in buffer-local variables **loses the handle the moment the user
+and erases buffer-local bindings afterwards. A buffer-local minor mode recording its resources (overlays,
+markers, timers, processes, registry entries) in buffer-local variables **loses the handle the moment the user
 types `M-x fundamental-mode`.** Its disable command never runs, `kill-buffer-hook` never runs because the
 buffer is still alive, and a global disable command can no longer discover the orphaned resources. Two
 independent packages have hit this the same way.
 
-Register a buffer-local `change-major-mode-hook` entry calling one shared teardown — the same one the disable
-command and `kill-buffer-hook` call — so resources are released while local state still exists. Make it
+Register a buffer-local `change-major-mode-hook` entry calling one shared teardown (the same one the disable
+command and `kill-buffer-hook` call) so resources are released while local state still exists. Make it
 idempotent, because all three paths can fire for the same buffer.
 
 ```elisp
@@ -322,7 +322,7 @@ state and the value; on restore, remove every watcher currently present includin
 restore the value or unbound state, then re-add the saved watchers **in reverse order**.
 
 Installing an anonymous lambda as a watcher makes it unremovable by identity, so every module reload
-accumulates another copy — the same trap as a lambda in a hook, with no `remove-hook`-style escape. Always
+accumulates another copy, the same trap as a lambda in a hook, with no `remove-hook`-style escape. Always
 install a stable named function and remove it before re-adding.
 
 ## Buffer state and editing contracts
@@ -332,8 +332,8 @@ install a stable named function and remove it before re-adding.
 Text properties live in the buffer text, so they are **shared with every indirect buffer** made from the same
 base: applying `read-only` or `cursor-intangible` in an indirect buffer makes the base read-only too, even
 though the buffer-local variable tracking that decoration is not shared and the base has no record of it. Text
-properties also have **no notion of an owner** — two features writing the same property over overlapping ranges
-are indistinguishable — so a feature that captures the previous value and restores it later silently discards
+properties also have **no notion of an owner** (two features writing the same property over overlapping ranges
+are indistinguishable) so a feature that captures the previous value and restores it later silently discards
 whatever a concurrent writer added. That has been reproduced as real state loss.
 
 Overlays are the opposite: each belongs to exactly one buffer, is not shared with indirect buffers, and is a
@@ -354,8 +354,8 @@ authoritative bounds in **markers**, and resynchronize the overlays from those m
 
 ### Region and atomic-change contracts
 
-`(interactive "r")` supplies point and mark **whenever a mark exists at all** — it does not require the region
-to be active — so a command declared with `"r"` will cheerfully transform a stale range the user does not
+`(interactive "r")` supplies point and mark **whenever a mark exists at all** (it does not require the region
+to be active) so a command declared with `"r"` will cheerfully transform a stale range the user does not
 believe is selected. Guard with an explicit `use-region-p` check.
 
 `atomic-change-group` reverts buffer *text* on a non-local exit but **does not restore point or mark**, so an
@@ -366,7 +366,7 @@ yourself on **both** the error and the quit path.
 
 ### `insert` is not `self-insert-command`
 
-A great deal of behaviour hangs off `post-self-insert-hook` — `electric-pair-mode`, `electric-indent-mode`,
+A great deal of behaviour hangs off `post-self-insert-hook`: `electric-pair-mode`, `electric-indent-mode`,
 auto-fill, abbrev expansion, many minor modes. **`insert` does not run that hook.** Code typing characters on
 the user's behalf therefore disables all of it silently, with no error and no visible cause.
 
@@ -383,19 +383,19 @@ the user's behalf therefore disables all of it silently, with no error and no vi
 **Mutating a stored key orphans the entry.** A hash table computes a key's hash once, at insertion. Under
 `equal` the key is compared structurally, so a mutable key the caller destructively modifies after `puthash`
 **no longer hashes to the bucket its entry sits in.** The entry becomes unreachable under both old and new key
-while the physical entry remains — logical and physical size diverge, and repeated put-then-mutate grows the
+while the physical entry remains: logical and physical size diverge, and repeated put-then-mutate grows the
 table without bound. A reproducer with capacity one and twenty iterations ended with logical size one and
 physical size twenty.
 
 A public API accepting a caller-owned mutable value as a key must **detach it before storing**:
 `copy-sequence` for a string or vector, a deep copy for a structured key. Where keys may be cyclic, register a
-dedicated test with `define-hash-table-test` backed by `sxhash-equal` and a cycle-safe comparison — on Emacs 30
+dedicated test with `define-hash-table-test` backed by `sxhash-equal` and a cycle-safe comparison: on Emacs 30
 the built-in `equal` test can signal `circular-list` on cyclic cons keys. **Unbounded growth of a table whose
 logical size stays small is the diagnostic signature.**
 
 **Recursion bounded by collection length.** Elisp recursion is bounded by `max-lisp-eval-depth`, and that
-ceiling is reached by ordinary data. A recursive walk whose depth tracks the **length of a collection** — the
-characters of a long key, the entries of a bucket, the elements of a list being copied — passes every small
+ceiling is reached by ordinary data. A recursive walk whose depth tracks the **length of a collection** (the
+characters of a long key, the entries of a bucket, the elements of a list being copied) passes every small
 test and fails once real input arrives: a scale-dependent failure with no reproducible trigger. Recursion
 bounded by *structural nesting* is a different case and is generally fine.
 
@@ -407,7 +407,7 @@ connecting edges. This preserves cycles and shared identity in O(V+E) at constan
 **An absent stamp is not a comparable value.** A cache validated by "the recorded stamp still equals the
 current stamp" degenerates into "always valid" whenever the stamp function returns nil for an absent input. If
 the stamp is a sentinel file's mtime from `file-attributes`, a missing sentinel yields nil, the entry stores
-nil, and `(equal nil nil)` reports a hit **forever.** The scheme is correct exactly when the sentinel exists —
+nil, and `(equal nil nil)` reports a hit **forever.** The scheme is correct exactly when the sentinel exists,
 the case the author tested. Treat an unobtainable stamp as a miss and refuse to store an entry whose validity
 token is nil.
 
@@ -415,7 +415,7 @@ token is nil.
 
 **`with-timeout` does not bound a synchronous call.** It schedules a timer, and timers fire only when Emacs
 reaches its event loop. A synchronous `call-process` never returns to the event loop, so Emacs simply stays
-blocked — **the timeout appears to work only because the helper usually returns quickly.** The same call
+blocked: **the timeout appears to work only because the helper usually returns quickly.** The same call
 accumulates unbounded stdout and returns an exit status easy to discard by accident.
 
 Run any helper that could hang under `make-process`, with one decrementing wait budget shared by startup and
@@ -423,14 +423,14 @@ draining, a byte-counted cap on accumulated stdout, a separate non-accumulating 
 explicit check that the exit status was zero before believing the output.
 
 **The exit sentinel can precede pending output.** A sentinel reporting termination does not mean output has
-been delivered — output the child already wrote may still be pending in the filter. A stress probe of a helper
+been delivered: output the child already wrote may still be pending in the filter. A stress probe of a helper
 writing 32 bytes **lost stdout in 12 of 20 runs**, and a test against it fails intermittently in a full suite
 while passing alone. After the sentinel fires, keep draining with `accept-process-output` until the process is
 no longer live *and* no further output arrives. Read an intermittent truncation that appears only under load as
 a drain race, not as flakiness to retry away.
 
 **The wait budget is shared by startup and drain.** `accept-process-output`'s TIMEOUT bounds a single slice, so
-any aggregate bound is the caller's to maintain — as a decrementing budget, never an absolute deadline
+any aggregate bound is the caller's to maintain: as a decrementing budget, never an absolute deadline
 recomputed from `float-time`.
 
 ```elisp
@@ -446,20 +446,20 @@ recomputed from `float-time`.
         (setq remaining (- remaining slice))))))
 ```
 
-Validate the budget and reject degenerate values — non-numeric, NaN, non-finite, zero, negative — rather than
+Validate the budget and reject degenerate values (non-numeric, NaN, non-finite, zero, negative) rather than
 clamping silently, and cap the iteration count so a slice returning immediately cannot spin.
 
 **JUST-THIS-ONE is asymmetric.** It suppresses processing of other processes' events, which is what you want
-while draining a response body — it stops unrelated filters running re-entrantly mid-read. It is **wrong**
+while draining a response body: it stops unrelated filters running re-entrantly mid-read. It is **wrong**
 while waiting for a `:nowait` connection to be established, because the connection-completion event goes
 through the same machinery: pinning attention to that one process can prevent Emacs ever observing that it
 connected. Leave it nil when awaiting establishment; pass it non-nil when reading from an established process.
 
-**Process-tree cleanup needs identity.** A PID is not an identity — the OS reuses PIDs, so a routine recording
+**Process-tree cleanup needs identity.** A PID is not an identity: the OS reuses PIDs, so a routine recording
 a PID and signalling it later can signal an unrelated process. Descendants make it worse: a helper that forks
 and exits immediately leaves a `setsid` child reparented away before any process-table scan sees it,
 **reproduced in 10 of 10 attempts.** And a scan bounded for memory reaches its cap as *saturation*, which is
-not the same as having enumerated everything — treating the cap as completion silently orphans the remainder.
+not the same as having enumerated everything: treating the cap as completion silently orphans the remainder.
 
 Identify by the pair of PID and immutable start time, re-verified immediately before and after stopping.
 The safe sequence is SIGSTOP, re-verify identity, then SIGKILL only confirmed-stopped identities, so a recycled
@@ -471,8 +471,8 @@ success. Use a monotonic clock for the deadline, and spool large output to a bou
 **Remote paths block; subprocesses do not follow.** Emacs file-name primitives are remote-transparent:
 `file-exists-p`, `file-attributes`, and `directory-files` on a remote path go over the network and can block
 for a full remote-access timeout, **freezing the UI during what looked like local bookkeeping.** Subprocess
-primitives are *not* symmetrically transparent — `shell-command-to-string` and `call-process` run locally
-regardless of a remote `default-directory` — so a helper invoked to inspect "the project" inspects the wrong
+primitives are *not* symmetrically transparent (`shell-command-to-string` and `call-process` run locally
+regardless of a remote `default-directory`) so a helper invoked to inspect "the project" inspects the wrong
 machine and returns confidently wrong metadata. Two unrelated packages have hit one side each.
 
 Guard bulk filesystem work with `(and (file-exists-p path) (not (file-remote-p path)))`. When a subprocess must
@@ -486,8 +486,8 @@ look inert and are not.
 
 **Opening a file can execute it.** Visiting a file applies its file-local variables, and a file-local `eval:`
 entry is code chosen by whoever wrote the file. Any package opening a path derived from outside the user's own
-intent — a request handled by an in-Emacs server, a link inside rendered content, an entry from a search index
-— **hands arbitrary code execution to whoever controls that file, at the moment of preview.**
+intent (a request handled by an in-Emacs server, a link inside rendered content, an entry from a search index)
+**hands arbitrary code execution to whoever controls that file, at the moment of preview.**
 
 ```elisp
 (let ((enable-local-variables nil)
@@ -498,7 +498,7 @@ intent — a request handled by an in-Emacs server, a link inside rendered conte
 ```
 
 **Decode-then-validate is not enough.** `url-unhex-string` is a decoder, not a validator, and it fails open in
-two directions: it normalizes some sequences — `%0d%0a` can emerge as spaces — so a check on the decoded string
+two directions: it normalizes some sequences (`%0d%0a` can emerge as spaces) so a check on the decoded string
 never sees the CRLF that was in the input, which is the classic header-injection bypass; and it **preserves
 malformed triplets like `%ZZ` verbatim** rather than rejecting them. Validate the raw encoded form first,
 rejecting percent-encoded control characters and malformed triplets, then decode, then validate again. **The
@@ -506,7 +506,7 @@ pre-decode check is the one usually missing.**
 
 **Strings carry text properties into the display.** An Elisp string is not a leaf value: it can carry
 `display`, `keymap`, `local-map`, and `face`, any of which change what the user sees and what their keys do. A
-string from a data file, a network response, or persisted state can carry any of them — and ordinary operations
+string from a data file, a network response, or persisted state can carry any of them, and ordinary operations
 preserve them: `concat` keeps them, `format` propagates them from a `%s` operand into its result, and
 `propertize` **adds** a property rather than replacing the set, so applying your own outer face does not remove
 an attacker-selected `keymap`. Copying does not help: **`copy-tree` does not copy strings**, so a deep copy
@@ -535,39 +535,39 @@ macro invocations are its only consumers.
 
 Discover a project's conventions from its own artifacts rather than guessing:
 
-- **Commit style** — CONTRIBUTING plus `git log` for the actual norm.
-- **Changelog** — the file and its format, including symbol-quoting conventions.
-- **Naming** — the private/public prefix split (`pkg--` vs `pkg-`).
-- **Test harness** — how tests run (`make test`, `eask`, `ert-runner`), the file layout, tags used to skip
+- **Commit style**: CONTRIBUTING plus `git log` for the actual norm.
+- **Changelog**: the file and its format, including symbol-quoting conventions.
+- **Naming**: the private/public prefix split (`pkg--` vs `pkg-`).
+- **Test harness**: how tests run (`make test`, `eask`, `ert-runner`), the file layout, tags used to skip
   environment-specific cases, and the mocking idiom (commonly `cl-letf` on `symbol-function`).
-- **Compatibility gate** — the minimum Emacs version, the CI matrix, and whether byte-compilation is treated as
+- **Compatibility gate**: the minimum Emacs version, the CI matrix, and whether byte-compilation is treated as
   an error.
-- **Formatting commits** — whether whitespace-only changes must be separate and recorded in
+- **Formatting commits**: whether whitespace-only changes must be separate and recorded in
   `.git-blame-ignore-revs`.
 
 Publishing to MELPA means keeping the recipe, the main library's headers, and the local lint/compile targets in
 agreement with what package-build actually generates rather than with the working tree verbatim.
 
-- **Recipe** — a single Lisp form in the archive's `recipes/` directory, named exactly after the package
+- **Recipe**: a single Lisp form in the archive's `recipes/` directory, named exactly after the package
   (`(foo :fetcher github :repo "owner/foo")`). A submission is a pull request adding only that file, built
   against the current repository HEAD.
-- **Version** — computed, not the `Version:` header you wrote. The unstable channel is stamped from the date of
+- **Version**: computed, not the `Version:` header you wrote. The unstable channel is stamped from the date of
   the latest commit touching a selected file, the stable channel from a matching SCM tag parsed by
   `version-to-list`. The header is a floor that package-lint and package.el read literally, so it must still be
   present and monotonic.
-- **Generated files** — never commit `NAME-pkg.el` or autoloads. Anything package-build generates and you also
+- **Generated files**: never commit `NAME-pkg.el` or autoloads. Anything package-build generates and you also
   commit either gets overwritten or ships stale.
-- **`:files`** — the exact boundary of what an installed user receives. The default set already covers
+- **`:files`**: the exact boundary of what an installed user receives. The default set already covers
   top-level and `lisp/*.el` plus docs and excludes test files, so most packages need no override at all.
-- **package-lint / checkdoc** — package-lint checks that the declared `emacs` minimum in `Package-Requires`
+- **package-lint / checkdoc**: package-lint checks that the declared `emacs` minimum in `Package-Requires`
   matches the newest built-in symbol the code actually calls, and that every defined symbol carries the package
   prefix. checkdoc governs docstring form: imperative-mood first sentence, `` `symbol' `` quoting.
-- **Release gate** — must not mutate the contributor's tree or personal package directory. Byte-compile and
+- **Release gate**: must not mutate the contributor's tree or personal package directory. Byte-compile and
   validate generated autoloads in a temporary directory, and never infer success from `git diff` against
   ignored generated files.
 
 ## Related
 
-- [trust-boundaries](../trust-boundaries/SKILL.md) — the general untrusted-input discipline
-- [test-integrity](../test-integrity/SKILL.md) — proving which implementation a test actually loaded
-- [testing-patterns](../testing-patterns/SKILL.md) — seam design and fixture isolation
+- [trust-boundaries](../trust-boundaries/SKILL.md): the general untrusted-input discipline
+- [test-integrity](../test-integrity/SKILL.md): proving which implementation a test actually loaded
+- [testing-patterns](../testing-patterns/SKILL.md): seam design and fixture isolation

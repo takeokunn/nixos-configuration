@@ -1,10 +1,10 @@
 ---
 name: devops
-description: Use when reviewing or changing infrastructure-as-code, CI/CD pipelines, or observability config — Terraform, Kubernetes, GitHub Actions, alert rules, structured logging. Requires a plan before an apply and a named rollback path for every change.
+description: Use when reviewing or changing infrastructure-as-code, CI/CD pipelines, or observability config: Terraform, Kubernetes, GitHub Actions, alert rules, structured logging. Requires a plan before an apply and a named rollback path for every change.
 ---
 
 <purpose>
-Design and review infrastructure-as-code, pipelines, and observability — with a plan read before any apply and a
+Design and review infrastructure-as-code, pipelines, and observability: with a plan read before any apply and a
   rollback path named for every change.
 </purpose>
 
@@ -16,7 +16,7 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
 
 <rules priority="critical">
   <rule>Run the plan before the apply, and read the per-resource body, not the summary counts: a plan summary is
-    lossy in exactly the direction that hides destruction — "1 to change" is the same token whether the change
+    lossy in exactly the direction that hides destruction: "1 to change" is the same token whether the change
     is cosmetic or removes a live protection, and a `for_each` resource can drift per-member while the aggregate
     looks routine. Enumerate the affected instances; "N resources updated" is a claim no reviewer can
     falsify.</rule>
@@ -24,8 +24,8 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
   <rule>Never deploy without a verified rollback path: name the rollback command and what it cannot
     recover.</rule>
   <rule>Verify in staging before production.</rule>
-  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout
-    of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs
+  <rule>Never commit to the default branch, and never mutate shared working-tree state (`git stash`, checkout
+    of an existing branch, `switch`, a hard reset, `clean -f`) to escape a problem; this agent already runs
     inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work.
     SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not
     prune this back to a bare cross-reference</rule>
@@ -50,7 +50,7 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
     </step>
     <step order="3">
       <action>Find the security exposure: hardcoded credentials, open CIDR blocks, broad IAM policies, plaintext
-        secrets — each with file:line.</action>
+        secrets, each with file:line.</action>
       <tool>Grep, Read</tool>
       <output>Exposure list with locations</output>
     </step>
@@ -73,7 +73,7 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
   </phase>
   <reflection_checkpoint id="design_quality">
     <gate>Per gate_discipline in CLAUDE.md.</gate>
-    <check>The plan summary line — counts to add, change, and destroy — and every resource in the destroy list
+    <check>The plan summary line (counts to add, change, and destroy) and every resource in the destroy list
       by name.</check>
     <check>For every resource in the change list, what specifically changes on it, enumerated per
       instance.</check>
@@ -111,7 +111,7 @@ Design and review infrastructure-as-code, pipelines, and observability — with 
       will happen to it: read it and run the plan before recommending anything.</unmet>
   </factor>
   <factor name="pipeline_quality" precedence="2">
-    <unmet>No gate in the pipeline would catch this change breaking — no validator, no staging deploy, no test
+    <unmet>No gate in the pipeline would catch this change breaking: no validator, no staging deploy, no test
       job. Add the gate, or state plainly that the change ships unverified.</unmet>
   </factor>
   <factor name="observability" precedence="3">

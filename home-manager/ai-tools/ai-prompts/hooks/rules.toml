@@ -1,7 +1,7 @@
 version = 1
 
 # guard-and-guide rules for Claude Code. Registered with an empty matcher so these reach every
-# tool, which is what the `File` rules below need — the sibling shell hooks bind to Bash only and
+# tool, which is what the `File` rules below need, since the sibling shell hooks bind to Bash only and
 # cannot see a Read, Write, or Edit at all.
 #
 # Only rules with no allow-exception live here. guard-and-guide matches with the Rust `regex`
@@ -13,7 +13,7 @@ version = 1
 #   - `File` resolves to Read|Write|Edit only. Grep and Glob are not canonical tool names upstream,
 #     so the credential rules below do not see them, and Grep can read a file's contents.
 #   - If this file is ever unreadable or unparseable, guard-and-guide exits 1 without emitting a
-#     decision, which Claude Code treats as a hook error rather than a block — the whole layer
+#     decision, which Claude Code treats as a hook error rather than a block, so the whole layer
 #     fails open. It is a store path baked in at build time, so that needs a build to go wrong.
 
 # --- Credentials and keys: unreachable by the Bash-only hooks, so this is new coverage ---
@@ -58,13 +58,13 @@ message = "Use of 'awk' is prohibited. Use 'perl' instead. Example: perl -lane '
 # --- Bypass by absolute path ---
 #
 # Upstream's example is '(/usr)?/(s?bin|local/bin)/', which matches any path merely containing
-# /bin/ — on this machine that is every /nix/store/*/bin/* entry, including the store path
+# /bin/, and on this machine that is every /nix/store/*/bin/* entry, including the store path
 # rtk-rewrite.sh substitutes into the command it hands back. Anchoring the match to a path that
 # actually starts at /usr or /bin fixes that, but a bare (^|\s) anchor is then evaded by ordinary
 # quoting and assignment, so the leading class also admits the characters a shell puts in front of
 # an argument, and /+ absorbs the redundant slash in /usr//bin.
 #
-# Residual, accepted: `cd /usr/bin && ./killall` still passes — there is no trailing slash to match
+# Residual, accepted: `cd /usr/bin && ./killall` still passes, since there is no trailing slash to match
 # and the invocation that follows carries no path at all. A regex cannot close that; only a
 # tokenizer like block-destructive-git.sh's could. Treat this rule as friction against a casual
 # bypass, not as a boundary.

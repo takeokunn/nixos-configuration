@@ -1,10 +1,10 @@
 ---
 name: design
-description: Use when a task needs architecture evaluation, dependency and layer-violation checking, requirements decomposition, or effort estimation — circular dependencies, module boundaries, coupling and cohesion, ADRs, and where a new component belongs. Use proactively before implementation starts, not only in review, because a placement mistake costs more to correct than the code it holds.
+description: Use when a task needs architecture evaluation, dependency and layer-violation checking, requirements decomposition, or effort estimation: circular dependencies, module boundaries, coupling and cohesion, ADRs, and where a new component belongs. Use proactively before implementation starts, not only in review, because a placement mistake costs more to correct than the code it holds.
 ---
 
 <purpose>
-Evaluate architecture, validate dependencies, decide where a component belongs, and size the work — all from
+Evaluate architecture, validate dependencies, decide where a component belongs, and size the work: all from
   what the tree actually shows.
 </purpose>
 
@@ -16,11 +16,11 @@ Evaluate architecture, validate dependencies, decide where a component belongs, 
 </skills_to_load>
 
 <rules priority="critical">
-  <rule>Verify dependencies with find_referencing_symbols before any design decision — one inferred from a
+  <rule>Verify dependencies with find_referencing_symbols before any design decision: one inferred from a
     directory name isn't a dependency.</rule>
   <rule>Never estimate in clock time: hours depend on who works and how often they are interrupted, so the
-    number can only be fabricated. Estimate in tree-derived units — files touched, call sites from a reference
-    search, dependency depth, test cases required — naming the unit, the search behind it, and the unresolved
+    number can only be fabricated. Estimate in tree-derived units (files touched, call sites from a reference
+    search, dependency depth, test cases required) naming the unit, the search behind it, and the unresolved
     input that would move the figure most, on its own line.</rule>
 </rules>
 <rules priority="high">
@@ -28,14 +28,14 @@ Evaluate architecture, validate dependencies, decide where a component belongs, 
     component belongs exists before the code does, and a layer violation found in review costs a dependency-wide
     move, not an edit.</rule>
   <rule>When aligning an artifact to a reference implementation, close the gap in one direction only: a stricter
-    security gate, verification step, or fail-closed behavior on the aligned side is an asset, not a divergence
-    — align the looser side up, never the stricter side down, even if the difference wasn't listed in advance as
+    security gate, verification step, or fail-closed behavior on the aligned side is an asset, not a divergence:
+    align the looser side up, never the stricter side down, even if the difference wasn't listed in advance as
     protected.</rule>
   <rule>Report a circular dependency or layer violation only against a layering rule the project actually
-    states, and say where — if none exists, say so: a violation can't be claimed against a convention invented
+    states, and say where; if none exists, say so: a violation can't be claimed against a convention invented
     during the review.</rule>
-  <rule>Where a design crosses an ownership boundary, name the commit point — the single irreversible step that
-    makes the change visible — and state what's undoable before it and best-effort after. A design mutating two
+  <rule>Where a design crosses an ownership boundary, name the commit point (the single irreversible step that
+    makes the change visible) and state what's undoable before it and best-effort after. A design mutating two
     owners without one risks a partial write nobody can repair. Say whether a retried step is idempotent, and
     treat an indeterminate read as its own outcome, not as absence.</rule>
 </rules>
@@ -46,8 +46,8 @@ Evaluate architecture, validate dependencies, decide where a component belongs, 
 <workflow>
   <phase name="analyze">
     <step order="1">
-      <action>Map the component hierarchy and identify the architecture pattern from structural facts — import
-        direction, boundary types — not directory names; read existing ADRs.</action>
+      <action>Map the component hierarchy and identify the architecture pattern from structural facts (import
+        direction, boundary types) not directory names; read existing ADRs.</action>
       <tool>Serena get_symbols_overview, find_symbol, read_memory</tool>
       <output>Component hierarchy, pattern with the facts identifying it, decision history</output>
     </step>
@@ -65,19 +65,19 @@ Evaluate architecture, validate dependencies, decide where a component belongs, 
   </phase>
   <reflection_checkpoint id="verification_complete" after="analyze">
     <gate>Per gate_discipline in CLAUDE.md.</gate>
-    <check>Each module whose imports were traced and the tool call that traced them — an unlisted module is
+    <check>Each module whose imports were traced and the tool call that traced them: an unlisted module is
       unverified, not clean.</check>
     <check>Every wrong-direction import with its file:line, or that none were found among the modules
       named.</check>
     <check>The architecture pattern and the structural facts identifying it.</check>
     <check>The ADRs read from memory, or that list_memories returned none for this component.</check>
-    <on_unmet>Trace remaining modules before reporting; if the project never states its layering rule, say so —
+    <on_unmet>Trace remaining modules before reporting; if the project never states its layering rule, say so:
       a violation can't be claimed against a rule that doesn't exist.</on_unmet>
   </reflection_checkpoint>
   <phase name="plan">
     <step order="1">
-      <action>Structure requirements — functional and non-functional, use cases as actors/goals/flows,
-        acceptance criteria as observable behavior — then decompose into tasks with their dependency
+      <action>Structure requirements (functional and non-functional, use cases as actors/goals/flows,
+        acceptance criteria as observable behavior) then decompose into tasks with their dependency
         graph.</action>
       <output>Requirements and the task dependency graph</output>
     </step>
@@ -113,7 +113,7 @@ Evaluate architecture, validate dependencies, decide where a component belongs, 
 </decision_criteria>
 
 <escalations>
-  <escalation condition="Circular dependency">Fatal — report it before any other finding</escalation>
+  <escalation condition="Circular dependency">Fatal: report it before any other finding</escalation>
   <escalation condition="Layer violation">High severity, stated against the rule the project
     defines</escalation>
   <escalation condition="Requirements unclear">List the ambiguities rather than resolving them

@@ -1,5 +1,5 @@
 #!/bin/bash
-# PreToolUse:Bash hook — blocks git commands that mutate shared working-tree state, since
+# PreToolUse:Bash hook that blocks git commands that mutate shared working-tree state, since
 # concurrent sessions may share this checkout: stash (except list/show), switch,
 # reset --hard, clean -f, checkout <ref>. Allows checkout -b/-B/--orphan and checkout -- <path>.
 # Looks through shell wrappers (bash -c, xargs, sudo, ...) to find the underlying git command,
@@ -25,7 +25,7 @@ if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
-# Bound to a variable, not heredoc-fed via $(...) — macOS's bash 3.2 mis-parses a heredoc
+# Bound to a variable, not heredoc-fed via $(...), since macOS's bash 3.2 mis-parses a heredoc
 # containing a backtick inside $(...).
 read -r -d '' perl_prog <<'PERL' || true
 use strict;
@@ -123,7 +123,7 @@ sub lex_segments {
         }
 
         # Redirections. The operator and its target are not commands, and a heredoc body is
-        # data — `cat <<EOF` followed by the words "git stash" must not read as an invocation.
+        # data: `cat <<EOF` followed by the words "git stash" must not read as an invocation.
         if ($c eq q{<} or $c eq q{>}) {
             # A leading file descriptor number belongs to the redirection, not to a word.
             $tok = undef if defined $tok and !$tok->{quoted} and $tok->{text} =~ /^\d+$/;
@@ -344,8 +344,8 @@ Assume other Claude Code sessions are working in this same checkout right now.
 
 Use instead:
   Isolate a branch     git worktree add -b feat/<name> "\$(d=\$(git rev-parse --path-format=absolute --git-common-dir); echo "\${d%/.git}")/.worktrees/<timestamp>-<sha>" origin/<default>
-  Park changes         git commit -m "WIP" (on your own branch) — not git stash
-  Undo a commit        git revert <sha>, or git reset --soft HEAD~1 — not --hard
+  Park changes         git commit -m "WIP" (on your own branch), not git stash
+  Undo a commit        git revert <sha>, or git reset --soft HEAD~1, not --hard
   Discard one file     git checkout -- <path> (allowed)
   New branch           git checkout -b <name> (allowed)
 

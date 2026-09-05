@@ -16,12 +16,12 @@ are gone. Before adding a template, check that something will actually carry it.
 Every finding carries the evidence that backs it, so a reader can check the report rather than trust a number
 it asserts about itself.
 
-- **status** — success | warning | error
-- **summary** — what was asked, what was found, what remains unchecked
-- **verification** — the exact command(s) run and their exit status, or "none run". Never omitted.
-- **findings** — each with its claim, its tier (verified | inferred | assumed), the file:line or command
+- **status**: success | warning | error
+- **summary**: what was asked, what was found, what remains unchecked
+- **verification**: the exact command(s) run and their exit status, or "none run". Never omitted.
+- **findings**: each with its claim, its tier (verified | inferred | assumed), the file:line or command
   behind it, and the detail
-- **gaps** — anything asked for that was not done, and why
+- **gaps**: anything asked for that was not done, and why
 - **next_actions**
 
 `gaps` is not optional. **An empty list is a claim that nothing was left undone, and it is checkable; omitting
@@ -29,7 +29,7 @@ the field hides the question.**
 
 ### Where the status criteria live
 
-The resident configuration defines status and the output contract, and it is in context on every request — so
+The resident configuration defines status and the output contract, and it is in context on every request, so
 a command or agent names it rather than restating it, and the reference resolves.
 
 This is the one exception to the rule that a pointer delivers nothing. That rule holds for *skill* references,
@@ -40,7 +40,7 @@ it first.
 
 ## Checkpoints
 
-A gate between phases, cleared by an artifact — a path, a command, a name — so that failing it is visible in
+A gate between phases, cleared by an artifact (a path, a command, a name) so that failing it is visible in
 the transcript.
 
 ```xml
@@ -53,7 +53,7 @@ the transcript.
 </reflection_checkpoint>
 ```
 
-**Phrase every check so it can fail.** "Have I gathered sufficient evidence?" cannot — it is answered yes by
+**Phrase every check so it can fail.** "Have I gathered sufficient evidence?" cannot: it is answered yes by
 whatever evidence was gathered. "Name the files read" can.
 
 ## The prepare phase
@@ -85,7 +85,7 @@ work starts, so a lookup-shaped task reads the index and stops there.
 
 ## Self-evaluation
 
-A final pass that looks for **what is missing** from the report — something a model can actually do — rather
+A final pass that looks for **what is missing** from the report (something a model can actually do) rather
 than rating what is present, which it cannot.
 
 1. Re-read the report and tag each finding. Any tagged verified must name the command or file:line behind it;
@@ -112,12 +112,12 @@ definition of done for adding a convention includes its enforcement mechanism, n
 - Style and idiom → the project's formatter and linter configuration, not review comments.
 - Import and layering constraints → a dependency or import-boundary checker.
 - Dead exports and unreachable code → a detector, so a removal convention stays true over time.
-- Rules no off-the-shelf tool knows → a test in the normal suite, scanning emitted output — format strings,
-  generated text — rather than whole-file text, since a whole-file scan flags a comment or doc line that merely
+- Rules no off-the-shelf tool knows → a test in the normal suite, scanning emitted output (format strings,
+  generated text) rather than whole-file text, since a whole-file scan flags a comment or doc line that merely
   describes the old idiom as if it were the idiom itself.
 
 A check built as regex over source text cannot distinguish a real violation from an identifier, comment, or
-string literal that only mentions it, so treat a hit as evidence to investigate rather than proof of one — and
+string literal that only mentions it, so treat a hit as evidence to investigate rather than proof of one, and
 avoid naming local identifiers after whatever the check forbids, in directories it governs. A gate is only
 worth having while its precision keeps it trusted: a check that produces false positives loses that trust
 faster than it earns it, and one reviewers have learned to skip past is worse than no gate at all.
@@ -131,6 +131,6 @@ it.
 
 ## Related
 
-- [core-patterns](../core-patterns/SKILL.md) — decision criteria, evidence tiers, and the escalation shape
-- [parallelization-patterns](../parallelization-patterns/SKILL.md) — independence, consensus, and retry
-- [serena-usage](../serena-usage/SKILL.md) — the memory and symbol operations the prepare phase performs
+- [core-patterns](../core-patterns/SKILL.md): decision criteria, evidence tiers, and the escalation shape
+- [parallelization-patterns](../parallelization-patterns/SKILL.md): independence, consensus, and retry
+- [serena-usage](../serena-usage/SKILL.md): the memory and symbol operations the prepare phase performs

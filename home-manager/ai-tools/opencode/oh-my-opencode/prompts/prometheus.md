@@ -58,7 +58,7 @@ Additionally, ensure the plan leaves behind a short handoff trail that names the
 - For every non-trivial plan, explicitly state the live inputs the execution phase will rely on, the evidence expectations for execution and verification, and the closeout fields that must be resolved during execution.
 - The same plan must explicitly name the intended promotion target for any durable knowledge (a Serena memory, not an ad-hoc file), the expected outcome, and `N/A` for every field that does not apply.
 - Record these expectations as plain prose inside the existing plan structure.
-- Treat local references — code, existing memories, this repository's own history — as the default authority whenever they are sufficient. Use external references only when the required answer cannot be resolved locally.
+- Treat local references (code, existing memories, this repository's own history) as the default authority whenever they are sufficient. Use external references only when the required answer cannot be resolved locally.
 - Do not introduce or imply any separate unmanaged durable storage lane. Durable outcomes must be routed through the already-managed Serena memory workflow instead of inventing a parallel destination.
 - If future execution will require archive-time distillation, say so explicitly in the plan. The plan should also state the expected scope of the final closeout summary, including reusable learnings, non-negotiable user constraints, key verification outcomes, unresolved items, and any clearly scoped follow-up.
 - Prometheus remains planner-only. When memory or documentation follow-through work is needed, plan it as execution work for the post-planning phase instead of implying that Prometheus performs those updates itself.

@@ -1,10 +1,10 @@
 ---
 name: nix-ecosystem
-description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check — including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards.
+description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check (including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards).
 version: 3.0.0
 ---
 
-Nix traps that read as success. Everything here is a failure that leaves no error behind — a check that verified
+Nix traps that read as success. Everything here is a failure that leaves no error behind: a check that verified
 nothing, a pin that landed on the wrong version, an option that silently does not exist. Base language
 mechanics are assumed; this file carries only what gets it wrong.
 
@@ -13,10 +13,10 @@ mechanics are assumed; this file carries only what gets it wrong.
 ### A flake build reads the git tree, not the working tree
 
 `nix build .#pkg`, `nix flake check`, and `nix eval .#x` all resolve `self` through the git-tree fetcher, which
-walks `git ls-files` rather than the raw filesystem. A **tracked** file's uncommitted edits are still visible —
-Nix prints `warning: Git tree '...' is dirty` to say so — but an **untracked** file does not exist in that tree
-at all, no matter what is on disk. A path-based evaluation that never goes through `getFlake`/`fetchTree` —
-`nix-instantiate --eval`, `import ./x`, `nix build -f default.nix` — reads the raw filesystem instead, so
+walks `git ls-files` rather than the raw filesystem. A **tracked** file's uncommitted edits are still visible
+(Nix prints `warning: Git tree '...' is dirty` to say so) but an **untracked** file does not exist in that tree
+at all, no matter what is on disk. A path-based evaluation that never goes through `getFlake`/`fetchTree`
+(`nix-instantiate --eval`, `import ./x`, `nix build -f default.nix`) reads the raw filesystem instead, so
 untracked files and uncommitted edits are both visible there. Getting this backwards costs real time either
 direction: assuming a flake build sees everything on disk, or assuming it sees only what is committed.
 
@@ -25,7 +25,7 @@ No such file or directory` against a `/nix/store/...-source/` path, even though 
 the file present. Settle which case a command is in with `git status --porcelain -- <path>`: `??` means
 untracked and invisible to a flake build; anything else, including a bare `M`, is tracked and visible with its
 on-disk content. Observed in this repo: a newly created module directory not yet `git add`ed vanished from
-flake evaluation with a "path does not exist" error — the untracked half of this same rule; see the `readDir`
+flake evaluation with a "path does not exist" error: the untracked half of this same rule; see the `readDir`
 case below.
 
 ### `nix flake check` passes vacuously off-platform
@@ -46,7 +46,7 @@ nix flake check --all-systems --no-write-lock-file --print-build-logs --keep-goi
 ```
 
 `--all-systems` evaluates every system's outputs; *building* foreign-platform derivations still needs a builder
-or substituter. Evaluation-only coverage already catches the common case — an output that does not evaluate on
+or substituter. Evaluation-only coverage already catches the common case: an output that does not evaluate on
 the target platform. Where a flake exposes Linux outputs only, the authoritative local check on Darwin is the
 language toolchain directly, with the flake gate deferred to Linux CI. Say which of the two ran.
 
@@ -54,7 +54,7 @@ language toolchain directly, with the flake gate deferred to Linux CI. Say which
 
 When depending on a package from another flake, prefer its `overlays.default`. The `packages` output is keyed
 by system and exists only for the systems upstream enumerated, so `inputs.tool.packages.${system}.default`
-fails outright on any other platform. An overlay is system-agnostic by construction — a `final: prev:` function
+fails outright on any other platform. An overlay is system-agnostic by construction: a `final: prev:` function
 applied to the *consumer's* package set.
 
 ```nix
@@ -70,7 +70,7 @@ pkgs = import nixpkgs {
 ```
 
 The same asymmetry applies to any system-keyed output (`lib.${system}`, `apps.${system}`). A missing system key
-surfaces as `attribute '...' missing` during evaluation, which reads like a typo rather than a platform gap —
+surfaces as `attribute '...' missing` during evaluation, which reads like a typo rather than a platform gap:
 check the upstream flake's system list before assuming the attribute path is wrong.
 
 ### Pin by enumerating tags, not by "latest release"
@@ -79,7 +79,7 @@ On forges that distinguish a git tag from a published Release object, a "latest 
 tagged commits that also have a Release attached. A maintainer who tags without publishing one is invisible to
 it, and the pin silently lands on an older version while looking authoritative.
 
-Resolve versions from tag listings — `git ls-remote --tags <url>`, or the forge's tags endpoint — never from a
+Resolve versions from tag listings (`git ls-remote --tags <url>`, or the forge's tags endpoint), never from a
 latest-release endpoint, and re-verify existing pins the same way when auditing for drift. Only the tag listing
 matches what a `github:owner/repo/vX.Y.Z` URL can actually resolve.
 
@@ -113,7 +113,7 @@ rebuild-from-source after a flake update, inspect the lock for duplicated nixpkg
 
 `programs.*` and `services.*` exist in both the NixOS and Home Manager module systems, under the same names but
 with genuinely different schemas. Which one an option path resolves to is decided by the module system that
-evaluated the file — not by the file, its directory, or its author's intent. A tree of "home" modules imported
+evaluated the file, not by the file, its directory, or its author's intent. A tree of "home" modules imported
 into a `nixosSystem` evaluates its `programs.foo` against NixOS's module, and any Home-Manager-only option
 inside it is an error.
 
@@ -129,7 +129,7 @@ programs.tmux = {
   plugins = [{ plugin = pkgs.tmuxPlugins.resurrect; extraConfig = "set -g @resurrect-strategy-nvim 'session'"; }];
 };
 
-# NixOS: no prefix/shell — use shortcut; plugins is a plain package list,
+# NixOS: no prefix/shell, use shortcut; plugins is a plain package list,
 # so per-plugin @plugin-* variables must go into extraConfig instead
 programs.tmux = {
   shortcut = "t";
@@ -138,7 +138,7 @@ programs.tmux = {
 };
 ```
 
-A module tree can land on the NixOS side unintentionally — for example because it also sets `systemd.services`
+A module tree can land on the NixOS side unintentionally, for example because it also sets `systemd.services`
 and was therefore imported as a NixOS module rather than through `home-manager.users.<name>`. Sharing one tree
 across both requires either restricting it to options existing in both, or splitting the structurally divergent
 programs into per-system files. Assume divergence and check.
@@ -146,7 +146,7 @@ programs into per-system files. Assume divergence and check.
 ### `home.file` makes declared settings read-only
 
 A file placed with `source` or `text` is a symlink into the Nix store, and store files are read-only. For a GUI
-application whose settings file is managed this way, every key declared in Nix is enforced on every switch — but
+application whose settings file is managed this way, every key declared in Nix is enforced on every switch, but
 the application's own settings UI can no longer persist changes to those keys, because the write-back fails
 against a read-only symlink. **More Nix-declared keys means less in-app control over exactly those toggles.**
 Surface this tradeoff *before* declaring more keys, not after the user finds a switch that will not stick.
@@ -161,8 +161,8 @@ against the application's own documentation.
 
 ### Import-from-derivation breaks cross-platform modules
 
-Any `builtins.readFile` / `fromJSON` / `import` applied to a path *inside a derivation output* — for example
-`builtins.readFile "${nurPkgs.someTheme}/theme.conf"` — forces that derivation to be built during *evaluation*.
+Any `builtins.readFile` / `fromJSON` / `import` applied to a path *inside a derivation output* (for example
+`builtins.readFile "${nurPkgs.someTheme}/theme.conf"`) forces that derivation to be built during *evaluation*.
 In a module shared across systems this is a trap: evaluating a Darwin configuration that imports the module
 triggers an `aarch64-linux` build merely to read a file, so evaluation now needs a Linux builder or fails
 outright, and a config that only wanted to render a text file drags in a foreign-platform closure.
@@ -173,7 +173,7 @@ vendored per-platform rather than promoting it into shared infrastructure. Make 
 starting a build. The other tell is an evaluation that pauses to build a derivation whose name carries a system
 you are not on.
 
-Reading a file already in the source tree is ordinary evaluation, not IFD — pure and free.
+Reading a file already in the source tree is ordinary evaluation, not IFD, pure and free.
 
 ### Two imports that both set `_module.args`
 
@@ -203,7 +203,7 @@ in
 ```
 
 `readDir` returns name-to-type (`"directory"` | `"regular"` | `"symlink"`); filter by type rather than assuming
-all entries are files. This is exactly the untracked half of the git-tree rule above — "works with `nix build`
+all entries are files. This is exactly the untracked half of the git-tree rule above: "works with `nix build`
 locally but the file is missing after switch" is almost always an un-added path.
 
 Modules pulled in via `imports = [ ./x ]` must take `...` in their signature so the module system can pass extra
@@ -222,7 +222,7 @@ that project. In hook scripts use NUL-delimited iteration (`-z` / `-0` / `--null
 ### Derive the version from the manifest
 
 When packaging a repository that already declares its version in a language manifest, derive the Nix `version`
-from that manifest. A hardcoded copy drifts silently — the build keeps succeeding while package metadata and the
+from that manifest. A hardcoded copy drifts silently: the build keeps succeeding while package metadata and the
 store path carry a stale version, and nothing ever fails to point it out. Observed in practice: a `flake.nix`
 still saying `0.1.0` long after the manifest had reached `0.1.7`.
 
@@ -245,7 +245,7 @@ the manifest only becomes readable after the fetch has already been pinned by th
 
 ### Rust
 
-`overrideAttrs` cannot change vendored dependencies by setting a new `cargoHash` — it has no effect after the
+`overrideAttrs` cannot change vendored dependencies by setting a new `cargoHash`: it has no effect after the
 fact. To override for a version bump you must override the resulting `cargoDeps` and set its `outputHash`.
 
 On nixpkgs 25.05+ the fetchCargoVendor mechanism is the default and non-optional; a bare
@@ -256,7 +256,7 @@ from the mismatch error. `cmake` is commonly needed transitively (e.g. `aws-lc-s
 ### Darwin SDK
 
 Nixpkgs replaced the per-framework Darwin inputs with a bundled versioned SDK. Drop unversioned
-`darwin.apple_sdk.frameworks.*` entries entirely — the default SDK is in the Darwin stdenv now — and add
+`darwin.apple_sdk.frameworks.*` entries entirely (the default SDK is in the Darwin stdenv now) and add
 `apple-sdk_NN` to `buildInputs` only when a specific version is required. The SDK propagates libiconv/libresolv
 automatically. The legacy `darwin.apple_sdk_11_0.*` stubs have been removed and now error out.
 
@@ -266,7 +266,7 @@ automatically. The legacy `darwin.apple_sdk_11_0.*` stubs have been removed and 
 |---|---|
 | npm lockfile, no build step | `buildNpmPackage` with `npmDepsHash`, `dontNpmBuild = true` |
 | npm lockfile, needs build | `buildNpmPackage` with `npmDepsHash`; `finalAttrs` when src needs the version |
-| pnpm lockfile | `stdenvNoCC.mkDerivation` + `fetchPnpmDeps` (hash + fetcherVersion) + `pnpmConfigHook` — the pnpm major used to fetch deps must match the one used to build |
+| pnpm lockfile | `stdenvNoCC.mkDerivation` + `fetchPnpmDeps` (hash + fetcherVersion) + `pnpmConfigHook`: the pnpm major used to fetch deps must match the one used to build |
 | bun lockfile | Two-phase: a fixed-output derivation runs `bun install --frozen-lockfile`, then the main build consumes it |
 | turbo / monorepo orchestrator | See the daemon trap below |
 
@@ -295,12 +295,12 @@ a language-specific derivation; prefer the language builder to raw `mkDerivation
 ## Secrets never enter the store
 
 The store is world-readable by design (0555 directories, 0444 files) and content-addressed. Anything
-materialized into it — via `writeText`, `toJSON` piped into a store file, an unquoted path literal, or
-string-interpolating a path — becomes readable by every local user *and* is copied into any binary cache the
+materialized into it (via `writeText`, `toJSON` piped into a store file, an unquoted path literal, or
+string-interpolating a path) becomes readable by every local user *and* is copied into any binary cache the
 closure is pushed to. **No plaintext or ciphertext secret should ever enter the store.**
 
 A path literal, or a string produced by coercing a path (`"${./secrets.yaml}"`,
-`"${inputs.self}/secrets.yaml"`), is copied into the store as an evaluation input — even a store-resident sops
+`"${inputs.self}/secrets.yaml"`), is copied into the store as an evaluation input: even a store-resident sops
 file is then in the closure. Reference the secret by a runtime string path that is never a Nix path type: an
 absolute string like `"/var/lib/app-secrets/secrets.yaml"` resolving only on the target. With sops-nix this also
 needs `sops.validateSopsFiles = false;`, because the validator asserts `builtins.isPath sopsFile` and rejects a
@@ -326,16 +326,16 @@ non-secret-only unless reworked.
 
 ## Activation scripts are a privileged, recurring attack surface
 
-Activation scripts — nix-darwin and NixOS alike — run as root, and many write into the logged-in user's home:
+Activation scripts (nix-darwin and NixOS alike) run as root, and many write into the logged-in user's home:
 SSH material, agent sockets, per-user state. The user owns every component of that path, so anything running as
 that user can replace any directory along it with a symlink in the window between activation checking the path
 and writing to it. Path-based operations re-resolve the whole path on every call, so each call reopens the race;
 the check you performed a moment ago says nothing about the object you are about to write. **This surface exists
-on every switch, by construction** — which is what distinguishes it from ordinary untrusted-input handling.
+on every switch, by construction**, which is what distinguishes it from ordinary untrusted-input handling.
 
 - Never use path-based `mkdir -p`, `chmod`, `chown`, `touch`, or `install` on user-controlled paths from a
   privileged activation script or a root helper it installs.
-- `O_NOFOLLOW` on the final component alone is insufficient — an attacker only needs an ancestor. Traverse
+- `O_NOFOLLOW` on the final component alone is insufficient: an attacker only needs an ancestor. Traverse
   descriptor-relatively: open each component with `openat(dirfd, name, O_DIRECTORY | O_NOFOLLOW)` and operate on
   the resulting descriptor (`mkdirat`, `openat`, `fchown`, `fchmod`), so the object you validated is the object
   you write.
@@ -343,7 +343,7 @@ on every switch, by construction** — which is what distinguishes it from ordin
   subprocess re-resolves from scratch and reintroduces the race in full. Do the work in-process against the
   descriptor, or pass the descriptor itself (`/dev/fd/N`) where the tool accepts it.
 
-On macOS several standard paths are system symlink aliases into `/private` — `/var`, `/tmp`, `/etc`. A blanket
+On macOS several standard paths are system symlink aliases into `/private` (`/var`, `/tmp`, `/etc`). A blanket
 `O_NOFOLLOW` traversal therefore rejects legitimate configuration such as a state directory under `/var/lib/…`,
 and the naive fix (drop `O_NOFOLLOW`) undoes the hardening. Canonicalize only an explicit allowlist of these
 fixed system aliases and keep strict traversal for everything else.
@@ -363,13 +363,13 @@ for anything large, offload to native CI and only substitute the result.
 | Faster boot, native virtio | A MicroVM framework or a vfkit runner over Apple's hypervisor. vfkit is the practical macOS hypervisor (built-in virtiofs, no 9p, no TAP); microvm.nix on Darwin needs a compatible pin because virtiofsd is unavailable on some revisions, plus `storeOnDisk = false` and `vmHostPackages = nixpkgs.legacyPackages.aarch64-darwin`. |
 | Near-native | A Virtualization.framework builder VM. No QEMU overhead, and Rosetta gives x86_64-linux at roughly 70–90% native versus QEMU's order-of-magnitude slowdown. Most bespoke. |
 
-Only one mechanism can be active at once — they are mutually exclusive on `nix.buildMachines` /
+Only one mechanism can be active at once: they are mutually exclusive on `nix.buildMachines` /
 `nix.linux-builder`.
 
 On the native-framework path: networking is NAT/user-mode only, with no TAP and no port forwarding, so discover
 the guest IP via the ARP table (deterministic guest MAC) or `/var/db/dhcpd_leases` (fixed guest hostname).
 `/nix/store` is shared read-only over virtiofs with an overlay for the writable layer. There is no nested
-virtualization on Apple Silicon, so the builder VM will not run inside another VM — it fails in typical M-series
+virtualization on Apple Silicon, so the builder VM will not run inside another VM: it fails in typical M-series
 CI runners.
 
 Generate the builder SSH keypair at activation time and keep the private key on the host; never commit it, since
@@ -391,7 +391,7 @@ form: `nix.settings = { extra-platforms = [ "aarch64-linux" ]; always-allow-subs
 often spans multiple substituters, so all must be configured for the fetch to complete.
 
 For large closures, build on native CI and let the Mac substitute the finished closure. Building a big `*-linux`
-closure on a virtiofs-overlay store can churn the store hard enough to lose store-path visibility mid-build — an
+closure on a virtiofs-overlay store can churn the store hard enough to lose store-path visibility mid-build, an
 architectural limit of the shared/overlay store, not a transient bug.
 
 ### launchd
@@ -402,14 +402,14 @@ flaky bootstrap where a process is alive but `launchctl print gui/$UID/...` show
 from a user-domain job, explicitly boot out the old `user/$UID/...` job or launchd may respawn it.
 
 Raise file-descriptor limits in layers or you hit "Too many open files": a boot-time daemon for `kern.maxfiles`
-/ `kern.maxfilesperproc` / `launchctl limit maxfiles`, per-agent `NumberOfFiles` (soft and hard), and — the
-commonly missed one — the GUI session's own `launchctl limit maxfiles`.
+/ `kern.maxfilesperproc` / `launchctl limit maxfiles`, per-agent `NumberOfFiles` (soft and hard), and (the
+commonly missed one) the GUI session's own `launchctl limit maxfiles`.
 
 ### PID files and GC roots
 
 A PID file tells you *a* process exists, not that it is *your* process. PIDs are reused, and the state file can
-be replaced between the read and the signal. Persist a composite identity — canonical executable path, canonical
-state directory, process start time — and require all three to match before acting. Re-read and revalidate
+be replaced between the read and the signal. Persist a composite identity (canonical executable path, canonical
+state directory, process start time) and require all three to match before acting. Re-read and revalidate
 immediately before every signal, including the SIGKILL fallback of a stop handshake: a slow shutdown escalation
 is exactly the window in which the original process exits and an unrelated one inherits the PID.
 
@@ -425,7 +425,7 @@ NixOS activation (`switch-to-configuration`, as driven by deploy-rs) takes a non
 `/run/nixos/switch-to-configuration.lock`. A second concurrent activation fails immediately (exit 11 / EAGAIN)
 rather than queueing. A local Ctrl+C on deploy-rs can leave the remote `switch-to-configuration` running and
 holding the lock; kill the leftover remote process. A crash while holding it leaves a stale lock file to remove
-manually — check with `fuser` / `ps` on the target before assuming it is stale.
+manually: check with `fuser` / `ps` on the target before assuming it is stale.
 
 deploy-rs `magicRollback` verifies post-activation reachability, but when activation starts many or slow
 services, startup can exceed the verification window and trigger a false rollback. Disable `magicRollback`, rely
@@ -450,13 +450,13 @@ minimal toolset (no git); Nix also builds Rust in the release profile.
 - The release profile strips `debug_assert!`, so a `#[should_panic]` test asserting that a `debug_assert!` fires
   must be gated with `#[cfg(debug_assertions)]`, or it fails under the Nix build while passing under a debug
   `cargo test`.
-- A hardcoded conventional path — `/bin/sleep`, `/bin/echo`, `/usr/bin/env` — does not exist in the sandbox;
+- A hardcoded conventional path (`/bin/sleep`, `/bin/echo`, `/usr/bin/env`) does not exist in the sandbox;
   only `PATH` entries from `buildInputs` and their store paths do. Such a test passes on the host and fails only
   under `nix build` / `nix flake check`, and the failure can present as a bare nonzero exit with the underlying
   signal swallowed, so the symptom itself never names the missing binary. Resolve every tool through `PATH`
   (bare `sleep`, `echo`) or an explicit store path from `buildInputs` (`"${coreutils}/bin/sleep"`), never a
-  conventional absolute path. The same rule holds for any other hermetic runner — Bazel, a minimal container
-  image — wherever the toolset is not the host's.
+  conventional absolute path. The same rule holds for any other hermetic runner (Bazel, a minimal container
+  image) wherever the toolset is not the host's.
 
 ### The multicall `argv[0]` trap
 
@@ -464,14 +464,14 @@ In a Nix environment a large share of `PATH` entries are symlinks into multicall
 `echo`, `ls`, `cat` and dozens more as links to a single `coreutils` executable that dispatches on `argv[0]`.
 Code that "hardens" a resolved executable path by canonicalizing it (`realpath`, `readlink -f`,
 `Path::canonicalize`) rewrites `argv[0]` to the dispatcher's own name, and the program then runs as the wrong
-tool entirely. The signature is a spawn producing empty stdout, a usage message on stderr, and a nonzero exit —
+tool entirely. The signature is a spawn producing empty stdout, a usage message on stderr, and a nonzero exit:
 a failure that looks like a broken argument list, not a resolution bug.
 
 **Existence and executability checks may follow symlinks; the path handed to exec must keep the candidate's own
 basename. Canonicalize for comparison, never for invocation.**
 
 This is near-certain to surface under `nix build` / `nix flake check` and may never surface on a distribution
-shipping separate binaries — a textbook "passes on my machine, fails in the sandbox" case. It is plain POSIX
+shipping separate binaries, a textbook "passes on my machine, fails in the sandbox" case. It is plain POSIX
 behavior; Nix just makes the multicall layout the norm.
 
 ## Rules
@@ -481,18 +481,18 @@ behavior; Nix just makes the multicall layout the norm.
   to `lib.mkForce`.
 - Set `home.stateVersion` to the initial version and do not change it after setup unless migrating.
 - Always provide a hash to `fetchurl` / `fetchTarball`; use `nix-prefetch-url` or `lib.fakeHash` to obtain it.
-- Avoid `with lib;` at module top level — it pollutes scope and hides where functions come from. Use explicit
+- Avoid `with lib;` at module top level: it pollutes scope and hides where functions come from. Use explicit
   `lib.mkIf`, `lib.types.str`. Narrow scopes like `with pkgs; [ ... ]` are fine.
 - Prefer declarative configuration to `nix-env -i`, `nix-channel`, and other mutable `/nix/var` state.
-- Document non-obvious overlay and override rationale in a comment — this is one of the cases where a comment
+- Document non-obvious overlay and override rationale in a comment: this is one of the cases where a comment
   carries a WHY the code cannot.
 
 ## Related
 
-- [trust-boundaries](../trust-boundaries/SKILL.md) — general untrusted-input and privilege-boundary rules
-- [context7-usage](../context7-usage/SKILL.md) — fetching current nixpkgs and Home Manager documentation
-- [investigation-patterns](../investigation-patterns/SKILL.md) — debugging evaluation and derivation failures
-- [serena-usage](../serena-usage/SKILL.md) — navigating Nix expressions by symbol
-- [testing-patterns](../testing-patterns/SKILL.md) — what acceptance means for a declarative change
+- [trust-boundaries](../trust-boundaries/SKILL.md): general untrusted-input and privilege-boundary rules
+- [context7-usage](../context7-usage/SKILL.md): fetching current nixpkgs and Home Manager documentation
+- [investigation-patterns](../investigation-patterns/SKILL.md): debugging evaluation and derivation failures
+- [serena-usage](../serena-usage/SKILL.md): navigating Nix expressions by symbol
+- [testing-patterns](../testing-patterns/SKILL.md): what acceptance means for a declarative change
 - Language conventions for nixpkgs packaging: [rust-ecosystem](../rust-ecosystem/SKILL.md) and
   [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md)

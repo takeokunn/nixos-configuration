@@ -8,4 +8,4 @@
 
 - Treat structural improvement as a framework for thinking, not a mandate for large-scale change.
 - When the delegated task already contains detailed instructions (specific files, specific changes, concrete steps), prioritize those task instructions. Treat the refactor mindset as supplementary guidance, not an override.
-- When the delegated task is broad (e.g. "refactor X") without detailed steps, conduct investigation first — understand the current state, identify what needs to change, and determine the appropriate scope before making any edits.
+- When the delegated task is broad (e.g. "refactor X") without detailed steps, conduct investigation first: understand the current state, identify what needs to change, and determine the appropriate scope before making any edits.

@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese — includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials.
+description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese: includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials.
 version: 3.1.0
 ---
 
@@ -8,22 +8,22 @@ Structured patterns for writing technical blogs, articles, and tutorials that co
 to external audiences, in English or Japanese. Pick the article type that matches the reader's need below,
 apply the language-specific conventions, and for book chapters or serials layer the long-form structure
 ruleset on top. The general prose mechanics below apply to any human-facing writing, not only the article
-types — reach for them alone when revising a report, a PR/issue body, or documentation prose.
+types; reach for them alone when revising a report, a PR/issue body, or documentation prose.
 
 ## General prose mechanics
 
 Classify each passage before writing it, and do not mix the two in one passage:
 
-- **Procedural** — tells the reader what to do; imperative mood, one instruction per sentence.
-- **Descriptive** — explains what a thing is or does; no imperative, one new point per sentence.
+- **Procedural**: tells the reader what to do; imperative mood, one instruction per sentence.
+- **Descriptive**: explains what a thing is or does; no imperative, one new point per sentence.
 
-Put the condition before the command ("If the build fails, read the log" — a trailing condition gets dropped
+Put the condition before the command ("If the build fails, read the log"; a trailing condition gets dropped
 by a skimming reader). Describe an action with a verb, not a nominalization ("compress the file", not
 "perform compression"). A requirement is "must"; a capability is "can"; do not write "should" in
-instructions — readers treat it as optional. Never convert genuine uncertainty into assertion: a hedge that
+instructions: readers treat it as optional. Never convert genuine uncertainty into assertion: a hedge that
 carries real epistemic content (an unverified fact, an inference, a reader's likely doubt) keeps its
-uncertainty, and is deleted only once the text grounds the claim. Delete filler — announcements ("In this
-section..."), empty intensifiers ("robust", "comprehensive"), padding connectives — by removing it, not by
+uncertainty, and is deleted only once the text grounds the claim. Delete filler: announcements ("In this
+section..."), empty intensifiers ("robust", "comprehensive"), padding connectives, by removing it, not by
 rephrasing around it.
 
 The Japanese-specific rules under Language guidelines extend this same rigor (argument structure, redundancy,
@@ -71,29 +71,29 @@ implications → Call to action.
 
 ## Writing principles
 
-- **Hook early** — capture attention in the first paragraph: a problem the reader faces, a surprising fact,
+- **Hook early**: capture attention in the first paragraph: a problem the reader faces, a surprising fact,
   or a brief relatable story. Never open with "In this article...".
-- **Inverted pyramid** — lead with the conclusion; most important information first, details follow. Provide
+- **Inverted pyramid**: lead with the conclusion; most important information first, details follow. Provide
   a TL;DR for long articles.
-- **One idea per section** — if a section covers multiple ideas, split it; use headings that summarize the
+- **One idea per section**: if a section covers multiple ideas, split it; use headings that summarize the
   key point.
-- **Show, don't tell** — demonstrate with working code, diagrams, and before/after comparisons rather than
+- **Show, don't tell**: demonstrate with working code, diagrams, and before/after comparisons rather than
   abstract description.
-- **Credibility** — cite sources and benchmarks, acknowledge limitations, show your work. Test all code
+- **Credibility**: cite sources and benchmarks, acknowledge limitations, show your work. Test all code
   examples before publishing and verify technical claims against sources.
 
 ## Title patterns
 
-- **How-to**: How to [achieve result] with [tool/technique] — e.g. "How to Implement Rate Limiting with
+- **How-to**: How to [achieve result] with [tool/technique], e.g. "How to Implement Rate Limiting with
   Redis"
-- **Number list**: [N] [Things] Every Developer Should Know About [Topic] — e.g. "5 Things Every Developer
+- **Number list**: [N] [Things] Every Developer Should Know About [Topic], e.g. "5 Things Every Developer
   Should Know About TypeScript Generics"
-- **Comparison**: [A] vs [B]: Which Should You Choose in [Year]? — e.g. "REST vs GraphQL: Which Should You
+- **Comparison**: [A] vs [B]: Which Should You Choose in [Year]?, e.g. "REST vs GraphQL: Which Should You
   Choose in 2026?"
-- **Problem/solution**: Solving [Problem] with [Solution] — e.g. "Solving N+1 Queries with DataLoader"
-- **Deep dive**: Understanding [Concept]: A Deep Dive — e.g. "Understanding React Reconciliation: A Deep
+- **Problem/solution**: Solving [Problem] with [Solution], e.g. "Solving N+1 Queries with DataLoader"
+- **Deep dive**: Understanding [Concept]: A Deep Dive, e.g. "Understanding React Reconciliation: A Deep
   Dive"
-- **Lessons**: What I Learned [Building/Using] [Thing] — e.g. "What I Learned Building a Real-Time
+- **Lessons**: What I Learned [Building/Using] [Thing], e.g. "What I Learned Building a Real-Time
   Collaboration System"
 
 ## Language guidelines
@@ -252,7 +252,7 @@ High value; after drafting, self-check against this. Using the book's own terms 
 problem is empty decoration. Japanese phrase tokens are kept verbatim.
 
 - Avoid announcement and summary padding:「重要なのは〜である」「本章では〜を扱う／探求する」「ここでは〜について見ていく」「まとめると」「要するに」(when only restating the prior line),「〜に他ならない」.
-- Avoid the「正面から」family:「正面から扱う」「正面から回収する」「正面から見る／書く／立てる」— they declare
+- Avoid the「正面から」family:「正面から扱う」「正面から回収する」「正面から見る／書く／立てる」; they declare
   stance instead of content.
 - Avoid empty adjectives:「不可欠」「核心的」「鍵となる」「根本的な」(emphasis without explaining the claim),
   「多角的」「包括的」「総合的」(without saying what was examined how).
@@ -333,34 +333,34 @@ grow, and how a chapter or a whole work closes.
 
 Shape each chapter or installment as problem-then-solution:
 
-1. **Introduction** — make the conventional approach's failure concrete before naming the new approach. Show
+1. **Introduction**: make the conventional approach's failure concrete before naming the new approach. Show
    the scenario where the old method breaks (a realistic "works on my machine" or "the build fails on the new
    OS" situation) so the solution is felt as relief rather than asserted as superior.
-2. **Foundation** — the core structure or theory of the new approach.
-3. **Migration** — how to move from the old approach to the new one, shown as a side-by-side change of one
+2. **Foundation**: the core structure or theory of the new approach.
+3. **Migration**: how to move from the old approach to the new one, shown as a side-by-side change of one
    concrete example.
-4. **Practice** — a worked, realistic example.
-5. **Deep dive** — the mechanism behind why it works.
-6. **Outlook** — a bridge to the next chapter's higher demand.
+4. **Practice**: a worked, realistic example.
+5. **Deep dive**: the mechanism behind why it works.
+6. **Outlook**: a bridge to the next chapter's higher demand.
 
 Introduce the solution in three graded moves: what visibly changes ("it becomes this"), why it changes (the
 mechanism), then the essential value ("so, in effect"). Build credibility with one concrete, checkable fact
 (adoption status, a count of supported items, who authored it) rather than adjectives. Keep the introduction's
-problem framing tight (roughly 300-400 words) — a longer intro delays the payoff and front-loads detail
+problem framing tight (roughly 300-400 words): a longer intro delays the payoff and front-loads detail
 unrelated to the example to come.
 
 ### Code example escalation
 
 Grow code examples in stages rather than presenting one large block:
 
-1. **Minimal example** — the smallest version that runs.
-2. **Incremental complexity** — add one axis at a time (an environment variable, then a hook, then a
+1. **Minimal example**: the smallest version that runs.
+2. **Incremental complexity**: add one axis at a time (an environment variable, then a hook, then a
    service), each as its own step.
-3. **Integrated example** — combine the pieces into one realistic configuration.
+3. **Integrated example**: combine the pieces into one realistic configuration.
 
 Cap a single code block at what a reader can absorb in a few minutes (on the order of 50-70 lines); split
 anything longer. Frame each block: one or two sentences of lead-in before it, a two- or three-sentence
-takeaway after it, and defer the deeper "why" to the following subsection. Watch the prose-to-code balance —
+takeaway after it, and defer the deeper "why" to the following subsection. Watch the prose-to-code balance:
 a section that is mostly code with thin narration is under-explained; when code exceeds roughly two-thirds of
 a section, add explanation or move some code to a later stage. Trim decorative shell or log output to the few
 lines that carry the point (a 40-line status dump where 5-10 lines matter is noise). Do not let example
@@ -370,13 +370,13 @@ difficulty regress: the last example in a chapter should not be the simplest one
 
 Evaluate and write closing sections (chapter endings and the final chapter) against three required beats:
 
-- **Recap** — name the specific technical elements the chapter taught, not a vague gesture at "what we
+- **Recap**: name the specific technical elements the chapter taught, not a vague gesture at "what we
   covered".
-- **Significance** — state what was achieved and which problem it solved.
-- **Next steps** — point to concrete next actions and, at most, the single most important learning resource.
+- **Significance**: state what was achieved and which problem it solved.
+- **Next steps**: point to concrete next actions and, at most, the single most important learning resource.
 
 Chapter endings come in two types: **bridging**, which hands off to the next chapter's demand ("the
-environment built here now faces a higher requirement") — the default for interior chapters — and
+environment built here now faces a higher requirement"), the default for interior chapters, and
 **terminal**, which ends a series by integrating all prior chapters; it must still name the individual
 results, not only assert a "culmination".
 
@@ -400,12 +400,12 @@ Reduce the bloat that accumulates across a long piece:
 
 ## Related
 
-- [cold-read](../cold-read/SKILL.md) — dispatch a context-free reviewer to test whether the written prose
+- [cold-read](../cold-read/SKILL.md): dispatch a context-free reviewer to test whether the written prose
   actually reads clearly to its audience
-- [serena-usage](../serena-usage/SKILL.md) — symbol operations for extracting code examples from projects
-- [context7-usage](../context7-usage/SKILL.md) — library documentation lookup for accurate technical
+- [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples from projects
+- [context7-usage](../context7-usage/SKILL.md): library documentation lookup for accurate technical
   references
-- [investigation-patterns](../investigation-patterns/SKILL.md) — researching technical topics and verifying
+- [investigation-patterns](../investigation-patterns/SKILL.md): researching technical topics and verifying
   claims
-- [technical-documentation](../technical-documentation/SKILL.md) — creating reference documentation from blog
+- [technical-documentation](../technical-documentation/SKILL.md): creating reference documentation from blog
   content

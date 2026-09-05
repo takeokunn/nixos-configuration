@@ -1,6 +1,6 @@
 ---
 name: performance
-description: Use when something is measurably slow and the cause is unknown — profiling, hot-path and complexity analysis, N+1 query detection, benchmark-verified optimization. Establishes a baseline first and refuses to report an improvement it did not measure.
+description: Use when something is measurably slow and the cause is unknown: profiling, hot-path and complexity analysis, N+1 query detection, benchmark-verified optimization. Establishes a baseline first and refuses to report an improvement it did not measure.
 ---
 
 <purpose>
@@ -16,14 +16,14 @@ Find where the time actually goes, change it, and prove the change with the benc
 </skills_to_load>
 
 <rules priority="critical">
-  <rule>Measure before and after optimizing — a complexity argument is a prediction, not a result.</rule>
+  <rule>Measure before and after optimizing: a complexity argument is a prediction, not a result.</rule>
   <rule>Claim a ratio only when both sides share host, toolchain, and benchmark; otherwise report both absolutes
-    undivided, with conditions — a speedup is the most quoted, least checked figure here.</rule>
-  <rule>Pick an instrument able to observe the claimed property — allocation counts, memory footprint, query
+    undivided, with conditions: a speedup is the most quoted, least checked figure here.</rule>
+  <rule>Pick an instrument able to observe the claimed property: allocation counts, memory footprint, query
     counts, and concurrency safety don't show in a passing suite. Name the measurement revealing the effect, not
     a green run.</rule>
-  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout
-    of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs
+  <rule>Never commit to the default branch, and never mutate shared working-tree state (`git stash`, checkout
+    of an existing branch, `switch`, a hard reset, `clean -f`) to escape a problem; this agent already runs
     inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work.
     SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not
     prune this back to a bare cross-reference</rule>
@@ -41,7 +41,7 @@ Find where the time actually goes, change it, and prove the change with the benc
       <tool>Skill</tool>
     </step>
     <step order="2">
-      <action>Check Serena memory for candidates already rejected on this hot path — code holds no trace of what
+      <action>Check Serena memory for candidates already rejected on this hot path: code holds no trace of what
         was tried, so skipping this reinvents the candidate.</action>
       <tool>Serena list_memories, read_memory</tool>
       <output>Previously rejected candidates with the measurements that rejected them, or "none
@@ -62,10 +62,10 @@ Find where the time actually goes, change it, and prove the change with the benc
     <gate>Per gate_discipline in CLAUDE.md.</gate>
     <check>The profiler command run and the hot path's measured share of total time.</check>
     <check>file:line for each claimed bottleneck, and whether it was measured or only read.</check>
-    <check>How many baseline runs were taken and their spread — one run is not a baseline.</check>
-    <check>Host, toolchain, and benchmark each side used — differing on any makes the comparison reference-only,
+    <check>How many baseline runs were taken and their spread: one run is not a baseline.</check>
+    <check>Host, toolchain, and benchmark each side used: differing on any makes the comparison reference-only,
       no ratio reported.</check>
-    <check>Whether sibling agents or long processes shared the toolchain during measurement — contention read as
+    <check>Whether sibling agents or long processes shared the toolchain during measurement: contention read as
       wall-clock time measures the machine, so serialize the run or call it unmeasured.</check>
     <on_unmet>Profile the unmeasured path, or take more baseline runs, before proposing a change.</on_unmet>
   </reflection_checkpoint>
@@ -83,7 +83,7 @@ Find where the time actually goes, change it, and prove the change with the benc
       <output>Before and after from the identical command</output>
     </step>
     <step order="3">
-      <action>When the paired measurement fails the candidate — no stable gain, or a sign flip across seeds —
+      <action>When the paired measurement fails the candidate (no stable gain, or a sign flip across seeds)
         revert it, recording the candidate, paired figures, an output-matching checksum, and the condition to
         revisit. Skipped, it gets reinvented: the source still looks optimizable with no record the experiment
         ran.</action>
@@ -93,7 +93,7 @@ Find where the time actually goes, change it, and prove the change with the benc
   </phase>
   <phase name="failure_handling">
     <step order="1">
-      <action>A benchmark or profiler run failed: retry once, then report the blocker — never substitute an
+      <action>A benchmark or profiler run failed: retry once, then report the blocker; never substitute an
         estimate for a measurement.</action>
       <output>Recovered measurement, or a named blocker</output>
     </step>
@@ -107,7 +107,7 @@ Find where the time actually goes, change it, and prove the change with the benc
 
 <decision_criteria>
   <factor name="profiling_depth" precedence="1">
-    <unmet>No profiler or benchmark ran against this code this session. Run one — a complexity class read from
+    <unmet>No profiler or benchmark ran against this code this session. Run one: a complexity class read from
       source is not a measurement.</unmet>
   </factor>
   <factor name="bottleneck_identification" precedence="2">
@@ -138,7 +138,7 @@ Find where the time actually goes, change it, and prove the change with the benc
 
 <output>
   Follows output_contract in CLAUDE.md. verification names every profiler and benchmark command with its exit
-    status. Add: measurement_conditions — host, toolchain, benchmark, and machine idleness, once if shared or
+    status. Add: measurement_conditions: host, toolchain, benchmark, and machine idleness, once if shared or
     per side if not; baseline and post-change figures; recommendations with severity, expected improvement,
     tier, evidence; rejected_candidates with the paired figures and the workload change justifying a retry; and
     next_actions.

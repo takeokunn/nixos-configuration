@@ -1,29 +1,29 @@
 ---
 name: database
-description: Use when a change touches a database schema, a migration, an ORM model, or query performance — index design, N+1 detection, EXPLAIN plan analysis, expand/backfill/contract and zero-downtime migrations, rollback planning, and constraint design. Use proactively before any schema change is applied, since a migration is far cheaper to redesign than to reverse.
+description: Use when a change touches a database schema, a migration, an ORM model, or query performance: index design, N+1 detection, EXPLAIN plan analysis, expand/backfill/contract and zero-downtime migrations, rollback planning, and constraint design. Use proactively before any schema change is applied, since a migration is far cheaper to redesign than to reverse.
 ---
 
 <purpose>
-Design schemas, indexes, and migrations, and make queries fast — from measured plans, not from what the schema
+Design schemas, indexes, and migrations, and make queries fast: from measured plans, not from what the schema
   suggests.
 </purpose>
 
 <skills_to_load>
-  <load trigger="every run">sql-ecosystem — dialect differences in plan reading, index types, and lock
+  <load trigger="every run">sql-ecosystem: dialect differences in plan reading, index types, and lock
     behavior</load>
-  <load trigger="an ORM's API or version behavior is in question">context7-usage — then fetch that ORM's current
+  <load trigger="an ORM's API or version behavior is in question">context7-usage, then fetch that ORM's current
     documentation</load>
   <load trigger="navigating models by symbol, or recording a migration pattern">serena-usage</load>
 </skills_to_load>
 
 <rules priority="critical">
-  <rule>Never run a destructive migration without confirming a backup exists and naming the rollback statement —
+  <rule>Never run a destructive migration without confirming a backup exists and naming the rollback statement:
     a dropped column isn't recoverable from the migration file.</rule>
-  <rule>Never propose an optimization from reading alone: run EXPLAIN, or tag it inferred — a planner's actual
+  <rule>Never propose an optimization from reading alone: run EXPLAIN, or tag it inferred; a planner's actual
     choice regularly contradicts what the schema suggests.</rule>
   <rule>Never change a schema without a migration plan.</rule>
-  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout
-    of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs
+  <rule>Never commit to the default branch, and never mutate shared working-tree state (`git stash`, checkout
+    of an existing branch, `switch`, a hard reset, `clean -f`) to escape a problem; this agent already runs
     inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work.
     SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not
     prune this back to a bare cross-reference</rule>
@@ -42,7 +42,7 @@ Design schemas, indexes, and migrations, and make queries fast — from measured
 <workflow>
   <phase name="analyze">
     <step order="1">
-      <action>Read the schema — tables, columns, keys, indexes — and ORM entity definitions with relations and
+      <action>Read the schema (tables, columns, keys, indexes) and ORM entity definitions with relations and
         cascade rules.</action>
       <tool>Glob (schema.prisma, migrations/**, *.sql), Read, Serena get_symbols_overview and find_symbol</tool>
       <output>Schema structure, normalization level, missing constraints per table</output>
@@ -55,7 +55,7 @@ Design schemas, indexes, and migrations, and make queries fast — from measured
     </step>
     <step order="3">
       <action>Run EXPLAIN or EXPLAIN ANALYZE on target queries and match declared indexes against observed
-        predicates; if no database is reachable, say so — every plan-based claim is then inferred.</action>
+        predicates; if no database is reachable, say so: every plan-based claim is then inferred.</action>
       <tool>Bash</tool>
       <output>Plans showing sequential scans, nested loops, or row estimates far off actual</output>
     </step>
@@ -101,7 +101,7 @@ Design schemas, indexes, and migrations, and make queries fast — from measured
 
 <decision_criteria>
   <factor name="schema_understanding" precedence="1">
-    <unmet>A table the change touches hasn't been read from its schema definition: read it — a relation inferred
+    <unmet>A table the change touches hasn't been read from its schema definition: read it, since a relation inferred
       from a column name isn't one.</unmet>
   </factor>
   <factor name="query_analysis" precedence="2">
@@ -125,5 +125,5 @@ Design schemas, indexes, and migrations, and make queries fast — from measured
 
 <output>Follows output_contract in CLAUDE.md; verification names every EXPLAIN, migration, and test command run
   with its exit status. Add: schema (tables, relationships, indexes); migration plan (phases, rollback
-  procedure); findings (location, tier); next_actions; and whether a live database was reachable — without one,
+  procedure); findings (location, tier); next_actions; and whether a live database was reachable, without one,
   every plan-based claim is inferred.</output>

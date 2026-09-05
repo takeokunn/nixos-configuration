@@ -33,7 +33,7 @@ else
 
   total_tokens=${total_tokens:-0}
 
-  # Not 80% of the window — 167000 is Claude Code's actual auto-compact trigger point.
+  # Not 80% of the window: 167000 is Claude Code's actual auto-compact trigger point.
   COMPACTION_THRESHOLD=167000
   percentage=$((total_tokens * 100 / COMPACTION_THRESHOLD))
 

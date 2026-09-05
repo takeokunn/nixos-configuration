@@ -1,6 +1,6 @@
 ---
 name: rust-ecosystem
-description: Use when working with Rust projects — Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns.
+description: Use when working with Rust projects: Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns.
 version: 3.0.0
 ---
 
@@ -16,8 +16,8 @@ one field while the caller still holds a read of another. A method taking `&mut 
 whole struct; the borrow checker only reasons about disjoint fields when those fields are named at
 the call site, and a method signature hides them.
 
-- When an extraction hits E0502, give the helper exactly the fields it needs —
-  `fn encode_row(pool: &mut EncodePool, line: &Line)` — instead of `&mut self`. The immutable
+- When an extraction hits E0502, give the helper exactly the fields it needs:
+  `fn encode_row(pool: &mut EncodePool, line: &Line)`, instead of `&mut self`. The immutable
   borrow of one field and the mutable borrow of the other stay disjoint, and the call site keeps
   ownership of the composition.
 - A module-level free function taking two `&mut` fields is sometimes the forced, correct design
@@ -39,7 +39,7 @@ encode_row(&mut self.pool, line);
 **Prefer named fields over positional tuples for anything that isn't a wire format.** A type alias
 over a tuple makes a positional shape look intentional while leaving it entirely unchecked. In
 `type EncodedLine = (usize, String, Vec<(usize, usize, u32, u32, u64, u32)>, Vec<usize>)`, every
-same-typed field is silently swappable and the compiler accepts any permutation — the alias
+same-typed field is silently swappable and the compiler accepts any permutation: the alias
 supplies a name for the aggregate but no name for any of its parts, which is exactly where the
 ordering knowledge was needed. A cache key of three bare `u64`s has the same defect: transposing
 two of them still typechecks and produces a hash that matches the wrong row.
@@ -56,16 +56,16 @@ A trust boundary is any point where data crosses from an unvalidated source (con
 external processes, network, shell) into code that acts on it. The general rule: never let a raw
 `String` or `Map` travel to the final action site (process spawn, shell emission, SQL) still typed
 as raw text. Wrap validated values in newtypes so the type system, not developer discipline,
-enforces that only validated data reaches the boundary. (The language-neutral rules — enforce
+enforces that only validated data reaches the boundary. (The language-neutral rules (enforce
 limits before allocating, validate before applying normalizing coercion, pin an identity rather
-than re-opening a path, never interpolate untrusted data into output — live in the
+than re-opening a path, never interpolate untrusted data into output) live in the
 [trust-boundaries](../trust-boundaries/SKILL.md) skill; what follows is the Rust expression of
 them.)
 
 **Validated newtype over raw string.** Public/config model fields that carry constrained values
 should use validated newtypes instead of raw `String` / `HashMap<String, String>`, so direct Rust
 construction cannot bypass the serde/runtime validators. Do not add an infallible `From<&str>` or
-`From<String>` for a validated newtype — that reintroduces unchecked construction and defeats the
+`From<String>` for a validated newtype: that reintroduces unchecked construction and defeats the
 boundary. Provide only a fallible constructor (`TryFrom` / `new -> Result`).
 
 ```rust
@@ -88,7 +88,7 @@ constant the constructor checks, not from a separately written field-level annot
 
 **Runtime validate mirrors serde.** When a type is constructed both via serde (deserialization) and
 directly by API callers, the direct-construction `validate()` path is a second trust boundary. It
-must mirror the serde validators exactly — same limits, same shared constants (e.g. a single
+must mirror the serde validators exactly: same limits, same shared constants (e.g. a single
 `MAX_DEPTH` used by validator, compiler, and executor). A separate model-side limit that disagrees
 with the downstream limit lets a "valid" value fail later during generation or execution. Route
 both paths through one constant.
@@ -102,7 +102,7 @@ no call site can smuggle an unvalidated value to the action point.
 execution semantics, give them distinct output types so call sites cannot mix them. A concrete
 argument value and an already-quoted shell word are not interchangeable even though both are text.
 Cross the boundary explicitly (`as_str()` / `into_inner()`) so the conversion is visible and
-intentional. This also applies to identity handles parsed from external process stdout — parse into
+intentional. This also applies to identity handles parsed from external process stdout: parse into
 a validated `Id` type, then require that `Id` for follow-up operations.
 
 **Reject non-UTF-8 before validation.** Bytes read from external processes are not guaranteed
@@ -112,7 +112,7 @@ values that will be fed back into execution.
 
 **Sanitize config values that get rendered to a terminal.** Configuration files and environment
 variables become untrusted input the moment their values are rendered rather than merely compared.
-A colour or style string, a set of hint-label characters, a prompt loaded from a file — each
+A colour or style string, a set of hint-label characters, a prompt loaded from a file; each
 reaches the terminal as bytes, and a terminal interprets the escape sequences it receives
 regardless of who authored them. A config value is therefore an injection surface with the same
 shape as untrusted network data: it can move the cursor, clear the screen, or drive a clipboard
@@ -126,7 +126,7 @@ write.
   on-screen glyph. Preserve ordinary space where it is a legitimate input character (a search
   term); discard whitespace only where the value is a set of distinct single-character labels.
 - Filtering can empty the set. After discarding unsafe characters and deduplicating, assert that
-  enough usable values remain — at least two distinct labels, for instance — and fall back to the
+  enough usable values remain (at least two distinct labels, for instance) and fall back to the
   built-in default rather than proceeding with a degenerate set. Silently operating on one label,
   or none, is a worse outcome than ignoring the configuration.
 - Reject a repeated singleton CLI option instead of letting the last occurrence win. Last-wins
@@ -136,7 +136,7 @@ write.
 **Bound latency, not only length.** A read capped at N bytes bounds how much you accept, not how
 long you wait. Opening a FIFO blocks inside `open()` before a single byte is read, so a size limit
 gives no protection at all to a startup path or a request handler pointed at a path that an
-attacker — or an ordinary mistake — controls. Length and latency are separate budgets and each
+attacker (or an ordinary mistake) controls. Length and latency are separate budgets and each
 needs its own enforcement.
 
 - On Unix, open with `O_NONBLOCK` and then interrogate the descriptor you actually got, via
@@ -169,8 +169,8 @@ compile-time-known set can use static dispatch with no vtable or heap allocation
 set needs dynamic dispatch.
 
 For a closed set, combine a trait with an enum whose variants are the implementers, annotated with
-`#[enum_dispatch]`. This gives zero-cost (static) polymorphism — the enum forwards each trait
-method to the active variant with no `Box<dyn Trait>` indirection — while keeping one exhaustive
+`#[enum_dispatch]`. This gives zero-cost (static) polymorphism (the enum forwards each trait
+method to the active variant with no `Box<dyn Trait>` indirection) while keeping one exhaustive
 registration point. Use `Box<dyn Trait>` instead for an open set: plugin boundaries or heterogeneous
 collections whose members are decided at runtime.
 
@@ -191,7 +191,7 @@ To add a new implementer and keep the enum the single source of truth: create th
 module and implement the trait for the new type; add a variant to the dispatch enum (which carries
 the `#[enum_dispatch(Trait)]` attribute); wire construction/selection (CLI variant, factory, or
 detection logic) to produce the new variant. Because dispatch is exhaustive over the enum, the
-compiler flags every match that must handle the new variant — the type system drives completeness.
+compiler flags every match that must handle the new variant: the type system drives completeness.
 
 ## Concurrency
 
@@ -201,7 +201,7 @@ lock should protect only the collection's shape, and each entry should carry its
 
 **Registry of locks.** Holding the guard of a `Mutex<HashMap<K, V>>` for the duration of the work
 done on one entry serializes every entry against every other. Polling, parsing, rendering, and
-transcoding on one session then block all other sessions even though they share no state — the map
+transcoding on one session then block all other sessions even though they share no state: the map
 was never the contended resource, it was just the thing in the way. The fix is to make the map hold
 handles rather than values.
 
@@ -221,7 +221,7 @@ handles rather than values.
   the replacement.
 
 **Asymmetric poison recovery.** A poisoned mutex records that some thread panicked while holding it
-— it does not establish that the data is unusable. How to respond depends on the signature of the
+; it does not establish that the data is unusable. How to respond depends on the signature of the
 API doing the locking, and treating every case identically makes one of the two cases lie.
 
 - A fallible single-resource API (returning `Result`) should map both map-level and entry-level
@@ -230,11 +230,11 @@ API doing the locking, and treating every case identically makes one of the two 
 - An infallible enumerating API (list, count, snapshot) must recover a poisoned entry lock with
   `PoisonError::into_inner()` instead of skipping the entry. Omitting it reports a live resource as
   absent, and the caller has no way to distinguish "no such resource" from "that resource panicked
-  once" — the enumeration becomes wrong rather than merely degraded.
+  once": the enumeration becomes wrong rather than merely degraded.
 
 ## Language-feature traps
 
-Return-position `impl Trait` now captures all in-scope lifetimes by default — a change from prior
+Return-position `impl Trait` now captures all in-scope lifetimes by default: a change from prior
 editions. Use `use<..>` to explicitly specify captured parameters when you need the narrower
 behavior.
 
@@ -252,7 +252,7 @@ the property that makes it self-cleaning. `#[allow]` is silent forever, so it ac
 outlives whatever justified it. (This is the attribute `#[expect(...)]`, entirely unrelated to the
 `clippy::expect_used` lint, which is about `Option::expect`.)
 
-- When `unfulfilled_lint_expectations` fires, delete the annotation — the lint is telling you the
+- When `unfulfilled_lint_expectations` fires, delete the annotation: the lint is telling you the
   suppression is now dead. Re-broadening it to `#[allow]` to quiet the build discards exactly the
   signal you configured it to produce.
 - Do not attach `#[expect]` to a macro that expands at many call sites. The expectation can be
@@ -268,14 +268,14 @@ cognitive-complexity-threshold = 25
 ```
 
 **Dead code at registration boundaries.** rustc computes reachability over the Rust call graph. A
-function whose only caller is an attribute macro's generated registration path — FFI entry points,
+function whose only caller is an attribute macro's generated registration path (FFI entry points,
 `#[no_mangle]` exports, `#[wasm_bindgen]` or `#[pyfunction]` surfaces, `inventory`- and
-`linkme`-style distributed registries — has no in-language caller at all, so `cargo check` and
+`linkme`-style distributed registries) has no in-language caller at all, so `cargo check` and
 `cargo test` report it as `dead_code`. The warning is an accurate statement about the reference
 graph and says nothing about whether the function is used.
 
 - Treat `dead_code` on an export or registration surface as boundary noise first, before treating it
-  as a finding. Confirm the registration path — does the macro emit a static registration, an
+  as a finding. Confirm the registration path: does the macro emit a static registration, an
   exported symbol, or a table entry that the host resolves at runtime? Deleting on the strength of
   the warning removes a live entry point, and the breakage surfaces only when the host loads the
   artifact, far from the edit.
@@ -301,10 +301,10 @@ Assertions and tests behave differently under the release profile than under dev
 and any debug-only invariant check compile out when built with `--release`, so tests that expect a
 `debug_assert` to fire will not observe it in an optimized build. Packaging pipelines (distro
 packages, sandboxed builds) commonly build with `--release` and no network, so the release build is
-the one that actually ships — design tests to stay green there.
+the one that actually ships: design tests to stay green there.
 
 **`debug_assert!` is stripped in release.** It is fine as an internal sanity check, but it is not a
-runtime safety boundary — the real boundary must be a normal check that returns a `Result` (or
+runtime safety boundary: the real boundary must be a normal check that returns a `Result` (or
 panics unconditionally), so the guarantee survives optimization. Gate `#[should_panic]` tests that
 exercise `debug_assert!` behavior behind `#[cfg(debug_assertions)]`, otherwise they fail (no panic)
 under a release test run.
@@ -317,7 +317,7 @@ fn rejects_invalid_in_debug() { /* triggers a debug_assert! path */ }
 ```
 
 **Checked or saturating arithmetic on untrusted sizes.** Arithmetic on sizes derived from untrusted
-input — pane dimensions, match counts, display widths, byte lengths — must not use plain `+`, `-`,
+input (pane dimensions, match counts, display widths, byte lengths) must not use plain `+`, `-`,
 or `*`. The reason is the same debug/release divergence as above, read from the other direction: an
 overflowing expression panics in a debug build and silently wraps to a wrong value in release, so
 the failure mode differs between the build you test and the build that ships. Both halves are bad,
@@ -328,7 +328,7 @@ and neither is visible from the other profile.
   must decide; use `saturating_*` where clamping to the bound is the correct answer and continuing
   is safe, as with a rendering coordinate that should stop at the screen edge.
 - Never reach for `wrapping_*` to silence an overflow warning. Wrapping is correct for hashes and
-  deliberate modular arithmetic and for nothing else — on a size it converts a loud debug panic into
+  deliberate modular arithmetic and for nothing else: on a size it converts a loud debug panic into
   a silent release-only wrong answer, which is precisely the outcome the other two operations exist
   to prevent.
 - Keep boundary tests at zero, at radix powers, at `usize::MAX`, and near coordinate limits. These
@@ -355,7 +355,7 @@ Reserve real external backends for opt-in test profiles; use recording/mock back
 
 ## Related
 
-- [serena-usage](../serena-usage/SKILL.md) — navigate trait implementations and module hierarchies
-- [context7-usage](../context7-usage/SKILL.md) — fetch current Rust book, cargo, and clippy documentation
-- [investigation-patterns](../investigation-patterns/SKILL.md) — debug borrow-checker errors, lifetime issues, and performance bottlenecks
-- [trust-boundaries](../trust-boundaries/SKILL.md) — language-neutral rules behind the trust-boundary patterns above: limits before allocation, validation before normalizing coercion, pinning identity instead of re-opening a path, and never interpolating untrusted data into output
+- [serena-usage](../serena-usage/SKILL.md): navigate trait implementations and module hierarchies
+- [context7-usage](../context7-usage/SKILL.md): fetch current Rust book, cargo, and clippy documentation
+- [investigation-patterns](../investigation-patterns/SKILL.md): debug borrow-checker errors, lifetime issues, and performance bottlenecks
+- [trust-boundaries](../trust-boundaries/SKILL.md): language-neutral rules behind the trust-boundary patterns above: limits before allocation, validation before normalizing coercion, pinning identity instead of re-opening a path, and never interpolating untrusted data into output

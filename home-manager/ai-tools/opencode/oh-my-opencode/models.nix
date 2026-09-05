@@ -7,7 +7,7 @@ in
 {
   inherit promptLang;
 
-  # DeepSeek-V4-Pro — default tier for most agents/categories: orchestration, planning, review,
+  # DeepSeek-V4-Pro, the default tier for most agents/categories: orchestration, planning, review,
   # and deep implementation. Fallback is the Go-only Flash tier, so it stays within the same
   # (text-only) capability class.
   deepseekPro = {
@@ -17,7 +17,7 @@ in
     ];
   };
 
-  # DeepSeek-V4-Flash — fast, low-cost tier for routine work (quick/unspecified-low) and
+  # DeepSeek-V4-Flash, the fast, low-cost tier for routine work (quick/unspecified-low) and
   # lighter-weight lookups (librarian/explore).
   deepseekFlash = {
     model = deepseekFlashModel;
@@ -26,7 +26,7 @@ in
     ];
   };
 
-  # Kimi-K2.6 — vision-capable, for agents that must interpret images (DeepSeek V4 is text-only).
+  # Kimi-K2.6, vision-capable, for agents that must interpret images (DeepSeek V4 is text-only).
   # No fallback: DeepSeek can't substitute for a vision task, so an outage should fail loudly
   # rather than silently return text-only analysis of an image it never saw.
   kimiVision = {

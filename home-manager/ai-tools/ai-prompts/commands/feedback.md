@@ -11,11 +11,11 @@ Review this session's work: pick the mode from the previous command, run its spe
 <rules priority="critical">
   <rule>Every dispatched agent is read-only: it reviews, not changes. Writing this review's memory isn't a
     change, so persist proceeds.</rule>
-  <rule>Launch one wave's Agent calls together — a wave is the mode's specialists, or refute's per-finding
+  <rule>Launch one wave's Agent calls together: a wave is the mode's specialists, or refute's per-finding
     validators. Refute after the specialist wave is sequencing, not the banned pattern.</rule>
   <rule>A complete finding has four parts: file:line; the test that should have caught it and why not (same
     implementation, fresh identifier, same-kind input, calls not allocations, single instance); the fix; the
-    follow-up test. When green but wrong, the gap is why tests miss it, not the location — without that, no
+    follow-up test. When green but wrong, the gap is why tests miss it, not the location: without that, no
     reproducing condition.</rule>
 </rules>
 <rules priority="important">
@@ -23,7 +23,7 @@ Review this session's work: pick the mode from the previous command, run its spe
     Edit/Write history, take the file list from the commit pinned in prepare.</rule>
   <rule>Calibrate severity by runtime impact: critical is data loss or security, warning is degraded behavior,
     info is style.</rule>
-  <rule>State a quantitative claim as a direction unless measured on both sides — usually performance and
+  <rule>State a quantitative claim as a direction unless measured on both sides: usually performance and
     database agents, but any agent near a performance change can invent a plausible percentage as fluently as
     prose.</rule>
 </rules>
@@ -37,22 +37,22 @@ Review this session's work: pick the mode from the previous command, run its spe
       <output>Skills loaded</output>
     </step>
     <step order="2">
-      <action>Read auto-memory's history first — MEMORY.md indexes every entry, including persist's ledger. Then
-        read matching Serena entries — {project}-conventions, code-quality-*, architecture-* — for conventions
+      <action>Read auto-memory's history first: MEMORY.md indexes every entry, including persist's ledger. Then
+        read matching Serena entries ({project}-conventions, code-quality-*, architecture-*) for conventions
         anchored to a symbol or file; the stores differ per memory_policy.</action>
       <tool>Read (auto-memory MEMORY.md and the entries it names), Serena activate_project, list_memories,
         read_memory</tool>
       <output>Matched memory names per store, and the ones loaded</output>
     </step>
     <step order="3">
-      <action>Retrieve prior findings (identifier, location) from the persist ledger or earlier this session —
+      <action>Retrieve prior findings (identifier, location) from the persist ledger or earlier this session;
         otherwise this re-diagnoses from scratch: an unfixed finding is rediscovered or missed, and one raised
-        twice is the user's call, not a repeat. Serena holds no such ledger — wrong store, not absence of prior
+        twice is the user's call, not a repeat. Serena holds no such ledger: wrong store, not absence of prior
         reviews.</action>
       <output>Prior findings with identifiers and locations, or "no prior review found"</output>
     </step>
     <step order="4">
-      <action>Pin what's under review — branch/commit, or the file list touched — so later sessions know which
+      <action>Pin what's under review (branch/commit, or the file list touched) so later sessions know which
         state the findings describe.</action>
       <tool>Bash: git rev-parse --short HEAD, git branch --show-current</tool>
       <output>Branch and commit, plus the file list as paths</output>
@@ -61,7 +61,7 @@ Review this session's work: pick the mode from the previous command, run its spe
 
   <phase name="select">
     <action>Select the mode from the modes table, files in scope as explicit paths, not "recent changes." With
-      no Edit/Write history — invoked fresh — take paths from the commit pinned in prepare via git show --stat,
+      no Edit/Write history (invoked fresh), take paths from the commit pinned in prepare via git show --stat,
       noting scope came from the commit, not session operations.</action>
     <tool>Serena find_symbol, get_symbols_overview, Bash: git show --stat</tool>
     <output>Mode, the command that selected it, the file list, and the source the list came from</output>
@@ -82,9 +82,9 @@ Review this session's work: pick the mode from the previous command, run its spe
       <output>One report per agent, or a named agent that returned nothing</output>
     </step>
     <step order="2">
-      <action>Re-read each finding before keeping it — one concluding the code is fine gets deleted, not
+      <action>Re-read each finding before keeping it: one concluding the code is fine gets deleted, not
         demoted. Severity is assigned pre-read from the triggering pattern; the later read can dissolve it, but
-        nothing forces retraction once numbered — a self-refuting entry left in place tops the list.</action>
+        nothing forces retraction once numbered: a self-refuting entry left in place tops the list.</action>
       <output>Findings retained, and the ones deleted because their own analysis voided them</output>
     </step>
     <step order="3">
@@ -94,12 +94,12 @@ Review this session's work: pick the mode from the previous command, run its spe
     </step>
   </phase>
   <reflection_checkpoint id="review_quality">
-    <check>Every agent dispatched and what it returned — name any timed out or dead; a missing report isn't
+    <check>Every agent dispatched and what it returned: name any timed out or dead; a missing report isn't
       clean.</check>
-    <check>Per finding: file:line, the test that misses it, the fix — without them it's a retry, not a
+    <check>Per finding: file:line, the test that misses it, the fix; without them it's a retry, not a
       result.</check>
     <check>Per finding: severity and the runtime impact justifying it.</check>
-    <check>Per prior finding: resolved, still present, or superseded — checked against the tree, not the earlier
+    <check>Per prior finding: resolved, still present, or superseded; checked against the tree, not the earlier
       report.</check>
     <on_unmet>Re-run the named agent once with a narrower prompt naming the specific files. If it fails again,
       review that dimension here and report the delegation failed.</on_unmet>
@@ -108,25 +108,25 @@ Review this session's work: pick the mode from the previous command, run its spe
   <phase name="refute">
     <objective>Independently attack the critical findings before they reach the user</objective>
     <step order="1">
-      <action>Select critical findings only — warning and info never go: an adversarial pass costs far more than
+      <action>Select critical findings only; warning and info never go: an adversarial pass costs far more than
         review. Skip and say so when none exist; otherwise load core-patterns for the escalation pattern and its
-        failure modes — false positives, rubber-stamping, shared blindspots between identical models.</action>
+        failure modes: false positives, rubber-stamping, shared blindspots between identical models.</action>
       <tool>Skill (core-patterns)</tool>
-      <output>The critical subset, or "no critical findings — refute skipped"</output>
+      <output>The critical subset, or "no critical findings, refute skipped"</output>
     </step>
     <step order="2">
       <action>Dispatch one validator per critical finding, one message, each in a fresh context holding only
-        that finding's text and its cited file:line or command output — never the specialist's report, for
-        genuine independence. Frame it "refute this finding," not "review" it — a reviewer confirms, a refuter
+        that finding's text and its cited file:line or command output: never the specialist's report, for
+        genuine independence. Frame it "refute this finding," not "review" it: a reviewer confirms, a refuter
         hunts the flaw. State this is single-claim, overriding validator's default multi-report
         framing.</action>
       <tool>Agent (validator)</tool>
       <output>One refutation attempt per critical finding</output>
     </step>
     <step order="3">
-      <action>On a failed, timed-out, or unchecked dispatch, don't retry silently or drop the finding — record
+      <action>On a failed, timed-out, or unchecked dispatch, don't retry silently or drop the finding: record
         "attempted, outcome unavailable" so it stays traced, not unmarked. Where refutation succeeds, downgrade
-        the tier and keep both evidences — never drop the disagreement. Otherwise keep it, annotated
+        the tier and keep both evidences: never drop the disagreement. Otherwise keep it, annotated
         attempted-not-succeeded.</action>
       <output>Every critical finding accounted for, including failed attempts</output>
     </step>
@@ -139,12 +139,12 @@ Review this session's work: pick the mode from the previous command, run its spe
   </reflection_checkpoint>
 
   <phase name="persist">
-    <action>Write the ledger of unresolved findings to auto-memory — identifier, file:line, severity, per entry.
+    <action>Write the ledger of unresolved findings to auto-memory: identifier, file:line, severity, per entry.
       Prepare step 3 reads this next time; skipping it starts the next review from nothing (memory_policy
       exempts location-ledgers from the verdict ban it otherwise enforces). Also record a recurring quality
       issue, reusable pattern, or convention as a rule for the next session, pinned to its revision. Search the
       auto-memory index and Serena's list_memories by topic substring first, so an existing entry is edited, not
-      duplicated. Output "persist: no triggers matched — skip" only when the ledger is empty too.</action>
+      duplicated. Output "persist: no triggers matched, skip" only when the ledger is empty too.</action>
     <tool>Read and Write (auto-memory MEMORY.md and its entries), Serena list_memories, write_memory or
       edit_memory</tool>
     <output>The ledger entries written, the memory names written or edited, or the explicit skip</output>
@@ -159,7 +159,7 @@ Review this session's work: pick the mode from the previous command, run its spe
 
 <modes>
   Selected from the previous command. Every mode dispatches its agents together and loads fact-check when
-    reviewed work makes external claims — this injects the method only, so name the agent applying it (docs for
+    reviewed work makes external claims: this injects the method only, so name the agent applying it (docs for
     documented-interface claims, quality-assurance otherwise) to check each claim against Context7 or the
     vendored source. Skip that and fact_check_results comes back empty despite claims being read.
 
@@ -178,7 +178,7 @@ Review this session's work: pick the mode from the previous command, run its spe
   </mode>
   <mode name="ask" after="/ask" target="the answer and its evidence">
     Citation quality, conclusion validity, and whether any claim is tagged verified without a command or
-      file:line. Report the tier per claim and whether each cited file:line was read, not inferred — design and
+      file:line. Report the tier per claim and whether each cited file:line was read, not inferred: design and
       performance are omitted, since they evaluate questions, not answers. <agents>explore for evidence
       gathering; quality-assurance for accuracy; code-quality for reference precision</agents>
   </mode>
@@ -190,8 +190,8 @@ Review this session's work: pick the mode from the previous command, run its spe
 
 <decision_criteria>
   <factor name="review_depth" precedence="1">
-    <unmet>A file in scope went unopened by every agent, or an agent reported on a file it didn't read. Read it
-      — a review of unopened files isn't a review.</unmet>
+    <unmet>A file in scope went unopened by every agent, or an agent reported on a file it didn't read. Read it,
+      since a review of unopened files isn't a review.</unmet>
   </factor>
   <factor name="feedback_actionability" precedence="2">
     <unmet>A finding names no file:line, proposes no concrete change, or can't say which test should have caught
@@ -214,13 +214,13 @@ Review this session's work: pick the mode from the previous command, run its spe
   <section name="reviewed">The branch and commit, or the file list, these findings describe.</section>
   <section name="agents_run">Each agent dispatched and what it returned; name any that returned
     nothing.</section>
-  <section name="carried_forward">Per prior finding: identifier, location, status — resolved, still present, or
-    superseded — or "no prior review found." Standing after two reviews flags an explicit decision, not a third
+  <section name="carried_forward">Per prior finding: identifier, location, status (resolved, still present, or
+    superseded), or "no prior review found." Standing after two reviews flags an explicit decision, not a third
     repeat.</section>
   <section name="findings">Grouped critical, warning, info. Each carries category, location, the problem, the
     existing test that misses it with why it passes anyway, the fix, and the follow-up test.</section>
   <section name="refutation_results">Per critical finding: attempted yes/no, outcome survived | downgraded |
-    unavailable, and the refuting evidence — or "no critical findings this run."</section>
+    unavailable, and the refuting evidence, or "no critical findings this run."</section>
   <section name="good_practice">What the work did well, by category.</section>
   <section name="fact_check_results">When fact-check ran: claims confirmed against a named source with the
     confirming passage; claims unconfirmed or only inferred, with the inferential step and correction; and

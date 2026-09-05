@@ -1,14 +1,14 @@
 #!/bin/bash
-# PreToolUse:Bash hook — routes a read-only command through rtk so its output is compressed
+# PreToolUse:Bash hook that routes a read-only command through rtk so its output is compressed
 # before it reaches the model's context.
 #
 # Emits only hookSpecificOutput.updatedInput; a permissionDecision would auto-approve the
 # command sight-unseen.
 #
-# rtk's exit status is not a success flag — only stdout (empty, or equal to the input) decides
+# rtk's exit status is not a success flag; only stdout (empty, or equal to the input) decides
 # whether a rewrite happened.
 #
-# rtk emits a bare `rtk` prefix, which resolves only if rtk is on PATH — it is not in
+# rtk emits a bare `rtk` prefix, which resolves only if rtk is on PATH, and it is not in
 # home.packages. The leading token is rewritten to RTK_BIN's absolute store path before the
 # command is handed back, so the hook carries its own dependency.
 
@@ -41,7 +41,7 @@ fi
 
 normalized="$(printf '%s' "$command" | perl -0pe 's/\A\s+//; s/\s+\z//')"
 
-# Exclusion 1: not a lone simple command — inside a pipeline/substitution/redirect the output
+# Exclusion 1: not a lone simple command. Inside a pipeline/substitution/redirect the output
 # is consumed by another program, not the model, so rewriting there breaks the consumer.
 nl='
 '
@@ -60,7 +60,7 @@ t1="${1:-}"
 t2="${2:-}"
 t3="${3:-}"
 
-# Exclusion 2: already routed through rtk — an explicit guard for what the equality check below
+# Exclusion 2: already routed through rtk, an explicit guard for what the equality check below
 # would also catch.
 if [[ $t1 == "rtk" ]]; then
   exit 0
@@ -74,7 +74,7 @@ if [[ -z $rewritten ]] || [[ $rewritten == "$normalized" ]]; then
   exit 0
 fi
 
-# Exclusion 3: only an explicit allowlist of read-only commands may be rewritten — rtk also
+# Exclusion 3: only an explicit allowlist of read-only commands may be rewritten, since rtk also
 # maps commands that mutate state (git push, aws s3 rm, psql DROP TABLE, ...), so "rtk supports
 # it" carries no safety of its own. A command survives only if its family is named here and,
 # for a family that can also mutate, its sub-command is a reading one.
@@ -125,7 +125,7 @@ fi
 
 # Nothing downstream re-checks this, so a rewrite that is not a single rtk invocation is dropped
 # rather than handed to the tool. A bare `rtk` prefix is bound to RTK_BIN here: the Bash tool
-# resolves the command against PATH, where rtk is absent. The bare arm must be tested first —
+# resolves the command against PATH, where rtk is absent. The bare arm must be tested first:
 # an absolute-path rewrite also contains `/rtk `, and matching that arm would hand back a command
 # naming an rtk that does not resolve. Today rtk only ever emits the bare form; the second arm
 # exists so a future rtk that emits its own absolute path passes through unaltered instead of

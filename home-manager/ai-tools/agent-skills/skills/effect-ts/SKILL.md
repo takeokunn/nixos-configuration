@@ -1,6 +1,6 @@
 ---
 name: effect-ts
-description: Use when writing or reviewing Effect (Effect-TS) code — Effect.Service definitions, Layer composition, Effect.scoped resource handling, converting try/catch/async to the Effect error channel, Schema-as-SSOT type derivation, or testing with @effect/vitest and TestClock.
+description: Use when writing or reviewing Effect (Effect-TS) code (Effect.Service definitions, Layer composition, Effect.scoped resource handling, converting try/catch/async to the Effect error channel, Schema-as-SSOT type derivation, or testing with @effect/vitest and TestClock).
 version: 3.0.0
 ---
 
@@ -11,7 +11,7 @@ that makes it necessary, then the fix.
 
 This skill covers only the Effect-specific surface; two TypeScript mechanics recur below without restatement.
 `Effect<A, E, R>` is not a Promise: `Awaited<ReturnType<typeof fn>>`, the usual idiom for unwrapping an async
-function's return, does nothing to an Effect-returning function — it yields the `Effect<A, E, R>` type itself,
+function's return, does nothing to an Effect-returning function: it yields the `Effect<A, E, R>` type itself,
 not `A`. Extract with Effect's own type-level utilities instead: `Effect.Effect.Success<T>`,
 `Effect.Effect.Error<T>`, `Effect.Effect.Context<T>`. And `Schema.brand` (used throughout below for
 EntityId-style identifiers) is the standard TypeScript nominal-typing trick applied to Schema: intersecting a
@@ -26,12 +26,12 @@ Verified against Effect 3.19.x, @effect/vitest 0.25.x, vitest 3.2.x. Effect.Serv
 provideMerge / merge / mergeAll, Effect.scoped, TestClock, and Schema.Struct are stable across the 3.x line.
 Import everything from the single `"effect"` package (`import { Effect, Layer, Schema, Ref } from "effect"`);
 test bindings come from `"@effect/vitest"`. Effect 2.x and pre-3.x tutorials predate Effect.Service and the
-current Schema location (Schema moved into the core `effect` package) — do not mix guidance across major
+current Schema location (Schema moved into the core `effect` package): do not mix guidance across major
 versions. Verify version-specific claims against current docs via [context7-usage](../context7-usage/SKILL.md)
 before asserting them.
 
 Two terms recur below: the requirement channel `R` in `Effect<A, E, R>` lists what a program still needs to
-run — a program is runnable only when `R` is `never`, and Layers are what discharge it. A Schema is the single
+run: a program is runnable only when `R` is `never`, and Layers are what discharge it. A Schema is the single
 source of truth for a value type: the static type is derived from it, so validation and typing cannot drift
 apart.
 
@@ -62,12 +62,12 @@ class Database extends Effect.Service<Database>()("app/Database", {
 //   Database.DefaultWithoutDependencies  -> Layer<Database, never, Config>    (deps external)
 ```
 
-Consumers write `const db = yield* Database` regardless of how the service was defined — migrating between
+Consumers write `const db = yield* Database` regardless of how the service was defined: migrating between
 Context.Tag and Effect.Service does not change call sites. Use a stable, namespaced identifier string
 (`"app/Database"`); it participates in tag identity.
 
 For services that acquire resources needing release (connections, listeners, timers), use `scoped` and tie
-acquisition to the Scope with `Effect.acquireRelease` — this is the general replacement for manual
+acquisition to the Scope with `Effect.acquireRelease`: this is the general replacement for manual
 add/removeEventListener or setInterval/clearInterval pairs, guaranteeing cleanup symmetric with construction:
 
 ```ts
@@ -105,7 +105,7 @@ takes the finished implementation as a plain object; `sync` takes a thunk; `effe
 takes an Effect requiring a Scope. The last three run when the layer is built, so anything constructed per
 service instance must live in one of them.
 
-`succeed` does not call what you hand it — passing a factory function stores the function itself rather than
+`succeed` does not call what you hand it: passing a factory function stores the function itself rather than
 its result, so per-instance state is never created, and if that state was hoisted into a module-level closure
 to make the types line up, every consumer silently shares one copy:
 
@@ -127,19 +127,19 @@ For synchronous stateful construction use `sync: () => impl` or `effect: Effect.
 Layers form a dependency graph. Sequence dependent layers with `provide` / `provideMerge`; reserve flat merge
 for genuinely independent layers.
 
-- **`Layer.provide`**: `inner.pipe(Layer.provide(outer))` builds `inner` using `outer`, and CONSUMES `outer` —
+- **`Layer.provide`**: `inner.pipe(Layer.provide(outer))` builds `inner` using `outer`, and CONSUMES `outer`;
   it does not appear in the resulting output type. Use when the dependency is an implementation detail the
   rest of the app should not see.
 - **`Layer.provideMerge`**: like `provide`, but also keeps the provided service in the output. Use when a
   lower-level service must remain visible to the final program in addition to satisfying a higher one.
 - **`Layer.merge` / `Layer.mergeAll`**: combines layers side by side. The output is the union of outputs AND
-  the union of requirements — no wiring happens. `mergeAll(a, b, c)` is the n-ary form.
+  the union of requirements: no wiring happens. `mergeAll(a, b, c)` is the n-ary form.
 
 ```ts
-// Layer<Database, never, never> — Config is satisfied and hidden
+// Layer<Database, never, never>: Config is satisfied and hidden
 const DatabaseWired = Database.DefaultWithoutDependencies.pipe(Layer.provide(Config.Default))
 
-// Layer<Database | Config> — Config both feeds Database and stays available
+// Layer<Database | Config>: Config both feeds Database and stays available
 const Wired = Database.DefaultWithoutDependencies.pipe(Layer.provideMerge(Config.Default))
 
 // Layer<Metrics | Tracer, never, ...both requirements unioned...>
@@ -148,7 +148,7 @@ const Observability = Layer.merge(Metrics.Default, Tracer.Default)
 
 **Why flat merge leaks**: when layer B depends on layer A, `Layer.mergeAll(A, B)` does NOT feed A into B. It
 merely places both in one layer whose requirement set is the union, so A's service leaks upward as an
-unsatisfied requirement of the combined layer. The leak surfaces later — typically as an assignability error
+unsatisfied requirement of the combined layer. The leak surfaces later: typically as an assignability error
 at the top-level `Effect.provide`, far from the merge that caused it. Sequencing with provide/provideMerge
 discharges the dependency at the point of composition, where the type is still local and legible. If B needs
 A, wire them (`B.pipe(Layer.provide(A))`); use merge/mergeAll only for layers with no dependency relationship.
@@ -163,16 +163,16 @@ requirement is eventually satisfied.
 const runnable = program.pipe(Effect.provide(MainLayer), Effect.scoped)
 ```
 
-**Memoization is per provision graph, not per layer value**: if the same layer is provided at two points —
-once inside a sub-composition and again at the top level — it is BUILT TWICE, producing two distinct service
+**Memoization is per provision graph, not per layer value**: if the same layer is provided at two points
+(once inside a sub-composition and again at the top level) it is BUILT TWICE, producing two distinct service
 instances that both satisfy the same tag. Invisible for a pure, stateless service; severe for one that owns a
-singleton — two sockets open, two caches diverging, two subscriptions delivering every event twice. Provide a
+singleton: two sockets open, two caches diverging, two subscriptions delivering every event twice. Provide a
 shared layer at exactly one point in the composition; if an inner composition needs it, leave it as an unmet
 requirement there and discharge it once at the outer provide.
 
 **`Effect.provide` is not free per iteration**: it is not a type-level annotation, it builds the layer graph.
 Applying it inside a per-iteration handler (a frame callback, a per-message handler, a per-request path)
-reconstructs every layer in the graph on every iteration — the same mistake as a hot-path `runPromise`, wearing
+reconstructs every layer in the graph on every iteration: the same mistake as a hot-path `runPromise`, wearing
 different clothes. Resolve services ONCE at the program edge and forward the resolved values into the handler
 as an explicit record, so the handler's type is `Effect<void, E, never>` and needs no provide of its own:
 
@@ -244,15 +244,15 @@ third shape avoids both:
 3. Re-run the same algorithm against the now-populated synchronous cache to recover the canonical result and
    its metadata.
 
-The algorithm is never copied, so its semantics — ordering, first-hit short-circuit, single-read-per-candidate
-— are preserved by construction rather than by review. The cost is one extra traversal over an in-memory cache,
+The algorithm is never copied, so its semantics (ordering, first-hit short-circuit, single-read-per-candidate)
+are preserved by construction rather than by review. The cost is one extra traversal over an in-memory cache,
 almost always cheaper than the I/O the pattern exists to batch. Applies to any pure search/scan whose data
 source has moved behind an Effect: route lookup, permission resolution, dependency walks.
 
 ## Description vs. execution
 
-An Effect is a description. Everything evaluated OUTSIDE the description — in the builder function, before
-`Effect.gen`, in a default argument — runs once, at construction time, and its value is frozen into every
+An Effect is a description. Everything evaluated OUTSIDE the description (in the builder function, before
+`Effect.gen`, in a default argument) runs once, at construction time, and its value is frozen into every
 subsequent execution. Everything inside the description re-runs per execution. This is the Effect analogue of
 the classic closure-capture bug, and it is easy to write accidentally the moment a handler is refactored into
 a "build once, invoke later" shape.
@@ -273,45 +273,45 @@ const flush = Effect.gen(function* () {
 
 Symptom shape: the effect behaves correctly the first time and then appears "stuck" on a stale decision, with
 no error anywhere. Test-honesty corollary: when an effect is fired at a lifecycle edge the test cannot outlive
-(page unload, shutdown signal), assert that it was FORKED, not that its work completed — asserting completion
+(page unload, shutdown signal), assert that it was FORKED, not that its work completed: asserting completion
 there either passes vacuously or forces production code to block a teardown path it must not block.
 
 ## Long-running fibers
 
-A supervisory loop — a repeating daemon, a frame processor, a consumer fiber — is only as durable as its error
+A supervisory loop (a repeating daemon, a frame processor, a consumer fiber) is only as durable as its error
 channel and only as responsive as its wake-up condition. The failure modes below are all silent: the loop
 stops, stalls, or burns a core, and nothing is logged because the mechanism that would have logged it is the
 thing that died.
 
-**Repeated effects must be total.** `Effect.repeat` and `Effect.forever` terminate on the FIRST failure — the
+**Repeated effects must be total.** `Effect.repeat` and `Effect.forever` terminate on the FIRST failure: the
 schedule governs recurrence, not recovery. A daemon that repeats an effect which can fail stops permanently the
 first time a transient error occurs, typically hours after start-up, with no trace. Type the repeated body as
 `Effect<A, never>`: handle and log its failures inside the body so the daemon has nothing left to propagate.
 Reserve the error channel for conditions that genuinely should stop the loop.
 
-**`catchAll` does not catch defects.** It handles typed failures only. A defect — an unexpected exception
-thrown inside a `sync`/`try` body, a bug rather than a modelled error — passes straight through it and kills
+**`catchAll` does not catch defects.** It handles typed failures only. A defect (an unexpected exception
+thrown inside a `sync`/`try` body, a bug rather than a modelled error) passes straight through it and kills
 the fiber. A loop guarded only by `catchAll` dies silently on exactly the class of problem the guard was meant
 to survive. Guard long-running loops with `Effect.catchAllCause`, and log the Cause; use `catchAll` only where
 recovering a specific modelled failure, not where keeping a fiber alive.
 
 **Backpressure choice is a queue choice.** A bounded queue applies backpressure by SUSPENDING the producer's
-offer. Behind a real-time producer that cannot be slowed — a frame callback, an event listener, an inbound
-socket — each suspended offer is a fiber that accumulates, so the memory the bound was meant to cap is
+offer. Behind a real-time producer that cannot be slowed (a frame callback, an event listener, an inbound
+socket) each suspended offer is a fiber that accumulates, so the memory the bound was meant to cap is
 consumed by blocked fibers instead of queued items; under sustained overload the process degrades rather than
 sheds. Choose the queue by what should happen when the consumer falls behind: `Queue.bounded` when the
 producer can legitimately be slowed, `Queue.dropping`/`Queue.sliding` when it cannot and stale items are worth
 less than liveness, `Queue.unbounded` only when the producer is provably finite.
 
-A `start()` that forks a daemon and then calls `Fiber.join` on it never returns — the daemon runs forever by
+A `start()` that forks a daemon and then calls `Fiber.join` on it never returns: the daemon runs forever by
 design, so the caller blocks forever. In tests this surfaces as a mass timeout rather than a failure at the
 offending line. Fork and return immediately, handing back the Fiber (or a `Scope`-bound handle) so callers can
 interrupt it; joining is for fibers expected to complete.
 
 Repeating an effect that waits on a LEVEL-triggered condition busy-spins: once the condition becomes true it
 stays true until something external resets it, so every iteration returns immediately and the loop consumes a
-core doing nothing. Wait on an edge rather than a level — take from a Queue, await a Deferred, or
-clear/consume the condition as part of the same iteration that observes it — so the loop blocks until there is
+core doing nothing. Wait on an edge rather than a level (take from a Queue, await a Deferred, or
+clear/consume the condition as part of the same iteration that observes it) so the loop blocks until there is
 genuinely new work.
 
 ## Concurrency
@@ -320,13 +320,13 @@ Widening `Effect.forEach` / `Effect.all` from sequential to concurrent looks lik
 (`{ concurrency: n }`) and is in fact a semantics change. Four conditions decide whether it is
 behavior-preserving:
 
-1. Items are independent and their effects are read-only or touch disjoint state — safe on this axis.
-2. Any item writes back into a target shared with other items — NOT safe; keep sequential, or collect
+1. Items are independent and their effects are read-only or touch disjoint state: safe on this axis.
+2. Any item writes back into a target shared with other items: NOT safe; keep sequential, or collect
    concurrently and fold sequentially.
-3. A downstream consumer depends on result order — only safe if ordering is restored explicitly; concurrent
+3. A downstream consumer depends on result order: only safe if ordering is restored explicitly; concurrent
    completion order is not input order.
 4. The real bottleneck downstream (worker pool, connection pool, rate limit) is narrower than the chosen
-   concurrency — widening buys nothing; raise the ceiling that actually binds, or match the concurrency to it.
+   concurrency: widening buys nothing; raise the ceiling that actually binds, or match the concurrency to it.
 
 The standard repair when an accumulator is involved: run the concurrent work as a pure map producing per-item
 results, then fold those results into the shared accumulator on a single fiber after the batch completes.
@@ -334,24 +334,24 @@ Mutating a shared tracker from inside concurrent fibers races and drops updates.
 
 ```ts
 const results = yield* Effect.forEach(items, computeOne, { concurrency: 4 })
-// Fold happens on one fiber, after the batch — no shared mutable target during the batch.
+// Fold happens on one fiber, after the batch, so no shared mutable target during the batch.
 yield* Ref.update(totals, current => results.reduce(applyOne, current))
 ```
 
 Pick the concurrency number from the real downstream capacity (pool size, permitted request rate), not a round
-number — an arbitrary bump adds scheduling overhead and hides the ceiling that actually limits throughput.
+number: an arbitrary bump adds scheduling overhead and hides the ceiling that actually limits throughput.
 `concurrency: "unbounded"` on an input whose size comes from user data is a resource-exhaustion hazard; bound
 it.
 
 ## Stateful services
 
 A service that owns mutable state owns its invariants too. `Ref` gives atomicity for a single cell and a
-single operation — everything beyond that (a decision spanning read and write, an invariant spanning two
+single operation: everything beyond that (a decision spanning read and write, an invariant spanning two
 cells, a restore that must not land half-applied) has to be arranged deliberately; the Ref API does not hint
 at it.
 
 **Fold the decision into the update.** `Ref.get`, then a decision, then `Ref.set` is three steps, and another
-fiber can interleave between any two of them — the classic time-of-check-to-time-of-use race. Folding the
+fiber can interleave between any two of them: the classic time-of-check-to-time-of-use race. Folding the
 decision into `Ref.update` / `Ref.modify` makes the whole transition one atomic step, because the callback
 runs inside the update.
 
@@ -371,12 +371,12 @@ const evicted = yield* Ref.modify(cacheRef, cache => {
 ```
 
 Keep I/O OUT of the modify callback: compute the next state and RETURN the work to be performed, then perform
-it after the update completes — a side effect inside the critical section is what makes people abandon
+it after the update completes: a side effect inside the critical section is what makes people abandon
 atomicity in the first place.
 
 **Invariants across two Refs need explicit serialization.** `Ref.modify` is atomic per Ref. The moment a
-single logical transition touches two Refs — a public queue and its private sidecar, a balance and its ledger
-— the pair is no longer atomic, and interleaving fibers can observe or produce a state that satisfies neither
+single logical transition touches two Refs (a public queue and its private sidecar, a balance and its ledger)
+the pair is no longer atomic, and interleaving fibers can observe or produce a state that satisfies neither
 Ref's invariant on its own. Serialize the paired update under one `Effect.Semaphore` (a one-permit mutex) and
 make the paired section `Effect.uninterruptible`, so no fiber can observe the intermediate state and
 interruption cannot leave the pair half-updated. If the pairing is permanent, prefer collapsing the two Refs
@@ -388,22 +388,22 @@ partially-restored state worse than either the old state or a clean failure. Val
 shape and reconstruct every owned value FIRST, then commit with a single Ref update. An invalid snapshot must
 leave the existing state completely unchanged.
 
-**Copy on accept.** A value handed in from outside the service — a candidate from a caller, a payload from a
-host — remains reachable by that caller. Storing it by reference means later mutation outside the service
+**Copy on accept.** A value handed in from outside the service (a candidate from a caller, a payload from a
+host) remains reachable by that caller. Storing it by reference means later mutation outside the service
 silently rewrites state the service believes it owns. Copy accepted values on the way in; reject invalid
 candidates without disturbing current state.
 
 **Widen the error channel rather than defect.** Converting a storage read failure or a decode failure into a
 defect (a thrown exception, `Effect.die`, a `decodeSync` at a boundary) removes it from the type and from
-every caller's ability to recover — these are expected conditions at an I/O boundary, not bugs. Widen the
+every caller's ability to recover: these are expected conditions at an I/O boundary, not bugs. Widen the
 service's `E` (and `R`, when the recovery needs a capability) to name the failure, so callers see it and
 choose. Reserve defects for genuine invariant violations no caller could sensibly handle.
 
 **Attempt the fallible operation before flipping state.** When a state transition is paired with a resource
 transfer, ORDER decides what a partial failure costs. Perform the fallible transfer first and commit the state
 change only on success: the failure mode becomes "the transition did not happen, retry is available" instead
-of "the state changed and the resource is gone." Applied symmetrically — acquire before entering, return
-before leaving — every failure becomes a no-op, and snapshot-and-rollback machinery turns out unnecessary.
+of "the state changed and the resource is gone." Applied symmetrically (acquire before entering, return
+before leaving) every failure becomes a no-op, and snapshot-and-rollback machinery turns out unnecessary.
 
 ```ts
 // Return the resource FIRST; flip the state only if the return succeeded.
@@ -411,23 +411,23 @@ yield* returnResource(item)                 // fallible: may reject (full, close
 yield* Ref.set(engagedRef, false)           // reached only on success
 ```
 
-Rollback is the fallback for transitions whose steps genuinely cannot be ordered — try ordering first.
+Rollback is the fallback for transitions whose steps genuinely cannot be ordered: try ordering first.
 
 These are the Effect-shaped expressions of general state-ownership rules.
 
 **A cross-boundary read has three outcomes, not two.** A `Ref` backed by storage, or a service call to another
-process, can succeed, succeed with nothing, or fail to determine anything at all — the store is unreachable,
+process, can succeed, succeed with nothing, or fail to determine anything at all: the store is unreachable,
 the region is unloaded. Collapsing the third into the second treats "I could not tell" as "it is absent", which
 is the permissive branch in nearly every design: state gets dropped because it "wasn't there", or a check
 passes because nothing contradicted it. Model the third outcome in the type rather than folding it into
-`Option` — `Effect<Option<A>, StorageUnavailable>`, not `Effect<Option<A>, never>` with unavailability silently
+`Option`: `Effect<Option<A>, StorageUnavailable>`, not `Effect<Option<A>, never>` with unavailability silently
 decoded as `None`. On the unknown outcome, take the conservative branch: preserve existing state, skip the
 effect, retry later. Confirming that something changed requires positive evidence of the new value, never the
 absence of the old one.
 
 ## Hot-path allocation
 
-Every combinator that takes a callback allocates a closure per invocation — irrelevant almost everywhere,
+Every combinator that takes a callback allocates a closure per invocation: irrelevant almost everywhere,
 measurable in a 60 Hz loop or a per-request path under load. Apply the rewrites below only where a profile or
 an explicit frame/latency budget justifies it, never as house style:
 
@@ -440,17 +440,17 @@ an explicit frame/latency budget justifies it, never as house style:
 | `Array.from(...)`/map/filter chains over known-length input | A pre-sized array with an indexed loop | Iterator helpers allocate intermediates per stage |
 
 The `Ref.update` → get/compute/set substitution trades atomicity for allocation and is valid ONLY where a
-single writer is guaranteed — where concurrent writers exist, "fold the decision into the update" wins
+single writer is guaranteed: where concurrent writers exist, "fold the decision into the update" wins
 outright, correctness before allocation. Measure before and after on the actual budget being defended; an
 allocation rewrite that does not move the number is a readability regression with no payoff. Do not apply
-these to cold paths — start-up, configuration, error handling — where `Effect.gen` is more readable and that
+these to cold paths (start-up, configuration, error handling) where `Effect.gen` is more readable and that
 matters more.
 
 ## Imperative-to-Effect correspondence
 
 | Imperative | Effect equivalent |
 |---|---|
-| `try/catch` around sync code | `Effect.try({ try, catch })` — models the failure as a typed error `E` instead of swallowing it |
+| `try/catch` around sync code | `Effect.try({ try, catch })`: models the failure as a typed error `E` instead of swallowing it |
 | `try/catch` around a Promise / async fn | `Effect.tryPromise({ try, catch })` |
 | `throw new DomainError()` | `Effect.fail(new DomainError())` with a `Data.TaggedError` subclass |
 | `setInterval` / `clearInterval` | `Effect.repeat(effect, Schedule.spaced(...))` on a forked fiber; interrupt to stop |
@@ -461,7 +461,7 @@ matters more.
 | `new Promise` + resolve/reject callback API | `Effect.async(register)` to lift a callback source into an interruptible Effect |
 | `throw` to abort a batch | `Effect.fail` short-circuits `Effect.gen`; recover with `catchTag`/`catchAll` |
 
-An `async` function passed to `Effect.tryPromise` is already correctly wrapped — rewriting its internal await
+An `async` function passed to `Effect.tryPromise` is already correctly wrapped: rewriting its internal await
 chain into Promise combinators is a style change, not a correctness fix; leave it unless there is a reason.
 Not every callback must be lifted: event-emitter integrations with third-party libraries whose API is
 fundamentally callback-based are legitimate boundaries, so wrap the surface in an Effect interface rather than
@@ -492,16 +492,16 @@ export const CommandSchema = Schema.TaggedStruct("Tick", { at: Schema.Number })
 ```
 
 Universal pattern: `export const XSchema = Schema.Struct({...})` then
-`export type X = Schema.Schema.Type<typeof XSchema>` — never hand-write a parallel interface. Decode at
+`export type X = Schema.Schema.Type<typeof XSchema>`: never hand-write a parallel interface. Decode at
 boundaries with `Schema.decodeUnknown` (Effect-returning) or `decodeUnknownSync`; keep structural validation in
 the schema and push value-range clamping into an explicit follow-up step when bounds are business rules rather
-than shape. For JS `Date` instances use `Schema.DateFromSelf`; for ISO-string dates use `Schema.Date` —
+than shape. For JS `Date` instances use `Schema.DateFromSelf`; for ISO-string dates use `Schema.Date`:
 choosing the wrong one silently changes the decoded representation.
 
 Two Schema misuses do not announce themselves: one type-checks into nonsense, the other moves a validation
 failure out of the error channel and into a defect.
 
-`Schema.filter` in Effect 3.x is **curried** — it takes the predicate and returns a transformation to be
+`Schema.filter` in Effect 3.x is **curried**: it takes the predicate and returns a transformation to be
 piped. Calling it in the uncurried, "obvious" shape (`Schema.filter(schema, predicate, options)`) passes the
 SCHEMA where the predicate is expected. It can typecheck and produce a refinement meaning something entirely
 different from what was written.
@@ -518,21 +518,21 @@ const Positive = Schema.Number.pipe(
 
 `Schema.decodeUnknownSync` (and `decodeSync`) THROW a `ParseError` on invalid input. Inside an `Effect.gen`
 body that throw is a defect, not a typed failure: it bypasses `catchAll`, is absent from the effect's `E`, and
-can kill a supervising fiber. This bites hardest when a later step was meant to sanitize the value — clamping,
+can kill a supervising fiber. This bites hardest when a later step was meant to sanitize the value: clamping,
 normalization, and range repair all run AFTER decode, so a non-finite or out-of-range input never reaches
 them. Use the Effect-returning `Schema.decodeUnknown` at boundaries so the parse failure lands in the typed
 error channel; keep `decodeUnknownSync` for construction-time literals and test fixtures, where a throw is the
 intended outcome.
 
-Types that must NOT be forced into Schema — converting them costs more than it returns or is impossible:
+Types that must NOT be forced into Schema (converting them costs more than it returns or is impossible):
 
 - **Hot-path binary buffers**: TypedArrays (Uint8Array, Float32Array, …) and structs on a per-iteration hot
-  path — Schema decode overhead is unacceptable there.
+  path; Schema decode overhead is unacceptable there.
 - **Opaque external class instances**: physics bodies, GPU handles, DB driver objects, browser objects like
-  IndexedDB — not plain value types.
-- **Mutable internal machinery**: structures whose identity is a mutable Map/Set/LRU cache with a dirty flag —
+  IndexedDB, not plain value types.
+- **Mutable internal machinery**: structures whose identity is a mutable Map/Set/LRU cache with a dirty flag;
   Schema models values, not mutable containers.
-- **Service contracts**: capability interfaces a Layer produces — these are behavior, not data.
+- **Service contracts**: capability interfaces a Layer produces; these are behavior, not data.
 - **Pure helpers**: pure functions need neither Effect wrapping nor Schema.
 
 ## Testing
@@ -600,20 +600,20 @@ it.effect("fires after the interval", () =>
 )
 ```
 
-`TestClock.adjust` advances the virtual clock and runs any effects scheduled within that window — recurring or
+`TestClock.adjust` advances the virtual clock and runs any effects scheduled within that window: recurring or
 delayed effects become synchronous and deterministic. To flush forked handlers inside a test, prefer an
 Effect-based pause such as `Effect.yieldNow()` over a raw Promise sleep; wall-clock sleeps are both flaky and,
 in strict Effect codebases, flagged as domain-layer violations.
 
 ## Related
 
-- [testing-patterns](../testing-patterns/SKILL.md) — general test strategy that @effect/vitest patterns plug
+- [testing-patterns](../testing-patterns/SKILL.md): general test strategy that @effect/vitest patterns plug
   into
-- [context7-usage](../context7-usage/SKILL.md) — verify current Effect / @effect/vitest APIs and
+- [context7-usage](../context7-usage/SKILL.md): verify current Effect / @effect/vitest APIs and
   version-specific behavior
-- [investigation-patterns](../investigation-patterns/SKILL.md) — evidence-based tracing of requirement leaks
+- [investigation-patterns](../investigation-patterns/SKILL.md): evidence-based tracing of requirement leaks
   and runtime-boundary issues
-- [trust-boundaries](../trust-boundaries/SKILL.md) — discipline for untrusted input crossing into a service;
+- [trust-boundaries](../trust-boundaries/SKILL.md): discipline for untrusted input crossing into a service;
   Schema decoding here is the mechanism, not the policy
-- [test-integrity](../test-integrity/SKILL.md) — whether a test genuinely exercises the code it claims to;
+- [test-integrity](../test-integrity/SKILL.md): whether a test genuinely exercises the code it claims to;
   pairs with the fork-not-completion honesty rule above

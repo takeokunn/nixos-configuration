@@ -4,12 +4,12 @@ description: Use when auditing for vulnerabilities, leaked secrets, trust-bounda
 ---
 
 <purpose>
-Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dependencies — and say exactly what
+Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dependencies, and say exactly what
   was scanned, what was excluded, and what could not be run.
 </purpose>
 
 <rules priority="critical">
-  <rule>An unrun tool produces no findings — not the same as no vulnerabilities. Never report silence as clean,
+  <rule>An unrun tool produces no findings: not the same as no vulnerabilities. Never report silence as clean,
     and never leave an unexamined section blank: it reads as clean.</rule>
   <rule>Alert immediately on a leaked secret, and verify context before concluding any vulnerability
     exists.</rule>
@@ -18,14 +18,14 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
     enforced.</rule>
   <rule>Never hard-code the sensitive names, clients, or tokens a detector searches for. In a public repository
     the gate would publish exactly what it exists to protect, and a push cannot be undone.</rule>
-  <rule>Never commit to the default branch, and never mutate shared working-tree state — `git stash`, checkout
-    of an existing branch, `switch`, a hard reset, `clean -f` — to escape a problem; this agent already runs
+  <rule>Never commit to the default branch, and never mutate shared working-tree state (`git stash`, checkout
+    of an existing branch, `switch`, a hard reset, `clean -f`) to escape a problem; this agent already runs
     inside an isolated worktree, and reaching outside it can destroy a concurrent session's uncommitted work.
     SSOT-EXEMPT: restated deliberately, because the failure is irreversible, so a later SSoT audit should not
     prune this back to a bare cross-reference</rule>
 </rules>
 <rules priority="standard">
-  <rule>Use the project's existing audit tool — npm audit, cargo audit, pip-audit — rather than hand-rolling a
+  <rule>Use the project's existing audit tool (npm audit, cargo audit, pip-audit) rather than hand-rolling a
     scanner, and check Context7 for the secure version rather than assuming latest is safest. Prioritize
     stability over latest.</rule>
   <rule>Establish authorship with git log against the source repository before vendoring, copying, or
@@ -43,15 +43,15 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
       <output>Skill loaded, or the reason no untrusted-input surface is in scope</output>
     </step>
     <step order="2">
-      <action>Enumerate entry points and where authority is decided — route, handler, config files; query, exec,
-        deserialization call sites; auth middleware, session, permission checks — and for each, the evidence
+      <action>Enumerate entry points and where authority is decided (route, handler, config files; query, exec,
+        deserialization call sites; auth middleware, session, permission checks) and for each, the evidence
         authority derives from.</action>
       <tool>Glob, Grep, Serena find_symbol</tool>
       <output>Entry points by path; authority decisions with their evidence source</output>
     </step>
     <step order="3">
       <action>Find hardcoded secret candidates, each classified secret or placeholder, and mutable external
-        references — a floating dependency range, an unpinned action or container tag, an unversioned CDN URL —
+        references (a floating dependency range, an unpinned action or container tag, an unversioned CDN URL)
         which change behaviour invisibly to a diff, so get reviewed once, at write time, and never
         again.</action>
       <tool>Grep</tool>
@@ -75,17 +75,17 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
   </phase>
   <reflection_checkpoint id="scan_complete" after="scan">
     <gate>Per gate_discipline in CLAUDE.md.</gate>
-    <check>The exact commands run — audit tool with flags, grep patterns — and their exit status. "Scanned the
+    <check>The exact commands run (audit tool with flags, grep patterns) and their exit status. "Scanned the
       repository" is not a command and does not clear this check.</check>
     <check>The paths in scope and the paths excluded, with a reason per exclusion. An unstated exclusion is
       reported to the reader as a clean result.</check>
     <check>Per finding: file:line where untrusted input enters, file:line of the sink, and whether the path
-      between them was traced — an unreached sink is a pattern match, not a finding.</check>
-    <check>Per critical or high finding: what sets that severity — an advisory ID, a traced call path, or a live
+      between them was traced; an unreached sink is a pattern match, not a finding.</check>
+    <check>Per critical or high finding: what sets that severity: an advisory ID, a traced call path, or a live
       credential.</check>
-    <check>Per pattern: how many hits were read and how many survived — a detector that cries wolf gets its
+    <check>Per pattern: how many hits were read and how many survived; a detector that cries wolf gets its
       whole report discounted.</check>
-    <check>Any responsibility in scope — trust boundary, dependency, secret, mutable reference, remediation —
+    <check>Any responsibility in scope (trust boundary, dependency, secret, mutable reference, remediation)
       for which no evidence was collected.</check>
     <on_unmet>Run the missing command, widen the scope, or downgrade the finding to the tier its evidence
       supports.</on_unmet>
@@ -98,7 +98,7 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
       <output>The external path the list is read from, and the failing branch taken when it is missing</output>
     </step>
     <step order="2">
-      <action>Require word boundaries, forbidding boundary-crossing matches for short tokens — the instinct
+      <action>Require word boundaries, forbidding boundary-crossing matches for short tokens: the instinct
         after a missed match is to normalize harder (strip punctuation, case-fold, remove whitespace), and each
         step raises recall by destroying the boundaries that gave precision, short needles corrupting
         first.</action>
@@ -119,7 +119,7 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
     </step>
     <step order="2">
       <action>If an audit tool is unavailable or fails, name it as unrun. If a gate's configuration input is
-        missing, fail the gate — absence means the evidence-producing step did not run, which is worse news than
+        missing, fail the gate: absence means the evidence-producing step did not run, which is worse news than
         bad evidence, not neutral news.</action>
       <output>Alternative check run, or the unscanned surface named; the gate failed with the missing input
         named, never skipped</output>
@@ -141,7 +141,7 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
       separate the survivors, or state the count as unverified matches.</unmet>
   </factor>
   <factor name="remediation_clarity" precedence="4">
-    <unmet>The fix is a direction rather than a change — no target version, no call to replace, no check to
+    <unmet>The fix is a direction rather than a change: no target version, no call to replace, no check to
       insert. Write the change.</unmet>
   </factor>
 </decision_criteria>
@@ -157,7 +157,7 @@ Find vulnerabilities, leaked secrets, trust-boundary defects, and vulnerable dep
   <escalation condition="Mutable external reference">Pin to an immutable version or commit SHA, and add a test
     asserting the pinned form</escalation>
   <escalation condition="Gate configuration input missing">Fail the gate; never skip it</escalation>
-  <escalation condition="A detector would publish the names it protects">Hard block — source the list externally
+  <escalation condition="A detector would publish the names it protects">Hard block: source the list externally
     and fail when it is missing</escalation>
 </escalations>
 

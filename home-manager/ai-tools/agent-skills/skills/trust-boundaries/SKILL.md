@@ -15,12 +15,12 @@ else it applies.
 ## Vocabulary
 
 **A trust boundary** is the line at which data stops being produced by code you control. Every value crossing
-it is a *claim*, not a fact — and a boundary is not only a network socket: a persisted file the user can edit,
+it is a *claim*, not a fact; and a boundary is not only a network socket: a persisted file the user can edit,
 a byte stream from whatever program the user chose to run, an archive member, a plugin's return value, and an
 inter-language call all cross one.
 
-**Fail closed.** When a check cannot be completed — ambiguous input, unknown key, exhausted budget,
-unverifiable identity, missing checksum — the outcome is refusal. A missing verification result is a failure,
+**Fail closed.** When a check cannot be completed (ambiguous input, unknown key, exhausted budget,
+unverifiable identity, missing checksum), the outcome is refusal. A missing verification result is a failure,
 never a pass. **The symptom of a fail-open design is that removing an input makes the code take the happy
 path.**
 
@@ -36,7 +36,7 @@ answer.
 
 An untrusted party may report **what happened to it**; it may never state **what should change.**
 
-A command carrying a caller-chosen magnitude — "apply amount N", "grant tier T", "set remaining quota to Q" —
+A command carrying a caller-chosen magnitude ("apply amount N", "grant tier T", "set remaining quota to Q")
 delegates the entire policy to the caller. Every mitigation, floor, ceiling, cooldown, and eligibility rule the
 authoritative side implements is bypassed, because the caller supplied the answer those rules were supposed to
 produce. **Authenticating the caller does not help: authentication answers "who", not "what may they assert".**
@@ -44,7 +44,7 @@ produce. **Authenticating the caller does not help: authentication answers "who"
 Replace the magnitude command with cause-specific evidence claims. The caller says *which cause occurred*, with
 the parameters only it can observe; the authoritative side looks up the base magnitude, applies its own
 modifiers and mitigations, clamps to its own bounds, and records the result. **The wire protocol should have no
-representation for a raw effect at all** — an unrepresentable request cannot be smuggled through.
+representation for a raw effect at all**: an unrepresentable request cannot be smuggled through.
 
 - Scoring: the client reports "objective X completed at time T"; the server owns the point value and the
   anti-replay window.
@@ -60,7 +60,7 @@ target belongs to the caller's scope **against the server's record of that scope
 the caller supplied alongside the target.
 
 **Reject unknown shapes.** A restore or update path that ignores unrecognized keys silently accepts whatever a
-future — or hostile — writer adds, and gives an attacker a stable channel to probe which keys the
+future (or hostile) writer adds, and gives an attacker a stable channel to probe which keys the
 implementation actually consumes. Unknown keys, extra positional elements, and unexpected variants are errors,
 not noise to skip. This is the structural half of fail-closed.
 
@@ -71,14 +71,14 @@ regressed.**
 
 1. Enumerate the hostile shapes: absent field, wrong type, out-of-domain value, ambiguous duplicate, oversized
    payload, wrong scope, replayed identifier, adversarially chosen boundary value.
-2. Write a rejection test for each, asserting on a **typed** rejection value — a named error variant or tagged
-   result — never on a message string, so a reworded diagnostic does not silently turn a rejection test into a
+2. Write a rejection test for each, asserting on a **typed** rejection value (a named error variant or tagged
+   result), never on a message string, so a reworded diagnostic does not silently turn a rejection test into a
    tautology.
 3. Snapshot the typed rejection set, so a change that removes a refusal is visible in review as a deleted
    entry rather than as an absence.
 4. Only then implement the acceptance path.
 
-The integrity of those tests — vacuity, assertion strength, not computing an expected value from the subject —
+The integrity of those tests (vacuity, assertion strength, not computing an expected value from the subject)
 belongs to [test-integrity](../test-integrity/SKILL.md).
 
 ## Validation ordering
@@ -87,7 +87,7 @@ Most holes here are not missing checks. **The check exists, and is unreachable, 
 other than what crosses the wire.**
 
 **Validate raw before any normalizing coercion.** When a guard exists to reject input class A, and a coercion
-maps A into class B, running the coercion first makes the guard unreachable — by the time it runs, no input is
+maps A into class B, running the coercion first makes the guard unreachable: by the time it runs, no input is
 still in class A. The refactor that causes this ("normalize first, then validate, so the validator handles one
 shape") sounds strictly safer and is exactly backwards, and **the guard keeps passing its own tests because the
 fixtures were already in normal form.** Run class-discriminating checks against the original input, then
@@ -106,17 +106,17 @@ decoded value for its own domain. **Neither check substitutes for the other.**
 
 **Validate in the encoding actually written.** A protocol framed by byte-level delimiters is attacked at the
 byte level, but validation is usually written over decoded text. When the transport uses an encoding that
-cannot represent some characters, the encoder substitutes replacement bytes — and a character harmless as a
+cannot represent some characters, the encoder substitutes replacement bytes; and a character harmless as a
 codepoint can become the protocol's own terminator on the wire. The codepoint check is then correct and
 irrelevant. Encode first, then check the encoded bytes for delimiters, control bytes, and length.
 
-**One normalization boundary, plus a fail-closed helper.** Ambiguity in structured input — duplicate keys
-differing only by case, a key present with no value, a continuation-folded field — is resolved differently by
+**One normalization boundary, plus a fail-closed helper.** Ambiguity in structured input (duplicate keys
+differing only by case, a key present with no value, a continuation-folded field) is resolved differently by
 each helper that parses it. When the authorization gate resolves it one way and the consuming helper another,
 **the value that was authorized is not the value that is used.** That is the classic parameter-pollution bypass
 and it needs no exotic input. Name exactly one boundary that owns normalization and let it *reject* ambiguity
 rather than picking a winner; then independently make each downstream helper apply the same rejection rules.
-The helper's fail-closed behavior must not be justified by "the gate already checked" — a later caller will
+The helper's fail-closed behavior must not be justified by "the gate already checked": a later caller will
 reach the helper directly.
 
 **Match the validator's domain to the producer's range.** Validators get written against the example in front
@@ -128,7 +128,7 @@ caused it. Derive the accepted set from the producer's real range, and treat tig
 over persisted data as a breaking change requiring a migration path.
 
 *The mirror-image trap:* a standard-library character-class predicate usually accepts a wider class than the
-grammar you are implementing — decimal-digit predicates commonly accept non-ASCII digit forms. When the grammar
+grammar you are implementing: decimal-digit predicates commonly accept non-ASCII digit forms. When the grammar
 defines an ASCII-only class, implement the predicate explicitly and cover fullwidth and non-Latin digit forms
 in regression tests.
 
@@ -166,28 +166,28 @@ many gigabytes, and post-extraction validation runs only after the disk is full.
 count and enforce it *during* extraction, aborting mid-stream. Any declared uncompressed size in the metadata
 is itself untrusted: use it for early rejection only, and still count actual bytes written.
 
-**Each decoder is its own boundary.** When a payload is decoded on two sides — a fast native path and a
-fallback in another language, a preview renderer and the real consumer — the cap installed on one path does not
+**Each decoder is its own boundary.** When a payload is decoded on two sides (a fast native path and a
+fallback in another language, a preview renderer and the real consumer), the cap installed on one path does not
 exist on the other. **The second path is usually the one nobody reviewed, precisely because it was described as
 a fallback.** Every decode path carries its own budget, in its own language, with its own test.
 
 **Bound retained payloads, not only reports.** An error object retaining the offending input for diagnostics
 keeps the whole payload alive for as long as the error propagates, even when the rendered message is truncated.
-Truncation at the presentation layer bounds what you *see*, not what you *hold* — sanitize and bound at
+Truncation at the presentation layer bounds what you *see*, not what you *hold*: sanitize and bound at
 construction time.
 
 ### Extracting one file from an untrusted archive
 
 1. List the members without extracting anything.
 2. Require an exact single-member list matching what you expect. More than one member, or a different name, is
-   a rejection — **not a reason to search the list.**
+   a rejection, **not a reason to search the list.**
 3. Extract only that member into a freshly created private temporary directory, never a shared or predictable
    location.
 4. Reject symbolic links, hard links, device entries, and any member whose path is absolute or contains upward
    traversal, **before writing anything.**
 5. Enforce a hard cap on uncompressed bytes while writing, aborting when exceeded.
 6. Require a regular file, and verify its checksum or signature while it is still inside the private directory.
-   **A missing checksum is a failure, not a skipped optional step** — this is where fail-open most often hides:
+   **A missing checksum is a failure, not a skipped optional step**; this is where fail-open most often hides:
    code that verifies "if one is provided" grants an attacker the ability to remove verification by removing
    data.
 7. Only after verification succeeds, publish to the destination.
@@ -210,11 +210,11 @@ property as "we checked the file first."**
 must be provably the same object, which a second path resolution cannot establish. Hold an open descriptor
 where the platform allows it, or create a link to the checked entry inside a private directory you control and
 read only through that link, requiring the linked entry's identity to equal the pre-link identity. Where the
-platform genuinely cannot close the window, compare the **full** identity tuple — device, inode, size,
-modification time, status-change time — before and after, and *document the residual window explicitly* rather
+platform genuinely cannot close the window, compare the **full** identity tuple (device, inode, size,
+modification time, status-change time) before and after, and *document the residual window explicitly* rather
 than describing the result as safe. Device, inode, and size alone miss a same-size in-place rewrite.
 
-Hardlink pinning is frequently unavailable — different devices, or a filesystem that refuses hard links. **The
+Hardlink pinning is frequently unavailable: different devices, or a filesystem that refuses hard links. **The
 fallback is not to check the path and open it afterwards; that is the original hazard restored.** Invert the
 order: open first with symlink-following disabled, then run every type, size, and ownership check against the
 *open descriptor*. The checks then describe the object you are already holding. The same inversion is right
@@ -222,22 +222,22 @@ wherever a platform offers descriptor-relative operations: resolve once, keep op
 
 **Bound the read itself.** A pre-read size check does not bound the read, because the entry can grow between
 the stat and the read; a post-read check bounds nothing, because the bytes are already in memory. Read at most
-limit-plus-one bytes and reject when the extra byte materializes — one read that both enforces the cap and
+limit-plus-one bytes and reject when the extra byte materializes, one read that both enforces the cap and
 detects overflow.
 
 **Reject by type, because some types block.** A named pipe is the sharpest case: readable, reports size zero,
-is not a symbolic link, satisfies every metadata precheck — **and then blocks forever on open**, before any
+is not a symbolic link, satisfies every metadata precheck; **and then blocks forever on open**, before any
 post-read size limit or identity comparison gets a chance to run. The denial of service happens strictly inside
 the code you believed was guarded. Require a regular file explicitly, and note that "is a regular file"
 predicates commonly follow symlinks, so a separate symlink check is still needed.
 
 Writing into that same space safely follows one more rule beyond the read-side ones above: write the new
-content under a private temporary name first, verify it there — checksum, signature, structural validation —
+content under a private temporary name first, verify it there (checksum, signature, structural validation),
 then publish by moving it into place, a rename or the platform's atomic pointer swap, as the single
 irreversible step. A crash before that step leaves the previous, complete content reachable; publishing before
 the content is fully written and verified leaves a pointer to something incomplete or unverified, restored only
 by deletion rather than by simply never having happened. Clean up the temporary artifact on failure and the
-superseded one on success, but treat both as best-effort — a cleanup failure must never be reported as a
+superseded one on success, but treat both as best-effort: a cleanup failure must never be reported as a
 failure of the write that already succeeded. Nothing observable changes until the publish step, so a failed
 attempt is safe to retry from the top: the sequence is idempotent under retry, not merely crash-safe.
 
@@ -252,19 +252,19 @@ allowlist's decision has any effect. Parse with the reader's evaluation hooks di
 against exact supported names and call the corresponding function **directly**, so the set of reachable code is
 fixed at compile time rather than derived from input.
 
-**Exact names only, and nothing left over.** Prefix and substring matching turns an allowlist into a wildcard —
+**Exact names only, and nothing left over.** Prefix and substring matching turns an allowlist into a wildcard:
 a check accepting a command because it *begins with* an allowed name accepts every longer name sharing that
 prefix. Ignoring bytes after the parsed form lets an attacker append a second payload a differently-configured
 consumer will read. Compare for exact equality, reject trailing input, and enforce arity before dispatching so
 a mismatch is a rejection rather than a runtime error inside a handler that has already started work.
 
 **Reject reader-constructed cycles.** Readers supporting internal references can be made to produce cyclic
-structures, and any later traversal — validation, logging, comparison, serialization — then hangs or overflows
+structures, and any later traversal (validation, logging, comparison, serialization) then hangs or overflows
 the stack, **inside code that looks total.** Reject cycles at the boundary with a cycle-safe traversal and
 bound traversal depth: an unbounded recursive walk is a scale-dependent failure the test corpus will not reach.
 
 **Documents must not configure their reader.** Many document and container formats include a mechanism by which
-the document instructs the tool that opens it — embedded settings, in-band directives, in some ecosystems
+the document instructs the tool that opens it: embedded settings, in-band directives, in some ecosystems
 arbitrary expressions attached to the file. Opening a file on behalf of external input therefore inherits code
 execution from that file's author, **with no explicit call site to review.** When opening a path derived from
 external input, disable in-band configuration and evaluation for the duration of the open, as part of the open
@@ -283,13 +283,13 @@ person who configured it.**
 
 ## Output and logging
 
-Untrusted data is still dangerous on the way out. The output channel has its own interpreter — a log pipeline,
-a terminal, a formatter, a renderer — and untrusted bytes reach it directly through diagnostics written for
+Untrusted data is still dangerous on the way out. The output channel has its own interpreter (a log pipeline,
+a terminal, a formatter, a renderer), and untrusted bytes reach it directly through diagnostics written for
 convenience.
 
 **Never use untrusted text as a format template.** Formatting functions *interpret* their template argument.
 Passing an already-composed message, or any attacker-influenced text, in the template position hands the
-formatter's directive language to the attacker — which across ecosystems means crashes, resource exhaustion
+formatter's directive language to the attacker, which across ecosystems means crashes, resource exhaustion
 through repeat directives, argument-stack reads, or writes into a stream. Always pass composed or untrusted
 text as a formatting **argument** with a plain pass-through directive. This applies to error constructors and
 logging helpers, **which are exactly where the mistake looks harmless.**
@@ -298,11 +298,11 @@ logging helpers, **which are exactly where the mistake looks harmless.**
 interpreters: a log file, an aggregator that splits on newlines, a terminal that acts on escape sequences, a
 notification area. Newline enables log forging; a NUL byte truncates the record in some consumers; escape
 sequences can rewrite a terminal's state or spoof subsequent output; and **the message often crosses a
-privilege level upward, being read by an operator.** Report a bounded, sanitized representation — escape or
+privilege level upward, being read by an operator.** Report a bounded, sanitized representation: escape or
 strip control characters, cap the length, prefer a stable identifier or a hash over the content.
 
-**Untrusted strings can carry presentation metadata.** In ecosystems where a string carries attached metadata —
-display substitutions, styling, an attached key map — that metadata survives concatenation and formatting, is
+**Untrusted strings can carry presentation metadata.** In ecosystems where a string carries attached metadata
+(display substitutions, styling, an attached key map), that metadata survives concatenation and formatting, is
 preserved through ordinary substitution directives, and is **not** removed by applying an outer style. A value
 from a lookup table, a cache, or a network response can therefore alter what the user sees, or what a keystroke
 does, at a place in the code that appears to be doing nothing but string building. Generic deep-copy helpers
@@ -324,7 +324,7 @@ visually prominent part is then chosen by the attacker. Reject anything relative
 userinfo component **outright rather than stripping it.**
 
 **Validate the host by class.** A single pattern intended to match "a hostname" inevitably admits forms it was
-not designed for, because the host component has several genuinely different grammars — and the failures are
+not designed for, because the host component has several genuinely different grammars; and the failures are
 silent, producing a validator that is confidently wrong. Classify first, then validate within the class: a
 dotted name label by label against the label grammar and length limits; a dotted-quad as **exactly four**
 decimal components, each in range and **each without a leading zero**; a bracketed literal as an address of
@@ -334,7 +334,7 @@ private ranges are permitted, since the class check alone accepts them.
 Both extra conditions on the dotted-quad class exist because **the resolver is more permissive than the grammar
 most validators assume.** A component with a leading zero is reinterpreted as octal by several resolvers, so a
 validator that only range-checks approves one address while the connection is made to another. Forms with fewer
-than four parts — a bare integer, or two or three parts where the last absorbs the remaining bytes — are
+than four parts (a bare integer, or two or three parts where the last absorbs the remaining bytes) are
 likewise still accepted, so "it did not look like an address" is not a safe conclusion from a failed four-part
 match. **When a validator and a resolver disagree about a grammar, the resolver wins**, and the disagreement is
 exactly where a private-range check gets bypassed.
@@ -347,16 +347,16 @@ inert text.
 
 **A host-supplied path cannot be vouched for.** When a protocol lets a peer name a local file for the software
 to read and return, no wrapper type, canonicalization, or prefix check can establish that the requester is
-entitled to that file's contents — **the entitlement question is not answerable from the path.** Decline the
+entitled to that file's contents: **the entitlement question is not answerable from the path.** Decline the
 capability rather than attempting to validate it, and document it as a deliberate refusal so it is not
 reintroduced as a missing feature.
 
 ## Related
 
-- [test-integrity](../test-integrity/SKILL.md) — integrity of the rejection tests themselves
-- [testing-patterns](../testing-patterns/SKILL.md) — the strategy the rejection-tests-first method plugs into
-- [investigation-patterns](../investigation-patterns/SKILL.md) — tracing a suspected boundary to the failing input
-- [core-patterns](../core-patterns/SKILL.md) — shared decision-criteria and escalation structures
-- [rust-ecosystem](../rust-ecosystem/SKILL.md) — newtypes carrying a validated value
-- [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md) — conditions, and standard-predicate character classes
-- [emacs-ecosystem](../emacs-ecosystem/SKILL.md) — document-directed evaluation and string presentation metadata
+- [test-integrity](../test-integrity/SKILL.md): integrity of the rejection tests themselves
+- [testing-patterns](../testing-patterns/SKILL.md): the strategy the rejection-tests-first method plugs into
+- [investigation-patterns](../investigation-patterns/SKILL.md): tracing a suspected boundary to the failing input
+- [core-patterns](../core-patterns/SKILL.md): shared decision-criteria and escalation structures
+- [rust-ecosystem](../rust-ecosystem/SKILL.md): newtypes carrying a validated value
+- [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md): conditions, and standard-predicate character classes
+- [emacs-ecosystem](../emacs-ecosystem/SKILL.md): document-directed evaluation and string presentation metadata

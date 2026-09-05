@@ -46,7 +46,10 @@ in
     autoCompactEnabled = true;
     enableAllProjectMcpServers = true;
     feedbackSurveyState.lastShownTime = 1754089004345;
-    outputStyle = "Explanatory";
+    # Selects the style defined below. Built-in Explanatory cannot be extended, only replaced, so
+    # explanatory-strict re-authors its insight behavior and adds output_discipline's prohibitions
+    # at the system-prompt layer, which CLAUDE.md cannot reach.
+    outputStyle = "explanatory-strict";
 
     permissions = {
       deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
@@ -78,7 +81,7 @@ in
     # Claude Code fans one event out to every matching hook in parallel and merges the results
     # afterwards, so position in this list confers nothing: no hook runs before another and none
     # sees another's updatedInput. Every hook here judges the command as issued. rtk-rewrite is
-    # currently the only one emitting updatedInput — adding a second would make precedence between
+    # currently the only one emitting updatedInput; adding a second would make precedence between
     # them non-deterministic, and this list could not resolve it.
     hooks.PreToolUse = [
       # The empty matcher is what reaches Read, Write, and Edit; the Bash entry below cannot see
@@ -94,7 +97,7 @@ in
       }
       {
         matcher = "Bash";
-        # The assert fails the build if the derived wiring stops matching what this file expects —
+        # The assert fails the build if the derived wiring stops matching what this file expects:
         # a guardrail renamed or added in the shared catalog would otherwise be installed and never
         # fire, which has gone unnoticed here once before.
         hooks =
@@ -141,6 +144,10 @@ in
     "feedback"
     "markdown"
     "upstream"
+  ];
+
+  programs.claude-code.outputStyles = readFiles "${ai-prompts-path}/output-styles" [
+    "explanatory-strict"
   ];
 
   programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
