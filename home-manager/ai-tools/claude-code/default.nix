@@ -141,7 +141,6 @@ in
     "define"
     "execute"
     "execute-full"
-    "feedback"
     "markdown"
     "upstream"
   ];
