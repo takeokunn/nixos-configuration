@@ -1,3 +1,7 @@
+{ pkgs, ... }:
+let
+  emojiFont = if pkgs.stdenv.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
+in
 {
   programs.kitty.enable = true;
   programs.kitty.themeFile = "Dracula";
@@ -6,8 +10,8 @@
   programs.kitty.font.size = 13;
 
   # HackGen Console NF has no emoji glyphs; route emoji/pictograph/flag
-  # ranges to Noto Color Emoji instead of falling back to a tofu glyph.
-  programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF Noto Color Emoji";
+  # ranges to the platform's color emoji font instead of a tofu glyph.
+  programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF ${emojiFont}";
 
   programs.kitty.settings = {
     remember_window_size = false;
@@ -37,9 +41,6 @@
 
     enable_audio_bell = false;
     visual_bell_duration = 0;
-
-    # Focus reporting (disable to prevent OI escape sequences in terminal apps)
-    focus_reporting_protocol = "none";
 
     # Splits/Windows (not covered by Dracula theme)
     active_border_color = "#f8f8f2";

@@ -1762,9 +1762,22 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   (defun my/scratchpad-init ()
     "Initialize scratchpad: switch to *scratch* and enable nskk-mode."
     (switch-to-buffer "*scratch*")
-    (when (fboundp 'nskk-mode)
+    (when (and (fboundp 'nskk-mode)
+               (not (bound-and-true-p nskk-mode)))
       (nskk-mode 1))
     nil)
+
+  (defun my/scratchpad-warm-up ()
+    "Enable nskk-mode in *scratch* before the first scratchpad hotkey needs it."
+    (when (fboundp 'nskk-mode)
+      (with-current-buffer (get-buffer-create "*scratch*")
+        (unless (bound-and-true-p nskk-mode)
+          (condition-case err
+              (nskk-mode 1)
+            (error (message "scratchpad warm-up skipped: %s"
+                            (error-message-string err))))))))
+
+  (run-with-idle-timer 3 nil #'my/scratchpad-warm-up)
 #+end_src
 * Coding
 :PROPERTIES:

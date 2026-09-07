@@ -8,9 +8,24 @@ let
     defaultWindowWidth
     defaultWindowHeight
     defaultAppId
+    scratchpadInstanceGroup
     ;
   socketPath =
     if pkgs.stdenv.isDarwin then constants.socketPath else "/run/user/$(id -u)/emacs/server";
+
+  # Holds the single-instance socket open with no window so the hotkey pays
+  # only a window create, not a kitty cold start. Close confirmation is a
+  # process-wide setting, so it must be disabled here rather than per window.
+  scratchpadKittyServer = pkgs.writeShellScript "emacs-scratchpad-kitty-server" ''
+    exec ${pkgs.kitty}/bin/kitty \
+      --single-instance \
+      --instance-group ${scratchpadInstanceGroup} \
+      --start-as=hidden \
+      -o confirm_os_window_close=0 \
+      -o macos_quit_when_last_window_closed=no \
+      -o remember_window_size=no \
+      -- ${pkgs.coreutils}/bin/true
+  '';
 
   mkScratchpadToggle =
     {
@@ -118,14 +133,14 @@ let
 
         focus_existing_window() {
           local i=0
-          while [ "$i" -lt 100 ]; do
+          while [ "$i" -lt 500 ]; do
             TARGET_ID="$(window_id_by_title)"
             if [ -n "$TARGET_ID" ]; then
               "$AEROSPACE" focus --window-id "$TARGET_ID"
               return 0
             fi
             i=$((i + 1))
-            sleep 0.1
+            sleep 0.02
           done
 
           return 1
@@ -165,12 +180,16 @@ let
 
         # Keep hotkey startup on AeroSpace/kitty/emacsclient only. AppleScript/System Events
         # adds a fixed delay and can race with Accessibility permissions during login.
+        # The instance group is normally served by the resident kitty that scratchpadKittyServer
+        # (started by home-manager/editor/emacs-scratchpad at login) holds open; when it is
+        # absent this invocation becomes the server and must not quit on close.
         "$KITTY" \
-          --single-instance=no \
+          --single-instance \
+          --instance-group ${scratchpadInstanceGroup} \
           -o close_on_child_death=yes \
-          -o macos_quit_when_last_window_closed=yes \
+          -o confirm_os_window_close=0 \
+          -o macos_quit_when_last_window_closed=no \
           -o term=xterm-256color \
-          -o focus_reporting_protocol=none \
           -o remember_window_size=no \
           -o initial_window_width=${toString windowWidth} \
           -o initial_window_height=${toString windowHeight} \
@@ -225,14 +244,14 @@ let
 
         center_new_window() {
           local i=0
-          while [ "$i" -lt 100 ]; do
+          while [ "$i" -lt 500 ]; do
             window_data_value="$(window_data)"
             if [ -n "$window_data_value" ]; then
               ${pkgs.niri}/bin/niri msg action center-window
               return 0
             fi
             i=$((i + 1))
-            sleep 0.1
+            sleep 0.02
           done
 
           return 1
@@ -249,7 +268,7 @@ let
           window_data_value="$(window_data)"
           if [ -z "$window_data_value" ]; then
             start_emacs_service
-            XMODIFIERS=@im= ${kitty} --class "$APP_ID" -o initial_window_width=80c -o initial_window_height=24c -e ${emacsclientTerminal} &
+            XMODIFIERS=@im= ${kitty} --single-instance --instance-group ${scratchpadInstanceGroup} --class "$APP_ID" -o confirm_os_window_close=0 -o initial_window_width=80c -o initial_window_height=24c -e ${emacsclientTerminal} &
             center_new_window
           fi
         fi
@@ -272,6 +291,7 @@ in
   inherit
     socketPath
     mkScratchpadToggle
+    scratchpadKittyServer
     defaultWindowWidth
     defaultWindowHeight
     ;

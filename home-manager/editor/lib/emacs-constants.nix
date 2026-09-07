@@ -7,4 +7,6 @@
   defaultWindowHeight = 600;
 
   defaultAppId = "FloatingEmacs";
+
+  scratchpadInstanceGroup = "emacs-scratchpad";
 }
