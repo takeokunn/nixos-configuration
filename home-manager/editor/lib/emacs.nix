@@ -81,6 +81,19 @@ let
         exit 1
       '';
 
+      # AeroSpace has no command that places a floating window at a coordinate, so the
+      # position has to come from kitty. GLFW's work area already excludes the menu bar
+      # and the Dock, so the bottom-right corner needs no further correction.
+      bottomRightPosition = pkgs.writeText "emacs-scratchpad-position.py" ''
+        import sys
+        from kitty.constants import glfw_path
+        from kitty.fast_data_types import glfw_init, glfw_get_monitor_workarea
+
+        glfw_init(glfw_path("cocoa"), lambda *a, **k: (0, 0, 0, 0), False, False, False)
+        x, y, w, h = glfw_get_monitor_workarea()[0]
+        sys.stdout.write(f"{x + w - ${toString windowWidth}}x{y + h - ${toString windowHeight}}")
+      '';
+
       aerospaceScript = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
         APP_TITLE="${appId}"
         AEROSPACE="/run/current-system/sw/bin/aerospace"
@@ -186,6 +199,7 @@ let
         "$KITTY" \
           --single-instance \
           --instance-group ${scratchpadInstanceGroup} \
+          --position="$("$KITTY" +launch ${bottomRightPosition} 2>/dev/null)" \
           -o close_on_child_death=yes \
           -o confirm_os_window_close=0 \
           -o macos_quit_when_last_window_closed=no \
