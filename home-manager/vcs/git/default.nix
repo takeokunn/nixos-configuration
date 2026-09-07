@@ -38,6 +38,7 @@
     "playwright-report/"
     "test-results/"
     ".playwright-mcp/"
+    ".qa/"
     ".worktrees/"
   ];
 

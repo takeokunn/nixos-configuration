@@ -143,6 +143,7 @@ in
     "execute"
     "execute-full"
     "markdown"
+    "qa"
     "upstream"
   ];
 
