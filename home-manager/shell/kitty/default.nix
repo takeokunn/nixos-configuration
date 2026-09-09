@@ -9,9 +9,17 @@ in
   programs.kitty.font.name = "HackGen Console NF";
   programs.kitty.font.size = 13;
 
-  # HackGen Console NF has no emoji glyphs; route emoji/pictograph/flag
-  # ranges to the platform's color emoji font instead of a tofu glyph.
-  programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF ${emojiFont}";
+  # HackGen Console NF has no emoji glyphs; route emoji ranges to the
+  # platform's color emoji font instead of a tofu glyph. Claude Code's own
+  # record-bullet (U+23FA) and other glyphs like U+2B50 star fell outside
+  # the original three ranges. The added codepoints list only the
+  # emoji-flagged characters in the Miscellaneous Technical (U+2300-U+23FF)
+  # and Miscellaneous Symbols and Arrows (U+2B00-U+2BFF) blocks, not the
+  # full blocks: routing the full blocks would also widen non-emoji glyphs
+  # they contain (e.g. U+2318 command key, U+23CE return) to the emoji
+  # font's wide aspect ratio, breaking column alignment wherever those
+  # appear.
+  programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF,U+231A-U+231B,U+2328,U+23CF,U+23E9-U+23F3,U+23F8-U+23FA,U+2B05-U+2B07,U+2B1B-U+2B1C,U+2B50,U+2B55 ${emojiFont}";
 
   programs.kitty.settings = {
     remember_window_size = false;
