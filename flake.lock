@@ -412,16 +412,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1789120477,
-        "narHash": "sha256-lP3thFnW8vCH1fmNutuinVcU/QEmaYV1n5EI7rShfkY=",
+        "lastModified": 1789153584,
+        "narHash": "sha256-XMoytpVt8HRcH5SGL6xVcCo33x7pZli9inplngAOhcU=",
         "owner": "takeokunn",
         "repo": "git-bulk-clean",
-        "rev": "f5cafe42a4dfc87e786e9e822c686f8318c48f15",
+        "rev": "85e342d02e7ecf2ebc670c9fab86217e7cdf99b5",
         "type": "github"
       },
       "original": {
         "owner": "takeokunn",
-        "ref": "v0.6.0",
+        "ref": "v0.6.1",
         "repo": "git-bulk-clean",
         "type": "github"
       }
