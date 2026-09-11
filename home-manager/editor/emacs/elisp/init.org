@@ -1749,21 +1749,24 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
     (set-face-attribute 'nskk-cursor-jisx0208-latin nil :background "#ffb86c")
     (set-face-attribute 'nskk-cursor-abbrev nil :background "#bd93f9")
 
-    (defun my/nskk-kakutei-newline-on-hiragana-idle (&rest _)
-      "`nskk-kakutei' documents `hiragana-idle' as a no-op; this turns that
-no-op into a newline, so C-j breaks the line whenever nothing is left to
-confirm, at any point position. The ▽/▼ commit paths keep DDSKK's
-C-j-confirms-without-newline behavior. A later `:override' advice on
-`nskk-kakutei' added elsewhere in this file would silently stop this from
-firing (nadvice `:override' ignores anything already wrapped) — call this
-function explicitly from such an override rather than assuming it still
-runs."
-      (when (eq (nskk-current-kakutei-state) 'hiragana-idle)
-        (condition-case nil
-            (newline)
-          ((buffer-read-only text-read-only) nil))))
+    (defun my/nskk-kakutei-newline-on-hiragana-idle (orig-fn &rest args)
+      "`nskk-kakutei' documents `hiragana-idle' as a no-op; turn that no-op
+into a newline, so C-j breaks the line whenever nothing is left to confirm.
+The state must be read before ORIG-FN runs: committing ▽/▼ leaves nskk in
+`hiragana-idle', so an `:after' advice reading it afterwards cannot tell a
+commit apart from an idle keypress and appends a newline to every
+conversion. A later `:override' advice on `nskk-kakutei' added elsewhere in
+this file would silently stop this from firing (nadvice `:override' ignores
+anything already wrapped) — call this function explicitly from such an
+override rather than assuming it still runs."
+      (let ((idle (eq (nskk-current-kakutei-state) 'hiragana-idle)))
+        (prog1 (apply orig-fn args)
+          (when idle
+            (condition-case nil
+                (newline)
+              ((buffer-read-only text-read-only) nil))))))
 
-    (advice-add 'nskk-kakutei :after #'my/nskk-kakutei-newline-on-hiragana-idle)
+    (advice-add 'nskk-kakutei :around #'my/nskk-kakutei-newline-on-hiragana-idle)
 
     (when-darwin
      (setopt nskk-server-enable t)
