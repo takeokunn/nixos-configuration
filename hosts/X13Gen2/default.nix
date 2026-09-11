@@ -44,6 +44,7 @@ nixpkgs.lib.nixosSystem {
         nixvim.homeModules.nixvim
         inputs.zen-browser.homeModules.twilight
         inputs.agent-skills.homeManagerModules.default
+        inputs.git-bulk-clean.homeManagerModules.default
       ];
       home-manager.extraSpecialArgs = {
         inherit inputs system;
