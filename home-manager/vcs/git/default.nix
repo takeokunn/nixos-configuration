@@ -8,7 +8,6 @@
 
   programs.git.enable = true;
   programs.git.lfs.enable = true;
-  programs.git.maintenance.enable = true;
 
   programs.git.ignores = [
     "*.swp"
@@ -47,7 +46,6 @@
   programs.git.signing.signByDefault = true;
 
   programs.git.includes = [
-    { path = "~/.config/git/config.d/maintenance.conf"; }
     { path = "~/.config/git/work.gitconfig"; }
   ];
 
