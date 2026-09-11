@@ -69,28 +69,6 @@ nix-darwin.lib.darwinSystem {
         # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
-        (
-          { pkgs, lib, ... }:
-          {
-            services.git-maintenance = {
-              enable = true;
-              ghq.enable = true;
-              interval = 3600; # 1 hour
-              # Private HTTPS remotes can only fetch through the gh credential
-              # helpers; the daemon resets every helper unless told otherwise.
-              credentialHelpers = true;
-            };
-
-            # launchd agents don't inherit home.sessionVariables (shell-only), so
-            # SSH-remote repos fail fetch without the agent socket set explicitly,
-            # and the credential helper scripts under ~/.config/git call `gh` by
-            # name, which launchd's default PATH cannot resolve.
-            launchd.agents.git-maintenance.config.EnvironmentVariables = {
-              SSH_AUTH_SOCK = "/Users/${username}/.gnupg/S.gpg-agent.ssh";
-              PATH = "${lib.makeBinPath [ pkgs.gh ]}:/usr/bin:/bin:/usr/sbin:/sbin";
-            };
-          }
-        )
       ];
       home-manager.extraSpecialArgs = {
         inherit inputs system username;
