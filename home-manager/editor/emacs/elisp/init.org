@@ -6849,6 +6849,12 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setq consult-org-roam-grep-func #'consult-ripgrep)
     (setq consult-org-roam-buffer-narrow-key ?r)
     (setq consult-org-roam-buffer-after-buffers nil))
+
+  ;; consult-org-roam-buffer.el reads/sets org-roam-buffer-open-buffer-list
+  ;; without ever declaring it, so exiting the minibuffer before its :items
+  ;; function has run signals (void-variable org-roam-buffer-open-buffer-list).
+  (with-eval-after-load 'consult-org-roam-buffer
+    (defvar org-roam-buffer-open-buffer-list nil))
 #+end_src
 *** org-roam-ui
 :PROPERTIES:
