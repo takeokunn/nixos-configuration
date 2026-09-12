@@ -11,6 +11,7 @@
   homebrew.casks = [
     "amical"
     "aquaskk"
+    "arto-app/tap/arto"
     "cleanshot"
     "claude"
     "clickup"
