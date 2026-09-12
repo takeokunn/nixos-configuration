@@ -16,6 +16,7 @@ pkgs.writeText "oh-my-opencode.json" (
     autoupdate = false;
     model_fallback = true;
     disabled_hooks = [ "comment-checker" ];
+    codegraph.enabled = false;
 
     inherit agents categories;
   }
