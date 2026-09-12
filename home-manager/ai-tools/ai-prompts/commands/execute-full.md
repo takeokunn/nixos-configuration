@@ -19,13 +19,7 @@ Execute, review across every quality dimension, then fix what the review found: 
     fix summary, commit messages, PR bodies, documentation, code comments. It applies hardest to the fix phase,
     where a fixed symptom described in praise rather than as a named diff hunk is indistinguishable from a
     symptom that stopped reproducing on its own.</rule>
-  <rule>A commit message or PR body holds only what its reader needs to approve and cannot get anywhere else.
-    Not the diff. It already shows every changed file, line, and function name. Not the commit history. It
-    already shows how the work evolved. Not a CI check that already ran. The checks tab already shows its
-    pass/fail and count. Write instead the judgment the diff can't show: why a workaround stands in for a root
-    fix, what was deliberately left out of scope, and which verification no CI gate runs and had to be done by
-    hand: name what was actually checked, not that it passed, since a selector matching nothing exits zero the
-    same as a real one.</rule>
+  <rule>Load pull-request before writing a commit message or a PR body; it owns what belongs in one.</rule>
 </rules>
 <rules priority="important">
   <rule>Skip the fix phase when the review found nothing: say so explicitly instead of running it as a

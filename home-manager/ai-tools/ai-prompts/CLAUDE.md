@@ -233,6 +233,7 @@ govern costs its full body on every later request in the session.
 | Nix, flake, or Home Manager work | nix-ecosystem |
 | Needing a library's current API, version behavior, or migration notes | context7-usage |
 | Writing prose for an external audience, a report, or documentation | technical-writing, technical-documentation |
+| Deciding what goes into a commit message, a PR title, or a PR body | pull-request |
 | Docs, README, comment blocks, commit messages, or PR/issue bodies were written or revised, at task completion | cold-read |
 | Auditing an existing file or corpus you did not just write, for the tells output_discipline names | ai-slop-detector |
 | Other language or domain work | the matching skill in the injected listing |
