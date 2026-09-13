@@ -3,7 +3,7 @@
   (import emacs-overlay)
   (
     _: prev:
-    if prev.stdenv.isDarwin then
+    if prev.stdenv.hostPlatform.isDarwin then
       let
         # mailutils 3.21 fails to link on aarch64-darwin: the libmu_sieve
         # extension modules reference _mu_url_* without linking libmailutils,

@@ -36,7 +36,7 @@ Or use the official installer:
 ** Step 4: First nix-darwin Installation
 
 #+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
+  sudo -H nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 
 ** Step 5: Restart Terminal

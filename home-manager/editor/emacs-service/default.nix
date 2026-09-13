@@ -6,7 +6,7 @@
 }:
 let
   lib = pkgs.lib;
-  isDarwin = pkgs.stdenv.isDarwin;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   emacsSocketPath = "/tmp/emacs$(id -u)/server";
   emacsLaunchdCommon = ''
     AGENT_NAME="org.nix-community.home.emacs"
@@ -108,7 +108,7 @@ in
   # Linux: start emacs daemon after WAYLAND_DISPLAY is available in the systemd
   # user environment (niri exports it to systemd via dbus-update-activation-environment
   # as part of graphical-session.target activation).
-  systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
+  systemd.user.services.emacs = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     Unit.After = [ "graphical-session.target" ];
     Unit.PartOf = [ "graphical-session.target" ];
     Service.Restart = lib.mkForce "always";
@@ -150,7 +150,7 @@ in
   # check, which is also exactly the layout upstream's own installer produces.
   home.activation.installKuroModule =
     let
-      libName = if pkgs.stdenv.isDarwin then "libkuro_core.dylib" else "libkuro_core.so";
+      libName = if pkgs.stdenv.hostPlatform.isDarwin then "libkuro_core.dylib" else "libkuro_core.so";
     in
     {
       after = [ "writeBoundary" ];

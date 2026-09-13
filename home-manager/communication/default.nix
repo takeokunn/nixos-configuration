@@ -8,7 +8,7 @@
     };
   };
 
-  home.packages = pkgs.lib.optionals (!pkgs.stdenv.isDarwin) (
+  home.packages = pkgs.lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) (
     with pkgs;
     [
       slack

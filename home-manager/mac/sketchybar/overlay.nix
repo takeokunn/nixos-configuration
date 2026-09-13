@@ -1,7 +1,7 @@
 [
   (
     _: prev:
-    if prev.stdenv.isDarwin then
+    if prev.stdenv.hostPlatform.isDarwin then
       {
         # nixpkgs' bundled ld64-957.1 crashes (`Trace/BPT trap: 5`, SIGTRAP inside `ld`
         # itself) linking sketchybar's private-framework-heavy binary on macOS 26 (Tahoe).

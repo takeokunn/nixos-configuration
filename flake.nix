@@ -37,7 +37,6 @@
     llm-agents.inputs.treefmt-nix.follows = "treefmt-nix";
     agent-skills.url = "github:Kyure-A/agent-skills-nix";
     agent-skills.inputs.nixpkgs.follows = "nixpkgs";
-    agent-skills.inputs.home-manager.follows = "home-manager";
     guard-and-guide.url = "github:kawarimidoll/guard-and-guide";
     guard-and-guide.inputs.nixpkgs.follows = "nixpkgs";
     anthropic-skills.url = "github:anthropics/skills";

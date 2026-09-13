@@ -21,7 +21,7 @@
     set -x TMPDIR /tmp
 
     ${
-      if pkgs.stdenv.isDarwin then
+      if pkgs.stdenv.hostPlatform.isDarwin then
         "set -gx EMACS_SOCKET_NAME /tmp/emacs(id -u)/server"
       else
         "set -gx EMACS_SOCKET_NAME $XDG_RUNTIME_DIR/emacs/server"

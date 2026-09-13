@@ -82,7 +82,7 @@ If you don't have another machine available, use this traditional method.
 *WARNING*: This will erase all data on the target disk.
 
 #+begin_src shell
-  sudo nix --experimental-features "nix-command flakes" run \
+  sudo -H nix --experimental-features "nix-command flakes" run \
     github:nix-community/disko/latest -- \
     --mode destroy,format,mount \
     ./hosts/X13Gen2/disko-config.nix
@@ -93,7 +93,7 @@ If you don't have another machine available, use this traditional method.
 #+begin_src shell
   # Increase file descriptor limit for large builds
   ulimit -n 65536
-  sudo nixos-install --flake .#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
+  sudo -H nixos-install --flake .#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
 #+end_src
 
 *** Step 5: Reboot
@@ -107,7 +107,7 @@ If you don't have another machine available, use this traditional method.
 After installation, use this command to apply configuration changes:
 
 #+begin_src shell
-  sudo nixos-rebuild switch --flake .#X13Gen2 --show-trace
+  sudo -H nixos-rebuild switch --flake .#X13Gen2 --show-trace
 #+end_src
 
 ** Notes

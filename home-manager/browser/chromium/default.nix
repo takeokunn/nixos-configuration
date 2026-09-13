@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  programs.chromium.enable = pkgs.stdenv.isLinux;
+  programs.chromium.enable = pkgs.stdenv.hostPlatform.isLinux;
   programs.chromium.extensions = [
     { id = "gppongmhjkpfnbhagpmjfkannfbllamg"; } # Wappalyzer
     { id = "kfdibhbheajeacnkkakomaliggbgndcf"; } # Chromemacs

@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
   lib = pkgs.lib;
-  isDarwin = pkgs.stdenv.isDarwin;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in
 {
   home.sessionVariables.SSH_AUTH_SOCK = "$HOME/.gnupg/S.gpg-agent.ssh";

@@ -35,14 +35,14 @@ in
       old:
       parallelBuildAttrs
       // {
-        buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.apple-sdk ];
+        buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.apple-sdk ];
         configureFlags = old.configureFlags ++ [ "--with-xwidgets" ];
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
     extraEmacsPackages = import ./epkgs {
       inherit nurPkgs pkgs;
-      isDarwin = pkgs.stdenv.isDarwin;
+      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
     };
     override = override;
   };
@@ -55,12 +55,12 @@ in
           old:
           parallelBuildAttrs
           // {
-            buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.apple-sdk ];
+            buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.apple-sdk ];
             configureFlags = old.configureFlags ++ [ "--with-xwidgets" ];
             env =
               (old.env or { })
               // parallelBuildAttrs.env
-              // lib.optionalAttrs pkgs.stdenv.isDarwin {
+              // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
                 # On Darwin 25.x (macOS 16), ObjC files (.m) fail to compile because
                 # the compiler defaults to a pre-C11 standard where `bool` and `alignof`
                 # are unknown. Force gnu11 standard and include stdbool.h explicitly.
@@ -70,7 +70,7 @@ in
         );
         extraEmacsPackages = import ./epkgs {
           inherit nurPkgs pkgs;
-          isDarwin = pkgs.stdenv.isDarwin;
+          isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
         };
         override = override;
       };
@@ -81,7 +81,7 @@ in
       passthru = base.passthru // {
         withPackages = base;
       };
-      postBuild = lib.optionalString pkgs.stdenv.isDarwin ''
+      postBuild = lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
         EXEC="$out/Applications/Emacs.app/Contents/MacOS/Emacs"
         if [ -e "$EXEC" ] || [ -L "$EXEC" ]; then
           rm -f "$EXEC"
@@ -99,14 +99,14 @@ in
       old:
       parallelBuildAttrs
       // {
-        buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.apple-sdk ];
+        buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.apple-sdk ];
         configureFlags = old.configureFlags ++ [ "--with-xwidgets" ];
         env = (old.env or { }) // parallelBuildAttrs.env;
       }
     );
     extraEmacsPackages = import ./epkgs {
       inherit nurPkgs pkgs;
-      isDarwin = pkgs.stdenv.isDarwin;
+      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
     };
     override = override;
   };
@@ -122,7 +122,7 @@ in
     );
     extraEmacsPackages = import ./epkgs {
       inherit nurPkgs pkgs;
-      isDarwin = pkgs.stdenv.isDarwin;
+      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
     };
     override = override;
   };
@@ -138,7 +138,7 @@ in
     );
     extraEmacsPackages = import ./epkgs {
       inherit nurPkgs pkgs;
-      isDarwin = pkgs.stdenv.isDarwin;
+      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
     };
     override = override;
   };
