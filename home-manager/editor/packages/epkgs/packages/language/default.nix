@@ -34,6 +34,7 @@ with epkgs;
   forth-mode
   fsharp-mode
   git-modes
+  gleam-ts-mode
   glsl-mode
   go-mode
   gradle-mode
