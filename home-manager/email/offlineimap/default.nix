@@ -1,5 +1,5 @@
 { pkgs, lib, ... }:
-lib.mkIf (!pkgs.stdenv.isDarwin) {
+lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
   programs.offlineimap.enable = true;
   programs.offlineimap.extraConfig.general.accounts = "Gmail";
   programs.offlineimap.extraConfig.general.maxsyncaccounts = 1;

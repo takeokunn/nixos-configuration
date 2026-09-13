@@ -16,7 +16,7 @@ with epkgs;
 
   # Mail
 ]
-++ pkgs.lib.optionals (!pkgs.stdenv.isDarwin) [
+++ pkgs.lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
   mu4e
   mu4e-views
   mu4e-dashboard

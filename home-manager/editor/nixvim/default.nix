@@ -35,6 +35,6 @@ in
   programs.nixvim.performance.byteCompileLua.configs = true;
   programs.nixvim.performance.byteCompileLua.plugins = true;
 
-  programs.nixvim.clipboard.providers.pbcopy.enable = pkgs.stdenv.isDarwin;
-  programs.nixvim.clipboard.providers.wl-copy.enable = pkgs.stdenv.isLinux;
+  programs.nixvim.clipboard.providers.pbcopy.enable = pkgs.stdenv.hostPlatform.isDarwin;
+  programs.nixvim.clipboard.providers.wl-copy.enable = pkgs.stdenv.hostPlatform.isLinux;
 }

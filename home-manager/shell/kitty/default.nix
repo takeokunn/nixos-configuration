@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  emojiFont = if pkgs.stdenv.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
+  emojiFont = if pkgs.stdenv.hostPlatform.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
 in
 {
   programs.kitty.enable = true;

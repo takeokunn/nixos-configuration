@@ -3,7 +3,7 @@ let
   lib = pkgs.lib;
 in
 {
-  launchd.agents.emacs-scratchpad-kitty = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.emacs-scratchpad-kitty = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     domain = "gui";
     config = {

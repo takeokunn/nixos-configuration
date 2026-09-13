@@ -11,7 +11,10 @@ let
     scratchpadInstanceGroup
     ;
   socketPath =
-    if pkgs.stdenv.isDarwin then constants.socketPath else "/run/user/$(id -u)/emacs/server";
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      constants.socketPath
+    else
+      "/run/user/$(id -u)/emacs/server";
 
   # Holds the single-instance socket open with no window so the hotkey pays
   # only a window create, not a kitty cold start. Close confirmation is a
@@ -53,7 +56,7 @@ let
 
         start_emacs_service() {
           ${
-            if pkgs.stdenv.isDarwin then
+            if pkgs.stdenv.hostPlatform.isDarwin then
               ''
                 /bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1 || true
               ''

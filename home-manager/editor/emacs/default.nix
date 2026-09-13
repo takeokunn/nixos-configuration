@@ -9,7 +9,7 @@ let
   tangle = org-babel.lib.tangleOrgBabel { languages = [ "emacs-lisp" ]; };
 in
 {
-  xdg.desktopEntries.emacsclient-gui = lib.mkIf pkgs.stdenv.isLinux {
+  xdg.desktopEntries.emacsclient-gui = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     name = "Emacs (Client)";
     genericName = "Text Editor";
     exec = "emacsclient -c -a emacs %F";
@@ -32,7 +32,7 @@ in
   home.file.".emacs.d/init.el".text = tangle (builtins.readFile ./elisp/init.org);
   home.file.".emacs.d/early-init.el".text = tangle (builtins.readFile ./elisp/early-init.org);
   home.file.".emacs.d/misc/yasnippet.org".source = ./misc/yasnippet.org;
-  home.file.".emacs.d/misc/mu4e-dashboard.org" = lib.mkIf (!pkgs.stdenv.isDarwin) {
+  home.file.".emacs.d/misc/mu4e-dashboard.org" = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
     source = ./misc/mu4e-dashboard.org;
   };
 
