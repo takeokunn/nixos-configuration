@@ -14,11 +14,11 @@
 ** Usage
 *** for M4-Max
 #+begin_src shell
-  sudo nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
+  sudo -H nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 *** for X13Gen2
 #+begin_src shell
-  sudo nixos-rebuild switch --flake .#X13Gen2 --show-trace
+  sudo -H nixos-rebuild switch --flake .#X13Gen2 --show-trace
 #+end_src
 *** for OPPO-A79
 #+begin_src shell
