@@ -821,6 +821,15 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   (with-eval-after-load 'gitattributes-mode
     (add-hook 'gitattributes-mode-hook #'view-mode))
 #+end_src
+** gleam-ts-mode
+:PROPERTIES:
+:CUSTOM_ID: gleam-ts-mode
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(gleam-ts-mode) "gleam-ts-mode" nil t)
+
+  (add-to-list 'auto-mode-alist '("\\.gleam\\'" . gleam-ts-mode))
+#+end_src
 ** glsl-mode
 :PROPERTIES:
 :CUSTOM_ID: glsl-mode
