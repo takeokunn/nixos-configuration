@@ -19,6 +19,11 @@ in
     # Private HTTPS remotes can only fetch through the gh credential
     # helpers; the daemon resets every helper unless told otherwise.
     credentialHelpers = true;
+    aggressive = true;
+    reflogExpire = "now";
+    pruneTags = true;
+    pruneBranches = true;
+    pruneWorktrees = true;
   };
 
   launchd.agents.git-maintenance.config.EnvironmentVariables = lib.mkIf isDarwin {
