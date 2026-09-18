@@ -1,20 +1,20 @@
 ---
 name: define-core
 description: Shared workflow phases and patterns for the /define command. Use this skill when implementing /define to ensure consistent workflow structure, agent delegation, and requirements documentation patterns.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 The phase sequence /define executes, so the command file does not restate it. Question design and requirement
 formatting live in [requirements-definition](../requirements-definition/SKILL.md), loaded alongside this one.
 
-Read-only throughout: no file is created or modified, and no code is written. That is what makes the approval
-step meaningful.
+Read-only throughout: no file or memory is created or modified, and no code is written. Return the document
+in the response. Report any memory candidates for a later write-authorized phase.
 
 ## Phases
 
 **prepare**: Load requirements-definition, plus serena-usage before any memory operation and any other
 companion this run needs: [fact-check](../fact-check/SKILL.md) when a claim needs an external source,
-[context7-usage](../context7-usage/SKILL.md) when a library's current behavior is in question,
 [core-patterns](../core-patterns/SKILL.md) for the shared decision-criteria structure. Then activate the
 project, list memories, and read only the entries this task type calls for.
 
@@ -26,10 +26,10 @@ architectural consistency and dependencies, database for schema implications whe
 general-purpose for completeness and dependency risk, which needs the others' output. Verify any external
 claim against Context7 rather than recall.
 
-**clarify**: Score the candidate questions by design branching, irreversibility, whether investigation could
+**clarify**: Prioritize the candidate questions by design branching, irreversibility, whether investigation could
 have answered them, and effort impact. Classify each as spec confirmation, design choice, constraint, scope, or
-priority. Ask the highest-scoring first, through AskUserQuestion with two to four structured options and one
-marked (Recommended), including follow-ups, which go through the same tool rather than dropping to plain text.
+priority. Ask the highest-priority first, through the runtime's question tool with its supported options and one
+marked (Recommended), including follow-ups. If no question tool is available, ask a concise question in text.
 Do not proceed on an assumption where a critical question is unanswered.
 
 **verify**: Cross-check the user's answers against what the agents actually found, and read the
@@ -57,24 +57,21 @@ If it reads "none", **skip the gate entirely and finish**: do not prompt.
 If it holds one or more items, ask with AskUserQuestion, offering exactly three dispositions:
 
 - **Resolve now (Recommended)**: re-enter clarify, ask the outstanding questions, and patch the document.
-- **Defer to /execute**: keep the issues documented and carry them explicitly into the handoff, so the
-  implementer inherits them.
+- **Defer to /execute**: carry the issues into the handoff and mark dependent tasks blocked until their
+  critical questions are answered. Independent tasks may proceed on their own verified requirements.
 - **Stop and revise scope**: halt without finalizing the handoff, leaving the document visible so the user can
   revise the request.
 
 **The resolution loop is bounded.** After "Resolve now", re-evaluate Outstanding Issues and re-present the gate
 at most once more, after which only Defer and Stop remain. Never loop unbounded.
 
-Choosing a disposition *is* a valid resolution of an issue that cannot be answered, so the rule that clarify
-blocks until critical questions are answered is satisfied by this gate, not bypassed by it.
-
-The purpose of the gate is that /define never ends by silently documenting a gap. Documenting an unresolved
-question and stopping looks identical, in the output, to having resolved it.
+Deferral records an unresolved issue; it does not approve an assumption or clear a dependent task's gate.
+State whether the handoff is ready, partially blocked, or stopped, naming the affected tasks.
 
 ## Agents
 
 All read-only. Every delegation carries the scope, the target paths, the explicit prohibition on editing, and
-the instruction to use AskUserQuestion for any user interaction rather than emitting a question as text.
+the instruction to use the runtime's question tool when available, otherwise a concise question in text.
 
 - **explore**: relevant files and existing patterns
 - **design**: architectural consistency, dependencies, API design
@@ -104,7 +101,7 @@ carrying the decisions made, the references, and the constraints, including what
 
 ## Related
 
-- [requirements-definition](../requirements-definition/SKILL.md): question scoring and requirement formatting
+- [requirements-definition](../requirements-definition/SKILL.md): question prioritization and requirement formatting
 - [investigation-patterns](../investigation-patterns/SKILL.md): evidence gathering for feasibility
 - [serena-usage](../serena-usage/SKILL.md): the memory operations in prepare
 - [fact-check](../fact-check/SKILL.md): verifying an external claim

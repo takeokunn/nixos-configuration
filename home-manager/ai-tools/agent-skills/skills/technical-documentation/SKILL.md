@@ -1,7 +1,8 @@
 ---
 name: technical-documentation
 description: Use when writing or auditing technical documentation - README, API docs, design docs, specifications, user guides, in English or Japanese. Also covers auditing docs against code for both over-claims and stale future-work claims, and retired-name registries.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Patterns for README, API spec, design doc, and user guide writing, and for auditing existing docs against
@@ -16,9 +17,9 @@ a conventions file, a design doc, or a comment at the line itself.
 Match structure and depth to audience: developers get technical depth, team members get context plus depth,
 end users get no jargon and step-by-step instructions.
 
-- **README**: project entry point. Sections: title, one-line description, 3-5 key features, quick
-  start/install, basic usage example, documentation links, contributing/license. Keep it under 500 lines;
-  link out to detailed docs rather than growing it.
+- **README**: project entry point. Include the purpose, relevant features, quick start/install, basic usage,
+  documentation links, and contributing/license information as needed. Link to detailed docs when they
+  distract from getting started; there is no line or feature-count quota.
 - **API specification**: for REST/GraphQL/SDK interfaces. Sections: overview + authentication, base URL and
   versioning, endpoints (method, path, parameters, response), error codes, rate limits, examples (curl and
   language-specific).
@@ -63,15 +64,16 @@ costs, so checking only one leaves the other invisible:
 - **Named mechanism** ("over WebSocket", "via the message queue"): verify the mechanism itself, not just the
   capability. Docs commonly keep the right feature description paired with the wrong transport.
 
-Record each claim's outcome as confirmed, over-claimed, under-claimed, or wrong-mechanism. Over-claims are the
+Record each claim's outcome as confirmed, over-claimed, under-claimed, wrong-mechanism, or unresolved when
+the available evidence cannot settle it. Over-claims are the
 dangerous kind: a stale line saying a safety control exists gets cited as evidence that it does. Under-claims
 are the wasteful kind: they cause already-shipped features to be re-planned and rebuilt.
 
 ## Reversal rationale at the change site
 
 When a change deliberately deletes, inverts, or narrows something that carried a documented rationale (an
-exemption, a suppression, a deliberate gate, a documented workaround), write the reversal's reasoning at the
-same site the original rationale occupied, in the same form. Not the commit message, not the pull request, not
+exemption, a suppression, a deliberate gate, a documented workaround), preserve the reversal's reasoning at
+the relevant site if its absence would leave the next reader confused. Not the commit message, not the pull request, not
 a session memory: none of those are visible to the person reading the code a year later. State that the
 removal was intentional and what changed to make the original reason no longer apply: enough that a reader
 does not "fix" it back. Do not restate what the surrounding code does.
@@ -99,21 +101,21 @@ words and idioms that don't translate.
 prose, and use consistent terminology (build a glossary if terms recur).
 
 For Japanese prose-quality norms beyond structure (argumentation rigor, LLM-tell avoidance, dramatization
-restraint), see technical-writing's `<japanese><prose_norms>`, linked below.
+restraint), see technical-writing's Japanese language guidelines, linked below.
 
 ## Other checkable criteria
 
-- Verify every code example compiles and runs, and include its expected output, before publishing.
+- Validate runnable examples with scoped checks and record what ran. Label illustrative fragments as such;
+  do not execute destructive or external-write examples without authorization merely to validate the prose.
 - Define technical terms on first use or link to a glossary.
 - Do not add timestamps to documents; they go stale immediately and the repository already has commit dates.
 
 ## Related
 
 - [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples and API signatures
-- [context7-usage](../context7-usage/SKILL.md): library documentation lookup for accurate API references
 - [investigation-patterns](../investigation-patterns/SKILL.md): analyzing codebases to understand features
   before documenting them
 - [technical-writing](../technical-writing/SKILL.md): writing blog posts and tutorials from documentation;
   the canonical source for Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance,
-  dramatization restraint, redundancy): apply its `<japanese><prose_norms>` when writing Japanese
+  dramatization restraint, redundancy): apply its Japanese language guidelines when writing Japanese
   documentation

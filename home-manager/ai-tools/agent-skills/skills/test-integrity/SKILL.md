@@ -1,13 +1,14 @@
 ---
 name: test-integrity
 description: Use when a test suite is green but its value is in doubt (false greens, zero tests collected, vacuous assertions, dead guards, or mocks that make the code under test unnecessary). Contrast testing-patterns (designing tests); this skill asks whether a passing suite proves anything.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 One question and its many disguises: **the suite is green: is that evidence?**
 
-Every trap here produces byte-identical output to a healthy suite, so none is caught by reading the result.
-They are caught only by deliberately asking what would have to break for this test to go red.
+These traps can share a healthy suite's green headline while counts, skips, or loaded artifacts differ.
+Inspect that evidence and ask which contract violation would make each test go red.
 
 Test *design* (the unit/integration/e2e split, arrange-act-assert, double selection, where a seam goes and how
 a double is installed in it, fixtures, settlement barriers, coverage as a metric) belongs to
@@ -25,22 +26,33 @@ accepting a zero exit code as the signal, and start asserting a count of what ex
 
 ### Zero collected is not zero failures
 
-Every runner accepts a selector (a directory, a glob, a tag, a name filter) and every selector can match
-nothing. A run over an empty set exits successfully and prints a summary differing from a full run only in
-numbers nobody reads. A referenced directory that does not exist, a filter argument accepted at the command
-line but never forwarded to the runner, and a build target never added to the check graph all produce this.
+Selectors can match nothing. Some runners or wrapper configurations still exit zero; others reject an empty
+run (pytest normally uses exit code 5). Missing targets and incorrectly forwarded filters can also select the
+wrong set. Verify the selected and executed set rather than inferring it from a green summary or exit status.
 
 A gate must assert a **non-zero collected-and-executed count**, and assert every selected test's outcome is
 *passed* rather than merely *not failed*: some runners report expected-failure and skipped states in ways that
 satisfy a naive exit-code check. Designate exactly one canonical gate command; a narrower subset run must never
 be cited as having satisfied it.
 
+### A fail-fast runner truncates the result it reports
+
+Where the runner stops at the first failure, its summary describes the point it stopped at, not the suite. "1
+failed" bounds nothing: the remaining tests were never executed, so the real count is unknown and may be far
+larger. The same run's "N skipped" means N tests did not run, which is a gap in coverage reported in the
+vocabulary of a pass. Fixing the first failure and re-running then produces a second single failure, and the
+sequence reads as steady progress while the total stays unmeasured.
+
+Before citing a count, establish whether the runner ran to completion: pass its no-bail flag, or compare the
+executed count against the collected count. Report both numbers, and say "first failure" rather than "one
+failure" whenever the run stopped early.
+
 ### Reconcile every discovery mechanism
 
 A suite usually has more than one registry: files on disk, a manifest listing them, a build-system component
 list, a package export list, a shard configuration. A test can be present in some and absent from others. It
 then compiles, passes when invoked by hand, and is never scheduled. **This is green-on-green: nothing fails,
-coverage just quietly shrinks**, and it is among the most frequently repeated operational failures in practice.
+coverage just quietly shrinks.**
 
 Write a meta-test reconciling the registries against the filesystem and against each other, failing when any
 test source is unreachable from the canonical entry point. That test is the only thing standing between a suite
@@ -88,7 +100,7 @@ and assert the post-registration count equals the expected case count.
 
 These read as real tests in review and count as covered lines in a coverage report.
 
-### Name the input that would fail
+### Name the wrong result the assertion rejects
 
 An assertion whose accepted set covers every outcome the system can produce is a tautology. The most common
 form is disjunctive: asserting a result is *either* the empty value *or* a well-formed object, when those two
@@ -96,7 +108,8 @@ exhaust the return type. The test appears to cover a rejection path while provin
 returned. The unconditional true assertion is the degenerate case, often used as a placeholder to mark a
 requirement "covered".
 
-**For every assertion, name a concrete input that would make it fail.** If none exists, it is vacuous. Replace
+**For every assertion, name a concrete wrong observed value or state that it rejects.** A correct function
+need not have a valid input that fails its tests; the counterexample concerns a contract-breaking result. Replace
 a disjunction with the exact expected outcome: stub the collaborators to force the branch, then assert the
 single value that branch must produce. A passing placeholder is worse than an absent test, because it
 suppresses the gap: leave the case failing or explicitly pending instead.
@@ -257,8 +270,8 @@ Teardown releasing many resources in one loop aborts at the first failure, leavi
 the single reported error understates the leak by an unknown factor, and the next test starts in a state nobody
 described. Wrap each release independently, collect every failure, and report them together after attempting
 all of them. Where the resource is a process tree or external system, distinguish "the release call failed"
-from "the release call succeeded but the resource is still present": only the second is a leak, and only an
-explicit post-condition check finds it.
+from "the release call succeeded but the resource is still present". Either outcome can leave a leak;
+record the cleanup result and verify the resource post-condition independently.
 
 ## A coarser grammar is not the compiler's grammar
 
@@ -301,10 +314,11 @@ one that agreed.**
 Run this when a suite is inherited, when a green result is about to be cited as proof a change is correct, or
 when a defect escaped that the suite claimed to cover.
 
-**1. Prove it can fail.** Mutate the implementation the test names (invert a condition, return a constant,
-delete the effect) and confirm the test goes red. Restore immediately. This is the only check that subsumes
-every trap here at once: a test that stays green under a mutation of its own subject was never testing that
-subject, whatever the reason.
+**1. Prove it can detect a relevant fault.** Against a known-good baseline in an isolated copy, introduce a
+reachable, contract-breaking mutation (invert a condition, return a wrong constant, delete a required effect)
+and confirm the test goes red. A surviving mutant needs investigation, not an automatic "untested" verdict:
+equivalent mutants preserve behavior and cannot be killed by a correct test. Do not mutate shared source or
+treat one killed mutant as proof that every integrity trap is absent.
 
 **2. Assert what executed.** Capture the runner's collected and executed counts for the canonical gate and
 assert them against the number of test definitions in the tree. Assert the exit status of every spawned process
@@ -331,9 +345,9 @@ exception a reviewed act, and fails when an exception stops being necessary.
 the same generated inputs, and compare the *full* result, including failure metadata: error class, position,
 line, column, expected value, context. Load the prior implementation directly from version control so both are
 live simultaneously. Comparing only success values leaves the failure contract unverified, and the failure
-contract is usually the part callers depend on most precisely. In practice a large success-only comparison can
-report clean while a smaller run that also compares error metadata finds mismatches in the low percent range:
-the ratio is the argument for comparing everything rather than for running more cases.
+contract is usually the part callers depend on most precisely. A large success-only comparison can report clean
+while a smaller run that also compares error metadata finds mismatches, which is the argument for comparing
+everything rather than for running more cases.
 
 *Confirm the two arms are still two implementations.* Part-way through a migration the usual tidying move is to
 make the old entry point delegate to the new one, and at that moment the comparison becomes an implementation
@@ -344,7 +358,7 @@ replacement is exactly the cleanup an agent reaches for. Read the old arm's body
 rather than forwards; where it no longer does, replace the comparison with table-driven expected values or an
 independent reference calculation.
 
-**6. Audit the assertions.** For each assertion in the area, name an input that would make it fail. Flag every
+**6. Audit the assertions.** For each assertion, name a wrong observed value or state it rejects. Flag every
 disjunction exhausting the return type, every unconditional truth, every substring check against numbered
 content, and every expected value computed by invoking the subject. Mutation testing catches most of these but
 is expensive to run broadly and cannot be applied to a suite that will not run at all. This pass is cheap,

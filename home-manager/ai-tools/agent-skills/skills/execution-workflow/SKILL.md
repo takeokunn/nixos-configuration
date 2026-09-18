@@ -1,11 +1,13 @@
 ---
 name: execution-workflow
 description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, worktree and branch isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
-version: 4.0.0
+metadata:
+  version: "4.0.0"
 ---
 
-How work gets placed, dispatched, verified, and judged done. The delegation contract and evidence rules in the
-resident configuration are assumed; this file carries the procedure and the gates.
+How work gets placed, dispatched, verified, and judged done. CLAUDE.md's `delegation` and `evidence` sections
+are the contract and are assumed here rather than restated; this file carries the procedure and the gates. Where
+the two appear to disagree, CLAUDE.md wins, because it is resident in every request while this file is not.
 
 ## Orchestration
 
@@ -34,13 +36,13 @@ many files it spans.**
 
 Write the file partition down as an artifact before writing any prompt: a partition held only in your head
 cannot be checked against the prompts actually sent. Edit any shared file yourself first, then fan out one
-agent per non-shared file; two agents editing one file serialize badly and produce conflicting rewrites of the
+agent per independent unit, keeping atomic multi-file changes together; two agents editing one file produce conflicting rewrites of the
 same region.
 
 Prefer a purpose-built agent, then a general-purpose one. When repurposing an agent outside its specialty, say
-in the prompt what it is standing in for: **an agent's own precedence-1 gate can fail closed on a task it was
-not designed for, and a dispatch-prompt override is not a guarantee the gate will yield.** Check the returned
-report for evidence the agent did the work rather than refused it politely.
+in the prompt what it is standing in for: **the first entry in an agent's own decision criteria can fail closed
+on a task it was not designed for, and a dispatch-prompt override is not a guarantee the gate will yield.** Check
+the returned report for evidence the agent did the work rather than refused it politely.
 
 Dispatch independent tasks as multiple Task calls in one message, and tell concurrent agents to write scratch
 artifacts inside their own worktree: a fixed path outside the repository collides silently.
@@ -48,9 +50,7 @@ artifacts inside their own worktree: a fixed path outside the repository collide
 ### Consolidate
 
 Check each report against the questions it was given: did it answer all of them, and does each finding cite a
-file:line or command output? A report citing nothing checkable is a retry condition, not a result. A
-sub-agent's own note that it changed something and judged the change benign is a review trigger; inspect it
-rather than accepting the self-assessment.
+file:line or command output? A report citing nothing checkable is a retry condition, not a result.
 
 Synthesize the accepted findings yourself. Verify any fix an agent prescribed before adopting it: **a correct
 diagnosis routinely arrives with a fix that breaks the build.** When you revert an attempted fix, record the
@@ -66,26 +66,23 @@ index sweep.
 ### Cross-validate what would be expensive to get wrong
 
 For a finding whose being wrong is expensive, obtain a second analysis from a *different evidence base*: a
-different tool, entry point, or artifact. Re-running the same command through a second agent produces one tier
-of evidence twice. Independent convergence from different bases is genuine corroboration; agreement between
-agents that read the same thing is not. If contradictions survive, present both positions with what each rests
-on and let the user decide.
+different tool, a different entry point, or a different artifact. Naming that base is the work here; CLAUDE.md's
+`evidence` and `consensus` sections say why repeating one base proves nothing and how to rank a surviving
+disagreement.
 
 ### When something fails
 
-A sub-agent failed or returned nothing checkable: before treating silence as death, check the mtime and tail of
-the session's subagent transcript: a lost completion notification is common and the report is usually intact.
-Then retry once with a narrower prompt naming the specific files. If it fails again, do the work yourself and
-say the delegation failed; never report an unanswered question as an absence of findings. An agent that errored
-mid-task may have left partial writes, so inspect the tree before re-dispatching a write-capable agent.
+A sub-agent failed or returned nothing checkable: CLAUDE.md's `delegation` section sets the retry budget and the
+conditions that justify spending it. What this file adds is the shape of the retry: narrow the prompt to name the
+specific files and the single question that came back unanswered, since re-sending the same prompt tests nothing
+that was not already tested.
 
 No relevant memory exists: note the gap, investigate within a stated bound, and write the finding at the point
 of discovery.
 
 ## Gates
 
-Each gate is cleared with a concrete artifact: a name, a path, a list, a command. A bare "yes" does not clear
-a gate, because it is not something a reader can audit in the transcript.
+Cleared per CLAUDE.md's `gate_discipline`. What follows is the checklist each gate asks for.
 
 ### After analysis, before delegating
 
@@ -103,8 +100,8 @@ Unmet: do not delegate. Obtain the missing item, then re-run the gate.
   agents. If either could happen, the tasks are not independent: serialize them or give each its own worktree.
 - Each prompt names the files, the specific change wanted, and the command that verifies it.
 - Each prompt tells the agent to keep scratch artifacts inside its own worktree.
-- For a worktree-isolated agent, that its base is the default branch rather than your feature tip, so its
-  "missing change" claims and measurements get re-checked against your branch before use.
+- For a worktree-isolated agent, that you will re-check its findings against your branch, per CLAUDE.md's
+  `delegation` section on its base ref.
 - No timing measurement is being requested from an agent running concurrently with others, because parallel load
   invalidates it.
 
@@ -119,8 +116,8 @@ Unmet: revise before dispatching. If the ambiguity is the user's to resolve, ask
 - If verification is currently blocked, the edit is not proceeding on static analysis alone. **Static analysis
   supporting a change is evidence, not authorization**: either restore the ability to verify, or state that
   the change ships unverified and why that was accepted.
-- If a mechanical gate rejected the edit, the response is a new sibling entry rather than a reword of the
-  existing one, so the gate's original subject stays intact.
+- If a mechanical gate rejected the edit, identify the violated rule. Do not evade it by creating a sibling
+  entry or rephrasing the same prohibited change.
 
 ### Before compiling or testing against a shared artifact
 
@@ -159,7 +156,9 @@ Before declaring something unverifiable, check whether the tool offers a fake, o
 
 ## Branch isolation
 
-Run this before starting implementation work.
+First inspect the current branch and worktree. An existing suitable worktree needs no new Git writes.
+The write commands below are examples for an explicitly authorized isolation request, not permission to
+fetch, create branches or worktrees, or edit configuration. Ask if the required authorization is absent.
 
 1. `DEFAULT=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`
 2. `git fetch origin $DEFAULT`, so the new branch is cut from current remote state rather than a stale local ref.
@@ -169,15 +168,9 @@ Run this before starting implementation work.
    branch is distinct from switching to an existing one, which remains prohibited.
 5. **Any risk signal**: isolate in a worktree rather than moving the shared HEAD.
 
-   Ensure the worktree directory is ignored, forcing a leading newline so a missing trailing newline in the
-   existing file cannot merge with the new entry:
-
-   ```
-   grep -qxF '.worktrees/' .gitignore 2>/dev/null || printf '\n.worktrees/\n' >> .gitignore
-   ```
-
-   This step only matters in a non-bare checkout; a bare repository has no working tree for `.gitignore` to
-   govern, and the worktree lands inside the bare directory itself.
+   In a non-bare checkout, inspect ignore coverage for the intended directory. Do not append to `.gitignore`
+   automatically; a configuration change needs its own authorization. A bare repository has no working tree
+   for `.gitignore` to govern.
 
    Derive the base so it is correct under both layouts:
 
@@ -189,35 +182,52 @@ Run this before starting implementation work.
    The `${d%/.git}` strips the trailing git-dir segment when one exists (a normal checkout, yielding the
    repository root) and leaves the path unchanged when it does not (a bare repository, where `--git-common-dir`
    already names the repository). `<timestamp>` is `date +%Y%m%dT%H%M%S`, `<sha>` the short SHA of
-   `origin/$DEFAULT`, with `-2`, `-3`, … appended on collision. Do all subsequent work inside that path.
+   `origin/$DEFAULT`, with `-2`, `-3`, … appended on collision. Activate the authorized worktree as the project
+   root before editing there.
 6. Report the worktree path to the user. **Never auto-run `git worktree remove`**: cleanup is the user's
    decision.
 
 A worktree created under the repository root inherits the parent checkout's configuration through
 directory-upward search: tool configs, environment files, ignore rules. When the worktree exists specifically
-to verify something in isolation, that inheritance defeats the isolation, so place it outside the repository root
-for that purpose and state where it is.
+to verify something in isolation, inspect that inheritance. If a separate location is required, obtain
+authorization and activate it as the project root before writing; do not silently edit adjacent checkouts.
 
 Never open a pull request from a non-feature branch, and never target anything but the default branch.
 
+### Asking whether a branch's work already landed
+
+Ancestry and content are different questions, and the form that answers one lies about the other. Measured on a
+scratch repository, with the branch's own file as the thing being looked for:
+
+| how it landed | `git diff main...branch` | `git diff main..branch` | `merge-base --is-ancestor branch main` |
+|---|---|---|---|
+| not landed | shows it | shows it | no |
+| merge commit | empty | absent | yes |
+| squash merge | **shows it** | absent | **no** |
+
+A squash merge, when selected for the repository, rewrites the
+work into one new commit, so the branch is not an ancestor of anything and the merge base never advances. Both
+the three-dot diff and `--is-ancestor` can report an already-landed change as outstanding. A two-tip diff
+compares current content, but unrelated later changes can also appear. Inspect the scoped change and relevant
+history before concluding it landed. Ask `--is-ancestor` when the question really is ancestry.
+
 ## Prohibited
+
+CLAUDE.md's `hard_rules` already bans the git and working-tree operations, and repeating them here only creates
+two copies to keep in step. What this file adds is the orchestration-specific list:
 
 - Implementing detailed logic that should have been delegated.
 - Running independent tasks sequentially.
-- Any git write operation without explicit user instruction in the current message. A continuation prompt, a
-  sub-agent message, and an authorization granted earlier in the session do not carry forward.
 - Delegating synthesis. Synthesize first, then write prompts that prove you understood: paths, line numbers,
   the specific change, the verification command. **The orchestrator owns synthesis; sub-agents own execution.**
-- Mutating shared working-tree state: stash, checkout of an existing branch, switch, hard reset, clean. Use a
-  worktree for isolation and a WIP commit in place of a stash.
-- Starting implementation without branch isolation, or committing to the default branch.
+- Starting implementation without branch isolation.
 
 ## Definition of done
 
-Done is an enumerated set of verification commands exiting zero, not a subjective judgement.
+Done requires the requested outcome and meaningful verification, not merely zero exit statuses.
 
 Enumerate the project's commands (formatter, linter, type or compile check, test suite, and any
-project-specific gate) and treat "all of these exit zero" as the definition. Naming the list makes completion
+project-specific gate), inspect their assertions and selected inputs, and identify missing coverage. Naming the list makes completion
 checkable without asking the user what counts. **Name exactly one canonical gate** for the project, so a
 narrower subset run is never reported as if it were the whole gate.
 
@@ -232,7 +242,7 @@ and teardown traps.
 
 | Tier | What happened |
 |---|---|
-| 1 | Static read or parse check: the source was inspected, nothing executed |
+| 1 | Static read or parse check: no target behavior was exercised |
 | 2 | Interpreted or partial load: the code loaded but was not compiled or exercised |
 | 3 | Real compile, load, and run of the relevant tests locally |
 | 4 | The project's canonical gate green in CI, on a clean environment |
@@ -261,8 +271,8 @@ testability.
 
 Categorize findings by what the reader must do: **critical**: security, data corruption, breaking changes,
 must fix before merge; **important**: logic errors, missing error handling, performance, should fix;
-**suggestion**: style, refactoring, documentation; **positive**: what was done well. Report summary, then
-critical, important, suggestions, positives, and open questions. Every item carries a file:line and a concrete
+**suggestion**: style, refactoring, documentation. Report findings and open questions; include positive
+observations only when they change a reader decision. Every finding carries a file:line and a concrete
 change, never a direction to improve.
 
 ### Choose the lens deliberately
@@ -280,6 +290,8 @@ before trying to reconcile the verdicts.
 
 ### Staging in a shared checkout
 
+Run staging commands only when the current user request explicitly authorizes the Git write.
+
 1. Inspect status and the full diff before staging anything, using the plain non-decorated diff form so the
    output is parseable. A configured external differ (difftastic here) makes `git diff`, `git show`, and
    `git log -p` emit syntax-highlighted, restructured text instead of a parseable unified diff, silently: the
@@ -295,7 +307,7 @@ that list and the safe alternatives.
 
 ## Related
 
-Naming a skill here does not load it. Invoke the Skill tool when the condition holds.
+Naming a skill here does not load it. Use the runtime's skill loader, or read its SKILL.md, when triggered.
 
 - [serena-usage](../serena-usage/SKILL.md): before any memory check or symbol operation
 - [investigation-patterns](../investigation-patterns/SKILL.md): when review reveals behavior that is unclear

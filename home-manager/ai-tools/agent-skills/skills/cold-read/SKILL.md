@@ -1,7 +1,8 @@
 ---
 name: cold-read
 description: A context-free reviewer reads durable prose as its real audience; the writer applies surviving cuts. Use at task completion whenever docs, README, comment blocks, commit messages, or PR/issue bodies were written or revised.
-version: 1.0.0
+metadata:
+  version: "1.0.0"
 ---
 
 # Cold read
@@ -18,8 +19,9 @@ script to apply verbatim.
    tree, never the diff or the conversation that produced it: a comment that only reads clearly next to the
    diff is the defect this test catches. For a PR or commit body: the body plus its diff. Nothing from this
    session.
-3. Dispatch one fresh agent via the Agent tool with a subagent_type other than `fork`: a fork inherits this
-   conversation's context, which is exactly what this test must exclude. Give it the reviewer prompt below
+3. Dispatch one fresh agent without inherited conversation context using the available runtime's tools.
+   If that is unavailable, perform a separate reader pass and report the lack of an independent reviewer.
+   Give the reviewer the prompt below
    verbatim, filling only `{paths}` and the audience line (the artifact's real reader: "a developer new to
    this repo", "the human reviewing this PR"). Anything more is context that reader will not have, and it
    blinds the test.
@@ -29,8 +31,9 @@ script to apply verbatim.
    fact the reader can reach nowhere else. If most of a passage is cut, rewrite it from the survivors rather
    than patching around the cuts. For style-level repairs, apply technical-writing's rules, not the
    reviewer's prose.
-5. Load-bearing docs (README, architecture notes, onboarding) get three independent reviewer dispatches: a
-   span every one of them cuts is dead weight; a confusion any one of them raises needs an anchor in the text.
+5. For load-bearing docs, add independent review where it can test a different audience or evidence base.
+   Resolve suggested cuts by the reader information lost, not reviewer count; investigate even a single
+   evidence-backed confusion.
 
 ## Reviewer prompt template
 

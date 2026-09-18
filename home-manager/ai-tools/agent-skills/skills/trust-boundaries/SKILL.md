@@ -1,7 +1,8 @@
 ---
 name: trust-boundaries
 description: Use when untrusted input crosses a privilege boundary, such as parsing client or network requests, decoding payloads or deserialization, expanding archives, restoring persisted files, evaluating input via eval, validating paths, URLs, or schemes, or guarding against TOCTOU. Covers fail-closed validation, decode budgets, format-template injection, and log injection.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 The central question is never "is this value well-formed?" but **"what authority does this value carry, and
@@ -181,11 +182,11 @@ construction time.
 1. List the members without extracting anything.
 2. Require an exact single-member list matching what you expect. More than one member, or a different name, is
    a rejection, **not a reason to search the list.**
-3. Extract only that member into a freshly created private temporary directory, never a shared or predictable
-   location.
-4. Reject symbolic links, hard links, device entries, and any member whose path is absolute or contains upward
+3. Reject symbolic links, hard links, device entries, and any member whose path is absolute or contains upward
    traversal, **before writing anything.**
-5. Enforce a hard cap on uncompressed bytes while writing, aborting when exceeded.
+4. Extract only that validated member into a freshly created private temporary directory, never a shared or
+   predictable location. Validation and extraction must use the same immutable archive bytes.
+5. During step 4, enforce a hard cap on uncompressed bytes while writing, aborting when exceeded.
 6. Require a regular file, and verify its checksum or signature while it is still inside the private directory.
    **A missing checksum is a failure, not a skipped optional step**; this is where fail-open most often hides:
    code that verifies "if one is provided" grants an attacker the ability to remove verification by removing
@@ -216,9 +217,11 @@ than describing the result as safe. Device, inode, and size alone miss a same-si
 
 Hardlink pinning is frequently unavailable: different devices, or a filesystem that refuses hard links. **The
 fallback is not to check the path and open it afterwards; that is the original hazard restored.** Invert the
-order: open first with symlink-following disabled, then run every type, size, and ownership check against the
-*open descriptor*. The checks then describe the object you are already holding. The same inversion is right
-wherever a platform offers descriptor-relative operations: resolve once, keep operating on the handle.
+order: open with platform-appropriate flags that prevent symlink following and FIFO blocking, then run type,
+size, and ownership checks against the *open descriptor* before reading. On POSIX-style systems, a read-only
+`O_NOFOLLOW | O_NONBLOCK` open followed by `fstat` can reject a FIFO without waiting for a writer.
+`O_NOFOLLOW` protects the final component, not untrusted parents: resolve through trusted directory handles
+with the platform's required traversal restrictions. Retain the checked handle for subsequent operations.
 
 **Bound the read itself.** A pre-read size check does not bound the read, because the entry can grow between
 the stat and the read; a post-read check bounds nothing, because the bytes are already in memory. Read at most
@@ -226,10 +229,11 @@ limit-plus-one bytes and reject when the extra byte materializes, one read that 
 detects overflow.
 
 **Reject by type, because some types block.** A named pipe is the sharpest case: readable, reports size zero,
-is not a symbolic link, satisfies every metadata precheck; **and then blocks forever on open**, before any
-post-read size limit or identity comparison gets a chance to run. The denial of service happens strictly inside
-the code you believed was guarded. Require a regular file explicitly, and note that "is a regular file"
-predicates commonly follow symlinks, so a separate symlink check is still needed.
+is not a symbolic link, passes size and symlink checks, and can block on an ordinary open before a descriptor
+check runs. Require a regular file using `fstat` after the nonblocking open above, and reject other types
+before reading. This is not a universal safe-open recipe for hostile device nodes: nonblocking flags do not
+remove every device-open side effect. Constrain the namespace or use a platform-specific mechanism when
+attackers can supply those objects.
 
 Writing into that same space safely follows one more rule beyond the read-side ones above: write the new
 content under a private temporary name first, verify it there (checksum, signature, structural validation),

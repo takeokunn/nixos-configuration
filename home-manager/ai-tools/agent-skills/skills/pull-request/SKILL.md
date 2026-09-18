@@ -1,7 +1,8 @@
 ---
 name: pull-request
-description: Write or revise a pull request: commit shaping, title, body, and screenshots. Use when the user explicitly asks to create or edit a pull request, or when a commit message or PR body is being written.
-version: 1.0.0
+description: "Write or revise a pull request: commit shaping, title, body, and screenshots. Use when the user explicitly asks to create or edit a pull request, or when a commit message or PR body is being written."
+metadata:
+  version: "1.0.0"
 ---
 
 # Pull request
@@ -11,15 +12,15 @@ already in front of them, and repeating it buries the part that is not.
 
 SSOT-EXEMPT: `hard_rules` already gates commit, rebase, and `gh pr create`, restated here because this
 skill's procedure names them. Marking a draft ready is **not** in that enumeration, so this skill gates it,
-on the same ground: it is externally visible and it summons reviewers. Each of the three requires the user's
+on the same ground: it is externally visible and it summons reviewers. Each of these operations requires the user's
 instruction in the current turn. An instruction to write a PR body is not an instruction to open the pull
 request.
 
 ## Procedure
 
-1. Shape the commits, only when the user instructed a commit operation in the current turn. Until a human
-   review lands they can be reshaped freely; after one lands, leave the reviewed commits alone and append.
-   Bot reviews do not count as human review.
+1. Shape commits only within the Git operations explicitly requested in the current user message. A request
+   to commit does not authorize rewriting existing history. Preserve reviewed commits unless the user
+   specifically requests otherwise, and explain the effect on review continuity.
 2. Gather material from the diff against the base: the commit log, the changed-file list, and the diff
    itself. Issue and tracker links come from the commit messages and the branch name.
 3. Read `.github/pull_request_template.md` when the repository has one, and match its sections. Treat that
@@ -84,7 +85,8 @@ This is the part the diff cannot show, so it is most of what the body is for.
 
 ## Screenshots
 
-`gh pr create --attach` and `gh pr edit --attach` upload an image or video, up to 50 files per command, in
+Check the installed `gh pr create --help` and `gh pr edit --help` before using version-dependent attachment
+flags. Where supported, `gh pr create --attach` and `gh pr edit --attach` upload an image or video in
 `<file>#<alt text>` form. A body reference such as `![alt](./login.png)` is rewritten in place to point at
 the uploaded asset; with no reference the attachment is appended at the end, which is what to use when the
 only goal is adding evidence during review. A reference that already carries alt text keeps it. Video

@@ -1,7 +1,8 @@
 ---
 name: common-lisp-ecosystem
 description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, defpackage and defsystem. Also covers package hygiene, condition design, format-string injection, Unicode predicates, reader macros, macro-argument evaluation hygiene, atomic file publishing, and hash-table key safety.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Silent failure modes in Common Lisp, CLOS, ASDF, and package systems: cases where correct-looking
@@ -16,13 +17,10 @@ convenience constructor like `make-foo` is advisory: a caller who writes `(make-
 convenience constructor reads like the API, so reviewers check it and stop; nothing in `make-foo`
 hints that a second, unvalidated construction path is exported alongside it.
 
-Pick one of three, and state which in the class documentation: enforce invariants in an
-`initialize-instance :after` (or `shared-initialize`) method so every path runs them; keep the class
-package-internal and export only the constructor; or, when the class must be exported as-is, give
-every optional slot a bound `:initform` so direct `make-instance` is as safe as convenience
-construction. A privileged fast path must never be expressible as an initarg; carry it in
-package-internal dynamic state or a private constructor, or `make-instance` becomes a way to request
-the unvalidated path by name.
+Enforce invariants in an `initialize-instance :after` (or applicable `shared-initialize`) method when
+direct construction must preserve them. A slot `:initform` supplies a default but does not validate
+supplied values. Keeping the class package-internal narrows the supported API; it is not an access-control
+boundary. Document any unchecked constructor as an internal convention, not a security guarantee.
 
 ```lisp
 ;; invariant enforced at the construction boundary, not in a helper
@@ -138,14 +136,14 @@ failure appears later as an undefined-function call, typically at test-image sta
 load-order problem rather than the deletion it actually is. When deleting or replacing a module, audit
 the retained exports with `fboundp` (and `boundp` / `find-class` for the other namespaces) as an
 explicit step, and search for every remaining top-level caller. Encode the audit as a test over the
-package's external symbols so the next deletion is caught mechanically:
+package's documented callable exports so the next deletion is caught mechanically. The following wider
+scan produces review candidates, not failures: exported type names and declaration identifiers can lack
+all three bindings.
 
 ```lisp
-;; audit every external symbol of a package for a live function binding
 (loop for sym being the external-symbols of (find-package :my-project)
       unless (or (fboundp sym) (boundp sym) (find-class sym nil))
         collect sym)
-;; a non-empty result means the package promises names it cannot deliver
 ```
 
 **Balance is not nesting correctness.** A structural checker proves the parentheses balance, not that
@@ -153,8 +151,7 @@ the nesting is what the author meant. A misplaced closing parenthesis can nest t
 third, or produce `(defparameter (defparameter *table* ...))`, and the file still reads as valid Lisp.
 The exported symbols then exist but are not fbound, because the definitions never became top-level
 forms. Passing a structural check feels like proof, which is exactly what makes this dangerous: the
-tooling's green result is used as evidence for a property it never examined. Two independent
-occurrences of this shape were observed in unrelated files. Use the full ladder and stop treating any
+tooling's green result is used as evidence for a property it never examined. Use the full ladder and stop treating any
 single rung as sufficient: balance check → top-level form outline (does each expected definition
 appear at depth zero?) → `fboundp` on the expected exports → an actual system load. Structural repair
 tooling should be verified at the outline and `fboundp` rungs, not just the balance rung.
@@ -227,15 +224,10 @@ Recurring traps when defining a library system plus its test system in a `.asd` 
   (asdf:find-system "proj/test" nil) ...)` makes `asdf:test-system` recurse into the same `.asd` load
   path and can surface as a circular dependency during system discovery. Define the library system and
   the test system unconditionally; let ASDF handle repeated loads/redefinitions of the `.asd` file.
-- **Bare operation symbol in `:perform`.** Writing `:perform (test-op ...)` or `:in-order-to` with a
-  bare `test-op` resolves to `COMMON-LISP-USER::TEST-OP`, not the ASDF operation class, and fails with
-  class-not-found at run time. Qualify the operation as `asdf:test-op` in `:perform`, and prefer an
-  explicit `(asdf:test-system ...)` call in the `:perform` body over a chained `:in-order-to` graph,
-  which is easier to isolate and less likely to stall the compile/load plan.
-- **Relative file pathnames in a raw checkout.** `:file "src/..."` / `:file "t/..."` relative
-  component paths can raise "Invalid relative pathname" in a raw checkout. Group components under
-  `(:module "src" :pathname "src" :components (...))` so the module carries the pathname, rather than
-  embedding directory segments in each `:file`.
+- **Operation symbol package.** Qualify operations as `asdf:test-op` when forms may be read outside
+  `ASDF-USER`. Ordinary `.asd` files use `ASDF-USER`, where inherited ASDF symbols already resolve.
+- **Component pathnames.** Relative directory components such as `:file "src/foo"` are supported;
+  use `:module` when several components share a directory, not as a workaround for a raw checkout.
 - **Canonical system defined inside an alias-named `.asd`.** Defining the canonical test system inside
   an alias-named file (e.g. `proj-test.asd`), so that loading the library does not let ASDF discover
   it, triggers an ASDF warning and a fresh-registry smoke gap. Keep the canonical `proj/test` system in
@@ -264,9 +256,7 @@ Recurring traps when defining a library system plus its test system in a `.asd` 
 
 Swapping, removing, or externalizing a dependency is not a code change with follow-up chores. It is
 one atomic edit across a fixed set of surfaces, and a partial application leaves the system unloadable:
-ASDF still names components that no longer exist, so the next fresh load fails for everyone. Three
-unrelated codebases independently produced the same surface list, which is why it is worth carrying as
-a checklist:
+ASDF still names components that no longer exist, so the next fresh load fails for everyone. Check:
 
 - The `.asd` build manifest: `:depends-on` of the library system and the test system, and `:components`
   entries for any deleted files.
@@ -291,15 +281,10 @@ no longer have a source.
 
 Concurrent CLI/test invocations that each call `asdf:load-system` can race on an inherited default FASL
 cache and fail with "Failed to find the TRUENAME of ...fasl". Initialize output translations in the
-launcher, before `load-system`, to a private per-user cache, and keep that initialization in the
-packaged launcher (not only in ad hoc scripts) so every subcommand inherits it:
-
-```lisp
-(asdf:initialize-output-translations
-  '(:output-translations
-    (t (:home ".cache" "common-lisp" :implementation))
-    :ignore-inherited-configuration))
-```
+launcher, before `load-system`, to a private directory unique to each invocation. A path based only on
+the user and implementation still collides between concurrent runs. Keep this initialization in the
+packaged launcher so every subcommand inherits it, and verify that simultaneous invocations resolve
+their FASL outputs to different directories.
 
 ## Constant reload safety
 
@@ -369,8 +354,7 @@ not the one that is broken.
 
 **Retreat when boundaries are not stable.** Split only where fragment boundaries are genuinely stable.
 If achieving a split requires duplicating loader scaffolding across fragments, or cutting through a
-form, the file wants one cohesive data fragment plus a thin loader rather than N fragments. An observed
-four-way split of a registry file proved brittle at every boundary and was collapsed back. The signal
+form, the file wants one cohesive data fragment plus a thin loader rather than N fragments. The signal
 that a decomposition is wrong is mechanical rather than aesthetic: repeated loader text and forms that
 resist separation both mean the chosen seams are not real seams in the code's structure.
 
@@ -399,20 +383,14 @@ Test this invariant by file name or truename, never by raw pathname equality: on
 a test wrote to canonicalizes to `/private/tmp`, so a pathname-equality assertion fails on a correct
 implementation, a routine source of platform-only flaky filesystem tests.
 
-**Retry only on a confirmed collision.** Open the temporary exclusively with `:if-exists nil`, and
-retry only when the resulting `file-error` is confirmed to be a name collision by `probe-file`. Every
-other open failure must escape immediately. Bound the loop with an explicit attempt count and treat
-exhaustion as a structured operation failure rather than an infinite retry. Without the `probe-file`
-confirmation, a permission error or a missing parent directory is retried the full attempt count and
-then reported as "could not find a free temporary name", which points the investigation at name
-generation instead of at permissions.
+**Retry only on a collision result.** With `:if-exists nil`, `open` returns `nil` for an existing file;
+let other open failures propagate. Bound retries with an explicit attempt count. Do not use a subsequent
+`probe-file` to reinterpret an error: that introduces a race and can misclassify permission failures.
+See [CLHS OPEN](https://www.lispworks.com/documentation/HyperSpec/Body/f_open.htm).
 
 ```lisp
-;; exclusive create; NIL means the name was taken
-(let ((stream (open candidate :direction :output :if-exists nil)))
-  (cond (stream stream)
-        ((probe-file candidate) :retry)      ; genuine collision
-        (t (error 'temp-file-open-failure :path candidate))))
+(or (open candidate :direction :output :if-exists nil :if-does-not-exist :create)
+    :retry)
 ```
 
 ## Numeric frontend correctness
@@ -425,10 +403,7 @@ specification.
 identity with the implementation's own reader. A reader can be off by one unit in the last place on
 subnormals and other hard cases, so a differential test using it as the oracle reports failures where
 the implementation under test is the more accurate of the two. Use an exact rational-to-binary64
-computation (or libc `strtod`) as the reference. Measured case: of 90,041 inputs where both sides
-produced double-floats, 1,118 differed; every difference was an adjacent subnormal one unit apart, and
-exact rational distance favored the direct parser in all 1,118. Reading that run as 1,118 bugs would
-have meant "fixing" the correct implementation to reproduce the reader's error. Build the oracle from
+computation as the reference. Build the oracle from
 exact arithmetic: parse the decimal into an exact rational, round to nearest with ties to even against
 the binary64 grid, compare bit patterns. When two implementations disagree, decide the winner by exact
 rational distance rather than by which one is the host.
@@ -445,8 +420,7 @@ factorization or zero padding must be bounded before it runs rather than after i
 ## Derived state and cache coherence
 
 Three linked invariants for any structure that carries derived state (an index, a compiled plan, a
-memoized signature) alongside the data it is derived from. All three failed in observed code without
-raising a single error; the system simply computed against a stale view.
+memoized signature) alongside the data it is derived from.
 
 **Every mutator must go through the rebuild.** A derived index is only as coherent as the least
 disciplined mutator. Public mutators that write the underlying collection directly (bypassing the
@@ -510,8 +484,9 @@ introduces that the caller did not write must be `gensym`'d; a symbol
 intentionally exposed to caller code (anaphora) should be documented as such at the definition site rather
 than left to look like an accident.
 
-Never evaluate a caller-supplied argument form more than once, and never reorder the left-to-right
-evaluation of caller-supplied forms: a macro that evaluates `(incf counter)` twice, or evaluates argument B
+For macros promising ordinary function-call semantics, evaluate each argument form once and preserve
+left-to-right evaluation. Control-flow macros instead follow their documented conditional or repeated
+evaluation contract. A function-like macro that evaluates `(incf counter)` twice, or evaluates argument B
 before argument A, silently breaks any caller relying on ordinary function-call semantics. Bind each
 argument exactly once, in the order it appears, via gensym'd let-bindings before referencing it;
 `alexandria:once-only` does this correctly and should be preferred over hand-rolling it inline, since
@@ -536,7 +511,5 @@ correct macro's expansion evaluates that form exactly once.
   file-decomposition section complements.
 - [serena-usage](../serena-usage/SKILL.md): navigating CLOS hierarchies, generic functions, and symbol
   definitions.
-- [context7-usage](../context7-usage/SKILL.md): fetching current ASDF, SBCL, and Common Lisp library
-  documentation.
 - [investigation-patterns](../investigation-patterns/SKILL.md): debugging condition handling, macro
   expansion, and SBCL-specific issues.

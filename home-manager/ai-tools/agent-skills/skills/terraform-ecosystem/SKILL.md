@@ -1,13 +1,14 @@
 ---
 name: terraform-ecosystem
 description: Use for Terraform or OpenTofu HCL configuration and provider development (Go, terraform-plugin-framework). Covers state management, plan and apply, failed-apply recovery, moved blocks, import, and provider schema design.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Two pillars: authoring custom providers with terraform-plugin-framework in Go, and writing/operating HCL
 (lifecycle management, credential scoping, DNS+hosting composition, CI plan/apply chains, state management).
-Concrete providers below are illustrative only: the mechanisms generalize. For Go idioms (error handling,
-module layout, table-driven tests) and for dev-shell setup, see the Related links at the end; this skill
+Concrete providers below are illustrative only. General Go idioms are outside this skill;
+for dev-shell setup, see [nix-ecosystem](../nix-ecosystem/SKILL.md). This skill
 covers only the Terraform-specific surface on top of those.
 
 ## Provider development (terraform-plugin-framework)
@@ -52,7 +53,8 @@ var (
 
 Required/Optional/Computed drives planning: Computed means the provider supplies the value, possibly unknown
 at plan time; Optional+Computed means the user may set it but the provider fills a default when unset;
-Sensitive redacts it from CLI output and logs. Declare these deliberately: they are read by Terraform's
+Sensitive redacts normal CLI/UI output, but does not omit the value from state or guarantee log redaction.
+Declare these deliberately: they are read by Terraform's
 planner, not just documentation.
 
 ```go
@@ -103,7 +105,8 @@ if err != nil {
 }
 ```
 
-`Update` never receives an attribute marked `RequiresReplace`: the framework schedules a replace instead.
+`RequiresReplace` requests replacement when the attribute changes; unchanged attributes still appear
+in plans passed to `Update`.
 `Delete` should treat 404 as success (already gone); on success the framework calls
 `State.RemoveResource` automatically.
 
@@ -176,7 +179,11 @@ inferred from a credential variable name several files away.
 
 ```hcl
 provider "example" { token = var.primary_token }               # default owner
-provider "example" { alias = "secondary"; owner = var.secondary_owner; token = var.secondary_token }
+provider "example" {
+  alias = "secondary"
+  owner = var.secondary_owner
+  token = var.secondary_token
+}
 
 resource "example_thing" "shared" {
   provider = example.secondary
@@ -184,22 +191,17 @@ resource "example_thing" "shared" {
 }
 ```
 
-**No Terraform resource performs an ownership transfer of the underlying object.** Changing a resource's
-`provider =` only changes which credential Terraform uses to look for it: the object's identity (which
-usually embeds an owner/account/zone/project) does not move with an address rewrite. On the next refresh
-Terraform finds nothing under the new owner, concludes the object is gone (silently orphaning the real one,
-which still holds its data), and plans a brand-new empty resource under the new owner. Observed signature: a
-same-address owner change plans as `N to add, 0 to change, M to destroy`: never as an in-place change. Any
-resource whose identity includes an owner/account/org/project/zone segment behaves this way when that
-segment moves; "the plan says destroy and create but I only changed which provider manages it" is a
-data-loss signal, never a rename.
+**Changing `provider =` is not an ownership transfer.** It selects the provider configuration;
+whether the remote object can move depends on the platform and resource implementation. A new
+credential scope may make an existing object invisible and lead to a create/replacement plan.
+Inspect the complete plan and provider-specific migration documentation before applying.
 
-Safe sequence: (1) transfer the real object out-of-band via whatever mechanism the platform itself provides
-: Terraform cannot do this step; (2) `terraform state rm` the address so the stale entry stops driving a
-destroy; (3) re-import under the aliased provider: `terraform import -provider=example.secondary <address>
-<id>`, or an `import {}` block carrying `provider = example.secondary` when the CLI form is unavailable (see
-below); (4) require a zero-diff plan before applying anything else: a non-empty plan means the import did
-not match the real object.
+If the platform requires an out-of-band transfer, verify that transfer and the destination identity
+first. Any subsequent state removal/import requires explicit approval, a recoverable state backup,
+and exact addresses. Select the alias in the resource's `provider = example.secondary`, then use
+`terraform import <address> <id>`, or an import block's `provider` argument. Do not use the removed
+CLI `-provider` option. Require a zero-change plan after reconciling state.
+See [import configuration](https://developer.hashicorp.com/terraform/language/block/import).
 
 ### Declarative `import {}` vs the `terraform import` CLI
 
@@ -210,8 +212,9 @@ no values for them, so provider configuration cannot complete. The failure reads
 expression in a provider block ("cannot be determined until apply") and points at the configuration, but
 the configuration is fine; the credentials simply are not present on the machine running the command.
 
-Use a declarative import block instead: it is processed during an ordinary `plan`/`apply`, which runs
-remotely and has credential access:
+Use a declarative import block instead when the workspace uses remote execution: it is processed
+during its remote `plan`/`apply` and can access workspace credentials. Remote state storage alone
+does not imply remote execution:
 
 ```hcl
 import {
@@ -228,12 +231,10 @@ side of the backend boundary the operation executed on.
 
 ### A failed `apply` does not roll back
 
-Everything that completed before the failure stays created and stays in state; the run simply stops where it
-broke. Resources created earlier in the run remain and remain tracked; re-running apply will not recreate
-them. Resources that failed to *destroy* stay correctly tracked, so state is not corrupted, just incomplete
-relative to intent. **"The apply failed, so nothing happened" is the most expensive wrong assumption
-available in Terraform operations**: the correct default is that an unknown prefix of the change is now
-live.
+Completed operations are not rolled back. Even a failed provider operation can leave partial remote
+changes, and a state-save failure can leave state behind reality. Inspect both state and remote
+objects before retrying; do not infer that every created object is tracked or every failed deletion
+left its object intact.
 
 Recovery: read the actual state (`terraform state list`, `terraform show`) before re-running anything; do
 not reason from the configuration you intended to apply. Where an object must go but the provider couldn't
@@ -279,7 +280,10 @@ broken or unverified domain.
 ```hcl
 resource "hosting_site" "example" {
   name = "example"
-  deployment { build_type = "workflow"; domain = "sub.example.com" }
+  deployment {
+    build_type = "workflow"
+    domain     = "sub.example.com"
+  }
 }
 
 resource "dns_record" "example_sub" {
@@ -300,8 +304,12 @@ composition is the reusable idea, applicable to any static-hosting-plus-DNS pair
 
 Isolate independent concerns into separate workspaces/root modules (DNS, source-control, compute each with
 their own state) so a plan/apply in one never evaluates or risks another. Use a remote backend as the single
-source of truth; avoid local state for shared infrastructure. Keep secrets out of state and config: a
-secrets manager or encrypted file (SOPS), never plaintext `.tf`, and mark token attributes `Sensitive`.
+source of truth; avoid local state for shared infrastructure. Keep plaintext secrets out of `.tf`.
+Secrets managers and SOPS protect the source, not values subsequently persisted in state or plans.
+Mark sensitive values for output redaction and protect state/plan storage with encryption and access
+controls. Terraform's `ephemeral` values (1.10+) and provider-supported write-only arguments (1.11+)
+can avoid persistence where supported; verify the pinned CLI/provider and OpenTofu behavior separately.
+See [sensitive data management](https://developer.hashicorp.com/terraform/language/manage-sensitive-data).
 
 CI chain, cheapest checks first: `terraform fmt -check` → `terraform validate` (no remote calls) → `tflint`
 → `terraform plan` (the reviewable artifact, per isolated project) → `terraform apply` (gated behind
@@ -311,7 +319,8 @@ Nix/devenv shell entered via `... --command` is one way) so local and CI runs us
 ## Context7 lookups
 
 The framework's public helper packages (`stringplanmodifier`, `stringvalidator`, `providerserver`) differ
-from older pre-1.0 design docs: verify before quoting exact names. Libraries:
+from older pre-1.0 design docs: verify before quoting exact names. Resolve the library first with
+Context7; these IDs are discovery candidates, not a resolution bypass:
 `/hashicorp/terraform-plugin-framework`, `/hashicorp/terraform-plugin-testing`,
 `/websites/developer_hashicorp_terraform`. Useful lookup topics: plan-modifier helper signatures,
 validators-package APIs, `ProtoV5`/`ProtoV6ProviderFactories` and `providerserver` factory helpers,
@@ -319,8 +328,7 @@ validators-package APIs, `ProtoV5`/`ProtoV6ProviderFactories` and `providerserve
 
 ## Related
 
+- [nix-ecosystem](../nix-ecosystem/SKILL.md): pinned toolchains and development shells.
 - [serena-usage](../serena-usage/SKILL.md): navigate provider Go symbols and HCL references efficiently.
-- [context7-usage](../context7-usage/SKILL.md): fetch current terraform-plugin-framework and Terraform
-  documentation.
 - [investigation-patterns](../investigation-patterns/SKILL.md): evidence-based diagnosis of plan diffs and
   apply-time failures.

@@ -1,7 +1,8 @@
 ---
 name: sbcl-usage
 description: Use for SBCL execution and debugging (--script usage, REPL workflows, backtraces, ASDF loading, save-lisp-and-die, profiling, SLY development, terminating an unresponsive SBCL, or sb-thread/sb-cover hazards). Complements common-lisp-ecosystem's runtime operations.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Operational guidance for running, debugging, profiling, and shipping SBCL programs: invocation modes, ASDF
@@ -179,21 +180,9 @@ A sound, non-interactive harness is a prerequisite for diagnosing the stalls abo
 is unsound, a stalled form and a stalled harness are indistinguishable, producing false positives.
 
 **Real subprocess timeout.** The timeout must run in a parent process that keeps the ability to kill the
-child. A wrapper that arms an alarm and then `exec`s SBCL replaces itself with SBCL and cancels the alarm: the
-timeout never fires, so a hang survives indefinitely and looks like a stalled form. Use fork + wait in the
-parent, with the parent owning the alarm and the kill:
-```perl
-# Perl fork/wait timeout skeleton: the parent keeps the alarm and can signal the child.
-# (exec-after-alarm in a single process would silently cancel the alarm.)
-perl -e '
-  my $pid = fork();
-  if ($pid == 0) { setpgrp(0,0); exec @ARGV or die; }
-  local $SIG{ALRM} = sub { kill "KILL", -$pid; exit 124; };
-  alarm($ENV{TIMEOUT} || 60);
-  waitpid($pid, 0);
-  exit($? >> 8);
-' -- sbcl --script run.lisp
-```
+child. Use an established timeout utility with a kill grace, as below, rather than an unverified fork/alarm
+wrapper. Verify normal completion, signal termination, and timeout exit statuses against known controls.
+Before group signalling, establish that the group belongs to this run; never infer ownership from a PID alone.
 
 **Kill the process group, not just the wrapper's PID.** A child that has called `setpgid`/`setpgrp` is
 orphaned (not reaped) if only the parent is killed, and keeps holding resources. Put the child in its own
@@ -213,32 +202,35 @@ sbcl --no-sysinit --no-userinit --disable-debugger \
      --eval '(sb-ext:exit :code 0)'
 ```
 
-**Fresh process per unit.** Run each file/test in a fresh SBCL process rather than many units in one
-long-lived image. Whole-suite single-process runs have been observed to hang at function/test boundaries even
-when each unit passes alone; per-unit fresh processes (chunk size 1) is the stable path. The isolation must be
-complete: a bootstrap step that itself calls `compile-file` in the long-lived process defeats a per-file
-subprocess strategy.
+**Fresh process per unit.** Use isolated processes to diagnose cross-unit state or load-order failures.
+Passing isolated units does not establish that the whole-suite execution contract works; preserve and rerun
+the failing combined case. Keep diagnostic isolation complete, including the bootstrap compilation step.
 
 **Isolate the FASL cache.** Give each run a private, initialized output-translations/cache root before
 `asdf:load-system`. Parallel processes sharing an inherited default FASL cache can race and fail with
-`"Failed to find the TRUENAME of ...fasl"`. Initialize output translations in the launcher itself, and set a
-fresh `HOME`/`XDG_CACHE_HOME` when reproducing in isolation.
+`"Failed to find the TRUENAME of ...fasl"`. Initialize output translations in the launcher itself with a
+run-owned directory inside the authorized worktree; do not repurpose `HOME` or clear another run's cache.
 
 **Bound timeout with a kill grace.** When using coreutils `timeout(1)`, always pass a kill grace:
-`timeout --foreground -k 10s <limit>s <command>`. Plain `timeout` sends only TERM, and SBCL can remain alive
+`timeout -k 10s <limit>s <command>`. Do not use `--foreground` for noninteractive test jobs:
+[GNU Coreutils](https://www.gnu.org/s/coreutils/manual/html_node/timeout-invocation.html) documents that its
+children are not timed out in that mode. Descendants that escape the managed process group still need
+separate, ownership-checked cleanup. Plain `timeout` sends only TERM, and SBCL can remain alive
 after its initial termination signal, so a nominally bounded run leaks past the job budget and the escaped
 child keeps holding the FASL cache and any ports it opened, same root cause as the interrupt-disabled-region
 issue above: the first signal is a request, not a guarantee. Set the grace long enough for an orderly exit
 (a few seconds is usually ample) but budget the outer CI step timeout against `limit + grace`, not `limit`.
 ```bash
 # bounded: TERM at the limit, KILL 10s later if the child is still alive
-timeout --foreground -k 10s 300s \
+timeout -k 10s 300s \
   sbcl --no-sysinit --no-userinit --disable-debugger --script run-tests.lisp
 ```
 
 **Timeout threshold vs. contention.** Distinguish a genuine per-file stall from ambient machine contention.
 When many SBCL sessions run concurrently, baseline load latency can exceed a low per-file timeout and report
-every file as a timeout. Raise the threshold or reduce concurrency before attributing blame to a single file.
+every file as a timeout. Reproduce alone and measure an unchanged control before attributing blame to a
+single file. Do not raise an acceptance timeout merely to make the check pass; document a demonstrated
+harness defect before changing its limit.
 
 ## Form bisect and package preflight
 
@@ -414,9 +406,9 @@ as a gate; the SB-COVER specifics above are what make it easy to lose rows here.
 
 ;; apply optimization declarations locally, and verify impact; avoid safety 0
 ;; without hard evidence and strong tests
-(declaim (optimize (speed 3) (safety 1) (debug 1)))
 (defun hot (x y)
-  (declare (type fixnum x y))
+  (declare (optimize (speed 3) (safety 1) (debug 1))
+           (type fixnum x y))
   (+ x y))
 ```
 These are tool invocations: how to obtain a number from SBCL. They do not tell you whether the number means

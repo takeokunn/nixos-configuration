@@ -1,7 +1,8 @@
 ---
 name: rust-ecosystem
 description: Use when working with Rust projects (Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns).
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Non-obvious Rust patterns and toolchain hazards: borrow-checker refactors, trust-boundary type
@@ -93,10 +94,11 @@ must mirror the serde validators exactly: same limits, same shared constants (e.
 with the downstream limit lets a "valid" value fail later during generation or execution. Route
 both paths through one constant.
 
-**Convert at entry, require at boundary.** Keep serde-facing models ergonomic (plain `String`), but
-convert to the validated newtype immediately after validation, and require the newtype at every
-downstream API. Downstream backend/executor signatures should take `&ValidatedName`, not `&str`, so
-no call site can smuggle an unvalidated value to the action point.
+**Convert at entry, require at boundary.** Plain `String` belongs only in a separate wire DTO;
+convert it through `TryFrom` into the validated domain model before calling downstream APIs.
+For direct deserialization into a validated newtype, use Serde's
+[`#[serde(try_from = "String")]`](https://serde.rs/container-attrs.html#try_from)
+and keep its inner field private. Downstream signatures should take `&ValidatedName`, not `&str`.
 
 **Distinct types for distinct semantics.** When two values are both "strings" but have different
 execution semantics, give them distinct output types so call sites cannot mix them. A concrete
@@ -234,9 +236,10 @@ API doing the locking, and treating every case identically makes one of the two 
 
 ## Language-feature traps
 
-Return-position `impl Trait` now captures all in-scope lifetimes by default: a change from prior
-editions. Use `use<..>` to explicitly specify captured parameters when you need the narrower
-behavior.
+In Rust 2024, return-position `impl Trait` captures all in-scope lifetimes by default.
+Earlier editions differ for free functions and inherent methods. Use `use<..>` (stable since
+Rust 1.82) to specify captures explicitly; check the consuming crate's edition and MSRV.
+See the [edition guide](https://doc.rust-lang.org/edition-guide/rust-2024/rpit-lifetime-capture.html).
 
 `async fn` in traits is stable and no longer requires the `async-trait` crate for most cases, but
 the default does not add `Send` bounds. For public traits in libraries, use `trait_variant::make` to
@@ -260,12 +263,15 @@ outlives whatever justified it. (This is the attribute `#[expect(...)]`, entirel
   necessary and stale with no edit that satisfies every site. Move it down onto the specific
   generated function, or the specific call site, that actually needs it.
 
-Non-default lint groups and MSRV live in `clippy.toml`, separate from `Cargo.toml`:
+Configure lint levels/groups in `Cargo.toml` under `[lints.clippy]`. Clippy reads MSRV from
+`package.rust-version` unless overridden by `msrv` in `clippy.toml`; lint-specific options live
+in `clippy.toml`, for example:
 
 ```
-msrv = "1.94"
 cognitive-complexity-threshold = 25
 ```
+
+See [Clippy configuration](https://github.com/rust-lang/rust-clippy/blob/master/book/src/configuration.md).
 
 **Dead code at registration boundaries.** rustc computes reachability over the Rust call graph. A
 function whose only caller is an attribute macro's generated registration path (FFI entry points,
@@ -343,6 +349,9 @@ Reserve real external backends for opt-in test profiles; use recording/mock back
 
 ## Context7 library IDs
 
+These are discovery candidates, not permission to skip resolution. Resolve the library first
+with Context7, then verify the returned source and version.
+
 | Library | ID |
 |---|---|
 | The Rust Book | `/rust-lang/book` |
@@ -356,6 +365,5 @@ Reserve real external backends for opt-in test profiles; use recording/mock back
 ## Related
 
 - [serena-usage](../serena-usage/SKILL.md): navigate trait implementations and module hierarchies
-- [context7-usage](../context7-usage/SKILL.md): fetch current Rust book, cargo, and clippy documentation
 - [investigation-patterns](../investigation-patterns/SKILL.md): debug borrow-checker errors, lifetime issues, and performance bottlenecks
 - [trust-boundaries](../trust-boundaries/SKILL.md): language-neutral rules behind the trust-boundary patterns above: limits before allocation, validation before normalizing coercion, pinning identity instead of re-opening a path, and never interpolating untrusted data into output

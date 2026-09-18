@@ -1,11 +1,12 @@
 ---
 name: core-patterns
 description: Use when authoring an agent or command that needs the shared decision-criteria or escalation template (copy them in, since a bare reference to this skill resolves to nothing at runtime). Also covers modelling absence without an in-range sentinel, safe alternatives to destructive Git commands, and when to escalate a review into an independent refutation pass.
-version: 4.0.0
+metadata:
+  version: "4.0.0"
 ---
 
 Shared structures for authoring agents and commands, plus the patterns that keep them honest. Agent and command
-files are XML; the templates below are given in that form even though this file is markdown.
+files are markdown with YAML frontmatter, and the templates below are given in that form.
 
 **These templates follow their consumers rather than leading them.** When the corpus changes shape, this file
 changes with it: a template prescribing a structure no consumer uses is worse than none, because it invites
@@ -46,27 +47,24 @@ Factors are **ordered, not weighted**. A model can apply "if these disagree, thi
 a calibrated weighted average of qualities it just judged. Ordering is also auditable: a reader can check that
 the winning factor really was the first unmet one.
 
-```xml
-<decision_criteria>
-  <factor name="evidence_completeness" precedence="1">
-    <unmet>A file the decision depends on has not been read in this session. Read it before deciding:
-      a summary of a file is not the file.</unmet>
-  </factor>
-  <factor name="scope_clarity" precedence="2">
-    <unmet>The request admits two readings that lead to different work. Ask with AskUserQuestion
-      rather than choosing the cheaper reading.</unmet>
-  </factor>
-  <factor name="reversibility" precedence="3">
-    <unmet>The action cannot be undone from the repository alone: it deletes, publishes, or mutates
-      shared state. Confirm with the user first.</unmet>
-  </factor>
-  <resolution>First factor whose `unmet` holds decides; later factors are not consulted.</resolution>
-</decision_criteria>
+List position carries the precedence, so the numbering is the ordering and there is nothing else to keep in sync:
+
+```markdown
+## Decision criteria
+
+1. **Evidence completeness.** A file the decision depends on has not been read in this session. Read it before
+   deciding: a summary of a file is not the file.
+2. **Scope clarity.** The request admits two readings that lead to different work. Ask with AskUserQuestion
+   rather than choosing the cheaper reading.
+3. **Reversibility.** The action cannot be undone from the repository alone: it deletes, publishes, or mutates
+   shared state. Confirm with the user first.
+
+Resolution: the first criterion whose condition holds decides; later ones are not consulted.
 ```
 
-Every factor states an **observable** `unmet` condition: something a reader could check against the transcript,
-not a quality to be rated. If two factors could each independently block, they are separate factors, not one
-weighted score.
+Every entry states an **observable** unmet condition: something a reader could check against the transcript, not
+a quality to be rated. If two entries could each independently block, they are separate entries, not one weighted
+score.
 
 This replaced a numeric-weight scheme in which every weight came from the same handful of values and every gate
 used an identical threshold, which is what a set of numbers looks like when nothing ever reads them. Two things
@@ -80,10 +78,12 @@ Conditions that change what happens next, stated per domain. Four severities rem
 findings (low: note and proceed; medium: document and ask; high: stop and present options; critical: block and
 require acknowledgment) but the escalation block itself names conditions and responses, not severity examples.
 
-```xml
-<escalations>
-  <escalation condition="The observable condition">What to do instead of proceeding</escalation>
-</escalations>
+```markdown
+## Escalations
+
+| Condition | Response |
+|---|---|
+| The observable condition | What to do instead of proceeding |
 ```
 
 ## Gates
@@ -92,29 +92,27 @@ A gate is cleared by naming a concrete artifact: a path, a command, an agent nam
 whose questions can all be answered "yes" without producing anything ("Have I gathered sufficient evidence?")
 does not distinguish a real pass from a nominal one. **A check that cannot fail is not a check.**
 
-The resident configuration holds the one definition of gate discipline; a command references it by name rather
-than restating it.
+CLAUDE.md holds the one definition of gate discipline; a command references it by name rather than restating it.
 
 ## Loading a skill
 
-Nothing resolves a reference automatically. A skill reaches the model only through an explicit Skill tool call,
-so a dependency must be registered where the orchestrator will see it and then loaded in the workflow that
-depends on it.
+Nothing resolves a reference automatically. Load a skill through the runtime's Skill tool when available;
+otherwise read its SKILL.md completely. Register dependencies where the orchestrator will see them, then
+load them in the workflow that depends on them.
 
 Register it as a row in the orchestrator's load table, naming **the condition that fires the load**: "Writing
 or evaluating tests", "Any Serena memory or symbol operation", not a taxonomy the skill belongs to. A category
 label cannot fire; a condition can. Then load it in the workflow's first phase, before any step that depends on
 it, and record that it was loaded.
 
-```xml
-<phase name="prepare">
-  <step order="1">
-    <action>Load the execution-workflow skill with the Skill tool. It governs the delegation contract
-      and the definition of done that this command depends on.</action>
-    <tool>Skill (execution-workflow)</tool>
-  </step>
-</phase>
+```markdown
+## Workflow
+
+1. **Prepare (Skill).** Load the execution-workflow skill. It governs the delegation contract and the
+   definition of done that this command depends on. Return the skills loaded, by name.
 ```
+
+Name the tool in the step text rather than in a separate field, so a reader cannot see one without the other.
 
 This replaced a `refs` block with `use="patterns|tools|workflow|domain"` attributes and an
 `inherits="skill#anchor"` attribute for composing one file out of another's sections. Both were markup nothing
@@ -123,7 +121,7 @@ happened to restate, and the reference itself was decoration that read as if it 
 plus an explicit Skill call is checkable: either the call appears in the transcript, or the content was never
 there.
 
-**The one exception is the resident configuration**, which is in context on every request. A reference to it
+**The one exception is CLAUDE.md**, which is in context on every request. A reference to it
 does resolve, which is why shared contracts live there and are named rather than restated.
 
 ## Concurrent sessions in one checkout
@@ -136,18 +134,15 @@ another session's uncommitted changes), `git checkout <branch>` / `git switch <b
 tree under them), `git reset --hard` (discards uncommitted changes across all sessions), `git clean -f` /
 `-fd` (deletes untracked files that may belong to others).
 
-Instead: `git worktree add <path> <branch>` for branch isolation; a WIP commit where you would have stashed.
+Use an assigned isolated worktree when available. Creating a worktree or a WIP commit requires the explicit
+Git-write authorization in CLAUDE.md; neither is an automatic fallback for a prohibited command.
 
-To reflect a worktree's state back into the main checkout, **mirror the files** with a sync tool (archive mode
-with delete, excluding the git metadata directory and any nested worktree directory) rather than switching
-branches in the shared tree. This propagates unstaged, staged, and untracked changes without touching Git
-metadata, and it is exactly the moment someone otherwise reaches for a prohibited command: the isolation
-guidance says how to *create* a worktree and nothing about how to get its state back.
+Do not mirror a worktree into a shared checkout: overwrites and sync deletion can destroy concurrent work
+without changing Git metadata. Hand off the changed paths and diff, and leave integration to an explicitly
+authorized operation that preserves the destination's unrelated changes.
 
-Removing a linked worktree destroys anything not reflected elsewhere, so it needs preconditions rather than a
-judgement call: the main worktree has no unmerged paths; its complete working-tree diff against the target
-branch is empty, meaning the mirrored state is *present* rather than believed to be; and branch refs are
-retained until the reflected state is committed, so the work is recoverable if the mirror was incomplete.
+Remove a linked worktree only when removal is requested and its tracked, untracked, and ignored work has been
+checked for preservation elsewhere. A clean tracked diff alone does not establish that removal is safe.
 
 ## Absence is not a value
 
@@ -215,10 +210,8 @@ Known failure modes, all of which are properties of the technique rather than re
   warrant a fix. A refutation is an input to a decision, not the decision.
 - **Lazy validation.** The inverse: a checker asked to "review" with no skeptical framing tends to rubber-stamp
   plausible-looking work. This is the default failure this pattern escalates away from.
-- **Cost.** An independent adversarial pass costs materially more than a single pass: reports in the wild cite
-  roughly 3–10x, though this repository has not measured its own multiplier (assumed, not verified). Reserve it
-  for findings whose cost of being wrong is high. The multiplier compounds *per finding escalated*, not per
-  run, so bound the count sent for refutation, not just the per-finding cost.
+- **Cost.** Each refutation adds an investigation. Reserve it for findings whose cost of being wrong is high,
+  and bound both the findings sent for refutation and the work assigned to each.
 - **Shared blindspot.** Dispatching the same underlying model as both producer and refuter does not buy true
   independence: identical models tend to miss the same category of error. A known limitation, not a guarantee
   it does not have.
@@ -231,7 +224,7 @@ Report the outcome as an evidence tier, never as a numeric confidence.
   The rating comes from the same pass as the work, so it agrees with the work by construction and the gate
   never fires. State the condition that must hold in observable terms, and the action when it does not.
 - **A reference in place of content.** Writing "see core-patterns" where the content belongs, on the assumption
-  that something resolves it. Nothing does, outside the resident configuration. The file then carries an empty
+  that something resolves it. Nothing does, outside CLAUDE.md. The file then carries an empty
   slot that reads to every later reader as if it were filled, worse than an obviously missing section.
 - **A ceremonial placeholder.** Structure filled with generic text to satisfy a template: a `<tool>` element
   reading "task-specific analysis tools", a step whose output is "Step completed". It costs context on every

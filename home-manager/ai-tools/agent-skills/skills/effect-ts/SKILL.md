@@ -1,7 +1,8 @@
 ---
 name: effect-ts
 description: Use when writing or reviewing Effect (Effect-TS) code (Effect.Service definitions, Layer composition, Effect.scoped resource handling, converting try/catch/async to the Effect error channel, Schema-as-SSOT type derivation, or testing with @effect/vitest and TestClock).
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Design principles and reference patterns for Effect (Effect-TS): service definitions, disciplined Layer
@@ -22,12 +23,13 @@ package boundaries. Reach for the symbol form whenever the branded type crosses 
 
 ## Version
 
-Verified against Effect 3.19.x, @effect/vitest 0.25.x, vitest 3.2.x. Effect.Service, Layer.provide /
-provideMerge / merge / mergeAll, Effect.scoped, TestClock, and Schema.Struct are stable across the 3.x line.
+These patterns target Effect 3, not Effect 4. Check the consuming project's lockfile and
+`@effect/vitest` peer dependencies before using them; not every API exists in every 3.x release.
+Use the [Effect 3 documentation](https://effect.website/docs/v3/getting-started/introduction).
 Import everything from the single `"effect"` package (`import { Effect, Layer, Schema, Ref } from "effect"`);
 test bindings come from `"@effect/vitest"`. Effect 2.x and pre-3.x tutorials predate Effect.Service and the
 current Schema location (Schema moved into the core `effect` package): do not mix guidance across major
-versions. Verify version-specific claims against current docs via [context7-usage](../context7-usage/SKILL.md)
+versions. Verify version-specific claims against current docs via Context7 or official documentation
 before asserting them.
 
 Two terms recur below: the requirement channel `R` in `Effect<A, E, R>` lists what a program still needs to
@@ -163,12 +165,11 @@ requirement is eventually satisfied.
 const runnable = program.pipe(Effect.provide(MainLayer), Effect.scoped)
 ```
 
-**Memoization is per provision graph, not per layer value**: if the same layer is provided at two points
-(once inside a sub-composition and again at the top level) it is BUILT TWICE, producing two distinct service
-instances that both satisfy the same tag. Invisible for a pure, stateless service; severe for one that owns a
-singleton: two sockets open, two caches diverging, two subscriptions delivering every event twice. Provide a
-shared layer at exactly one point in the composition; if an inner composition needs it, leave it as an unmet
-requirement there and discharge it once at the outer provide.
+**Memoization shares a layer reference within one provision graph.** Reusing the same layer value
+in multiple branches of that graph builds it once. Constructing distinct layer values or providing
+them through separate builds can create separate services, including duplicate sockets or caches.
+Reuse the layer reference and check build boundaries before diagnosing duplicate initialization.
+See [layer memoization](https://effect.website/docs/v3/requirements-management/layer-memoization).
 
 **`Effect.provide` is not free per iteration**: it is not a type-level annotation, it builds the layer graph.
 Applying it inside a per-iteration handler (a frame callback, a per-message handler, a per-request path)
@@ -201,14 +202,15 @@ const tick = () => {
 }
 ```
 
-Bridge the external callback into Effect ONCE by enqueuing, then process on a single forked fiber that stays
-inside Effect:
+Enqueue at the callback boundary, then process on one scoped fiber. Each callback still enters the
+runtime, but the processing chain stays inside Effect. This frame example keeps only the latest
+pending tick; use a different queue policy when dropping events is unacceptable:
 
 ```ts
 import { Effect, Queue } from "effect"
 
 const makeLoop = Effect.gen(function* () {
-  const commands = yield* Queue.unbounded<number>()
+  const commands = yield* Queue.sliding<number>(1)
 
   // Single processing fiber: one runtime, unified error channel.
   yield* Effect.forever(
@@ -290,10 +292,13 @@ first time a transient error occurs, typically hours after start-up, with no tra
 Reserve the error channel for conditions that genuinely should stop the loop.
 
 **`catchAll` does not catch defects.** It handles typed failures only. A defect (an unexpected exception
-thrown inside a `sync`/`try` body, a bug rather than a modelled error) passes straight through it and kills
+thrown inside a `sync` body, a bug rather than a modelled error) passes straight through it and kills
 the fiber. A loop guarded only by `catchAll` dies silently on exactly the class of problem the guard was meant
 to survive. Guard long-running loops with `Effect.catchAllCause`, and log the Cause; use `catchAll` only where
 recovering a specific modelled failure, not where keeping a fiber alive.
+
+`Effect.try` converts exceptions from its `try` callback into typed failures instead.
+See [creating effects](https://effect.website/docs/v3/getting-started/creating-effects).
 
 **Backpressure choice is a queue choice.** A bounded queue applies backpressure by SUSPENDING the producer's
 offer. Behind a real-time producer that cannot be slowed (a frame callback, an event listener, an inbound
@@ -323,8 +328,8 @@ behavior-preserving:
 1. Items are independent and their effects are read-only or touch disjoint state: safe on this axis.
 2. Any item writes back into a target shared with other items: NOT safe; keep sequential, or collect
    concurrently and fold sequentially.
-3. A downstream consumer depends on result order: only safe if ordering is restored explicitly; concurrent
-   completion order is not input order.
+3. Side effects depend on execution order: keep them sequential. The returned arrays from `forEach`
+   and array-form `all` preserve input order, but concurrent side-effect completion does not.
 4. The real bottleneck downstream (worker pool, connection pool, rate limit) is narrower than the chosen
    concurrency: widening buys nothing; raise the ceiling that actually binds, or match the concurrency to it.
 
@@ -378,9 +383,9 @@ atomicity in the first place.
 single logical transition touches two Refs (a public queue and its private sidecar, a balance and its ledger)
 the pair is no longer atomic, and interleaving fibers can observe or produce a state that satisfies neither
 Ref's invariant on its own. Serialize the paired update under one `Effect.Semaphore` (a one-permit mutex) and
-make the paired section `Effect.uninterruptible`, so no fiber can observe the intermediate state and
-interruption cannot leave the pair half-updated. If the pairing is permanent, prefer collapsing the two Refs
-into one Ref holding a single record.
+make the short paired update `Effect.uninterruptible`. Every reader and writer of the pair must
+use the same semaphore to avoid observing intermediate state. Do not include blocking I/O in that
+uninterruptible section. If the pairing is permanent, prefer one Ref holding a single record.
 
 **Restore is all-or-nothing.** Rehydrating a service from a persisted snapshot is a validation step and a
 state transition; running them interleaved is how a corrupt snapshot leaves the service in a
@@ -400,18 +405,20 @@ service's `E` (and `R`, when the recovery needs a capability) to name the failur
 choose. Reserve defects for genuine invariant violations no caller could sensibly handle.
 
 **Attempt the fallible operation before flipping state.** When a state transition is paired with a resource
-transfer, ORDER decides what a partial failure costs. Perform the fallible transfer first and commit the state
-change only on success: the failure mode becomes "the transition did not happen, retry is available" instead
-of "the state changed and the resource is gone." Applied symmetrically (acquire before entering, return
-before leaving) every failure becomes a no-op, and snapshot-and-rollback machinery turns out unnecessary.
+transfer, perform the fallible transfer first, then commit state. This is a no-op on typed failure
+only if the transfer itself has no partial effects on failure. Interruption between transfer and
+commit still breaks the invariant. For a bounded, non-blocking transfer with that failure contract,
+protect both steps from interruption and serialize competing access:
 
 ```ts
-// Return the resource FIRST; flip the state only if the return succeeded.
-yield* returnResource(item)                 // fallible: may reject (full, closed, …)
-yield* Ref.set(engagedRef, false)           // reached only on success
+yield* Effect.uninterruptible(Effect.gen(function* () {
+  yield* returnResource(item)
+  yield* Ref.set(engagedRef, false)
+}))
 ```
 
-Rollback is the fallback for transitions whose steps genuinely cannot be ordered: try ordering first.
+For blocking or remote transfers, use a transaction or an explicit cancellation/compensation protocol;
+ordering alone does not make arbitrary external effects atomic.
 
 These are the Effect-shaped expressions of general state-ownership rules.
 
@@ -609,8 +616,6 @@ in strict Effect codebases, flagged as domain-layer violations.
 
 - [testing-patterns](../testing-patterns/SKILL.md): general test strategy that @effect/vitest patterns plug
   into
-- [context7-usage](../context7-usage/SKILL.md): verify current Effect / @effect/vitest APIs and
-  version-specific behavior
 - [investigation-patterns](../investigation-patterns/SKILL.md): evidence-based tracing of requirement leaks
   and runtime-boundary issues
 - [trust-boundaries](../trust-boundaries/SKILL.md): discipline for untrusted input crossing into a service;

@@ -1,7 +1,8 @@
 ---
 name: emacs-ecosystem
 description: Use for Emacs Lisp, init.el, use-package, and Emacs runtime hazards such as hook ordering, condition-case versus quit, overlays versus text properties, buffer-local state, keymap precedence, and subprocess handling. Also covers macro hygiene and MELPA recipe and release gates.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Emacs mechanisms whose documented behaviour differs from what their names suggest. Elisp syntax, `defun`,
@@ -53,8 +54,8 @@ deterministic failure.
 
 ### Asserting contents
 
-`lookup-key` and `where-is-internal` are **lossy for test assertions**. For a key sequence that is only a
-prefix of a longer binding, `lookup-key` returns an integer (the number of events consumed), which is easy to
+`lookup-key` and `where-is-internal` are **lossy for test assertions**. For a key
+sequence that extends past a non-prefix binding, `lookup-key` returns an integer (the number of events consumed), which is easy to
 misread as "bound to something". Bindings inside a composed keymap or a nested prefix keymap can also be missed
 depending on how the lookup is issued.
 
@@ -116,18 +117,19 @@ overlays versus text properties below.
 ### A stale `.elc` masks the source
 
 With both `LIB.el` and `LIB.elc` on the same load-path entry, `load` uses the **`.elc` even when the `.el` is
-newer**, emitting only a warning that is easy to miss in batch output. A `.eln` beats `.elc` beats `.el`. So a
+newer**, emitting only a warning that is easy to miss in batch output. Native-compiled candidates also require
+provenance checks. A
 stale `.elc` hides a source fix: a passing test does not prove the patch works, and a failing test may not
 reflect current source.
 
 ```sh
-find . -name '*.elc' -delete
 emacs -Q --batch --eval '(setq load-prefer-newer t)' \
-  -L . -L test -l ert -l my-feature -l my-feature-test \
+  -L . -L test -l ert -l ./my-feature.el -l ./test/my-feature-test.el \
   -f ert-run-tests-batch-and-exit
 ```
 
-Better still, byte-compile to a temporary destination so verification never leaves `.elc` in the tree. **If a
+Do not delete shared `.elc` files. Byte-compile to a run-owned temporary destination so verification never
+leaves `.elc` in the tree. **If a
 result contradicts a source change, suspect stale bytecode first.**
 
 ### Candidate order beats timestamp
@@ -136,13 +138,11 @@ result contradicts a source change, suspect stale bytecode first.**
 directory is consulted first.** When the same feature exists in both the worktree and an installed location (a
 Nix site-lisp path, a `package.el` tree), the first matching candidate in `load-path` wins regardless of
 modification time, so an installed `.elc` shadows the source you just edited even with `load-prefer-newer` set.
-In one investigation, **ten of fifteen apparent test failures were this loader false negative** rather than a
-regression.
 
 Place every worktree source directory ahead of any installed location explicitly, then *prove* provenance:
 `(symbol-file 'my-feature-function)` reports where a definition was actually loaded from, and
-`(locate-library "my-feature")` reports which candidate the loader would pick. Deleting `.elc` and setting
-`load-prefer-newer` does not settle the multi-candidate case.
+`(locate-library "my-feature")` reports which candidate the loader would pick. Setting
+`load-prefer-newer` does not settle the multi-candidate case; explicitly load the source under test.
 
 ### Compilation removes the seam you stubbed
 
@@ -190,10 +190,10 @@ new code. A stale installed library keeps executing code deleted from the source
 rendering artifacts, or empty output, **with no error anywhere.** Compare modification times of built and
 installed artifacts as the *first* check, not the last.
 
-**On macOS, copying a dynamic library invalidates its ad-hoc signature.** AMFI refuses the load and the kernel
-kills the process: Emacs dies with **SIGKILL, exit 137, no Lisp error, no backtrace, nothing naming the
-module.** Re-sign after any copy: `codesign --force --sign - /path/to/module.dylib`. Treat status 137 on module
-load as a signature problem until proven otherwise.
+**On macOS, verify a suspected signature failure before changing the artifact.** An unchanged copy does not
+by itself invalidate a code signature, and status 137 identifies SIGKILL, not its cause. Inspect crash logs
+and run `codesign --verify --strict /path/to/module.dylib`; check architecture compatibility separately.
+Re-sign only an owned build artifact when the build's signing requirements call for it.
 
 ## Autoload cookies
 
@@ -218,7 +218,7 @@ Verify against your target version rather than assuming.
 
 ## Macro hygiene
 
-A `defmacro` needs three protections Elisp does not give automatically. A helper function the macro calls
+A `defmacro` needs protections Elisp does not give automatically. A helper function the macro calls
 *during expansion* must exist at compile time, which means wrapping it in `eval-and-compile`; a plain `defun`
 is not evaluated while the calling file is being byte-compiled, so expansion fails with `void-function` at
 compile time rather than at runtime (the cross-file recompilation trap above is the sibling failure of the same
@@ -227,9 +227,9 @@ root cause). Every symbol the macro introduces that the caller did not write mus
 `(make-symbol "prefix")`, which returns exactly the name given, so every call site shares one print name. And
 Elisp derives neither indentation nor Edebug support from a macro's lambda list: a macro taking a body argument
 needs `(declare (indent N) (debug FORM))` as its first form, or callers get flat default indentation and no
-step-debugging into the body. Finally, a macro must never evaluate a caller-supplied argument form more than
-once or reorder its evaluation relative to other arguments: bind each one exactly once through a gensym'd
-`let` before referencing it, since `cl-lib` has no `once-only` helper to reach for.
+step-debugging into the body. For macros promising ordinary function-call semantics, bind each argument
+once in left-to-right order through a gensym'd `let` before referencing it. Control-flow macros instead
+follow their documented conditional or repeated evaluation contract.
 
 ## Lifecycle and error boundaries
 
@@ -270,8 +270,7 @@ Changing a buffer's major mode calls `kill-all-local-variables`, which runs `cha
 and erases buffer-local bindings afterwards. A buffer-local minor mode recording its resources (overlays,
 markers, timers, processes, registry entries) in buffer-local variables **loses the handle the moment the user
 types `M-x fundamental-mode`.** Its disable command never runs, `kill-buffer-hook` never runs because the
-buffer is still alive, and a global disable command can no longer discover the orphaned resources. Two
-independent packages have hit this the same way.
+buffer is still alive, and a global disable command can no longer discover the orphaned resources.
 
 Register a buffer-local `change-major-mode-hook` entry calling one shared teardown (the same one the disable
 command and `kill-buffer-hook` call) so resources are released while local state still exists. Make it
@@ -334,7 +333,7 @@ base: applying `read-only` or `cursor-intangible` in an indirect buffer makes th
 though the buffer-local variable tracking that decoration is not shared and the base has no record of it. Text
 properties also have **no notion of an owner** (two features writing the same property over overlapping ranges
 are indistinguishable) so a feature that captures the previous value and restores it later silently discards
-whatever a concurrent writer added. That has been reproduced as real state loss.
+whatever a concurrent writer added.
 
 Overlays are the opposite: each belongs to exactly one buffer, is not shared with indirect buffers, and is a
 first-class object you delete by identity. Use overlays for decoration your feature owns and must remove
@@ -384,8 +383,7 @@ the user's behalf therefore disables all of it silently, with no error and no vi
 `equal` the key is compared structurally, so a mutable key the caller destructively modifies after `puthash`
 **no longer hashes to the bucket its entry sits in.** The entry becomes unreachable under both old and new key
 while the physical entry remains: logical and physical size diverge, and repeated put-then-mutate grows the
-table without bound. A reproducer with capacity one and twenty iterations ended with logical size one and
-physical size twenty.
+table without bound.
 
 A public API accepting a caller-owned mutable value as a key must **detach it before storing**:
 `copy-sequence` for a string or vector, a deep copy for a structured key. Where keys may be cyclic, register a
@@ -423,9 +421,8 @@ draining, a byte-counted cap on accumulated stdout, a separate non-accumulating 
 explicit check that the exit status was zero before believing the output.
 
 **The exit sentinel can precede pending output.** A sentinel reporting termination does not mean output has
-been delivered: output the child already wrote may still be pending in the filter. A stress probe of a helper
-writing 32 bytes **lost stdout in 12 of 20 runs**, and a test against it fails intermittently in a full suite
-while passing alone. After the sentinel fires, keep draining with `accept-process-output` until the process is
+been delivered: output the child already wrote may still be pending in the filter. After the sentinel fires,
+keep draining with `accept-process-output` until the process is
 no longer live *and* no further output arrives. Read an intermittent truncation that appears only under load as
 a drain race, not as flakiness to retry away.
 
@@ -437,17 +434,24 @@ recomputed from `float-time`.
 (defun my-drain (proc budget)
   (unless (and (numberp budget) (> budget 0) (< budget 1.0e+INF))
     (error "Invalid wait budget: %S" budget))
-  (let ((remaining budget) (iterations 0))
-    (while (and (process-live-p proc)
-                (> remaining 0)
+  (let ((remaining budget) (iterations 0) drained)
+    (while (and (not drained) (> remaining 0)
                 (< (setq iterations (1+ iterations)) 10000))
       (let ((slice (min 0.05 remaining)))
-        (accept-process-output proc slice nil t)   ; JUST-THIS-ONE: established process
-        (setq remaining (- remaining slice))))))
+        (let ((received (accept-process-output proc slice nil t)))
+          (when (and (not received) (not (process-live-p proc)))
+            (setq drained t))
+          (setq remaining (- remaining slice)))))
+    (unless drained
+      (error "Process drain budget exhausted"))
+    remaining))
 ```
 
 Validate the budget and reject degenerate values (non-numeric, NaN, non-finite, zero, negative) rather than
 clamping silently, and cap the iteration count so a slice returning immediately cannot spin.
+This helper covers one established process, not connection setup or a separate stderr process. Drain that
+stderr process independently within the same caller-owned budget; see the
+[Emacs manual](https://www.gnu.org/software/emacs/manual/html_node/elisp/Accepting-Output.html).
 
 **JUST-THIS-ONE is asymmetric.** It suppresses processing of other processes' events, which is what you want
 while draining a response body: it stops unrelated filters running re-entrantly mid-read. It is **wrong**
@@ -457,25 +461,24 @@ connected. Leave it nil when awaiting establishment; pass it non-nil when readin
 
 **Process-tree cleanup needs identity.** A PID is not an identity: the OS reuses PIDs, so a routine recording
 a PID and signalling it later can signal an unrelated process. Descendants make it worse: a helper that forks
-and exits immediately leaves a `setsid` child reparented away before any process-table scan sees it,
-**reproduced in 10 of 10 attempts.** And a scan bounded for memory reaches its cap as *saturation*, which is
+and exits immediately leaves a `setsid` child reparented away before any process-table scan sees it.
+A scan bounded for memory reaches its cap as *saturation*, which is
 not the same as having enumerated everything: treating the cap as completion silently orphans the remainder.
 
-Identify by the pair of PID and immutable start time, re-verified immediately before and after stopping.
-The safe sequence is SIGSTOP, re-verify identity, then SIGKILL only confirmed-stopped identities, so a recycled
-PID can never be killed. Close the reparent race with a cryptographically opaque ownership token in the child's
-environment, scanned for immediately after launch as well as at cleanup, rather than relying on parentage.
+PID/start-time checks reduce mistakes but cannot make a later signal atomic with the check; SIGSTOP can also
+hit a recycled PID. Prefer an OS-supported stable process handle or a supervisor-owned containment mechanism.
+An inherited ownership token can help discover descendants, but does not make PID-based signalling race-free.
 **Report a saturated scan and any signal-delivery failure as incomplete cleanup**; never fold either into a
 success. Use a monotonic clock for the deadline, and spool large output to a bounded temporary file.
 
 **Remote paths block; subprocesses do not follow.** Emacs file-name primitives are remote-transparent:
 `file-exists-p`, `file-attributes`, and `directory-files` on a remote path go over the network and can block
 for a full remote-access timeout, **freezing the UI during what looked like local bookkeeping.** Subprocess
-primitives are *not* symmetrically transparent (`shell-command-to-string` and `call-process` run locally
-regardless of a remote `default-directory`) so a helper invoked to inspect "the project" inspects the wrong
-machine and returns confidently wrong metadata. Two unrelated packages have hit one side each.
+primitives differ: `call-process` is local, whereas `process-file` can dispatch through file-name handlers.
+Choose explicitly instead of assuming every subprocess follows `default-directory`.
 
-Guard bulk filesystem work with `(and (file-exists-p path) (not (file-remote-p path)))`. When a subprocess must
+Guard bulk filesystem work with `(and (not (file-remote-p path)) (file-exists-p path))` so the remote
+check precedes filesystem I/O. When a subprocess must
 run where the directory lives, use `process-file` and `start-file-process`. When the tool genuinely exists only
 locally, detect `file-remote-p` and **decline** rather than returning local results for a remote tree.
 

@@ -52,22 +52,6 @@
         "type": "github"
       }
     },
-    "aws-agent-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1789442804,
-        "narHash": "sha256-/EwhB/+h83GV6TiaIWCmLtEXoC9jAJ0HxsuVtbEi6E4=",
-        "owner": "itsmostafa",
-        "repo": "aws-agent-skills",
-        "rev": "e786d25128a6018d42bd7bcb8c47c531ff31c0f0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "itsmostafa",
-        "repo": "aws-agent-skills",
-        "type": "github"
-      }
-    },
     "bun2nix": {
       "inputs": {
         "flake-parts": [
@@ -1049,7 +1033,6 @@
         "agent-skills": "agent-skills",
         "anthropic-skills": "anthropic-skills",
         "ast-grep-skill": "ast-grep-skill",
-        "aws-agent-skills": "aws-agent-skills",
         "darwin-vz-nix": "darwin-vz-nix",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",

@@ -1,7 +1,8 @@
 ---
 name: requirements-definition
 description: Use for requirement analysis, specification, and clarification.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Question design and requirement formatting. The phase sequence belongs to
@@ -30,12 +31,6 @@ Rank a candidate question by four considerations, in this order:
 A question is **critical** when it branches the design *and* the wrong answer is expensive to undo. Ask those
 first, and do not proceed on an assumption while one is unanswered.
 
-*This deliberately carries no arithmetic.* An earlier form scored each consideration 1–5 and gated on a total
-of 15, which is the self-gated numeric threshold the corpus prohibits elsewhere: the scales were unanchored,
-so the total encoded nothing the ordering above does not, while looking like a measurement. The prohibition on
-numeric self-assessment is about rating *your own work*, which is self-confirming; ranking questions is a
-different act, and the fix here is to drop the false precision rather than the ranking.
-
 ### Classify each question
 
 - **Spec confirmation**: "does the API return null or an empty array for no results?"
@@ -44,8 +39,8 @@ different act, and the fix here is to drop the false precision rather than the r
 - **Scope**: "are admin features in the first version?"
 - **Priority**: "which of these ships first?"
 
-Ask through AskUserQuestion with two to four concrete options and one marked (Recommended), so the user reviews
-a proposal rather than doing the analysis. Follow-ups go through the same tool.
+Ask through the runtime's question tool, respecting its supported option count and marking a recommendation
+when supported. If no question tool is available, ask a concise question in the response.
 
 ## Writing the requirements
 
@@ -86,9 +81,11 @@ State which capability was located at which file:line, and which was not found a
 A feasibility number produced in the same pass that wrote the requirement never contradicts that requirement,
 so nothing downstream ever reads a low score and investigates further.
 
-Tag each requirement **verified** (grounded in direct investigation), **inferred** (derived from something
-verified but not directly observed), or **assumed** (from the user's framing, unchecked). **A requirement still
-assumed at handoff time is not ready.**
+Record explicit user requests as desired behavior, not as unverified claims about the existing system.
+Tag factual premises **verified** (grounded in direct investigation), **inferred** (derived from something
+verified but not directly observed), or **assumed** (unchecked). **A factual premise still assumed at handoff
+time is not ready to support dependent implementation.** A partial handoff must name those blocked
+tasks separately from independent, ready tasks; deferral does not approve the assumption.
 
 ## Map every requirement to a test
 

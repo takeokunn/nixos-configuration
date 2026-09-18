@@ -1,7 +1,8 @@
 ---
 name: technical-writing
 description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese (includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials).
-version: 3.1.0
+metadata:
+  version: "3.1.0"
 ---
 
 Structured patterns for writing technical blogs, articles, and tutorials that communicate technical concepts
@@ -32,7 +33,7 @@ this prose actually reads clearly to its intended audience once written, see [co
 
 ## Article types
 
-### Tutorial (1500-3000 words)
+### Tutorial
 
 Use when teaching readers how to accomplish a specific task step by step. For understanding rather than
 doing, use concept explanation; for choosing between options, use comparison. Audience: developers learning a
@@ -41,28 +42,28 @@ new skill.
 Structure: Problem statement / what you'll learn → Prerequisites → Step-by-step instructions → Complete
 working example → Troubleshooting common issues → Next steps / further reading.
 
-### Concept explanation (1000-2500 words)
+### Concept explanation
 
 Use when explaining a complex concept for deeper understanding. Audience: developers seeking understanding.
 
 Structure: Hook / why this matters → Core concept explanation → Analogies and visualizations → Practical
 examples → Common misconceptions → When to use / when to avoid.
 
-### Comparison (1500-2500 words)
+### Comparison
 
 Use when helping readers choose between multiple options. Audience: developers making technical decisions.
 
 Structure: Context and criteria → Overview of each option → Feature-by-feature comparison → Benchmark results
 (if applicable) → Use case recommendations → Conclusion with clear guidance.
 
-### Case study (1500-3000 words)
+### Case study
 
 Use when sharing a real-world implementation experience. Audience: developers and technical leaders.
 
 Structure: Background and challenge → Solution approach → Implementation details → Results and metrics →
 Lessons learned → Recommendations.
 
-### Opinion piece (800-1500 words)
+### Opinion piece
 
 Audience: experienced developers.
 
@@ -142,10 +143,10 @@ particle norms.
 - One topic per paragraph. Split long paragraphs that mix multiple scene-progressions (investigation, report,
   verification, evaluation) into one-step paragraphs.
 - The first sentence of a paragraph should reveal what the paragraph is about.
-- At a paragraph's start, make the logical relation to the previous paragraph explicit with a connective
-  (「であれば」「実際」「しかし」「この例自体からも」).
-- Advance the argument in one direction. Do not use a "conclude then handle objection then restate
-  conclusion" shape. Finish objections and doubts first, then state the conclusion once.
+- Make the relation between paragraphs clear; add a connective only when the relation would otherwise be
+  ambiguous.
+- Lead with the conclusion when it helps the reader, then give grounds and address objections without
+  repeating the conclusion mechanically.
 - Defenses of an example (looks contrived, pre-empting) must not break the flow mid-climax; handle them
   together at the start of the next section.
 - Explicitly deny a likely wrong reading before stating the real reason (「その理由は『〜だから』ではない。〜だからだ」).
@@ -195,8 +196,8 @@ particle norms.
 
 #### Reader load
 
-- Do not introduce proper nouns (file names, function names, identifiers) that are not referenced later; use
-  general phrasing like「仕様書」「金額計算のユーティリティ」.
+- Omit decorative names, but preserve file names, identifiers, and other locators needed to verify a claim,
+  even when they appear only once.
 - When an abstract phrase's referent is not uniquely determined by context, pin it down in place with a
   parenthetical apposition so the reader need not look back.
 - When adding a new example or scene increases the context the reader must hold, preface it with what
@@ -266,8 +267,8 @@ problem is empty decoration. Japanese phrase tokens are kept verbatim.
 
 Self-check examples:
 
-- Bad: 本章では、〇〇の理論を正面から扱う
-- Good: 本章では、〇〇の理論を扱う
+- Bad: 本章では、型理論を正面から扱う
+- Good: 型理論は、式を型によって分類する
 - Bad: 多角的に分析すると、重要なのは〜である
 - Good: 評価の核心は、正しさを誰が知っているかにある
 
@@ -292,10 +293,8 @@ Self-check examples:
 - Make prose share context with the reader in the fewest steps; if it lands without unrolling every step,
   name the structure and assert it.
 - Do not preemptively bring out concepts or document names not yet introduced in the body.
-- Do not settle for weak hesitant predicates (「有効な対策であり」); state what is settled by in-text grounds
-  strongly and concretely (「活用において必須であり」). Keep weak predicates that express genuine uncertainty,
-  possibility, hypothesis, or reader-doubt; intentional softening for tone (「必須だと言ってもいい」) is
-  allowed.
+- Match the predicate to the evidence. 「有効」does not imply「必須」: necessity needs its own grounds.
+  Preserve genuine uncertainty, possibility, hypothesis, and reader-doubt.
 - Connectives that set rhythm (「しかし一方で」) are not counted as redundancy.
 
 #### Headings
@@ -303,8 +302,8 @@ Self-check examples:
 - Make headings specific enough to identify content: the question the section answers, or the object it
   treats.
 - Do not use procedure-only headings (「例に戻す」「〜を読み直す」) or information-free headings.
-- Do not make a heading a "punchline" that states the section's conclusion (avoid spoiling the payoff at the
-  heading).
+- A heading may state the conclusion when that helps navigation; avoid a theatrical punchline that hides
+  what the section actually covers.
 - A noun phrase naming the section's object is acceptable.
 - Whether interrogative or declarative does not matter; what matters is that it points to the object or the
   reader's question. Choose whichever suits the body's tone.
@@ -313,8 +312,8 @@ Self-check examples:
 
 - If an example may look contrived, do not hide it; pre-empt the reader's doubt and add brief grounds that it
   is realistically plausible.
-- Ground it not in the author's assertion (「十分あり得る状況だ」) but in a general fact or common view the
-  reader can recognize from experience (「この症状は珍しくないだろう」「〜という言い方もよく耳にする」).
+- Ground plausibility in a cited observation or explain the example's assumptions. Do not replace an
+  unsupported assertion with an invented appeal to common experience.
 - Do not smoothly write unconfirmed things as if confirmed.
 
 ### Bilingual
@@ -345,9 +344,8 @@ Shape each chapter or installment as problem-then-solution:
 
 Introduce the solution in three graded moves: what visibly changes ("it becomes this"), why it changes (the
 mechanism), then the essential value ("so, in effect"). Build credibility with one concrete, checkable fact
-(adoption status, a count of supported items, who authored it) rather than adjectives. Keep the introduction's
-problem framing tight (roughly 300-400 words): a longer intro delays the payoff and front-loads detail
-unrelated to the example to come.
+(adoption status, a count of supported items, who authored it) rather than adjectives. Keep the introduction
+focused on the problem and prerequisites needed for the example; do not expand it to meet a word count.
 
 ### Code example escalation
 
@@ -358,31 +356,27 @@ Grow code examples in stages rather than presenting one large block:
    service), each as its own step.
 3. **Integrated example**: combine the pieces into one realistic configuration.
 
-Cap a single code block at what a reader can absorb in a few minutes (on the order of 50-70 lines); split
-anything longer. Frame each block: one or two sentences of lead-in before it, a two- or three-sentence
-takeaway after it, and defer the deeper "why" to the following subsection. Watch the prose-to-code balance:
-a section that is mostly code with thin narration is under-explained; when code exceeds roughly two-thirds of
-a section, add explanation or move some code to a later stage. Trim decorative shell or log output to the few
-lines that carry the point (a 40-line status dump where 5-10 lines matter is noise). Do not let example
-difficulty regress: the last example in a chapter should not be the simplest one.
+Split code at meaningful boundaries when that improves comprehension, while preserving enough context to
+run or understand it. Explain the purpose and non-obvious result where the surrounding prose does not
+already do so. Do not add narration to meet a prose-to-code ratio. Trim log output to the lines needed for
+the claim, retaining errors and other evidence that qualifies the result.
 
 ### Concluding chapter rubric
 
-Evaluate and write closing sections (chapter endings and the final chapter) against three required beats:
+Include a closing section when it adds synthesis or a next decision. Useful elements include:
 
 - **Recap**: name the specific technical elements the chapter taught, not a vague gesture at "what we
   covered".
 - **Significance**: state what was achieved and which problem it solved.
-- **Next steps**: point to concrete next actions and, at most, the single most important learning resource.
+- **Next steps**: point to concrete next actions and the resources needed for them.
 
 Chapter endings come in two types: **bridging**, which hands off to the next chapter's demand ("the
 environment built here now faces a higher requirement"), the default for interior chapters, and
 **terminal**, which ends a series by integrating all prior chapters; it must still name the individual
 results, not only assert a "culmination".
 
-A closing section is short (about half a page, ~600 words across 3-4 paragraphs). Under-length is as much a
-defect as over-length: a final chapter that claims to integrate everything but omits the individual results
-is incomplete. Checklist: does it reference the chapter's actual sections and results, not just its title? Is
+A closing section has no word or paragraph quota. Checklist: does it connect the relevant results rather
+than merely repeat the title? Is
 there a single message focus rather than several competing ones? Is the ending type (bridging vs terminal)
 consistent with sibling chapters' endings?
 
@@ -392,7 +386,7 @@ Reduce the bloat that accumulates across a long piece:
 
 - Merge duplicated messages: the same claim restated in three places (a feature's "everything is automated"
   line appearing across three consecutive subsections) collapses to one.
-- Prune URL enumeration: cite the single most important link, not a list.
+- Prune redundant links, but retain distinct sources needed to support the claims or the next action.
 - Cut encouragement padding ("surely", "you should be able to ...") and re-summaries that immediately follow
   the thing they summarize.
 - Define a central term before or at its first use within a section, and keep its meaning stable across
@@ -403,8 +397,6 @@ Reduce the bloat that accumulates across a long piece:
 - [cold-read](../cold-read/SKILL.md): dispatch a context-free reviewer to test whether the written prose
   actually reads clearly to its audience
 - [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples from projects
-- [context7-usage](../context7-usage/SKILL.md): library documentation lookup for accurate technical
-  references
 - [investigation-patterns](../investigation-patterns/SKILL.md): researching technical topics and verifying
   claims
 - [technical-documentation](../technical-documentation/SKILL.md): creating reference documentation from blog

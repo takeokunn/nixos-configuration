@@ -41,8 +41,6 @@
     guard-and-guide.inputs.nixpkgs.follows = "nixpkgs";
     anthropic-skills.url = "github:anthropics/skills";
     anthropic-skills.flake = false;
-    aws-agent-skills.url = "github:itsmostafa/aws-agent-skills";
-    aws-agent-skills.flake = false;
     ast-grep-skill.url = "github:ast-grep/agent-skill";
     ast-grep-skill.flake = false;
     paredit-cli-skills.url = "github:takeokunn/paredit-cli";
@@ -109,7 +107,6 @@
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills
-                  aws-agent-skills
                   ast-grep-skill
                   paredit-cli-skills
                   ;
@@ -202,6 +199,59 @@
 
           # lib.debug.runTests returns [] when every case passes, else the failing cases.
           sharedAiToolsTestFailures = pkgs.lib.debug.runTests {
+            testDecodeFrontmatterScalar = {
+              expr = map sharedAiTools.decodeFrontmatterScalar [
+                "Plain description"
+                ''"Description: with colon and \"quotes\""''
+              ];
+              expected = [
+                "Plain description"
+                ''Description: with colon and "quotes"''
+              ];
+            };
+            testAgentReadOnlyPolicies = {
+              expr = map sharedAiTools.agentIsReadOnly [
+                [ "tools: Read, Grep, Glob" ]
+                [ "disallowedTools: Write, Edit, NotebookEdit" ]
+                [
+                  "tools: Read, Edit"
+                  "disallowedTools: Edit"
+                ]
+                [ ]
+                [ "tools: Read, Write" ]
+                [ "tools: Read, NotebookEdit" ]
+                [ "disallowedTools: Write, Edit" ]
+                [ "disallowedTools: WriteFile, Edit, NotebookEdit" ]
+                [ "tools: Read, WriteFile" ]
+                [ "tools: Bash, mcp__serena" ]
+              ];
+              expected = [
+                true
+                true
+                true
+                false
+                false
+                false
+                false
+                false
+                true
+                true
+              ];
+            };
+            testAgentOpencodePermissions = {
+              expr = sharedAiTools.agentOpencodePermissions [ "tools: Read, Grep, Glob" ];
+              expected = ''
+                permission:
+                  '*': deny
+                  read: allow
+                  glob: allow
+                  grep: allow
+              '';
+            };
+            testWritableAgentPermissions = {
+              expr = sharedAiTools.agentOpencodePermissions [ "tools: Read, Write" ];
+              expected = "";
+            };
             testMcpServerToOpencodeHttp = {
               expr = sharedAiTools.mcpServerToOpencode {
                 type = "http";

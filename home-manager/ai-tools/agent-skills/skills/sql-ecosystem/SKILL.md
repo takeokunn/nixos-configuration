@@ -1,7 +1,8 @@
 ---
 name: sql-ecosystem
 description: Use when working with SQL databases (SELECT/INSERT/UPDATE/DELETE, CREATE TABLE, JOIN, INDEX, EXPLAIN, transactions, or migrations) across PostgreSQL, MySQL, and SQLite.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Cross-engine SQL guidance focused on where PostgreSQL, MySQL, and SQLite diverge, and where
@@ -10,15 +11,14 @@ file exists for the parts that surprise a competent developer moving between eng
 
 ## Engine divergence traps
 
-- **SQLite type affinity is advisory, not enforced.** A column declared `INTEGER` still accepts
-  and stores a string: the declared type only selects an affinity, not a constraint. Code that
-  assumes SQLite rejects wrong-typed inserts the way PostgreSQL/MySQL do will silently store
-  garbage.
+- **SQLite non-STRICT affinity is not a type constraint.** An `INTEGER` column can retain text
+  that cannot be converted to an integer. `STRICT` tables enforce their declared types after
+  permitted lossless conversions; check the table definition before assuming either behavior.
 - **Upsert syntax differs and is not interchangeable**: PostgreSQL uses
   `INSERT ... ON CONFLICT (col) DO UPDATE SET x = EXCLUDED.x`; MySQL uses
-  `INSERT ... ON DUPLICATE KEY UPDATE x = VALUES(x)`. Porting one to the other by search-replace
-  fails to parse rather than misbehaving, but the `EXCLUDED`/`VALUES()` reference syntax is the
-  part people forget to translate.
+  `INSERT INTO t (id, x) VALUES (1, 2) AS new ON DUPLICATE KEY UPDATE x = new.x` in MySQL 8.4.
+  Its older `VALUES(x)` reference is deprecated. Verify syntax for the deployed version rather
+  than translating the conflict clause alone.
 - **`FULL OUTER JOIN` does not exist in MySQL.** Rewrite as
   `LEFT JOIN ... UNION SELECT ... RIGHT JOIN ...`; there is no direct substitute keyword.
 - **Foreign-key columns are auto-indexed by MySQL but not by PostgreSQL.** A `REFERENCES` clause
@@ -29,18 +29,12 @@ file exists for the parts that surprise a competent developer moving between eng
   equivalent is `EXPLAIN QUERY PLAN`, not `EXPLAIN` (bare `EXPLAIN` in SQLite dumps VDBE
   bytecode, not a query plan: a frequent tool-invocation mistake).
 
-## Current engine versions
+## Version-sensitive behavior
 
-- **PostgreSQL**: 18, 17 (LTS), 16, 15, 14 supported; 13 and earlier reached EOL November 2025.
-  PG 18 adds async I/O (concurrent readahead/seqscan) and, notably, **flips the default for
-  generated columns from `STORED` to `VIRTUAL`** when neither keyword is specified: a schema
-  written for PG ≤17 that omitted the keyword changes behavior on upgrade (computed-on-write
-  becomes computed-on-read). PG 17 adds SQL/JSON (`JSON_TABLE`, `JSON_QUERY`, `JSON_VALUE`,
-  `JSON_EXISTS`). PG 15 adds `MERGE` (full MATCHED/NOT MATCHED upsert). `pg_stat_io` (PG 16+)
-  gives per-backend-type I/O stats; incremental sort (PG 13+) exploits existing index order to
-  cut ORDER BY cost: look for "Incremental Sort" in the plan rather than assuming a full sort ran.
-- **MySQL**: 8.4 LTS and 9.x Innovation releases.
-- **SQLite**: 3.48+, type-affinity system (see trap above), single-file database.
+Check the deployed version and its documentation before selecting DDL or relying on a planner feature.
+PostgreSQL 17 supports only stored generated columns and requires `STORED`; PostgreSQL 18 adds
+`VIRTUAL` and makes it the default when neither keyword is present. This is not a changed default
+for previously valid omitted-keyword DDL. State the intended storage explicitly in migrations.
 
 ## Query patterns that hide bugs
 
@@ -70,12 +64,12 @@ file exists for the parts that surprise a competent developer moving between eng
     SELECT total FROM orders WHERE user_id = u.id ORDER BY total DESC LIMIT 3
   ) t ON true;
   ```
-- **Composite indexes obey a leftmost-prefix rule**: an index on `(user_id, status)` serves
-  `WHERE user_id = ?` and `WHERE user_id = ? AND status = ?`, but not `WHERE status = ?` alone.
-  Column order in the index, not in the query, decides usability.
-- **`OR` across different columns defeats single-index use.** `WHERE email = ? OR name = ?`
-  forces a scan even with indexes on both columns individually; rewrite as a `UNION` of two
-  single-column-filtered queries to let each half use its own index.
+- **Leading columns affect composite B-tree efficiency, not absolute usability.** An index on
+  `(user_id, status)` generally favors filters on `user_id`, but PostgreSQL 18 can use skip scan
+  for some `status`-only filters. Check the actual plan, cardinality, and engine version.
+- **`OR` does not necessarily force a table scan.** PostgreSQL can combine separate indexes with
+  bitmap OR. Inspect the plan before rewriting as `UNION`; a rewrite must preserve duplicate
+  and ordering semantics as well as improve the measured plan.
 
 ## Schema design traps
 
@@ -86,8 +80,8 @@ file exists for the parts that surprise a competent developer moving between eng
   in IEEE 754). Use `DECIMAL`/`NUMERIC`, or store integer minor units (cents).
 - **`GENERATED ... STORED` vs `VIRTUAL`**: PostgreSQL supported only `STORED` through v17 (18+
   adds `VIRTUAL`, see version note above); MySQL and SQLite support both. `VIRTUAL` recomputes on
-  read and cannot be indexed the same way `STORED` can: check which one a query actually needs
-  before assuming "generated column" means "persisted and indexable."
+  read. Index support and expression restrictions depend on the engine and version; do not
+  infer either persistence or indexability solely from the term "generated column."
 
 ## Transactions and isolation
 
@@ -111,18 +105,19 @@ file exists for the parts that surprise a competent developer moving between eng
 
 ## Migrations
 
-- **`ALTER TABLE ... ADD COLUMN ... DEFAULT x` is instant in PostgreSQL 11+** (no table rewrite,
-  metadata-only) but a full table rewrite on older PostgreSQL and on MySQL before 8.0's instant
-  DDL support: the same statement is a no-op-cost change on one version and a
-  locks-the-table-for-the-duration change on another.
+- **A fast default is conditional.** PostgreSQL's metadata-only path for adding a column with a
+  default requires a non-volatile expression; a volatile default can require a table rewrite.
+  Avoid equating "no rewrite" with "no lock or cost". Check the exact DDL and engine version,
+  including MySQL's operation-specific instant-DDL restrictions.
 - **`CREATE INDEX CONCURRENTLY` (PostgreSQL) can fail and leave an invalid index behind** rather
   than rolling back cleanly: it cannot run inside a transaction, so a failure mid-build does not
   undo. Always check `pg_index.indisvalid` after a concurrent build and `DROP INDEX` + retry if
   it's false; don't assume "the command returned" means "the index is usable."
 - **Renaming a column with zero downtime is expand-contract, not `RENAME COLUMN`**: add the new
-  column, backfill, deploy code that writes both, deploy code that reads only the new column,
-  then drop the old one. A bare `RENAME COLUMN` breaks every in-flight deployment still reading
-  the old name.
+  column, establish dual writes or change capture for every writer, then backfill with a protocol
+  that cannot overwrite newer values. Validate convergence before switching reads; drain old
+  readers and writers before dropping the old column. Backfilling before capturing concurrent
+  writes loses updates. A bare `RENAME COLUMN` breaks deployments still using the old name.
 - **Dropping a column safely requires the drain step**: stop writing from the application first,
   let old code paths fully roll off, only then `DROP COLUMN`: dropping while old code still
   references the column errors mid-request rather than failing at deploy time.
@@ -133,8 +128,10 @@ Parameterized queries close the value-injection path but leave two others open:
 
 - **Wildcard injection in `LIKE`**: if user input is interpolated as the pattern, a value of `%`
   matches every row even through a parameterized query, because `%`/`_` are pattern metacharacters
-  the parameterization doesn't escape. Escape them in application code before binding, or use an
-  explicit `ESCAPE` clause: `... LIKE '%' || $1 || '%' ESCAPE '\'`.
+  the parameterization doesn't escape. For literal substring search, escape the escape character
+  itself first (`!` to `!!`), then `%` to `!%` and `_` to `!_`, bind that transformed value, and
+  use `... LIKE '%' || $1 || '%' ESCAPE '!'` in PostgreSQL. `ESCAPE` declares the character;
+  it does not transform an unescaped parameter.
 - **Identifier injection**: parameters bind values, not table/column names: `f"SELECT
   {column_name} FROM {table_name}"` is unparameterizable by definition. The only safe pattern is
   whitelisting identifiers against a known set before interpolating them, plus quoting
@@ -171,9 +168,6 @@ Uppercase keywords, snake_case identifiers, explicit `AS` on aliases, one column
 
 ## Related
 
-- [context7-usage](../context7-usage/SKILL.md): fetch current PostgreSQL/MySQL/SQLite docs
-  (library IDs: `/websites/postgresql`, `/websites/dev_mysql_doc_refman_9_4_en`, `/sqlite/sqlite`)
-  instead of relying on training-data recall of version-specific behavior.
 - [serena-usage](../serena-usage/SKILL.md): navigate schema definitions and find existing query
   patterns across a codebase before adding a new one.
 - [investigation-patterns](../investigation-patterns/SKILL.md): for tracing a query-performance

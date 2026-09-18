@@ -24,7 +24,7 @@ let
         <rule>Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, no git write operations unless explicitly requested, and explicit verification reporting.</rule>
       </rules>
       <tool_mapping>
-        <map from="Task tool / sub-agents / subagent_type">Use an explicit multi-agent tool when one is available; otherwise decompose with the plan tool, run independent investigations in parallel with multi_tool_use.parallel, and synthesize the results directly.</map>
+        <map from="Task tool / sub-agents / subagent_type">Use the available multi-agent tool and agent catalog. If a requested role is unavailable, perform its checks yourself and identify that limitation; do not recreate a role that requires unavailable runtime restrictions.</map>
         <map from="AskUserQuestion">Use request_user_input when available; otherwise ask the user a concise blocking question.</map>
         <map from="run_in_background">Use exec_command sessions for long-running processes and poll them before finishing.</map>
         <map from="Bash / Read / Edit / Write">Use exec_command for shell reads/commands, apply_patch for manual file edits, and Serena symbol tools for code navigation and targeted edits.</map>
@@ -35,7 +35,7 @@ let
       <execution_guidance>
         <rule>Respond in the user's language; for Japanese sessions, use Japanese unless the user asks otherwise.</rule>
         <rule>For repo work, activate Serena and check onboarding before symbolic investigation when Serena is available.</rule>
-        <rule>If a shared command asks for delegation but no multi-agent tool is available, perform the delegated checks yourself and label the checked roles or concerns in the final synthesis.</rule>
+        <rule>If delegation is unavailable, perform the checks yourself, parallelize independent reads with available tools, and label the checked concerns in the final synthesis.</rule>
         <rule>After changes, run the narrowest meaningful formatter, parser, or test command. If verification cannot be run, state exactly why.</rule>
       </execution_guidance>
     </codex_runtime_adapter>
@@ -55,9 +55,14 @@ let
     )
   );
   agentNames = map (name: lib.removeSuffix ".md" name) (
-    builtins.filter (name: agentFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
-      builtins.attrNames agentFiles
-    )
+    # Codex 0.154.0 role overrides cannot enforce per-agent sandbox or MCP restrictions.
+    builtins.filter (
+      name:
+      agentFiles.${name} == "regular"
+      && lib.hasSuffix ".md" name
+      && !shared.agentIsReadOnly
+        (shared.parseFrontmatter (builtins.readFile (agentPromptsPath + "/${name}"))).frontmatterLines
+    ) (builtins.attrNames agentFiles)
   );
 
   commandPromptToCodexSkill =
@@ -83,7 +88,7 @@ let
       nameLine = shared.findLineWithPrefix "name: " parsed.frontmatterLines;
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
       name = lib.removePrefix "name: " nameLine;
-      description = lib.removePrefix "description: " descriptionLine;
+      description = shared.decodeFrontmatterScalar (lib.removePrefix "description: " descriptionLine);
     in
     pkgs.writeText "codex-agent-${agent}.toml" ''
       name = ${builtins.toJSON name}

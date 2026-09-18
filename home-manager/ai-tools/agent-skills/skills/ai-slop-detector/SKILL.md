@@ -1,7 +1,8 @@
 ---
 name: ai-slop-detector
 description: Use when auditing already-written prose or code for the tells output_discipline (ai-prompts/CLAUDE.md) bans, rather than applying the norm while drafting. Covers grep patterns per tell, the quoted-example false-positive trap, and code-artifact slop (dead branches, needless abstraction, restated docstrings, scaffolding).
-version: 1.0.0
+metadata:
+  version: "1.0.0"
 ---
 
 This skill is the audit procedure for the norm output_discipline states in `ai-prompts/CLAUDE.md`. That file
@@ -54,13 +55,13 @@ them using that skill's list, in that language.
 ## The false-positive trap
 
 A corpus that defines a banned-token rule has to quote the token to state the rule, so a lexical scan over that
-corpus flags the rule's own definition. The discriminator: a hit inside a quotation, a code fence, or a
-worked/illustrative example is the rule's subject, not a violation of it. Check the enclosing syntax before
-logging a finding.
+corpus flags the rule's own definition. Distinguish examples of prohibited wording from deliverable prose
+or code: quotation marks and code fences alone do not exempt their contents. Read the example's purpose
+before logging a finding.
 
 Two real instances in this repo, worth knowing by name so you recognize the shape elsewhere:
 
-- `agent-skills/skills/technical-writing/SKILL.md:116` and `:127` quote the em dash (U+2014) and two related
+- `technical-writing/SKILL.md` quotes the em dash (U+2014) and two related
   Japanese dash variants as the literal subject of the rule banning them in Japanese prose. A raw grep for that
   character over that file returns a nonzero count that names no defect.
 - `ai-prompts/CLAUDE.md` and `ai-prompts/output-styles/explanatory-strict.md` each quote "robust" and
@@ -85,14 +86,14 @@ rather than by text, since the exact spacing and variable name vary per call sit
 
 **Abstraction introduced for a second case that does not exist.** An interface, strategy, or plugin point with
 exactly one implementation, or a config parameter that holds the same value at every call site. Detection is a
-reference count, not a grep: find the interface or base class, then run Serena's `find_implementations` (or
-`find_referencing_symbols` for a parameter) and check the count. A count of one is the finding; the fix is
-inlining the abstraction into its sole implementor, not adding a second case to justify it.
+reference search, not a grep: find implementations and callers with the available symbol tools. One
+implementation is a review candidate, not proof of a defect. Check for a present contract, dependency
+boundary, or test seam before proposing inlining; do not invent a second implementation to justify it.
 
 **Docstring restating the signature.** A docstring whose content is fully recoverable from the function name,
 parameter names, and types already in the signature, adding no WHY (a constraint, an invariant, a caller-facing
-gotcha) the signature can't show. Detection: read the docstring against the signature side by side; if every
-noun in the docstring already appears as an identifier, it restates rather than explains. The ast-grep skill can
+gotcha) the signature can't show. Detection: read the docstring against the signature side by side and name
+the information it adds. Repeated identifiers alone do not establish redundancy. The ast-grep skill can
 locate all docstrings of a given node kind for batch review; the restates-or-explains judgment itself stays
 manual.
 
@@ -106,7 +107,8 @@ should do.
 **Ceremonial placeholder steps.** A numbered list of steps, or a sequence of log statements, that narrates
 work without doing any ("Step 1: Analyze the problem" with no analysis attached, a "Starting process..." log
 immediately followed by the next step with no intervening work). This is a reading heuristic, not a grep: for
-each step, name the artifact it produces; a step producing nothing is ceremony.
+each step, name its observable result, including a decision, approval, or report. Report steps that add
+neither a result nor a necessary precondition.
 
 ## Reporting a finding
 

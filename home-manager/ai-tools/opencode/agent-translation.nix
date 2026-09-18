@@ -42,13 +42,14 @@ let
       parsed = shared.parseFrontmatter content;
       nameLine = shared.findLineWithPrefix "name: " parsed.frontmatterLines;
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
+      permissionBlock = shared.agentOpencodePermissions parsed.frontmatterLines;
     in
     builtins.seq nameLine (
       pkgs.writeText "opencode-agent-${agent}.md" ''
         ---
         ${descriptionLine}
         mode: subagent
-        ---
+        ${permissionBlock}---
         ${parsed.body}
       ''
     );

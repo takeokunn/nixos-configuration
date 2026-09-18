@@ -1,7 +1,8 @@
 ---
 name: investigation-patterns
 description: Use when tracing a symptom to its cause (debugging, bisecting, or working out how an unfamiliar implementation behaves). Covers evidence-based analysis, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, and checking a completion claim against the artifact instead of the summary.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 How to reach a cause you can defend. The standard debugging arc (reproduce, isolate, investigate, hypothesize,
@@ -44,8 +45,9 @@ the oracle is noisy and the next reduction target is meaningless. Check for inte
 
 **The failure signature is a long log of "the next reduction target is…" entries with no reproducibility
 re-check.** The accumulated narrowing feels like progress and creates pressure to continue, but every entry
-after the boundary first moved is unusable. A resolved-without-a-fix outcome confirms the symptom was
-environmental: record that conclusion, so the old reduction notes are not later mistaken for live findings.
+after the boundary first moved is unusable. If the symptom disappears without a fix, record "no longer
+reproduces" and the conditions checked. That alone does not distinguish environmental interference from an
+intermittent code defect; a causal conclusion needs a controlled reproduction.
 
 ## A probe inside a guard measures the guard
 

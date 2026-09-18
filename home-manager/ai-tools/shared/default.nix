@@ -89,6 +89,39 @@ rec {
     "enforce-perl"
   ];
 
+  agentIsReadOnly =
+    frontmatterLines:
+    let
+      tools =
+        prefix:
+        let
+          line = lib.findFirst (lib.hasPrefix prefix) null frontmatterLines;
+        in
+        if line == null then null else map lib.trim (lib.splitString "," (lib.removePrefix prefix line));
+      allowed = tools "tools:";
+      denied = tools "disallowedTools:";
+    in
+    lib.all
+      (
+        tool:
+        (allowed != null && !(builtins.elem tool allowed)) || (denied != null && builtins.elem tool denied)
+      )
+      [
+        "Write"
+        "Edit"
+        "NotebookEdit"
+      ];
+
+  agentOpencodePermissions =
+    frontmatterLines:
+    lib.optionalString (agentIsReadOnly frontmatterLines) ''
+      permission:
+        '*': deny
+        read: allow
+        glob: allow
+        grep: allow
+    '';
+
   parseFrontmatter =
     content:
     let
@@ -110,6 +143,9 @@ rec {
       frontmatterLines = lib.sublist 1 (closingIndex - 1) lines;
       body = lib.concatStringsSep "\n" (lib.drop (closingIndex + 1) lines);
     };
+
+  decodeFrontmatterScalar =
+    value: if lib.hasPrefix "\"" value then builtins.fromJSON value else value;
 
   findLineWithPrefix =
     prefix: lines:

@@ -1,11 +1,14 @@
 ---
 name: serena-usage
 description: Use for Serena MCP work - semantic symbol search, find references, code navigation, memory read/write, and organizing memory as a linked reference graph rather than a flat list. Also covers recovering a subagent's report from its session transcript when a completion notification is lost.
-version: 4.0.0
+metadata:
+  version: "4.0.0"
 ---
 
 Serena's tool schemas are injected by the harness and are not restated here. This file covers tool *choice*,
 the failure modes that make a Serena result misleading, and how a memory corpus stays worth reading.
+Tool availability depends on the server and runtime. Use the injected catalog as the authority; if an operation
+is absent, name the limitation and use a scoped text-based fallback rather than inventing a tool call.
 
 ## Tool choice
 
@@ -47,8 +50,7 @@ is not always loud. Detection routinely settles on a language the repository mer
 configuration files are enough to swing it), and the symbol tools then return *nothing* rather than erroring.
 An empty `find_symbol` is then indistinguishable from a symbol that genuinely does not exist, and the
 conclusion drawn from it ("no references, safe to delete", "this module is unreachable") is wrong in the most
-expensive direction. This is the single most re-derived trap in the memory corpus: sessions across a dozen
-repositories each recorded it separately, which means each one paid for it first.
+expensive direction.
 
 The control is the same one an empty grep needs. Before reading an empty result as an absence, run the query
 against a symbol you already know is there; if that comes back empty too, the tool is not answering your
@@ -67,9 +69,9 @@ symbol operations entirely.
 ## The active-project pointer is shared
 
 Concurrent sessions can move it out from under each other. `edit_memory` returning not-found for a memory known
-to exist, or `list_memories` returning a small unrelated set, is a routing problem rather than missing data: the
-files on disk were never touched, only the pointer moved. Re-run `activate_project` with this session's own
-absolute path, then retry.
+to exist, or `list_memories` returning an unrelated set, can indicate a routing problem. Inspect the active
+project, re-run `activate_project` with this session's own absolute path, then retry. If the expected memory
+is still absent, investigate its storage; pointer drift alone does not prove that the data is intact.
 
 **A subagent reporting "no relevant memory exists" during a parallel dispatch may be hitting the same
 confusion. Do not treat that negative as authoritative**: acting on it means writing a duplicate of an entry
@@ -80,15 +82,15 @@ that already exists under the project the pointer drifted away from.
 Completion notifications for parallel subagents can be delayed or lost, so their absence is not evidence the
 agent failed; and re-running on that assumption discards completed work and doubles the cost.
 
-1. Look in the session directory's `subagents/` folder for the agent's `agent-*.jsonl` transcript. The final
-   report survives there even when the notification did not arrive.
-2. Check its mtime and tail. A recent mtime with a terminal assistant message means it finished; a stalled
-   mtime mid-run means it did not.
-3. Extract the report as the longest assistant text message: agent reports are substantially longer than the
-   intermediate status notes around them.
+1. Check the runtime's agent status and queued messages first.
+2. If the runtime exposes session transcripts, locate the actual transcript path. Claude-style
+   `subagents/agent-*.jsonl` paths are not a portable assumption for Codex or OpenCode.
+3. Read the terminal status and final report identified by that runtime's transcript format. Message length
+   and file mtime do not establish completion: a long intermediate message is not a final report, and a quiet
+   file may belong to an agent waiting on a tool.
 
-The sibling `.meta.json` records only spawn-time configuration and no completion state, so it cannot answer
-whether the agent finished. Read the transcript, not the metadata.
+If neither status nor a transcript establishes completion, report it as unknown before deciding whether to
+retry. Inspect possible partial edits before re-dispatching a write-capable agent.
 
 ## Memory
 
@@ -114,6 +116,10 @@ is re-checkable by navigating to that code. **Claude auto-memory** (the per-proj
 injects, indexed by its `MEMORY.md`) holds what outlives the session that learned it and is anchored to
 nothing in the tree: review history and unresolved findings, a trap with the command that reproduces it, a
 policy the user stated, an option declined and why.
+
+Use auto-memory only when the runtime exposes that store and writing is authorized. Do not invent its path
+or silently move its assigned facts into Serena when it is unavailable; report the unpersisted note in the
+handoff. Read-only phases may inspect memory but return write candidates without persisting them.
 
 The split is not cosmetic. An agent that reaches for review history in Serena finds an empty result and reads
 it as "no prior review", which is indistinguishable in the output from having checked and found none, so the
@@ -161,7 +167,8 @@ last-verified: YYYY-MM
 ```
 
 `status`: active (current and verified), archived (superseded), draft (unverified hypothesis). On
-`write_memory`, `last-verified` equals `created`. On `edit_memory`, bump `last-verified` and leave `created`.
+`write_memory`, set `last-verified` only for content checked against current evidence. On `edit_memory`,
+leave `created` unchanged and bump `last-verified` only for reverified content, recording the checked scope.
 Apply to new memories only: do not migrate retroactively, but add frontmatter when editing a memory that
 lacks it.
 
@@ -209,10 +216,8 @@ so a reader who half-remembers it can still find the file that settles it.
 - **Record what constituted done** for the area: the commands that had to pass, and any non-zero output
   accepted as normal. That accepted-warning detail is written nowhere else, and without it the next agent reads
   a pre-existing warning as a fresh regression.
-- Where a figure genuinely must be recorded, write it as an observation made at a stated time by a stated
-  command: "reported N at `<date>` via `<command>`" ages honestly; "the suite contains N tests" does not, and
-  a corpus accumulates several mutually contradictory values of N, each confident and each correct when
-  written.
+- Keep historical measurements in the task's evidence report, not the memory body. A memory can link to that
+  report and retain the reproduction command without copying its counts.
 
 ### Editing hygiene
 
@@ -235,8 +240,7 @@ damage is visible only to a later reader.
 exactly when the corpus is large enough for duplication to matter. Working inside one domain, the natural name
 for a new memory carries that domain's prefix, so the identical fact filed under a different domain never comes
 into view. The bodies diverge in vocabulary too, so neither a name scan nor a grep for the obvious term finds
-it. The observed cost is a fact recorded in seven places where the sum carries less information than the best
-single copy, each partial, and the decisive detail present in only one.
+it. Duplicate entries can each carry only part of the evidence, leaving the decisive detail in one copy.
 
 - **Search by the words describing the symptom**, not the words you would use to name the file. "Tests run
   stale logic", "the edit did not take effect": a reader hits the memory through the problem they are having,
@@ -320,11 +324,9 @@ deferring it means an independent investigation later that starts from nothing.
 Outcomes: still accurate → bump; partially outdated → correct the stale section and bump; fully superseded →
 `rename_memory` with an `-archived` suffix and note the reason.
 
-For a memory whose value is mixed (some claims hold, others are dead), correcting in place erases the audit
-trail and archiving discards what was confirmed. Instead keep the file and put a dated banner at the top
-stating which claims still hold and explicitly invalidating the point-in-time facts as historical. A later
-session quoting a stale number is stopped when it opens the file, rather than after it has built on the number.
-The banner also carries status in the text a reader actually loads, which a metadata field does not.
+For a memory whose value is mixed, preserve the verified claims and replace stale claims in place. State
+which earlier claim the correction negates and which sections remain unverified; do not retain a stale
+statement as current guidance beneath a banner.
 
 A rename reaches only whoever consults the index next. It leaves nothing for the session that already loaded
 the old memory, and nothing for the memories citing it, so **the superseding memory names the old one and

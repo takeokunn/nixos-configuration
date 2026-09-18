@@ -1,7 +1,8 @@
 ---
 name: nix-ecosystem
 description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check (including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards).
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Nix traps that read as success. Everything here is a failure that leaves no error behind: a check that verified
@@ -288,37 +289,41 @@ across invocations must be forced into single-shot, cache-clean mode inside the 
 
 Compute all hashes as SRI (`sha256-...`). Language builders carry a second hash for the dependency set
 (`cargoHash`, `vendorHash`, `npmDepsHash`, `pnpmDeps.hash`) that must be regenerated whenever the lockfile
-changes. Consult Context7 with library ID `/nixos/nixpkgs` for current language-builder patterns before writing
-a language-specific derivation; prefer the language builder to raw `mkDerivation`, and keep `meta` complete
+changes. Query Context7 or consult official documentation directly; verify builder patterns
+against official documentation or source at the project's locked Nixpkgs revision. Use official retrieval
+when Context7 cannot supply that version. Prefer the language builder to raw `mkDerivation`, and keep `meta` complete
 (description, homepage, license, maintainers, platforms, `mainProgram` for CLIs).
 
-## Secrets never enter the store
+## Plaintext secrets and private keys never enter the store
 
-The store is world-readable by design (0555 directories, 0444 files) and content-addressed. Anything
+The store is normally readable by every local user; store paths are not necessarily content-addressed. Anything
 materialized into it (via `writeText`, `toJSON` piped into a store file, an unquoted path literal, or
 string-interpolating a path) becomes readable by every local user *and* is copied into any binary cache the
-closure is pushed to. **No plaintext or ciphertext secret should ever enter the store.**
+closure is pushed to. **Keep plaintext secrets and decryption keys out of the store.** Encrypted SOPS files
+are intentionally store-compatible in [sops-nix](https://github.com/Mic92/sops-nix#features); assess exposed
+metadata and recipient policy before publishing ciphertext.
 
 A path literal, or a string produced by coercing a path (`"${./secrets.yaml}"`,
-`"${inputs.self}/secrets.yaml"`), is copied into the store as an evaluation input: even a store-resident sops
-file is then in the closure. Reference the secret by a runtime string path that is never a Nix path type: an
-absolute string like `"/var/lib/app-secrets/secrets.yaml"` resolving only on the target. With sops-nix this also
-needs `sops.validateSopsFiles = false;`, because the validator asserts `builtins.isPath sopsFile` and rejects a
-plain string.
+`"${inputs.self}/secrets.yaml"`), can copy the file or its source tree into the store. Use a runtime string
+path for plaintext runtime files, never interpolate their contents into generated configuration. A
+runtime-only encrypted SOPS source is a separate deployment choice: check the pinned sops-nix module's
+validation and rollback contracts before changing it; do not disable validation just to pass evaluation.
 
 Keep decryption keys out of source and store by deriving them at boot: a oneshot systemd service (`Type =
 oneshot`, `RemainAfterExit = true`, ordered before the units that need it and after host-key generation) derives
 an age key from the host SSH key with `ssh-to-age`, writes it 0600, and decrypted secrets land under a runtime
 tmpfs. Make the derivation idempotent.
 
-Prove nothing leaked:
+List the output closure for inspection:
 
 ```
-nix-store -q --requisites <drvPath-or-outPath> | grep -i secrets
+nix-store -q --requisites <outPath>
 ```
 
-An empty result is the pass condition. Run it whenever a config touches secret handling, and always before
-pushing a closure to a public cache.
+Path names do not prove absence of secret bytes. Trace secret inputs through evaluation and inspect the
+generated configuration and relevant closure contents without printing secret values. Check derivation inputs
+separately when they are published. Record the inspected scope and remaining gaps before a public-cache push;
+an empty filename search is not a passing secrecy test.
 
 Declarative modules that serialize their whole config into the store (`writeText` of a `toJSON` blob) turn any
 `env`, `vars`, command strings, or hook bodies into world-readable store data. Treat such modules as
@@ -361,34 +366,36 @@ for anything large, offload to native CI and only substitute the result.
 |---|---|
 | Simplest, zero extra inputs | nix-darwin's `nix.linux-builder` (QEMU). Auto-configures buildMachines, distributedBuilds, builders-use-substitutes. Slowest, least to maintain. |
 | Faster boot, native virtio | A MicroVM framework or a vfkit runner over Apple's hypervisor. vfkit is the practical macOS hypervisor (built-in virtiofs, no 9p, no TAP); microvm.nix on Darwin needs a compatible pin because virtiofsd is unavailable on some revisions, plus `storeOnDisk = false` and `vmHostPackages = nixpkgs.legacyPackages.aarch64-darwin`. |
-| Near-native | A Virtualization.framework builder VM. No QEMU overhead, and Rosetta gives x86_64-linux at roughly 70–90% native versus QEMU's order-of-magnitude slowdown. Most bespoke. |
+| Virtualization.framework | A builder VM using Apple's virtualization API; compatible configurations can use Rosetta for x86_64-linux. Measure the actual build workload before choosing it for performance. |
 
-Only one mechanism can be active at once: they are mutually exclusive on `nix.buildMachines` /
-`nix.linux-builder`.
+Multiple remote builders can coexist in `nix.buildMachines`. Do not let competing modules manage the same
+builder VM or service; check each module's options and generated configuration before combining them.
 
 On the native-framework path: networking is NAT/user-mode only, with no TAP and no port forwarding, so discover
 the guest IP via the ARP table (deterministic guest MAC) or `/var/db/dhcpd_leases` (fixed guest hostname).
-`/nix/store` is shared read-only over virtiofs with an overlay for the writable layer. There is no nested
-virtualization on Apple Silicon, so the builder VM will not run inside another VM: it fails in typical M-series
-CI runners.
+`/nix/store` may be shared read-only over virtiofs with an overlay for the writable layer, depending on the
+builder. Nested virtualization is hardware and host dependent: Apple's Virtualization framework supports it
+on [M3 and later Macs](https://developer.apple.com/documentation/virtualization/vzgenericplatformconfiguration/isnestedvirtualizationsupported).
+Check the runtime capability and whether the CI host exposes it; Apple Silicon alone does not decide it.
 
 Generate the builder SSH keypair at activation time and keep the private key on the host; never commit it, since
 the config repo may be public. Share only the public key into the guest over a read-only mount. Bootstrap may
 use a password, but harden to key-only once the builder works.
 
-Substituting foreign-platform derivations from Darwin needs explicit flags, because NixOS `system.build.toplevel`
-sets `preferLocalBuild` (`allowSubstitutes = false`) and the daemon negatively caches narinfo 404s:
+Inspect the derivation before diagnosing a foreign-platform substitution failure. `preferLocalBuild` chooses
+local over remote building when possible; `allowSubstitutes = false` disables substitution. They are separate
+attributes. For a derivation that disables substitution, an explicit override can permit cached outputs:
 
 ```
 nix build .#packages.aarch64-linux.<pkg> \
   --max-jobs 0 \
-  --option extra-platforms aarch64-linux \
   --option always-allow-substitutes true
 ```
 
-Add `--option narinfo-cache-negative-ttl 0` when a stale negative cache hides a now-available path. Permanent
-form: `nix.settings = { extra-platforms = [ "aarch64-linux" ]; always-allow-substitutes = true; };`. A closure
-often spans multiple substituters, so all must be configured for the fetch to complete.
+Add `--option narinfo-cache-negative-ttl 0` only when a stale negative cache hides a now-available path.
+Do not advertise Linux in a Darwin daemon's `extra-platforms` merely to fetch cached outputs: that setting
+declares build capability. Cache misses require a capable builder, and every required substituter must be
+configured and trusted. See the [Nix configuration reference](https://nix.dev/manual/nix/2.35/command-ref/conf-file.html).
 
 For large closures, build on native CI and let the Mac substitute the finished closure. Building a big `*-linux`
 closure on a virtiofs-overlay store can churn the store hard enough to lose store-path visibility mid-build, an
@@ -424,29 +431,27 @@ of a running system. Accept only canonical `/nix/store/...` values as root targe
 NixOS activation (`switch-to-configuration`, as driven by deploy-rs) takes a non-blocking exclusive flock at
 `/run/nixos/switch-to-configuration.lock`. A second concurrent activation fails immediately (exit 11 / EAGAIN)
 rather than queueing. A local Ctrl+C on deploy-rs can leave the remote `switch-to-configuration` running and
-holding the lock; kill the leftover remote process. A crash while holding it leaves a stale lock file to remove
-manually: check with `fuser` / `ps` on the target before assuming it is stale.
+holding the lock. Inspect the target's process identity and deployment logs before retrying or requesting
+termination of that run. A lock-file's existence is not evidence that a lock remains held:
+[flock locks](https://man7.org/linux/man-pages/man2/flock.2.html) are released when the owning open-file
+descriptions close. Never unlink the lock path to bypass a live holder; that can create two lock domains.
 
 deploy-rs `magicRollback` verifies post-activation reachability, but when activation starts many or slow
-services, startup can exceed the verification window and trigger a false rollback. Disable `magicRollback`, rely
-on `autoRollback`, and raise `activationTimeout`:
-
-```nix
-{ autoRollback = true; magicRollback = false; activationTimeout = 600; }
-```
-
-Keep ephemeral containers' `TimeoutStopSec` low (e.g. 15s) so a slow shutdown does not hold the activation lock;
-with the default 90s across many containers, teardown alone can block the next deploy for a long time. Declared
-NixOS containers are auto-started by systemd on activation, and a full reset of systemd-machined state before
-applying can be needed to avoid EEXIST races on redeploy.
+services, investigate activation and reachability timings separately. Preserve `magicRollback` and
+`autoRollback`: they cover different failure modes. Do not increase timeouts, shorten service shutdown
+guarantees, or reset systemd-machined state merely to make deployment pass. Establish the failing contract
+and obtain authorization for any configuration change; consult the pinned
+[deploy-rs options](https://github.com/serokell/deploy-rs#profile).
 
 ## Sandbox discipline
 
-The build sandbox has no network, no conventional absolute paths (no `/bin/sleep`, no `/bin/echo`), and a
-minimal toolset (no git); Nix also builds Rust in the release profile.
+Ordinary sandboxed builds cannot assume network access or host executables. Fixed-output derivations have
+different network rules. Declare tools such as git in the appropriate build/check inputs; inspect the pinned
+Rust builder's selected profile rather than assuming debug assertions are enabled.
 
-- Tests needing network or git must be `#[ignore]`d or feature-gated so the sandboxed `cargo test` still passes;
-  run them outside the sandbox in a dev shell.
+- Keep git-based checks enabled with declared tool inputs. For genuinely network-dependent integration tests,
+  use the project's designated integration job or hermetic fixtures and report that coverage separately.
+  Do not add `#[ignore]`, feature gates, or skip flags just to turn a red build green.
 - The release profile strips `debug_assert!`, so a `#[should_panic]` test asserting that a `debug_assert!` fires
   must be gated with `#[cfg(debug_assertions)]`, or it fails under the Nix build while passing under a debug
   `cargo test`.
@@ -490,7 +495,6 @@ behavior; Nix just makes the multicall layout the norm.
 ## Related
 
 - [trust-boundaries](../trust-boundaries/SKILL.md): general untrusted-input and privilege-boundary rules
-- [context7-usage](../context7-usage/SKILL.md): fetching current nixpkgs and Home Manager documentation
 - [investigation-patterns](../investigation-patterns/SKILL.md): debugging evaluation and derivation failures
 - [serena-usage](../serena-usage/SKILL.md): navigating Nix expressions by symbol
 - [testing-patterns](../testing-patterns/SKILL.md): what acceptance means for a declarative change

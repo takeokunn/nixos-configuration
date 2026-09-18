@@ -1,7 +1,8 @@
 ---
 name: performance-benchmarking
 description: Use when producing, gating, or reviewing performance numbers - before/after benchmarks, speedup/regression claims, CI benchmark gates, noise floor and confidence interval, wall-clock vs allocation-count metrics, and wording a performance claim.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Producing performance numbers that mean something. **The organizing fact is that a benchmark comparing
@@ -21,8 +22,8 @@ a result from noise.
 **Paired measurement**: measuring both arms under the same conditions, so shared variance (machine load, cache
 state, scheduler behavior) cancels in the difference instead of accumulating in it.
 
-**Gate vs signal**: a gate blocks a merge and must be near-zero false positive; a signal informs a reviewer and
-may be noisy. **Benchmarks are signals.**
+**Gate vs signal**: a gate blocks a merge under an agreed performance budget and measurement policy; a signal
+informs a reviewer. Use advisory results by default unless the project explicitly requires a performance gate.
 
 **Deterministic contract**: a property that does not vary with machine speed: allocations, commits, subprocesses
 spawned, iterations. Asserting one turns a flaky timing test into a deterministic one.
@@ -80,8 +81,8 @@ is attributed to B.
 Report the **median of the paired differences plus the win count**: "B was faster in 13 of 15 pairs". The win
 count is less affected by a single outlier pair than a mean of ratios, and it is immediately interpretable.
 
-A complete disclosure looks like: 15 paired samples, alternating order, warmup 2, full collection before each
-sample, output signature verified identical in all 120 samples.
+A complete disclosure looks like: 15 measured pairs (30 arm measurements), alternating order, 2 warmup pairs
+excluded, full collection before each measurement, output signature identical in all 30 measured results.
 
 **Instrumented runs are single-worker.** Coverage and allocation instrumentation typically maintains
 process-global mutable counters, so running instrumented work across concurrent workers produces
@@ -182,22 +183,17 @@ candidate being re-proposed.**
 
 ## Gating
 
-**Gate on the interval's lower bound.** A gate reading only the point estimate discards the part that says
-whether the number means anything, and therefore fires at exactly the rate of the noise floor: the identity
-measurement above would have been flagged as a regression on a no-op commit. Fail only when the lower bound
-also clears the threshold: that is the condition under which the harness asserts the effect is *at least* that
-large, rather than that its best guess is.
+**Define the direction and uncertainty policy.** For a metric where positive means regression, an
+interval-based gate can classify a regression when the lower bound exceeds the agreed threshold. This relies
+on the sampling model and a calibrated harness; an interval is not a guarantee against systematic bias.
 
-**Print "noisy" instead of failing.** The interesting middle case (point estimate over the threshold, interval
-reaching back below it) is neither a clean pass nor defensible evidence. Suppressing it loses a real signal;
-failing on it makes the gate unusable. Emit a distinct status, report the number, name it inconclusive, do not
-fail.
+**Keep inconclusive distinct from pass.** If the interval crosses the threshold, report the estimate and
+interval as inconclusive. Define beforehand whether that status blocks or requests another measurement;
+do not change an existing gate's policy to make a result green.
 
-**Degrade to the old behavior when the interval is missing.** An older harness may emit only a point estimate,
-and a gate written to require an interval will find none, treat every result as unverifiable, and **silently
-pass everything: a check that has become a no-op while still reporting green.** Fall back to the point
-estimate. Whenever a check depends on an optional field, decide explicitly what its absence means; the default
-of "absent means pass" is almost never intended.
+**Missing required uncertainty is an invalid measurement.** If a gate requires an interval, do not silently
+substitute a point estimate or pass when the interval is absent. Report the missing field and follow the
+declared invalid-result policy. A legacy point-estimate gate remains a different, explicitly named policy.
 
 **An aggregate percentage needs a denominator manifest.** A gate accepting an aggregate from a report trusts
 the report's own choice of denominator, and a file dropped from the report entirely (never instrumented, never
@@ -206,21 +202,12 @@ show a perfect total precisely because the interesting components are missing. C
 identifiers against a declared manifest and reject when an entry has no row, a row is malformed, or a row's
 total is zero, *before* evaluating the aggregate. **Verify the set of things summarized, not just the summary.**
 
-## Benchmarks inform; they do not block
+## Advisory results and required gates
 
-A correctness fix that costs performance is still a correctness fix. Blocking it on a benchmark inverts the
-priority, and because benchmarks have a noise floor it also blocks changes that cost nothing at all. **The
-failure mode is predictable: the gate is routinely overridden, and once overriding is routine the signal is
-worthless.**
-
-Configure the job as non-blocking *by design* (continue-on-error, or an advisory status) and say in the
-configuration that this is intentional so nobody "fixes" it later. The output is addressed to a reviewer, not
-to the merge button.
-
-Because the job cannot block, a red result carries no procedural consequence, which makes it tempting to
-ignore. **That is the opposite of the intent: the number is the only reason the job exists.** Treat red as an
-obligation to investigate and state a conclusion (real regression, noise above the floor, workload change),
-never as a reason to halt the change.
+For a new advisory benchmark, document its non-blocking status and investigate regressions rather than
+ignoring them. For a required performance gate, preserve its budget and failure policy. A correctness fix
+that exceeds that budget needs an explicit tradeoff decision from its owner, not an automatic override or
+a change to `continue-on-error`.
 
 ## Wording the claim
 
@@ -260,14 +247,13 @@ that the area is not understood well enough to optimize.
 
 **Measure the arm where the premise does not hold.** A scheduling change motivated by skew will look good on
 the skewed workload that motivated it: **that arm proves the mechanism works, not that the change is free.**
-Whether it is a strict improvement or a tradeoff is decided entirely by the workload where its premise does not
-hold, and that is the arm people skip because it is expected to be boring.
+The workload where the premise does not hold can expose a tradeoff hidden by the motivating workload;
+include both before making an improvement claim.
 
-Replacing static contiguous chunking with size-descending claiming through a shared atomic cursor produced a
-**4.80x median speedup on a size-skewed workload of 240 items, and 1.004x on an evenly-sized workload of the
-same size.** The second number is what licenses the word "strict": it says the change costs nothing when its
-premise does not hold. Because a scheduling change also perturbs output order, pair the timing with a
-byte-identical output comparison on both workloads: the ordering discipline that comparison checks belongs to
+Compare skewed and evenly sized workloads, reporting uncertainty and the noise floor for each. A point
+estimate such as 1.004x alone does not establish zero cost or a strict improvement. Because a scheduling
+change can also perturb output order, pair timing with the required output-equivalence check on both workloads:
+the ordering discipline that comparison checks belongs to
 [parallelization-patterns](../parallelization-patterns/SKILL.md).
 
 **Throttle expensive probes independently of cheap polling.** A polling loop usually has one interval, but not

@@ -1,7 +1,8 @@
 ---
 name: testing-patterns
 description: Use when writing, structuring, or reviewing tests - test strategy, coverage, unit/integration/e2e split, mocks/fixtures/fakes, flaky-test isolation, async settlement. For whether a green suite actually proves anything, see test-integrity instead.
-version: 3.0.0
+metadata:
+  version: "3.0.0"
 ---
 
 Designing tests that hold up. Arrange-act-assert, given-when-then, the stub/mock/spy/fake vocabulary, and
@@ -64,11 +65,15 @@ complete while proving nothing.
 
 Where several tests are identical except for input and expected classification, define a typed case record
 carrying a stable id, and tag each assertion with it so a failure names the exact row.
+In this pseudocode, `reportSkip` records the case and reason in the runner's skipped-test report.
 
 ```
 interface Case { id: string; name: string; input: string; expect: Status; skip?: { reason: string } }
 for (const c of cases) {
-  if (c.skip) continue   // record intent; do not silently drop
+  if (c.skip) {
+    reportSkip(`${c.id}: ${c.name}`, c.skip.reason)
+    continue
+  }
   assert(run(c.input), `${c.id}: ${c.name}`).hasStatus(c.expect)
 }
 ```
@@ -199,10 +204,13 @@ A test that iterates a production registry and reads a property off each member 
 predicate for the variant that carries it, and assert the guard matched at least once.
 
 ```
+let matched = 0
 for (const member of registry) {
   if (!hasCommandForm(member)) continue
+  matched += 1
   assertValidCommand(member)
 }
+assertEqual(matched > 0, true)
 ```
 
 **A docstring narrowing a registry's contract is documentation, not enforcement.** A second variant registered
@@ -226,10 +234,11 @@ coercion at the framework boundary.
 
 ### Settlement is layered, and a race is answered by strengthening
 
-**A single read of a single source is not settlement.** Retry the stimulus until the first observable effect
-appears, then poll a *different, authoritative* source for the consequence. A status published on the previous
-tick reads as ready while the durable value is still mid-flight, so the flag alone samples a transient
-intermediate value some fraction of the time.
+**An acknowledgement is not necessarily settlement.** Issue the stimulus once, then poll the authoritative
+source for its durable consequence within a bounded wait. Retry the stimulus only when it is idempotent,
+deduplicated by a stable operation key, or proven not to have applied; a timeout alone proves none of these.
+A separately published ready flag can precede durable state, so use it as a barrier only if its contract
+guarantees the required consequence.
 
 ```
 await waitForFlag(subject, "settled")      // necessary, not sufficient
@@ -295,12 +304,10 @@ When adding an optional parameter, key, or field to a contract existing callers 
 that makes the old call and asserts the old result shape. **The new-feature tests all pass the new argument, so
 none of them ever exercises the old call shape.**
 
-Omitting the addition and passing it explicitly as null must produce identical behavior and identical output
-shape; when they differ, callers acquire an invisible dependency on argument-passing style. Exactly one layer
-owns the decision to forward a new key: when two layers each conditionally append it, the result carries it
-twice and the winner depends on the consumer's parsing order. Prefer a stable output shape (key always present,
-sometimes null) over one that appears and disappears: a varying shape forces every consumer to handle both
-forms, and **the branch handling the absent form is the one that goes untested.**
+Test omission, explicit null, and a supplied value against the declared contract. They need not be equivalent:
+an update API can use omission for "leave unchanged" and null for "clear". Preserve the old call shape and
+output contract unless the change explicitly revises them. Give forwarding of a new key one owner so layers
+cannot append duplicate keys, and cover each supported output shape rather than imposing an always-present key.
 
 ## Declarative repositories
 
