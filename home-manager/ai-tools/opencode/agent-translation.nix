@@ -44,6 +44,8 @@ let
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
       permissionBlock = shared.agentOpencodePermissions parsed.frontmatterLines;
     in
+    # opencode drops the name field, so nameLine is forced only to keep
+    # findLineWithPrefix's assert as a gate on agents missing `name:`.
     builtins.seq nameLine (
       pkgs.writeText "opencode-agent-${agent}.md" ''
         ---

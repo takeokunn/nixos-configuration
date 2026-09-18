@@ -17,7 +17,6 @@ function prompt_pwd --description 'ref: https://hotoolong.hatenablog.com/entry/2
     set -q fish_prompt_pwd_dir_length
     or set -l fish_prompt_pwd_dir_length 1
 
-    set -l fulldirs 0
     set -ql _flag_D
     and set fish_prompt_pwd_full_dirs $_flag_D
 

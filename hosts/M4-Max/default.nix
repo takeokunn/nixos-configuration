@@ -66,7 +66,6 @@ nix-darwin.lib.darwinSystem {
       home-manager.sharedModules = [
         nixvim.homeModules.nixvim
         mac-app-util.homeManagerModules.default
-        # inputs.zen-browser.homeModules.twilight  # TODO: hash mismatch, re-enable after fix
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
       ];
@@ -80,12 +79,10 @@ nix-darwin.lib.darwinSystem {
           guard-and-guide
           nur-packages
           anthropic-skills
-          aws-agent-skills
           ast-grep-skill
           paredit-cli-skills
           emacs-overlay
           org-babel
-          firefox-addons
           ;
       };
     }

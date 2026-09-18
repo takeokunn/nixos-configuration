@@ -12,22 +12,10 @@ Before adding a template, identify its consumer and verify that the runtime supp
 
 ## Output
 
-Every finding carries the evidence that backs it, so a reader can check the report rather than trust a number
-it asserts about itself.
-
-- **status**: success | warning | error
-- **summary**: what was asked, what was found, what remains unchecked
-- **verification**: the exact command(s) run and their exit status, or "none run". Never omitted.
-- **evidence**: each finding with its claim, its tier (verified | inferred | assumed), the file:line or command
-  behind it, and the detail
-- **gaps**: anything asked for that was not done, and why; omit only when empty
+CLAUDE.md's `output_contract` holds the field list and the status criteria, and it is in context on every
+request, so a command or agent names it rather than restating it, and the reference resolves.
 
 Add next actions only when they help the caller decide what to do.
-
-### Where the status criteria live
-
-CLAUDE.md defines status and the output contract, and it is in context on every request, so
-a command or agent names it rather than restating it, and the reference resolves.
 
 This is the one exception to the rule that a pointer delivers nothing. That rule holds for *skill* references,
 because a skill body is absent until it is loaded through the runtime's skill mechanism or read in full:

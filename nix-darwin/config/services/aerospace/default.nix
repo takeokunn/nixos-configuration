@@ -95,7 +95,7 @@ in
 
           alt-r = "mode resize";
 
-          # Emacs Scratchpad Toggle (like NixOS Mod+I)
+          # Keep in sync with the niri Mod+I binding.
           alt-i = "exec-and-forget ${emacsScratchpadToggle}";
         };
       };
@@ -126,7 +126,6 @@ in
     };
 
     on-window-detected = [
-      # FloatingEmacs scratchpad (kitty with specific title)
       {
         "if".app-id = "net.kovidgoyal.kitty";
         "if".window-title-regex-substring = "FloatingEmacs";

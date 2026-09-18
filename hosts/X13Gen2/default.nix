@@ -34,7 +34,7 @@ nixpkgs.lib.nixosSystem {
       boot.initrd.luks.devices."cryptroot".allowDiscards = true;
       boot.initrd.luks.devices."cryptroot".bypassWorkqueues = true;
 
-      # Enable systemd in initrd for LUKS and impermanence
+      # LUKS unlock and the impermanence rollback both run from initrd.
       boot.initrd.systemd.enable = true;
     }
     {
@@ -42,7 +42,6 @@ nixpkgs.lib.nixosSystem {
       home-manager.users."${username}" = import ../../home-manager/advanced.nix;
       home-manager.sharedModules = [
         nixvim.homeModules.nixvim
-        inputs.zen-browser.homeModules.twilight
         inputs.agent-skills.homeManagerModules.default
         inputs.git-bulk-clean.homeManagerModules.default
       ];
@@ -55,13 +54,11 @@ nixpkgs.lib.nixosSystem {
           llm-agents
           guard-and-guide
           anthropic-skills
-          aws-agent-skills
           ast-grep-skill
           paredit-cli-skills
           nur-packages
           emacs-overlay
           org-babel
-          firefox-addons
           ;
       };
     }

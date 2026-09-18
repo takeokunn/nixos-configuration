@@ -6,7 +6,6 @@ M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-a
 ** Prerequisites
 
 - macOS (Apple Silicon)
-- Xcode Command Line Tools
 
 ** Step 1: Install Xcode Command Line Tools
 

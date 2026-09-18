@@ -14,7 +14,6 @@ let
     red = "0xffff5555";
     yellow = "0xfff1fa8c";
     transparent = "0x00000000";
-    black = "0xff21222c";
   };
 
   # 各space itemが自分自身の状態のみを更新（イベント駆動 + ポーリング両対応）
@@ -193,7 +192,6 @@ let
   sketchybarConfig = ''
     #!/bin/bash
 
-    BACKGROUND="${colors.background}"
     BACKGROUND_TRANSPARENT="${colors.backgroundTransparent}"
     CURRENT_LINE="${colors.currentLine}"
     FOREGROUND="${colors.foreground}"
@@ -203,9 +201,7 @@ let
     ORANGE="${colors.orange}"
     PINK="${colors.pink}"
     PURPLE="${colors.purple}"
-    RED="${colors.red}"
     YELLOW="${colors.yellow}"
-    BLACK="${colors.black}"
     TRANSPARENT="${colors.transparent}"
 
     bar=(
@@ -257,7 +253,7 @@ let
 
     for i in "''${!SPACE_ICONS[@]}"; do
       sid="''${SPACE_ICONS[$i]}"
-      # 10番目は表示を "0" にする
+      # aerospace binds alt-0 to workspace 10, so the label matches the key.
       if [ "$sid" = "10" ]; then
         display_icon="0"
       else

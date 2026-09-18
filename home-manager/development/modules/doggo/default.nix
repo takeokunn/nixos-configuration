@@ -22,15 +22,15 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ cfg.package ];
 
-    programs.bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
+    programs.bash.initExtra = lib.mkIf cfg.enableBashIntegration ''
       eval "$(${lib.getExe cfg.package} completions bash)"
     '';
 
-    programs.zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
+    programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration ''
       eval "$(${lib.getExe cfg.package} completions zsh)"
     '';
 
-    programs.fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
+    programs.fish.interactiveShellInit = lib.mkIf cfg.enableFishIntegration ''
       ${lib.getExe cfg.package} completions fish | source
     '';
   };

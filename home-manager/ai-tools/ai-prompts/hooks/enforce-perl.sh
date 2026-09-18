@@ -16,12 +16,10 @@ if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
   exit 0
 fi
 
-# Check for sed or awk usage (word boundary to avoid false positives)
+# Word boundaries, so "parsed" and "hawking" do not trip the guard.
 if echo "$command" | grep -qE '\b(sed|awk)\b'; then
   cat >&2 <<'EOF'
 ❌ sed/awk detected - Use perl instead
-
-According to text-processing rules, batch text operations should use perl.
 
 Examples:
   ❌ sed 's/foo/bar/g' file.txt
@@ -32,8 +30,6 @@ Examples:
 
   ❌ sed -i 's/old/new/g' *.txt
   ✅ perl -pi -e 's/old/new/g' *.txt
-
-Please reformulate your command using perl.
 EOF
   exit 2
 fi
