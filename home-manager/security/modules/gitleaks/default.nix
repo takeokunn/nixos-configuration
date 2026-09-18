@@ -231,15 +231,15 @@ in
 
     home.sessionVariables.GITLEAKS_CONFIG = "${config.xdg.configHome}/gitleaks/config.toml";
 
-    programs.bash.initExtra = lib.mkIf (cfg.enableBashIntegration && cfg.package != null) ''
+    programs.bash.initExtra = lib.mkIf cfg.enableBashIntegration ''
       eval "$(${lib.getExe cfg.package} completion bash)"
     '';
 
-    programs.zsh.initContent = lib.mkIf (cfg.enableZshIntegration && cfg.package != null) ''
+    programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration ''
       eval "$(${lib.getExe cfg.package} completion zsh)"
     '';
 
-    programs.fish.interactiveShellInit = lib.mkIf (cfg.enableFishIntegration && cfg.package != null) ''
+    programs.fish.interactiveShellInit = lib.mkIf cfg.enableFishIntegration ''
       ${lib.getExe cfg.package} completion fish | source
     '';
   };

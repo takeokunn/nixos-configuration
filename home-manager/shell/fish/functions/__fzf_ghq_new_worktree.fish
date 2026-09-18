@@ -65,8 +65,6 @@ function __fzf_ghq_new_worktree
                 echo "fzf_ghq: fetch of origin/main failed ($fetch_output); falling back to local refs" >&2
             end
         end
-    end
-    if test -z "$base_ref"
         set base_ref (__fzf_ghq_resolve_default_ref $repo_path)
     end
     if test -z "$base_ref"

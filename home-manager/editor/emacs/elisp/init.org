@@ -307,7 +307,6 @@ Handles focus reporting (DECSET 1004) and bracketed paste (DECSET 2004)."
   ;; Apply to new frames (handles emacsclient connections to daemon)
   (add-hook 'after-make-frame-functions #'my/setup-terminal-escape-sequences)
 
-  ;; Apply to current frame if not running as daemon
   (unless (daemonp)
     (my/setup-terminal-escape-sequences))
 #+end_src
@@ -1766,7 +1765,7 @@ The state must be read before ORIG-FN runs: committing ▽/▼ leaves nskk in
 commit apart from an idle keypress and appends a newline to every
 conversion. A later `:override' advice on `nskk-kakutei' added elsewhere in
 this file would silently stop this from firing (nadvice `:override' ignores
-anything already wrapped) — call this function explicitly from such an
+anything already wrapped); call this function explicitly from such an
 override rather than assuming it still runs."
       (let ((idle (eq (nskk-current-kakutei-state) 'hiragana-idle)))
         (prog1 (apply orig-fn args)

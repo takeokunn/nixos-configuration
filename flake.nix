@@ -45,11 +45,6 @@
     ast-grep-skill.flake = false;
     paredit-cli-skills.url = "github:takeokunn/paredit-cli";
     paredit-cli-skills.flake = false;
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-    zen-browser.inputs.home-manager.follows = "home-manager";
-    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";

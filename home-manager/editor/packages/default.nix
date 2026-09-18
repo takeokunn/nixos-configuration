@@ -93,24 +93,6 @@ in
       '';
     };
 
-  emacs-unstable-with-widgets = pkgs.emacsWithPackagesFromUsePackage {
-    config = builtins.toFile "empty.el" "";
-    package = pkgs.emacs-unstable.overrideAttrs (
-      old:
-      parallelBuildAttrs
-      // {
-        buildInputs = old.buildInputs ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ pkgs.apple-sdk ];
-        configureFlags = old.configureFlags ++ [ "--with-xwidgets" ];
-        env = (old.env or { }) // parallelBuildAttrs.env;
-      }
-    );
-    extraEmacsPackages = import ./epkgs {
-      inherit nurPkgs pkgs;
-      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-    };
-    override = override;
-  };
-
   emacs-stable = pkgs.emacsWithPackagesFromUsePackage {
     config = builtins.toFile "empty.el" "";
     package = pkgs.emacs.overrideAttrs (

@@ -88,9 +88,9 @@ let
       ${checkMergeConflicts} || RESULT=1
     ''}
 
-    # ${lib.optionalString cfg.enableCheckCaseConflicts ''
-      #   ${checkCaseConflicts} || RESULT=1
-      # ''}
+    ${lib.optionalString cfg.enableCheckCaseConflicts ''
+      ${checkCaseConflicts} || RESULT=1
+    ''}
 
     ${lib.optionalString (cfg.enableGitleaks && gitleaksCfg.enable) ''
       ${gitleaksCheck} || RESULT=1
@@ -117,7 +117,8 @@ in
 
     enableCheckCaseConflicts = lib.mkOption {
       type = lib.types.bool;
-      default = true;
+      # Off by default: the check is O(tracked files x staged files).
+      default = false;
       description = "Enable case-insensitive filename conflict detection in pre-commit hook";
     };
 
