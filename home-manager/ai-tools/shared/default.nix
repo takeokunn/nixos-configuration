@@ -17,14 +17,6 @@ rec {
         type = "http";
         url = "https://mcp.deepwiki.com/mcp";
       };
-      # Auth is the Claude-Code-only /design-login and /design-sync slash commands, not the generic
-      # remote-MCP OAuth flow deepwiki/Slite/ClickUp use, so this entry is inert in opencode and Codex
-      # even though it's registered there too. Do not copy this entry's shared placement as precedent
-      # for a server that isn't similarly Claude-Code-gated.
-      "claude-design" = {
-        type = "http";
-        url = "https://api.anthropic.com/v1/design/mcp";
-      };
     };
 
   mcpServerToOpencode =
