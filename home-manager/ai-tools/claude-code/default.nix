@@ -53,6 +53,11 @@ in
 
     permissions = {
       deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
+      # Reviewed via /define: hooks and permissions.deny still enforce independently of
+      # permission mode, so this only removes the interactive prompt; a background classifier
+      # model now reviews everything else auto mode would have prompted for (see Claude Code
+      # docs: "Eliminate permission prompts with auto mode").
+      defaultMode = "auto";
     };
 
     env = {

@@ -55,6 +55,7 @@
 
   outputs =
     {
+      self,
       flake-parts,
       treefmt-nix,
       ...
@@ -192,6 +193,13 @@
         let
           sharedAiTools = import ./home-manager/ai-tools/shared { inherit (pkgs) lib; };
 
+          # Guards the wiring a nix eval/build cannot: a future edit to the `permissions`
+          # attrset that drops `defaultMode` or empties `deny` still evaluates and builds
+          # cleanly (settings.json is freeform JSON with no schema), so only an assertion
+          # against the actual evaluated value catches the drift.
+          claudeCodePermissions =
+            self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.claude-code.settings.permissions;
+
           # lib.debug.runTests returns [] when every case passes, else the failing cases.
           sharedAiToolsTestFailures = pkgs.lib.debug.runTests {
             testDecodeFrontmatterScalar = {
@@ -310,6 +318,26 @@
                 if [ "$failuresJson" != "[]" ]; then
                   echo "home-manager/ai-tools/shared regression tests failed:" >&2
                   echo "$failuresJson" >&2
+                  exit 1
+                fi
+                touch $out
+              '';
+
+          checks.claude-code-permissions =
+            pkgs.runCommand "claude-code-permissions-test"
+              {
+                nativeBuildInputs = [ pkgs.jq ];
+                permissionsJson = builtins.toJSON claudeCodePermissions;
+              }
+              ''
+                defaultMode=$(jq -r '.defaultMode' <<< "$permissionsJson")
+                denyCount=$(jq '.deny | length' <<< "$permissionsJson")
+                if [ "$defaultMode" != "auto" ]; then
+                  echo "expected programs.claude-code.settings.permissions.defaultMode == \"auto\", got \"$defaultMode\"" >&2
+                  exit 1
+                fi
+                if [ "$denyCount" -lt 1 ]; then
+                  echo "programs.claude-code.settings.permissions.deny is unexpectedly empty" >&2
                   exit 1
                 fi
                 touch $out
