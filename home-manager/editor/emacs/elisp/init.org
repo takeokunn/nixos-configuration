@@ -4546,7 +4546,7 @@ single computation, instead of each recomputing it independently."
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(pass pass-view-mode) "pass" nil t)
 
-  (add-to-list 'auto-mode-alist (cons (concat (regexp-quote (my/ghq-repo-path "github.com/takeokunn/private")) "/password-store/.*\\.gpg") 'pass-view-mode))
+  (add-to-list 'auto-mode-alist (cons (concat (regexp-quote (my/ghq-repo-path "github.com/takeokunn-private/private-pass")) "/.*\\.gpg") 'pass-view-mode))
 
   (with-eval-after-load 'pass
     (setopt pass-suppress-confirmations t))
