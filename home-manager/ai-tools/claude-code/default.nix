@@ -1,25 +1,14 @@
 {
-  config,
   pkgs,
   nurPkgs,
   mcp-servers-nix,
   llmAgentsPkgs,
-  guardAndGuide,
   ...
 }:
 let
   ai-prompts-path = ../ai-prompts;
 
   shared = import ../shared { inherit (pkgs) lib; };
-
-  hooksDir = "${config.programs.claude-code.configDir}/hooks";
-
-  # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
-  # cannot silently fail to fire here. enforce-perl is the one deliberate omission: guard-and-guide
-  # carries its sed/awk rule for Claude Code, while Codex still wires the script itself.
-  claudeBashHookNames = builtins.filter (n: n != "enforce-perl") shared.guardrailHookNames ++ [
-    "rtk-rewrite"
-  ];
 
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (_: {
     doInstallCheck = false;
@@ -38,91 +27,14 @@ in
   programs.claude-code.enable = true;
   programs.claude-code.package = claude-code-fixed;
   programs.claude-code.context = builtins.readFile "${ai-prompts-path}/CLAUDE.md";
-  programs.claude-code.settings = {
-    theme = "dark";
-    model = "sonnet";
-    autoUpdates = false;
-    includeCoAuthoredBy = false;
-    autoCompactEnabled = true;
-    enableAllProjectMcpServers = true;
-    feedbackSurveyState.lastShownTime = 1754089004345;
-    # Selects the style defined below. Built-in Explanatory cannot be extended, only replaced, so
-    # explanatory-strict re-authors its insight behavior and adds output_discipline's prohibitions
-    # at the system-prompt layer, which CLAUDE.md cannot reach.
-    outputStyle = "explanatory-strict";
-
-    permissions = {
-      deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
-      # Reviewed via /define: hooks and permissions.deny still enforce independently of
-      # permission mode, so this only removes the interactive prompt; a background classifier
-      # model now reviews everything else auto mode would have prompted for (see Claude Code
-      # docs: "Eliminate permission prompts with auto mode").
-      defaultMode = "auto";
-    };
-
-    env = {
-      BASH_DEFAULT_TIMEOUT_MS = "300000";
-      BASH_MAX_TIMEOUT_MS = "1200000";
-      CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1";
-      MAX_MCP_OUTPUT_TOKENS = "25000";
-      MCP_TOOL_TIMEOUT = "120000";
-      CLAUDE_CODE_MAX_OUTPUT_TOKENS = "32000";
-      CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
-      CLAUDE_CODE_AUTO_CONNECT_IDE = "0";
-      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
-      CLAUDE_CODE_ENABLE_TELEMETRY = "0";
-      CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL = "1";
-      CLAUDE_CODE_IDE_SKIP_VALID_CHECK = "1";
-      DISABLE_AUTOUPDATER = "1";
-      DISABLE_ERROR_REPORTING = "1";
-      DISABLE_INTERLEAVED_THINKING = "1";
-      DISABLE_NON_ESSENTIAL_MODEL_CALLS = "1";
-      DISABLE_TELEMETRY = "1";
-      ENABLE_EXPERIMENTAL_MCP_CLI = "false";
-      ENABLE_TOOL_SEARCH = "true";
-      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-    };
-
-    # Claude Code fans one event out to every matching hook in parallel and merges the results
-    # afterwards, so position in this list confers nothing: no hook runs before another and none
-    # sees another's updatedInput. Every hook here judges the command as issued. rtk-rewrite is
-    # currently the only one emitting updatedInput; adding a second would make precedence between
-    # them non-deterministic, and this list could not resolve it.
-    hooks.PreToolUse = [
-      # The empty matcher is what reaches Read, Write, and Edit; the Bash entry below cannot see
-      # them, which is the gap guard-and-guide was added to close.
-      {
-        matcher = "";
-        hooks = [
-          {
-            type = "command";
-            command = "${guardAndGuide}/bin/guard-and-guide --config ${ai-prompts-path}/hooks/rules.toml";
-          }
-        ];
-      }
-      {
-        matcher = "Bash";
-        # The assert fails the build if the derived wiring stops matching what this file expects:
-        # a guardrail renamed or added in the shared catalog would otherwise be installed and never
-        # fire, which has gone unnoticed here once before.
-        hooks =
-          assert
-            claudeBashHookNames == [
-              "block-destructive-git"
-              "block-bare-cd"
-              "rtk-rewrite"
-            ];
-          map (name: {
-            type = "command";
-            command = "${hooksDir}/${name}";
-          }) claudeBashHookNames;
-      }
-    ];
-
-    statusLine.type = "command";
-    statusLine.command = "${ai-prompts-path}/scripts/statusline.sh";
-    statusLine.padding = 0;
-  };
+  # `programs.claude-code.settings` is deliberately unset. Setting it makes home-manager place
+  # `~/.claude/settings.json` as a read-only store symlink (`home.file`, mode 444), and Claude Code
+  # expects that file to be writable: it persists a `/model` choice there, and tools that install
+  # hook entries resolve the path and write through it. Both fail silently against a store symlink.
+  # Everything this repository pins now lives in the managed-settings file instead, declared once in
+  # `shared/claude-code-managed-settings.nix` and placed per platform by `nix-darwin/config/` and
+  # `nixos/config/`. The hook scripts below still land in `~/.claude/hooks/`, which is where those
+  # managed settings reference them.
 
   programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" [
     "code-quality"

@@ -1,5 +1,6 @@
 {
   pkgs,
+  inputs,
   xremap,
   username,
   ...
@@ -33,6 +34,7 @@ let
 
   users = import ./config/users.nix { inherit pkgs username; };
   fonts = import ./config/fonts.nix { inherit pkgs; };
+  claudeCodeSettings = import ./config/claude-code-settings.nix { inherit pkgs inputs username; };
 
   power = import ./config/services/power.nix;
   misc = import ./config/services/misc.nix;
@@ -64,6 +66,7 @@ in
     shell
     users
     fonts
+    claudeCodeSettings
     power
     misc
     swayosd

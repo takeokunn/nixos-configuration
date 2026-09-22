@@ -195,10 +195,31 @@
 
           # Guards the wiring a nix eval/build cannot: a future edit to the `permissions`
           # attrset that drops `defaultMode` or empties `deny` still evaluates and builds
-          # cleanly (settings.json is freeform JSON with no schema), so only an assertion
-          # against the actual evaluated value catches the drift.
-          claudeCodePermissions =
-            self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.claude-code.settings.permissions;
+          # cleanly (managed-settings.json is freeform JSON with no schema), so only an
+          # assertion against the actual evaluated value catches the drift.
+          claudeCodeHomeDirectory =
+            self.darwinConfigurations.M4-Max.config.home-manager.users.take.home.homeDirectory;
+
+          # The managed-settings file is system-level policy and cannot reach home-manager's
+          # `configDir`, so its hook commands hardcode `<home>/.claude/hooks`. This is the only
+          # scope where both values exist, so it is the only place the two can be compared.
+          claudeCodeConfigDir =
+            self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.claude-code.configDir;
+
+          # Every key home-manager would still place under the Claude config dir as a read-only
+          # store symlink. `settings.json` must not be among them: Claude Code writes that file
+          # itself, and a store symlink makes the write fail silently.
+          claudeCodeSettingsFileKeys = builtins.filter (n: pkgs.lib.hasSuffix ".claude/settings.json" n) (
+            builtins.attrNames self.darwinConfigurations.M4-Max.config.home-manager.users.take.home.file
+          );
+
+          claudeCodeManagedSettings = import ./shared/claude-code-managed-settings.nix {
+            inherit (pkgs) lib;
+            guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            homeDirectory = claudeCodeHomeDirectory;
+          };
+
+          claudeCodePermissions = claudeCodeManagedSettings.permissions;
 
           # lib.debug.runTests returns [] when every case passes, else the failing cases.
           sharedAiToolsTestFailures = pkgs.lib.debug.runTests {
@@ -328,16 +349,34 @@
               {
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
+                configDir = claudeCodeConfigDir;
+                expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
+                settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
               }
               ''
                 defaultMode=$(jq -r '.defaultMode' <<< "$permissionsJson")
                 denyCount=$(jq '.deny | length' <<< "$permissionsJson")
+                bypass=$(jq -r '.disableBypassPermissionsMode' <<< "$permissionsJson")
+                settingsKeyCount=$(jq 'length' <<< "$settingsFileKeysJson")
                 if [ "$defaultMode" != "auto" ]; then
-                  echo "expected programs.claude-code.settings.permissions.defaultMode == \"auto\", got \"$defaultMode\"" >&2
+                  echo "expected managed-settings permissions.defaultMode == \"auto\", got \"$defaultMode\"" >&2
                   exit 1
                 fi
                 if [ "$denyCount" -lt 1 ]; then
-                  echo "programs.claude-code.settings.permissions.deny is unexpectedly empty" >&2
+                  echo "managed-settings permissions.deny is unexpectedly empty" >&2
+                  exit 1
+                fi
+                if [ "$bypass" != "disable" ]; then
+                  echo "expected managed-settings permissions.disableBypassPermissionsMode == \"disable\", got \"$bypass\"" >&2
+                  exit 1
+                fi
+                if [ "$configDir" != "$expectedConfigDir" ]; then
+                  echo "home-manager configDir \"$configDir\" no longer matches the path the managed hook commands hardcode (\"$expectedConfigDir\")" >&2
+                  exit 1
+                fi
+                if [ "$settingsKeyCount" -ne 0 ]; then
+                  echo "home-manager is placing a read-only .claude/settings.json again; Claude Code must own that file:" >&2
+                  echo "$settingsFileKeysJson" >&2
                   exit 1
                 fi
                 touch $out

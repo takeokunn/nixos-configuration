@@ -16,7 +16,7 @@ in
 nixpkgs.lib.nixosSystem {
   inherit system;
   specialArgs = {
-    inherit username xremap;
+    inherit inputs username xremap;
   };
 
   modules = [
