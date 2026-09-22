@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   username,
   emacsLib,
@@ -6,6 +7,10 @@
   ...
 }:
 let
+  claudeCodeSettings = import ./config/claude-code-settings.nix {
+    inherit pkgs username;
+    guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  };
   fonts = import ./config/fonts.nix { inherit pkgs; };
   homebrew = import ./config/homebrew.nix;
   networking = import ./config/networking.nix;
@@ -18,6 +23,7 @@ let
 in
 {
   imports = [
+    claudeCodeSettings
     fonts
     homebrew
     networking
