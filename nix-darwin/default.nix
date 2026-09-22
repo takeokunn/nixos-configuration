@@ -6,12 +6,17 @@
   nurPkgs,
   ...
 }:
-# Activation text below must go into `system.activationScripts.extraActivation`, never an
-# attribute named after the module. nix-darwin splices a fixed, enumerated list of slots into the
-# script it runs, so any other name defines an option that typechecks, evaluates, and is never
-# executed, with nothing reporting the omission. `extraActivation` is one of the three slots
-# nix-darwin opens to consumers, and its `text` is `types.lines`, so every module setting it is
-# concatenated rather than overriding the others.
+# Activation text below must go into one of `preActivation`, `extraActivation` or `postActivation`,
+# never an attribute named after the module. nix-darwin splices a fixed, enumerated list of slots
+# into the script it runs, so any other name defines an option that typechecks, evaluates, and is
+# never executed, with nothing reporting the omission.
+#
+# `text` is `types.lines`, so several modules sharing a slot concatenate rather than collide, and
+# the whole script is one `set -e` sequence across every slot. Picking a later slot therefore adds
+# failures that can abort you, it does not decouple you from anything; `postActivation` already
+# carries mac-app-util and the entire home-manager activation. Prefer `extraActivation`, which runs
+# near the front. A failure anywhere fails the switch loudly, which is the opposite of the silent
+# no-op an unrecognised slot name produces.
 #
 # `spotlight.nix` and `security.nix` still use module-named attributes and therefore have never
 # run: grep `mdutil` and `pmset` in /run/current-system/activate returns 0 while `osascript` from

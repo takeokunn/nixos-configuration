@@ -213,6 +213,14 @@
             builtins.attrNames self.darwinConfigurations.M4-Max.config.home-manager.users.take.home.file
           );
 
+          # The NixOS placement hardcodes the same shape from `/home/<user>`, and no other check
+          # here evaluates that host, so without these two it ships with no drift coverage at all.
+          claudeCodeLinuxHomeDirectory =
+            self.nixosConfigurations.X13Gen2.config.home-manager.users.take.home.homeDirectory;
+
+          claudeCodeLinuxConfigDir =
+            self.nixosConfigurations.X13Gen2.config.home-manager.users.take.programs.claude-code.configDir;
+
           claudeCodeManagedSettings = import ./shared/claude-code-managed-settings.nix {
             inherit (pkgs) lib;
             guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -352,6 +360,10 @@
                 configDir = claudeCodeConfigDir;
                 expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
                 settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
+                homeDirectory = claudeCodeHomeDirectory;
+                linuxConfigDir = claudeCodeLinuxConfigDir;
+                expectedLinuxConfigDir = "${claudeCodeLinuxHomeDirectory}/.claude";
+                linuxHomeDirectory = claudeCodeLinuxHomeDirectory;
               }
               ''
                 defaultMode=$(jq -r '.defaultMode' <<< "$permissionsJson")
@@ -379,6 +391,21 @@
                   echo "$settingsFileKeysJson" >&2
                   exit 1
                 fi
+                if [ "$linuxConfigDir" != "$expectedLinuxConfigDir" ]; then
+                  echo "X13Gen2 configDir \"$linuxConfigDir\" no longer matches the path its managed hook commands hardcode (\"$expectedLinuxConfigDir\")" >&2
+                  exit 1
+                fi
+                # The platform modules build the hook paths from a literal prefix, so a host whose
+                # home moves off that prefix -- an impermanence-style relocation, say -- writes hook
+                # commands pointing at a directory that does not exist, and nothing else notices.
+                case "$homeDirectory" in
+                  /Users/*) ;;
+                  *) echo "M4-Max home \"$homeDirectory\" left /Users; nix-darwin/config/claude-code-settings.nix still builds its hook paths from that prefix" >&2; exit 1 ;;
+                esac
+                case "$linuxHomeDirectory" in
+                  /home/*) ;;
+                  *) echo "X13Gen2 home \"$linuxHomeDirectory\" left /home; nixos/config/claude-code-settings.nix still builds its hook paths from that prefix" >&2; exit 1 ;;
+                esac
                 touch $out
               '';
 

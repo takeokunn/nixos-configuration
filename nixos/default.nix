@@ -34,7 +34,10 @@ let
 
   users = import ./config/users.nix { inherit pkgs username; };
   fonts = import ./config/fonts.nix { inherit pkgs; };
-  claudeCodeSettings = import ./config/claude-code-settings.nix { inherit pkgs inputs username; };
+  claudeCodeSettings = import ./config/claude-code-settings.nix {
+    inherit pkgs username;
+    guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  };
 
   power = import ./config/services/power.nix;
   misc = import ./config/services/misc.nix;

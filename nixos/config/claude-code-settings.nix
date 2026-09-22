@@ -5,12 +5,10 @@
 # itself makes there (e.g. persisting a `/model` choice).
 {
   pkgs,
-  inputs,
   username,
+  guardAndGuide,
 }:
 let
-  guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
-
   settings = import ../../shared/claude-code-managed-settings.nix {
     inherit (pkgs) lib;
     inherit guardAndGuide;

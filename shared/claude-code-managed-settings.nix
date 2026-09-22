@@ -53,9 +53,11 @@ in
     defaultMode = "auto";
     # Neutralises `--dangerously-skip-permissions` on launches this machine does not control:
     # tools that spawn unattended agents hardcode that flag, which would otherwise outrank
-    # `defaultMode` and disable every check above. Measured behaviour with this key set: the
+    # `defaultMode` and disable every check above. Measured against Claude Code 2.1.278: the
     # process still starts and exits 0, the flag is ignored, and the session falls back to
-    # `defaultMode`. It is not a startup refusal, so an unattended agent degrades rather than dies.
+    # `defaultMode`, so an unattended agent degrades rather than dies. The version matters —
+    # anthropics/claude-code#44642 reports this key having no effect at all on 2.1.92. Re-measure
+    # after a major CLI bump rather than trusting this line.
     disableBypassPermissionsMode = "disable";
   };
 
