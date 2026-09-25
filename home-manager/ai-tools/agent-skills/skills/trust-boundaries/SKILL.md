@@ -360,7 +360,7 @@ reintroduced as a missing feature.
 - [test-integrity](../test-integrity/SKILL.md): integrity of the rejection tests themselves
 - [testing-patterns](../testing-patterns/SKILL.md): the strategy the rejection-tests-first method plugs into
 - [investigation-patterns](../investigation-patterns/SKILL.md): tracing a suspected boundary to the failing input
-- [core-patterns](../core-patterns/SKILL.md): shared decision-criteria and escalation structures
+- [workflow-patterns](../workflow-patterns/SKILL.md): shared decision-criteria and escalation structures
 - [rust-ecosystem](../rust-ecosystem/SKILL.md): newtypes carrying a validated value
 - [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md): conditions, and standard-predicate character classes
 - [emacs-ecosystem](../emacs-ecosystem/SKILL.md): document-directed evaluation and string presentation metadata

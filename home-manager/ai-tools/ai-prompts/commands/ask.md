@@ -11,7 +11,7 @@ Answer a repository question from evidence. This command is read-only, including
 2. Read only domain-matching memories, checking their claims against the current ref. Load serena-usage for memory or symbol work, investigation-patterns for hypothesis testing, and fact-check for external claims. A direct lookup needs neither research workflow.
 3. Handle bounded lookups directly. Delegate substantial independent questions, read-only: the runtime's exploration agent for execution paths, design for boundaries, performance for measured cost, quality-assurance for behavior, or code-quality for complexity.
 4. Cite the source governing the behavior. Generated documentation may be stale; inspect its generator. A call site proves presence, not a production role. Check registration before claiming absence. Verify external contracts against the installed version's vendored source or official documentation.
-5. Resolve contradictions by the evidence each claim examined, not by agreement. If evidence contradicts the user's premise, name both plainly. Use a validator only for a consequential claim still disputed after rereading.
+5. Resolve contradictions by the evidence each claim examined, not by agreement. If evidence contradicts the user's premise, name both plainly. Dispatch the verification agent in its read-only reconcile mode only for a consequential claim still disputed after rereading.
 
 ## Answer
 

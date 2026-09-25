@@ -38,17 +38,15 @@ in
 
   programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" [
     "code-quality"
-    "database"
     "design"
-    "devops"
     "docs"
     "explore"
     "general-purpose"
+    "infra"
     "performance"
     "quality-assurance"
     "security"
     "test"
-    "validator"
     "verification"
   ];
 
@@ -56,7 +54,6 @@ in
     "ask"
     "bug"
     "define"
-    "design-best-of-n"
     "execute"
     "execute-full"
     "markdown"

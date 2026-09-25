@@ -9,13 +9,13 @@ Use this command for ambiguous scope, meaningful alternatives, cross-file impact
 
 ## Method
 
-Load define-core and requirements-definition, plus fact-check when external claims matter. Follow prepare → analyze → investigate → clarify → verify → document → finalize; this command's read-only boundary governs any broader skill permissions.
+Load requirements-definition, plus fact-check when external claims matter. Follow prepare → analyze → investigate → clarify → verify → document → finalize; this command's read-only boundary governs any broader skill permissions.
 
 1. Separate the user's problem from their proposed solution. Identify subject, object, and operation. Establish Why, How, and What at the relevant levels: system/cross-cutting, data, interfaces, business behavior, then affected files.
 2. Verify current capabilities at the target ref before promising feasibility. State an impossible requirement plainly. Investigate a signal, form a hypothesis, and check it before asking a question the repository can answer.
 3. Specify observable behavior, options, constraints, and load-bearing decisions, not invented function names or algorithms. Ask when materially different interpretations change the work; do not impose an artificial question budget.
 4. Prefer the minimum scope meeting the need. Compare simpler alternatives and phased delivery. Require three evidenced cases before generalizing a one-off need. Trace the full impact, including callers, migrations, API compatibility, and tests.
-5. Delegate substantial independent exploration, architecture, or data questions read-only when useful. Use a validator only for an unresolved consequential disagreement. Synthesize results rather than forwarding agent reports.
+5. Delegate substantial independent exploration, architecture, or data questions read-only when useful. Dispatch the verification agent in its read-only reconcile mode only for an unresolved consequential disagreement. Synthesize results rather than forwarding agent reports.
 6. Offer decision options with a recommended choice and concrete tradeoffs. Replace confidence percentages or effort-hour estimates with observed files, call sites, layers, and test obligations.
 
 ### Signals to resolve

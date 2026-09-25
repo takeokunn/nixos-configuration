@@ -252,9 +252,11 @@ include both before making an improvement claim.
 
 Compare skewed and evenly sized workloads, reporting uncertainty and the noise floor for each. A point
 estimate such as 1.004x alone does not establish zero cost or a strict improvement. Because a scheduling
-change can also perturb output order, pair timing with the required output-equivalence check on both workloads:
-the ordering discipline that comparison checks belongs to
-[parallelization-patterns](../parallelization-patterns/SKILL.md).
+change can also perturb output order, pair timing with the required output-equivalence check on both workloads.
+Contiguous chunking kept output in input order for free; size-descending claiming through a shared cursor does
+not. The order must be restored deliberately: each worker writes into the slot for the unit's original index,
+claimed with the work, and results are read back by index after all workers join, never by claim or
+completion order. Skipping this produces output whose order varies run to run.
 
 **Throttle expensive probes independently of cheap polling.** A polling loop usually has one interval, but not
 all of its probes cost the same: a file read at 50 ms is fine; a probe that spawns a child process at 50 ms is
@@ -267,6 +269,5 @@ after a 250 ms grace period and running it at most once per 250 ms while leaving
 
 - [test-integrity](../test-integrity/SKILL.md): correctness tests that report success without exercising the contract
 - [testing-patterns](../testing-patterns/SKILL.md): the deterministic assertions that replace timing thresholds
-- [parallelization-patterns](../parallelization-patterns/SKILL.md): the scheduling strategy this measures
-- [sbcl-usage](../sbcl-usage/SKILL.md): runtime-specific profiler invocation and instrumentation caveats
+- [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md): SBCL profiler invocation and instrumentation caveats
 - [investigation-patterns](../investigation-patterns/SKILL.md): when a result contradicts the expected mechanism

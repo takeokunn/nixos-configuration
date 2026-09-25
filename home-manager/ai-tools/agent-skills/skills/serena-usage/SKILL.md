@@ -367,5 +367,5 @@ completion/hover support. Installation footprint determines adoption cost and CI
 ## Related
 
 - [investigation-patterns](../investigation-patterns/SKILL.md): investigation methodology using these tools
-- [core-patterns](../core-patterns/SKILL.md): shared escalation and decision-criteria templates
+- [workflow-patterns](../workflow-patterns/SKILL.md): shared escalation and decision-criteria templates
 - [execution-workflow](../execution-workflow/SKILL.md): where memory checks sit in the orchestration

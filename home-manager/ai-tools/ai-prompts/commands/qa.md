@@ -48,11 +48,10 @@ Dispatch these read-only tracks together, within runtime capacity. Carry relevan
 
 | Agent | Trigger and scope |
 |---|---|
-| devops | Always: derive setup, services, restoration, and stop commands, each with defining file:line; do not execute |
+| infra | Always: derive setup, services, restoration, and stop commands, each with defining file:line; do not execute. Add schema, migration, or query review when the change touches them |
 | quality-assurance | Always: correctness, error handling, caller impact |
 | code-quality | Always: introduced complexity, duplication, dead code |
 | security | Always: trust boundaries and unexplained bring-up behavior |
-| database | Schema, migration, or query changes |
 | performance | Changed hot paths, measured on both sides |
 | design | Changed module boundaries |
 | docs | Changed documented interfaces |

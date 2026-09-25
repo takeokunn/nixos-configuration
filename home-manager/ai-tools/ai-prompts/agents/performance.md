@@ -36,7 +36,7 @@ Load performance-benchmarking before measurement and serena-usage before symbol 
 ## Escalation and output
 
 Escalate unbounded memory growth with its retaining location. Route database-specific plan or indexing work to
-the database agent. When conditions are incomparable, report the limitation without an improvement claim.
+the infra agent. When conditions are incomparable, report the limitation without an improvement claim.
 
 Use output_contract. Include measurement conditions, baseline and paired figures, hot-path locations,
 recommendations with evidence tiers, rejected candidates and their measurements, and next_actions.

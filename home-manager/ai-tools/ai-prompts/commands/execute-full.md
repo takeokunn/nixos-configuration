@@ -36,7 +36,7 @@ Dispatch these six read-only reviews together, scheduling to the runtime's concu
 
 Require a usable report from all six. Each finding needs a location or command, evidence tier, severity, and concrete impact. Missing output is not a clean review. Retry an incomplete or unsupported report once with a narrower question, then perform the check here and disclose failed delegation and lost independence.
 
-Use a validator only for a consequential disputed claim remaining after the evidence is reread; it must contribute a different evidence base.
+Dispatch the verification agent in its read-only reconcile mode only for a consequential disputed claim remaining after the evidence is reread; it must contribute a different evidence base.
 
 ## One fix pass
 

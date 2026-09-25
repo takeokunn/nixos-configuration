@@ -135,8 +135,8 @@ report unavailable instructions. Routine replies do not require documentation-au
 | Trigger | Load |
 |---|---|
 | Implementation, delegation, or judging completion | execution-workflow |
-| Formal requirements or unresolved scope | define-core, requirements-definition |
-| Consequential finding needing refutation | core-patterns |
+| Formal requirements or unresolved scope | requirements-definition |
+| Consequential finding needing refutation | workflow-patterns |
 | Writing/evaluating tests; interpreting a green suite | testing-patterns; test-integrity respectively |
 | Debugging or tracing a cause | investigation-patterns |
 | Reading/writing memory or Serena symbol operations | serena-usage |

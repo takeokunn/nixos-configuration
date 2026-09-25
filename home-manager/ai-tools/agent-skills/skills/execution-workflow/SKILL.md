@@ -2,7 +2,7 @@
 name: execution-workflow
 description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, worktree and branch isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 
 How work gets placed, dispatched, verified, and judged done. CLAUDE.md's `delegation` and `evidence` sections
@@ -302,8 +302,18 @@ Run staging commands only when the current user request explicitly authorizes th
    else's, **stop and ask.** Do not bundle them and do not split them speculatively; whose-work-is-it is not
    inferable from the diff.
 
-Destructive shared-tree operations are off the table entirely; [core-patterns](../core-patterns/SKILL.md) holds
-that list and the safe alternatives.
+## Concurrent sessions in one checkout
+
+CLAUDE.md's `hard_rules` lists the destructive shared-tree operations. Use an assigned isolated worktree when
+available. Creating a worktree or a WIP commit requires the explicit Git-write authorization in CLAUDE.md;
+neither is an automatic fallback for a prohibited command.
+
+Do not mirror a worktree into a shared checkout: overwrites and sync deletion can destroy concurrent work
+without changing Git metadata. Hand off the changed paths and diff, and leave integration to an explicitly
+authorized operation that preserves the destination's unrelated changes.
+
+Remove a linked worktree only when removal is requested and its tracked, untracked, and ignored work has been
+checked for preservation elsewhere. A clean tracked diff alone does not establish that removal is safe.
 
 ## Related
 
@@ -313,4 +323,4 @@ Naming a skill here does not load it. Use the runtime's skill loader, or read it
 - [investigation-patterns](../investigation-patterns/SKILL.md): when review reveals behavior that is unclear
 - [testing-patterns](../testing-patterns/SKILL.md): when verifying coverage or designing a suite
 - [test-integrity](../test-integrity/SKILL.md): when a gate reports green
-- [core-patterns](../core-patterns/SKILL.md): for the refutation pass, and safe alternatives to destructive Git
+- [workflow-patterns](../workflow-patterns/SKILL.md): for the refutation pass

@@ -39,7 +39,7 @@ After gathering, prepare metadata/documentation and reproduction/verification in
 - Derive reproduction commands from actual flake outputs, Make targets, package scripts, service/compose definitions, environment examples, and CI. Prefer the repository's Nix entrypoints where present. Carry defining file:line beside every command; never guess an executable recipe.
 - Classify changed UI, API, database, configuration, security, and integration surfaces. Give manual checks with real paths, endpoints, components, inputs, expected results, and tools. Unresolved values belong in gaps, not executable steps.
 - Use optional scratch artifacts only when needed by an existing verification convention; keep them isolated and named.
-- Cross-check guidelines, diff, metadata, tests, and manual checks. Resolve contradictions from evidence; use a validator only for a consequential unsettled claim.
+- Cross-check guidelines, diff, metadata, tests, and manual checks. Resolve contradictions from evidence; dispatch the verification agent in its read-only reconcile mode only for a consequential unsettled claim.
 
 ## Execution plan
 

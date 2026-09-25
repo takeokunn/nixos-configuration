@@ -1,12 +1,86 @@
 ---
 name: requirements-definition
-description: Use for requirement analysis, specification, and clarification.
+description: Use for requirement analysis, specification, and clarification, and when running /define. Covers its phase sequence (prepare through finalize), the investigation and finalize gates, read-only agent dispatch, question prioritization, and requirement formatting.
 metadata:
-  version: "3.0.0"
+  version: "4.0.0"
 ---
 
-Question design and requirement formatting. The phase sequence belongs to
-[define-core](../define-core/SKILL.md).
+The phase sequence /define executes, so the command file does not restate it, plus question design and
+requirement formatting.
+
+Read-only throughout: no file or memory is created or modified, and no code is written. Return the document
+in the response. Report any memory candidates for a later write-authorized phase.
+
+## Phases
+
+**prepare**: Load serena-usage before any memory operation and any other companion this run needs:
+[fact-check](../fact-check/SKILL.md) when a claim needs an external source,
+[workflow-patterns](../workflow-patterns/SKILL.md) for the shared decision-criteria structure. Then activate the
+project, list memories, and read only the entries this task type calls for.
+
+**analyze**: Extract the core requirements from the request, identify the technical constraints its context
+implies, name the design decisions that will need user input, and take a first read on feasibility.
+
+**investigate**: Dispatch in one message: explore for the relevant files and existing patterns, design for
+architectural consistency and dependencies, infra for schema implications where they exist. After they
+return, dispatch general-purpose with their output for completeness and dependency risk. Verify any external
+claim against Context7 rather than recall.
+
+**clarify**: Prioritize and classify the candidate questions as described under
+[Which questions to ask first](#which-questions-to-ask-first). Ask the highest-priority first, through the
+runtime's question tool with its supported options and one marked (Recommended), including follow-ups. If no
+question tool is available, ask a concise question in text. Do not proceed on an assumption where a critical
+question is unanswered.
+
+**verify**: Cross-check the user's answers against what the agents actually found, and read the
+implementations the chosen approach depends on.
+
+**document**: Produce the requirements document and the phased task breakdown for /execute.
+
+**finalize**: The gate below.
+
+## Gate after investigation
+
+- The files and existing patterns the requirement will build on.
+- The scope boundary: what is explicitly out of scope.
+- Any technical blocker found, or that none was and what was checked.
+
+Unmet: widen the investigation, or ask if only the user can supply it. **Never write a requirement around an
+unexamined area.**
+
+## The finalize gate
+
+Read the Outstanding Issues section of the document just produced.
+
+If it reads "none", **skip the gate entirely and finish**: do not prompt.
+
+If it holds one or more items, ask with AskUserQuestion, offering exactly three dispositions:
+
+- **Resolve now (Recommended)**: re-enter clarify, ask the outstanding questions, and patch the document.
+- **Defer to /execute**: carry the issues into the handoff and mark dependent tasks blocked until their
+  critical questions are answered. Independent tasks may proceed on their own verified requirements.
+- **Stop and revise scope**: halt without finalizing the handoff, leaving the document visible so the user can
+  revise the request.
+
+**The resolution loop is bounded.** After "Resolve now", re-evaluate Outstanding Issues and re-present the gate
+at most once more, after which only Defer and Stop remain. Never loop unbounded.
+
+Deferral records an unresolved issue; it does not approve an assumption or clear a dependent task's gate.
+State whether the handoff is ready, partially blocked, or stopped, naming the affected tasks.
+
+## Agents
+
+All read-only. Every delegation carries the scope, the target paths, the explicit prohibition on editing, and
+the instruction to use the runtime's question tool when available, otherwise a concise question in text.
+
+- **explore**: relevant files and existing patterns
+- **design**: architectural consistency, dependencies, API design
+- **infra**: schema, migration, and query implications
+- **general-purpose**: requirements completeness, dependency risk, effort in tree-derived units
+- **verification** (read-only reconcile mode): cross-validation when findings conflict
+
+explore, design, and infra are independent and dispatch together; general-purpose consumes their output and
+follows.
 
 ## Investigate before asking
 
@@ -92,10 +166,27 @@ tasks separately from independent, ready tasks; deferral does not approve the as
 Unit coverage expectations, integration scenarios, and the acceptance criteria as observable behavior. A
 requirement with no test scenario is a requirement nobody will notice going unmet.
 
+## Output
+
+A requirements document carrying: the request in one sentence with its background and expected outcomes; the
+current system and stack; functional requirements in FR-001 form marked mandatory or optional; non-functional
+requirements; technical specifications with each decision's rationale; test requirements as observable
+behavior; and Outstanding Issues.
+
+Feasibility is stated as the observable condition supporting it, per the section above, never as a score.
+Where a requirement rests on an assumption rather than on investigation, say so at that requirement.
+
+Outstanding Issues states "none" explicitly when there are none: **the finalize gate's skip branch keys off
+that sentinel**, so an omitted section and an empty one are not the same thing.
+
+Then the task breakdown: the dependency graph, phased tasks with files and dependencies, and the handoff
+carrying the decisions made, the references, and the constraints, including what /execute must not assume.
+
 ## Related
 
-- [define-core](../define-core/SKILL.md): the phase sequence this methodology runs inside
-- [investigation-patterns](../investigation-patterns/SKILL.md): establishing current state before specifying
+- [investigation-patterns](../investigation-patterns/SKILL.md): establishing current state and evidence for feasibility
 - [testing-patterns](../testing-patterns/SKILL.md): turning acceptance criteria into tests
-- [execution-workflow](../execution-workflow/SKILL.md): delegating implementation once approved
-- [core-patterns](../core-patterns/SKILL.md): the evidence tiers and the numeric-self-assessment prohibition
+- [serena-usage](../serena-usage/SKILL.md): the memory operations in prepare
+- [fact-check](../fact-check/SKILL.md): verifying an external claim
+- [execution-workflow](../execution-workflow/SKILL.md): what happens to the handoff afterwards
+- [workflow-patterns](../workflow-patterns/SKILL.md): the decision-criteria template and the numeric-self-assessment prohibition

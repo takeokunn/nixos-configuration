@@ -13,6 +13,8 @@
   programs.agent-skills.sources.anthropic.subdir = "skills";
   programs.agent-skills.sources."ast-grep".path = ast-grep-skill;
   programs.agent-skills.sources."ast-grep".subdir = "ast-grep/skills";
+  # The source also ships an `outline` skill; only the ast-grep rule-writing skill is kept.
+  programs.agent-skills.sources."ast-grep".filter.nameRegex = "ast-grep";
   programs.agent-skills.sources."paredit-cli".path = paredit-cli-skills;
   programs.agent-skills.sources."paredit-cli".subdir = "skills";
 
@@ -22,6 +24,8 @@
   # canvas-design, theme-factory, slack-gif-creator, algorithmic-art, web-artifacts-builder,
   # brand-guidelines, frontend-design, doc-coauthoring, internal-comms, academy-guide) and the whole
   # aws source cost 11,515 bytes of description between them against one measured invocation.
+  # claude-api, mcp-builder, and skill-creator were dropped later on zero invocations in a 30-day
+  # window, as was ast-grep's outline skill through the source filter above.
   # Re-measure before adding a source back: count `tool_use` blocks with name=="Skill" over
   # `~/.claude/projects/**/*.jsonl`, counting paths containing `/subagents/` separately, since most
   # loads here come from agents rather than from the model reading a description.
@@ -33,11 +37,7 @@
 
   # An unknown entry fails evaluation rather than being skipped, so this list cannot rot silently.
   programs.agent-skills.skills.enable = [
-    "claude-api"
     "discernment-nudge"
-    "mcp-builder"
-    "outline"
-    "skill-creator"
     "webapp-testing"
   ];
 
