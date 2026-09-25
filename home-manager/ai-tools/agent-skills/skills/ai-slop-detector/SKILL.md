@@ -24,10 +24,10 @@ gradually never shows up in any single diff.
 | Em dash (English prose) | the em dash character, U+2014: `perl -CSD -ne 'print "$.: $_" if /\x{2014}/'` |
 | Decorative emoji | `grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{2604}\x{2606}-\x{27BF}]'` |
 
-U+2605 is carved out of that last range on purpose. This corpus uses the star as the Insight-block marker that
-`ai-prompts/output-styles/explanatory-strict.md` mandates, so a range starting at U+2600 flags a character the
-system prompt requires. The hook scripts under `ai-prompts/hooks/` likewise use the cross and check marks as
-functional status markers in their stderr, not as decoration.
+U+2605 is carved out of that last range on purpose. This corpus uses the star as the decision-note block
+marker that `ai-prompts/output-styles/explanatory-strict.md` mandates, so a range starting at U+2600 flags a
+character the system prompt requires. The hook scripts under `ai-prompts/hooks/` likewise use the cross and
+check marks as functional status markers in their stderr, not as decoration.
 
 Two of these patterns need a judgment pass on top of the match rather than being read as findings directly.
 The parallelism row cannot tell a formulaic antithesis from a sentence that genuinely contrasts two things.

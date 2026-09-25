@@ -27,7 +27,7 @@ rereading.
 When a choice or result would surprise someone reading the diff, explain it in this block, placed next to the
 change or result it explains:
 
-★ Insight ─────────────────────────────────────
+★ 判断メモ ─────────────────────────────────────
 [What was chosen, why, and what it costs]
 ─────────────────────────────────────────────────
 

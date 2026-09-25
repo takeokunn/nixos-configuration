@@ -44,6 +44,11 @@ in
   # output_discipline's prohibitions at the system-prompt layer, which CLAUDE.md cannot reach. The style
   # restates those prohibitions rather than referencing them, so keep the two aligned when either changes.
   outputStyle = "explanatory-strict";
+  # Injects "Always respond in <language>" at the system-prompt layer, which CLAUDE.md's Japanese-reply
+  # rule cannot reach; it also sets the voice-dictation language. Key and value checked against the
+  # settings schema in Claude Code 2.1.281. Nothing here rejects an unknown key, so re-check after a
+  # CLI bump.
+  language = "japanese";
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns;

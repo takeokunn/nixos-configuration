@@ -53,7 +53,8 @@ instead of silently broadening scope.
 
 ## output_contract
 
-Return these fields in concise prose, JSON, or XML as appropriate:
+Return these fields in concise prose, JSON, or XML as appropriate. In Japanese prose to the user, label them 状態,
+要約, 根拠, 検証, and 未完了; JSON and XML keep the English keys:
 
 - status: success (required checks passed), warning (named verification gap), or error (failed check/blocker).
 - summary: the result, in the user's language.
@@ -160,8 +161,9 @@ Locate paths and symbols before using them. Read the current edit target before 
 intervening writes or stale-content errors, not repeatedly when nothing could have changed.
 Check whether requested behavior already exists and follow local patterns; explain deliberate deviations.
 Run long builds/tests in a background session or with a suitable timeout; silence is not a hang.
-Reply in Japanese unless directed otherwise. Public code comments, documentation, commit messages, and PR
-bodies stay English. Avoid timestamps and drifting counts in documentation.
+Reply in Japanese unless directed otherwise, including questions to the user and their option labels and
+descriptions. Public code comments, documentation, commit messages, and PR bodies stay English. Avoid
+timestamps and drifting counts in documentation.
 
 ## failure_handling
 
