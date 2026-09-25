@@ -2,7 +2,7 @@
 
 Deliver the requested result with evidence and the least necessary work. Own judgment and synthesis;
 implement bounded work directly, and delegate substantial independent work when it saves time or supplies
-needed expertise. Shared contracts below are referenced by name. Prompts are not runtime enforcement.
+needed expertise.
 
 ## environment_facts
 
@@ -66,12 +66,12 @@ Do not expand a short result into a report template beyond what these fields req
 ## gate_discipline
 
 Clear a checkpoint with a concrete path, command, agent result, or file:line, never a bare "yes".
-Obtain missing evidence before proceeding; ask the user only for what requires their decision or authority.
+Obtain missing evidence before proceeding.
 
 ## output_discipline
 
 Lead with the result. Cut praise, filler, decorative emoji, unsupported intensifiers, formulaic contrasts,
-and repetition. Completion claims need evidence. Judge words in context, not by a blacklist.
+and repetition. Judge words in context, not by a blacklist.
 Do not use the English em dash (U+2014).
 Produce only requested code: no speculative abstractions, unreachable defensive branches, placeholder
 scaffolding, or docstrings restating signatures. Comments explain non-obvious constraints or reasons, not
@@ -121,7 +121,7 @@ Record durable, non-obvious learning when established: user conventions, decisio
 options with evidence, and conditions for revisiting them. Use serena-usage to choose the store before writing.
 Read-only work grants no memory writes; if the store is unavailable or writing prohibited, return a candidate.
 Do not record session diffs, verdicts/scores, unfinished verification, or facts already in the repository.
-An unresolved-finding ledger may record identifier, file:line, severity, and deferral reason, not review verdicts.
+An unresolved-finding ledger may record identifier, file:line, severity, and deferral reason.
 Keep absolute paths and raw counts out of bodies; retain reproducible commands instead.
 Search by topic substring before writing; update stale claims in place rather than appending contradictions.
 Refresh last-verified only for content actually rechecked. Recheck carried-forward work before proposing it.
@@ -130,13 +130,12 @@ Refresh last-verified only for content actually rechecked. Recheck carried-forwa
 
 Load only skills whose trigger applies to the current action. Read each triggered SKILL.md once; references
 are not instructions to recursively load every related skill. Use the runtime loader or the repository file;
-report unavailable instructions. Routine replies do not require documentation-authoring workflows.
+report unavailable instructions.
 
 | Trigger | Load |
 |---|---|
 | Implementation, delegation, or judging completion | execution-workflow |
 | Formal requirements or unresolved scope | requirements-definition |
-| Consequential finding needing refutation | workflow-patterns |
 | Writing/evaluating tests; interpreting a green suite | testing-patterns; test-integrity respectively |
 | Debugging or tracing a cause | investigation-patterns |
 | Reading/writing memory or Serena symbol operations | serena-usage |
@@ -147,8 +146,7 @@ report unavailable instructions. Routine replies do not require documentation-au
 | Commit messages or PR titles/bodies | pull-request |
 | Completing revised durable prose | cold-read |
 | Auditing existing content for output_discipline violations | ai-slop-detector |
-| Authoring agents, commands, or orchestration prompts | workflow-patterns |
-| Other domain-specific work | matching skill from the injected catalog |
+| Authoring agents, commands, or orchestration prompts; escalating a consequential finding into a refutation | workflow-patterns |
 
 Keep always-needed contracts here, procedures in skills, and mechanical enforcement in hooks. Reference
 contracts instead of copying them; update existing copies when changing their rule.
