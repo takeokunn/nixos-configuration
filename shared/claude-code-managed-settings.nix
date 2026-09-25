@@ -41,7 +41,8 @@ in
   feedbackSurveyState.lastShownTime = 1754089004345;
   # Selects the style defined in the home-manager module. Built-in Explanatory cannot be extended,
   # only replaced, so explanatory-strict re-authors its insight behavior and adds
-  # output_discipline's prohibitions at the system-prompt layer, which CLAUDE.md cannot reach.
+  # output_discipline's prohibitions at the system-prompt layer, which CLAUDE.md cannot reach. The style
+  # restates those prohibitions rather than referencing them, so keep the two aligned when either changes.
   outputStyle = "explanatory-strict";
 
   permissions = {
