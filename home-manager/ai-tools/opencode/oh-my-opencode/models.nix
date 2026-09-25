@@ -1,5 +1,5 @@
 let
-  promptLang = "Think and work in English. Reply to the user and write documentation in Japanese.";
+  promptLang = "Reply to the user in Japanese unless requested otherwise. Write repository documentation, code comments, commit messages, and PR bodies in English.";
   deepseekModel = "opencode-go/deepseek-v4.1-flash";
 in
 {

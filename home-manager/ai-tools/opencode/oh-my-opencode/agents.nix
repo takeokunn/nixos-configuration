@@ -11,7 +11,7 @@ in
     prompt_append =
       models.promptLang
       + "\n\n"
-      + "Assess the full picture, identify task dependencies, and delegate independent tasks in parallel to appropriate subagents. Always specify run_in_background when spawning subagents (false for delegation, true for parallel exploration only).";
+      + "Identify dependencies and delegate independent work to distinct agents when useful. Set run_in_background explicitly: true only for read-only exploration, false otherwise. Sequence overlapping writes unless separate workspaces prevent conflicts.";
     description = "Orchestrates high-stakes multi-system tasks and delegates independent work.";
   };
   themis = mkLane {
@@ -24,13 +24,13 @@ in
     modelTier = models.deepseek;
     variant = "max";
     prompt_append = models.promptLang;
-    description = "Architecture designer. Cross-system, long-horizon design decisions with written rationale. Use oracle for fast advisory; use daedalus for final-say architectural choices.";
+    description = "Cross-system architecture decisions with written rationale; use oracle for bounded advice.";
   };
   heracles = mkLane {
     modelTier = models.deepseek;
     variant = "max";
     prompt_append = models.promptLang;
-    description = "Complex debugger. Multi-system root cause analysis spanning services, hard-to-reproduce failures. Use oracle for single-system debug; use heracles for cross-system investigations.";
+    description = "Cross-system root-cause investigations; use oracle for single-system debugging advice.";
   };
 
   sisyphus = mkLane {
@@ -77,7 +77,7 @@ in
     modelTier = models.deepseek;
     variant = "max";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/momus.md;
-    description = "Reviews code and design for defects, compatibility risks, and missed requirements.";
+    description = "Reviews plans for execution blockers, reference validity, and final verification readiness.";
   };
   metis = mkLane {
     modelTier = models.deepseek;

@@ -1,11 +1,8 @@
-## General Principles
+## Sources
 
-- This appendix is advisory and additive only. Preserve the built-in librarian role, workflow, and machine-consumed control syntax.
-- Human-facing documentation should default to Japanese, but preserve the established document language when editing existing files.
+Preserve the built-in role, workflow, and machine-consumed syntax.
 
-## Source Handling Discipline
-
-- Prefer authoritative and version-relevant sources first, and use context7 and web sources to confirm or complete gaps instead of relying on a single source type.
-- When external information matters, include source identifiers such as URL, version, or retrieval context when they are available and materially useful.
-- If sources conflict, do not flatten them into a single claim. Briefly note the conflict and the reason you currently trust one source more, or what should be checked next.
-- Treat vendor self-ratings such as "Excellent" and other marketing copy as potentially exaggerated promotional language; use them as secondary context, not as high-confidence evidence, and evaluate them against factual data, independent evidence, and real user feedback.
+- Prefer authoritative, version-relevant sources. Use Context7 or web sources to fill gaps; do not fetch both without a reason.
+- Cite useful source identifiers, versions, and retrieval context.
+- When sources conflict, explain which evidence governs or name the next resolving check.
+- Treat vendor ratings and marketing as claims, not conclusions. Check them against factual data, independent evidence, and user feedback.

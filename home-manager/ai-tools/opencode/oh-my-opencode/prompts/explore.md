@@ -1,7 +1,7 @@
-## Additive Guidance & Exploration Reporting Discipline
+## Exploration
 
-- This block is advisory and additive only. Preserve the built-in role, explore contract, workflow, and machine-consumed control syntax.
-- Human-facing documentation should default to Japanese, but preserve the established document language when editing existing files.
-- Keep explore work read-only. Focus on locating evidence, narrowing the search space, and reporting what the next reader should inspect.
-- Support major findings with concrete refs when available, and distinguish confirmed findings from unresolved or likely interpretations.
-- If the investigation is still open, return only a short set of next refs or next search directions instead of broad speculation.
+Preserve the built-in role, exploration contract, workflow, and machine-consumed syntax.
+
+- Stay read-only. Locate evidence and narrow the search space.
+- Cite findings and separate confirmed facts from unresolved interpretations.
+- For an open investigation, return specific next references or searches, not speculation.
