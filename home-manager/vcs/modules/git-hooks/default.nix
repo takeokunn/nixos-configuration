@@ -77,8 +77,84 @@ let
     exec ${gitleaksCfg.package}/bin/gitleaks protect --staged --verbose --config ${config.xdg.configHome}/gitleaks/config.toml
   '';
 
+  # Agents have committed as "take <...noreply...>" or with a misspelled email by
+  # passing `git -c user.*` or GIT_AUTHOR_*/GIT_COMMITTER_* overrides. The expected
+  # identity is what the config files resolve to (so includeIf work identities
+  # still apply), read with command-line config overrides stripped. Scoped to
+  # the ghq root so test fixtures committing as a fake identity in temp repos
+  # keep working.
+  identityPrelude = ''
+    git_from_files() {
+      env -u GIT_CONFIG_PARAMETERS -u GIT_CONFIG_COUNT ${pkgs.git}/bin/git "$@"
+    }
+
+    GHQ_ROOT=$(git_from_files config --path ghq.root) || exit 0
+    GHQ_ROOT=$(cd "$GHQ_ROOT" 2>/dev/null && pwd -P) || exit 0
+    COMMON_DIR=$(cd "$(${pkgs.git}/bin/git rev-parse --git-common-dir)" && pwd -P) || exit 0
+    case "$COMMON_DIR/" in
+      "$GHQ_ROOT"/*) ;;
+      *) exit 0 ;;
+    esac
+
+    EXPECTED_NAME=$(git_from_files config user.name)
+    EXPECTED_EMAIL=$(git_from_files config user.email)
+    if [ -z "$EXPECTED_NAME" ] || [ -z "$EXPECTED_EMAIL" ]; then
+      printf 'user.name and user.email must be set in git config files\n'
+      exit 1
+    fi
+    EXPECTED="$EXPECTED_NAME <$EXPECTED_EMAIL>"
+  '';
+
+  checkCommitIdentity = pkgs.writeShellScript "check-commit-identity" ''
+    ${identityPrelude}
+
+    RESULT=0
+    for VAR in GIT_AUTHOR_IDENT GIT_COMMITTER_IDENT; do
+      IDENT=$(${pkgs.git}/bin/git var "$VAR") || exit 1
+      ACTUAL=''${IDENT% * *}
+      if [ "$ACTUAL" != "$EXPECTED" ]; then
+        printf '%s is "%s", expected "%s" from git config files\n' "$VAR" "$ACTUAL" "$EXPECTED"
+        RESULT=1
+      fi
+    done
+    exit $RESULT
+  '';
+
+  prePushScript = pkgs.writeShellScript "pre-push" ''
+    ${identityPrelude}
+
+    # Only commits the remote does not already have are checked, so history
+    # that landed before this hook existed does not block every push. The
+    # remote's refs are listed directly because remote-tracking refs are absent
+    # in clones without a fetch refspec.
+    REMOTE_OIDS=$(${pkgs.git}/bin/git ls-remote "$1") || exit 1
+    KNOWN=$(
+      while read -r OID _; do
+        printf '%s\n' "$OID"
+      done <<< "$REMOTE_OIDS" | ${pkgs.git}/bin/git cat-file --batch-check='^%(objectname)' | ${pkgs.gnugrep}/bin/grep -v ' missing$'
+    )
+
+    RESULT=0
+    while read -r _ LOCAL_OID _ _; do
+      if [ "$LOCAL_OID" = "$(printf '%0*d' "''${#LOCAL_OID}" 0)" ]; then
+        continue
+      fi
+      while IFS=$'\t' read -r OID AUTHOR COMMITTER; do
+        if [ "$AUTHOR" != "$EXPECTED" ] || [ "$COMMITTER" != "$EXPECTED" ]; then
+          printf '%s: author "%s", committer "%s", expected "%s"\n' "$OID" "$AUTHOR" "$COMMITTER" "$EXPECTED"
+          RESULT=1
+        fi
+      done < <(printf '%s\n' "$KNOWN" | ${pkgs.git}/bin/git log --stdin --format='%h%x09%an <%ae>%x09%cn <%ce>' "$LOCAL_OID")
+    done
+    exit $RESULT
+  '';
+
   preCommitScript = pkgs.writeShellScript "pre-commit" ''
     RESULT=0
+
+    ${lib.optionalString cfg.enableIdentityCheck ''
+      ${checkCommitIdentity} || RESULT=1
+    ''}
 
     ${lib.optionalString cfg.enableEditorconfigChecker ''
       ${editorconfigCheck} || RESULT=1
@@ -128,10 +204,22 @@ in
       description = "Enable gitleaks secret scanning in pre-commit hook";
     };
 
+    enableIdentityCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Reject commits and pushes whose author or committer differs from the identity in git config files";
+    };
+
     editorconfigCheckerPackage = lib.mkPackageOption pkgs "editorconfig-checker" { };
   };
 
-  config = lib.mkIf cfg.enable {
-    programs.git.hooks.pre-commit = preCommitScript;
-  };
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
+      { programs.git.hooks.pre-commit = preCommitScript; }
+      (lib.mkIf cfg.enableIdentityCheck {
+        programs.git.hooks.pre-merge-commit = checkCommitIdentity;
+        programs.git.hooks.pre-push = prePushScript;
+      })
+    ]
+  );
 }
