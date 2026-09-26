@@ -52,11 +52,13 @@
     };
     flags = {
       basic = false;
-      case_sensitive = false;
       dot_marker = false;
-      group_processes = true;
       hide_table_gap = true;
       rate = 700;
+    };
+    processes = {
+      case_sensitive = false;
+      default_grouped = true;
     };
   };
 }
