@@ -16,6 +16,20 @@
     };
   };
 
+  # 999 is xnu's hard ceiling (PTMX_MAX_HARD); the kernel ignores larger values
+  # without an error, leaving the default of 511 in place.
+  launchd.daemons.sysctl-ptmx-max = {
+    serviceConfig = {
+      Label = "org.nixos.sysctl-ptmx-max";
+      ProgramArguments = [
+        "/usr/sbin/sysctl"
+        "-w"
+        "kern.tty.ptmx_max=999"
+      ];
+      RunAtLoad = true;
+    };
+  };
+
   # Disabled: nix-darwin's manual-html build fails on current nixpkgs-unstable
   # (uses a removed nixos-render-docs flag). man/info pages are unaffected.
   documentation.doc.enable = false;
