@@ -26,8 +26,8 @@ mcp-servers-nix.lib.mkConfig pkgs {
   settings = {
     theme = "dark";
     plugin = [ "oh-my-openagent" ];
-    model = "opencode-go/deepseek-v4.1-flash";
-    small_model = "opencode-go/deepseek-v4.1-flash";
+    model = "opencode-go/space-bunny-free";
+    small_model = "opencode-go/space-bunny-free";
     share = "disabled";
     autoupdate = false;
 

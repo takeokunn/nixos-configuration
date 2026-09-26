@@ -1,19 +1,17 @@
 let
   promptLang = "Reply to the user in Japanese unless requested otherwise. Write repository documentation, code comments, commit messages, and PR bodies in English.";
-  deepseekModel = "opencode-go/deepseek-v4.1-flash";
+  defaultModel = "opencode-go/space-bunny-free";
 in
 {
   inherit promptLang;
 
-  # DeepSeek-V4.1-Flash, the single tier for every agent and category, including multimodal-looker.
-  # The prior V4 generation was text-only, requiring a separate Kimi vision tier; V4.1 Flash is
-  # claimed to handle image input directly (per efoo-team/opencode-setting's opencode-go_deepseek
-  # formation), but that capability is unverified from this repo. Fallback is self-referential
-  # since there is only one tier.
-  deepseek = {
-    model = deepseekModel;
+  # Space Bunny Free, the single tier for every agent and category, including multimodal-looker:
+  # `opencode models --verbose` lists image and video input for it, so no separate vision tier is
+  # needed. Fallback is self-referential since there is only one tier.
+  default = {
+    model = defaultModel;
     fallback = [
-      deepseekModel
+      defaultModel
     ];
   };
 }
