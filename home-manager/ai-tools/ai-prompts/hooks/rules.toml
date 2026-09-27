@@ -43,18 +43,6 @@ matcher = "File"
 regex = '\.git-credentials$|\.netrc$|\.npmrc$'
 message = "Access to credential files is prohibited. Ask the user to handle credentials."
 
-# --- Text substitution: mirrors enforce-perl.sh, which stays on disk for Codex ---
-
-[[rules]]
-matcher = "Bash"
-regex = '\bsed\b'
-message = "Use of 'sed' is prohibited. Use 'perl' instead. Example: perl -pi -e 's/old/new/g' file.txt"
-
-[[rules]]
-matcher = "Bash"
-regex = '\bawk\b'
-message = "Use of 'awk' is prohibited. Use 'perl' instead. Example: perl -lane 'print $F[0]' file.txt"
-
 # --- Bypass by absolute path ---
 #
 # Upstream's example is '(/usr)?/(s?bin|local/bin)/', which matches any path merely containing

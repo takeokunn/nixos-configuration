@@ -81,6 +81,7 @@ nix-darwin.lib.darwinSystem {
           anthropic-skills
           ast-grep-skill
           paredit-cli-skills
+          aitools-skills
           emacs-overlay
           org-babel
           ;

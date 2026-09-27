@@ -20,6 +20,22 @@
         "type": "github"
       }
     },
+    "aitools-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790498283,
+        "narHash": "sha256-BXTPwYfw1Z2e4TJ+vrLdz4tzV3SRU5eYkOtQNT/j1EI=",
+        "owner": "nerima-lisp",
+        "repo": "aitools",
+        "rev": "dd7a0e0d3b253d79859b6408311149f084f19eac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nerima-lisp",
+        "repo": "aitools",
+        "type": "github"
+      }
+    },
     "anthropic-skills": {
       "flake": false,
       "locked": {
@@ -1009,6 +1025,7 @@
     "root": {
       "inputs": {
         "agent-skills": "agent-skills",
+        "aitools-skills": "aitools-skills",
         "anthropic-skills": "anthropic-skills",
         "ast-grep-skill": "ast-grep-skill",
         "darwin-vz-nix": "darwin-vz-nix",

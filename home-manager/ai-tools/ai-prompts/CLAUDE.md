@@ -154,8 +154,8 @@ contracts instead of copying them; update existing copies when changing their ru
 
 ## standard_practices
 
-Use rg for discovery, Serena for symbolic investigation when available, perl rather than sed/awk for text
-substitution, and gh for GitHub. If a command is missing, try `nix run nixpkgs#<command>` once.
+Use rg for discovery, Serena for symbolic investigation when available, aitools for file reads and text
+edits when available, and gh for GitHub. If a command is missing, try `nix run nixpkgs#<command>` once.
 Set the command's working directory; do not spend calls on bare cd.
 Locate paths and symbols before using them. Read the current edit target before patching; refresh after
 intervening writes or stale-content errors, not repeatedly when nothing could have changed.
