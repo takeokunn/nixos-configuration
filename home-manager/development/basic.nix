@@ -12,5 +12,6 @@
     nurPkgs.devenv
     nurPkgs.kuro
     nurPkgs.paredit-cli
-  ] ++ lib.optional (nurPkgs.aitools != null) nurPkgs.aitools;
+  ]
+  ++ lib.optional (nurPkgs.aitools != null) nurPkgs.aitools;
 }
