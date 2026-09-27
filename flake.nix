@@ -45,6 +45,8 @@
     ast-grep-skill.flake = false;
     paredit-cli-skills.url = "github:takeokunn/paredit-cli";
     paredit-cli-skills.flake = false;
+    aitools-skills.url = "github:nerima-lisp/aitools";
+    aitools-skills.flake = false;
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
@@ -105,6 +107,7 @@
                   anthropic-skills
                   ast-grep-skill
                   paredit-cli-skills
+                  aitools-skills
                   ;
               };
             };
@@ -231,6 +234,16 @@
 
           # lib.debug.runTests returns [] when every case passes, else the failing cases.
           sharedAiToolsTestFailures = pkgs.lib.debug.runTests {
+            # Covers the guardrail catalog through `nix flake check` rather than relying solely on
+            # the claudeBashHookNames assert in shared/claude-code-managed-settings.nix, which only
+            # evaluates during a full darwinConfigurations/nixosConfigurations build.
+            testGuardrailHookNames = {
+              expr = sharedAiTools.guardrailHookNames;
+              expected = [
+                "block-destructive-git"
+                "block-bare-cd"
+              ];
+            };
             testDecodeFrontmatterScalar = {
               expr = map sharedAiTools.decodeFrontmatterScalar [
                 "Plain description"

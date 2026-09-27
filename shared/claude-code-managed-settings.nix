@@ -26,9 +26,8 @@ let
   hooksDir = "${homeDirectory}/.claude/hooks";
 
   # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
-  # cannot silently fail to fire here. enforce-perl is the one deliberate omission: guard-and-guide
-  # carries its sed/awk rule for Claude Code, while Codex still wires the script itself.
-  claudeBashHookNames = builtins.filter (n: n != "enforce-perl") shared.guardrailHookNames ++ [
+  # cannot silently fail to fire here.
+  claudeBashHookNames = shared.guardrailHookNames ++ [
     "rtk-rewrite"
   ];
 in

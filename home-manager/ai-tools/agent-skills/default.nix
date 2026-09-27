@@ -2,6 +2,7 @@
   anthropic-skills,
   ast-grep-skill,
   paredit-cli-skills,
+  aitools-skills,
   ...
 }:
 {
@@ -17,6 +18,8 @@
   programs.agent-skills.sources."ast-grep".filter.nameRegex = "ast-grep";
   programs.agent-skills.sources."paredit-cli".path = paredit-cli-skills;
   programs.agent-skills.sources."paredit-cli".subdir = "skills";
+  programs.agent-skills.sources."aitools".path = aitools-skills;
+  programs.agent-skills.sources."aitools".subdir = "skills";
 
   # Every installed skill's name and description is resident in the system prompt of every session,
   # whether or not it ever fires, so a source is enabled wholesale only where most of it earns that.
@@ -33,6 +36,7 @@
     "custom"
     "ast-grep"
     "paredit-cli"
+    "aitools"
   ];
 
   # An unknown entry fails evaluation rather than being skipped, so this list cannot rot silently.
