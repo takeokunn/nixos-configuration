@@ -85,7 +85,11 @@
           nur =
             { pkgs, ... }:
             {
-              _module.args.nurPkgs = import inputs.nur-packages { inherit pkgs; };
+              _module.args.nurPkgs = import inputs.nur-packages {
+                inherit pkgs;
+                aitoolsPackage =
+                  inputs.nur-packages.legacyPackages.${pkgs.stdenv.hostPlatform.system}.aitools or null;
+              };
             };
 
           # Requires the agent-skills home module
