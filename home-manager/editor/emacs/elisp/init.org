@@ -6724,8 +6724,16 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-roam-db-autosync-enable) "org-roam-db" nil t)
 
+  (defun my/org-roam-db-autosync-maybe-enable ()
+    "Enable Org-roam autosync only when its backing repository is checked out.
+`org-roam-directory' resolves through `my/ghq-repo-path', which falls back to
+a path that may not exist when the repository has never been cloned; syncing
+against a missing directory signals file-missing on every Org buffer visit."
+    (when (file-directory-p (my/ghq-repo-path "github.com/takeokunn/blog"))
+      (org-roam-db-autosync-enable)))
+
   (with-eval-after-load 'org
-    (add-hook 'org-mode-hook #'org-roam-db-autosync-enable))
+    (add-hook 'org-mode-hook #'my/org-roam-db-autosync-maybe-enable))
 
   (with-eval-after-load 'org-roam-db
     (setq org-roam-db-gc-threshold (* 4 gc-cons-threshold)))
