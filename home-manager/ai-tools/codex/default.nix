@@ -3,6 +3,7 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
+  aitools-skills,
   ...
 }:
 let
@@ -161,6 +162,13 @@ let
   codexHookScript =
     name: pkgs.writeShellScript name (builtins.readFile (aiPromptsPath + "/hooks/${name}.sh"));
 
+  # aitools-rewrite defaults to Claude Code's output shape. Codex rejects an updatedInput that is not
+  # paired with permissionDecision "allow", so its entry passes `codex` from a wrapper rather than
+  # relying on how Codex splits a hook's command string.
+  codexAitoolsRewrite = pkgs.writeShellScript "aitools-rewrite-codex" ''
+    exec ${codexHookScript "aitools-rewrite"} codex
+  '';
+
   codexSettings = {
     model = "gpt-5.6-luna";
     model_provider = "openai";
@@ -180,10 +188,17 @@ let
       PreToolUse = [
         {
           matcher = "^Bash$";
-          hooks = map (name: {
-            type = "command";
-            command = "${codexHookScript name}";
-          }) shared.guardrailHookNames;
+          hooks =
+            map (name: {
+              type = "command";
+              command = "${codexHookScript name}";
+            }) shared.guardrailHookNames
+            ++ [
+              {
+                type = "command";
+                command = "${codexAitoolsRewrite}";
+              }
+            ];
         }
       ];
     };
@@ -251,6 +266,12 @@ in
     // agentFileAttrs
     // customSkillFileAttrs
     // {
+      # Only the aitools skill from that source: the agent-skills module's codex target would
+      # install every enabled skill into the directory the attrs above already populate.
+      "codex/skills/aitools/SKILL.md" = {
+        source = aitools-skills + "/skills/aitools/SKILL.md";
+        force = true;
+      };
       "codex/AGENTS.md" = {
         source = codexAgents;
         force = true;

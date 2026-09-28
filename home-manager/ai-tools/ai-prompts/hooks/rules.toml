@@ -46,8 +46,8 @@ message = "Access to credential files is prohibited. Ask the user to handle cred
 # --- Bypass by absolute path ---
 #
 # Upstream's example is '(/usr)?/(s?bin|local/bin)/', which matches any path merely containing
-# /bin/, and on this machine that is every /nix/store/*/bin/* entry, including the store path
-# rtk-rewrite.sh substitutes into the command it hands back. Anchoring the match to a path that
+# /bin/, and on this machine that is every /nix/store/*/bin/* entry, so any Nix-built binary
+# invoked by its store path would trip it. Anchoring the match to a path that
 # actually starts at /usr or /bin fixes that, but a bare (^|\s) anchor is then evaded by ordinary
 # quoting and assignment, so the leading class also admits the characters a shell puts in front of
 # an argument, and /+ absorbs the redundant slash in /usr//bin.

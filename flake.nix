@@ -369,6 +369,20 @@
                 touch $out
               '';
 
+          checks.aitools-rewrite-hook =
+            pkgs.runCommand "aitools-rewrite-hook-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.perl
+                ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.sh}
+                touch $out
+              '';
+
           checks.claude-code-permissions =
             pkgs.runCommand "claude-code-permissions-test"
               {

@@ -67,9 +67,7 @@ in
 
   programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
   programs.claude-code.hooks.block-bare-cd = builtins.readFile "${ai-prompts-path}/hooks/block-bare-cd.sh";
-  programs.claude-code.hooks.rtk-rewrite =
-    builtins.replaceStrings [ "@RTK_BIN@" ] [ "${llmAgentsPkgs.rtk}/bin/rtk" ]
-      (builtins.readFile "${ai-prompts-path}/hooks/rtk-rewrite.sh");
+  programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh";
 
   programs.claude-code.mcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {

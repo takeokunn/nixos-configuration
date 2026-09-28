@@ -28,7 +28,7 @@ let
   # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
   # cannot silently fail to fire here.
   claudeBashHookNames = shared.guardrailHookNames ++ [
-    "rtk-rewrite"
+    "aitools-rewrite"
   ];
 in
 {
@@ -91,7 +91,7 @@ in
 
   # Claude Code fans one event out to every matching hook in parallel and merges the results
   # afterwards, so position in this list confers nothing: no hook runs before another and none
-  # sees another's updatedInput. Every hook here judges the command as issued. rtk-rewrite is
+  # sees another's updatedInput. Every hook here judges the command as issued. aitools-rewrite is
   # currently the only one emitting updatedInput; adding a second would make precedence between
   # them non-deterministic, and this list could not resolve it.
   #
@@ -119,7 +119,7 @@ in
           claudeBashHookNames == [
             "block-destructive-git"
             "block-bare-cd"
-            "rtk-rewrite"
+            "aitools-rewrite"
           ];
         map (name: {
           type = "command";

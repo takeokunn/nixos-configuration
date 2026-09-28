@@ -19,6 +19,10 @@ let
   };
 
   opencodeAgents = import ./agent-translation.nix { inherit pkgs ai-prompts-path; };
+
+  aitoolsRewrite = pkgs.writeShellScript "aitools-rewrite" (
+    builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh"
+  );
 in
 {
   home.packages = pkgs.lib.optionals (nurPkgs.oh-my-openagent != null) [
@@ -31,6 +35,11 @@ in
   xdg.configFile."opencode/opencode.json".source = opencodeConfig;
 
   xdg.configFile."opencode/oh-my-opencode.json".source = ohMyOpencodeConfig;
+
+  # A single file, not the directory: other tools drop their own plugins into `plugin/`.
+  xdg.configFile."opencode/plugin/aitools-rewrite.js".text =
+    builtins.replaceStrings [ "@AITOOLS_REWRITE@" ] [ "${aitoolsRewrite}" ]
+      (builtins.readFile ./aitools-rewrite-plugin.js);
 
   xdg.configFile."opencode/agents" = {
     source = opencodeAgents.agents;
