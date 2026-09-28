@@ -486,6 +486,40 @@
                 touch $out
               '';
 
+          # The module is evaluated on its own with stub options, so the check needs no home
+          # directory and bakes the gitleaks config path to a store path it controls.
+          checks.git-hooks-pre-push =
+            let
+              prePush =
+                (pkgs.lib.evalModules {
+                  specialArgs = { inherit pkgs; };
+                  modules = [
+                    ./home-manager/vcs/modules/git-hooks
+                    (
+                      { lib, ... }:
+                      {
+                        options.programs.git.hooks = lib.mkOption {
+                          type = lib.types.attrsOf lib.types.anything;
+                          default = { };
+                        };
+                        options.programs.gitleaks.enable = lib.mkOption { default = true; };
+                        options.programs.gitleaks.package = lib.mkOption { default = pkgs.gitleaks; };
+                        options.xdg.configHome = lib.mkOption { type = lib.types.str; };
+                        config.programs.gitHooks.enable = true;
+                        config.xdg.configHome = "${pkgs.writeTextDir "gitleaks/config.toml" ''
+                          [extend]
+                          useDefault = true
+                        ''}";
+                      }
+                    )
+                  ];
+                }).config.programs.git.hooks.pre-push;
+            in
+            pkgs.runCommand "git-hooks-pre-push-test" { nativeBuildInputs = [ pkgs.git ]; } ''
+              bash ${./home-manager/vcs/modules/git-hooks/pre-push.test.sh} ${prePush}
+              touch $out
+            '';
+
           checks.claude-code-permissions =
             pkgs.runCommand "claude-code-permissions-test"
               {
