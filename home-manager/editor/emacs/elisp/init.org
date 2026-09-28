@@ -2087,6 +2087,13 @@ directly instead of recomputing via `my/ghq-project-roots'."
     (setopt gac-debounce-interval (* 60 60 3))
     (setopt gac-default-message "Update"))
 #+end_src
+*** majutsu
+:PROPERTIES:
+:CUSTOM_ID: majutsu
+:END:
+#+begin_src emacs-lisp :tangle yes
+  (autoload-if-found '(majutsu majutsu-log) "majutsu" nil t)
+#+end_src
 ** Keyboard
 :PROPERTIES:
 :CUSTOM_ID: keyboard

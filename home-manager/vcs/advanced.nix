@@ -4,5 +4,6 @@
     ./gh
     ./gh-dash
     ./git-maintenance
+    ./jujutsu
   ];
 }

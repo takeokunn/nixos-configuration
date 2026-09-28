@@ -21,6 +21,7 @@ with epkgs;
   gist
   blamer
   git-auto-commit-mode
+  majutsu
 
   # keyboard
   key-chord
