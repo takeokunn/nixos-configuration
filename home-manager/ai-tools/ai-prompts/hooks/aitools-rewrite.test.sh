@@ -53,7 +53,7 @@ expect_plain 'grep -Fw a.b file' 'aitools search a.b file --fixed --word --conte
 expect_plain "rg 'fn \\w+' -g '*.rs'" "aitools search 'fn \\w+' --context 0 --limit 100 --glob '*.rs'"
 expect_plain 'rg -l TODO' 'aitools search TODO --output files --limit 200'
 expect_plain 'rg -n "a.b" src --no-heading' 'aitools search a.b src --context 0 --limit 100'
-expect_plain 'ls' "aitools find '*' --depth 1 --no-ignore --limit 200"
+expect_plain 'ls' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain 'ls -la home-manager' "aitools find '*' home-manager --depth 1 --no-ignore --limit 200"
 expect_plain "find . -name '*.nix' -type f -maxdepth 2" "aitools find '*.nix' . --type file --depth 2 --no-ignore --limit 200"
 expect_plain 'find src -type d' "aitools find '*' src --type dir --no-ignore --limit 200"
@@ -68,6 +68,30 @@ expect_plain 'git diff -- flake.nix' 'aitools git diff flake.nix'
 expect_plain 'git show HEAD:flake.nix' 'aitools git show HEAD:flake.nix --max-lines 2000'
 expect_plain 'git blame -L 10,20 flake.nix' 'aitools git blame flake.nix --range 10:20'
 expect_plain '  cat flake.nix  ' 'aitools read flake.nix --max-lines 2000'
+expect_plain 'cat 2000' 'aitools read 2000 --max-lines 2000'
+expect_plain 'cat 2000 | head -5' 'aitools read 2000 --range 1:5 --max-lines 5'
+
+# Envelopes: a leading cd, a trailing stderr redirect, a trailing head/tail.
+expect_plain 'cd src && cat a.txt' 'cd src && aitools read a.txt --max-lines 2000'
+expect_plain 'cd ~/repo&&git status' 'cd ~/repo&&aitools git status'
+expect_plain 'cat x 2>&1' 'aitools read x --max-lines 2000 2>&1'
+expect_plain 'cat x 2>/dev/null' 'aitools read x --max-lines 2000 2>/dev/null'
+expect_plain 'cat flake.nix | head -20' 'aitools read flake.nix --range 1:20 --max-lines 20'
+expect_plain 'cat x | head -n 3' 'aitools read x --range 1:3 --max-lines 3'
+expect_plain 'cat x | tail' 'aitools read x --tail 10 --max-lines 10'
+expect_plain 'cat file | head' 'aitools read file --range 1:10 --max-lines 10'
+expect_plain 'cat log | tail -5' 'aitools read log --tail 5 --max-lines 5'
+expect_plain 'grep -rn foo src | head -20' 'aitools search foo src --context 0 --limit 20 --no-ignore'
+expect_plain 'grep -rl foo src | head -500' 'aitools search foo src --output files --limit 200 --no-ignore'
+expect_plain 'rg -n foo | head -3' 'aitools search foo --context 0 --limit 3'
+expect_plain 'ls | head' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 10"
+expect_plain 'ls -A src' "aitools find '*' src --depth 1 --no-ignore --limit 200"
+expect_plain 'ls -l' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
+expect_plain "find . -name '*.nix' | head -5" "aitools find '*.nix' . --no-ignore --limit 5"
+expect_plain 'git log --oneline | head -5' 'aitools git log --limit 5'
+expect_plain 'git show HEAD:f | head -30' 'aitools git show HEAD:f --max-lines 30'
+expect_plain 'grep -rn foo . 2>/dev/null | head -5' 'aitools search foo . --context 0 --limit 5 --no-ignore 2>/dev/null'
+expect_plain 'cd src && grep -rn foo . 2>&1 | head -5' 'cd src && aitools search foo . --context 0 --limit 5 --no-ignore 2>&1'
 
 # Pass-through: anything the rewrite could change the meaning of.
 for cmd in \
@@ -114,7 +138,6 @@ for cmd in \
   'cat $HOME/.x' \
   'cat "$HOME/.x"' \
   'cat ~/.x' \
-  'cat file | head' \
   'cat a && cat b' \
   'cat a; cat b' \
   'cat a > b' \
@@ -125,6 +148,38 @@ for cmd in \
   'cat "unterminated' \
   "cat it\\'s.txt" \
   'cat a # comment' \
+  'cd $HOME && cat x' \
+  'cd a b && cat x' \
+  'cd src; cat x' \
+  'cat x | head -0' \
+  'cat x | head -c 5' \
+  'cat x | grep y' \
+  'cat x | head -5 | tail -1' \
+  'cat x > out 2>&1' \
+  'cat x 2>err' \
+  "grep 'a | head -5' f" \
+  'grep -rn -C2 foo src | head -3' \
+  'grep -rn foo src | tail -3' \
+  'rg foo | tail -3' \
+  "sed -n '1,5p' f | head -2" \
+  'head -5 x | tail -1' \
+  'git status | head' \
+  'git diff | head -20' \
+  'git blame -L 20,10 f' \
+  'git blame -L 1,99999999999999999999 f' \
+  'git blame -L 1, f' \
+  'git log | head -5' \
+  'tail -5 x | head -3' \
+  'tail -n 5 x | tail -2' \
+  'cat x | head -99999999' \
+  'git stash' \
+  'git stash pop' \
+  'git checkout main' \
+  'git switch main' \
+  'git reset --hard' \
+  'git clean -fd' \
+  'cd /tmp' \
+  'cd /tmp && git stash' \
   'bat x' \
   ''; do
   expect_plain "$cmd" ''

@@ -1,7 +1,7 @@
 #!/bin/bash
-# PreToolUse:Bash hook that rewrites a lone read-only shell command (cat, head, tail, sed -n, grep,
-# rg, ls, find, diff, and the reading git sub-commands) into the equivalent `aitools` call, so
-# the model gets aitools' JSON with line numbers, hashes, and next_commands instead of raw text.
+# PreToolUse:Bash hook that rewrites a read-only shell command (cat, head, tail, sed -n, grep, rg,
+# ls, find, diff, and the reading git sub-commands) into the equivalent `aitools` call, so the
+# model gets aitools' JSON with line numbers, hashes, and next_commands instead of raw text.
 #
 # The first argument selects the output shape:
 #   claude (default)  hookSpecificOutput.updatedInput only. A permissionDecision would auto-approve
@@ -11,10 +11,13 @@
 #   plain             stdin is the raw command; stdout is the rewrite, or empty for no rewrite. Used
 #                     by the opencode plugin.
 #
-# Only a single simple command is considered: inside a pipeline, list, substitution, or redirect the
-# output feeds another program, and aitools' JSON would break it. A flag outside the per-command
-# allowlist, an unquoted glob, a variable, or a regex whose dialect differs from aitools' leaves the
-# command untouched. Everything fails open. To keep a command as typed, prefix it: `command cat f`.
+# The command must be one simple command, optionally wrapped in the three envelopes agents add most:
+# a leading `cd DIR &&`, a trailing `2>&1` or `2>/dev/null`, and a trailing `| head -N` or
+# `| tail -N`, which becomes aitools' own line or result limit. Any other pipeline, list,
+# substitution, or redirect feeds the output to another program, and aitools' JSON would break it.
+# A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
+# differs from aitools' leaves the command untouched. Everything fails open. To keep a command as
+# typed, prefix it: `command cat f`.
 
 set -euo pipefail
 
@@ -49,9 +52,13 @@ if ($mode eq 'plain') {
 }
 exit 0 unless defined $command && !ref $command;
 
-my @words = split_words($command) or exit 0;
+my ($prefix, $body, $redirect, $filter) = split_envelope($command);
+my @words = split_words($body) or exit 0;
 my @rewritten = rewrite(@words) or exit 0;
-my $new = join ' ', map { quote($_) } 'aitools', @rewritten;
+if ($filter) {
+  @rewritten = apply_filter($filter, \@words, @rewritten) or exit 0;
+}
+my $new = $prefix . join(' ', map { quote($_) } 'aitools', @rewritten) . $redirect;
 
 if ($mode eq 'plain') {
   print $new;
@@ -62,6 +69,82 @@ my %out = (hookEventName => 'PreToolUse', updatedInput => \%updated);
 $out{permissionDecision} = 'allow' if $mode eq 'codex';
 print JSON::PP->new->canonical->encode({ hookSpecificOutput => \%out });
 exit 0;
+
+# Peels the envelopes off the command. Each is matched only at the very start or end of the text: a
+# `|` or `2>` inside quotes would leave an unterminated quote in the body, which split_words rejects.
+sub split_envelope {
+  my ($s) = @_;
+  $s =~ s/\A\s+//;
+  $s =~ s/\s+\z//;
+  my ($prefix, $redirect, $filter) = ('', '', undef);
+  if ($s =~ s{\A(cd\s+[A-Za-z0-9_/.,:\@%+~-]+\s*&&\s*)}{}) {
+    $prefix = $1;
+  }
+  if ($s =~ s/\s*\|\s*(head|tail)(?:\s+-n\s*([0-9]+)|\s+-([0-9]+))?\z//) {
+    my $n = $2 // $3 // 10;
+    return ('', '', '', undef) unless count($n);
+    $filter = [$1, $n];
+  }
+  if ($s =~ s{\s+(2>&1|2>/dev/null)\z}{}) {
+    $redirect = " $1";
+  }
+  return ($prefix, $s, $redirect, $filter);
+}
+
+# Folds a trailing `| head -N` or `| tail -N` into the rewrite. Only where aitools can express the
+# same cut: its first N lines, results, or commits for head; the last N lines of a file for tail.
+sub apply_filter {
+  my ($filter, $words, @args) = @_;
+  my ($kind, $n) = @$filter;
+  my %has = map { $_ => 1 } grep { /\A--/ } @args;
+  my $sub = $args[0];
+  if ($sub eq 'read') {
+    return () if $has{'--range'} || $has{'--tail'};
+    my @out = without_flag('--max-lines', @args);
+    return (@out, ($kind eq 'head' ? ('--range', "1:$n") : ('--tail', $n)), '--max-lines', $n);
+  }
+  return () unless $kind eq 'head';
+  if ($sub eq 'search') {
+    # With context lines, head's N lines are fewer than N selected lines.
+    return () if $has{'--before'} || $has{'--after'} || ($has{'--context'} && context_of(@args) ne '0');
+    return limit_to($n, '--limit', @args);
+  }
+  return limit_to($n, '--limit', @args) if $sub eq 'find';
+  if ($sub eq 'git') {
+    # Without --oneline a commit spans several lines, so head's N lines are fewer than N commits.
+    return limit_to($n, '--limit', @args) if $args[1] eq 'log' && grep { $_ eq '--oneline' } @$words;
+    return limit_to($n, '--max-lines', @args) if $args[1] eq 'show';
+  }
+  return ();
+}
+
+sub context_of {
+  my @args = @_;
+  for my $i (0 .. $#args - 1) { return $args[$i + 1] if $args[$i] eq '--context' }
+  return '';
+}
+
+sub without_flag {
+  my ($flag, @args) = @_;
+  my @out;
+  while (@args) {
+    my $a = shift @args;
+    if ($a eq $flag) { shift @args; next }
+    push @out, $a;
+  }
+  return @out;
+}
+
+sub limit_to {
+  my ($n, $flag, @args) = @_;
+  for my $i (0 .. $#args - 1) {
+    if ($args[$i] eq $flag) {
+      $args[$i + 1] = $n if $n < $args[$i + 1];
+      return @args;
+    }
+  }
+  return (@args, $flag, $n);
+}
 
 # Splits a command into words the way the shell would, or returns () when the shell would do more
 # than split: expand, glob, redirect, or chain.
@@ -312,14 +395,15 @@ sub rw_rg {
 
 sub rw_ls {
   my @args = @_;
-  my @paths;
+  my (@paths, $all);
   for my $a (@args) {
-    if ($a =~ /\A-[laAh1]+\z/) { next }
+    if ($a =~ /\A-[laAh1]+\z/) { $all = 1 if $a =~ /[aA]/; next }
     return () unless operand($a);
     push @paths, $a;
   }
   return () if @paths > 1;
-  return ('find', '*', @paths, '--depth', '1', '--no-ignore', '--limit', '200');
+  # ls hides dot entries unless -a or -A; aitools find lists them.
+  return ('find', '*', @paths, '--depth', '1', '--no-ignore', ($all ? () : ('--glob', '!.*')), '--limit', '200');
 }
 
 # find [PATH] with any of -maxdepth N, -type f|d, -name GLOB. find -name matches a whole name while
@@ -391,7 +475,8 @@ sub rw_git {
       my $a = shift @args;
       if ($a eq '-L') {
         my $v = shift @args // return ();
-        my ($s, $e) = $v =~ /\A([1-9][0-9]*),([1-9][0-9]*)\z/ or return ();
+        my ($s, $e) = split /,/, $v, 2;
+        return () unless defined $e && count($s) && count($e) && $e >= $s;
         $range = "$s:$e";
       } elsif (operand($a)) { push @paths, $a }
       else { return () }
