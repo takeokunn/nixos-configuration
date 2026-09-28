@@ -4,9 +4,16 @@
 # reset --hard, clean -f, checkout <ref>. Allows checkout -b/-B/--orphan and checkout -- <path>.
 # The jj equivalents are blocked too: edit, next, prev, abandon, undo, redo, op restore/revert,
 # restore without paths, and new onto another revision; plus jj git push, which skips Git hooks.
-# A jj subcommand computed at run time blocks, and `jj util exec` is judged by the command it runs.
+# Also blocked: anything that skips or redirects the Git hooks (--no-verify, commit -n,
+# core.hooksPath, GIT_CONFIG_* overrides), and jj commands that override the user identity or the
+# private-commit check (--config user.*/git.private-commits, --config-file, --allow-private,
+# JJ_USER/JJ_EMAIL/JJ_CONFIG). `jj util exec` and `env -S` are judged by the command they run.
 # Looks through shell wrappers (bash -c, xargs, sudo, ...) to find the underlying command,
-# and fails open on anything it cannot classify. Override: ALLOW_DESTRUCTIVE_GIT=1 <command>.
+# and fails open on anything it cannot classify, except where the unclassifiable part could itself
+# be the destructive command, which blocks: nesting deeper than the recursion limit, a git or jj
+# subcommand computed at run time ($(...), backticks, $VAR), a dynamic argument to git reset or
+# clean, and a jj subcommand that is not a built-in (a user alias can expand to anything).
+# Override: ALLOW_DESTRUCTIVE_GIT=1 <command>.
 
 set -euo pipefail
 
@@ -221,6 +228,16 @@ sub verdict_for_segment {
     my ($tokens, $depth) = @_;
     my @t = @{$tokens};
 
+    # Environment that swaps the config git or jj reads, which can drop the hooks or the identity
+    # the push checks rely on.
+    my ($git_env, $jj_env) = (0, 0);
+    my $note_env = sub {
+        my ($key) = @_;
+        $git_env = 1 if $key =~ /^GIT_CONFIG_(?:COUNT|PARAMETERS|GLOBAL|SYSTEM|KEY_\d+|VALUE_\d+)$/;
+        $jj_env  = 1 if $key =~ /^JJ_(?:USER|EMAIL|CONFIG)$/;
+        return;
+    };
+
     while (@t) {
         my $raw = $t[0]{text};
         my $w   = $raw;
@@ -231,6 +248,7 @@ sub verdict_for_segment {
             # The override is honoured where it is written, so it also works one level down
             # inside a shell payload.
             return q{} if $key =~ /^(?:CLAUDE_)?ALLOW_DESTRUCTIVE_GIT$/ and $val eq '1';
+            $note_env->($key);
             shift @t;
             next;
         }
@@ -262,8 +280,17 @@ sub verdict_for_segment {
             shift @t;
             while (@t) {
                 my $a = $t[0]{text};
-                if ($a =~ /^-/)                            { shift @t; next; }
-                if ($a =~ /^[A-Za-z_][A-Za-z0-9_]*=/)      { shift @t; next; }
+                # exec -a NAME: NAME is argv[0] for the command that follows, not the command.
+                if ($w eq 'exec' and $a eq '-a') { shift @t; shift @t if @t; next; }
+                # env -S splits its operand into the command line, so it is re-parsed as one.
+                if ($w eq 'env' and $a =~ /^(?:-S|--split-string)=?(.*)$/s) {
+                    shift @t;
+                    my @cmd = length $1 ? ($1) : @t ? (shift(@t)->{text}) : ();
+                    push @cmd, map { shell_quote($_->{text}) } @t;
+                    return classify(join(q{ }, @cmd), $depth + 1);
+                }
+                if ($a =~ /^-/) { shift @t; next; }
+                if ($a =~ /^([A-Za-z_][A-Za-z0-9_]*)=/) { $note_env->($1); shift @t; next; }
                 # timeout/nice and friends take a numeric operand before the command.
                 if ($w =~ /^(?:timeout|nice|ionice|chrt)$/ and $a =~ /^\d+(?:\.\d+)?[smhd]?$/) {
                     shift @t;
@@ -284,16 +311,26 @@ sub verdict_for_segment {
     shift @t;
     my @a = map { $_->{text} } @t;
 
-    return jj_verdict($depth, @a) if $prog eq 'jj';
+    return jj_verdict($depth, $jj_env, @a) if $prog eq 'jj';
     return q{} unless $prog eq 'git';
+    return 'hooks' if $git_env;
 
     # Global options precede the subcommand; some of them take a separate value.
     while (@a and $a[0] =~ /^-/) {
         my $opt = shift @a;
+        return 'hooks' if $opt =~ /^(?:-ccore\.hookspath|--config-env)/i;
+        return 'hooks' if $opt eq '-c' and @a and $a[0] =~ /^core\.hookspath/i;
         shift @a if @a and $opt =~ /^(?:-C|-c|--git-dir|--work-tree|--namespace|--exec-path)$/;
     }
     my $sub = @a ? shift @a : q{};
 
+    return 'dynamic' if is_dynamic($sub);
+    # Skipping or redirecting the hooks skips the pre-commit and pre-push secret scans.
+    return 'hooks' if grep { $_ eq '--no-verify' } @a;
+    return 'hooks' if $sub eq 'commit' and grep { /^-[A-Za-z]*n[A-Za-z]*$/ } @a;
+    if ($sub eq 'config' and grep { /^core\.hookspath$/i } @a) {
+        return (grep { /^--(?:get|get-all|list)$/ or $_ eq 'get' or $_ eq 'list' } @a) ? q{} : 'hooks';
+    }
     if ($sub eq 'stash') {
         my $verb = @a ? $a[0] : q{};
         return q{} if $verb eq 'list' or $verb eq 'show';
@@ -304,10 +341,10 @@ sub verdict_for_segment {
         return 'switch';
     }
     if ($sub eq 'reset') {
-        return (grep { $_ eq '--hard' } @a) ? 'reset' : q{};
+        return (grep { $_ eq '--hard' or is_dynamic($_) } @a) ? 'reset' : q{};
     }
     if ($sub eq 'clean') {
-        return (grep { /^-[A-Za-z]*f/ or $_ eq '--force' } @a) ? 'clean' : q{};
+        return (grep { /^-[A-Za-z]*f/ or $_ eq '--force' or is_dynamic($_) } @a) ? 'clean' : q{};
     }
     if ($sub eq 'checkout') {
         return q{} if grep { $_ eq '-b' or $_ eq '-B' or $_ eq '--orphan' or $_ eq '--' } @a;
@@ -345,22 +382,51 @@ sub jj_split {
 }
 
 # A word the shell expands at run time (`$(...)`, backticks, `$VAR`) has no value the hook can check.
-sub jj_dynamic { return $_[0] =~ /[\$`]/; }
+sub is_dynamic { return $_[0] =~ /[\$`]/; }
 
 sub shell_quote { my ($w) = @_; $w =~ s/'/'\\''/g; return "'$w'"; }
+
+# jj 0.45 built-in subcommands, from `jj --help`, plus the hidden built-in names debug, obslog, and
+# evolution-log, and op, the CLI alias of operation. A config alias cannot shadow any of these, so any
+# other name may be a user alias expanding to a blocked command. That includes the default config
+# aliases b, ci, desc, and st, which a config file can redefine. A jj upgrade that adds a subcommand
+# needs it added here, or the hook blocks it.
+my %JJ_BUILTIN = map { $_ => 1 } qw(
+    abandon absorb arrange bisect bookmark commit config converge describe diff diffedit duplicate
+    edit evolog file fix gerrit git help interdiff log metaedit new next operation parallelize prev
+    rebase redo resolve restore revert root run show sign simplify-parents sparse split squash status
+    tag undo unsign util version workspace
+    debug obslog evolution-log op
+);
+
+# Config that changes who jj thinks the user is, or which commits it refuses to push, turns the
+# `git.private-commits = "~mine()"` author check into a no-op.
+sub jj_identity_override {
+    my ($jj_env, @args) = @_;
+    return 1 if $jj_env;
+    while (@args) {
+        my $x = shift @args;
+        return 1 if $x =~ /^--config-file(?:=|$)/ or $x eq '--allow-private';
+        my $val = $x eq '--config' ? shift(@args) : $x =~ /^--config=(.*)$/s ? $1 : undef;
+        return 1 if defined $val and $val =~ /^(?:user\.|git\.private-commits)/;
+    }
+    return 0;
+}
 
 # Every jj command snapshots the working copy first, which is harmless; the danger is a command that
 # then rewrites the files on disk (moving @ or discarding its changes) under another session, and a
 # push, since jj runs no Git hooks and so skips the gitleaks pre-commit scan. A subcommand or
 # operand that decides between those and a safe command blocks when it is dynamic.
 sub jj_verdict {
-    my ($depth, @args) = @_;
+    my ($depth, $jj_env, @args) = @_;
     my ($pos, $opt) = jj_split(@args);
     return q{} if exists $opt->{'-h'} or exists $opt->{'--help'};
     my @p   = @{$pos};
     my $sub = @p ? shift @p : q{};
 
-    return 'jj-dynamic' if jj_dynamic($sub);
+    return 'jj-identity' if jj_identity_override($jj_env, @args);
+    return 'jj-dynamic' if is_dynamic($sub);
+    return 'jj-alias' if length $sub and !$JJ_BUILTIN{$sub};
     if ($sub eq 'util' and @p and $p[0] eq 'exec') {
         my @rest = @args;
         shift @rest while @rest and $rest[0] ne 'exec';
@@ -370,7 +436,7 @@ sub jj_verdict {
     }
     return "jj-$sub" if $sub =~ /^(?:edit|next|prev|abandon|undo|redo)$/;
     if ($sub eq 'op' or $sub eq 'operation') {
-        return (@p and ($p[0] =~ /^(?:restore|revert)$/ or jj_dynamic($p[0]))) ? 'jj-op' : q{};
+        return (@p and ($p[0] =~ /^(?:restore|revert)$/ or is_dynamic($p[0]))) ? 'jj-op' : q{};
     }
     # Without paths, restore overwrites the working copy (or the --into revision) wholesale.
     return @p ? q{} : 'jj-restore' if $sub eq 'restore';
@@ -383,7 +449,7 @@ sub jj_verdict {
     }
     if ($sub eq 'git') {
         return q{} unless @p;
-        return 'jj-push' if jj_dynamic($p[0]);
+        return 'jj-push' if is_dynamic($p[0]);
         return ($p[0] eq 'push' and !exists $opt->{'--dry-run'}) ? 'jj-push' : q{};
     }
     return q{};
@@ -391,8 +457,9 @@ sub jj_verdict {
 
 sub classify {
     my ($text, $depth) = @_;
-    # Bounded to 4 levels so a self-referential payload cannot spin; falls open past that.
-    return q{} if $depth > 4;
+    # Bounded to 4 levels so a self-referential payload cannot spin. Past that the shell would still
+    # run the innermost command, so the hook blocks rather than guess.
+    return 'depth' if $depth > 4;
     for my $seg (lex_segments($text)) {
         my $v = verdict_for_segment($seg, $depth);
         return $v if length $v;
@@ -438,6 +505,8 @@ if [[ $verdict == jj-* ]]; then
   jj-restore) detail="jj restore without paths overwrites the working copy (or the --into revision) wholesale, including changes you did not make." ;;
   jj-undo | jj-redo | jj-op) detail="Rewinding the operation log also rewinds the files other sessions are editing." ;;
   jj-dynamic) detail="The subcommand is computed when the shell runs it, so the hook cannot tell whether it is destructive; spell it literally." ;;
+  jj-alias) detail="This is not a jj built-in subcommand, so it may be an alias that expands to a destructive one; run the built-in it stands for (status, not st)." ;;
+  jj-identity) detail="This overrides the jj user, loads another config, or allows private commits, which disables the check that stops jj git push from sending commits you did not author." ;;
   esac
   cat >&2 <<EOF
 ❌ Destructive jj operation blocked (ORCH-P005)
@@ -463,6 +532,9 @@ switch) detail="git switch moves HEAD for every session sharing this checkout." 
 reset) detail="git reset --hard discards uncommitted work irrecoverably, including work you did not make." ;;
 clean) detail="git clean -f deletes untracked files irrecoverably, including another session's scratch files." ;;
 checkout) detail="git checkout <ref> moves HEAD for every session sharing this checkout." ;;
+dynamic) detail='Part of this git command is computed when the shell runs it ($(...), backticks, or a variable), so the hook cannot tell whether it is destructive; spell it literally.' ;;
+depth) detail="The command nests eval, sh -c, or jj util exec deeper than the hook follows, so what finally runs is unchecked; flatten it." ;;
+hooks) detail="This skips or redirects the Git hooks (--no-verify, commit -n, core.hooksPath, or GIT_CONFIG_* overrides), and with them the gitleaks and identity checks on commit and push." ;;
 *) detail="This command mutates shared working-tree state." ;;
 esac
 
