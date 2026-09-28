@@ -383,6 +383,20 @@
                 touch $out
               '';
 
+          checks.block-destructive-git-hook =
+            pkgs.runCommand "block-destructive-git-hook-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.perl
+                ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.sh}
+                touch $out
+              '';
+
           checks.claude-code-permissions =
             pkgs.runCommand "claude-code-permissions-test"
               {

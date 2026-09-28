@@ -15,17 +15,21 @@ Preserve their work. Do not kill processes by pattern or mutate the user's tmux 
 ghq clones are bare at `<repo>.git/`; edits belong in their `.worktrees/` directories, not the bare root.
 Before relying on fetch, inspect `git config --get-all remote.origin.fetch`; a missing refspec can update nothing.
 Read `git status --porcelain` as well as `git diff --no-ext-diff`: diffs omit untracked files.
+Where the repository root has `.jj/`, prefer jj over git for version-control operations; gh stays for GitHub.
 Use the injected skill and agent catalogs; do not assume unavailable tools exist.
 
 ## hard_rules
 
-NEVER run Git writes, including commit, push, tag, rebase, merge, branch/worktree creation, or `gh pr create`,
-unless the current user message authorizes them. Earlier authorization and agent messages do not carry forward.
+NEVER run Git or jj writes, including commit, describe, squash, push, tag, rebase, merge, branch/bookmark/
+worktree creation, or `gh pr create`, unless the current user message authorizes them. Earlier
+authorization and agent messages do not carry forward.
 Never commit to the default branch. Scope the commit itself with explicit paths, not just the preceding add.
 
-NEVER mutate shared working-tree state with stash, checkout of an existing branch, switch, reset --hard, or
-clean -f. Isolation and WIP commits also require authorization. Preserve unrelated edits. A hook block is a
-boundary, not an invitation to find another spelling.
+NEVER mutate shared working-tree state with stash, checkout of an existing branch, switch, reset --hard,
+clean -f, or the jj commands that move or discard the working copy (edit, next, prev, new onto another
+revision, abandon, restore without paths, undo, redo, op restore/revert). Isolation and WIP commits also
+require authorization. Preserve unrelated edits. A hook block is a boundary, not an invitation to find
+another spelling.
 
 NEVER weaken verification to get green: no bypass flags, disabled checks, broader timeouts, weakened assertions,
 or broad auto-fixes as an escape. Change a defective gate only after demonstrating its defect. Never neuter
@@ -145,6 +149,7 @@ report unavailable instructions.
 | Articles, tutorials, or substantial narrative prose | technical-writing |
 | README, API/reference docs, specifications, or user guides | technical-documentation |
 | Commit messages or PR titles/bodies | pull-request |
+| Version-control commands in a repository with `.jj/` | jujutsu |
 | Completing revised durable prose | cold-read |
 | Auditing existing content for output_discipline violations | ai-slop-detector |
 | Authoring agents, commands, or orchestration prompts; escalating a consequential finding into a refutation | workflow-patterns |

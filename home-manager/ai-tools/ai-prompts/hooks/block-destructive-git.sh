@@ -2,7 +2,10 @@
 # PreToolUse:Bash hook that blocks git commands that mutate shared working-tree state, since
 # concurrent sessions may share this checkout: stash (except list/show), switch,
 # reset --hard, clean -f, checkout <ref>. Allows checkout -b/-B/--orphan and checkout -- <path>.
-# Looks through shell wrappers (bash -c, xargs, sudo, ...) to find the underlying git command,
+# The jj equivalents are blocked too: edit, next, prev, abandon, undo, redo, op restore/revert,
+# restore without paths, and new onto another revision; plus jj git push, which skips Git hooks.
+# A jj subcommand computed at run time blocks, and `jj util exec` is judged by the command it runs.
+# Looks through shell wrappers (bash -c, xargs, sudo, ...) to find the underlying command,
 # and fails open on anything it cannot classify. Override: ALLOW_DESTRUCTIVE_GIT=1 <command>.
 
 set -euo pipefail
@@ -50,6 +53,7 @@ sub lex_segments {
     my @cur;
     my $tok;
     my @pending;
+    my $in_backtick = 0;
     my $i = 0;
     my $n = length $s;
 
@@ -151,10 +155,21 @@ sub lex_segments {
             next;
         }
 
-        # Command substitution opens a fresh command position.
+        # Command substitution opens a fresh command position. The outer command keeps an opaque
+        # `$(` word in its place, so a classifier sees an argument whose value is unknown rather
+        # than no argument at all.
         if ($c eq q{$} and substr($s, $i, 2) eq q{$(}) {
+            $add->(q{$(}, 0);
             $flush_seg->();
             $i += 2;
+            next;
+        }
+
+        if ($c eq q{`}) {
+            $add->(q{`}, 0) if !$in_backtick;
+            $in_backtick = !$in_backtick;
+            $flush_seg->();
+            $i++;
             next;
         }
 
@@ -168,7 +183,7 @@ sub lex_segments {
             next;
         }
 
-        if ($c =~ /[;\n&|()]/ or $c eq q{`}) {
+        if ($c =~ /[;\n&|()]/) {
             $flush_seg->();
             $i++;
             $i++ if ($c eq q{&} or $c eq q{|}) and $i < $n and substr($s, $i, 1) eq $c;
@@ -266,10 +281,11 @@ sub verdict_for_segment {
 
     my $prog = $t[0]{text};
     $prog =~ s{^.*/}{};
-    return q{} unless $prog eq 'git';
     shift @t;
-
     my @a = map { $_->{text} } @t;
+
+    return jj_verdict($depth, @a) if $prog eq 'jj';
+    return q{} unless $prog eq 'git';
 
     # Global options precede the subcommand; some of them take a separate value.
     while (@a and $a[0] =~ /^-/) {
@@ -301,6 +317,78 @@ sub verdict_for_segment {
     return q{};
 }
 
+# jj options that take a separate value, global or per-subcommand; skipping them keeps a value such
+# as `-R .` from reading as a path operand.
+my %JJ_VALUE_OPT = map { $_ => 1 } qw(
+    -R --repository --at-operation --at-op --color --config --config-file
+    -m --message -r --revision -A --insert-after --after -B --insert-before --before
+    -f --from -t --into --to -c --changes-in --tool -o --onto
+);
+
+# Returns the operands and the options seen, the latter keyed by name (`--opt=value` folded to
+# `--opt`) with the option's value, or 1 for a flag.
+sub jj_split {
+    my @a = @_;
+    my (@pos, %opt);
+    while (@a) {
+        my $x = shift @a;
+        if ($x eq '--') { push @pos, @a; last; }
+        if ($x =~ /^-/) {
+            my ($name, $val) = $x =~ /^([^=]+)(?:=(.*))?$/s;
+            $val = shift @a if !defined $val and $JJ_VALUE_OPT{$name} and @a;
+            $opt{$name} = defined $val ? $val : 1;
+            next;
+        }
+        push @pos, $x;
+    }
+    return (\@pos, \%opt);
+}
+
+# A word the shell expands at run time (`$(...)`, backticks, `$VAR`) has no value the hook can check.
+sub jj_dynamic { return $_[0] =~ /[\$`]/; }
+
+sub shell_quote { my ($w) = @_; $w =~ s/'/'\\''/g; return "'$w'"; }
+
+# Every jj command snapshots the working copy first, which is harmless; the danger is a command that
+# then rewrites the files on disk (moving @ or discarding its changes) under another session, and a
+# push, since jj runs no Git hooks and so skips the gitleaks pre-commit scan. A subcommand or
+# operand that decides between those and a safe command blocks when it is dynamic.
+sub jj_verdict {
+    my ($depth, @args) = @_;
+    my ($pos, $opt) = jj_split(@args);
+    return q{} if exists $opt->{'-h'} or exists $opt->{'--help'};
+    my @p   = @{$pos};
+    my $sub = @p ? shift @p : q{};
+
+    return 'jj-dynamic' if jj_dynamic($sub);
+    if ($sub eq 'util' and @p and $p[0] eq 'exec') {
+        my @rest = @args;
+        shift @rest while @rest and $rest[0] ne 'exec';
+        shift @rest;
+        shift @rest if @rest and $rest[0] eq '--';
+        return classify(join(q{ }, map { shell_quote($_) } @rest), $depth + 1);
+    }
+    return "jj-$sub" if $sub =~ /^(?:edit|next|prev|abandon|undo|redo)$/;
+    if ($sub eq 'op' or $sub eq 'operation') {
+        return (@p and ($p[0] =~ /^(?:restore|revert)$/ or jj_dynamic($p[0]))) ? 'jj-op' : q{};
+    }
+    # Without paths, restore overwrites the working copy (or the --into revision) wholesale.
+    return @p ? q{} : 'jj-restore' if $sub eq 'restore';
+    if ($sub eq 'new') {
+        return q{} if exists $opt->{'--no-edit'};
+        return 'jj-new' if grep { exists $opt->{$_} } qw(-A --insert-after --after -B --insert-before --before);
+        # -r and -o are aliases for the parent operands.
+        my @parents = (@p, map { $opt->{$_} } grep { exists $opt->{$_} } qw(-r --revision -o --onto));
+        return (grep { $_ ne '@' } @parents) ? 'jj-new' : q{};
+    }
+    if ($sub eq 'git') {
+        return q{} unless @p;
+        return 'jj-push' if jj_dynamic($p[0]);
+        return ($p[0] eq 'push' and !exists $opt->{'--dry-run'}) ? 'jj-push' : q{};
+    }
+    return q{};
+}
+
 sub classify {
     my ($text, $depth) = @_;
     # Bounded to 4 levels so a self-referential payload cannot spin; falls open past that.
@@ -325,6 +413,48 @@ verdict="$(HOOK_CMD="$command" perl -e "$perl_prog")"
 # which `set -e` turns into a spurious non-zero exit from the hook itself.
 if [[ -z $verdict ]]; then
   exit 0
+fi
+
+if [[ $verdict == jj-push ]]; then
+  cat >&2 <<'EOF'
+❌ jj git push blocked (ORCH-P005)
+
+jj runs no Git hooks, so the gitleaks pre-commit scan never saw these commits.
+Scan exactly what will be pushed, then push with the override prefix and literal arguments:
+  jj git push --dry-run <arguments>     (shows the bookmarks and commits to push)
+  gitleaks git --config ~/.config/gitleaks/config.toml --log-opts="<remote>/<bookmark>..<commit>"
+                                        (a new bookmark: --log-opts="<commit> --not --remotes")
+  ALLOW_DESTRUCTIVE_GIT=1 jj git push <arguments>
+
+A push still needs the user's authorization in the current message.
+EOF
+  exit 2
+fi
+
+if [[ $verdict == jj-* ]]; then
+  case "$verdict" in
+  jj-edit | jj-next | jj-prev | jj-new) detail="This moves the working-copy revision, rewriting the files every session sharing this checkout is editing." ;;
+  jj-abandon) detail="jj abandon drops a revision, including working-copy changes you did not make when it is @." ;;
+  jj-restore) detail="jj restore without paths overwrites the working copy (or the --into revision) wholesale, including changes you did not make." ;;
+  jj-undo | jj-redo | jj-op) detail="Rewinding the operation log also rewinds the files other sessions are editing." ;;
+  jj-dynamic) detail="The subcommand is computed when the shell runs it, so the hook cannot tell whether it is destructive; spell it literally." ;;
+  esac
+  cat >&2 <<EOF
+❌ Destructive jj operation blocked (ORCH-P005)
+
+$detail
+Assume other Claude Code sessions are working in this same checkout right now.
+
+Use instead:
+  Start a change       jj new (on top of @; the files stay as they are)
+  Park changes         jj describe -m "WIP"; @ already records the working copy
+  Undo a revision      jj revert -r <rev> --onto @
+  Discard one file     jj restore <path> (allowed)
+
+Still need it? Re-run with the override prefix and tell the user why first:
+  ALLOW_DESTRUCTIVE_GIT=1 <your command>
+EOF
+  exit 2
 fi
 
 case "$verdict" in
