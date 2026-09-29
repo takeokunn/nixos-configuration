@@ -16,8 +16,8 @@ Serena owns code intelligence; standard tools own the filesystem.
 
 | Need | Tool |
 |---|---|
-| Find files by name | Glob |
-| Search file contents | Grep for discovery, then Serena for navigation |
+| Find files by name | `aitools find` |
+| Search file contents | `aitools search` for discovery, then Serena for navigation |
 | File structure | `get_symbols_overview`: depth 0 first, then depth 1 |
 | A named function, class, or method | `find_symbol`; `substring_matching=true` when the name is uncertain |
 | Its implementation | `find_symbol` with `include_body=true` |
@@ -34,7 +34,7 @@ Restrict any search with `relative_path` when the scope is known. Read whole fil
 JSON, Markdown, config) or when symbol operations have already been tried and were insufficient.
 
 Prefer symbol operations strongly in strongly-typed languages, where LSP resolution is accurate. In dynamic
-languages add `substring_matching=true`. For configuration and prose formats, go straight to Grep and Read.
+languages add `substring_matching=true`. For configuration and prose formats, go straight to `aitools search` and Read.
 
 At session start: `initial_instructions`, then `activate_project`, then `check_onboarding_performed`, then
 `onboarding` if it returns false.
@@ -57,9 +57,9 @@ against a symbol you already know is there; if that comes back empty too, the to
 question and no result from it counts as evidence.
 
 **Treat this as an ongoing constraint of that repository, not a transient glitch to retry against.** Confirm it
-once, then commit to the text-based path: locate definitions and references with Grep across source *and*
-tests, edit with `replace_content` or the standard Edit tool, and verify with the language's own build or load
-step; `get_diagnostics_for_file` is unavailable for an inactive language too.
+once, then commit to the text-based path: locate definitions and references with `aitools search` across source
+*and* tests, edit with `replace_content` or the standard Edit tool, and verify with the language's own build or
+load step; `get_diagnostics_for_file` is unavailable for an inactive language too.
 
 Failure can also be per-symbol rather than wholesale. When the tree is changing under a concurrent session, a
 lookup can succeed for one symbol and come back empty for the next in the same session; that pattern indicts
