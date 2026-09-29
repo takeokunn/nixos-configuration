@@ -99,7 +99,7 @@ manual.
 
 **Scaffolding standing in for the work.** A function body that is a stub, a hardcoded return dressed as
 computed output, or an exception meaning "not implemented" left behind a caller that no longer expects one.
-Grep for the direct markers first: `TODO|FIXME|XXX|not implemented|NotImplementedError|unimplemented!|panic!\(
+Search for the direct markers first with `aitools search`: `TODO|FIXME|XXX|not implemented|NotImplementedError|unimplemented!|panic!\(
 "todo"`. These markers undercount, since a stub can return a plausible-looking constant with no marker at all;
 cross-check any function whose body is disproportionately short against what its name and call sites imply it
 should do.

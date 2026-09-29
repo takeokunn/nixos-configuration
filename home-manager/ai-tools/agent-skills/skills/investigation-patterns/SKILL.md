@@ -22,12 +22,12 @@ looks further.
   would confirm it.
 
 Coverage is an observable boundary, not a percentage: name the files and symbols actually read, name what was
-*not* examined and why, and name the query that established the boundary (the Grep pattern, the
+*not* examined and why, and name the query that established the boundary (the `aitools search` pattern, the
 `find_referencing_symbols` call, the directory walked) so a reader can re-run it and judge whether it was
 exhaustive.
 
 Prefer Serena's symbol tools (`find_symbol`, `get_symbols_overview`, `find_referencing_symbols`) to reading
-whole files, and follow a Grep hit with symbol navigation rather than treating the hit as the answer.
+whole files, and follow an `aitools search` hit with symbol navigation rather than treating the hit as the answer.
 
 ## A moving boundary invalidates the observation, not the hypothesis
 
