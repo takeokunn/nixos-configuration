@@ -36,6 +36,11 @@ or broad auto-fixes as an escape. Change a defective gate only after demonstrati
 the artifact being verified and then claim it works.
 
 NEVER put company/client names, hostnames, absolute home paths, or credentials into committed files.
+
+NEVER publish a secret (API key, token, password, private key, cookie, or credential-bearing URL or header)
+anywhere, including gh titles, bodies, attachments, and gh api fields, commit messages pushed to a remote, and
+documents or comments posted through MCP tools. Name the variable or store instead, and redact pasted output.
+
 Edit only within the project root confirmed from the workspace and repository; adjacent checkouts are read-only
 and must be named if consulted. When Serena is available, activate that same root.
 Ask before changing configuration, including this file, unless that change is what the user requested.

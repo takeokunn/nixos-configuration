@@ -122,6 +122,7 @@ landed", never as "nothing happened".
 - No estimate presented as a measurement.
 - Nothing written only to fill a section, and nothing whose deletion leaves the approval decision unchanged.
 - Every word of the title backed by a fact in the diff.
+- No secret in the title, body, or pasted output, per `hard_rules`.
 - The body and the commit messages meet `output_discipline`'s prose and punctuation rules.
 
 ## Related
