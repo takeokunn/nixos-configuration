@@ -7,7 +7,7 @@
 let
   lib = pkgs.lib;
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-  emacsSocketPath = "/tmp/emacs$(id -u)/server";
+  emacsSocketPath = (import ../lib/emacs-constants.nix).socketPath;
   emacsLaunchdCommon = ''
     AGENT_NAME="org.nix-community.home.emacs"
     PLIST_PATH="$HOME/Library/LaunchAgents/$AGENT_NAME.plist"
@@ -115,31 +115,37 @@ in
     Service.RestartSec = 10;
   };
 
-  # macOS: Set TMPDIR so emacs daemon creates socket in /tmp
-  launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf isDarwin {
-    TMPDIR = "/tmp";
+  launchd.agents.emacs = lib.mkIf isDarwin {
+    domain = lib.mkForce "gui";
+    config = {
+      EnvironmentVariables = {
+        # Make the daemon create its socket in /tmp.
+        TMPDIR = "/tmp";
+        # launchd passes no TERMINFO_DIRS, and Emacs's ncurses lacks xterm-kitty, so
+        # `emacsclient -t` from kitty (the scratchpad) fails without kitty's entry.
+        # The trailing empty entry keeps ncurses' compiled-in database searched.
+        TERMINFO_DIRS = "${pkgs.kitty.terminfo}/share/terminfo:";
+      };
+
+      # Launch the Emacs.app binary directly, not the bin/emacs shell wrapper. The
+      # wrapper lacks .app bundle context, so NSApp does not initialise properly and
+      # emacsclient -c cannot create GUI frames.
+      ProgramArguments = lib.mkForce [
+        "${cocoaEmacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
+        "--fg-daemon"
+      ];
+      KeepAlive = lib.mkForce true;
+      ThrottleInterval = 10;
+
+      # launchd hands every agent a 256-file soft rlimit by default, which Emacs
+      # (native-comp .eln files alone keep ~500 FDs open at idle, plus LSP servers and many
+      # buffers/processes) exhausts -> "too many open files". Pin the agent itself so it does
+      # not depend on the global launchctl limit (a separate launchd domain). 65536 is ~130x
+      # measured idle usage, ample headroom without an enormous soft rlimit.
+      SoftResourceLimits.NumberOfFiles = 65536;
+      HardResourceLimits.NumberOfFiles = 65536;
+    };
   };
-  launchd.agents.emacs.domain = lib.mkIf isDarwin (lib.mkForce "gui");
-
-  # macOS: Launch daemon via Emacs.app binary directly, not the bin/emacs shell
-  # wrapper.  The shell wrapper lacks .app bundle context, so NSApp does not
-  # initialise properly and emacsclient -c cannot create GUI frames.
-  launchd.agents.emacs.config.ProgramArguments = lib.mkIf isDarwin (
-    lib.mkForce [
-      "${cocoaEmacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
-      "--fg-daemon"
-    ]
-  );
-  launchd.agents.emacs.config.KeepAlive = lib.mkIf isDarwin (lib.mkForce true);
-  launchd.agents.emacs.config.ThrottleInterval = lib.mkIf isDarwin 10;
-
-  # macOS: launchd hands every agent a 256-file soft rlimit by default, which Emacs
-  # (native-comp .eln files alone keep ~500 FDs open at idle, plus LSP servers and many
-  # buffers/processes) exhausts -> "too many open files".  Pin the agent itself so it does
-  # not depend on the global launchctl limit (a separate launchd domain).  65536 is ~130x
-  # measured idle usage -- ample headroom without an enormous soft rlimit.
-  launchd.agents.emacs.config.SoftResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
-  launchd.agents.emacs.config.HardResourceLimits.NumberOfFiles = lib.mkIf isDarwin 65536;
 
   # Install the Nix-built kuro native module into kuro-module.el's XDG default
   # location (~/.local/share/kuro/). kuro-module.el validates the module file
