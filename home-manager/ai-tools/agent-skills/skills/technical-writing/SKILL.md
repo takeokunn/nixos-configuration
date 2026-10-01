@@ -2,7 +2,7 @@
 name: technical-writing
 description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese (includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials).
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
 ---
 
 Structured patterns for writing technical blogs, articles, and tutorials that communicate technical concepts
@@ -20,7 +20,9 @@ Classify each passage before writing it, and do not mix the two in one passage:
 
 Put the condition before the command ("If the build fails, read the log"; a trailing condition gets dropped
 by a skimming reader). Describe an action with a verb, not a nominalization ("compress the file", not
-"perform compression"). A requirement is "must"; a capability is "can"; do not write "should" in
+"perform compression"; in Japanese, over-nominalizing with a サ変名詞 chain like「保守性担保機能の形骸化の
+防止」erases who does what, so write it as an action instead:「この機能を使うと、保守性を保てる」). A
+requirement is "must"; a capability is "can"; do not write "should" in
 instructions: readers treat it as optional. Never convert genuine uncertainty into assertion: a hedge that
 carries real epistemic content (an unverified fact, an inference, a reader's likely doubt) keeps its
 uncertainty, and is deleted only once the text grounds the claim. Delete filler: announcements ("In this
@@ -113,6 +115,19 @@ language and buzzwords without substance.
 - Avoid: 過度に硬い表現、主語の省略による曖昧さ
 - Note: 英語の技術用語は適度にカタカナで使用可
 
+Domain calibration runs on an axis independent of the article types above (which classify by reader need)
+and of Formality (register): it classifies by document domain instead. A technical article favors
+restoring concrete steps and holding bullets to the 15% cap below, with a kanji ratio around 20% (open the
+rest to hiragana or verbs). A business document (PR body, spec, report) bans metaphor outright and names
+the responsible party instead of a passive construction (say「開発チームで合意した」, not「合意に至った」),
+and maps a condition to its result one-to-one (say「エラーコード404の場合は3回まで再試行する」, not「適宜
+対応する」). An essay or personal piece keeps the writer's own subject and plain sensory detail instead of
+generalizing to「一般に」「多くの人が」, and does not inflate a small experience into a lesson (say「ここの
+コーヒーは酸味が少なくて飲みやすかった」, not a grandiose「日常の喧騒という虚飾を剥ぎ取った先に現れる静謐な
+真実」). A business document has no counterpart among the article types above; a technical article and an
+essay loosely overlap with the Tutorial/Concept group and Opinion piece respectively, but the two axes are
+not interchangeable.
+
 The ruleset below is the canonical set for drafting and revising Japanese technical prose. Directive text is
 English; illustrative bad/good examples and Japanese-specific tokens (中黒「・」, dashes「—」「―」「――」, 「」,
 footnote [^label], phrases) are kept in Japanese verbatim because they demonstrate Japanese-punctuation and
@@ -135,6 +150,29 @@ particle norms.
   particle or comma). Column headings must not be bare category names like「基礎」「補足」; specify content,
   e.g.「同値関係としての分類」「ループ不変条件と帰納法」.
 - A bullet listing a term and its definition uses a fullwidth colon, not a rule line:「**用語**：説明」.
+- Do not end a sentence, a heading, or the line introducing a bullet list with a fullwidth colon（：）. Close
+  with 。, or state the content directly without the colon-led preamble.
+  - Bad: 対応方針は以下の通りです：
+  - Good: 対応方針は次の3点である。
+- Do not insert half-width spaces around an English word or alphabetic string embedded in Japanese text
+  (e.g.「この README は」). Join them directly:「このREADMEは」.
+- Delete a parenthetical aside that only restates its host phrase in different words and adds no new
+  information (e.g.「AI生成文（素の出力）」→「AI生成文」;「不自然な日本語（いわゆるAI臭さ）」→「AI特有の
+  不自然な日本語」). Keep a parenthetical only when it adds a fact the host phrase does not already carry.
+
+#### Rhythm
+
+- Keep the average sentence length around 30-45 characters. Split a sentence past 60 characters into two;
+  conversely, do not stack several sentences under 10 characters in a row for dramatic effect.
+- Keep commas (読点) to 0-2 per sentence. Do not open a sentence with an emphatic comma that has no
+  syntactic function (「前提を、〜」「ここでは、〜」).
+- Open a run of dense kanji compounds (漢語の連続) by replacing one with a native-Japanese word or a verb
+  where that keeps the meaning, instead of leaving three or more kanji compounds chained in one clause.
+- Do not let the same sentence ending (「です」「ます」「でした」「である」) repeat three or more times in a
+  row; vary it with a different ending form, a 体言止め, or a different verb conjugation. This governs
+  flowing paragraph prose; it does not apply to a status line, a field label, or code.
+  - Bad: 設定を変更した。再起動した。ログを確認した。
+  - Good: 設定を変更し、再起動する。その後、ログを確認した。
 
 #### Paragraph and argument
 
@@ -211,6 +249,17 @@ particle norms.
 
 - In examples, write an actor-as-subject chain of actions (「リポジトリを調査して特定し、見つけてくれた」),
   not a list of results or passive voice (「特定され、判明した」).
+- Do not give an inanimate subject (a concept, tool, architecture, or event) agency or intent it cannot
+  have. Rewrite it as a human or organizational action, or an observable fact.
+  - Bad: この事例が残したのは、先例である。
+  - Good: この事例は、先例として参照できる。
+  - Bad: アーキテクチャが開発者に規律を要求する。
+  - Good: 開発者はアーキテクチャの規則に従ってコードを書く。
+  A result-reporting subject stays fine (「結果が〜を示す」); the ban is on treating a non-agent as if it
+  acted with intent.
+- Separate the reader's action from a system's capability: a request to the reader is「〜してください」; a
+  capability or behavior being described is「〜できます」「〜が可能です」. Do not blur the two with a bare
+  「〜します」that leaves the actor ambiguous.
 - Do not gratuitously prefix fictional personas like「入社2年目のエンジニアが」.
 - In argument, do not call the reader「あなた」; use a role name (「開発者」「読者」). Reserve second-person
   address for limited spots (scene setup「〜としよう」, chapter or book closings).
@@ -233,8 +282,11 @@ This is restraint, not a total ban; use rhetoric only where it works.
 - Do not overuse the device of isolating a short punchline into its own paragraph for tension. A short
   体言止め within a paragraph (「ここまでわずか数十秒。」) is allowed only at a climax.
 - Do not overuse bold in body text; limit to logical crux points (misreading-preventing negations, section
-  conclusions), one or two per section, intro allowed. Otherwise let sentence order and structure do the
-  emphasizing.
+  conclusions): roughly 1-2 bolded spans per 1,000 characters of body text, not per section, so the limit
+  scales with length. Otherwise let sentence order and structure do the emphasizing.
+- Keep bulleted lines to at most 15% of an article's total lines; reserve bullets for genuinely parallel
+  data (parameter lists, comparison tables) and write everything else, including a line of reasoning, as
+  paragraph prose.
 - Prefer the worker-judgment form (「〜するわけにはいかない」) over the imperative assertion
   (「〜してはならない」).
 - Do not over-dramatize turning points; one factual sentence usually suffices. Only at an argument's climax,
@@ -264,6 +316,32 @@ problem is empty decoration. Japanese phrase tokens are kept verbatim.
 - Avoid weak hedges and praise:「〜と言えるだろう」「〜かもしれない」(only when weakening a claim groundlessly;
   keep for speculation, hypothesis, reader-doubt, or character-perception),「非常に」「極めて」「大いに」
   (empty intensifiers).
+- Avoid AI's favorite metaphor verbs that paper over a mechanism with imagery:「効く」「効いてくる」(say
+  「役に立つ」「〜を防げる」),「壊れる」(say「要件を満たせなくなる」「例外が発生する」「整合性が崩れる」),
+  「倒す」(say「〜を原則とする」「除外する」),「溶かす」(say「〜に時間を費やした」),「潰す」(say「解消する」
+  「検証する」),「踏み込む」(say「詳細まで調べる」),「引き返す」(say「元の状態に戻す」「ロールバックする」),
+  「添える」(say「参照する」「付与する」),「収斂する」(say「〜に決まる」「〜に落ち着く」),「沈黙する」「黙って」
+  (say「エラーを出さずに」「通知なく」). The replacement must name the actual mechanism, not swap one vague
+  word for another.
+- Avoid the incident-vocabulary spike these same verbs feed:「事故」「混ざる」「落とし穴」「破綻」「実害」
+  「素通り」for a failure (say what broke and how);「実測」「疑う」「照合」「突き合わせる」「断定」
+  「取り違える」for checking (say what was measured or compared);「入口」「土台」「道具」「主役」
+  「構図」「線引き」for role or position (name the actual role; 「核心」stays fine when it grounds a specific
+  claim, as in the Self-check example below, so it is not listed here as a bare filler);「既定」「別物」「定番」「要点」「定石」
+  「桁違い」as filler evaluation (state the specific difference or default instead).
+- Avoid grandiose vocabulary imported to dramatize an ordinary observation or experience:「真理」「虚飾」
+  「境地」「美学」「深淵」「冷徹」「禁欲的」「優美」「極致」「宿命」, and pseudo-concrete jargon that sounds
+  technical but adds nothing checkable:「手触り」「肌感」「温度感」「熱量」(describe the actual steps, logs,
+  or measured values instead),「解像度」as in「解像度を上げる」(say what was investigated and how far),
+  「腹落ち」「メンタルモデル」(「文脈」as a pre-formalization word stays fine per the perspective-and-voice
+  rule above),「本質」「地に足のついた」「等身大」, and an invented compound term standing in for a real
+  technical name (e.g.「意思決定OS」; name the actual mechanism or use the standard term).
+- Avoid direct-translation leaks from English idiom beyond the em dash and antithesis rules above:「〜した
+  瞬間」for "the moment ..." (say「〜するとすぐに」「〜した直後に」),「〜を正本にする」for "single source of
+  truth" (say「信頼できる唯一の情報源とする」),「〜を指している」「〜を示唆している」used as a hedge for
+  "point to / suggest" (say「〜を表している」「〜と考えられる」when the claim is actually grounded),「耐力
+  のある」for "load-bearing" (say「根幹となる」「外せない」; do not say「不可欠な」, which the empty-adjective
+  bullet above already bans).
 
 Self-check examples:
 
