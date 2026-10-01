@@ -119,7 +119,9 @@
 
   ;;;###autoload
   (defun my/load-init-time ()
-    "Loading time of user init files including time for `after-init-hook'."
+    "Loading time of user init files including time for `after-init-hook'.
+In a daemon the functions in `my/deferred-after-init-functions' run later
+and are not counted."
     (let ((time1 (float-time
                   (time-subtract after-init-time my/before-load-init-time)))
           (time2 (float-time
@@ -7304,6 +7306,50 @@ With prefix argument ARG, include line number as #L<line>."
 :END:
 #+begin_src emacs-lisp :tangle yes
   (setq file-name-handler-alist my/saved-file-name-handler-alist)
+#+end_src
+** daemon起動時のafter-init-hookを遅延実行する
+:PROPERTIES:
+:CUSTOM_ID: defer-after-init-hook-in-daemon
+:END:
+daemonは ~after-init-hook~ を実行し終えるまでserver socketを公開しない.
+起動時間を測る2関数以外をtimerで1関数ずつ実行し, その間もemacsclientに応答できるようにする.
+最初のframeが作られた時点で残りをまとめて実行するので, frameからは従来と同じmodeが有効に見える.
+#+begin_src emacs-lisp :tangle yes
+  (defvar my/deferred-after-init-functions nil
+    "`after-init-hook' functions the daemon runs after starting its server.")
+
+  (defun my/run-deferred-after-init-function (fn)
+    "Call FN, logging an error instead of aborting the caller."
+    (with-demoted-errors "Deferred after-init function failed: %S"
+      (funcall fn)))
+
+  (defun my/flush-deferred-after-init-functions (&rest _)
+    "Run every remaining deferred `after-init-hook' function now."
+    (remove-hook 'after-make-frame-functions #'my/flush-deferred-after-init-functions)
+    (while my/deferred-after-init-functions
+      (my/run-deferred-after-init-function (pop my/deferred-after-init-functions))))
+
+  (defun my/schedule-deferred-after-init-function ()
+    "Run the next deferred `after-init-hook' function from a timer."
+    ;; With a zero delay the whole chain ran before emacsclient got a reply;
+    ;; a short delay lets Emacs accept connections between functions.
+    (run-with-timer 0.01 nil #'my/run-next-deferred-after-init-function))
+
+  (defun my/run-next-deferred-after-init-function ()
+    "Run one deferred `after-init-hook' function and schedule the next."
+    (if (null my/deferred-after-init-functions)
+        (remove-hook 'after-make-frame-functions #'my/flush-deferred-after-init-functions)
+      (my/schedule-deferred-after-init-function)
+      (my/run-deferred-after-init-function (pop my/deferred-after-init-functions))))
+
+  (when (daemonp)
+    (let ((kept '(my/load-init-time my/emacs-init-time)))
+      (setq my/deferred-after-init-functions
+            (seq-remove (lambda (fn) (memq fn kept)) after-init-hook))
+      (setq after-init-hook
+            (seq-filter (lambda (fn) (memq fn kept)) after-init-hook)))
+    (add-hook 'after-init-hook #'my/schedule-deferred-after-init-function)
+    (add-hook 'after-make-frame-functions #'my/flush-deferred-after-init-functions -100))
 #+end_src
 ** profilerを終了する
 :PROPERTIES:
