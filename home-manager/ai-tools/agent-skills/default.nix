@@ -3,6 +3,7 @@
   ast-grep-skill,
   paredit-cli-skills,
   aitools-skills,
+  yomiyasu-skill,
   ...
 }:
 {
@@ -20,6 +21,11 @@
   programs.agent-skills.sources."paredit-cli".subdir = "skills";
   programs.agent-skills.sources."aitools".path = aitools-skills;
   programs.agent-skills.sources."aitools".subdir = "skills";
+  # Upstream ships the skill twice with identical SKILL.md, scripts and references (checked at the
+  # locked rev): at the repository root and under skills/yomiyasu/. The nested copy is installed so the
+  # bundle excludes the root's tests/, articles/ and evals/.
+  programs.agent-skills.sources."yomiyasu".path = yomiyasu-skill;
+  programs.agent-skills.sources."yomiyasu".subdir = "skills";
 
   # Every installed skill's name and description is resident in the system prompt of every session,
   # whether or not it ever fires, so a source is enabled wholesale only where most of it earns that.
@@ -43,6 +49,7 @@
   programs.agent-skills.skills.enable = [
     "discernment-nudge"
     "webapp-testing"
+    "yomiyasu"
   ];
 
   programs.agent-skills.targets.claude.enable = true;

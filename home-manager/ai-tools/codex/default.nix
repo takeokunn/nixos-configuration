@@ -4,6 +4,7 @@
   llmAgentsPkgs,
   mcp-servers-nix,
   aitools-skills,
+  yomiyasu-skill,
   ...
 }:
 let
@@ -270,6 +271,12 @@ in
       # install every enabled skill into the directory the attrs above already populate.
       "codex/skills/aitools/SKILL.md" = {
         source = aitools-skills + "/skills/aitools/SKILL.md";
+        force = true;
+      };
+      # The whole directory: SKILL.md calls scripts/yomiyasu_lint.py and reads references/.
+      "codex/skills/yomiyasu" = {
+        source = yomiyasu-skill + "/skills/yomiyasu";
+        recursive = true;
         force = true;
       };
       "codex/AGENTS.md" = {

@@ -47,6 +47,8 @@
     paredit-cli-skills.flake = false;
     aitools-skills.url = "github:nerima-lisp/aitools";
     aitools-skills.flake = false;
+    yomiyasu-skill.url = "github:nanaism/yomiyasu";
+    yomiyasu-skill.flake = false;
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
@@ -112,6 +114,7 @@
                   ast-grep-skill
                   paredit-cli-skills
                   aitools-skills
+                  yomiyasu-skill
                   ;
               };
             };

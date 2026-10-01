@@ -2,7 +2,7 @@
 name: technical-writing
 description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese (includes general prose mechanics, a Japanese prose-quality ruleset, and a long-form structure ruleset for books and serials).
 metadata:
-  version: "3.2.0"
+  version: "3.3.0"
 ---
 
 Structured patterns for writing technical blogs, articles, and tutorials that communicate technical concepts
@@ -10,6 +10,11 @@ to external audiences, in English or Japanese. Pick the article type that matche
 apply the language-specific conventions, and for book chapters or serials layer the long-form structure
 ruleset on top. The general prose mechanics below apply to any human-facing writing, not only the article
 types; reach for them alone when revising a report, a PR/issue body, or documentation prose.
+
+This skill governs drafting new text. To rewrite existing AI-generated Japanese, load only the `yomiyasu`
+skill and do not apply this skill's Japanese ruleset in the same pass: the two disagree where a rewrite
+must keep the source's negation as is (「AではなくB」 below asks for added grounds). The Japanese ruleset
+below stays the standard for drafting.
 
 ## General prose mechanics
 

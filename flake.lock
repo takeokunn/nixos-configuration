@@ -1386,7 +1386,8 @@
         "org-babel": "org-babel",
         "paredit-cli-skills": "paredit-cli-skills",
         "treefmt-nix": "treefmt-nix_6",
-        "xremap": "xremap"
+        "xremap": "xremap",
+        "yomiyasu-skill": "yomiyasu-skill"
       }
     },
     "rust-overlay": {
@@ -1651,6 +1652,22 @@
         "owner": "k0kubun",
         "ref": "v0.15.13",
         "repo": "xremap",
+        "type": "github"
+      }
+    },
+    "yomiyasu-skill": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790842909,
+        "narHash": "sha256-5PqZpMj5NLa1tQDSvKrHlL7Pt2gXXMOQtdysqhni8Wk=",
+        "owner": "nanaism",
+        "repo": "yomiyasu",
+        "rev": "7b61b2f0283265ce1986d76c67929622a775844d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nanaism",
+        "repo": "yomiyasu",
         "type": "github"
       }
     }
