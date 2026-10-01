@@ -45,79 +45,37 @@ let
       emacsclient = "${emacsPkg}/bin/emacsclient";
       kitty = "${pkgs.kitty}/bin/kitty";
       jq = "${pkgs.jq}/bin/jq";
+      niri = "${pkgs.niri}/bin/niri";
       emacsclientTerminal = pkgs.writeShellScript "emacs-scratchpad-emacsclient" ''
         EMACSCLIENT="${emacsclient}"
         SOCKET="${socketPath}"
-        TIMEOUT="${pkgs.coreutils}/bin/timeout"
 
-        emacs_ready() {
-          "$TIMEOUT" 1 "$EMACSCLIENT" -s "$SOCKET" -e '(emacs-pid)' >/dev/null 2>&1
+        open_scratchpad() {
+          "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)"
         }
 
-        start_emacs_service() {
-          ${
-            if pkgs.stdenv.hostPlatform.isDarwin then
-              ''
-                /bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1 || true
-              ''
-            else
-              ''
-                ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
-              ''
-          }
-        }
-
-        if ! emacs_ready; then
-          start_emacs_service
+        # The service manager keeps the daemon running, so the socket normally exists and
+        # emacsclient connects without a readiness probe.
+        if [ -S "$SOCKET" ] && open_scratchpad; then
+          exit 0
         fi
 
+        # The daemon is starting, or crashed and left a socket that refuses connections.
+        ${
+          if pkgs.stdenv.hostPlatform.isDarwin then
+            ''/bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1''
+          else
+            "${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1"
+        }
         i=0
-        while [ "$i" -lt 100 ]; do
-          if emacs_ready; then
-            exec "$EMACSCLIENT" -s "$SOCKET" -t -e "(my/scratchpad-init)"
-          fi
+        until "$EMACSCLIENT" -s "$SOCKET" -e t >/dev/null 2>&1 || [ "$i" -ge 100 ]; do
           i=$((i + 1))
           sleep 0.1
         done
-
-        printf '%s\n' "emacs daemon did not become ready for $SOCKET" >&2
-        exit 1
+        open_scratchpad
       '';
 
-      # AeroSpace has no command that places a floating window at a coordinate, so the
-      # position has to come from kitty. GLFW's work area already excludes the menu bar
-      # and the Dock, so the bottom-right corner needs no further correction.
-      bottomRightPosition = pkgs.writeText "emacs-scratchpad-position.py" ''
-        import sys
-        from kitty.constants import glfw_path
-        from kitty.fast_data_types import glfw_init, glfw_get_monitor_workarea
-
-        glfw_init(glfw_path("cocoa"), lambda *a, **k: (0, 0, 0, 0), False, False, False)
-        x, y, w, h = glfw_get_monitor_workarea()[0]
-        sys.stdout.write(f"{x + w - ${toString windowWidth}}x{y + h - ${toString windowHeight}}")
-      '';
-
-      aerospaceScript = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
-        APP_TITLE="${appId}"
-        AEROSPACE="/run/current-system/sw/bin/aerospace"
-        JQ="${jq}"
-        KITTY="${kitty}"
-        LOCK_DIR="''${TMPDIR:-/tmp}/emacs-scratchpad-$APP_TITLE.lock"
-
-        window_id_by_title() {
-          "$AEROSPACE" list-windows --all --json | "$JQ" -r --arg title "$APP_TITLE" '
-            first(.[] | select((.["window-title"] // "") | contains($title)) | .["window-id"]) // empty
-          '
-        }
-
-        focused_window_id() {
-          "$AEROSPACE" list-windows --focused --json | "$JQ" -r '.[0]["window-id"] // empty'
-        }
-
-        start_emacs_service() {
-          /bin/launchctl kickstart "gui/$UID/org.nix-community.home.emacs" >/dev/null 2>&1 || true
-        }
-
+      lockFunctions = ''
         acquire_lock() {
           if mkdir "$LOCK_DIR" 2>/dev/null; then
             printf '%s\n' "$$" > "$LOCK_DIR/pid"
@@ -126,9 +84,9 @@ let
 
           local old_pid
           if [ -r "$LOCK_DIR/pid" ]; then
-            old_pid="$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)"
+            old_pid="$(${pkgs.coreutils}/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)"
             if [ -n "$old_pid" ] && ! kill -0 "$old_pid" 2>/dev/null; then
-              /bin/rm -f "$LOCK_DIR/pid"
+              ${pkgs.coreutils}/bin/rm -f "$LOCK_DIR/pid"
               rmdir "$LOCK_DIR" 2>/dev/null || true
               if mkdir "$LOCK_DIR" 2>/dev/null; then
                 printf '%s\n' "$$" > "$LOCK_DIR/pid"
@@ -141,11 +99,34 @@ let
         }
 
         release_lock() {
-          if [ -f "$LOCK_DIR/pid" ] && [ "$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
-            /bin/rm -f "$LOCK_DIR/pid"
+          if [ -f "$LOCK_DIR/pid" ] && [ "$(${pkgs.coreutils}/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
+            ${pkgs.coreutils}/bin/rm -f "$LOCK_DIR/pid"
             rmdir "$LOCK_DIR" 2>/dev/null || true
           fi
         }
+      '';
+
+      aerospaceScript = pkgs.writeShellScript "emacs-scratchpad-toggle" ''
+        APP_TITLE="${appId}"
+        AEROSPACE="/run/current-system/sw/bin/aerospace"
+        KITTY="${kitty}"
+        LOCK_DIR="''${TMPDIR:-/tmp}/emacs-scratchpad-$APP_TITLE.lock"
+
+        window_id_by_title() {
+          local id title
+          while IFS='|' read -r id title; do
+            if [[ "$title" == *"$APP_TITLE"* ]]; then
+              printf '%s' "$id"
+              return
+            fi
+          done < <("$AEROSPACE" list-windows --all --format '%{window-id}|%{window-title}')
+        }
+
+        focused_window_id() {
+          "$AEROSPACE" list-windows --focused --format '%{window-id}'
+        }
+
+        ${lockFunctions}
 
         focus_existing_window() {
           local i=0
@@ -192,8 +173,6 @@ let
           exit 0
         fi
 
-        start_emacs_service
-
         # Keep hotkey startup on AeroSpace/kitty/emacsclient only. AppleScript/System Events
         # adds a fixed delay and can race with Accessibility permissions during login.
         # The instance group is normally served by the resident kitty that scratchpadKittyServer
@@ -202,11 +181,9 @@ let
         "$KITTY" \
           --single-instance \
           --instance-group ${scratchpadInstanceGroup} \
-          --position="$("$KITTY" +launch ${bottomRightPosition} 2>/dev/null)" \
           -o close_on_child_death=yes \
           -o confirm_os_window_close=0 \
           -o macos_quit_when_last_window_closed=no \
-          -o term=xterm-256color \
           -o remember_window_size=no \
           -o initial_window_width=${toString windowWidth} \
           -o initial_window_height=${toString windowHeight} \
@@ -221,50 +198,19 @@ let
         LOCK_DIR="''${XDG_RUNTIME_DIR:-/tmp}/emacs-scratchpad-$APP_ID.lock"
 
         window_data() {
-          ${pkgs.niri}/bin/niri msg -j windows | ${jq} -r --arg id "$APP_ID" '
+          ${niri} msg -j windows | ${jq} -r --arg id "$APP_ID" '
             first(.[] | select(.app_id == $id) | "\(.id) \(.is_focused)") // empty
           '
         }
 
-        start_emacs_service() {
-          ${pkgs.systemd}/bin/systemctl --user start emacs.service >/dev/null 2>&1 || true
-        }
-
-        acquire_lock() {
-          if mkdir "$LOCK_DIR" 2>/dev/null; then
-            printf '%s\n' "$$" > "$LOCK_DIR/pid"
-            return 0
-          fi
-
-          local old_pid
-          if [ -r "$LOCK_DIR/pid" ]; then
-            old_pid="$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)"
-            if [ -n "$old_pid" ] && ! kill -0 "$old_pid" 2>/dev/null; then
-              /bin/rm -f "$LOCK_DIR/pid"
-              rmdir "$LOCK_DIR" 2>/dev/null || true
-              if mkdir "$LOCK_DIR" 2>/dev/null; then
-                printf '%s\n' "$$" > "$LOCK_DIR/pid"
-                return 0
-              fi
-            fi
-          fi
-
-          return 1
-        }
-
-        release_lock() {
-          if [ -f "$LOCK_DIR/pid" ] && [ "$(/bin/cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
-            /bin/rm -f "$LOCK_DIR/pid"
-            rmdir "$LOCK_DIR" 2>/dev/null || true
-          fi
-        }
+        ${lockFunctions}
 
         center_new_window() {
           local i=0
           while [ "$i" -lt 500 ]; do
             window_data_value="$(window_data)"
             if [ -n "$window_data_value" ]; then
-              ${pkgs.niri}/bin/niri msg action center-window
+              ${niri} msg action center-window
               return 0
             fi
             i=$((i + 1))
@@ -284,7 +230,6 @@ let
 
           window_data_value="$(window_data)"
           if [ -z "$window_data_value" ]; then
-            start_emacs_service
             XMODIFIERS=@im= ${kitty} --single-instance --instance-group ${scratchpadInstanceGroup} --class "$APP_ID" -o confirm_os_window_close=0 -o initial_window_width=80c -o initial_window_height=24c -e ${emacsclientTerminal} &
             center_new_window
           fi
@@ -295,9 +240,9 @@ let
           is_focused="''${window_data_value#* }"
 
           if [ "$is_focused" = "true" ]; then
-            ${pkgs.niri}/bin/niri msg action focus-window-previous
+            ${niri} msg action focus-window-previous
           else
-            ${pkgs.niri}/bin/niri msg action focus-window --id "$window_id"
+            ${niri} msg action focus-window --id "$window_id"
           fi
         fi
       '';
