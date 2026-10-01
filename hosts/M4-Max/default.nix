@@ -82,6 +82,7 @@ nix-darwin.lib.darwinSystem {
           ast-grep-skill
           paredit-cli-skills
           aitools-skills
+          yomiyasu-skill
           emacs-overlay
           org-babel
           ;

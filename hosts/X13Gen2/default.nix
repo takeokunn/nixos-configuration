@@ -57,6 +57,7 @@ nixpkgs.lib.nixosSystem {
           ast-grep-skill
           paredit-cli-skills
           aitools-skills
+          yomiyasu-skill
           nur-packages
           emacs-overlay
           org-babel
