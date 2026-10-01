@@ -56,6 +56,15 @@ In Japanese:
 - Hedges that weaken a claim without grounds: 「〜と言えるでしょう」「〜かもしれません」. When something is
   genuinely unverified, say what is unverified.
 - Repeated 「AではなくB」 punchlines, and questions you pose only to answer yourself.
+- Metaphor verbs that paper over a mechanism: 「効く」「壊れる」「倒す」「黙って」「沈黙する」. Name what
+  actually happened instead (「例外が発生する」「除外する」「エラーを出さずに」).
+- Giving an inanimate subject (a concept, tool, or event) agency it cannot have (「アーキテクチャが開発者に
+  規律を要求する」; say「開発者はアーキテクチャの規則に従ってコードを書く」instead). Name the actual actor:
+  a person, a system, or an observable fact.
+- A fullwidth colon（：）closing a sentence or heading (「方針は以下です：」→「方針は以下である。」), and a
+  half-width space wrapped around an English word embedded in Japanese text (「README は」→「READMEは」).
+- In a long explanatory paragraph, the same sentence ending repeated three or more times in a row
+  (「設定した。確認した。反映した。」); this does not apply to short status lines or field-style output.
 
 In both languages, also remove decorative emoji, praise of the user or of your own work, and sentences that
 exist only to connect or evaluate.
