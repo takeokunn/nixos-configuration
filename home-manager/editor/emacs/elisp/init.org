@@ -25,8 +25,8 @@
 :PROPERTIES:
 :CUSTOM_ID: header
 :END:
-#+begin_src emacs-lisp :tangle yes
-  ;; init.el --- My init.el -*- lexical-binding: t; -*-
+#+begin_src emacs-lisp -i :tangle yes
+;; init.el --- My init.el -*- lexical-binding: t; -*-
 #+end_src
 * Macro Utilities
 :PROPERTIES:
@@ -2359,7 +2359,7 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
                (not (functionp 'json-rpc-connection))  ;; native json-rpc
                (executable-find "emacs-lsp-booster"))
           (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (when-let* ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
               (setcar orig-result command-from-exec-path))
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
@@ -2437,13 +2437,8 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     (add-hook 'dap-mode-hook #'dap-ui-controls-mode)
     (add-hook 'dap-mode-hook #'tooltip-mode)
     (add-hook 'dap-mode-hook #'dap-tooltip-mode)
-    (add-hook 'dap-stopped-hook #'(lambda (arg) (call-interactively #'dap-hydra))))
-
-
-
-
-
-#+END_SRC
+    (add-hook 'dap-stopped-hook #'(lambda (_arg) (call-interactively #'dap-hydra))))
+#+end_src
 *** lsp-ui
 :PROPERTIES:
 :CUSTOM_ID: lsp-ui
@@ -7030,7 +7025,7 @@ against a missing directory signals file-missing on every Org buffer visit."
 
   (with-eval-after-load 'copilot
     (setopt copilot-log-max 100000)
-    (when-let ((path (getenv "COPILOT_LANGUAGE_SERVER_PATH")))
+    (when-let* ((path (getenv "COPILOT_LANGUAGE_SERVER_PATH")))
       (setopt copilot-server-executable path))
 
     (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)

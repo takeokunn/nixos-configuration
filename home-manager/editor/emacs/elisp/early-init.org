@@ -6,8 +6,8 @@
 #+OPTIONS: toc:t
 * early-init.el
 ** Header
-#+begin_src emacs-lisp :tangle yes
-  ;; early-init.el --- My early-init.el -*- lexical-binding: t; -*-
+#+begin_src emacs-lisp -i :tangle yes
+;; early-init.el --- My early-init.el -*- lexical-binding: t; -*-
 #+end_src
 ** 自動的なpackageのロードを無効にする
 #+begin_src emacs-lisp :tangle yes
@@ -23,19 +23,19 @@
 ** スタートアップメッセージを非表示
 #+begin_src emacs-lisp :tangle yes
   (setq inhibit-startup-message t)
-#+END_SRC
+#+end_src
 ** 自動生成ファイルを無効にする
 #+begin_src emacs-lisp :tangle yes
   (setq make-backup-files nil)
   (setq auto-save-default nil)
   (setq auto-save-list-file-prefix nil)
   (setq create-lockfiles nil)
-#+END_SRC
+#+end_src
 ** GC/Memory
 #+begin_src emacs-lisp :tangle yes
   (setq gc-cons-threshold (* 10 128 1024 1024))
   (setq garbage-collection-messages nil)
-#+END_SRC
+#+end_src
 ** read-process
 #+begin_src emacs-lisp :tangle yes
   (setq read-process-output-max (* 8 1024 1024))
