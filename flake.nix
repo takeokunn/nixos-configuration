@@ -386,6 +386,41 @@
                 touch $out
               '';
 
+          checks.gh-secret-guard =
+            let
+              stubGh = pkgs.writeShellScript "stub-gh" ''
+                if [ "$1 $2" = "auth token" ]; then
+                  printf '%s\n' "$STUB_TOKEN"
+                  exit 0
+                fi
+                mkdir -p "$STUB_LOG"
+                printf '%s\n' "$@" >"$STUB_LOG/argv"
+                cat >"$STUB_LOG/stdin"
+                exit "''${STUB_EXIT:-0}"
+              '';
+              guard = import ./home-manager/vcs/gh/gh-secret-guard.nix {
+                inherit pkgs;
+                gh = stubGh;
+              };
+              brokenGuard = import ./home-manager/vcs/gh/gh-secret-guard.nix {
+                pkgs = pkgs // {
+                  gitleaks = pkgs.writeShellScriptBin "gitleaks" "exit 127";
+                };
+                gh = stubGh;
+              };
+            in
+            pkgs.runCommand "gh-secret-guard-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.git
+                  pkgs.perl
+                ];
+              }
+              ''
+                bash ${./home-manager/vcs/gh/gh-secret-guard.test.sh} ${guard} ${brokenGuard}
+                touch $out
+              '';
+
           checks.block-destructive-git-hook =
             pkgs.runCommand "block-destructive-git-hook-test"
               {
