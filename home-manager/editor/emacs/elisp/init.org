@@ -4503,7 +4503,7 @@ single computation, instead of each recomputing it independently."
   (autoload-if-found '(arto-open arto-version) "arto" nil t)
 
   (with-eval-after-load 'arto
-    (setopt arto-path "/Users/take/Applications/Home Manager Apps/Arto.app"))
+    (setopt arto-path "/Applications/Arto.app"))
 #+end_src
 *** redacted
 :PROPERTIES:
