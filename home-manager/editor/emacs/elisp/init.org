@@ -5534,20 +5534,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
   (with-eval-after-load 'elfeed-curl
     (setopt elfeed-curl-max-connections 32))
 #+end_src
-** elfeed-org
-:PROPERTIES:
-:CUSTOM_ID: elfeed-org
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(elfeed-org) "elfeed-org" nil t)
-
-  (with-eval-after-load 'elfeed-search
-    (add-hook 'elfeed-search-mode-hook #'elfeed-org))
-
-  (with-eval-after-load 'elfeed-org
-    (setopt rmh-elfeed-org-files (list (expand-file-name "project/elfeed.org" (my/ghq-repo-path "github.com/takeokunn/private"))))
-    (setopt rmh-elfeed-org-auto-ignore-invalid-feeds t))
-#+end_src
 ** elfeed-dashboard
 :PROPERTIES:
 :CUSTOM_ID: elfeed-dashboard
@@ -5790,7 +5776,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
     (setopt org-tags-match-list-sublevels nil)
 
-    (setq org-directory (expand-file-name "agenda" (my/ghq-repo-path "github.com/takeokunn/private")))
+    (setq org-directory (my/ghq-repo-path "github.com/takeokunn-private/private"))
 
     (setq org-todo-keywords '((sequence "TODO(t)" "SOMEDAY(s)" "WAIT(w)" "REVIEW(r)" "QA(q)" "|" "DONE(d)")))
 
@@ -5800,7 +5786,8 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (defvar my/org-agenda-files `(,(concat org-directory "/task")
                                   ,(concat org-directory "/archive/2023")
                                   ,(concat org-directory "/archive/2024")
-                                  ,(concat org-directory "/archive/2025")))
+                                  ,(concat org-directory "/archive/2025")
+                                  ,(concat org-directory "/archive/2026")))
 
     (setq org-agenda-files my/org-agenda-files)
     (setq org-archive-location `,(format (expand-file-name "archive/%s/%s.org::* Archived Tasks" org-directory)
