@@ -13,6 +13,7 @@ let
       "com.sequel-ace.sequel-ace"
       "at.eggerapps.Postico"
     ];
+    "6" = [ "com.efoo.mediator" ];
     "7" = [ "com.slite.desktop" ];
     "8" = [ "com.clickup.desktop-app" ];
     "9" = [
