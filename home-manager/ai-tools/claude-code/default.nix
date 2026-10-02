@@ -58,7 +58,6 @@ in
     "execute-full"
     "markdown"
     "qa"
-    "upstream"
   ];
 
   programs.claude-code.outputStyles = readFiles "${ai-prompts-path}/output-styles" [

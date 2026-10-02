@@ -2,7 +2,7 @@
 name: pull-request
 description: "Write or revise a pull request: commit shaping, title, body, and screenshots. Use when the user explicitly asks to create or edit a pull request, or when a commit message or PR body is being written."
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Pull request
@@ -68,10 +68,8 @@ body, and every word in it is backed by a fact in the diff.
 
 ### Summary language
 
-Read the language from the repository, not from the conversation. `git log --format='%s' -40` and the titles
-of recently merged pull requests show which language the project writes in; match it. A repository writing
-English Conventional Commits does not want a Japanese summary because the request happened to arrive in
-Japanese. For a Japanese summary, technical-writing's Japanese ruleset governs the prose.
+Public commit messages, PR titles, and PR bodies stay English, per `standard_practices`. Read recent commit
+and PR titles to match the repository's terminology and format, not to override that language policy.
 
 ## Writing a judgment
 
@@ -129,8 +127,7 @@ landed", never as "nothing happened".
 
 - [execution-workflow](../execution-workflow/SKILL.md): the branch a pull request may be opened from, and
   what it may target
-- [technical-writing](../technical-writing/SKILL.md): prose mechanics, and the Japanese ruleset a Japanese
-  summary follows
+- [technical-writing](../technical-writing/SKILL.md): prose mechanics
 - [cold-read](../cold-read/SKILL.md): reading the finished body as the reviewer will, at task completion
 - [ai-slop-detector](../ai-slop-detector/SKILL.md): auditing a body written earlier for the tells
   `output_discipline` names

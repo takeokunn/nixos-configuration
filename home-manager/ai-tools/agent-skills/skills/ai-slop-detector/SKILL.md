@@ -2,17 +2,17 @@
 name: ai-slop-detector
 description: Use when auditing already-written prose or code for the tells output_discipline (ai-prompts/CLAUDE.md) bans, rather than applying the norm while drafting. Covers grep patterns per tell, the quoted-example false-positive trap, and code-artifact slop (dead branches, needless abstraction, restated docstrings, scaffolding).
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 This skill is the audit procedure for the norm output_discipline states in `ai-prompts/CLAUDE.md`. That file
-says what is banned; this file says how to find an instance already sitting in a body of prose or code. Do not
-restate its banned-token list here; read it, then come back for the detection technique.
+says what to avoid; this file says how to find an instance already sitting in a body of prose or code. Read
+that contract first. Judge words in context: the patterns below identify candidates, not a banned-token list.
 
 ## Prose tells: what greps and what doesn't
 
-Most tells resolve to a lexical scan. Run these over the target file, not over a diff, since slop introduced
-gradually never shows up in any single diff.
+Start with a lexical scan, then judge each hit in context before reporting it. Run these over the target file,
+not over a diff, since slop introduced gradually never shows up in any single diff.
 
 | Tell | Pattern (case-insensitive) |
 |---|---|
@@ -59,15 +59,9 @@ corpus flags the rule's own definition. Distinguish examples of prohibited wordi
 or code: quotation marks and code fences alone do not exempt their contents. Read the example's purpose
 before logging a finding.
 
-Two real instances in this repo, worth knowing by name so you recognize the shape elsewhere:
-
-- `technical-writing/SKILL.md` quotes the em dash (U+2014) and two related
-  Japanese dash variants as the literal subject of the rule banning them in Japanese prose. A raw grep for that
-  character over that file returns a nonzero count that names no defect.
-- `ai-prompts/CLAUDE.md` and `ai-prompts/output-styles/explanatory-strict.md` each quote "robust" and
-  "comprehensive" in the banned-intensifier list itself. Same shape: the hit is the rule stating its own
-  subject, not an instance of the padding it forbids. Locate them with
-  `grep -n '"robust", "comprehensive"'` rather than by line number, since prose files renumber.
+`technical-writing/SKILL.md` quotes the em dash (U+2014) and two related Japanese dash variants as the literal
+subject of the rule banning them in Japanese prose. A raw grep for that character over that file returns a
+nonzero count that names no defect.
 
 Before reporting a hit, read enough of the surrounding paragraph to tell whether the sentence is asserting a
 claim in that word, or naming the word as an example. Only the former is a finding.

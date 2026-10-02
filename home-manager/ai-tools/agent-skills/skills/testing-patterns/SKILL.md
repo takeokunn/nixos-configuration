@@ -2,7 +2,7 @@
 name: testing-patterns
 description: Use when writing, structuring, or reviewing tests - test strategy, coverage, unit/integration/e2e split, mocks/fixtures/fakes, flaky-test isolation, async settlement. For whether a green suite actually proves anything, see test-integrity instead.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Designing tests that hold up. Arrange-act-assert, given-when-then, the stub/mock/spy/fake vocabulary, and
@@ -45,7 +45,8 @@ compatibility, usability, reliability, security, maintainability, portability), 
 
 ### Rotate adversarial perspectives
 
-Each perspective must leave at least one confirmation point; never trust "it should work".
+Select the perspectives relevant to the changed behavior and its risks. Each selected perspective needs an
+observable confirmation point; the list is not a mandatory test matrix for every local edit.
 
 - **Naive user**: intuitive misuse, unexpected operation order.
 - **Heavy user**: rapid, bulk, or sustained input; behavior under load.

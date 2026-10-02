@@ -1,8 +1,8 @@
 ---
 name: jujutsu
-description: "Use when running version-control commands in a repository with a `.jj/` directory, where jj replaces git for history, commits, bookmarks, and pushes. Covers the git-to-jj command map, non-interactive flags, the auto-snapshotted working copy, and the gitleaks scan jj's missing Git hooks require before a push."
+description: "Use when planning or running version-control operations. jj is the default for status, history, diffs, commits, bookmarks, fetch, and push; an uninitialized repository requires confirmation, not a Git fallback. Covers non-interactive use, shared working copies, workspaces, and pre-push checks."
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Jujutsu (jj)
@@ -22,12 +22,22 @@ Two layouts carry `.jj/`:
   files. Work happens in jj workspaces under `.worktrees/`, which have no `.git` of their own: git commands
   there resolve to the bare repository, so `git status` fails and `git log` reads the bare HEAD, not `@`.
 
+Use jj for routine version control and `gh` for GitHub. Check initialization with `jj root` or the repository's
+`.jj/` directory. If jj is not initialized, report it and ask before initialization or migration; do not
+silently fall back to Git. A prompt update does not authorize repository migration or version-control writes.
+
+Inspect the actual layout rather than assuming colocation. In a colocated repository, jj and Git share an
+object store, and jj exports changes to Git refs. Necessary read-only Git plumbing remains available;
+Git writes bypass jj's model and are not an alternate workflow. Any exception needs an explicit request.
+
+
 ## The working copy is a commit
 
-jj has no staging area. Every jj command first snapshots the files on disk into the working-copy revision `@`,
+jj has no staging area. Repository commands normally snapshot files on disk into the working-copy revision `@`,
 so `jj st` records edits as well as reporting them. In a checkout shared with other sessions, that snapshot
 absorbs their edits into `@` too: before describing, squashing, or pushing `@`, read `jj diff --git` and
-confirm every hunk is yours. Pass `--ignore-working-copy` to a read-only command that must not snapshot.
+confirm every hunk is yours. Pass `--ignore-working-copy` to read-only commands to avoid snapshotting shared
+edits. Their view may be stale: inspect on-disk changes and untracked files separately before relying on it.
 
 A change has a stable change ID (letters k-z) and a commit ID that changes on every rewrite. Refer to changes
 by change ID across rewrites.
@@ -73,9 +83,10 @@ The guardrail hook blocks commands that rewrite the files under other sessions: 
 `jj op restore`/`revert`. The equivalents are to start work with plain `jj new`, discard one file with
 `jj restore <path>`, and undo a revision with `jj revert`. Spell the subcommand literally: one produced by
 `$(...)` or a variable is blocked because the hook cannot see it. Every jj write (commit, describe, squash,
-rebase, bookmark, push) needs the same authorization a git write does. Branch and worktree isolation follows
-execution-workflow's procedure, except that a repository with `.jj/` at its root isolates with a jj workspace
-instead of `git worktree add`, which would create a git worktree that the root's jj cannot see:
+Every jj write (commit, describe, squash, rebase, bookmark, fetch, push, workspace creation) needs current
+authorization. Workspace isolation follows execution-workflow's jj procedure; never substitute Git branch or
+worktree writes. A repository with `.jj/` at its root isolates with a jj workspace instead of `git worktree add`,
+which would create a git worktree that the root's jj cannot see:
 `jj -R <repo> workspace add --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`, after
 `mkdir -p <repo>/.worktrees`. Without `--sparse-patterns full` the workspace copies the bare root's empty
 sparse set and checks out no files.
@@ -90,8 +101,10 @@ Before `jj git push`:
 2. Scan exactly that range with the configured rules:
    `gitleaks git --config ~/.config/gitleaks/config.toml --log-opts="<remote>/<bookmark>..<commit>"`, or for a
    new bookmark `--log-opts="<commit> --not --remotes"`. A finding stops the push.
-3. `jj log -r '<range>' -T 'author.email() ++ "\n"'` to confirm the author identity.
-4. Push with the override prefix the hook asks for: `ALLOW_DESTRUCTIVE_GIT=1 jj git push -b <bookmark>`.
+3. `jj log --ignore-working-copy --no-pager -r '<range>' -T 'author.email() ++ "\n"'` to confirm the author identity.
+4. When authorized and all checks pass, push with the override prefix the guardrail hook names for this step:
+   `ALLOW_DESTRUCTIVE_GIT=1 jj git push -b <bookmark>`. The hook blocks every unprefixed `jj git push` so the
+   scan above cannot be skipped; the prefix is for that scanned push only. Never switch to Git to push.
 
 A bookmark does not follow new commits. Move it first (`jj bookmark set <b> -r @-`), or push a change directly
 with `jj git push -c <change>`, which creates a bookmark named after it.

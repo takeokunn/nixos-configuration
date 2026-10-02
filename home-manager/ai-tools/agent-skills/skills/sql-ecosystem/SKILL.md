@@ -2,7 +2,7 @@
 name: sql-ecosystem
 description: Use when working with SQL databases (SELECT/INSERT/UPDATE/DELETE, CREATE TABLE, JOIN, INDEX, EXPLAIN, transactions, or migrations) across PostgreSQL, MySQL, and SQLite.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Cross-engine SQL guidance focused on where PostgreSQL, MySQL, and SQLite diverge, and where
@@ -19,8 +19,10 @@ file exists for the parts that surprise a competent developer moving between eng
   `INSERT INTO t (id, x) VALUES (1, 2) AS new ON DUPLICATE KEY UPDATE x = new.x` in MySQL 8.4.
   Its older `VALUES(x)` reference is deprecated. Verify syntax for the deployed version rather
   than translating the conflict clause alone.
-- **`FULL OUTER JOIN` does not exist in MySQL.** Rewrite as
-  `LEFT JOIN ... UNION SELECT ... RIGHT JOIN ...`; there is no direct substitute keyword.
+- **`FULL OUTER JOIN` does not exist in MySQL.** Combine a left join with only unmatched right rows using
+  `UNION ALL` and identical projections. Test unmatchedness with a non-nullable left-side key being NULL,
+  not a nullable join column. Plain `UNION` removes legitimate duplicates; an unfiltered right join doubles
+  matched rows. Verify duplicate and NULL cases when translating.
 - **Foreign-key columns are auto-indexed by MySQL but not by PostgreSQL.** A `REFERENCES` clause
   in PostgreSQL creates no index: joins and cascading deletes on that column do full scans until
   you add `CREATE INDEX` explicitly. This is the single most common missing-index bug when a
@@ -91,8 +93,8 @@ for previously valid omitted-keyword DDL. State the intended storage explicitly 
   closer to snapshot isolation): code tested against Postgres at that isolation level can see new
   phantom-read failures purely from being pointed at MySQL, with no code change.
 - **`FOR UPDATE SKIP LOCKED`** is the standard queue-worker pattern (skip rows another worker
-  already locked rather than blocking): `SELECT * FROM jobs WHERE status='pending' FOR UPDATE
-  SKIP LOCKED LIMIT 1`. `FOR UPDATE NOWAIT` fails immediately instead of blocking: useful to
+  already locked rather than blocking): `SELECT * FROM jobs WHERE status='pending' LIMIT 1 FOR UPDATE
+  SKIP LOCKED`. This clause order also works in MySQL 8.4. `FOR UPDATE NOWAIT` fails immediately instead of blocking: useful to
   distinguish real contention from a hang.
 - **Advisory locks (PostgreSQL) have two different lifetimes**: `pg_advisory_lock`/
   `pg_advisory_unlock` are session-scoped and outlive the transaction unless explicitly released;

@@ -1,6 +1,6 @@
 ---
 argument-hint: [task-description]
-description: Task execution command
+description: Implement a task and verify it. Use for a bounded change that needs no full review wave.
 ---
 
 Implement the requested task and verify the result. Use /execute-full when the user wants the full review wave.
