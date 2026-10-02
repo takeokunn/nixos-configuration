@@ -1,4 +1,5 @@
-# Private helper: create a new worktree under a bare repo's .worktrees/. Not
+# Private helper: create a new worktree under a bare repo's .worktrees/, as a
+# jj workspace when the repo root holds .jj/. Not
 # named ghq_* to stay out of the ghq_* function glob. Prints the created path
 # to stdout; all other messages go to stderr.
 function __fzf_ghq_new_worktree
@@ -95,9 +96,23 @@ function __fzf_ghq_new_worktree
     end
     set -l target_path "$worktrees_dir/$target_name"
 
-    # Detached, not the branch name: `git worktree add <path> <branch>` fails
-    # once a sibling worktree already holds that branch.
-    set -l worktree_add_output (git -C $repo_path worktree add --detach $target_path $base_sha 2>&1)
+    # A repo carrying jj's store at its root gets a jj workspace: jj refuses
+    # to colocate inside a git worktree, and a git worktree below that root
+    # would find the root's jj, which sees none of the worktree's files.
+    set -l worktree_add_output
+    if test -d "$repo_path/.jj"
+        # A bare repo's jj store is not colocated, so it sees refs that git
+        # fetched only after an import. --sparse-patterns full, because the
+        # default copies the root workspace's empty sparse set. Unlike git,
+        # jj does not create the missing .worktrees parent.
+        mkdir -p $worktrees_dir
+        set worktree_add_output (jj -R $repo_path git import 2>&1)
+        and set worktree_add_output (jj -R $repo_path workspace add --sparse-patterns full --name $target_name -r $base_sha $target_path 2>&1)
+    else
+        # Detached, not the branch name: `git worktree add <path> <branch>`
+        # fails once a sibling worktree already holds that branch.
+        set worktree_add_output (git -C $repo_path worktree add --detach $target_path $base_sha 2>&1)
+    end
     if test $status -ne 0
         echo "fzf_ghq: failed to create worktree: $worktree_add_output" >&2
         return 1

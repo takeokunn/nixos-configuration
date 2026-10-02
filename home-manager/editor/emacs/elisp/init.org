@@ -3448,15 +3448,23 @@ so a value in ARGS or REPO-PATH can never be reinterpreted as shell syntax."
 
   (defun my/ghq-repo-worktrees (repo-path)
     "Return REPO-PATH's existing worktree paths, excluding its own bare
-git-common-dir entry."
+git-common-dir entry, followed by its jj workspaces, which `git worktree
+list' does not report.  The jj workspace named \"default\" holds jj's store
+at REPO-PATH itself and is excluded the same way."
     (let ((common-dir (my/ghq--git repo-path "rev-parse" "--path-format=absolute" "--git-common-dir"))
-          (worktrees nil))
+          (worktrees nil)
+          (workspaces nil))
       (dolist (line (split-string (or (my/ghq--git repo-path "worktree" "list" "--porcelain") "") "\n" t))
         (when (string-prefix-p "worktree " line)
           (let ((wt (substring line (length "worktree "))))
             (unless (string= wt common-dir)
               (push wt worktrees)))))
-      (nreverse worktrees)))
+      (when (file-directory-p (expand-file-name ".jj" repo-path))
+        (with-temp-buffer
+          (when (zerop (call-process "jj" nil (list t nil) nil "-R" repo-path "--ignore-working-copy"
+                                     "workspace" "list" "-T" "if(name != \"default\", root ++ \"\\n\")"))
+            (setq workspaces (split-string (buffer-string) "\n" t)))))
+      (append (nreverse worktrees) workspaces)))
 
   (defun my/ghq--resolve-base-ref (repo-path)
     "Resolve a base ref in REPO-PATH via the same fallback chain as
@@ -3526,7 +3534,9 @@ job for worktrees created there). BASE-REF, when omitted, is resolved via
 created directory <timestamp>-<sanitized-base-ref> (leading \"origin/\"
 stripped, remaining \"/\" replaced with \"-\") instead of the default
 <timestamp>-<short-sha>, mirroring __fzf_ghq_new_worktree.fish's
-naming_mode = branch case. Returns the created worktree's absolute path."
+naming_mode = branch case. A repository carrying jj's store at its root gets a
+jj workspace instead of a git worktree, as in the fish helper. Returns the
+created worktree's absolute path."
     (let* ((base-ref (or base-ref (my/ghq--resolve-base-ref repo-path)))
            (base-sha (or (my/ghq--git repo-path "rev-parse" "--short" base-ref)
                          (error "my/ghq-create-worktree: cannot resolve base ref %s in %s" base-ref repo-path)))
@@ -3543,7 +3553,15 @@ naming_mode = branch case. Returns the created worktree's absolute path."
         (setq suffix (1+ suffix)))
       (let ((target-path (expand-file-name target-name worktrees-dir)))
         (with-temp-buffer
-          (unless (zerop (call-process "git" nil t nil "-C" repo-path "worktree" "add" "--detach" target-path base-sha))
+          (unless (zerop (if (file-directory-p (expand-file-name ".jj" repo-path))
+                             (progn
+                               (make-directory worktrees-dir t)
+                               (if (zerop (call-process "jj" nil t nil "-R" repo-path "git" "import"))
+                                   (call-process "jj" nil t nil "-R" repo-path "workspace" "add"
+                                                 "--sparse-patterns" "full" "--name" target-name
+                                                 "-r" base-sha target-path)
+                                 1))
+                           (call-process "git" nil t nil "-C" repo-path "worktree" "add" "--detach" target-path base-sha)))
             (error "my/ghq-create-worktree: failed to create worktree at %s: %s" target-path (buffer-string))))
         (my/ghq--link-state repo-path target-path)
         target-path)))
