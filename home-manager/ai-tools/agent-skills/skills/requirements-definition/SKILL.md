@@ -2,7 +2,7 @@
 name: requirements-definition
 description: Use for requirement analysis, specification, and clarification, and when running /define. Covers its phase sequence (prepare through finalize), the investigation and finalize gates, read-only agent dispatch, question prioritization, and requirement formatting.
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 
 The phase sequence /define executes, so the command file does not restate it, plus question design and
@@ -16,15 +16,17 @@ in the response. Report any memory candidates for a later write-authorized phase
 **prepare**: Load serena-usage before any memory operation and any other companion this run needs:
 [fact-check](../fact-check/SKILL.md) when a claim needs an external source,
 [workflow-patterns](../workflow-patterns/SKILL.md) for the shared decision-criteria structure. Then activate the
-project, list memories, and read only the entries this task type calls for.
+project when Serena is available, check the memory catalog once, and read only relevant entries. If the store
+is unavailable, continue from repository evidence and report the limitation.
 
 **analyze**: Extract the core requirements from the request, identify the technical constraints its context
 implies, name the design decisions that will need user input, and take a first read on feasibility.
 
-**investigate**: Dispatch in one message: explore for the relevant files and existing patterns, design for
-architectural consistency and dependencies, infra for schema implications where they exist. After they
-return, dispatch general-purpose with their output for completeness and dependency risk. Verify any external
-claim against Context7 rather than recall.
+**investigate**: Establish the relevant files, patterns, dependencies, and schema implications. Delegate
+bounded independent checks only when their value warrants coordination, using the available agent catalog.
+If a needed role is unavailable, perform its checks yourself and report the limitation; do not substitute a
+role whose runtime restrictions are unavailable. Verify external library claims with Context7 when available,
+otherwise with official documentation, rather than recall.
 
 **clarify**: Prioritize and classify the candidate questions as described under
 [Which questions to ask first](#which-questions-to-ask-first). Ask the highest-priority first, through the
@@ -32,7 +34,7 @@ runtime's question tool with its supported options and one marked (Recommended),
 question tool is available, ask a concise question in text. Do not proceed on an assumption where a critical
 question is unanswered.
 
-**verify**: Cross-check the user's answers against what the agents actually found, and read the
+**verify**: Cross-check the user's answers against the investigation findings, and read the
 implementations the chosen approach depends on.
 
 **document**: Produce the requirements document and the phased task breakdown for /execute.
@@ -54,7 +56,8 @@ Read the Outstanding Issues section of the document just produced.
 
 If it reads "none", **skip the gate entirely and finish**: do not prompt.
 
-If it holds one or more items, ask with AskUserQuestion, offering exactly three dispositions:
+If it holds one or more items, offer these dispositions through the runtime's question tool when available
+and permitted, respecting its supported options. Otherwise ask a concise question in text:
 
 - **Resolve now (Recommended)**: re-enter clarify, ask the outstanding questions, and patch the document.
 - **Defer to /execute**: carry the issues into the handoff and mark dependent tasks blocked until their
@@ -79,14 +82,15 @@ the instruction to use the runtime's question tool when available, otherwise a c
 - **general-purpose**: requirements completeness, dependency risk, effort in tree-derived units
 - **verification** (read-only reconcile mode): cross-validation when findings conflict
 
-explore, design, and infra are independent and dispatch together; general-purpose consumes their output and
-follows.
+When selected, independent explore, design, and infra checks dispatch together. A general-purpose check of
+their combined findings follows only when completeness or dependency risk needs a separate review.
 
 ## Investigate before asking
 
 Establish the current state first: directory structure, the symbol overview of the affected area, keyword and
 symbol search for the feature's existing neighbours, the reference graph around anything that will change, then
-the specific files. Verify external library behavior against Context7 rather than recall.
+the specific files. Verify external library behavior with Context7 when available, otherwise with official
+documentation, rather than recall.
 
 **A question that investigation could have answered spends the user's turn.** The point of investigating first
 is not thoroughness for its own sake: it is that the remaining questions are then exactly the ones only the

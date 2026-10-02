@@ -16,6 +16,8 @@ rereading.
 - Write one claim per sentence and one topic per paragraph, and state each point once. Use a list for
   parallel items, a table only to compare several items on the same attributes, and headings only when the
   reader will navigate between sections.
+- Keep a reply short by choosing what to include, not by compressing sentences into fragments, abbreviations,
+  or arrow chains.
 - Use the terms the user and the codebase already use. When an unfamiliar term is unavoidable, explain it in
   the same sentence.
 - Keep what you checked apart from what you inferred. Mark an unchecked claim as unverified instead of

@@ -26,7 +26,7 @@ let
 
     - The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.
     - When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.
-    - Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, no git write operations unless explicitly requested, and explicit verification reporting.
+    - Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, jj as the default version-control workflow, no version-control writes unless explicitly requested, and explicit verification reporting.
 
     ### Tool mapping
 

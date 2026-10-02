@@ -2,7 +2,7 @@
 name: nix-ecosystem
 description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check (including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards).
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Nix traps that read as success. Everything here is a failure that leaves no error behind: a check that verified
@@ -246,8 +246,11 @@ the manifest only becomes readable after the fetch has already been pinned by th
 
 ### Rust
 
-`overrideAttrs` cannot change vendored dependencies by setting a new `cargoHash`: it has no effect after the
-fact. To override for a version bump you must override the resulting `cargoDeps` and set its `outputHash`.
+Setting `cargoHash` in `overrideAttrs` alone does not reconstruct vendored dependencies. For a version bump,
+recreate `cargoDeps` with `rustPlatform.fetchCargoVendor`, the updated source and hash, and the package's
+existing vendoring inputs. In the fetchCargoVendor implementation, the fixed-output hash belongs to the
+inner vendor-staging derivation; setting `outputHash` on the outer `cargoDeps` derivation does not update it.
+Check the locked nixpkgs builder before choosing an override; do not transplant an older fetcher recipe.
 
 On nixpkgs 25.05+ the fetchCargoVendor mechanism is the default and non-optional; a bare
 `useFetchCargoVendor = true;` is redundant and nixpkgs asks you to remove it. `cargoHash` is still required (or

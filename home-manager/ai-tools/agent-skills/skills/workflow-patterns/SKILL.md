@@ -2,7 +2,7 @@
 name: workflow-patterns
 description: Use when authoring an agent or command (output, checkpoints, decision criteria, escalations, skill loading, self-evaluation), when escalating a consequential finding into an independent refutation pass, or when two instructions appear to contradict and must be reconciled.
 metadata:
-  version: "5.0.0"
+  version: "5.1.0"
 ---
 
 Structures for authoring agents and commands, plus the patterns that keep them honest. Those files are markdown
@@ -12,6 +12,34 @@ Before adding a template, identify its consumer and verify that the runtime supp
 templates follow their consumers rather than leading them.** When the corpus changes shape, this file changes
 with it: a template prescribing a structure no consumer uses is worse than none, because it invites someone to
 reintroduce it.
+
+## Evidence-informed prompt changes
+
+Start with an observed failure or a requested behavior, not a longer rule set. Check relevant project memories
+against current source; a past verdict is not an oracle. Keep universal contracts resident, task procedures
+in triggered skills, and runtime-specific capabilities in adapters.
+
+Before using cclens counts to remove a skill, establish the analysis window, analyzer version, source freshness,
+runtime coverage, and parent/subagent coverage. Distinguish a Skill tool invocation from a body loaded by a
+file read. A missing record means unobserved use, not proven non-use. The
+[session-format specification](https://github.com/lambdalisue/cclens/blob/main/docs/specs/session-format.md)
+describes what the analyzer can observe; verify the installed implementation before relying on newer fields.
+
+Measure the catalog actually emitted for each client, separately from resident instructions and dynamically
+loaded bodies. Source-tree byte counts and invocation counts do not measure session token cost or task quality.
+Do not prune a required safety or verification skill merely because its observed use is rare.
+
+For a behavior-changing instruction, compare the old and new versions on a representative observed failure
+and an unaffected control task. Declare the criterion first, such as correct scope, preserved authorization,
+or valid verification, and check for regressions. Hold task inputs, runtime, model, and available tools fixed
+where possible; report differences and remaining confounders rather than a self-assigned quality score.
+The [Codex prompting guide](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#troubleshooting--metaprompting)
+and [Claude Code best practices](https://code.claude.com/docs/en/best-practices#write-an-effective-claudemd)
+support iteration against observed behavior, not copying every vendor's instructions into every runtime.
+
+Inspect the generated client artifacts as well as source text. Formatting, evaluation, and packaging checks
+establish delivery, not better agent behavior. If a behavior comparison cannot be run, name that gap and keep
+the proposed improvement explicitly unmeasured.
 
 ## Output
 

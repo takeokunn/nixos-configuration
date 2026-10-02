@@ -2,7 +2,7 @@
 name: performance-benchmarking
 description: Use when producing, gating, or reviewing performance numbers - before/after benchmarks, speedup/regression claims, CI benchmark gates, noise floor and confidence interval, wall-clock vs allocation-count metrics, and wording a performance claim.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Producing performance numbers that mean something. **The organizing fact is that a benchmark comparing
@@ -244,6 +244,11 @@ idea. Pair every null result with its mechanism, or state that the mechanism is 
 that the area is not understood well enough to optimize.
 
 ## Throughput evidence
+
+**Requested parallelism is not executed parallelism.** Worker caps, input size, and available resources can
+reduce the effective worker count below the requested count. Record both, and establish that the measured
+workload reaches the parallel path before attributing a result to parallel scheduling. A single-worker run
+can verify correctness for that configuration, but cannot establish a parallel speedup.
 
 **Measure the arm where the premise does not hold.** A scheduling change motivated by skew will look good on
 the skewed workload that motivated it: **that arm proves the mechanism works, not that the change is free.**

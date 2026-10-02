@@ -2,7 +2,7 @@
 name: serena-usage
 description: Use for Serena MCP work - semantic symbol search, find references, code navigation, memory read/write, and organizing memory as a linked reference graph rather than a flat list. Also covers recovering a subagent's report from its session transcript when a completion notification is lost.
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 
 Serena's tool schemas are injected by the harness and are not restated here. This file covers tool *choice*,
@@ -110,26 +110,21 @@ global/{topic}          shared across all projects (only when the user explicitl
 
 ### Which store, before what to write
 
-Serena is not the only memory store, and choosing between them comes before choosing what to say. **Serena
-holds what is anchored to a symbol or a file position**: the code is what makes the entry true, so the entry
-is re-checkable by navigating to that code. **Claude auto-memory** (the per-project directory the harness
-injects, indexed by its `MEMORY.md`) holds what outlives the session that learned it and is anchored to
-nothing in the tree: review history and unresolved findings, a trap with the command that reproduces it, a
-policy the user stated, an option declined and why.
+Choose the store by scope and by what the runtime actually exposes, not by the client name.
 
-Use auto-memory only when the runtime exposes that store and writing is authorized. Do not invent its path
-or silently move its assigned facts into Serena when it is unavailable; report the unpersisted note in the
-handoff. Read-only phases may inspect memory but return write candidates without persisting them.
+- Serena stores durable project knowledge: architectural invariants, conventions, rejected design options,
+  and costly debugging traps. Include source references or reproducible commands so a later agent can recheck
+  the claim. Knowledge can span files; it need not be attached to one symbol or line number.
+- A runtime-provided personal or auto-memory store may hold cross-project preferences and session-independent
+  working conventions. Use only an exposed store with the appropriate scope; do not invent Claude, Codex, or
+  OpenCode paths or assume another client's memory is injected.
+- Rules that must govern future work belong in the repository's authoritative instructions when that edit is
+  requested. Do not keep a competing policy in memory or write facts already documented in the repository.
 
-The split is not cosmetic. An agent that reaches for review history in Serena finds an empty result and reads
-it as "no prior review", which is indistinguishable in the output from having checked and found none, so the
-next review starts from scratch and re-reports what was already raised. Getting the store wrong therefore
-fails silently and looks like a clean result.
-
-Write a fact to one store and link to it from the other. **A fact living in both drifts apart**, and the reader
-who finds the stale copy has no way to tell which one is current: the duplicate-hunting rules below apply
-across the two stores, not only within Serena, and the duplicate is hardest to see exactly when it spans them,
-because neither store's index lists the other's entries.
+Read-only work returns candidates without persisting them. If no suitable store is available or writing is
+unauthorized, report the candidate and its intended scope. A missing store is not evidence of no prior history.
+Search the available stores before writing, keep each fact authoritative in one place, and use links rather
+than duplicate bodies when another store needs to point to it.
 
 ### What earns a memory
 
@@ -138,9 +133,8 @@ implementation pattern, a convention or preference the user stated, a transferab
 
 Do **not** write:
 
-- Anything the split above assigns to auto-memory: review history, a finding ledger, a trap, a user-stated
-  policy, a rejected option. Those belong there whatever their subject matter, and filing one here is the
-  silent failure named above rather than a tidy-up someone will notice.
+- Session verdicts and review chronology. A deferred-finding ledger may retain an identifier, location,
+  severity, and deferral reason under CLAUDE.md's `memory_policy`; do not turn it into a session transcript.
 - A note that names one file and would not change what you do in a different file. That is a commit message.
 - Anything volatile enough to be wrong within weeks: line numbers, file counts, current status, an in-flight
   branch's state. **Volatility is the load-bearing exclusion**, because it rejects at write time exactly the
@@ -343,8 +337,8 @@ When several small memories cover related topics, merge them into one.
 
 ## Rules
 
-- Check `list_memories` before implementing, and use `edit_memory` for an existing topic; `write_memory` only
-  for a genuinely new one.
+- When prior project knowledge could affect the task, check `list_memories` once. For authorized persistence,
+  use `edit_memory` for an existing topic and `write_memory` only for a genuinely new one.
 - Never `delete_memory` without an explicit user request.
 - Never read an entire code file when symbol operations would do.
 - Never update symbol references by hand when `rename_symbol` exists.

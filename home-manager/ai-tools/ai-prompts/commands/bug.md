@@ -1,6 +1,6 @@
 ---
 argument-hint: [error-message]
-description: Root cause investigation command
+description: Find the root cause of a reported error or failure. Use when the user wants a diagnosis; read-only, does not fix.
 ---
 
 Diagnose a reported failure without fixing it. Files and memories are read-only. Apply CLAUDE.md's evidence, delegation, consensus, and output_contract.

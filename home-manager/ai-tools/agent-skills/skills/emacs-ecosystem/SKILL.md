@@ -2,7 +2,7 @@
 name: emacs-ecosystem
 description: Use for Emacs Lisp, init.el, use-package, and Emacs runtime hazards such as hook ordering, condition-case versus quit, overlays versus text properties, buffer-local state, keymap precedence, and subprocess handling. Also covers macro hygiene and MELPA recipe and release gates.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Emacs mechanisms whose documented behaviour differs from what their names suggest. Elisp syntax, `defun`,
@@ -420,11 +420,11 @@ Run any helper that could hang under `make-process`, with one decrementing wait 
 draining, a byte-counted cap on accumulated stdout, a separate non-accumulating destination for stderr, and an
 explicit check that the exit status was zero before believing the output.
 
-**The exit sentinel can precede pending output.** A sentinel reporting termination does not mean output has
-been delivered: output the child already wrote may still be pending in the filter. After the sentinel fires,
-keep draining with `accept-process-output` until the process is
-no longer live *and* no further output arrives. Read an intermittent truncation that appears only under load as
-a drain race, not as flakiness to retry away.
+**Termination status is not output delivery.** Emacs checks for pending output before invoking a termination
+sentinel, and no more output from that same process arrives after that sentinel. Polling `process-status`
+or `process-live-p` alone does not establish that delivery happened: use bounded `accept-process-output`
+while waiting. A separate stderr process has its own output and sentinel lifecycle and must be drained
+independently. Inspect which process and event path truncated output before calling it a drain race.
 
 **The wait budget is shared by startup and drain.** `accept-process-output`'s TIMEOUT bounds a single slice, so
 any aggregate bound is the caller's to maintain: as a decrementing budget, never an absolute deadline

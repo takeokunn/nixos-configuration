@@ -27,17 +27,10 @@
   programs.agent-skills.sources."yomiyasu".path = yomiyasu-skill;
   programs.agent-skills.sources."yomiyasu".subdir = "skills";
 
-  # Every installed skill's name and description is resident in the system prompt of every session,
-  # whether or not it ever fires, so a source is enabled wholesale only where most of it earns that.
-  # anthropic is named per skill instead: its document and design skills (docx, pptx, xlsx, pdf,
-  # canvas-design, theme-factory, slack-gif-creator, algorithmic-art, web-artifacts-builder,
-  # brand-guidelines, frontend-design, doc-coauthoring, internal-comms, academy-guide) and the whole
-  # aws source cost 11,515 bytes of description between them against one measured invocation.
-  # claude-api, mcp-builder, and skill-creator were dropped later on zero invocations in a 30-day
-  # window, as was ast-grep's outline skill through the source filter above.
-  # Re-measure before adding a source back: count `tool_use` blocks with name=="Skill" over
-  # `~/.claude/projects/**/*.jsonl`, counting paths containing `/subagents/` separately, since most
-  # loads here come from agents rather than from the model reading a description.
+  # Installed skill metadata consumes catalog context even when its body is not loaded. Keep broad
+  # sources selective; measure the emitted catalog for each client rather than the source inventory.
+  # Before pruning, check the analysis window, source freshness, and subagent coverage. A missing
+  # invocation record is not proof of no use, including bodies read without a Skill tool call.
   programs.agent-skills.skills.enableAll = [
     "custom"
     "ast-grep"

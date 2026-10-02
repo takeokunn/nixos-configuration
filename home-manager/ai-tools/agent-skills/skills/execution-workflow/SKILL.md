@@ -1,8 +1,8 @@
 ---
 name: execution-workflow
-description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, worktree and branch isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
+description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, jj workspace isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
 metadata:
-  version: "4.1.0"
+  version: "4.2.0"
 ---
 
 How work gets placed, dispatched, verified, and judged done. CLAUDE.md's `delegation` and `evidence` sections
@@ -13,8 +13,8 @@ the two appear to disagree, CLAUDE.md wins, because it is resident in every requ
 
 ### Analyze before dispatching
 
-State what is being asked in one sentence. If two readings would produce different work, that is an ambiguity
-to resolve with AskUserQuestion, not to pick a side of.
+State what is being asked in one sentence. Resolve ambiguity with the runtime's user-question mechanism only
+when the answer materially changes the work; otherwise state a reasonable assumption and proceed.
 
 **Audit a broad directive against the current tree before treating any item as unmet.** A multi-item
 instruction carried in from a plan, a prior review, or a hook's rubric frequently contains items already
@@ -25,8 +25,9 @@ than judging by reading.
 Classify the task type and load only the matching memories: investigation prioritizes domain patterns,
 architecture entries, project conventions; implementation prioritizes feature patterns, language conventions,
 testing patterns; review prioritizes project conventions and code-quality entries; refactoring prioritizes
-architecture and component patterns. Include any project-local completion-checklist memory, which records what
-done means here. Call `list_memories`, filter against those priorities, then `read_memory` only the matches.
+architecture and component patterns. When Serena is available and relevant prior knowledge could change the
+work, call `list_memories` once and read only matching entries, including a relevant completion checklist.
+Treat memories as historical evidence; verify claims that affect this task against the current tree.
 
 Identify which subtasks are genuinely independent. **Two subtasks writing to the same file are not independent
 however unrelated they look, and a change that must land atomically across several files is one subtask however
@@ -34,18 +35,17 @@ many files it spans.**
 
 ### Dispatch
 
-Write the file partition down as an artifact before writing any prompt: a partition held only in your head
-cannot be checked against the prompts actually sent. Edit any shared file yourself first, then fan out one
-agent per independent unit, keeping atomic multi-file changes together; two agents editing one file produce conflicting rewrites of the
-same region.
+Record file ownership in the dispatch prompts so it can be checked. Use a separate partition artifact only
+when the coordination needs it. Keep shared-file and atomic multi-file edits together; delegate independent
+units only when CLAUDE.md's `delegation` criteria justify the cost.
 
 Prefer a purpose-built agent, then a general-purpose one. When repurposing an agent outside its specialty, say
 in the prompt what it is standing in for: **the first entry in an agent's own decision criteria can fail closed
 on a task it was not designed for, and a dispatch-prompt override is not a guarantee the gate will yield.** Check
 the returned report for evidence the agent did the work rather than refused it politely.
 
-Dispatch independent tasks as multiple Task calls in one message, and tell concurrent agents to write scratch
-artifacts inside their own worktree: a fixed path outside the repository collides silently.
+Dispatch independent tasks together using the runtime's agent tools. Give each concurrent writer a unique
+scratch path inside its assigned project or worktree; do not create a worktree without authorization.
 
 ### Consolidate
 
@@ -53,15 +53,15 @@ Check each report against the questions it was given: did it answer all of them,
 file:line or command output? A report citing nothing checkable is a retry condition, not a result.
 
 Synthesize the accepted findings yourself. Verify any fix an agent prescribed before adopting it: **a correct
-diagnosis routinely arrives with a fix that breaks the build.** When you revert an attempted fix, record the
-reverted attempt and why, so the next session does not re-propose it.
+diagnosis routinely arrives with a fix that breaks the build.** Report a rejected fix and its evidence; persist
+it only when it meets CLAUDE.md's `memory_policy` and memory writes are authorized.
 
 Treat results from parallel worktrees as competing alternatives rather than composable increments. Two agents
 that each produced a working version of the same area have produced a choice to make, not two halves to merge.
 
-Persist memories at the point of discovery, not at task end. Apply staleness verification only to memories this
-task actually read; never read a memory solely to check its freshness, because that turns every task into an
-index sweep.
+Apply CLAUDE.md's `memory_policy` and serena-usage's store selection before persisting a durable discovery.
+Read-only work returns a candidate without writing. Check staleness only for memories this task actually read;
+never read an entry solely to refresh it, because that turns every task into an index sweep.
 
 ### Cross-validate what would be expensive to get wrong
 
@@ -77,8 +77,8 @@ conditions that justify spending it. What this file adds is the shape of the ret
 specific files and the single question that came back unanswered, since re-sending the same prompt tests nothing
 that was not already tested.
 
-No relevant memory exists: note the gap, investigate within a stated bound, and write the finding at the point
-of discovery.
+No relevant memory exists: continue from current evidence. Investigate only a gap that blocks this task;
+absence of a memory is not itself a requirement to research or write one.
 
 ## Gates
 
@@ -87,7 +87,7 @@ Cleared per CLAUDE.md's `gate_discipline`. What follows is the checklist each ga
 ### After analysis, before delegating
 
 - Each sub-agent selected and the one question it will answer.
-- The memories read, or that `list_memories` returned nothing matching this task type.
+- Relevant memories read, or the reason memory lookup was unnecessary or unavailable.
 - Which items of the incoming directive were already satisfied and are therefore excluded.
 - Which subtasks run in parallel, and the dependency forcing the rest to be sequential.
 
@@ -133,7 +133,8 @@ shared build artifacts as a workaround during concurrent work; that breaks other
 
 ### Before reporting complete
 
-Report the answer to each check to the user; do not resolve them silently.
+Establish the applicable evidence below, then report the result and verification gaps through CLAUDE.md's
+`output_contract`. Do not paste the entire checklist when the concise report covers it.
 
 - The exact verification command and its exit status, or that none ran. "Should work" is not a verification.
 - What that command actually covers: which files, selectors, platforms. A file created this session may be
@@ -143,93 +144,84 @@ Report the answer to each check to the user; do not resolve them silently.
 - That the gate's input was non-empty, naming the assertion used. An empty tree passing most of a check suite
   is a vacuous pass.
 - For a generated artifact, the observed bytes or size of the output, not just that generation succeeded.
-- The baseline. A gate that already failed before the change is not a regression gate, and the red must not be
-  attributed to the change.
+- For a bulk replace or regex edit, a grep for the glued or concatenated forms it could produce and a run of the
+  edited artifact. A syntax or balance check cannot see a wrong symbol or two lines merged into one.
+- For a failed check, the baseline before calling it a regression. A pre-existing failure must not be
+  attributed to this change.
 - Where several agents verified, whether they used the same command. The same command run N times is one tier
   of evidence, not N.
 - Anything asked for that was not done, and why.
-- The memory outcome: written, edited, or "no triggers matched".
+- If a durable discovery earned a memory, its store and write outcome, or the unpersisted candidate.
 
 Unmet: **missing evidence is not a pass.** Run the missing verification now rather than reporting around it.
 Where no real gate exists in this repository, enumerate the manual checks performed and label them manual.
 Before declaring something unverifiable, check whether the tool offers a fake, offline, or dry-run mode.
 
-## Branch isolation
+## Workspace isolation
 
-First inspect the current branch and worktree. An existing suitable worktree needs no new Git writes.
-The write commands below are examples for an explicitly authorized isolation request, not permission to
-fetch, create branches or worktrees, or edit configuration. Ask if the required authorization is absent.
+Use jj, following [jujutsu](../jujutsu/SKILL.md). First inspect initialization, the existing workspace, and
+current on-disk changes. A suitable existing workspace needs no new version-control writes. If jj is not
+initialized, ask before migration rather than falling back to Git. The write commands below require an
+explicitly authorized isolation request; they do not grant permission to fetch, create workspaces or bookmarks,
+or edit configuration.
 
-1. `DEFAULT=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`
-2. `git fetch origin $DEFAULT`, so the new branch is cut from current remote state rather than a stale local ref.
-3. Check the risk signals: `git status --porcelain` non-empty, or `git branch --show-current` not `$DEFAULT`.
-   Derive a lowercase kebab-case slug for `<name>` from the task.
-4. **No risk signal**: create in place: `git checkout -b feat/<name> origin/$DEFAULT`. Creating a brand-new
-   branch is distinct from switching to an existing one, which remains prohibited.
-5. **Any risk signal**: isolate in a worktree rather than moving the shared HEAD.
+1. Inspect `jj workspace list --ignore-working-copy --no-pager` and the intended workspace's ownership and
+   changes, including untracked files. Do not move or discard another session's working copy.
+2. Obtain the default branch name with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
+3. When authorized, fetch the named base with `jj git fetch --remote origin --branch <default>`.
+   Compare the resulting remote bookmark's commit with `git ls-remote origin refs/heads/<default>` before
+   using it as the base; a local remote ref alone is not freshness evidence.
+4. When a separate workspace is needed and authorized, choose a nonexisting destination within the approved
+   scope and use `jj workspace add --name <name> -r <verified-base> <authorized-destination>`.
+   This creates an empty working-copy commit whose parent is the verified base, not a working copy with the
+   base's own commit ID. Activate that workspace as the project root before editing.
+5. Create or move a feature bookmark only when authorized and needed for delivery. Do not commit to or open
+   a pull request from the default bookmark; target the default branch unless the user requests otherwise.
+6. Report the workspace path. Do not automatically forget or remove it; cleanup needs its own authorization.
 
-   In a non-bare checkout, inspect ignore coverage for the intended directory. Do not append to `.gitignore`
-   automatically; a configuration change needs its own authorization. A bare repository has no working tree
-   for `.gitignore` to govern.
-
-   Derive the base so it is correct under both layouts:
-
-   ```
-   WT_BASE="$(d=$(git rev-parse --path-format=absolute --git-common-dir); echo "${d%/.git}")"
-   git worktree add -b feat/<name> "$WT_BASE/.worktrees/<timestamp>-<sha>" origin/$DEFAULT
-   ```
-
-   The `${d%/.git}` strips the trailing git-dir segment when one exists (a normal checkout, yielding the
-   repository root) and leaves the path unchanged when it does not (a bare repository, where `--git-common-dir`
-   already names the repository). `<timestamp>` is `date +%Y%m%dT%H%M%S`, `<sha>` the short SHA of
-   `origin/$DEFAULT`, with `-2`, `-3`, … appended on collision. Activate the authorized worktree as the project
-   root before editing there.
-6. Report the worktree path to the user. **Never auto-run `git worktree remove`**: cleanup is the user's
-   decision.
-
-A worktree created under the repository root inherits the parent checkout's configuration through
-directory-upward search: tool configs, environment files, ignore rules. When the worktree exists specifically
-to verify something in isolation, inspect that inheritance. If a separate location is required, obtain
-authorization and activate it as the project root before writing; do not silently edit adjacent checkouts.
-
-Never open a pull request from a non-feature branch, and never target anything but the default branch.
+A workspace under the repository root can inherit parent configuration through directory-upward search:
+tool configs, environment files, and ignore rules. Inspect that inheritance when verifying in isolation.
+Do not append ignore rules or silently write to adjacent checkouts. A separate location needs authorization
+and activation as the project root before edits.
 
 ### Asking whether a branch's work already landed
 
-Ancestry and content are different questions, and the form that answers one lies about the other. Measured on a
-scratch repository, with the branch's own file as the thing being looked for:
+Ancestry and content are different questions. For ancestry, inspect
+`jj log --ignore-working-copy --no-pager --no-graph -r '<branch> & ancestors(<main>)'`: a nonempty result means
+the branch tip is an ancestor of main. A squash merge creates a new commit and need not preserve that ancestry.
+For current content, use `jj diff --ignore-working-copy --no-pager --git --from <main> --to <branch> -- <paths>`.
+Later unrelated changes can also appear, so inspect the scoped change and relevant history before concluding
+the work landed. Neither an ancestry result nor an empty scoped diff alone establishes all delivery criteria.
 
-| how it landed | `git diff main...branch` | `git diff main..branch` | `merge-base --is-ancestor branch main` |
-|---|---|---|---|
-| not landed | shows it | shows it | no |
-| merge commit | empty | absent | yes |
-| squash merge | **shows it** | absent | **no** |
+### After merging, and before tagging
 
-A squash merge, when selected for the repository, rewrites the
-work into one new commit, so the branch is not an ancestor of anything and the merge base never advances. Both
-the three-dot diff and `--is-ancestor` can report an already-landed change as outstanding. A two-tip diff
-compares current content, but unrelated later changes can also appear. Inspect the scoped change and relevant
-history before concluding it landed. Ask `--is-ancestor` when the question really is ancestry.
+Green on each branch is no evidence about their union. A signature change on one side breaks stubs on the
+other, and a type-aware lint can fail only on the combined tree. Rerun the typecheck, lint, and tests on the
+merged tip, one merge at a time. A commit message claiming another branch fixed something needs
+ancestry evidence against the tip being released, or scoped content and history evidence for a squash merge.
+
+Run the release gate on the exact tree being tagged, after the version bump, and grep the tests for the old
+version string, since some suites mirror it. Tag the SHA confirmed with `git ls-remote`, not a local
+`origin/<branch>` that a fetch without a refspec left stale. A burned version number cannot be reused.
 
 ## Prohibited
 
-CLAUDE.md's `hard_rules` already bans the git and working-tree operations, and repeating them here only creates
-two copies to keep in step. What this file adds is the orchestration-specific list:
+CLAUDE.md's `hard_rules` already bans unauthorized version-control and shared-working-copy operations.
+Repeating those rules creates two copies to keep in step. This file adds the orchestration-specific list:
 
-- Implementing detailed logic that should have been delegated.
-- Running independent tasks sequentially.
 - Delegating synthesis. Synthesize first, then write prompts that prove you understood: paths, line numbers,
   the specific change, the verification command. **The orchestrator owns synthesis; sub-agents own execution.**
-- Starting implementation without branch isolation.
+- Overlapping concurrent writers or verifying an artifact while its sources are changing.
+- Creating workspace isolation without authorization. A suitable existing workspace needs no new writes;
+  bounded local work does not require delegation or a new workspace.
 
 ## Definition of done
 
 Done requires the requested outcome and meaningful verification, not merely zero exit statuses.
 
-Enumerate the project's commands (formatter, linter, type or compile check, test suite, and any
-project-specific gate), inspect their assertions and selected inputs, and identify missing coverage. Naming the list makes completion
-checkable without asking the user what counts. **Name exactly one canonical gate** for the project, so a
-narrower subset run is never reported as if it were the whole gate.
+Identify the project's canonical gate and the narrow checks meaningful for the affected paths. Inspect the
+selected inputs and assertions; run the applicable checks and name missing coverage. Never report a subset as
+the full gate. A bounded local change does not require unrelated suites, but /execute-full retains its coverage.
 
 A failing pre-push or pre-commit hook is evidence about the work, not an obstacle in front of it. The correct
 response is to fix the work: never bypass with a skip-verification flag, and read a red CI job the same way.
@@ -305,12 +297,16 @@ Run staging commands only when the current user request explicitly authorizes th
 ## Concurrent sessions in one checkout
 
 CLAUDE.md's `hard_rules` lists the destructive shared-tree operations. Use an assigned isolated worktree when
-available. Creating a worktree or a WIP commit requires the explicit Git-write authorization in CLAUDE.md;
-neither is an automatic fallback for a prohibited command.
+available. Creating a jj workspace or a WIP change requires the explicit version-control-write authorization
+in CLAUDE.md; neither is an automatic fallback for a prohibited command.
 
 Do not mirror a worktree into a shared checkout: overwrites and sync deletion can destroy concurrent work
 without changing Git metadata. Hand off the changed paths and diff, and leave integration to an explicitly
-authorized operation that preserves the destination's unrelated changes.
+authorized operation that preserves the destination's unrelated changes. When integration is authorized,
+check the agent's scoped diff against the destination's current content, apply it with the available patch
+tool, and check for conflict markers afterwards. `git apply --3way` requires an explicitly requested Git
+exception. Copying its whole files onto a base that moved since reverts the work merged in between, and the
+tree and gates stay green.
 
 Remove a linked worktree only when removal is requested and its tracked, untracked, and ignored work has been
 checked for preservation elsewhere. A clean tracked diff alone does not establish that removal is safe.

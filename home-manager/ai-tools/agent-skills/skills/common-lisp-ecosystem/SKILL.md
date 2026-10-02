@@ -2,7 +2,7 @@
 name: common-lisp-ecosystem
 description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, package hygiene, condition design, format-string injection, Unicode predicates, reader macros, macro hygiene, atomic file publishing, and hash-table key safety. Also SBCL execution and debugging (--script, REPL/SLY, backtraces, save-lisp-and-die, profiling, compile/load hangs, terminating a stuck SBCL, sb-thread/sb-cover hazards).
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
 ---
 
 Silent failure modes in Common Lisp, CLOS, ASDF, and package systems: cases where correct-looking
@@ -247,8 +247,9 @@ Recurring traps when defining a library system plus its test system in a `.asd` 
   :components ((:module "tests" :pathname "tests"
                 :components ((:file "suite"))))
   :perform (asdf:test-op (o c)
-             (uiop:symbol-call :fiveam '#:run!
-               (uiop:find-symbol* '#:proj-suite :proj/test))))
+             (unless (uiop:symbol-call :fiveam '#:run!
+                       (uiop:find-symbol* '#:proj-suite :proj/test))
+               (error "Test suite failed."))))
 ```
 
 ## Dependency change surface

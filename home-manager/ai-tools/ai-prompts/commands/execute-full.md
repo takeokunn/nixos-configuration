@@ -1,9 +1,9 @@
 ---
 argument-hint: [task-description]
-description: Full task execution with feedback loop
+description: Implement a task with a full review wave and independent verification. Use for risky or cross-cutting changes.
 ---
 
-Implement the task with a full review wave and independent verification. Apply CLAUDE.md's hard_rules, delegation, evidence, consensus, memory_policy, and output_contract. Do not request routine confirmation; ask for missing authority or a material scope decision. This command grants no Git-write authority.
+Implement the task with a full review wave and independent verification. Apply CLAUDE.md's hard_rules, delegation, evidence, consensus, memory_policy, and output_contract. Do not request routine confirmation; ask for missing authority or a material scope decision. This command grants no version-control-write authority.
 
 ## Prepare
 

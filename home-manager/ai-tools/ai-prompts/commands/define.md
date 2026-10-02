@@ -1,6 +1,6 @@
 ---
 argument-hint: [message]
-description: Requirements definition command
+description: Turn a request into an implementation-ready specification. Use when scope is unresolved before implementation.
 ---
 
 Turn a request into an implementation-ready specification for the user to approve. Do not edit files, write memories, or implement. Apply CLAUDE.md's evidence, delegation, gate_discipline, and output_contract.

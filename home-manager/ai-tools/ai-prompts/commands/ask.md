@@ -1,6 +1,6 @@
 ---
 argument-hint: [question]
-description: Question and inquiry command
+description: Answer a question about the repository from evidence. Use when the user asks how or why something works; read-only.
 ---
 
 Answer a repository question from evidence. This command is read-only, including memories: do not implement recommendations or persist findings. Apply CLAUDE.md's evidence, delegation, consensus, and output_contract.

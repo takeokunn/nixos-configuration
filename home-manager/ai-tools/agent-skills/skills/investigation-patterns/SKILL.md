@@ -2,7 +2,7 @@
 name: investigation-patterns
 description: Use when tracing a symptom to its cause (debugging, bisecting, or working out how an unfamiliar implementation behaves). Covers evidence-based analysis, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, and checking a completion claim against the artifact instead of the summary.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 How to reach a cause you can defend. The standard debugging arc (reproduce, isolate, investigate, hypothesize,
@@ -97,8 +97,10 @@ State which verification tier was actually reached rather than implying the high
 
 ## Before adding a feature to an unfamiliar codebase
 
-Produce a written architecture analysis first. It is the deliverable of the investigation and precedes any
-implementation.
+Locate the relevant patterns and integration points before editing. Produce a written architecture analysis
+when explicitly requested or when the change crosses interfaces, affects security or data, or has uncertain
+behavior. For a bounded local change, cite the relevant evidence without a separate analysis artifact. When
+an analysis is needed, cover the applicable items:
 
 - **Existing patterns**: the codebase's governing patterns (state management, event flow, layering, module
   boundaries) with file:line evidence.
@@ -124,16 +126,16 @@ ill-fitting extension.
 
 ## Deferred decisions
 
-When work is blocked on an external dependency maturing, record it rather than leaving an open loop or
-re-investigating from scratch each time:
+When work is blocked on an external dependency maturing, report the decision and revisit conditions. Persist
+them only in an authorized store selected through serena-usage; read-only work returns a candidate:
 
-- The decision, its date, and the next review date.
+- The current decision and the condition for reviewing it.
 - The conditions that must **all** hold to unblock, each with a target and a concrete way to check it: a
   release page, a changelog, a capability list.
-- A cadence plus event triggers (on a dependency release, on renewed demand).
+- Event triggers (on a dependency release, on renewed demand); schedule a cadence only when requested.
 - The implementation outline and reference implementations to follow once unblocked.
 - What to do if the dependency stalls: seek active forks, choose an alternative, or close with an explanation.
-- An append-only review log: date, observed dependency state, outcome.
+- Update the current decision in place; keep a review history only when an audit log is explicitly requested.
 
 Make the revisit conditions checkable without re-investigation: name the exact capability (a required protocol
 method) or version threshold, so a future review is a lookup rather than a fresh analysis.
@@ -173,7 +175,8 @@ diverges from the expected one.
 
 ## Rules
 
-- Complete the investigation before proposing a solution, and propose without implementing.
+- Establish the cause before proposing a solution. For diagnosis or review only, stop at the findings. When
+  the user also requests a fix, implement within that scope and verify it.
 - Never confirm the user's assumption without independently verifying it.
 - Never state a claim without a file:line, and never substitute a numeric confidence or coverage score for an
   evidence tier.

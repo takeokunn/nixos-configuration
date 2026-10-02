@@ -1,6 +1,6 @@
 ---
 argument-hint: [file-path]
-description: Markdown text update command
+description: Save the previous command's output as a Markdown file. Use after a command whose result should persist.
 ---
 
 Save the previous command's substantive output as Markdown. Preserve its conclusions, specifications, and decisions, not its deliberation or execution history.

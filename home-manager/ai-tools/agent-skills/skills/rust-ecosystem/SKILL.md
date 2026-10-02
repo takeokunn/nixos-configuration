@@ -2,7 +2,7 @@
 name: rust-ecosystem
 description: Use when working with Rust projects (Cargo.toml, rustc, cargo build/test/clippy/rustfmt, borrow-checker errors, lock-registry design, checked/saturating arithmetic on untrusted sizes, or Rust language patterns).
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 Non-obvious Rust patterns and toolchain hazards: borrow-checker refactors, trust-boundary type
@@ -341,11 +341,13 @@ and neither is visible from the other profile.
   are the inputs that discriminate between the two build profiles; without them the debug build
   stays green and the release wrap ships undetected.
 
-**Sandbox build test gating.** Packaged/sandboxed builds typically run `--release` with no network
-access and a minimal toolchain (no git, no external CLIs). Tests that need network, git, or external
-tools will fail there if run unconditionally. Mark network/IO/external-tool tests with `#[ignore]`
-or put them behind a feature flag so the default (and packaged) test run passes in the sandbox.
-Reserve real external backends for opt-in test profiles; use recording/mock backends by default.
+**Sandbox build coverage.** Packaged builds can lack network access or required external tools.
+Inspect the package's actual test command, dependencies, and established test profiles before attributing
+a failure. Supply legitimate test dependencies or run the existing integration profile in an appropriate
+environment. Do not add `#[ignore]`, feature gates, or mocks merely to make a failing gate green.
+When a documented profile excludes external tests, name the excluded coverage and its separate run;
+recording/mock backends do not establish real integration behavior. Report an unmet precondition if the
+required environment is unavailable.
 
 ## Context7 library IDs
 
