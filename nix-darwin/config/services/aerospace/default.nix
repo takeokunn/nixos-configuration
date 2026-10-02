@@ -3,6 +3,32 @@ let
   emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
     windowManager = "aerospace";
   };
+
+  workspaceApps = {
+    "1" = [ "com.google.Chrome" ];
+    "3" = [ "org.gnu.Emacs" ];
+    "4" = [
+      "com.jgraph.drawio.desktop"
+      "com.lambdalisue.Arto"
+      "com.sequel-ace.sequel-ace"
+      "at.eggerapps.Postico"
+    ];
+    "7" = [ "com.slite.desktop" ];
+    "8" = [ "com.clickup.desktop-app" ];
+    "9" = [
+      "com.google.Chrome.app.caidcmannjgahlnbpmidmiecjcoiiigg"
+      "com.hnc.Discord"
+      "jp.naver.line.mac"
+    ];
+    "10" = [ "com.tinyspeck.slackmacgap" ];
+  };
+
+  floatingApps = [
+    "com.google.Chrome"
+    "pl.maketheweb.cleanshotx"
+    "io.github.keycastr"
+    "ai.amical.desktop"
+  ];
 in
 {
   services.aerospace.enable = true;
@@ -125,59 +151,26 @@ in
       "10" = "main";
     };
 
+    # AeroSpace stops at the first matching callback unless check-further-callbacks
+    # is set, so the floating rules must precede the move rules for an app in both.
     on-window-detected = [
       {
         "if".app-id = "net.kovidgoyal.kitty";
         "if".window-title-regex-substring = "FloatingEmacs";
         run = [ "layout floating" ];
       }
-      {
-        "if".app-id = "com.google.Chrome";
-        run = [
-          "layout floating"
-          "move-node-to-workspace 1"
-        ];
-      }
-      {
-        "if".app-id = "com.apple.Terminal";
-        run = [ "move-node-to-workspace 2" ];
-      }
-      {
-        "if".app-id = "org.gnu.Emacs";
-        run = [ "move-node-to-workspace 3" ];
-      }
-      {
-        "if".app-id = "com.jgraph.drawio.desktop";
-        run = [ "move-node-to-workspace 4" ];
-      }
-      {
-        "if".app-id = "com.lambdalisue.Arto";
-        run = [ "move-node-to-workspace 4" ];
-      }
-      {
-        "if".app-id = "com.sequel-ace.sequel-ace";
-        run = [ "move-node-to-workspace 4" ];
-      }
-      {
-        "if".app-id = "com.slite.desktop";
-        run = [ "move-node-to-workspace 7" ];
-      }
-      {
-        "if".app-id = "com.hnc.Discord";
-        run = [ "move-node-to-workspace 8" ];
-      }
-      {
-        "if".app-id = "com.clickup.desktop-app";
-        run = [ "move-node-to-workspace 8" ];
-      }
-      {
-        "if".app-id = "com.google.Chrome.app.caidcmannjgahlnbpmidmiecjcoiiigg";
-        run = [ "move-node-to-workspace 9" ];
-      }
-      {
-        "if".app-id = "com.tinyspeck.slackmacgap";
-        run = [ "move-node-to-workspace 10" ];
-      }
-    ];
+    ]
+    ++ map (app: {
+      "if".app-id = app;
+      check-further-callbacks = true;
+      run = [ "layout floating" ];
+    }) floatingApps
+    ++ builtins.concatMap (
+      ws:
+      map (app: {
+        "if".app-id = app;
+        run = [ "move-node-to-workspace ${ws}" ];
+      }) workspaceApps.${ws}
+    ) (builtins.attrNames workspaceApps);
   };
 }
