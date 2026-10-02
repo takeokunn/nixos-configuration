@@ -5511,54 +5511,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (keymap-set go-mode-map "C-x ! b" #'go-test-current-benchmark)
     (keymap-set go-mode-map "C-x ! x" #'go-run))
 #+end_src
-* Elfeed
-:PROPERTIES:
-:CUSTOM_ID: elfeed
-:END:
-** elfeed
-:PROPERTIES:
-:CUSTOM_ID: elfeed-2
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(elfeed) "elfeed" nil t)
-
-  (with-eval-after-load 'elfeed-show
-    (setopt elfeed-show-entry-switch #'display-buffer))
-
-  (with-eval-after-load 'elfeed-db
-    (setopt elfeed-db-directory "~/.cache/elfeed"))
-
-  (with-eval-after-load 'elfeed-search
-    (setopt elfeed-search-filter "@2-week-ago"))
-
-  (with-eval-after-load 'elfeed-curl
-    (setopt elfeed-curl-max-connections 32))
-#+end_src
-** elfeed-dashboard
-:PROPERTIES:
-:CUSTOM_ID: elfeed-dashboard
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(elfeed-dashboard) "elfeed-dashboard" nil t)
-
-  (keymap-global-set "C-x w" #'elfeed-dashboard)
-
-  (with-eval-after-load 'elfeed-dashboard
-    (setopt elfeed-dashboard-file (locate-user-emacs-file "elfeed-dashboard.org")))
-#+end_src
-** elfeed-goodies
-:PROPERTIES:
-:CUSTOM_ID: elfeed-goodies
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(elfeed-goodies/setup) "elfeed-goodies" nil t)
-
-  (with-eval-after-load 'elfeed-dashboard
-    (add-hook 'elfeed-dashboard-mode-hook #'elfeed-goodies/setup))
-
-  (with-eval-after-load 'elfeed-goodies
-    (setopt elfeed-goodies/entry-pane-size 0.6))
-#+end_src
 * Terminal
 :PROPERTIES:
 :CUSTOM_ID: terminal

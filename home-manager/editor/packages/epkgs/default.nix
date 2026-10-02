@@ -12,7 +12,6 @@ let
   coding = import ./packages/coding { inherit epkgs; };
   cursor = import ./packages/cursor { inherit epkgs; };
   dired = import ./packages/dired { inherit epkgs; };
-  elfeed = import ./packages/elfeed { inherit epkgs; };
   eshell = import ./packages/eshell { inherit epkgs; };
   eww = import ./packages/eww { inherit epkgs; };
   file = import ./packages/file { inherit epkgs; };
@@ -36,7 +35,6 @@ ai
 ++ coding
 ++ cursor
 ++ dired
-++ elfeed
 ++ eshell
 ++ eww
 ++ file
