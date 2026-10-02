@@ -7,13 +7,20 @@ metadata:
 
 # Jujutsu (jj)
 
-`jj root` succeeding, or a `.jj/` directory at the repository root, means jj is in use: run version-control
-operations through jj. Without `.jj/`, use git; never run `jj git init` to convert a repository unasked.
-GitHub operations stay on `gh`.
+A `.jj/` directory at the root of the checkout you work in means jj is in use: run version-control operations
+through jj. Without one, use git; never run `jj git init` to convert a repository unasked. GitHub operations
+stay on `gh`. A git worktree under a bare repository's `.worktrees/` has no `.jj/` of its own, so it stays on
+git even though `jj root` succeeds there: `jj root` names the bare root, whose jj sees none of the worktree's
+files, and `jj st` shows no changes.
 
-Repositories here are colocated: `.jj/` and `.git/` share one Git object store, jj exports its changes to Git
-refs, and Git's HEAD is left detached. Read-only git commands still work; git writes (commit, rebase, checkout)
-bypass jj's model and are replaced by the jj commands below.
+Two layouts carry `.jj/`:
+
+- A non-bare clone is colocated: `.jj/` and `.git/` share one Git object store, jj exports its changes to Git
+  refs, and Git's HEAD is left detached. Read-only git commands still work; git writes (commit, rebase,
+  checkout) bypass jj's model and are replaced by the jj commands below.
+- A bare `<repo>.git/` holds jj's store at its root in an empty-sparse `default` workspace that tracks no
+  files. Work happens in jj workspaces under `.worktrees/`, which have no `.git` of their own: git commands
+  there resolve to the bare repository, so `git status` fails and `git log` reads the bare HEAD, not `@`.
 
 ## The working copy is a commit
 
@@ -66,8 +73,12 @@ The guardrail hook blocks commands that rewrite the files under other sessions: 
 `jj op restore`/`revert`. The equivalents are to start work with plain `jj new`, discard one file with
 `jj restore <path>`, and undo a revision with `jj revert`. Spell the subcommand literally: one produced by
 `$(...)` or a variable is blocked because the hook cannot see it. Every jj write (commit, describe, squash,
-rebase, bookmark, push) needs the same authorization a git write does. Branch and worktree isolation still
-follows execution-workflow's git procedure.
+rebase, bookmark, push) needs the same authorization a git write does. Branch and worktree isolation follows
+execution-workflow's procedure, except that a repository with `.jj/` at its root isolates with a jj workspace
+instead of `git worktree add`, which would create a git worktree that the root's jj cannot see:
+`jj -R <repo> workspace add --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`, after
+`mkdir -p <repo>/.worktrees`. Without `--sparse-patterns full` the workspace copies the bare root's empty
+sparse set and checks out no files.
 
 ## Pushing
 

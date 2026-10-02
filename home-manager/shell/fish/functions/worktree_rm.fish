@@ -5,8 +5,28 @@
 # naturally refuses to ever target the bare repo itself.
 #
 # Args pass through to `git worktree remove`, so `-f`/`--force` overrides
-# git's own uncommitted-changes refusal.
+# git's own uncommitted-changes refusal. In a jj workspace, `-f`/`--force`
+# overrides the same refusal for a non-empty working-copy commit.
 function worktree_rm
+    # Checked before git: from inside a jj workspace git finds the bare repo,
+    # which has no toplevel.
+    set -l jj_root (jj workspace root 2>/dev/null)
+    if test -n "$jj_root"; and __fzf_ghq_jj_workspace_p $jj_root
+        set -l force
+        contains -- -f $argv; or contains -- --force $argv; and set force force
+        set -l repo_root (jj workspace root --name default)
+
+        set -l remove_output (__fzf_ghq_remove_jj_workspace $jj_root $force)
+        if test $status -ne 0
+            echo "worktree_rm: $remove_output" >&2
+            return 1
+        end
+
+        echo "worktree_rm: removed jj workspace $jj_root" >&2
+        cd $repo_root
+        return
+    end
+
     set -l target_path (git rev-parse --show-toplevel 2>/dev/null)
     if test -z "$target_path"
         echo "worktree_rm: not inside a git worktree" >&2

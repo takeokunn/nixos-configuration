@@ -15,7 +15,9 @@ Preserve their work. Do not kill processes by pattern or mutate the user's tmux 
 ghq clones are bare at `<repo>.git/`; edits belong in their `.worktrees/` directories, not the bare root.
 Before relying on fetch, inspect `git config --get-all remote.origin.fetch`; a missing refspec can update nothing.
 Read `git status --porcelain` as well as `git diff --no-ext-diff`: diffs omit untracked files.
-Where the repository root has `.jj/`, prefer jj over git for version-control operations; gh stays for GitHub.
+Where the checkout you work in has `.jj/` at its own root, prefer jj over git for version-control operations;
+gh stays for GitHub. A jj workspace under `.worktrees/` has its own `.jj/`; a git worktree there does not and
+stays on git, even though `jj root` succeeds by finding the bare root's `.jj/`.
 Use the injected skill and agent catalogs; do not assume unavailable tools exist.
 
 ## hard_rules
