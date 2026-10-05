@@ -1,8 +1,8 @@
 ---
 name: workflow-patterns
-description: Use when authoring an agent or command (output, checkpoints, decision criteria, escalations, skill loading, self-evaluation), when escalating a consequential finding into an independent refutation pass, or when two instructions appear to contradict and must be reconciled.
+description: Use when authoring an agent, a command, or a skill description (output, checkpoints, decision criteria, escalations, skill loading, self-evaluation), when escalating a consequential finding into an independent refutation pass, or when two instructions appear to contradict and must be reconciled.
 metadata:
-  version: "5.1.0"
+  version: "5.2.0"
 ---
 
 Structures for authoring agents and commands, plus the patterns that keep them honest. Those files are markdown
@@ -29,6 +29,10 @@ Measure the catalog actually emitted for each client, separately from resident i
 loaded bodies. Source-tree byte counts and invocation counts do not measure session token cost or task quality.
 Do not prune a required safety or verification skill merely because its observed use is rare.
 
+A skill's `description` is resident in every session's catalog, and its body is not. Open the description with
+the condition under which the skill applies, in the words a user request or a symptom would use, and spend the
+rest on what separates it from neighboring skills.
+
 For a behavior-changing instruction, compare the old and new versions on a representative observed failure
 and an unaffected control task. Declare the criterion first, such as correct scope, preserved authorization,
 or valid verification, and check for regressions. Hold task inputs, runtime, model, and available tools fixed
@@ -40,6 +44,14 @@ support iteration against observed behavior, not copying every vendor's instruct
 Inspect the generated client artifacts as well as source text. Formatting, evaluation, and packaging checks
 establish delivery, not better agent behavior. If a behavior comparison cannot be run, name that gap and keep
 the proposed improvement explicitly unmeasured.
+
+Before a comparison run, check that the skill's `description` and its body cover the same scope; when they
+differ, the run measures an undefined scope. Fix the pass/fail
+checklist before the first run, with at least one item marked critical, and do not relabel items after seeing
+results. Classify each confusion a run reports by the phase where it arose: understanding, planning, execution,
+or formatting. A scenario that needs several times the tool calls of its peers signals a prompt that is not
+self-contained. Compare two versions in both presentation orders and adopt a change only when both orders
+agree; when only one order could run, the result stays unmeasured.
 
 ## Output
 
@@ -244,6 +256,10 @@ automated gates from policies that require human or agent judgment.
 - Rules no off-the-shelf tool knows → a test in the normal suite, scanning emitted output (format strings,
   generated text) rather than whole-file text, since a whole-file scan flags a comment or doc line that merely
   describes the old idiom as if it were the idiom itself.
+
+A lesson that recurs a third time, in memory, review findings, or user corrections, warrants proposing one of
+these checks rather than another record. Adding the check is a configuration change that needs the user's
+approval. Until it exists, update the existing memory entry in place per `memory_policy`.
 
 A check built as regex over source text cannot distinguish a real violation from an identifier, comment, or
 string literal that only mentions it, so treat a hit as evidence to investigate rather than proof of one, and

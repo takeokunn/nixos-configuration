@@ -2,7 +2,7 @@
 name: test-integrity
 description: Use when a test suite is green but its value is in doubt (false greens, zero tests collected, vacuous assertions, dead guards, or mocks that make the code under test unnecessary). Contrast testing-patterns (designing tests); this skill asks whether a passing suite proves anything.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 One question and its many disguises: **the suite is green: is that evidence?**
@@ -318,7 +318,9 @@ when a defect escaped that the suite claimed to cover.
 reachable, contract-breaking mutation (invert a condition, return a wrong constant, delete a required effect)
 and confirm the test goes red. A surviving mutant needs investigation, not an automatic "untested" verdict:
 equivalent mutants preserve behavior and cannot be killed by a correct test. Do not mutate shared source or
-treat one killed mutant as proof that every integrity trap is absent.
+treat one killed mutant as proof that every integrity trap is absent. When mutation testing runs only over
+changed code, the rest is unmeasured, not covered: report the mutated scope with the score, and do not read a
+change that touched only tests or configuration as mutation evidence.
 
 **2. Assert what executed.** Capture the runner's collected and executed counts for the canonical gate and
 assert them against the number of test definitions in the tree. Assert the exit status of every spawned process

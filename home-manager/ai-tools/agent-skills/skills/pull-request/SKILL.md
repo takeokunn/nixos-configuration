@@ -2,7 +2,7 @@
 name: pull-request
 description: "Write or revise a pull request: commit shaping, title, body, and screenshots. Use when the user explicitly asks to create or edit a pull request, or when a commit message or PR body is being written."
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Pull request
@@ -112,6 +112,18 @@ landed", never as "nothing happened".
 - To add an image and nothing else, pass `--attach` with no body flag: `gh pr edit` then keeps the body it
   already has and appends, so nothing human-written is overwritten.
 
+## Repositories you do not own
+
+Before drafting for a repository you do not maintain, measure how it receives contributions. The measurement
+uses read-only `gh` queries and authorizes nothing to be opened.
+
+- Of recent pull requests from first-time contributors, count those merged, closed by a person, and closed by
+  automation. When automated closes dominate, read the workflow that closes them before writing anything.
+- Measure the length of recent merged bodies. Keep the body at or below their 90th percentile, and fold detail
+  beyond it into a `<details>` block.
+- The template follows procedure step 3, and terminology follows Summary language. The body stays English even
+  when the repository writes in another language.
+
 ## Before submitting
 
 - Nothing the checks tab, the diff, or the commit log already shows.
@@ -120,6 +132,8 @@ landed", never as "nothing happened".
 - No estimate presented as a measurement.
 - Nothing written only to fill a section, and nothing whose deletion leaves the approval decision unchanged.
 - Every word of the title backed by a fact in the diff.
+- For a repository you do not own: every link in the body resolves, and the body length is at or below the
+  measured 90th percentile.
 - No secret in the title, body, or pasted output, per `hard_rules`.
 - The body and the commit messages meet `output_discipline`'s prose and punctuation rules.
 

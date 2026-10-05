@@ -2,7 +2,7 @@
 name: execution-workflow
 description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, jj workspace isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
 metadata:
-  version: "4.2.0"
+  version: "4.3.0"
 ---
 
 How work gets placed, dispatched, verified, and judged done. CLAUDE.md's `delegation` and `evidence` sections
@@ -33,6 +33,11 @@ Identify which subtasks are genuinely independent. **Two subtasks writing to the
 however unrelated they look, and a change that must land atomically across several files is one subtask however
 many files it spans.**
 
+A call edge between two subtasks does not by itself make them dependent. When the callee's contract (its
+types, signatures, or API shape) is first written down as an artifact both sides read, caller and callee can
+proceed in parallel as long as their write sets stay disjoint. A written contract does not split an atomic
+multi-file change.
+
 ### Dispatch
 
 Record file ownership in the dispatch prompts so it can be checked. Use a separate partition artifact only
@@ -44,8 +49,10 @@ in the prompt what it is standing in for: **the first entry in an agent's own de
 on a task it was not designed for, and a dispatch-prompt override is not a guarantee the gate will yield.** Check
 the returned report for evidence the agent did the work rather than refused it politely.
 
-Dispatch independent tasks together using the runtime's agent tools. Give each concurrent writer a unique
-scratch path inside its assigned project or worktree; do not create a worktree without authorization.
+Dispatch independent tasks together using the runtime's agent tools. Size the fan-out by the independent
+subtasks found above: a comparison of alternatives usually needs two to four agents, and a wider fan-out suits
+only a broad survey whose parts are independent. Give each concurrent writer a unique scratch path inside its
+assigned project or worktree; do not create a worktree without authorization.
 
 ### Consolidate
 
@@ -68,7 +75,8 @@ never read an entry solely to refresh it, because that turns every task into an 
 For a finding whose being wrong is expensive, obtain a second analysis from a *different evidence base*: a
 different tool, a different entry point, or a different artifact. Naming that base is the work here; CLAUDE.md's
 `evidence` and `consensus` sections say why repeating one base proves nothing and how to rank a surviving
-disagreement.
+disagreement. A second persona prompt with the same model, input, and tools is not a different base, because
+its errors correlate with the first.
 
 ### When something fails
 
@@ -76,6 +84,17 @@ A sub-agent failed or returned nothing checkable: CLAUDE.md's `delegation` secti
 conditions that justify spending it. What this file adds is the shape of the retry: narrow the prompt to name the
 specific files and the single question that came back unanswered, since re-sending the same prompt tests nothing
 that was not already tested.
+
+Name the cause before choosing the response:
+
+- **Missing context**: the agent lacked a file, a fact, or a precise question. Retry in the narrowed form above.
+- **Missing permission**: a hook, sandbox, or authorization boundary stopped it. Do not retry or rephrase
+  around the boundary; report the blocker and the authority it needs.
+- **Insufficient capability**: the task exceeds what the agent or tool does in one pass. Split the task or
+  change the approach, within the same retry budget.
+
+When missing permission is among the causes, it decides the response. A timeout or crash with no visible cause
+is retried under the budget as it stands.
 
 No relevant memory exists: continue from current evidence. Investigate only a gap that blocks this task;
 absence of a memory is not itself a requirement to research or write one.
@@ -229,6 +248,25 @@ response is to fix the work: never bypass with a skip-verification flag, and rea
 A gate that selects and runs zero tests is a false green: assert a nonzero selected-test count before reading a
 pass as a pass. See [test-integrity](../test-integrity/SKILL.md) for the full treatment of selector, double,
 and teardown traps.
+
+### Unattended loops
+
+CLAUDE.md's `work_selection` already holds that reaching an iteration limit is not completion. A loop that runs
+while the user is not watching (`/loop`, a scheduled wakeup, `/goal`, a repeated headless run) needs three
+things fixed before it starts:
+
+- A stop condition decided by a command and a threshold: an exit status, a test count, or a measured value
+  together with a no-regression clause. A condition that needs judgment the loop cannot supply, such as
+  taste or a product decision, goes to the user.
+- An iteration limit.
+- One item per iteration, verified before the next begins, so a failure points at one change.
+
+When the stop condition passes while the no-regression clause fails, the loop stops and reports instead of
+continuing.
+
+A `/goal` condition is judged by a separate model that reads only the conversation; it runs no commands and
+reads no files. Write the condition so the transcript proves it, such as "the test command exits 0 and its
+output is shown", and bound it with a turn limit such as "or stop after 20 turns".
 
 ### Report the verification tier you actually reached
 

@@ -2,7 +2,7 @@
 name: ai-slop-detector
 description: Use when auditing already-written prose or code for the tells output_discipline (ai-prompts/CLAUDE.md) bans, rather than applying the norm while drafting. Covers grep patterns per tell, the quoted-example false-positive trap, and code-artifact slop (dead branches, needless abstraction, restated docstrings, scaffolding).
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 This skill is the audit procedure for the norm output_discipline states in `ai-prompts/CLAUDE.md`. That file
@@ -12,7 +12,9 @@ that contract first. Judge words in context: the patterns below identify candida
 ## Prose tells: what greps and what doesn't
 
 Start with a lexical scan, then judge each hit in context before reporting it. Run these over the target file,
-not over a diff, since slop introduced gradually never shows up in any single diff.
+not over a diff, since slop introduced gradually never shows up in any single diff. Zero hits is not evidence
+that the text carries content: prose with every listed token removed can still state nothing, so the judgment
+pass described below runs whatever the scan's count.
 
 | Tell | Pattern (case-insensitive) |
 |---|---|

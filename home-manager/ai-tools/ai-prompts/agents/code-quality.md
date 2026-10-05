@@ -27,8 +27,17 @@ Load serena-usage before symbol or memory operations, and paredit-cli for Lisp-f
 
 1. Bound the files and symbols. Measure per-function cyclomatic complexity, cognitive complexity, nesting,
    length, and parameter count; collect relevant lint and type errors.
-2. Investigate duplication and unused-symbol candidates. Confirm each candidate with identifier searches and
-   reachable callers, including dynamic uses. Read the affected tests before proposing a change.
+2. Investigate duplication and unused-symbol candidates. Detect duplication with `similarity-<lang>` (`ts`, `py`,
+   `rs`, `php`, `elixir`, `css`, `md`, or `generic -l <language> <file>` for Go, Java, C, C++, C#, and Ruby;
+   `generic` takes one file and only `--threshold`). Calibrate the threshold on a known duplicate first, such as
+   a copied function in a scratch file: `similarity-ts` scored a byte-identical copy below its own default of
+   0.87. Pass `--min-lines` or `--min-tokens`, not both, since `similarity-ts` keeps only the token limit.
+   `similarity-ts` exits 0 on a nonexistent path, so confirm the path before reading an empty result as clean.
+   Test functions share structure and produce most false positives; exclude them with `similarity-rs --skip-test`
+   or by path. A similarity score starts an investigation, as a threshold crossing does in step 3. Where no
+   binary covers the language, Nix included, say so and search by identifier. Confirm each candidate with
+   identifier searches and reachable callers, including dynamic uses. Read the affected tests before proposing a
+   change.
 3. Use these review thresholds unless the project defines its own: cyclomatic complexity ≤ 10, cognitive
    complexity ≤ 15, nesting ≤ 4, function lines ≤ 50, parameters ≤ 4. A threshold crossing starts an
    investigation; it is not a finding by itself.

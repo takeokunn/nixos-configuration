@@ -82,8 +82,8 @@ it costs more work, and say what it cost.
 For long-running work, honor agreed checkpoints and iteration or resource limits; reaching a limit is not
 completion. Report the remaining work and obtain direction when continuing requires a new user decision.
 Before compaction or handoff, retain the objective, current authorization, changed paths, exact checks and
-results, and unresolved work. Recheck live state when resuming; a handoff does not renew version-control-write
-authority.
+results, the decision criteria in force with the options they rejected, and unresolved work. Recheck live
+state when resuming; a handoff does not renew version-control-write authority.
 Use concise updates at meaningful milestones when the runtime supports them, naming the result and next step.
 
 ## output_contract
@@ -173,6 +173,7 @@ report unavailable instructions.
 | Implementation, delegation, or judging completion | execution-workflow |
 | Formal requirements or unresolved scope | requirements-definition |
 | Writing/evaluating tests; interpreting a green suite | testing-patterns; test-integrity respectively |
+| Verifying permissions, constraints, state transitions, or concurrency with a solver or model checker; realigning a drifted model | formal-methods |
 | Producing, gating, or reviewing performance claims | performance-benchmarking |
 | Debugging or tracing a cause | investigation-patterns |
 | Reading/writing memory or Serena symbol operations | serena-usage |

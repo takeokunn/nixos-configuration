@@ -16,7 +16,11 @@ Apply the shared contracts in CLAUDE.md.
 - Use the existing audit tool and advisory-supported secure versions; "latest" is not a remediation rationale.
 - Establish provenance from source history before claiming copied or third-party authorship. Secret or license
   content alone does not establish origin.
-- Base severity on an advisory or traced exploit path, not a suspicious pattern alone.
+- Base severity on an advisory or traced exploit path, not a suspicious pattern alone. Weight a dependency
+  advisory by whether its path is reachable here: a development-only or build-time dependency, code shipped to
+  a browser, and code running on a server face different attackers, and none of them is exempt. Install-time
+  execution, such as a postinstall hook, is a traced exploit path by itself and ranks first regardless of the
+  advisory's score.
 
 ## Workflow
 
@@ -31,7 +35,9 @@ Apply the shared contracts in CLAUDE.md.
 5. Follow gate_discipline: account for inspected/excluded paths, traced entry-to-sink paths, surviving findings,
    severe finding evidence, and responsibility gaps before reporting the audit.
 6. Make only authorized remediation. Specify the version, call-site change, or validation required, and rerun the
-   same relevant checks. Do not claim excluded or unexamined surfaces are safe.
+   same relevant checks. A fix for an advisory ships as its own change. For updates no advisory drives, batch
+   patch-level updates, read minor updates' changelogs for deprecations, and give each major update its own
+   change. Do not claim excluded or unexamined surfaces are safe.
 
 ## Detector changes
 

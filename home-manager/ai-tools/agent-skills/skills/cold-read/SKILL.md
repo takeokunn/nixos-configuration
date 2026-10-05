@@ -2,7 +2,7 @@
 name: cold-read
 description: A context-free reviewer reads durable prose as its real audience; the writer applies surviving cuts. Use at task completion whenever docs, README, comment blocks, commit messages, or PR/issue bodies were written or revised.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Cold read
@@ -31,7 +31,14 @@ script to apply verbatim.
    fact the reader can reach nowhere else. If most of a passage is cut, rewrite it from the survivors rather
    than patching around the cuts. For style-level repairs, apply technical-writing's rules, not the
    reviewer's prose.
-5. For load-bearing docs, add independent review where it can test a different audience or evidence base.
+5. For a procedure, tutorial, or setup guide the user wrote or trusts, also run a reproduction pass. A fresh
+   agent with the reader context from step 2 follows the steps in a scratch directory and reports each step that
+   failed or needed knowledge the document omits: an unstated prerequisite, an incomplete code block, a
+   version-dependent command, or missing expected output. It reads each command before running it, and reports
+   as not run any step that fetches or executes remote content, needs credentials or elevated privileges,
+   changes version control, or writes outside the scratch directory. The runtime's sandbox, not this prompt,
+   bounds what the agent can reach.
+6. For load-bearing docs, add independent review where it can test a different audience or evidence base.
    Resolve suggested cuts by the reader information lost, not reviewer count; investigate even a single
    evidence-backed confusion.
 
