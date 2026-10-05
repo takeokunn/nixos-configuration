@@ -1167,11 +1167,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1791011291,
-        "narHash": "sha256-V6OBJccNKBo/ktknxlJXZChPoI0NE2lembArBO3CE9k=",
+        "lastModified": 1791097562,
+        "narHash": "sha256-K9O9lG3UZNFCnwrz0ViWgP3Kgqukg1DvvzsrkFJfcvU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "73e728ddb6b7a12d18808f510813a13ee1fe4cce",
+        "rev": "a322c65bf7233456788a9ebf03bc067db7dc090a",
         "type": "github"
       },
       "original": {
@@ -1658,11 +1658,11 @@
     "yomiyasu-skill": {
       "flake": false,
       "locked": {
-        "lastModified": 1791189012,
-        "narHash": "sha256-V/+HAxXA3tTavrAEZc/S8QwlHX7vDxJj0CRVUmgHhIA=",
+        "lastModified": 1791190478,
+        "narHash": "sha256-iOp44DZs2K4UBvWGJU3Y/ZVVwr3TMYTGoW2oNM7p4j0=",
         "owner": "nanaism",
         "repo": "yomiyasu",
-        "rev": "8dc47e2594dc63f3dc37cd2c36eaf549e54b4678",
+        "rev": "986da6ffc89316a90e509d007c1efe1fc59057e6",
         "type": "github"
       },
       "original": {
