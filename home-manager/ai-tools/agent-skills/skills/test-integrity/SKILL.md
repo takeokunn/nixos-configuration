@@ -2,18 +2,18 @@
 name: test-integrity
 description: Use when a test suite is green but its value is in doubt (false greens, zero tests collected, vacuous assertions, dead guards, or mocks that make the code under test unnecessary). Contrast testing-patterns (designing tests); this skill asks whether a passing suite proves anything.
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
 ---
 
 One question and its many disguises: **the suite is green: is that evidence?**
 
-These traps can share a healthy suite's green headline while counts, skips, or loaded artifacts differ.
-Inspect that evidence and ask which contract violation would make each test go red.
+These traps can share a healthy suite's green headline while counts, skips, or loaded artifacts differ. Inspect
+that evidence and ask which contract violation would make each test go red.
 
 Test *design* (the unit/integration/e2e split, arrange-act-assert, double selection, where a seam goes and how
 a double is installed in it, fixtures, settlement barriers, coverage as a metric) belongs to
-[testing-patterns](../testing-patterns/SKILL.md). This skill assumes those tests are written and asks only
-whether their green result is trustworthy.
+[testing-patterns](../testing-patterns/SKILL.md). This skill assumes those tests exist and asks only whether
+their green result is trustworthy.
 
 **Vacuity has degrees.** An assertion satisfiable by every outcome is fully vacuous; a test whose precondition
 is never met is vacuous in practice while looking sound in source. **A seam exists only if the production call
@@ -21,55 +21,55 @@ path actually goes through it at the moment the test runs.**
 
 ## The test never ran
 
-The most complete false green. Worth its own category because every mitigation has the same shape: stop
-accepting a zero exit code as the signal, and start asserting a count of what executed.
+The most complete false green. Every mitigation has the same shape: stop accepting a zero exit code as the
+signal, and assert a count of what executed.
 
 ### Zero collected is not zero failures
 
 Selectors can match nothing. Some runners or wrapper configurations still exit zero; others reject an empty
 run (pytest normally uses exit code 5). Missing targets and incorrectly forwarded filters can also select the
-wrong set. Verify the selected and executed set rather than inferring it from a green summary or exit status.
+wrong set. Verify the selected and executed set, not a green summary or exit status.
 
-A gate must assert a **non-zero collected-and-executed count**, and assert every selected test's outcome is
-*passed* rather than merely *not failed*: some runners report expected-failure and skipped states in ways that
-satisfy a naive exit-code check. Designate exactly one canonical gate command; a narrower subset run must never
-be cited as having satisfied it.
+A gate must assert a **non-zero collected-and-executed count**, and that every selected test *passed* rather
+than merely did *not fail*: some runners report expected-failure and skipped states in ways that satisfy a
+naive exit-code check. Designate exactly one canonical gate command; a narrower subset run must never be cited
+as having satisfied it.
 
 ### A fail-fast runner truncates the result it reports
 
 Where the runner stops at the first failure, its summary describes the point it stopped at, not the suite. "1
-failed" bounds nothing: the remaining tests were never executed, so the real count is unknown and may be far
-larger. The same run's "N skipped" means N tests did not run, which is a gap in coverage reported in the
-vocabulary of a pass. Fixing the first failure and re-running then produces a second single failure, and the
-sequence reads as steady progress while the total stays unmeasured.
+failed" bounds nothing: the remaining tests never executed, so the real count is unknown and may be far larger.
+The same run's "N skipped" means N tests did not run: a coverage gap reported in the vocabulary of a pass.
+Fixing the first failure and re-running yields a second single failure, so the sequence reads as steady progress
+while the total stays unmeasured.
 
 Before citing a count, establish whether the runner ran to completion: pass its no-bail flag, or compare the
-executed count against the collected count. Report both numbers, and say "first failure" rather than "one
-failure" whenever the run stopped early.
+executed count against the collected count. Report both, and say "first failure" rather than "one failure"
+whenever the run stopped early.
 
 ### Reconcile every discovery mechanism
 
-A suite usually has more than one registry: files on disk, a manifest listing them, a build-system component
-list, a package export list, a shard configuration. A test can be present in some and absent from others. It
-then compiles, passes when invoked by hand, and is never scheduled. **This is green-on-green: nothing fails,
-coverage just quietly shrinks.**
+A suite usually has several registries: files on disk, a manifest listing them, a build-system component list,
+a package export list, a shard configuration. A test present in some and absent from others compiles, passes
+when invoked by hand, and is never scheduled. **This is green-on-green: nothing fails, coverage just quietly
+shrinks.**
 
-Write a meta-test reconciling the registries against the filesystem and against each other, failing when any
-test source is unreachable from the canonical entry point. That test is the only thing standing between a suite
-and slow invisible erosion; adding a file must fail loudly until every registry names it.
+Write a meta-test reconciling the registries against the filesystem and each other, failing when any test
+source is unreachable from the canonical entry point. Adding a file must fail loudly until every registry names
+it; this test is the only defense against slow invisible erosion.
 
 The common single-registry case is a manifest checked in beside the directory it enumerates: ASDF
 `:components`, a CMake test list, a CI YAML test matrix, an explicit `__init__` export list. A file dropped into
-the directory without a matching manifest entry compiles alone and passes under a manual invocation, so nothing
-about running it by hand reveals the gap; only the canonical entry point's silence does. Diff the manifest
-against a directory listing of the same tree and assert the difference is empty or explicitly deliberate: an
-exclusion list checked in beside the manifest, not something held in one reviewer's memory.
+the directory without a manifest entry compiles alone and passes under manual invocation, so only the canonical
+entry point's silence reveals the gap. Diff the manifest against a directory listing of the same tree and assert
+the difference is empty or explicitly deliberate: an exclusion list checked in beside the manifest, not
+something held in one reviewer's memory.
 
 ### Two naming conventions, one glob
 
-Two conventions commonly coexist in one repository: a suffix for unit specs and a different one for
-integration specs. A runner matching only one silently ignores every file using the other, and **the
-configuration looks reasonable in review because the pattern it contains is a real, valid pattern.**
+Two conventions commonly coexist in one repository: a suffix for unit specs and another for integration specs.
+A runner matching only one silently ignores every file using the other, and **the configuration looks
+reasonable in review because the pattern it contains is a real, valid pattern.**
 
 Compare the runner's reported test-file count against the count on disk, per runner, whenever a convention is
 introduced or a runner added. Better: enforce a single convention with a lint rule.
@@ -87,8 +87,8 @@ the dispatched count is a test failure in its own right, not context for a later
 ### Registration collisions delete tests
 
 Frameworks with a global name-keyed registry replace an existing registration when the same name is registered
-again. This is deliberate (it prevents accumulation across reloads) but **a duplicated name silently deletes
-a test rather than reporting a conflict.** Two common sources: a shared helper file both loaded as a dependency
+again. This is deliberate (it prevents accumulation across reloads), but **a duplicated name silently deletes a
+test rather than reporting a conflict.** Two common sources: a shared helper file both loaded as a dependency
 and picked up as a standalone file by a recursive loader; and a migration to a table-driven generator where the
 legacy hand-written cases were left in place beside it.
 
@@ -105,33 +105,35 @@ These read as real tests in review and count as covered lines in a coverage repo
 An assertion whose accepted set covers every outcome the system can produce is a tautology. The most common
 form is disjunctive: asserting a result is *either* the empty value *or* a well-formed object, when those two
 exhaust the return type. The test appears to cover a rejection path while proving only that the function
-returned. The unconditional true assertion is the degenerate case, often used as a placeholder to mark a
-requirement "covered".
+returned. The unconditional true assertion is the degenerate case, often a placeholder marking a requirement
+"covered".
 
 **For every assertion, name a concrete wrong observed value or state that it rejects.** A correct function
-need not have a valid input that fails its tests; the counterexample concerns a contract-breaking result. Replace
-a disjunction with the exact expected outcome: stub the collaborators to force the branch, then assert the
-single value that branch must produce. A passing placeholder is worse than an absent test, because it
-suppresses the gap: leave the case failing or explicitly pending instead.
+need not have a valid input that fails its tests; the counterexample concerns a contract-breaking result.
+Replace a disjunction with the exact expected outcome: stub the collaborators to force the branch, then assert
+the single value that branch must produce. A passing placeholder suppresses the gap, so it is worse than an
+absent test: leave the case failing or explicitly pending instead.
+
+A regression test names its wrong result by failing on the pre-fix code for the reason the fix addresses; one
+never seen failing proves the fixture or the double, not the fix.
 
 ### Never call the subject to compute the expected value
 
 Deriving the expected value by invoking the system under test makes the assertion true by construction when the
 subject is pure, and **flaky when it is stateful**: a second invocation of a stateful parser or builder can
 return a differently shaped result than the first, so the test fails for reasons unrelated to the contract. The
-failure presents as a genuine behavior regression, which is why this costs an investigation rather than being
-spotted immediately.
+failure presents as a genuine behavior regression, so it costs an investigation.
 
 Ground expected values in the specification, a fixture, or a previously captured artifact. Where the subject
 must be invoked to build the comparison, invoke it exactly once and assert against that single captured result.
 
 ### The stimulus must not satisfy the assertion
 
-When the input channel is visible in the output channel, an assertion can be satisfied by the stimulus rather
-than by the system's response. A terminal echoing typed input satisfies any marker that is a literal substring
-of the command *before the command executes*; a shell that traces commands, and a log-scraping test that greps
-for the line it just wrote, have the same shape. Everything the test claims to prove (that the command
-executed, that rendering occurred, that the stream advanced) is unproven.
+When the input channel is visible in the output channel, the stimulus rather than the system's response can
+satisfy an assertion. A terminal echoing typed input satisfies any marker that is a literal substring of the
+command *before the command executes*; a shell that traces commands, and a log-scraping test that greps for the
+line it just wrote, have the same shape. Everything the test claims to prove (that the command executed, that
+rendering occurred, that the stream advanced) is unproven.
 
 Disable echo where possible; snapshot the output before the stimulus and search only the post-stimulus delta;
 emit markers from encoded or split input so the marker bytes never appear in the stimulus; carry an output-only
@@ -142,8 +144,8 @@ pattern that matches the stimulus it is about to send.
 
 A substring assertion on rendered text containing sequence numbers matches its own numbered siblings: a check
 for entry one is satisfied by entry ten and entry eleven, which share its prefix. The test passes while
-asserting nothing, and **only becomes visibly wrong once the sequence crosses a digit boundary**, long after
-it was written and long after anyone remembers why.
+asserting nothing, and **only becomes visibly wrong once the sequence crosses a digit boundary**, long after it
+was written and long after anyone remembers why.
 
 Parse the rendered output into blocks, assert the block count, and assert the first and last blocks exactly.
 Where a substring check is unavoidable, anchor it with a delimiter that cannot occur inside a sibling's
@@ -152,7 +154,7 @@ identifier.
 ### Observation must not move the metric
 
 Probing a cache, counter, or rate-limited component to inspect its contents can itself register as an access. A
-later assertion that the hit count is at least one is then satisfied by the probe. The test measures its own
+later assertion that the hit count is at least one is then satisfied by the probe: the test measures its own
 instrumentation.
 
 Read counters through a side-effect-free accessor, or snapshot immediately before the act step and assert on
@@ -161,16 +163,16 @@ something for the test to work around.
 
 ## The fixture removed the subject
 
-The test ran and the assertion is meaningful, but the assertion is checking work the setup performed.
+The test ran and the assertion is meaningful, but it checks work the setup performed.
 
 ### A presence probe is satisfied by its own double
 
 Any "is this dependency available?" check (a function-bound predicate, an attribute probe, a callable type
-check, an interface conformance test) is satisfied by the double installed to replace that dependency. The
-availability test becomes a tautology: it passes with the real component present and passes identically with it
-absent. Pair this with a broad exception swallow around the call boundary and **signature drift becomes
-invisible too**: a change adding a leading argument to every function at that boundary can leave a large body
-of tests passing against doubles that still have the old arity.
+check, an interface conformance test) is satisfied by the double installed to replace that dependency: it
+passes with the real component present and identically with it absent. Pair this with a broad exception swallow
+around the call boundary and **signature drift becomes invisible too**: a change adding a leading argument to
+every function at that boundary can leave a large body of tests passing against doubles that still have the old
+arity.
 
 Prove availability by observing behavior only the real component can produce, never by probing for a name.
 Never wrap the boundary in a catch-all swallowing arity or signature errors: those are defects, not expected
@@ -179,15 +181,14 @@ against the real one so drift fails at fixture-construction time.
 
 ### A partial module double erases value exports
 
-Guidance on doubles concentrates almost entirely on function behavior, so a partial module replacement
-typically re-declares the functions and omits everything else. Non-function exports (enumerations,
-allow-lists, category sets, thresholds) then resolve to undefined. Code validating against them does not
-throw; it classifies every input as invalid and returns an empty result. **The symptom is a plausible empty
-collection rather than an error**, which sends the investigation into the parser or the feature code instead of
-the fixture.
+Guidance on doubles concentrates on function behavior, so a partial module replacement typically re-declares
+the functions and omits everything else. Non-function exports (enumerations, allow-lists, category sets,
+thresholds) then resolve to undefined. Code validating against them does not throw; it classifies every input as
+invalid and returns an empty result. **The symptom is a plausible empty collection rather than an error**, which
+sends the investigation into the parser or the feature code instead of the fixture.
 
 A partial module double must re-export every symbol any consumer reads, not only the helpers the test calls
-directly. Diagnostic heuristic: when a parsing or filtering test returns an unexpectedly empty result, inspect
+directly. Heuristic: when a parsing or filtering test returns an unexpectedly empty result, inspect
 the module double before touching the subject.
 
 ### Seeds establish preconditions, never the subject
@@ -199,30 +200,30 @@ reaching on its own. **This is the most common way an end-to-end suite becomes d
 still reads like full coverage.**
 
 Seeds may establish world, actor, and inventory preconditions. The transition under test is performed through
-the same interface a real user drives. State this as a boundary rule in the fixture layer, so it survives the
+the same interface a real user drives. State this as a boundary rule in the fixture layer so it survives the
 next person who finds the seed convenient.
 
 ### A fixture that misses a gate exercises nothing
 
 When the path under test opens with a guard clause, a fixture failing to satisfy the guard turns the whole
-interaction into a no-op. The resulting failure is misleading in an expensive way: it accuses a downstream
-subsystem that is perfectly healthy, and in the worst case surfaces as a timeout whose message names neither
-the real cause nor the right subsystem.
+interaction into a no-op. The resulting failure misleads expensively: it accuses a healthy downstream
+subsystem, and in the worst case surfaces as a timeout whose message names neither the real cause nor the right
+subsystem.
 
 Enumerate the guards on the path and build the fixture to satisfy each explicitly. When an integration test
-fails, confirm the code path actually ran before investigating the subsystem the failure appears to implicate:
-an assertion that the entry point was reached is cheap and eliminates the entire class.
+fails, confirm the code path actually ran before investigating the implicated subsystem: an assertion that the
+entry point was reached is cheap and eliminates the entire class.
 
 ### Redirect every persistence path before anything can register
 
 A harness redirecting only the obvious persistence path leaves the others pointing at real user state. The
-suite then reads and rewrites the developer's real data, both damaging it and contaminating the suite's
-assertions with values the test never created. **Ordering matters as much as coverage**: enabling a mode can
-register an exit hook or load a file immediately, so a redirect applied after that point is too late.
+suite then reads and rewrites the developer's real data, damaging it and contaminating the suite's assertions
+with values the test never created. **Ordering matters as much as coverage**: enabling a mode can register an
+exit hook or load a file immediately, so a redirect applied after that point is too late.
 
 Bind every persistence path (primary stores, learning or statistics files, caches, history) to per-run
 temporary locations before any code path can load or register. Add a suite-level assertion that real user files
-are unchanged after the run; without it this class of defect is entirely invisible.
+are unchanged after the run; without it this defect class is invisible.
 
 ## Guards nothing proves can fire
 
@@ -234,10 +235,9 @@ practice. **This is the general shape of every silently dead safety control**: r
 alert thresholds, kill switches, validation bounds.
 
 Write a test that drives each guard to *trip*, not merely one that calls the enclosing function. Prefer
-thresholds expressed relative to a measured baseline over absolute constants, because an absolute constant
-silently dies when the underlying scale changes. Keep measurement outside any gate whose behavior it feeds: a
-counter inside a conditionally-executed body measures the gate, so a threshold expressed in units of that
-counter can never be reached.
+thresholds relative to a measured baseline over absolute constants, which silently die when the underlying scale
+changes. Keep measurement outside any gate whose behavior it feeds: a counter inside a conditionally-executed
+body measures the gate, so a threshold in units of that counter can never be reached.
 
 ### Delete impossible branches rather than test them
 
@@ -249,46 +249,46 @@ correctly refusing to ignore.
 
 The discriminator: is the fallback behavior user-visible, or unreachable because an upstream invariant
 guarantees the input? Test the first; delete the second and assert the invariant instead. For an exhaustive set
-of cases, prefer enumerating every case with an explicit terminal result over a catch-all arm, which
-manufactures a branch no input can take.
+of cases, prefer enumerating every case with an explicit terminal result over a catch-all arm, which manufactures
+a branch no input can take.
 
 ## Something ate the failure
 
-Cleanup code is the usual culprit: it runs on both the success and failure paths and is written as if it cannot
+Cleanup code is the usual culprit: it runs on both success and failure paths and is written as if it cannot
 fail itself.
 
 A cleanup that raises either replaces the real failure or is swallowed by a handler written to keep the suite
-moving. Both lose information. **Swallowing is worse than replacing**, because a resource leak (an orphaned
-process, an unreleased lock, a temporary directory outliving the run) then reports as a successful test, and
-the leak accumulates across the suite until something unrelated fails.
+moving. Both lose information. **Swallowing is worse than replacing**: a resource leak (an orphaned process, an
+unreleased lock, a temporary directory outliving the run) then reports as a successful test, and accumulates
+across the suite until something unrelated fails.
 
 When both the body and the cleanup fail, keep the body's condition primary and attach the cleanup's to it as
 structured data under a distinct key. When only the cleanup fails, the test still fails. Never report a
 cleanup-only failure as a pass, and never discard the body's condition to surface the cleanup's.
 
-Teardown releasing many resources in one loop aborts at the first failure, leaving the remainder allocated:
-the single reported error understates the leak by an unknown factor, and the next test starts in a state nobody
+Teardown releasing many resources in one loop aborts at the first failure, leaving the remainder allocated: the
+single reported error understates the leak by an unknown factor, and the next test starts in a state nobody
 described. Wrap each release independently, collect every failure, and report them together after attempting
 all of them. Where the resource is a process tree or external system, distinguish "the release call failed"
-from "the release call succeeded but the resource is still present". Either outcome can leave a leak;
-record the cleanup result and verify the resource post-condition independently.
+from "the release call succeeded but the resource is still present"; either can leave a leak. Record the
+cleanup result and verify the resource post-condition independently.
 
 ## A coarser grammar is not the compiler's grammar
 
-A structural linter, a formatter, or a bare parser answers "is this parseable": a strictly weaker question
-than "does this compile" or "does this evaluate as intended". An unclosed `let*` binding list can absorb the
-form that follows it while leaving the file balanced at every delimiter check a linter performs, so a
-paren-balance or lint pass reports zero errors on input the real toolchain rejects outright. **The general
-shape: whenever a checker runs a coarser grammar than the tool that actually produces the artifact, the checker
-can pass on input the real toolchain rejects, and the coarser check is usually the one wired into the gate,
-because it is the faster one.**
+A structural linter, a formatter, or a bare parser answers "is this parseable", a strictly weaker question than
+"does this compile" or "does this evaluate as intended". An unclosed `let*` binding list can absorb the form
+that follows it while leaving the file balanced at every delimiter check a linter performs, so a paren-balance
+or lint pass reports zero errors on input the real toolchain rejects outright. **The general shape: whenever a
+checker runs a coarser grammar than the tool that actually produces the artifact, the checker can pass on input
+the real toolchain rejects, and the coarser check is usually the one wired into the gate, because it is the
+faster one.**
 
 Never cite a lint, format, or bare-parse pass as evidence that a file builds. The canonical gate is whatever the
 deployed artifact is actually produced from (`compile-file`, the real interpreter, the linker, the type
 checker); run that, not a faster stand-in, and treat every structural-only pass as advisory input to review.
 Where a structural pass is kept for its speed on every keystroke, pair it with a periodic run of the real
-toolchain over the same tree; a lint-clean file that has never been compiled is unverified regardless of how
-many times the linter has passed.
+toolchain over the same tree; a lint-clean file that has never been compiled is unverified however many times
+the linter has passed.
 
 ## Which implementation actually loaded
 
@@ -298,7 +298,7 @@ package and a system-wide one), the loader picks one, and **newest-wins preferen
 within a single location, never between locations.** Deleting stale artifacts therefore does not help: both
 candidates are legitimately current, and the wrong one is simply earlier in the search order. A test can run
 entirely against an implementation the change never touched, producing both false greens and false reds, and
-the usual mitigation would lead you to trust a run that is still wrong.
+the usual mitigation would lead you to trust a still-wrong run.
 
 Before believing any result from a suite with this shape, query the runtime for the provenance of a symbol
 under test and confirm it resolves to the tree being changed. Compare timestamps of the built artifact against
@@ -324,47 +324,46 @@ change that touched only tests or configuration as mutation evidence.
 
 **2. Assert what executed.** Capture the runner's collected and executed counts for the canonical gate and
 assert them against the number of test definitions in the tree. Assert the exit status of every spawned process
-and the completion count of every worker. This distinguishes a green over the full set from a green over an
-empty or truncated one, indistinguishable by exit code alone.
+and the completion count of every worker. This separates a green over the full set from one over an
+empty or truncated set, which exit code alone cannot.
 
 **3. Prove the precondition and forbid the fast path.** Before the act step, assert the state the test depends
 on actually holds: the cache entry is warm, the gate is satisfied, the slow path is the one about to run. Then
 make the alternative path an error for the duration, so taking it fails rather than passes. A test named for a
 warm path that silently exercises a cold one passes for the wrong reason forever. Asserting the precondition
-catches setup drift; forbidding the fast path catches the case where the subject stops using the path the test
-names. *Deleting a cache entry tests a cold miss, not stale-entry rejection*: the distinction only survives if
-the test states it.
+catches setup drift; forbidding the fast path catches the subject no longer using the path the test names.
+*Deleting a cache entry tests a cold miss, not stale-entry rejection*: the distinction only survives if the
+test states it.
 
 **4. Discover the subjects rather than list them.** For a cross-cutting invariant, enumerate the population from
 the code itself (an exported-symbol scan, a reflective walk, a filesystem traversal) and assert the invariant
 over every member. Encode intentional exceptions as an explicit data set, each pinned by its own negative test
-asserting that this member does not satisfy the invariant, deliberately. Strictly stronger than a maintained
-allowlist: **a new subject defaults to enforced rather than to unchecked**, so "we added a handler and forgot
-to apply the rule" becomes a red test rather than a silent gap. The negative test per exception makes each
-exception a reviewed act, and fails when an exception stops being necessary.
+asserting that this member does not satisfy the invariant, deliberately. Strictly stronger than a
+maintained allowlist: **a new subject defaults to enforced rather than to unchecked**, so "we added a handler
+and forgot to apply the rule" becomes a red test rather than a silent gap. The negative test per exception makes
+each exception a reviewed act, and fails when an exception stops being necessary.
 
 **5. Differential-test a replacement.** Run the previous version and the new one in the same process against
 the same generated inputs, and compare the *full* result, including failure metadata: error class, position,
 line, column, expected value, context. Load the prior implementation directly from version control so both are
-live simultaneously. Comparing only success values leaves the failure contract unverified, and the failure
-contract is usually the part callers depend on most precisely. A large success-only comparison can report clean
-while a smaller run that also compares error metadata finds mismatches, which is the argument for comparing
-everything rather than for running more cases.
+live simultaneously. Comparing only success values leaves the failure contract unverified, and callers usually
+depend on that contract most precisely. A large success-only comparison can report clean while a smaller run
+that also compares error metadata finds mismatches: compare everything rather than running more cases.
 
 *Confirm the two arms are still two implementations.* Part-way through a migration the usual tidying move is to
-make the old entry point delegate to the new one, and at that moment the comparison becomes an implementation
-compared against itself. The difference is zero by construction, the test stays green forever, and **nothing
-marks the instant it stopped testing anything**: a regression present in both paths passes. This is a specific
-risk for agent-driven refactoring, because collapsing a superseded implementation into a wrapper around its
-replacement is exactly the cleanup an agent reaches for. Read the old arm's body and check it still computes
-rather than forwards; where it no longer does, replace the comparison with table-driven expected values or an
-independent reference calculation.
+make the old entry point delegate to the new one, and the comparison then checks an implementation against
+itself. The difference is zero by construction, the test stays green forever, and **nothing marks the instant it
+stopped testing anything**: a regression present in both paths passes. Agent-driven refactoring is
+especially exposed: collapsing a superseded implementation into a wrapper around its replacement is exactly
+the cleanup an agent reaches for. Read the old arm's body and check it still computes rather than forwards;
+where it no longer does, replace the comparison with table-driven expected values or an independent reference
+calculation.
 
 **6. Audit the assertions.** For each assertion, name a wrong observed value or state it rejects. Flag every
 disjunction exhausting the return type, every unconditional truth, every substring check against numbered
 content, and every expected value computed by invoking the subject. Mutation testing catches most of these but
 is expensive to run broadly and cannot be applied to a suite that will not run at all. This pass is cheap,
-needs no infrastructure, and is where most vacuity is actually found.
+needs no infrastructure, and finds most vacuity.
 
 ## Related
 

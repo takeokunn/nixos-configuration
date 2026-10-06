@@ -1,8 +1,8 @@
 ---
 name: testing-patterns
-description: Use when writing, structuring, or reviewing tests - test strategy, coverage, unit/integration/e2e split, mocks/fixtures/fakes, flaky-test isolation, async settlement. For whether a green suite actually proves anything, see test-integrity instead.
+description: Use when writing, structuring, or reviewing tests - test strategy, coverage, whether a test should be added, kept, or deleted, unit/integration/e2e split, mocks/fixtures/fakes, flaky-test isolation, async settlement. For whether a green suite actually proves anything, see test-integrity instead.
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
 ---
 
 Designing tests that hold up. Arrange-act-assert, given-when-then, the stub/mock/spy/fake vocabulary, and
@@ -13,9 +13,9 @@ Whether a *passing* suite proves anything belongs to [test-integrity](../test-in
 
 ## Classify by the boundary crossed
 
-Scope alone ("one function" versus "several components") does not settle the cases teams actually argue
-about, because both readings are defensible for the same file. **The boundary crossed is decidable:** does this
-test touch a socket, the filesystem, a subprocess, a daemon lifecycle, the program's standard output?
+Scope ("one function" versus "several components") does not settle the cases teams argue about, since both
+readings are defensible for the same file. **The boundary crossed is decidable:** does this test touch a socket,
+the filesystem, a subprocess, a daemon lifecycle, the program's standard output?
 
 | Layer | Boundary |
 |---|---|
@@ -24,22 +24,50 @@ test touch a socket, the filesystem, a subprocess, a daemon lifecycle, the progr
 | e2e | Crosses the program's outermost entry point: a command invocation, standard output, a browser session |
 
 A file mixing deterministic helper checks with process-boundary checks is **split along the boundary**, not
-filed whole under whichever kind holds the majority: otherwise the fast suite inherits the slow file's
-flakiness, or the slow suite hides fast checks nobody runs early.
+filed whole under the majority kind: otherwise the fast suite inherits the slow file's flakiness, or the slow
+suite hides fast checks nobody runs early.
 
-Let exactly one mechanism route a file to its suite, and prefer the directory path over filename markers. When
-the layer can be inferred from two mechanisms, a stray character in a manifest or a missed naming convention
-silently routes a file into a suite that never executes it, **and the omission is invisible because nothing
-failed.**
+Let exactly one mechanism route a file to its suite, and prefer the directory path over filename markers. With
+two mechanisms, a stray character in a manifest or a missed naming convention silently routes a file into a
+suite that never executes it, **and the omission is invisible because nothing failed.**
 
 ## Coverage
 
-Line, branch, and function coverage answer "what executed". They do not answer "what is guaranteed". Aim high
-but prioritize meaningful tests: 100% coverage does not guarantee correctness, and a coverage number is not a
-substitute for asking what would have to break for a test to go red.
+Line, branch, and function coverage answer "what executed", not "what is guaranteed". Aim high but prioritize
+meaningful tests: 100% coverage does not guarantee correctness, and a coverage number does not replace asking
+what would have to break for a test to go red.
 
 Check applicability against the quality characteristics too (functional suitability, performance,
 compatibility, usability, reliability, security, maintainability, portability), not only executed lines.
+
+## Whether a test should exist
+
+Before adding or changing a test, answer all four; an unanswered one means do not add it yet.
+
+1. Which observable behavior, invariant, or contract does it protect?
+2. Which credible regression makes it fail?
+3. Why does existing coverage miss that regression? Each contract has one primary test at the strongest
+   boundary that observes it; another layer needs a risk the primary test cannot reach, such as a transport or
+   lifecycle failure. Prefer a new row in an existing case table to a near-duplicate test.
+4. Does it need a seam no production caller uses (a test-only export, flag, wrapper, or injection hook)? Then
+   test at the real boundary.
+
+A test that breaks under a behavior-preserving refactor checks the implementation: rewrite it at the boundary
+that owns the behavior before landing it. A bug-fix regression test must be seen failing on the pre-fix code
+([test-integrity](../test-integrity/SKILL.md#name-the-wrong-result-the-assertion-rejects)). One at the owning
+boundary covers the bug; do not replay the scenario at every layer it passes through.
+
+### Deleting an existing test
+
+The same questions apply, but a test that must change under a behavior-preserving refactor is a suspect, not
+yet a deletion. Delete only after recording: the failure it can detect; the non-test callers of the code or
+seam it covers; the stronger proof that remains, or why none is needed; what the deletion also removes (a
+test-only export, a production path only tests call); and the command that validates the deletion.
+
+Keep a test that alone guards a public API, a configuration or storage format, a migration, a security
+property, or an ordering callers can observe. Slowness or static inspection is no reason to delete: a source
+check can be the cheapest guard on a user-facing key or path, if it survives renames of internal identifiers.
+A retained test that fails on the baseline is a possible product bug: reproduce it and fix the owning code.
 
 ## Designing the cases
 
@@ -64,9 +92,9 @@ complete while proving nothing.
 
 ### Drive families from a case table
 
-Where several tests are identical except for input and expected classification, define a typed case record
-carrying a stable id, and tag each assertion with it so a failure names the exact row.
-In this pseudocode, `reportSkip` records the case and reason in the runner's skipped-test report.
+Where several tests differ only in input and expected classification, define a typed case record carrying a
+stable id, and tag each assertion with it so a failure names the exact row. In this pseudocode, `reportSkip`
+records the case and reason in the runner's skipped-test report.
 
 ```
 interface Case { id: string; name: string; input: string; expect: Status; skip?: { reason: string } }
@@ -97,9 +125,9 @@ Vitest is preferred for new JS/TS projects; Jest remains supported.
 
 ### Choose values that keep derived values distinct
 
-A legal but degenerate fixture value produces a test that appears to cover several paths while exercising one.
-**It fails silently in both directions**: the collapsed path is never checked, and the surviving path passes,
-so the suite reports coverage of a condition it never reached.
+A legal but degenerate fixture value yields a test that appears to cover several paths while exercising one.
+**It fails silently in both directions**: the collapsed path is never checked, and the surviving path passes, so
+the suite reports coverage of a condition it never reached.
 
 ```
 position.y = 64.3     // lower sample resolves to 64, upper to 65, not: 64
@@ -107,9 +135,8 @@ startAt(threshold + 2 * step)   // one step lands past the boundary, not exactly
 ```
 
 An advance landing exactly on a boundary tests the wrong side of a strict comparison. And **do not feed an
-already-normalized fixture constant back through its normalizer**: converting a converted value commonly
-yields nothing, the fixture falls back to its default, and the scenario the test claims to arrange was never
-built.
+already-normalized fixture constant back through its normalizer**: converting a converted value commonly yields
+nothing, the fixture falls back to its default, and the scenario the test claims to arrange was never built.
 
 ### Suspect the fixture before the implementation
 
@@ -125,8 +152,8 @@ Weakening a guard makes the test pass and removes the behavior the guard existed
 ### Scenario-scoped identifiers, not truncation
 
 Give each scenario its own unique id for the data it creates, tag records with it, and delete by that id in
-teardown. Truncating shared tables is a blunt reset that breaks the moment tests run concurrently, and it can
-destroy seed data the suite did not create.
+teardown. Truncating shared tables is a blunt reset that breaks once tests run concurrently, and it can destroy
+seed data the suite did not create.
 
 ### Snapshot and restore global state
 
@@ -161,8 +188,8 @@ Bind an indirection the production code declares (a dynamically-scoped variable,
 constructor parameter) rather than overwriting a global function definition for the duration of a test.
 
 **Overwriting a global binding is process-wide and unscoped.** Under a parallel runner it corrupts unrelated
-tests non-deterministically, and the resulting flake is nearly impossible to attribute because the failing test
-never mentions the test that did the overwriting.
+tests non-deterministically, and the flake is nearly impossible to attribute because the failing test never
+mentions the test that did the overwriting.
 
 Local function shadowing does not intercept calls compiled to direct global references. A helper compiled
 against the global name keeps calling it, so **the stub appears to install successfully and simply has no
@@ -192,12 +219,12 @@ When a test replaces every member of a dispatch chain, build the double set from
 dispatches over, or assert the two sets are equal before running.
 
 A hand-enumerated set quietly becomes a second registration list nobody knows they own. Adding a member to the
-production chain leaves it undoubled, so the real implementation runs against empty stubs; **and the resulting
-failures land in unrelated cases elsewhere in the file, naming neither the new member nor the file that needed
+production chain leaves it undoubled, so the real implementation runs against empty stubs; **and the failures
+land in unrelated cases elsewhere in the file, naming neither the new member nor the file that needed
 updating.**
 
-This is completeness of the set, a different failure from fidelity of any single double: a set can be perfectly
-faithful member by member and still be wrong because it is missing one.
+This is completeness of the set, a different failure from fidelity of any single double: a set can be faithful
+member by member and still be wrong because it is missing one.
 
 ### Guard variant-specific reads when enumerating a registry
 
@@ -217,8 +244,8 @@ assertEqual(matched > 0, true)
 **A docstring narrowing a registry's contract is documentation, not enforcement.** A second variant registered
 through a different path will eventually appear, and every consumer reading a property only the first variant
 carries then silently degrades: the loop still runs, the assertion still passes, and it proves nothing about
-the members it skipped. When the same inline presence check appears at several call sites, the duplication is
-the signal that a named predicate is missing.
+the members it skipped. When the same inline presence check appears at several call sites, the duplication
+signals a missing named predicate.
 
 ## Asynchrony
 
@@ -247,9 +274,9 @@ await waitForDurableRecord(store, id)      // second, independent source
 assertUnchanged(preexistingEntities)       // the change disturbed nothing else
 ```
 
-**When such a test proves flaky, the correct response is a stronger barrier, never a wider tolerance.**
-Relaxing an exact expected value to a range, or dropping the durability check, converts a real race into a
-permanently silent one. Loosening is the default reflex under time pressure and is almost always wrong here.
+**When such a test proves flaky, respond with a stronger barrier, never a wider tolerance.** Relaxing an exact
+expected value to a range, or dropping the durability check, converts a real race into a permanently silent
+one. Loosening is the default reflex under time pressure and is almost always wrong here.
 
 Include the negative half: assert that entities the change was not supposed to affect are still present. A
 settlement bug frequently manifests as collateral loss rather than as a wrong value at the target.
@@ -270,14 +297,14 @@ asserting *presence* can then only fail, never falsely pass; but **the mirror-im
 gone after a reset, passes vacuously every time and will never detect a broken reset.**
 
 Poll before closing the first session: closing immediately after the save races the storage layer's flush, and
-the resulting failure looks like a durability bug rather than a missing barrier. Give each run its own
-temporary profile directory, removed in a cleanup block that runs even when the body throws.
+the failure looks like a durability bug rather than a missing barrier. Give each run its own temporary profile
+directory, removed in a cleanup block that runs even when the body throws.
 
 ## Efficiency guarantees are operation counts, not wall clock
 
 An efficiency fix has no natural test, because the observable output is identical before and after. A suite
-that only checks output stays green when the optimization is silently undone by the next change to a data
-relation or a call site.
+that only checks output stays green when the next change to a data relation or a call site silently undoes the
+optimization.
 
 ```
 for (const size of [81, 289, 1089]) { applyBatch(size); assertEqual(commitCount(), 1) }
@@ -291,8 +318,8 @@ guarantee you care about is the shape of the curve.
 
 ## Skipping versus failing
 
-A skipped test and a failed test carry different meanings. Reserve failure for a violated expectation about
-code under your control; use skip for a missing precondition of the *environment*. **Conflating the two trains
+A skipped test and a failed test mean different things. Reserve failure for a violated expectation about code
+under your control; use skip for a missing precondition of the *environment*. **Conflating the two trains
 readers to ignore red.**
 
 ```
@@ -303,7 +330,7 @@ setup: async (ctx) => { if (!(await dependencyReachable())) ctx.skip("dependency
 
 When adding an optional parameter, key, or field to a contract existing callers already use, write one test
 that makes the old call and asserts the old result shape. **The new-feature tests all pass the new argument, so
-none of them ever exercises the old call shape.**
+none of them exercises the old call shape.**
 
 Test omission, explicit null, and a supplied value against the declared contract. They need not be equivalent:
 an update API can use omission for "leave unchanged" and null for "clear". Preserve the old call shape and
@@ -320,9 +347,9 @@ definition) surface only when the output is realized, so an evaluation-only chec
 configuration that cannot build.
 
 **The search half is the part people skip and the part that catches real defects.** A successful build proves
-the new path works; it says nothing about whether the old path was fully removed, so a migration can leave both
-installed and appear entirely healthy. State the gate as an enumerated list of commands that must exit zero:
-"it builds" is not checkable by a reviewer; a list of targets is.
+the new path works, not that the old path was fully removed, so a migration can leave both installed and appear
+healthy. State the gate as an enumerated list of commands that must exit zero: "it builds" is not checkable by a
+reviewer; a list of targets is.
 
 ## Authoring test infrastructure
 
