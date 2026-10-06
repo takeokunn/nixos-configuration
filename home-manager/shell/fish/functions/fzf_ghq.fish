@@ -9,9 +9,8 @@ function fzf_ghq
     end
 
     set -l target $repo
-    set -l is_bare (git -C $repo rev-parse --is-bare-repository 2>/dev/null)
 
-    if test "$is_bare" = true
+    if __fzf_ghq_bare_p $repo
         # Bare repos hold no working files, so route to one of their
         # worktrees instead.
         set -l worktree_paths (__fzf_ghq_worktree_paths $repo)

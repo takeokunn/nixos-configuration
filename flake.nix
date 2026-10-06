@@ -435,6 +435,54 @@
                 touch $out
               '';
 
+          checks.statusline =
+            pkgs.runCommand "statusline-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.bc
+                  pkgs.git
+                  pkgs.jq
+                  pkgs.jujutsu
+                ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/scripts/statusline.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/scripts/statusline.sh}
+                touch $out
+              '';
+
+          checks.fish-ghq-jj =
+            pkgs.runCommand "fish-ghq-jj-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.fish
+                  pkgs.git
+                  pkgs.jujutsu
+                ];
+              }
+              ''
+                export HOME=$(mktemp -d)
+                fish ${./home-manager/shell/fish/tests/ghq-jj.test.fish} ${./home-manager/shell/fish/functions}
+                touch $out
+              '';
+
+          # The whole emacs directory is copied so the test finds ../elisp/init.org.
+          checks.emacs-ghq-jj =
+            pkgs.runCommand "emacs-ghq-jj-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.emacs-nox
+                  pkgs.git
+                  pkgs.jujutsu
+                ];
+              }
+              ''
+                export HOME=$(mktemp -d)
+                emacs --batch -l ${./home-manager/editor/emacs}/tests/ghq-jj-test.el \
+                  -f ert-run-tests-batch-and-exit
+                touch $out
+              '';
+
           checks.claude-code-permissions =
             pkgs.runCommand "claude-code-permissions-test"
               {

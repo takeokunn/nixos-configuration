@@ -1969,10 +1969,54 @@ override rather than assuming it still runs."
   (keymap-global-set "C-x g" #'my/magit-status)
   (keymap-global-set "C-x G" #'magit-blame)
 
+  (defun my/vcs-root (dir)
+    "Return (KIND . ROOT) for the repository enclosing DIR, or nil.
+The nearest ancestor of DIR holding a .jj or .git entry decides, so a git
+checkout nested under a jj repository is git and a colocated checkout, which
+has both entries, is jj.  KIND is `jj' or `git'; ROOT is a directory name.
+statusline.sh applies the same nearest-.jj/.git rule."
+    (when-let* ((root (locate-dominating-file
+                       dir
+                       (lambda (d)
+                         (or (file-exists-p (expand-file-name ".jj" d))
+                             (file-exists-p (expand-file-name ".git" d)))))))
+      (cons (if (file-exists-p (expand-file-name ".jj" root)) 'jj 'git) root)))
+
+  (defun my/jj-call (root &rest args)
+    "Run `jj -R ROOT ARGS'; return (EXIT STDOUT STDERR) with both streams trimmed.
+Uses `call-process' with an argument list so no value is reinterpreted as
+shell syntax."
+    (let ((err-file (make-temp-file "jj-stderr-")))
+      (unwind-protect
+          (with-temp-buffer
+            (let ((exit (apply #'call-process "jj" nil (list t err-file) nil "-R" root args)))
+              (list exit
+                    (string-trim (buffer-string))
+                    (progn (erase-buffer)
+                           (insert-file-contents err-file)
+                           (string-trim (buffer-string))))))
+        (delete-file err-file))))
+
+  (defun my/jj-output (root &rest args)
+    "Run `jj -R ROOT ARGS'; return trimmed stdout, or nil on nonzero exit."
+    (pcase-let ((`(,exit ,out ,_) (apply #'my/jj-call root args)))
+      (and (zerop exit) out)))
+
+  (defun my/jj-output-or-error (root &rest args)
+    "Like `my/jj-output', but signal an error carrying jj's stderr on failure."
+    (pcase-let ((`(,exit ,out ,err) (apply #'my/jj-call root args)))
+      (if (zerop exit)
+          out
+        (error "jj %s failed (exit %s): %s" (string-join args " ") exit err))))
+
   (defun my/magit-status ()
+    "Open majutsu in a jj repository and magit otherwise."
     (interactive)
-    (let ((default-directory (locate-dominating-file default-directory ".git")))
-      (magit-status)))
+    (let ((vcs (my/vcs-root default-directory)))
+      (if (eq (car vcs) 'jj)
+          (majutsu-log (cdr vcs))
+        (let ((default-directory (locate-dominating-file default-directory ".git")))
+          (magit-status)))))
 
   (defun my/update-magit-repository-directories (&optional roots)
     "Populate `magit-repository-directories' from the same ghq-aware root set
@@ -2095,6 +2139,45 @@ directly instead of recomputing via `my/ghq-project-roots'."
 :END:
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(majutsu majutsu-log) "majutsu" nil t)
+
+  (defun my/jj-checkout-pr (number)
+    "Start a new jj change on top of the head branch of pull request NUMBER.
+The head branch is fetched from origin and `jj new' is run on it in the
+current jj repository.  A pull request from a fork is refused instead of
+adding a remote."
+    (interactive (list (read-number "PR number: ")))
+    (let* ((root (let ((vcs (my/vcs-root default-directory)))
+                   (if (eq (car vcs) 'jj)
+                       (cdr vcs)
+                     (user-error "Not inside a jj repository"))))
+           (default-directory root)
+           (url (or (my/jj-origin-url root)
+                    (user-error "No origin remote in %s" root)))
+           ;; a jj workspace has no .git, so gh cannot infer the repository
+           (repo (replace-regexp-in-string "\\`https?://" "" (my/remote-url-to-https url)))
+           (info (with-temp-buffer
+                   (unless (zerop (call-process "gh" nil (list t nil) nil "pr" "view"
+                                                (number-to-string number) "--repo" repo
+                                                "--json" "headRefName,isCrossRepository"))
+                     (user-error "gh pr view %d failed" number))
+                   (goto-char (point-min))
+                   (json-parse-string (buffer-string) :object-type 'alist
+                                      :false-object nil :null-object nil)))
+           (head (alist-get 'headRefName info)))
+      (when (alist-get 'isCrossRepository info)
+        (user-error "PR %d comes from a fork; add the remote manually" number))
+      (unless (and (stringp head)
+                   (string-match-p "\\`[A-Za-z0-9._/-]+\\'" head)
+                   (not (string-prefix-p "-" head)))
+        (user-error "PR %d has an unusable head branch name: %S" number head))
+      (pcase-let ((`(,exit ,_ ,err) (my/jj-call root "git" "fetch" "--remote" "origin"
+                                                "--branch" (concat "exact:" head))))
+        (unless (zerop exit)
+          (user-error "jj git fetch of %s failed: %s" head err)))
+      (pcase-let ((`(,exit ,_ ,err) (my/jj-call root "new" (concat head "@origin"))))
+        (unless (zerop exit)
+          (user-error "jj new %s@origin failed: %s" head err)))
+      (message "Checked out PR %d (%s@origin)" number head)))
 #+end_src
 ** Keyboard
 :PROPERTIES:
@@ -3392,7 +3475,9 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
     "Return non-nil when DIR is a bare repository.
 Tests for the absence of a .git entry rather than a .git suffix on the
 directory name, so the answer does not depend on ghq's naming convention."
-    (not (file-exists-p (expand-file-name ".git" dir))))
+    (let ((git (expand-file-name ".git" dir)))
+      ;; a dangling .git symlink is still a .git entry
+      (not (or (file-exists-p git) (file-symlink-p git)))))
 
   (defun my/ghq-repo-path (relative)
     "Return a directory holding the working files of RELATIVE.
@@ -3450,7 +3535,9 @@ so a value in ARGS or REPO-PATH can never be reinterpreted as shell syntax."
     "Return REPO-PATH's existing worktree paths, excluding its own bare
 git-common-dir entry, followed by its jj workspaces, which `git worktree
 list' does not report.  The jj workspace named \"default\" holds jj's store
-at REPO-PATH itself and is excluded the same way."
+at REPO-PATH itself and is excluded the same way.  The git half only lists
+legacy worktrees: it goes away once `worktree_migrate_jj' has left none."
+    ;; LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
     (let ((common-dir (my/ghq--git repo-path "rev-parse" "--path-format=absolute" "--git-common-dir"))
           (worktrees nil)
           (workspaces nil))
@@ -3466,16 +3553,86 @@ at REPO-PATH itself and is excluded the same way."
             (setq workspaces (split-string (buffer-string) "\n" t)))))
       (append (nreverse worktrees) workspaces)))
 
+  (defun my/ghq--jj-run (what &rest args)
+    "Run jj with ARGS in `default-directory'; signal an error naming WHAT on failure."
+    (with-temp-buffer
+      (let ((exit (apply #'call-process "jj" nil t nil args)))
+        (unless (zerop exit)
+          (error "%s failed (exit %s): %s" what exit (string-trim (buffer-string)))))))
+
+  (defun my/ghq--jj-init-bare (repo-path)
+    "Give the bare repository REPO-PATH jj's store at its root.
+Mirrors fish's `__fzf_ghq_init_jj'.  The store is initialised in a scratch
+directory inside REPO-PATH, with an empty sparse set so no files are checked
+out, then moved to REPO-PATH/.jj.  `jj git init --git-repo' records an
+absolute git_target, which is rewritten to the relative path the moved store
+needs.  Any failure removes the scratch directory and, only when this call's
+rename succeeded, the moved .jj, then signals an error.  A .jj that appears
+concurrently is never touched.  Does nothing when REPO-PATH already has .jj."
+    (unless (my/ghq-bare-repository-p repo-path)
+      (error "my/ghq--jj-init-bare: %s is not a bare repository" repo-path))
+    (let ((jj-dir (expand-file-name ".jj" repo-path))
+          (tmp nil)
+          (moved nil)
+          (done nil))
+      (unless (file-exists-p jj-dir)
+        (unwind-protect
+            (progn
+              (setq tmp (make-temp-file (expand-file-name ".jj-init." repo-path) t))
+              (let ((default-directory (file-name-as-directory tmp)))
+                (my/ghq--jj-run "jj git init" "git" "init" "--git-repo=.."))
+              (my/ghq--jj-run "jj sparse set" "-R" tmp "sparse" "set" "--clear")
+              (when (or (file-exists-p jj-dir) (file-symlink-p jj-dir))
+                (error "my/ghq--jj-init-bare: concurrent jj init created %s" jj-dir))
+              (condition-case nil
+                  (rename-file (expand-file-name ".jj" tmp) jj-dir)
+                (file-error
+                 (error "my/ghq--jj-init-bare: concurrent jj init created %s" jj-dir)))
+              (setq moved t)
+              (write-region "../../.." nil (expand-file-name "repo/store/git_target" jj-dir)
+                            nil 'silent)
+              (my/ghq--jj-run "jj workspace list" "-R" repo-path "--ignore-working-copy"
+                              "workspace" "list")
+              (setq done t))
+          (when (and moved (not done))
+            (delete-directory jj-dir t))
+          (when (and tmp (file-directory-p tmp))
+            (delete-directory tmp t))))))
+
+  (defun my/ghq--jj-fetch (repo-path)
+    "Fetch every branch of origin into REPO-PATH's jj store, then import.
+A bare clone has no remote.origin.fetch refspec, so a plain `jj git fetch'
+would fetch nothing; the branch glob is passed explicitly.  A failed fetch
+is tolerated with a message, since the local store may already be current."
+    (let ((remotes (my/jj-output repo-path "--ignore-working-copy" "git" "remote" "list")))
+      (when (and remotes (string-match-p "^origin[ \t]" remotes))
+        (pcase-let ((`(,exit ,_ ,err) (my/jj-call repo-path "git" "fetch" "--remote" "origin"
+                                                  "--branch" "glob:*")))
+          (unless (zerop exit)
+            (message "my/ghq--jj-fetch: fetch from origin failed in %s: %s" repo-path err)))))
+    (my/jj-output-or-error repo-path "git" "import"))
+
+  (defun my/ghq--jj-resolves-p (repo-path revset)
+    "Return non-nil when REVSET names at least one commit in REPO-PATH."
+    (let ((out (my/jj-output repo-path "--ignore-working-copy" "log" "--no-graph"
+                             "-r" (format "present(%s)" revset) "-T" "commit_id")))
+      (and out (not (string-empty-p out)))))
+
   (defun my/ghq--resolve-base-ref (repo-path)
-    "Resolve a base ref in REPO-PATH via the same fallback chain as
-__fzf_ghq_new_worktree.fish: an explicit-refspec fetch of origin/main
-\(tolerating failure), refs/remotes/origin/HEAD, origin/main, then local HEAD."
-    (when (my/ghq--git repo-path "remote" "get-url" "origin")
-      (my/ghq--git repo-path "fetch" "origin" "+refs/heads/main:refs/remotes/origin/main"))
-    (or (let ((ref (my/ghq--git repo-path "symbolic-ref" "refs/remotes/origin/HEAD")))
-          (and ref (string-remove-prefix "refs/remotes/" ref)))
-        (and (my/ghq--git repo-path "rev-parse" "--verify" "--quiet" "origin/main") "origin/main")
-        (my/ghq--git repo-path "symbolic-ref" "--short" "HEAD")
+    "Return a jj revset naming the default branch of REPO-PATH.
+Mirrors fish's `__fzf_ghq_new_worktree': fetch origin first, then take the
+first of main@origin, master@origin and trunk@origin that resolves, then the
+branch REPO-PATH/HEAD points at, and signal an error otherwise."
+    (my/ghq--jj-fetch repo-path)
+    (or (seq-find (lambda (ref) (my/ghq--jj-resolves-p repo-path ref))
+                  '("main@origin" "master@origin" "trunk@origin"))
+        (let* ((head-file (expand-file-name "HEAD" repo-path))
+               (name (and (file-readable-p head-file)
+                          (with-temp-buffer
+                            (insert-file-contents head-file)
+                            (and (looking-at "ref: refs/heads/\\(.+\\)$")
+                                 (match-string 1))))))
+          (and name (my/ghq--jj-resolves-p repo-path name) name))
         (error "my/ghq--resolve-base-ref: cannot resolve a base ref in %s" repo-path)))
 
   (defun my/ghq--link-state (repo-path target-path)
@@ -3525,26 +3682,39 @@ stderr warning on the same failure."
                  (message "my/ghq--link-state: direnv allow failed for %s (%s)" target-path (error-message-string err)))))))))))
 
   (defun my/ghq-create-worktree (repo-path &optional base-ref naming-mode)
-    "Create a new worktree of the bare repository at REPO-PATH, Elisp-native
-equivalent of __fzf_ghq_new_worktree.fish (fish's Serena serena_config.yml
-projects: prune step is deliberately NOT reimplemented here because it needs YAML
-parsing this Emacs config has no library for; that cleanup remains fish's
-job for worktrees created there). BASE-REF, when omitted, is resolved via
-`my/ghq--resolve-base-ref'. NAMING-MODE, when the symbol `branch', names the
-created directory <timestamp>-<sanitized-base-ref> (leading \"origin/\"
-stripped, remaining \"/\" replaced with \"-\") instead of the default
-<timestamp>-<short-sha>, mirroring __fzf_ghq_new_worktree.fish's
-naming_mode = branch case. A repository carrying jj's store at its root gets a
-jj workspace instead of a git worktree, as in the fish helper. Returns the
-created worktree's absolute path."
+    "Create a new jj workspace under the .worktrees/ of REPO-PATH.
+Elisp-native equivalent of __fzf_ghq_new_worktree.fish (fish's Serena
+serena_config.yml projects: prune step is deliberately NOT reimplemented here
+because it needs YAML parsing this Emacs config has no library for; that
+cleanup remains fish's job for worktrees created there).  A bare REPO-PATH
+without jj's store is given one first; a non-bare one without it is an error.
+BASE-REF is a jj revset that must name exactly one commit; when omitted it is
+resolved via `my/ghq--resolve-base-ref'.  NAMING-MODE, when the symbol
+`branch', names the created directory <timestamp>-<sanitized-base-ref>
+\(trailing \"@origin\" stripped, \"/\" replaced with \"-\") instead of the
+default <timestamp>-<short-sha>, mirroring __fzf_ghq_new_worktree.fish's
+naming_mode = branch case.  Returns the created workspace's absolute path."
+    (unless (file-directory-p (expand-file-name ".jj" repo-path))
+      (if (my/ghq-bare-repository-p repo-path)
+          (my/ghq--jj-init-bare repo-path)
+        (error "my/ghq-create-worktree: %s is not bare and has no jj store" repo-path)))
     (let* ((base-ref (or base-ref (my/ghq--resolve-base-ref repo-path)))
-           (base-sha (or (my/ghq--git repo-path "rev-parse" "--short" base-ref)
-                         (error "my/ghq-create-worktree: cannot resolve base ref %s in %s" base-ref repo-path)))
+           (_ (my/jj-output-or-error repo-path "git" "import"))
+           (shas (split-string
+                  (or (my/jj-output repo-path "--ignore-working-copy" "log" "--no-graph"
+                                    "-r" base-ref "-T" "commit_id ++ \"\\n\"")
+                      "")
+                  "\n" t))
+           (full-sha (if (= (length shas) 1)
+                         (car shas)
+                       (error "my/ghq-create-worktree: base ref %s must name exactly one commit in %s, got %d"
+                              base-ref repo-path (length shas))))
+           (base-sha (substring full-sha 0 8))
            (worktrees-dir (expand-file-name ".worktrees" repo-path))
            (base-name (if (eq naming-mode 'branch)
                           (format "%s-%s"
                                   (format-time-string "%Y%m%dT%H%M%S")
-                                  (string-replace "/" "-" (string-remove-prefix "origin/" base-ref)))
+                                  (string-replace "/" "-" (string-remove-suffix "@origin" base-ref)))
                         (format "%s-%s" (format-time-string "%Y%m%dT%H%M%S") base-sha)))
            (target-name base-name)
            (suffix 2))
@@ -3552,32 +3722,25 @@ created worktree's absolute path."
         (setq target-name (format "%s-%d" base-name suffix))
         (setq suffix (1+ suffix)))
       (let ((target-path (expand-file-name target-name worktrees-dir)))
+        (make-directory worktrees-dir t)
         (with-temp-buffer
-          (unless (zerop (if (file-directory-p (expand-file-name ".jj" repo-path))
-                             (progn
-                               (make-directory worktrees-dir t)
-                               (if (zerop (call-process "jj" nil t nil "-R" repo-path "git" "import"))
-                                   (call-process "jj" nil t nil "-R" repo-path "workspace" "add"
-                                                 "--sparse-patterns" "full" "--name" target-name
-                                                 "-r" base-sha target-path)
-                                 1))
-                           (call-process "git" nil t nil "-C" repo-path "worktree" "add" "--detach" target-path base-sha)))
-            (error "my/ghq-create-worktree: failed to create worktree at %s: %s" target-path (buffer-string))))
+          (unless (zerop (call-process "jj" nil t nil "-R" repo-path "workspace" "add"
+                                       "--sparse-patterns" "full" "--name" target-name
+                                       "-r" full-sha target-path))
+            (error "my/ghq-create-worktree: failed to create workspace at %s: %s" target-path (buffer-string))))
         (my/ghq--link-state repo-path target-path)
         target-path)))
 
   (defun my/ghq--current-repo-path ()
-    "Resolve the repository path containing `default-directory', mirroring
-__fzf_ghq_new_worktree.fish's no-arg repo-path resolution: ask git for the
-absolute git-common-dir and strip a trailing \"/.git\" suffix, if present, so
-REPO-PATH names the bare repository itself rather than its .git contents."
-    (let (common-dir)
-      (with-temp-buffer
-        (unless (zerop (call-process "git" nil t nil
-                                      "rev-parse" "--path-format=absolute" "--git-common-dir"))
-          (error "my/ghq--current-repo-path: not inside a git repository"))
-        (setq common-dir (string-trim (buffer-string))))
-      (string-remove-suffix "/.git" common-dir)))
+    "Resolve the repository path containing `default-directory'.
+Asks jj for the root of the workspace named \"default\", which holds jj's
+store at the bare repository itself, so the answer is the same from a jj
+workspace and from a legacy git worktree under REPO-PATH/.worktrees/."
+    (with-temp-buffer
+      (unless (zerop (call-process "jj" nil (list t nil) nil
+                                   "workspace" "root" "--name" "default"))
+        (error "my/ghq--current-repo-path: not inside a jj repository"))
+      (string-trim (buffer-string))))
 
   (defun my/ghq-create-worktree-default-branch ()
     "Create a new worktree of the current repository named after its resolved
@@ -7200,6 +7363,27 @@ against a missing directory signals file-missing on every Org buffer visit."
 :CUSTOM_ID: my-copy-projectile-github-url
 :END:
 #+begin_src emacs-lisp
+  (defun my/remote-url-to-https (remote-url)
+    "Return REMOTE-URL as an https URL without a trailing .git."
+    (let ((https-remote
+           (cond
+            ;; ssh://git@github.com/ORG/REPO
+            ((string-match "^ssh://git@\\(.*?\\)/\\(.*\\)$" remote-url)
+             (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
+            ;; git@github.com:ORG/REPO.git
+            ((string-match "^git@\\(.*?\\):\\(.*\\)$" remote-url)
+             (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
+            (t remote-url))))
+      (replace-regexp-in-string
+       "\\`\\(https?://\\)[^/@]*@" "\\1"
+       (replace-regexp-in-string "\\.git$" "" https-remote))))
+
+  (defun my/jj-origin-url (root)
+    "Return the URL of the origin remote of the jj repository at ROOT, or nil."
+    (let ((remotes (my/jj-output root "--ignore-working-copy" "git" "remote" "list")))
+      (when (and remotes (string-match "^origin[ \t]+\\(.+\\)$" remotes))
+        (match-string 1 remotes))))
+
   (defun my/copy-projectile-github-url ()
     "Copy the GitHub URL of the current line in the current Projectile project."
     (interactive)
@@ -7208,22 +7392,26 @@ against a missing directory signals file-missing on every Org buffer visit."
     (let* ((project-root (projectile-project-root))
            (file-path (file-relative-name (buffer-file-name) project-root))
            (line-number (line-number-at-pos))
-           (remote-url (string-trim (shell-command-to-string "git config --get remote.origin.url")))
-           ;; a detached worktree reports literal "HEAD" here; name the commit instead
-           (branch (let ((ref (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD"))))
-                     (if (string= ref "HEAD")
-                         (string-trim (shell-command-to-string "git rev-parse HEAD"))
-                       ref)))
-           (https-remote
-            (cond
-             ;; ssh://git@github.com/ORG/REPO
-             ((string-match "^ssh://git@\\(.*?\\)/\\(.*\\)$" remote-url)
-              (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
-             ;; git@github.com:ORG/REPO.git
-             ((string-match "^git@\\(.*?\\):\\(.*\\)$" remote-url)
-              (format "https://%s/%s" (match-string 1 remote-url) (match-string 2 remote-url)))
-             (t remote-url)))
-           (https-remote (replace-regexp-in-string "\\.git$" "" https-remote))
+           (vcs (my/vcs-root project-root))
+           (jj-root (and (eq (car vcs) 'jj) (cdr vcs)))
+           (remote-url (if jj-root
+                           (or (my/jj-origin-url jj-root)
+                               (error "No origin remote in %s" jj-root))
+                         (string-trim (shell-command-to-string "git config --get remote.origin.url"))))
+           (branch (if jj-root
+                       ;; a commit known to exist on the remote; `git rev-parse HEAD'
+                       ;; in a jj workspace would report the bare root's HEAD
+                       (let ((out (my/jj-output jj-root "--ignore-working-copy" "log" "--no-graph"
+                                                "-r" "heads(::@- & ::remote_bookmarks())"
+                                                "-T" "commit_id ++ \"\\n\"")))
+                         (or (and out (car (split-string out "\n" t)))
+                             (error "No commit reachable from a remote bookmark in %s" jj-root)))
+                     ;; a detached worktree reports literal "HEAD" here; name the commit instead
+                     (let ((ref (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD"))))
+                       (if (string= ref "HEAD")
+                           (string-trim (shell-command-to-string "git rev-parse HEAD"))
+                         ref))))
+           (https-remote (my/remote-url-to-https remote-url))
            (url (format "%s/blob/%s/%s#L%d"
                         https-remote branch file-path line-number)))
       (kill-new url)

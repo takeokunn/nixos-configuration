@@ -12,6 +12,7 @@
 function __fzf_ghq_worktree_paths
     set -l repo_path $argv[1]
 
+    # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
     set -l repo_git_dir (git -C $repo_path rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 
     for line in (git -C $repo_path worktree list --porcelain)
