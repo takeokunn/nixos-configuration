@@ -7,7 +7,22 @@ CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path')
 
 GIT_BRANCH=""
-if git rev-parse &>/dev/null; then
+
+# The nearest .jj or .git decides: inside a jj workspace of a bare repo, git
+# finds the bare root and would report its HEAD instead of this workspace's.
+vcs_dir=$PWD
+while [ "$vcs_dir" != / ] && [ ! -e "$vcs_dir/.jj" ] && [ ! -e "$vcs_dir/.git" ]; do
+  vcs_dir=$(dirname "$vcs_dir")
+done
+
+if [ -d "$vcs_dir/.jj" ]; then
+  # --ignore-working-copy: a status line must not snapshot the working copy.
+  JJ_REF=$(jj --ignore-working-copy -R "$vcs_dir" log --no-graph -r @ \
+    -T 'coalesce(bookmarks.join(" "), parents.map(|c| c.bookmarks().join(" ")).join(" "), "@ (" ++ change_id.short(8) ++ ")")' 2>/dev/null)
+  if [ -n "$JJ_REF" ]; then
+    GIT_BRANCH=" |  $JJ_REF"
+  fi
+elif git rev-parse &>/dev/null; then
   BRANCH=$(git branch --show-current)
   if [ -n "$BRANCH" ]; then
     GIT_BRANCH=" |  $BRANCH"

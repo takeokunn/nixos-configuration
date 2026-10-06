@@ -1,5 +1,6 @@
-# Sweeps every bare repo's worktrees for ones safe to delete -- merged or
-# idle -- and offers them in one cross-repo fzf multi-select.
+# Sweeps every bare repo's jj workspaces and legacy git worktrees for ones
+# safe to delete -- merged or idle -- and offers them in one cross-repo fzf
+# multi-select.
 function worktree_clean
     # Capture before mutating anything, so a worktree removed later in this
     # loop can't be mistaken for "current".
@@ -18,16 +19,18 @@ function worktree_clean
     set -l candidate_paths
 
     for repo in (ghq list --full-path)
-        set -l is_bare (git -C $repo rev-parse --is-bare-repository 2>/dev/null)
-        test "$is_bare" = true; or continue
+        __fzf_ghq_bare_p $repo; or continue
 
-        # Refresh remote-tracking refs before checking merged-status. A
-        # failed fetch isn't fatal -- falls back to existing local refs.
-        if git -C $repo remote get-url origin >/dev/null 2>&1
-            set -l fetch_output (git -C $repo fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' 2>&1)
-            if test $status -ne 0
-                echo "worktree_clean: fetch failed for $repo ($fetch_output); using existing local refs" >&2
-            end
+        if not test -e "$repo/.jj"
+            echo "worktree_clean: '$repo' has no jj repository; skipping" >&2
+            continue
+        end
+
+        # Refresh remote bookmarks before checking merged-status. A failed
+        # fetch isn't fatal -- falls back to existing local refs.
+        if not __fzf_ghq_jj_refresh $repo worktree_clean
+            echo "worktree_clean: cannot import refs in '$repo'; skipping" >&2
+            continue
         end
 
         set -l default_ref (__fzf_ghq_resolve_default_ref $repo)
@@ -35,6 +38,16 @@ function worktree_clean
             echo "worktree_clean: cannot resolve a default ref in '$repo'; skipping" >&2
             continue
         end
+
+        # A full commit id works for both jj revsets and `git merge-base`:
+        # the git store shares jj's commit ids.
+        set -l base_commits (jj -R $repo --ignore-working-copy log --no-graph -r $default_ref -T 'commit_id ++ "\n"' 2>/dev/null)
+        set -l base_status $status
+        if test $base_status -ne 0 -o (count $base_commits) -ne 1
+            echo "worktree_clean: '$default_ref' does not resolve to exactly one commit in '$repo'; skipping" >&2
+            continue
+        end
+        set -l base_commit $base_commits[1]
 
         # Exclude $own_worktree: the invoking shell's own worktree must
         # never be offered as a deletion candidate.
@@ -46,14 +59,19 @@ function worktree_clean
         for wt in $worktree_paths
             set -l head_revs HEAD
             set -l last_commit_epoch
+            set -l is_jj false
             if __fzf_ghq_jj_workspace_p $wt
+                set is_jj true
                 # `git -C` here would read the bare repo's own HEAD, so ask jj
                 # for the workspace's @. A non-empty @ is unfinished work and
-                # yields no revs, so it never counts as merged.
+                # yields no revs, so it never counts as merged. No
+                # --ignore-working-copy: the snapshot is what makes unsaved
+                # edits count.
                 set -l wc_fields (jj -R $wt log --no-graph -r @ -T 'if(empty, parents.map(|c| c.commit_id()).join(" ")) ++ "\t" ++ committer.timestamp().format("%s")' 2>/dev/null)
                 set head_revs (string split --no-empty ' ' -- (string split -f1 \t -- $wc_fields))
                 set last_commit_epoch (string split -f2 \t -- $wc_fields)
             else
+                # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
                 set last_commit_epoch (git -C $wt log -1 --format=%ct HEAD 2>/dev/null)
             end
 
@@ -61,7 +79,15 @@ function worktree_clean
             if test (count $head_revs) -gt 0
                 set merged true
                 for rev in $head_revs
-                    git -C $wt merge-base --is-ancestor $rev $default_ref 2>/dev/null; or set merged false
+                    if test $is_jj = true
+                        # Merged when the revision has no commit outside the
+                        # base's ancestors.
+                        set -l outside (jj -R $repo --ignore-working-copy log --no-graph -r "$rev ~ ::$base_commit" -T commit_id 2>/dev/null)
+                        test $status -eq 0 -a -z "$outside"; or set merged false
+                    else
+                        # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
+                        git -C $wt merge-base --is-ancestor $rev $base_commit 2>/dev/null; or set merged false
+                    end
                 end
             end
 
@@ -113,6 +139,7 @@ function worktree_clean
             set remove_output (__fzf_ghq_remove_jj_workspace $path)
             set remove_status $status
         else
+            # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
             set remove_output (git -C $path worktree remove -- $path 2>&1)
             set remove_status $status
         end

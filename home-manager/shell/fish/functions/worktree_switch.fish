@@ -1,12 +1,12 @@
 # Lists the current repo's worktrees via fzf and cds to the pick. Never
 # creates a worktree -- reports and returns if none exist.
 function worktree_switch
-    set -l git_common_dir (git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
-    if test -z "$git_common_dir"
-        echo "worktree_switch: not inside a git repository" >&2
+    # Also resolves from inside a legacy git worktree below the bare root.
+    set -l repo_path (jj workspace root --name default 2>/dev/null)
+    if test -z "$repo_path"
+        echo "worktree_switch: not inside a jj repository" >&2
         return 1
     end
-    set -l repo_path (string replace -r '/\.git$' '' -- $git_common_dir)
 
     set -l worktree_paths (__fzf_ghq_worktree_paths $repo_path)
 
