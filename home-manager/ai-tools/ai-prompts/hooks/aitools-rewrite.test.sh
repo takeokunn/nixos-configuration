@@ -30,6 +30,9 @@ expect_plain() {
   [[ $got == "$2" ]] || fail "plain [$1]: expected [$2], got [$got]"
 }
 
+# The globs rg, fd, and tree rewrites add so that dot entries stay hidden, as they are in those tools.
+hidden="--glob '!.*' --glob '!**/.*/**'"
+
 expect_plain 'cat flake.nix' 'aitools read flake.nix --max-lines 2000'
 expect_plain 'cat -n flake.nix' 'aitools read flake.nix --max-lines 2000'
 expect_plain 'cat "my file.txt"' "aitools read 'my file.txt' --max-lines 2000"
@@ -50,9 +53,50 @@ expect_plain 'grep -rn -A3 foo src' 'aitools search foo src --context 0 --after 
 expect_plain 'grep -rn -e foo -e bar src' 'aitools search --pattern foo --pattern bar src --context 0 --limit 100 --no-ignore'
 expect_plain "grep -rn --include='*.nix' foo ." "aitools search foo . --context 0 --limit 100 --glob '*.nix' --no-ignore"
 expect_plain 'grep -Fw a.b file' 'aitools search a.b file --fixed --word --context 0 --limit 100 --no-ignore'
-expect_plain "rg 'fn \\w+' -g '*.rs'" "aitools search 'fn \\w+' --context 0 --limit 100 --glob '*.rs'"
-expect_plain 'rg -l TODO' 'aitools search TODO --output files --limit 200'
-expect_plain 'rg -n "a.b" src --no-heading' 'aitools search a.b src --context 0 --limit 100'
+# rg -t also lists the dot-files of its type, so it gets only the dot-directory glob.
+dot_dirs="--glob '!**/.*/**'"
+expect_plain "rg -l foo -g '!*.min.js'" "aitools search foo --output files --limit 200 --glob '!*.min.js' $hidden"
+expect_plain "rg -l foo -t nix -g '!*.md'" "aitools search foo --output files --limit 200 --glob '!*.md' --lang nix $dot_dirs"
+expect_plain 'rg -l TODO' "aitools search TODO --output files --limit 200 $hidden"
+expect_plain 'rg -n "a.b" src --no-heading' "aitools search a.b src --context 0 --limit 100 $hidden"
+expect_plain 'rg -l mkIf .' "aitools search mkIf . --output files --limit 200 $hidden"
+expect_plain 'rg -l mkIf ./src' "aitools search mkIf ./src --output files --limit 200 $hidden"
+expect_plain 'rg -o "v[0-9]+" f' "aitools search 'v[0-9]+' f --output matches --limit 100 $hidden"
+expect_plain 'rg --only-matching foo' "aitools search foo --output matches --limit 100 $hidden"
+expect_plain 'rg -v foo f' "aitools search foo f --invert --context 0 --limit 100 $hidden"
+expect_plain 'rg -x foo f' "aitools search foo f --line-regexp --context 0 --limit 100 $hidden"
+expect_plain 'rg -U "a.b" src' "aitools search a.b src --multiline --context 0 --limit 100 $hidden"
+expect_plain 'rg -t nix mkIf' "aitools search mkIf --context 0 --limit 100 --lang nix $dot_dirs"
+expect_plain "rg 'a{2,3}b\\{' f" "aitools search 'a{2,3}b\\{' f --context 0 --limit 100 $hidden"
+expect_plain 'rg -tpy import' "aitools search import --context 0 --limit 100 --lang python $dot_dirs"
+expect_plain 'rg --type ts foo' "aitools search foo --context 0 --limit 100 --lang typescript $dot_dirs"
+expect_plain 'rg -il foo -t rust' "aitools search foo --ignore-case --output files --limit 200 --lang rust $dot_dirs"
+expect_plain 'rg --files' "aitools find '*' --type file $hidden --limit 200"
+expect_plain 'rg --files src' "aitools find '*' src --type file $hidden --limit 200"
+expect_plain "rg --files -g '!*.lock'" "aitools find '*' --type file --glob '!*.lock' $hidden --limit 200"
+expect_plain 'rg --files -t go src' "aitools find '*' src --type file --lang go $dot_dirs --limit 200"
+expect_plain 'grep -o foo f' 'aitools search foo f --output matches --limit 100 --no-ignore'
+expect_plain 'grep -v foo x' 'aitools search foo x --invert --context 0 --limit 100 --no-ignore'
+expect_plain 'grep -rnx foo src' 'aitools search foo src --line-regexp --context 0 --limit 100 --no-ignore'
+expect_plain 'grep --invert-match -r foo .' 'aitools search foo . --invert --context 0 --limit 100 --no-ignore'
+expect_plain 'fd' "aitools find '*' $hidden --limit 200"
+expect_plain 'fd .' "aitools find '*' $hidden --limit 200"
+expect_plain 'fd README' "aitools find README $hidden --limit 200"
+expect_plain 'fd -t f Config src' "aitools find Config src --type file $hidden --limit 200"
+expect_plain 'fd -td . home' "aitools find '*' home --type dir $hidden --limit 200"
+expect_plain 'fd --type=file -d 2 X' "aitools find X --type file --depth 2 $hidden --limit 200"
+expect_plain 'fd -H Makefile' "aitools find Makefile --limit 200"
+expect_plain 'fd -H Makefile .config' "aitools find Makefile .config --limit 200"
+expect_plain 'fd -I Cargo' "aitools find Cargo --no-ignore $hidden --limit 200"
+expect_plain 'tree' "aitools find '*' --output tree --no-ignore $hidden --limit 200"
+expect_plain 'tree -L 2 src' "aitools find '*' src --output tree --depth 2 --no-ignore $hidden --limit 200"
+expect_plain 'tree -d' "aitools find '*' --output tree --type dir --no-ignore $hidden --limit 200"
+expect_plain 'wc -c flake.lock' 'aitools info flake.lock'
+expect_plain 'jq . flake.lock' "aitools json get flake.lock ''"
+expect_plain "jq '.nodes.root' flake.lock" 'aitools json get flake.lock /nodes/root'
+expect_plain "jq -r '.a[0].b_1' x.json" 'aitools json get x.json /a/0/b_1 --raw'
+expect_plain "jq '.[10]' x.json" 'aitools json get x.json /10'
+expect_plain "jq '.a.[2]' x.json" 'aitools json get x.json /a/2'
 expect_plain 'ls' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain 'ls -la home-manager' "aitools find '*' home-manager --depth 1 --no-ignore --limit 200"
 expect_plain "find . -name '*.nix' -type f -maxdepth 2" "aitools find '*.nix' . --type file --depth 2 --no-ignore --limit 200"
@@ -83,9 +127,17 @@ expect_plain 'cat file | head' 'aitools read file --range 1:10 --max-lines 10'
 expect_plain 'cat log | tail -5' 'aitools read log --tail 5 --max-lines 5'
 expect_plain 'grep -rn foo src | head -20' 'aitools search foo src --context 0 --limit 20 --no-ignore'
 expect_plain 'grep -rl foo src | head -500' 'aitools search foo src --output files --limit 200 --no-ignore'
-expect_plain 'rg -n foo | head -3' 'aitools search foo --context 0 --limit 3'
+expect_plain 'rg -n foo | head -3' "aitools search foo --context 0 --limit 3 $hidden"
+expect_plain 'rg -v foo f | head -3' "aitools search foo f --invert --context 0 --limit 3 $hidden"
+expect_plain 'rg --files | head -20' "aitools find '*' --type file $hidden --limit 20"
+expect_plain 'fd Config | head -5' "aitools find Config $hidden --limit 5"
+expect_plain 'cd src && rg -l foo' "cd src && aitools search foo --output files --limit 200 $hidden"
+expect_plain 'cd .github && rg -l foo' ''
+expect_plain 'cd .github && grep -rl foo .' 'cd .github && aitools search foo . --output files --limit 200 --no-ignore'
 expect_plain 'ls | head' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 10"
 expect_plain 'ls -A src' "aitools find '*' src --depth 1 --no-ignore --limit 200"
+expect_plain 'ls .config' "aitools find '*' .config --depth 1 --no-ignore --glob '!.*' --limit 200"
+expect_plain 'cd .github && ls' "cd .github && aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain 'ls -l' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain "find . -name '*.nix' | head -5" "aitools find '*.nix' . --no-ignore --limit 5"
 expect_plain 'git log --oneline | head -5' 'aitools git log --limit 5'
@@ -105,6 +157,77 @@ for cmd in \
   "sed -n '20,10p' f.nix" \
   "sed -n 's/a/b/p' f.nix" \
   'wc -l f.nix' \
+  'wc -w f.nix' \
+  'wc f.nix' \
+  'wc -c a b' \
+  'rg foo .github' \
+  'rg foo ../other' \
+  'rg foo /abs/path' \
+  'rg --files .config' \
+  'cd .config && rg foo' \
+  'cd /tmp && rg foo' \
+  'cd ~/repo && rg foo' \
+  'rg --hidden foo' \
+  'rg -o -v foo f' \
+  'rg -o -C 2 foo f' \
+  'rg -ol foo' \
+  'rg -vl foo' \
+  'rg -vc foo' \
+  'rg -Uv foo' \
+  'rg -v -e a -e b f' \
+  'rg -xw foo f' \
+  "rg -x '  };' f" \
+  "rg 'a{' f" \
+  "rg '\${x}' f" \
+  "grep -rE 'a{,2}' ." \
+  'rg -x -e a -e b f' \
+  'rg -t js foo' \
+  'rg -t md foo' \
+  'rg -t nix -t rust foo' \
+  "rg -t nix -g '*.md' x" \
+  "rg --files -t nix -g '*.md'" \
+  "rg 'fn \\w+' -g '*.rs'" \
+  "rg --files -g '*.nix'" \
+  "rg -l foo -g '!src'" \
+  "rg -l foo -g '!src/**'" \
+  "rg -l foo -g '*.log'" \
+  'fd -H -I Foo' \
+  'fd -HI .' \
+  'rg -oc foo f' \
+  'cd .github && fd Foo' \
+  'cd .github && tree' \
+  'rg -T nix foo' \
+  'rg --files a b' \
+  'rg --files -t sh' \
+  'rg --files --hidden' \
+  'rg -o foo f | head -3' \
+  'grep -o -v foo f' \
+  'grep -rvl foo .' \
+  'fd readme' \
+  'fd -e nix' \
+  'fd "a.b"' \
+  'fd Foo src extra' \
+  'fd -t l X' \
+  'fd -t f -t d X' \
+  'fd -g "*.NIX"' \
+  'fd X .config' \
+  'fd -d 0 X' \
+  'tree -a' \
+  'tree -I node_modules' \
+  'tree a b' \
+  'tree .github' \
+  'tree | head -5' \
+  "jq 'keys' x.json" \
+  "jq '.[]' x.json" \
+  "jq '.a | length' x.json" \
+  "jq '[0]' x.json" \
+  "jq '.[01]' x.json" \
+  "jq '.[-1]' x.json" \
+  "jq '.\"a b\"' x.json" \
+  'jq . a.json b.json' \
+  'jq .' \
+  'jq -c . x.json' \
+  'jq . x.json | head -3' \
   'git status --porcelain' \
   'git log --foo' \
   'git blame a b' \
@@ -115,7 +238,6 @@ for cmd in \
   'grep -r --include=-x foo .' \
   "find . -name '-*'" \
   'grep foo' \
-  'grep -v foo x' \
   "grep -rn 'foo\\|bar' src" \
   "grep -rn 'a+' src" \
   'grep -rlc foo src' \
@@ -214,6 +336,20 @@ expect_json claude '{"tool_name":"Bash","tool_input":"cat x"}' ''
 expect_json claude 'not json' ''
 expect_json claude '' ''
 expect_json codex '{"tool_name":"Bash","tool_input":{"command":"git push"}}' ''
+
+# aitools anchors its globs at the nearest directory holding .git, so a working directory below a
+# dot-directory of that workspace must not get the hidden-entry globs, while the workspace top must.
+repo="$stub_dir/repo"
+mkdir -p "$repo/.git" "$repo/.hidden/sub" "$repo/src"
+cwd_payload() { jq -cn --arg c "$1" --arg d "$2" '{tool_name: "Bash", tool_input: {command: $c}, cwd: $d}'; }
+expect_json claude "$(cwd_payload 'rg -l foo' "$repo")" ".hookSpecificOutput.updatedInput.command == \"aitools search foo --output files --limit 200 $hidden\""
+expect_json claude "$(cwd_payload 'rg -l foo' "$repo/src")" '.hookSpecificOutput.updatedInput.command | startswith("aitools search")'
+expect_json claude "$(cwd_payload 'rg -l foo' "$repo/.hidden")" ''
+expect_json claude "$(cwd_payload 'fd Foo' "$repo/.hidden/sub")" ''
+expect_json claude "$(cwd_payload 'tree' "$repo/.hidden")" ''
+expect_json codex "$(cwd_payload 'rg --files' "$repo/.hidden")" ''
+expect_json claude "$(cwd_payload 'cat x' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+expect_json claude "$(cwd_payload 'fd -H Foo' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools find Foo --limit 200"'
 
 # Without aitools on PATH the hook must stand aside rather than hand back a command that cannot run.
 checked=$((checked + 1))
