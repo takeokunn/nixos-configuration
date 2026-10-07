@@ -34,7 +34,7 @@ Git writes bypass jj's model and are not an alternate workflow. Any exception ne
 ## The working copy is a commit
 
 jj has no staging area. Repository commands normally snapshot files on disk into the working-copy revision `@`,
-so `jj st` records edits as well as reporting them. In a checkout shared with other sessions, that snapshot
+so `jj status` records edits as well as reporting them. In a checkout shared with other sessions, that snapshot
 absorbs their edits into `@` too: before describing, squashing, or pushing `@`, read `jj diff --git` and
 confirm every hunk is yours. Pass `--ignore-working-copy` to read-only commands to avoid snapshotting shared
 edits. Their view may be stale: inspect on-disk changes and untracked files separately before relying on it.
@@ -46,7 +46,7 @@ by change ID across rewrites.
 
 | Git | jj |
 |---|---|
-| `git status` | `jj st` |
+| `git status` | `jj status` |
 | `git log --oneline --graph` | `jj log` |
 | `git diff` / `git diff --cached` | `jj diff --git` (no staging, one diff) |
 | `git show <rev>` | `jj show --git <rev>` |
@@ -81,12 +81,13 @@ Revsets name revisions: `@` is the working copy, `@-` its parent, `main@origin` 
 The guardrail hook blocks commands that rewrite the files under other sessions: `jj edit`, `jj next`,
 `jj prev`, `jj new` onto another revision, `jj abandon`, `jj restore` without paths, `jj undo`, `jj redo`, and
 `jj op restore`/`revert`. The equivalents are to start work with plain `jj new`, discard one file with
-`jj restore <path>`, and undo a revision with `jj revert`. Spell the subcommand literally: one produced by
-`$(...)` or a variable is blocked because the hook cannot see it. Every jj write (commit, describe, squash,
-Every jj write (commit, describe, squash, rebase, bookmark, fetch, push, workspace creation) needs current
-authorization. Workspace isolation follows execution-workflow's jj procedure; never substitute Git branch or
-worktree writes. A repository with `.jj/` at its root isolates with a jj workspace instead of `git worktree add`,
-which would create a git worktree that the root's jj cannot see:
+`jj restore <path>`, and undo a revision with `jj revert`. Spell the built-in subcommand in full and
+literally: one produced by `$(...)` or a variable is blocked, and so is any name that is not a built-in,
+including the default aliases `b`, `ci`, `desc`, and `st`, because a config file can repoint an alias at any
+command. Every jj write (commit, describe, squash, rebase, bookmark, fetch, push, workspace creation) needs
+current authorization. Workspace isolation follows execution-workflow's jj procedure; never substitute Git
+branch or worktree writes. A repository with `.jj/` at its root isolates with a jj workspace instead of
+`git worktree add`, which would create a git worktree that the root's jj cannot see:
 `jj -R <repo> workspace add --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`, after
 `mkdir -p <repo>/.worktrees`. Without `--sparse-patterns full` the workspace copies the bare root's empty
 sparse set and checks out no files.
@@ -94,8 +95,13 @@ sparse set and checks out no files.
 ## Pushing
 
 jj runs no Git hooks, so the pre-commit checks (gitleaks, conflict markers, editorconfig, author identity) never
-ran on commits made with jj. Push only through `jj git push`, never `git push`, which no hook here gates.
-Before `jj git push`:
+ran on commits made with jj, and `jj git push` skips the pre-push hook too. Two checks still hold: the jj config
+sets `git.private-commits = "~mine()"`, so `jj git push` refuses any commit the remote lacks whose author is not
+you; and a plain `git push` runs the pre-push hook, which scans the pushed range with gitleaks. The author check
+only holds while the user config is the real one, so the hook blocks jj commands that pass `--config user.*`,
+`--config git.private-commits`, `--config-file`, or `--allow-private`, or set `JJ_USER`, `JJ_EMAIL`, or
+`JJ_CONFIG`; it likewise blocks `--no-verify` and `core.hooksPath` overrides on git. The secret scan before
+`jj git push` is on you:
 
 1. `jj git push --dry-run -b <bookmark>` to list what would move.
 2. Scan exactly that range with the configured rules:
@@ -105,6 +111,9 @@ Before `jj git push`:
 4. When authorized and all checks pass, push with the override prefix the guardrail hook names for this step:
    `ALLOW_DESTRUCTIVE_GIT=1 jj git push -b <bookmark>`. The hook blocks every unprefixed `jj git push` so the
    scan above cannot be skipped; the prefix is for that scanned push only. Never switch to Git to push.
+
+A rejection naming a private commit means a commit by someone else is about to be pushed; stop and ask rather
+than overriding it.
 
 A bookmark does not follow new commits. Move it first (`jj bookmark set <b> -r @-`), or push a change directly
 with `jj git push -c <change>`, which creates a bookmark named after it.

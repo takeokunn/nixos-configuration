@@ -20,7 +20,10 @@ in
       inherit (git.settings.user) name email;
     };
 
-    # jj never runs Git hooks, so the gitHooks checks do not cover commits made here; signing still does.
+    # jj never runs Git hooks, so the gitHooks checks do not cover commits made here. Signing still
+    # applies, and private-commits stands in for the pre-push identity check: jj git push refuses a
+    # commit the remote lacks unless its author is user.email. Secret scanning before a jj push is left
+    # to the agent guardrail and the jujutsu skill.
     signing = {
       behavior = "own";
       backend = "ssh";
@@ -44,6 +47,8 @@ in
         ${builtins.toJSON commitTemplate},
       )
     '';
+
+    git.private-commits = "~mine()";
   };
 
   programs.difftastic.jujutsu.enable = true;

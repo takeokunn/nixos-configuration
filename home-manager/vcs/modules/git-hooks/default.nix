@@ -74,7 +74,7 @@ let
   '';
 
   gitleaksCheck = pkgs.writeShellScript "gitleaks-hook" ''
-    exec ${gitleaksCfg.package}/bin/gitleaks protect --staged --verbose --config ${config.xdg.configHome}/gitleaks/config.toml
+    exec ${gitleaksCfg.package}/bin/gitleaks protect --staged --verbose --redact --config ${config.xdg.configHome}/gitleaks/config.toml
   '';
 
   # Agents have committed as "take <...noreply...>" or with a misspelled email by
@@ -120,19 +120,22 @@ let
     exit $RESULT
   '';
 
-  prePushScript = pkgs.writeShellScript "pre-push" ''
-    ${identityPrelude}
-
-    # Only commits the remote does not already have are checked, so history
-    # that landed before this hook existed does not block every push. The
-    # remote's refs are listed directly because remote-tracking refs are absent
-    # in clones without a fetch refspec.
+  # Only commits the remote does not already have are checked, so history
+  # that landed before these hooks existed does not block every push. The
+  # remote's refs are listed directly because remote-tracking refs are absent
+  # in clones without a fetch refspec. KNOWN holds one `^<oid>` exclusion per
+  # line, computed once by pre-push and exported to each check.
+  knownOidsPrelude = ''
     REMOTE_OIDS=$(${pkgs.git}/bin/git ls-remote "$1") || exit 1
     KNOWN=$(
       while read -r OID _; do
         printf '%s\n' "$OID"
       done <<< "$REMOTE_OIDS" | ${pkgs.git}/bin/git cat-file --batch-check='^%(objectname)' | ${pkgs.gnugrep}/bin/grep -v ' missing$'
     )
+  '';
+
+  checkPushIdentity = pkgs.writeShellScript "check-push-identity" ''
+    ${identityPrelude}
 
     RESULT=0
     while read -r _ LOCAL_OID _ _; do
@@ -146,6 +149,52 @@ let
         fi
       done < <(printf '%s\n' "$KNOWN" | ${pkgs.git}/bin/git log --stdin --format='%h%x09%an <%ae>%x09%cn <%ce>' "$LOCAL_OID")
     done
+    exit $RESULT
+  '';
+
+  # The pre-commit scan never sees commits made with `--no-verify` or by jj,
+  # which runs no Git hooks; this rescans what is about to leave the machine.
+  # gitleaks splits --log-opts on spaces and passes an empty trailing word to
+  # git log, which then fails; gitleaks swallows that failure, scans nothing,
+  # and exits 0. So the options are joined without a stray separator.
+  checkPushGitleaks = pkgs.writeShellScript "check-push-gitleaks" ''
+    RESULT=0
+    while read -r _ LOCAL_OID _ _; do
+      if [ "$LOCAL_OID" = "$(printf '%0*d' "''${#LOCAL_OID}" 0)" ]; then
+        continue
+      fi
+      LOG_OPTS=$LOCAL_OID
+      for EXCLUDE in $KNOWN; do
+        LOG_OPTS="$LOG_OPTS $EXCLUDE"
+      done
+      ${gitleaksCfg.package}/bin/gitleaks git --no-banner --redact \
+        --config ${config.xdg.configHome}/gitleaks/config.toml \
+        --log-opts="$LOG_OPTS" || RESULT=1
+    done
+    exit $RESULT
+  '';
+
+  runIdentity = cfg.enableIdentityCheck;
+  runGitleaks = cfg.enableGitleaks && gitleaksCfg.enable;
+
+  # Git hands the ref updates to pre-push on stdin once, so they are captured
+  # and replayed to each check.
+  prePushScript = pkgs.writeShellScript "pre-push" ''
+    UPDATES=$(cat)
+    [ -n "$UPDATES" ] || exit 0
+
+    ${knownOidsPrelude}
+    export KNOWN
+    RESULT=0
+
+    ${lib.optionalString runIdentity ''
+      ${checkPushIdentity} "$@" <<< "$UPDATES" || RESULT=1
+    ''}
+
+    ${lib.optionalString runGitleaks ''
+      ${checkPushGitleaks} "$@" <<< "$UPDATES" || RESULT=1
+    ''}
+
     exit $RESULT
   '';
 
@@ -201,7 +250,7 @@ in
     enableGitleaks = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Enable gitleaks secret scanning in pre-commit hook";
+      description = "Enable gitleaks secret scanning in pre-commit and pre-push hooks";
     };
 
     enableIdentityCheck = lib.mkOption {
@@ -216,10 +265,8 @@ in
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       { programs.git.hooks.pre-commit = preCommitScript; }
-      (lib.mkIf cfg.enableIdentityCheck {
-        programs.git.hooks.pre-merge-commit = checkCommitIdentity;
-        programs.git.hooks.pre-push = prePushScript;
-      })
+      (lib.mkIf runIdentity { programs.git.hooks.pre-merge-commit = checkCommitIdentity; })
+      (lib.mkIf (runIdentity || runGitleaks) { programs.git.hooks.pre-push = prePushScript; })
     ]
   );
 }
