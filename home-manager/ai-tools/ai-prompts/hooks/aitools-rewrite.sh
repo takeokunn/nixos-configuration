@@ -1,7 +1,8 @@
 #!/bin/bash
 # PreToolUse:Bash hook that rewrites a read-only shell command (cat, head, tail, sed -n, grep, rg,
-# ls, find, diff, and the reading git sub-commands) into the equivalent `aitools` call, so the
-# model gets aitools' JSON with line numbers, hashes, and next_commands instead of raw text.
+# ls, find, fd, tree, wc -c, jq, diff, and the reading git sub-commands) into the equivalent
+# `aitools` call, so the model gets aitools' JSON with line numbers, hashes, and next_commands
+# instead of raw text.
 #
 # The first argument selects the output shape:
 #   claude (default)  hookSpecificOutput.updatedInput only. A permissionDecision would auto-approve
@@ -13,11 +14,24 @@
 #
 # The command must be one simple command, optionally wrapped in the three envelopes agents add most:
 # a leading `cd DIR &&`, a trailing `2>&1` or `2>/dev/null`, and a trailing `| head -N` or
-# `| tail -N`, which becomes aitools' own line or result limit. Any other pipeline, list,
+# `| tail -N`, which becomes aitools' own line or result limit where aitools can count the same
+# units (not for tree output, rg -o, or a search with context lines). Any other pipeline, list,
 # substitution, or redirect feeds the output to another program, and aitools' JSON would break it.
 # A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
 # differs from aitools' leaves the command untouched. Everything fails open. To keep a command as
 # typed, prefix it: `command cat f`.
+#
+# rg, fd, and tree skip hidden entries where aitools lists them, so their rewrites add globs that
+# exclude dot-files and dot-directories. Those globs match workspace-relative paths, so the command
+# stays as typed when a start point or the `cd DIR` is hidden, absolute, home-relative, or uses `..`,
+# or when the working directory sits below a dot-directory of the workspace. rg --hidden, tree -a,
+# and fd -H -I also stay as typed, since they list .git, which aitools always skips. rg -g is
+# rewritten only to exclude an extension (`!*.EXT`): any other rg glob also matches directories,
+# and a selecting one brings back gitignored files, neither of which an aitools glob does.
+#
+# jq is rewritten only for `.` or a chain of `.name` and `[N]` steps. Its result differs on one
+# input: jq prints null for a missing key, while `aitools json get` fails with input.not-found and
+# lists the pointers that do exist.
 
 set -euo pipefail
 
@@ -34,10 +48,11 @@ read -r -d '' perl_prog <<'PERL' || true
 use strict;
 use warnings;
 use JSON::PP;
+use Cwd qw(getcwd);
 
 my ($mode, $input) = @ARGV;
 
-my ($command, $tool_input);
+my ($command, $tool_input, $cwd);
 if ($mode eq 'plain') {
   $command = $input;
 } else {
@@ -49,12 +64,15 @@ if ($mode eq 'plain') {
   $tool_input = $payload->{tool_input};
   exit 0 unless ref $tool_input eq 'HASH';
   $command = $tool_input->{command};
+  $cwd = $payload->{cwd} if defined $payload->{cwd} && !ref $payload->{cwd};
 }
 exit 0 unless defined $command && !ref $command;
+$cwd //= getcwd();
 
-my ($prefix, $body, $redirect, $filter) = split_envelope($command);
+my ($prefix, $body, $redirect, $filter, $cd_dir) = split_envelope($command);
 my @words = split_words($body) or exit 0;
-my @rewritten = rewrite(@words) or exit 0;
+my %ctx = (cd_dir => $cd_dir, hidden_cwd => under_dot_directory($cwd));
+my @rewritten = rewrite(\%ctx, @words) or exit 0;
 if ($filter) {
   @rewritten = apply_filter($filter, \@words, @rewritten) or exit 0;
 }
@@ -76,9 +94,9 @@ sub split_envelope {
   my ($s) = @_;
   $s =~ s/\A\s+//;
   $s =~ s/\s+\z//;
-  my ($prefix, $redirect, $filter) = ('', '', undef);
-  if ($s =~ s{\A(cd\s+[A-Za-z0-9_/.,:\@%+~-]+\s*&&\s*)}{}) {
-    $prefix = $1;
+  my ($prefix, $redirect, $filter, $cd_dir) = ('', '', undef, undef);
+  if ($s =~ s{\A(cd\s+([A-Za-z0-9_/.,:\@%+~-]+)\s*&&\s*)}{}) {
+    ($prefix, $cd_dir) = ($1, $2);
   }
   if ($s =~ s/\s*\|\s*(head|tail)(?:\s+-n\s*([0-9]+)|\s+-([0-9]+))?\z//) {
     my $n = $2 // $3 // 10;
@@ -88,7 +106,7 @@ sub split_envelope {
   if ($s =~ s{\s+(2>&1|2>/dev/null)\z}{}) {
     $redirect = " $1";
   }
-  return ($prefix, $s, $redirect, $filter);
+  return ($prefix, $s, $redirect, $filter, $cd_dir);
 }
 
 # Folds a trailing `| head -N` or `| tail -N` into the rewrite. Only where aitools can express the
@@ -105,11 +123,17 @@ sub apply_filter {
   }
   return () unless $kind eq 'head';
   if ($sub eq 'search') {
-    # With context lines, head's N lines are fewer than N selected lines.
-    return () if $has{'--before'} || $has{'--after'} || ($has{'--context'} && context_of(@args) ne '0');
+    # With context lines, head's N lines are fewer than N selected lines. In matches mode --limit
+    # counts matches, and one line can hold several.
+    return () if $has{'--before'} || $has{'--after'} || ($has{'--context'} && value_of('--context', @args) ne '0');
+    return () if value_of('--output', @args) eq 'matches';
     return limit_to($n, '--limit', @args);
   }
-  return limit_to($n, '--limit', @args) if $sub eq 'find';
+  if ($sub eq 'find') {
+    # tree prints a root line and nests its entries, so its first N lines are not N entries.
+    return () if value_of('--output', @args) eq 'tree';
+    return limit_to($n, '--limit', @args);
+  }
   if ($sub eq 'git') {
     # Without --oneline a commit spans several lines, so head's N lines are fewer than N commits.
     return limit_to($n, '--limit', @args) if $args[1] eq 'log' && grep { $_ eq '--oneline' } @$words;
@@ -118,9 +142,9 @@ sub apply_filter {
   return ();
 }
 
-sub context_of {
-  my @args = @_;
-  for my $i (0 .. $#args - 1) { return $args[$i + 1] if $args[$i] eq '--context' }
+sub value_of {
+  my ($flag, @args) = @_;
+  for my $i (0 .. $#args - 1) { return $args[$i + 1] if $args[$i] eq $flag }
   return '';
 }
 
@@ -188,11 +212,13 @@ sub quote {
 sub count { return $_[0] =~ /\A[1-9][0-9]{0,6}\z/ }
 
 sub rewrite {
-  my ($cmd, @args) = @_;
+  my ($ctx, $cmd, @args) = @_;
   my %table = (
     cat => \&rw_cat, head => \&rw_head, tail => \&rw_tail, sed => \&rw_sed,
-    grep => \&rw_grep, rg => \&rw_rg, ls => \&rw_ls, find => \&rw_find, diff => \&rw_diff,
-    git => \&rw_git,
+    grep => \&rw_grep, ls => \&rw_ls, find => \&rw_find, diff => \&rw_diff,
+    git => \&rw_git, wc => \&rw_wc, jq => \&rw_jq,
+    # These add the hidden-entry globs, whose fit depends on the `cd DIR &&` envelope.
+    rg => sub { rw_rg($ctx, @_) }, fd => sub { rw_fd($ctx, @_) }, tree => sub { rw_tree($ctx, @_) },
   );
   my $handler = $table{$cmd} or return ();
   return $handler->(@args);
@@ -251,13 +277,16 @@ sub bre_safe { return $_[0] !~ /[\\+?|(){}]/ }
 
 # ERE and rg syntax agree with aitools apart from backslash escapes: keep the ones all three read
 # alike (character-class shorthands, word boundaries, escaped punctuation). GNU's \< \> \` \' are
-# anchors there but literal characters in aitools.
+# anchors there but literal characters in aitools. A brace outside a {n}, {n,}, or {n,m} quantifier
+# is a literal to grep -E and rg but a syntax error to aitools.
 sub escapes_safe {
   my ($p) = @_;
   while ($p =~ /\\(.)/g) {
     return 0 unless $1 =~ /[bBdDsSwW]|[^A-Za-z0-9<>`']/;
   }
-  return 1;
+  (my $bare = $p) =~ s/\\.//g;
+  $bare =~ s/\{[0-9]+(?:,[0-9]*)?\}//g;
+  return $bare !~ /[{}]/;
 }
 
 # Parses grep/rg arguments against a table of accepted flags. Each table entry is either a string
@@ -319,6 +348,71 @@ sub glob_setter {
   return sub { my ($opt, $v) = @_; return 0 if defined $opt->{glob} || !operand($v); $opt->{glob} = $v; 1 };
 }
 
+# rg's type names whose file sets equal an aitools language's extensions (`rg --type-list`).
+sub rg_lang {
+  my %lang = (
+    nix => 'nix', rust => 'rust', go => 'go', py => 'python', python => 'python',
+    ts => 'typescript', typescript => 'typescript',
+  );
+  return $lang{ $_[0] // '' };
+}
+
+sub type_setter {
+  return sub { my ($opt, $v) = @_; return 0 if defined $opt->{lang}; $opt->{lang} = rg_lang($v) // return 0; 1 };
+}
+
+# Flag combinations whose aitools meaning differs from grep or rg, or is unverified, stay as typed.
+sub combination_ok {
+  my ($opt, $patterns) = @_;
+  my $context = grep { defined $opt->{$_} } qw(context before after);
+  return 0 if $opt->{files} && $opt->{count};
+  return 0 if $opt->{only} && ($opt->{invert} || $opt->{files} || $opt->{count} || $context);
+  return 0 if $opt->{invert} && ($opt->{files} || $opt->{count} || $opt->{multiline} || @$patterns > 1);
+  return 0 if $opt->{line} && ($opt->{word} || @$patterns > 1);
+  return 1;
+}
+
+# rg's -g matches directories as well as files, and a glob that selects files also brings back
+# gitignored files and dot-files it names; aitools globs only filter files. An excluded extension
+# reads the same in both.
+sub rg_glob_ok { return $_[0] =~ /\A!\*\.[A-Za-z0-9_.]+\z/ }
+
+sub rg_glob_setter {
+  return sub { my ($opt, $v) = @_; return 0 if defined $opt->{glob} || !rg_glob_ok($v); $opt->{glob} = $v; 1 };
+}
+
+# rg, fd, and tree skip dot-files and the contents of dot-directories; aitools lists both. rg -t
+# still lists the dot-files of its type, so it keeps only the dot-directory glob.
+sub hidden_globs {
+  my ($keep_dot_files) = @_;
+  return (($keep_dot_files ? () : ('--glob', '!.*')), '--glob', '!**/.*/**');
+}
+
+# aitools takes its workspace from the nearest directory holding a `.git` entry, as its root
+# resolution does, and matches globs against paths relative to it. Below a dot-directory of that
+# workspace, the dot-directory glob would exclude every result.
+sub under_dot_directory {
+  my ($cwd) = @_;
+  return 1 unless defined $cwd && $cwd =~ m{\A/};
+  my @parts = grep { $_ ne '' } split m{/}, $cwd;
+  for (my $i = @parts; $i >= 0; $i--) {
+    next unless -e '/' . join('/', @parts[0 .. $i - 1], '.git');
+    return scalar grep { /\A\./ } @parts[$i .. $#parts];
+  }
+  return 0;
+}
+
+# Those globs match workspace-relative paths, so a start point that is hidden itself, or that the
+# hook cannot place in that frame (absolute, home-relative, or `..`), would lose everything under it.
+sub hidden_globs_fit {
+  my ($ctx, @paths) = @_;
+  return 0 if $ctx->{hidden_cwd};
+  for my $p (grep { defined } $ctx->{cd_dir}, @paths) {
+    return 0 if $p =~ m{\A[/~]} || grep { /\A\./ && $_ ne '.' } split m{/}, $p;
+  }
+  return 1;
+}
+
 sub search_command {
   my ($opt, $patterns, $paths) = @_;
   my @out = ('search');
@@ -331,10 +425,15 @@ sub search_command {
   push @out, '--fixed' if $opt->{fixed};
   push @out, '--ignore-case' if $opt->{icase};
   push @out, '--word' if $opt->{word};
+  push @out, '--line-regexp' if $opt->{line};
+  push @out, '--invert' if $opt->{invert};
+  push @out, '--multiline' if $opt->{multiline};
   if ($opt->{files}) {
     push @out, '--output', 'files', '--limit', '200';
   } elsif ($opt->{count}) {
     push @out, '--output', 'count', '--limit', '200';
+  } elsif ($opt->{only}) {
+    push @out, '--output', 'matches', '--limit', '100';
   } else {
     push @out, '--context', $opt->{context} // 0;
     push @out, '--before', $opt->{before} if defined $opt->{before};
@@ -342,6 +441,8 @@ sub search_command {
     push @out, '--limit', '100';
   }
   push @out, '--glob', $opt->{glob} if defined $opt->{glob};
+  push @out, '--lang', $opt->{lang} if defined $opt->{lang};
+  push @out, hidden_globs(defined $opt->{lang}) if $opt->{hidden_globs};
   push @out, '--no-ignore' if $opt->{no_ignore};
   return @out;
 }
@@ -350,6 +451,7 @@ sub rw_grep {
   my %short = (
     n => '', H => '', s => '', I => '', r => 'recursive', R => 'recursive',
     i => 'icase', w => 'word', F => 'fixed', E => 'extended', l => 'files', c => 'count',
+    o => 'only', v => 'invert', x => 'line',
     e => pattern_setter(), A => context_setter('after'), B => context_setter('before'),
     C => context_setter('context'),
   );
@@ -357,12 +459,13 @@ sub rw_grep {
     'line-number' => '', recursive => 'recursive', 'ignore-case' => 'icase',
     'word-regexp' => 'word', 'fixed-strings' => 'fixed', 'extended-regexp' => 'extended',
     'files-with-matches' => 'files', count => 'count', regexp => pattern_setter(),
+    'only-matching' => 'only', 'invert-match' => 'invert', 'line-regexp' => 'line',
     include => glob_setter(),
   );
   my ($opt, $patterns, $paths) = search_args(\%short, \%long, @_) or return ();
   # Without a path grep reads stdin, which a hook cannot supply.
   return () if !@$paths && !$opt->{recursive};
-  return () if $opt->{files} && $opt->{count};
+  return () unless combination_ok($opt, $patterns);
   unless ($opt->{fixed}) {
     for my $p (@$patterns) {
       return () unless $opt->{extended} ? escapes_safe($p) : bre_safe($p);
@@ -373,24 +476,150 @@ sub rw_grep {
   return search_command($opt, $patterns, $paths);
 }
 
+# rg --hidden is not taken: it also searches .git, which aitools always skips.
 sub rw_rg {
+  my ($ctx, @args) = @_;
+  return rw_rg_files($ctx, @args) if grep { $_ eq '--files' } @args;
   my %short = (
     n => '', N => '', i => 'icase', w => 'word', F => 'fixed', l => 'files', c => 'count',
+    o => 'only', v => 'invert', x => 'line', U => 'multiline', t => type_setter(),
     e => pattern_setter(), A => context_setter('after'), B => context_setter('before'),
     C => context_setter('context'),
-    g => glob_setter(),
+    g => rg_glob_setter(),
   );
   my %long = (
     'line-number' => '', 'no-heading' => '', 'ignore-case' => 'icase', 'word-regexp' => 'word',
     'fixed-strings' => 'fixed', 'files-with-matches' => 'files', count => 'count',
+    'only-matching' => 'only', 'invert-match' => 'invert', 'line-regexp' => 'line',
+    multiline => 'multiline', type => $short{t},
     regexp => pattern_setter(), glob => $short{g},
   );
-  my ($opt, $patterns, $paths) = search_args(\%short, \%long, @_) or return ();
-  return () if $opt->{files} && $opt->{count};
+  my ($opt, $patterns, $paths) = search_args(\%short, \%long, @args) or return ();
+  return () unless combination_ok($opt, $patterns) && hidden_globs_fit($ctx, @$paths);
   unless ($opt->{fixed}) {
     for my $p (@$patterns) { return () unless escapes_safe($p) }
   }
+  $opt->{hidden_globs} = 1;
   return search_command($opt, $patterns, $paths);
+}
+
+# rg --files [-g GLOB] [-t TYPE] [PATH]: the files rg would search.
+sub rw_rg_files {
+  my ($ctx, @args) = @_;
+  my %takes = ('-g' => 'glob', '--glob' => 'glob', '-t' => 'type', '--type' => 'type');
+  my (%opt, @paths);
+  while (@args) {
+    my $a = shift @args;
+    next if $a eq '--files';
+    if (my $key = $takes{$a}) {
+      my $v = shift @args;
+      return () unless operand($v) && !defined $opt{$key};
+      $opt{$key} = $v;
+      next;
+    }
+    return () unless operand($a);
+    push @paths, $a;
+  }
+  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths);
+  return () if defined $opt{glob} && !rg_glob_ok($opt{glob});
+  my $lang;
+  if (defined $opt{type}) { $lang = rg_lang($opt{type}) // return () }
+  return (
+    'find', '*', @paths, '--type', 'file', (defined $lang ? ('--lang', $lang) : ()),
+    (defined $opt{glob} ? ('--glob', $opt{glob}) : ()), hidden_globs(defined $lang), '--limit', '200',
+  );
+}
+
+# fd [PATTERN [PATH]]. fd reads PATTERN as a regex over the name and is smart-case, while an aitools
+# pattern is a case-sensitive substring, so only patterns both read alike pass: none, `.`, or a
+# literal holding an uppercase letter. fd skips .git under -H, as aitools always does, but lists it
+# under -H -I, so that pair stays as typed.
+sub rw_fd {
+  my ($ctx, @args) = @_;
+  my %types = (f => 'file', file => 'file', d => 'dir', dir => 'dir', directory => 'dir');
+  my (%opt, @operands);
+  while (@args) {
+    my $a = shift @args;
+    if ($a eq '-H' || $a eq '--hidden') { $opt{hidden} = 1 }
+    elsif ($a eq '-I' || $a eq '--no-ignore') { $opt{no_ignore} = 1 }
+    elsif ($a =~ /\A(?:-t|--type=?)(.*)\z/) {
+      my $v = $1 ne '' ? $1 : shift @args;
+      return () if defined $opt{type} || !defined $v;
+      $opt{type} = $types{$v} // return ();
+    } elsif ($a eq '-d' || $a eq '--max-depth') {
+      my $v = shift @args;
+      return () if defined $opt{depth} || !defined $v || !count($v);
+      $opt{depth} = $v;
+    } elsif (operand($a)) {
+      push @operands, $a;
+    } else {
+      return ();
+    }
+  }
+  return () if @operands > 2 || ($opt{hidden} && $opt{no_ignore});
+  my ($pattern, @path) = @operands;
+  if (!defined $pattern || $pattern eq '.') {
+    $pattern = '*';
+  } else {
+    return () unless $pattern =~ /\A[A-Za-z0-9_-]+\z/ && $pattern =~ /[A-Z]/;
+  }
+  return () unless $opt{hidden} || hidden_globs_fit($ctx, @path);
+  return (
+    'find', $pattern, @path, (defined $opt{type} ? ('--type', $opt{type}) : ()),
+    (defined $opt{depth} ? ('--depth', $opt{depth}) : ()), ($opt{no_ignore} ? ('--no-ignore') : ()),
+    ($opt{hidden} ? () : hidden_globs()), '--limit', '200',
+  );
+}
+
+# tree [-d] [-L N] [PATH]. tree reads no .gitignore and hides dot entries; tree -a would also list
+# .git, which aitools never does, so it stays as typed.
+sub rw_tree {
+  my ($ctx, @args) = @_;
+  my ($dirs, $depth, @paths);
+  while (@args) {
+    my $a = shift @args;
+    if ($a eq '-d') {
+      $dirs = 1;
+    } elsif ($a eq '-L') {
+      $depth = shift @args;
+      return () unless defined $depth && count($depth);
+    } elsif (operand($a)) {
+      push @paths, $a;
+    } else {
+      return ();
+    }
+  }
+  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths);
+  return (
+    'find', '*', @paths, '--output', 'tree', ($dirs ? ('--type', 'dir') : ()),
+    (defined $depth ? ('--depth', $depth) : ()), '--no-ignore', hidden_globs(), '--limit', '200',
+  );
+}
+
+# wc -c FILE only: info's size is the byte count. wc -l stays as typed because info's lines field
+# also counts an unterminated last line.
+sub rw_wc {
+  my @args = @_;
+  return () unless @args == 2 && $args[0] eq '-c' && operand($args[1]);
+  return ('info', $args[1]);
+}
+
+# jq [-r] FILTER FILE, where FILTER is `.` or a chain of `.name` and `[N]` steps that map one to one
+# onto JSON pointer segments.
+sub rw_jq {
+  my @args = @_;
+  my $raw = 0;
+  while (@args && $args[0] eq '-r') { $raw = 1; shift @args }
+  return () unless @args == 2 && operand($args[1]);
+  my ($filter, $file) = @args;
+  my $name = qr/[A-Za-z_][A-Za-z0-9_]*/;
+  my $index = qr/\[(?:0|[1-9][0-9]*)\]/;
+  my $pointer = '';
+  if ($filter ne '.') {
+    return () unless $filter =~ /\A(?:\.$name|\.$index)(?:\.$name|\.?$index)*\z/;
+    $pointer = join '', map { "/$_" } $filter =~ /([A-Za-z_][A-Za-z0-9_]*|[0-9]+)/g;
+  }
+  return ('json', 'get', $file, $pointer, ($raw ? ('--raw') : ()));
 }
 
 sub rw_ls {
@@ -402,7 +631,8 @@ sub rw_ls {
     push @paths, $a;
   }
   return () if @paths > 1;
-  # ls hides dot entries unless -a or -A; aitools find lists them.
+  # ls hides dot entries unless -a or -A; aitools find lists them. At depth 1 the dot-file glob is
+  # enough, and the dot-directory glob would empty `ls .config`.
   return ('find', '*', @paths, '--depth', '1', '--no-ignore', ($all ? () : ('--glob', '!.*')), '--limit', '200');
 }
 
