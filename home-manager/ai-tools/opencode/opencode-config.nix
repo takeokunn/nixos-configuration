@@ -2,6 +2,7 @@
   pkgs,
   mcp-servers-nix,
   nurPkgs,
+  models,
 }:
 let
   inherit (pkgs) lib;
@@ -26,8 +27,8 @@ mcp-servers-nix.lib.mkConfig pkgs {
   settings = {
     theme = "dark";
     plugin = [ "oh-my-openagent" ];
-    model = "opencode-go/space-bunny-free";
-    small_model = "opencode-go/space-bunny-free";
+    model = models.default.model;
+    small_model = models.default.model;
     share = "disabled";
     autoupdate = false;
 
