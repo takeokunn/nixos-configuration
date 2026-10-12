@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791738353,
-        "narHash": "sha256-WzO385lhPpiVu5UiG7ReW/s3nNRDvPsHzDUBxs8zqfs=",
+        "lastModified": 1791801176,
+        "narHash": "sha256-7yMjYQUjpCy0IhItfGt2EJbOobNu1pkIrBX2GA3yOcU=",
         "owner": "Kyure-A",
         "repo": "agent-skills-nix",
-        "rev": "660b518c0e0a75b2952df82c3110e7cee7f13a2f",
+        "rev": "2948865044b2af55c8c4e4eb2abda7de79d60f0e",
         "type": "github"
       },
       "original": {
@@ -728,11 +728,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791780238,
-        "narHash": "sha256-0ByhIFsA8mIW9aF7BHGUTUqGgL8l0Jmv6ZfmV3QbL10=",
+        "lastModified": 1791819052,
+        "narHash": "sha256-RNlc9xmOg7xS66eRI1gskt+Xz7Fn3v5/YHVsnzk7u+Q=",
         "owner": "kawarimidoll",
         "repo": "guard-and-guide",
-        "rev": "fa76653950719b2ec83d513b28ef2d69024fb827",
+        "rev": "4a03ee7b5e7ff8f5ab13a501fccf403b09c67c92",
         "type": "github"
       },
       "original": {
@@ -1289,11 +1289,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791778360,
-        "narHash": "sha256-l9WAaQYCph6LLsqy+zotHbuyzakOueUoz5uzUhLhZnY=",
+        "lastModified": 1791821956,
+        "narHash": "sha256-VNn25+fmJX/8vzHq/EhqVYImWL9w2+jm31nYIA0ANEs=",
         "owner": "takeokunn",
         "repo": "nur-packages",
-        "rev": "a4ffd9ac606c09e68e16aa790b63870cb332a5fe",
+        "rev": "b3940d0fb4fbfc02ea4422eb11e964aef32d47d9",
         "type": "github"
       },
       "original": {
