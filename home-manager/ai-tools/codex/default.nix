@@ -246,14 +246,18 @@ let
     name: server: "-c ${lib.escapeShellArg "mcp_servers.${name}=${toTomlInline server}"}"
   ) codexMcpServers;
 
+  # Trusts the target directory when it lies under ~/ghq; see ghq-trust.sh.
+  codexGhqTrust = pkgs.writeShellScript "codex-ghq-trust" (builtins.readFile ./ghq-trust.sh);
+
   codexWrapped = pkgs.symlinkJoin {
     name = "codex";
     paths = [ llmAgentsPkgs.codex ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
-      wrapProgram $out/bin/codex ${
+      rm $out/bin/codex
+      makeWrapper ${codexGhqTrust} $out/bin/codex ${
         lib.concatMapStringsSep " " (flag: "--add-flags ${lib.escapeShellArg flag}") (
-          codexSettingFlags ++ codexMcpFlags
+          [ "${llmAgentsPkgs.codex}/bin/codex" ] ++ codexSettingFlags ++ codexMcpFlags
         )
       }
     '';

@@ -389,6 +389,17 @@
                 touch $out
               '';
 
+          checks.codex-ghq-trust =
+            pkgs.runCommand "codex-ghq-trust-test"
+              {
+                nativeBuildInputs = [ pkgs.python3 ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/codex/ghq-trust.test.sh} \
+                  ${./home-manager/ai-tools/codex/ghq-trust.sh}
+                touch $out
+              '';
+
           checks.gh-secret-guard =
             let
               stubGh = pkgs.writeShellScript "stub-gh" ''
