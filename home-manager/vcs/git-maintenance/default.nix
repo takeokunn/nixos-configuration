@@ -15,7 +15,7 @@ in
   services.git-maintenance = {
     enable = true;
     ghq.enable = true;
-    interval = 3600; # 1 hour
+    interval = 604800; # 1 week
     # Private HTTPS remotes can only fetch through the gh credential
     # helpers; the daemon resets every helper unless told otherwise.
     credentialHelpers = true;
