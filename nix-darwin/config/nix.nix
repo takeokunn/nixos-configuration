@@ -35,6 +35,7 @@
     http-connections = 50;
     download-buffer-size = 268435456;
     always-allow-substitutes = true;
+    warn-dirty = false;
     extra-substituters = [
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"

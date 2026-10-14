@@ -16,6 +16,7 @@
     keep-outputs = true;
     keep-derivations = true;
     connect-timeout = 5;
+    warn-dirty = false;
     experimental-features = [
       "nix-command"
       "flakes"
