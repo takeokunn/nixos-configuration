@@ -545,7 +545,7 @@ $detail
 Assume other Claude Code sessions are working in this same checkout right now.
 
 Use instead:
-  Isolate a branch     jj -R "\$(jj workspace root --name default)" workspace add --sparse-patterns full --name <timestamp>-<sha> -r <default>@origin "\$(jj workspace root --name default)/.worktrees/<timestamp>-<sha>"
+  Isolate a branch     jj -R "\$(jj workspace root --name default)" workspace add --no-colocate --sparse-patterns full --name <timestamp>-<sha> -r <default>@origin "\$(jj workspace root --name default)/.worktrees/<timestamp>-<sha>"
   Park changes         git commit -m "WIP" (on your own branch), not git stash
   Undo a commit        git revert <sha>, or git reset --soft HEAD~1, not --hard
   Discard one file     git checkout -- <path> (allowed)

@@ -140,7 +140,7 @@ including the default aliases `b`, `ci`, `desc`, and `st`, because a config file
 command. Workspace isolation follows execution-workflow's jj procedure; never substitute Git branch or
 worktree writes. A repository with `.jj/` at its root isolates with a jj workspace instead of
 `git worktree add`, which would create a git worktree that the root's jj cannot see:
-`jj -R <repo> workspace add --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`, after
+`jj -R <repo> workspace add --no-colocate --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`, after
 `mkdir -p <repo>/.worktrees`. Without `--sparse-patterns full` the workspace copies the bare root's empty
 sparse set and checks out no files.
 

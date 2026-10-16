@@ -198,8 +198,9 @@ configuration.
    resulting remote bookmark's commit with `git ls-remote origin refs/heads/<default>` before using it as the
    base; a local remote ref alone is not freshness evidence.
 4. When a separate workspace is needed and authorized, choose a nonexisting destination within the approved scope
-   and use `jj workspace add --name <name> -r <verified-base> <authorized-destination>`. This creates an empty
-   working-copy commit whose parent is the verified base, not a working copy with the base's own commit ID.
+   and use `jj workspace add --no-colocate --sparse-patterns full --name <name> -r <verified-base>
+   <authorized-destination>`. This creates an empty working-copy commit whose parent is the verified base, not a
+   working copy with the base's own commit ID.
    Activate that workspace as the project root before editing.
 5. Create or move a feature bookmark only when authorized and needed for delivery. Do not commit to or open a pull
    request from the default bookmark; target the default branch unless the user requests otherwise.

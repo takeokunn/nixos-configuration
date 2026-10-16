@@ -1,12 +1,10 @@
-# Sweeps every bare repo's jj workspaces and legacy git worktrees for ones
+# Sweeps every bare repo's jj workspaces for ones
 # safe to delete -- merged or idle -- and offers them in one cross-repo fzf
 # multi-select.
 function worktree_clean
     # Capture before mutating anything, so a worktree removed later in this
     # loop can't be mistaken for "current".
-    set -l own_worktree (git rev-parse --show-toplevel 2>/dev/null)
-    # A jj workspace has no git toplevel, so fall back to jj's root.
-    test -n "$own_worktree"; or set own_worktree (jj workspace root 2>/dev/null)
+    set -l own_worktree (jj workspace root 2>/dev/null)
 
     set -l idle_threshold_seconds 259200 # 3 days, not configurable
     set -l now_epoch (date +%s)
@@ -57,37 +55,24 @@ function worktree_clean
         end
 
         for wt in $worktree_paths
-            set -l head_revs HEAD
-            set -l last_commit_epoch
-            set -l is_jj false
-            if __fzf_ghq_jj_workspace_p $wt
-                set is_jj true
-                # `git -C` here would read the bare repo's own HEAD, so ask jj
-                # for the workspace's @. A non-empty @ is unfinished work and
-                # yields no revs, so it never counts as merged. No
-                # --ignore-working-copy: the snapshot is what makes unsaved
-                # edits count.
-                set -l wc_fields (jj -R $wt log --no-graph -r @ -T 'if(empty, parents.map(|c| c.commit_id()).join(" ")) ++ "\t" ++ committer.timestamp().format("%s")' 2>/dev/null)
-                set head_revs (string split --no-empty ' ' -- (string split -f1 \t -- $wc_fields))
-                set last_commit_epoch (string split -f2 \t -- $wc_fields)
-            else
-                # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
-                set last_commit_epoch (git -C $wt log -1 --format=%ct HEAD 2>/dev/null)
-            end
+            __fzf_ghq_jj_workspace_p $wt; or continue
+
+            # Ask jj for the workspace's @. A non-empty @ is unfinished work and
+            # yields no revs, so it never counts as merged. No
+            # --ignore-working-copy: the snapshot is what makes unsaved
+            # edits count.
+            set -l wc_fields (jj -R $wt log --no-graph -r @ -T 'if(empty, parents.map(|c| c.commit_id()).join(" ")) ++ "\t" ++ committer.timestamp().format("%s")' 2>/dev/null)
+            set -l head_revs (string split --no-empty ' ' -- (string split -f1 \t -- $wc_fields))
+            set -l last_commit_epoch (string split -f2 \t -- $wc_fields)
 
             set -l merged false
             if test (count $head_revs) -gt 0
                 set merged true
                 for rev in $head_revs
-                    if test $is_jj = true
-                        # Merged when the revision has no commit outside the
-                        # base's ancestors.
-                        set -l outside (jj -R $repo --ignore-working-copy log --no-graph -r "$rev ~ ::$base_commit" -T commit_id 2>/dev/null)
-                        test $status -eq 0 -a -z "$outside"; or set merged false
-                    else
-                        # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
-                        git -C $wt merge-base --is-ancestor $rev $base_commit 2>/dev/null; or set merged false
-                    end
+                    # Merged when the revision has no commit outside the
+                    # base's ancestors.
+                    set -l outside (jj -R $repo --ignore-working-copy log --no-graph -r "$rev ~ ::$base_commit" -T commit_id 2>/dev/null)
+                    test $status -eq 0 -a -z "$outside"; or set merged false
                 end
             end
 
@@ -133,17 +118,8 @@ function worktree_clean
     set -l skipped 0
     for line in $selected
         set -l path (string split -f2 \t -- $line)
-        set -l remove_output
-        set -l remove_status
-        if __fzf_ghq_jj_workspace_p $path
-            set remove_output (__fzf_ghq_remove_jj_workspace $path)
-            set remove_status $status
-        else
-            # LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
-            set remove_output (git -C $path worktree remove -- $path 2>&1)
-            set remove_status $status
-        end
-        if test $remove_status -eq 0
+        set -l remove_output (__fzf_ghq_remove_jj_workspace $path)
+        if test $status -eq 0
             set removed (math $removed + 1)
         else
             echo "worktree_clean: failed to remove $path: $remove_output" >&2

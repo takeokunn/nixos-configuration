@@ -109,13 +109,12 @@ function __fzf_ghq_new_worktree
     end
     set -l target_path "$worktrees_dir/$target_name"
 
-    # jj refuses to colocate inside a git worktree, and a git worktree below
-    # the repo root would find the root's jj, which sees none of the
-    # worktree's files. --sparse-patterns full, because the default copies the
-    # root workspace's empty sparse set. Unlike git, jj does not create the
-    # missing .worktrees parent.
+    # --no-colocate, so jj adds no Git worktree and the choice does not depend
+    # on git.colocate in the user's config. --sparse-patterns full, because the
+    # default copies the root workspace's empty sparse set. Unlike git, jj does
+    # not create the missing .worktrees parent.
     mkdir -p $worktrees_dir
-    set -l worktree_add_output (jj -R $repo_path workspace add --sparse-patterns full --name $target_name -r $base_commit $target_path 2>&1)
+    set -l worktree_add_output (jj -R $repo_path workspace add --no-colocate --sparse-patterns full --name $target_name -r $base_commit $target_path 2>&1)
     if test $status -ne 0
         echo "fzf_ghq: failed to create worktree: $worktree_add_output" >&2
         return 1

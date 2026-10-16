@@ -27,7 +27,7 @@
 (defconst ghq-jj-test--defuns
   '("my/ghq-bare-repository-p" "my/vcs-root" "my/jj-call" "my/jj-output"
     "my/jj-output-or-error" "my/magit-status"
-    "my/ghq--git" "my/ghq-repo-worktrees"
+    "my/ghq-repo-worktrees"
     "my/ghq--jj-init-bare" "my/ghq--jj-run" "my/ghq--jj-fetch"
     "my/ghq--jj-resolves-p" "my/ghq--resolve-base-ref" "my/ghq--link-state"
     "my/ghq-create-worktree" "my/ghq--current-repo-path"
@@ -263,28 +263,33 @@ HEAD, when non-nil, replaces the branch the bare repository's HEAD names."
       (should-error (my/ghq-create-worktree origin "main"))
       (should-not (file-exists-p (expand-file-name ".worktrees" origin))))))
 
-(ert-deftest ghq-jj/repo-worktrees-lists-workspace-and-legacy-git-worktree ()
+(ert-deftest ghq-jj/repo-worktrees-lists-workspaces-without-the-default ()
   (ghq-jj-test--with-sandbox
     (let* ((bare (ghq-jj-test--make-bare root '("main")))
            (ws (my/ghq-create-worktree bare))
-           (legacy (expand-file-name ".worktrees/legacy" bare)))
-      (ghq-jj-test--run bare "git" "-C" bare "worktree" "add" "--detach" legacy "main")
-      (let ((listed (my/ghq-repo-worktrees bare)))
-        (should (member ws (mapcar #'file-truename listed)))
-        (should (member (file-truename legacy) (mapcar #'file-truename listed)))
-        (should-not (member (file-truename bare) (mapcar #'file-truename listed)))))))
+           (listed (mapcar #'file-truename (my/ghq-repo-worktrees bare))))
+      (should (equal listed (list ws)))
+      (should-not (member (file-truename bare) listed)))))
+
+(ert-deftest ghq-jj/create-worktree-creates-no-git-worktree ()
+  ;; The sandbox jj config is empty, so git.colocate is at its default (true):
+  ;; only the explicit --no-colocate keeps jj from adding a Git worktree.
+  (ghq-jj-test--with-sandbox
+    (let* ((bare (ghq-jj-test--make-bare root '("main")))
+           (ws (my/ghq-create-worktree bare)))
+      (should-not (file-exists-p (expand-file-name ".git" ws)))
+      (should (equal (split-string
+                      (ghq-jj-test--run bare "git" "-C" bare "worktree" "list" "--porcelain")
+                      "\n" t)
+                     (list (concat "worktree " (file-truename bare)) "bare"))))))
 
 ;;; C6: current repository path
 
-(ert-deftest ghq-jj/current-repo-path-from-workspace-and-legacy-worktree ()
+(ert-deftest ghq-jj/current-repo-path-from-workspace ()
   (ghq-jj-test--with-sandbox
     (let* ((bare (ghq-jj-test--make-bare root '("main")))
-           (ws (my/ghq-create-worktree bare))
-           (legacy (expand-file-name ".worktrees/legacy" bare)))
-      (ghq-jj-test--run bare "git" "-C" bare "worktree" "add" "--detach" legacy "main")
+           (ws (my/ghq-create-worktree bare)))
       (let ((default-directory (file-name-as-directory ws)))
-        (should (equal (file-truename (my/ghq--current-repo-path)) (file-truename bare))))
-      (let ((default-directory (file-name-as-directory legacy)))
         (should (equal (file-truename (my/ghq--current-repo-path)) (file-truename bare)))))))
 
 (ert-deftest ghq-jj/current-repo-path-outside-repo-errors ()

@@ -49,6 +49,10 @@ in
     '';
 
     git.private-commits = "~mine()";
+
+    # Workspaces here are jj-only. With the default (true), jj 0.46 would add a
+    # Git worktree for every `jj workspace add` run from a bare repository root.
+    git.colocate = false;
   };
 
   programs.difftastic.jujutsu.enable = true;

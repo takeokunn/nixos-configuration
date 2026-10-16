@@ -3522,36 +3522,15 @@ checked out normally contributes its own path, plus any worktrees it carries."
     "Return the list of ghq-managed repository paths (bare and non-bare)."
     (split-string (shell-command-to-string "ghq list --full-path") "\n" t))
 
-  (defun my/ghq--git (repo-path &rest args)
-    "Run git ARGS in REPO-PATH; return trimmed stdout, or nil on nonzero exit.
-Uses `call-process' with an argument list rather than a shell command string,
-so a value in ARGS or REPO-PATH can never be reinterpreted as shell syntax."
-    (with-temp-buffer
-      (let ((exit (apply #'call-process "git" nil (list t nil) nil "-C" repo-path args)))
-        (when (zerop exit)
-          (string-trim (buffer-string))))))
-
   (defun my/ghq-repo-worktrees (repo-path)
-    "Return REPO-PATH's existing worktree paths, excluding its own bare
-git-common-dir entry, followed by its jj workspaces, which `git worktree
-list' does not report.  The jj workspace named \"default\" holds jj's store
-at REPO-PATH itself and is excluded the same way.  The git half only lists
-legacy worktrees: it goes away once `worktree_migrate_jj' has left none."
-    ;; LEGACY-GIT: delete once worktree_migrate_jj reports no git worktrees
-    (let ((common-dir (my/ghq--git repo-path "rev-parse" "--path-format=absolute" "--git-common-dir"))
-          (worktrees nil)
-          (workspaces nil))
-      (dolist (line (split-string (or (my/ghq--git repo-path "worktree" "list" "--porcelain") "") "\n" t))
-        (when (string-prefix-p "worktree " line)
-          (let ((wt (substring line (length "worktree "))))
-            (unless (string= wt common-dir)
-              (push wt worktrees)))))
-      (when (file-directory-p (expand-file-name ".jj" repo-path))
-        (with-temp-buffer
-          (when (zerop (call-process "jj" nil (list t nil) nil "-R" repo-path "--ignore-working-copy"
-                                     "workspace" "list" "-T" "if(name != \"default\", root ++ \"\\n\")"))
-            (setq workspaces (split-string (buffer-string) "\n" t)))))
-      (append (nreverse worktrees) workspaces)))
+    "Return the paths of REPO-PATH's jj workspaces.
+The jj workspace named \"default\" holds jj's store at REPO-PATH itself and is
+excluded."
+    (when (file-directory-p (expand-file-name ".jj" repo-path))
+      (with-temp-buffer
+        (when (zerop (call-process "jj" nil (list t nil) nil "-R" repo-path "--ignore-working-copy"
+                                   "workspace" "list" "-T" "if(name != \"default\", root ++ \"\\n\")"))
+          (split-string (buffer-string) "\n" t)))))
 
   (defun my/ghq--jj-run (what &rest args)
     "Run jj with ARGS in `default-directory'; signal an error naming WHAT on failure."
@@ -3725,7 +3704,7 @@ naming_mode = branch case.  Returns the created workspace's absolute path."
         (make-directory worktrees-dir t)
         (with-temp-buffer
           (unless (zerop (call-process "jj" nil t nil "-R" repo-path "workspace" "add"
-                                       "--sparse-patterns" "full" "--name" target-name
+                                       "--no-colocate" "--sparse-patterns" "full" "--name" target-name
                                        "-r" full-sha target-path))
             (error "my/ghq-create-worktree: failed to create workspace at %s: %s" target-path (buffer-string))))
         (my/ghq--link-state repo-path target-path)
@@ -3734,8 +3713,8 @@ naming_mode = branch case.  Returns the created workspace's absolute path."
   (defun my/ghq--current-repo-path ()
     "Resolve the repository path containing `default-directory'.
 Asks jj for the root of the workspace named \"default\", which holds jj's
-store at the bare repository itself, so the answer is the same from a jj
-workspace and from a legacy git worktree under REPO-PATH/.worktrees/."
+store at the bare repository itself, so the answer is the same from any jj
+workspace of the repository."
     (with-temp-buffer
       (unless (zerop (call-process "jj" nil (list t nil) nil
                                    "workspace" "root" "--name" "default"))

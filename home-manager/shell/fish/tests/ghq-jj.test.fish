@@ -1,7 +1,7 @@
 # Tests for the jj-based worktree helpers in ../functions.
 # Usage: fish ghq-jj.test.fish <functions_dir>
 #
-# Needs only fish, git, jj and coreutils. ghq, lsof and fzf are replaced by PATH
+# Needs only fish, git, jj and coreutils. ghq and fzf are replaced by PATH
 # stubs, and every repository is built locally from a local origin.
 
 set -g functions_dir (path resolve -- $argv[1])
@@ -13,7 +13,7 @@ set fish_function_path $functions_dir $fish_function_path
 
 # Number of check calls this file must execute; a drop means a scenario was
 # skipped silently.
-set -g expected_checks 122
+set -g expected_checks 81
 
 set -g total 0
 set -g failures 0
@@ -27,7 +27,7 @@ mkdir -p $HOME
 # The state links new_worktree creates (.claude, .serena) are untracked in a
 # workspace; a global ignore keeps them out of the snapshot, as on a real
 # machine, so a fresh workspace's working-copy commit stays empty. .direnv and
-# .env are ignored too, for the `ignored` class of worktree_migrate_jj.
+# .env are ignored too, as a copied .env is on a real machine.
 printf '%s\n' .claude .serena .direnv .env >$root/gitignore
 printf '[core]\n\texcludesFile = %s\n' $root/gitignore >$root/gitconfig
 touch $root/jjconfig
@@ -56,21 +56,6 @@ set -g stubs $root/stubs
 mkdir -p $stubs
 printf '%s\n' '#!/bin/sh' 'cat "$GHQ_LIST"' >$stubs/ghq
 printf '%s\n' '#!/bin/sh' 'cat >"$FZF_CAPTURE"' >$stubs/fzf
-# Call 0 prints LSOF_LIST. From call 1 on it prints LSOF_LIST_2 when that file
-# exists, runs LSOF_HOOK, and fails without output when LSOF_FAIL_FROM_1 is set.
-printf '%s\n' '#!/bin/sh' \
-    '[ "$LSOF_MODE" = fail ] && exit 1' \
-    'n=$(cat "$LSOF_COUNTER" 2>/dev/null || echo 0)' \
-    'echo $((n + 1)) >"$LSOF_COUNTER"' \
-    'list=$LSOF_LIST' \
-    'if [ "$n" -ge 1 ]; then' \
-    '  [ -n "$LSOF_FAIL_FROM_1" ] && exit 1' \
-    '  [ -f "$LSOF_LIST_2" ] && list=$LSOF_LIST_2' \
-    '  [ -n "$LSOF_HOOK" ] && eval "$LSOF_HOOK"' \
-    fi \
-    'echo p1' 'echo fcwd' 'echo n/' \
-    '[ -f "$list" ] && while IFS= read -r l; do echo "n$l"; done <"$list"' \
-    'exit 0' >$stubs/lsof
 # Wraps jj: fails any call that has the word $FAILJJ_ON as an argument, and
 # on `sparse` first creates $FAILJJ_MKDIR/.jj holding a marker file (a rival
 # init finishing mid-way). Everything else passes through.
@@ -82,13 +67,10 @@ printf '%s\n' '#!/bin/sh' \
     '  if [ -n "$FAILJJ_ON" ] && [ "$a" = "$FAILJJ_ON" ]; then echo "forced failure" >&2; exit 1; fi' \
     done \
     "exec $real_jj \"\$@\"" >$failjj/jj
-chmod +x $stubs/ghq $stubs/fzf $stubs/lsof $failjj/jj
+chmod +x $stubs/ghq $stubs/fzf $failjj/jj
 set -gx PATH $stubs $PATH
 set -gx GHQ_LIST $root/ghq.list
 set -gx FZF_CAPTURE $root/fzf.capture
-set -gx LSOF_LIST $root/lsof.list
-set -gx LSOF_LIST_2 $root/lsof.list2
-set -gx LSOF_COUNTER $root/lsof.count
 touch $GHQ_LIST
 
 function t_commit --argument-names repo parent
@@ -229,6 +211,8 @@ check "C5 worktree is a jj workspace" -f $wt/.jj/repo
 check "C5 workspace is checked out (sparse full)" -f $wt/f
 check "C5 workspace is registered in jj" (jj_ws_names $a1 | string match -q (path basename $wt); echo $status) -eq 0
 check "C5 git worktree list is unchanged" (git -C $a1 worktree list | count) -eq $git_wt_before
+check "C5 workspace has no .git entry" ! -e $wt/.git -a ! -L $wt/.git
+check "C5 git worktree list shows only the bare root" (git -C $a1 worktree list --porcelain | string match -r '^worktree .*' | count) -eq 1
 check "C5 parent is the default ref commit" (jj -R $wt --ignore-working-copy log --no-graph -r @- -T commit_id) = $main_commit
 check "C5 name mode ends in the short sha" (string match -q "*-"(string sub -l 8 -- $main_commit) -- (path basename $wt); echo $status) -eq 0
 check "C5 state dir is linked" -L $wt/.claude
@@ -298,9 +282,6 @@ check "C7 idle fixtures exist" -d "$ws_idle" -a -d "$ws_idle_merged"
 for ws in $ws_idle $ws_idle_merged
     JJ_TIMESTAMP=2020-01-01T00:00:00+00:00 jj -R $ws describe -m old >/dev/null 2>&1
 end
-mkdir -p $root/legacy
-git -C $c1 worktree add -q --detach $root/legacy/merged main
-git -C $c1 worktree add -q --detach $root/legacy/ahead feature
 worktree_clean 2>$root/clean.err
 check "C7 worktree_clean exits cleanly" $status -eq 0
 set -l captured (cat $FZF_CAPTURE)
@@ -308,11 +289,9 @@ set -l tab \t
 check "C7 merged jj workspace is offered as merged" (contains -- "merged$tab$ws_merged" $captured; echo $status) -eq 0
 check "C7 jj workspace ahead of the base is not a candidate" (string match -q "*$ws_unmerged*" -- $captured; echo $status) -ne 0
 check "C7 jj workspace with unsaved edits is not a candidate" (string match -q "*$ws_dirty*" -- $captured; echo $status) -ne 0
-check "C7 merged legacy git worktree is offered as merged" (contains -- "merged$tab$root/legacy/merged" $captured; echo $status) -eq 0
-check "C7 legacy git worktree ahead of the base is not a candidate" (string match -q "*legacy/ahead*" -- $captured; echo $status) -ne 0
 check "C7 old unmerged jj workspace is offered as idle" (contains -- "idle$tab$ws_idle" $captured; echo $status) -eq 0
 check "C7 old merged jj workspace is offered as merged,idle" (contains -- "merged,idle$tab$ws_idle_merged" $captured; echo $status) -eq 0
-check "C7 exactly four worktrees are offered" (count $captured) -eq 4
+check "C7 exactly three worktrees are offered" (count $captured) -eq 3
 
 # an import failure skips the repo with a note
 set -l out (FAILJJ_ON=import PATH=$failjj:$PATH worktree_clean 2>&1)
@@ -346,136 +325,6 @@ popd >/dev/null
 check "C9 missing default workspace makes worktree_rm fail" $rc -eq 1
 check "C9 missing default workspace keeps the workspace" -d $rm_ws2
 check "C9 missing default workspace explains itself" (string match -q "*cannot find the default workspace*" -- $out; echo $status) -eq 0
-
-# ---- C10: worktree_migrate_jj
-set -l m (t_clone $src mig)
-echo $m >$GHQ_LIST
-set -l wts $root/wts
-mkdir -p $wts
-set -l head_main (git -C $m rev-parse main)
-set -l orphan (git -C $m commit-tree (git -C $m rev-parse main^{tree}) -p $head_main -m orphan)
-function t_wt --argument-names repo path rev
-    git -C $repo worktree add -q --detach $path $rev
-end
-t_wt $m $wts/w10 $head_main
-t_wt $m $wts/w1 $head_main
-t_wt $m $wts/dirty $head_main
-echo x >$wts/dirty/untracked
-t_wt $m $wts/unref $orphan
-t_wt $m $wts/locked $head_main
-git -C $m worktree lock $wts/locked
-t_wt $m $wts/gone $head_main
-rm -rf $wts/gone
-# ignored files that git worktree remove would delete
-t_wt $m $wts/ign $head_main
-echo SECRET >$wts/ign/.env
-# only our own state: links and caches
-t_wt $m $wts/state $head_main
-ln -s $root/state-target $wts/state/.claude
-mkdir -p $wts/state/.serena/memories $wts/state/.direnv
-echo x >$wts/state/.serena/memories/note
-echo x >$wts/state/.direnv/cache
-# combined classes
-t_wt $m $wts/lockdirty $head_main
-echo x >$wts/lockdirty/untracked
-git -C $m worktree lock $wts/lockdirty
-t_wt $m $wts/usedirty $head_main
-echo x >$wts/usedirty/untracked
-t_wt $m $wts/dirtyorph $orphan
-echo x >$wts/dirtyorph/untracked
-t_wt $m $wts/exact $head_main
-
-# lsof prints resolved paths: w1 and usedirty have a cwd below them, exact has
-# one equal to the worktree path, w10 has none (and w1 must not match w10)
-printf '%s\n' (path resolve -- $wts/w1)/sub (path resolve -- $wts/usedirty)/deep (path resolve -- $wts/exact) >$LSOF_LIST
-set -g dry (worktree_migrate_jj)
-set -l rc $status
-check "C10 dry-run exits 0" $rc -eq 0
-function t_class --argument-names path
-    for l in $dry
-        string match -q "*"\t"$path" -- $l; and echo (string split -f1 \t -- $l)
-    end
-end
-check "C10 clean worktree is removable" (t_class $wts/w10) = removable
-check "C10 dirty (untracked) worktree is dirty" (t_class $wts/dirty) = dirty
-check "C10 unreachable HEAD is unreferenced" (t_class $wts/unref) = unreferenced
-check "C10 locked worktree is locked" (t_class $wts/locked) = locked
-check "C10 cwd below the worktree is in-use (w1 not confused with w10)" (t_class $wts/w1) = in-use
-check "C10 cwd equal to the worktree is in-use" (t_class $wts/exact) = in-use
-check "C10 missing directory is prunable" (t_class $wts/gone) = prunable
-check "C10 ignored .env makes the worktree ignored" (t_class $wts/ign) = ignored
-check "C10 .claude, .serena and .direnv alone stay removable" (t_class $wts/state) = removable
-check "C10 locked beats dirty" (t_class $wts/lockdirty) = locked
-check "C10 in-use beats dirty" (t_class $wts/usedirty) = in-use
-check "C10 dirty beats unreferenced" (t_class $wts/dirtyorph) = dirty
-check "C10 summary counts removable" (string match -q "removable: 2" -- $dry; echo $status) -eq 0
-check "C10 summary counts the other classes" (string match -q "in-use: 3" -- $dry; and string match -q "dirty: 2" -- $dry; and string match -q "prunable: 1" -- $dry; and string match -q "ignored: 1" -- $dry; and string match -q "locked: 2" -- $dry; and string match -q "unreferenced: 1" -- $dry; echo $status) -eq 0
-check "C10 dry-run removes nothing" (git -C $m worktree list | count) -eq 13
-
-set -l apply (worktree_migrate_jj --apply 2>/dev/null)
-set -l rc $status
-check "C10 apply exits 0" $rc -eq 0
-check "C10 apply removes the removable worktrees" ! -e $wts/w10 -a ! -e $wts/state
-check "C10 apply keeps every other class" -d $wts/dirty -a -d $wts/unref -a -d $wts/locked -a -d $wts/w1 -a -d $wts/ign -a -d $wts/lockdirty -a -d $wts/usedirty -a -d $wts/dirtyorph -a -d $wts/exact
-check "C10 apply keeps the ignored file" -f $wts/ign/.env
-check "C10 apply prunes the prunable entry" (git -C $m worktree list | string match -q "*$wts/gone*"; echo $status) -ne 0
-check "C10 apply reports removed and remaining" (string match -q "*: removed 2, remaining 9" -- $apply; echo $status) -eq 0
-check "C10 unreferenced commit is still stored" (git -C $m cat-file -t $orphan) = commit
-
-# fail closed
-t_wt $m $wts/w2 $head_main
-set -l out (LSOF_MODE=fail worktree_migrate_jj --apply 2>&1)
-set -l rc $status
-check "C10 failing lsof makes apply return 1" $rc -eq 1
-check "C10 failing lsof removes nothing" -d $wts/w2
-check "C10 failing lsof prints an error" (string match -q "*cannot detect in-use worktrees*" -- $out; echo $status) -eq 0
-mkdir -p $root/nolsof
-cp $stubs/ghq $root/nolsof/ghq
-set -l out (PATH=$root/nolsof worktree_migrate_jj --apply 2>&1)
-set -l rc $status
-check "C10 missing lsof makes apply return 1" $rc -eq 1
-check "C10 missing lsof removes nothing" -d $wts/w2
-check "C10 missing lsof says lsof was not found" (string match -q "*lsof not found*" -- $out; echo $status) -eq 0
-rm -f $LSOF_COUNTER
-set -l out (LSOF_FAIL_FROM_1=1 worktree_migrate_jj --apply 2>&1)
-set -l rc $status
-check "C10 a failing rescan before removal returns 1" $rc -eq 1
-check "C10 a failing rescan before removal removes nothing" -d $wts/w2
-worktree_migrate_jj --bogus 2>/dev/null
-check "C10 unknown argument returns 2" $status -eq 2
-set -l out (worktree_migrate_jj --bogus 2>&1)
-check "C10 usage goes to stderr" (string match -q "usage:*" -- $out; echo $status) -eq 0
-
-# re-checks right before removal, in a fresh repo
-set -l m2 (t_clone $src mig2)
-echo $m2 >$GHQ_LIST
-set -l lc (git -C $m2 commit-tree (git -C $m2 rev-parse main^{tree}) -p main -m late)
-git -C $m2 branch tmp $lc
-t_wt $m2 $wts/late (git -C $m2 rev-parse main)
-t_wt $m2 $wts/lateref $lc
-t_wt $m2 $wts/ctl (git -C $m2 rev-parse main)
-rm -f $LSOF_COUNTER $LSOF_LIST
-# a process enters `late`, and `tmp` disappears, only after the first scan
-echo (path resolve -- $wts/late)/x >$LSOF_LIST_2
-set -l out (LSOF_HOOK="git -C $m2 update-ref -d refs/heads/tmp" worktree_migrate_jj --apply 2>&1)
-set -l rc $status
-check "C10 recheck: apply still exits 0" $rc -eq 0
-check "C10 recheck: a worktree entered since the scan is kept" -d $wts/late
-check "C10 recheck: a worktree whose HEAD lost its ref is kept" -d $wts/lateref
-check "C10 recheck: the unchanged worktree is removed" ! -e $wts/ctl
-check "C10 recheck: skips are reported" (string match -q "*skipping*late: now in use*" -- $out; and string match -q "*skipping*lateref: HEAD is no longer reachable*" -- $out; echo $status) -eq 0
-rm -f $LSOF_LIST_2 $LSOF_COUNTER
-
-# a plain directory nested in another repository is not a bare repo
-git -C $plain commit -q --allow-empty -m c
-t_wt $plain $root/enclosing HEAD
-mkdir -p $plain/nested
-echo $plain/nested >$GHQ_LIST
-set -l out (worktree_migrate_jj 2>&1)
-set -l rc $status
-check "C10 nested non-bare dir is skipped with a note" (string match -q "*not a bare repository; skipping*" -- $out; echo $status) -eq 0
-check "C10 nested non-bare dir does not expose the enclosing repo" (string match -q "*enclosing*" -- $out; echo $status) -ne 0
-check "C10 nested non-bare dir still exits 0" $rc -eq 0
 
 echo "$total checks, $failures failed"
 rm -rf -- $root

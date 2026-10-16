@@ -62,9 +62,9 @@ rmdir "$root/r.git/.jj-init"
 printf %s ../../.. >"$root/r.git/.jj/repo/store/git_target"
 
 mkdir -p "$root/r.git/.worktrees"
-jj -R "$root/r.git" workspace add --sparse-patterns full --name feat -r feat \
+jj -R "$root/r.git" workspace add --no-colocate --sparse-patterns full --name feat -r feat \
   "$root/r.git/.worktrees/feat" >/dev/null 2>&1
-jj -R "$root/r.git" workspace add --sparse-patterns full --name bare -r 'root()' \
+jj -R "$root/r.git" workspace add --no-colocate --sparse-patterns full --name bare -r 'root()' \
   "$root/r.git/.worktrees/bare" >/dev/null 2>&1
 
 out=$(run "$root/r.git/.worktrees/feat")
