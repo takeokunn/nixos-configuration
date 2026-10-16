@@ -41,8 +41,6 @@
     guard-and-guide.inputs.nixpkgs.follows = "nixpkgs";
     anthropic-skills.url = "github:anthropics/skills";
     anthropic-skills.flake = false;
-    ast-grep-skill.url = "github:ast-grep/agent-skill";
-    ast-grep-skill.flake = false;
     paredit-cli-skills.url = "github:takeokunn/paredit-cli";
     paredit-cli-skills.flake = false;
     aitools-skills.url = "github:nerima-lisp/aitools";
@@ -114,7 +112,6 @@
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills
-                  ast-grep-skill
                   paredit-cli-skills
                   aitools-skills
                   yomiyasu-skill
@@ -446,6 +443,34 @@
               ''
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.test.sh} \
                   ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.sh}
+                touch $out
+              '';
+
+          checks.prose-skill-gate-hook =
+            pkgs.runCommand "prose-skill-gate-hook-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.perl
+                ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/prose-skill-gate.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/prose-skill-gate.sh}
+                touch $out
+              '';
+
+          checks.guard-and-guide-rules =
+            pkgs.runCommand "guard-and-guide-rules-test"
+              {
+                nativeBuildInputs = [ pkgs.jq ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/rules.test.sh} \
+                  ${
+                    inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default
+                  }/bin/guard-and-guide \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml}
                 touch $out
               '';
 

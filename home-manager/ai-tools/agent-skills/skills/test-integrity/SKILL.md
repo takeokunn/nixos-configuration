@@ -248,7 +248,9 @@ ever called under a structural invariant, the fallback is not defensive; it is n
 correctly refusing to ignore.
 
 The discriminator: is the fallback behavior user-visible, or unreachable because an upstream invariant
-guarantees the input? Test the first; delete the second and assert the invariant instead. For an exhaustive set
+guarantees the input? Test the first; delete the second and assert the invariant instead. A fail-closed check
+at a trust boundary is neither: keep it even when an upstream gate covers the same input, and test the
+rejection, because a later caller reaches the helper directly (see trust-boundaries). For an exhaustive set
 of cases, prefer enumerating every case with an explicit terminal result over a catch-all arm, which manufactures
 a branch no input can take.
 

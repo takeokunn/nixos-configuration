@@ -86,22 +86,6 @@
         "type": "github"
       }
     },
-    "ast-grep-skill": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1789268336,
-        "narHash": "sha256-dORqiMdFOUQVEF6wn1IZiTIcslzO+441A0GZP4KNcOQ=",
-        "owner": "ast-grep",
-        "repo": "agent-skill",
-        "rev": "f2175aff21f20cfb8e2db30c28febeb3a2d42b61",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ast-grep",
-        "repo": "agent-skill",
-        "type": "github"
-      }
-    },
     "bun2nix": {
       "inputs": {
         "flake-parts": [
@@ -1364,7 +1348,6 @@
         "agent-skills": "agent-skills",
         "aitools-skills": "aitools-skills",
         "anthropic-skills": "anthropic-skills",
-        "ast-grep-skill": "ast-grep-skill",
         "darwin-vz-nix": "darwin-vz-nix",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",

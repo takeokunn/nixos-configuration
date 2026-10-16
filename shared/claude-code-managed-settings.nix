@@ -35,6 +35,9 @@ in
   theme = "dark";
   autoUpdates = false;
   includeCoAuthoredBy = false;
+  # The built-in commit and PR instructions conflict with CLAUDE.md's hard_rules (they branch from the
+  # default branch unasked); the pull-request and jujutsu skills carry this workflow instead.
+  includeGitInstructions = false;
   autoCompactEnabled = true;
   enableAllProjectMcpServers = true;
   feedbackSurveyState.lastShownTime = 1754089004345;
@@ -125,6 +128,28 @@ in
           type = "command";
           command = "${hooksDir}/${name}";
         }) claudeBashHookNames;
+    }
+    # Claude Code only: it judges skill loads from the session transcript, whose format Codex does not
+    # share. Bash is matched for the `gh pr|issue` publish commands.
+    {
+      matcher = "Write|Edit|MultiEdit|Bash";
+      hooks = [
+        {
+          type = "command";
+          command = "${hooksDir}/prose-skill-gate";
+        }
+      ];
+    }
+  ];
+
+  hooks.Stop = [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${hooksDir}/prose-skill-gate";
+        }
+      ];
     }
   ];
 

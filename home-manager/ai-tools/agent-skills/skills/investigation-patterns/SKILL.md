@@ -174,28 +174,13 @@ Two reliable candidates: thin compatibility barrels that only re-export concrete
 at the concrete module, then delete the barrel), and single-use private helpers whose only call sites are local
 (inline them, keeping the public entry point as the sole behavioral surface).
 
-## Recurring shapes
-
-| Symptom | Where to look |
-|---|---|
-| Intermittent, works sometimes | Shared mutable state, async ordering |
-| Missing first or last element | Loop boundaries, inclusive vs exclusive index |
-| Memory growth, connection exhaustion | Acquisition paths without a matching release on the error path |
-| Garbled text | Encoding at each transformation step, not just at the ends |
-| Null or undefined at use | Every path reaching the access, not only the one in the trace |
-
-Drill with repeated "why" until the answer is a change someone can make: *server crashed → out of memory →
-connection pool exhausted → connections not released → an exception bypasses cleanup*: the root cause is the
-missing try/finally, not the memory. Where timestamps exist, order the events and find where the sequence
-diverges from the expected one.
-
 ## Rules
 
 - Establish the cause before proposing a solution. For diagnosis or review only, stop at the findings. When
   the user also requests a fix, implement within that scope and verify it.
 - Never confirm the user's assumption without independently verifying it.
-- Never state a claim without a file:line, and never substitute a numeric confidence or coverage score for an
-  evidence tier.
+- Never state a verified or inferred claim without its file:line or command (an assumed one names what would
+  confirm it), and never substitute a numeric confidence or coverage score for an evidence tier.
 - Where a finding is still inferred, check a second source to see whether it can be raised to verified.
 - Document the information gaps rather than closing them by plausibility.
 

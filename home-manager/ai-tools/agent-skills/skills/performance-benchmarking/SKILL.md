@@ -95,18 +95,19 @@ one.**
 
 **Bound the run with a kill grace.** A plain timeout is not sufficient: a runtime that installs a termination
 handler or blocks signals can remain alive after its first signal, so a nominal limit leaks past the budget it
-was supposed to enforce. Use `timeout --foreground -k 10s <limit>s`. The escalation from a polite signal to an
-unconditional kill must be part of the design, not an assumption about the child's cooperation.
+was supposed to enforce. Use `timeout -k 10s <limit>s` where coreutils is available, and the tool's own timeout
+plus an explicit kill of the process group where it is not. `--foreground` does not time out the command's
+children, so it does not bound a noninteractive run.
 
-## Three ways a clean run measures the wrong thing
+## Ways a clean run measures the wrong thing
 
 **Prove you are measuring your working tree.** A development environment or dependency cache can pre-register a
 published build of the very package you are benchmarking, and the harness then compiles and measures *that*
 while your edits sit unread on disk. Benchmark metadata such as a reported source root does not prove which
-artifact the compiler consumed. Force resolution to the working tree and verify it: reinitialize the module
-registry against the workspace, clear the registered system, load its definition by absolute workspace path,
-force recompilation, then **assert that the resolved source file and the compiler's output paths point into the
-workspace** rather than into a package store.
+artifact the compiler consumed. Make the build system resolve the package from the workspace path and rebuild
+it, then **assert that the resolved source file and the compiler's output paths point into the workspace**
+rather than into a package store. For ASDF, load common-lisp-ecosystem: its "Load the workspace, not a
+published build" paragraph gives the calls.
 
 **The fixture must pass a correctness guard first.** A malformed fixture frequently normalizes to the empty or
 trivial case rather than failing. In one instance a fixture intended to exercise a styled-output path was not
@@ -120,6 +121,11 @@ and checking the output once does not cover the case where the optimized arm is 
 wrong on a later one, or is nondeterministic. Compare a cheap signature (a result hash, a record count, a
 byte-identical report) on every sample of every arm, and report that it was constant as part of the result.
 "Identical result hash in all 120 samples" has proved something a spot-check has not.
+
+**The input distribution must match the traffic the change targets.** A guard added to a family of accessors
+was justified by a benchmark in which almost every looked-up id was absent, a case production rarely hits. State
+the distribution the fixture draws from (hit rate, size mix, skew) and why it represents the real workload
+before an optimization is adopted on its numbers.
 
 ## Choose the metric
 

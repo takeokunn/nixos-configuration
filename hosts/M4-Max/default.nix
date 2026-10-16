@@ -79,7 +79,6 @@ nix-darwin.lib.darwinSystem {
           guard-and-guide
           nur-packages
           anthropic-skills
-          ast-grep-skill
           paredit-cli-skills
           aitools-skills
           yomiyasu-skill

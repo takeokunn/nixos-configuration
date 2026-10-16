@@ -34,9 +34,8 @@ file exists for the parts that surprise a competent developer moving between eng
 ## Version-sensitive behavior
 
 Check the deployed version and its documentation before selecting DDL or relying on a planner feature.
-PostgreSQL 17 supports only stored generated columns and requires `STORED`; PostgreSQL 18 adds
-`VIRTUAL` and makes it the default when neither keyword is present. This is not a changed default
-for previously valid omitted-keyword DDL. State the intended storage explicitly in migrations.
+PostgreSQL 18 makes `VIRTUAL` the default generated-column storage when neither keyword is present, while 17
+accepts only `STORED`, so state the intended storage explicitly in migrations.
 
 ## Query patterns that hide bugs
 
@@ -80,10 +79,9 @@ for previously valid omitted-keyword DDL. State the intended storage explicitly 
   mistyped `commentable_id` is not caught by the database, ever.
 - **Monetary values stored as `FLOAT`/`DOUBLE` accumulate rounding error** (`0.1 + 0.2 != 0.3`
   in IEEE 754). Use `DECIMAL`/`NUMERIC`, or store integer minor units (cents).
-- **`GENERATED ... STORED` vs `VIRTUAL`**: PostgreSQL supported only `STORED` through v17 (18+
-  adds `VIRTUAL`, see version note above); MySQL and SQLite support both. `VIRTUAL` recomputes on
-  read. Index support and expression restrictions depend on the engine and version; do not
-  infer either persistence or indexability solely from the term "generated column."
+- **`GENERATED ... STORED` vs `VIRTUAL`** (PostgreSQL versions in the note above; MySQL and SQLite
+  support both): `VIRTUAL` recomputes on read. Check index support and expression restrictions for the
+  engine and version in use; the term "generated column" implies neither persistence nor indexability.
 
 ## Transactions and isolation
 
@@ -149,7 +147,9 @@ Parameterized queries close the value-injection path but leave two others open:
 
 ## Style convention (Emacs sql-indent)
 
-Right-align keywords so clause bodies start at a consistent column, and put commas at line start:
+For hand-written SQL; `pg_format` and `sqlfluff fix` produce a different layout, so do not run them over files
+that follow this one. Right-align keywords so clause bodies start at a consistent column, and put commas at
+line start:
 
 ```sql
 SELECT c.customer_id

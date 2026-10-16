@@ -52,6 +52,12 @@ message = "Access to credential files is prohibited. Ask the user to handle cred
 # quoting and assignment, so the leading class also admits the characters a shell puts in front of
 # an argument, and /+ absorbs the redundant slash in /usr//bin.
 #
+# The match is limited to the programs `permissions.deny` names (shared/default.nix), since those deny
+# patterns match the command name and an absolute path is what slips past them. block-destructive-git.sh
+# strips the directory before judging git and jj, so they need no entry here. Matching any system
+# binary blocked harmless calls such as an absolute-path grep or a path quoted inside a search pattern.
+# rules.test.sh holds the cases.
+#
 # Residual, accepted: `cd /usr/bin && ./killall` still passes, since there is no trailing slash to match
 # and the invocation that follows carries no path at all. A regex cannot close that; only a
 # tokenizer like block-destructive-git.sh's could. Treat this rule as friction against a casual
@@ -59,5 +65,5 @@ message = "Access to credential files is prohibited. Ask the user to handle cred
 
 [[rules]]
 matcher = "Bash"
-regex = '''(^|[\s"'=;&|(])/+(usr/+)?(s?bin|local/+bin)/'''
-message = "Do not invoke system binaries by absolute path to work around a blocked command. Use the command name directly, and if it is blocked, ask the user."
+regex = '''(^|[\s"'=;&|(])/+(usr/+)?(s?bin|local/+bin)/+(sudo|rm|chmod|dd|mkfs(\.\w+)?|fdisk|format|shutdown|reboot|halt|poweroff|killall|pkill|nc|ncat|netcat)([\s"';&|)]|$)'''
+message = "Do not invoke a denied command by absolute path to get past the permission rules. Use the command name directly, and if it is blocked, ask the user."

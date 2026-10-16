@@ -13,21 +13,16 @@ Treat repositories as public unless established otherwise.
 Other sessions may change the working tree, HEAD, build artifacts, and Serena's active-project pointer.
 Preserve their work. Do not kill processes by pattern or mutate the user's tmux session.
 ghq clones are bare at `<repo>.git/`; edits belong in their `.worktrees/` directories, not the bare root.
-Before relying on fetch, inspect `git config --get-all remote.origin.fetch`; a missing refspec can update nothing.
-Read `git status --porcelain` as well as `git diff --no-ext-diff`: diffs omit untracked files.
-Where the checkout you work in has `.jj/` at its own root, prefer jj over git for version-control operations;
-gh stays for GitHub. A jj workspace under `.worktrees/` has its own `.jj/`; a git worktree there does not and
-stays on git, even though `jj root` succeeds by finding the bare root's `.jj/`.
-Use jj, not git, for routine version control: status, history, diffs, commits, bookmarks, fetch, and push.
-GitHub operations stay on gh. Git commands are limited to necessary read-only plumbing or an explicitly
-requested exception, not an alternate workflow. If jj is not initialized, report that and ask before
-initializing or migrating; do not silently fall back to Git.
-For read-only jj queries, pass `--ignore-working-copy` to avoid snapshotting shared edits. Inspect current
-on-disk changes and untracked files separately because those queries can be stale; read-only Git plumbing
-such as `git status --porcelain` and `git diff --no-ext-diff` can supply that evidence in Git-backed checkouts.
-Before relying on a Git-backed remote's default fetch configuration, inspect
-`git config --get-all remote.origin.fetch`; specify the intended remote and bookmark when fetching with jj.
-Confirm a remote branch base or tag target with `git ls-remote origin <ref>`, not a stale local remote ref.
+
+Where the checkout has `.jj/` at its own root, use jj for status, history, diffs, commits, bookmarks, fetch,
+and push; gh stays for GitHub. A jj workspace under `.worktrees/` has its own `.jj/`; a git worktree there
+does not and stays on git, even though `jj root` succeeds by finding the bare root's `.jj/`. Git is limited to
+read-only plumbing or an explicitly requested exception. If jj is not initialized, report that and ask before
+initializing; do not fall back to Git.
+Pass `--ignore-working-copy` to read-only jj queries. Their view can be stale, so read on-disk state with
+`git status --porcelain` and `git diff --no-ext-diff`; diffs omit untracked files.
+Before fetching, inspect `git config --get-all remote.origin.fetch` (a missing refspec updates nothing) and
+name the remote and bookmark. Confirm a remote base or tag target with `git ls-remote origin <ref>`.
 Use the injected skill and agent catalogs; do not assume unavailable tools exist.
 
 ## hard_rules
@@ -109,6 +104,11 @@ Obtain missing evidence before proceeding.
 Lead with the result. Cut praise, filler, decorative emoji, unsupported intensifiers, formulaic contrasts,
 and repetition. Judge words in context, not by a blacklist.
 Do not use the English em dash (U+2014).
+Every piece of durable prose (docs, README, comments of more than a line, prompt and skill files, articles,
+commit messages, PR and issue bodies) goes through the same three skills, however small the edit: load
+technical-writing before drafting; for Japanese text, load yomiyasu and revise the draft in a separate pass
+before writing it to the file; run cold-read before reporting the work complete or publishing it. Name in the
+report which of the three ran.
 Produce only requested code: no speculative abstractions, unreachable defensive branches, placeholder
 scaffolding, or docstrings restating signatures. Comments explain non-obvious constraints or reasons, not
 what identifiers already say.
@@ -121,8 +121,9 @@ State whether external reads are needed. Research/review grants no file, Git, or
 Use runtime restrictions when available; prompts alone are not access controls.
 
 Partition ownership before dispatch. Run independent tasks together; keep atomic cross-file changes together.
-Resolve shared-file edits before parallel writers. Agents must preserve others' edits, use unique scratch paths,
-and return evidence. Record isolated agents' base refs and recheck findings against your tree when refs differ.
+Resolve shared-file edits before parallel writers. Agents must preserve others' edits, use unique scratch paths
+and leave them in place (the auto-mode classifier denies `rm -rf` on them), and return evidence. Record
+isolated agents' base refs and recheck findings against your tree when refs differ.
 Give resumed agents explicit ownership and end state.
 
 Retry at most twice, only for timeout, incomplete answers, or missing citations. Inspect status/logs before
@@ -154,8 +155,8 @@ new evidence call for a user decision, not another identical cycle.
 ## memory_policy
 
 Record durable, non-obvious learning when established: user conventions, decisions, costly traps, rejected
-options with evidence, and conditions for revisiting them. Use serena-usage to choose the store before writing.
-Read-only work grants no memory writes; if the store is unavailable or writing prohibited, return a candidate.
+options with evidence, and conditions for revisiting them. Read-only work grants no memory writes; if the
+store is unavailable or writing prohibited, return a candidate.
 Do not record session diffs, verdicts/scores, unfinished verification, or facts already in the repository.
 An unresolved-finding ledger may record identifier, file:line, severity, and deferral reason.
 Keep absolute paths and raw counts out of bodies; retain reproducible commands instead.
@@ -173,27 +174,30 @@ report unavailable instructions.
 | Implementation, delegation, or judging completion | execution-workflow |
 | Formal requirements or unresolved scope | requirements-definition |
 | Writing/evaluating tests; interpreting a green suite | testing-patterns; test-integrity respectively |
-| Verifying permissions, constraints, state transitions, or concurrency with a solver or model checker; realigning a drifted model | formal-methods |
 | Producing, gating, or reviewing performance claims | performance-benchmarking |
 | Debugging or tracing a cause | investigation-patterns |
 | Reading/writing memory or Serena symbol operations | serena-usage |
 | Editing Lisp-family source | paredit-cli |
 | Nix, flakes, or Home Manager implementation | nix-ecosystem |
-| Articles, tutorials, or substantial narrative prose | technical-writing |
-| README, API/reference docs, specifications, or user guides | technical-documentation |
-| Commit messages or PR titles/bodies | pull-request |
 | Planning or running version-control operations | jujutsu |
-| Completing revised durable prose | cold-read |
+| Commit messages or PR titles/bodies | pull-request |
+| README, API/reference docs, specifications, or user guides | technical-documentation |
+| Any durable prose: docs, prompt and skill files, articles, PR and issue bodies | technical-writing, yomiyasu for Japanese, cold-read (order in output_discipline) |
 | Auditing existing content for output_discipline violations | ai-slop-detector |
 | Authoring agents, commands, or orchestration prompts; escalating a consequential finding into a refutation | workflow-patterns |
+
+In Claude Code, the prose-skill-gate hook refuses writes to Markdown, Org, and plain-text files (outside memory
+stores and scratch paths) and `gh pr|issue` publishing until these skills are loaded, and blocks the first stop
+after such an edit that cold-read has not followed.
 
 Keep always-needed contracts here, procedures in skills, and mechanical enforcement in hooks. Reference
 contracts instead of copying them; update existing copies when changing their rule.
 
 ## standard_practices
 
-Use aitools for discovery, file reads, and text edits when available, Serena for symbolic investigation
-when available, and gh for GitHub. If a command is missing, try `nix run nixpkgs#<command>` once.
+Use Serena for symbolic investigation when available, and gh for GitHub. If a command is missing, try
+`nix run nixpkgs#<command>` once. The `timeout` command is not installed: bound a call with the tool's own
+timeout parameter instead of wrapping it.
 Set the command's working directory; do not spend calls on bare cd.
 Locate paths and symbols before using them. Read the current edit target before patching; refresh after
 intervening writes or stale-content errors, not repeatedly when nothing could have changed.
@@ -212,4 +216,3 @@ a broad catch, a fabricated result, or a silent fallback; report the failure and
 Try the stated alternative once after a tool/approach fails, then name the blocker. When precedent is absent,
 bound the investigation rather than searching indefinitely. After partial external operations, establish what
 already took effect before retrying. For external limits, give the resume command and unblocking condition.
-After a Serena failure, check the shared project pointer, reactivate the intended project, and retry once.

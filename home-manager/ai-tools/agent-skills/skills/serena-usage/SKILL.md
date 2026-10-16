@@ -2,7 +2,7 @@
 name: serena-usage
 description: Use for Serena MCP work - semantic symbol search, find references, code navigation, memory read/write, and organizing memory as a linked reference graph rather than a flat list. Also covers recovering a subagent's report from its session transcript when a completion notification is lost.
 metadata:
-  version: "4.1.0"
+  version: "4.2.0"
 ---
 
 Serena's tool schemas are injected by the harness and are not restated here. This file covers tool *choice*,
@@ -30,8 +30,9 @@ Serena owns code intelligence; standard tools own the filesystem.
 | Delete a symbol | `safe_delete_symbol`; inspect the returned references if it refuses |
 | Confirm a file is clean after editing | `get_diagnostics_for_file` with `min_severity=2` to drop hint noise |
 
-Restrict any search with `relative_path` when the scope is known. Read whole files only for non-code (YAML,
-JSON, Markdown, config) or when symbol operations have already been tried and were insufficient.
+Restrict any search with `relative_path` when the scope is known. Read a whole code file only when symbol
+operations were tried and were insufficient, or the language is unsupported (next section). Start
+`get_symbols_overview` at depth 0 and increase only if needed.
 
 Prefer symbol operations strongly in strongly-typed languages, where LSP resolution is accurate. In dynamic
 languages add `substring_matching=true`. For configuration and prose formats, go straight to `aitools search` and Read.
@@ -59,12 +60,13 @@ question and no result from it counts as evidence.
 **Treat this as an ongoing constraint of that repository, not a transient glitch to retry against.** Confirm it
 once, then commit to the text-based path: locate definitions and references with `aitools search` across source
 *and* tests, edit with `replace_content` or the standard Edit tool, and verify with the language's own build or
-load step; `get_diagnostics_for_file` is unavailable for an inactive language too.
+load step; `get_diagnostics_for_file` is unavailable for an inactive language too. This section is the record:
+do not write a per-repository memory restating it.
 
 Failure can also be per-symbol rather than wholesale. When the tree is changing under a concurrent session, a
-lookup can succeed for one symbol and come back empty for the next in the same session; that pattern indicts
-the moment rather than the repository, so name the fallback for the symbol that failed instead of abandoning
-symbol operations entirely.
+lookup can succeed for one symbol and come back empty for the next in the same session; that pattern points to
+the concurrent change rather than to the repository, so name the fallback for the symbol that failed instead of
+abandoning symbol operations entirely.
 
 ## The active-project pointer is shared
 
@@ -100,13 +102,15 @@ Names may contain `/` to organize into subtopics; `list_memories` enumerates nes
 
 ```
 convention-{topic}      forward-looking project conventions
-decision-{topic}        architectural decision records
-review-{topic}-YYYY-MM  past investigation findings
+decision-{topic}        architectural decision records, with the rejected options
 {feature}-patterns      feature-specific reusable patterns
 {domain}-patterns       domain-specific patterns
 global/{topic}          shared across all projects (only when the user explicitly asks for
                         a project-independent memory)
 ```
+
+Name a memory by the durable topic, never by a date or review round: `deduplication-phase2-2026-01` records
+when someone worked, which is chronology this store excludes.
 
 ### Which store, before what to write
 
@@ -168,50 +172,23 @@ lacks it.
 
 ### The body states the present, not a history
 
-The frontmatter constrains metadata; these rules constrain what a reader actually loads.
+This store is a cache of current truth, read top-down under a context budget, so the part most likely to be
+read must be the part most likely to be right. (A decision log that exists to show how a position was reached
+is the opposite kind: append-only. Know which kind you are writing into.)
 
-**Correct in place because this store is a cache of current truth, not an audit trail.** The distinction is
-the store's purpose, not a universal rule: a decision log that exists to show how a position was arrived at is
-append-only, and reversing an entry there means adding a new one rather than rewriting the old. A memory store
-read under a context budget is the opposite: the reader loads the top of the file and acts on it, so a
-superseded first paragraph is worse than no file. Know which kind you are writing into before editing it, and
-do not carry one discipline into the other.
-
-**A correction propagates to every memory carrying the same claim, not just the one you are editing.** Search
-the stale claim's distinctive words before you finish, because the sibling that still asserts the old version
-is the one the next session will read. Quote the wrong claim verbatim inside the correction while negating it,
-so a reader who half-remembers it can still find the file that settles it.
-
-- **A memory body describes the present state, not a change log.** If an addition invalidates something already
-  written, rewriting or deleting that passage is part of the same edit. Appending looks like the safe move (it
-  destroys no prior observation) but memories are read top-down under a context budget, so an append-only file
-  becomes a document whose truth value decreases with reading order, and the part most likely to be read is the
-  part most likely to be wrong.
-- **A retraction goes in the lead.** When a task's observations contradict a memory, rewrite its opening line
-  to say so before doing anything else with it. A retraction buried under sixteen dated update markers does not
-  reach a reader who stops after the first paragraph. This is also what makes `status` expendable: if the lead
-  always states current status, nothing depends on a taxonomy maintained separately. A status value that has
-  never taken anything but its default across the whole corpus is decoration to route around, not a filter to
-  trust.
-- **Store the command, never the count.** Never write a figure that moves with the tree: test counts, file
-  counts, lines of code, coverage percentage, dependency totals. It is stale one commit later, and a date stamp
-  cannot protect it: `last-verified` is honest about when someone looked and useless for deciding whether to
-  trust the number today. "The full unit suite is `<command>`, expected to report zero unexpected results"
-  survives every commit that a number does not.
-- **Record the re-verification command verbatim, next to the claim.** A date tells a later reader when someone
-  was satisfied and offers only two options, trust or re-derive; the command makes re-verification a paste.
-  Where the memory records an audit, add the commit or date it covered and the command revealing what has
-  changed since, so a re-audit becomes a diff. This applies past the numbers: an architectural or behavioural
-  claim earns a command too, because it is exactly the kind of claim that stays plausible after it stops being
-  true, and so gets re-read and believed long after a stale count would have been caught.
-- **Name what decays fastest** (line numbers and counts always do) so a reader knows which sentences to
-  re-check. A memory that does not distinguish its durable claims from its perishable ones gets discarded whole
-  once any part is found wrong.
-- **Record what constituted done** for the area: the commands that had to pass, and any non-zero output
-  accepted as normal. That accepted-warning detail is written nowhere else, and without it the next agent reads
-  a pre-existing warning as a fresh regression.
-- Keep historical measurements in the task's evidence report, not the memory body. A memory can link to that
-  report and retain the reproduction command without copying its counts.
+- **Correct in place.** If an addition invalidates something already written, rewriting or deleting that
+  passage is part of the same edit; an append-only memory grows less true with reading order.
+- **A retraction goes in the lead**, before anything else is done with the memory. One buried under dated
+  update markers does not reach a reader who stops after the first paragraph.
+- **A correction reaches every sibling carrying the same claim.** Search the stale claim's distinctive words
+  before finishing, and quote the wrong claim verbatim while negating it, so a reader who half-remembers it
+  finds the file that settles it.
+- **Store the command, never the count.** Test counts, file counts, coverage, and line numbers are stale one
+  commit later, and `last-verified` cannot protect them. Put the re-verification command verbatim next to each
+  claim, behavioural ones included: a claim that stays plausible after it stops being true is the one most in
+  need of a command. Historical measurements belong in the task's evidence report.
+- **Record what constituted done**: the commands that had to pass, and any non-zero output accepted as normal.
+  Without the accepted-warning detail, the next agent reads a pre-existing warning as a fresh regression.
 
 ### Editing hygiene
 
@@ -255,15 +232,6 @@ the day either changes, and the copy is what the next session reads. Give the do
 that fetches it. Where a project's own docs already restate such a policy, say so in the memory: the restating
 sites are the ones that go stale, and nothing else records that they exist.
 
-### Which memories to read
-
-| Task type | Priority |
-|---|---|
-| Investigation | `{domain}-patterns`, `architecture-*`, `{project}-conventions` |
-| Implementation | `{feature}-patterns`, `{language}-conventions`, `testing-patterns` |
-| Review | `{project}-conventions`, `code-quality-*`, `architecture-*` |
-| Refactoring | `architecture-*`, `{component}-patterns`, `testing-patterns` |
-
 ### The corpus as a graph, not a list
 
 At small scale a flat set is fine, because listing it is cheap. Past a few dozen memories, an agent that must
@@ -284,9 +252,8 @@ linked from it, and leaf memories reached by traversal rather than by scanning t
   the linking entry that gathers them, not to add another leaf. A cluster held together only by a shared
   filename prefix is not a graph.
 
-The task-type table above is the selection heuristic for a flat corpus or when no root exists; the graph is how
-a corpus is navigated once one does. Where both apply, start at the root and let the task type decide which
-branches to follow.
+Without a root, select by task type as execution-workflow's Analyze step describes; with one, start at the
+root and let the task type decide which branches to follow.
 
 ### Staleness, checked lazily
 
@@ -322,16 +289,11 @@ For a memory whose value is mixed, preserve the verified claims and replace stal
 which earlier claim the correction negates and which sections remain unverified; do not retain a stale
 statement as current guidance beneath a banner.
 
-A rename reaches only whoever consults the index next. It leaves nothing for the session that already loaded
-the old memory, and nothing for the memories citing it, so **the superseding memory names the old one and
-states what it wrongly claimed.** Recording the wrong claim, not just the name, is what lets a reader match it
-against what they remember reading. Where the old claim is likely to be re-derived from the same code, keep it
-visible with its correction and date rather than deleting it: a silently overwritten memory means the next
-session re-derives the superseded claim, reaches the same wrong conclusion, and has no way to know it has been
-here before. This holds with particular force for a recorded rejection
-("we evaluated this and decided
-against it"), which is stored with its reasoning, not just its verdict, because a rejection goes stale when its
-premise is invalidated even though its conclusion still sounds right.
+A rename reaches only whoever consults the index next, so **the superseding memory names the old one and
+states what it wrongly claimed.** Where the old claim is likely to be re-derived from the same code, keep it
+visible with its correction rather than deleting it, or the next session reaches the same wrong conclusion
+with no sign it has been here before. A recorded rejection keeps its reasoning, not just its verdict: it goes
+stale when its premise is invalidated, even though its conclusion still sounds right.
 
 When several small memories cover related topics, merge them into one.
 
@@ -340,9 +302,6 @@ When several small memories cover related topics, merge them into one.
 - When prior project knowledge could affect the task, check `list_memories` once. For authorized persistence,
   use `edit_memory` for an existing topic and `write_memory` only for a genuinely new one.
 - Never `delete_memory` without an explicit user request.
-- Never read an entire code file when symbol operations would do.
-- Never update symbol references by hand when `rename_symbol` exists.
-- Start `get_symbols_overview` at depth 0 and increase only if needed.
 
 ## Extending Serena to a new language
 

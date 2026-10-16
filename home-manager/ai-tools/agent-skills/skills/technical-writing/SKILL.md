@@ -11,10 +11,10 @@ apply the language-specific conventions, and for book chapters or serials layer 
 ruleset on top. The general prose mechanics below apply to any human-facing writing, not only the article
 types; reach for them alone when revising a report, a PR/issue body, or documentation prose.
 
-This skill governs drafting new text. To rewrite existing AI-generated Japanese, load only the `yomiyasu`
-skill and do not apply this skill's Japanese ruleset in the same pass: the two disagree where a rewrite
-must keep the source's negation as is (「AではなくB」 below asks for added grounds). The Japanese ruleset
-below stays the standard for drafting.
+This skill governs drafting. Japanese prose then gets a separate revision pass with the `yomiyasu` skill,
+and cold-read tests the result before it is completed or published. Do not apply this skill's Japanese
+ruleset during the yomiyasu pass: the two disagree where a rewrite must keep the source's negation as is
+(「AではなくB」 below asks for added grounds), and in that pass yomiyasu decides.
 
 ## General prose mechanics
 

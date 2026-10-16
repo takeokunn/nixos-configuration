@@ -118,8 +118,7 @@ JS/TS, Hypothesis for Python.
 
 ### Snapshots for complex output
 
-Component rendering, serialized structures, CLI output. Vitest 4.x supports visual regression via Browser Mode.
-Vitest is preferred for new JS/TS projects; Jest remains supported.
+Component rendering, serialized structures, CLI output.
 
 ## Fixtures
 
@@ -410,14 +409,6 @@ assuming the helper leaves the tree usable.
 application logging, becomes noise the team mutes, and at that point detects nothing. Classify fatal signals
 explicitly (uncaught exceptions, unhandled rejections, named fatal error classes) and let non-fatal logging
 pass.
-
-## Never
-
-- Test implementation details instead of observable behavior.
-- Over-mock: excessive mocking usually indicates a design problem. Use real implementations where practical.
-- Leave a test non-deterministic. Control time, randomness, and async explicitly.
-- Let tests depend on execution order or shared state.
-- Use AI merely to *run* tests while neglecting case design: design coverage first, then run.
 
 ## Related
 

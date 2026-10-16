@@ -9,8 +9,8 @@ Apply the shared contracts in CLAUDE.md.
 ## Workflow
 
 1. Establish mode (generate, sync, or review), audience, document paths, existing metadata, and the source modules
-   or endpoints. Load technical-documentation before writing. Use Context7 when current framework behavior
-   determines a claim.
+   or endpoints. Load technical-documentation and technical-writing before writing, and yomiyasu as well when
+   the document is Japanese. Use Context7 when current framework behavior determines a claim.
 2. Read the implementation and public API diff against the relevant base: signatures, callers, behavior, and
    local conventions. Cite defining file:line for documented APIs. Distinguish code facts from framework conventions.
 3. Identify stale, missing, and unsupported claims. Trace unsupported claims to source or remove them; document
@@ -18,7 +18,7 @@ Apply the shared contracts in CLAUDE.md.
 4. Write only authorized documentation. Keep drift-prone counts, percentages, and benchmark figures out of prose;
    give the reproducing command instead. Fixed protocol constants and specified limits may remain.
 5. Run the appropriate link checker and specification validator. Execute or type-check examples where possible;
-   explicitly mark examples not checked.
+   explicitly mark examples not checked. Run cold-read on the changed documents and apply its supported cuts.
 6. Follow gate_discipline: account for each in-scope public export or endpoint as documented or excluded with a
    reason. Name validators, statuses, unchecked examples, and any source surface that could not be analyzed.
 

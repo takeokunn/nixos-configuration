@@ -38,7 +38,9 @@ Do not repeat an explanation already given in the conversation, and never write 
 
 ## Remove from replies and written files
 
-Delete any word or sentence whose removal loses no information. In English:
+Delete any word or sentence whose removal loses no information. Where filler stood in for a fact, state the
+fact: "Overall, this significantly improves robustness" becomes "The retry loop now stops after three failures."
+In English, remove:
 
 - Announcements and closing restatements: "In this section", "Overall", "In summary", "It is worth noting".
 - Intensifiers and self-praise with nothing behind them: "robust", "comprehensive", "seamless",

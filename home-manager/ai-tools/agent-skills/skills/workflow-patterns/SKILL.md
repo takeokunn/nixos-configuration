@@ -99,10 +99,8 @@ Every entry states an **observable** unmet condition: something a reader could c
 a quality to be rated. If two entries could each independently block, they are separate entries, not one weighted
 score.
 
-This replaced a numeric-weight scheme in which every weight came from the same handful of values and every gate
-used an identical threshold, which is what a set of numbers looks like when nothing ever reads them. Two things
-were wrong with it: the score was produced by the same pass that produced the work being scored, so it never
-contradicted that work and no gate ever fired; and the arithmetic displaced the judgement it was meant to
+Do not use numeric weights or scores for these criteria. A score produced by the same pass that produced the
+work never contradicts that work, so no gate fires, and the arithmetic displaces the judgement it was meant to
 encode: **an agent that computes 80.5 has not thought about whether it read the right files.**
 
 ## Escalations
@@ -166,12 +164,10 @@ Nothing resolves a reference automatically. Register a skill dependency as a row
 table, naming **the condition that fires the load**: "Writing or evaluating tests", "Any Serena memory or
 symbol operation", not a taxonomy the skill belongs to. A category label cannot fire; a condition can.
 
-This replaced a `refs` block with `use="patterns|tools|workflow|domain"` attributes and an
-`inherits="skill#anchor"` attribute for composing one file out of another's sections. Both were markup nothing
-ever read: the referenced body never entered the context, so an agent applied whatever the referencing file
-happened to restate, and the reference itself was decoration that read as if it were content. A trigger row
-plus an explicit Skill call is checkable: either the call appears in the transcript, or the content was never
-there.
+Do not compose a file from another's sections with reference markup (`refs`, `inherits="skill#anchor"`): the
+referenced body never enters the context, so the agent applies only what the referencing file restates. A
+trigger row plus an explicit Skill call is checkable: either the call appears in the transcript, or the
+content was never there.
 
 Scale the preamble to the work. A memory read that returns nothing useful still costs a round trip before any
 work starts, so a lookup-shaped task reads the index and stops there.

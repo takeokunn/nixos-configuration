@@ -35,10 +35,9 @@ from a sentence that genuinely contrasts two things. The intensifier row fires o
 most hits are not defects. Three buckets, only the last a finding:
 
 - The rule quoting its own subject, covered in the next section.
-- A domain term of art, where the word carries a technical meaning no synonym replaces. "Robust to a single
-  outlier" is a statistics term in `performance-benchmarking/SKILL.md`, "robust selectors" is an established
-  test-automation term in `agents/test.md`, and "exited successfully" beside the exit status it reports is a
-  fact. None stand in for evidence.
+- A domain term of art, where the word carries a technical meaning no synonym replaces: "robust standard
+  errors" in statistics, or "exited successfully" beside the exit status it reports. Neither stands in for
+  evidence.
 - The word asserting quality with nothing behind it: "Successfully implemented a robust solution", or a
   self-description like "provides a comprehensive methodology".
 
@@ -71,7 +70,7 @@ output_discipline names these shapes; this section is how to find them in writte
 caller already establishes the invariant. Not lexically detectable in general, since reachability is a property
 of the call sites, not the branch's text, but two shapes are: a guard duplicating a check the immediately
 enclosing scope already performed, and a `catch ($E) { throw $E; }` (or language equivalent) that adds nothing
-over letting the exception propagate. Use the ast-grep skill to match catch-and-rethrow structurally, since
+over letting the exception propagate. Use the `ast-grep` CLI to match catch-and-rethrow structurally, since
 spacing and variable name vary per call site.
 
 **Abstraction introduced for a second case that does not exist.** An interface, strategy, or plugin point with
@@ -83,7 +82,7 @@ or test seam before proposing inlining; do not invent a second implementation to
 **Docstring restating the signature.** A docstring fully recoverable from the function name, parameter names, and
 types in the signature, adding no WHY (a constraint, an invariant, a caller-facing gotcha) the signature can't
 show. Read the docstring against the signature side by side and name the information it adds; repeated
-identifiers alone do not establish redundancy. The ast-grep skill can locate all docstrings of a node kind for
+identifiers alone do not establish redundancy. The `ast-grep` CLI can locate all docstrings of a node kind for
 batch review; the restates-or-explains judgment stays manual.
 
 **Scaffolding standing in for the work.** A function body that is a stub, a hardcoded return dressed as computed
@@ -100,7 +99,7 @@ nor a necessary precondition.
 
 **A cast that launders a type.** An escape-type cast (`any`, `interface{}`, `Object`, a raw pointer) or a
 widen-then-narrow pair asserts what no check established. List the cast nodes in the changed code with the
-ast-grep skill and name the invariant that makes each true; where none can be named, replace the cast with a
+`ast-grep` CLI and name the invariant that makes each true; where none can be named, replace the cast with a
 check or a correctly typed source.
 
 **A compatibility path with no contract.** A shim, alias, retry, or fallback branch needs a shipped consumer
@@ -132,5 +131,5 @@ code does, what fact or behavior is missing or wrong, and the specific replaceme
   reader's judgment rather than a pattern match, or when a full document needs a fresh read after this audit.
 - [technical-writing](../technical-writing/SKILL.md): the Japanese LLM-tell token list and prose-quality rules
   this skill does not restate.
-- ast-grep: structural matching for the code-artifact shapes above where a text pattern would miss or
-  overmatch, if that skill is available in this environment.
+- `ast-grep` (CLI): structural matching for the code-artifact shapes above where a text pattern would miss or
+  overmatch.

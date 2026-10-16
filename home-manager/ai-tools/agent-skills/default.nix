@@ -1,6 +1,5 @@
 {
   anthropic-skills,
-  ast-grep-skill,
   paredit-cli-skills,
   aitools-skills,
   yomiyasu-skill,
@@ -13,10 +12,6 @@
   programs.agent-skills.sources.custom.filter.maxDepth = 1;
   programs.agent-skills.sources.anthropic.path = anthropic-skills;
   programs.agent-skills.sources.anthropic.subdir = "skills";
-  programs.agent-skills.sources."ast-grep".path = ast-grep-skill;
-  programs.agent-skills.sources."ast-grep".subdir = "ast-grep/skills";
-  # The source also ships an `outline` skill; only the ast-grep rule-writing skill is kept.
-  programs.agent-skills.sources."ast-grep".filter.nameRegex = "ast-grep";
   programs.agent-skills.sources."paredit-cli".path = paredit-cli-skills;
   programs.agent-skills.sources."paredit-cli".subdir = "skills";
   programs.agent-skills.sources."aitools".path = aitools-skills;
@@ -33,7 +28,6 @@
   # invocation record is not proof of no use, including bodies read without a Skill tool call.
   programs.agent-skills.skills.enableAll = [
     "custom"
-    "ast-grep"
     "paredit-cli"
     "aitools"
   ];

@@ -54,7 +54,6 @@ nixpkgs.lib.nixosSystem {
           llm-agents
           guard-and-guide
           anthropic-skills
-          ast-grep-skill
           paredit-cli-skills
           aitools-skills
           yomiyasu-skill

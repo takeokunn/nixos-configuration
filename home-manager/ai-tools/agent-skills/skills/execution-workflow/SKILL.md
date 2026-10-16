@@ -50,7 +50,10 @@ returned report for evidence the agent did the work rather than refused it polit
 Dispatch independent tasks together using the runtime's agent tools. Size the fan-out by the independent subtasks
 found above: comparing alternatives usually needs two to four agents; a wider fan-out suits only a broad survey
 of independent parts. Give each concurrent writer a unique scratch path inside its assigned project or worktree;
-do not create a worktree without authorization.
+do not create a worktree without authorization. The Agent tool's `isolation: "worktree"` creates one and pins
+the agent to it, so Edit refuses the existing worktree you meant it to change; omit `isolation` for work on an
+existing checkout. When Edit refuses, an agent that writes the file through a shell command instead has evaded
+a boundary, not fixed it.
 
 ### Consolidate
 
@@ -305,17 +308,6 @@ The gap between tiers is real risk, not bookkeeping: bugs surviving extensive lo
 caught only by a full clean-environment run.
 
 ## Code review
-
-Four passes, in this order, because addressing style while functionality is broken wastes the review:
-
-1. **Initial scan**: syntax, typos, missing imports, obvious logic errors, style violations.
-2. **Deep analysis**: algorithm correctness, edge cases, error-handling completeness, resource management.
-3. **Context**: breaking changes to public APIs, side effects on existing behavior, dependency compatibility.
-4. **Standards**: naming, documentation, test coverage.
-
-Evaluate across correctness, security (input validation, authn/authz, sanitization, secrets), performance
-(algorithmic cost, resource usage, leaks, N+1), maintainability (naming, single responsibility, DRY), and
-testability.
 
 Categorize findings by what the reader must do: **critical**: security, data corruption, breaking changes, must
 fix before merge; **important**: logic errors, missing error handling, performance, should fix; **suggestion**:

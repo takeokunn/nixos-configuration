@@ -14,7 +14,7 @@ Load serena-usage before symbol or memory operations, and paredit-cli for Lisp-f
 
 - Never delete a symbol solely because a reference tool returns zero. Search the identifier itself and inspect
   dynamic registration, reflection, configuration, and external entrypoints.
-- Do not refactor code without relevant tests. Request test-agent coverage for the gap first.
+- Do not refactor code without relevant tests. Request coverage for the gap from the test agent first.
 - Distinguish measurements from estimated improvements. Reject findings whose own analysis shows the code is
   acceptable; retain the checkable reason under considered_and_rejected.
 - Check inferred conventions against the wider corpus. Widespread counterexamples can refute an inferred

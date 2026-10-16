@@ -398,7 +398,7 @@ nix build .#packages.aarch64-linux.<pkg> \
 Add `--option narinfo-cache-negative-ttl 0` only when a stale negative cache hides a now-available path.
 Do not advertise Linux in a Darwin daemon's `extra-platforms` merely to fetch cached outputs: that setting
 declares build capability. Cache misses require a capable builder, and every required substituter must be
-configured and trusted. See the [Nix configuration reference](https://nix.dev/manual/nix/2.35/command-ref/conf-file.html).
+configured and trusted. See the [Nix configuration reference](https://nix.dev/manual/nix/latest/command-ref/conf-file.html).
 
 For large closures, build on native CI and let the Mac substitute the finished closure. Building a big `*-linux`
 closure on a virtiofs-overlay store can churn the store hard enough to lose store-path visibility mid-build, an
@@ -484,14 +484,8 @@ behavior; Nix just makes the multicall layout the norm.
 
 ## Rules
 
-- Verify `flake.lock` is updated after any input change.
-- Use `mkIf` and `mkMerge` for conditional module options, never a plain `if` at top level. Prefer `lib.mkDefault`
-  to `lib.mkForce`.
-- Set `home.stateVersion` to the initial version and do not change it after setup unless migrating.
-- Always provide a hash to `fetchurl` / `fetchTarball`; use `nix-prefetch-url` or `lib.fakeHash` to obtain it.
-- Avoid `with lib;` at module top level: it pollutes scope and hides where functions come from. Use explicit
-  `lib.mkIf`, `lib.types.str`. Narrow scopes like `with pkgs; [ ... ]` are fine.
-- Prefer declarative configuration to `nix-env -i`, `nix-channel`, and other mutable `/nix/var` state.
+- Avoid `with lib;` at module top level: it hides where functions come from. Narrow scopes like
+  `with pkgs; [ ... ]` are fine.
 - Document non-obvious overlay and override rationale in a comment: this is one of the cases where a comment
   carries a WHY the code cannot.
 

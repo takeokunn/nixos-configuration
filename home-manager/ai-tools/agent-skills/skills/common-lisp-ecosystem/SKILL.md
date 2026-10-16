@@ -215,6 +215,13 @@ root, since the worktree directory does not contain them.
 If a stall survives switching to `:directory`, the traversal source may be the implementation's own
 wrapping registry rather than your configuration; see ASDF plan-layer hang triage below.
 
+**Load the workspace, not a published build.** A development environment can pre-register a store copy of the
+system under test, and a benchmark or test then compiles that copy while the edits sit unread. Register the
+workspace root as a `:directory` entry (Register directories, not trees), then run
+`(asdf:clear-system "proj")`, `(asdf:load-asd #p"/abs/workspace/proj.asd")`, and
+`(asdf:load-system "proj" :force t)`, and assert that `(asdf:system-source-file "proj")` and the compiled
+output paths lie inside the workspace.
+
 ## ASDF system definition pitfalls
 
 Recurring traps when defining a library system plus its test system in a `.asd` file:
@@ -503,68 +510,20 @@ correct macro's expansion evaluates that form exactly once.
 
 ## SBCL operations
 
-Operational guidance for running, debugging, profiling, and shipping SBCL programs: invocation modes, ASDF
-loading, the specific ways a compile or load can hang silently, subprocess/thread contracts that differ from
-the textbook expectation, and coverage-measurement biases.
+### Invocation and debugging defaults
 
-### Invocation modes
-
-- **REPL** (`sbcl`, `sbcl --noinform`): interactive exploration. Reproduce a failure here first, then
-  minimize the input.
-- **Script** (`sbcl --script tools/task.lisp`): batch/CI execution. Design explicit exit codes; wrap
-  top-level failures with `handler-case` + `sb-ext:exit`.
-- **Load/eval**: one-liner load-and-run for CI or local automation:
-  ```bash
-  sbcl --non-interactive \
-    --eval '(require :asdf)' \
-    --eval '(asdf:load-system :my-app)' \
-    --eval '(my-app:main)'
+- Run batch and CI work with `--non-interactive` (or `--script`, with explicit exit codes via `sb-ext:exit`) so
+  a debugger prompt cannot hang the job. Do not pass `--disable-debugger` while investigating a single
+  failure; reserve it for the Headless verification harness below.
+- After `asdf:load-system` fails, read the *first* ASDF failure; the later ones are usually its consequences.
+- Wrap a failing operation in `restart-case` so the debugger can continue or retry from the failure with the
+  condition intact; a bare `handler-case` discards the condition and the stack it was raised on:
+  ```lisp
+  (restart-case
+      (dangerous-op x)
+    (use-default () :report "fallback value" 0)
+    (retry () :report "retry operation" (dangerous-op x)))
   ```
-  Prefer `--non-interactive` in CI so a prompt cannot hang the job. Move complex startup logic into a
-  `--script` file for maintainability.
-- **Core control** (`sbcl --core my.core`, `--disable-debugger --non-interactive`): do not disable the
-  debugger while actively investigating a single failure; reserve it for the batch harness described below.
-
-### ASDF workflow
-
-```lisp
-(require :asdf)
-(asdf:load-system :my-app)
-```
-Validate `load-system` success before deeper debugging, and read the *first* ASDF failure carefully:
-chasing secondary errors wastes time. For tests:
-```bash
-sbcl --non-interactive --eval '(require :asdf)' --eval '(asdf:test-system :my-app/test)'
-```
-Prefer Qlot for dependency reproducibility (`qlot install`, then `qlot exec sbcl ...`) to cut local-vs-CI
-drift.
-
-### Debugging workflow
-
-Reproduce → observe → hypothesize → fix and verify:
-
-1. **Reproduce**: fix the execution mode first, then strip inputs/environment to a minimal failing case.
-2. **Observe**: inspect the debugger backtrace and stack frames, `describe`/`inspect` the problem objects,
-   and `trace` the call path:
-   ```lisp
-   (trace my-app::parse-input)
-   (untrace my-app::parse-input)
-   (describe some-object)
-   (inspect some-object)
-   ```
-3. **Hypothesize**: define an observable signal per hypothesis and use step/break/log checks to prove or
-   reject it one at a time.
-4. **Fix and verify**: re-run the *same* reproduction command after the fix, and add a test that preserves
-   the failure case.
-
-Use `restart-case` to keep diagnosing while preserving continuity, instead of a bare `handler-case` that
-swallows the condition:
-```lisp
-(restart-case
-    (dangerous-op x)
-  (use-default () :report "fallback value" 0)
-  (retry () :report "retry operation" (dangerous-op x)))
-```
 
 ### Compile/load hang triage
 
@@ -708,7 +667,8 @@ the failing combined case. Keep diagnostic isolation complete, including the boo
 the launcher itself with a run-owned directory inside the authorized worktree; do not repurpose `HOME` or clear
 another run's cache.
 
-**Bound timeout with a kill grace.** When using coreutils `timeout(1)`, always pass a kill grace:
+**Bound timeout with a kill grace.** Wherever coreutils `timeout(1)` is available (Nix builds and CI; it is not
+on this machine's interactive PATH, where the tool's own timeout bounds the call), pass a kill grace:
 `timeout -k 10s <limit>s <command>`. Do not use `--foreground` for noninteractive test jobs:
 [GNU Coreutils](https://www.gnu.org/s/coreutils/manual/html_node/timeout-invocation.html) documents that its
 children are not timed out in that mode. Descendants that escape the managed process group still need
@@ -939,9 +899,7 @@ Always define explicit process exit codes, and validate ASDF load and tests befo
 - **SLY**: prefer SLY over SLIME in this environment, assume sly/sly-asdf/sly-macrostep workflows for Emacs
   integration, and give SLY-compatible guidance when explaining editor actions.
 - **Nix**: `nix shell nixpkgs#sbcl` for reproducible execution; pin project environments via `shell.nix` or
-  `flake.nix`, and combine with Qlot for stronger dependency reproducibility.
-- **Roswell**: `ros install sbcl`, `ros run`, `ros build app.ros` for implementation management and script
-  execution.
+  `flake.nix`.
 
 ## Related
 
@@ -951,7 +909,7 @@ Always define explicit process exit codes, and validate ASDF load and tests befo
 - [serena-usage](../serena-usage/SKILL.md): navigating CLOS hierarchies, generic functions, and symbol
   definitions.
 - [investigation-patterns](../investigation-patterns/SKILL.md): debugging condition handling, macro
-  expansion, and SBCL-specific issues; the evidence-driven methodology behind the SBCL debugging workflow.
+  expansion, and SBCL-specific issues.
 - [nix-ecosystem](../nix-ecosystem/SKILL.md): pinned SBCL runtime environments with nix shell/flake.
 - [performance-benchmarking](../performance-benchmarking/SKILL.md): benchmark methodology (paired protocols,
   noise floor, interval-based gating) behind the SBCL profiling tools.

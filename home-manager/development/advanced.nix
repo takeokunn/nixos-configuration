@@ -6,12 +6,8 @@
     ./lnav
   ];
 
-  # Duplicate-code detection and the solvers and model checkers named by the formal-methods skill.
+  # Duplicate-code detection.
   home.packages = with pkgs; [
     similarity
-    z3
-    alloy6
-    quint
-    tlaplus
   ];
 }
