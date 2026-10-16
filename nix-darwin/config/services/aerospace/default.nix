@@ -28,7 +28,6 @@ let
     "com.google.Chrome"
     "pl.maketheweb.cleanshotx"
     "io.github.keycastr"
-    "ai.amical.desktop"
   ];
 in
 {
