@@ -208,14 +208,12 @@ in
 {
   home.packages = [ codexWrapped ];
 
-  xdg.configFile =
-    agentFileAttrs
-    // {
-      "codex/AGENTS.md" = {
-        source = codexAgents;
-        force = true;
-      };
+  xdg.configFile = agentFileAttrs // {
+    "codex/AGENTS.md" = {
+      source = codexAgents;
+      force = true;
     };
+  };
 
   home.sessionVariables = {
     CODEX_DISABLE_TELEMETRY = "1";
