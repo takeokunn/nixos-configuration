@@ -1,10 +1,19 @@
 {
+  config,
+  pkgs,
+  lib,
   anthropic-skills,
   paredit-cli-skills,
   aitools-skills,
   yomiyasu-skill,
   ...
 }:
+let
+  commandSkills = import ./command-skills.nix { inherit pkgs; };
+
+  # Same expansion as CODEX_HOME in codex/default.nix; the activation environment may not export it.
+  codexSkillsDest = "\${CODEX_HOME:-$HOME/.config/codex}/skills";
+in
 {
   programs.agent-skills.enable = true;
 
@@ -21,6 +30,9 @@
   # bundle excludes the root's tests/, articles/ and evals/.
   programs.agent-skills.sources."yomiyasu".path = yomiyasu-skill;
   programs.agent-skills.sources."yomiyasu".subdir = "skills";
+  programs.agent-skills.sources."commands".path = commandSkills.source;
+  # Without a depth limit discovery also reads each SKILL.md symlink as a directory and fails.
+  programs.agent-skills.sources."commands".filter.maxDepth = 1;
 
   # Installed skill metadata consumes catalog context even when its body is not loaded. Keep broad
   # sources selective; measure the emitted catalog for each client rather than the source inventory.
@@ -39,5 +51,37 @@
     "yomiyasu"
   ];
 
+  # Claude Code and OpenCode serve ai-prompts/commands/ as slash commands, so the same prompts are
+  # skills only for Codex, which has no slash commands.
+  programs.agent-skills.skills.explicit = lib.genAttrs commandSkills.names (_: {
+    from = "commands";
+    agents = [ "codex" ];
+  });
+
   programs.agent-skills.targets.claude.enable = true;
+  programs.agent-skills.targets.codex = {
+    enable = true;
+    dest = codexSkillsDest;
+  };
+  programs.agent-skills.targets.opencode.enable = true;
+
+  # One-shot migration. The sync refuses a non-empty destination without its marker, and Codex's
+  # skills directory used to be filled by home-manager links into the store. Adopt it only when every
+  # file is such a link (or under Codex's own .system): anything else is hand-placed work that the
+  # sync's --delete would remove. The marker fields follow has_valid_marker in agent-skills-nix
+  # scripts/sync.sh at the locked rev. Remove this entry once every host has been activated.
+  home.activation.adoptCodexSkills = lib.hm.dag.entryBetween [ "agent-skills" ] [ "writeBoundary" ] ''
+    codex_skills="''${CODEX_HOME:-$HOME/.config/codex}/skills"
+    codex_marker="$codex_skills/.agent-skills-managed.json"
+    if [ -d "$codex_skills" ] && [ ! -e "$codex_marker" ] && [ -z "''${DRY_RUN:-}" ]; then
+      foreign="$(${pkgs.findutils}/bin/find "$codex_skills" -mindepth 1 -path "$codex_skills/.system" -prune -o ! -type d ! -lname '/nix/store/*' -print -quit)"
+      if [ -z "$foreign" ]; then
+        ${pkgs.jq}/bin/jq -n --arg bundle "${config.programs.agent-skills.targetBundlePaths.codex}" \
+          '{schemaVersion: 1, managedBy: "agent-skills-nix", mode: "global", bundle: $bundle, target: "codex", structure: "symlink-tree"}' \
+          > "$codex_marker"
+      else
+        echo "adoptCodexSkills: not adopting $codex_skills; unmanaged entry: $foreign" >&2
+      fi
+    fi
+  '';
 }

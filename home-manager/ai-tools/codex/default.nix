@@ -3,8 +3,6 @@
   nurPkgs,
   llmAgentsPkgs,
   mcp-servers-nix,
-  aitools-skills,
-  yomiyasu-skill,
   ...
 }:
 let
@@ -13,9 +11,7 @@ let
   shared = import ../shared { inherit lib; };
 
   aiPromptsPath = ../ai-prompts;
-  commandPromptsPath = aiPromptsPath + "/commands";
   agentPromptsPath = aiPromptsPath + "/agents";
-  customSkillsPath = ../agent-skills/skills;
 
   codexRuntimeAdapter = ''
     ## codex_runtime_adapter
@@ -52,13 +48,7 @@ let
     ${builtins.readFile (aiPromptsPath + "/CLAUDE.md")}
   '';
 
-  commandFiles = builtins.readDir commandPromptsPath;
   agentFiles = builtins.readDir agentPromptsPath;
-  skillNames = map (name: lib.removeSuffix ".md" name) (
-    builtins.filter (name: commandFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
-      builtins.attrNames commandFiles
-    )
-  );
   agentNames = map (name: lib.removeSuffix ".md" name) (
     # Codex 0.154.0 role overrides cannot enforce per-agent sandbox or MCP restrictions.
     builtins.filter (
@@ -69,21 +59,6 @@ let
         (shared.parseFrontmatter (builtins.readFile (agentPromptsPath + "/${name}"))).frontmatterLines
     ) (builtins.attrNames agentFiles)
   );
-
-  commandPromptToCodexSkill =
-    skill:
-    let
-      content = builtins.readFile (commandPromptsPath + "/${skill}.md");
-      parsed = shared.parseFrontmatter content;
-      descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
-    in
-    pkgs.writeText "codex-skill-${skill}.md" ''
-      ---
-      name: ${skill}
-      ${descriptionLine}
-      ---
-      ${parsed.body}
-    '';
 
   agentPromptToCodexAgent =
     agent:
@@ -101,16 +76,6 @@ let
       developer_instructions = ${builtins.toJSON parsed.body}
     '';
 
-  skillFileAttrs = builtins.listToAttrs (
-    map (skill: {
-      name = "codex/skills/${skill}/SKILL.md";
-      value = {
-        source = commandPromptToCodexSkill skill;
-        force = true;
-      };
-    }) skillNames
-  );
-
   agentFileAttrs = builtins.listToAttrs (
     map (agent: {
       name = "codex/agents/${agent}.toml";
@@ -120,29 +85,6 @@ let
       };
     }) agentNames
   );
-
-  customSkillDirEntries = builtins.readDir customSkillsPath;
-  customSkillNames = builtins.filter (name: customSkillDirEntries.${name} == "directory") (
-    builtins.attrNames customSkillDirEntries
-  );
-
-  customSkillCollisions = builtins.filter (name: builtins.elem name skillNames) customSkillNames;
-
-  customSkillFileAttrs =
-    if customSkillCollisions != [ ] then
-      throw ''
-        codex: skill name collision between agent-skills/skills/ and ai-prompts/commands/: ${lib.concatStringsSep ", " customSkillCollisions}. Rename the skill directory or the command file so the two do not both resolve to
-        codex/skills/<name>/SKILL.md.''
-    else
-      builtins.listToAttrs (
-        map (name: {
-          name = "codex/skills/${name}/SKILL.md";
-          value = {
-            source = customSkillsPath + "/${name}/SKILL.md";
-            force = true;
-          };
-        }) customSkillNames
-      );
 
   nixMcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {
@@ -267,22 +209,8 @@ in
   home.packages = [ codexWrapped ];
 
   xdg.configFile =
-    skillFileAttrs
-    // agentFileAttrs
-    // customSkillFileAttrs
+    agentFileAttrs
     // {
-      # Only the aitools skill from that source: the agent-skills module's codex target would
-      # install every enabled skill into the directory the attrs above already populate.
-      "codex/skills/aitools/SKILL.md" = {
-        source = aitools-skills + "/skills/aitools/SKILL.md";
-        force = true;
-      };
-      # The whole directory: SKILL.md calls scripts/yomiyasu_lint.py and reads references/.
-      "codex/skills/yomiyasu" = {
-        source = yomiyasu-skill + "/skills/yomiyasu";
-        recursive = true;
-        force = true;
-      };
       "codex/AGENTS.md" = {
         source = codexAgents;
         force = true;
