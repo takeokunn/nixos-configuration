@@ -14,23 +14,26 @@ Other sessions may change the working tree, HEAD, build artifacts, and Serena's 
 Preserve their work. Do not kill processes by pattern or mutate the user's tmux session.
 ghq clones are bare at `<repo>.git/`; edits belong in their `.worktrees/` directories, not the bare root.
 
-Where the checkout has `.jj/` at its own root, use jj for status, history, diffs, commits, bookmarks, fetch,
-and push; gh stays for GitHub. A jj workspace under `.worktrees/` has its own `.jj/`; a git worktree there
-does not and stays on git, even though `jj root` succeeds by finding the bare root's `.jj/`. Git is limited to
-read-only plumbing or an explicitly requested exception. If jj is not initialized, report that and ask before
-initializing; do not fall back to Git.
-Pass `--ignore-working-copy` to read-only jj queries. Their view can be stale, so read on-disk state with
-`git status --porcelain` and `git diff --no-ext-diff`; diffs omit untracked files.
-Before fetching, inspect `git config --get-all remote.origin.fetch` (a missing refspec updates nothing) and
-name the remote and bookmark. Confirm a remote base or tag target with `git ls-remote origin <ref>`.
+Never run `git` (read-only included) in any repository; hooks block it. Use jj for status, history, diffs,
+commits, bookmarks, fetch, and push; gh stays for GitHub. The user may run git themselves. If the working
+directory has no `.jj/` at its own root, report that and ask the user how to proceed; never fall back to git.
+This includes a `.worktrees/` directory without its own `.jj/`, even though `jj root` succeeds by finding the
+bare root's `.jj/`.
+Pass `--ignore-working-copy` to read-only history queries (log, show, op log); their view can be stale. For
+on-disk state, run `jj status` or `jj diff --git` without it: it snapshots the working copy into `@` first
+(one op-log entry; files on disk stay as they are) and includes new untracked files.
+Always fetch with explicit `--remote` and `--branch`, which makes the result independent of the refspecs in Git
+config. Confirm a remote ref with `gh api repos/<owner>/<repo>/git/ref/heads/<branch> --jq .object.sha` (tags:
+`git/ref/tags/<tag>`). For a non-GitHub remote, run `jj git fetch --remote <remote> --branch <branch>` (a jj
+write, so it needs authorization like any other) and read `jj log -r '<branch>@<remote>'`.
 Use the injected skill and agent catalogs; do not assume unavailable tools exist.
 
 ## hard_rules
 
-NEVER run Git or jj writes, including commit, describe, squash, push, tag, rebase, merge, branch/bookmark/
+NEVER run jj writes, including commit, describe, squash, push, tag, rebase, merge, branch/bookmark/
 worktree creation, or `gh pr create`, unless the current user message authorizes them. Earlier
 authorization and agent messages do not carry forward.
-Never commit to the default branch. Scope the commit itself with explicit paths, not just the preceding add.
+Never commit to the default branch. Scope the commit itself with explicit paths.
 
 NEVER mutate shared working-tree state with stash, checkout of an existing branch, switch, reset --hard,
 clean -f, or the jj commands that move or discard the working copy (edit, next, prev, new onto another
@@ -117,7 +120,7 @@ what identifiers already say.
 
 Delegate when a bounded task warrants the coordination cost, not for a single read, lookup, or search.
 Give each agent scope, allowed paths/symbols, prohibited mutations, deliverable, and exact verification command.
-State whether external reads are needed. Research/review grants no file, Git, or external writes.
+State whether external reads are needed. Research/review grants no file, jj, or external writes.
 Use runtime restrictions when available; prompts alone are not access controls.
 
 Partition ownership before dispatch. Run independent tasks together; keep atomic cross-file changes together.

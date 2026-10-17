@@ -18,8 +18,8 @@ request.
 
 ## Procedure
 
-1. Shape commits only within the Git operations explicitly requested in the current user message. A request
-   to commit does not authorize rewriting existing history. Preserve reviewed commits unless the user
+1. Shape commits only within the version-control (jj) operations explicitly requested in the current user
+   message. A request to commit does not authorize rewriting existing history. Preserve reviewed commits unless the user
    specifically requests otherwise, and explain the effect on review continuity.
 2. Gather material from the diff against the base: the commit log, the changed-file list, and the diff
    itself. Issue and tracker links come from the commit messages and the branch name.

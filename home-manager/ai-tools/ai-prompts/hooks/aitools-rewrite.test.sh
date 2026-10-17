@@ -102,22 +102,23 @@ expect_plain 'ls -la home-manager' "aitools find '*' home-manager --depth 1 --no
 expect_plain "find . -name '*.nix' -type f -maxdepth 2" "aitools find '*.nix' . --type file --depth 2 --no-ignore --limit 200"
 expect_plain 'find src -type d' "aitools find '*' src --type dir --no-ignore --limit 200"
 expect_plain 'diff a.txt b.txt' 'aitools diff a.txt b.txt'
-expect_plain 'git status' 'aitools git status'
-expect_plain 'git status -sb' 'aitools git status'
-expect_plain 'git log --oneline -5' 'aitools git log --limit 5'
-expect_plain 'git log -n 3 -- flake.nix' 'aitools git log flake.nix --limit 3'
-expect_plain 'git diff' 'aitools git diff'
-expect_plain 'git diff --cached --stat' 'aitools git diff --staged --output stat'
-expect_plain 'git diff -- flake.nix' 'aitools git diff flake.nix'
-expect_plain 'git show HEAD:flake.nix' 'aitools git show HEAD:flake.nix --max-lines 2000'
-expect_plain 'git blame -L 10,20 flake.nix' 'aitools git blame flake.nix --range 10:20'
+# git is never rewritten: the block-destructive-git hook rejects it.
+expect_plain 'git status' ''
+expect_plain 'git status -sb' ''
+expect_plain 'git log --oneline -5' ''
+expect_plain 'git log -n 3 -- flake.nix' ''
+expect_plain 'git diff' ''
+expect_plain 'git diff --cached --stat' ''
+expect_plain 'git diff -- flake.nix' ''
+expect_plain 'git show HEAD:flake.nix' ''
+expect_plain 'git blame -L 10,20 flake.nix' ''
 expect_plain '  cat flake.nix  ' 'aitools read flake.nix --max-lines 2000'
 expect_plain 'cat 2000' 'aitools read 2000 --max-lines 2000'
 expect_plain 'cat 2000 | head -5' 'aitools read 2000 --range 1:5 --max-lines 5'
 
 # Envelopes: a leading cd, a trailing stderr redirect, a trailing head/tail.
 expect_plain 'cd src && cat a.txt' 'cd src && aitools read a.txt --max-lines 2000'
-expect_plain 'cd ~/repo&&git status' 'cd ~/repo&&aitools git status'
+expect_plain 'cd ~/repo&&git status' ''
 expect_plain 'cat x 2>&1' 'aitools read x --max-lines 2000 2>&1'
 expect_plain 'cat x 2>/dev/null' 'aitools read x --max-lines 2000 2>/dev/null'
 expect_plain 'cat flake.nix | head -20' 'aitools read flake.nix --range 1:20 --max-lines 20'
@@ -140,8 +141,8 @@ expect_plain 'ls .config' "aitools find '*' .config --depth 1 --no-ignore --glob
 expect_plain 'cd .github && ls' "cd .github && aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain 'ls -l' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_plain "find . -name '*.nix' | head -5" "aitools find '*.nix' . --no-ignore --limit 5"
-expect_plain 'git log --oneline | head -5' 'aitools git log --limit 5'
-expect_plain 'git show HEAD:f | head -30' 'aitools git show HEAD:f --max-lines 30'
+expect_plain 'git log --oneline | head -5' ''
+expect_plain 'git show HEAD:f | head -30' ''
 expect_plain 'grep -rn foo . 2>/dev/null | head -5' 'aitools search foo . --context 0 --limit 5 --no-ignore 2>/dev/null'
 expect_plain 'cd src && grep -rn foo . 2>&1 | head -5' 'cd src && aitools search foo . --context 0 --limit 5 --no-ignore 2>&1'
 

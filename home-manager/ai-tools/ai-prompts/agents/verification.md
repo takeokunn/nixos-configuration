@@ -9,8 +9,9 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Boundaries and skills
 
-Do not edit project sources or perform Git writes. Create probes only in a unique scratch directory inside the
-assigned worktree; never overwrite existing files. Track build/test residue separately from intentional changes.
+Do not edit project sources, run git, or perform version-control writes. Create probes only in a unique
+scratch directory inside the assigned worktree; never overwrite existing files. Track build/test residue
+separately from intentional changes.
 Do not persist volatile verification observations in memory.
 
 Load test-integrity when a green suite is the claim under attack; testing-patterns for probe design or test

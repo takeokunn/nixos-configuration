@@ -1,6 +1,6 @@
 #!/bin/bash
 # PreToolUse:Bash hook that rewrites a read-only shell command (cat, head, tail, sed -n, grep, rg,
-# ls, find, fd, tree, wc -c, jq, diff, and the reading git sub-commands) into the equivalent
+# ls, find, fd, tree, wc -c, jq, diff) into the equivalent
 # `aitools` call, so the model gets aitools' JSON with line numbers, hashes, and next_commands
 # instead of raw text.
 #
@@ -74,7 +74,7 @@ my @words = split_words($body) or exit 0;
 my %ctx = (cd_dir => $cd_dir, hidden_cwd => under_dot_directory($cwd));
 my @rewritten = rewrite(\%ctx, @words) or exit 0;
 if ($filter) {
-  @rewritten = apply_filter($filter, \@words, @rewritten) or exit 0;
+  @rewritten = apply_filter($filter, @rewritten) or exit 0;
 }
 my $new = $prefix . join(' ', map { quote($_) } 'aitools', @rewritten) . $redirect;
 
@@ -112,7 +112,7 @@ sub split_envelope {
 # Folds a trailing `| head -N` or `| tail -N` into the rewrite. Only where aitools can express the
 # same cut: its first N lines, results, or commits for head; the last N lines of a file for tail.
 sub apply_filter {
-  my ($filter, $words, @args) = @_;
+  my ($filter, @args) = @_;
   my ($kind, $n) = @$filter;
   my %has = map { $_ => 1 } grep { /\A--/ } @args;
   my $sub = $args[0];
@@ -133,11 +133,6 @@ sub apply_filter {
     # tree prints a root line and nests its entries, so its first N lines are not N entries.
     return () if value_of('--output', @args) eq 'tree';
     return limit_to($n, '--limit', @args);
-  }
-  if ($sub eq 'git') {
-    # Without --oneline a commit spans several lines, so head's N lines are fewer than N commits.
-    return limit_to($n, '--limit', @args) if $args[1] eq 'log' && grep { $_ eq '--oneline' } @$words;
-    return limit_to($n, '--max-lines', @args) if $args[1] eq 'show';
   }
   return ();
 }
@@ -216,7 +211,7 @@ sub rewrite {
   my %table = (
     cat => \&rw_cat, head => \&rw_head, tail => \&rw_tail, sed => \&rw_sed,
     grep => \&rw_grep, ls => \&rw_ls, find => \&rw_find, diff => \&rw_diff,
-    git => \&rw_git, wc => \&rw_wc, jq => \&rw_jq,
+    wc => \&rw_wc, jq => \&rw_jq,
     # These add the hidden-entry globs, whose fit depends on the `cd DIR &&` envelope.
     rg => sub { rw_rg($ctx, @_) }, fd => sub { rw_fd($ctx, @_) }, tree => sub { rw_tree($ctx, @_) },
   );
@@ -663,58 +658,6 @@ sub rw_diff {
   my @args = grep { $_ ne '-u' } @_;
   return () unless @args == 2 && operand($args[0]) && operand($args[1]);
   return ('diff', @args);
-}
-
-sub rw_git {
-  my ($sub, @args) = @_;
-  return () unless defined $sub;
-  if ($sub eq 'status') {
-    return () if grep { !/\A(?:-s|--short|-sb|-b|--branch)\z/ } @args;
-    return ('git', 'status');
-  }
-  if ($sub eq 'log') {
-    my ($limit, $path) = (20, undef);
-    while (@args) {
-      my $a = shift @args;
-      if ($a eq '--oneline') { next }
-      elsif ($a eq '-n') { $limit = shift @args; return () unless defined $limit && count($limit) }
-      elsif ($a =~ /\A-n?([0-9]+)\z/) { $limit = $1; return () unless count($limit) }
-      elsif ($a eq '--') { $path = shift @args; return () unless operand($path) && !@args }
-      else { return () }
-    }
-    return ('git', 'log', (defined $path ? ($path) : ()), '--limit', $limit);
-  }
-  if ($sub eq 'diff') {
-    my (@flags, $path);
-    while (@args) {
-      my $a = shift @args;
-      if ($a eq '--staged' || $a eq '--cached') { push @flags, '--staged' }
-      elsif ($a eq '--stat') { push @flags, '--output', 'stat' }
-      elsif ($a eq '--') { $path = shift @args; return () unless operand($path) && !@args }
-      else { return () }
-    }
-    return ('git', 'diff', (defined $path ? ($path) : ()), @flags);
-  }
-  if ($sub eq 'show') {
-    return () unless @args == 1 && $args[0] =~ /\A[^-:\s][^:\s]*:[^:\s]+\z/;
-    return ('git', 'show', $args[0], '--max-lines', '2000');
-  }
-  if ($sub eq 'blame') {
-    my ($range, @paths);
-    while (@args) {
-      my $a = shift @args;
-      if ($a eq '-L') {
-        my $v = shift @args // return ();
-        my ($s, $e) = split /,/, $v, 2;
-        return () unless defined $e && count($s) && count($e) && $e >= $s;
-        $range = "$s:$e";
-      } elsif (operand($a)) { push @paths, $a }
-      else { return () }
-    }
-    return () unless @paths == 1;
-    return ('git', 'blame', $paths[0], (defined $range ? ('--range', $range) : ()));
-  }
-  return ();
 }
 PERL
 

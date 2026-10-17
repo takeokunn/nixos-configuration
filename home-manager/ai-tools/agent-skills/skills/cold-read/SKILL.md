@@ -48,7 +48,7 @@ script to apply verbatim.
     conversation, task, or commits that produced it. Audience to embody: {audience line}.
 
     Read: {paths}. You may read other repository files to verify claims, but read no
-    git history and, unless a diff is listed above, no diffs.
+    version-control history and, unless a diff is listed above, no diffs.
 
     Report three lists with file:line spans:
     1. Probe: what is each artifact for, and what would you do differently because

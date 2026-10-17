@@ -37,21 +37,67 @@ expect_allow() {
   [[ ! -s $stderr_file ]] || fail "allow for [$1] wrote to stderr: $(cat "$stderr_file")"
 }
 
-# git: the pre-existing rules.
+# git: every invocation blocks, read-only ones included.
+expect_block 'git status'
+expect_block 'git'
+expect_block 'git --version'
+expect_block 'git --help'
 expect_block 'git stash'
-expect_block 'git stash push -m wip'
-expect_block 'git switch main'
-expect_block 'git reset --hard HEAD~1'
-expect_block 'git clean -fd'
-expect_block 'git checkout main'
-expect_block 'bash -c "git stash"'
+expect_block 'git stash list'
+expect_block 'git reset --soft HEAD~1'
+expect_block 'git checkout -b feat/x'
+expect_block 'git commit -m "no verify needed"'
+expect_block 'git -c color.ui=never log'
+expect_block 'git -C . log'
+expect_block '/usr/bin/git log'
 expect_block 'cd repo && git -C . switch main'
-expect_allow 'git stash list'
-expect_allow 'git reset --soft HEAD~1'
-expect_allow 'git checkout -b feat/x'
-expect_allow 'git checkout -- flake.nix'
-expect_allow 'git status'
-expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 git stash'
+expect_block 'echo ok; git status'
+expect_block 'git $(echo status)'
+expect_block 'git $SUB'
+expect_block 'git log $(git merge-base HEAD main)..HEAD'
+expect_block 'bash -c "git diff"'
+expect_block 'bash -c "git stash"'
+expect_block 'sudo git status'
+expect_block 'env git status'
+expect_block 'nohup git status'
+expect_block 'xargs git log'
+expect_block 'eval git status'
+expect_block 'command git status'
+expect_block 'aitools git status'
+expect_block 'aitools --workspace . git log'
+expect_block 'aitools run -- git status'
+expect_block 'aitools bg start -- /usr/bin/git fetch'
+# Reserved words and wrapper options that precede the command.
+expect_block '! git status'
+expect_block 'if true; then git status; fi'
+expect_block 'for i in 1; do git log; done'
+expect_block 'while true; do git log; done'
+expect_block '{ git status; }'
+expect_block 'env -u X git log'
+expect_block 'env --unset X git log'
+expect_block 'env -C . git log'
+expect_block 'sudo -u x git log'
+expect_block 'sudo --user=x git log'
+expect_block 'sudo --user x git log'
+expect_block 'sudo -u x -g y git log'
+expect_block '! jj undo'
+expect_block 'if true; then jj undo; fi'
+expect_block 'command git status'
+# command -v/-V only print a path.
+expect_allow 'command -v git'
+expect_allow 'command -V git'
+# The override is for the jj verdicts; it never unblocks git.
+expect_block 'ALLOW_DESTRUCTIVE_GIT=1 git status'
+expect_block 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 git status'
+expect_block 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; git status'
+expect_block 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "git status"'
+expect_block 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 git status"'
+expect_allow 'echo git'
+expect_allow 'rg -n "git status" docs'
+expect_allow 'gitleaks git --config x'
+expect_allow 'aitools read git'
+expect_allow 'aitools search git src'
+expect_allow $'cat <<EOF\ngit status\nEOF'
 
 # jj: commands that rewrite the shared working copy.
 expect_block 'jj edit abc'
@@ -60,6 +106,11 @@ expect_block 'jj prev --edit'
 expect_block 'jj abandon'
 expect_block 'jj abandon xyz'
 expect_block 'jj undo'
+expect_block 'jj bisect run --range a..b -- true'
+expect_block 'jj sparse set --add x'
+expect_block 'jj sparse reset'
+expect_block 'jj sparse edit'
+expect_block 'jj sparse $(echo reset)'
 expect_block 'jj redo'
 expect_block 'jj op restore 1234'
 expect_block 'jj operation revert 1234'
@@ -88,11 +139,16 @@ expect_allow 'jj restore flake.nix'
 expect_allow 'jj restore --from main -- flake.nix'
 expect_allow 'jj restore -R . flake.nix'
 expect_allow 'jj op log'
+expect_allow 'jj sparse list'
+expect_allow 'jj bisect --help'
+expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj sparse reset'
 expect_allow 'jj edit --help'
 expect_allow 'jj log -r @'
 expect_allow 'jj status'
 expect_allow 'jj describe -m "feat: x"'
 expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
+expect_allow 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj abandon"'
+expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj abandon"'
 
 # jj git push skips the gitleaks pre-commit hook, so it needs the override.
 expect_block 'jj git push'
@@ -114,12 +170,6 @@ expect_allow 'jj describe -m "$(cat msg.txt)"'
 expect_allow 'jj log -r $(echo main)'
 expect_allow 'echo $(jj log)'
 
-expect_block 'git $(echo stash)'
-expect_block 'git $SUB'
-expect_block 'git reset $(echo --hard)'
-expect_block 'git clean $FLAGS'
-expect_allow 'git log $(git merge-base HEAD main)..HEAD'
-expect_allow 'git commit -m "$(cat msg.txt)"'
 
 # A jj name that is not a built-in may be an alias for anything.
 expect_block 'jj ab'
@@ -144,34 +194,20 @@ expect_block 'JJ_EMAIL=x@example.com jj describe -m x'
 expect_block 'env JJ_USER=x jj log'
 expect_allow 'jj --config ui.color=never log'
 
-# Skipping or redirecting the Git hooks skips the secret and identity checks.
-expect_block 'git commit --no-verify -m x'
-expect_block 'git commit -nm x'
-expect_block 'git push --no-verify origin main'
-expect_block 'git -c core.hooksPath=/dev/null push origin main'
-expect_block 'git -c core.hooksPath=/tmp/none commit -m x'
-expect_block 'GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/tmp git push'
-expect_block 'git config core.hooksPath /tmp/none'
-expect_allow 'git config --get core.hooksPath'
-expect_allow 'git push -n origin main'
-expect_allow 'git commit -m "no verify needed"'
-expect_allow 'git -c color.ui=never log'
-
 # Wrappers whose operands are not the command.
 expect_block 'exec -a name jj abandon'
-expect_block 'exec -a name git stash'
+expect_block 'exec -a name git status'
 expect_block 'env -S "jj abandon"'
-expect_block "env -S'git stash'"
+expect_block "env -S'git status'"
 expect_allow 'jj'
 expect_allow 'jj --version'
 
 # Nesting past the recursion limit still runs the innermost command.
 expect_block 'eval eval eval eval eval jj abandon'
-expect_block 'eval eval eval eval eval git stash'
 expect_block 'eval eval eval eval eval echo ok'
 expect_allow 'eval eval eval eval jj log'
 expect_block 'eval eval eval eval jj abandon'
-expect_block 'eval eval eval eval git stash'
+expect_block 'eval eval eval eval git status'
 nested='ls'
 for _ in 1 2 3 4; do nested="bash -c $(printf '%q' "$nested")"; done
 expect_allow "$nested"
@@ -179,14 +215,21 @@ for _ in 5 6; do nested="bash -c $(printf '%q' "$nested")"; done
 expect_block "$nested"
 
 # jj util exec runs its operand as a command.
+expect_block 'jj util exec -- git status'
 expect_block 'jj util exec -- git stash'
 expect_block 'jj util exec -- bash -c "jj abandon"'
-expect_allow 'jj util exec -- git status'
 
 # Data, not invocations.
 expect_allow 'echo "jj abandon"'
 expect_allow "rg -n 'jj undo' docs"
 expect_allow $'cat <<EOF\njj abandon\nEOF'
+
+# Nothing to classify: malformed input and an empty command stand aside.
+checked=$((checked + 1))
+status=0
+printf 'not json' | bash "$hook" >/dev/null 2>&1 || status=$?
+[[ $status -eq 0 ]] || fail "malformed JSON: expected exit 0, got $status"
+expect_allow ''
 
 # Other tools stand aside.
 checked=$((checked + 1))

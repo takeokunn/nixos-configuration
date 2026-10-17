@@ -48,7 +48,7 @@ Use instead:
   ❌ cd /path/to/dir            (then a separate call expecting to be there)
   ✅ ls /path/to/dir            : absolute paths in the command itself
   ✅ cd /path/to/dir && ls      : one compound command, allowed
-  ✅ git -C /path/to/repo status : tool-native directory flags
+  ✅ jj -R /path/to/repo status : tool-native directory flags
 
 Override deliberately with:  ALLOW_BARE_CD=1 cd /path
 EOF

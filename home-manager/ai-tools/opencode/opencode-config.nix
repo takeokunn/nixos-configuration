@@ -60,7 +60,7 @@ mcp-servers-nix.lib.mkConfig pkgs {
       bash = {
         "*" = "allow";
       }
-      // lib.genAttrs shared.bashDenyPatternsOpencode (_: "deny");
+      // lib.genAttrs shared.bashDenyPatterns (_: "deny");
       edit = "allow";
       write = "allow";
       read = "allow";

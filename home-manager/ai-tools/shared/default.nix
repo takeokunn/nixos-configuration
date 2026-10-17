@@ -32,46 +32,52 @@ rec {
         command = [ def.command ] ++ (def.args or [ ]);
       };
 
+  # Plain `*` globs only: Claude Code reads `x:*` as `x*`, and opencode has no `:*` form, so one
+  # spelling serves both. An entry another one already covers is omitted (`rm -rf ~*` covers
+  # `rm -rf ~/.ssh*`).
+  #
+  # git is denied outright: agents use jj for every VCS operation. These prefixes miss `/usr/bin/git`,
+  # `env git`, and `bash -c 'git ...'`; block-destructive-git catches those for Claude Code and Codex,
+  # and nothing does for opencode, which runs no hooks.
+  #
+  # gh alias and gh extension run arbitrary programs under a gh command line, and gh auth token and
+  # gh auth status -t print the token into the transcript.
   bashDenyPatterns = [
-    "rm -rf /*"
     "rm -rf /"
-    "sudo rm -:*"
-    "sudo rm -rf *"
+    "rm -rf /*"
+    "rm -rf ~*"
+    "rm -rf $HOME*"
+    "sudo rm -*"
     "chmod 777 /*"
     "chmod -R 777 /*"
-    "dd if=:*"
     "dd if=*"
-    "mkfs.:*"
     "mkfs.*"
-    "fdisk -:*"
     "fdisk *"
-    "format -:*"
-    "shutdown -:*"
+    "format -*"
     "shutdown *"
-    "reboot -:*"
     "reboot *"
-    "halt -:*"
     "halt *"
-    "poweroff -:*"
     "poweroff *"
-    "killall -:*"
     "killall *"
-    "pkill -:*"
-    "pkill -f *"
-    "nc -l -:*"
-    "ncat -l -:*"
-    "netcat -l -:*"
-    "rm -rf ~:*"
-    "rm -rf $HOME:*"
-    "rm -rf ~/.ssh*"
-    "rm -rf ~/.config*"
+    "pkill -*"
+    "nc -l -*"
+    "ncat -l -*"
+    "netcat -l -*"
+    "git"
+    "git *"
+    "aitools git"
+    "aitools git *"
+    "gh alias *"
+    "gh extension *"
+    "gh ext *"
+    "gh auth token*"
+    "gh auth status *-t*"
+    "gh auth status *--show-token*"
   ];
 
-  bashDenyPatternToOpencode = p: if lib.hasSuffix ":*" p then (lib.removeSuffix ":*" p) + "*" else p;
-
-  bashDenyPatternsOpencode = lib.unique (map bashDenyPatternToOpencode bashDenyPatterns);
-
   # The catalog of guardrail scripts, not the wiring. Both Codex and Claude Code wire every name here.
+  # block-destructive-git kept its name after it grew to block every git invocation, not only the
+  # destructive ones.
   guardrailHookNames = [
     "block-destructive-git"
     "block-bare-cd"

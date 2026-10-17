@@ -538,7 +538,7 @@ macro invocations are its only consumers.
 
 Discover a project's conventions from its own artifacts rather than guessing:
 
-- **Commit style**: CONTRIBUTING plus `git log` for the actual norm.
+- **Commit style**: CONTRIBUTING plus `jj log` for the actual norm.
 - **Changelog**: the file and its format, including symbol-quoting conventions.
 - **Naming**: the private/public prefix split (`pkg--` vs `pkg-`).
 - **Test harness**: how tests run (`make test`, `eask`, `ert-runner`), the file layout, tags used to skip
@@ -566,7 +566,7 @@ agreement with what package-build actually generates rather than with the workin
   matches the newest built-in symbol the code actually calls, and that every defined symbol carries the package
   prefix. checkdoc governs docstring form: imperative-mood first sentence, `` `symbol' `` quoting.
 - **Release gate**: must not mutate the contributor's tree or personal package directory. Byte-compile and
-  validate generated autoloads in a temporary directory, and never infer success from `git diff` against
+  validate generated autoloads in a temporary directory, and never infer success from `jj diff` against
   ignored generated files.
 
 ## Related

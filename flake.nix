@@ -338,13 +338,10 @@
                 ];
               };
             };
-            testBashDenyPatternToOpencodeStripsTerminatorSuffix = {
-              expr = sharedAiTools.bashDenyPatternToOpencode "sudo rm -:*";
-              expected = "sudo rm -*";
-            };
-            testBashDenyPatternToOpencodeLeavesOtherPatternsUnchanged = {
-              expr = sharedAiTools.bashDenyPatternToOpencode "rm -rf /*";
-              expected = "rm -rf /*";
+            # opencode has no `:*` form, so such an entry would reach it as a literal that never matches.
+            testBashDenyPatternsUsePlainGlobs = {
+              expr = builtins.filter (pkgs.lib.hasSuffix ":*") sharedAiTools.bashDenyPatterns;
+              expected = [ ];
             };
           };
         in
@@ -561,6 +558,8 @@
               {
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
+                opencodeConfig =
+                  self.darwinConfigurations.M4-Max.config.home-manager.users.take.xdg.configFile."opencode/opencode.json".source;
                 configDir = claudeCodeConfigDir;
                 expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
                 settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
@@ -580,6 +579,27 @@
                 fi
                 if [ "$denyCount" -lt 1 ]; then
                   echo "managed-settings permissions.deny is unexpectedly empty" >&2
+                  exit 1
+                fi
+                for rule in git 'git *' 'aitools git' 'aitools git *'; do
+                  if ! jq -e --arg r "Bash($rule)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.deny lost \"Bash($rule)\"; agents must not run git" >&2
+                    exit 1
+                  fi
+                  # opencode runs none of the hooks, so its prefix deny is the only thing between it and git.
+                  if ! jq -e --arg r "$rule" '.permission.bash[$r] == "deny"' "$opencodeConfig" >/dev/null; then
+                    echo "opencode permission.bash no longer denies \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                if [ "$(jq '.allow | length' <<< "$permissionsJson")" -lt 1 ]; then
+                  echo "managed-settings permissions.allow is unexpectedly empty" >&2
+                  exit 1
+                fi
+                # Deny wins over allow, so a rule in both lists is an allow entry that never applies.
+                overlap=$(jq -c '[.allow[] as $a | .deny[] | select(. == $a)]' <<< "$permissionsJson")
+                if [ "$overlap" != "[]" ]; then
+                  echo "managed-settings rules in both allow and deny: $overlap" >&2
                   exit 1
                 fi
                 if [ "$bypass" != "disable" ]; then

@@ -187,16 +187,18 @@ declaring something unverifiable, check whether the tool offers a fake, offline,
 
 Use jj, following [jujutsu](../jujutsu/SKILL.md). First inspect initialization, the existing workspace, and
 current on-disk changes. A suitable existing workspace needs no new version-control writes. If jj is not
-initialized, ask before migration rather than falling back to Git. The write commands below require an explicitly
-authorized isolation request; they do not grant permission to fetch, create workspaces or bookmarks, or edit
+initialized, ask the user how to proceed rather than falling back to git. The write commands below
+require an explicitly authorized isolation request; they do not grant permission to fetch, create workspaces or bookmarks, or edit
 configuration.
 
 1. Inspect `jj workspace list --ignore-working-copy --no-pager` and the intended workspace's ownership and
    changes, including untracked files. Do not move or discard another session's working copy.
 2. Obtain the default branch name with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
-3. When authorized, fetch the named base with `jj git fetch --remote origin --branch <default>`. Compare the
-   resulting remote bookmark's commit with `git ls-remote origin refs/heads/<default>` before using it as the
-   base; a local remote ref alone is not freshness evidence.
+3. When authorized, fetch the named base with `jj git fetch --remote origin --branch <default>`. Compare
+   `jj log -r '<default>@origin' --no-graph -T 'commit_id'` with
+   `gh api repos/<owner>/<repo>/git/ref/heads/<default> --jq .object.sha` before using it as the base; a local
+   remote ref alone is not freshness evidence. If they differ, fetch again with explicit `--remote` and
+   `--branch` and recompare; if they still differ, stop and report.
 4. When a separate workspace is needed and authorized, choose a nonexisting destination within the approved scope
    and use `jj workspace add --no-colocate --sparse-patterns full --name <name> -r <verified-base>
    <authorized-destination>`. This creates an empty working-copy commit whose parent is the verified base, not a
@@ -228,8 +230,9 @@ one merge at a time. A commit message claiming another branch fixed something ne
 tip being released, or scoped content and history evidence for a squash merge.
 
 Run the release gate on the exact tree being tagged, after the version bump, and grep the tests for the old
-version string, since some suites mirror it. Tag the SHA confirmed with `git ls-remote`, not a local
-`origin/<branch>` that a fetch without a refspec left stale. A burned version number cannot be reused.
+version string, since some suites mirror it. Tag the SHA confirmed with
+`gh api repos/<owner>/<repo>/git/ref/heads/<branch> --jq .object.sha`, not a local `<branch>@origin` that a
+fetch without explicit `--remote` and `--branch` left stale. A burned version number cannot be reused.
 
 ## Prohibited
 
@@ -334,16 +337,16 @@ reader does not treat a style pass as behavioral clearance. When two reviews of 
 the cause is usually a lens difference, not a judgement difference: identify each lens before reconciling the
 verdicts.
 
-### Staging in a shared checkout
+### Committing in a shared checkout
 
-Run staging commands only when the current user request explicitly authorizes the Git write.
+Run jj write commands only when the current user request explicitly authorizes them. jj has no staging area:
+`jj commit` takes the whole working copy unless you pass paths.
 
-1. Inspect status and the full diff before staging anything, using the plain non-decorated diff form so the output
-   is parseable. A configured external differ (difftastic here) makes `git diff`, `git show`, and `git log -p`
-   silently emit syntax-highlighted, restructured text instead of a parseable unified diff: the command exits zero
-   and the reader draws conclusions from decorated output rather than hitting an error. Pass `--no-ext-diff` to
-   neutralize it before concluding a diff is empty or a change is missing.
-2. If every hunk is cleanly attributable to your own work, stage only those.
+1. Inspect `jj status` and the full `jj diff --git` before committing anything, without
+   `--ignore-working-copy` (see CLAUDE.md). jj ignores git's external differ, so `--git` emits a plain unified
+   diff that is parseable.
+2. If every hunk is cleanly attributable to your own work, commit only those paths
+   (`jj commit -m "<msg>" <paths>`).
 3. If a shared file (an export list, a build manifest, a lockfile) carries changes interleaved with someone
    else's, **stop and ask.** Do not bundle them and do not split them speculatively; whose-work-is-it is not
    inferable from the diff.
@@ -358,8 +361,7 @@ Do not mirror a worktree into a shared checkout: overwrites and sync deletion ca
 changing Git metadata. Hand off the changed paths and diff, and leave integration to an explicitly authorized
 operation that preserves the destination's unrelated changes. When integration is authorized, check the agent's
 scoped diff against the destination's current content, apply it with the available patch tool, and check for
-conflict markers afterwards. `git apply --3way` requires an explicitly requested Git exception. Copying its whole
-files onto a base that moved since reverts the work merged in between, and the tree and gates stay green.
+conflict markers afterwards. Copying its whole files onto a base that moved since reverts the work merged in between, and the tree and gates stay green.
 
 Remove a linked worktree only when removal is requested and its tracked, untracked, and ignored work has been
 checked for preservation elsewhere. A clean tracked diff alone does not establish that removal is safe.

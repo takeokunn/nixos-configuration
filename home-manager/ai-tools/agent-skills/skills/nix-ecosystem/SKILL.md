@@ -23,10 +23,11 @@ direction: assuming a flake build sees everything on disk, or assuming it sees o
 
 The tell for the untracked half: a path referenced from the flake evaluates to `error: opening file '...':
 No such file or directory` against a `/nix/store/...-source/` path, even though `ls` on the working tree shows
-the file present. Settle which case a command is in with `git status --porcelain -- <path>`: `??` means
-untracked and invisible to a flake build; anything else, including a bare `M`, is tracked and visible with its
-on-disk content. Observed in this repo: a newly created module directory not yet `git add`ed vanished from
-flake evaluation with a "path does not exist" error: the untracked half of this same rule; see the `readDir`
+the file present. This applies only to a checkout with a `.git`, where Nix follows the Git
+index. A jj workspace created with `--no-colocate` has no `.git`, so Nix reads it as a plain path and sees every
+file, tracked or not. The index cannot be inspected without git: when a `.git` exists, ask the user whether the
+path is tracked, or report the gap. Observed in a git checkout: a newly created module directory not yet added
+to the index vanished from flake evaluation with a "path does not exist" error: the untracked half of this same rule; see the `readDir`
 case below.
 
 ### `nix flake check` passes vacuously off-platform
@@ -80,8 +81,8 @@ On forges that distinguish a git tag from a published Release object, a "latest 
 tagged commits that also have a Release attached. A maintainer who tags without publishing one is invisible to
 it, and the pin silently lands on an older version while looking authoritative.
 
-Resolve versions from tag listings (`git ls-remote --tags <url>`, or the forge's tags endpoint), never from a
-latest-release endpoint, and re-verify existing pins the same way when auditing for drift. Only the tag listing
+Resolve versions from tag listings (for GitHub, `gh api repos/<owner>/<repo>/tags`; otherwise the forge's tags
+endpoint), never from a latest-release endpoint, and re-verify existing pins the same way when auditing for drift. Only the tag listing
 matches what a `github:owner/repo/vX.Y.Z` URL can actually resolve.
 
 ### One dependency graph

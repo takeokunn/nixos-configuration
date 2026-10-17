@@ -54,6 +54,44 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
+    # An allow rule skips the auto-mode classifier entirely, so everything here runs unprompted; the
+    # PreToolUse hooks below still run first. Each entry is one the classifier kept refusing in
+    # practice. gh is allowed whole on purpose, writes included (merge, `api -X`); the deny list keeps
+    # the gh commands that run arbitrary programs or print the token. jj is allowed
+    # whole because block-destructive-git still blocks the commands that move or discard a shared
+    # working copy and every unscanned `jj git push`. That hook exits 0 when neither jq nor python3
+    # is on PATH, which leaves `jj *` with no check at all.
+    allow = [
+      "Bash(gh)"
+      "Bash(gh *)"
+      "Bash(jj)"
+      "Bash(jj *)"
+      "Bash(nix eval *)"
+      "Bash(nix search *)"
+      "Bash(nix log *)"
+      "Bash(nix path-info *)"
+      "Bash(nix why-depends *)"
+      "Bash(nix flake show *)"
+      "Bash(nix flake metadata *)"
+      "mcp__mediator"
+    ];
+    # Ask outranks allow, so these forms of an allowed command still prompt. Each can start a program
+    # the allow rule never named: jj through a configured tool, editor, pager, or fixer; nix through an
+    # impure read of any file. The override prefix lifts block-destructive-git's jj verdicts, and an
+    # agent can type it, so a person confirms each use.
+    ask = [
+      "Bash(jj *--config*)"
+      "Bash(jj *--tool*)"
+      "Bash(jj config set *)"
+      "Bash(jj config edit*)"
+      "Bash(jj fix*)"
+      "Bash(jj run *)"
+      "Bash(jj sign*)"
+      "Bash(jj gerrit *)"
+      "Bash(nix eval *--impure*)"
+      "Bash(ALLOW_DESTRUCTIVE_GIT=1 *)"
+      "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"
+    ];
     # Reviewed via /define: hooks and permissions.deny still enforce independently of
     # permission mode, so this only removes the interactive prompt; a background classifier
     # model now reviews everything else auto mode would have prompted for (see Claude Code
