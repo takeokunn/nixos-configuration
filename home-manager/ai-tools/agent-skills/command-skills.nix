@@ -31,11 +31,12 @@ in
 {
   inherit names;
 
-  # One <name>/SKILL.md per command, laid out as an agent-skills source.
-  source = pkgs.linkFarm "command-skills" (
-    map (command: {
-      name = "${command}/SKILL.md";
-      path = commandPromptToSkill command;
-    }) names
+  # One <name>/SKILL.md per command, laid out as an agent-skills source. The files are copied, not
+  # linked: agent-skills copies each source with `rsync --safe-links`, which drops a symlink pointing
+  # outside the source tree, so a linkFarm's SKILL.md links vanish and the bundle build fails.
+  source = pkgs.runCommand "command-skills" { } (
+    lib.concatMapStrings (command: ''
+      install -Dm644 ${commandPromptToSkill command} "$out/${command}/SKILL.md"
+    '') names
   );
 }

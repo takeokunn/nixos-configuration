@@ -31,7 +31,6 @@ in
   programs.agent-skills.sources."yomiyasu".path = yomiyasu-skill;
   programs.agent-skills.sources."yomiyasu".subdir = "skills";
   programs.agent-skills.sources."commands".path = commandSkills.source;
-  # Without a depth limit discovery also reads each SKILL.md symlink as a directory and fails.
   programs.agent-skills.sources."commands".filter.maxDepth = 1;
 
   # Installed skill metadata consumes catalog context even when its body is not loaded. Keep broad
