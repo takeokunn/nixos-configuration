@@ -170,7 +170,6 @@ expect_allow 'jj describe -m "$(cat msg.txt)"'
 expect_allow 'jj log -r $(echo main)'
 expect_allow 'echo $(jj log)'
 
-
 # A jj name that is not a built-in may be an alias for anything.
 expect_block 'jj ab'
 expect_block 'jj --config aliases.x=["abandon"] x'
