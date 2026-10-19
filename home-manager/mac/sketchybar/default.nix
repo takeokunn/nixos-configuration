@@ -48,7 +48,9 @@ let
   '';
 
   cpuPlugin = pkgs.writeShellScript "cpu.sh" ''
-    CPU=$(top -l 1 -n 0 | grep "CPU usage" | awk '{print $3}' | tr -d '%')
+    # Sum of per-process ps %cpu (user+sys) over logical CPUs. ps reports a decayed
+    # average, so this lags bursts; `top -l 1` is far slower and its $3 was user-only.
+    CPU=$(ps -A -o %cpu | awk -v n="$(sysctl -n hw.logicalcpu)" 'NR>1 {s+=$1} END {v=s/n; if (v>100) v=100; printf "%.0f", v}')
     sketchybar --set "$NAME" label="$CPU%"
   '';
 
@@ -58,8 +60,10 @@ let
   '';
 
   volumePlugin = pkgs.writeShellScript "volume.sh" ''
-    VOLUME=$(osascript -e 'output volume of (get volume settings)')
-    MUTED=$(osascript -e 'output muted of (get volume settings)')
+    SETTINGS=$(osascript -e 'get volume settings')
+    VOLUME=$(echo "$SETTINGS" | sed -n 's/.*output volume:\([0-9]*\).*/\1/p')
+    MUTED=$(echo "$SETTINGS" | sed -n 's/.*output muted:\([a-z]*\).*/\1/p')
+    [ -z "$VOLUME" ] && exit 0
 
     if [ "$MUTED" = "true" ]; then
       ICON="󰖁"
@@ -95,8 +99,9 @@ let
   '';
 
   batteryPlugin = pkgs.writeShellScript "power.sh" ''
-    PERCENTAGE=$(pmset -g batt | grep -Eo "[0-9]+%" | cut -d% -f1)
-    CHARGING=$(pmset -g batt | grep 'AC Power')
+    BATT=$(pmset -g batt)
+    PERCENTAGE=$(echo "$BATT" | grep -Eo "[0-9]+%" | cut -d% -f1)
+    CHARGING=$(echo "$BATT" | grep 'AC Power')
 
     if [ -z "$PERCENTAGE" ]; then
       exit 0
@@ -272,7 +277,6 @@ let
                         background.height=24 \
                         click_script="aerospace workspace $sid" \
                         script="${aerospacePlugin}" \
-                        update_freq=1 \
                   --subscribe space.$sid aerospace_workspace_change
     done
 
@@ -290,7 +294,7 @@ let
                       icon="󰥔" \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$PURPLE" \
-                      update_freq=1 \
+                      update_freq=15 \
                       script="${timePlugin}"
 
     sketchybar --add item date right \
@@ -298,7 +302,7 @@ let
                       icon="󰃭" \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$PINK" \
-                      update_freq=1 \
+                      update_freq=60 \
                       script="${datePlugin}"
 
     sketchybar --add item separator_datetime right \
@@ -311,7 +315,7 @@ let
 
     sketchybar --add item battery right \
                 --set battery \
-                      update_freq=1 \
+                      update_freq=30 \
                       script="${batteryPlugin}"
 
     sketchybar --add item power_icon right \
@@ -322,7 +326,7 @@ let
                       label.drawing=off
 
     # Sleep prevention enable button (sudo pmset -a disablesleep 1; update_freq=5 since it's a
-    # cheap `pmset -g` read, not a heavier poll like the 1s-interval items below). Icon-only (no
+    # cheap `pmset -g` read, not a heavier poll like cpu/wifi). Icon-only (no
     # label, matching power_icon) to keep the right-side item group narrow enough to clear the notch.
     sketchybar --add item sleep_prevent right \
                 --set sleep_prevent \
@@ -359,7 +363,7 @@ let
                       icon=󰕾 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$GREEN" \
-                      update_freq=1 \
+                      update_freq=10 \
                       script="${volumePlugin}" \
                 --subscribe volume volume_change
 
@@ -368,7 +372,7 @@ let
                       icon=󰖩 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$CYAN" \
-                      update_freq=1 \
+                      update_freq=15 \
                       script="${wifiPlugin}"
 
     sketchybar --add item separator_network right \
@@ -384,7 +388,7 @@ let
                       icon=󰍛 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$YELLOW" \
-                      update_freq=1 \
+                      update_freq=15 \
                       script="${memoryPlugin}"
 
     sketchybar --add item cpu right \
@@ -392,7 +396,7 @@ let
                       icon=󰻠 \
                       icon.font="Hack Nerd Font:Bold:14.0" \
                       icon.color="$ORANGE" \
-                      update_freq=1 \
+                      update_freq=3 \
                       script="${cpuPlugin}"
 
     sketchybar --add bracket spaces_bracket '/space\..*/' \
