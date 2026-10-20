@@ -54,26 +54,21 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
-    # An allow rule skips the auto-mode classifier entirely, so everything here runs unprompted; the
-    # PreToolUse hooks below still run first. Each entry is one the classifier kept refusing in
-    # practice. gh is allowed whole on purpose, writes included (merge, `api -X`); the deny list keeps
-    # the gh commands that run arbitrary programs or print the token. jj is allowed
-    # whole because block-destructive-git still blocks the commands that move or discard a shared
-    # working copy and every unscanned `jj git push`. That hook exits 0 when neither jq nor python3
-    # is on PATH, which leaves `jj *` with no check at all.
+    # An allow rule skips the auto-mode classifier, so Bash(*) leaves the deny and ask lists and the
+    # PreToolUse hooks as the only guards on shell commands. block-destructive-git still blocks the jj
+    # commands that move or discard a shared working copy and every unscanned `jj git push`, but it
+    # exits 0 when neither jq nor python3 is on PATH, which leaves jj with no check at all.
+    # Claude Code may drop a blanket Bash rule when auto mode starts (unverified for this version): if
+    # a command that is not denied still prompts after a rebuild, replace Bash(*) with per-command
+    # entries for gh, jj and the read-only nix subcommands.
+    # slite and clickup stay prompted because their writes publish to external workspaces.
     allow = [
-      "Bash(gh)"
-      "Bash(gh *)"
-      "Bash(jj)"
-      "Bash(jj *)"
-      "Bash(nix eval *)"
-      "Bash(nix search *)"
-      "Bash(nix log *)"
-      "Bash(nix path-info *)"
-      "Bash(nix why-depends *)"
-      "Bash(nix flake show *)"
-      "Bash(nix flake metadata *)"
+      "Bash(*)"
       "mcp__mediator"
+      "mcp__plugin_hm_context7"
+      "mcp__plugin_hm_deepwiki"
+      "mcp__plugin_hm_playwright"
+      "mcp__plugin_hm_serena"
     ];
     # Ask outranks allow, so these forms of an allowed command still prompt. Each can start a program
     # the allow rule never named: jj through a configured tool, editor, pager, or fixer; nix through an

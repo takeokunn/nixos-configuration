@@ -112,10 +112,35 @@ let
     exec ${codexHookScript "aitools-rewrite"} codex
   '';
 
+  # execpolicy matches whole argv tokens from the front, so only a literal command, or one ending in
+  # " *" after literal tokens, has an equivalent. Patterns such as `rm -rf /*` or `gh auth status *-t*`
+  # return null and are listed in the generated file instead of being dropped unseen.
+  denyPatternToTokens =
+    pattern:
+    let
+      literal = lib.removeSuffix " *" pattern;
+    in
+    if lib.hasInfix "*" literal then null else lib.splitString " " literal;
+
+  convertedDenyTokens = lib.unique (
+    lib.filter (tokens: tokens != null) (map denyPatternToTokens shared.bashDenyPatterns)
+  );
+  unconvertedDenyPatterns = lib.filter (p: denyPatternToTokens p == null) shared.bashDenyPatterns;
+
+  # With approval_policy "never" there is no prompt to fall back on, so these rules and the PreToolUse
+  # hooks are the only guards on shell commands.
+  codexDenyRules = pkgs.writeText "codex-deny.rules" ''
+    # Generated from shared.bashDenyPatterns. Not expressible as an execpolicy prefix and so not enforced here:
+    ${lib.concatMapStringsSep "\n" (p: "#   ${p}") unconvertedDenyPatterns}
+    ${lib.concatMapStringsSep "\n" (
+      tokens: ''prefix_rule(pattern = ${builtins.toJSON tokens}, decision = "forbidden")''
+    ) convertedDenyTokens}
+  '';
+
   codexSettings = {
     model = "gpt-5.6-luna";
     model_provider = "openai";
-    approval_policy = "on-request";
+    approval_policy = "never";
     sandbox_mode = "danger-full-access";
     model_auto_compact_token_limit = 50000;
     # Nix manages the codex package; disable the built-in updater.
@@ -211,6 +236,10 @@ in
   xdg.configFile = agentFileAttrs // {
     "codex/AGENTS.md" = {
       source = codexAgents;
+      force = true;
+    };
+    "codex/rules/deny.rules" = {
+      source = codexDenyRules;
       force = true;
     };
   };
