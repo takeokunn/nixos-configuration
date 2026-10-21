@@ -33,14 +33,29 @@ in
 {
   services.aerospace.enable = true;
   services.aerospace.settings = {
+    config-version = 2;
+    persistent-workspaces = [
+      "1"
+      "2"
+      "3"
+      "4"
+      "5"
+      "6"
+      "7"
+      "8"
+      "9"
+      "10"
+    ];
     enable-normalization-flatten-containers = true;
     enable-normalization-opposite-orientation-for-nested-containers = true;
     accordion-padding = 0;
     on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
+    # launchd starts AeroSpace with PATH=/usr/bin:/bin:/usr/sbin:/sbin, so the
+    # home-manager sketchybar must be reached through the per-user profile.
     exec-on-workspace-change = [
       "/bin/bash"
       "-c"
-      "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(/run/current-system/sw/bin/aerospace list-workspaces --focused)"
+      "u=$(id -un); USER=$u /etc/profiles/per-user/$u/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(/run/current-system/sw/bin/aerospace list-workspaces --focused)"
     ];
 
     gaps = {
