@@ -10,6 +10,17 @@ let
   shared = import ../shared { inherit lib; };
   sharedServers = shared.mcpServers { inherit nurPkgs; };
 
+  # Upstream passes "--prefix PATH : ..." as one makeWrapperArgs element, which
+  # makeWrapper rejects under structuredAttrs.
+  astGrepMcp = nurPkgs.ast-grep-mcp.overrideAttrs (_: {
+    makeWrapperArgs = [
+      "--prefix"
+      "PATH"
+      ":"
+      (lib.makeBinPath [ pkgs.ast-grep ])
+    ];
+  });
+
   providerTimeoutOpts = {
     timeout = 600000;
     chunkTimeout = 60000;
@@ -53,7 +64,7 @@ mcp-servers-nix.lib.mkConfig pkgs {
 
     servers = lib.mapAttrs (_: shared.mcpServerToOpencode) sharedServers // {
       "ast-grep".type = "local";
-      "ast-grep".command = [ "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server" ];
+      "ast-grep".command = [ "${astGrepMcp}/bin/ast-grep-server" ];
     };
 
     permission = {
