@@ -50,7 +50,7 @@ in
     "verification"
   ];
 
-  programs.claude-code.commands = readFiles "${ai-prompts-path}/commands" [
+  programs.claude-code.commands = pkgs.lib.genAttrs [
     "ask"
     "bug"
     "define"
@@ -58,7 +58,7 @@ in
     "execute-full"
     "markdown"
     "qa"
-  ];
+  ] (name: builtins.readFile "${ai-prompts-path}/commands/${name}/SKILL.md");
 
   programs.claude-code.outputStyles = readFiles "${ai-prompts-path}/output-styles" [
     "explanatory-strict"

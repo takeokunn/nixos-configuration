@@ -10,11 +10,7 @@ let
   commandFiles = builtins.readDir commandPromptsPath;
   agentFiles = builtins.readDir agentPromptsPath;
 
-  commandNames = map (name: lib.removeSuffix ".md" name) (
-    builtins.filter (name: commandFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
-      builtins.attrNames commandFiles
-    )
-  );
+  commandNames = builtins.attrNames (lib.filterAttrs (_: type: type == "directory") commandFiles);
   agentNames = map (name: lib.removeSuffix ".md" name) (
     builtins.filter (name: agentFiles.${name} == "regular" && lib.hasSuffix ".md" name) (
       builtins.attrNames agentFiles
@@ -24,7 +20,7 @@ let
   commandPromptToOpencodeCommand =
     command:
     let
-      content = builtins.readFile (commandPromptsPath + "/${command}.md");
+      content = builtins.readFile (commandPromptsPath + "/${command}/SKILL.md");
       parsed = shared.parseFrontmatter content;
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
     in

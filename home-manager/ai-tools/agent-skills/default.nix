@@ -9,7 +9,10 @@
   ...
 }:
 let
-  commandSkills = import ./command-skills.nix { inherit pkgs; };
+  commandPromptsPath = ../ai-prompts/commands;
+  commandNames = builtins.attrNames (
+    lib.filterAttrs (_: type: type == "directory") (builtins.readDir commandPromptsPath)
+  );
 
   # Same expansion as CODEX_HOME in codex/default.nix; the activation environment may not export it.
   codexSkillsDest = "\${CODEX_HOME:-$HOME/.config/codex}/skills";
@@ -30,7 +33,12 @@ in
   # bundle excludes the root's tests/, articles/ and evals/.
   programs.agent-skills.sources."yomiyasu".path = yomiyasu-skill;
   programs.agent-skills.sources."yomiyasu".subdir = "skills";
-  programs.agent-skills.sources."commands".path = commandSkills.source;
+  # The slash-command prompts are stored as <name>/SKILL.md so this source is a plain path, not a
+  # generated one. agent-skills reads a source's directory during evaluation, so a generated source
+  # is import-from-derivation, which fails when the machine cannot build for the host being
+  # evaluated (a Mac evaluating the Linux host X13Gen2). Codex ignores the files' argument-hint
+  # key and names each skill after its directory, so they need no rewrite.
+  programs.agent-skills.sources."commands".path = commandPromptsPath;
   programs.agent-skills.sources."commands".filter.maxDepth = 1;
 
   # Installed skill metadata consumes catalog context even when its body is not loaded. Keep broad
@@ -52,7 +60,7 @@ in
 
   # Claude Code and OpenCode serve ai-prompts/commands/ as slash commands, so the same prompts are
   # skills only for Codex, which has no slash commands.
-  programs.agent-skills.skills.explicit = lib.genAttrs commandSkills.names (_: {
+  programs.agent-skills.skills.explicit = lib.genAttrs commandNames (_: {
     from = "commands";
     agents = [ "codex" ];
   });
