@@ -123,6 +123,15 @@ in
     ENABLE_EXPERIMENTAL_MCP_CLI = "false";
     ENABLE_TOOL_SEARCH = "true";
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+    # The claude package from the llm-agents input sets CLAUDE_CODE_CERT_STORE=system in its
+    # wrapper, so that nixpkgs' cacert decides the trusted roots. On macOS that store holds only
+    # admin-trusted certificates, not Apple's built-in roots, and API calls fail with
+    # UNABLE_TO_GET_ISSUER_CERT_LOCALLY. Adding the cacert bundle that nix-darwin places in /etc/ssl
+    # restores the roots and keeps them following nixpkgs; switching back to `bundled,system` would
+    # pin them to the binary instead. On NixOS the entry is expected to duplicate the system store.
+    # Drop it once `claude --debug`, run without it, logs a "Loaded N system CA certificates" count
+    # that includes Apple's roots (over 100) rather than the admin-trusted few.
+    NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt";
   };
 
   # Claude Code fans one event out to every matching hook in parallel and merges the results
