@@ -558,8 +558,12 @@
               {
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
-                opencodeConfig =
-                  self.darwinConfigurations.M4-Max.config.home-manager.users.take.xdg.configFile."opencode/opencode.json".source;
+                # `.value` is the attrset the JSON generator serialises into opencode.json. A Linux
+                # runner can evaluate the Mac host but cannot build the file, whose MCP server
+                # packages are Mac builds; the "allow"/"deny" strings here need no build.
+                opencodeBashPermissionsJson =
+                  builtins.toJSON
+                    self.darwinConfigurations.M4-Max.config.home-manager.users.take.xdg.configFile."opencode/opencode.json".source.value.permission.bash;
                 configDir = claudeCodeConfigDir;
                 expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
                 settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
@@ -587,7 +591,7 @@
                     exit 1
                   fi
                   # opencode runs none of the hooks, so its prefix deny is the only thing between it and git.
-                  if ! jq -e --arg r "$rule" '.permission.bash[$r] == "deny"' "$opencodeConfig" >/dev/null; then
+                  if ! jq -e --arg r "$rule" '.[$r] == "deny"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
                     echo "opencode permission.bash no longer denies \"$rule\"" >&2
                     exit 1
                   fi
