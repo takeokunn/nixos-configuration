@@ -130,12 +130,13 @@ in
     # restores the roots and keeps them following nixpkgs; switching back to `bundled,system` would
     # pin them to the binary instead. On NixOS the entry is expected to duplicate the system store.
     #
-    # A host that launches claude with CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST set (Mediator does)
+    # A launcher that sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST (the Mediator desktop app does)
     # makes Claude Code ignore this entry, so the claude wrapper in
     # home-manager/ai-tools/claude-code/default.nix also sets the bundle in the process environment.
-    # This entry stays for launches that bypass that wrapper. Drop both once `claude --debug`, run
-    # with neither in effect, logs a "Loaded N system CA certificates" count that includes Apple's
-    # roots (over 100) rather than the admin-trusted few.
+    # This entry stays for launches that bypass that wrapper. Drop both once the unwrapped binary
+    # (`.claude-wrapped` in the package's bin/), run with `--debug` while the deployed
+    # managed-settings.json is unreadable to it, logs a "Loaded N system CA certificates" count that includes Apple's roots (over 100) rather
+    # than the admin-trusted few.
     NODE_EXTRA_CA_CERTS = shared.claudeCodeCaBundle;
   };
 
