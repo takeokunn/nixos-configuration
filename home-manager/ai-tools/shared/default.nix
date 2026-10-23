@@ -19,6 +19,11 @@ rec {
       };
     };
 
+  # Handed to Claude Code as NODE_EXTRA_CA_CERTS from two places, the claude wrapper
+  # (../claude-code/default.nix) and the managed-settings env (shared/claude-code-managed-settings.nix),
+  # which reach different launches; the managed-settings comment says why both are needed.
+  claudeCodeCaBundle = "/etc/ssl/certs/ca-certificates.crt";
+
   mcpServerToOpencode =
     def:
     if def ? url then

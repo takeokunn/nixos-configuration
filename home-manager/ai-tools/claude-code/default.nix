@@ -10,8 +10,27 @@ let
 
   shared = import ../shared { inherit (pkgs) lib; };
 
-  claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (_: {
+  # Puts the CA bundle in the process environment. Under a host-managed provider Claude Code ignores
+  # the managed-settings NODE_EXTRA_CA_CERTS entry and logs "skipping settings-sourced
+  # NODE_EXTRA_CA_CERTS under host-managed provider"; the comment on that entry in
+  # shared/claude-code-managed-settings.nix covers why the bundle is needed at all and when to drop
+  # both. --set-default lets a caller's own value win.
+  #
+  # The flag is spliced into upstream's single wrapProgram call because wrapping a second time
+  # renames the process (upstream's comment on postFixup); the assert fails the build when upstream
+  # rewrites that call, instead of silently dropping the bundle.
+  caCertsAnchor = "--set-default CLAUDE_CODE_CERT_STORE system";
+  claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (old: {
     doInstallCheck = false;
+    postFixup =
+      assert pkgs.lib.assertMsg (pkgs.lib.hasInfix caCertsAnchor old.postFixup)
+        "llm-agents claude-code: postFixup no longer contains `${caCertsAnchor}`; re-check where NODE_EXTRA_CA_CERTS is injected";
+      builtins.replaceStrings
+        [ caCertsAnchor ]
+        [
+          "${caCertsAnchor} \\\n      --set-default NODE_EXTRA_CA_CERTS ${shared.claudeCodeCaBundle}"
+        ]
+        old.postFixup;
   });
 
   readFiles =
