@@ -8,7 +8,7 @@ of a reported failure. Apply the shared contracts in CLAUDE.md.
 
 ## Skills
 
-Load serena-usage for symbol-level impact analysis or recorded conventions, and trust-boundaries when a change
+Load trust-boundaries when a change
 consumes input the project does not control.
 
 ## Review rules

@@ -8,7 +8,7 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
-Load performance-benchmarking before measurement and serena-usage before symbol or memory operations.
+Load performance-benchmarking before measurement.
 
 - Report an improvement only from before/after measurements. Ratios require the same host, toolchain, and
   benchmark; otherwise report absolute figures and differing conditions.

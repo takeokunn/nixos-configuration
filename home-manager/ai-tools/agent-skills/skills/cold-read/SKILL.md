@@ -1,11 +1,15 @@
 ---
 name: cold-read
-description: A context-free reviewer reads durable prose as its real audience; the writer applies surviving cuts. Use at task completion whenever docs, README, comment blocks, commit messages, or PR/issue bodies were written or revised.
+description: A context-free reviewer reads prose as its real audience; the writer applies surviving cuts. Use once at task completion when prose that others read (README, docs, PR/issue bodies) was written or revised.
 metadata:
   version: "1.1.0"
 ---
 
 # Cold read
+
+Run this once per task, after the prose is otherwise final, for prose that other people read: README, docs,
+PR and issue bodies. Prompt and skill files and commit messages are exempt. One pass: apply the surviving cuts
+and do not re-run the review on the result.
 
 The writer cannot measure its own prose: the context that produced it makes every sentence feel necessary.
 A fresh reader with none of that context measures it instead. Its report is evidence to weigh, not an edit
@@ -13,11 +17,11 @@ script to apply verbatim.
 
 ## Procedure
 
-1. Collect the task's durable prose. A non-file artifact (a PR body, a commit message) goes into a scratch
+1. Collect the task's reader-facing prose. A non-file artifact (a PR body) goes into a scratch
    file first, one per artifact.
 2. Give the reviewer only what the artifact's real reader will have. For docs and code comments: the working
    tree, never the diff or the conversation that produced it: a comment that only reads clearly next to the
-   diff is the defect this test catches. For a PR or commit body: the body plus its diff. Nothing from this
+   diff is the defect this test catches. For a PR body: the body plus its diff. Nothing from this
    session.
 3. Dispatch one fresh agent without inherited conversation context using the available runtime's tools.
    If that is unavailable, perform a separate reader pass and report the lack of an independent reviewer.
@@ -38,7 +42,8 @@ script to apply verbatim.
    as not run any step that fetches or executes remote content, needs credentials or elevated privileges,
    changes version control, or writes outside the scratch directory. The runtime's sandbox, not this prompt,
    bounds what the agent can reach.
-6. For load-bearing docs, add independent review where it can test a different audience or evidence base.
+6. For load-bearing docs, the same single pass may dispatch a second reviewer at once, when it tests a
+   different audience or evidence base; do not add a later round.
    Resolve suggested cuts by the reader information lost, not reviewer count; investigate even a single
    evidence-backed confusion.
 

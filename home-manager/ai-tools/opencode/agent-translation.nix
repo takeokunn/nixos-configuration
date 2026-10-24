@@ -1,7 +1,5 @@
-{ pkgs, ai-prompts-path }:
+{ lib, ai-prompts-path }:
 let
-  inherit (pkgs) lib;
-
   shared = import ../shared { inherit lib; };
 
   commandPromptsPath = ai-prompts-path + "/commands";
@@ -24,7 +22,7 @@ let
       parsed = shared.parseFrontmatter content;
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
     in
-    pkgs.writeText "opencode-command-${command}.md" ''
+    ''
       ---
       ${descriptionLine}
       ---
@@ -42,28 +40,16 @@ let
     in
     # opencode drops the name field, so nameLine is forced only to keep
     # findLineWithPrefix's assert as a gate on agents missing `name:`.
-    builtins.seq nameLine (
-      pkgs.writeText "opencode-agent-${agent}.md" ''
-        ---
-        ${descriptionLine}
-        mode: subagent
-        ${permissionBlock}---
-        ${parsed.body}
-      ''
-    );
+    builtins.seq nameLine (''
+      ---
+      ${descriptionLine}
+      mode: subagent
+      ${permissionBlock}---
+      ${parsed.body}
+    '');
 in
+# Attribute name -> file content, the shape programs.opencode.agents/commands take.
 {
-  agents = pkgs.linkFarm "opencode-agents" (
-    map (agent: {
-      name = "${agent}.md";
-      path = agentPromptToOpencodeAgent agent;
-    }) agentNames
-  );
-
-  commands = pkgs.linkFarm "opencode-commands" (
-    map (command: {
-      name = "${command}.md";
-      path = commandPromptToOpencodeCommand command;
-    }) commandNames
-  );
+  agents = lib.genAttrs agentNames agentPromptToOpencodeAgent;
+  commands = lib.genAttrs commandNames commandPromptToOpencodeCommand;
 }

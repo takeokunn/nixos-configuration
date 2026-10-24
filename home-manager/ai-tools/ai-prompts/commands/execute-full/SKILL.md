@@ -3,13 +3,13 @@ argument-hint: [task-description]
 description: Implement a task with a full review wave and independent verification. Use for risky or cross-cutting changes.
 ---
 
-Implement the task with a full review wave and independent verification. Apply CLAUDE.md's hard_rules, delegation, evidence, consensus, memory_policy, and output_contract. Do not request routine confirmation; ask for missing authority or a material scope decision. This command grants no version-control-write authority.
+Implement the task with a full review wave and independent verification. Apply CLAUDE.md's hard_rules, delegation, evidence, consensus, memory_policy, and output_contract. Do not request routine confirmation; ask only under CLAUDE.md's work_selection rule.
 
 ## Prepare
 
-Load execution-workflow. Confirm the active root, current ref, and dirty state; record HEAD and the initial dirty diff, including untracked files, so later scans exclude pre-existing work.
+Load execution-workflow once. Confirm the active root and note existing changes only where they could be confused with this task's.
 
-Inspect both memory indices, then load only task-matching entries, canonical verification commands, and relevant deferred findings. Name matched and loaded entries; explain relevant entries deferred. Report an unavailable store rather than guessing its contents.
+Read memory entries only when prior knowledge (canonical verification commands, deferred findings) could change the work; report an unavailable store rather than guessing its contents.
 
 Define acceptance criteria, atomic execution units, dependencies, owned paths, and concrete checks. Trace sibling registration/discovery before adding a family member, and search identifiers across declarations, comments, callers, and test doubles before migration or removal. A missing search hit does not establish automatic discovery.
 

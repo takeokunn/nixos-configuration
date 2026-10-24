@@ -9,7 +9,7 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
-Load sql-ecosystem for schema, ORM, query, or migration work, and serena-usage before symbol or memory operations.
+Load sql-ecosystem for schema, ORM, query, or migration work.
 Use official provider/API documentation and the actual runtime skill catalog.
 
 - Plan before apply. Read each proposed resource body and expanded instance, including for_each members and drift;

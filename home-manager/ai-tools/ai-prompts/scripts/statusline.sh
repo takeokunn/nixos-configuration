@@ -2,9 +2,11 @@
 
 input=$(cat)
 
-MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
-CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
-TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path')
+# used_percentage is null early in a session and right after /compact. The separator is not
+# whitespace: read collapses runs of whitespace IFS characters, so an empty field would shift the rest.
+IFS=$'\x1f' read -r MODEL_DISPLAY CURRENT_DIR USED_PCT < <(
+  echo "$input" | jq -r '[.model.display_name // "", .workspace.current_dir // "", .context_window.used_percentage // ""] | map(tostring) | join("\u001f")'
+)
 
 GIT_BRANCH=""
 
@@ -34,31 +36,10 @@ elif git rev-parse &>/dev/null; then
   fi
 fi
 
-if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
-  TOKEN_COUNT="_ tkns. (_%)"
+if [[ ! $USED_PCT =~ ^[0-9]+(\.[0-9]*)?$ ]]; then
+  CONTEXT="ctx _%"
 else
-  total_tokens=$(tail -n 100 "$TRANSCRIPT_PATH" 2>/dev/null |
-    jq -s 'map(select(.type == "assistant" and .message.usage)) |
-    last |
-    .message.usage |
-    (.input_tokens // 0) +
-    (.output_tokens // 0) +
-    (.cache_creation_input_tokens // 0) +
-  (.cache_read_input_tokens // 0)' 2>/dev/null)
-
-  total_tokens=${total_tokens:-0}
-
-  # Not 80% of the window: 167000 is Claude Code's actual auto-compact trigger point.
-  COMPACTION_THRESHOLD=167000
-  percentage=$((total_tokens * 100 / COMPACTION_THRESHOLD))
-
-  if [ "$total_tokens" -ge 1000 ]; then
-    thousands=$(echo "scale=1; $total_tokens/1000" | bc)
-    token_display=$(printf "%.1fK" "$thousands")
-  else
-    token_display="$total_tokens"
-  fi
-
+  percentage=${USED_PCT%%.*}
   if [ "$percentage" -ge 90 ]; then
     color="\033[31m"
   elif [ "$percentage" -ge 70 ]; then
@@ -66,8 +47,7 @@ else
   else
     color="\033[32m"
   fi
-
-  TOKEN_COUNT=$(echo -e "${token_display} tkns. (${color}${percentage}%\033[0m)")
+  CONTEXT=$(echo -e "ctx ${color}${percentage}%\033[0m")
 fi
 
-echo "󰚩 ${MODEL_DISPLAY} |  ${CURRENT_DIR##*/}${GIT_BRANCH} |  ${TOKEN_COUNT}"
+echo "󰚩 ${MODEL_DISPLAY} |  ${CURRENT_DIR##*/}${GIT_BRANCH} |  ${CONTEXT}"

@@ -8,8 +8,7 @@ revisit placement when new dependencies appear. Apply the shared contracts in CL
 
 ## Skills and constraints
 
-- Load serena-usage for symbol/dependency or memory operations and ADR work; investigation-patterns for
-  evidence-gathering investigations.
+- Load investigation-patterns for evidence-gathering investigations.
 - Establish dependencies from references, not directory names. Report cycles with their edges even if no layer
   policy exists; call a layer violation only against a cited explicit policy.
 - Never weaken a stricter security, verification, or fail-closed requirement to achieve consistency.

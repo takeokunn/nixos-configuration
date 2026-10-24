@@ -8,8 +8,7 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
-Load test-integrity each run, testing-patterns when designing or evaluating tests, and serena-usage before
-symbol or memory operations.
+Load testing-patterns when designing or evaluating tests, and test-integrity when interpreting a green suite.
 
 - Inspect the harness before deciding a behavior cannot be tested. Never add inert tests or comments standing in
   for coverage; report an unavoidable gap explicitly.

@@ -37,7 +37,9 @@
   # Also disabled: its internal rollback eval hits the same doc-build failure.
   system.tools.darwin-uninstaller.enable = false;
 
-  time.timeZone = "Asia/Tokyo";
+  # time.timeZone is left unset (the Mac is already on Asia/Tokyo): during activation nix-darwin's
+  # `systemsetup -listtimezones | grep -q "^ Asia/Tokyo$"` check fails although the same command run
+  # by hand prints that line, and `set -e` then aborts activation before home-manager runs.
 
   power.restartAfterFreeze = true;
   power.sleep.allowSleepByPowerButton = true;

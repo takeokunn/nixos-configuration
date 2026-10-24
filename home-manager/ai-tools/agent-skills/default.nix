@@ -14,7 +14,8 @@ let
     lib.filterAttrs (_: type: type == "directory") (builtins.readDir commandPromptsPath)
   );
 
-  # Same expansion as CODEX_HOME in codex/default.nix; the activation environment may not export it.
+  # Mirrors the CODEX_HOME that programs.codex exports (home.preferXdgDirectories puts it at ~/.config/codex);
+  # the activation environment may not export it.
   codexSkillsDest = "\${CODEX_HOME:-$HOME/.config/codex}/skills";
 in
 {

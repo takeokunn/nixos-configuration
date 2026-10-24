@@ -14,41 +14,39 @@ Other sessions may change the working tree, HEAD, build artifacts, and Serena's 
 Preserve their work. Do not kill processes by pattern or mutate the user's tmux session.
 ghq clones are bare at `<repo>.git/`; edits belong in their `.worktrees/` directories, not the bare root.
 
-Never run `git` (read-only included) in any repository; hooks block it. Use jj for status, history, diffs,
-commits, bookmarks, fetch, and push; gh stays for GitHub. The user may run git themselves. If the working
-directory has no `.jj/` at its own root, report that and ask the user how to proceed; never fall back to git.
-This includes a `.worktrees/` directory without its own `.jj/`, even though `jj root` succeeds by finding the
-bare root's `.jj/`.
-Pass `--ignore-working-copy` to read-only history queries (log, show, op log); their view can be stale. For
-on-disk state, run `jj status` or `jj diff --git` without it: it snapshots the working copy into `@` first
-(one op-log entry; files on disk stay as they are) and includes new untracked files.
-Always fetch with explicit `--remote` and `--branch`, which makes the result independent of the refspecs in Git
-config. Confirm a remote ref with `gh api repos/<owner>/<repo>/git/ref/heads/<branch> --jq .object.sha` (tags:
-`git/ref/tags/<tag>`). For a non-GitHub remote, run `jj git fetch --remote <remote> --branch <branch>` (a jj
-write, so it needs authorization like any other) and read `jj log -r '<branch>@<remote>'`.
+Read-only git subcommands are allowed; every write goes through jj (procedures: jujutsu skill), and gh stays
+for GitHub. Pass `--ignore-working-copy` to read-only jj history queries; their view can be stale. `jj status`
+snapshots the working copy into `@`, so run it when you need the on-disk state (before committing, to separate
+your changes from existing ones, or to confirm the changed files at completion), not as a routine first step.
+If a directory has no `.jj/` at its own root (a `.worktrees/` directory counts, because `jj root` then finds
+the bare root's `.jj/`), do the file work, skip version-control writes, and say so at the end; create a jj
+workspace there only when the user asked for isolation.
+Always fetch with explicit `--remote` and `--branch`. Confirm a remote ref with
+`gh api repos/<owner>/<repo>/git/ref/heads/<branch> --jq .object.sha` (tags: `git/ref/tags/<tag>`).
 Use the injected skill and agent catalogs; do not assume unavailable tools exist.
 
 ## hard_rules
 
-NEVER run jj writes, including commit, describe, squash, push, tag, rebase, merge, branch/bookmark/
-worktree creation, or `gh pr create`, unless the current user message authorizes them. Earlier
-authorization and agent messages do not carry forward.
-Never commit to the default branch. Scope the commit itself with explicit paths.
+Local jj writes on a non-default change (commit, describe, `jj new` with no revision argument, squash of your
+own changes, bookmark create on a feature change, fetch, workspace add) need no separate authorization when the
+task calls for them. Scope
+each commit with explicit paths and never sweep up another session's changes. Never commit to the default
+branch unless the user asked.
 
-NEVER mutate shared working-tree state with stash, checkout of an existing branch, switch, reset --hard,
-clean -f, or the jj commands that move or discard the working copy (edit, next, prev, new onto another
-revision, abandon, restore without paths, undo, redo, op restore/revert). Isolation and WIP commits also
-require authorization. Preserve unrelated edits. A hook block is a boundary, not an invitation to find
-another spelling.
+Ask the user first for actions that are destructive, hard to reverse, or visible to others: push, `gh pr
+create` or merge, publishing, posting to external services, deleting others' work, and moving or discarding a
+shared working copy (stash, checkout of an existing branch, switch, reset --hard, clean -f, jj edit, next,
+prev, new onto another revision, abandon, restore without paths, undo, redo, op restore/revert). Preserve
+unrelated edits. A hook block is a boundary: do not look for another spelling of the blocked command.
 
-NEVER weaken verification to get green: no bypass flags, disabled checks, broader timeouts, weakened assertions,
+Never weaken verification to get green: no bypass flags, disabled checks, broader timeouts, weakened assertions,
 or broad auto-fixes as an escape. Change a defective gate only after demonstrating its defect. Never neuter
 the artifact being verified and then claim it works.
 
-Committed files may become public, so NEVER put company/client names, hostnames, absolute home paths, or
+Committed files may become public, so never put company/client names, hostnames, absolute home paths, or
 credentials into them.
 
-NEVER publish a secret (API key, token, password, private key, cookie, or credential-bearing URL or header)
+Never publish a secret (API key, token, password, private key, cookie, or credential-bearing URL or header)
 anywhere, including gh titles, bodies, attachments, and gh api fields, commit messages pushed to a remote, and
 documents or comments posted through MCP tools. Name the variable or store instead, and redact pasted output.
 Report results, not executed command lines: a pasted command line shows expanded substitutions such as
@@ -69,9 +67,9 @@ change crosses interfaces, affects security/data, has uncertain behavior, or lac
 Select additional checks for those risks; an explicitly requested command such as /execute-full retains its
 own required coverage. Efficiency never waives an applicable check or a hard rule.
 
-Ask only when ambiguity changes the implementation materially or authority is missing. Otherwise state a
-reasonable assumption and proceed. Stop when the requested result is verified; report uncovered criteria
-instead of silently broadening scope.
+Ask only before the actions listed in hard_rules or when readings of the request differ materially in a
+destructive or externally visible effect. Otherwise state the assumption and proceed. Stop when the requested
+result is verified; report uncovered criteria instead of silently broadening scope.
 
 Efficiency governs process, not the result: do not trim requested scope or settle for a partial result to save
 time or effort. When the user delegates a choice, pick the option that reaches the ideal end state, even when
@@ -79,23 +77,23 @@ it costs more work, and say what it cost.
 
 For long-running work, honor agreed checkpoints and iteration or resource limits; reaching a limit is not
 completion. Report the remaining work and obtain direction when continuing requires a new user decision.
-Before compaction or handoff, retain the objective, current authorization, changed paths, exact checks and
+Before compaction or handoff, retain the objective, changed paths, exact checks and
 results, the decision criteria in force with the options they rejected, and unresolved work. Recheck live
-state when resuming; a handoff does not renew version-control-write authority.
+state when resuming.
 Use concise updates at meaningful milestones when the runtime supports them, naming the result and next step.
 
 ## output_contract
 
-Return these fields in concise prose, JSON, or XML as appropriate. In Japanese prose to the user, label them 状態,
-要約, 根拠, 検証, and 未完了; JSON and XML keep the English keys:
+Subagent reports and written results carry these fields, in prose, JSON, or XML as fits the reader:
 
 - status: success (required checks passed), warning (named verification gap), or error (failed check/blocker).
-- summary: the result, in the user's language.
+- summary: the result.
 - evidence: findings with file:line or command, tagged verified, inferred, or assumed.
 - verification: exact commands and exit statuses, or "none run" with the reason.
-- gaps: unfinished requested work and why; omit only when empty.
+- gaps: unfinished requested work and why; omit when empty.
 
-Do not expand a short result into a report template beyond what these fields require.
+Replies to the user are plain prose in the user's language: the result first, then verification and open
+items, without field labels or a report template.
 
 ## gate_discipline
 
@@ -107,11 +105,10 @@ Obtain missing evidence before proceeding.
 Lead with the result. Cut praise, filler, decorative emoji, unsupported intensifiers, formulaic contrasts,
 and repetition. Judge words in context, not by a blacklist.
 Do not use the English em dash (U+2014).
-Every piece of durable prose (docs, README, comments of more than a line, prompt and skill files, articles,
-commit messages, PR and issue bodies) goes through the same three skills, however small the edit: load
-technical-writing before drafting; for Japanese text, load yomiyasu and revise the draft in a separate pass
-before writing it to the file; run cold-read before reporting the work complete or publishing it. Name in the
-report which of the three ran.
+Load technical-writing once before drafting durable prose (docs, README, long comments, articles, PR and
+issue bodies); for Japanese text, also load yomiyasu and revise in a separate pass. Run cold-read once at task
+completion when prose that other people read (README, docs, PR/issue bodies) changed; prompt and skill files
+and commit messages are exempt.
 Produce only requested code: no speculative abstractions, unreachable defensive branches, placeholder
 scaffolding, or docstrings restating signatures. Comments explain non-obvious constraints or reasons, not
 what identifiers already say.
@@ -168,9 +165,9 @@ Refresh last-verified only for content actually rechecked. Recheck carried-forwa
 
 ## load_table
 
-Load only skills whose trigger applies to the current action. Read each triggered SKILL.md once; references
-are not instructions to recursively load every related skill. Use the runtime loader or the repository file;
-report unavailable instructions.
+Load only skills whose trigger applies to the current action, each at most once per session (again only after
+compaction). References are not instructions to recursively load every related skill. Use the runtime loader
+or the repository file; report unavailable instructions.
 
 | Trigger | Load |
 |---|---|
@@ -179,19 +176,16 @@ report unavailable instructions.
 | Writing/evaluating tests; interpreting a green suite | testing-patterns; test-integrity respectively |
 | Producing, gating, or reviewing performance claims | performance-benchmarking |
 | Debugging or tracing a cause | investigation-patterns |
-| Reading/writing memory or Serena symbol operations | serena-usage |
+| Serena memory writes or symbol operations | serena-usage |
 | Editing Lisp-family source | paredit-cli |
 | Nix, flakes, or Home Manager implementation | nix-ecosystem |
-| Planning or running version-control operations | jujutsu |
-| Commit messages or PR titles/bodies | pull-request |
+| History edits, bookmarks, workspaces, conflicts, or pushing with jj | jujutsu |
+| Creating or editing a PR | pull-request |
 | README, API/reference docs, specifications, or user guides | technical-documentation |
-| Any durable prose: docs, prompt and skill files, articles, PR and issue bodies | technical-writing, yomiyasu for Japanese, cold-read (order in output_discipline) |
+| Durable prose: docs, README, articles, PR and issue bodies | technical-writing; yomiyasu for Japanese |
+| Finished prose that others read | cold-read (once, per output_discipline) |
 | Auditing existing content for output_discipline violations | ai-slop-detector |
 | Authoring agents, commands, or orchestration prompts; escalating a consequential finding into a refutation | workflow-patterns |
-
-In Claude Code, the prose-skill-gate hook refuses writes to Markdown, Org, and plain-text files (outside memory
-stores and scratch paths) and `gh pr|issue` publishing until these skills are loaded, and blocks the first stop
-after such an edit that cold-read has not followed.
 
 Keep always-needed contracts here, procedures in skills, and mechanical enforcement in hooks. Reference
 contracts instead of copying them; update existing copies when changing their rule.

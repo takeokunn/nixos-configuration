@@ -70,7 +70,7 @@ in
 
   quick = mkLane {
     modelTier = models.default;
-    variant = "high";
+    variant = "medium";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/quick.md;
     description = "Tiny mechanical edits: typos, trivial renames, one-file micro-fixes.";
   };

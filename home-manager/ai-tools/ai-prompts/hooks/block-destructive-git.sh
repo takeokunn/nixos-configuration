@@ -1,8 +1,17 @@
 #!/bin/bash
 # PreToolUse:Bash hook for agents that share a checkout with other sessions. Policy:
-# - Any `git` invocation blocks (verdict `git`), whatever the subcommand or flags, read-only ones
-#   included, so all version control goes through jj. So does `aitools git ...` and `aitools run|bg`
-#   given git as an argument. ALLOW_DESTRUCTIVE_GIT=1 never lifts this verdict.
+# - `git` blocks (verdict `git`) unless its subcommand is on a read-only allowlist: status, log, diff,
+#   show, blame, rev-parse, ls-files, ls-tree, ls-remote, merge-base, rev-list, cat-file, grep,
+#   describe, shortlog, name-rev, for-each-ref, show-ref, count-objects, check-ignore, plus the
+#   read-only forms of remote, config (--get, --get-all), branch, tag, stash list, and worktree list.
+#   Global options before the subcommand (-C, -c, --no-pager, --git-dir, ...) are skipped, but -c/
+#   --config-env keys that make git run a program (core.fsmonitor, core.pager, alias.*, diff.*.textconv,
+#   man.*, ...), --exec-path=, environment that redirects git's config, repository, or helper programs
+#   (GIT_CONFIG_*, GIT_DIR, GIT_PAGER, GIT_SSH*, GIT_TRACE*, ...), and subcommand options that run a
+#   program or write a file (--output, --ext-diff, --no-index, -O, ...) block. git accepts unique
+#   prefixes of long options, so any `--xxx` of four or more characters that begins one of those
+#   options blocks too. Writes go through jj. ALLOW_DESTRUCTIVE_GIT=1 never lifts this verdict.
+# - `aitools git ...` only reads, so it passes; `aitools run|bg ... git <args>` is judged like `git <args>`.
 # - Destructive jj commands block: edit, next, prev, bisect, sparse set/reset/edit, abandon, undo, redo,
 #   op restore/revert, restore without paths, and new onto another revision; plus jj git push,
 #   which skips Git hooks.
@@ -11,11 +20,12 @@
 # Looks through shell wrappers (bash -c, env, env -S, xargs, sudo, eval, ...), shell reserved words
 # (`!`, if, then, do, ...), and `jj util exec` to find the underlying command.
 # The git verdict fails closed for a literal `git` command word: any path, any arguments, any
-# wrapper the hook peels. It does not classify a command name computed at run time (`$g status`,
-# `$(echo git) status`, `$'git' status`), a command fed to a shell on stdin (`bash <<< ...`,
+# wrapper the hook peels. It does not classify a command name computed at run time (`$g commit`,
+# `$(echo git) commit`, `$'git' commit`), a command fed to a shell on stdin (`bash <<< ...`,
 # `echo ... | bash`), `coproc git`, wrappers it does not peel (find -exec, watch, ssh, nix
 # run/shell), or a wrapper option whose value is a separate word that the hook does not know takes
-# one (`xargs -I {} git`, `sudo -T 5 git`, `time -f %e git`).
+# one (`xargs -I {} git`, `sudo -T 5 git`, `time -f %e git`). A command substitution inside double
+# quotes ("$(git commit)", "`git commit`") is not classified either, for jj as well as git.
 # Everything else fails open on what the hook cannot classify, except where the unclassifiable part
 # could itself be destructive, which blocks: nesting deeper than the recursion limit, a jj
 # subcommand computed at run time ($(...), backticks, $VAR), and a jj subcommand that is not a
@@ -248,9 +258,12 @@ sub verdict_for_segment {
 
     # Environment that swaps the config jj reads, which can change the identity the push check relies on.
     my $jj_env = 0;
+    # Environment that makes a read-only git subcommand run a program.
+    my $git_env = 0;
     my $note_env = sub {
         my ($key) = @_;
         $jj_env = 1 if $key =~ /^JJ_(?:USER|EMAIL|CONFIG)$/;
+        $git_env = 1 if $key =~ /^GIT_(?:EXTERNAL_DIFF|PAGER|SSH\w*|ASKPASS|EDITOR|SEQUENCE_EDITOR|PROXY_COMMAND|CONFIG_(?:GLOBAL|SYSTEM|COUNT|PARAMETERS|KEY_\d+|VALUE_\d+)|TRACE\w*|DIR|WORK_TREE|EXEC_PATH|TEMPLATE_DIR)$/;
         return;
     };
     my $lift = sub {
@@ -339,28 +352,118 @@ sub verdict_for_segment {
     my @a = map { $_->{text} } @t;
 
     return $lift->(jj_verdict($depth, $allow, $jj_env, @a)) if $prog eq 'jj';
-    return 'git' if $prog eq 'git';
-    return aitools_git(@a) ? 'git' : q{} if $prog eq 'aitools';
+    return (git_blocked($git_env, @a) ? 'git' : q{}) if $prog eq 'git';
+    return aitools_verdict($depth, $allow, @a) if $prog eq 'aitools';
     return q{};
 }
 
-# `aitools git ...` reads repositories; `aitools run|bg start` can launch git itself. The leading
-# options may take a value, so the word after one is a candidate for the subcommand too.
-sub aitools_git {
-    my @a = @_;
-    my ($sub, $opt_seen) = (q{}, 0);
-    while (@a) {
-        my $x = shift @a;
-        if ($x =~ /^-/) { $opt_seen = 1; next; }
-        return 1 if $x eq 'git';
-        $sub = $x;
-        last;
+# `aitools git ...` only reads (status, log, diff, blame, show). `aitools run|bg` can launch any program,
+# so from the first git word after a launcher word the rest is judged as a git command line. Scanning
+# stops at the first git word, so `aitools git log --grep run` never reads as a launch.
+sub aitools_verdict {
+    my ($depth, $allow, @a) = @_;
+    my $launcher = 0;
+    for my $i (0 .. $#a) {
+        $launcher = 1 if $a[$i] eq 'run' or $a[$i] eq 'bg';
+        (my $b = $a[$i]) =~ s{^.*/}{};
+        next unless $b eq 'git';
+        return q{} unless $launcher;
+        return classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);
     }
-    return 1 if $opt_seen and $sub ne q{} and @a and $a[0] eq 'git';
-    if ($sub eq 'run' or $sub eq 'bg') {
-        for my $x (@a) { (my $b = $x) =~ s{^.*/}{}; return 1 if $b eq 'git'; }
+    return q{};
+}
+
+my %GIT_READONLY = map { $_ => 1 } qw(
+    status log diff show blame rev-parse ls-files ls-tree ls-remote merge-base rev-list cat-file
+    grep describe shortlog name-rev for-each-ref show-ref count-objects check-ignore version
+);
+
+# Global options whose value is the next word when written without `=`.
+my %GIT_GLOBAL_VALUE_OPT = map { $_ => 1 } qw(-C -c --git-dir --work-tree --namespace --super-prefix --config-env --attr-source);
+
+# Config keys that make git execute a program, a path, or a different config, so a read-only
+# subcommand stops being read-only.
+sub git_config_runs_program {
+    my ($kv) = @_;
+    return $kv =~ /^(?:core\.(?:fsmonitor|pager|editor|sshcommand|askpass|hookspath|gitproxy)|alias\.|pager\.|diff\.external|credential\.|include|url\.|protocol\.|gpg\.|filter\.|uploadpack\.|receive\.|man\.|browser\.|help\.|sequence\.|core\.alternaterefscommand|diff\..*\.(?:textconv|command)|merge\..*\.driver|mergetool\.|difftool\.|http\.proxy)/i;
+}
+
+# Long options that run a program, write a file, or read outside the repository. git resolves a unique
+# prefix of a long option, so an abbreviation of any of these is as dangerous as the full name.
+my @GIT_DANGEROUS_LONG = qw(
+    --output --output-directory --ext-diff --open-files-in-pager --upload-pack --receive-pack --exec
+    --exec-path --delete --move --copy --force --set-upstream-to --unset-upstream --edit-description
+    --no-index --textconv
+);
+
+# Prefixes shorter than four characters are left alone: they match too many harmless options.
+sub long_option_may_be_dangerous {
+    for my $x (@_) {
+        last if $x eq '--';
+        my ($name) = $x =~ /^(--[^=]*)/ or next;
+        next if length $name < 4;
+        for my $d (@GIT_DANGEROUS_LONG) { return 1 if index($d, $name) == 0; }
     }
     return 0;
+}
+
+# True when the git command line (arguments after `git`) is not provably read-only.
+sub git_blocked {
+    my ($git_env, @a) = @_;
+    return 1 if $git_env;
+    while (@a) {
+        my $x = $a[0];
+        return 1 if is_dynamic($x);
+        last unless $x =~ /^-/;
+        shift @a;
+        return 0 if $x eq '--version' or $x eq '--help' or $x eq '-h';
+        return 1 if $x =~ /^--exec-path=/;
+        my ($name, $val) = $x =~ /^(--[^=]+)=(.*)$/s;
+        if (defined $name) {
+            return 1 if $name eq '--config-env' and git_config_runs_program($val);
+            next;
+        }
+        if ($GIT_GLOBAL_VALUE_OPT{$x}) {
+            return 1 unless @a;
+            my $v = shift @a;
+            return 1 if ($x eq '-c' or $x eq '--config-env') and git_config_runs_program($v);
+            return 1 if is_dynamic($v);
+        } elsif ($x =~ /^-c(.+)$/s) {
+            return 1 if git_config_runs_program($1);
+        }
+    }
+    return 0 unless @a;
+    my $sub = shift @a;
+    return 1 if is_dynamic($sub);
+
+    # Options that run a program or write a file whatever the subcommand.
+    return 1 if grep { /^-[A-Za-z]*O/ } @a;
+    return 1 if long_option_may_be_dangerous(@a);
+
+    return 0 if $GIT_READONLY{$sub};
+
+    my @pos = grep { !/^-/ } @a;
+    my %opt = map { $_ => 1 } grep { /^-/ } @a;
+    if ($sub eq 'remote') {
+        return 0 if !@pos and !grep { !/^(?:-v|--verbose)$/ } keys %opt;
+        return (@pos and ($pos[0] eq 'show' or $pos[0] eq 'get-url')) ? 0 : 1;
+    }
+    if ($sub eq 'config') {
+        return 1 if grep { /^(?:--add|--unset|--unset-all|--replace-all|--edit|-e|--rename-section|--remove-section|--file|-f|--blob)(?:=|$)/ } keys %opt;
+        return (grep { /^(?:--get|--get-all)$/ } keys %opt) ? 0 : 1;
+    }
+    if ($sub eq 'branch') {
+        return 1 if grep { /^(?:-d|-D|-m|-M|-c|-C|-f|-u|--delete|--move|--copy|--force|--set-upstream-to(?:=.*)?|--unset-upstream|--edit-description|--track|--no-track|-t)$/ } keys %opt;
+        return 0 if !@pos;
+        return (grep { /^(?:--list|-l|-a|--all|-r|--remotes|--show-current|--contains|--no-contains|--merged|--no-merged|--points-at)(?:=|$)/ } keys %opt) ? 0 : 1;
+    }
+    if ($sub eq 'tag') {
+        return 1 if grep { /^(?:-d|-a|-s|-u|-f|-m|-F|--delete|--annotate|--sign|--force|--local-user|--message|--file)(?:=|$)/ } keys %opt;
+        return 0 if !@pos;
+        return (grep { /^(?:-l|--list)$/ } keys %opt) ? 0 : 1;
+    }
+    return ((@pos and $pos[0] eq 'list') ? 0 : 1) if $sub eq 'stash' or $sub eq 'worktree';
+    return 1;
 }
 
 # jj options that take a separate value, global or per-subcommand; skipping them keeps a value such
@@ -504,7 +607,7 @@ Scan exactly what will be pushed, then push with the override prefix and literal
                                         (a new bookmark: --log-opts="<commit> --not --remotes")
   ALLOW_DESTRUCTIVE_GIT=1 jj git push <arguments>
 
-A push still needs the user's authorization in the current message.
+A push still needs the user's confirmation.
 EOF
   exit 2
 fi
@@ -548,22 +651,17 @@ EOF
 fi
 
 cat >&2 <<'EOF'
-❌ git is disabled for agents (ORCH-P005)
+❌ git write blocked (ORCH-P005)
 
-Every git invocation is blocked, read-only ones included, and ALLOW_DESTRUCTIVE_GIT=1 does not lift it.
-Use jj instead:
-  status              jj status
-  diff                jj diff --git
-  log                 jj log
-  show                jj show --git <rev>
-  blame               jj file annotate <file>
+Only read-only git subcommands are allowed (status, log, diff, show, blame, rev-parse, ls-files, ...),
+and ALLOW_DESTRUCTIVE_GIT=1 does not lift this block. Writes go through jj:
   commit              jj commit -m "<message>"
   branch, checkout -b jj bookmark create <b> -r @
   fetch               jj git fetch --remote <r> --branch <b>
   push                jj git push -b <b>  (still gated: see the jj git push block)
-  ls-remote           gh api repos/<owner>/<repo>/git/ref/heads/<b> --jq .object.sha
+  clone               ghq get <url>
   no .jj/ directory   ask the user before running jj git init --colocate
 
-If git is truly needed, ask the user to run it with:  ! git <arguments>
+If a git write is truly needed, ask the user to run it with:  ! git <arguments>
 EOF
 exit 2

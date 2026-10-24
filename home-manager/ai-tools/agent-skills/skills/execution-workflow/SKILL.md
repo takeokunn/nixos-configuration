@@ -21,11 +21,8 @@ from a plan, a prior review, or a hook's rubric often contains items already sat
 most common source of wasted parallel waves. Where the directive names a tool-defined property (dead code,
 duplication, cyclomatic complexity), run that tool's own detector rather than judging by reading.
 
-Classify the task type and load only the matching memories: investigation prioritizes domain patterns,
-architecture entries, project conventions; implementation prioritizes feature patterns, language conventions,
-testing patterns; review prioritizes project conventions and code-quality entries; refactoring prioritizes
-architecture and component patterns. When Serena is available and relevant prior knowledge could change the
-work, call `list_memories` once and read only matching entries, including a relevant completion checklist.
+When Serena is available and relevant prior knowledge could change the work (project conventions, a completion
+checklist), call `list_memories` once and read only matching entries.
 Treat memories as historical evidence; verify claims that affect this task against the current tree.
 
 Identify which subtasks are independent. **Two subtasks writing to the same file are not independent however
@@ -50,7 +47,7 @@ returned report for evidence the agent did the work rather than refused it polit
 Dispatch independent tasks together using the runtime's agent tools. Size the fan-out by the independent subtasks
 found above: comparing alternatives usually needs two to four agents; a wider fan-out suits only a broad survey
 of independent parts. Give each concurrent writer a unique scratch path inside its assigned project or worktree;
-do not create a worktree without authorization. The Agent tool's `isolation: "worktree"` creates one and pins
+create a worktree only when concurrent writers need one. The Agent tool's `isolation: "worktree"` creates one and pins
 the agent to it, so Edit refuses the existing worktree you meant it to change; omit `isolation` for work on an
 existing checkout. When Edit refuses, an agent that writes the file through a shell command instead has evaded
 a boundary, not fixed it.
@@ -62,7 +59,7 @@ file:line or command output? A report citing nothing checkable is a retry condit
 
 Synthesize the accepted findings yourself. Verify any fix an agent prescribed before adopting it: **a correct
 diagnosis routinely arrives with a fix that breaks the build.** Report a rejected fix and its evidence; persist it
-only when it meets CLAUDE.md's `memory_policy` and memory writes are authorized.
+only when it meets CLAUDE.md's `memory_policy`.
 
 Treat results from parallel worktrees as competing alternatives, not composable increments: two working versions
 of the same area are a choice to make, not two halves to merge.
@@ -133,7 +130,7 @@ Unmet: do not delegate. Obtain the missing item, then re-run the gate.
   `delegation` section on its base ref.
 - No timing measurement is requested from an agent running concurrently with others; parallel load invalidates it.
 
-Unmet: revise before dispatching. If the ambiguity is the user's to resolve, ask rather than guess.
+Unmet: revise before dispatching. If only the user can resolve the ambiguity and the readings differ in a destructive or external effect, ask; otherwise state the assumption.
 
 ### Before editing code
 
@@ -186,31 +183,31 @@ declaring something unverifiable, check whether the tool offers a fake, offline,
 ## Workspace isolation
 
 Use jj, following [jujutsu](../jujutsu/SKILL.md). First inspect initialization, the existing workspace, and
-current on-disk changes. A suitable existing workspace needs no new version-control writes. If jj is not
-initialized, ask the user how to proceed rather than falling back to git. The write commands below
-require an explicitly authorized isolation request; they do not grant permission to fetch, create workspaces or bookmarks, or edit
-configuration.
+current on-disk changes. A suitable existing workspace needs no new version-control writes. If the directory has
+no `.jj/` of its own, do the file work in place and report the missing isolation; do not fall back to git.
+Fetching, creating a workspace, and creating a feature bookmark are local writes that need no separate
+authorization when the task calls for isolation.
 
 1. Inspect `jj workspace list --ignore-working-copy --no-pager` and the intended workspace's ownership and
    changes, including untracked files. Do not move or discard another session's working copy.
 2. Obtain the default branch name with `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
-3. When authorized, fetch the named base with `jj git fetch --remote origin --branch <default>`. Compare
+3. Fetch the named base with `jj git fetch --remote origin --branch <default>`. Compare
    `jj log -r '<default>@origin' --no-graph -T 'commit_id'` with
    `gh api repos/<owner>/<repo>/git/ref/heads/<default> --jq .object.sha` before using it as the base; a local
    remote ref alone is not freshness evidence. If they differ, fetch again with explicit `--remote` and
    `--branch` and recompare; if they still differ, stop and report.
-4. When a separate workspace is needed and authorized, choose a nonexisting destination within the approved scope
-   and use `jj workspace add --no-colocate --sparse-patterns full --name <name> -r <verified-base>
-   <authorized-destination>`. This creates an empty working-copy commit whose parent is the verified base, not a
-   working copy with the base's own commit ID.
+4. When a separate workspace is needed, choose a nonexisting destination within the project's `.worktrees/`
+   directory or the scope the user named, and use `jj workspace add --no-colocate --sparse-patterns full --name
+   <name> -r <verified-base> <destination>`. This creates an empty working-copy commit whose parent is the
+   verified base, not a working copy with the base's own commit ID.
    Activate that workspace as the project root before editing.
-5. Create or move a feature bookmark only when authorized and needed for delivery. Do not commit to or open a pull
-   request from the default bookmark; target the default branch unless the user requests otherwise.
-6. Report the workspace path. Do not automatically forget or remove it; cleanup needs its own authorization.
+5. Create a feature bookmark when needed for delivery. Do not commit to the default bookmark unless the user
+   asked; push and PR creation need confirmation.
+6. Report the workspace path. Do not forget or remove it without the user's say; cleanup deletes work.
 
 A workspace under the repository root can inherit parent configuration through directory-upward search: tool
 configs, environment files, and ignore rules. Inspect that inheritance when verifying in isolation. Do not append
-ignore rules or silently write to adjacent checkouts. A separate location needs authorization and activation as
+ignore rules or silently write to adjacent checkouts. Activate a separate location as
 the project root before edits.
 
 ### Asking whether a branch's work already landed
@@ -236,14 +233,14 @@ fetch without explicit `--remote` and `--branch` left stale. A burned version nu
 
 ## Prohibited
 
-CLAUDE.md's `hard_rules` already bans unauthorized version-control and shared-working-copy operations; repeating
-them would create two copies to keep in step. This file adds the orchestration-specific list:
+CLAUDE.md's `hard_rules` states the version-control and shared-working-copy prohibitions; this file adds the
+orchestration-specific list:
 
 - Delegating synthesis. Synthesize first, then write prompts that prove you understood: paths, line numbers, the
   specific change, the verification command. **The orchestrator owns synthesis; sub-agents own execution.**
 - Overlapping concurrent writers or verifying an artifact while its sources are changing.
-- Creating workspace isolation without authorization. A suitable existing workspace needs no new writes; bounded
-  local work does not require delegation or a new workspace.
+- Creating a workspace when a suitable one exists. Bounded local work does not require delegation or a new
+  workspace.
 
 ## Definition of done
 
@@ -339,8 +336,8 @@ verdicts.
 
 ### Committing in a shared checkout
 
-Run jj write commands only when the current user request explicitly authorizes them. jj has no staging area:
-`jj commit` takes the whole working copy unless you pass paths.
+Commit when the task calls for it (CLAUDE.md `hard_rules`). jj has no staging area: `jj commit` takes the whole
+working copy unless you pass paths.
 
 1. Inspect `jj status` and the full `jj diff --git` before committing anything, without
    `--ignore-working-copy` (see CLAUDE.md). jj ignores git's external differ, so `--git` emits a plain unified
@@ -348,18 +345,18 @@ Run jj write commands only when the current user request explicitly authorizes t
 2. If every hunk is cleanly attributable to your own work, commit only those paths
    (`jj commit -m "<msg>" <paths>`).
 3. If a shared file (an export list, a build manifest, a lockfile) carries changes interleaved with someone
-   else's, **stop and ask.** Do not bundle them and do not split them speculatively; whose-work-is-it is not
-   inferable from the diff.
+   else's, commit only your own paths, leave that file out, and report it. Do not bundle the interleaved
+   changes or split them speculatively; whose-work-is-it is not inferable from the diff.
 
 ## Concurrent sessions in one checkout
 
 CLAUDE.md's `hard_rules` lists the destructive shared-tree operations. Use an assigned isolated worktree when
-available. Creating a jj workspace or a WIP change requires the explicit version-control-write authorization in
-CLAUDE.md; neither is an automatic fallback for a prohibited command.
+available. A jj workspace or a WIP change is a local write that needs no separate authorization; neither is a way to
+get around a blocked command.
 
 Do not mirror a worktree into a shared checkout: overwrites and sync deletion can destroy concurrent work without
-changing Git metadata. Hand off the changed paths and diff, and leave integration to an explicitly authorized
-operation that preserves the destination's unrelated changes. When integration is authorized, check the agent's
+changing Git metadata. Hand off the changed paths and diff, and leave integration to an
+operation that preserves the destination's unrelated changes. When integrating, check the agent's
 scoped diff against the destination's current content, apply it with the available patch tool, and check for
 conflict markers afterwards. Copying its whole files onto a base that moved since reverts the work merged in between, and the tree and gates stay green.
 

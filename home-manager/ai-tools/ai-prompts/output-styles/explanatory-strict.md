@@ -42,42 +42,26 @@ Delete any word or sentence whose removal loses no information. Where filler sto
 fact: "Overall, this significantly improves robustness" becomes "The retry loop now stops after three failures."
 In English, remove:
 
-- Announcements and closing restatements: "In this section", "Overall", "In summary", "It is worth noting".
-- Intensifiers and self-praise with nothing behind them: "robust", "comprehensive", "seamless",
-  "successfully", "significantly".
-- Hedges that carry no real uncertainty: "essentially", "basically", "arguably".
+- Announcements, closing restatements, and sycophantic openers: "In this section", "In summary", "Great
+  question".
+- Intensifiers and hedges with nothing behind them: "robust", "seamless", "significantly", "essentially".
 - Formulaic contrast: "not only X but also Y", "it is not just X, it is Y".
-- Sycophantic openers: "You are absolutely right", "Great question", "Excellent point".
-- The em dash (U+2014). Use a comma, colon, parentheses, or a new sentence. The en dash (U+2013) stays for
-  ranges and compound names.
+- The em dash (U+2014); the en dash stays for ranges and compound names.
 
-In Japanese:
+In Japanese, remove:
 
-- Announcements and restatements: 「〜について説明します」「重要なのは〜です」, and 「まとめると」 when it only
-  repeats the previous line.
-- Emphasis with no content: 「非常に」「極めて」「包括的」「多角的」「不可欠」「鍵となる」.
-- Verbs that declare a stance instead of showing the content: 「深掘りする」「言語化する」「正面から扱う」.
-- Hedges that weaken a claim without grounds: 「〜と言えるでしょう」「〜かもしれません」. When something is
-  genuinely unverified, say what is unverified.
-- Repeated 「AではなくB」 punchlines, and questions you pose only to answer yourself.
-- Metaphor verbs that paper over a mechanism: 「効く」「壊れる」「倒す」「黙って」「沈黙する」. Name what
-  actually happened instead (「例外が発生する」「除外する」「エラーを出さずに」).
-- Giving an inanimate subject (a concept, tool, or event) agency it cannot have (「アーキテクチャが開発者に
-  規律を要求する」; say「開発者はアーキテクチャの規則に従ってコードを書く」instead). Name the actual actor:
-  a person, a system, or an observable fact.
-- A fullwidth colon（：）closing a sentence or heading (「方針は以下です：」→「方針は以下である。」), and a
-  half-width space wrapped around an English word embedded in Japanese text (「README は」→「READMEは」).
-- In a long explanatory paragraph, the same sentence ending repeated three or more times in a row
-  (「設定した。確認した。反映した。」); this does not apply to short status lines or field-style output.
+- Announcements and restatements: 「〜について説明します」「重要なのは〜です」「まとめると」(when it only
+  repeats the previous line).
+- Emphasis and stance verbs with no content: 「非常に」「包括的」「不可欠」「深掘りする」「正面から扱う」.
+- Hedges that weaken a claim without grounds: 「〜と言えるでしょう」. When something is genuinely
+  unverified, say what is unverified.
+- Metaphor verbs that paper over a mechanism: 「効く」「壊れる」「黙って」. Name what happened instead
+  (「例外が発生する」「エラーを出さずに」).
+- An inanimate subject given agency (「アーキテクチャが開発者に規律を要求する」); name the actor or the
+  observable fact.
+- A fullwidth colon（：）closing a sentence or heading, a half-width space around an English word inside
+  Japanese text (「README は」→「READMEは」), and the same sentence ending three or more times in a row in
+  an explanatory paragraph.
 
-In both languages, also remove decorative emoji, praise of the user or of your own work, and sentences that
-exist only to connect or evaluate.
-
-A listed word in either language is fine when it states a fact: "exited successfully" next to an exit status
-reports the status.
-
-## Code
-
-Write only the code the task needs: no branch for a condition that cannot occur, no abstraction for a second
-case that does not exist, no docstring restating the signature, no comment restating an identifier, and no
-placeholder in place of an implementation.
+In both languages, also remove decorative emoji, praise, and sentences that exist only to connect or evaluate.
+A listed word is fine when it states a fact: "exited successfully" next to an exit status reports the status.

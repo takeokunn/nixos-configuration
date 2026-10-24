@@ -10,7 +10,7 @@ let
 
   models = import ./oh-my-opencode/models.nix;
 
-  opencodeConfig = import ./opencode-config.nix {
+  opencodeSettings = import ./opencode-config.nix {
     inherit
       pkgs
       mcp-servers-nix
@@ -23,7 +23,10 @@ let
     inherit pkgs models;
   };
 
-  opencodeAgents = import ./agent-translation.nix { inherit pkgs ai-prompts-path; };
+  opencodeAgents = import ./agent-translation.nix {
+    inherit (pkgs) lib;
+    inherit ai-prompts-path;
+  };
 
   aitoolsRewrite = pkgs.writeShellScript "aitools-rewrite" (
     builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh"
@@ -34,30 +37,21 @@ in
     nurPkgs.oh-my-openagent
   ];
 
-  home.file.".opencode/CLAUDE.md".source = "${ai-prompts-path}/CLAUDE.md";
-  home.file.".opencode/CLAUDE.md".force = true;
-
-  xdg.configFile."opencode/opencode.json".source = opencodeConfig;
-
   xdg.configFile."opencode/oh-my-opencode.json".source = ohMyOpencodeConfig;
 
-  # A single file, not the directory: other tools drop their own plugins into `plugin/`.
-  xdg.configFile."opencode/plugin/aitools-rewrite.js".text =
+  # A single file, not the directory: other tools drop their own plugins into the plugin directories.
+  xdg.configFile."opencode/plugins/aitools-rewrite.js".text =
     builtins.replaceStrings [ "@AITOOLS_REWRITE@" ] [ "${aitoolsRewrite}" ]
       (builtins.readFile ./aitools-rewrite-plugin.js);
-
-  xdg.configFile."opencode/agents" = {
-    source = opencodeAgents.agents;
-    recursive = true;
-  };
-  xdg.configFile."opencode/commands" = {
-    source = opencodeAgents.commands;
-    recursive = true;
-  };
 
   programs.opencode = {
     enable = true;
     package = llmAgentsPkgs.opencode;
+    # The package exposes no passthru.jsonschema, so validateFiles.config cannot be enabled.
+    enableMcpIntegration = false;
+    settings = opencodeSettings;
+    context = ai-prompts-path + "/CLAUDE.md";
+    inherit (opencodeAgents) agents commands;
     tui.theme = "dracula";
     tui.scroll_speed = 3;
     tui.scroll_acceleration.enabled = true;

@@ -9,9 +9,9 @@ Apply the shared contracts in CLAUDE.md.
 ## Workflow
 
 1. Classify the task: log analysis, refactoring, debugging, migration, error handling, or knowledge-base work.
-   If competing interpretations lead to different work, ask for clarification or decompose the task.
-2. Load investigation-patterns for debugging or logs, and serena-usage before symbol or memory operations.
-   Read relevant recorded patterns and report what matched, or that nothing matched this task type.
+   If competing interpretations lead to different work, state the assumption or decompose the task.
+2. Load investigation-patterns for debugging or logs.
+   Read recorded patterns only when prior knowledge could change the work.
    Use Context7 or official documentation when a current library API determines the answer.
 3. Bound the investigation or change to named files and symbols. Gather logs, code, and configuration before
    concluding; cite file:line or the command producing each fact. Read cited files and count log evidence

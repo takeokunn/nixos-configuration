@@ -8,7 +8,7 @@
 # The override is an inline table because Codex splits a dotted -c key on every '.', so
 # projects."<path>".trust_level breaks on paths such as github.com/<owner>/<repo>.git. Codex merges
 # it with config.toml's [projects] and does not write it back. It is inserted before every other
-# argument, including the wrapper's static -c flags, which never set `projects`.
+# argument.
 
 set -euo pipefail
 

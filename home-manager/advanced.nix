@@ -85,6 +85,7 @@ in
   programs.nixvim.nixpkgs.source = nixpkgs;
 
   home.stateVersion = "25.11";
+  home.preferXdgDirectories = true;
   home.enableNixpkgsReleaseCheck = false;
 
   targets.darwin.linkApps.enable = isDarwin;

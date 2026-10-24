@@ -37,8 +37,9 @@ operations were tried and were insufficient, or the language is unsupported (nex
 Prefer symbol operations strongly in strongly-typed languages, where LSP resolution is accurate. In dynamic
 languages add `substring_matching=true`. For configuration and prose formats, go straight to `aitools search` and Read.
 
-At session start: `initial_instructions`, then `activate_project`, then `check_onboarding_performed`, then
-`onboarding` if it returns false.
+Before the first symbol operation in a session: `initial_instructions`, then `activate_project`. Check
+onboarding (`check_onboarding_performed`, then `onboarding` if it returns false) and list memories only when
+prior knowledge could change the work.
 
 ## When symbol tools cannot work
 

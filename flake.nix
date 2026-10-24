@@ -246,10 +246,7 @@
             # evaluates during a full darwinConfigurations/nixosConfigurations build.
             testGuardrailHookNames = {
               expr = sharedAiTools.guardrailHookNames;
-              expected = [
-                "block-destructive-git"
-                "block-bare-cd"
-              ];
+              expected = [ "block-destructive-git" ];
             };
             testDecodeFrontmatterScalar = {
               expr = map sharedAiTools.decodeFrontmatterScalar [
@@ -304,13 +301,14 @@
               expr = sharedAiTools.agentOpencodePermissions [ "tools: Read, Write" ];
               expected = "";
             };
-            testMcpServerToOpencodeHttp = {
+            # opencode's schema names URL servers "remote"; "http" is Claude Code's spelling.
+            testMcpServerToOpencodeRemote = {
               expr = sharedAiTools.mcpServerToOpencode {
                 type = "http";
                 url = "https://example.com/mcp";
               };
               expected = {
-                type = "http";
+                type = "remote";
                 url = "https://example.com/mcp";
               };
             };
@@ -443,20 +441,6 @@
                 touch $out
               '';
 
-          checks.prose-skill-gate-hook =
-            pkgs.runCommand "prose-skill-gate-hook-test"
-              {
-                nativeBuildInputs = [
-                  pkgs.jq
-                  pkgs.perl
-                ];
-              }
-              ''
-                bash ${./home-manager/ai-tools/ai-prompts/hooks/prose-skill-gate.test.sh} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/prose-skill-gate.sh}
-                touch $out
-              '';
-
           checks.guard-and-guide-rules =
             pkgs.runCommand "guard-and-guide-rules-test"
               {
@@ -475,7 +459,6 @@
             pkgs.runCommand "statusline-test"
               {
                 nativeBuildInputs = [
-                  pkgs.bc
                   pkgs.git
                   pkgs.jq
                   pkgs.jujutsu
@@ -558,12 +541,10 @@
               {
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
-                # `.value` is the attrset the JSON generator serialises into opencode.json. A Linux
-                # runner can evaluate the Mac host but cannot build the file, whose MCP server
-                # packages are Mac builds; the "allow"/"deny" strings here need no build.
-                opencodeBashPermissionsJson =
-                  builtins.toJSON
-                    self.darwinConfigurations.M4-Max.config.home-manager.users.take.xdg.configFile."opencode/opencode.json".source.value.permission.bash;
+                autoModeJson = builtins.toJSON claudeCodeManagedSettings.autoMode;
+                # The module option, not the built opencode.json: a Linux runner can evaluate the Mac
+                # host but cannot build the file, whose MCP server packages are Mac builds.
+                opencodeBashPermissionsJson = builtins.toJSON self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.opencode.settings.permission.bash;
                 configDir = claudeCodeConfigDir;
                 expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
                 settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
@@ -585,17 +566,85 @@
                   echo "managed-settings permissions.deny is unexpectedly empty" >&2
                   exit 1
                 fi
-                for rule in git 'git *' 'aitools git' 'aitools git *'; do
+                # Git writes are denied; read-only git is allowed (block-destructive-git judges it).
+                for rule in 'git commit *' 'git push *' 'git reset *' 'git checkout *' 'git stash push *' 'git -C * commit *' 'git -c * push *'; do
                   if ! jq -e --arg r "Bash($rule)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
-                    echo "managed-settings permissions.deny lost \"Bash($rule)\"; agents must not run git" >&2
+                    echo "managed-settings permissions.deny lost \"Bash($rule)\"; agents must not run git writes" >&2
                     exit 1
                   fi
-                  # opencode runs none of the hooks, so its prefix deny is the only thing between it and git.
+                  # opencode runs none of the hooks, so its prefix deny is the only thing between it and a git write.
                   if ! jq -e --arg r "$rule" '.[$r] == "deny"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
                     echo "opencode permission.bash no longer denies \"$rule\"" >&2
                     exit 1
                   fi
                 done
+                # Read-only git must stay reachable: Claude Code judges it through block-destructive-git, and
+                # opencode asks on an unknown git command but allows the listed reads.
+                for rule in git 'git *' 'git stash *' 'aitools git' 'aitools git *'; do
+                  if jq -e --arg r "Bash($rule)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.deny blocks read-only git again via \"Bash($rule)\"" >&2
+                    exit 1
+                  fi
+                done
+                if ! jq -e '.["git *"] == "ask" and .["git"] == "ask"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
+                  echo "opencode permission.bash lost its \"git\"/\"git *\" ask default, which covers git writes no prefix can name" >&2
+                  exit 1
+                fi
+                for rule in 'git status *' 'git status' 'git stash list'; do
+                  if ! jq -e --arg r "$rule" '.[$r] == "allow"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
+                    echo "opencode permission.bash no longer allows \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                for sub in commit push reset checkout switch rebase merge clean restore add rm mv pull fetch clone; do
+                  if ! jq -e --arg r "Bash(git $sub *)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.deny lost \"Bash(git $sub *)\"" >&2
+                    exit 1
+                  fi
+                  for rule in "git $sub" "git $sub *"; do
+                    if ! jq -e --arg r "$rule" '.[$r] == "deny"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
+                      echo "opencode permission.bash no longer denies \"$rule\"" >&2
+                      exit 1
+                    fi
+                  done
+                done
+                # Each of these runs a program or leaks the environment from inside an allowed command.
+                for rule in 'Bash(nix eval *)' 'Bash(nix flake show *)' 'Bash(nix flake metadata *)' 'Bash(jq *)' 'Bash(tree *)' 'Bash(aitools sys procs *)' 'Bash(bash *)' 'Bash(sh *)' 'Bash(python *)' 'Bash(python3 *)' 'Bash(node *)'; do
+                  if jq -e --arg r "$rule" '.allow | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.allow contains \"$rule\", which skips the classifier for a command that can run code or leak secrets" >&2
+                    exit 1
+                  fi
+                done
+                if ! jq -e '.ask | index("Bash(rg *--hostname-bin*)")' <<< "$permissionsJson" >/dev/null; then
+                  echo "managed-settings permissions.ask lost \"Bash(rg *--hostname-bin*)\"" >&2
+                  exit 1
+                fi
+                # Auto mode ignores a blanket Bash allow, and the push and PR checkpoints must stay ask rules.
+                for rule in 'Bash(*)' 'Bash'; do
+                  if jq -e --arg r "$rule" '.allow | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.allow contains the blanket \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                for rule in 'Bash(jj git push*)' 'Bash(gh pr create*)' 'Bash(gh pr merge*)'; do
+                  if ! jq -e --arg r "$rule" '.ask | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.ask lost \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                if ! jq -e '.environment | index("$defaults")' <<< "$autoModeJson" >/dev/null; then
+                  echo "managed-settings autoMode.environment lost \"\$defaults\", which drops the built-in trust slots" >&2
+                  exit 1
+                fi
+                # "$defaults" plus the four custom entries (source control, worktrees, scratch, contest servers).
+                if [ "$(jq '.environment | length' <<< "$autoModeJson")" -ne 5 ]; then
+                  echo "managed-settings autoMode.environment no longer has \"\$defaults\" plus 4 custom entries" >&2
+                  exit 1
+                fi
+                if jq -e '.environment[] | select(contains("/Users/") or contains("/home/"))' <<< "$autoModeJson" >/dev/null; then
+                  echo "managed-settings autoMode.environment names an absolute home path" >&2
+                  exit 1
+                fi
                 if [ "$(jq '.allow | length' <<< "$permissionsJson")" -lt 1 ]; then
                   echo "managed-settings permissions.allow is unexpectedly empty" >&2
                   exit 1
@@ -634,6 +683,78 @@
                   /home/*) ;;
                   *) echo "X13Gen2 home \"$linuxHomeDirectory\" left /home; nixos/config/claude-code-settings.nix still builds its hook paths from that prefix" >&2; exit 1 ;;
                 esac
+                touch $out
+              '';
+
+          checks.codex-hooks =
+            let
+              codex = self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.codex;
+              # The hook scripts and the MCP server packages are Mac builds, which a Linux runner could
+              # not realise; only their text is inspected here.
+              plain = builtins.unsafeDiscardStringContext;
+            in
+            pkgs.runCommand "codex-hooks-test"
+              {
+                nativeBuildInputs = [ pkgs.jq ];
+                hooksJson = plain (builtins.toJSON codex.hooks);
+                settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
+                settingsJson = builtins.toJSON {
+                  inherit (codex.settings) model model_reasoning_effort;
+                  hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;
+                  hasApprovalPolicy = codex.settings ? approval_policy;
+                  hasSandboxMode = codex.settings ? sandbox_mode;
+                };
+                rulesDeny = plain codex.rules.deny;
+              }
+              ''
+                # Codex merges hook sources, so a hook registered through both programs.codex.hooks and
+                # settings.hooks would run twice.
+                if [ "$settingsHooksJson" != "null" ]; then
+                  echo "programs.codex.settings.hooks is set next to programs.codex.hooks" >&2
+                  exit 1
+                fi
+                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("-block-destructive-git$"))] | length' <<< "$hooksJson")
+                if [ "$n" -ne 1 ]; then
+                  echo "programs.codex.hooks registers block-destructive-git $n times, expected exactly once" >&2
+                  exit 1
+                fi
+                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("-aitools-rewrite-codex$"))] | length' <<< "$hooksJson")
+                if [ "$n" -ne 1 ]; then
+                  echo "programs.codex.hooks registers aitools-rewrite-codex $n times, expected exactly once" >&2
+                  exit 1
+                fi
+                # The bare aitools-rewrite script emits Claude Code's output shape, which Codex rejects.
+                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("aitools-rewrite"))] | length' <<< "$hooksJson")
+                if [ "$n" -ne 1 ]; then
+                  echo "programs.codex.hooks references aitools-rewrite $n times, expected only the codex wrapper" >&2
+                  exit 1
+                fi
+                if ! jq -e '.PreToolUse | length > 0 and all(.[]; .matcher == "^Bash$")' <<< "$hooksJson" >/dev/null; then
+                  echo "programs.codex.hooks.PreToolUse must be non-empty with every matcher exactly ^Bash$" >&2
+                  exit 1
+                fi
+                if jq -e '.. | objects | select(.command? != null) | .command | select(test("block-bare-cd|prose-skill-gate"))' <<< "$hooksJson" >/dev/null; then
+                  echo "programs.codex.hooks wires a removed hook (block-bare-cd or prose-skill-gate)" >&2
+                  exit 1
+                fi
+                if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
+                  echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
+                  exit 1
+                fi
+                # approval_policy and sandbox_mode are wrapper -c flags so they outrank the mutable config.toml.
+                if ! jq -e '.hasAutoCompactLimit == false and .hasApprovalPolicy == false and .hasSandboxMode == false' <<< "$settingsJson" >/dev/null; then
+                  echo "programs.codex.settings carries model_auto_compact_token_limit, approval_policy, or sandbox_mode" >&2
+                  exit 1
+                fi
+                # The bare pattern "git stash" would become this prefix rule and forbid `git stash list`.
+                if grep -F 'prefix_rule(pattern = ["git","stash"],' <<< "$rulesDeny" >/dev/null; then
+                  echo "programs.codex.rules.deny forbids the bare [\"git\",\"stash\"] prefix, which also covers git stash list" >&2
+                  exit 1
+                fi
+                if ! grep -F 'prefix_rule(pattern = ["git","commit"],' <<< "$rulesDeny" >/dev/null; then
+                  echo "programs.codex.rules.deny no longer forbids git commit" >&2
+                  exit 1
+                fi
                 touch $out
               '';
 

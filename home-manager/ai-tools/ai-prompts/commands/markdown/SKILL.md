@@ -7,7 +7,7 @@ Save the previous command's substantive output as Markdown. Preserve its conclus
 
 ## Target
 
-Use the user's path only inside the active project root; otherwise ask for an in-project path. Without a path, write at that root:
+Use the user's path only inside the active project root; otherwise use the table below at the project root. Without a path, write at that root:
 
 | Previous command | File |
 |---|---|

@@ -22,7 +22,7 @@ let
 
     - The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*/SKILL.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.
     - When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.
-    - Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, jj as the default version-control workflow, no version-control writes unless explicitly requested, and explicit verification reporting.
+    - Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, jj as the default version-control workflow, version-control writes only through jj (git is read-only), and explicit verification reporting.
 
     ### Tool mapping
 
@@ -38,12 +38,11 @@ let
 
     ### Execution guidance
 
-    - For repo work, activate Serena and check onboarding before symbolic investigation when Serena is available.
     - After changes, run the narrowest meaningful formatter, parser, or test command. If verification cannot be run, state exactly why.
 
   '';
 
-  codexAgents = pkgs.writeText "codex-AGENTS.md" ''
+  codexAgents = ''
     ${codexRuntimeAdapter}
     ${builtins.readFile (aiPromptsPath + "/CLAUDE.md")}
   '';
@@ -122,27 +121,47 @@ let
     in
     if lib.hasInfix "*" literal then null else lib.splitString " " literal;
 
+  # A deny prefix that is also the start of a read-only git command would forbid that read as well:
+  # the bare "git stash" pattern becomes ["git","stash"], which covers `git stash list`. Such a
+  # pattern is left out of the rules and listed as unenforced; block-destructive-git handles it.
+  readOnlyGitTokens = map (r: [ "git" ] ++ lib.splitString " " r) shared.gitReadSubcommands;
+  shadowsRead =
+    tokens: lib.any (read: lib.take (builtins.length tokens) read == tokens) readOnlyGitTokens;
+
   convertedDenyTokens = lib.unique (
-    lib.filter (tokens: tokens != null) (map denyPatternToTokens shared.bashDenyPatterns)
+    lib.filter (tokens: tokens != null && !shadowsRead tokens) (
+      map denyPatternToTokens shared.bashDenyPatterns
+    )
   );
-  unconvertedDenyPatterns = lib.filter (p: denyPatternToTokens p == null) shared.bashDenyPatterns;
+  unconvertedDenyPatterns = lib.filter (
+    p:
+    let
+      tokens = denyPatternToTokens p;
+    in
+    tokens == null || shadowsRead tokens
+  ) shared.bashDenyPatterns;
 
   # With approval_policy "never" there is no prompt to fall back on, so these rules and the PreToolUse
   # hooks are the only guards on shell commands.
-  codexDenyRules = pkgs.writeText "codex-deny.rules" ''
-    # Generated from shared.bashDenyPatterns. Not expressible as an execpolicy prefix and so not enforced here:
+  codexDenyRules = ''
+    # Generated from shared.bashDenyPatterns. Not expressible as an execpolicy prefix, or a prefix that
+    # would also forbid a read-only git command, and so not enforced here:
     ${lib.concatMapStringsSep "\n" (p: "#   ${p}") unconvertedDenyPatterns}
     ${lib.concatMapStringsSep "\n" (
       tokens: ''prefix_rule(pattern = ${builtins.toJSON tokens}, decision = "forbidden")''
     ) convertedDenyTokens}
   '';
 
+  codexMcpServers = {
+    context7 = pickMcpServer nixMcpServers.context7;
+    playwright = pickMcpServer nixMcpServers.playwright;
+  }
+  // shared.mcpServers { inherit nurPkgs; };
+
   codexSettings = {
-    model = "gpt-5.6-luna";
+    model = "gpt-6.1-sol";
+    model_reasoning_effort = "medium";
     model_provider = "openai";
-    approval_policy = "never";
-    sandbox_mode = "danger-full-access";
-    model_auto_compact_token_limit = 50000;
     # Nix manages the codex package; disable the built-in updater.
     check_for_update_on_startup = false;
     suppress_unstable_features_warning = true;
@@ -152,100 +171,70 @@ let
     feedback = {
       enabled = false;
     };
-    hooks = {
-      PreToolUse = [
-        {
-          matcher = "^Bash$";
-          hooks =
-            map (name: {
-              type = "command";
-              command = "${codexHookScript name}";
-            }) shared.guardrailHookNames
-            ++ [
-              {
-                type = "command";
-                command = "${codexAitoolsRewrite}";
-              }
-            ];
-        }
-      ];
-    };
-    # Manual escape hatch for a capacity-limited primary model: `codex --profile fallback`.
-    profiles = {
-      fallback = {
-        model = "gpt-5.4-mini";
-      };
-    };
+    mcp_servers = lib.mapAttrs (
+      _: server: lib.filterAttrs (_: v: v != null && v != [ ] && v != { }) server
+    ) codexMcpServers;
   };
 
-  codexMcpServers = {
-    context7 = pickMcpServer nixMcpServers.context7;
-    playwright = pickMcpServer nixMcpServers.playwright;
-  }
-  // shared.mcpServers { inherit nurPkgs; };
-
-  cleanAttrs = lib.filterAttrs (_: v: v != null && v != [ ] && v != { });
-
-  toTomlInline =
-    value:
-    if builtins.isString value then
-      builtins.toJSON value
-    else if builtins.isInt value then
-      toString value
-    else if builtins.isBool value then
-      lib.boolToString value
-    else if builtins.isList value then
-      "[${lib.concatMapStringsSep ", " toTomlInline value}]"
-    else if builtins.isAttrs value then
-      "{ ${
-        lib.concatStringsSep ", " (
-          lib.mapAttrsToList (name: attrValue: "${name} = ${toTomlInline attrValue}") (cleanAttrs value)
-        )
-      } }"
-    else
-      throw "Unsupported Codex config value: ${builtins.typeOf value}";
-
-  codexSettingFlags = lib.mapAttrsToList (
-    name: value: "-c ${lib.escapeShellArg "${name}=${toTomlInline value}"}"
-  ) codexSettings;
-
-  codexMcpFlags = lib.mapAttrsToList (
-    name: server: "-c ${lib.escapeShellArg "mcp_servers.${name}=${toTomlInline server}"}"
-  ) codexMcpServers;
+  # Registered once, here; settings.hooks stays unset so Codex sees a single hook source.
+  codexHooks = {
+    PreToolUse = [
+      {
+        matcher = "^Bash$";
+        hooks =
+          map (name: {
+            type = "command";
+            command = "${codexHookScript name}";
+          }) shared.guardrailHookNames
+          ++ [
+            {
+              type = "command";
+              command = "${codexAitoolsRewrite}";
+            }
+          ];
+      }
+    ];
+  };
 
   # Trusts the target directory when it lies under ~/ghq; see ghq-trust.sh.
   codexGhqTrust = pkgs.writeShellScript "codex-ghq-trust" (builtins.readFile ./ghq-trust.sh);
 
+  # approval_policy and sandbox_mode are command-line overrides, not settings: config.toml is mutable
+  # and Codex can rewrite it, while a -c flag always wins over it.
+  codexForcedFlags = [
+    "-c"
+    ''approval_policy="never"''
+    "-c"
+    ''sandbox_mode="danger-full-access"''
+  ];
+
+  # The version in the name lets programs.codex choose the TOML layout from lib.getVersion.
   codexWrapped = pkgs.symlinkJoin {
-    name = "codex";
+    name = "codex-${llmAgentsPkgs.codex.version}";
     paths = [ llmAgentsPkgs.codex ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       rm $out/bin/codex
-      makeWrapper ${codexGhqTrust} $out/bin/codex ${
-        lib.concatMapStringsSep " " (flag: "--add-flags ${lib.escapeShellArg flag}") (
-          [ "${llmAgentsPkgs.codex}/bin/codex" ] ++ codexSettingFlags ++ codexMcpFlags
-        )
-      }
+      makeWrapper ${codexGhqTrust} $out/bin/codex --add-flags ${lib.escapeShellArg "${llmAgentsPkgs.codex}/bin/codex ${lib.escapeShellArgs codexForcedFlags}"}
     '';
   };
 in
 {
-  home.packages = [ codexWrapped ];
-
-  xdg.configFile = agentFileAttrs // {
-    "codex/AGENTS.md" = {
-      source = codexAgents;
-      force = true;
-    };
-    "codex/rules/deny.rules" = {
-      source = codexDenyRules;
-      force = true;
-    };
+  programs.codex = {
+    enable = true;
+    package = codexWrapped;
+    # config.toml stays writable: Codex records project trust, hook trust and model notices in it.
+    # Declared values win on every activation.
+    mutableSettings = true;
+    settings = codexSettings;
+    context = codexAgents;
+    hooks = codexHooks;
+    rules.deny = codexDenyRules;
+    profiles.fallback.model = "gpt-5.4-mini";
   };
 
-  home.sessionVariables = {
-    CODEX_DISABLE_TELEMETRY = "1";
-    CODEX_HOME = "$HOME/.config/codex";
-  };
+  xdg.configFile = agentFileAttrs;
+
+  # CODEX_HOME itself comes from programs.codex (home.preferXdgDirectories).
+  home.sessionVariables.CODEX_DISABLE_TELEMETRY = "1";
 }

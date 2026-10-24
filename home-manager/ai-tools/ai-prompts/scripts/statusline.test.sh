@@ -88,7 +88,40 @@ out=$(run "$root/plain")
 separators=$(grep -o ' | ' <<<"$out" | wc -l | tr -d ' ')
 check "a directory outside any repository shows no branch" "2" "$separators"
 
-expected_checks=6
+# The context segment comes from the input's used_percentage, never from the transcript.
+ctx() { printf '%s' "$1" | bash "$statusline"; }
+out=$(ctx '{"model":{"display_name":"M"},"workspace":{"current_dir":"/x"},"context_window":{"used_percentage":37.5}}')
+check "context usage shows the integer percentage" "ctx "$'\033[32m'"37%" "$out"
+out=$(ctx '{"model":{"display_name":"M"},"workspace":{"current_dir":"/x"},"context_window":{"used_percentage":92}}')
+check "context usage at 90% or more is red" $'\033[31m'"92%" "$out"
+out=$(ctx '{"model":{"display_name":"M"},"workspace":{"current_dir":"/x"},"context_window":{"used_percentage":null}}')
+check "a null used_percentage shows a placeholder" "ctx _%" "$out"
+
+base='"model":{"display_name":"M"},"workspace":{"current_dir":"/x"}'
+out=$(ctx '{"model":{"display_name":""},"workspace":{"current_dir":"/proj"},"context_window":{"used_percentage":37.5}}')
+check "an empty display_name keeps the directory in its own segment" " proj" "$out"
+check "an empty display_name keeps the context percentage" "37%" "$out"
+out=$(ctx '{"model":{"display_name":"M"},"context_window":{"used_percentage":37.5}}')
+check "a missing workspace keeps the context percentage" "37%" "$out"
+out=$(ctx '{"model":{"display_name":"M"},"workspace":{"current_dir":"/x"}}')
+check "a missing context_window shows a placeholder" "ctx _%" "$out"
+out=$(ctx "{$base,\"context_window\":{\"used_percentage\":0}}")
+check "0% is green" $'\033[32m'"0%" "$out"
+out=$(ctx "{$base,\"context_window\":{\"used_percentage\":70}}")
+check "70% is yellow" $'\033[33m'"70%" "$out"
+out=$(ctx "{$base,\"context_window\":{\"used_percentage\":89.9}}")
+check "89.9% is yellow" $'\033[33m'"89%" "$out"
+out=$(ctx "{$base,\"context_window\":{\"used_percentage\":90}}")
+check "90% is red" $'\033[31m'"90%" "$out"
+out=$(ctx "{$base,\"context_window\":{\"used_percentage\":\"abc\"}}" 2>&1)
+check "a non-numeric used_percentage shows a placeholder" "ctx _%" "$out"
+check_absent "a non-numeric used_percentage raises no shell error" "integer expression" "$out"
+transcript=$root/transcript.jsonl
+printf '%s\n' '{"usage":{"input_tokens":999999}}' >"$transcript"
+out=$(ctx "{$base,\"transcript_path\":\"$transcript\"}")
+check "transcript_path is ignored" "ctx _%" "$out"
+
+expected_checks=20
 echo "$total checks, $failures failed"
 if [ "$total" -ne "$expected_checks" ]; then
   echo "FAIL: ran $total checks, expected $expected_checks"

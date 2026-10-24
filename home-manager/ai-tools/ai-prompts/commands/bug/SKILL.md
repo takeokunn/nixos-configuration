@@ -19,7 +19,7 @@ Separate the observed symptom site from the proposed cause. Logs establish what 
 2. Keep small investigations local. Delegate independent mechanism/hypothesis analysis, recurrence searches, or timeline/dependency tracing only when substantial. Every assignment is read-only.
 3. Check external contracts against vendored source or version-matched official documentation. A remembered API contract is not evidence.
 4. Reproduce with the smallest relevant probe. Distinguish a subject failure from a broken reproduction or unresolved setup. A failure before the target starts says nothing about its behavior; a changed error is not itself progress.
-5. Narrow for at most three iterations. If the boundary remains unstable, repeat an identical probe once, state what was ruled out, and ask the user which remaining direction to pursue.
+5. Narrow for at most three iterations. If the boundary remains unstable, repeat an identical probe once, state what was ruled out and the remaining directions, and stop.
 
 ## Conclude
 

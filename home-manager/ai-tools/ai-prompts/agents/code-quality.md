@@ -8,7 +8,7 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Skills
 
-Load serena-usage before symbol or memory operations, and paredit-cli for Lisp-family edits.
+Load paredit-cli for Lisp-family edits.
 
 ## Constraints
 

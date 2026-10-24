@@ -33,14 +33,16 @@ let
 in
 {
   theme = "dark";
-  autoUpdates = false;
-  includeCoAuthoredBy = false;
+  # Commit and PR text comes from the pull-request skill, so Claude Code adds no trailer of its own.
+  attribution = {
+    commit = "";
+    pr = "";
+  };
   # The built-in commit and PR instructions conflict with CLAUDE.md's hard_rules (they branch from the
   # default branch unasked); the pull-request and jujutsu skills carry this workflow instead.
   includeGitInstructions = false;
   autoCompactEnabled = true;
   enableAllProjectMcpServers = true;
-  feedbackSurveyState.lastShownTime = 1754089004345;
   # Selects the style defined in the home-manager module. Built-in Explanatory cannot be extended,
   # only replaced, so explanatory-strict re-authors its insight behavior and adds
   # output_discipline's prohibitions at the system-prompt layer, which CLAUDE.md cannot reach. The style
@@ -54,16 +56,66 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
-    # An allow rule skips the auto-mode classifier, so Bash(*) leaves the deny and ask lists and the
-    # PreToolUse hooks as the only guards on shell commands. block-destructive-git still blocks the jj
-    # commands that move or discard a shared working copy and every unscanned `jj git push`, but it
-    # exits 0 when neither jq nor python3 is on PATH, which leaves jj with no check at all.
-    # Claude Code may drop a blanket Bash rule when auto mode starts (unverified for this version): if
-    # a command that is not denied still prompts after a rebuild, replace Bash(*) with per-command
-    # entries for gh, jj and the read-only nix subcommands.
+    # An allow rule skips the auto-mode classifier, so only commands that read and cannot launch another
+    # program are listed; everything else reaches the classifier (auto mode ignores a blanket Bash(*)).
+    # find and fd are left out (-delete, -exec, -x), as are interpreters, the aitools write subcommands,
+    # aitools run|bg, and aitools sys env, which prints secrets into the transcript. nix eval and
+    # nix flake show|metadata (--option allow-unsafe-native-code, --write-to), jq (`jq -n env` prints
+    # the environment), tree (-o writes a file), and aitools sys procs (unredacted argv) are left out for
+    # the same reason. Redirects on an allowed command are checked against the Edit rules separately.
     # slite and clickup stay prompted because their writes publish to external workspaces.
     allow = [
-      "Bash(*)"
+      "Bash(ls *)"
+      "Bash(cat *)"
+      "Bash(head *)"
+      "Bash(tail *)"
+      "Bash(wc *)"
+      "Bash(rg *)"
+      "Bash(grep *)"
+      "Bash(jj status *)"
+      "Bash(jj log *)"
+      "Bash(jj diff *)"
+      "Bash(jj show *)"
+      "Bash(jj op log *)"
+      "Bash(jj op show *)"
+      "Bash(jj file show *)"
+      "Bash(jj file list *)"
+      "Bash(jj file annotate *)"
+      "Bash(git status *)"
+      "Bash(git log *)"
+      "Bash(git diff *)"
+      "Bash(git show *)"
+      "Bash(git blame *)"
+      "Bash(git rev-parse *)"
+      "Bash(git ls-files *)"
+      "Bash(nix path-info *)"
+      "Bash(nix log *)"
+      "Bash(aitools read *)"
+      "Bash(aitools search *)"
+      "Bash(aitools find *)"
+      "Bash(aitools overview *)"
+      "Bash(aitools info *)"
+      "Bash(aitools check *)"
+      "Bash(aitools diff *)"
+      "Bash(aitools code *)"
+      "Bash(aitools json get *)"
+      "Bash(aitools json select *)"
+      "Bash(aitools json diff *)"
+      "Bash(aitools table read *)"
+      "Bash(aitools table agg *)"
+      "Bash(aitools archive list *)"
+      "Bash(aitools archive read *)"
+      "Bash(aitools git *)"
+      "Bash(aitools sys info *)"
+      "Bash(aitools sys tools *)"
+      "Bash(aitools sys metrics *)"
+      "Bash(aitools sys network *)"
+      "Bash(aitools sys disk *)"
+      "Bash(aitools sys ports *)"
+      "Bash(aitools sys snapshot *)"
+      "Bash(aitools time *)"
+      "Bash(aitools util tokens *)"
+      "Bash(aitools util calc *)"
       "mcp__mediator"
       "mcp__plugin_hm_context7"
       "mcp__plugin_hm_deepwiki"
@@ -72,9 +124,18 @@ in
     ];
     # Ask outranks allow, so these forms of an allowed command still prompt. Each can start a program
     # the allow rule never named: jj through a configured tool, editor, pager, or fixer; nix through an
-    # impure read of any file. The override prefix lifts block-destructive-git's jj verdicts, and an
-    # agent can type it, so a person confirms each use.
+    # impure read of any file; rg through --pre. The override prefix lifts block-destructive-git's jj
+    # verdicts, and an agent can type it, so a person confirms each use.
+    #
+    # The push and PR rules are a human checkpoint: ask rules are evaluated before the auto-mode
+    # classifier. They match only commands that start with the named words (`jj -R x git push` slips
+    # past), so block-destructive-git still gates every jj push.
     ask = [
+      "Bash(jj git push*)"
+      "Bash(gh pr create*)"
+      "Bash(gh pr merge*)"
+      "Bash(rg *--pre*)"
+      "Bash(rg *--hostname-bin*)"
       "Bash(jj *--config*)"
       "Bash(jj *--tool*)"
       "Bash(jj config set *)"
@@ -102,6 +163,15 @@ in
     disableBypassPermissionsMode = "disable";
   };
 
+  # "$defaults" keeps the built-in environment; the entries after it name where this user's work lives.
+  autoMode.environment = [
+    "$defaults"
+    "Source control: repositories under the user's own owner directories in the ghq root (the user's account and the organizations the user belongs to) and those repositories' configured remotes. Third-party clones under the ghq root are reference copies, not trusted destinations."
+    "jj workspaces and .worktrees directories of those repositories are part of the same trusted repository."
+    "Scratch: /tmp, /private/tmp, and the system temp directory are ephemeral agent scratch space."
+    "Contest servers: only SSH host aliases whose names start with \"isu\" in the user's ssh config, used for ISUCON practice and contests; benchmarking, editing configs, restarting services, and reading logs there is routine."
+  ];
+
   env = {
     BASH_DEFAULT_TIMEOUT_MS = "300000";
     BASH_MAX_TIMEOUT_MS = "1200000";
@@ -118,25 +188,19 @@ in
     DISABLE_AUTOUPDATER = "1";
     DISABLE_ERROR_REPORTING = "1";
     DISABLE_INTERLEAVED_THINKING = "1";
-    DISABLE_NON_ESSENTIAL_MODEL_CALLS = "1";
     DISABLE_TELEMETRY = "1";
-    ENABLE_EXPERIMENTAL_MCP_CLI = "false";
     ENABLE_TOOL_SEARCH = "true";
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-    # The claude package from the llm-agents input sets CLAUDE_CODE_CERT_STORE=system in its
-    # wrapper, so that nixpkgs' cacert decides the trusted roots. On macOS that store holds only
-    # admin-trusted certificates, not Apple's built-in roots, and API calls fail with
-    # UNABLE_TO_GET_ISSUER_CERT_LOCALLY. Adding the cacert bundle that nix-darwin places in /etc/ssl
-    # restores the roots and keeps them following nixpkgs; switching back to `bundled,system` would
-    # pin them to the binary instead. On NixOS the entry is expected to duplicate the system store.
+    # Adds the cacert bundle that nix-darwin places in /etc/ssl to the trusted roots, so they follow
+    # nixpkgs rather than the binary. The llm-agents claude wrapper used to set
+    # CLAUDE_CODE_CERT_STORE=system, which on macOS left only admin-trusted certificates and failed API
+    # calls with UNABLE_TO_GET_ISSUER_CERT_LOCALLY; it no longer does, and whether this entry is still
+    # needed is unmeasured. On NixOS it is expected to duplicate the system store.
     #
     # A launcher that sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST (the Mediator desktop app does)
     # makes Claude Code ignore this entry, so the claude wrapper in
     # home-manager/ai-tools/claude-code/default.nix also sets the bundle in the process environment.
-    # This entry stays for launches that bypass that wrapper. Drop both once the unwrapped binary
-    # (`.claude-wrapped` in the package's bin/), run with `--debug` while the deployed
-    # managed-settings.json is unreadable to it, logs a "Loaded N system CA certificates" count that includes Apple's roots (over 100) rather
-    # than the admin-trusted few.
+    # This entry stays for launches that bypass that wrapper.
     NODE_EXTRA_CA_CERTS = shared.claudeCodeCaBundle;
   };
 
@@ -169,35 +233,12 @@ in
         assert
           claudeBashHookNames == [
             "block-destructive-git"
-            "block-bare-cd"
             "aitools-rewrite"
           ];
         map (name: {
           type = "command";
           command = "${hooksDir}/${name}";
         }) claudeBashHookNames;
-    }
-    # Claude Code only: it judges skill loads from the session transcript, whose format Codex does not
-    # share. Bash is matched for the `gh pr|issue` publish commands.
-    {
-      matcher = "Write|Edit|MultiEdit|Bash";
-      hooks = [
-        {
-          type = "command";
-          command = "${hooksDir}/prose-skill-gate";
-        }
-      ];
-    }
-  ];
-
-  hooks.Stop = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = "${hooksDir}/prose-skill-gate";
-        }
-      ];
     }
   ];
 

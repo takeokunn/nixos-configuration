@@ -352,6 +352,45 @@ expect_json codex "$(cwd_payload 'rg --files' "$repo/.hidden")" ''
 expect_json claude "$(cwd_payload 'cat x' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_json claude "$(cwd_payload 'fd -H Foo' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools find Foo --limit 200"'
 
+# `aitools read` exits 2 (selection.no-match) on a file without lines, so an empty file keeps its
+# shell command; a file with content, or one that does not exist yet, still gets the rewrite.
+empty_dir="$stub_dir/emptyfiles"
+mkdir -p "$empty_dir/sub"
+: >"$empty_dir/empty.txt"
+: >"$empty_dir/sub/empty.txt"
+printf 'x\n' >"$empty_dir/full.txt"
+for cmd in 'cat empty.txt' 'head empty.txt' 'head -n 5 empty.txt' 'tail -n 5 empty.txt' \
+  'sed -n 1,5p empty.txt' 'cat empty.txt | head -5' 'cat empty.txt 2>&1' 'cd sub && head empty.txt'; do
+  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" ''
+  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" ''
+done
+expect_json claude "$(cwd_payload 'head full.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read full.txt --range 1:10 --max-lines 10"'
+expect_json claude "$(cwd_payload 'head missing.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read missing.txt --range 1:10 --max-lines 10"'
+expect_json claude "$(cwd_payload 'cd sub && head full.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command | startswith("cd sub && aitools read")'
+
+# A range that starts beyond the last line fails the same way (exit 2), so it also keeps the shell
+# command. plain mode resolves paths against the hook's own working directory.
+printf 'a\nb\nc\n' >"$empty_dir/three.txt"
+printf 'a\nb\nc' >"$empty_dir/nonl.txt"
+plain_in() {
+  checked=$((checked + 1))
+  local got
+  got=$(cd "$1" && printf '%s' "$2" | bash "$hook" plain)
+  [[ $got == "$3" ]] || fail "plain in [$1] [$2]: expected [$3], got [$got]"
+}
+for cmd in "sed -n 4p three.txt" "sed -n 10,20p three.txt" "sed -n '4,\$p' three.txt" "sed -n 4p nonl.txt" "cd sub && sed -n 1p empty.txt"; do
+  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" ''
+  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" ''
+  plain_in "$empty_dir" "$cmd" ''
+done
+plain_in "$empty_dir" 'cat empty.txt' ''
+plain_in "$empty_dir" 'head empty.txt' ''
+plain_in "$empty_dir" 'sed -n 3p three.txt' 'aitools read three.txt --range 3:3 --max-lines 1'
+plain_in "$empty_dir" 'sed -n 3p nonl.txt' 'aitools read nonl.txt --range 3:3 --max-lines 1'
+plain_in "$empty_dir" 'sed -n 2,9p three.txt' 'aitools read three.txt --range 2:9 --max-lines 8'
+plain_in "$empty_dir" 'sed -n 4p missing.txt' 'aitools read missing.txt --range 4:4 --max-lines 1'
+expect_json claude "$(cwd_payload 'sed -n 3p three.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read three.txt --range 3:3 --max-lines 1"'
+
 # Without aitools on PATH the hook must stand aside rather than hand back a command that cannot run.
 checked=$((checked + 1))
 bare_dir="$stub_dir/bare"

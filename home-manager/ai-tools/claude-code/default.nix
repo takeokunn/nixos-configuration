@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   nurPkgs,
   mcp-servers-nix,
@@ -16,10 +17,10 @@ let
   # needed) and logs "skipping settings-sourced NODE_EXTRA_CA_CERTS under host-managed provider".
   # --set-default lets a caller's own value win.
   #
-  # The flag goes into upstream's single wrapProgram call, right after its CLAUDE_CODE_CERT_STORE
-  # flag, because upstream notes that wrapping a second time renames the process. The assert fails
-  # evaluation when upstream rewrites that call, instead of silently dropping the bundle.
-  wrapperSplicePoint = "--set-default CLAUDE_CODE_CERT_STORE system";
+  # The flag goes into upstream's single wrapProgram call, right after its --argv0 flag, because
+  # wrapping a second time renames the process. The assert fails evaluation when upstream rewrites
+  # that call, instead of silently dropping the bundle.
+  wrapperSplicePoint = "--argv0 claude";
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (old: {
     doInstallCheck = false;
     postFixup =
@@ -45,6 +46,9 @@ in
 {
   programs.claude-code.enable = true;
   programs.claude-code.package = claude-code-fixed;
+  # Pinned: the module's default moves to the XDG config directory once home.stateVersion reaches 26.11
+  # or home.preferXdgDirectories is set, and the managed hook commands hardcode this path.
+  programs.claude-code.configDir = "${config.home.homeDirectory}/.claude";
   programs.claude-code.context = builtins.readFile "${ai-prompts-path}/CLAUDE.md";
   # `programs.claude-code.settings` is deliberately unset. Setting it makes home-manager place
   # `~/.claude/settings.json` as a read-only store symlink (`home.file`, mode 444), and Claude Code
@@ -84,9 +88,7 @@ in
   ];
 
   programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
-  programs.claude-code.hooks.block-bare-cd = builtins.readFile "${ai-prompts-path}/hooks/block-bare-cd.sh";
   programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh";
-  programs.claude-code.hooks.prose-skill-gate = builtins.readFile "${ai-prompts-path}/hooks/prose-skill-gate.sh";
 
   programs.claude-code.mcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {

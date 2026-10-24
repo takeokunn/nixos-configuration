@@ -47,13 +47,13 @@ in
   };
   librarian = mkLane {
     modelTier = models.default;
-    variant = "high";
+    variant = "medium";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/librarian.md;
     description = "Specification researcher. Looks up docs via context7, web search, and API references.";
   };
   explore = mkLane {
     modelTier = models.default;
-    variant = "high";
+    variant = "medium";
     prompt_append = models.promptLang + "\n\n" + builtins.readFile ./prompts/explore.md;
     description = "Fast explorer. Quick codebase navigation, file search, and pattern matching.";
   };

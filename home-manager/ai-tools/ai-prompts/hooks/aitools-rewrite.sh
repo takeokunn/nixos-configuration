@@ -17,6 +17,8 @@
 # `| tail -N`, which becomes aitools' own line or result limit where aitools can count the same
 # units (not for tree output, rg -o, or a search with context lines). Any other pipeline, list,
 # substitution, or redirect feeds the output to another program, and aitools' JSON would break it.
+# An empty file, or a line range that starts beyond the last line, is left to the shell command, since
+# `aitools read` fails on both (see is_empty_file and range_past_eof).
 # A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
 # differs from aitools' leaves the command untouched. Everything fails open. To keep a command as
 # typed, prefix it: `command cat f`.
@@ -73,6 +75,10 @@ my ($prefix, $body, $redirect, $filter, $cd_dir) = split_envelope($command);
 my @words = split_words($body) or exit 0;
 my %ctx = (cd_dir => $cd_dir, hidden_cwd => under_dot_directory($cwd));
 my @rewritten = rewrite(\%ctx, @words) or exit 0;
+# Every `aitools read` selector fails with selection.no-match (exit 2) on a file without lines, where
+# cat, head, tail, and sed succeed with no output. A range starting past the last line fails the same way.
+exit 0 if $rewritten[0] eq 'read' && is_empty_file($rewritten[1], $cwd, $cd_dir);
+exit 0 if $rewritten[0] eq 'read' && range_past_eof(\@rewritten, $cwd, $cd_dir);
 if ($filter) {
   @rewritten = apply_filter($filter, @rewritten) or exit 0;
 }
@@ -87,6 +93,39 @@ my %out = (hookEventName => 'PreToolUse', updatedInput => \%updated);
 $out{permissionDecision} = 'allow' if $mode eq 'codex';
 print JSON::PP->new->canonical->encode({ hookSpecificOutput => \%out });
 exit 0;
+
+# Resolves a file operand the way the shell would after `cd DIR &&`.
+sub resolve_path {
+  my ($file, $cwd, $cd_dir) = @_;
+  my $home = $ENV{HOME} // '';
+  for ($file, $cd_dir) { s{\A~(?=/|\z)}{$home} if defined }
+  my $path = $file;
+  if ($path !~ m{\A/}) {
+    $path = "$cd_dir/$path" if defined $cd_dir;
+    $path = "$cwd/$path" if $path !~ m{\A/};
+  }
+  return $path;
+}
+
+# True only for an existing, empty regular file.
+sub is_empty_file {
+  my $path = resolve_path(@_);
+  return -f $path && !-s $path;
+}
+
+# True when the rewrite carries `--range A:...` and the existing file has fewer than A lines. A last
+# line without a trailing newline still counts.
+sub range_past_eof {
+  my ($args, $cwd, $cd_dir) = @_;
+  my ($i) = grep { $args->[$_] eq '--range' } 0 .. $#$args;
+  return 0 unless defined $i && ($args->[$i + 1] // '') =~ /\A([0-9]+):/;
+  my $start = $1;
+  my $path = resolve_path($args->[1], $cwd, $cd_dir);
+  return 0 unless -f $path && open(my $fh, '<:raw', $path);
+  my $lines = 0;
+  $lines++ while <$fh>;
+  return $start > $lines;
+}
 
 # Peels the envelopes off the command. Each is matched only at the very start or end of the text: a
 # `|` or `2>` inside quotes would leave an unterminated quote in the body, which split_words rejects.

@@ -87,8 +87,8 @@ List position carries the precedence, so the numbering is the ordering and there
 
 1. **Evidence completeness.** A file the decision depends on has not been read in this session. Read it before
    deciding: a summary of a file is not the file.
-2. **Scope clarity.** The request admits two readings that lead to different work. Ask with AskUserQuestion
-   rather than choosing the cheaper reading.
+2. **Scope clarity.** The request admits two readings that lead to different work. State the assumption and
+   proceed; ask with AskUserQuestion only when the readings differ in a destructive or external effect.
 3. **Reversibility.** The action cannot be undone from the repository alone: it deletes, publishes, or mutates
    shared state. Confirm with the user first.
 
@@ -106,7 +106,7 @@ encode: **an agent that computes 80.5 has not thought about whether it read the 
 ## Escalations
 
 Conditions that change what happens next, stated per domain. Four severities remain the vocabulary for ranking
-findings (low: note and proceed; medium: document and ask; high: stop and present options; critical: block and
+findings (low: note and proceed; medium: document the assumption; high: stop and present options; critical: block and
 require acknowledgment) but the escalation block itself names conditions and responses, not severity examples.
 
 ```markdown
@@ -131,8 +131,8 @@ Per gate_discipline in CLAUDE.md. Name:
 - The files read and the specific lines the conclusion rests on.
 - What is still unknown, or that nothing material is.
 
-Unmet: gather the missing evidence before proceeding. If only the user can supply it, ask with AskUserQuestion
-rather than assuming.
+Unmet: gather the missing evidence before proceeding. If only the user can supply it and a wrong guess would be destructive or externally visible, ask with
+AskUserQuestion; otherwise state the assumption and proceed.
 ```
 
 Place it where it belongs in the sequence: a checkpoint between two phases goes between them, and a heading
@@ -144,7 +144,7 @@ whatever evidence was gathered. "Name the files read" can. **A check that cannot
 ## The prepare phase
 
 Load the governing skill first, because every step after it is written against guidance that has not arrived
-yet. Then initialize Serena and read only the memories the task type calls for.
+yet. Then, when prior knowledge could change the work, initialize Serena and read the memories the task type calls for.
 
 ```markdown
 ### Prepare
@@ -152,8 +152,9 @@ yet. Then initialize Serena and read only the memories the task type calls for.
 1. Load the skill this workflow depends on through the runtime's skill mechanism, or read its SKILL.md in full
    when that mechanism is unavailable. Load serena-usage for memory or symbol operations. Return the skills
    loaded, by name.
-2. Activate the project, list memories, and read only the entries matching this task type, using Serena's
-   activate_project, list_memories and read_memory. Return the memories read, or an explicit "nothing matched".
+2. When prior knowledge could change the work, activate the project, list memories, and read only the entries
+   matching this task type, using Serena's activate_project, list_memories and read_memory. Return the memories
+   read, or an explicit "nothing matched".
 ```
 
 **Name the loaded skills in the output.** "Loaded the governing skill" with no name is not checkable against
