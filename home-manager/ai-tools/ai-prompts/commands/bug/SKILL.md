@@ -3,7 +3,7 @@ argument-hint: [error-message]
 description: Find the root cause of a reported error or failure. Use when the user wants a diagnosis; read-only, does not fix.
 ---
 
-Diagnose a reported failure without fixing it. Files and memories are read-only. Apply CLAUDE.md's evidence, delegation, consensus, and output_contract.
+Diagnose a reported failure without fixing it. Files and memories are read-only.
 
 ## Establish the subject
 
@@ -23,7 +23,7 @@ Separate the observed symptom site from the proposed cause. Logs establish what 
 
 ## Conclude
 
-Use gate_discipline to connect symptom → mechanism → cause, with a citation and evidence tier for every link. An unsupported link remains a hypothesis. Call it a root cause only when observed reproduction, logs, or an end-to-end source trace establishes the chain.
+Connect symptom → mechanism → cause, with a citation and evidence tier for every link. An unsupported link remains a hypothesis. Call it a root cause only when observed reproduction, logs, or an end-to-end source trace establishes the chain.
 
 Search the identified mechanism's recurrence scope and name every matching location; state exclusions. Resolve conflicting reports through the underlying evidence, not votes.
 
@@ -33,4 +33,4 @@ Return output_contract with:
 - Diagnosis: immediate cause, underlying cause, triggering conditions, and affected callers or other sites.
 - Fix scope bracket: smallest sufficient change, largest justified change, constraints, and under-fix/over-fix risks.
 - Recommended next action, without applying it, and the exact commands/results supporting the diagnosis.
-- Remaining hypotheses, missing observations, and durable memory candidates for handoff.
+- Remaining hypotheses and missing observations.

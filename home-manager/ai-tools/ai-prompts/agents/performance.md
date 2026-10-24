@@ -4,7 +4,6 @@ description: "Use when something is measurably slow and the cause is unknown: pr
 ---
 
 Establish a baseline, locate the cost, and measure any proposed improvement.
-Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
@@ -25,7 +24,7 @@ Load performance-benchmarking before measurement.
    Measure peak and steady-state memory and database statement counts where relevant.
 2. Profile the workload. Cite hot paths with file:line, measured share, and complexity; inspect queries in loops
    and corroborate N+1 with driver-level counts.
-3. Propose a bounded change and its risks. Follow gate_discipline before editing: establish paired measurement
+3. Propose a bounded change and its risks. Before editing, establish paired measurement
    conditions, relevant functional coverage, and absence of competing sibling workloads.
 4. Make only authorized changes. Repeat the identical benchmark and relevant functional tests under comparable
    conditions. Report all paired figures, not just the favorable run.

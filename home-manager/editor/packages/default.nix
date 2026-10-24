@@ -5,15 +5,6 @@
 }:
 let
   override = _: super: {
-    # copilot-0.5.0 bundles an old copilot-chat.el that shadows the
-    # standalone copilot-chat package in load-path, causing autoloads like
-    # copilot-chat-insert-commit-message to fail at runtime.
-    copilot = super.copilot.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + ''
-        rm -f $out/share/emacs/site-lisp/elpa/copilot-*/copilot-chat.el
-        rm -f $out/share/emacs/site-lisp/elpa/copilot-*/copilot-chat.elc
-      '';
-    });
     # projectile ≥ 20260627 requires consult at byte-compile time but the
     # generated nixpkgs derivation does not yet declare it as a dependency.
     projectile = super.projectile.overrideAttrs (old: {

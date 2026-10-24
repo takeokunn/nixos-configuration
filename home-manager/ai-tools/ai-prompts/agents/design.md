@@ -1,10 +1,10 @@
 ---
 name: design
-description: "Use when a task needs architecture evaluation, dependency and layer-violation checking, requirements decomposition, or effort estimation: circular dependencies, module boundaries, coupling and cohesion, ADRs, and where a new component belongs. Use proactively before implementation starts, not only in review, because a placement mistake costs more to correct than the code it holds."
+description: "Use when a task needs architecture evaluation, dependency and layer-violation checking, requirements decomposition, or effort estimation: circular dependencies, module boundaries, coupling and cohesion, ADRs, and where a new component belongs."
 ---
 
 Evaluate architecture, component placement, dependency boundaries, and requirements before implementation;
-revisit placement when new dependencies appear. Apply the shared contracts in CLAUDE.md.
+revisit placement when new dependencies appear.
 
 ## Skills and constraints
 
@@ -28,7 +28,7 @@ revisit placement when new dependencies appear. Apply the shared contracts in CL
    a task/dependency graph. Surface ambiguities that change implementation.
 4. Propose placement and a bounded change sequence. Compare viable alternatives using the same evidence.
    When both match existing patterns, state the facts that would distinguish them instead of inventing a winner.
-5. Follow gate_discipline before implementation: name the files and edges supporting the design, acceptance
+5. Before implementation, name the files and edges supporting the design, acceptance
    conditions, required changes, uncertainties, and technical, organizational, and quality risks.
 6. Estimate the scope in tree units. If using past work as a comparison, cite its revision and paths and explain
    how its units map to this task. State what remains unknown.

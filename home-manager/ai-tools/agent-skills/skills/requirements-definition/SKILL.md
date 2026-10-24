@@ -1,8 +1,8 @@
 ---
 name: requirements-definition
-description: Use for requirement analysis, specification, and clarification, and when running /define. Covers its phase sequence (prepare through finalize), the investigation and finalize gates, read-only agent dispatch, question prioritization, and requirement formatting.
+description: Use for requirement analysis, specification, and clarification, and when running /define. Covers its phase sequence (prepare through document), the investigation gate, read-only agent dispatch, question prioritization, and requirement formatting.
 metadata:
-  version: "4.1.0"
+  version: "4.2.0"
 ---
 
 The phase sequence /define executes, so the command file does not restate it, plus question design and
@@ -29,17 +29,16 @@ role whose runtime restrictions are unavailable. Verify external library claims 
 otherwise with official documentation, rather than recall.
 
 **clarify**: Prioritize and classify the candidate questions as described under
-[Which questions to ask first](#which-questions-to-ask-first). Ask the highest-priority first, through the
-runtime's question tool with its supported options and one marked (Recommended), including follow-ups. If no
-question tool is available, ask a concise question in text. Do not proceed on an assumption where a critical
-question is unanswered.
+[Which questions to ask first](#which-questions-to-ask-first). Ask only when readings differ in a destructive
+or externally visible effect (CLAUDE.md `work_selection`); use the runtime's question tool with its supported
+options and one marked (Recommended), or a concise question in text. Every other open question becomes a
+recorded assumption in the document, tagged inferred or assumed, and work proceeds.
 
 **verify**: Cross-check the user's answers against the investigation findings, and read the
 implementations the chosen approach depends on.
 
-**document**: Produce the requirements document and the phased task breakdown for /execute.
-
-**finalize**: The gate below.
+**document**: Produce the requirements document and the phased task breakdown for /execute. This is the last
+phase: there is no approval prompt afterwards.
 
 ## Gate after investigation
 
@@ -47,29 +46,15 @@ implementations the chosen approach depends on.
 - The scope boundary: what is explicitly out of scope.
 - Any technical blocker found, or that none was and what was checked.
 
-Unmet: widen the investigation, or ask if only the user can supply it. **Never write a requirement around an
+Unmet: widen the investigation, or record the gap as an assumption. **Never write a requirement around an
 unexamined area.**
 
-## The finalize gate
+## Unresolved items
 
-Read the Outstanding Issues section of the document just produced.
-
-If it reads "none", **skip the gate entirely and finish**: do not prompt.
-
-If it holds one or more items, offer these dispositions through the runtime's question tool when available
-and permitted, respecting its supported options. Otherwise ask a concise question in text:
-
-- **Resolve now (Recommended)**: re-enter clarify, ask the outstanding questions, and patch the document.
-- **Defer to /execute**: carry the issues into the handoff and mark dependent tasks blocked until their
-  critical questions are answered. Independent tasks may proceed on their own verified requirements.
-- **Stop and revise scope**: halt without finalizing the handoff, leaving the document visible so the user can
-  revise the request.
-
-**The resolution loop is bounded.** After "Resolve now", re-evaluate Outstanding Issues and re-present the gate
-at most once more, after which only Defer and Stop remain. Never loop unbounded.
-
-Deferral records an unresolved issue; it does not approve an assumption or clear a dependent task's gate.
-State whether the handoff is ready, partially blocked, or stopped, naming the affected tasks.
+Outstanding Issues lists each unresolved item with the assumption taken. Do not ask the user to resolve,
+defer, or stop. State whether the handoff is ready or partially blocked, naming the tasks that depend on an
+assumption that could not be checked. Recording an assumption does not verify it or clear a dependent task's
+gate.
 
 ## Agents
 
@@ -106,8 +91,9 @@ Rank a candidate question by four considerations, in this order:
    investigate rather than ask.
 4. **Effort impact**: how much the answer moves the size of the work.
 
-A question is **critical** when it branches the design *and* the wrong answer is expensive to undo. Ask those
-first, and do not proceed on an assumption while one is unanswered.
+A question is **critical** when it branches the design *and* the wrong answer is expensive to undo. Record the
+assumption taken for a critical question prominently in Outstanding Issues; ask only under the destructive or
+externally visible rule in clarify.
 
 ### Classify each question
 
@@ -117,8 +103,8 @@ first, and do not proceed on an assumption while one is unanswered.
 - **Scope**: "are admin features in the first version?"
 - **Priority**: "which of these ships first?"
 
-Ask through the runtime's question tool, respecting its supported option count and marking a recommendation
-when supported. If no question tool is available, ask a concise question in the response.
+When a question is asked, use the runtime's question tool, respecting its supported option count and marking a
+recommendation when supported. If no question tool is available, ask a concise question in the response.
 
 ## Writing the requirements
 
@@ -163,7 +149,7 @@ Record explicit user requests as desired behavior, not as unverified claims abou
 Tag factual premises **verified** (grounded in direct investigation), **inferred** (derived from something
 verified but not directly observed), or **assumed** (unchecked). **A factual premise still assumed at handoff
 time is not ready to support dependent implementation.** A partial handoff must name those blocked
-tasks separately from independent, ready tasks; deferral does not approve the assumption.
+tasks separately from independent, ready tasks; recording the assumption does not approve it.
 
 ## Map every requirement to a test
 
@@ -172,16 +158,14 @@ requirement with no test scenario is a requirement nobody will notice going unme
 
 ## Output
 
-A requirements document carrying: the request in one sentence with its background and expected outcomes; the
-current system and stack; functional requirements in FR-001 form marked mandatory or optional; non-functional
-requirements; technical specifications with each decision's rationale; test requirements as observable
-behavior; and Outstanding Issues.
+A requirements document carrying what the implementation needs, and omitting empty sections: the request in one
+sentence with its background and expected outcomes; the current system and stack; functional requirements in
+FR-001 form marked mandatory or optional; non-functional requirements when applicable; technical specifications
+with each decision's rationale; test requirements as observable behavior; and Outstanding Issues when any
+remain.
 
 Feasibility is stated as the observable condition supporting it, per the section above, never as a score.
 Where a requirement rests on an assumption rather than on investigation, say so at that requirement.
-
-Outstanding Issues states "none" explicitly when there are none: **the finalize gate's skip branch keys off
-that sentinel**, so an omitted section and an empty one are not the same thing.
 
 Then the task breakdown: the dependency graph, phased tasks with files and dependencies, and the handoff
 carrying the decisions made, the references, and the constraints, including what /execute must not assume.

@@ -856,24 +856,6 @@ $0
   特になし
 #+end_src
 ** org-mode/
-*** ai-block
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/ai-block") :mkdirp yes :noweb yes
-  #name: ai-block
-  #key: ai-block
-  # --
-  ,#+begin_ai
-  [ME]: $0
-  ,#+end_ai
-#+end_src
-*** ai-image
-#+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/ai-image") :mkdirp yes :noweb yes
-  #name: ai-image
-  #key: ai-image
-  # --
-  ,#+begin_ai :image :size ${1:$$(yas/choose-value '("256x256" "512x512" "1024x1024"))}
-  $0
-  ,#+end_ai
-#+end_src
 *** author
 #+begin_src snippet :tangle (expand-file-name "~/.emacs.d/snippets/org-mode/author") :mkdirp yes :noweb yes
   # name: author

@@ -34,7 +34,6 @@ let
     | Bash / Read / Edit / Write | Use exec_command for shell reads/commands, apply_patch for manual file edits, and Serena symbol tools for code navigation and targeted edits. |
     | WebSearch / WebFetch | Use web.run when current external information is required; for library/framework APIs prefer Context7 official docs first. |
     | Playwright MCP | Use Playwright MCP for browser verification, screenshots, console logs, and interaction checks. |
-    | DeepWiki MCP | Use DeepWiki for repository-level questions about public GitHub repositories. |
 
     ### Execution guidance
 
@@ -112,7 +111,7 @@ let
   '';
 
   # execpolicy matches whole argv tokens from the front, so only a literal command, or one ending in
-  # " *" after literal tokens, has an equivalent. Patterns such as `rm -rf /*` or `gh auth status *-t*`
+  # " *" after literal tokens, has an equivalent. Patterns such as `rm -rf /etc*` or `gh auth status *-t*`
   # return null and are listed in the generated file instead of being dropped unseen.
   denyPatternToTokens =
     pattern:
@@ -156,12 +155,11 @@ let
     context7 = pickMcpServer nixMcpServers.context7;
     playwright = pickMcpServer nixMcpServers.playwright;
   }
-  // shared.mcpServers { inherit nurPkgs; };
+  // removeAttrs (shared.mcpServers { inherit nurPkgs; }) [ "deepwiki" ];
 
   codexSettings = {
     model = "gpt-6.1-sol";
     model_reasoning_effort = "medium";
-    model_provider = "openai";
     # Nix manages the codex package; disable the built-in updater.
     check_for_update_on_startup = false;
     suppress_unstable_features_warning = true;
@@ -230,7 +228,6 @@ in
     context = codexAgents;
     hooks = codexHooks;
     rules.deny = codexDenyRules;
-    profiles.fallback.model = "gpt-5.4-mini";
   };
 
   xdg.configFile = agentFileAttrs;

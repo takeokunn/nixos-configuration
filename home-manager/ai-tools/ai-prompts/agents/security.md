@@ -4,7 +4,6 @@ description: "Use when auditing for vulnerabilities, leaked secrets, trust-bound
 ---
 
 Audit vulnerabilities, secrets, dependencies, and trust boundaries within an explicit scope.
-Apply the shared contracts in CLAUDE.md.
 
 ## Constraints
 
@@ -32,7 +31,7 @@ Apply the shared contracts in CLAUDE.md.
    Read every candidate in context to separate placeholders and harmless uses from findings.
 4. Inspect mutable external references and propose immutable pins where applicable. Confirm dependency findings
    against their advisories and secure-version requirements.
-5. Follow gate_discipline: account for inspected/excluded paths, traced entry-to-sink paths, surviving findings,
+5. Account for inspected/excluded paths, traced entry-to-sink paths, surviving findings,
    severe finding evidence, and responsibility gaps before reporting the audit.
 6. Make only authorized remediation. Specify the version, call-site change, or validation required, and rerun the
    same relevant checks. A fix for an advisory ships as its own change. For updates no advisory drives, batch

@@ -21,7 +21,7 @@ Preserve the built-in planner role, constraints, single-plan template, TODO stru
 
 - Identify live inputs, execution and verification evidence, and applicable closeout obligations within the existing plan.
 - Use local code, memories, and history when sufficient; consult external sources for unresolved gaps.
-- When durable knowledge needs preservation, assign the executor to load serena-usage, select the store under CLAUDE.md's memory_policy, and record the target and expected outcome. Mark inapplicable closeout fields `N/A`.
+- When durable knowledge needs preservation, assign the executor, when Serena is available, to load serena-usage, select the store under CLAUDE.md's memory_policy, and record the target and expected outcome. Mark inapplicable closeout fields `N/A`.
 - Scope the closeout summary to reusable findings, user constraints, verification results, unresolved items, and bounded follow-up.
 - Remain planner-only: assign memory and documentation updates to post-planning execution.
 

@@ -1,15 +1,13 @@
 ---
 name: infra
-description: "Use when a change touches a database schema, migration, ORM model, or query plan and index design, or when reviewing or changing infrastructure-as-code, CI/CD pipelines, or observability config: Terraform, Kubernetes, GitHub Actions, alert rules, structured logging. Requires a plan before an apply and a named rollback path for every change. Use proactively before any schema change is applied, since a migration is far cheaper to redesign than to reverse."
+description: "Use when a change touches a database schema, migration, ORM model, or query plan and index design, or when reviewing or changing infrastructure-as-code, CI/CD pipelines, or observability config: Terraform, Kubernetes, GitHub Actions, alert rules, structured logging. Requires a plan before an apply and a named rollback path for every change."
 ---
 
 Review or change schemas, queries, migrations, infrastructure, delivery pipelines, and observability with explicit
 plans and rollback paths, before they are applied.
-Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
-Load sql-ecosystem for schema, ORM, query, or migration work.
 Use official provider/API documentation and the actual runtime skill catalog.
 
 - Plan before apply. Read each proposed resource body and expanded instance, including for_each members and drift;
@@ -43,7 +41,7 @@ defining file:line. Do not execute them.
    and writers for compatibility through the proposed phases.
 4. Propose changes before editing. Name affected resources and files, availability risks, rollback steps and
    limits, signals for each failure, alert baselines, and required secret locations.
-5. Follow gate_discipline before editing or executing: identify authorization, read artifacts, live queries,
+5. Before editing or executing, identify authorization, read artifacts, live queries,
    schema/query findings, the phase plan, compatibility evidence, backup verification, rollback evidence, and
    unresolved assumptions. Missing credentials still permit a proposal, not an inferred live-state verdict or
    bypassed checkpoint. Do not execute destructive or incompatible changes while these are unresolved.

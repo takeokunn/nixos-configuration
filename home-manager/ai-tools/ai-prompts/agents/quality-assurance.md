@@ -1,10 +1,10 @@
 ---
 name: quality-assurance
-description: "Use to review a diff for correctness, error handling, readability, and accessibility, or to run a root-cause investigation on a reported failure: stack traces, swallowed failure paths, exception design, WCAG 2.1 AA, and impact on callers outside the change. Use proactively after implementation work and before it is proposed as done."
+description: "Use to review a diff for correctness, error handling, readability, and accessibility, or to run a root-cause investigation on a reported failure: stack traces, swallowed failure paths, exception design, WCAG 2.1 AA, and impact on callers outside the change."
 ---
 
 Review correctness, error handling, readability, accessibility, and affected callers, or establish the root cause
-of a reported failure. Apply the shared contracts in CLAUDE.md.
+of a reported failure.
 
 ## Skills
 
@@ -35,7 +35,7 @@ consumes input the project does not control.
    own error strategy. Cite file:line for each finding.
 4. Escalate risky idioms to security when confirmation is needed. For UI changes, capture the accessibility tree
    and check keyboard navigation and accessible names; report unavailable browser verification.
-5. Run the relevant build, lint, and tests. Follow gate_discipline: account for every changed file, distinguish
+5. Run the relevant build, lint, and tests. Account for every changed file, distinguish
    command-backed checks from checks discharged by a named source or artifact, and identify missing evidence.
    Do not fill root-cause, fix, or accessibility fields from plausibility.
 

@@ -3303,8 +3303,6 @@ https://github.com/blahgeek/emacs-lsp-booster?tab=readme-ov-file#configure-lsp-m
 
     (define-key embark-file-map (kbd "S") #'my/sudo-find-file)
 
-    (define-key embark-general-map (kbd "C") #'copilot-chat-transient-code)
-
     (add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode))
 #+end_src
 ** compile-multi
@@ -4864,7 +4862,7 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 
   ;; Configure variables BEFORE initialization
   (setopt exec-path-from-shell-arguments '("-l"))
-  (setopt exec-path-from-shell-variables '("PATH" "TERM" "COPILOT_LANGUAGE_SERVER_PATH"))
+  (setopt exec-path-from-shell-variables '("PATH" "TERM"))
 
   (exec-path-from-shell-initialize)
 
@@ -6350,21 +6348,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
     (setopt org-redmine-template-header "[#%i%] %s%")
     (setopt org-redmine-template-property '(("project_name" . "%p_n%"))))
 #+end_src
-*** org-ai
-:PROPERTIES:
-:CUSTOM_ID: org-ai
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-ai-mode) "org-ai" nil t)
-
-  (with-eval-after-load 'org
-    (add-to-list 'org-structure-template-alist '("A" . "ai"))
-
-    (add-hook 'org-mode-hook #'org-ai-mode))
-
-  (with-eval-after-load 'org-ai
-    (setopt org-ai-default-chat-model "gpt-3.5-turbo"))
-#+end_src
 ** Org Babel
 :PROPERTIES:
 :CUSTOM_ID: org-babel
@@ -7110,49 +7093,6 @@ against a missing directory signals file-missing on every Org buffer visit."
 #+begin_src emacs-lisp :tangle yes
 
 
-#+end_src
-* AI
-:PROPERTIES:
-:CUSTOM_ID: ai
-:END:
-** copilot.el
-:PROPERTIES:
-:CUSTOM_ID: copilotel
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(copilot-login copilot-mode) "copilot" nil t)
-
-  (keymap-global-set "C-x C-:" #'copilot-mode)
-
-  (with-eval-after-load 'copilot
-    (setopt copilot-log-max 100000)
-    (when-let* ((path (getenv "COPILOT_LANGUAGE_SERVER_PATH")))
-      (setopt copilot-server-executable path))
-
-    (define-key copilot-mode-map (kbd "C-S-i") #'copilot-complete)
-    (define-key copilot-mode-map (kbd "C-S-a") #'copilot-accept-completion)
-    (define-key copilot-mode-map (kbd "C-c # a") #'copilot-accept-completion))
-#+end_src
-** copilot-chat.el
-:PROPERTIES:
-:CUSTOM_ID: copilot-chatel
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(copilot-chat-transient-code copilot-chat-insert-commit-message) "copilot-chat" nil t)
-
-  (with-eval-after-load 'git-commit
-    (add-hook 'git-commit-setup-hook #'copilot-chat-insert-commit-message))
-
-  (with-eval-after-load 'copilot-chat
-    (setopt copilot-chat-frontend 'shell-maker))
-
-  (with-eval-after-load 'copilot-chat-prompts
-    (let ((my/copilot-chat-prompt "日本語で回答してください。\nコードと概念を正確に説明し、ユーザーの要件に従ってください。\n名前を尋ねられた場合は「GitHub Copilot」と答えてください。\n専門知識はソフトウェア開発に限定してください。\nMicrosoft のコンテンツポリシーに従い、著作権を侵害する内容は避けてください。\nソフトウェア開発以外の質問には、AIプログラミングアシスタントであることを簡潔に伝えてください。\n回答は簡潔で非個人的な Markdown 形式にしてください。\nコードブロックの先頭に言語名を記述し、回答全体を三重バッククオートで囲まないでください。\n提供されたコード、質問、エラー、プロジェクト情報を確認してから回答してください。\n不明確な点がある場合は確認し、必要に応じて可読性やパフォーマンスの改善案を示してください。\n"))
-      (setopt copilot-chat-markdown-prompt my/copilot-chat-prompt)
-      (setopt copilot-chat-org-prompt my/copilot-chat-prompt)))
-
-  (with-eval-after-load 'copilot-chat-copilot
-    (setopt copilot-chat-prompt-review "次のコードをレビューしてください。\n"))
 #+end_src
 * MyFunc
 :PROPERTIES:

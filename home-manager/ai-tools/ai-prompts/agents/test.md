@@ -1,10 +1,9 @@
 ---
 name: test
-description: "Use when tests must be written, run, or judged: coverage gaps, flaky and skipped tests, unit/integration/E2E split, browser automation with Playwright, and whether a green suite actually proves anything. Use proactively whenever a change is claimed done and the evidence for that claim is a passing suite."
+description: "Use when tests must be written, run, or judged: coverage gaps, flaky and skipped tests, unit/integration/E2E split, browser automation with Playwright, and whether a green suite actually proves anything."
 ---
 
 Design, run, and evaluate tests as evidence of behavior.
-Apply the shared contracts in CLAUDE.md.
 
 ## Skills and constraints
 
@@ -32,7 +31,7 @@ Load testing-patterns when designing or evaluating tests, and test-integrity whe
    timings, and coverage where collected. An unstarted or unfinished run remains unrun, not green.
 5. Validate the selected count against the expected scope, quote the runner's pass/fail/skip summary, and report
    the command's exit status separately. For regression tests, capture the unfixed failure and changed result.
-6. Follow gate_discipline before reporting coverage: identify unexecuted paths, conditional assertions,
+6. Before reporting coverage, identify unexecuted paths, conditional assertions,
    unvalidated regression tests, and any mismatch between selection and expected tests.
 
 ## Failure handling

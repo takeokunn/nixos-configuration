@@ -72,7 +72,6 @@ rec {
     "rm"
     "mv"
     "pull"
-    "fetch"
     "clone"
     "init"
     "am"
@@ -118,9 +117,13 @@ rec {
     "archive"
   ];
 
-  # Subcommands that never write. opencode allows them ahead of its `git *` ask default, and the
-  # Codex rule conversion uses them to drop a deny prefix that would also forbid a read.
+  # Subcommands that never write the working tree, the index, or a local branch. opencode allows them
+  # ahead of its `git *` ask default (except `fetch`, see below), and the Codex rule conversion uses
+  # them to drop a deny prefix that would also forbid a read. `fetch` only updates remote-tracking refs
+  # when block-destructive-git vets its URL, option, and refspec forms. Claude Code and Codex run that
+  # hook; opencode runs no hooks, so opencode-config.nix leaves `fetch` at its `git *` ask default.
   gitReadSubcommands = [
+    "fetch"
     "status"
     "log"
     "diff"
@@ -171,9 +174,92 @@ rec {
     "git -c * ${sub} *"
   ]) gitWriteSubcommands;
 
+  # System subdirectories of /var (macOS and Linux) that `rm -rf` must not reach. /var/folders and
+  # /var/tmp are left out on purpose: they hold per-user temp files that agents clean up routinely.
+  varSystemDirs = [
+    "account"
+    "agentx"
+    "at"
+    "audit"
+    "backups"
+    "boot"
+    "cache"
+    "containers"
+    "crash"
+    "db"
+    "dextcores"
+    "dirs_cleaner"
+    "empty"
+    "games"
+    "install"
+    "jabberd"
+    "lib"
+    "local"
+    "lock"
+    "log"
+    "logs"
+    "ma"
+    "mail"
+    "msgs"
+    "netboot"
+    "networkd"
+    "OOPJit"
+    "opt"
+    "personalized_factory"
+    "protected"
+    "root"
+    "rpc"
+    "run"
+    "select"
+    "sntpd"
+    "spool"
+    "vm"
+    "www"
+    "yp"
+  ];
+
+  # `rm -rf /*` cannot be listed: a Claude Code or opencode glob `*` also matches `/tmp/x`, which
+  # agents delete routinely. Every top-level directory except /tmp, /private/tmp, and /var/folders is
+  # listed instead, with `*` so paths below it are covered (`/Users*` includes a home directory's
+  # contents; relative paths pass). The literal `/*`, `/`, `~`, and `$HOME/*` forms for Claude Code are
+  # caught by a regex rule in ai-prompts/hooks/rules.toml; opencode runs no hooks, so it adds `rm -rf /*`
+  # to its own deny set (opencode/opencode-config.nix).
   bashDenyPatterns = [
     "rm -rf /"
-    "rm -rf /*"
+    "rm -rf //*"
+    "rm -rf /bin*"
+    "rm -rf /sbin*"
+    "rm -rf /etc*"
+    "rm -rf /usr*"
+    "rm -rf /System*"
+    "rm -rf /Library*"
+    "rm -rf /Applications*"
+    "rm -rf /nix*"
+    "rm -rf /opt*"
+    "rm -rf /boot*"
+    "rm -rf /lib*"
+    "rm -rf /root*"
+    "rm -rf /dev*"
+    "rm -rf /proc*"
+    "rm -rf /sys*"
+    "rm -rf /Users*"
+    "rm -rf /home*"
+    "rm -rf /Volumes*"
+    "rm -rf /cores*"
+    "rm -rf /srv*"
+    "rm -rf /mnt*"
+    "rm -rf /media*"
+    "rm -rf /var"
+    "rm -rf /var/"
+    "rm -rf /private"
+    "rm -rf /private/"
+    "rm -rf /private/var"
+    "rm -rf /private/var/"
+    "rm -rf /private/etc*"
+  ]
+  ++ map (d: "rm -rf /var/${d}*") varSystemDirs
+  ++ map (d: "rm -rf /private/var/${d}*") varSystemDirs
+  ++ [
     "rm -rf ~*"
     "rm -rf $HOME*"
     "sudo rm -*"

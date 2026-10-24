@@ -2,7 +2,7 @@
 name: workflow-patterns
 description: Use when authoring an agent, a command, or a skill description (output, checkpoints, decision criteria, escalations, skill loading, self-evaluation), when escalating a consequential finding into an independent refutation pass, or when two instructions appear to contradict and must be reconciled.
 metadata:
-  version: "5.2.0"
+  version: "5.3.0"
 ---
 
 Structures for authoring agents and commands, plus the patterns that keep them honest. Those files are markdown
@@ -119,14 +119,13 @@ require acknowledgment) but the escalation block itself names conditions and res
 
 ## Checkpoints
 
-A gate between phases, cleared by an artifact (a path, a command, a name) so that failing it is visible in
-the transcript. CLAUDE.md's `gate_discipline` holds the one definition; a command references it by name rather
-than restating it.
+A gate between phases, cleared by an artifact so that failing it is visible in the transcript. The clearing rule
+is in the Gates section of [execution-workflow](../execution-workflow/SKILL.md).
 
 ```markdown
 ### Checkpoint on analysis quality
 
-Per gate_discipline in CLAUDE.md. Name:
+Name:
 
 - The files read and the specific lines the conclusion rests on.
 - What is still unknown, or that nothing material is.

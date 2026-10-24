@@ -4,14 +4,14 @@ version = 1
 # tool, which is what the `File` rules below need, since the sibling shell hooks bind to Bash only and
 # cannot see a Read, Write, or Edit at all.
 #
-# Only rules with no allow-exception live here. guard-and-guide matches with the Rust `regex`
-# crate, which has no lookahead, so "block X except Y" is not expressible; block-destructive-git.sh
-# keeps those cases because it parses the command instead of matching it.
+# guard-and-guide matches with the Rust `regex` crate, which has no lookahead, so "block X except Y"
+# is written as a pattern for the complement of Y. rules.test.sh holds the cases for each rule.
 #
 # Two limits worth knowing before relying on this file:
 #
 #   - `File` resolves to Read|Write|Edit only. Grep and Glob are not canonical tool names upstream,
-#     so the credential rules below do not see them, and Grep can read a file's contents.
+#     so the credential rules below do not see them, and Grep can read a file's contents. MultiEdit
+#     and NotebookEdit are not covered by `File` or by the `Write|Edit` matcher either.
 #   - If this file is ever unreadable or unparseable, guard-and-guide exits 1 without emitting a
 #     decision, which Claude Code treats as a hook error rather than a block, so the whole layer
 #     fails open. It is a store path baked in at build time, so that needs a build to go wrong.
@@ -20,50 +20,128 @@ version = 1
 
 [[rules]]
 matcher = "File"
-regex = '\.env$'
-message = "Access to .env files is prohibited. Ask the user to check or provide the values you need."
+regex = '(?i)\.env$'
+message = ".env files are off-limits. Continue without them; use the variables named in the task or in checked-in documentation."
+
+# Reading: everything under .ssh/ except config, known_hosts, known_hosts.old, and *.pub directly in
+# that directory. Case-insensitive, because the default macOS file system is. The pattern is the
+# complement of that set, built from the end of the file name: a name is blocked when it differs from an allowed name at some position counted from the end, is a shorter
+# suffix of it, or is longer. A subdirectory, or a bare `.ssh/`, blocks too.
+[[rules]]
+matcher = "Read"
+regex = '''(?ix)
+\.ssh/ (?:
+    [^/]*/
+  | (?:
+      # No name after .ssh/.
+      (?:)
+      # Ends in g but is not config: differs at some position counted from the end, is a shorter suffix, or is longer.
+      | [^/]*[^/i]g
+      | [^/]*[^/f]ig
+      | [^/]*[^/n]fig
+      | [^/]*[^/o]nfig
+      | [^/]*[^/c]onfig
+      | g
+      | ig
+      | fig
+      | nfig
+      | onfig
+      | [^/]+config
+      # Ends in s but is not known_hosts: differs at some position counted from the end, is a shorter suffix, or is longer.
+      | [^/]*[^/t]s
+      | [^/]*[^/s]ts
+      | [^/]*[^/o]sts
+      | [^/]*[^/h]osts
+      | [^/]*[^/_]hosts
+      | [^/]*[^/n]_hosts
+      | [^/]*[^/w]n_hosts
+      | [^/]*[^/o]wn_hosts
+      | [^/]*[^/n]own_hosts
+      | [^/]*[^/k]nown_hosts
+      | s
+      | ts
+      | sts
+      | osts
+      | hosts
+      | _hosts
+      | n_hosts
+      | wn_hosts
+      | own_hosts
+      | nown_hosts
+      | [^/]+known_hosts
+      # Ends in d but is not known_hosts.old: differs at some position counted from the end, is a shorter suffix, or is longer.
+      | [^/]*[^/l]d
+      | [^/]*[^/o]ld
+      | [^/]*[^/.]old
+      | [^/]*[^/s]\.old
+      | [^/]*[^/t]s\.old
+      | [^/]*[^/s]ts\.old
+      | [^/]*[^/o]sts\.old
+      | [^/]*[^/h]osts\.old
+      | [^/]*[^/_]hosts\.old
+      | [^/]*[^/n]_hosts\.old
+      | [^/]*[^/w]n_hosts\.old
+      | [^/]*[^/o]wn_hosts\.old
+      | [^/]*[^/n]own_hosts\.old
+      | [^/]*[^/k]nown_hosts\.old
+      | d
+      | ld
+      | old
+      | \.old
+      | s\.old
+      | ts\.old
+      | sts\.old
+      | osts\.old
+      | hosts\.old
+      | _hosts\.old
+      | n_hosts\.old
+      | wn_hosts\.old
+      | own_hosts\.old
+      | nown_hosts\.old
+      | [^/]+known_hosts\.old
+      # Ends in b but not in .pub.
+      | [^/]*[^/u]b | [^/]*[^/p]ub | [^/]*[^/.]pub | b | ub | pub
+      # Ends in any other character.
+      | [^/]*[^/bgsd]
+  ) $
+)'''
+message = "SSH keys and other files under .ssh/ are off-limits; only config, known_hosts, known_hosts.old, and public keys (*.pub) can be read. Continue without them."
+
+# Writing: nothing under .ssh/ at all, so an agent cannot plant a key, a ProxyCommand, or an
+# authorized_keys entry through config.
+[[rules]]
+matcher = "Write|Edit"
+regex = '(?i)\.ssh/'
+message = "Writing under .ssh/ is off-limits, config included. Continue without changing SSH files; ask the user to make the change."
 
 [[rules]]
 matcher = "File"
-regex = '\.ssh/'
-message = "Access to SSH keys is prohibited. Ask the user to handle SSH-related operations."
+regex = '(?i)\.aws/'
+message = "AWS credentials are off-limits. Continue without them; use the configuration named in the task."
 
 [[rules]]
 matcher = "File"
-regex = '\.aws/'
-message = "Access to AWS credentials is prohibited. Ask the user to check or provide AWS configuration."
+regex = '(?i)(^|/)id_[A-Za-z0-9_]+$'
+message = "Private keys are off-limits. Continue without them."
 
 [[rules]]
 matcher = "File"
-regex = 'id_rsa|id_ed25519'
-message = "Access to private keys is prohibited. Ask the user to handle key-related operations."
+regex = '(?i)\.git-credentials$|\.netrc$|\.npmrc$'
+message = "Credential files are off-limits. Continue without them."
 
+# git runs what these files name: a planted remote.<name>.uploadpack or core.fsmonitor in config runs
+# on the next `git fetch` or `git status`, and a hook runs on the next git command. Covers `.git/` and
+# the bare-repo form `<name>.git/`, and submodule git directories under `.git/modules/`.
 [[rules]]
-matcher = "File"
-regex = '\.git-credentials$|\.netrc$|\.npmrc$'
-message = "Access to credential files is prohibited. Ask the user to handle credentials."
+matcher = "Write|Edit"
+regex = '\.git/(config|hooks/|modules/.+/(config|hooks/))'
+message = "Git config and hooks are off-limits to writes: a planted setting runs a program on the next git fetch. Continue without editing them; ask the user to make the change."
 
-# --- Bypass by absolute path ---
-#
-# Upstream's example is '(/usr)?/(s?bin|local/bin)/', which matches any path merely containing
-# /bin/, and on this machine that is every /nix/store/*/bin/* entry, so any Nix-built binary
-# invoked by its store path would trip it. Anchoring the match to a path that
-# actually starts at /usr or /bin fixes that, but a bare (^|\s) anchor is then evaded by ordinary
-# quoting and assignment, so the leading class also admits the characters a shell puts in front of
-# an argument, and /+ absorbs the redundant slash in /usr//bin.
-#
-# The match is limited to the programs `permissions.deny` names (shared/default.nix), since those deny
-# patterns match the command name and an absolute path is what slips past them. block-destructive-git.sh
-# strips the directory before judging git and jj, so they need no entry here. Matching any system
-# binary blocked harmless calls such as an absolute-path grep or a path quoted inside a search pattern.
-# rules.test.sh holds the cases.
-#
-# Residual, accepted: `cd /usr/bin && ./killall` still passes, since there is no trailing slash to match
-# and the invocation that follows carries no path at all. A regex cannot close that; only a
-# tokenizer like block-destructive-git.sh's could. Treat this rule as friction against a casual
-# bypass, not as a boundary.
-
+# Claude Code cannot express `rm -rf /*` as a permission pattern without also matching `rm -rf /tmp/x`
+# (see bashDenyPatterns in home-manager/ai-tools/shared/default.nix), so the literal targets are matched
+# here. A target must be a whole word, so a deeper path (`/tmp/x`, `$HOME/work/x`) passes. The command
+# text is matched as written: `rm -rf "$d"` and `echo "rm -rf /"` are outside what a regex can judge.
 [[rules]]
 matcher = "Bash"
-regex = '''(^|[\s"'=;&|(])/+(usr/+)?(s?bin|local/+bin)/+(sudo|rm|chmod|dd|mkfs(\.\w+)?|fdisk|format|shutdown|reboot|halt|poweroff|killall|pkill|nc|ncat|netcat)([\s"';&|)]|$)'''
-message = "Do not invoke a denied command by absolute path to get past the permission rules. Use the command name directly, and if it is blocked, ask the user."
+regex = '''(?:^|[\s;&|(`/])rm(?:\s+[^\s;&|]+)*?\s+["']?(?:/+(?:\*|\.\*)?|/(?:Users|home|Volumes|cores|srv|mnt|media|var|private|private/var)/?\*?|~/?(?:\*|\.\*)?|\$\{?HOME\}?/?(?:\*|\.\*)?)["']?\*?(?:\s|$|[;&|)])'''
+message = "rm on /, a home directory, or a top-level system directory is off-limits. Continue by naming the specific files or directories to remove."

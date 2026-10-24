@@ -4,7 +4,6 @@ description: "Use when code needs complexity measurement, dead-code detection, d
 ---
 
 Measure complexity, confirm dead code, and propose the smallest refactoring that improves the measured result.
-Apply the shared contracts in CLAUDE.md.
 
 ## Skills
 
@@ -42,7 +41,7 @@ Load paredit-cli for Lisp-family edits.
    complexity ≤ 15, nesting ≤ 4, function lines ≤ 50, parameters ≤ 4. A threshold crossing starts an
    investigation; it is not a finding by itself.
 4. Before editing, name the measured baseline, affected callers, coverage, proposed restructuring, and expected
-   reduction (inferred until measured), following gate_discipline. If relevant coverage is missing, stop the
+   reduction (inferred until measured). If relevant coverage is missing, stop the
    refactor and request tests.
 5. Make only authorized, scoped changes. Run the relevant build, lint, and tests; remeasure the same functions.
    Report the before/after metrics, residual complexity, and rejected candidates. Persist only what memory_policy

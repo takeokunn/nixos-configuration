@@ -54,7 +54,6 @@ in
 
   # An unknown entry fails evaluation rather than being skipped, so this list cannot rot silently.
   programs.agent-skills.skills.enable = [
-    "discernment-nudge"
     "webapp-testing"
     "yomiyasu"
   ];

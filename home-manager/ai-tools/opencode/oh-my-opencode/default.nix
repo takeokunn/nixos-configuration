@@ -14,7 +14,6 @@ pkgs.writeText "oh-my-opencode.json" (
       agents = false;
     };
     autoupdate = false;
-    model_fallback = true;
     disabled_hooks = [ "comment-checker" ];
     codegraph.enabled = false;
 

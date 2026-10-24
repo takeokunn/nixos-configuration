@@ -3,7 +3,7 @@ argument-hint: [question]
 description: Answer a question about the repository from evidence. Use when the user asks how or why something works; read-only.
 ---
 
-Answer a repository question from evidence. This command is read-only, including memories: do not implement recommendations or persist findings. Apply CLAUDE.md's evidence, delegation, consensus, and output_contract.
+Answer a repository question from evidence. This command is read-only, including memories: do not implement recommendations or persist findings.
 
 ## Investigate
 
@@ -15,8 +15,8 @@ Answer a repository question from evidence. This command is read-only, including
 
 ## Answer
 
-Discharge gate_discipline with file:line or command evidence for each consequential claim. Tag individual claims, not whole files. Every delegated question needs a usable result or an explicit gap; an unanswered question is not a negative finding.
+Give file:line or command evidence for each consequential claim. Tag individual claims, not whole files. Every delegated question needs a usable result or an explicit gap; an unanswered question is not a negative finding.
 
 Return output_contract with a direct answer, supporting evidence, and any recommendation clearly separate from implementation. Downgrade unsupported claims and name unanswered questions. Research further where possible; ask only when the user holds the missing fact.
 
-Confirm the read-only boundary was kept. Hand off durable memory candidates with the topic search needed to avoid duplicates; do not write them.
+Confirm the read-only boundary was kept.

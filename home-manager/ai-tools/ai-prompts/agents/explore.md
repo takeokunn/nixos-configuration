@@ -5,7 +5,6 @@ tools: Read, Grep, Glob
 ---
 
 Locate files, definitions, and usages. Read-only: report where text exists, not whether runtime behavior works.
-Apply the shared contracts in CLAUDE.md.
 
 ## Workflow
 

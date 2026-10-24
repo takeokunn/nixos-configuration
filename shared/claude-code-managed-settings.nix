@@ -170,26 +170,23 @@ in
     "jj workspaces and .worktrees directories of those repositories are part of the same trusted repository."
     "Scratch: /tmp, /private/tmp, and the system temp directory are ephemeral agent scratch space."
     "Contest servers: only SSH host aliases whose names start with \"isu\" in the user's ssh config, used for ISUCON practice and contests; benchmarking, editing configs, restarting services, and reading logs there is routine."
+    "Deleting, moving, and rebasing files and jj changes inside .worktrees checkouts and jj workspaces that this session created is routine; other sessions' checkouts and workspaces are not."
+    "Stopping background processes the agent itself started in this session, by PID, is routine."
+    "The Mediator MCP server is the user's own agent orchestrator; sending messages, plans, and turns through it is routine delegation unless the message directs a push, merge, publication, or deletion."
   ];
 
   env = {
     BASH_DEFAULT_TIMEOUT_MS = "300000";
     BASH_MAX_TIMEOUT_MS = "1200000";
     CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1";
-    MAX_MCP_OUTPUT_TOKENS = "25000";
     MCP_TOOL_TIMEOUT = "120000";
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "32000";
     CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
     CLAUDE_CODE_AUTO_CONNECT_IDE = "0";
+    # Also covers telemetry, error reporting, and the autoupdater (code.claude.com/docs/en/env-vars).
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
-    CLAUDE_CODE_ENABLE_TELEMETRY = "0";
     CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL = "1";
     CLAUDE_CODE_IDE_SKIP_VALID_CHECK = "1";
-    DISABLE_AUTOUPDATER = "1";
-    DISABLE_ERROR_REPORTING = "1";
-    DISABLE_INTERLEAVED_THINKING = "1";
-    DISABLE_TELEMETRY = "1";
-    ENABLE_TOOL_SEARCH = "true";
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
     # Adds the cacert bundle that nix-darwin places in /etc/ssl to the trusted roots, so they follow
     # nixpkgs rather than the binary. The llm-agents claude wrapper used to set
@@ -237,7 +234,9 @@ in
           ];
         map (name: {
           type = "command";
-          command = "${hooksDir}/${name}";
+          # `claude` makes the hook answer a jj push with an ask decision instead of exit 2, so the
+          # person confirms it; Codex runs the same script with no argument and keeps the block.
+          command = "${hooksDir}/${name}" + lib.optionalString (name == "block-destructive-git") " claude";
         }) claudeBashHookNames;
     }
   ];

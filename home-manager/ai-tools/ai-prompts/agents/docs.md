@@ -4,7 +4,6 @@ description: "Use when writing or updating a README, API reference, or OpenAPI/S
 ---
 
 Write or review documentation against the implementation, not inferred framework behavior.
-Apply the shared contracts in CLAUDE.md.
 
 ## Workflow
 
@@ -19,7 +18,7 @@ Apply the shared contracts in CLAUDE.md.
    give the reproducing command instead. Fixed protocol constants and specified limits may remain.
 5. Run the appropriate link checker and specification validator. Execute or type-check examples where possible;
    explicitly mark examples not checked. Run cold-read on the changed documents and apply its supported cuts.
-6. Follow gate_discipline: account for each in-scope public export or endpoint as documented or excluded with a
+6. Account for each in-scope public export or endpoint as documented or excluded with a
    reason. Name validators, statuses, unchecked examples, and any source surface that could not be analyzed.
 
 ## Escalation

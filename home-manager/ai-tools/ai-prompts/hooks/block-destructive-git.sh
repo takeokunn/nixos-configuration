@@ -4,6 +4,9 @@
 #   show, blame, rev-parse, ls-files, ls-tree, ls-remote, merge-base, rev-list, cat-file, grep,
 #   describe, shortlog, name-rev, for-each-ref, show-ref, count-objects, check-ignore, plus the
 #   read-only forms of remote, config (--get, --get-all), branch, tag, stash list, and worktree list.
+#   fetch passes only as `git fetch [safe options] [<named remote> [<refspec>...]]`, where no refspec
+#   writes outside refs/remotes/; a URL or path, an option off the safe list (no --tags, --depth,
+#   --unshallow, --prune, --force), a tag refspec, a `..` in a refspec, and `main:main` block.
 #   Global options before the subcommand (-C, -c, --no-pager, --git-dir, ...) are skipped, but -c/
 #   --config-env keys that make git run a program (core.fsmonitor, core.pager, alias.*, diff.*.textconv,
 #   man.*, ...), --exec-path=, environment that redirects git's config, repository, or helper programs
@@ -11,6 +14,8 @@
 #   program or write a file (--output, --ext-diff, --no-index, -O, ...) block. git accepts unique
 #   prefixes of long options, so any `--xxx` of four or more characters that begins one of those
 #   options blocks too. Writes go through jj. ALLOW_DESTRUCTIVE_GIT=1 never lifts this verdict.
+#   A global option value computed at run time blocks, except the value of -C and --work-tree when it
+#   is double-quoted and only a plain variable expansion (`git -C "$repo" log`).
 # - `aitools git ...` only reads, so it passes; `aitools run|bg ... git <args>` is judged like `git <args>`.
 # - Destructive jj commands block: edit, next, prev, bisect, sparse set/reset/edit, abandon, undo, redo,
 #   op restore/revert, restore without paths, and new onto another revision; plus jj git push,
@@ -32,7 +37,16 @@
 # built-in (a user alias can expand to anything).
 # Input boundary: malformed JSON, an empty command, a non-Bash tool, or no jq and no python3 to parse
 # the input all exit 0, since there is nothing to classify.
-# Override for the jj verdicts only: ALLOW_DESTRUCTIVE_GIT=1 <command>.
+# Override for the jj verdicts: ALLOW_DESTRUCTIVE_GIT=1 <command>. It covers jj git push only in the
+# default (Codex) mode; with `claude` a push always asks, override or not.
+# Argument 1 selects how a jj git push verdict is reported. Without it the hook exits 2 with a banner
+# (Codex, which has no interactive approval, and where the override prefix lifts the push block with
+# no person confirming). With `claude` it answers permissionDecision "ask" on stdout and exits 0, so
+# the person confirms the push after the agent has run the gitleaks scan. A push never hides another
+# verdict in the same command line: `jj git push -b x; jj undo` exits 2.
+# Every other verdict exits 2 in both modes.
+
+mode="${1:-}"
 
 set -euo pipefail
 
@@ -61,6 +75,7 @@ use strict;
 use warnings;
 
 my $cmd = defined $ENV{HOOK_CMD} ? $ENV{HOOK_CMD} : q{};
+my $CLAUDE_MODE = (defined $ENV{HOOK_MODE} and $ENV{HOOK_MODE} eq 'claude') ? 1 : 0;
 
 # Wrappers whose operand is the real command, e.g. `xargs git log` classifies as `git log`.
 my %WRAPPER = map { $_ => 1 } qw(
@@ -103,9 +118,11 @@ sub lex_segments {
     };
     my $add = sub {
         my ($text, $q) = @_;
-        $tok = { text => q{}, quoted => 0 } if !defined $tok;
+        $tok = { text => q{}, quoted => 0, udyn => 0 } if !defined $tok;
         $tok->{text} .= $text;
         $tok->{quoted} = 1 if $q;
+        # An unquoted `$` or backtick leaves part of the word to the shell's own splitting and globbing.
+        $tok->{udyn} = 1 if !$q and $text =~ /[\$`]/;
         return;
     };
 
@@ -266,9 +283,11 @@ sub verdict_for_segment {
         $git_env = 1 if $key =~ /^GIT_(?:EXTERNAL_DIFF|PAGER|SSH\w*|ASKPASS|EDITOR|SEQUENCE_EDITOR|PROXY_COMMAND|CONFIG_(?:GLOBAL|SYSTEM|COUNT|PARAMETERS|KEY_\d+|VALUE_\d+)|TRACE\w*|DIR|WORK_TREE|EXEC_PATH|TEMPLATE_DIR)$/;
         return;
     };
+    # In claude mode a jj push is never lifted: the person confirms it whatever prefix the command carries.
     my $lift = sub {
         my ($v) = @_;
-        return ($allow and $v ne 'git' and $v ne 'depth') ? q{} : $v;
+        return q{} if $allow and $v ne 'git' and $v ne 'depth' and !($CLAUDE_MODE and $v eq 'jj-push');
+        return $v;
     };
 
     while (@t) {
@@ -352,7 +371,9 @@ sub verdict_for_segment {
     my @a = map { $_->{text} } @t;
 
     return $lift->(jj_verdict($depth, $allow, $jj_env, @a)) if $prog eq 'jj';
-    return (git_blocked($git_env, @a) ? 'git' : q{}) if $prog eq 'git';
+    # A dynamic value counts as quoted only when every part of its word is quoted.
+    my @aq = map { ($_->{quoted} && !$_->{udyn}) ? 1 : 0 } @t;
+    return (git_blocked($git_env, \@aq, @a) ? 'git' : q{}) if $prog eq 'git';
     return aitools_verdict($depth, $allow, @a) if $prog eq 'aitools';
     return q{};
 }
@@ -382,10 +403,11 @@ my %GIT_READONLY = map { $_ => 1 } qw(
 my %GIT_GLOBAL_VALUE_OPT = map { $_ => 1 } qw(-C -c --git-dir --work-tree --namespace --super-prefix --config-env --attr-source);
 
 # Config keys that make git execute a program, a path, or a different config, so a read-only
-# subcommand stops being read-only.
+# subcommand stops being read-only. remote.* (uploadpack, receivepack, proxy, vcs) and fetch.* (a
+# planted fetch.* key rewrites what an allowed `git fetch` does) are covered by the same pattern.
 sub git_config_runs_program {
     my ($kv) = @_;
-    return $kv =~ /^(?:core\.(?:fsmonitor|pager|editor|sshcommand|askpass|hookspath|gitproxy)|alias\.|pager\.|diff\.external|credential\.|include|url\.|protocol\.|gpg\.|filter\.|uploadpack\.|receive\.|man\.|browser\.|help\.|sequence\.|core\.alternaterefscommand|diff\..*\.(?:textconv|command)|merge\..*\.driver|mergetool\.|difftool\.|http\.proxy)/i;
+    return $kv =~ /^(?:core\.(?:fsmonitor|pager|editor|sshcommand|askpass|hookspath|gitproxy)|alias\.|pager\.|diff\.external|credential\.|include|url\.|protocol\.|gpg\.|filter\.|uploadpack\.|receive\.|man\.|browser\.|help\.|sequence\.|core\.alternaterefscommand|diff\..*\.(?:textconv|command)|merge\..*\.driver|mergetool\.|difftool\.|http\.proxy|remote\.|fetch\.)/i;
 }
 
 # Long options that run a program, write a file, or read outside the repository. git resolves a unique
@@ -407,15 +429,53 @@ sub long_option_may_be_dangerous {
     return 0;
 }
 
+# fetch updates remote-tracking refs and FETCH_HEAD, never the working tree or a local branch, as long
+# as it talks to a configured remote and no refspec names a local branch. So only a named remote and
+# plain refspecs pass, and an option must be on the list below. That list is closed on purpose: it
+# leaves out --upload-pack, --receive-pack (run a program), --update-head-ok and -u (let fetch
+# overwrite the checked-out branch), --prune, -p, --prune-tags, --force, -f (delete or rewrite local
+# refs), --tags, -t, and the `tag <name>` and refs/tags/ refspecs (write local tags), --depth,
+# --deepen, --unshallow, --shallow-* and --update-shallow (rewrite .git/shallow), --refmap,
+# --recurse-submodules, --stdin (refspecs the hook cannot see), and anything
+# abbreviated, so a unique-prefix spelling of a dangerous option cannot slip through. Option values
+# must be attached with `=`; a separate value would read as the remote.
+sub git_fetch_blocked {
+    my @a = @_;
+    my @pos;
+    while (@a) {
+        my $x = shift @a;
+        if ($x eq '--') { push @pos, @a; last; }
+        if ($x !~ /^-/) { push @pos, $x; next; }
+        next if $x =~ /^--(?:all|no-tags|quiet|verbose|dry-run|atomic|keep|progress|no-progress|ipv4|ipv6|multiple|refetch|(?:no-)?write-fetch-head|(?:no-)?show-forced-updates|(?:no-)?auto-gc|(?:no-)?auto-maintenance|porcelain)$/;
+        next if $x =~ /^--(?:filter|jobs)=[\w.:+-]+$/;
+        next if $x =~ /^-[qvnk46]+$/ or $x =~ /^-j\d+$/;
+        return 1;
+    }
+    return 0 unless @pos;
+    my $remote = shift @pos;
+    return 1 unless $remote =~ /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/;
+    for my $r (@pos) {
+        # `tag <name>` and refs/tags/ write local tags; `..` could walk a destination out of refs/remotes/.
+        return 1 if $r eq 'tag' or $r =~ m{(?:^|[+:])refs/tags/} or $r =~ /\.\./;
+        # `src` alone only fills FETCH_HEAD; `src:dst` must land under refs/remotes/.
+        return 1 unless $r =~ m{^\+?[\w.\/*\@{}^~-]+(?::refs/remotes/[\w.\/*-]+)?$};
+    }
+    return 0;
+}
+
 # True when the git command line (arguments after `git`) is not provably read-only.
 sub git_blocked {
-    my ($git_env, @a) = @_;
+    my ($git_env, $quoted, @a) = @_;
+    my @q = @{$quoted};
     return 1 if $git_env;
     while (@a) {
         my $x = $a[0];
-        return 1 if is_dynamic($x);
+        if (is_dynamic($x)) {
+            return 1 unless $x =~ /^--work-tree=(.*)$/s and safe_dynamic_path($1, $q[0]);
+        }
         last unless $x =~ /^-/;
         shift @a;
+        shift @q;
         return 0 if $x eq '--version' or $x eq '--help' or $x eq '-h';
         return 1 if $x =~ /^--exec-path=/;
         my ($name, $val) = $x =~ /^(--[^=]+)=(.*)$/s;
@@ -425,9 +485,10 @@ sub git_blocked {
         }
         if ($GIT_GLOBAL_VALUE_OPT{$x}) {
             return 1 unless @a;
-            my $v = shift @a;
+            my $v  = shift @a;
+            my $vq = shift @q;
             return 1 if ($x eq '-c' or $x eq '--config-env') and git_config_runs_program($v);
-            return 1 if is_dynamic($v);
+            return 1 if is_dynamic($v) and !(($x eq '-C' or $x eq '--work-tree') and safe_dynamic_path($v, $vq));
         } elsif ($x =~ /^-c(.+)$/s) {
             return 1 if git_config_runs_program($1);
         }
@@ -440,6 +501,7 @@ sub git_blocked {
     return 1 if grep { /^-[A-Za-z]*O/ } @a;
     return 1 if long_option_may_be_dangerous(@a);
 
+    return git_fetch_blocked(@a) if $sub eq 'fetch';
     return 0 if $GIT_READONLY{$sub};
 
     my @pos = grep { !/^-/ } @a;
@@ -496,7 +558,23 @@ sub jj_split {
 # A word the shell expands at run time (`$(...)`, backticks, `$VAR`) has no value the hook can check.
 sub is_dynamic { return $_[0] =~ /[\$`]/; }
 
-sub shell_quote { my ($w) = @_; $w =~ s/'/'\\''/g; return "'$w'"; }
+# A dynamic word is re-emitted unquoted, with its metacharacters escaped, so the re-parse still sees it
+# as computed at run time instead of as a quoted literal.
+sub shell_quote {
+    my ($w) = @_;
+    if (is_dynamic($w)) { $w =~ s/([^\w\$])/\\$1/g; return $w; }
+    $w =~ s/'/'\\''/g;
+    return "'$w'";
+}
+
+# The value of -C or --work-tree may be a double-quoted plain variable (`"$repo"`, `"${repo}/sub"`).
+# Anything else computed at run time (`$(...)`, backticks, `${x:-y}`) could name any directory.
+sub safe_dynamic_path {
+    my ($v, $quoted) = @_;
+    return 0 unless $quoted;
+    (my $rest = $v) =~ s/\$(?:[A-Za-z_]\w*|\{[A-Za-z_]\w*\})//g;
+    return $rest !~ /[\$`]/;
+}
 
 # jj 0.45 built-in subcommands, from `jj --help`, plus the hidden built-in names debug, obslog, and
 # evolution-log, and op, the CLI alias of operation. A config alias cannot shadow any of these, so any
@@ -575,11 +653,16 @@ sub classify {
     # Bounded to 4 levels so a self-referential payload cannot spin. Past that the shell would still
     # run the innermost command, so the hook blocks rather than guess.
     return 'depth' if $depth > 4;
+    # A push is reported last: it only asks (claude) or has its own banner, so it must not hide a
+    # later segment's verdict, which always blocks.
+    my $push = q{};
     for my $seg (lex_segments($text)) {
         my $v = verdict_for_segment($seg, $depth, $allow);
-        return $v if length $v;
+        next unless length $v;
+        return $v if $v ne 'jj-push';
+        $push = $v;
     }
-    return q{};
+    return $push;
 }
 
 my $allow_all = $cmd =~ /^\s*(?:CLAUDE_)?ALLOW_DESTRUCTIVE_GIT=1\s/ ? 1 : 0;
@@ -588,7 +671,7 @@ print "$verdict\n" if length $verdict;
 exit 0;
 PERL
 
-verdict="$(HOOK_CMD="$command" perl -e "$perl_prog")"
+verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"
 
 # An `[[ ... ]] && exit 0` here would leave the whole list returning 1 on the common path,
 # which `set -e` turns into a spurious non-zero exit from the hook itself.
@@ -597,17 +680,22 @@ if [[ -z $verdict ]]; then
 fi
 
 if [[ $verdict == jj-push ]]; then
+  if [[ $mode == claude ]]; then
+    reason='jj git push runs no Git hooks, so the gitleaks pre-commit scan never saw these commits. Scan exactly what will be pushed before confirming: run `jj git push --dry-run <arguments>` to list the bookmarks and commits, then `gitleaks git --config ~/.config/gitleaks/config.toml --log-opts="<remote>/<bookmark>..<commit>"` (a new bookmark: `--log-opts="<commit> --not --remotes"`). Confirm only when the scan is clean.'
+    jq -nc --arg r "$reason" '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "ask", permissionDecisionReason: $r}}'
+    exit 0
+  fi
   cat >&2 <<'EOF'
 ❌ jj git push blocked (ORCH-P005)
 
 jj runs no Git hooks, so the gitleaks pre-commit scan never saw these commits.
-Scan exactly what will be pushed, then push with the override prefix and literal arguments:
+Scan exactly what would be pushed:
   jj git push --dry-run <arguments>     (shows the bookmarks and commits to push)
   gitleaks git --config ~/.config/gitleaks/config.toml --log-opts="<remote>/<bookmark>..<commit>"
                                         (a new bookmark: --log-opts="<commit> --not --remotes")
-  ALLOW_DESTRUCTIVE_GIT=1 jj git push <arguments>
 
-A push still needs the user's confirmation.
+This environment cannot ask the user to confirm a push. The override prefix lifts this block without
+a person confirming (ALLOW_DESTRUCTIVE_GIT=1 <command>); use it only for a push the user asked for.
 EOF
   exit 2
 fi
@@ -634,7 +722,8 @@ Use instead:
   Undo a revision      jj revert -r <rev> --onto @
   Discard one file     jj restore <path> (allowed)
 
-Still need it? Re-run with the override prefix and tell the user why first:
+If this is the only way to do the task, the override prefix lifts this block (Claude Code asks the
+user to confirm each use; Codex has no prompt, so the prefix is the only gate there):
   ALLOW_DESTRUCTIVE_GIT=1 <your command>
 EOF
   exit 2
@@ -657,11 +746,12 @@ Only read-only git subcommands are allowed (status, log, diff, show, blame, rev-
 and ALLOW_DESTRUCTIVE_GIT=1 does not lift this block. Writes go through jj:
   commit              jj commit -m "<message>"
   branch, checkout -b jj bookmark create <b> -r @
-  fetch               jj git fetch --remote <r> --branch <b>
+  fetch               git fetch <remote> [<ref>...] is allowed (named remote, no local-branch refspec,
+                      no --prune or --upload-pack); jj git fetch --remote <r> --branch <b> also works
   push                jj git push -b <b>  (still gated: see the jj git push block)
   clone               ghq get <url>
-  no .jj/ directory   ask the user before running jj git init --colocate
+  no .jj/ directory   run jj git init --colocate in a repo you are working in, or stay on read-only git
 
-If a git write is truly needed, ask the user to run it with:  ! git <arguments>
+Git writes are not available to agents; use the jj form above and continue.
 EOF
 exit 2

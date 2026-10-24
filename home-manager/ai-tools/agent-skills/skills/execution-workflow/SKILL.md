@@ -1,13 +1,14 @@
 ---
 name: execution-workflow
-description: Load at the start of implementing or delegating a task, and when judging whether work is done. Covers orchestration phases, verification gates, choosing the proof for a change, CI failure triage, jj workspace isolation, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
+description: Load when isolating work in a jj workspace, dispatching several agents, reconciling conflicting agent reports, triaging a CI failure, or judging whether non-trivial work is done. Covers orchestration phases, delegation partitioning and retries, verification gates, choosing the proof for a change, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
 metadata:
-  version: "4.4.0"
+  version: "4.5.0"
 ---
 
 How work gets placed, dispatched, verified, and judged done. CLAUDE.md's `delegation` and `evidence` sections are
-the contract, assumed here; this file carries the procedure and gates. Where the two appear to disagree,
-CLAUDE.md wins: it is resident in every request and this file is not.
+the contract, assumed here; this file carries the procedure, the gates, and the delegation detail that does not
+need to be resident. Where the two appear to disagree, CLAUDE.md wins: it is resident in every request and this
+file is not.
 
 ## Orchestration
 
@@ -44,6 +45,13 @@ the prompt what it is standing in for: **the first entry in an agent's own decis
 task it was not designed for, and a dispatch-prompt override is not a guarantee the gate will yield.** Check the
 returned report for evidence the agent did the work rather than refused it politely.
 
+Partition ownership before dispatch. Run independent tasks together; keep atomic cross-file changes together
+and resolve shared-file edits before parallel writers. State in each prompt whether external reads are needed.
+Use runtime restrictions when available; a prompt alone is not an access control. Agents preserve others'
+edits, use unique scratch paths and leave them in place (the auto-mode classifier denies `rm -rf` on them), and
+return evidence. Record an isolated agent's base ref and recheck its findings against your tree when the refs
+differ. Give a resumed agent explicit ownership and end state.
+
 Dispatch independent tasks together using the runtime's agent tools. Size the fan-out by the independent subtasks
 found above: comparing alternatives usually needs two to four agents; a wider fan-out suits only a broad survey
 of independent parts. Give each concurrent writer a unique scratch path inside its assigned project or worktree;
@@ -71,15 +79,24 @@ an entry solely to refresh it, which turns every task into an index sweep.
 ### Cross-validate what would be expensive to get wrong
 
 For a finding that is expensive to get wrong, obtain a second analysis from a *different evidence base*: a
-different tool, entry point, or artifact. Naming that base is the work; CLAUDE.md's `evidence` and `consensus`
-sections say why repeating one base proves nothing and how to rank a surviving disagreement. A second persona
-prompt with the same model, input, and tools is not a different base: its errors correlate with the first.
+different tool, entry point, or artifact. Naming that base is the work; CLAUDE.md's `evidence` section says why
+repeating one base proves nothing. A second persona prompt with the same model, input, and tools is not a
+different base: its errors correlate with the first.
+
+### Resolving disagreement
+
+Resolve disagreement by evidence, not votes or agent titles. Prefer inspected source, version, and lifecycle
+over convention. Re-read the disputed location when both sides cite evidence; report unresolved alternatives
+rather than averaging them. An author's self-approval is not independent review. Repeated gate complaints with
+no new evidence call for a user decision, not another identical cycle.
 
 ### When something fails
 
-When a sub-agent failed or returned nothing checkable, CLAUDE.md's `delegation` section sets the retry budget and
-what justifies spending it. This file adds the shape of the retry: narrow the prompt to the specific files and
-the single unanswered question, since re-sending the same prompt tests nothing new.
+When a sub-agent failed or returned nothing checkable, retry at most twice, and only for a timeout, an
+incomplete answer, or missing citations. Inspect status and logs before retrying a silent agent, and partial
+edits before redispatching a writer. Narrow the retry prompt to the specific files and the single unanswered
+question, since re-sending the same prompt tests nothing new. If the agent is unavailable or still failing,
+perform the checks yourself and disclose the limitation. A missing report never means no findings.
 
 Name the cause before choosing the response:
 
@@ -108,7 +125,8 @@ Trace a cause with [investigation-patterns](../investigation-patterns/SKILL.md).
 
 ## Gates
 
-Cleared per CLAUDE.md's `gate_discipline`; each gate's checklist follows.
+Clear each gate with a concrete path, command, agent result, or file:line, never a bare "yes", and obtain missing
+evidence before proceeding. Each gate's checklist follows.
 
 ### After analysis, before delegating
 
@@ -126,8 +144,8 @@ Unmet: do not delegate. Obtain the missing item, then re-run the gate.
   agents. If either could happen, the tasks are not independent: serialize them or give each its own worktree.
 - Each prompt names the files, the specific change wanted, and the command that verifies it.
 - Each prompt tells the agent to keep scratch artifacts inside its own worktree.
-- For a worktree-isolated agent, that you will re-check its findings against your branch, per CLAUDE.md's
-  `delegation` section on its base ref.
+- For a worktree-isolated agent, that you will re-check its findings against your branch when its base ref
+  differs from yours.
 - No timing measurement is requested from an agent running concurrently with others; parallel load invalidates it.
 
 Unmet: revise before dispatching. If only the user can resolve the ambiguity and the readings differ in a destructive or external effect, ask; otherwise state the assumption.
@@ -171,6 +189,8 @@ Establish the applicable evidence below, then report the result and verification
   edited artifact. A syntax or balance check cannot see a wrong symbol or two lines merged into one.
 - For a failed check, the baseline before calling it a regression. Do not attribute a pre-existing failure to this
   change.
+- For a new probe, that it fails against a known-good control, and that state it created is kept apart from the
+  original state. Unit tests do not establish integration behavior.
 - Where several agents verified, whether they used the same command. The same command run N times is one tier of
   evidence, not N.
 - Anything asked for that was not done, and why.
@@ -248,7 +268,7 @@ Done requires the requested outcome and meaningful verification, not merely zero
 
 Identify the project's canonical gate and the narrow checks meaningful for the affected paths. Inspect the
 selected inputs and assertions; run the applicable checks and name missing coverage. Never report a subset as the
-full gate. A bounded local change does not require unrelated suites, but /execute-full retains its coverage.
+full gate. A bounded local change does not require unrelated suites.
 
 A failing pre-push or pre-commit hook is evidence about the work, not an obstacle in front of it: fix the work,
 never bypass with a skip-verification flag, and read a red CI job the same way.
@@ -259,7 +279,9 @@ teardown traps.
 
 ### Unattended loops
 
-CLAUDE.md's `work_selection` already holds that reaching an iteration limit is not completion. A loop that runs
+CLAUDE.md's `work_selection` already holds that reaching an iteration limit is not completion. Before
+compaction or handoff, retain the objective, changed paths, exact checks and results, the decision criteria in
+force with the options they rejected, and the unresolved work; recheck live state when resuming. A loop that runs
 while the user is not watching (`/loop`, a scheduled wakeup, `/goal`, a repeated headless run) needs three things
 fixed before it starts:
 
@@ -278,8 +300,8 @@ shown", and bound it with a turn limit such as "or stop after 20 turns".
 ### Choose the smallest proof that covers the change
 
 Start with the check that exercises the changed contract; widen it after a failure, after a further change, or
-for a risk it cannot reach. /execute-full and the project's canonical gate keep their own coverage; the next
-section's tier table states what each check establishes.
+for a risk it cannot reach. The project's canonical gate keeps its own coverage; the next section's tier table
+states what each check establishes.
 
 | Change | First proof |
 |---|---|

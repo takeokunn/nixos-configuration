@@ -2,7 +2,7 @@
 name: jujutsu
 description: "Use when planning or running version-control operations: jj for every write and history edit, git for reads only. Covers non-interactive use, side-effect-free reads (templates, filesets, past operations), precise history edits (split, squash, absorb, rebase, inserting without moving @), recovering earlier versions without undo, conflicts recorded in commits, revset checks, the operation log, shared working copies, stale workspaces, bisect, bookmarks and stacks, and pre-push checks."
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Jujutsu (jj)
@@ -33,8 +33,14 @@ jj has no staging area. Repository commands normally snapshot files on disk into
 so `jj status` records edits as well as reporting them. In a checkout shared with other sessions, that snapshot
 absorbs their edits into `@` too: before describing, squashing, or pushing `@`, read `jj diff --git` and
 confirm every hunk is yours. Pass `--ignore-working-copy` to read-only commands to avoid snapshotting shared
-edits, but their view may be stale. To read on-disk state, run `jj status` or `jj diff --git` without the flag,
-as CLAUDE.md describes.
+edits, but their view may be stale. To read on-disk state, run `jj status` or `jj diff --git` without the flag:
+before committing, to separate your changes from existing ones, or at completion to confirm the changed files,
+not as a routine first step.
+
+Confirm a remote ref before relying on a fetched one: compare `jj log --ignore-working-copy -r '<b>@<remote>'
+--no-graph -T 'commit_id'` with `gh api repos/<owner>/<repo>/git/ref/heads/<branch> --jq .object.sha` (tags:
+`git/ref/tags/<tag>`). A remote-tracking ref left by a fetch without explicit `--remote` and `--branch` is not
+freshness evidence.
 
 A change has a stable change ID (letters k-z) and a commit ID that changes on every rewrite. Refer to changes
 by change ID across rewrites.

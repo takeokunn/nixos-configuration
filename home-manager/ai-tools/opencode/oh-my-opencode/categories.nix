@@ -11,19 +11,6 @@ in
     prompt_append = models.promptLang;
     description = "Lane for multi-system tasks that need additional planning and review.";
   };
-  security = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append = models.promptLang;
-    description = "Security-focused analysis, vulnerability review, and threat modeling.";
-  };
-  architecture = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append = models.promptLang;
-    description = "Cross-system or long-horizon architectural decisions requiring written rationale. Use ultrabrain for single-system tradeoffs; use architecture for irreversible structural choices.";
-  };
-
   research = mkLane {
     modelTier = models.default;
     variant = "high";

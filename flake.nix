@@ -542,6 +542,9 @@
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
                 autoModeJson = builtins.toJSON claudeCodeManagedSettings.autoMode;
+                claudeHooksJson = builtins.unsafeDiscardStringContext (
+                  builtins.toJSON claudeCodeManagedSettings.hooks
+                );
                 # The module option, not the built opencode.json: a Linux runner can evaluate the Mac
                 # host but cannot build the file, whose MCP server packages are Mac builds.
                 opencodeBashPermissionsJson = builtins.toJSON self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.opencode.settings.permission.bash;
@@ -580,7 +583,7 @@
                 done
                 # Read-only git must stay reachable: Claude Code judges it through block-destructive-git, and
                 # opencode asks on an unknown git command but allows the listed reads.
-                for rule in git 'git *' 'git stash *' 'aitools git' 'aitools git *'; do
+                for rule in git 'git *' 'git stash *' 'git fetch' 'git fetch *' 'aitools git' 'aitools git *'; do
                   if jq -e --arg r "Bash($rule)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
                     echo "managed-settings permissions.deny blocks read-only git again via \"Bash($rule)\"" >&2
                     exit 1
@@ -596,7 +599,15 @@
                     exit 1
                   fi
                 done
-                for sub in commit push reset checkout switch rebase merge clean restore add rm mv pull fetch clone; do
+                # opencode runs no hooks, so nothing vets fetch's URL, option, and refspec forms there; it must
+                # fall to the "git *" ask default instead of being allowed.
+                for rule in 'git fetch' 'git fetch *'; do
+                  if jq -e --arg r "$rule" '.[$r] == "allow"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
+                    echo "opencode permission.bash allows \"$rule\" although opencode runs no block-destructive-git hook" >&2
+                    exit 1
+                  fi
+                done
+                for sub in commit push reset checkout switch rebase merge clean restore add rm mv pull clone; do
                   if ! jq -e --arg r "Bash(git $sub *)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
                     echo "managed-settings permissions.deny lost \"Bash(git $sub *)\"" >&2
                     exit 1
@@ -632,15 +643,46 @@
                     exit 1
                   fi
                 done
+                # rm denials: the system directories stay denied, and scratch space stays deletable. The patterns are
+                # plain globs whose only `*` is trailing, so a prefix test stands in for the matcher.
+                for rule in 'Bash(rm -rf /)' 'Bash(rm -rf /etc*)' 'Bash(rm -rf /Users*)' 'Bash(rm -rf /home*)'; do
+                  if ! jq -e --arg r "$rule" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.deny lost \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                if ! jq -e '[.deny[] | select(startswith("Bash(rm -rf ")) | .[5:-1] | select(.[:-1] | contains("*"))] | length == 0' <<< "$permissionsJson" >/dev/null; then
+                  echo "managed-settings permissions.deny holds an rm pattern with a non-trailing *, which the prefix test below cannot model" >&2
+                  exit 1
+                fi
+                for target in 'rm -rf /tmp' 'rm -rf /tmp/x' 'rm -rf /private/tmp/x' 'rm -rf /var/folders/zz/x'; do
+                  hits=$(jq -c --arg t "$target" '[.deny[] | select(startswith("Bash(rm -rf ")) | .[5:-1] | . as $p | select(if ($p | endswith("*")) then ($t | startswith($p[:-1])) else $t == $p end)]' <<< "$permissionsJson")
+                  if [ "$hits" != "[]" ]; then
+                    echo "managed-settings permissions.deny matches \"$target\" through $hits; scratch cleanup must stay possible" >&2
+                    exit 1
+                  fi
+                done
+                # The Claude Code hook must be told to answer a jj push with ask; Codex's wiring passes no argument.
+                if ! jq -e '[.PreToolUse[].hooks[].command | select(test("/block-destructive-git( |$)"))] | length == 1 and all(test("/block-destructive-git claude$"))' <<< "$claudeHooksJson" >/dev/null; then
+                  echo "managed-settings hooks must register block-destructive-git exactly once, ending in \" claude\"" >&2
+                  exit 1
+                fi
                 if ! jq -e '.environment | index("$defaults")' <<< "$autoModeJson" >/dev/null; then
                   echo "managed-settings autoMode.environment lost \"\$defaults\", which drops the built-in trust slots" >&2
                   exit 1
                 fi
-                # "$defaults" plus the four custom entries (source control, worktrees, scratch, contest servers).
-                if [ "$(jq '.environment | length' <<< "$autoModeJson")" -ne 5 ]; then
-                  echo "managed-settings autoMode.environment no longer has \"\$defaults\" plus 4 custom entries" >&2
+                # "$defaults" plus the seven custom entries (source control, worktrees, scratch, contest servers,
+                # routine worktree cleanup, own background processes, the Mediator MCP server).
+                if [ "$(jq '.environment | length' <<< "$autoModeJson")" -ne 8 ]; then
+                  echo "managed-settings autoMode.environment no longer has \"\$defaults\" plus 7 custom entries" >&2
                   exit 1
                 fi
+                for needle in 'that this session created' 'the agent itself started in this session' 'unless the message directs a push, merge, publication, or deletion'; do
+                  if ! jq -e --arg n "$needle" '[.environment[] | select(contains($n))] | length == 1' <<< "$autoModeJson" >/dev/null; then
+                    echo "managed-settings autoMode.environment lost the entry containing \"$needle\"" >&2
+                    exit 1
+                  fi
+                done
                 if jq -e '.environment[] | select(contains("/Users/") or contains("/home/"))' <<< "$autoModeJson" >/dev/null; then
                   echo "managed-settings autoMode.environment names an absolute home path" >&2
                   exit 1

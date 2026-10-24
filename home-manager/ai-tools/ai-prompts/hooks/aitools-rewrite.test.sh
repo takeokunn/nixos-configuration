@@ -239,7 +239,6 @@ for cmd in \
   'grep -r --include=-x foo .' \
   "find . -name '-*'" \
   'grep foo' \
-  "grep -rn 'foo\\|bar' src" \
   "grep -rn 'a+' src" \
   'grep -rlc foo src' \
   "grep -E '\\<word' -r ." \
@@ -260,9 +259,6 @@ for cmd in \
   'git show HEAD' \
   'cat $HOME/.x' \
   'cat "$HOME/.x"' \
-  'cat ~/.x' \
-  'cat a && cat b' \
-  'cat a; cat b' \
   'cat a > b' \
   'cat <(ls)' \
   'cat `ls`' \
@@ -273,7 +269,6 @@ for cmd in \
   'cat a # comment' \
   'cd $HOME && cat x' \
   'cd a b && cat x' \
-  'cd src; cat x' \
   'cat x | head -0' \
   'cat x | head -c 5' \
   'cat x | grep y' \
@@ -390,6 +385,277 @@ plain_in "$empty_dir" 'sed -n 3p nonl.txt' 'aitools read nonl.txt --range 3:3 --
 plain_in "$empty_dir" 'sed -n 2,9p three.txt' 'aitools read three.txt --range 2:9 --max-lines 8'
 plain_in "$empty_dir" 'sed -n 4p missing.txt' 'aitools read missing.txt --range 4:4 --max-lines 1'
 expect_json claude "$(cwd_payload 'sed -n 3p three.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read three.txt --range 3:3 --max-lines 1"'
+
+# `aitools search` and `aitools find` fail with argument.invalid on a path outside the workspace root,
+# while read, info, json get, and diff accept one. So only grep, rg, ls, find, fd, and tree keep their
+# shell command for an absolute path elsewhere, a `..` that climbs out, a `~` path, or an outside
+# `cd DIR`; a path inside the root (here $repo, which holds .git) is still rewritten.
+plain_in "$repo/src" 'cat /etc/x' 'aitools read /etc/x --max-lines 2000'
+plain_in "$repo/src" 'head ../x' 'aitools read ../x --range 1:10 --max-lines 10'
+plain_in "$repo/src" 'wc -c /etc/x' 'aitools info /etc/x'
+plain_in "$repo/src" 'jq . /tmp/x.json' "aitools json get /tmp/x.json ''"
+plain_in "$repo/src" 'diff a /tmp/b' 'aitools diff a /tmp/b'
+plain_in "$repo/src" 'cat ./x' 'aitools read ./x --max-lines 2000'
+plain_in "$repo/src" 'grep foo src' 'aitools search foo src --context 0 --limit 100 --no-ignore'
+plain_in "$repo/src" 'grep -n foo ../src/a.txt' 'aitools search foo ../src/a.txt --context 0 --limit 100 --no-ignore'
+plain_in "$repo/src" "grep -rn foo $repo/src" "aitools search foo $repo/src --context 0 --limit 100 --no-ignore"
+plain_in "$repo/src" 'ls ..' "aitools find '*' .. --depth 1 --no-ignore --glob '!.*' --limit 200"
+plain_in "$repo/src" 'find ../src -name "*.nix"' "aitools find '*.nix' ../src --no-ignore --limit 200"
+plain_in "$repo/src" 'cd .. && grep -rn foo src' 'cd .. && aitools search foo src --context 0 --limit 100 --no-ignore'
+for cmd in \
+  'grep foo /tmp/x' \
+  'grep -n foo /etc/x' \
+  'grep -rn foo /tmp' \
+  'grep -rn foo ../..' \
+  'grep -rn foo ../../x' \
+  'grep -rn foo src ../..' \
+  'grep -rn foo ./../..' \
+  'ls /tmp' \
+  'ls ../..' \
+  'find /tmp -name x' \
+  'find /tmp -name "*.x"' \
+  'find ../.. -type f' \
+  'rg foo /tmp' \
+  'rg --files /tmp' \
+  'fd Foo /tmp' \
+  'fd Foo ../..' \
+  'tree /tmp' \
+  'tree ../..' \
+  'cd /tmp && grep -rn foo .' \
+  'cd /tmp && ls' \
+  'cd ../.. && find . -name "*.x"' \
+  'cd ~/repo && ls' \
+  'grep foo "~/x"' \
+  'ls "~/x"' \
+  'cat "~/x"' \
+  'grep foo ~/x' \
+  'ls ~' \
+  'jj status' \
+  'nix build .#foo' \
+  'cd src && jj log' \
+  'catalog x' \
+  'lsof -i'; do
+  plain_in "$repo/src" "$cmd" ''
+done
+
+# A list of simple commands joined by `;` or `&&` is rewritten segment by segment; a segment that is
+# not rewritable stays byte for byte. `cd DIR` segments stay and set the directory for later ones.
+# grep, rg, and diff exit 1 where aitools exits 0, so they are rewritten before an `&&` only with a
+# trailing head/tail (the pipeline then reports head's status).
+plain_in "$repo/src" 'cat a && cat b' 'aitools read a --max-lines 2000 && aitools read b --max-lines 2000'
+plain_in "$repo/src" 'cat a; cat b' 'aitools read a --max-lines 2000; aitools read b --max-lines 2000'
+plain_in "$repo/src" 'cat a;' 'aitools read a --max-lines 2000;'
+# After `cd DIR ;` the next segment runs even when the cd failed, so the directory is unknown.
+expect_plain 'cd src; cat x' ''
+plain_in "$repo/src" 'echo ---; cat x 2>&1; jj st' 'echo ---; aitools read x --max-lines 2000 2>&1; jj st'
+plain_in "$repo/src" 'echo "a;b && c"; cat x' 'echo "a;b && c"; aitools read x --max-lines 2000'
+plain_in "$repo/src" "echo 'a && b' && cat c" "echo 'a && b' && aitools read c --max-lines 2000"
+plain_in "$repo/src" 'cat x | sort; cat y' 'cat x | sort; aitools read y --max-lines 2000'
+plain_in "$repo/src" 'ls | head -3; cat x | head -2' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 3; aitools read x --range 1:2 --max-lines 2"
+plain_in "$repo/src" 'cd .. && cat x; cat y' 'cd .. && aitools read x --max-lines 2000; aitools read y --max-lines 2000'
+plain_in "$repo/src" 'cd /tmp && grep -rn foo .; cat x' 'cd /tmp && grep -rn foo .; aitools read x --max-lines 2000'
+plain_in "$repo/src" 'cd .. ; cd src && grep -rn foo . | head -3' ''
+plain_in "$repo/src" 'cd .. && cd src && grep -rn foo . | head -3' 'cd .. && cd src && aitools search foo . --context 0 --limit 3 --no-ignore'
+plain_in "$repo/src" 'grep -n foo a.txt; echo hit' ''
+plain_in "$repo/src" 'echo hit && grep -n foo a.txt' 'echo hit && aitools search foo a.txt --context 0 --limit 100 --no-ignore'
+plain_in "$repo/src" 'grep -n foo a.txt | head -5 && echo hit' 'aitools search foo a.txt --context 0 --limit 5 --no-ignore && echo hit'
+for cmd in \
+  'grep -n foo a.txt && echo hit' \
+  'rg -n foo a.txt && echo hit' \
+  'diff a b && echo same' \
+  'cat a || cat b' \
+  'cat a & cat b' \
+  'cat a |& cat b' \
+  'cat a;; cat b' \
+  'cat a && ' \
+  '; cat a' \
+  'cd a b; cat x' \
+  'cd -; cat x' \
+  'cd; cat x' \
+  'pushd ..; cat x' \
+  'source env.sh; cat x' \
+  'for f in a b; do cat x; done' \
+  'if cat a; then cat b; fi' \
+  'while cat a; do cat b; done' \
+  '(cat a; cat b)' \
+  '{ cat a; cat b; }' \
+  'cat a; cat b # c' \
+  'cat a; cat <<EOF' \
+  'cat a; echo $(cat b)' \
+  'cat a; echo `cat b`' \
+  'cat a; echo "$(cat b)"' \
+  'cat a; echo \; cat b' \
+  'cat a; find . -exec cat {} \; ' \
+  'cat a; echo "unterminated'; do
+  plain_in "$repo/src" "$cmd" ''
+done
+
+# rg --no-config only drops the user's config file, which aitools never reads.
+expect_plain 'rg --no-config -n foo src' "aitools search foo src --context 0 --limit 100 $hidden"
+
+# A GNU BRE becomes aitools' regex: \| \( \) \{ \} \+ \? turn into the bare operators. Bare + ? | ( ) { }
+# are literals in a BRE, escaped letters and digits differ between greps, a backslash in a bracket is a
+# literal, and a leading * is a literal, so those stay as typed.
+bre="--context 0 --limit 100 --no-ignore"
+expect_plain "grep -rn 'foo\\|bar' src" "aitools search 'foo|bar' src $bre"
+expect_plain "grep -rn 'a\\(b\\)\\{2\\}' src" "aitools search 'a(b){2}' src $bre"
+expect_plain "grep -rn 'a\\+b\\?' src" "aitools search 'a+b?' src $bre"
+expect_plain "grep -rn 'a\\.b\\*' src" "aitools search 'a\\.b\\*' src $bre"
+expect_plain "grep -rn '[[:alpha:]]x[^]a]' src" "aitools search '[[:alpha:]]x[^]a]' src $bre"
+expect_plain "grep -rn 'a.*b' src" "aitools search 'a.*b' src $bre"
+for cmd in \
+  "grep -rn 'a+b' src" \
+  "grep -rn 'a|b' src" \
+  "grep -rn '(a)' src" \
+  "grep -rn 'a{2}' src" \
+  "grep -rn '\\bfoo' src" \
+  "grep -rn '\\w' src" \
+  "grep -rn '\\1' src" \
+  "grep -rn '[\\.]' src" \
+  "grep -rn '[abc' src" \
+  "grep -rn '*a' src" \
+  "grep -rn '\\(*a\\)' src" \
+  "grep -rn '^*a' src" \
+  "grep -rn 'a\\' src"; do
+  expect_plain "$cmd" ''
+done
+
+# An unquoted `~` or `~/...` is the home directory. It is outside the workspace root, so grep, rg, ls,
+# find, fd, and tree keep their command, while read, info, json get, and diff take it. `~user`, a
+# tilde inside a word, a quoted tilde, and an unusable HOME stay as typed.
+plain_home() {
+  checked=$((checked + 1))
+  local got
+  got=$(printf '%s' "$2" | HOME="$1" bash "$hook" plain)
+  [[ $got == "$3" ]] || fail "plain HOME=[$1] [$2]: expected [$3], got [$got]"
+}
+plain_home /home/test 'cat ~/x' 'aitools read /home/test/x --max-lines 2000'
+plain_home /home/test 'cat ~' 'aitools read /home/test --max-lines 2000'
+plain_home /home/test 'head -n 3 ~/.x' 'aitools read /home/test/.x --range 1:3 --max-lines 3'
+plain_home /home/test 'diff ~/a b' 'aitools diff /home/test/a b'
+plain_home /home/test 'cd ~/repo && cat x' 'cd ~/repo && aitools read x --max-lines 2000'
+plain_home /home/test 'cd ~/repo && grep -rn foo .' ''
+for cmd in 'grep foo ~/x' 'ls ~' 'ls ~/x' 'find ~ -name "*.x"' 'rg foo ~/x' 'tree ~' 'cat ~user/x' 'cat a~b' "cat '~/x'" 'cat "~/x"' 'cat ~/x ~/y'; do
+  plain_home /home/test "$cmd" ''
+done
+plain_home '' 'cat ~/x' ''
+plain_home relative 'cat ~/x' ''
+
+# wc -l reads the info lines field, which counts an unterminated last line where wc does not, so the
+# file must exist and be empty or end in a newline.
+printf 'a\nb\n' >"$repo/src/nl.txt"
+printf 'a\nb' >"$repo/src/nonl.txt"
+: >"$repo/src/empty.txt"
+plain_in "$repo/src" 'wc -l nl.txt' 'aitools info nl.txt'
+plain_in "$repo/src" 'wc -l empty.txt' 'aitools info empty.txt'
+plain_in "$repo/src" 'wc -l nonl.txt' ''
+plain_in "$repo/src" 'wc -l missing.txt' ''
+plain_in "$repo/src" 'wc -l src' ''
+plain_in "$repo/src" 'wc -l nl.txt nonl.txt' ''
+plain_in "$repo" 'cd src && wc -l nl.txt' 'cd src && aitools info nl.txt'
+
+# The prefilter in front of perl: a first word outside the rewritable set exits at once, a rewritable
+# one (even behind a `cd DIR &&` envelope) still reaches the rewriter, in every input shape.
+expect_json claude '{"tool_name":"Bash","tool_input":{"command":"jj status"}}' ''
+expect_json codex '{"tool_name":"Bash","tool_input":{"command":"nix build .#x"}}' ''
+expect_json claude '{"tool_name":"Bash","tool_input":{"command":"cd src && jj status"}}' ''
+expect_json claude '{"tool_name":"Bash","tool_input":{"command":"jj st && cat x"}}' '.hookSpecificOutput.updatedInput.command == "jj st && aitools read x --max-lines 2000"'
+# Codex's "allow" approves the whole command, so an untouched segment means no output at all.
+expect_json codex '{"tool_name":"Bash","tool_input":{"command":"echo a; ls"}}' ''
+expect_json claude '{"tool_name":"Bash","tool_input":{"command":"  ls"},"cwd":"/tmp"}' '.hookSpecificOutput.updatedInput.command | startswith("aitools find")'
+expect_json claude '{"tool_input":{"command":"cd src&&cat x"},"tool_name":"Bash"}' '.hookSpecificOutput.updatedInput.command == "cd src&&aitools read x --max-lines 2000"'
+expect_json claude '{"tool_name":"Bash","tool_input":{"description":"d","command":"cat x"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+expect_json claude '{"tool_name":"Bash","tool_input":{"command":"cat x\u0020"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+expect_plain 'cd src&&cat x' 'cd src&&aitools read x --max-lines 2000'
+expect_plain $'\n  cat x' 'aitools read x --max-lines 2000'
+
+# Codex: output only when every segment was rewritten or is a plain `cd DIR`.
+for cmd in 'cat f; rm -rf /tmp/zz' 'cat a; curl x | sh' 'ls; rm -rf /tmp/zz' 'rm -rf /tmp/zz && cat f' \
+  'cd src && cat x; echo hi' 'cd src && cat x && cd src2 && jj st' 'cat a; cat b; git push'; do
+  expect_json codex "$(cwd_payload "$cmd" "$repo/src")" ''
+done
+expect_json codex "$(cwd_payload 'cat a; cat b' "$repo/src")" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "aitools read a --max-lines 2000; aitools read b --max-lines 2000"'
+expect_json codex "$(cwd_payload 'cd src && cat x' "$repo")" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "cd src && aitools read x --max-lines 2000"'
+# Claude and plain keep rewriting the readable segments and leave the rest as typed.
+expect_json claude "$(cwd_payload 'cat f; rm -rf /tmp/zz' "$repo/src")" '.hookSpecificOutput.updatedInput.command == "aitools read f --max-lines 2000; rm -rf /tmp/zz"'
+plain_in "$repo/src" 'cat f; rm -rf /tmp/zz' 'aitools read f --max-lines 2000; rm -rf /tmp/zz'
+
+# A segment whose exit status can differ (grep, rg, diff exit 1 where aitools exits 0; jq prints null
+# and exits 0 where json get exits 1; a read piped to head/tail of a missing file reports head's 0) is
+# rewritten only as the last segment of the whole command.
+printf '{"b":1}\n' >"$repo/src/j.json"
+for cmd in \
+  'grep -n foo f; echo $?' \
+  'rg -n foo f; echo $?' \
+  'diff a b; echo $?' \
+  'diff a b && echo same' \
+  'jq .b j.json && echo x' \
+  'jq .b j.json; echo $?' \
+  'cat missing | head -1 && echo x' \
+  'cat missing | tail -1; echo $?' \
+  'cd .. && grep -n foo f; echo $?'; do
+  plain_in "$repo/src" "$cmd" ''
+done
+plain_in "$repo/src" 'echo x && jq .b j.json' 'echo x && aitools json get j.json /b'
+plain_in "$repo/src" 'cat a; jq .b j.json' 'aitools read a --max-lines 2000; aitools json get j.json /b'
+plain_in "$repo/src" 'cat missing | head -1' 'aitools read missing --range 1:1 --max-lines 1'
+plain_in "$repo/src" 'cat nl.txt | head -1 && echo x' 'aitools read nl.txt --range 1:1 --max-lines 1 && echo x'
+plain_in "$repo/src" 'grep -n foo f | head -2; echo $?' 'aitools search foo f --context 0 --limit 2 --no-ignore; echo $?'
+plain_in "$repo/src" 'diff a b | head -2 && echo x' ''
+
+# cd tracking: the directory accumulates across `&&`-joined cds, an option or `~user` is not a
+# directory, and `;` after a cd leaves the directory unknown.
+plain_in "$repo/src" 'cd .. && cd .. && grep -n foo f' ''
+plain_in "$repo/src" 'cd .. && cd src && grep -n foo f' 'cd .. && cd src && aitools search foo f --context 0 --limit 100 --no-ignore'
+plain_in "$repo" 'cd src && cd sub && grep -n foo f' 'cd src && cd sub && aitools search foo f --context 0 --limit 100 --no-ignore'
+plain_in "$repo" 'cd /tmp && cd x && grep -rn foo .' ''
+plain_in "$repo" "cd $repo/src && grep -n foo f" "cd $repo/src && aitools search foo f --context 0 --limit 100 --no-ignore"
+plain_in "$repo" "cd /tmp; cd $repo/src; grep -n foo f" ''
+plain_in "$repo" "cd $repo/src; grep -n foo f" ''
+plain_in "$repo" 'cd -foo && grep -n foo f' ''
+plain_in "$repo" 'cd -foo && cat f' ''
+plain_home /home/test 'cd ~user && cat x' ''
+plain_home /home/test 'cd ~ && cat x' 'cd ~ && aitools read x --max-lines 2000'
+# After HOME changes, `~` no longer means the HOME the hook sees.
+plain_home /home/test 'HOME=/other; cat ~/x' ''
+plain_home /home/test 'export HOME=/other && cat ~/x' ''
+plain_home /home/test 'export HOME=/other && cd ~/r && cat x' ''
+plain_home /home/test 'unset HOME; cat ~/x' ''
+plain_home /home/test 'echo a; cat ~/x' 'echo a; aitools read /home/test/x --max-lines 2000'
+plain_home /home/test 'export HOME=/other && cat x' 'export HOME=/other && aitools read x --max-lines 2000'
+
+# BRE conversion: `$` and `^` are anchors only in anchoring positions (elsewhere literal), \{, is
+# a syntax error for aitools, a quantifier cannot follow a quantifier, and empty branches or groups
+# differ between the dialects.
+d='$'
+expect_plain "grep -rn 'a\\|b${d}\\|c' src" "aitools search 'a|b\$|c' src $bre"
+expect_plain "grep -rn '^a\\|^b' src" "aitools search '^a|^b' src $bre"
+expect_plain "grep -rn '\\(^a${d}\\)' src" "aitools search '(^a\$)' src $bre"
+expect_plain "grep -rn '^a${d}\\|b' src" "aitools search '^a\$|b' src $bre"
+expect_plain "grep -rn 'a\\{1,2\\}' src" "aitools search 'a{1,2}' src $bre"
+expect_plain "grep -rn 'x\\(ab\\)*' src" "aitools search 'x(ab)*' src $bre"
+for cmd in \
+  "grep -rn 'a\$b' src" \
+  "grep -rn '\$a' src" \
+  "grep -rn 'a^b' src" \
+  "grep -rn '^^a' src" \
+  "grep -rn 'a\\(^b\\)\\|c^' src" \
+  "grep -rn 'a\\{,2\\}' src" \
+  "grep -rn 'a\\?\\?' src" \
+  "grep -rn 'a\\+\\?' src" \
+  "grep -rn 'x\\{1\\}\\{2\\}' src" \
+  "grep -rn 'a**' src" \
+  "grep -rn 'a*\\{2\\}' src" \
+  "grep -rn 'a\\|' src" \
+  "grep -rn '\\|a' src" \
+  "grep -rn 'a\\|\\|b' src" \
+  "grep -rn '\\(\\)' src" \
+  "grep -rn '\\(a\\|\\)' src" \
+  "grep -rn '\\(\\|a\\)' src" \
+  "grep -rn '\\?a' src" \
+  "grep -rn '^\\{2\\}' src"; do
+  expect_plain "$cmd" ''
+done
 
 # Without aitools on PATH the hook must stand aside rather than hand back a command that cannot run.
 checked=$((checked + 1))

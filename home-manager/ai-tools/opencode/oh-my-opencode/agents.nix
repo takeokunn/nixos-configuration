@@ -5,34 +5,6 @@ in
 # prompt_append values sourced from ./prompts/<name>.md are live prompt text, loaded via
 # builtins.readFile, not documentation.
 {
-  zeus = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append =
-      models.promptLang
-      + "\n\n"
-      + "Identify dependencies and delegate independent work to distinct agents when useful. Set run_in_background explicitly: true only for read-only exploration, false otherwise. Sequence overlapping writes unless separate workspaces prevent conflicts.";
-    description = "Orchestrates high-stakes multi-system tasks and delegates independent work.";
-  };
-  themis = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append = models.promptLang;
-    description = "Analyzes vulnerabilities, threat models, and security-sensitive code.";
-  };
-  daedalus = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append = models.promptLang;
-    description = "Cross-system architecture decisions with written rationale; use oracle for bounded advice.";
-  };
-  heracles = mkLane {
-    modelTier = models.default;
-    variant = "high";
-    prompt_append = models.promptLang;
-    description = "Cross-system root-cause investigations; use oracle for single-system debugging advice.";
-  };
-
   sisyphus = mkLane {
     modelTier = models.default;
     variant = "high";

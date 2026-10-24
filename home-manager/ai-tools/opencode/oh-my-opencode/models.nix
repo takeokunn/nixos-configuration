@@ -7,12 +7,9 @@ in
 
   # Step 5 Preview Free, the single tier for every agent and category, including multimodal-looker:
   # `opencode models --verbose` lists image and video input for it, so no separate vision tier is
-  # needed. Its only variants are low, medium, and high, so lanes cannot request max. Fallback is
-  # self-referential since there is only one tier.
+  # needed. Its only variants are low, medium, and high, so lanes cannot request max. There is
+  # no fallback list since there is only one tier.
   default = {
     model = defaultModel;
-    fallback = [
-      defaultModel
-    ];
   };
 }

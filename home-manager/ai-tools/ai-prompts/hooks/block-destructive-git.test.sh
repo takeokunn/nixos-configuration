@@ -128,8 +128,94 @@ expect_block 'git merge feat'
 expect_block 'git cherry-pick abc'
 expect_block 'git revert abc'
 expect_block 'git pull'
-expect_block 'git fetch'
-expect_block 'git fetch --all'
+
+# fetch: a named remote with plain refspecs passes; anything that could run a program, delete or
+# rewrite a local ref, or write a local branch blocks.
+expect_allow 'git fetch'
+expect_allow 'git fetch --all'
+expect_allow 'git fetch origin'
+expect_allow 'git fetch origin main'
+expect_allow 'git fetch origin main v1.0 refs/heads/x'
+expect_allow 'git fetch -q origin'
+expect_allow 'git fetch --no-tags origin main'
+expect_allow 'git fetch origin +refs/heads/*:refs/remotes/origin/*'
+expect_allow 'git -C . fetch origin'
+# --tags and tag refspecs write local tags; --depth and friends rewrite .git/shallow; `..` walks a
+# destination out of refs/remotes/.
+expect_block 'git fetch --tags -q origin'
+expect_block 'git fetch --tags origin'
+expect_block 'git fetch -t origin'
+expect_block 'git fetch -qt origin'
+expect_block 'git fetch origin tag v1.0'
+expect_block 'git fetch origin refs/tags/v1.0'
+expect_block 'git fetch origin +refs/tags/*:refs/remotes/origin/tags/*'
+expect_block 'git fetch --depth=1 origin main'
+expect_block 'git fetch --deepen=5 origin'
+expect_block 'git fetch --unshallow origin'
+expect_block 'git fetch --shallow-since=2020-01-01 origin'
+expect_block 'git fetch --update-shallow origin'
+expect_block 'git fetch origin main:refs/remotes/../heads/main'
+expect_block 'git fetch origin refs/heads/main:refs/remotes/origin/../../heads/x'
+expect_block 'git fetch origin main..dev'
+expect_block 'git fetch --upload-pack=x origin'
+expect_block 'git fetch --upload-pack x origin'
+expect_block 'git fetch --upload origin'
+expect_block 'git fetch --receive-pack=x origin'
+expect_block 'git fetch --update-head-ok origin main:main'
+expect_block 'git fetch -u origin'
+expect_block 'git fetch --prune origin'
+expect_block 'git fetch --pru origin'
+expect_block 'git fetch -p origin'
+expect_block 'git fetch -pq origin'
+expect_block 'git fetch --prune-tags origin'
+expect_block 'git fetch --force origin main'
+expect_block 'git fetch -f origin main'
+expect_block 'git fetch --refmap= origin main'
+expect_block 'git fetch --recurse-submodules origin'
+expect_block 'git fetch --stdin origin'
+expect_block 'git fetch -j 4 ../repo'
+expect_block 'git fetch https://example.com/y main'
+expect_block 'git fetch ../other main'
+expect_block 'git fetch /tmp/repo'
+expect_block 'git fetch git@example.com:o/r.git'
+expect_block 'git fetch ext::sh origin'
+expect_block 'git fetch origin main:main'
+expect_block 'git fetch origin +main:refs/heads/main'
+expect_block 'git fetch origin refs/heads/main:refs/heads/other'
+expect_block 'git fetch origin :refs/remotes/origin/x'
+expect_block 'git fetch origin main:HEAD'
+expect_block 'git fetch $remote'
+expect_block 'git fetch origin $ref'
+expect_block 'git -c remote.origin.url=x fetch origin'
+expect_block 'git -c remote.origin.fetch=+refs/*:refs/heads/* fetch origin'
+expect_block 'bash -c "git fetch --upload-pack=x origin"'
+expect_block 'bash -c "git fetch origin main:main"'
+expect_allow 'bash -c "git fetch origin main"'
+
+# A global-option value computed at run time blocks, except a double-quoted plain variable in -C or
+# --work-tree. The subcommand, -c, --config-env, and unquoted values stay strict.
+expect_allow 'git -C "$r" show HEAD:x'
+expect_allow 'git -C "${r}" log'
+expect_allow 'git -C "$r/sub" status'
+expect_allow 'git --work-tree="$r" status'
+expect_allow 'git --work-tree "$r" status'
+expect_block 'git -C $r show'
+expect_block 'git -C "$r"$d show'
+expect_block 'git -C "$(echo x)" show'
+expect_block 'git -C "`echo x`" show'
+expect_block 'git -C "${r:-x}" show'
+expect_block 'git -C "$r" commit -m x'
+expect_block 'git -C "$r" fetch origin main:main'
+expect_block 'git -c "$k" status'
+expect_block 'git -c "core.pager=$p" status'
+expect_block 'git --config-env="$k" status'
+expect_block 'git --git-dir="$r" status'
+expect_block 'git "$s"'
+expect_block 'git -C "$r" "$s"'
+expect_block 'git $s status'
+expect_block 'aitools run -- git -C "$r" show'
+expect_block 'jj util exec -- git -C "$r" show'
+expect_allow 'bash -c "git -C \"$r\" show"'
 expect_block 'git clone https://example.invalid/x.git'
 expect_block 'git am x.patch'
 expect_block 'git apply x.patch'
@@ -253,7 +339,8 @@ expect_block 'git --no-pager commit'
 expect_block 'git --git-dir=x.git push'
 expect_block 'aitools run -- git push'
 expect_block 'aitools run -- git commit -m x'
-expect_block 'aitools bg start -- /usr/bin/git fetch'
+expect_allow 'aitools bg start -- /usr/bin/git fetch origin'
+expect_block 'aitools bg start -- /usr/bin/git fetch --prune'
 expect_block 'aitools -q run git push'
 # Reserved words and wrapper options that precede the command.
 expect_block '! git push'
@@ -344,6 +431,71 @@ expect_block 'jj -R . git push --all'
 expect_allow 'jj git push --dry-run'
 expect_allow 'jj git fetch'
 expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
+
+# A push verdict never hides a later segment's verdict.
+expect_block 'jj git push -b x; jj undo'
+expect_block 'jj git push -b x && git commit -am z'
+expect_block 'jj git push -b x || jj abandon'
+expect_block 'bash -c "jj git push -b x; jj undo"'
+expect_block 'jj git push -b x; git push'
+expect_block 'jj git push -b x; jj git push -b y'
+
+# `claude` mode turns the jj push verdict into an ask decision on stdout (exit 0); every other verdict
+# still exits 2. Without the argument the verdict is the exit-2 banner tested above.
+expect_ask() {
+  checked=$((checked + 1))
+  local status=0 out
+  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
+  [[ $status -eq 0 ]] || fail "claude mode: expected exit 0 for [$1], got exit $status"
+  [[ $(jq -r '.hookSpecificOutput.permissionDecision' <<<"$out") == ask ]] || fail "claude mode: no ask decision for [$1]: $out"
+  [[ $(jq -r '.hookSpecificOutput.hookEventName' <<<"$out") == PreToolUse ]] || fail "claude mode: wrong event name for [$1]: $out"
+  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason' <<<"$out") == *gitleaks* ]] || fail "claude mode: reason lacks gitleaks instructions for [$1]"
+  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason' <<<"$out") != *ALLOW_DESTRUCTIVE_GIT* ]] || fail "claude mode: reason still mentions the override for [$1]"
+  [[ ! -s $stderr_file ]] || fail "claude mode: ask for [$1] wrote to stderr"
+}
+expect_claude_block() {
+  checked=$((checked + 1))
+  local status=0 out
+  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
+  [[ $status -eq 2 ]] || fail "claude mode: expected block (exit 2) for [$1], got exit $status"
+  [[ -z $out ]] || fail "claude mode: block for [$1] printed to stdout: $out"
+  grep -q 'ORCH-P005' "$stderr_file" || fail "claude mode: block for [$1] printed no ORCH-P005 banner"
+}
+expect_claude_allow() {
+  checked=$((checked + 1))
+  local status=0 out
+  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
+  [[ $status -eq 0 && -z $out && ! -s $stderr_file ]] || fail "claude mode: expected silent allow for [$1], got exit $status, stdout [$out]"
+}
+expect_ask 'jj git push -b main'
+expect_ask 'jj -R . git push --all'
+expect_ask 'jj git push -b $(jj log -r @- -T bookmarks)'
+expect_claude_allow 'jj git push --dry-run'
+# The override never lifts a push in claude mode, wherever it appears; the person always confirms.
+expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
+expect_ask 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
+expect_ask 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
+expect_ask 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
+expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
+expect_ask 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
+# Other jj verdicts are still lifted by the override, so only the push remains.
+expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
+# A push in the same command line does not hide another block, with or without the override.
+expect_claude_block 'jj git push -b x; jj undo'
+expect_claude_block 'jj git push -b x && git commit -am z'
+expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b x; git commit -am z'
+expect_claude_block 'jj git push --allow-private -b main'
+expect_claude_block 'jj --config user.email=x@example.com git push -b main'
+expect_claude_block 'git push'
+expect_claude_block 'jj abandon'
+expect_claude_block 'eval eval eval eval eval git push'
+# Default mode keeps the banner and never prints a decision.
+checked=$((checked + 1))
+out=$(jq -n '{tool_name: "Bash", tool_input: {command: "jj git push -b main"}}' | bash "$hook" 2>/dev/null) || true
+[[ -z $out ]] || fail "default mode printed to stdout: $out"
 
 # A value the shell computes at run time cannot be proven safe.
 expect_block 'jj new $(echo main)'

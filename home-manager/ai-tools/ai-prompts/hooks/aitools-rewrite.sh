@@ -1,22 +1,36 @@
 #!/bin/bash
 # PreToolUse:Bash hook that rewrites a read-only shell command (cat, head, tail, sed -n, grep, rg,
-# ls, find, fd, tree, wc -c, jq, diff) into the equivalent
+# ls, find, fd, tree, wc -c, wc -l, jq, diff) into the equivalent
 # `aitools` call, so the model gets aitools' JSON with line numbers, hashes, and next_commands
 # instead of raw text.
 #
 # The first argument selects the output shape:
 #   claude (default)  hookSpecificOutput.updatedInput only. A permissionDecision would auto-approve
 #                     the command sight-unseen.
-#   codex             Codex rejects updatedInput unless permissionDecision is "allow". The rewrite
-#                     only ever yields a reading aitools command, so nothing mutating is approved.
+#   codex             Codex rejects updatedInput unless permissionDecision is "allow", and that approves
+#                     the whole command, untouched segments included. So output is emitted only when
+#                     every segment was rewritten into a reading aitools command or is a plain
+#                     `cd DIR`; any other segment (`cat f; rm -rf x`) makes the hook print nothing.
 #   plain             stdin is the raw command; stdout is the rewrite, or empty for no rewrite. Used
 #                     by the opencode plugin.
 #
-# The command must be one simple command, optionally wrapped in the three envelopes agents add most:
-# a leading `cd DIR &&`, a trailing `2>&1` or `2>/dev/null`, and a trailing `| head -N` or
+# The command is a list of simple commands joined by `;` or `&&`, each optionally wrapped in the
+# envelopes agents add most: a trailing `2>&1` or `2>/dev/null`, and a trailing `| head -N` or
 # `| tail -N`, which becomes aitools' own line or result limit where aitools can count the same
-# units (not for tree output, rg -o, or a search with context lines). Any other pipeline, list,
-# substitution, or redirect feeds the output to another program, and aitools' JSON would break it.
+# units (not for tree output, rg -o, or a search with context lines). Each segment is rewritten or
+# kept as typed on its own; a plain `cd DIR` segment stays and sets the directory for the later ones.
+# A `cd` joined to the next segment by `;` leaves the directory unknown (it may have failed), and so
+# do a `cd` with an option, `~user`, or more than one operand, and pushd, popd, source, `.`, eval, and
+# exec: later segments stay as typed. So does any `~` after a segment that assigns, exports, or unsets
+# HOME. A list with `||`, `&`, a group, a loop or `if`, a heredoc, a substitution, a comment, a
+# backslash, or a newline stays whole as typed. Any other pipeline or redirect feeds the output to
+# another program, and aitools' JSON would break it.
+#
+# Exit statuses that differ from the shell command: grep, rg, and diff exit 1 on no match or a
+# difference where aitools exits 0 (unless a trailing head/tail makes head's status the pipeline's),
+# jq prints null and exits 0 for a missing key where `aitools json get` exits 1, and a read piped to
+# head/tail of a file that is not a regular file reports head's 0 in the shell. Such a segment is
+# rewritten only as the last segment of the whole command; before any `;` or `&&` it stays as typed.
 # An empty file, or a line range that starts beyond the last line, is left to the shell command, since
 # `aitools read` fails on both (see is_empty_file and range_past_eof).
 # A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
@@ -31,14 +45,45 @@
 # rewritten only to exclude an extension (`!*.EXT`): any other rg glob also matches directories,
 # and a selecting one brings back gitignored files, neither of which an aitools glob does.
 #
-# jq is rewritten only for `.` or a chain of `.name` and `[N]` steps. Its result differs on one
-# input: jq prints null for a missing key, while `aitools json get` fails with input.not-found and
-# lists the pointers that do exist.
+# `aitools search` and `aitools find` reject a start point outside the workspace root (argument.invalid),
+# while read, info, json get, and diff accept any path. So grep, rg, ls, find, fd, and tree stay as
+# typed when a path operand, or the `cd DIR` target, resolves outside the root (nearest ancestor of the
+# working directory holding a `.git` entry): an absolute path elsewhere, `..` that climbs out, or a
+# `~` path (an unquoted `~` is expanded to the home directory first, which is outside the root).
+#
+# `~` handling: an unquoted `~` or `~/x` operand, or `cd ~` and `cd ~/x`, expands to HOME (which must
+# be an absolute path). `~user`, a quoted tilde, and a tilde inside a word stay as typed.
+#
+# wc -c FILE becomes `aitools info`. wc -l FILE does too, only when the file exists and is empty or
+# ends in a newline, since info's line count also counts an unterminated last line.
+#
+# A grep pattern in the default (basic) dialect is converted to aitools' regex: \| \( \) \{ \} \+ \?
+# become the bare operators. A pattern that holds a bare + ? | ( ) { }, an escaped letter or digit,
+# a `$` or `^` outside an anchoring position, `\{,`, a quantifier after a quantifier, or an empty
+# alternation branch or group stays as typed.
+#
+# jq is rewritten only for `.` or a chain of `.name` and `[N]` steps. On a missing key `aitools json
+# get` fails with input.not-found and lists the pointers that do exist, where jq prints null.
 
 set -euo pipefail
 
 mode="${1:-claude}"
 input=$(cat)
+
+# Cheap prefilter, so the common non-rewritable command (jj, nix, git, ...) never pays for perl. It
+# only has to be a superset of what the rewriter accepts: a rewritable command word at the start (after
+# an optional `cd DIR &&`) or right after a `;` or `&`. A miss only skips the rewrite.
+cmd_words='(cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff)'
+cd_env='(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+[[:space:]]*(&|\\u0026)(&|\\u0026)[[:space:]]*)?'
+if [[ $mode == plain ]]; then
+  prefilter="^[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\$)"
+else
+  prefilter="\"command\"[[:space:]]*:[[:space:]]*\"[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
+fi
+# Later segments of a `;` or `&&` list are rewritten too, so a rewritable word right after a separator
+# also passes.
+after_sep="(;|&|u0026)[[:space:]]*${cmd_words}([[:space:]]|\\\\|\")"
+[[ $input =~ $prefilter || $input =~ $after_sep ]] || exit 0
 
 if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null; then
   exit 0
@@ -50,7 +95,7 @@ read -r -d '' perl_prog <<'PERL' || true
 use strict;
 use warnings;
 use JSON::PP;
-use Cwd qw(getcwd);
+use Cwd qw(getcwd abs_path);
 
 my ($mode, $input) = @ARGV;
 
@@ -71,18 +116,35 @@ if ($mode eq 'plain') {
 exit 0 unless defined $command && !ref $command;
 $cwd //= getcwd();
 
-my ($prefix, $body, $redirect, $filter, $cd_dir) = split_envelope($command);
-my @words = split_words($body) or exit 0;
-my %ctx = (cd_dir => $cd_dir, hidden_cwd => under_dot_directory($cwd));
-my @rewritten = rewrite(\%ctx, @words) or exit 0;
-# Every `aitools read` selector fails with selection.no-match (exit 2) on a file without lines, where
-# cat, head, tail, and sed succeed with no output. A range starting past the last line fails the same way.
-exit 0 if $rewritten[0] eq 'read' && is_empty_file($rewritten[1], $cwd, $cd_dir);
-exit 0 if $rewritten[0] eq 'read' && range_past_eof(\@rewritten, $cwd, $cd_dir);
-if ($filter) {
-  @rewritten = apply_filter($filter, @rewritten) or exit 0;
+$command =~ s/\A\s+//;
+$command =~ s/\s+\z//;
+my @segments = split_chain($command) or exit 0;
+my ($cd_dir, $cd_known, $home_known, $changed, $all_handled, $new) = (undef, 1, 1, 0, 1, '');
+for my $i (0 .. $#segments) {
+  my ($text, $sep) = @{ $segments[$i] };
+  my $plain_cd = $text =~ m{\Acd\s+([A-Za-z0-9_/.,:\@%+~-]+)\z} ? $1 : undef;
+  $plain_cd = undef if defined $plain_cd && !cd_dir_ok($plain_cd, $home_known);
+  my $handled = 0;
+  if (defined $plain_cd) {
+    # A plain `cd DIR` stays as typed; later segments resolve their operands against it.
+    $cd_dir = ($plain_cd =~ m{\A[/~]} || !defined $cd_dir) ? $plain_cd : "$cd_dir/$plain_cd";
+    # After `cd DIR ;` the next segment runs even when the cd failed.
+    $cd_known = 0 if $sep =~ /;/;
+    $handled = 1;
+  } elsif ($text =~ /\A(?:cd|pushd|popd|source|\.|eval|exec)(?:\s|\z)/) {
+    $cd_known = 0;
+  } elsif ($text =~ /(?:\A|\s)HOME=/ || $text =~ /\A(?:export|declare|typeset|readonly|local|unset)\s.*\bHOME\b/) {
+    $home_known = 0;
+  } elsif ($cd_known && ($home_known || $text !~ /~/)) {
+    my $out = rewrite_segment($text, $cwd, $cd_dir, $i == $#segments);
+    if (defined $out) { $text = $out; $changed = 1; $handled = 1 }
+  }
+  $all_handled = 0 unless $handled;
+  $new .= $text . $sep;
 }
-my $new = $prefix . join(' ', map { quote($_) } 'aitools', @rewritten) . $redirect;
+exit 0 unless $changed;
+# Codex's "allow" approves the whole command, so every segment must be known-safe.
+exit 0 if $mode eq 'codex' && !$all_handled;
 
 if ($mode eq 'plain') {
   print $new;
@@ -93,6 +155,96 @@ my %out = (hookEventName => 'PreToolUse', updatedInput => \%updated);
 $out{permissionDecision} = 'allow' if $mode eq 'codex';
 print JSON::PP->new->canonical->encode({ hookSpecificOutput => \%out });
 exit 0;
+
+# A `cd` operand the hook can resolve: not an option, and a tilde only as `~` or `~/...` with a usable HOME.
+sub cd_dir_ok {
+  my ($dir, $home_known) = @_;
+  return 0 if $dir =~ /\A-/;
+  return 1 unless $dir =~ /~/;
+  return $home_known && ($ENV{HOME} // '') =~ m{\A/} && $dir =~ m{\A~(?:/|\z)} && $dir !~ m{.~};
+}
+
+# Rewrites one simple command (with its trailing stderr redirect and head/tail filter), or returns
+# undef to keep it as typed. A rewrite whose exit status can differ from the shell command's is
+# only made for the last segment of the whole command.
+sub rewrite_segment {
+  my ($text, $cwd, $cd_dir, $is_last) = @_;
+  my ($body, $redirect, $filter) = split_envelope($text);
+  my @words = split_words($body) or return undef;
+  my %ctx = (cd_dir => $cd_dir, cwd => $cwd, hidden_cwd => under_dot_directory($cwd));
+  my @rewritten = rewrite(\%ctx, @words) or return undef;
+  # Every `aitools read` selector fails with selection.no-match (exit 2) on a file without lines, where
+  # cat, head, tail, and sed succeed with no output. A range starting past the last line fails the same way.
+  return undef if $rewritten[0] eq 'read' && is_empty_file($rewritten[1], $cwd, $cd_dir);
+  return undef if $rewritten[0] eq 'read' && range_past_eof(\@rewritten, $cwd, $cd_dir);
+  my $differs = $rewritten[0] eq 'json'
+    || (!$filter && $rewritten[0] =~ /\A(?:search|diff)\z/)
+    || ($filter && $rewritten[0] eq 'read' && !-f resolve_path($rewritten[1], $cwd, $cd_dir));
+  return undef if $differs && !$is_last;
+  if ($filter) {
+    @rewritten = apply_filter($filter, @rewritten) or return undef;
+  }
+  return join(' ', map { quote($_) } 'aitools', @rewritten) . $redirect;
+}
+
+# Splits the command at top-level `;` and `&&` into [text, separator] pairs, keeping the separator and
+# its whitespace as typed. Returns () when the text holds anything that could hide or move a
+# separator (escapes, substitutions, heredocs, groups, comments, `||`, `&`, `|&`, newlines) or a
+# compound-command keyword, so the whole command stays as typed.
+sub split_chain {
+  my ($s) = @_;
+  return () if $s eq '';
+  my @chars = split //, $s;
+  my (@out, $state, $start);
+  ($state, $start) = ('', 0);
+  my $n = @chars;
+  for (my $i = 0; $i < $n; $i++) {
+    my $c = $chars[$i];
+    my $next = $i + 1 < $n ? $chars[$i + 1] : '';
+    my $prev = $i > 0 ? $chars[$i - 1] : '';
+    return () if $c eq "\n" || $c eq '`' || ($c eq '$' && $next =~ /[('"]/);
+    if ($state eq "'") {
+      $state = '' if $c eq "'";
+    } elsif ($state eq '"') {
+      if ($c eq '"') { $state = '' } elsif ($c eq '\\') { $i++ }
+    } elsif ($c eq "'" || $c eq '"') {
+      $state = $c;
+    } elsif ($c =~ /[\\(){}]/) {
+      return ();
+    } elsif ($c eq '#' && ($i == 0 || $prev =~ /\s/)) {
+      return ();
+    } elsif ($c eq '<' && ($next eq '<' || $next eq '(')) {
+      return ();
+    } elsif ($c eq '>' && $next eq '(') {
+      return ();
+    } elsif ($c eq '|') {
+      return () if $next eq '|' || $next eq '&';
+    } elsif ($c eq ';' || $c eq '&') {
+      if ($c eq '&') {
+        next if $prev eq '>' || $prev eq '<' || $next eq '>';
+        return () unless $next eq '&';
+      }
+      my $len = $c eq '&' ? 2 : 1;
+      return () if $next eq ';' && $c eq ';';
+      my $text = substr($s, $start, $i - $start);
+      $text =~ s/(\s*)\z//;
+      my $before = $1;
+      my $j = $i + $len;
+      $j++ while $j < $n && $chars[$j] =~ /\s/;
+      push @out, [$text, $before . substr($s, $i, $j - $i)];
+      ($start, $i) = ($j, $j - 1);
+    }
+  }
+  return () if $state ne '';
+  my $last = substr($s, $start);
+  return () if $last eq '' && (!@out || $out[-1][1] !~ /;\s*\z/);
+  push @out, [$last, ''] if $last ne '';
+  for my $seg (@out) {
+    return () if $seg->[0] eq '';
+    return () if $seg->[0] =~ /\A(?:if|then|else|elif|fi|for|while|until|do|done|case|esac|select|function|time|!)(?:\s|\z)/;
+  }
+  return @out;
+}
 
 # Resolves a file operand the way the shell would after `cd DIR &&`.
 sub resolve_path {
@@ -105,6 +257,46 @@ sub resolve_path {
     $path = "$cwd/$path" if $path !~ m{\A/};
   }
   return $path;
+}
+
+# The workspace root as aitools resolves it: the nearest ancestor of the working directory holding a
+# `.git` entry, else the directory itself. Symlinks are resolved, as aitools compares real paths.
+sub workspace_root {
+  my ($cwd) = @_;
+  my @parts = grep { $_ ne '' } split m{/}, $cwd;
+  for (my $i = @parts; $i >= 0; $i--) {
+    my $dir = '/' . join('/', @parts[0 .. $i - 1]);
+    return abs_path($dir) // $dir if -e "$dir/.git";
+  }
+  return abs_path($cwd) // $cwd;
+}
+
+# Collapses `.` and `..` lexically, then resolves symlinks of the part that exists.
+sub real_path {
+  my ($path) = @_;
+  my @out;
+  for my $seg (split m{/}, $path) {
+    next if $seg eq '' || $seg eq '.';
+    if ($seg eq '..') { pop @out } else { push @out, $seg }
+  }
+  my @rest;
+  while (@out && !-e '/' . join('/', @out)) { unshift @rest, pop @out }
+  my $base = @out ? (abs_path('/' . join('/', @out)) // '/' . join('/', @out)) : '/';
+  $base =~ s{/\z}{};
+  return join('/', $base, @rest);
+}
+
+# True when a path operand, or the directory the command runs in, lies outside the workspace root, so
+# that `aitools search` and `aitools find` would reject it. `.` stands for the implied start point and
+# for the `cd DIR` target.
+sub outside_root {
+  my ($ctx, @paths) = @_;
+  my $root = $ctx->{root} //= workspace_root($ctx->{cwd});
+  for my $p (@paths, '.') {
+    my $real = real_path(resolve_path($p, $ctx->{cwd}, $ctx->{cd_dir}));
+    return 1 unless $real eq $root || index($real, "$root/") == 0;
+  }
+  return 0;
 }
 
 # True only for an existing, empty regular file.
@@ -133,19 +325,16 @@ sub split_envelope {
   my ($s) = @_;
   $s =~ s/\A\s+//;
   $s =~ s/\s+\z//;
-  my ($prefix, $redirect, $filter, $cd_dir) = ('', '', undef, undef);
-  if ($s =~ s{\A(cd\s+([A-Za-z0-9_/.,:\@%+~-]+)\s*&&\s*)}{}) {
-    ($prefix, $cd_dir) = ($1, $2);
-  }
+  my ($redirect, $filter) = ('', undef);
   if ($s =~ s/\s*\|\s*(head|tail)(?:\s+-n\s*([0-9]+)|\s+-([0-9]+))?\z//) {
     my $n = $2 // $3 // 10;
-    return ('', '', '', undef) unless count($n);
+    return ('', '', undef) unless count($n);
     $filter = [$1, $n];
   }
   if ($s =~ s{\s+(2>&1|2>/dev/null)\z}{}) {
     $redirect = " $1";
   }
-  return ($prefix, $s, $redirect, $filter, $cd_dir);
+  return ($s, $redirect, $filter);
 }
 
 # Folds a trailing `| head -N` or `| tail -N` into the rewrite. Only where aitools can express the
@@ -212,8 +401,16 @@ sub split_words {
   $s =~ s/\s+\z//;
   return () if $s eq '';
   my @words;
-  my ($word, $in_word, $state) = ('', 0, '');
-  for my $c (split //, $s) {
+  my ($word, $in_word, $state, $tilde) = ('', 0, '', 0);
+  my $home = $ENV{HOME} // '';
+  my @chars = split //, $s;
+  my $flush = sub {
+    $word = $home . substr($word, 1) if $tilde;
+    push @words, $word;
+    ($word, $in_word, $tilde) = ('', 0, 0);
+  };
+  for my $i (0 .. $#chars) {
+    my $c = $chars[$i];
     if ($state eq "'") {
       if ($c eq "'") { $state = '' } else { $word .= $c }
     } elsif ($state eq '"') {
@@ -222,9 +419,14 @@ sub split_words {
       else { $word .= $c }
     } elsif ($c =~ /\s/) {
       return () if $c eq "\n";
-      if ($in_word) { push @words, $word; ($word, $in_word) = ('', 0) }
+      $flush->() if $in_word;
     } elsif ($c eq "'" || $c eq '"') {
       ($state, $in_word) = ($c, 1);
+    } elsif ($c eq '~' && !$in_word) {
+      # An unquoted `~` or `~/...` is the home directory; `~user` and a tilde inside a word are not
+      # taken. A quoted tilde stays literal, as in the shell, and operand() refuses it.
+      return () unless $home =~ m{\A/} && ($i == $#chars || $chars[$i + 1] =~ m{[/\s]});
+      ($word, $in_word, $tilde) = ('~', 1, 1);
     } elsif ($c =~ /[|&;<>()\$`\\{}!*?\[\]#~]/) {
       return ();
     } else {
@@ -232,7 +434,7 @@ sub split_words {
     }
   }
   return () if $state ne '';
-  push @words, $word if $in_word;
+  $flush->() if $in_word;
   return @words;
 }
 
@@ -248,18 +450,22 @@ sub count { return $_[0] =~ /\A[1-9][0-9]{0,6}\z/ }
 sub rewrite {
   my ($ctx, $cmd, @args) = @_;
   my %table = (
-    cat => \&rw_cat, head => \&rw_head, tail => \&rw_tail, sed => \&rw_sed,
-    grep => \&rw_grep, ls => \&rw_ls, find => \&rw_find, diff => \&rw_diff,
-    wc => \&rw_wc, jq => \&rw_jq,
-    # These add the hidden-entry globs, whose fit depends on the `cd DIR &&` envelope.
+    # read, info, json get, and diff take any path, so these need no root check.
+    cat => \&rw_cat, head => \&rw_head, tail => \&rw_tail, sed => \&rw_sed, diff => \&rw_diff,
+    jq => \&rw_jq, wc => sub { rw_wc($ctx, @_) },
+    # search and find only take paths inside the workspace root.
+    grep => sub { rw_grep($ctx, @_) }, ls => sub { rw_ls($ctx, @_) }, find => sub { rw_find($ctx, @_) },
+    # These also add the hidden-entry globs, whose fit depends on the `cd DIR &&` envelope.
     rg => sub { rw_rg($ctx, @_) }, fd => sub { rw_fd($ctx, @_) }, tree => sub { rw_tree($ctx, @_) },
   );
   my $handler = $table{$cmd} or return ();
   return $handler->(@args);
 }
 
-# A path operand must not look like an option, so a stray flag is never passed on as a file name.
-sub operand { return defined $_[0] && $_[0] ne '' && $_[0] !~ /\A-/ }
+# A path operand must not look like an option, so a stray flag is never passed on as a file name. A
+# `~`-prefixed word is refused: split_words already expanded an unquoted tilde to the home directory,
+# so what remains was quoted, and a quoted tilde is a literal name that the writer likely did not mean.
+sub operand { return defined $_[0] && $_[0] ne '' && $_[0] !~ /\A[-~]/ }
 
 sub rw_cat {
   my @args = grep { $_ ne '-n' } @_;
@@ -308,6 +514,101 @@ sub rw_sed {
 # grep's default dialect is BRE, where + ? | ( ) { } are literal and \ introduces the operators;
 # aitools reads the same text as a modern regex, so any of those characters changes the meaning.
 sub bre_safe { return $_[0] !~ /[\\+?|(){}]/ }
+
+# Rewrites a GNU BRE into the modern regex dialect aitools reads: \| \( \) \{ \} \+ \? become the bare
+# operators, and the bare characters, literal in a BRE, make the pattern stay as typed. Escaped
+# punctuation and bracket expressions carry over; escaped letters and digits (\w, \1, ...) differ
+# between grep implementations, and a backslash inside a bracket expression is a literal there but an
+# escape for aitools, so they stay as typed too.
+sub bre_translate {
+  my ($p) = @_;
+  return undef if $p =~ /\A\*/;
+  my @c = split //, $p;
+  my $out = '';
+  # nonempty: the current alternation branch holds something. quantifiable: the last item is an atom
+  # a quantifier may follow (not the start of a branch, an anchor, or another quantifier).
+  my ($nonempty, $quantifiable) = (0, 0);
+  my $quantify = sub {
+    return 0 unless $quantifiable;
+    $quantifiable = 0;
+    return 1;
+  };
+  while (@c) {
+    my $ch = shift @c;
+    if ($ch eq '\\') {
+      my $e = shift @c;
+      return undef unless defined $e;
+      if ($e eq '(' || $e eq '|') {
+        return undef if $e eq '|' && !$nonempty;
+        $out .= $e;
+        ($nonempty, $quantifiable) = (0, 0);
+      } elsif ($e eq ')') {
+        return undef unless $nonempty;
+        $out .= $e;
+        ($nonempty, $quantifiable) = (1, 1);
+      } elsif ($e eq '{') {
+        # GNU reads \{,N\} as 0 to N; the modern dialect rejects it.
+        return undef if @c && $c[0] eq ',';
+        return undef unless $quantify->();
+        $out .= $e;
+      } elsif ($e eq '}') {
+        $out .= $e;
+        ($nonempty, $quantifiable) = (1, 0);
+      } elsif ($e eq '+' || $e eq '?') {
+        return undef unless $quantify->();
+        $out .= $e;
+      } elsif ($e =~ /[A-Za-z0-9<>`']/) {
+        return undef;
+      } else {
+        $out .= "\\$e";
+        ($nonempty, $quantifiable) = (1, 1);
+      }
+    } elsif ($ch eq '[') {
+      $out .= $ch;
+      for my $lead ('^', ']') { $out .= shift @c if @c && $c[0] eq $lead }
+      my $closed = 0;
+      while (@c) {
+        my $b = shift @c;
+        return undef if $b eq '\\';
+        $out .= $b;
+        if ($b eq '[' && @c && $c[0] =~ /[:.=]/) {
+          my $kind = shift @c;
+          $out .= $kind;
+          while (@c) {
+            my $d = shift @c;
+            $out .= $d;
+            if ($d eq $kind && @c && $c[0] eq ']') { $out .= shift @c; last }
+          }
+        } elsif ($b eq ']') { $closed = 1; last }
+      }
+      return undef unless $closed;
+      ($nonempty, $quantifiable) = (1, 1);
+    } elsif ($ch =~ /[+?|(){}]/) {
+      return undef;
+    } elsif ($ch eq '*') {
+      # At the start of a branch, after an anchor, or after a quantifier a BRE star is literal or
+      # redundant, and the modern dialect reads it differently.
+      return undef unless $quantify->();
+      $out .= $ch;
+    } elsif ($ch eq '^') {
+      # An anchor only at the start of the pattern or of a group or branch; elsewhere a literal in a BRE.
+      return undef if $nonempty;
+      $out .= $ch;
+      ($nonempty, $quantifiable) = (1, 0);
+    } elsif ($ch eq '$') {
+      # An anchor only at the end of the pattern or before \) or \|; elsewhere a literal in a BRE.
+      my $closes = !@c || ($c[0] eq '\\' && @c > 1 && $c[1] =~ /[)|]/);
+      return undef unless $closes;
+      $out .= $ch;
+      ($nonempty, $quantifiable) = (1, 0);
+    } else {
+      $out .= $ch;
+      ($nonempty, $quantifiable) = (1, 1);
+    }
+  }
+  return undef unless $nonempty;
+  return $out;
+}
 
 # ERE and rg syntax agree with aitools apart from backslash escapes: keep the ones all three read
 # alike (character-class shorthands, word boundaries, escaped punctuation). GNU's \< \> \` \' are
@@ -482,6 +783,7 @@ sub search_command {
 }
 
 sub rw_grep {
+  my ($ctx, @args) = @_;
   my %short = (
     n => '', H => '', s => '', I => '', r => 'recursive', R => 'recursive',
     i => 'icase', w => 'word', F => 'fixed', E => 'extended', l => 'files', c => 'count',
@@ -496,13 +798,18 @@ sub rw_grep {
     'only-matching' => 'only', 'invert-match' => 'invert', 'line-regexp' => 'line',
     include => glob_setter(),
   );
-  my ($opt, $patterns, $paths) = search_args(\%short, \%long, @_) or return ();
+  my ($opt, $patterns, $paths) = search_args(\%short, \%long, @args) or return ();
+  return () if outside_root($ctx, @$paths);
   # Without a path grep reads stdin, which a hook cannot supply.
   return () if !@$paths && !$opt->{recursive};
   return () unless combination_ok($opt, $patterns);
   unless ($opt->{fixed}) {
     for my $p (@$patterns) {
-      return () unless $opt->{extended} ? escapes_safe($p) : bre_safe($p);
+      if ($opt->{extended}) {
+        return () unless escapes_safe($p);
+      } else {
+        $p = bre_translate($p) // return ();
+      }
     }
   }
   # grep reads every file it is pointed at; aitools, like rg, skips .gitignore'd ones by default.
@@ -522,14 +829,15 @@ sub rw_rg {
     g => rg_glob_setter(),
   );
   my %long = (
-    'line-number' => '', 'no-heading' => '', 'ignore-case' => 'icase', 'word-regexp' => 'word',
-    'fixed-strings' => 'fixed', 'files-with-matches' => 'files', count => 'count',
+    'line-number' => '', 'no-heading' => '', 'no-config' => '', 'ignore-case' => 'icase',
+    'word-regexp' => 'word', 'fixed-strings' => 'fixed', 'files-with-matches' => 'files', count => 'count',
     'only-matching' => 'only', 'invert-match' => 'invert', 'line-regexp' => 'line',
     multiline => 'multiline', type => $short{t},
     regexp => pattern_setter(), glob => $short{g},
   );
   my ($opt, $patterns, $paths) = search_args(\%short, \%long, @args) or return ();
   return () unless combination_ok($opt, $patterns) && hidden_globs_fit($ctx, @$paths);
+  return () if outside_root($ctx, @$paths);
   unless ($opt->{fixed}) {
     for my $p (@$patterns) { return () unless escapes_safe($p) }
   }
@@ -554,7 +862,7 @@ sub rw_rg_files {
     return () unless operand($a);
     push @paths, $a;
   }
-  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths);
+  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths) || outside_root($ctx, @paths);
   return () if defined $opt{glob} && !rg_glob_ok($opt{glob});
   my $lang;
   if (defined $opt{type}) { $lang = rg_lang($opt{type}) // return () }
@@ -598,6 +906,7 @@ sub rw_fd {
     return () unless $pattern =~ /\A[A-Za-z0-9_-]+\z/ && $pattern =~ /[A-Z]/;
   }
   return () unless $opt{hidden} || hidden_globs_fit($ctx, @path);
+  return () if outside_root($ctx, @path);
   return (
     'find', $pattern, @path, (defined $opt{type} ? ('--type', $opt{type}) : ()),
     (defined $opt{depth} ? ('--depth', $opt{depth}) : ()), ($opt{no_ignore} ? ('--no-ignore') : ()),
@@ -623,18 +932,26 @@ sub rw_tree {
       return ();
     }
   }
-  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths);
+  return () if @paths > 1 || !hidden_globs_fit($ctx, @paths) || outside_root($ctx, @paths);
   return (
     'find', '*', @paths, '--output', 'tree', ($dirs ? ('--type', 'dir') : ()),
     (defined $depth ? ('--depth', $depth) : ()), '--no-ignore', hidden_globs(), '--limit', '200',
   );
 }
 
-# wc -c FILE only: info's size is the byte count. wc -l stays as typed because info's lines field
-# also counts an unterminated last line.
+# wc -c FILE: info's size is the byte count. wc -l FILE: info's lines field also counts an
+# unterminated last line, so only an existing file that is empty or ends in a newline is taken.
 sub rw_wc {
-  my @args = @_;
-  return () unless @args == 2 && $args[0] eq '-c' && operand($args[1]);
+  my ($ctx, @args) = @_;
+  return () unless @args == 2 && operand($args[1]);
+  return ('info', $args[1]) if $args[0] eq '-c';
+  return () unless $args[0] eq '-l';
+  my $path = resolve_path($args[1], $ctx->{cwd}, $ctx->{cd_dir});
+  return () unless -f $path && open(my $fh, '<:raw', $path);
+  return ('info', $args[1]) unless -s $path;
+  seek($fh, -1, 2);
+  read($fh, my $last, 1);
+  return () unless defined $last && $last eq "\n";
   return ('info', $args[1]);
 }
 
@@ -657,14 +974,14 @@ sub rw_jq {
 }
 
 sub rw_ls {
-  my @args = @_;
+  my ($ctx, @args) = @_;
   my (@paths, $all);
   for my $a (@args) {
     if ($a =~ /\A-[laAh1]+\z/) { $all = 1 if $a =~ /[aA]/; next }
     return () unless operand($a);
     push @paths, $a;
   }
-  return () if @paths > 1;
+  return () if @paths > 1 || outside_root($ctx, @paths);
   # ls hides dot entries unless -a or -A; aitools find lists them. At depth 1 the dot-file glob is
   # enough, and the dot-directory glob would empty `ls .config`.
   return ('find', '*', @paths, '--depth', '1', '--no-ignore', ($all ? () : ('--glob', '!.*')), '--limit', '200');
@@ -673,8 +990,9 @@ sub rw_ls {
 # find [PATH] with any of -maxdepth N, -type f|d, -name GLOB. find -name matches a whole name while
 # an aitools pattern without a glob character is a substring match, so -name must carry a glob.
 sub rw_find {
-  my @args = @_;
+  my ($ctx, @args) = @_;
   my $path = (@args && operand($args[0])) ? shift @args : undef;
+  return () if outside_root($ctx, grep { defined } $path);
   my ($depth, $type, $name);
   while (@args) {
     my $a = shift @args;

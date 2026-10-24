@@ -2,7 +2,7 @@
 name: serena-usage
 description: Use for Serena MCP work - semantic symbol search, find references, code navigation, memory read/write, and organizing memory as a linked reference graph rather than a flat list. Also covers recovering a subagent's report from its session transcript when a completion notification is lost.
 metadata:
-  version: "4.2.0"
+  version: "4.3.0"
 ---
 
 Serena's tool schemas are injected by the harness and are not restated here. This file covers tool *choice*,
@@ -97,6 +97,14 @@ retry. Inspect possible partial edits before re-dispatching a write-capable agen
 
 ## Memory
 
+CLAUDE.md's `memory_policy` holds the short rule; the full policy is this section. Record durable learning when
+it is established: user conventions, decisions, costly traps, rejected options with their evidence, and the
+conditions for revisiting them. Read-only work grants no memory writes; when the store is unavailable or writing
+is prohibited, return the entry as a candidate. Do not record session diffs, verdicts or scores, unfinished
+verification, or facts already in the repository. Keep absolute paths and raw counts out of bodies and retain the
+reproducible command instead. Recheck carried-forward work before proposing it. Update a stale claim in place
+rather than appending a contradiction.
+
 ### Naming
 
 Names may contain `/` to organize into subtopics; `list_memories` enumerates nested paths transparently.
@@ -139,7 +147,7 @@ implementation pattern, a convention or preference the user stated, a transferab
 Do **not** write:
 
 - Session verdicts and review chronology. A deferred-finding ledger may retain an identifier, location,
-  severity, and deferral reason under CLAUDE.md's `memory_policy`; do not turn it into a session transcript.
+  severity, and deferral reason; do not turn it into a session transcript.
 - A note that names one file and would not change what you do in a different file. That is a commit message.
 - Anything volatile enough to be wrong within weeks: line numbers, file counts, current status, an in-flight
   branch's state. **Volatility is the load-bearing exclusion**, because it rejects at write time exactly the

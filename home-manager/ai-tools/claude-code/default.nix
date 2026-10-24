@@ -34,6 +34,12 @@ let
         old.postFixup;
   });
 
+  commandNames = builtins.attrNames (
+    pkgs.lib.filterAttrs (_: type: type == "directory") (
+      builtins.readDir (ai-prompts-path + "/commands")
+    )
+  );
+
   readFiles =
     dir: names:
     builtins.listToAttrs (
@@ -73,15 +79,9 @@ in
     "verification"
   ];
 
-  programs.claude-code.commands = pkgs.lib.genAttrs [
-    "ask"
-    "bug"
-    "define"
-    "execute"
-    "execute-full"
-    "markdown"
-    "qa"
-  ] (name: builtins.readFile "${ai-prompts-path}/commands/${name}/SKILL.md");
+  programs.claude-code.commands = pkgs.lib.genAttrs commandNames (
+    name: builtins.readFile "${ai-prompts-path}/commands/${name}/SKILL.md"
+  );
 
   programs.claude-code.outputStyles = readFiles "${ai-prompts-path}/output-styles" [
     "explanatory-strict"

@@ -5,7 +5,6 @@
 }:
 epkgs:
 let
-  ai = import ./packages/ai { inherit epkgs; };
   awesome = import ./packages/awesome { inherit epkgs nurPkgs; };
   buffer = import ./packages/buffer { inherit epkgs; };
   client = if isDarwin then [ ] else import ./packages/client { inherit epkgs nurPkgs pkgs; };
@@ -28,8 +27,7 @@ let
   tree-sitter = import ./packages/tree-sitter { inherit epkgs; };
   window = import ./packages/window { inherit epkgs; };
 in
-ai
-++ awesome
+awesome
 ++ buffer
 ++ client
 ++ coding

@@ -4,7 +4,6 @@ description: "Use for work that spans domains and fits no single specialty: log 
 ---
 
 Handle work spanning specialties; recommend a specialist when the task clearly fits one.
-Apply the shared contracts in CLAUDE.md.
 
 ## Workflow
 
@@ -21,7 +20,7 @@ Apply the shared contracts in CLAUDE.md.
 
 ## Completion and escalation
 
-Follow gate_discipline. Name verification performed, unexercised callers, uncovered log periods, untested
+Name verification performed, unexercised callers, uncovered log periods, untested
 migration paths, and unavailable tools. If a semantic tool is replaced by text search, identify the claim whose
 evidence is weaker. Run missing checks or record the gap and qualify affected conclusions.
 

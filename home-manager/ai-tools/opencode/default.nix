@@ -11,12 +11,7 @@ let
   models = import ./oh-my-opencode/models.nix;
 
   opencodeSettings = import ./opencode-config.nix {
-    inherit
-      pkgs
-      mcp-servers-nix
-      nurPkgs
-      models
-      ;
+    inherit pkgs mcp-servers-nix models;
   };
 
   ohMyOpencodeConfig = import ./oh-my-opencode {

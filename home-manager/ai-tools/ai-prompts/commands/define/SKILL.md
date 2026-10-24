@@ -3,20 +3,20 @@ argument-hint: [message]
 description: Turn a request into an implementation-ready specification. Use when scope is unresolved before implementation.
 ---
 
-Turn a request into an implementation-ready specification for the user to approve. Do not edit files, write memories, or implement. Apply CLAUDE.md's evidence, delegation, gate_discipline, and output_contract.
+Turn a request into an implementation-ready specification. Do not edit files, write memories, or implement.
 
 Use this command for ambiguous scope, meaningful alternatives, cross-file impact, or high-risk decisions. A factual question belongs in /ask, a diagnosis in /bug, understood implementation in /execute, and saving the resulting document in /markdown.
 
 ## Method
 
-Load requirements-definition, plus fact-check when external claims matter. Follow prepare → analyze → investigate → clarify → verify → document → finalize; this command's read-only boundary governs any broader skill permissions.
+Load requirements-definition, plus fact-check when external claims matter. Follow prepare → analyze → investigate → clarify → verify → document; this command's read-only boundary governs any broader skill permissions.
 
 1. Separate the user's problem from their proposed solution. Identify subject, object, and operation. Establish Why, How, and What at the relevant levels: system/cross-cutting, data, interfaces, business behavior, then affected files.
 2. Verify current capabilities at the target ref before promising feasibility. State an impossible requirement plainly. Investigate a signal, form a hypothesis, and check it before asking a question the repository can answer.
-3. Specify observable behavior, options, constraints, and load-bearing decisions, not invented function names or algorithms. Ask when materially different interpretations change the work; do not impose an artificial question budget.
+3. Specify observable behavior, options, constraints, and load-bearing decisions, not invented function names or algorithms. Ask only when readings differ in a destructive or externally visible effect (CLAUDE.md work_selection); otherwise record the assumption in the specification and proceed.
 4. Prefer the minimum scope meeting the need. Compare simpler alternatives and phased delivery. Require three evidenced cases before generalizing a one-off need. Trace the full impact, including callers, migrations, API compatibility, and tests.
 5. Delegate substantial independent exploration, architecture, or data questions read-only when useful. Dispatch the verification agent in its read-only reconcile mode only for an unresolved consequential disagreement. Synthesize results rather than forwarding agent reports.
-6. Offer decision options with a recommended choice and concrete tradeoffs. Replace confidence percentages or effort-hour estimates with observed files, call sites, layers, and test obligations.
+6. Record decision options with a recommended choice and concrete tradeoffs in the specification. Replace confidence percentages or effort-hour estimates with observed files, call sites, layers, and test obligations.
 
 ### Signals to resolve
 
@@ -31,7 +31,7 @@ Load requirements-definition, plus fact-check when external claims matter. Follo
 
 ## Specification
 
-Always include:
+Include what the implementation needs and omit empty sections:
 
 - Summary: problem, intended outcomes, and why they matter.
 - Current state: verified capabilities and limitations.
@@ -39,13 +39,13 @@ Always include:
 - Technical specification: policy, affected surfaces, decisions, rationale, and rejected alternatives.
 - Constraints.
 - Test requirements: observable acceptance conditions, including failure behavior.
-- Outstanding issues: priority, conflicting evidence or positions, and the user decision needed; say explicitly when none remain.
+- Outstanding issues: priority, conflicting evidence or positions, and recorded assumptions; omit when none remain.
 - Task breakdown: phases, affected files, dependencies, references, and constraints. Do not hide unknowns inside implementation tasks.
 
 Add nonfunctional requirements only when applicable, an architecture diagram for meaningful multilayer relationships, and data/schema/API contract changes when relevant.
 
-## Finalize
+## Check before returning
 
 Check that scope and feasibility are grounded, blast radius and a simpler alternative were considered, acceptance is observable, and each task is ready or names its blocker. Keep decision points that affect implementation; omit obvious restatements.
 
-Resolve critical questions or list them explicitly. With outstanding issues, invoke the finalize step to ask the user to resolve, defer, or stop; do not silently treat the specification as approved. Return output_contract with the specification and unresolved decisions. Hand off memory candidates without writing them.
+Do not ask the user to resolve, defer, or stop. Record each unresolved item and the assumption taken in the specification, mark dependent tasks blocked only when an assumption cannot be checked, and return output_contract with the specification and unresolved decisions. Hand off memory candidates without writing them.

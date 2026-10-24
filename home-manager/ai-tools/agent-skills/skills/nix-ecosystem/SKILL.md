@@ -496,5 +496,4 @@ behavior; Nix just makes the multicall layout the norm.
 - [investigation-patterns](../investigation-patterns/SKILL.md): debugging evaluation and derivation failures
 - [serena-usage](../serena-usage/SKILL.md): navigating Nix expressions by symbol
 - [testing-patterns](../testing-patterns/SKILL.md): what acceptance means for a declarative change
-- Language conventions for nixpkgs packaging: [rust-ecosystem](../rust-ecosystem/SKILL.md) and
-  [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md)
+- Language conventions for nixpkgs packaging: [common-lisp-ecosystem](../common-lisp-ecosystem/SKILL.md)

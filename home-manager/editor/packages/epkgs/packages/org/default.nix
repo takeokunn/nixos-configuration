@@ -44,7 +44,6 @@ with epkgs;
 
   # Org External Tools
   org-redmine
-  org-ai
 
   # Org Babel
   ob-async

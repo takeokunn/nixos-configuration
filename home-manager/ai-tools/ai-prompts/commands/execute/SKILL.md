@@ -1,15 +1,15 @@
 ---
 argument-hint: [task-description]
-description: Implement a task and verify it. Use for a bounded change that needs no full review wave.
+description: Implement a task and verify it. Use when the scope is understood.
 ---
 
-Implement the requested task and verify the result. Use /execute-full when the user wants the full review wave.
-Apply CLAUDE.md's hard_rules, work_selection, delegation, evidence, and output_contract throughout.
+Implement the requested task and verify the result.
 
 ## Prepare
 
-Load execution-workflow once. Use Serena when available and read memories only when prior knowledge could
-change the work (for example a canonical verification command); if unavailable, use repository evidence.
+Load execution-workflow only when isolating the work in a jj workspace or dispatching several agents. Use
+Serena when available and read memories only when prior knowledge could change the work (for example a
+canonical verification command); if unavailable, use repository evidence.
 Run `jj status` before editing only if you need to tell your changes from existing ones at completion.
 
 Name the requested outcome, affected paths, and acceptance checks. For a local, understood change, this is

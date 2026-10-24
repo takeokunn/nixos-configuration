@@ -12,7 +12,6 @@
     "aquaskk"
     "arto-app/tap/arto"
     "cleanshot"
-    "claude"
     "clickup"
     "drawio"
     "docker-desktop"

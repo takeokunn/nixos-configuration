@@ -1,6 +1,4 @@
 {
-  pkgs,
-  nurPkgs,
   llmAgentsPkgs,
   ...
 }:
@@ -14,9 +12,6 @@
   ];
 
   home.packages = [
-    pkgs.mdq
     llmAgentsPkgs.ccusage
-    llmAgentsPkgs.terminal-use
-    nurPkgs.z_ai-coding-helper
   ];
 }
