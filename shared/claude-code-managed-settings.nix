@@ -87,7 +87,7 @@ in
     CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1";
     MCP_TOOL_TIMEOUT = "120000";
     CLAUDE_CODE_MAX_OUTPUT_TOKENS = "32000";
-    CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
+    CLAUDE_CODE_SUBAGENT_MODEL = "opus";
     CLAUDE_CODE_AUTO_CONNECT_IDE = "0";
     # Also covers telemetry, error reporting, and the autoupdater (code.claude.com/docs/en/env-vars).
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
