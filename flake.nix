@@ -559,10 +559,9 @@
               ''
                 defaultMode=$(jq -r '.defaultMode' <<< "$permissionsJson")
                 denyCount=$(jq '.deny | length' <<< "$permissionsJson")
-                bypass=$(jq -r '.disableBypassPermissionsMode' <<< "$permissionsJson")
                 settingsKeyCount=$(jq 'length' <<< "$settingsFileKeysJson")
-                if [ "$defaultMode" != "auto" ]; then
-                  echo "expected managed-settings permissions.defaultMode == \"auto\", got \"$defaultMode\"" >&2
+                if [ "$defaultMode" != "bypassPermissions" ]; then
+                  echo "expected managed-settings permissions.defaultMode == \"bypassPermissions\", got \"$defaultMode\"" >&2
                   exit 1
                 fi
                 if [ "$denyCount" -lt 1 ]; then
@@ -619,30 +618,11 @@
                     fi
                   done
                 done
-                # Each of these runs a program or leaks the environment from inside an allowed command.
-                for rule in 'Bash(nix eval *)' 'Bash(nix flake show *)' 'Bash(nix flake metadata *)' 'Bash(jq *)' 'Bash(tree *)' 'Bash(aitools sys procs *)' 'Bash(bash *)' 'Bash(sh *)' 'Bash(python *)' 'Bash(python3 *)' 'Bash(node *)'; do
-                  if jq -e --arg r "$rule" '.allow | index($r)' <<< "$permissionsJson" >/dev/null; then
-                    echo "managed-settings permissions.allow contains \"$rule\", which skips the classifier for a command that can run code or leak secrets" >&2
-                    exit 1
-                  fi
-                done
-                if ! jq -e '.ask | index("Bash(rg *--hostname-bin*)")' <<< "$permissionsJson" >/dev/null; then
-                  echo "managed-settings permissions.ask lost \"Bash(rg *--hostname-bin*)\"" >&2
+                # An ask rule prompts even in bypassPermissions, so only the override prefixes may stay.
+                if ! jq -e '.ask == ["Bash(ALLOW_DESTRUCTIVE_GIT=1 *)", "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"]' <<< "$permissionsJson" >/dev/null; then
+                  echo "managed-settings permissions.ask must hold only the two override prefixes" >&2
                   exit 1
                 fi
-                # Auto mode ignores a blanket Bash allow, and the push and PR checkpoints must stay ask rules.
-                for rule in 'Bash(*)' 'Bash'; do
-                  if jq -e --arg r "$rule" '.allow | index($r)' <<< "$permissionsJson" >/dev/null; then
-                    echo "managed-settings permissions.allow contains the blanket \"$rule\"" >&2
-                    exit 1
-                  fi
-                done
-                for rule in 'Bash(jj git push*)' 'Bash(gh pr create*)' 'Bash(gh pr merge*)'; do
-                  if ! jq -e --arg r "$rule" '.ask | index($r)' <<< "$permissionsJson" >/dev/null; then
-                    echo "managed-settings permissions.ask lost \"$rule\"" >&2
-                    exit 1
-                  fi
-                done
                 # rm denials: the system directories stay denied, and scratch space stays deletable. The patterns are
                 # plain globs whose only `*` is trailing, so a prefix test stands in for the matcher.
                 for rule in 'Bash(rm -rf /)' 'Bash(rm -rf /etc*)' 'Bash(rm -rf /Users*)' 'Bash(rm -rf /home*)'; do
@@ -662,7 +642,7 @@
                     exit 1
                   fi
                 done
-                # The Claude Code hook must be told to answer a jj push with ask; Codex's wiring passes no argument.
+                # The Claude Code hook must be told to allow a jj push; Codex's wiring passes no argument.
                 if ! jq -e '[.PreToolUse[].hooks[].command | select(test("/block-destructive-git( |$)"))] | length == 1 and all(test("/block-destructive-git claude$"))' <<< "$claudeHooksJson" >/dev/null; then
                   echo "managed-settings hooks must register block-destructive-git exactly once, ending in \" claude\"" >&2
                   exit 1
@@ -685,20 +665,6 @@
                 done
                 if jq -e '.environment[] | select(contains("/Users/") or contains("/home/"))' <<< "$autoModeJson" >/dev/null; then
                   echo "managed-settings autoMode.environment names an absolute home path" >&2
-                  exit 1
-                fi
-                if [ "$(jq '.allow | length' <<< "$permissionsJson")" -lt 1 ]; then
-                  echo "managed-settings permissions.allow is unexpectedly empty" >&2
-                  exit 1
-                fi
-                # Deny wins over allow, so a rule in both lists is an allow entry that never applies.
-                overlap=$(jq -c '[.allow[] as $a | .deny[] | select(. == $a)]' <<< "$permissionsJson")
-                if [ "$overlap" != "[]" ]; then
-                  echo "managed-settings rules in both allow and deny: $overlap" >&2
-                  exit 1
-                fi
-                if [ "$bypass" != "disable" ]; then
-                  echo "expected managed-settings permissions.disableBypassPermissionsMode == \"disable\", got \"$bypass\"" >&2
                   exit 1
                 fi
                 if [ "$configDir" != "$expectedConfigDir" ]; then

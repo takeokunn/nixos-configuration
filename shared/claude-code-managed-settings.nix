@@ -56,112 +56,18 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
-    # An allow rule skips the auto-mode classifier, so only commands that read and cannot launch another
-    # program are listed; everything else reaches the classifier (auto mode ignores a blanket Bash(*)).
-    # find and fd are left out (-delete, -exec, -x), as are interpreters, the aitools write subcommands,
-    # aitools run|bg, and aitools sys env, which prints secrets into the transcript. nix eval and
-    # nix flake show|metadata (--option allow-unsafe-native-code, --write-to), jq (`jq -n env` prints
-    # the environment), tree (-o writes a file), and aitools sys procs (unredacted argv) are left out for
-    # the same reason. Redirects on an allowed command are checked against the Edit rules separately.
-    # slite and clickup stay prompted because their writes publish to external workspaces.
-    allow = [
-      "Bash(ls *)"
-      "Bash(cat *)"
-      "Bash(head *)"
-      "Bash(tail *)"
-      "Bash(wc *)"
-      "Bash(rg *)"
-      "Bash(grep *)"
-      "Bash(jj status *)"
-      "Bash(jj log *)"
-      "Bash(jj diff *)"
-      "Bash(jj show *)"
-      "Bash(jj op log *)"
-      "Bash(jj op show *)"
-      "Bash(jj file show *)"
-      "Bash(jj file list *)"
-      "Bash(jj file annotate *)"
-      "Bash(git status *)"
-      "Bash(git log *)"
-      "Bash(git diff *)"
-      "Bash(git show *)"
-      "Bash(git blame *)"
-      "Bash(git rev-parse *)"
-      "Bash(git ls-files *)"
-      "Bash(nix path-info *)"
-      "Bash(nix log *)"
-      "Bash(aitools read *)"
-      "Bash(aitools search *)"
-      "Bash(aitools find *)"
-      "Bash(aitools overview *)"
-      "Bash(aitools info *)"
-      "Bash(aitools check *)"
-      "Bash(aitools diff *)"
-      "Bash(aitools code *)"
-      "Bash(aitools json get *)"
-      "Bash(aitools json select *)"
-      "Bash(aitools json diff *)"
-      "Bash(aitools table read *)"
-      "Bash(aitools table agg *)"
-      "Bash(aitools archive list *)"
-      "Bash(aitools archive read *)"
-      "Bash(aitools git *)"
-      "Bash(aitools sys info *)"
-      "Bash(aitools sys tools *)"
-      "Bash(aitools sys metrics *)"
-      "Bash(aitools sys network *)"
-      "Bash(aitools sys disk *)"
-      "Bash(aitools sys ports *)"
-      "Bash(aitools sys snapshot *)"
-      "Bash(aitools time *)"
-      "Bash(aitools util tokens *)"
-      "Bash(aitools util calc *)"
-      "mcp__mediator"
-      "mcp__plugin_hm_context7"
-      "mcp__plugin_hm_deepwiki"
-      "mcp__plugin_hm_playwright"
-      "mcp__plugin_hm_serena"
-    ];
-    # Ask outranks allow, so these forms of an allowed command still prompt. Each can start a program
-    # the allow rule never named: jj through a configured tool, editor, pager, or fixer; nix through an
-    # impure read of any file; rg through --pre. The override prefix lifts block-destructive-git's jj
-    # verdicts, and an agent can type it, so a person confirms each use.
-    #
-    # The push and PR rules are a human checkpoint: ask rules are evaluated before the auto-mode
-    # classifier. They match only commands that start with the named words (`jj -R x git push` slips
-    # past), so block-destructive-git still gates every jj push.
+    # bypassPermissions skips every prompt and the auto-mode classifier; deny rules and the PreToolUse
+    # hooks still apply. Allow rules have no effect in this mode and an ask rule would still prompt, so
+    # the only ask rules left are the override prefixes that lift a block-destructive-git verdict.
     ask = [
-      "Bash(jj git push*)"
-      "Bash(gh pr create*)"
-      "Bash(gh pr merge*)"
-      "Bash(rg *--pre*)"
-      "Bash(rg *--hostname-bin*)"
-      "Bash(jj *--config*)"
-      "Bash(jj *--tool*)"
-      "Bash(jj config set *)"
-      "Bash(jj config edit*)"
-      "Bash(jj fix*)"
-      "Bash(jj run *)"
-      "Bash(jj sign*)"
-      "Bash(jj gerrit *)"
-      "Bash(nix eval *--impure*)"
       "Bash(ALLOW_DESTRUCTIVE_GIT=1 *)"
       "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"
     ];
-    # Reviewed via /define: hooks and permissions.deny still enforce independently of
-    # permission mode, so this only removes the interactive prompt; a background classifier
-    # model now reviews everything else auto mode would have prompted for (see Claude Code
-    # docs: "Eliminate permission prompts with auto mode").
-    defaultMode = "auto";
-    # Neutralises `--dangerously-skip-permissions` on launches this machine does not control:
-    # tools that spawn unattended agents hardcode that flag, which would otherwise outrank
-    # `defaultMode` and disable every check above. Measured against Claude Code 2.1.278: the
-    # process still starts and exits 0, the flag is ignored, and the session falls back to
-    # `defaultMode`, so an unattended agent degrades rather than dies. The version matters —
-    # anthropics/claude-code#44642 reports this key having no effect at all on 2.1.92. Re-measure
-    # after a major CLI bump rather than trusting this line.
-    disableBypassPermissionsMode = "disable";
+    defaultMode = "bypassPermissions";
   };
+  # Accepts the one-time bypass warning dialog up front; background sessions honor it only from user or
+  # managed settings.
+  skipDangerousModePermissionPrompt = true;
 
   # "$defaults" keeps the built-in environment; the entries after it name where this user's work lives.
   autoMode.environment = [

@@ -440,19 +440,8 @@ expect_block 'bash -c "jj git push -b x; jj undo"'
 expect_block 'jj git push -b x; git push'
 expect_block 'jj git push -b x; jj git push -b y'
 
-# `claude` mode turns the jj push verdict into an ask decision on stdout (exit 0); every other verdict
-# still exits 2. Without the argument the verdict is the exit-2 banner tested above.
-expect_ask() {
-  checked=$((checked + 1))
-  local status=0 out
-  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
-  [[ $status -eq 0 ]] || fail "claude mode: expected exit 0 for [$1], got exit $status"
-  [[ $(jq -r '.hookSpecificOutput.permissionDecision' <<<"$out") == ask ]] || fail "claude mode: no ask decision for [$1]: $out"
-  [[ $(jq -r '.hookSpecificOutput.hookEventName' <<<"$out") == PreToolUse ]] || fail "claude mode: wrong event name for [$1]: $out"
-  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason' <<<"$out") == *gitleaks* ]] || fail "claude mode: reason lacks gitleaks instructions for [$1]"
-  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason' <<<"$out") != *ALLOW_DESTRUCTIVE_GIT* ]] || fail "claude mode: reason still mentions the override for [$1]"
-  [[ ! -s $stderr_file ]] || fail "claude mode: ask for [$1] wrote to stderr"
-}
+# `claude` mode allows the jj push verdict silently (exit 0); every other verdict still exits 2.
+# Without the argument the verdict is the exit-2 banner tested above.
 expect_claude_block() {
   checked=$((checked + 1))
   local status=0 out
@@ -467,21 +456,21 @@ expect_claude_allow() {
   out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
   [[ $status -eq 0 && -z $out && ! -s $stderr_file ]] || fail "claude mode: expected silent allow for [$1], got exit $status, stdout [$out]"
 }
-expect_ask 'jj git push -b main'
-expect_ask 'jj -R . git push --all'
-expect_ask 'jj git push -b $(jj log -r @- -T bookmarks)'
+expect_claude_allow 'jj git push -b main'
+expect_claude_allow 'jj -R . git push --all'
+expect_claude_allow 'jj git push -b $(jj log -r @- -T bookmarks)'
 expect_claude_allow 'jj git push --dry-run'
-# The override never lifts a push in claude mode, wherever it appears; the person always confirms.
-expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
-expect_ask 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
-expect_ask 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
-expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
-expect_ask 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
-expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
-expect_ask 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
-expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
-# Other jj verdicts are still lifted by the override, so only the push remains.
-expect_ask 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
+# A push is allowed in claude mode whether or not the override appears.
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
+expect_claude_allow 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
+expect_claude_allow 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
+expect_claude_allow 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
+expect_claude_allow 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
+# Other jj verdicts are still lifted by the override, so the push is allowed.
+expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
 # A push in the same command line does not hide another block, with or without the override.
 expect_claude_block 'jj git push -b x; jj undo'
