@@ -1,9 +1,15 @@
-{ lib, nurPkgs, ... }:
+{
+  lib,
+  nurPkgs,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./modules/doggo
     ./modules/lnav
     ./cargo
+    ./isucon
   ];
 
   # aitools is null on systems nur-packages' upstream flake doesn't build it for
@@ -13,5 +19,17 @@
     nurPkgs.kuro
     nurPkgs.paredit-cli
   ]
+  ++ (with pkgs; [
+    go
+    gopls
+    gotools # goimports, used by emacs gofmt-command
+    delve
+    golangci-lint
+    go-tools # staticcheck
+    gofumpt
+    gomodifytags
+    gotests
+    impl
+  ])
   ++ lib.optional (nurPkgs.aitools != null) nurPkgs.aitools;
 }
