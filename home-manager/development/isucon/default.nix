@@ -7,7 +7,6 @@
     percona-toolkit
     mariadb.client
     shellcheck
-    yq-go
     go-task
     graphviz
     sqlite
