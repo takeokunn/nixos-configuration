@@ -8,10 +8,8 @@ let
     "1" = [ "com.google.Chrome" ];
     "3" = [ "org.gnu.Emacs" ];
     "4" = [
-      "com.jgraph.drawio.desktop"
       "com.lambdalisue.Arto"
       "com.sequel-ace.sequel-ace"
-      "at.eggerapps.Postico"
     ];
     "6" = [ "com.efoo.mediator" ];
     "7" = [ "com.slite.desktop" ];
@@ -27,7 +25,6 @@ let
   floatingApps = [
     "com.google.Chrome"
     "pl.maketheweb.cleanshotx"
-    "io.github.keycastr"
   ];
 in
 {
