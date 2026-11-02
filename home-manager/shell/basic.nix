@@ -4,7 +4,6 @@
     ./bat
     ./bottom
     ./direnv
-    ./dust
     ./eza
     ./fd
     ./fish

@@ -23,13 +23,6 @@
     go
     gopls
     gotools # goimports, used by emacs gofmt-command
-    delve
-    golangci-lint
-    go-tools # staticcheck
-    gofumpt
-    gomodifytags
-    gotests
-    impl
   ])
   ++ lib.optional (nurPkgs.aitools != null) nurPkgs.aitools;
 }

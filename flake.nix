@@ -127,7 +127,6 @@
           bat = ./home-manager/shell/bat; # needs nur
           bottom = ./home-manager/shell/bottom;
           direnv = ./home-manager/shell/direnv;
-          dust = ./home-manager/shell/dust;
           eza = ./home-manager/shell/eza;
           fd = ./home-manager/shell/fd;
           fzf = ./home-manager/shell/fzf;
@@ -141,7 +140,6 @@
 
           git = ./home-manager/vcs/git;
           gh = ./home-manager/vcs/gh;
-          gh-dash = ./home-manager/vcs/gh-dash;
           tig = ./home-manager/vcs/tig; # needs nur
           git-hooks = ./home-manager/vcs/modules/git-hooks;
 
