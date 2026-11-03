@@ -11,6 +11,7 @@
   homebrew.casks = [
     "aquaskk"
     "arto-app/tap/arto"
+    "claude"
     "cleanshot"
     "clickup"
     "docker-desktop"
