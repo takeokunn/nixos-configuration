@@ -30,7 +30,7 @@ with explicit paths so another session's changes stay out. Do not commit to the 
 Ask before destructive, hard-to-reverse, or externally visible actions such as `gh pr merge`, publishing,
 posting, deleting others' work, or moving/discarding a shared working copy (stash/checkout/switch, reset --hard,
 clean -f, jj edit/next/prev, jj new onto another revision, abandon, restore without paths, undo/redo,
-op restore/revert). Task instructions or files they name count as user approval for push or PR creation within
+op restore/revert). Task instructions or files they name count as user approval for a push or PR creation within
 task scope when both operation and target branch are named; ask otherwise. A hook block is a boundary: do not
 seek another spelling. Run the hook rejection's override prefix for that operation exactly as one standalone
 command; do not chain it after `cd` or wrap it in a shell function.
@@ -54,9 +54,9 @@ file, unless requested.
 Start from the requested outcome, affected paths, and the check that would establish it. Inspect only enough
 context to choose the next action. For a local, understood change, implement and run the narrowest meaningful
 check directly. Only add review or verification agents on user request, for security/data changes, or for
-interface-spanning changes without tests for changed behavior. Do not ask agents to recheck established results.
+interface-spanning changes without tests for changed behavior. Do not ask agents to recheck results established by checks.
 
-Ask only before hard_rules actions or when different readings would have a destructive or externally visible
+Ask only before actions in hard_rules or when different readings would have a destructive or externally visible
 effect. Otherwise state the assumption and proceed. Within scope, fix same-kind defects in code already touched
 and review findings on your changes in that same change. Stop when the requested result is verified; report other
 improvements without implementing them. Reaching an iteration or resource limit is not completion; report
