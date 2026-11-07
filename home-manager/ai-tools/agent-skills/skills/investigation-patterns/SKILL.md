@@ -42,6 +42,7 @@ another), add a signal that tests a named suspicion instead of changing code on 
    can be off for that run. [Which implementation actually loaded](../test-integrity/SKILL.md#which-implementation-actually-loaded)
    is the same check for code.
 5. Fix the cause, rerun the exact failing probe, and widen only as far as the contract requires.
+6. If the same mechanism needs fixes in two locations, propose fixing the mechanism itself.
 
 Signals at adjacent layers bracket a fault: response headers show the transport answered, the first body event
 shows the remote side progressed, and a long gap between them points at the stream, not its consumer.
