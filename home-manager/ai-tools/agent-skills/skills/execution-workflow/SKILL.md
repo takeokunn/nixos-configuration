@@ -220,8 +220,9 @@ declaring something unverifiable, check whether the tool offers a fake, offline,
 ## Workspace isolation
 
 Use jj, following [jujutsu](../jujutsu/SKILL.md). First inspect initialization, the existing workspace, and
-current on-disk changes. A suitable existing workspace needs no new version-control writes. If the directory has
-no `.jj/` of its own, do the file work in place and report the missing isolation; do not fall back to git.
+current on-disk changes. A suitable existing workspace needs no new version-control writes. If a directory lacks
+`.jj/` at its root (a `.worktrees/` directory counts), do file work and report skipped VCS writes unless task
+instructions name a VCS procedure there; follow it.
 Fetching, creating a workspace, and creating a feature bookmark are local writes that need no separate
 authorization when the task calls for isolation.
 
