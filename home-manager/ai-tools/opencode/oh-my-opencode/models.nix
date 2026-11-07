@@ -1,5 +1,5 @@
 let
-  promptLang = "Reply to the user in Japanese unless requested otherwise. Write repository documentation, code comments, commit messages, and PR bodies in English.";
+  promptLang = "Reply to the user in Japanese unless requested otherwise. Use merged PRs' language for PR titles and bodies, and existing documents' language for documentation. Use English if none exists. Keep code comments and commit messages in English.";
   defaultModel = "opencode-go/step-5-preview-free";
 in
 {
