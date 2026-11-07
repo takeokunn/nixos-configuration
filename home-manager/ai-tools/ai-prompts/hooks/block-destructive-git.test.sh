@@ -439,6 +439,12 @@ expect_allow 'jj describe -m "feat: x"'
 expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
 expect_allow 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj abandon"'
 expect_allow 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj abandon"'
+expect_block 'jj workspace add --name w /p'
+workspace_add_guidance=$'❌ jj workspace add blocked (ORCH-P005)\n\nA workspace made without sparse patterns inherits the empty sparse set from the bare repository and checks out no files.\nUse this complete form:\n  jj -R <repo> workspace add --no-colocate --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>'
+expect_block_message 'jj workspace add --name w /p' "$workspace_add_guidance" codex
+expect_allow 'jj workspace add --sparse-patterns full --name w -r @ /repo/.worktrees/w'
+expect_allow 'jj workspace add --name w -r @ --sparse-patterns=full /repo/.worktrees/w'
+expect_block 'jj --ignore-working-copy -R . workspace add --name w /p'
 
 # jj git push skips the gitleaks pre-commit hook, so it needs the override.
 expect_block 'jj git push'

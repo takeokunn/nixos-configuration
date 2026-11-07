@@ -572,7 +572,7 @@ sub git_dynamic_path_help {
 my %JJ_VALUE_OPT = map { $_ => 1 } qw(
     -R --repository --at-operation --at-op --color --config --config-file
     -m --message -r --revision -A --insert-after --after -B --insert-before --before
-    -f --from -t --into --to -c --changes-in --tool -o --onto
+    -f --from -t --into --to -c --changes-in --tool -o --onto --sparse-patterns
 );
 
 # Returns the operands and the options seen, the latter keyed by name (`--opt=value` folded to
@@ -684,6 +684,9 @@ sub jj_verdict {
         return 'jj-push' if is_dynamic($p[0]);
         return ($p[0] eq 'push' and !exists $opt->{'--dry-run'}) ? 'jj-push' : q{};
     }
+    if ($sub eq 'workspace' and @p and $p[0] eq 'add') {
+        return 'jj-workspace-add' unless exists $opt->{'--sparse-patterns'};
+    }
     return q{};
 }
 
@@ -749,6 +752,16 @@ EOF
 fi
 
 if [[ $verdict == jj-* ]]; then
+  if [[ $verdict == jj-workspace-add ]]; then
+    cat >&2 <<'EOF'
+❌ jj workspace add blocked (ORCH-P005)
+
+A workspace made without sparse patterns inherits the empty sparse set from the bare repository and checks out no files.
+Use this complete form:
+  jj -R <repo> workspace add --no-colocate --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>
+EOF
+    exit 2
+  fi
   case "$verdict" in
   jj-edit | jj-next | jj-prev | jj-new | jj-bisect | jj-sparse) detail="This moves the working-copy revision, rewriting the files every session sharing this checkout is editing (jj bisect checks out each revision it tests; jj sparse changes which files exist on disk)." ;;
   jj-abandon) detail="jj abandon drops a revision, including working-copy changes you did not make when it is @." ;;
