@@ -212,6 +212,8 @@ expect_allow 'git --work-tree="$r" status'
 expect_allow 'git --work-tree "$r" status'
 expect_block 'git -C $r log'
 expect_block 'git --work-tree $r status'
+expect_allow 'git -C "$dir" log'
+expect_allow 'git --work-tree="$dir" status'
 git_dynamic_path_guidance=$'❌ Unquoted dynamic git path blocked (ORCH-P005)\n\nQuote the variable expansion so the shell passes the repository path as one argument:\n  git -C "$dir" log\n  git --work-tree="$dir" status'
 expect_block_message 'git -C $r log' "$git_dynamic_path_guidance" codex
 expect_block_message 'git --work-tree $r status' "$git_dynamic_path_guidance" claude
