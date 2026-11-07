@@ -27,6 +27,9 @@ bookmark create, fetch, workspace add) need no separate authorization when the t
 any write to the default branch, need the user's confirmation; so does moving or discarding a shared working
 copy (CLAUDE.md `hard_rules`).
 
+Before the first commit in a repository, run `jj config get user.email` there and confirm the value. Jujutsu
+does not read Git's conditional `includeIf` identity configuration.
+
 ## The working copy is a commit
 
 jj has no staging area. Repository commands normally snapshot files on disk into the working-copy revision `@`,
@@ -80,6 +83,8 @@ Run only the jj column.
   The guardrail hook does not catch these; an editor waiting for input hangs the call.
 - Add `--no-pager` to output-producing commands, and `--git` to diff commands whose output will be parsed:
   the default diff formatter here is difftastic.
+- For machine-readable output, pass `--no-ext-diff` to `git diff` so configured external diff drivers cannot
+  alter its output.
 - For scripted reads, `jj log --no-graph -r <revset> -T '<template>'` gives stable output.
 
 ## Reading without side effects
@@ -141,15 +146,19 @@ forward:
 
 A rebase or squash that conflicts **still exits 0**: jj records the conflict inside the commit and carries on,
 and every descendant inherits it. An exit status is therefore no evidence a rewrite succeeded. After any
-rewrite, and before any push, run `jj log --no-graph -r 'conflicts()'`: it must print nothing. In a clean
-`@`, `jj resolve --list` exits 2 with "No conflicts found", so its nonzero exit is the passing result there.
+rewrite, compare the old and new tips with `jj interdiff --from <old-tip> --to <new-tip> --git`, then run
+`jj log --no-graph -r 'conflicts()'` before pushing. The conflict query must print nothing. In a clean `@`,
+`jj resolve --list` exits 2 with "No conflicts found", so its nonzero exit is the passing result there.
 
 When `@` is the conflicted commit, edit the conflict markers in the files directly and the next snapshot
-records the resolution. When the conflict sits in an ancestor, jj suggests `jj new <conflicted>`, a `jj new`
-onto another revision, which the guardrail hook blocks. If one side is right for a whole file, resolve it in
-place with `jj resolve -r <conflicted> --tool :ours <path>` (`:theirs` for the other side); a permission
-rule makes any `--tool` form prompt the user. Otherwise report the conflicted change IDs and ask the user to resolve
-them or to approve a separate workspace for it, instead of working around the block.
+records the resolution. When the conflict sits in an ancestor, jj suggests `jj new <conflicted>`, which the
+guardrail hook blocks. If one side is right for a whole file, resolve it in place with
+`jj resolve -r <conflicted> --tool :ours <path>` (`:theirs` for the other side); a permission rule makes any
+`--tool` form prompt the user. For a manual resolution, keep `@` on its current descendant, edit the conflict
+markers in its file, then run `jj squash --into <conflicted> <paths>` from the repository root. The squash
+moves the resolution into the ancestor and leaves a new empty `@` child. Run
+`jj log --no-graph -r 'conflicts()'` to confirm that no conflicts remain. Otherwise report the conflicted
+change IDs and ask the user to resolve them or to approve a separate workspace for it.
 
 ## Revsets that answer checks
 
