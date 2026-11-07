@@ -18,27 +18,22 @@ let
 
     Apply the shared Claude/OpenCode orchestration prompt in Codex while preserving Codex tool semantics.
 
-    ### Critical rules
-
     - The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*/SKILL.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.
     - When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.
-    - Keep the shared policies authoritative: evidence-first work, Serena memory/symbol usage, parallel independent reads, jj as the default version-control workflow, version-control writes only through jj (git is read-only), and explicit verification reporting.
+    - Follow the shared policies for evidence-first work, jj as the default version-control workflow, version-control writes only through jj (git is read-only), and explicit verification reporting.
+    - Use Serena for symbolic investigation when available.
+    - If the user's instructions conflict with a skill's instructions, follow the user's instructions.
 
     ### Tool mapping
 
     | Shared mechanism | Codex equivalent |
     |---|---|
-    | Task tool / sub-agents / subagent_type | Use the available multi-agent tool and agent catalog. If a requested role is unavailable, perform its checks yourself and identify that limitation; do not recreate a role that requires unavailable runtime restrictions. |
+    | Agent tool / sub-agents / subagent_type | Use the available multi-agent tool and agent catalog. If a requested role is unavailable, perform its checks yourself and identify that limitation; do not recreate a role that requires unavailable runtime restrictions. |
     | AskUserQuestion | Use request_user_input when available and permitted by the current mode and question type; otherwise ask the user a concise blocking question. |
     | run_in_background | Use exec_command sessions for long-running processes and poll them before finishing. |
-    | Bash / Read / Edit / Write | Use exec_command for shell reads/commands, apply_patch for manual file edits, and Serena symbol tools for code navigation and targeted edits. |
+    | Bash / Read / Edit / Write | Use exec_command for shell reads/commands, apply_patch for manual file edits, and Serena symbol tools for code navigation and targeted edits when available. |
     | WebSearch / WebFetch | Use web.run when current external information is required; for library/framework APIs prefer Context7 official docs first. |
     | Playwright MCP | Use Playwright MCP for browser verification, screenshots, console logs, and interaction checks. |
-
-    ### Execution guidance
-
-    - After changes, run the narrowest meaningful formatter, parser, or test command. If verification cannot be run, state exactly why.
-
   '';
 
   codexAgents = ''
