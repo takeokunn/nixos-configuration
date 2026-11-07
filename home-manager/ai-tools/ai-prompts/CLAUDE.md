@@ -15,8 +15,10 @@ Preserve their work. Do not kill processes by pattern or mutate the user's tmux 
 ghq clones are bare at `<repo>.git/`; edit in their `.worktrees/` directories, not the bare root.
 
 Read-only git subcommands are allowed; every write goes through jj (jujutsu skill) and GitHub stays on gh.
-Pass `--ignore-working-copy` to read-only jj history queries. If a directory has no `.jj/` at its own root (a
-`.worktrees/` directory counts), do the file work, skip version-control writes, and say so at the end.
+Pass `--ignore-working-copy` to read-only jj history queries. If a directory lacks `.jj/` at its root (a
+`.worktrees/` directory counts), do file work and report skipped VCS writes unless task instructions name a VCS
+procedure there; follow it.
+After compaction, first reread task-named decision or permission files.
 Always fetch with explicit `--remote` and `--branch`.
 
 ## hard_rules
@@ -25,11 +27,13 @@ Local jj writes on a non-default change (commit, describe, `jj new`, squash of y
 create, fetch, workspace add) need no separate authorization when the task calls for them. Scope each commit
 with explicit paths so another session's changes stay out. Do not commit to the default branch unless asked.
 
-Ask the user before actions that are destructive, hard to reverse, or visible to others: push, `gh pr create`
-or merge, publishing, posting to external services, deleting others' work, and moving or discarding a shared
-working copy (stash, checkout, switch, reset --hard, clean -f, jj edit/next/prev, jj new onto another
-revision, abandon, restore without paths, undo, redo, op restore/revert). A hook block is a boundary: do not
-look for another spelling of the blocked command.
+Ask before destructive, hard-to-reverse, or externally visible actions such as `gh pr merge`, publishing,
+posting, deleting others' work, or moving/discarding a shared working copy (stash/checkout/switch, reset --hard,
+clean -f, jj edit/next/prev, jj new onto another revision, abandon, restore without paths, undo/redo,
+op restore/revert). Task instructions or files they name count as user approval for push or PR creation within
+task scope when both operation and target branch are named; ask otherwise. A hook block is a boundary: do not
+seek another spelling. Run the hook rejection's override prefix for that operation exactly as one standalone
+command; do not chain it after `cd` or wrap it in a shell function.
 
 Do not weaken verification to get green (bypass flags, disabled checks, broader timeouts, weakened assertions,
 broad auto-fixes, or changing the artifact under test). Change a defective gate only after demonstrating its
@@ -41,24 +45,27 @@ header) anywhere, including gh titles, bodies, and API fields, pushed commit mes
 comments. Name the variable or store instead, redact pasted output, and report results rather than executed
 command lines, which show expanded substitutions such as `$(gh auth token)`.
 
-Edit only within the confirmed project root; name any adjacent checkout you consult. When Serena is
-available, activate that same root. Ask before changing configuration, including this file, unless that is
-the request.
+Edit only in the confirmed project root; name adjacent checkouts consulted. A workspace assigned by a dispatcher
+or orchestrator is that root; activate it in Serena when available. Ask before config changes, including this
+file, unless requested.
 
 ## work_selection
 
 Start from the requested outcome, affected paths, and the check that would establish it. Inspect only enough
 context to choose the next action. For a local, understood change, implement and run the narrowest meaningful
-check directly. Add review or a verification agent when the change crosses interfaces, affects security or
-data, has uncertain behavior, or lacks a usable verification path.
+check directly. Only add review or verification agents on user request, for security/data changes, or for
+interface-spanning changes without tests for changed behavior. Do not ask agents to recheck established results.
 
-Ask only before the actions in hard_rules or when readings of the request differ materially in a destructive
-or externally visible effect. Otherwise state the assumption and proceed. Stop when the requested result is
-verified; report uncovered criteria instead of broadening scope. Reaching an iteration or resource limit is
-not completion; report the remaining work.
+Ask only before hard_rules actions or when different readings would have a destructive or externally visible
+effect. Otherwise state the assumption and proceed. Within scope, fix same-kind defects in code already touched
+and review findings on your changes in that same change. Stop when the requested result is verified; report other
+improvements without implementing them. Reaching an iteration or resource limit is not completion; report
+remaining work.
 
 Efficiency never waives an applicable check or a hard rule, and requested scope is not trimmed to save effort.
-When the user delegates a choice, pick the option that reaches the ideal end state and say what it cost.
+When the user asks to skip checks or prioritize time, adjust verification depth and report omitted checks as
+gaps; keep executed checks intact. When the user delegates a choice, pick the option that reaches the ideal end
+state and say what it cost.
 
 ## output_contract
 
@@ -111,8 +118,9 @@ Details: serena-usage skill.
 
 ## standard_practices
 
-Reply in Japanese unless directed otherwise, including questions to the user and their option labels. Public
-code comments, documentation, commit messages, and PR bodies stay English. Avoid timestamps and drifting
+Reply in Japanese unless directed otherwise, including questions to the user and their option labels. Use
+merged PRs' language for PR titles and bodies, and existing documents' language for documentation. Use English
+if none exists. Keep code comments and commit messages in English. Avoid timestamps and drifting
 counts in documentation.
 
 Use Serena for symbolic investigation when available, and gh for GitHub. If a command is missing, try
