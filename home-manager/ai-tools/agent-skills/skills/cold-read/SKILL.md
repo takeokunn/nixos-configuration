@@ -8,8 +8,9 @@ metadata:
 # Cold read
 
 Run this once per task, after the prose is otherwise final, for prose that other people read: README, docs,
-PR and issue bodies. Prompt and skill files and commit messages are exempt. One pass: apply the surviving cuts
-and do not re-run the review on the result.
+PR and issue bodies. Prompt and skill files and commit messages are exempt. Apply cuts only to prose written or
+changed by the task. Preserve pre-existing rationale comments outside the task's diff. One pass: apply the
+surviving cuts and do not re-run the review on the result.
 
 The writer cannot measure its own prose: the context that produced it makes every sentence feel necessary.
 A fresh reader with none of that context measures it instead. Its report is evidence to weigh, not an edit
