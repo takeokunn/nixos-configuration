@@ -84,6 +84,8 @@ Assert the exit status of every spawned process and the completion count of ever
 asserting anything about side effects. A non-zero status, a panic count above zero, or a completed count below
 the dispatched count is a test failure in its own right, not context for a later assertion.
 
+For a background task, read the command's own exit status because the notification reports the wrapper's status.
+
 ### Registration collisions delete tests
 
 Frameworks with a global name-keyed registry replace an existing registration when the same name is registered
