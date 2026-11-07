@@ -17,6 +17,8 @@ file is not.
 State what is being asked in one sentence. Use the runtime's user-question mechanism only when the answer
 materially changes the work; otherwise state a reasonable assumption and proceed.
 
+Host-wide load does not determine when an agent starts work.
+
 **Audit a broad directive against the current tree before treating any item as unmet.** A multi-item instruction
 from a plan, a prior review, or a hook's rubric often contains items already satisfied, and re-doing them is the
 most common source of wasted parallel waves. Where the directive names a tool-defined property (dead code,
@@ -33,6 +35,14 @@ files it spans.**
 A call edge between subtasks does not by itself make them dependent. When the callee's contract (types,
 signatures, API shape) is first written down as an artifact both sides read, caller and callee can proceed in
 parallel while their write sets stay disjoint. A written contract does not split an atomic multi-file change.
+
+### Stream instruction documents
+
+Name the path to each file that records task permissions or decisions. After an automatic summary, tell the
+stream to reread every task-named decision or permission file before any other action. If a hook rejection
+provides an override prefix, tell the stream to run that exact prefix as a standalone command. Include
+`--sparse-patterns full` in the workspace creation command. Treat a push or PR as authorized only when the task
+instructions or a file they name authorize it and name both the operation and target branch.
 
 ### Dispatch
 
@@ -59,6 +69,8 @@ create a worktree only when concurrent writers need one. The Agent tool's `isola
 the agent to it, so Edit refuses the existing worktree you meant it to change; omit `isolation` for work on an
 existing checkout. When Edit refuses, an agent that writes the file through a shell command instead has evaded
 a boundary, not fixed it.
+
+When dispatching to an isolated worktree, state the exact worktree root and give the agent paths relative to it.
 
 ### Consolidate
 
@@ -122,6 +134,9 @@ Classify the failure as product, harness, infrastructure, or credential before r
 failure is fixed in product code; a credential failure is a blocker to report with the authority it needs, not
 to retry. Baseline and harness checks are in CLAUDE.md's `evidence`; a rerun that turns green is not a fix.
 Trace a cause with [investigation-patterns](../investigation-patterns/SKILL.md).
+
+To identify the cause of a red result, alternate runs of the check and its baseline or use CI. Bound the number
+of concurrent CI pollers and space requests to protect the shared GitHub API quota.
 
 ## Gates
 
@@ -189,6 +204,8 @@ Establish the applicable evidence below, then report the result and verification
   edited artifact. A syntax or balance check cannot see a wrong symbol or two lines merged into one.
 - For a failed check, the baseline before calling it a regression. Do not attribute a pre-existing failure to this
   change.
+- For a landed change, read the test and CI diffs. Look for removed assertions, `continue-on-error`, and raised
+  limits.
 - For a new probe, that it fails against a known-good control, and that state it created is kept apart from the
   original state. Unit tests do not establish integration behavior.
 - Where several agents verified, whether they used the same command. The same command run N times is one tier of
@@ -207,6 +224,9 @@ current on-disk changes. A suitable existing workspace needs no new version-cont
 no `.jj/` of its own, do the file work in place and report the missing isolation; do not fall back to git.
 Fetching, creating a workspace, and creating a feature bookmark are local writes that need no separate
 authorization when the task calls for isolation.
+
+Create scratch directories with `mktemp -d`. Keep handoff material that must survive outside `/tmp` and outside
+the worktree.
 
 1. Inspect `jj workspace list --ignore-working-copy --no-pager` and the intended workspace's ownership and
    changes, including untracked files. Do not move or discard another session's working copy.
@@ -296,6 +316,8 @@ When the stop condition passes while the no-regression clause fails, the loop st
 A `/goal` condition is judged by a separate model that reads only the conversation; it runs no commands and reads
 no files. Write the condition so the transcript proves it, such as "the test command exits 0 and its output is
 shown", and bound it with a turn limit such as "or stop after 20 turns".
+
+Stop when the user explicitly asks to stop, even if a `/goal` Stop hook keeps evaluating.
 
 ### Choose the smallest proof that covers the change
 
