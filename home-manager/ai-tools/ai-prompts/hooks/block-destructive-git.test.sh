@@ -37,6 +37,17 @@ expect_allow() {
   [[ ! -s $stderr_file ]] || fail "allow for [$1] wrote to stderr: $(cat "$stderr_file")"
 }
 
+expect_block_message() {
+  checked=$((checked + 1))
+  local status=0 out stderr
+  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" "$3" 2>"$stderr_file") || status=$?
+  stderr=$(cat "$stderr_file")
+  [[ $status -eq 2 ]] || fail "$3 mode: expected block (exit 2) for [$1], got exit $status"
+  [[ -z $out ]] || fail "$3 mode: block for [$1] printed to stdout: $out"
+  [[ $stderr == *ORCH-P005* ]] || fail "$3 mode: block for [$1] printed no ORCH-P005 banner"
+  [[ $stderr == *"$2"* ]] || fail "$3 mode: block for [$1] omitted expected guidance: $2"
+}
+
 # git: read-only subcommands pass, everything else blocks.
 expect_allow 'git status'
 expect_allow 'git log --oneline -5'
@@ -199,6 +210,11 @@ expect_allow 'git -C "${r}" log'
 expect_allow 'git -C "$r/sub" status'
 expect_allow 'git --work-tree="$r" status'
 expect_allow 'git --work-tree "$r" status'
+expect_block 'git -C $r log'
+expect_block 'git --work-tree $r status'
+git_dynamic_path_guidance=$'❌ Unquoted dynamic git path blocked (ORCH-P005)\n\nQuote the variable expansion so the shell passes the repository path as one argument:\n  git -C "$dir" log\n  git --work-tree="$dir" status'
+expect_block_message 'git -C $r log' "$git_dynamic_path_guidance" codex
+expect_block_message 'git --work-tree $r status' "$git_dynamic_path_guidance" claude
 expect_block 'git -C $r show'
 expect_block 'git -C "$r"$d show'
 expect_block 'git -C "$(echo x)" show'

@@ -372,7 +372,11 @@ sub verdict_for_segment {
     return $lift->(jj_verdict($depth, $allow, $jj_env, @a)) if $prog eq 'jj';
     # A dynamic value counts as quoted only when every part of its word is quoted.
     my @aq = map { ($_->{quoted} && !$_->{udyn}) ? 1 : 0 } @t;
-    return (git_blocked($git_env, \@aq, @a) ? 'git' : q{}) if $prog eq 'git';
+    if ($prog eq 'git') {
+        my $git_verdict = git_blocked($git_env, \@aq, @a);
+        return q{} unless $git_verdict;
+        return git_dynamic_path_help($git_env, \@aq, @a) ? 'git-dynamic-path' : 'git';
+    }
     return aitools_verdict($depth, $allow, @a) if $prog eq 'aitools';
     return q{};
 }
@@ -527,6 +531,42 @@ sub git_blocked {
     return 1;
 }
 
+sub git_dynamic_path_help {
+    my ($git_env, $quoted, @a) = @_;
+    return 0 if $git_env;
+    my @q = @{$quoted};
+    my $found = 0;
+
+    for (my $i = 0; $i < @a;) {
+        my $x = $a[$i];
+        last unless $x =~ /^-/;
+        if ($x =~ /^--work-tree=(.*)$/s) {
+            if (is_dynamic($1) and !$q[$i] and safe_dynamic_path($1, 1)) {
+                $a[$i] = '--work-tree=repo';
+                $q[$i] = 1;
+                $found = 1;
+            }
+            $i++;
+            next;
+        }
+        if ($x eq '-C' or $x eq '--work-tree') {
+            return 0 unless defined $a[$i + 1];
+            if (is_dynamic($a[$i + 1]) and !$q[$i + 1] and safe_dynamic_path($a[$i + 1], 1)) {
+                $a[$i + 1] = 'repo';
+                $q[$i + 1] = 1;
+                $found = 1;
+            }
+            $i += 2;
+            next;
+        }
+        $i++;
+        $i++ if $GIT_GLOBAL_VALUE_OPT{$x};
+    }
+
+    return 0 unless $found;
+    return git_blocked($git_env, \@q, @a) ? 0 : 1;
+}
+
 # jj options that take a separate value, global or per-subcommand; skipping them keeps a value such
 # as `-R .` from reading as a path operand.
 my %JJ_VALUE_OPT = map { $_ => 1 } qw(
@@ -676,6 +716,17 @@ verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"
 # which `set -e` turns into a spurious non-zero exit from the hook itself.
 if [[ -z $verdict ]]; then
   exit 0
+fi
+
+if [[ $verdict == git-dynamic-path ]]; then
+  cat >&2 <<'EOF'
+❌ Unquoted dynamic git path blocked (ORCH-P005)
+
+Quote the variable expansion so the shell passes the repository path as one argument:
+  git -C "$dir" log
+  git --work-tree="$dir" status
+EOF
+  exit 2
 fi
 
 if [[ $verdict == jj-push ]]; then
