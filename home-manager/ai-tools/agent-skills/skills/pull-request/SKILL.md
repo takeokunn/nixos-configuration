@@ -66,8 +66,9 @@ body, and every word in it is backed by a fact in the diff.
 
 ### Summary language
 
-Public commit messages, PR titles, and PR bodies stay English, per `standard_practices`. Read recent commit
-and PR titles to match the repository's terminology and format, not to override that language policy.
+Write PR titles and bodies in the language used by the repository's merged pull requests and existing
+documents. Use English when those sources establish no language convention. Keep commit messages in English.
+Read recent merged pull requests and existing documents to match the repository's terminology and format.
 
 ## Writing a judgment
 
@@ -119,8 +120,9 @@ uses read-only `gh` queries and authorizes nothing to be opened.
   automation. When automated closes dominate, read the workflow that closes them before writing anything.
 - Measure the length of recent merged bodies. Keep the body at or below their 90th percentile, and fold detail
   beyond it into a `<details>` block.
-- The template follows procedure step 3, and terminology follows Summary language. The body stays English even
-  when the repository writes in another language.
+- The template follows procedure step 3, and terminology follows Summary language. Write the body in the
+  language established by merged pull requests and existing documents, using English when they establish no
+  convention.
 
 ## Before submitting
 
