@@ -7,7 +7,8 @@ metadata:
 
 This skill is the audit procedure for the norm output_discipline states in `ai-prompts/CLAUDE.md`: that file says
 what to avoid, this one how to find an instance already in prose or code. Read that contract first. Judge words
-in context; the patterns below identify candidates, not banned tokens.
+in context; the patterns below identify candidates, not banned tokens. Limit prose findings and edits to text
+written or changed by the task. Preserve pre-existing rationale comments outside the task's diff.
 
 ## Prose tells: what greps and what doesn't
 
