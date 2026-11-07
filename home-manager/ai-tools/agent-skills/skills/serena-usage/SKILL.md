@@ -37,9 +37,12 @@ operations were tried and were insufficient, or the language is unsupported (nex
 Prefer symbol operations strongly in strongly-typed languages, where LSP resolution is accurate. In dynamic
 languages add `substring_matching=true`. For configuration and prose formats, go straight to `aitools search` and Read.
 
-Before the first symbol operation in a session: `initial_instructions`, then `activate_project`. Check
-onboarding (`check_onboarding_performed`, then `onboarding` if it returns false) and list memories only when
-prior knowledge could change the work.
+Before the first symbol operation in a session: `initial_instructions`, then `activate_project`. For a project
+root inside `.worktrees/`, resolve the repository root as the path before `.worktrees/` and use its shared
+`.state/.serena/memories` directory. Managed worktrees expose it at `.serena/memories`; if that link is absent,
+read relevant entries directly from the shared directory. Skip `check_onboarding_performed` and `onboarding`
+for that worktree. For other project roots, check onboarding (`check_onboarding_performed`, then `onboarding`
+if it returns false) and list memories only when prior knowledge could change the work.
 
 ## When symbol tools cannot work
 
