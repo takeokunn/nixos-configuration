@@ -24,9 +24,10 @@ owners before implementation. State the assumption when interpretations differ; 
    comments, and test doubles. Use references to establish caller impact for interface changes.
 2. Implement directly or delegate substantial independent units under the delegation contract. Do not require
    an agent for each file. Each writer follows output_discipline and returns evidence, not self-approval.
-3. Add or update tests for changed functionality and documentation for changed public behavior. Do not create
-   unrelated tests or docs to fill a role. Never substitute an always-passing test for behavior unavailable
-   here; inspect existing helpers for a usable fixture or adapter first.
+3. Add or update tests only when the task asks for tests or the repository has tests for that kind of change.
+   A user instruction not to write tests takes precedence over any other guidance. Document changed public
+   behavior. Do not create unrelated tests or docs to fill a role. Never substitute an always-passing test for
+   behavior unavailable here; inspect existing helpers for a usable fixture or adapter first.
 
 ## Verify and review
 
@@ -39,10 +40,13 @@ owners before implementation. State the assumption when interpretations differ; 
 3. For failing tests, allow one targeted fix attempt across the task, then rerun. Remaining failures are
    blockers, not permission to weaken the gate. Preserve fail-closed behavior when following a reference
    implementation.
-4. Review the settled change for correctness, caller impact, and missing acceptance coverage. Select extra
-   review by risk: security for trust boundaries, design for new module dependencies, performance for changed
-   hot paths, and a verification agent for consequential claims not established by the suite. Independent
-   reviews may run together, read-only. Do not assign multiple reviewers the same check.
+4. Review the settled change for correctness, caller impact, and missing acceptance coverage. Add a review or
+   verification agent only when the user asks, the change involves security or data, or an interface change
+   lacks an existing test for the changed behavior. Use a security agent for security or data changes and a
+   verification agent for an untested interface change; use a design or performance agent when the user
+   requests that role. Do not add an agent for uncertain behavior alone, and do not ask an agent to repeat a
+   check already completed. Independent reviews may run together, read-only. Do not assign multiple reviewers
+   the same check.
    Give claim-verification agents the claim and supporting commands, not merely a diff. If agents are
    unavailable, perform the checks here and disclose that they were not independent.
 5. Completion requires passing
