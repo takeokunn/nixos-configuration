@@ -16,7 +16,6 @@ with epkgs;
   # Basic
   org-journal
   org-generate
-  org-pomodoro
   org-view-mode
   org-random-todo
   org-dashboard

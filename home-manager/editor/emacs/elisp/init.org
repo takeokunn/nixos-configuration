@@ -6065,13 +6065,6 @@ https://github.com/ch11ng/exwm/wiki#gpg-pinentry
 #+begin_src emacs-lisp :tangle yes
   (autoload-if-found '(org-generate) "org-generate" nil t)
 #+end_src
-*** org-pomodoro
-:PROPERTIES:
-:CUSTOM_ID: org-pomodoro
-:END:
-#+begin_src emacs-lisp :tangle yes
-  (autoload-if-found '(org-pomodoro) "org-pomodoro" nil t)
-#+end_src
 *** org-view-mode
 :PROPERTIES:
 :CUSTOM_ID: org-view-mode
