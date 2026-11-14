@@ -422,16 +422,49 @@ sub verdict_for_segment {
 # or through a shell; use the same classifier after finding that command.
 sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
-    my $launcher = 0;
+    my ($launcher, $prog) = (0, undef);
     for my $i (0 .. $#a) {
+        if (!$launcher and ($a[$i] eq 'run' or $a[$i] eq 'bg')) {
+            my $s = $i + 1;
+            $s++ if $a[$i] eq 'bg' and ($a[$s] // q{}) eq 'start';
+            my $k = aitools_program_index(@a[$s .. $#a]);
+            $prog = $s + $k if defined $k;
+        }
         $launcher = 1 if $a[$i] eq 'run' or $a[$i] eq 'bg';
         (my $b = $a[$i]) =~ s{^.*/}{};
-        return q{} if $b eq 'gh'; # Its arguments belong to the gh wrapper, not this classifier.
+        # A launched gh's arguments belong to the gh wrapper, not this classifier. Option values
+        # such as `--cwd vcs/gh` are not the launched program.
+        return q{} if defined $prog and $i == $prog and $b eq 'gh';
         next unless $b eq 'git' or $b eq 'jj' or $SHELL{$b};
         return q{} unless $launcher;
         return classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);
     }
     return q{};
+}
+
+# Options of `aitools run`, `aitools bg start`, and the global --root (aitools 0.3.0 schema).
+# aitools rejects any other option, so an unknown one leaves the program position undetermined.
+my %AITOOLS_VALUE_OPT = map { $_ => 1 } qw(
+    --stdin-data --stdin-file --cwd --env --timeout --head --tail --grep --grep-limit --stdout-to
+    --name --root
+);
+my %AITOOLS_FLAG_OPT = map { $_ => 1 } qw(--stdin --no-strip-ansi);
+
+# Index of the launched program among the words after the launcher subcommand, or undef. A value
+# option consumes the next word even when it is `--`, as aitools does.
+sub aitools_program_index {
+    my @w = @_;
+    my $j = 0;
+    while ($j <= $#w) {
+        return $j + 1 if $w[$j] eq '--';
+        if ($AITOOLS_VALUE_OPT{$w[$j]}) { $j += 2; next; }
+        if ($AITOOLS_FLAG_OPT{$w[$j]} or ($w[$j] =~ /^(--[a-z-]+)=/ and $AITOOLS_VALUE_OPT{$1})) {
+            $j++;
+            next;
+        }
+        return $w[$j] =~ /^-/ ? undef : $j;
+    }
+    return undef;
 }
 
 my %GIT_READONLY = map { $_ => 1 } qw(

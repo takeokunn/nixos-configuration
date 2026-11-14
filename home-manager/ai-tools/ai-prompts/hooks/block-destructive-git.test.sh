@@ -374,6 +374,11 @@ expect_block 'aitools run -- git commit -m x'
 expect_allow 'aitools bg start -- /usr/bin/git fetch origin'
 expect_block 'aitools bg start -- /usr/bin/git fetch --prune'
 expect_block 'aitools -q run git push'
+# An option value named gh is not the launched program.
+expect_block 'aitools run --cwd home-manager/vcs/gh -- git reset --hard'
+expect_block 'aitools run --cwd ../gh -- jj git push --bookmark x'
+expect_block 'aitools run --grep gh -- git push --force origin main'
+expect_block 'aitools run --stdout-to /tmp/gh -- sh -c "git reset --hard"'
 # Reserved words and wrapper options that precede the command.
 expect_block '! git push'
 expect_block 'if true; then git push; fi'
@@ -638,6 +643,7 @@ for runtime in claude codex; do
   expect_runtime_allow 'aitools run -- gh issue create --title jj --body x' "$runtime"
   expect_runtime_allow 'aitools run -- gh search issues git push' "$runtime"
   expect_runtime_allow 'aitools bg start -- /usr/bin/gh search issues git push' "$runtime"
+  expect_runtime_allow 'aitools run --cwd ../x gh search issues git push' "$runtime"
   expect_block_message 'git commit src/app.sh -m update' 'jj commit <paths> -m' "$runtime"
   expect_block_message 'jj git push -b x; gh pr merge 12' 'ORCH-P005' "$runtime"
 done
