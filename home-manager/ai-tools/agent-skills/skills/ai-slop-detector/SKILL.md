@@ -1,16 +1,14 @@
 ---
 name: ai-slop-detector
-description: Use when auditing already-written prose or code for the tells output_discipline (ai-prompts/CLAUDE.md) bans, rather than applying the norm while drafting. Covers grep patterns per tell, the quoted-example false-positive trap, code-artifact slop (dead branches, needless abstraction, restated docstrings, scaffolding, laundering casts, uncontracted shims), and diff cleanup before review.
+description: Use when auditing already-written prose or code for the tells the explanatory-strict output style (prose) and CLAUDE.md output_discipline (code) ban, rather than applying the norm while drafting. Covers grep patterns per tell, the quoted-example false-positive trap, code-artifact slop (dead branches, needless abstraction, restated docstrings, scaffolding, laundering casts, uncontracted shims), and diff cleanup before review.
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
-This skill is the audit procedure for the norm output_discipline states in `ai-prompts/CLAUDE.md`: that file says
-what to avoid, this one how to find an instance already in prose or code. Read that contract first. Judge words
-in context; the patterns below identify candidates, not banned tokens. When the task does not request an audit
-of existing prose, limit findings and edits to prose written or changed
-by the task. When the user requests an audit of existing prose or a file, use the requested scope. In either
-case, preserve pre-existing rationale comments outside the task's diff.
+This skill is the audit procedure for norms stated elsewhere: the explanatory-strict output style for prose
+tells, CLAUDE.md output_discipline for code shapes. Those documents say what to avoid; this one says how to find
+an instance already written. The patterns below identify candidates, not banned tokens. Audit scope follows
+CLAUDE.md work_selection; rationale comments outside the diff follow CLAUDE.md output_discipline.
 
 ## Prose tells: what greps and what doesn't
 
@@ -26,55 +24,45 @@ content: prose with every listed token removed can still state nothing, so the j
 | Formulaic parallelism | `not only .* but also\|it('s\| is) not just .*, it('s\| is)` |
 | Sycophantic opener | `^(you('re\| are) absolutely right\|great question\|excellent point)` |
 | Em dash (English prose) | the em dash character, U+2014: `perl -CSD -ne 'print "$.: $_" if /\x{2014}/'` |
-| Decorative emoji | `grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{2604}\x{2606}-\x{27BF}]'` |
+| Decorative emoji | `rg -n '[\x{1F300}-\x{1FAFF}\x{2600}-\x{2604}\x{2606}-\x{27BF}]'` |
 
-U+2605 is carved out of that last range on purpose: this corpus uses the star as the decision-note block marker
-that `ai-prompts/output-styles/explanatory-strict.md` mandates, so a range starting at U+2600 flags a character
-the system prompt requires. The hook scripts under `ai-prompts/hooks/` likewise use the cross and check marks as
-functional stderr status markers, not decoration.
+U+2605 is carved out of that last range on purpose: the star marks the decision-note block the
+explanatory-strict output style mandates, so a range starting at U+2600 flags a character the system prompt
+requires. Cross and check marks printed by scripts as stderr status markers are functional, not decoration.
 
 Two patterns need a judgment pass on top of the match. The parallelism row cannot tell a formulaic antithesis
 from a sentence that genuinely contrasts two things. The intensifier row fires on any use of its words, and here
 most hits are not defects. Three buckets, only the last a finding:
 
 - The rule quoting its own subject, covered in the next section.
-- A domain term of art, where the word carries a technical meaning no synonym replaces: "robust standard
-  errors" in statistics, or "exited successfully" beside the exit status it reports. Neither stands in for
-  evidence.
+- A domain term of art, where the word carries a technical meaning no synonym replaces, such as "robust
+  standard errors" in statistics.
 - The word asserting quality with nothing behind it: "Successfully implemented a robust solution", or a
   self-description like "provides a comprehensive methodology".
 
 The discriminator is whether deleting the word removes information: in the second bucket it does, in the third
-it does not.
-
-Two tells resist a pattern. "Any sentence carrying no fact the reader lacked" is a judgment call: for each
-sentence, ask what the reader loses if it is deleted, and cut it if nothing. That is exactly the question
-[cold-read](../cold-read/SKILL.md)'s fresh reviewer answers for durable prose, so dispatch it rather than
-eyeballing your own draft. Japanese prose has its own token list (LLM-tell avoidance in
-[technical-writing](../technical-writing/SKILL.md)); grep for those tokens in that language using that skill's
-list. Do not re-derive or restate them here.
+it does not. A sentence carrying no fact the reader lacked has no token to grep; only the judgment pass finds
+it. For Japanese prose, run the yomiyasu skill's lint instead of the table above.
 
 ## The false-positive trap
 
 A corpus that defines a banned-token rule must quote the token to state it, so a lexical scan flags the rule's
 own definition. Distinguish examples of prohibited wording from deliverable prose or code: quotation marks and
 code fences alone do not exempt their contents. Read the surrounding paragraph to tell whether the sentence
-asserts a claim in that word or names the word as an example; only the former is a finding.
-
-`technical-writing/SKILL.md` quotes the em dash (U+2014) and two related Japanese dash variants as the literal
-subject of the rule banning them in Japanese prose. A raw grep for that character over that file returns a
-nonzero count that names no defect.
+asserts a claim in that word or names the word as an example; only the former is a finding. A style guide that
+bans the em dash, for instance, quotes the character, and a raw count over that file names no defect.
 
 ## Code-artifact slop
 
-output_discipline names these shapes; this section is how to find them in written code.
+This section is how to find the shapes CLAUDE.md output_discipline names in written code.
 
 **Defensive branch guarding an unreachable condition.** A null check, type guard, or catch-and-rethrow after the
 caller already establishes the invariant. Not lexically detectable in general, since reachability is a property
 of the call sites, not the branch's text, but two shapes are: a guard duplicating a check the immediately
 enclosing scope already performed, and a `catch ($E) { throw $E; }` (or language equivalent) that adds nothing
-over letting the exception propagate. Use the `ast-grep` CLI to match catch-and-rethrow structurally, since
-spacing and variable name vary per call site.
+over letting the exception propagate. A fail-closed check at a trust boundary is out of scope for this tell even
+when upstream validated the same input (CLAUDE.md output_discipline; trust-boundaries skill). Use the `ast-grep`
+CLI to match catch-and-rethrow structurally, since spacing and variable name vary per call site.
 
 **Abstraction introduced for a second case that does not exist.** An interface, strategy, or plugin point with
 exactly one implementation, or a config parameter holding the same value at every call site. Detection is a
@@ -82,17 +70,16 @@ reference search, not a grep: find implementations and callers with the availabl
 implementation is a review candidate, not proof of a defect. Check for a present contract, dependency boundary,
 or test seam before proposing inlining; do not invent a second implementation to justify it.
 
-**Docstring restating the signature.** A docstring fully recoverable from the function name, parameter names, and
-types in the signature, adding no WHY (a constraint, an invariant, a caller-facing gotcha) the signature can't
-show. Read the docstring against the signature side by side and name the information it adds; repeated
-identifiers alone do not establish redundancy. The `ast-grep` CLI can locate all docstrings of a node kind for
-batch review; the restates-or-explains judgment stays manual.
+**Docstring restating the signature.** Read the docstring against the signature side by side and name the
+information it adds (a constraint, an invariant, a caller-facing gotcha); repeated identifiers alone do not
+establish redundancy. The `ast-grep` CLI can locate all docstrings of a node kind for batch review; the
+restates-or-explains judgment stays manual.
 
-**Scaffolding standing in for the work.** A function body that is a stub, a hardcoded return dressed as computed
-output, or an exception meaning "not implemented" left behind a caller that no longer expects one. Search for
-direct markers first with `aitools search`: `TODO|FIXME|XXX|not implemented|NotImplementedError|unimplemented!|panic!\("todo"`.
-Markers undercount, since a stub can return a plausible-looking constant with no marker; cross-check any
-function whose body is disproportionately short against what its name and call sites imply it should do.
+**Scaffolding standing in for the work.** A stub body, a hardcoded return dressed as computed output, or a
+"not implemented" exception left behind a caller that no longer expects one. Search for direct markers first:
+`TODO|FIXME|XXX|not implemented|NotImplementedError|unimplemented!|panic!\("todo"`. Markers undercount, since a
+stub can return a plausible-looking constant with no marker; cross-check any function whose body is
+disproportionately short against what its name and call sites imply it should do.
 
 **Ceremonial placeholder steps.** A numbered list of steps, or a sequence of log statements, that narrates work
 without doing any ("Step 1: Analyze the problem" with no analysis attached, a "Starting process..." log
@@ -119,20 +106,18 @@ Single-use helpers and pass-through intermediates are the abstraction entry abov
 
 Unlike the whole-file prose scan, a code cleanup may cover only the current change: the author owns it, and a
 repository-wide sweep mixes unrelated edits into the review. Check each hunk of the diff against the merge base
-for the shapes above; fix only what cannot change behavior and report the rest to the author. Run this before
-code review, never instead of it.
+for the shapes above. Which code findings to fix and which to report follows CLAUDE.md work_selection. Run this
+before code review, never instead of it.
 
 ## Reporting a finding
 
 Every finding is a file:line and a one-line concrete change, never a direction like "clean this up" or "make
 this more concise", which names no defect and gives the writer nothing to act on. State what the current text or
-code does, what fact or behavior is missing or wrong, and the specific replacement.
+code does, what fact or behavior is missing or wrong, and the specific replacement. In a prose audit, apply only
+replacements that do not change what the text says and report the rest.
 
 ## Related
 
-- [cold-read](../cold-read/SKILL.md): dispatch when the tell is "carries no fact the reader lacked" and needs a
-  reader's judgment rather than a pattern match, or when a full document needs a fresh read after this audit.
-- [technical-writing](../technical-writing/SKILL.md): the Japanese LLM-tell token list and prose-quality rules
-  this skill does not restate.
+- yomiyasu skill: the Japanese prose rules and the lint this skill does not restate.
 - `ast-grep` (CLI): structural matching for the code-artifact shapes above where a text pattern would miss or
-  overmatch.
+  overmatch. When it is not on PATH, CLAUDE.md standard_practices gives the fallback.
