@@ -16,29 +16,32 @@ let
   codexRuntimeAdapter = ''
     ## codex_runtime_adapter
 
-    Apply the shared Claude orchestration prompt in Codex while preserving Codex tool semantics.
+    The sections below and the skills were written for Claude Code. Apply them in Codex with Codex tool semantics.
 
-    - The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*/SKILL.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.
-    - When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.
-    - Follow the shared policies for evidence-first work, jj as the default version-control workflow, version-control writes only through jj (git is read-only), and explicit verification reporting.
-    - Use Serena for symbolic investigation when available.
+    - When a prompt names a Claude-only mechanism, translate the intent to the Codex tools available in the current session instead of treating the name as a literal requirement.
     - If the user's instructions conflict with a skill's instructions, follow the user's instructions.
 
     ### Tool mapping
 
-    | Shared mechanism | Codex equivalent |
+    | Claude Code mechanism | Codex equivalent |
     |---|---|
     | Agent tool / sub-agents / subagent_type | Use the available multi-agent tool and agent catalog. If a requested role is unavailable, perform its checks yourself and identify that limitation; do not recreate a role that requires unavailable runtime restrictions. |
     | AskUserQuestion | Use request_user_input when available and permitted by the current mode and question type; otherwise ask the user a concise blocking question. |
     | run_in_background | Use exec_command sessions for long-running processes and poll them before finishing. |
-    | Bash / Read / Edit / Write | Use exec_command for shell reads/commands, apply_patch for manual file edits, and Serena symbol tools for code navigation and targeted edits when available. |
-    | WebSearch / WebFetch | Use web.run when current external information is required; for library/framework APIs prefer Context7 official docs first. |
-    | Playwright MCP | Use Playwright MCP for browser verification, screenshots, console logs, and interaction checks. |
+    | Bash / Read / Edit / Write | Use exec_command for shell commands; file operations follow environment_facts. |
+    | WebSearch / WebFetch | Use web.run when current external information is required. |
   '';
+
+  # Claude Code loads the output style separately; Codex gets its body appended so replies follow the same rules.
+  outputStyleBody =
+    (shared.parseFrontmatter (builtins.readFile (aiPromptsPath + "/output-styles/explanatory-strict.md"))).body;
 
   codexAgents = ''
     ${codexRuntimeAdapter}
     ${builtins.readFile (aiPromptsPath + "/CLAUDE.md")}
+    ## output_style
+
+    ${outputStyleBody}
   '';
 
   agentFiles = builtins.readDir agentPromptsPath;
