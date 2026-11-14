@@ -2,8 +2,8 @@
 #
 # Policy this repository enforces (permissions, hooks, env) lives here, in the managed-settings
 # file, which is read at higher precedence than user settings and than the command line. User
-# preferences the user may override (model, effort) are merged into the writable
-# `~/.claude/settings.json` by home-manager's `programs.claude-code.mutableSettings` instead.
+# preference defaults (model, effort) are merged into the writable `~/.claude/settings.json` by
+# home-manager's `programs.claude-code.mutableSettings` instead, and re-applied on each activation.
 #
 # This is the one file reaching from a system module into `home-manager/ai-tools`: the guardrail
 # catalog and the hook scripts are authored there, and a second copy here would drift. The

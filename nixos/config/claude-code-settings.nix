@@ -1,8 +1,7 @@
 # Places Claude Code's managed-settings policy (shared/claude-code-managed-settings.nix) at
-# /etc/claude-code/managed-settings.json, read at higher precedence than user settings. Home
-# Manager no longer declares programs.claude-code.settings for this host: that path resolves to
-# a read-only /nix/store symlink at ~/.claude/settings.json, which breaks the writes Claude Code
-# itself makes there (e.g. persisting a `/model` choice).
+# /etc/claude-code/managed-settings.json, read at higher precedence than user settings. User
+# preference defaults (model, effort) reach ~/.claude/settings.json through home-manager's
+# programs.claude-code.mutableSettings merge, which keeps the file writable.
 {
   pkgs,
   username,
