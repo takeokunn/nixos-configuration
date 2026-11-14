@@ -153,19 +153,6 @@ let
     fi
   '';
 
-  # Sleep-prevention enable click script: one-way, via `sudo pmset -a disablesleep 1`.
-  # Requires the NOPASSWD sudoers grant in nix-darwin/config/security.nix (scoped to
-  # exactly that invocation), since this click_script has no TTY to answer a
-  # password/Touch ID prompt. Idempotent -- clicking while already enabled is a no-op,
-  # so no double-click lock is needed. Disabling isn't exposed here; sleepPreventPlugin
-  # above still reflects whatever the real SleepDisabled state is if it's turned off
-  # some other way.
-  sleepPreventEnablePlugin = pkgs.writeShellScript "sleep_prevent_enable.sh" ''
-    sudo pmset -a disablesleep 1
-
-    sketchybar --update
-  '';
-
   # Tailscale-serve display plugin script: reflects whether Mediator
   # (127.0.0.1:43100) is currently proxied onto the tailnet.
   tailscaleServePlugin = pkgs.writeShellScript "tailscale_serve.sh" ''
@@ -325,9 +312,6 @@ let
                       icon.color="$GREEN" \
                       label.drawing=off
 
-    # Sleep prevention enable button (sudo pmset -a disablesleep 1; update_freq=5 since it's a
-    # cheap `pmset -g` read, not a heavier poll like cpu/wifi). Icon-only (no
-    # label, matching power_icon) to keep the right-side item group narrow enough to clear the notch.
     sketchybar --add item sleep_prevent right \
                 --set sleep_prevent \
                       icon=󰅶 \
@@ -335,8 +319,7 @@ let
                       icon.color="$COMMENT" \
                       label.drawing=off \
                       update_freq=5 \
-                      script="${sleepPreventPlugin}" \
-                      click_script="${sleepPreventEnablePlugin}"
+                      script="${sleepPreventPlugin}"
 
     # Tailscale-serve toggle for Mediator (127.0.0.1:43100). Icon-only, matching
     # sleep_prevent, in the same power_bracket group.
