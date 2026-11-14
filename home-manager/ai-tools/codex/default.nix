@@ -171,7 +171,4 @@ in
   };
 
   xdg.configFile = agentFileAttrs;
-
-  # CODEX_HOME itself comes from programs.codex (home.preferXdgDirectories).
-  home.sessionVariables.CODEX_DISABLE_TELEMETRY = "1";
 }
