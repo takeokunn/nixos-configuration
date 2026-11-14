@@ -6,7 +6,14 @@
 }:
 let
   cfg = config.programs.serena;
-  yqExpr = ".ignored_paths = [${lib.concatMapStringsSep ", " (p: "\"${p}\"") cfg.ignoredPaths}]";
+  yqExpr = ''
+    ${lib.optionalString (cfg.ignoredPaths != [ ]) ".ignored_paths = env(SERENA_IGNORED_PATHS) | "}
+    .ls_specific_settings = (.ls_specific_settings // {}) |
+    .ls_specific_settings.typescript = (.ls_specific_settings.typescript // {}) |
+    .ls_specific_settings.typescript.ls_path = strenv(SERENA_TYPESCRIPT_LS_PATH) |
+    .ls_specific_settings.bash = (.ls_specific_settings.bash // {}) |
+    .ls_specific_settings.bash.ls_path = strenv(SERENA_BASH_LS_PATH)
+  '';
 in
 {
   options.programs.serena = {
@@ -40,12 +47,32 @@ in
     };
   };
 
-  config = lib.mkIf (cfg.ignoredPaths != [ ]) {
-    home.activation.serenaIgnoredPaths.after = [ "writeBoundary" ];
-    home.activation.serenaIgnoredPaths.before = [ ];
-    home.activation.serenaIgnoredPaths.data = ''
-      if [ -f "$HOME/.serena/serena_config.yml" ]; then
-        ${lib.getExe pkgs.yq-go} -i '${yqExpr}' "$HOME/.serena/serena_config.yml"
+  config = {
+    home.activation.serenaSettings.after = [ "writeBoundary" ];
+    home.activation.serenaSettings.before = [ ];
+    home.activation.serenaSettings.data = ''
+      serenaConfigFile="$HOME/.serena/serena_config.yml"
+      if [ ! -e "$serenaConfigFile" ]; then
+        mkdir -p "$HOME/.serena"
+        if [ ! -e "$serenaConfigFile" ]; then
+          (set -C; printf '{}\n' > "$serenaConfigFile") 2>/dev/null || [ -f "$serenaConfigFile" ]
+        fi
+      fi
+
+      if [ -f "$serenaConfigFile" ]; then
+        SERENA_IGNORED_PATHS=${lib.escapeShellArg (builtins.toJSON cfg.ignoredPaths)} \
+          SERENA_TYPESCRIPT_LS_PATH=${lib.escapeShellArg "${pkgs.typescript-language-server}/bin/typescript-language-server"} \
+          SERENA_BASH_LS_PATH=${lib.escapeShellArg "${pkgs.bash-language-server}/bin/bash-language-server"} \
+          ${lib.getExe pkgs.yq-go} -i '${yqExpr}' "$serenaConfigFile"
+
+        ${lib.getExe pkgs.yq-go} -r '.projects[]?' "$serenaConfigFile" |
+          while IFS= read -r project; do
+            if [ ! -d "$project" ]; then
+              SERENA_PROJECT_PATH="$project" ${lib.getExe pkgs.yq-go} -i \
+                '.projects = (.projects // [] | map(select(. != strenv(SERENA_PROJECT_PATH))))' \
+                "$serenaConfigFile"
+            fi
+          done
       fi
     '';
   };

@@ -21,7 +21,6 @@
   ]
   ++ (with pkgs; [
     go
-    gopls
     gotools # goimports, used by emacs gofmt-command
   ])
   ++ lib.optional (nurPkgs.aitools != null) nurPkgs.aitools;
