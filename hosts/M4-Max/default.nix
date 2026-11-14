@@ -76,7 +76,6 @@ nix-darwin.lib.darwinSystem {
           nixvim
           mcp-servers-nix
           llm-agents
-          guard-and-guide
           nur-packages
           anthropic-skills
           paredit-cli-skills

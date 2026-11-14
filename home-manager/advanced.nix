@@ -4,7 +4,6 @@
   emacs-overlay,
   mcp-servers-nix,
   llm-agents,
-  guard-and-guide,
   nur-packages,
   ...
 }:
@@ -27,7 +26,6 @@ let
     emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
-  guardAndGuide = guard-and-guide.packages.${system}.default;
 
   emacsPkgSet = import ./editor/packages {
     inherit lib pkgs;
@@ -66,7 +64,6 @@ in
       emacsPkg
       emacsLib
       llmAgentsPkgs
-      guardAndGuide
       ;
   };
 

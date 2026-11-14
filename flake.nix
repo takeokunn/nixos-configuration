@@ -108,7 +108,6 @@
               ++ import ./home-manager/ai-tools/serena/overlay.nix;
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
-                guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills
