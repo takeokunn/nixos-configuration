@@ -16,7 +16,8 @@
 #   options blocks too. Writes go through jj. ALLOW_DESTRUCTIVE_GIT=1 never lifts this verdict.
 #   A global option value computed at run time blocks, except the value of -C and --work-tree when it
 #   is double-quoted and only a plain variable expansion (`git -C "$repo" log`).
-# - `aitools git ...` only reads, so it passes; `aitools run|bg ... git <args>` is judged like `git <args>`.
+# - `aitools run|bg ... git <args>` is judged like `git <args>`.
+#   With `aitools batch`, dangerous git/jj words anywhere in the command also block.
 # - GitHub operations are guarded by the gh wrapper after shell argument expansion.
 # - Destructive jj commands block: edit, next, prev, bisect, sparse set/reset/edit, abandon, undo, redo,
 #   op restore/revert, restore without paths, and new onto another revision; plus jj git push,
@@ -418,7 +419,7 @@ sub verdict_for_segment {
     return q{};
 }
 
-# `aitools git ...` only reads. Its process launchers can invoke protected commands directly
+# The aitools process launchers can invoke protected commands directly
 # or through a shell; use the same classifier after finding that command.
 my %AITOOLS_GLOBAL_VALUE_OPT = map { $_ => 1 } qw(--root --lock-timeout);
 my %AITOOLS_GLOBAL_FLAG_OPT = map { $_ => 1 } qw(--trace);
@@ -427,12 +428,22 @@ sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
     my $launcher = 0;
     my $known_global = 1;
+    my $subcommand_index;
     for (my $i = 0; $i <= $#a; $i++) {
         if (!$launcher and $known_global) {
             if ($AITOOLS_GLOBAL_VALUE_OPT{$a[$i]}) { $i++; next; }
             next if $AITOOLS_GLOBAL_FLAG_OPT{$a[$i]}
                 or ($a[$i] =~ /^(--[a-z-]+)=/ and $AITOOLS_GLOBAL_VALUE_OPT{$1});
             $known_global = 0 if $a[$i] =~ /^-/;
+        }
+        $subcommand_index //= $i;
+        if (!$launcher and $known_global and $i == $subcommand_index and $a[$i] eq 'batch') {
+            # Batch stdin may come from another pipeline segment. Accept false positives for
+            # dangerous words in the same command; do not interpret JSON or read stdin files.
+            @a = grep { length } split /[\s\[\],"'\\;|&()<>]+/, $cmd;
+            $launcher = 1;
+            $i = -1;
+            next;
         }
         if (!$launcher and $known_global and ($a[$i] eq 'run' or ($a[$i] eq 'bg' and ($a[$i + 1] // q{}) eq 'start'))) {
             my $s = $a[$i] eq 'bg' ? $i + 2 : $i + 1;
@@ -455,13 +466,13 @@ sub aitools_verdict {
     return q{};
 }
 
-# Options of `aitools run`, `aitools bg start`, and the global --root (aitools 0.3.0 schema).
-# aitools rejects any other option, so an unknown one leaves the program position undetermined.
+# Options of `aitools run`, `aitools bg start`, and global options (aitools 0.3.0 schema).
+# Unknown options leave the program position undetermined and retain candidate scanning.
 my %AITOOLS_VALUE_OPT = map { $_ => 1 } qw(
     --stdin-data --stdin-file --cwd --env --timeout --head --tail --grep --grep-limit --stdout-to
-    --name --root
+    --name --root --lock-timeout
 );
-my %AITOOLS_FLAG_OPT = map { $_ => 1 } qw(--stdin --no-strip-ansi);
+my %AITOOLS_FLAG_OPT = map { $_ => 1 } qw(--stdin --no-strip-ansi --trace);
 
 # Index of the launched program among the words after the launcher subcommand, or undef. A value
 # option consumes the next word even when it is `--`, as aitools does.

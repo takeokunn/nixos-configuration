@@ -276,6 +276,7 @@ for runtime in claude codex; do
     'grep -v <0-9>x prod.env'; do
     expect_cmd deny "$cmd"
   done
+  # Accept blocking harmless search patterns ending in .env to protect credential paths.
   for cmd in 'rg prod.env docs' 'grep -rn app.env src' 'rg -- process.env docs' \
     'rg -e process.env -e app.env docs' 'grep -ineprocess.env docs' \
     'rg --regexp=process.env docs' 'grep --regexp process.env docs' \

@@ -381,6 +381,8 @@ expect_block 'aitools --root run bg start -- git push --force'
 expect_block 'aitools --root run run --cwd x -- git reset --hard'
 expect_block 'aitools --root=run run -- git push --force'
 expect_block 'aitools --root bg run -- git push --force'
+expect_block 'aitools --root git run -- git push --force'
+expect_block 'aitools --root bash run -- git push --force'
 expect_block 'aitools --lock-timeout 1s --root run run -- git push --force'
 expect_block 'aitools --trace --root run run -- git push --force'
 expect_block 'aitools --bogus run run -- git push --force'
@@ -653,6 +655,19 @@ expect_allow 'echo "jj abandon"'
 expect_allow "rg -n 'jj undo' docs"
 expect_allow $'cat <<EOF\njj abandon\nEOF'
 
+# Batch inspection includes words in the producer segment without interpreting JSON.
+for runtime in claude codex; do
+  expect_block_message "echo '[[\"run\",\"--\",\"git\",\"push\",\"--force\"]]' | aitools batch --stdin" 'ORCH-P005' "$runtime"
+  expect_block_message "printf '%s\\n' '[[\"run\",\"--\",\"git\",\"reset\",\"--hard\"]]' | aitools batch --stdin" 'ORCH-P005' "$runtime"
+  expect_block_message "echo '[[\"run\",\"--\",\"jj\",\"git\",\"push\"]]' | aitools batch --stdin" 'ORCH-P005' "$runtime"
+  expect_block_message "printf '%s\\n' '[[\"run\",\"--\",\"jj\",\"abandon\"]]' | aitools batch --stdin" 'ORCH-P005' "$runtime"
+  expect_runtime_allow "echo '[[\"run\",\"--\",\"/bin/echo\",\"batch-ok\"]]' | aitools batch --stdin" "$runtime"
+  expect_runtime_allow "printf '%s\\n' '[[\"run\",\"--\",\"git\",\"status\"]]' | aitools batch --stdin" "$runtime"
+  expect_runtime_allow 'aitools --root batch run -- echo git push --force' "$runtime"
+  expect_runtime_allow 'echo "aitools batch git push --force"' "$runtime"
+  expect_runtime_allow 'aitools search batch .; echo git push --force' "$runtime"
+done
+
 # GitHub policy belongs to the argv-level gh wrapper; git/jj remain this hook's responsibility.
 for runtime in claude codex; do
   expect_runtime_allow 'gh pr merge 12' "$runtime"
@@ -663,6 +678,8 @@ for runtime in claude codex; do
   expect_runtime_allow 'aitools run -- gh search issues git push' "$runtime"
   expect_runtime_allow 'aitools bg start -- /usr/bin/gh search issues git push' "$runtime"
   expect_runtime_allow 'aitools run --cwd ../x gh search issues git push' "$runtime"
+  expect_runtime_allow 'aitools run --trace -- gh search issues git push --force' "$runtime"
+  expect_runtime_allow 'aitools run --lock-timeout 1s -- gh search issues git push --force' "$runtime"
   expect_block_message 'git commit src/app.sh -m update' 'jj commit <paths> -m' "$runtime"
   expect_block_message 'jj git push -b x; gh pr merge 12' 'ORCH-P005' "$runtime"
 done
