@@ -629,106 +629,14 @@ expect_allow 'echo "jj abandon"'
 expect_allow "rg -n 'jj undo' docs"
 expect_allow $'cat <<EOF\njj abandon\nEOF'
 
-# FR-002: irreversible GitHub commands block in both runtimes, regardless of wrappers or override.
+# GitHub policy belongs to the argv-level gh wrapper; git/jj remain this hook's responsibility.
 for runtime in claude codex; do
-  for operation in 'pr merge 12 --merge' 'repo delete example/project --yes'; do
-    for invocation in \
-      "gh $operation" \
-      "/opt/bin/gh $operation" \
-      "gh -R example/project $operation" \
-      "gh --repo=example/project $operation" \
-      "gh -Rexample/project $operation" \
-      "env gh $operation" \
-      "bash -lc 'gh $operation'" \
-      "bash -cl 'gh $operation'" \
-      "bash -ec 'gh $operation'" \
-      "xargs -I {} gh $operation" \
-      "xargs -I{} gh $operation" \
-      "xargs -n 1 -P 2 gh $operation" \
-      "ALLOW_DESTRUCTIVE_GIT=1 gh $operation" \
-      "CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 gh $operation" \
-      "ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- gh $operation" \
-      "aitools run -- gh $operation" \
-      "aitools bg start -- gh $operation" \
-      "aitools run -- sh -c 'gh $operation'"; do
-      expect_block_message "$invocation" 'GitHub destructive operation blocked' "$runtime"
-    done
-  done
-  expect_block_message 'gh pr --repo example/project merge 12' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh repo --hostname github.com delete example/project' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'jj git push -b x; gh pr merge 12' 'GitHub destructive operation blocked' "$runtime"
+  expect_runtime_allow 'gh pr merge 12' "$runtime"
+  expect_runtime_allow 'aitools run -- gh api -X DELETE repos/example/project' "$runtime"
   expect_block_message 'git commit src/app.sh -m update' 'jj commit <paths> -m' "$runtime"
-  expect_block_message 'gh "$group" merge 1' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh $(printf pr) merge 1' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh $operation' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh pr "$action" 1' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh repo "$action" example/project' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'ALLOW_DESTRUCTIVE_GIT=1 gh "$group" merge 1' 'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'xargs -I {} gh pr merge {}' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'jj git push -b x; gh pr merge 12' 'ORCH-P005' "$runtime"
 done
-expect_allow 'gh pr view 12'
-expect_allow 'gh repo view example/project'
-expect_allow 'gh pr list --search merge'
-expect_allow 'gh repo list --json name'
-expect_allow 'echo "gh pr merge 12"'
-expect_allow 'aitools read gh'
-expect_allow 'gh --help'
-expect_allow 'gh pr --help'
-expect_allow 'xargs -I {} gh pr view {}'
-expect_allow 'xargs -n 1 gh repo view'
-expect_allow 'bash -cl "gh pr view 1"'
 expect_block 'bash -cl "jj git push"'
-
-# Equivalent API operations and new aliases cannot bypass the command guards.
-for runtime in claude codex; do
-  for operation in \
-    'gh api -X PUT repos/example/project/pulls/12/merge' \
-    'gh api repos/example/project/pulls/12/merge --method PUT' \
-    'gh api --method=PUT /repos/example/project/pulls/12/merge' \
-    'gh api -XPUT repos/example/project/pulls/12/merge' \
-    'gh api -X=PUT repos/example/project/pulls/12/merge' \
-    'gh api --hostname github.com --method PUT repos/example/project/pulls/12/merge' \
-    'gh api -X DELETE repos/example/project' \
-    'gh api repos/example/project --method DELETE' \
-    'gh api --method=DELETE /repos/example/project/' \
-    'gh api -XDELETE repos/example/project' \
-    'gh api graphql -f "query=mutation { mergePullRequest(input: {pullRequestId: \"PR_fixture\"}) { clientMutationId } }"' \
-    'gh api graphql --raw-field="query=mutation { deleteRepository(input: {repositoryId: \"R_fixture\"}) { clientMutationId } }"' \
-    'gh api graphql -F "query=mutation { mergePullRequest(input: {pullRequestId: \"PR_fixture\"}) { clientMutationId } }"' \
-    'gh api graphql --input /tmp/fixture-query.json' \
-    'gh api graphql --input -' \
-    'gh api graphql -F query=@/tmp/fixture-query.graphql' \
-    'gh api graphql -F query=@-' \
-    "gh alias set merge-now 'pr merge'" \
-    'gh alias import /tmp/fixture-aliases.yml' \
-    "gh alias set --shell remove-repo 'gh repo delete \"\$1\" --yes'"; do
-    printf -v quoted_operation '%q' "$operation"
-    for invocation in \
-      "$operation" \
-      "bash -c $quoted_operation" \
-      "env $operation" \
-      "aitools run -- $operation" \
-      "ALLOW_DESTRUCTIVE_GIT=1 $operation"; do
-      expect_block_message "$invocation" 'GitHub destructive operation blocked' "$runtime"
-    done
-  done
-  expect_block_message 'gh api -X GET repos/example/project/pulls/12/merge --method PUT' \
-    'GitHub destructive operation blocked' "$runtime"
-  expect_block_message 'gh api --method GET repos/example/project --method DELETE' \
-    'GitHub destructive operation blocked' "$runtime"
-  for invocation in \
-    'gh api repos/example/project' \
-    'gh api --method GET repos/example/project' \
-    'gh api -XGET repos/example/project/pulls/12/merge' \
-    'gh api --method=GET repos/example/project' \
-    'gh api -X PUT repos/example/project/topics' \
-    'gh api --method DELETE repos/example/project/issues/12' \
-    'gh api graphql -f "query=query { viewer { login } }"' \
-    "gh api graphql -f 'query=query(\$login: String!) { user(login: \$login) { login } }' -F login=fixture" \
-    'gh alias list'; do
-    expect_runtime_allow "$invocation" "$runtime"
-  done
-done
 
 # Every refusal assertion checks a nonempty stderr banner as well as exit 2.
 for invocation in \

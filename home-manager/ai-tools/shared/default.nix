@@ -34,8 +34,8 @@ rec {
   # and `git branch x` share a prefix with `git tag -l`, `git config --get`, and `git branch --list`.
   # block-destructive-git covers them for Claude Code and Codex.
   #
-  # gh alias and gh extension run arbitrary programs under a gh command line, and gh auth token and
-  # gh auth status -t print the token into the transcript.
+  # The gh wrapper guards GitHub operations and alias/extension execution. Keep token-output
+  # prefix denials as an additional Claude Code boundary.
   gitWriteSubcommands = [
     "commit"
     "commit-tree"
@@ -259,9 +259,6 @@ rec {
     "nc -l -*"
     "ncat -l -*"
     "netcat -l -*"
-    "gh alias *"
-    "gh extension *"
-    "gh ext *"
     "gh auth token*"
     "gh auth status *-t*"
     "gh auth status *--show-token*"
