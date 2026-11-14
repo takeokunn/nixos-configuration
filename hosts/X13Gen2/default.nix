@@ -52,6 +52,7 @@ nixpkgs.lib.nixosSystem {
           nixvim
           mcp-servers-nix
           llm-agents
+          cclens
           anthropic-skills
           paredit-cli-skills
           aitools-skills

@@ -35,6 +35,8 @@
     llm-agents.url = "github:numtide/llm-agents.nix";
     llm-agents.inputs.nixpkgs.follows = "nixpkgs";
     llm-agents.inputs.treefmt-nix.follows = "treefmt-nix";
+    cclens.url = "github:lambdalisue/cclens";
+    cclens.inputs.nixpkgs.follows = "nixpkgs";
     agent-skills.url = "github:Kyure-A/agent-skills-nix";
     agent-skills.inputs.nixpkgs.follows = "nixpkgs";
     guard-and-guide.url = "github:kawarimidoll/guard-and-guide";
@@ -108,6 +110,7 @@
               ++ import ./home-manager/ai-tools/serena/overlay.nix;
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+                cclensPkg = inputs.cclens.packages.${pkgs.stdenv.hostPlatform.system}.default;
                 inherit (inputs)
                   mcp-servers-nix
                   anthropic-skills

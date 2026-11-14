@@ -4,6 +4,7 @@
   emacs-overlay,
   mcp-servers-nix,
   llm-agents,
+  cclens,
   nur-packages,
   ...
 }:
@@ -26,6 +27,7 @@ let
     emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
   };
   llmAgentsPkgs = llm-agents.packages.${system};
+  cclensPkg = cclens.packages.${system}.default;
 
   emacsPkgSet = import ./editor/packages {
     inherit lib pkgs;
@@ -64,6 +66,7 @@ in
       emacsPkg
       emacsLib
       llmAgentsPkgs
+      cclensPkg
       ;
   };
 

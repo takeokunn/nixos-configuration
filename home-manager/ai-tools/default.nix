@@ -1,5 +1,6 @@
 {
   llmAgentsPkgs,
+  cclensPkg,
   ...
 }:
 {
@@ -12,5 +13,6 @@
 
   home.packages = [
     llmAgentsPkgs.ccusage
+    cclensPkg
   ];
 }
