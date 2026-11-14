@@ -1,8 +1,6 @@
 #!/bin/bash
-# Codex wrapper that marks the session's target directory as trusted when it lies under ~/ghq, so a
-# fresh worktree there does not stop at the "Trust this folder?" prompt. Trust also lets the
-# directory's own .codex config and hooks load, so every checkout under ~/ghq is treated as trusted.
-# Outside ~/ghq nothing is added and Codex prompts as before.
+# Trust only repositories belonging to the configured GitHub owners. Trust loads a checkout's
+# .codex settings and hooks, so third-party reference clones must keep Codex's trust prompt.
 # Usage: ghq-trust.sh <codex-executable> [codex-args...]
 #
 # The override is an inline table because Codex splits a dotted -c key on every '.', so
@@ -49,7 +47,10 @@ trust=()
 physical_dir "$target" physical
 physical_dir "$HOME/ghq" ghq_root
 # A TOML basic string cannot hold a raw control character, so such a path keeps the prompt.
-if [[ -n $physical && -n $ghq_root && $physical == "$ghq_root"/* && $physical != *[[:cntrl:]]* ]]; then
+if [[ -n $physical && -n $ghq_root && $physical != *[[:cntrl:]]* ]] &&
+  [[ $physical == "$ghq_root/github.com/takeokunn/"* ||
+     $physical == "$ghq_root/github.com/nerima-lisp/"* ||
+     $physical == "$ghq_root/github.com/nerima-games/"* ]]; then
   key=${physical//\\/\\\\}
   key=${key//\"/\\\"}
   trust=(-c "projects={ \"$key\" = { trust_level = \"trusted\" } }")

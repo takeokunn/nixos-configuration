@@ -29,9 +29,9 @@ EOF
 chmod +x "$stub"
 
 home="$scratch/home"
-worktree="$home/ghq/github.com/owner/repo.git/.worktrees/feature"
+worktree="$home/ghq/github.com/takeokunn/repo.git/.worktrees/feature"
 outside="$scratch/outside"
-quoted="$home/ghq/github.com/owner/q\"b\\s"
+quoted="$home/ghq/github.com/takeokunn/q\"b\\s"
 mkdir -p "$worktree/sub" "$outside" "$quoted" "$home/ghqx"
 ln -s "$worktree" "$outside/link-to-worktree"
 ln -s "$outside" "$worktree/link-to-outside"
@@ -65,6 +65,20 @@ expect_argv "cwd in a ghq worktree" -c "$(flag_for "$worktree")" exec hi
 run "$worktree/sub"
 expect_argv "cwd below a worktree root" -c "$(flag_for "$worktree/sub")"
 
+for owner in nerima-lisp nerima-games; do
+  owned="$home/ghq/github.com/$owner/repo.git/.worktrees/feature"
+  mkdir -p "$owned"
+  run "$owned"
+  expect_argv "allowed organization $owner" -c "$(flag_for "$owned")"
+done
+
+for relative in github.com/third-party/repo github.com/takeokunn-other/repo github.com/nerima-lisp-other/repo github.com/nerima-games-other/repo gitlab.com/takeokunn/repo github.com/takeokunn; do
+  untrusted="$home/ghq/$relative"
+  mkdir -p "$untrusted"
+  run "$untrusted"
+  expect_argv "untrusted owner or host: $relative"
+done
+
 run "$outside" exec hi
 expect_argv "cwd outside ghq" exec hi
 
@@ -86,8 +100,8 @@ expect_argv "--cd=<dir>" -c "$(flag_for "$worktree")" "--cd=$worktree"
 run "$outside" "-C$worktree"
 expect_argv "-C<dir>" -c "$(flag_for "$worktree")" "-C$worktree"
 
-run "$outside" -C ../home/ghq/github.com/owner/repo.git/.worktrees/feature
-expect_argv "relative -C" -c "$(flag_for "$worktree")" -C ../home/ghq/github.com/owner/repo.git/.worktrees/feature
+run "$outside" -C ../home/ghq/github.com/takeokunn/repo.git/.worktrees/feature
+expect_argv "relative -C" -c "$(flag_for "$worktree")" -C ../home/ghq/github.com/takeokunn/repo.git/.worktrees/feature
 
 run "$worktree" -C "$outside"
 expect_argv "-C outside ghq from inside ghq" -C "$outside"
@@ -107,8 +121,8 @@ expect_argv "-C without a value falls back to the cwd" -c "$(flag_for "$worktree
 run "$outside" "-C=$worktree"
 expect_argv "-C=<dir>" -c "$(flag_for "$worktree")" "-C=$worktree"
 
-run "$outside" --cd=../home/ghq/github.com/owner/repo.git/.worktrees/feature
-expect_argv "relative --cd=" -c "$(flag_for "$worktree")" --cd=../home/ghq/github.com/owner/repo.git/.worktrees/feature
+run "$outside" --cd=../home/ghq/github.com/takeokunn/repo.git/.worktrees/feature
+expect_argv "relative --cd=" -c "$(flag_for "$worktree")" --cd=../home/ghq/github.com/takeokunn/repo.git/.worktrees/feature
 
 # CDPATH must not redirect a relative -C: Codex resolves it against the cwd.
 mkdir -p "$outside/sub"
@@ -132,14 +146,14 @@ key=$(python3 -c 'import sys, tomllib; print(next(iter(tomllib.loads(sys.argv[1]
   fail "escaped flag is not valid TOML: $key"
 [[ $key == "$quoted" ]] || fail "escaped TOML key decodes to [$key], expected [$quoted]"
 
-control="$home/ghq/github.com/owner/ctl"$'\t'"x"
+control="$home/ghq/github.com/takeokunn/ctl"$'\t'"x"
 mkdir -p "$control"
 run "$control"
 expect_argv "control character keeps the prompt"
 
 # A name ending in a newline must not be trimmed into its sibling.
-mkdir -p "$home/ghq/github.com/owner/nl" "$home/ghq/github.com/owner/nl"$'\n'
-run "$home/ghq/github.com/owner/nl"$'\n'
+mkdir -p "$home/ghq/github.com/takeokunn/nl" "$home/ghq/github.com/takeokunn/nl"$'\n'
+run "$home/ghq/github.com/takeokunn/nl"$'\n'
 expect_argv "trailing newline keeps the prompt"
 
 run "$worktree" -c 'model="m"' -c 'projects={ "/other" = { trust_level = "untrusted" } }' exec
