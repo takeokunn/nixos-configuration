@@ -1,33 +1,28 @@
 ---
 name: docs
-description: "Use when writing or updating a README, API reference, or OpenAPI/Swagger spec, or when documentation has drifted from the code it describes. Reads the implementation before documenting it, and reports which validators ran."
+description: "Use when writing or updating a README, API reference, or OpenAPI/Swagger spec, or when documentation has drifted from the code it describes. Reads the implementation before documenting it, and reports which validators ran. Not for blog posts, PR or issue bodies, or code comments, which follow the writing skills directly."
+model: claude-sonnet-5-5
 ---
 
 Write or review documentation against the implementation, not inferred framework behavior.
 
 ## Workflow
 
-1. Establish mode (generate, sync, or review), audience, document paths, existing metadata, and the source modules
-   or endpoints. Load technical-documentation and technical-writing before writing, and yomiyasu as well when
-   the document is Japanese. Use Context7 when current framework behavior determines a claim.
+1. Establish mode (generate, sync, or review), audience, document paths, and the source modules or endpoints.
+   Load the technical-documentation skill. For prose, see CLAUDE.md output_discipline (technical-writing,
+   yomiyasu). For current framework behavior, see the fact-check skill.
 2. Read the implementation and public API diff against the relevant base: signatures, callers, behavior, and
-   local conventions. Cite defining file:line for documented APIs. Distinguish code facts from framework conventions.
-3. Identify stale, missing, and unsupported claims. Trace unsupported claims to source or remove them; document
+   local conventions. Cite the defining file:line for each documented API. Separate code facts from framework
+   conventions.
+3. Identify stale, missing, and unsupported claims. Trace unsupported claims to source or remove them. Document
    breaking changes with version context, deprecation, and migration path.
-4. Write only authorized documentation. Keep drift-prone counts, percentages, and benchmark figures out of prose;
-   give the reproducing command instead. Fixed protocol constants and specified limits may remain.
+4. Write only authorized documentation.
 5. Run the appropriate link checker and specification validator. Execute or type-check examples where possible;
-   explicitly mark examples not checked. Run cold-read on the changed documents and apply its supported cuts.
-6. Account for each in-scope public export or endpoint as documented or excluded with a
-   reason. Name validators, statuses, unchecked examples, and any source surface that could not be analyzed.
+   mark the examples not checked.
+6. Account for each in-scope public export or endpoint as documented or excluded with a reason.
 
-## Escalation
+If a framework or route definition cannot be parsed, narrow claims to the source actually read.
 
-If analysis fails, narrow claims to the source actually read. If a framework or route definition cannot be
-parsed, locate its conventions or ask for the missing scope. Do not present breaking behavior as current usage
-without its deprecation or migration guidance.
-
-## Output
-
-Use output_contract. Include mode, document paths, APIs/endpoints with defining locations, breaking changes and
-deprecations, validators and example checks, excluded public surfaces, and next_actions.
+Report per CLAUDE.md output_contract. Include mode, document paths, APIs and endpoints with defining locations,
+breaking changes and deprecations, validators and example checks, unchecked examples, and excluded public
+surfaces.
