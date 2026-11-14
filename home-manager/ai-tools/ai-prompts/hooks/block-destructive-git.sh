@@ -17,7 +17,9 @@
 #   A global option value computed at run time blocks, except the value of -C and --work-tree when it
 #   is double-quoted and only a plain variable expansion (`git -C "$repo" log`).
 # - `aitools git ...` only reads, so it passes; `aitools run|bg ... git <args>` is judged like `git <args>`.
-# - `gh pr merge` and `gh repo delete` block in both modes, without an override.
+# - `gh pr merge`, `gh repo delete`, equivalent REST/GraphQL requests, and gh alias set/import
+#   block in both modes without an override. Existing aliases and extension exec are not expanded;
+#   their bodies are outside this classifier. GraphQL bodies read from files/stdin block.
 # - Destructive jj commands block: edit, next, prev, bisect, sparse set/reset/edit, abandon, undo, redo,
 #   op restore/revert, restore without paths, and new onto another revision; plus jj git push,
 #   which skips Git hooks.
@@ -136,13 +138,14 @@ sub lex_segments {
         return;
     };
     my $add = sub {
-        my ($text, $q) = @_;
-        $tok = { text => q{}, quoted => 0, udyn => 0, expansion => 0 } if !defined $tok;
+        my ($text, $q, $literal) = @_;
+        $tok = { text => q{}, quoted => 0, udyn => 0, expansion => 0, dynamic => 0 } if !defined $tok;
         $tok->{text} .= $text;
         $tok->{quoted} = 1 if $q;
         # An unquoted `$` or backtick leaves part of the word to the shell's own splitting and globbing.
         $tok->{udyn} = 1 if !$q and $text =~ /[\$`]/;
         $tok->{expansion} = 1 if !$q and $text =~ /[\[\]*?~{}]/;
+        $tok->{dynamic} = 1 if !$literal and $text =~ /[\$`]/;
         return;
     };
 
@@ -170,14 +173,14 @@ sub lex_segments {
             my $d = ($i + 1 < $n) ? substr($s, $i + 1, 1) : q{};
             $i += 2;
             next if $d eq q{} or $d eq "\n";
-            $add->($d, 0);
+            $add->($d, 0, 1);
             next;
         }
 
         if ($c eq q{'}) {
             my $j = index($s, q{'}, $i + 1);
             $j = $n if $j < 0;
-            $add->(substr($s, $i + 1, $j - $i - 1), 1);
+            $add->(substr($s, $i + 1, $j - $i - 1), 1, 1);
             $i = $j + 1;
             next;
         }
@@ -185,14 +188,17 @@ sub lex_segments {
         if ($c eq q{"}) {
             my $j   = $i + 1;
             my $buf = q{};
+            my $dynamic = 0;
             while ($j < $n) {
                 my $d = substr($s, $j, 1);
                 last if $d eq q{"};
                 if ($d eq q{\\}) { $buf .= substr($s, $j + 1, 1); $j += 2; next; }
+                $dynamic = 1 if $d =~ /[\$`]/;
                 $buf .= $d;
                 $j++;
             }
-            $add->($buf, 1);
+            $add->($buf, 1, 1);
+            $tok->{dynamic} = 1 if $dynamic;
             $i = $j + 1;
             next;
         }
@@ -413,7 +419,7 @@ sub verdict_for_segment {
         return q{} unless $git_verdict;
         return git_dynamic_path_help($git_env, \@aq, @a) ? 'git-dynamic-path' : 'git';
     }
-    return gh_verdict(@a) if $prog eq 'gh';
+    return gh_verdict(@t) if $prog eq 'gh';
     return aitools_verdict($depth, $allow, @a) if $prog eq 'aitools';
     return q{};
 }
@@ -435,23 +441,92 @@ sub aitools_verdict {
 
 # gh permits persistent options before or between subcommands.
 sub gh_verdict {
-    my @a = @_;
+    my @t = @_;
     my @pos;
-    while (@a and @pos < 2) {
-        my $x = shift @a;
+    while (@t and @pos < 2) {
+        my $x = shift(@t)->{text};
         return q{} if $x eq '--help' or $x eq '-h' or $x eq '--version';
         if ($x eq '-R' or $x eq '--repo' or $x eq '--hostname') {
-            shift @a if @a;
+            shift @t if @t;
             next;
         }
         next if $x =~ /^(?:--(?:repo|hostname)=|-R.)/;
         next if $x =~ /^-/;
         push @pos, $x;
+        return gh_api_verdict(@t) if @pos == 1 and $x eq 'api';
     }
     return 'gh-destructive' if @pos and is_dynamic($pos[0]);
     return q{} unless @pos == 2;
     return 'gh-destructive' if ($pos[0] eq 'pr' and ($pos[1] eq 'merge' or is_dynamic($pos[1])))
-        or ($pos[0] eq 'repo' and ($pos[1] eq 'delete' or is_dynamic($pos[1])));
+        or ($pos[0] eq 'repo' and ($pos[1] eq 'delete' or is_dynamic($pos[1])))
+        or ($pos[0] eq 'alias' and ($pos[1] =~ /^(?:set|import)$/ or is_dynamic($pos[1])));
+    return q{};
+}
+
+sub gh_api_verdict {
+    my @t = @_;
+    my ($endpoint, $method, $input);
+    my @fields;
+    my $operands = 0;
+    my %value_opt = map { $_ => 1 } qw(
+        -X --method -f --raw-field -F --field --input --hostname --cache
+        -H --header -q --jq -p --preview -t --template
+    );
+    my %flag_opt = map { $_ => 1 } qw(
+        -i --include --paginate --slurp --silent --verbose --allow-escape-sequences
+    );
+    while (@t) {
+        my $token = shift @t;
+        my $word = $token->{text};
+        if (!$operands and $word eq '--') { $operands = 1; next; }
+        if (!$operands and $word =~ /^-/) {
+            return q{} if $word eq '--help' or $word eq '-h';
+            next if $flag_opt{$word};
+            my ($option, $value) = $word =~ /^(--[^=]+|-[XfFHqpt])(?:=(.*))?$/s;
+            ($option, $value) = ($1, $2) if !defined $option and $word =~ /^(-[XfFHqpt])(.+)$/s;
+            return 'gh-destructive' unless defined $option and $value_opt{$option};
+            my $dynamic = $token->{dynamic};
+            if (!defined $value) {
+                return 'gh-destructive' unless @t;
+                my $value_token = shift @t;
+                $value = $value_token->{text};
+                $dynamic = $value_token->{dynamic};
+            }
+            if ($option eq '-X' or $option eq '--method') {
+                return 'gh-destructive' if $dynamic;
+                $method = uc $value;
+                return 'gh-destructive' unless $method =~ /^(?:GET|HEAD|OPTIONS|POST|PUT|PATCH|DELETE)$/;
+            } elsif ($option eq '--input') {
+                $input = 1;
+            } elsif ($option =~ /^(?:-f|--raw-field|-F|--field)$/) {
+                push @fields, [$value, $dynamic];
+            }
+            next;
+        }
+        return 'gh-destructive' if defined $endpoint or $token->{dynamic};
+        $endpoint = $word;
+    }
+    return 'gh-destructive' unless defined $endpoint;
+    $method //= (@fields or $input) ? 'POST' : 'GET';
+    $endpoint =~ s{^https?://[^/]+}{}i;
+    $endpoint =~ s/%([0-9a-f]{2})/chr(hex($1))/egi;
+    (my $path = $endpoint) =~ s/[?#].*//s;
+    $path =~ s{^/}{};
+    $path =~ s{^api/v3/}{};
+    $path =~ s{/$}{};
+    return 'gh-destructive' if $method eq 'PUT' and $path =~ m{^repos/[^/]+/[^/]+/pulls/[^/]+/merge$};
+    return 'gh-destructive' if $method eq 'DELETE' and $path =~ m{^repos/[^/]+/[^/]+$};
+    if ($path eq 'graphql' or $path eq 'api/graphql') {
+        return 'gh-destructive' if $input or $endpoint =~ /\b(?:mergePullRequest|deleteRepository)\b/;
+        for my $field (@fields) {
+            my ($value, $dynamic) = @{$field};
+            my ($key, $body) = split /=/, $value, 2;
+            return 'gh-destructive' if is_dynamic($key);
+            next unless $key eq 'query';
+            return 'gh-destructive' if $dynamic or !defined $body or $body =~ /^\@/
+                or $body =~ /\b(?:mergePullRequest|deleteRepository)\b/;
+        }
+    }
     return q{};
 }
 
@@ -797,7 +872,8 @@ if [[ $verdict == gh-destructive ]]; then
   cat >&2 <<'EOF'
 GitHub destructive operation blocked (ORCH-P005)
 
-gh pr merge and gh repo delete are not available to agents. Ask the user to perform the operation.
+Merge, repository deletion, alias registration, or an unverifiable API request is not available to agents.
+Use a literal inspectable request for ordinary API work; ask the user to perform destructive operations.
 ALLOW_DESTRUCTIVE_GIT=1 does not lift this block.
 EOF
   exit 2
