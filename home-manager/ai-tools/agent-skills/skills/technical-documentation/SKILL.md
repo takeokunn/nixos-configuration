@@ -1,6 +1,6 @@
 ---
 name: technical-documentation
-description: Use when writing or auditing technical documentation - README, API docs, design docs, specifications, user guides, in English or Japanese. Also covers auditing docs against code for both over-claims and stale future-work claims, and retired-name registries.
+description: Use when writing or auditing a README, API docs, design doc, specification, or user guide, including checking docs against the code.
 metadata:
   version: "3.0.0"
 ---

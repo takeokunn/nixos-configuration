@@ -1,6 +1,6 @@
 ---
 name: common-lisp-ecosystem
-description: Use for Common Lisp, SBCL, or Coalton, covering CLOS, ASDF, package hygiene, condition design, format-string injection, Unicode predicates, reader macros, macro hygiene, atomic file publishing, and hash-table key safety. Also SBCL execution and debugging (--script, REPL/SLY, backtraces, save-lisp-and-die, profiling, compile/load hangs, terminating a stuck SBCL, sb-thread/sb-cover hazards).
+description: Use for Common Lisp, SBCL, Coalton, or ASDF code, and when running, debugging, profiling, or stopping a stuck SBCL.
 metadata:
   version: "4.1.0"
 ---

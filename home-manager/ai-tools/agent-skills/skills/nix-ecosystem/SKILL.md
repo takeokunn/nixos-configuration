@@ -1,6 +1,6 @@
 ---
 name: nix-ecosystem
-description: Use when writing Nix expressions, flake.nix, home-manager config, programs.*/services.* modules, nixpkgs packaging, or nix flake check (including vacuous flake checks missing a target platform, overlays vs system packages, and activation-script hazards).
+description: Use when writing Nix expressions, flake.nix, home-manager or nix-darwin modules, or nixpkgs packages, or when judging a nix flake check or build result.
 metadata:
   version: "3.1.0"
 ---

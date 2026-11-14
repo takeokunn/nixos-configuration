@@ -1,6 +1,6 @@
 ---
 name: emacs-lisp-ecosystem
-description: Use when editing the Emacs configuration in the nixos-configuration repository (home-manager/editor/emacs/elisp/init.org or early-init.org), adding an Emacs package to it, or checking an Emacs Lisp change there. Covers the Nix-side org-babel tangler and how it differs from org-babel-tangle, Nix-provided packages and the silent autoload-if-found no-op, byte-compile, paren, and ERT checks on a scratch tangle, and verifying without restarting, instrumenting, or evaluating in the user's running Emacs daemon.
+description: Use when editing or checking Emacs Lisp in this repository's Emacs config (init.org, early-init.org), adding an Emacs package to it, or probing the running Emacs daemon.
 metadata:
   version: "1.0.0"
 ---

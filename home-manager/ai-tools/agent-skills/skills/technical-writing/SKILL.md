@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Use when writing a blog post, technical article, tutorial, report, PR/issue body, or doc/comment prose, in English or Japanese (covers article types and title patterns, general prose mechanics and paragraph-level argument, and a long-form structure ruleset for books and serials; Japanese prose rules live in the yomiyasu skill).
+description: Use when writing a blog post, technical article, tutorial, report, book chapter or serial, PR/issue body, or doc/comment prose, in English or Japanese.
 metadata:
   version: "4.0.0"
 ---
