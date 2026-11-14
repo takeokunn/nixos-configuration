@@ -381,11 +381,8 @@
             pkgs.runCommand "block-destructive-git-hook-test"
               {
                 nativeBuildInputs = [
-                  pkgs.bash
-                  pkgs.coreutils
                   pkgs.git
                   pkgs.gitleaks
-                  pkgs.gnugrep
                   pkgs.jq
                   pkgs.jujutsu
                   pkgs.perl
@@ -402,7 +399,6 @@
             pkgs.runCommand "guard-and-guide-rules-test"
               {
                 nativeBuildInputs = [
-                  pkgs.bash
                   pkgs.jq
                 ];
               }
@@ -419,8 +415,6 @@
             pkgs.runCommand "copy-local-mcp-servers-test"
               {
                 nativeBuildInputs = [
-                  pkgs.bash
-                  pkgs.coreutils
                   pkgs.jq
                   pkgs.jujutsu
                 ];

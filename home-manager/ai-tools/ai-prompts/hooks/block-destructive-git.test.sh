@@ -1,6 +1,5 @@
-#!/bin/bash
 # Table-driven test for block-destructive-git.sh, run by the `block-destructive-git-hook` flake check.
-# Usage: block-destructive-git.test.sh <path-to-block-destructive-git.sh>
+# Usage: bash block-destructive-git.test.sh <path-to-block-destructive-git.sh>
 
 set -euo pipefail
 
@@ -792,8 +791,8 @@ done
 mkdir "$push_fixture/diagnostic-perl"
 real_perl=$(command -v perl)
 export real_perl
-cat >"$push_fixture/diagnostic-perl/perl" <<'PERL_STUB'
-#!/bin/bash
+printf '#!%s\n' "$BASH" >"$push_fixture/diagnostic-perl/perl"
+cat >>"$push_fixture/diagnostic-perl/perl" <<'PERL_STUB'
 printf 'R11 classifier diagnostic\n' >&2
 if [[ ${CLASSIFIER_PROBE_FAILURE:-0} == 1 ]]; then exit 17; fi
 exec "$real_perl" "$@"
@@ -909,8 +908,8 @@ expect_claude_block 'jj git push -b conflicted'
 fixture_jj bookmark delete conflicted
 
 # Different remote bases must select different outgoing histories.
-cat >"$push_fixture/record-gitleaks" <<'SCANNER'
-#!/usr/bin/env bash
+printf '#!%s\n' "$BASH" >"$push_fixture/record-gitleaks"
+cat >>"$push_fixture/record-gitleaks" <<'SCANNER'
 report=''
 while (($#)); do
   case "$1" in
@@ -995,8 +994,8 @@ done
 expect_claude_allow 'jj git push -b x'
 
 # Scanner launch/exit/report failures must not become an empty successful scan.
-cat >"$push_fixture/fake-gitleaks" <<'SCANNER'
-#!/usr/bin/env bash
+printf '#!%s\n' "$BASH" >"$push_fixture/fake-gitleaks"
+cat >>"$push_fixture/fake-gitleaks" <<'SCANNER'
 report=''
 while (($#)); do
   case "$1" in
