@@ -87,7 +87,19 @@ in
     "explanatory-strict"
   ];
 
-  programs.claude-code.hooks.block-destructive-git = builtins.readFile "${ai-prompts-path}/hooks/block-destructive-git.sh";
+  programs.claude-code.hooks.block-destructive-git = pkgs.writeShellScript "block-destructive-git" ''
+    # Keep jj on the caller's PATH so the scan uses the same binary as the push.
+    export PATH=${
+      pkgs.lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.jq
+        pkgs.perl
+        pkgs.python3
+      ]
+    }:"$PATH"
+    export GITLEAKS_BIN=${pkgs.gitleaks}/bin/gitleaks
+    exec ${pkgs.bash}/bin/bash ${ai-prompts-path}/hooks/block-destructive-git.sh "$@"
+  '';
   programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh";
 
   programs.claude-code.mcpServers =

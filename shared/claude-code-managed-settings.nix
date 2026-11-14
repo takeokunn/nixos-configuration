@@ -12,6 +12,7 @@
 # pulls in no module-system state.
 {
   lib,
+  pkgs,
   guardAndGuide,
   # Absolute home directory of the user these settings govern. The hook commands need it because
   # this file is evaluated as system-level policy, where home-manager's own `programs.claude-code.configDir`
@@ -24,6 +25,10 @@ let
   shared = import ../home-manager/ai-tools/shared { inherit lib; };
 
   hooksDir = "${homeDirectory}/.claude/hooks";
+
+  guardAndGuideHook = pkgs.writeShellScript "guard-and-guide" ''
+    exec ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml
+  '';
 
   # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
   # cannot silently fail to fire here.
@@ -42,7 +47,7 @@ in
   # default branch unasked); the pull-request and jujutsu skills carry this workflow instead.
   includeGitInstructions = false;
   autoCompactEnabled = true;
-  enableAllProjectMcpServers = true;
+  enableAllProjectMcpServers = false;
   # Selects the style defined in the home-manager module. Built-in Explanatory cannot be extended,
   # only replaced, so explanatory-strict re-authors its insight behavior and adds
   # output_discipline's prohibitions at the system-prompt layer, which CLAUDE.md cannot reach. The style
@@ -55,14 +60,17 @@ in
   language = "japanese";
 
   permissions = {
-    deny = map (p: "Bash(${p})") shared.bashDenyPatterns;
-    # bypassPermissions skips every prompt and the auto-mode classifier; deny rules and the PreToolUse
-    # hooks still apply. Allow rules have no effect in this mode and an ask rule would still prompt, so
-    # the only ask rules left are the override prefixes that lift a block-destructive-git verdict.
-    ask = [
-      "Bash(ALLOW_DESTRUCTIVE_GIT=1 *)"
-      "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"
+    deny = map (p: "Bash(${p})") shared.bashDenyPatterns ++ [
+      "mcp__plugin_hm_slite__archive-note"
+      "mcp__plugin_hm_slite__remove-blocks"
+      "mcp__plugin_hm_clickup__clickup_delete_task"
+      "mcp__plugin_hm_clickup__clickup_delete_comment"
+      "mcp__plugin_hm_clickup__clickup_delete_chat_message"
+      "mcp__plugin_hm_clickup__clickup_merge_tasks"
     ];
+    # bypassPermissions skips every prompt and the auto-mode classifier; deny rules and the PreToolUse
+    # hooks still apply. Ask rules would prompt, including for an already authorized override.
+    ask = [ ];
     defaultMode = "bypassPermissions";
   };
   # Accepts the one-time bypass warning dialog up front; background sessions honor it only from user or
@@ -123,7 +131,8 @@ in
       hooks = [
         {
           type = "command";
-          command = "${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml";
+          command = "${guardAndGuideHook}";
+          onFailure = "block";
         }
       ];
     }
@@ -138,12 +147,17 @@ in
             "block-destructive-git"
             "aitools-rewrite"
           ];
-        map (name: {
-          type = "command";
-          # `claude` makes the hook answer a jj push with an ask decision instead of exit 2, so the
-          # person confirms it; Codex runs the same script with no argument and keeps the block.
-          command = "${hooksDir}/${name}" + lib.optionalString (name == "block-destructive-git") " claude";
-        }) claudeBashHookNames;
+        map (
+          name:
+          {
+            type = "command";
+            # `claude` scans a direct jj push before allowing it without a permission prompt.
+            command = "${hooksDir}/${name}" + lib.optionalString (name == "block-destructive-git") " claude";
+          }
+          // lib.optionalAttrs (name == "block-destructive-git") {
+            onFailure = "block";
+          }
+        ) claudeBashHookNames;
     }
   ];
 

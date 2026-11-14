@@ -230,6 +230,7 @@
             self.nixosConfigurations.X13Gen2.config.home-manager.users.take.programs.claude-code.configDir;
 
           claudeCodeManagedSettings = import ./shared/claude-code-managed-settings.nix {
+            inherit pkgs;
             inherit (pkgs) lib;
             guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
             homeDirectory = claudeCodeHomeDirectory;
@@ -380,8 +381,15 @@
             pkgs.runCommand "block-destructive-git-hook-test"
               {
                 nativeBuildInputs = [
+                  pkgs.bash
+                  pkgs.coreutils
+                  pkgs.git
+                  pkgs.gitleaks
+                  pkgs.gnugrep
                   pkgs.jq
+                  pkgs.jujutsu
                   pkgs.perl
+                  pkgs.python3
                 ];
               }
               ''
@@ -394,6 +402,7 @@
             pkgs.runCommand "guard-and-guide-rules-test"
               {
                 nativeBuildInputs = [
+                  pkgs.bash
                   pkgs.jq
                 ];
               }
@@ -403,6 +412,22 @@
                     inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default
                   }/bin/guard-and-guide \
                   ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml}
+                touch $out
+              '';
+
+          checks.copy-local-mcp-servers =
+            pkgs.runCommand "copy-local-mcp-servers-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.bash
+                  pkgs.coreutils
+                  pkgs.jq
+                  pkgs.jujutsu
+                ];
+              }
+              ''
+                bash ${./home-manager/vcs/copy-local-mcp-servers/copy-local-mcp-servers.test.sh} \
+                  ${./home-manager/vcs/copy-local-mcp-servers/copy-local-mcp-servers.sh}
                 touch $out
               '';
 
@@ -492,6 +517,7 @@
               {
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
+                projectMcpEnabledJson = builtins.toJSON claudeCodeManagedSettings.enableAllProjectMcpServers;
                 autoModeJson = builtins.toJSON claudeCodeManagedSettings.autoMode;
                 claudeHooksJson = builtins.unsafeDiscardStringContext (
                   builtins.toJSON claudeCodeManagedSettings.hooks
@@ -536,9 +562,19 @@
                     exit 1
                   fi
                 done
-                # An ask rule prompts even in bypassPermissions, so only the override prefixes may stay.
-                if ! jq -e '.ask == ["Bash(ALLOW_DESTRUCTIVE_GIT=1 *)", "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"]' <<< "$permissionsJson" >/dev/null; then
-                  echo "managed-settings permissions.ask must hold only the two override prefixes" >&2
+                # Ask rules prompt even in bypassPermissions; push is checked by the hook.
+                if ! jq -e '.ask == []' <<< "$permissionsJson" >/dev/null; then
+                  echo "managed-settings permissions.ask must be empty" >&2
+                  exit 1
+                fi
+                for rule in mcp__plugin_hm_slite__archive-note mcp__plugin_hm_slite__remove-blocks mcp__plugin_hm_clickup__clickup_delete_task mcp__plugin_hm_clickup__clickup_delete_comment mcp__plugin_hm_clickup__clickup_delete_chat_message mcp__plugin_hm_clickup__clickup_merge_tasks; do
+                  if ! jq -e --arg r "$rule" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
+                    echo "managed-settings permissions.deny lost \"$rule\"" >&2
+                    exit 1
+                  fi
+                done
+                if [ "$projectMcpEnabledJson" != false ]; then
+                  echo "managed-settings must not enable all project MCP servers" >&2
                   exit 1
                 fi
                 # rm denials: the system directories stay denied, and scratch space stays deletable. The patterns are
@@ -563,6 +599,10 @@
                 # The Claude Code hook must be told to allow a jj push; Codex's wiring passes no argument.
                 if ! jq -e '[.PreToolUse[].hooks[].command | select(test("/block-destructive-git( |$)"))] | length == 1 and all(test("/block-destructive-git claude$"))' <<< "$claudeHooksJson" >/dev/null; then
                   echo "managed-settings hooks must register block-destructive-git exactly once, ending in \" claude\"" >&2
+                  exit 1
+                fi
+                if ! jq -e '[.PreToolUse[].hooks[] | select(.command | test("/block-destructive-git( |$)|/nix/store/[^/]+-guard-and-guide$"))] | length == 2 and all(.type == "command" and .onFailure == "block")' <<< "$claudeHooksJson" >/dev/null; then
+                  echo "managed-settings must register both safety hooks with onFailure=block" >&2
                   exit 1
                 fi
                 if ! jq -e '.environment | index("$defaults")' <<< "$autoModeJson" >/dev/null; then
