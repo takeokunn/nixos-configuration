@@ -49,7 +49,7 @@ let
 
   agentFiles = builtins.readDir agentPromptsPath;
   agentNames = map (name: lib.removeSuffix ".md" name) (
-    # Codex 0.154.0 role overrides cannot enforce per-agent sandbox or MCP restrictions.
+    # Codex role overrides cannot enforce per-agent sandbox or MCP restrictions.
     builtins.filter (
       name:
       agentFiles.${name} == "regular"

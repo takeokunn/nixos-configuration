@@ -39,7 +39,6 @@ in
         that wants to add to the baseline rather than replace it must repeat these
         three entries itself, since the default is not merged in alongside an
         explicit definition.
-        Requires Serena >= PR #996 (merged 2026-02-14).
       '';
     };
   };
@@ -53,7 +52,7 @@ in
         SERENA_IGNORED_PATHS=${lib.escapeShellArg (builtins.toJSON cfg.ignoredPaths)} \
           SERENA_TYPESCRIPT_LS_PATH=${lib.escapeShellArg "${pkgs.typescript-language-server}/bin/typescript-language-server"} \
           SERENA_BASH_LS_PATH=${lib.escapeShellArg "${pkgs.bash-language-server}/bin/bash-language-server"} \
-          ${lib.getExe pkgs.yq-go} -i '${yqExpr}' "$serenaConfigFile"
+          ${lib.getExe pkgs.yq-go} -i ${lib.escapeShellArg yqExpr} "$serenaConfigFile"
 
         ${lib.getExe pkgs.yq-go} -r '.projects[]?' "$serenaConfigFile" |
           while IFS= read -r project; do
