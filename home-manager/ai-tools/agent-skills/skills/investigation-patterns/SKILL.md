@@ -1,6 +1,6 @@
 ---
 name: investigation-patterns
-description: Use when tracing a symptom to its cause (debugging, bisecting, or working out how an unfamiliar implementation behaves). Covers evidence-based analysis, naming the suspected layer before adding a debug signal, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, and checking a completion claim against the artifact instead of the summary.
+description: Use when tracing a symptom to its cause (debugging, bisecting, or working out how an unfamiliar implementation behaves). Covers evidence-based analysis, naming the suspected layer before adding a debug signal, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, tracing registration (wiring, configuration, dispatch tables) before concluding something is absent or unused, and checking a completion claim against the artifact instead of the summary.
 metadata:
   version: "3.2.0"
 ---
@@ -10,15 +10,9 @@ fix) is assumed; this file covers where that arc yields a confident wrong answer
 
 ## Evidence
 
-Every finding carries a file:line and a tier, never a score. A confidence number produced in the same pass as
-the investigation never contradicts it, so nothing downstream reads a low score and looks further.
-
-- **verified**: a command was run, or the exact lines were read. The finding carries the command and its
-  output, or the citation, so anyone can re-run it and get the same answer.
-- **inferred**: derived from evidence actually read, but the conclusion itself was never observed. State the
-  evidence *and the inferential step*, so the step can be disputed.
-- **assumed**: from convention, prior knowledge, or the user's framing; nothing was checked. State what would
-  confirm it.
+Evidence tiers, citations, and scores: CLAUDE.md evidence. In an investigation, a verified finding carries the
+command and its output or the citation so anyone can re-run it; an inferred finding states the evidence *and
+the inferential step*, so the step can be disputed; an assumed finding states what would confirm it.
 
 Coverage is an observable boundary, not a percentage: name the files and symbols actually read, what was *not*
 examined and why, and the query that established the boundary (the `aitools search` pattern, the
@@ -47,8 +41,8 @@ another), add a signal that tests a named suspicion instead of changing code on 
 Signals at adjacent layers bracket a fault: response headers show the transport answered, the first body event
 shows the remote side progressed, and a long gap between them points at the stream, not its consumer.
 
-Report the layer tested, the redacted command and environment shape, the signal observed, the fix location,
-and the remaining risk.
+Report the layer tested, the command and environment shape (secrets: CLAUDE.md hard_rules), the signal
+observed, the fix location, and the remaining risk.
 
 ## A moving boundary invalidates the observation, not the hypothesis
 
@@ -91,12 +85,31 @@ so they pass while the live path never reaches the threshold.
 A consumer iterating a registry works for most members and yields meaningless or empty results for some. Check
 whether every member satisfies the property the consumer reads. **A docstring narrowing the contract ("members
 must be defined with X") is documentation, not enforcement, and is routinely violated.** Guard the
-variant-specific read and give the discrimination a name.
+variant-specific read, which is a reachable branch rather than a defensive one (CLAUDE.md output_discipline),
+and give the discrimination a name.
 
 The signal is duplication: the same inline property-presence check at several call sites to tell variants
 apart means a named predicate is missing. A registry with mixed member kinds is also a likely source of "passes
 but tests nothing" behavior: see [testing-patterns](../testing-patterns/SKILL.md) for tests that enumerate a
 production registry.
+
+## Trace the registration before concluding absence or role
+
+Code is often reached through registration rather than a direct call: wiring (dependency injection, module
+imports, plugin manifests), configuration (option values, feature flags, generated settings), or a dispatch
+table (routes, command maps, hook lists, registries keyed by name). A text search for direct calls misses all
+three.
+
+- Before concluding that something is absent or unused, trace the registration paths that could reach it and
+  name the ones checked. A search that found no call site establishes only that no direct call exists.
+- A call site proves presence, not a production role. Before assigning one a production role, follow the
+  registration to confirm the production path actually reaches it; a test, an example, or a disabled
+  configuration branch is also a call site.
+- Generated documentation (API references, option lists, help output, docs built from source) may be stale.
+  Inspect its generator, or the source the generator reads, and treat the generated text as a pointer to that
+  source.
+- Before adding a member to a registered family, trace an existing sibling through its registration and
+  discovery path and name every touch point the new member needs.
 
 ## Verify a completion claim against the artifact, not the summary
 
@@ -129,8 +142,8 @@ analysis is needed, cover the applicable items:
 - **Edge cases and risks**: enumerated, ranked, each with a mitigation.
 - **Change surface**: the files to create or modify *and* the files that need no change. Naming the no-change
   set bounds the blast radius and is as valuable as the change list.
-- **Effort**: a phased plan with an estimate, stated with its evidence tier and the basis for that tier, never
-  a numeric confidence.
+- **Effort**: a phased plan, each phase stated with its evidence tier and the basis for that tier (estimates:
+  CLAUDE.md evidence).
 - **Protected differences**: when aligning one project with a reference (a sibling service, a ported module, a
   second plugin in a family), enumerate the divergences that must survive *before starting*: a different auth
   scheme, a fixed rather than configurable endpoint, an extra handler the reference lacks, files the reference
@@ -143,8 +156,8 @@ requirement, say so and justify a rewrite rather than forcing an ill-fitting ext
 
 ## Deferred decisions
 
-When work is blocked on an external dependency maturing, report the decision and revisit conditions. Persist
-them only in an authorized store selected through serena-usage; read-only work returns a candidate:
+When work is blocked on an external dependency maturing, report the decision and revisit conditions
+(persisting them: CLAUDE.md memory_policy):
 
 - The current decision and the condition for reviewing it.
 - The conditions that must **all** hold to unblock, each with a target and a concrete way to check it: a
@@ -177,11 +190,9 @@ at the concrete module, then delete the barrel), and single-use private helpers 
 
 ## Rules
 
-- Establish the cause before proposing a solution. For diagnosis or review only, stop at the findings. When
-  the user also requests a fix, implement within that scope and verify it.
+- Establish the cause before proposing a solution. Scope and stopping point: CLAUDE.md work_selection.
 - Never confirm the user's assumption without independently verifying it.
-- Never state a verified or inferred claim without its file:line or command (an assumed one names what would
-  confirm it), and never substitute a numeric confidence or coverage score for an evidence tier.
+- Evidence tiers, citations, and scores: CLAUDE.md evidence.
 - Where a finding is still inferred, check a second source to see whether it can be raised to verified.
 - Document the information gaps rather than closing them by plausibility.
 
