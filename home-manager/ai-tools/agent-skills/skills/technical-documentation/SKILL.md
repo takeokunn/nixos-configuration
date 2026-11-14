@@ -8,7 +8,7 @@ metadata:
 Patterns for README, API spec, design doc, and user guide writing, and for auditing existing docs against
 the code they describe. Documentation rots in two directions: it over-claims capabilities that were never
 built or were removed, and it under-claims by still calling shipped work "planned." Teams reliably audit only
-the first direction, so the second accumulates unchecked; the audit pattern below exists to catch both. Not
+the first direction, so the second accumulates unchecked; the status-claim audit exists to catch both. Not
 every rationale belongs in a document: a rationale belongs wherever the reader who needs it will be standing:
 a conventions file, a design doc, or a comment at the line itself.
 
@@ -29,9 +29,6 @@ end users get no jargon and step-by-step instructions.
   rollout plan.
 - **User guide**: for non-technical end users. Sections: getting started, core concepts, step-by-step
   tutorials, feature reference, troubleshooting/FAQ, glossary.
-
-Never publish a document with placeholder content or an unresolved TODO; an unfinished section reads as
-finished to anyone who didn't write it.
 
 ## Retired vocabulary registry
 
@@ -64,24 +61,14 @@ costs, so checking only one leaves the other invisible:
 - **Named mechanism** ("over WebSocket", "via the message queue"): verify the mechanism itself, not just the
   capability. Docs commonly keep the right feature description paired with the wrong transport.
 
-Record each claim's outcome as confirmed, over-claimed, under-claimed, wrong-mechanism, or unresolved when
-the available evidence cannot settle it. Over-claims are the
+Give each claim one audit verdict: confirmed, over-claimed, under-claimed, wrong-mechanism, or unresolved when
+the available evidence cannot settle it. These verdicts are judgement terms for the audit; they are not
+evidence tags, so tag the evidence behind each verdict as CLAUDE.md evidence defines. Over-claims are the
 dangerous kind: a stale line saying a safety control exists gets cited as evidence that it does. Under-claims
 are the wasteful kind: they cause already-shipped features to be re-planned and rebuilt.
 
-## Reversal rationale at the change site
-
-When a change deliberately deletes, inverts, or narrows something that carried a documented rationale (an
-exemption, a suppression, a deliberate gate, a documented workaround), preserve the reversal's reasoning at
-the relevant site if its absence would leave the next reader confused. Not the commit message, not the pull request, not
-a session memory: none of those are visible to the person reading the code a year later. State that the
-removal was intentional and what changed to make the original reason no longer apply: enough that a reader
-does not "fix" it back. Do not restate what the surrounding code does.
-
-This is the narrow case where a code comment earns its place: an absence carries no evidence, so a
-deliberately removed exception is indistinguishable from an accidental deletion. Reviewers converge on
-flagging it as a regression, which is a reliable signal that the reader needs the note more than the author
-expected.
+For a comment that records why an exemption or workaround was deliberately removed, see CLAUDE.md
+output_discipline.
 
 ## Language guidelines
 
@@ -91,31 +78,21 @@ words and idioms that don't translate.
 - Good: "Run this command to start the server."
 - Bad: "The server can be started by running the following command."
 
-**Japanese**: です・ます調 (polite form) for user docs, である調 for technical specs. Tone: 丁寧だが簡潔。
-避けるもの: 過度なカタカナ語、曖昧な表現。
-
-- Good: 以下のコマンドでサーバーを起動します。
-- Bad: サーバーの起動については、下記コマンドを実行することで可能となります。
+**Japanese**: match the existing document's style. For Japanese prose rules, see the yomiyasu skill.
 
 **Bilingual**: maintain parallel structure between languages, keep code examples identical and translate only
 prose, and use consistent terminology (build a glossary if terms recur).
-
-For Japanese prose-quality norms beyond structure (argumentation rigor, LLM-tell avoidance, dramatization
-restraint), see technical-writing's Japanese language guidelines, linked below.
 
 ## Other checkable criteria
 
 - Validate runnable examples with scoped checks and record what ran. Label illustrative fragments as such;
   do not execute destructive or external-write examples without authorization merely to validate the prose.
 - Define technical terms on first use or link to a glossary.
-- Do not add timestamps to documents; they go stale immediately and the repository already has commit dates.
 
 ## Related
 
 - [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples and API signatures
 - [investigation-patterns](../investigation-patterns/SKILL.md): analyzing codebases to understand features
   before documenting them
-- [technical-writing](../technical-writing/SKILL.md): writing blog posts and tutorials from documentation;
-  the canonical source for Japanese prose-quality norms (argumentation rigor, LLM-tell avoidance,
-  dramatization restraint, redundancy): apply its Japanese language guidelines when writing Japanese
-  documentation
+- [technical-writing](../technical-writing/SKILL.md): writing blog posts and tutorials from documentation
+- yomiyasu skill: Japanese prose rules
