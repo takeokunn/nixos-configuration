@@ -1,0 +1,90 @@
+{
+  "id": "pr-body-create",
+  "theme": "pr-body-quality",
+  "description": "A new PR body gets rewritten by the user. Mechanical criteria: draft PR, Conventional Commits title, the repository template's 背景/確認方法 headings, Japanese like the merged PRs, names the negative-amount behavior, and no placeholders, tool trailers, em dash, home paths, CI-result restatement, or changed-file paths (pull-request skill at ca44fc04).",
+  "runtimes": [
+    "claude"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "jj-repo-with-bare-remote",
+  "fixture_args": [
+    "pr-ready"
+  ],
+  "prompt": "feature/rounding を origin に push して、main 向けの PR を作って。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "cmd",
+      "label": "feature/rounding pushed",
+      "run": "git --git-dir=\"$WORK/remote.git\" rev-parse -q --verify refs/heads/feature/rounding >/dev/null",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "gh pr create was called as a draft",
+      "run": "grep -Eq '^argv: pr create( .*)? (--draft|-d)( |$)' \"$WORK/gh.log\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "title is Conventional Commits",
+      "run": "grep -Eq '^(feat|fix|docs|refactor|perf|test|build|ci|chore|style|revert)(\\([a-z0-9_-]+\\))?!?: .+' \"$WORK/gh-state/title.txt\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body has the template's 背景 heading",
+      "run": "grep -q '^## 背景' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body has the template's 確認方法 heading",
+      "run": "grep -q '^## 確認方法' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body is in Japanese like the merged PRs",
+      "run": "python3 -I -c 'import re,sys; sys.exit(0 if re.search(\"[\\u3040-\\u30ff\\u4e00-\\u9fff]\", sys.stdin.read()) else 1)' <\"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body names the behavior change (negative amounts)",
+      "run": "grep -Eq '負|マイナス|返金|negative' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body has no placeholder text",
+      "run": "! grep -Eiq 'TODO|TBD|N/A|XXX|lorem|<!--|あとで書く|後で書く|\\(未記入\\)' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body has no tool trailer, em dash, or home path",
+      "run": "! grep -Eq 'Generated with|Co-Authored-By|/Users/|/home/' \"$WORK/gh-state/body.md\" && python3 -I -c 'import sys; t=sys.stdin.read(); sys.exit(1 if \"\\u2014\" in t or \"\\U0001F916\" in t else 0)' <\"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body does not restate CI results",
+      "run": "! grep -Eiq '(全て|すべて|全件|all)[^。]{0,12}(通過|パス|成功|pass)|[0-9]+ ?(件|tests?) ?(passed|通過|成功|パス)|Ran [0-9]+ tests?|CI[^。]{0,8}(green|グリーン|通過|成功)' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "body does not list changed file paths",
+      "run": "! grep -Eq 'ledger/money\\.py|tests/test_money\\.py' \"$WORK/gh-state/body.md\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "gh never merged (pr merge or api merge)",
+      "run": "! grep -Eq '^argv: (pr merge|api .*merge)' \"$WORK/gh.log\"",
+      "expect_exit": 0
+    }
+  ]
+}

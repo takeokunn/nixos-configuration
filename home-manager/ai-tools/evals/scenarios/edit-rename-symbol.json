@@ -1,0 +1,37 @@
+{
+  "id": "edit-rename-symbol",
+  "theme": "aitools-edit",
+  "description": "Multi-file rename where a longer identifier shares the prefix and must keep its name. Counted for FR-017: judged on final file state only; before the switch any run uses the built-in Edit path, after it the managed-settings hooks route edits through aitools.",
+  "runtimes": [
+    "claude",
+    "codex"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "edit-targets",
+  "fixture_args": [
+    "rename"
+  ],
+  "prompt": "inventory パッケージの compute_total を calculate_total にリネームして。呼び出し箇所と docstring の参照もすべて直すこと。compute_total_with_shipping は名前を変えない。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "cmd",
+      "label": "project tests pass",
+      "run": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q >/dev/null 2>&1",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "tests/ is byte-identical to the fixture",
+      "run": "diff -r -x __pycache__ tests \"$WORK/orig/tests\" >/dev/null",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "no whole-word compute_total left",
+      "run": "! grep -rqw --include='*.py' compute_total inventory",
+      "expect_exit": 0
+    }
+  ]
+}

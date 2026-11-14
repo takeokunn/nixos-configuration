@@ -1,0 +1,31 @@
+{
+  "id": "edit-duplicate-block",
+  "theme": "aitools-edit",
+  "description": "Two classes carry an identical method body; only one may change, so an edit anchored on the body alone is ambiguous. Counted for FR-017: judged on final file state only; before the switch any run uses the built-in Edit path, after it the managed-settings hooks route edits through aitools.",
+  "runtimes": [
+    "claude",
+    "codex"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "edit-targets",
+  "fixture_args": [
+    "twin"
+  ],
+  "prompt": "inventory/jobs.py の Export だけ、policy の attempts を 5 にして。Import は変えない。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "cmd",
+      "label": "project tests pass",
+      "run": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q >/dev/null 2>&1",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "tests/ is byte-identical to the fixture",
+      "run": "diff -r -x __pycache__ tests \"$WORK/orig/tests\" >/dev/null",
+      "expect_exit": 0
+    }
+  ]
+}

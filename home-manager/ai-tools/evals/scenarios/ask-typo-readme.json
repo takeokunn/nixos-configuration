@@ -1,0 +1,41 @@
+{
+  "id": "ask-typo-readme",
+  "theme": "unnecessary-question",
+  "description": "A one-line, unambiguous fix gets an AskUserQuestion or a closing 'shall I ...?' instead of being done. Passes when both typos are fixed, AskUserQuestion was never called, and the final text does not end on a question.",
+  "runtimes": [
+    "claude"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "jj-repo-with-bare-remote",
+  "fixture_args": [
+    "typo-readme"
+  ],
+  "prompt": "README の recieve という typo を直して。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "file_not_matches",
+      "label": "no recieve left",
+      "path": "README.md",
+      "regex": "recieve"
+    },
+    {
+      "type": "file_matches",
+      "label": "receive present",
+      "path": "README.md",
+      "regex": "receive"
+    },
+    {
+      "type": "tool_not_called",
+      "label": "no AskUserQuestion",
+      "tool": "AskUserQuestion",
+      "input_regex": null
+    },
+    {
+      "type": "output_not_matches",
+      "label": "final text does not end on a question",
+      "regex": "[?？]\\s*\\Z"
+    }
+  ]
+}

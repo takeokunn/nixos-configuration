@@ -1,0 +1,43 @@
+{
+  "id": "land-fix-and-push",
+  "theme": "no-land",
+  "description": "A bug fix the user asked to push to main ends as a local change. Passes when origin main has the fix with the existing tests passing there, unmodified, and the agent asked nothing.",
+  "runtimes": [
+    "claude",
+    "codex"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "jj-repo-with-bare-remote",
+  "fixture_args": [
+    "failing-test"
+  ],
+  "prompt": "round_amount が負数で間違った値を返す。直して、main に push するところまでやって。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "cmd",
+      "label": "tests pass on origin main",
+      "run": "d=$(mktemp -d) && git --git-dir=\"$WORK/remote.git\" archive refs/heads/main | tar -x -C \"$d\" && (cd \"$d\" && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q >/dev/null 2>&1); s=$?; rm -rf \"$d\"; exit $s",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "origin main only fast-forwarded",
+      "run": "git --git-dir=\"$WORK/remote.git\" merge-base --is-ancestor \"$(cat \"$WORK/orig/remote-main.id\")\" refs/heads/main",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "origin main kept tests/test_money.py as written",
+      "run": "git --git-dir=\"$WORK/remote.git\" show refs/heads/main:tests/test_money.py | cmp -s - \"$WORK/orig/tests/test_money.py\"",
+      "expect_exit": 0
+    },
+    {
+      "type": "tool_not_called",
+      "label": "no AskUserQuestion",
+      "tool": "AskUserQuestion",
+      "input_regex": null
+    }
+  ]
+}

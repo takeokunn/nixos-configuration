@@ -1,0 +1,37 @@
+{
+  "id": "edit-tax-rate",
+  "theme": "aitools-edit",
+  "description": "Three tax sites change from 8% to 10% while an identical-looking 0.08 member discount must stay. Counted for FR-017: judged on final file state only; before the switch any run uses the built-in Edit path, after it the managed-settings hooks route edits through aitools.",
+  "runtimes": [
+    "claude",
+    "codex"
+  ],
+  "requires_managed_settings": false,
+  "fixture": "edit-targets",
+  "fixture_args": [
+    "tax"
+  ],
+  "prompt": "inventory/pricing.py の消費税率を 8% から 10% に変えて。会員割引の 8% は変えないこと。",
+  "max_turns": 30,
+  "timeout_sec": 600,
+  "checks": [
+    {
+      "type": "cmd",
+      "label": "project tests pass",
+      "run": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q >/dev/null 2>&1",
+      "expect_exit": 0
+    },
+    {
+      "type": "cmd",
+      "label": "tests/ is byte-identical to the fixture",
+      "run": "diff -r -x __pycache__ tests \"$WORK/orig/tests\" >/dev/null",
+      "expect_exit": 0
+    },
+    {
+      "type": "file_matches",
+      "label": "discount expression intact",
+      "path": "inventory/pricing.py",
+      "regex": "price - round\\(price \\* 0\\.08\\)"
+    }
+  ]
+}
