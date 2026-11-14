@@ -58,7 +58,8 @@ input_error() {
 }
 
 if command -v jq &>/dev/null; then
-  tool_name=$(printf '%s' "$input" | jq -er 'if type == "object" and (.tool_name | type) == "string" and .tool_name != "" then .tool_name else error("invalid event") end' 2>/dev/null) || input_error
+  # jq accepts streams by default; one hook invocation must contain exactly one event.
+  tool_name=$(printf '%s' "$input" | jq -ers 'if length == 1 and (.[0] | type) == "object" then .[0] else error("expected one event") end | if (.tool_name | type) == "string" and .tool_name != "" then .tool_name else error("invalid event") end' 2>/dev/null) || input_error
   if [[ $tool_name != Bash ]]; then exit 0; fi
   command=$(printf '%s' "$input" | jq -er 'if (.tool_input | type) == "object" and (.tool_input.command | type) == "string" then .tool_input.command else error("invalid Bash input") end' 2>/dev/null) || input_error
 elif command -v python3 &>/dev/null; then

@@ -672,6 +672,43 @@ for runtime in claude codex; do
   done
 done
 bash_bin=$(command -v bash)
+# Test each real parser in isolation: a second JSON value must not turn tool_name into
+# a multi-line non-Bash name and bypass classification.
+for parser in jq python3; do
+  parser_path="$push_fixture/parser-$parser"
+  mkdir "$parser_path"
+  for dependency in cat perl "$parser"; do
+    ln -s "$(command -v "$dependency")" "$parser_path/$dependency"
+  done
+  for runtime in claude codex; do
+    for bad_input in '' 'null' '[]' '{} {}' \
+      '{"tool_name":"Bash","tool_input":{"command":"git status"}} {"tool_name":"Bash","tool_input":{"command":"git push"}}' \
+      '{"tool_name":"Bash","tool_input":{"command":"git push"}} {"tool_name":"Read"}' \
+      '{"tool_name":"Read"} {"tool_name":"Bash","tool_input":{"command":"git push"}}' \
+      '{"tool_name":"Bash","tool_input":{"command":"git status"}} null' \
+      'null {"tool_name":"Bash","tool_input":{"command":"git status"}}' \
+      '{"tool_name":"Bash","tool_input":{"command":"git status"}} trailing'; do
+      checked=$((checked + 1))
+      status=0
+      out=$(printf '%s' "$bad_input" | PATH="$parser_path" "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+      [[ $status -eq 2 && -z $out ]] || fail "$parser/$runtime invalid stream: expected exit 2 and no stdout, got $status"
+      grep -Fq 'Hook input blocked (ORCH-P005)' "$stderr_file" || fail "$parser/$runtime invalid stream: missing input refusal"
+    done
+    for good_input in '{"tool_name":"Bash","tool_input":{"command":"git status"}}' \
+      '{"tool_name":"Bash","tool_input":{"command":""}}' '{"tool_name":"Read"}'; do
+      checked=$((checked + 1))
+      status=0
+      out=$(printf '%s' "$good_input" | PATH="$parser_path" "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+      [[ $status -eq 0 && -z $out && ! -s $stderr_file ]] || fail "$parser/$runtime single event: expected silent allow, got $status"
+    done
+    checked=$((checked + 1))
+    status=0
+    out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git push"}}' |
+      PATH="$parser_path" "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+    [[ $status -eq 2 && -z $out ]] || fail "$parser/$runtime single destructive event: expected exit 2, got $status"
+    grep -Fq 'ORCH-P005' "$stderr_file" || fail "$parser/$runtime single destructive event: missing refusal"
+  done
+done
 mkdir "$push_fixture/no-parsers"
 ln -s "$(command -v cat)" "$push_fixture/no-parsers/cat"
 for runtime in claude codex; do
