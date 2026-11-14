@@ -27,6 +27,7 @@ let
     inherit pkgs username;
     guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
+  codexSettings = import ./config/codex-settings.nix { inherit pkgs inputs; };
   fonts = import ./config/fonts.nix { inherit pkgs; };
   homebrew = import ./config/homebrew.nix;
   networking = import ./config/networking.nix;
@@ -40,6 +41,7 @@ in
 {
   imports = [
     claudeCodeSettings
+    codexSettings
     fonts
     homebrew
     networking

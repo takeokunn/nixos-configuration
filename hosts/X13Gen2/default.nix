@@ -26,7 +26,6 @@ nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager
 
     ../../nixos
-    ../../nixos/config/codex-settings.nix
     ./hardware-configuration.nix
     ./disko-config.nix
     ./impermanence.nix

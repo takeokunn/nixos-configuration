@@ -38,6 +38,7 @@ let
     inherit pkgs username;
     guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
+  codexSettings = import ./config/codex-settings.nix { inherit pkgs inputs; };
 
   power = import ./config/services/power.nix;
   misc = import ./config/services/misc.nix;
@@ -70,6 +71,7 @@ in
     users
     fonts
     claudeCodeSettings
+    codexSettings
     power
     misc
     swayosd
