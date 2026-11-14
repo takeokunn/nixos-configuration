@@ -1,6 +1,6 @@
 ---
 name: requirements-definition
-description: Use for requirement analysis, specification, and clarification, and when running the define command (/define in Claude Code). Covers its phase sequence (prepare through document), the investigation gate, read-only agent dispatch, question prioritization, and requirement formatting.
+description: Use for requirement analysis, specification, and clarification, and when running the define command (/define in Claude Code).
 metadata:
   version: "4.2.0"
 ---

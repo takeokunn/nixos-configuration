@@ -1,6 +1,6 @@
 ---
 name: jujutsu
-description: "Use when planning or running version-control operations: jj for every write and history edit, git for reads only. Covers non-interactive use, side-effect-free reads (templates, filesets, past operations), precise history edits (split, squash, absorb, rebase, inserting without moving @), recovering earlier versions without undo, conflicts recorded in commits, revset checks, the operation log, shared working copies, stale workspaces, git-dependent gates that pass vacuously in a no-colocate workspace, commit identity and signing keys, bisect, bookmarks and stacks, and pre-push checks."
+description: "Use when planning or running version-control operations: jj for every write and history edit, git for reads only. Includes history edits and recovery, conflicts, workspaces, identity and signing, bookmarks, and pre-push checks."
 metadata:
   version: "1.4.0"
 ---

@@ -1,6 +1,6 @@
 ---
 name: execution-workflow
-description: Load when isolating work in a jj workspace, dispatching several agents, reconciling conflicting agent reports, triaging a CI failure, or judging whether non-trivial work is done. Covers orchestration phases, delegation partitioning and retries, verification gates, choosing the proof for a change, and code review standards. Not for authoring agents or commands, see workflow-patterns for that.
+description: Use when dispatching agents or isolating work in a jj workspace, reconciling conflicting agent reports, triaging a CI failure, or judging whether non-trivial work is done. Not for authoring agents or commands (workflow-patterns).
 metadata:
   version: "4.5.0"
 ---

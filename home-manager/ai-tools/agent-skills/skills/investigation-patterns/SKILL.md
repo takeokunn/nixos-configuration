@@ -1,6 +1,6 @@
 ---
 name: investigation-patterns
-description: Use when tracing a symptom to its cause (debugging, bisecting, or working out how an unfamiliar implementation behaves). Covers evidence-based analysis, naming the suspected layer before adding a debug signal, bisecting a symptom whose boundary moves between runs, a probe that measures its own gate rather than the phenomenon, tracing registration (wiring, configuration, dispatch tables) before concluding something is absent or unused, and checking a completion claim against the artifact instead of the summary.
+description: Use when tracing a symptom to its cause: debugging, bisecting, working out how an unfamiliar implementation behaves, deciding whether something is absent or unused, or checking a completion claim against the artifact.
 metadata:
   version: "3.2.0"
 ---

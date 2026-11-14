@@ -1,6 +1,6 @@
 ---
 name: fact-check
-description: Use for claim verification, source checks, and validation of external references (library APIs, specifications, cited URLs) against official documentation through Context7 or web search. Use when a remembered API contract or a claim's own URL or command would otherwise stand in for evidence.
+description: Use when verifying a claim or an external reference (library API, specification, cited URL) against official documentation.
 metadata:
   version: "3.0.0"
 ---

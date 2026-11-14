@@ -1,6 +1,6 @@
 ---
 name: workflow-patterns
-description: Use when authoring an agent, a command, or a skill description (output, checkpoints, decision criteria, escalations, skill loading, self-evaluation), when escalating a consequential finding into an independent refutation pass, or when two instructions appear to contradict and must be reconciled.
+description: Use when authoring an agent, a command, or a skill description, escalating a consequential finding into an independent refutation pass, or reconciling two instructions that appear to contradict.
 metadata:
   version: "5.3.0"
 ---

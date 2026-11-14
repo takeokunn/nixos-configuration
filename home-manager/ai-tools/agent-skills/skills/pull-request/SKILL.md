@@ -1,6 +1,6 @@
 ---
 name: pull-request
-description: "Write or revise a pull request: commit shaping, title, body, and screenshots. Use when creating or editing a PR; commit message conventions may be taken from here without loading the whole skill."
+description: Use when creating or editing a pull request: commit shaping, title, body, and screenshots.
 metadata:
   version: "1.2.0"
 ---
