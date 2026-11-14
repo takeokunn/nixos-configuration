@@ -56,8 +56,9 @@ agree; when only one order could run, the result stays unmeasured.
 
 ## Output
 
-A command or agent writes "Use output_contract" and does not restate the fields: CLAUDE.md is in context on
-every request, so the reference resolves.
+An agent, or a command step that writes a report to a file, says "Use output_contract" and does not restate
+the fields: CLAUDE.md is in context on every request, so the reference resolves. A command's reply to the user
+follows the output style as prose, so the command names the output style, not output_contract.
 
 This is the one exception to the rule that a pointer delivers nothing. That rule holds for *skill* references,
 because a skill body is absent until it is loaded through the runtime's skill mechanism or read in full:

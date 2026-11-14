@@ -137,12 +137,12 @@ Each pattern below has occurred despite a prompt that seemed to forbid it.
   `restore`, `stash`, or `reset` to undo the agent's own side effect, and a commit at a natural checkpoint. A
   prohibition written as a filesystem scope does not cover network or account effects (`gh repo create`,
   non-GET `gh api`). Name each class in the prompt, and say that a command with side effects is not a way to
-  check how that command behaves. When a test task needs a mutation probe, state how to revert it (reverse the
-  Edit from a Read taken before the mutation), or run the probe yourself after the wave.
+  check how that command behaves. When a test task needs a mutation probe, state how to revert it (restore the
+  file contents read before the mutation), or run the probe yourself after the wave.
 - **A correct artifact can contradict a decision the prompt never mentioned**, such as recreating a directory
   the project deleted on purpose. Name the allowed files, and check the history of a target path for a
   deliberate deletion before granting a directory.
-- **Audit a read-only wave by mtimes and shell commands, not by Edit and Write counts.** A restored file has
+- **Audit a read-only wave by mtimes and shell commands, not by counts of file-editing tool calls.** A restored file has
   identical content and a newer mtime, which an mtime-based build freshness check then rejects. Re-diff every
   file a write-capable agent touched against a copy you read before dispatch.
 - **An agent can delegate instead of working.** A brief that opens with the wider reorganization, or a
@@ -195,8 +195,8 @@ Unmet: do not delegate. Obtain the missing item, then re-run the gate.
 - Every subtask maps to a dispatched agent, or to an explicit decision to do it here with the reason.
 - No two agents in the same message write to the same file, and no atomic multi-file change is split across
   agents. If either could happen, the tasks are not independent: serialize them or give each its own worktree.
-- Each prompt carries CLAUDE.md `delegation`'s items, absolute paths, and a scratch path inside the agent's own
-  worktree.
+- Each prompt carries CLAUDE.md `delegation`'s items, absolute paths, and a unique scratch path: inside its
+  assigned worktree for a writer, outside the project for a research or review agent (CLAUDE.md `delegation`).
 - For a worktree-isolated agent, that you will re-check its findings against your branch when its base ref
   differs from yours.
 - No timing measurement is requested from an agent running concurrently with others; parallel load invalidates it.
