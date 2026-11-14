@@ -847,7 +847,10 @@ print encode_json(\@push_argv), "\n" if $CLAUDE_MODE and $verdict eq 'jj-push';
 exit 0;
 PERL
 
-verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"
+if ! verdict="$( { HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog"; } 2>/dev/null)"; then
+  printf '%s\n' 'Command classification failed (ORCH-P005).' >&2
+  exit 2
+fi
 push_argv=${verdict#*$'\n'}
 verdict=${verdict%%$'\n'*}
 
@@ -1109,19 +1112,20 @@ def scan_push():
                 if len(ids) > 1 or len(remote_refs.get(name, [])) > 1:
                     block("a selected reference is conflicted.")
                 targets.update(ids)
-        if targets & working_copy:
-            block("the push would snapshot a working-copy target. Run jj commit <paths> -m <message>, then push @-.")
         if targets:
             target_expr = "(" + "|".join(sorted(targets)) + ")"
             resolve(target_expr, required=True)
             known_expr = "(" + "|".join(sorted(known)) + ")" if known else "root()"
-            commits.update(resolve(known_expr + ".." + target_expr))
+            remote_commits = resolve(known_expr + ".." + target_expr)
+            if remote_commits & working_copy:
+                block("the push would snapshot a working-copy target. Run jj commit <paths> -m <message>, then push @-.")
+            commits.update(remote_commits)
 
     def locations(diff):
         mapping = {}
         old_file = new_file = None
         old_line = new_line = None
-        for number, line in enumerate(diff.splitlines(), 1):
+        for number, line in enumerate(diff.split("\n"), 1):
             if line.startswith("diff --git "):
                 old_file = new_file = old_line = new_line = None
             elif old_line is None and line.startswith(("--- ", "+++ ")):
@@ -1166,7 +1170,7 @@ def scan_push():
             # Only additions introduce content. Keep blank metadata/deletion lines so report
             # offsets stay valid; binary diffs contain no additions, as in gitleaks git mode.
             content = "\n".join(line[1:] if number in mapping and line.startswith("+") else ""
-                                for number, line in enumerate(diff.splitlines(), 1)) + "\n"
+                                for number, line in enumerate(diff.split("\n"), 1)) + "\n"
             if os.path.exists(report):
                 os.unlink(report)
             result = run(leak_args, scratch, data=content.encode("utf-8", errors="surrogateescape"), env=scan_env)

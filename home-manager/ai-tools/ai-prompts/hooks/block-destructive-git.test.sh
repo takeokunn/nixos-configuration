@@ -774,6 +774,28 @@ for runtime in claude codex; do
   [[ $status -eq 2 && -z $out && -s $stderr_file ]] || fail "$runtime missing parsers: expected refusal, got $status"
 done
 
+# Classifier startup failures must use the hook's refusal protocol too.
+mkdir "$push_fixture/no-perl"
+ln -s "$(command -v cat)" "$push_fixture/no-perl/cat"
+ln -s "$(command -v jq)" "$push_fixture/no-perl/jq"
+for runtime in claude codex; do
+  checked=$((checked + 1))
+  status=0
+  out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git push"}}' |
+    PATH="$push_fixture/no-perl" "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+  [[ $status -eq 2 && -z $out ]] || fail "$runtime missing perl: expected exit 2 with no stdout, got $status"
+  grep -Fq 'Command classification failed (ORCH-P005).' "$stderr_file" ||
+    fail "$runtime missing perl: missing classifier refusal reason"
+
+  checked=$((checked + 1))
+  status=0
+  out=$(jq -nc '{tool_name:"Bash",tool_input:{command:("echo " + ("x" * 1100000))}}' |
+    "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+  [[ $status -eq 2 && -z $out ]] || fail "$runtime oversized classifier argv: expected exit 2 with no stdout, got $status"
+  grep -Fq 'Command classification failed (ORCH-P005).' "$stderr_file" ||
+    fail "$runtime oversized classifier argv: missing classifier refusal reason"
+done
+
 # Other tools stand aside.
 checked=$((checked + 1))
 status=0
@@ -811,6 +833,14 @@ expect_claude_block 'jj git push -r @'
 expect_claude_allow 'jj --ignore-working-copy git push -c @'
 expect_claude_allow 'jj git push --ignore-working-copy -b working'
 fixture_jj bookmark delete working
+
+# A descendant is rewritten too when a later push snapshots its working-copy ancestor.
+fixture_jj new --no-edit @ -m 'Working-copy child'
+fixture_jj bookmark create working-child -r '@+'
+expect_claude_block 'jj git push -b working-child'
+grep -Fq 'jj commit <paths>' "$stderr_file" || fail 'working-copy child refusal omitted commit guidance'
+expect_claude_allow 'jj --ignore-working-copy git push -b working-child'
+fixture_jj bookmark delete working-child
 
 # Deleted and absent tracked references are empty targets, not conflicts.
 fixture_jj bookmark create gone -r main@origin
@@ -989,6 +1019,23 @@ fixture_jj commit latin.txt -m 'Latin-1 synthetic positive'
 fixture_jj bookmark create latin-secret -r @-
 latin_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy -r latin-secret --no-graph -T commit_id)
 expect_secret_block 'jj git push -b latin-secret' "$latin_commit" latin.txt 2
+
+# Diff lines are LF-delimited: these characters remain inside one source line.
+separator_case=0
+for separator in $'\r' $'\f' $'\342\200\250'; do
+  separator_case=$((separator_case + 1))
+  fixture_jj new x -m 'Inline separator fixture'
+  printf 'left%sright\n' "$separator" >"$push_fixture/sender/separator.txt"
+  fixture_jj commit separator.txt -m 'Clean inline separator'
+  fixture_jj bookmark create "separator-clean-$separator_case" -r @-
+  expect_claude_allow "jj git push -b separator-clean-$separator_case"
+  printf 'left%sfixture_value=%s\n' "$separator" "$synthetic_pat" >"$push_fixture/sender/separator.txt"
+  fixture_jj commit separator.txt -m 'Synthetic secret after inline separator'
+  fixture_jj bookmark create "separator-secret-$separator_case" -r @-
+  separator_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy \
+    -r "separator-secret-$separator_case" --no-graph -T commit_id)
+  expect_secret_block "jj git push -b separator-secret-$separator_case" "$separator_commit" separator.txt 1
+done
 
 # Build an already-published synthetic baseline directly in an independent local receiver.
 # No secret is pushed: a local clone reads it, then only hook calls inspect removals.
