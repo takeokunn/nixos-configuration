@@ -117,8 +117,9 @@ covers where memory lives, which store a new memory goes to, and how a memory st
 
 ### Where memory lives
 
-Memory is in Serena only; Claude Code's auto-memory is disabled, so no `MEMORY.md` index is loaded and none
-should be written. There are two stores:
+Serena is the memory store; write new memories only there. Claude Code's auto-memory is being retired and
+stays enabled until Serena is confirmed to read and write, so a `MEMORY.md` index may still be loaded in the
+meantime. Treat it as read-only input, and do not add entries to it. There are two Serena stores:
 
 | Store | Memory name | Directory |
 |---|---|---|
@@ -152,28 +153,6 @@ Search both stores before writing (see "Finding the duplicate before writing"). 
 existing memory covers the topic, even partly, and `write_memory` only for a genuinely new one. When two
 memories say the same thing, merge them into one and keep the detail that appears in only one copy. When
 several small memories cover related topics, merge them into one.
-
-### What does not earn a memory
-
-Beyond `memory_policy`'s exclusions, do not write:
-
-- Session diffs, progress logs, review chronology, verdicts, or scores. A deferred-finding ledger may keep
-  an identifier, location, severity, and deferral reason, not a transcript.
-- Anything readable from the code or the VCS history, or from a single quick read. A memory earns its place
-  by preventing an expensive rediscovery, not by recording something true.
-- Superseded content: deleted tools, finished one-off tasks, fixed bugs with no recurring lesson. Correct or
-  archive an existing memory that has become this (see "Staleness, checked lazily").
-- Anything volatile enough to be wrong within weeks: line numbers, file counts, current status, an in-flight
-  branch's state. **Volatility is the load-bearing exclusion**, because it rejects at write time the entries
-  the staleness check would otherwise have to catch later.
-- A note that names one file and would not change what you do in a different file. That is a commit message.
-- A memory that contradicts the current CLAUDE.md. Follow the rule; a memory does not override it.
-
-What does earn one is a concrete lesson or decision an agent cannot infer and that still holds: a trap, a
-non-obvious constraint, a user decision with its reason and the rejected options, a pointer to an external
-resource. Write dense agent notes: invariants and terse bullets, rationale and worked examples only where
-they prevent a likely mistake. **A maintained corpus looks like a handful of short files; an accumulated one
-looks like dozens of long ones.**
 
 ### A rule is a prompt candidate, not a memory
 
