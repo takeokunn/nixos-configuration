@@ -9,7 +9,10 @@ let
   languageLsp = import ./language/lsp.nix;
   languageTreesitter = import ./language/treesitter.nix { inherit pkgs; };
   languageMarkdown = import ./language/markdown.nix { inherit pkgs customPackages; };
-  languageRust = import ./language/rust.nix { inherit pkgs; };
+  languageRust = import ./language/rust.nix {
+    inherit pkgs;
+    lib = pkgs.lib;
+  };
   languageWeb = import ./language/web.nix;
   languageJapanese = import ./language/japanese.nix { inherit pkgs customPackages; };
 
