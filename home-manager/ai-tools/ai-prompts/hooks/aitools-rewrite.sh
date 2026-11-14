@@ -11,8 +11,6 @@
 #                     the whole command, untouched segments included. So output is emitted only when
 #                     every segment was rewritten into a reading aitools command or is a plain
 #                     `cd DIR`; any other segment (`cat f; rm -rf x`) makes the hook print nothing.
-#   plain             stdin is the raw command; stdout is the rewrite, or empty for no rewrite. Used
-#                     by the opencode plugin.
 #
 # The command is a list of simple commands joined by `;` or `&&`, each optionally wrapped in the
 # envelopes agents add most: a trailing `2>&1` or `2>/dev/null`, and a trailing `| head -N` or
@@ -75,11 +73,7 @@ input=$(cat)
 # an optional `cd DIR &&`) or right after a `;` or `&`. A miss only skips the rewrite.
 cmd_words='(cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff)'
 cd_env='(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+[[:space:]]*(&|\\u0026)(&|\\u0026)[[:space:]]*)?'
-if [[ $mode == plain ]]; then
-  prefilter="^[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\$)"
-else
-  prefilter="\"command\"[[:space:]]*:[[:space:]]*\"[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
-fi
+prefilter="\"command\"[[:space:]]*:[[:space:]]*\"[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
 # Later segments of a `;` or `&&` list are rewritten too, so a rewritable word right after a separator
 # also passes.
 after_sep="(;|&|u0026)[[:space:]]*${cmd_words}([[:space:]]|\\\\|\")"
@@ -100,19 +94,15 @@ use Cwd qw(getcwd abs_path);
 my ($mode, $input) = @ARGV;
 
 my ($command, $tool_input, $cwd);
-if ($mode eq 'plain') {
-  $command = $input;
-} else {
-  my $payload = eval { JSON::PP->new->decode($input) };
-  exit 0 unless ref $payload eq 'HASH';
-  exit 0 unless ($payload->{tool_name} // '') eq 'Bash';
-  my $event = $payload->{hook_event_name} // '';
-  exit 0 if $event ne '' && $event ne 'PreToolUse';
-  $tool_input = $payload->{tool_input};
-  exit 0 unless ref $tool_input eq 'HASH';
-  $command = $tool_input->{command};
-  $cwd = $payload->{cwd} if defined $payload->{cwd} && !ref $payload->{cwd};
-}
+my $payload = eval { JSON::PP->new->decode($input) };
+exit 0 unless ref $payload eq 'HASH';
+exit 0 unless ($payload->{tool_name} // '') eq 'Bash';
+my $event = $payload->{hook_event_name} // '';
+exit 0 if $event ne '' && $event ne 'PreToolUse';
+$tool_input = $payload->{tool_input};
+exit 0 unless ref $tool_input eq 'HASH';
+$command = $tool_input->{command};
+$cwd = $payload->{cwd} if defined $payload->{cwd} && !ref $payload->{cwd};
 exit 0 unless defined $command && !ref $command;
 $cwd //= getcwd();
 
@@ -146,10 +136,6 @@ exit 0 unless $changed;
 # Codex's "allow" approves the whole command, so every segment must be known-safe.
 exit 0 if $mode eq 'codex' && !$all_handled;
 
-if ($mode eq 'plain') {
-  print $new;
-  exit 0;
-}
 my %updated = (%$tool_input, command => $new);
 my %out = (hookEventName => 'PreToolUse', updatedInput => \%updated);
 $out{permissionDecision} = 'allow' if $mode eq 'codex';
