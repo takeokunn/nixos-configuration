@@ -1,3 +1,114 @@
+# Copy local Claude MCP servers from a repository to one of its new worktrees.
+function __fzf_ghq_copy_local_mcp_servers
+    set -l repo_path $argv[1]
+    set -l target_path $argv[2]
+
+    if not type -P realpath >/dev/null 2>&1
+        echo "fzf_ghq: worktree created at '$target_path', but realpath is not in PATH; local MCP copy incomplete" >&2
+        return 1
+    end
+
+    set -l source_key (realpath "$repo_path" 2>/dev/null)
+    or begin
+        echo "fzf_ghq: worktree created at '$target_path', but the source path could not be resolved; local MCP copy incomplete" >&2
+        return 1
+    end
+
+    set -l target_key (realpath "$target_path" 2>/dev/null)
+    or begin
+        echo "fzf_ghq: worktree created at '$target_path', but the destination path could not be resolved; local MCP copy incomplete" >&2
+        return 1
+    end
+
+    set -l claude_settings "$HOME/.claude.json"
+    test -f "$claude_settings"; or return 0
+
+    if not type -P jq >/dev/null 2>&1
+        echo "fzf_ghq: worktree created at '$target_path', but jq is not in PATH; local MCP copy incomplete" >&2
+        return 1
+    end
+
+    set -l mcp_servers_json (jq -c --arg source_key "$source_key" '
+        if type != "object"
+        then error("settings root is not an object")
+        else .
+        end
+        | (if has("projects") then .projects else {} end) as $projects
+        | if ($projects | type) != "object"
+          then error("projects is not an object")
+          else .
+          end
+        | (if ($projects | has($source_key)) then $projects[$source_key] else {} end) as $source_project
+        | if ($source_project | type) != "object"
+          then error("source project is not an object")
+          else .
+          end
+        | if ($source_project | has("mcpServers")) then $source_project.mcpServers else {} end
+        | if type != "object"
+          then error("mcpServers is not an object")
+          else .
+          end
+        | if all(.[]; type == "object")
+          then .
+          else error("server configuration is not an object")
+          end
+        | if all(keys[]; (length > 0) and (startswith("-") | not) and (test("[[:cntrl:]]") | not))
+          then .
+          else error("unsafe server name")
+          end
+    ' "$claude_settings" 2>/dev/null)
+    or begin
+        echo "fzf_ghq: worktree created at '$target_path', but ~/.claude.json could not be read for local MCP settings" >&2
+        return 1
+    end
+
+    if test "$mcp_servers_json" = "{}"
+        return 0
+    end
+
+    if not type -P claude >/dev/null 2>&1
+        echo "fzf_ghq: worktree created at '$target_path', but claude is not in PATH; local MCP copy incomplete" >&2
+        return 1
+    end
+
+    set -l server_names (printf '%s\n' "$mcp_servers_json" | jq -r 'keys[]' 2>/dev/null)
+    set -l server_names_status $status
+    if test $server_names_status -ne 0
+        echo "fzf_ghq: worktree created at '$target_path', but local MCP names could not be read" >&2
+        return 1
+    end
+
+    pushd "$target_key" >/dev/null 2>&1
+    or begin
+        echo "fzf_ghq: worktree created at '$target_path', but its directory could not be entered for local MCP registration" >&2
+        return 1
+    end
+
+    for name in $server_names
+        set -l server_json (printf '%s\n' "$mcp_servers_json" | jq -c --arg name "$name" '.[$name]' 2>/dev/null)
+        set -l server_json_status $status
+        if test $server_json_status -ne 0
+            popd >/dev/null 2>&1
+            echo "fzf_ghq: worktree created at '$target_path', but local MCP configuration could not be read" >&2
+            return 1
+        end
+
+        command claude mcp add-json --scope local "$name" "$server_json" >/dev/null 2>&1
+        set -l claude_status $status
+        if test $claude_status -ne 0
+            popd >/dev/null 2>&1
+            echo "fzf_ghq: local MCP registration failed for '$name' in the created worktree (exit $claude_status); earlier registrations may remain" >&2
+            return 1
+        end
+    end
+
+    popd >/dev/null 2>&1
+    or begin
+        echo "fzf_ghq: local MCPs were registered, but the directory stack could not be restored" >&2
+        return 1
+    end
+end
+
 # Private helper: create a new jj workspace under a bare repo's .worktrees/.
 # Not named ghq_* to stay out of the ghq_* function glob.
 #
@@ -162,6 +273,8 @@ function __fzf_ghq_new_worktree
             end
         end
     end
+
+    __fzf_ghq_copy_local_mcp_servers "$repo_path" "$target_path"; or return 1
 
     echo "fzf_ghq: created worktree $target_path" >&2
     echo $target_path
