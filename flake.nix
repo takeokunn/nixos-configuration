@@ -657,7 +657,7 @@
                   {
                     codex-hooks =
                       let
-                        isDarwin = pkgs.stdenv.isDarwin;
+                        isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
                         hostConfig =
                           if isDarwin then
                             self.darwinConfigurations.M4-Max.config
