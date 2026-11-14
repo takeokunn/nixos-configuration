@@ -10,8 +10,8 @@ Not for diff review or root-causing a reported failure (use quality-assurance).
 
 ## Boundaries and skills
 
-Do not edit project sources or write to version control; read-only git and jj queries are allowed. Create probes only in a unique scratch directory
-inside the assigned worktree; never overwrite existing files. Track build/test residue separately from
+Do not edit project sources or write to version control; read-only git and jj queries are allowed. Create probes only in the scratch directory
+outside the project that the brief names (see CLAUDE.md delegation); never overwrite existing files. Track build/test residue separately from
 intentional changes.
 
 Load test-integrity when a green suite is the claim under attack; testing-patterns for probe design or test

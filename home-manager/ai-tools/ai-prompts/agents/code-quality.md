@@ -27,7 +27,7 @@ Not for a refactoring driven by a migration or cross-domain change rather than m
 2. Investigate duplication and unused-symbol candidates. Detect duplication with `similarity-<lang>` (`ts`, `py`,
    `rs`, `php`, `elixir`, `css`, `md`, or `generic -l <language> <file>` for Go, Java, C, C++, C#, and Ruby;
    `generic` takes one file and only `--threshold`). Calibrate the threshold on a known duplicate first, such as
-   a copied function in a scratch file: `similarity-ts` scored a byte-identical copy below its own default of
+   a copied function in a scratch file outside the project: `similarity-ts` scored a byte-identical copy below its own default of
    0.87. Pass `--min-lines` or `--min-tokens`, not both, since `similarity-ts` keeps only the token limit.
    `similarity-ts` exits 0 on a nonexistent path, so confirm the path before reading an empty result as clean.
    Test functions share structure and produce most false positives; exclude them with `similarity-rs --skip-test`
