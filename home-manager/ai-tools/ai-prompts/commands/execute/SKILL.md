@@ -1,63 +1,53 @@
 ---
 argument-hint: [task-description]
 description: Implement a task and verify it. Use when the scope is understood.
+disable-model-invocation: true
 ---
 
 Implement the requested task and verify the result.
 
 ## Prepare
 
-Load execution-workflow only when isolating the work in a jj workspace or dispatching several agents. Use
-Serena when available and read memories only when prior knowledge could change the work (for example a
-canonical verification command); if unavailable, use repository evidence.
+Load execution-workflow only when isolating the work in a jj workspace or dispatching several agents. Read
+memories only when prior knowledge could change the work, for example a canonical verification command.
 Run `jj status` before editing only if you need to tell your changes from existing ones at completion.
 
-Name the requested outcome, affected paths, and acceptance checks. For a local, understood change, this is
-enough planning. For work spanning interfaces or uncertain behavior, identify atomic units, dependencies, and
-owners before implementation. State the assumption when interpretations differ; ask only under CLAUDE.md's work_selection rule.
+For work spanning interfaces or uncertain behavior, identify atomic units, dependencies, and owners before
+implementation. For planning depth and when to ask, see CLAUDE.md work_selection.
 
 ## Implement
 
-1. Read the edit targets and nearest relevant pattern.
-   Before adding a family member, trace its sibling through registration/discovery and name required touch
-   points. Before removing or migrating a definition, search the identifier itself, including declarations,
-   comments, and test doubles. Use references to establish caller impact for interface changes.
-2. Implement directly or delegate substantial independent units under the delegation contract. Do not require
-   an agent for each file. Each writer follows output_discipline and returns evidence, not self-approval.
+1. Read the edit targets and the nearest relevant pattern. Before adding a family member, trace its sibling's
+   registration (see the investigation-patterns skill). Before removing or migrating a definition, search the
+   identifier itself, including declarations, comments, and test doubles. Use references to establish caller
+   impact for interface changes.
+2. Implement directly or delegate substantial independent units (see CLAUDE.md delegation). Do not require an
+   agent for each file. Each writer returns evidence, not self-approval.
 3. Add or update tests only when the task asks for tests or the repository has tests for that kind of change.
    A user instruction not to write tests takes precedence over any other guidance. Document changed public
-   behavior. Do not create unrelated tests or docs to fill a role. Never substitute an always-passing test for
-   behavior unavailable here; inspect existing helpers for a usable fixture or adapter first.
+   behavior. Do not create unrelated tests or docs to fill a role.
 
 ## Verify and review
 
-1. Name the applicable test, lint, build, type, or artifact-validation commands from the project. Establish
-   their input scope, configuration, generated outputs, and fixture/service requirements. Ensure new and
-   untracked work is included; keep scratch outputs isolated from other sessions.
-2. Run the checks and inspect assertions as well as exit status. Use diagnostics when available, otherwise
-   repository commands. For unavailable behavior, search relevant scripts/configuration for a fixture,
-   in-memory adapter, or substitute backend; report the search and the remaining gap.
+1. Name the applicable test, lint, build, type, or artifact-validation commands from the project, with their
+   configuration, generated outputs, and fixture or service requirements. Keep scratch outputs isolated from
+   other sessions. Before claiming a check passed, see CLAUDE.md evidence.
+2. Use diagnostics when available, otherwise repository commands. For behavior unavailable here, search
+   existing helpers, scripts, and configuration for a fixture, in-memory adapter, or substitute backend;
+   report the search and the remaining gap.
 3. For failing tests, allow one targeted fix attempt across the task, then rerun. Remaining failures are
-   blockers, not permission to weaken the gate. Preserve fail-closed behavior when following a reference
-   implementation.
-4. Review the settled change for correctness, caller impact, and missing acceptance coverage. Add a review or
-   verification agent only when the user asks, the change involves security or data, or an interface change
-   lacks an existing test for the changed behavior. Use a security agent for security or data changes and a
-   verification agent for an untested interface change; use a design or performance agent when the user
-   requests that role. Do not add an agent for uncertain behavior alone, and do not ask an agent to repeat a
-   check already completed. Independent reviews may run together, read-only. Do not assign multiple reviewers
-   the same check.
-   Give claim-verification agents the claim and supporting commands, not merely a diff. If agents are
-   unavailable, perform the checks here and disclose that they were not independent.
-5. Completion requires passing
-   checks over the requested behavior. Static validation of prose/configuration does not establish runtime
-   behavior, and a missing check remains a reported gap.
+   blockers (see CLAUDE.md hard_rules).
+4. Review the settled change for correctness, caller impact, and missing acceptance coverage. For when to add
+   a review or verification agent, see CLAUDE.md work_selection. Use a security agent for security or data
+   changes, a verification agent for an untested interface change, and a design or performance agent when the
+   user requests that role. Independent reviews may run together, read-only; do not assign multiple reviewers
+   the same check. Give claim-verification agents the claim and supporting commands, not merely a diff. If
+   agents are unavailable, perform the checks here and disclose that they were not independent.
 
 ## Finish
 
-Apply memory_policy only when durable learning or unresolved findings warrant a write. Refresh only memories
-actually checked against the result; do not launch a memory agent or a freshness audit by default.
+For memory writes, see CLAUDE.md memory_policy. Do not launch a memory agent or a freshness audit by default.
 
-Return output_contract with changed paths, verification scope (including new files), review concerns checked,
-and any uncovered acceptance criteria. State the weakest consequential claim and
-what would confirm it when one remains.
+Reply in plain prose in the output style's form: changed paths, verification scope including new files,
+review concerns checked, uncovered acceptance criteria, and the weakest consequential claim with what would
+confirm it when one remains.
