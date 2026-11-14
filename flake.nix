@@ -654,55 +654,74 @@
 
           checks.codex-hooks =
             let
-              codex = self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.codex;
-              # The hook scripts and the MCP server packages are Mac builds, which a Linux runner could
-              # not realise; only their text is inspected here.
+              darwinConfig = self.darwinConfigurations.M4-Max.config;
+              codex = darwinConfig.home-manager.users.take.programs.codex;
+              linuxPolicy = self.nixosConfigurations.X13Gen2.config.environment.etc."codex/requirements.toml";
               plain = builtins.unsafeDiscardStringContext;
+              requirements = import ./shared/codex-managed-settings.nix {
+                inherit pkgs;
+                guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              };
+              requirementsFile = (pkgs.formats.toml { }).generate "codex-requirements-test.toml" requirements;
             in
             pkgs.runCommand "codex-hooks-test"
               {
-                nativeBuildInputs = [ pkgs.jq ];
-                hooksJson = plain (builtins.toJSON codex.hooks);
+                nativeBuildInputs = [ pkgs.jq pkgs.python3 ];
+                inherit requirementsFile;
+                userHooksJson = plain (builtins.toJSON codex.hooks);
+                userRulesJson = plain (builtins.toJSON codex.rules);
                 settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
+                darwinActivation = plain darwinConfig.system.activationScripts.extraActivation.text;
+                linuxPolicyJson = plain (builtins.toJSON {
+                  inherit (linuxPolicy) mode;
+                  source = toString linuxPolicy.source;
+                });
                 settingsJson = builtins.toJSON {
                   inherit (codex.settings) model model_reasoning_effort;
                   hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;
                   hasApprovalPolicy = codex.settings ? approval_policy;
                   hasSandboxMode = codex.settings ? sandbox_mode;
                 };
-                rulesDeny = plain codex.rules.deny;
               }
               ''
-                # Codex merges hook sources, so a hook registered through both programs.codex.hooks and
-                # settings.hooks would run twice.
-                if [ "$settingsHooksJson" != "null" ]; then
-                  echo "programs.codex.settings.hooks is set next to programs.codex.hooks" >&2
-                  exit 1
-                fi
-                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("-block-destructive-git$"))] | length' <<< "$hooksJson")
-                if [ "$n" -ne 1 ]; then
-                  echo "programs.codex.hooks registers block-destructive-git $n times, expected exactly once" >&2
-                  exit 1
-                fi
-                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("-aitools-rewrite-codex$"))] | length' <<< "$hooksJson")
-                if [ "$n" -ne 1 ]; then
-                  echo "programs.codex.hooks registers aitools-rewrite-codex $n times, expected exactly once" >&2
-                  exit 1
-                fi
-                # The bare aitools-rewrite script emits Claude Code's output shape, which Codex rejects.
-                n=$(jq '[.. | objects | select(.command? != null) | .command | select(test("aitools-rewrite"))] | length' <<< "$hooksJson")
-                if [ "$n" -ne 1 ]; then
-                  echo "programs.codex.hooks references aitools-rewrite $n times, expected only the codex wrapper" >&2
-                  exit 1
-                fi
-                if ! jq -e '.PreToolUse | length > 0 and all(.[]; .matcher == "^Bash$")' <<< "$hooksJson" >/dev/null; then
-                  echo "programs.codex.hooks.PreToolUse must be non-empty with every matcher exactly ^Bash$" >&2
-                  exit 1
-                fi
-                if jq -e '.. | objects | select(.command? != null) | .command | select(test("block-bare-cd|prose-skill-gate"))' <<< "$hooksJson" >/dev/null; then
-                  echo "programs.codex.hooks wires a removed hook (block-bare-cd or prose-skill-gate)" >&2
-                  exit 1
-                fi
+                python3 - <<'PY'
+                import json
+                import os
+                from pathlib import Path
+                import re
+                import tomllib
+
+                policy = tomllib.loads(Path(os.environ["requirementsFile"]).read_text())
+                assert policy["features"]["hooks"] is True
+                hooks = policy["hooks"]
+                root = Path(hooks["managed_dir"])
+                assert root.is_absolute() and root.is_dir()
+                entries = hooks["PreToolUse"]
+                assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
+                commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
+                expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
+                assert sorted(commands) == sorted(str(root / name) for name in expected)
+                for command in commands:
+                    path = Path(command)
+                    assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
+                assert "--agent claude-code" in (root / "guard-and-guide").read_text()
+                assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
+                rules = policy["rules"]["prefix_rules"]
+                assert rules and all(rule["decision"] == "forbidden" for rule in rules)
+                patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
+                for command in [["git", "commit"], ["gh", "pr", "merge"], ["gh", "repo", "delete"]]:
+                    assert command in patterns
+                assert ["git", "stash"] not in patterns
+                # Home Manager must not register these again or recreate a rules symlink.
+                assert json.loads(os.environ["userHooksJson"]) == {}
+                assert json.loads(os.environ["settingsHooksJson"]) is None
+                assert json.loads(os.environ["userRulesJson"]) == {}
+                assert re.search(r"install -m 0644 \S+ /etc/codex/requirements\.toml", os.environ["darwinActivation"])
+                linux = json.loads(os.environ["linuxPolicyJson"])
+                assert linux["mode"] == "0644"
+                assert linux["source"].endswith("codex-requirements.toml")
+                print(f"codex managed policy: {len(commands)} hooks, {len(rules)} forbidden prefixes")
+                PY
                 if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
                   echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
                   exit 1
@@ -710,15 +729,6 @@
                 # approval_policy and sandbox_mode are wrapper -c flags so they outrank the mutable config.toml.
                 if ! jq -e '.hasAutoCompactLimit == false and .hasApprovalPolicy == false and .hasSandboxMode == false' <<< "$settingsJson" >/dev/null; then
                   echo "programs.codex.settings carries model_auto_compact_token_limit, approval_policy, or sandbox_mode" >&2
-                  exit 1
-                fi
-                # The bare pattern "git stash" would become this prefix rule and forbid `git stash list`.
-                if grep -F 'prefix_rule(pattern = ["git","stash"],' <<< "$rulesDeny" >/dev/null; then
-                  echo "programs.codex.rules.deny forbids the bare [\"git\",\"stash\"] prefix, which also covers git stash list" >&2
-                  exit 1
-                fi
-                if ! grep -F 'prefix_rule(pattern = ["git","commit"],' <<< "$rulesDeny" >/dev/null; then
-                  echo "programs.codex.rules.deny no longer forbids git commit" >&2
                   exit 1
                 fi
                 touch $out
