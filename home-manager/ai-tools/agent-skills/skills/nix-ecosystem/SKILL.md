@@ -18,30 +18,30 @@ walks `git ls-files` rather than the raw filesystem. A **tracked** file's uncomm
 (Nix prints `warning: Git tree '...' is dirty` to say so) but an **untracked** file does not exist in that tree
 at all, no matter what is on disk. A path-based evaluation that never goes through `getFlake`/`fetchTree`
 (`nix-instantiate --eval`, `import ./x`, `nix build -f default.nix`) reads the raw filesystem instead, so
-untracked files and uncommitted edits are both visible there. Getting this backwards costs real time either
-direction: assuming a flake build sees everything on disk, or assuming it sees only what is committed.
+untracked files and uncommitted edits are both visible there.
 
 The tell for the untracked half: a path referenced from the flake evaluates to `error: opening file '...':
 No such file or directory` against a `/nix/store/...-source/` path, even though `ls` on the working tree shows
-the file present. This applies only to a checkout with a `.git`, where Nix follows the Git
-index. A jj workspace created with `--no-colocate` has no `.git`, so Nix reads it as a plain path and sees every
-file, tracked or not. The index cannot be inspected without git: when a `.git` exists, ask the user whether the
-path is tracked, or report the gap. Observed in a git checkout: a newly created module directory not yet added
-to the index vanished from flake evaluation with a "path does not exist" error: the untracked half of this same rule; see the `readDir`
-case below.
+the file present. This applies only to a checkout with a `.git`, where Nix follows the Git index. A jj
+workspace created with `--no-colocate` has no `.git`, so Nix reads it as a plain path and sees every file. When
+a `.git` exists, check tracking with `git ls-files --error-unmatch <path>`.
 
-### `nix flake check` passes vacuously off-platform
+On a dirty tree, run in this order: confirm every new file is tracked, build the target
+(`nix build --no-link .#darwinConfigurations.<host>.system` or the relevant output), then `nix flake check`.
+Observed in a flake that copies a source subtree into the store by path: `nix flake check` on freshly edited
+content failed with `path '/nix/store/<hash>-<name>' is not valid` until a build had copied that content into
+the store; the same check on the same content then passed. The hash changes with every edit, so each failure
+looks like a new defect in the diff, and `nix eval` of the same attribute succeeds throughout. From a linked
+git worktree, `nix flake check path:.` is no workaround: the copied `.git` pointer does not resolve in the sandbox.
+
+### `nix flake check` passes vacuously
 
 Per-system outputs exist only for the systems a flake enumerates, and `nix flake check` evaluates the outputs
 present for the *evaluating* system. On a platform the flake never listed there may be nothing at all to check,
-and the command exits 0 having verified nothing. An empty check set and a passing one are identical at the exit
-code.
-
-The tell: the check succeeds in seconds on a developer machine, then fails in CI on the platform the flake
-actually targets.
-
-Treat success on a platform absent from the flake's system list as non-evidence. Run natively on a supported
-system, or force full evaluation:
+and the command exits 0 having verified nothing. The tell: the check succeeds in seconds on a developer
+machine, ends with `warning: The check omitted these incompatible systems: ...`, then fails in CI on the
+platform the flake actually targets. Treat that success as non-evidence. Run natively on a supported system,
+or force full evaluation:
 
 ```
 nix flake check --all-systems --no-write-lock-file --print-build-logs --keep-going
@@ -50,7 +50,14 @@ nix flake check --all-systems --no-write-lock-file --print-build-logs --keep-goi
 `--all-systems` evaluates every system's outputs; *building* foreign-platform derivations still needs a builder
 or substituter. Evaluation-only coverage already catches the common case: an output that does not evaluate on
 the target platform. Where a flake exposes Linux outputs only, the authoritative local check on Darwin is the
-language toolchain directly, with the flake gate deferred to Linux CI. Say which of the two ran.
+language toolchain directly, with the flake gate deferred to Linux CI.
+
+The darwin part passes vacuously even on Darwin: `nix flake check` reports `checking flake output
+'darwinConfigurations'` and exits 0 without forcing `system.build.toplevel`, observed while
+`nix build .#darwinConfigurations.<host>.system` failed on the same tree. Gate a nix-darwin change with that
+build, or at least `nix eval .#darwinConfigurations.<host>.system.drvPath`. The check builds only
+`checks.<system>.*`, so a change to files no check reads (Markdown under a formatter that skips it) passes
+unexamined.
 
 ### Consume an overlay, not `packages.${system}`
 
@@ -205,11 +212,12 @@ in
 ```
 
 `readDir` returns name-to-type (`"directory"` | `"regular"` | `"symlink"`); filter by type rather than assuming
-all entries are files. This is exactly the untracked half of the git-tree rule above: "works with `nix build`
+all entries are files. This is the untracked half of "A flake build reads the git tree": "works with `nix build`
 locally but the file is missing after switch" is almost always an un-added path.
 
 Modules pulled in via `imports = [ ./x ]` must take `...` in their signature so the module system can pass extra
-arguments.
+arguments. Avoid `with lib;` at module top level: it hides where functions come from. Narrow scopes like
+`with pkgs; [ ... ]` are fine.
 
 Distribute cross-cutting constants through `specialArgs` (nixosSystem) or `extraSpecialArgs` (standalone
 homeManagerConfiguration) rather than relative imports; for a value only some modules need, `_module.args.foo`
@@ -273,7 +281,7 @@ automatically. The legacy `darwin.apple_sdk_11_0.*` stubs have been removed and 
 | npm lockfile, needs build | `buildNpmPackage` with `npmDepsHash`; `finalAttrs` when src needs the version |
 | pnpm lockfile | `stdenvNoCC.mkDerivation` + `fetchPnpmDeps` (hash + fetcherVersion) + `pnpmConfigHook`: the pnpm major used to fetch deps must match the one used to build |
 | bun lockfile | Two-phase: a fixed-output derivation runs `bun install --frozen-lockfile`, then the main build consumes it |
-| turbo / monorepo orchestrator | See the daemon trap below |
+| turbo / monorepo orchestrator | See Build daemons break sandbox teardown |
 
 Use `nodejs-slim_NN` for the runtime wrapper and full `nodejs_NN` for the build; wrap entrypoints with
 `makeBinaryWrapper`; install app trees under `$out/lib/<pname>/`.
@@ -293,9 +301,8 @@ across invocations must be forced into single-shot, cache-clean mode inside the 
 
 Compute all hashes as SRI (`sha256-...`). Language builders carry a second hash for the dependency set
 (`cargoHash`, `vendorHash`, `npmDepsHash`, `pnpmDeps.hash`) that must be regenerated whenever the lockfile
-changes. Query Context7 or consult official documentation directly; verify builder patterns
-against official documentation or source at the project's locked Nixpkgs revision. Use official retrieval
-when Context7 cannot supply that version. Prefer the language builder to raw `mkDerivation`, and keep `meta` complete
+changes. Verify builder patterns against official documentation or source at the project's locked Nixpkgs
+revision (see the fact-check skill). Prefer the language builder to raw `mkDerivation`, and keep `meta` complete
 (description, homepage, license, maintainers, platforms, `mainProgram` for CLIs).
 
 ## Plaintext secrets and private keys never enter the store
@@ -325,8 +332,8 @@ nix-store -q --requisites <outPath>
 ```
 
 Path names do not prove absence of secret bytes. Trace secret inputs through evaluation and inspect the
-generated configuration and relevant closure contents without printing secret values. Check derivation inputs
-separately when they are published. Record the inspected scope and remaining gaps before a public-cache push;
+generated configuration and relevant closure contents (handling secret values: CLAUDE.md hard_rules).
+Check derivation inputs separately when they are published. Record the inspected scope and remaining gaps before a public-cache push;
 an empty filename search is not a passing secrecy test.
 
 Declarative modules that serialize their whole config into the store (`writeText` of a `toJSON` blob) turn any
@@ -382,8 +389,8 @@ builder. Nested virtualization is hardware and host dependent: Apple's Virtualiz
 on [M3 and later Macs](https://developer.apple.com/documentation/virtualization/vzgenericplatformconfiguration/isnestedvirtualizationsupported).
 Check the runtime capability and whether the CI host exposes it; Apple Silicon alone does not decide it.
 
-Generate the builder SSH keypair at activation time and keep the private key on the host; never commit it, since
-the config repo may be public. Share only the public key into the guest over a read-only mount. Bootstrap may
+Generate the builder SSH keypair at activation time and keep the private key on the host (committing it: see
+CLAUDE.md hard_rules). Share only the public key into the guest over a read-only mount. Bootstrap may
 use a password, but harden to key-only once the builder works.
 
 Inspect the derivation before diagnosing a foreign-platform substitution failure. `preferLocalBuild` chooses
@@ -416,6 +423,12 @@ Raise file-descriptor limits in layers or you hit "Too many open files": a boot-
 / `kern.maxfilesperproc` / `launchctl limit maxfiles`, per-agent `NumberOfFiles` (soft and hard), and (the
 commonly missed one) the GUI session's own `launchctl limit maxfiles`.
 
+A Home Manager `launchd.agents.<name>` job does not inherit `home.sessionVariables` or shell-init variables;
+those reach interactive shells only. An agent needing session state such as `SSH_AUTH_SOCK` must set it in its
+own `config.EnvironmentVariables`, to which several modules can contribute distinct keys. Inspect the merge
+under `darwinConfigurations.<host>.config.home-manager.users.<user>.launchd.agents.<name>`; the top-level
+`config.launchd.agents` is nix-darwin's separate system-level option.
+
 ### PID files and GC roots
 
 A PID file tells you *a* process exists, not that it is *your* process. PIDs are reused, and the state file can
@@ -443,8 +456,7 @@ descriptions close. Never unlink the lock path to bypass a live holder; that can
 deploy-rs `magicRollback` verifies post-activation reachability, but when activation starts many or slow
 services, investigate activation and reachability timings separately. Preserve `magicRollback` and
 `autoRollback`: they cover different failure modes. Do not increase timeouts, shorten service shutdown
-guarantees, or reset systemd-machined state merely to make deployment pass. Establish the failing contract
-and obtain authorization for any configuration change; consult the pinned
+guarantees, or reset systemd-machined state merely to make deployment pass. Consult the pinned
 [deploy-rs options](https://github.com/serokell/deploy-rs#profile).
 
 ## Sandbox discipline
@@ -464,8 +476,7 @@ Rust builder's selected profile rather than assuming debug assertions are enable
   under `nix build` / `nix flake check`, and the failure can present as a bare nonzero exit with the underlying
   signal swallowed, so the symptom itself never names the missing binary. Resolve every tool through `PATH`
   (bare `sleep`, `echo`) or an explicit store path from `buildInputs` (`"${coreutils}/bin/sleep"`), never a
-  conventional absolute path. The same rule holds for any other hermetic runner (Bazel, a minimal container
-  image) wherever the toolset is not the host's.
+  conventional absolute path.
 
 ### The multicall `argv[0]` trap
 
@@ -474,21 +485,11 @@ In a Nix environment a large share of `PATH` entries are symlinks into multicall
 Code that "hardens" a resolved executable path by canonicalizing it (`realpath`, `readlink -f`,
 `Path::canonicalize`) rewrites `argv[0]` to the dispatcher's own name, and the program then runs as the wrong
 tool entirely. The signature is a spawn producing empty stdout, a usage message on stderr, and a nonzero exit:
-a failure that looks like a broken argument list, not a resolution bug.
+a failure that looks like a broken argument list, not a resolution bug. It is plain POSIX behavior that rarely
+shows on distributions shipping separate binaries; Nix makes the multicall layout the norm.
 
 **Existence and executability checks may follow symlinks; the path handed to exec must keep the candidate's own
 basename. Canonicalize for comparison, never for invocation.**
-
-This is near-certain to surface under `nix build` / `nix flake check` and may never surface on a distribution
-shipping separate binaries, a textbook "passes on my machine, fails in the sandbox" case. It is plain POSIX
-behavior; Nix just makes the multicall layout the norm.
-
-## Rules
-
-- Avoid `with lib;` at module top level: it hides where functions come from. Narrow scopes like
-  `with pkgs; [ ... ]` are fine.
-- Document non-obvious overlay and override rationale in a comment: this is one of the cases where a comment
-  carries a WHY the code cannot.
 
 ## Related
 
