@@ -56,14 +56,18 @@ in
   # or home.preferXdgDirectories is set, and the managed hook commands hardcode this path.
   programs.claude-code.configDir = "${config.home.homeDirectory}/.claude";
   programs.claude-code.context = builtins.readFile "${ai-prompts-path}/CLAUDE.md";
-  # `programs.claude-code.settings` is deliberately unset. Setting it makes home-manager place
-  # `~/.claude/settings.json` as a read-only store symlink (`home.file`, mode 444), and Claude Code
-  # expects that file to be writable: it persists a `/model` choice there, and tools that install
-  # hook entries resolve the path and write through it. Both fail silently against a store symlink.
-  # Everything this repository pins now lives in the managed-settings file instead, declared once in
-  # `shared/claude-code-managed-settings.nix` and placed per platform by `nix-darwin/config/` and
-  # `nixos/config/`. The hook scripts below still land in `~/.claude/hooks/`, which is where those
-  # managed settings reference them.
+  # mutableSettings merges the declared keys into a writable `~/.claude/settings.json` on activation
+  # instead of placing a read-only store symlink, so Claude Code can still persist a `/model` choice
+  # and tools can still install hook entries there. Declared keys win on every activation.
+  # `hooks` is deliberately not declared: the merge replaces arrays, which would erase hook entries
+  # other tools installed. Policy (hooks, permissions, env) lives in the managed-settings file,
+  # `shared/claude-code-managed-settings.nix`; the hook scripts below land in `~/.claude/hooks/`,
+  # where those managed settings reference them.
+  programs.claude-code.mutableSettings = true;
+  programs.claude-code.settings = {
+    model = "opus";
+    modelSettings.claude-opus-5-5.effortLevel = "high";
+  };
 
   programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" [
     "code-quality"

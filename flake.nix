@@ -214,9 +214,9 @@
           claudeCodeConfigDir =
             self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.claude-code.configDir;
 
-          # Every key home-manager would still place under the Claude config dir as a read-only
-          # store symlink. `settings.json` must not be among them: Claude Code writes that file
-          # itself, and a store symlink makes the write fail silently.
+          # Every key home-manager would place under the Claude config dir as a read-only store
+          # symlink. `settings.json` must not be among them: Claude Code writes that file itself, so
+          # declared settings reach it only through `mutableSettings`, which merges instead of linking.
           claudeCodeSettingsFileKeys = builtins.filter (n: pkgs.lib.hasSuffix ".claude/settings.json" n) (
             builtins.attrNames self.darwinConfigurations.M4-Max.config.home-manager.users.take.home.file
           );

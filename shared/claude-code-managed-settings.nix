@@ -1,10 +1,9 @@
 # Claude Code's managed-settings policy, shared by the darwin and NixOS system modules.
 #
-# Claude Code expects `~/.claude/settings.json` to be writable: it persists a `/model` choice
-# there, and tools that install hook entries resolve the path and write to it. Placing that file
-# from `home.file` makes it a read-only store symlink, so both writes fail silently. Everything
-# this repository wants to pin therefore lives here instead, in the managed-settings file, which
-# is read at higher precedence than user settings and than the command line.
+# Policy this repository enforces (permissions, hooks, env) lives here, in the managed-settings
+# file, which is read at higher precedence than user settings and than the command line. User
+# preferences the user may override (model, effort) are merged into the writable
+# `~/.claude/settings.json` by home-manager's `programs.claude-code.mutableSettings` instead.
 #
 # This is the one file reaching from a system module into `home-manager/ai-tools`: the guardrail
 # catalog and the hook scripts are authored there, and a second copy here would drift. The
