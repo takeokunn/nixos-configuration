@@ -28,7 +28,7 @@ signal, and assert a count of what executed.
 
 Selectors can match nothing. Some runners or wrapper configurations still exit zero; others reject an empty
 run (pytest normally uses exit code 5). Missing targets and incorrectly forwarded filters can also select the
-wrong set. Verify the selected and executed set, not a green summary or exit status.
+wrong set. What a passing claim must confirm is CLAUDE.md evidence; the runner-specific procedure follows.
 
 A gate must assert a **non-zero collected-and-executed count**, and that every selected test *passed* rather
 than merely did *not fail*: some runners report expected-failure and skipped states in ways that satisfy a
@@ -84,7 +84,15 @@ Assert the exit status of every spawned process and the completion count of ever
 asserting anything about side effects. A non-zero status, a panic count above zero, or a completed count below
 the dispatched count is a test failure in its own right, not context for a later assertion.
 
-For a background task, read the command's own exit status because the notification reports the wrapper's status.
+### The reported status belongs to the last command
+
+A command run in the background, or under any wrapper, reports the exit status of the last command in the line
+it was given, and a completion notice repeats that status. `cmd | tail -40`, `cmd | tee log`, and
+`cmd; echo done` report success when `cmd` failed. Two repairs fail the same way: appending
+`echo EXIT=${pipestatus[1]}` prints the right status and still exits 0 through the `echo`, and
+`cmd > log 2>&1; rc=$?; tail log` captures `rc` correctly and then exits with `tail`'s status. Redirect to a
+log, put the status on its own line (`cmd > log 2>&1; echo EXIT=$?`), and read that line from the output
+rather than the notice, or end the script with `exit "$rc"`.
 
 ### Registration collisions delete tests
 
@@ -113,8 +121,9 @@ returned. The unconditional true assertion is the degenerate case, often a place
 **For every assertion, name a concrete wrong observed value or state that it rejects.** A correct function
 need not have a valid input that fails its tests; the counterexample concerns a contract-breaking result.
 Replace a disjunction with the exact expected outcome: stub the collaborators to force the branch, then assert
-the single value that branch must produce. A passing placeholder suppresses the gap, so it is worse than an
-absent test: leave the case failing or explicitly pending instead.
+the single value that branch must produce. Where the exact outcome is not yet known, leave the case failing or
+explicitly pending, not a passing placeholder (CLAUDE.md output_discipline): a passing placeholder marks the gap
+covered.
 
 A regression test names its wrong result by failing on the pre-fix code for the reason the fix addresses; one
 never seen failing proves the fixture or the double, not the fix.
@@ -177,9 +186,9 @@ every function at that boundary can leave a large body of tests passing against 
 arity.
 
 Prove availability by observing behavior only the real component can produce, never by probing for a name.
-Never wrap the boundary in a catch-all swallowing arity or signature errors: those are defects, not expected
-conditions. Where a double stands in for a component with a known signature, assert the double's signature
-against the real one so drift fails at fixture-construction time.
+Remove any catch-all around the boundary (CLAUDE.md failure_handling): the arity and signature errors it
+swallows are the drift this test exists to catch. Where a double stands in for a component with a known
+signature, assert the double's signature against the real one so drift fails at fixture-construction time.
 
 ### A partial module double erases value exports
 
@@ -250,9 +259,15 @@ ever called under a structural invariant, the fallback is not defensive; it is n
 correctly refusing to ignore.
 
 The discriminator: is the fallback behavior user-visible, or unreachable because an upstream invariant
-guarantees the input? Test the first; delete the second and assert the invariant instead. A fail-closed check
-at a trust boundary is neither: keep it even when an upstream gate covers the same input, and test the
-rejection, because a later caller reaches the helper directly (see trust-boundaries). For an exhaustive set
+guarantees the input? Test the first; delete the second and assert the invariant instead.
+
+A fail-closed check at a trust boundary is not a dead guard, and CLAUDE.md output_discipline keeps it even when
+an upstream gate validates the same input. Tell the two apart by what the branch does and who can reach it. A
+fail-closed check rejects (raises, returns an error, refuses the operation) and guards input that crosses a
+trust boundary, so a caller that skips the upstream gate, such as a later entry point calling the helper
+directly, still reaches it. A dead branch substitutes a value and continues, and every caller reaches it only
+through code that already established the invariant. Test the fail-closed check by driving the rejection; the
+reasons it stays are in [trust-boundaries](../trust-boundaries/SKILL.md). For an exhaustive set
 of cases, prefer enumerating every case with an explicit terminal result over a catch-all arm, which manufactures
 a branch no input can take.
 
@@ -262,13 +277,12 @@ Cleanup code is the usual culprit: it runs on both success and failure paths and
 fail itself.
 
 A cleanup that raises either replaces the real failure or is swallowed by a handler written to keep the suite
-moving. Both lose information. **Swallowing is worse than replacing**: a resource leak (an orphaned process, an
-unreleased lock, a temporary directory outliving the run) then reports as a successful test, and accumulates
-across the suite until something unrelated fails.
+moving. **Swallowing is worse than replacing**: a resource leak (an orphaned process, an unreleased lock, a
+temporary directory outliving the run) then reports as a successful test, and accumulates across the suite
+until something unrelated fails.
 
 When both the body and the cleanup fail, keep the body's condition primary and attach the cleanup's to it as
-structured data under a distinct key. When only the cleanup fails, the test still fails. Never report a
-cleanup-only failure as a pass, and never discard the body's condition to surface the cleanup's.
+structured data under a distinct key. When only the cleanup fails, the test fails (CLAUDE.md failure_handling).
 
 Teardown releasing many resources in one loop aborts at the first failure, leaving the remainder allocated: the
 single reported error understates the leak by an unknown factor, and the next test starts in a state nobody
@@ -294,9 +308,28 @@ Where a structural pass is kept for its speed on every keystroke, pair it with a
 toolchain over the same tree; a lint-clean file that has never been compiled is unverified however many times
 the linter has passed.
 
+Tests of an analysis have the same shape when they parse with a different entry point than the production path.
+A legacy parse can keep a reader construct (`#+feature`, `#1=`, `#.`) as a dispatch followed by a sibling form,
+while the dialect-aware parse the command actually calls folds the construct and its datum into one opaque
+atom. An analysis written and tested against the legacy shape then finds nothing on the real path while every
+test stays green. Build test input through the same parse call the production caller uses.
+
+## One platform's green is not another's
+
+A gate passing on the development platform says nothing about a platform it did not run on, and a checker
+tuned against one platform's tool output fails on another. A coverage gate whose per-file exclusions were
+counted against one platform's coverage report fails on another, because the same compiler on a different
+platform renders the same constructs differently: a macro header marked uncovered on one and covered on the
+other, adjacent defaults merged into one span or split per default, an uncovered final form that never renders
+as a visible span. Make such rules key on the rendered output rather than hard-coded counts, and gate on every
+platform the artifact ships to. Read the pair of results as a diagnosis: green locally and red on the other
+platform is a platform-only failure; red on both is a code failure. For a flake check that silently omits the
+other platform, see nix-ecosystem.
+
 ## Which implementation actually loaded
 
-This extends the stale-compiled-artifact trap to the multi-location case, which that mitigation does not reach.
+This extends testing-patterns' stale-compiled-artifact trap to the multi-location case, which that mitigation
+does not reach.
 When the same component exists in more than one location (a working tree and an installed copy, a local
 package and a system-wide one), the loader picks one, and **newest-wins preference settings arbitrate only
 within a single location, never between locations.** Deleting stale artifacts therefore does not help: both
@@ -304,8 +337,9 @@ candidates are legitimately current, and the wrong one is simply earlier in the 
 entirely against an implementation the change never touched, producing both false greens and false reds, and
 the usual mitigation would lead you to trust a still-wrong run.
 
-Before believing any result from a suite with this shape, query the runtime for the provenance of a symbol
-under test and confirm it resolves to the tree being changed. Compare timestamps of the built artifact against
+CLAUDE.md evidence requires confirming the runner loaded the changed source; in a suite with this shape, do
+it by querying the runtime for the provenance of a symbol under test and confirming it resolves to the tree
+being changed. Compare timestamps of the built artifact against
 the loaded one when behavior contradicts the source. Make the harness put the working tree ahead of every
 installed location explicitly rather than relying on newest-wins.
 
@@ -329,7 +363,7 @@ change that touched only tests or configuration as mutation evidence.
 **2. Assert what executed.** Capture the runner's collected and executed counts for the canonical gate and
 assert them against the number of test definitions in the tree. Assert the exit status of every spawned process
 and the completion count of every worker. This separates a green over the full set from one over an
-empty or truncated set, which exit code alone cannot.
+empty or truncated set.
 
 **3. Prove the precondition and forbid the fast path.** Before the act step, assert the state the test depends
 on actually holds: the cache entry is warm, the gate is satisfied, the slow path is the one about to run. Then
