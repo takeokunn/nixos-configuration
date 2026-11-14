@@ -1,34 +1,68 @@
 ---
 name: jujutsu
-description: "Use when planning or running version-control operations: jj for every write and history edit, git for reads only. Covers non-interactive use, side-effect-free reads (templates, filesets, past operations), precise history edits (split, squash, absorb, rebase, inserting without moving @), recovering earlier versions without undo, conflicts recorded in commits, revset checks, the operation log, shared working copies, stale workspaces, bisect, bookmarks and stacks, and pre-push checks."
+description: "Use when planning or running version-control operations: jj for every write and history edit, git for reads only. Covers non-interactive use, side-effect-free reads (templates, filesets, past operations), precise history edits (split, squash, absorb, rebase, inserting without moving @), recovering earlier versions without undo, conflicts recorded in commits, revset checks, the operation log, shared working copies, stale workspaces, git-dependent gates that pass vacuously in a no-colocate workspace, commit identity and signing keys, bisect, bookmarks and stacks, and pre-push checks."
 metadata:
   version: "1.4.0"
 ---
 
 # Jujutsu (jj)
 
-A `.jj/` directory at the root of the checkout you work in means jj is in use: run all version-control
-operations through jj and keep GitHub operations on `gh`. Git is read-only; CLAUDE.md gives the rule, including
-what to do when `.jj/` is missing. A `.worktrees/` directory under a bare repository without its own `.jj/` is
-not a jj workspace: `jj root` succeeds there but names the bare root, whose jj sees none of the directory's
-files, and `jj status` shows no changes.
+A `.jj/` directory at the root of the checkout you work in means jj is in use. Which tool performs which
+operation, and what to do when `.jj/` is missing: CLAUDE.md `environment_facts`. A `.worktrees/` directory
+under a bare repository without its own `.jj/` is not a jj workspace: `jj root` succeeds there but names the
+bare root, whose jj sees none of the directory's files, and `jj status` shows no changes.
 
 Two layouts carry `.jj/`:
 
 - A non-bare clone is colocated: `.jj/` and `.git/` share one Git object store, jj exports its changes to Git
   refs, and Git's HEAD is left detached. Write through jj; read-only git subcommands also work.
 - A bare `<repo>.git/` holds jj's store at its root in an empty-sparse `default` workspace that tracks no
-  files. Work happens in jj workspaces under `.worktrees/`, which have no `.git` of their own. A gate that
-  enumerates files through git (`git ls-files`, treefmt's default walker) there checks nothing and exits 0.
-  Confirm its input count, or run it with a filesystem walk (`treefmt --walk filesystem`).
+  files. Work happens in jj workspaces under `.worktrees/`, which have no `.git` of their own (no-colocate).
 
-Local jj writes on a non-default change (commit, describe, split, squash, absorb, rebase of your own changes,
-bookmark create, fetch, workspace add) need no separate authorization when the task calls for them. Push, and
-any write to the default branch, need the user's confirmation; so does moving or discarding a shared working
-copy (CLAUDE.md `hard_rules`).
+In a no-colocate workspace, tooling that depends on git misbehaves in two ways:
 
-Before the first commit in a repository, run `jj config get user.email` there and confirm the value. Jujutsu
-does not read Git's conditional `includeIf` identity configuration.
+- A gate that enumerates files through git (`git ls-files`, a git-based pre-commit run, a linter fed by
+  `git diff`, treefmt's git walker) sees zero files and exits 0. Confirm its input count is nonzero before
+  trusting it. Run treefmt with `--walk filesystem`; for a script that lists files through git, feed it
+  `jj file list '<fileset>'` instead, and confirm the probe fails on a known-bad input first.
+- A script that calls `git rev-parse` fails as run outside a git repository, and a build script that
+  locates the repository through git can find the bare parent and fail. Run the underlying command
+  directly, or run the recipe in a copy of the tree outside the workspace.
+
+`nix develop <workspace>` there copies the whole tree, untracked directories such as `node_modules`
+included, into the store on every call. When the flake is unchanged, write the environment once with
+`nix print-dev-env 'git+file://<bare root>?rev=<rev>' > <file>` and source that file for each command.
+
+Which jj writes need no separate authorization, and which need the user's confirmation (push, the default
+branch, a shared working copy): CLAUDE.md `hard_rules`.
+
+## Identity and signing
+
+Jujutsu does not read Git's conditional `includeIf` configuration, so a repository that requires a different
+identity or signing key than the global jj config gets the global ones unless its jj repo config
+(`jj config path --repo`) overrides `user.email`, `user.name`, and `signing.key`. Before the first commit in a
+repository, run `jj config get user.email` and `jj config get signing.key` there and confirm both.
+
+Every rewrite (rebase, squash, split, describe, duplicate, `jj sign`) sets the committer to the configured user
+and re-signs with the configured key; the author stays. With the wrong configuration, rewriting existing
+commits produces three symptoms:
+
+- GitHub shows the commits as Unverified (`reason=unknown_key`), while jj's local `signature.status()` still
+  reports `good`: a valid signature by a key that the account has not registered.
+- The committer becomes the global identity.
+- `jj git push` refuses commits whose author is not `mine()` as private.
+
+Check before pushing rewritten commits:
+`jj log --no-graph -r '<range>' -T 'committer.email() ++ " " ++ if(signature, signature.key(), "unsigned") ++ "\n"'`,
+and compare the key with `ssh-keygen -lf <public key>`. After pushing, `gh api
+repos/<owner>/<repo>/commits/<sha> --jq .commit.verification` shows what GitHub accepted.
+
+To fix it, set the values in the jj repo config (a configuration change: CLAUDE.md `hard_rules`), then
+re-sign the unpushed range with `jj sign -r '<range>'`, which also resets the committer. Confirm the content is
+unchanged with `jj diff --stat --from <old> --to <new>` (0 files). Commits whose author carries the other
+identity need `jj metaedit --update-author -r '<range>'`, with the user's approval because it rewrites
+authorship. The guardrail hook blocks per-command `--config user.*`, `JJ_EMAIL`, and `--allow-private`, so
+the repo config is the route.
 
 ## The working copy is a commit
 
@@ -153,12 +187,12 @@ rewrite, compare the old and new tips with `jj interdiff --from <old-tip> --to <
 When `@` is the conflicted commit, edit the conflict markers in the files directly and the next snapshot
 records the resolution. When the conflict sits in an ancestor, jj suggests `jj new <conflicted>`, which the
 guardrail hook blocks. If one side is right for a whole file, resolve it in place with
-`jj resolve -r <conflicted> --tool :ours <path>` (`:theirs` for the other side); a permission rule makes any
-`--tool` form prompt the user. For a manual resolution, keep `@` on its current descendant, edit the conflict
-markers in its file, then run `jj squash --into <conflicted> <paths>` from the repository root. The squash
+`jj resolve -r <conflicted> --tool :ours <path>` (`:theirs` for the other side). In Claude Code, a permission
+rule makes any `--tool` form prompt the user. For a manual resolution, keep `@` on its current descendant,
+edit the conflict markers in its file, then run `jj squash --into <conflicted> <paths>` from the repository root. The squash
 moves the resolution into the ancestor and leaves a new empty `@` child. Run
 `jj log --no-graph -r 'conflicts()'` to confirm that no conflicts remain. Otherwise report the conflicted
-change IDs and ask the user to resolve them or to approve a separate workspace for it.
+change IDs; whether to ask: CLAUDE.md `work_selection`.
 
 ## Revsets that answer checks
 
@@ -184,37 +218,40 @@ Wrap a revset that must name one commit in `exactly(<revset>, 1)`: it errors ins
 several commits or none.
 
 `divergent()` turns nonempty when concurrent sessions rewrite the same change: two commits then share one
-change ID. Do not abandon either side to tidy it; report both commit IDs and let the user choose.
+change ID. Report both commit IDs. Abandoning either side needs approval: CLAUDE.md `hard_rules`.
 
 ## The operation log
 
 Every jj command records an operation, including those another session ran in the same repository.
 `jj op log` lists them, `jj op show -p <op>` shows what one changed as a diff, and `jj op diff --from <a> --to
 <b>` compares two points. Read these to establish what took effect after an interrupted or surprising command.
-Restoring or reverting an operation is blocked by the guardrail hook; name the operation ID and ask.
+Restoring or reverting an operation is blocked by the guardrail hook; name the operation ID in the report
+(approval: CLAUDE.md `hard_rules`).
 
 ## Shared working copy
 
 The guardrail hook blocks commands that rewrite the files under other sessions: `jj edit`, `jj next`,
 `jj prev`, `jj new` onto another revision, `jj abandon`, `jj restore` without paths, `jj undo`, `jj redo`,
 `jj op restore`/`revert`, and `jj sparse set`/`reset`/`edit`. It also blocks every git write, and
-`ALLOW_DESTRUCTIVE_GIT=1` does not lift that verdict: the prefix applies to the jj verdicts only. The equivalents are to start work with plain `jj new`, discard one file with
-`jj restore <path>`, and undo a revision with `jj revert`. Spell the built-in subcommand in full and
+`ALLOW_DESTRUCTIVE_GIT=1` does not lift that verdict: the prefix applies to the jj verdicts only. Approval
+and prefix use: CLAUDE.md `hard_rules`. The equivalents are to start work with plain `jj new`, discard one
+file with `jj restore <path>`, and undo a revision with `jj revert`. Spell the built-in subcommand in full and
 literally: one produced by `$(...)` or a variable is blocked, and so is any name that is not a built-in,
 including the default aliases `b`, `ci`, `desc`, and `st`, because a config file can repoint an alias at any
 command. Workspace isolation follows execution-workflow's jj procedure, not `git worktree`. A repository with `.jj/` at its
 root isolates with a jj workspace:
 `jj -R <repo> workspace add --no-colocate --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>`,
 after `mkdir -p <repo>/.worktrees`. Without `--sparse-patterns full` the workspace copies the bare root's empty
-sparse set and checks out no files.
+sparse set and checks out no files, and `jj status` reports nothing; list the directory before running
+anything in a new workspace. `jj sparse reset`, run in that workspace, populates it; the hook blocks it like
+the other `jj sparse` writes.
 
 When another workspace rewrites the commit this workspace's `@` sits on, jj reports this working copy as stale.
 `jj workspace update-stale` rewrites this workspace's files to match its new `@`.
 
 `jj bisect run` makes each candidate revision the working copy in turn, so the guardrail hook blocks it like
 `jj edit`. In a workspace created for the bisect and used by no other session, run
-`ALLOW_DESTRUCTIVE_GIT=1 jj bisect run --range '<good>..<bad>' -- <command>`. The override prefix is an ask
-rule in Claude Code, so its permission prompt is the user's confirmation.
+`ALLOW_DESTRUCTIVE_GIT=1 jj bisect run --range '<good>..<bad>' -- <command>`.
 
 ## Pushing
 
@@ -231,13 +268,14 @@ pass `--config user.*`, `--config git.private-commits`, `--config-file`, or `--a
 3. Scan exactly that range with the configured rules (`gitleaks git` is a gitleaks subcommand, not git):
    `gitleaks git --config ~/.config/gitleaks/config.toml --log-opts="<remote>/<bookmark>..<commit>"`, or for a
    new bookmark `--log-opts="<commit> --not --remotes"`. A finding stops the push.
-4. `jj log --ignore-working-copy --no-pager -r '<range>' -T 'author.email() ++ "\n"'` to confirm the author identity.
-5. When the user has confirmed the push and all checks pass, push with the override prefix the guardrail hook names for this step:
+4. `jj log --ignore-working-copy --no-pager -r '<range>' -T 'author.email() ++ "\n"'` to confirm the author
+   identity, and for rewritten commits the committer and signing key (Identity and signing).
+5. When the push is approved (CLAUDE.md `hard_rules`) and all checks pass, push with
    `ALLOW_DESTRUCTIVE_GIT=1 jj git push -b <bookmark>`. The hook blocks every unprefixed `jj git push` so the
-   scan above cannot be skipped; the prefix is for that scanned push only.
+   scan above cannot be skipped.
 
-A rejection naming a private commit means a commit by someone else is about to be pushed; stop and ask rather
-than overriding it.
+A rejection naming a private commit means its author is not the configured user: someone else's commit, or
+one of yours written under another identity (Identity and signing). Report it; `--allow-private` is blocked.
 
 A bookmark does not follow new commits. Move it first (`jj bookmark set <b> -r @-`), or push a change directly
 with `jj git push -c <change>`, which creates a bookmark named after it. For a stack of pull requests, give each
