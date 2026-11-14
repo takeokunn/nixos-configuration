@@ -66,10 +66,17 @@ let
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
       name = lib.removePrefix "name: " nameLine;
       description = shared.decodeFrontmatterScalar (lib.removePrefix "description: " descriptionLine);
+      claudeModel = lib.removePrefix "model: " (shared.findLineWithPrefix "model: " parsed.frontmatterLines);
+      reasoningEffort = {
+        claude-sonnet-5-5 = "medium";
+        claude-opus-5-5 = "high";
+      }.${claudeModel};
     in
     pkgs.writeText "codex-agent-${agent}.toml" ''
       name = ${builtins.toJSON name}
       description = ${builtins.toJSON description}
+      model = ${builtins.toJSON codexSettings.model}
+      model_reasoning_effort = ${builtins.toJSON reasoningEffort}
       developer_instructions = ${builtins.toJSON parsed.body}
     '';
 
@@ -99,57 +106,6 @@ let
       url = null;
     } server;
 
-  codexHookScript =
-    name: pkgs.writeShellScript name (builtins.readFile (aiPromptsPath + "/hooks/${name}.sh"));
-
-  # aitools-rewrite defaults to Claude Code's output shape. Codex rejects an updatedInput that is not
-  # paired with permissionDecision "allow", so its entry passes `codex` from a wrapper rather than
-  # relying on how Codex splits a hook's command string.
-  codexAitoolsRewrite = pkgs.writeShellScript "aitools-rewrite-codex" ''
-    exec ${codexHookScript "aitools-rewrite"} codex
-  '';
-
-  # execpolicy matches whole argv tokens from the front, so only a literal command, or one ending in
-  # " *" after literal tokens, has an equivalent. Patterns such as `rm -rf /etc*` or `gh auth status *-t*`
-  # return null and are listed in the generated file instead of being dropped unseen.
-  denyPatternToTokens =
-    pattern:
-    let
-      literal = lib.removeSuffix " *" pattern;
-    in
-    if lib.hasInfix "*" literal then null else lib.splitString " " literal;
-
-  # A deny prefix that is also the start of a read-only git command would forbid that read as well:
-  # the bare "git stash" pattern becomes ["git","stash"], which covers `git stash list`. Such a
-  # pattern is left out of the rules and listed as unenforced; block-destructive-git handles it.
-  readOnlyGitTokens = map (r: [ "git" ] ++ lib.splitString " " r) shared.gitReadSubcommands;
-  shadowsRead =
-    tokens: lib.any (read: lib.take (builtins.length tokens) read == tokens) readOnlyGitTokens;
-
-  convertedDenyTokens = lib.unique (
-    lib.filter (tokens: tokens != null && !shadowsRead tokens) (
-      map denyPatternToTokens shared.bashDenyPatterns
-    )
-  );
-  unconvertedDenyPatterns = lib.filter (
-    p:
-    let
-      tokens = denyPatternToTokens p;
-    in
-    tokens == null || shadowsRead tokens
-  ) shared.bashDenyPatterns;
-
-  # With approval_policy "never" there is no prompt to fall back on, so these rules and the PreToolUse
-  # hooks are the only guards on shell commands.
-  codexDenyRules = ''
-    # Generated from shared.bashDenyPatterns. Not expressible as an execpolicy prefix, or a prefix that
-    # would also forbid a read-only git command, and so not enforced here:
-    ${lib.concatMapStringsSep "\n" (p: "#   ${p}") unconvertedDenyPatterns}
-    ${lib.concatMapStringsSep "\n" (
-      tokens: ''prefix_rule(pattern = ${builtins.toJSON tokens}, decision = "forbidden")''
-    ) convertedDenyTokens}
-  '';
-
   codexMcpServers = {
     context7 = pickMcpServer nixMcpServers.context7;
     playwright = pickMcpServer nixMcpServers.playwright;
@@ -173,27 +129,7 @@ let
     ) codexMcpServers;
   };
 
-  # Registered once, here; settings.hooks stays unset so Codex sees a single hook source.
-  codexHooks = {
-    PreToolUse = [
-      {
-        matcher = "^Bash$";
-        hooks =
-          map (name: {
-            type = "command";
-            command = "${codexHookScript name}";
-          }) shared.guardrailHookNames
-          ++ [
-            {
-              type = "command";
-              command = "${codexAitoolsRewrite}";
-            }
-          ];
-      }
-    ];
-  };
-
-  # Trusts the target directory when it lies under ~/ghq; see ghq-trust.sh.
+  # The wrapper limits automatic trust to the configured owners; see ghq-trust.sh.
   codexGhqTrust = pkgs.writeShellScript "codex-ghq-trust" (builtins.readFile ./ghq-trust.sh);
 
   # approval_policy and sandbox_mode are command-line overrides, not settings: config.toml is mutable
@@ -225,8 +161,7 @@ in
     mutableSettings = true;
     settings = codexSettings;
     context = codexAgents;
-    hooks = codexHooks;
-    rules.deny = codexDenyRules;
+    # Safety hooks and deny rules live only in /etc/codex/requirements.toml.
   };
 
   xdg.configFile = agentFileAttrs;

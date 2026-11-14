@@ -57,6 +57,7 @@ nix-darwin.lib.darwinSystem {
   modules = [
     configuration
     ../../nix-darwin
+    ../../nix-darwin/config/codex-settings.nix
     darwin-vz-nix.darwinModules.default
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
