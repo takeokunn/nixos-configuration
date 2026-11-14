@@ -28,8 +28,9 @@ filed whole under the majority kind: otherwise the fast suite inherits the slow 
 suite hides fast checks nobody runs early.
 
 Let exactly one mechanism route a file to its suite, and prefer the directory path over filename markers. With
-two mechanisms, a stray character in a manifest or a missed naming convention silently routes a file into a
-suite that never executes it, **and the omission is invisible because nothing failed.**
+two mechanisms, a stray character in a manifest or a missed naming convention routes a file into a suite that
+never executes it, and no test fails; only the per-suite collected count shows it
+([test-integrity](../test-integrity/SKILL.md#zero-collected-is-not-zero-failures)).
 
 ## Coverage
 
@@ -145,8 +146,8 @@ feature-flag gate, permission gate) and confirm the fixture satisfies all of the
 logic. Prefer building the fixture from the same helper the passing tests use rather than assembling a
 plausible-looking one by hand.
 
-**The worst available outcome is changing correct production code to accommodate an inadequate fixture.**
-Weakening a guard makes the test pass and removes the behavior the guard existed for.
+Do not change correct production code to accommodate an inadequate fixture (CLAUDE.md hard_rules): weakening
+a guard so the test passes removes the behavior the guard existed for.
 
 ### Scenario-scoped identifiers, not truncation
 
@@ -273,9 +274,9 @@ await waitForDurableRecord(store, id)      // second, independent source
 assertUnchanged(preexistingEntities)       // the change disturbed nothing else
 ```
 
-**When such a test proves flaky, respond with a stronger barrier, never a wider tolerance.** Relaxing an exact
-expected value to a range, or dropping the durability check, converts a real race into a permanently silent
-one. Loosening is the default reflex under time pressure and is almost always wrong here.
+When such a test proves flaky, strengthen the barrier instead of widening the tolerance (CLAUDE.md hard_rules):
+relaxing an exact expected value to a range, or dropping the durability check, converts a real race into a
+permanently silent one.
 
 Include the negative half: assert that entities the change was not supposed to affect are still present. A
 settlement bug frequently manifests as collateral loss rather than as a wrong value at the target.
@@ -311,9 +312,11 @@ assertEqual(queriesIssuedDuring(() => loadListPage()), 3)
 ```
 
 Wall-clock assertions are machine-dependent, so **they get widened after each spurious failure until they no
-longer detect anything.** An operation count is deterministic on any machine and names the regression directly.
-Assert at several input sizes rather than one: a count constant at one size may be linear at another, and the
-guarantee you care about is the shape of the curve.
+longer detect anything.** A ratio of two timings taken one after the other is not load-independent either:
+load can change between the two measurements. An operation count is deterministic on any machine and names
+the regression directly. Replace the wall-clock assertion with a count and demote the timing to an opt-in benchmark (`#[ignore]` in Rust) rather
+than widening it. Assert at several input sizes rather than one: a count constant at one size may be linear at
+another, and the guarantee you care about is the shape of the curve.
 
 ## Skipping versus failing
 
@@ -347,8 +350,8 @@ configuration that cannot build.
 
 **The search half is the part people skip and the part that catches real defects.** A successful build proves
 the new path works, not that the old path was fully removed, so a migration can leave both installed and appear
-healthy. State the gate as an enumerated list of commands that must exit zero: "it builds" is not checkable by a
-reviewer; a list of targets is.
+healthy. State the gate as an enumerated list of build targets and search commands: "it builds" is not
+checkable by a reviewer; a list of targets is.
 
 ## Authoring test infrastructure
 
@@ -387,8 +390,9 @@ meaningless or a red one misleading.
 **A stale compiled artifact shadows the source.** A source edit appears to have no effect, or a test keeps
 failing against behavior that no longer matches the code. Default bundler resolution places `.js` ahead of
 `.ts` for extensionless imports, so a stale compiled sibling is exercised instead of the edited source.
-Regenerate or delete it, or import with an explicit extension. **When a change "does nothing", suspect a
-shadowing artifact before suspecting the test.**
+Regenerate or delete it, or import with an explicit extension. The general stale-artifact check is CLAUDE.md
+evidence; when the same component is installed in several locations, see
+[test-integrity](../test-integrity/SKILL.md#which-implementation-actually-loaded).
 
 **A global coverage gate fails on a subset run.** Global thresholds are evaluated over the aggregate of only
 the files measured in that run, and files imported but not exercised register as uncovered, so a subset run
