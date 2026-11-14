@@ -67,8 +67,17 @@ evidence tags, so tag the evidence behind each verdict as CLAUDE.md evidence def
 dangerous kind: a stale line saying a safety control exists gets cited as evidence that it does. Under-claims
 are the wasteful kind: they cause already-shipped features to be re-planned and rebuilt.
 
-For a comment that records why an exemption or workaround was deliberately removed, see CLAUDE.md
-output_discipline.
+## Reversal rationale at the change site
+
+When a change deliberately deletes, inverts, or narrows something that carried a documented rationale (an
+exemption, a suppression, a deliberate gate, a documented workaround), leave the reversal's reasoning at that
+site if its absence would confuse the next reader. The commit message, the pull request, and session memory
+are not visible to someone reading the code later. State that the removal was intentional and what changed so
+the original reason no longer applies, enough that a reader does not restore it. Do not restate what the
+surrounding code does.
+
+An absence carries no evidence: a deliberately removed exception looks the same as an accidental deletion,
+and reviewers flag it as a regression. That is why this case earns a code comment.
 
 ## Language guidelines
 
