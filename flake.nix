@@ -652,11 +652,6 @@
               codex = darwinConfig.home-manager.users.take.programs.codex;
               linuxPolicy = self.nixosConfigurations.X13Gen2.config.environment.etc."codex/requirements.toml";
               plain = builtins.unsafeDiscardStringContext;
-              requirements = import ./shared/codex-managed-settings.nix {
-                inherit pkgs;
-                guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
-              };
-              requirementsFile = (pkgs.formats.toml { }).generate "codex-requirements-test.toml" requirements;
             in
             pkgs.runCommand "codex-hooks-test"
               {
@@ -664,11 +659,11 @@
                   pkgs.jq
                   pkgs.python3
                 ];
-                inherit requirementsFile;
+                requirementsFile = linuxPolicy.source;
                 userHooksJson = plain (builtins.toJSON codex.hooks);
                 userRulesJson = plain (builtins.toJSON codex.rules);
                 settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
-                darwinActivation = plain darwinConfig.system.activationScripts.extraActivation.text;
+                darwinActivation = darwinConfig.system.activationScripts.extraActivation.text;
                 linuxPolicyJson = plain (
                   builtins.toJSON {
                     inherit (linuxPolicy) mode;
@@ -687,39 +682,51 @@
                 import json
                 import os
                 from pathlib import Path
-                import re
+                import shlex
                 import tomllib
 
-                policy = tomllib.loads(Path(os.environ["requirementsFile"]).read_text())
-                assert policy["features"]["hooks"] is True
-                hooks = policy["hooks"]
-                root = Path(hooks["managed_dir"])
-                assert root.is_absolute() and root.is_dir()
-                entries = hooks["PreToolUse"]
-                assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
-                commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
-                expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
-                assert sorted(commands) == sorted(str(root / name) for name in expected)
-                for command in commands:
-                    path = Path(command)
-                    assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
-                assert "--agent claude-code" in (root / "guard-and-guide").read_text()
-                assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
-                rules = policy["rules"]["prefix_rules"]
-                assert rules and all(rule["decision"] == "forbidden" for rule in rules)
-                patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
-                for command in [["git", "commit"], ["gh", "pr", "merge"], ["gh", "repo", "delete"]]:
-                    assert command in patterns
-                assert ["git", "stash"] not in patterns
+                def check_policy(source):
+                    policy = tomllib.loads(Path(source).read_text())
+                    assert policy["features"]["hooks"] is True
+                    hooks = policy["hooks"]
+                    root = Path(hooks["managed_dir"])
+                    assert root.is_absolute() and root.is_dir()
+                    entries = hooks["PreToolUse"]
+                    assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
+                    commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
+                    expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
+                    assert sorted(commands) == sorted(str(root / name) for name in expected)
+                    for command in commands:
+                        path = Path(command)
+                        assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
+                    assert "--agent claude-code" in (root / "guard-and-guide").read_text()
+                    assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
+                    rules = policy["rules"]["prefix_rules"]
+                    assert rules and all(rule["decision"] == "forbidden" for rule in rules)
+                    patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
+                    for command in [["git", "commit"], ["gh", "pr", "merge"], ["gh", "repo", "delete"]]:
+                        assert command in patterns
+                    assert ["git", "stash"] not in patterns
+                    print(f"codex managed policy: {len(commands)} hooks, {len(rules)} forbidden prefixes")
+
                 # Home Manager must not register these again or recreate a rules symlink.
                 assert json.loads(os.environ["userHooksJson"]) == {}
                 assert json.loads(os.environ["settingsHooksJson"]) is None
                 assert json.loads(os.environ["userRulesJson"]) == {}
-                assert re.search(r"install -m 0644 \S+ /etc/codex/requirements\.toml", os.environ["darwinActivation"])
                 linux = json.loads(os.environ["linuxPolicyJson"])
                 assert linux["mode"] == "0644"
-                assert linux["source"].endswith("codex-requirements.toml")
-                print(f"codex managed policy: {len(commands)} hooks, {len(rules)} forbidden prefixes")
+                assert linux["source"] == os.environ["requirementsFile"]
+                check_policy(linux["source"])
+                installs = []
+                for line in os.environ["darwinActivation"].splitlines():
+                    if not line.lstrip().startswith("install "):
+                        continue
+                    argv = shlex.split(line, comments=True)
+                    if argv[-1] == "/etc/codex/requirements.toml":
+                        assert len(argv) == 5 and argv[:3] == ["install", "-m", "0644"]
+                        installs.append(argv[3])
+                assert len(installs) == 1
+                check_policy(installs[0])
                 PY
                 if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
                   echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
