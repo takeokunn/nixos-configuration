@@ -43,10 +43,19 @@ if ((agent)); then
   sub=""
   sub_args=("${@:2}")
   i=0
-  while ((i < ${#sub_args[@]})); do
+  # api parses its own options below; other commands must name their subcommand unambiguously.
+  while [[ ${1-} != api ]] && ((i < ${#sub_args[@]})); do
     case ${sub_args[i]} in
-    -R | --repo | --hostname) ((i += 2)); continue ;;
-    -*) ;;
+    -R | --repo | --hostname)
+      ((i + 1 < ${#sub_args[@]})) && [[ -n ${sub_args[i + 1]} && ${sub_args[i + 1]} != -* ]] ||
+        block "a pre-subcommand option is missing its value"
+      ((i += 2)); continue
+      ;;
+    -R?* | --repo=?* | --hostname=?*) ;;
+    -h | --help)
+      ((i + 1 == ${#sub_args[@]})) || block "help before a subcommand is ambiguous; put help last"
+      ;;
+    -*) block "put command-specific options after the gh subcommand" ;;
     *) sub=${sub_args[i]}; break ;;
     esac
     ((i += 1))

@@ -25,6 +25,9 @@ work=$(mktemp -d)
 trap 'chmod -R u+rwx "$work"; rm -rf "$work"' EXIT
 cd "$work" || exit 1
 export STUB_LOG="$work/stub"
+mkdir -p "$work/home"
+export HOME="$work/home"
+export GH_TOKEN=fixture-gh-token-not-a-credential
 
 random() { perl -e 'my @c = ("A" .. "Z", "a" .. "z", 0 .. 9); print map { $c[rand @c] } 1 .. shift' "$1"; }
 
@@ -242,6 +245,31 @@ block	pr merge 1
 block	pr merge --auto --squash 1
 block	pr -R o/r merge 1
 block	pr --repo o/r merge 1
+block	pr --body x merge 1
+block	pr -b x merge 1
+block	pr -t s merge 1
+block	pr --subject s merge 1
+block	pr -F f merge 1
+block	pr --squash 1 merge
+block	repo --yes o/r delete
+block	auth -u USER token
+block	auth -h github.com token
+block	alias --clobber m set pr
+block	extension --force . install
+block	ext --x probe exec
+block	pr --repo
+block	pr --repo= merge 1
+block	pr --hostname
+block	pr --unknown=value view
+block	pr -Ro/r merge 1
+block	pr --repo=o/r merge 1
+allow	pr -R o/r view 1
+allow	pr --repo=o/r view 1
+allow	pr -Ro/r view 1
+allow	pr --hostname github.com view 1
+allow	pr --hostname=github.com view 1
+allow	pr -h
+allow	pr --help
 block	repo delete o/r --yes
 block	api -X PUT repos/o/r/pulls/1/merge
 block	api --method=put repos/o/r/pulls/1/merge
