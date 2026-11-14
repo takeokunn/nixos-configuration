@@ -8,10 +8,7 @@ let
   cfg = config.programs.serena;
   yqExpr = ''
     ${lib.optionalString (cfg.ignoredPaths != [ ]) ".ignored_paths = env(SERENA_IGNORED_PATHS) | "}
-    .ls_specific_settings = (.ls_specific_settings // {}) |
-    .ls_specific_settings.typescript = (.ls_specific_settings.typescript // {}) |
     .ls_specific_settings.typescript.ls_path = strenv(SERENA_TYPESCRIPT_LS_PATH) |
-    .ls_specific_settings.bash = (.ls_specific_settings.bash // {}) |
     .ls_specific_settings.bash.ls_path = strenv(SERENA_BASH_LS_PATH)
   '';
 in
@@ -52,13 +49,6 @@ in
     home.activation.serenaSettings.before = [ ];
     home.activation.serenaSettings.data = ''
       serenaConfigFile="$HOME/.serena/serena_config.yml"
-      if [ ! -e "$serenaConfigFile" ]; then
-        mkdir -p "$HOME/.serena"
-        if [ ! -e "$serenaConfigFile" ]; then
-          (set -C; printf '{}\n' > "$serenaConfigFile") 2>/dev/null || [ -f "$serenaConfigFile" ]
-        fi
-      fi
-
       if [ -f "$serenaConfigFile" ]; then
         SERENA_IGNORED_PATHS=${lib.escapeShellArg (builtins.toJSON cfg.ignoredPaths)} \
           SERENA_TYPESCRIPT_LS_PATH=${lib.escapeShellArg "${pkgs.typescript-language-server}/bin/typescript-language-server"} \
