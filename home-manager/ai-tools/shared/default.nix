@@ -24,8 +24,8 @@ rec {
   # (shared/claude-code-managed-settings.nix at the repository root).
   claudeCodeCaBundle = "/etc/ssl/certs/ca-certificates.crt";
 
-  # Plain `*` globs only because Claude Code reads `x:*` as `x*`. Skip a glob when another covers it
-  # already (`rm -rf ~*` covers `rm -rf ~/.ssh*`).
+  # Avoid :* forms because Codex's denyPatternToTokens cannot enforce them. Skip a glob when another
+  # covers it already (`rm -rf ~*` covers `rm -rf ~/.ssh*`).
   #
   # Git writes are denied and read-only git is not: agents use jj for every VCS write. Prefix lists miss
   # commands run as `/usr/bin/git`, `env git`, or `bash -c 'git ...'`; block-destructive-git catches

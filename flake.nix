@@ -285,6 +285,11 @@
                 true
               ];
             };
+            # Codex's denyPatternToTokens cannot represent :* globs; they are listed as unenforced.
+            testBashDenyPatternsUsePlainGlobs = {
+              expr = builtins.filter (pkgs.lib.hasSuffix ":*") sharedAiTools.bashDenyPatterns;
+              expected = [ ];
+            };
           };
         in
         {
