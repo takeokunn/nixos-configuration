@@ -420,11 +420,21 @@ sub verdict_for_segment {
 
 # `aitools git ...` only reads. Its process launchers can invoke protected commands directly
 # or through a shell; use the same classifier after finding that command.
+my %AITOOLS_GLOBAL_VALUE_OPT = map { $_ => 1 } qw(--root --lock-timeout);
+my %AITOOLS_GLOBAL_FLAG_OPT = map { $_ => 1 } qw(--trace);
+
 sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
     my $launcher = 0;
-    for my $i (0 .. $#a) {
-        if (!$launcher and ($a[$i] eq 'run' or ($a[$i] eq 'bg' and ($a[$i + 1] // q{}) eq 'start'))) {
+    my $known_global = 1;
+    for (my $i = 0; $i <= $#a; $i++) {
+        if (!$launcher and $known_global) {
+            if ($AITOOLS_GLOBAL_VALUE_OPT{$a[$i]}) { $i++; next; }
+            next if $AITOOLS_GLOBAL_FLAG_OPT{$a[$i]}
+                or ($a[$i] =~ /^(--[a-z-]+)=/ and $AITOOLS_GLOBAL_VALUE_OPT{$1});
+            $known_global = 0 if $a[$i] =~ /^-/;
+        }
+        if (!$launcher and $known_global and ($a[$i] eq 'run' or ($a[$i] eq 'bg' and ($a[$i + 1] // q{}) eq 'start'))) {
             my $s = $a[$i] eq 'bg' ? $i + 2 : $i + 1;
             my $k = aitools_program_index(@a[$s .. $#a]);
             # Option values such as `--cwd vcs/gh` or `--grep jj` are not the launched program, so
