@@ -41,8 +41,8 @@ expect_cmd() {
   }
 }
 
-# Read, Write, and Edit all reach the `File` rules. MultiEdit and NotebookEdit are not covered by any
-# matcher in rules.toml, so they have no cases here.
+# Read, Write, and Edit all reach the `File` rules. This guard version does not support
+# Grep, Glob, MultiEdit, or NotebookEdit; their path fields cannot be configured here.
 for tool in Read Write Edit; do
   # R7 permits the three explicit template names; .envrc remains protected.
   expect deny "$tool" '/work/app/.env'
@@ -205,11 +205,60 @@ for runtime in claude codex; do
     expect_cmd deny "cat '$path'"
     expect_cmd deny "aitools read '$path'"
   done
-  # Search identifiers and a virtualenv directory are not credential-file reads.
+  # Search identifiers and paths inside a virtualenv directory remain allowed.
   for cmd in 'rg -n "process.env" src' "grep -rn 'import.meta.env' ." 'rg id_token' \
-    'psql -c "select id_user from t"' 'python -m venv .env' '.env/bin/python x.py'; do
+    'psql -c "select id_user from t"' '.env/bin/python x.py'; do
     expect_cmd allow "$cmd"
   done
+  # D1 matches literal credential words regardless of the reader (23 x 11 R10 cases).
+  # These are command strings only; no reader command is executed.
+  for reader in 'grep KEY X' \
+    'grep -h . X' \
+    'rg KEY X' \
+    'rg . X' \
+    'sed -n p X' \
+    'awk 1 X' \
+    'cp X /tmp/x' \
+    'mv X /tmp/x' \
+    'tar cf /tmp/a.tar X' \
+    'base64 X' \
+    'xxd X' \
+    'jq -R . X' \
+    'diff X /dev/null' \
+    'tac X' \
+    'nl X' \
+    'strings X' \
+    'env $(cat X)' \
+    'aitools search KEY --root . X' \
+    'cat < X' \
+    'cat 0<X' \
+    'while read l; do echo $l; done <X' \
+    'exec 3< X' \
+    'cat <<< "$(< X)"'; do
+    for path in '.env' \
+      './.env' \
+      '/work/app/.env' \
+      '~/.env' \
+      'id_rsa' \
+      'id_ed25519' \
+      'id_ecdsa' \
+      './id_ed25519' \
+      'keys/id_rsa' \
+      '/work/keys/id_ecdsa' \
+      '~/.ssh/id_rsa'; do
+      expect_cmd deny "${reader/X/$path}"
+    done
+  done
+  # D1 accepts blocking non-read uses to avoid reopening credential reads.
+  for cmd in 'python -m venv .env' 'cp .env.example .env' \
+    'docker compose --env-file .env up' "echo 'copy .env.example to .env'" \
+    'rg -n id_ed25519 docs' 'ssh-keygen -t ed25519 -f id_ed25519'; do
+    expect_cmd deny "$cmd"
+  done
+  for cmd in 'rg "process.env"' 'jq .id_token f.json' 'git diff -- .env.example'; do
+    expect_cmd allow "$cmd"
+  done
+
   for template in example sample template; do
     for path in ".env.$template" "/work/.env.$template"; do
       for tool in Read Write Edit; do expect allow "$tool" "$path"; done
