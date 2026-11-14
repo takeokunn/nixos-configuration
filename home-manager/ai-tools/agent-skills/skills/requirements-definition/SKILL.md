@@ -1,23 +1,23 @@
 ---
 name: requirements-definition
-description: Use for requirement analysis, specification, and clarification, and when running /define. Covers its phase sequence (prepare through document), the investigation gate, read-only agent dispatch, question prioritization, and requirement formatting.
+description: Use for requirement analysis, specification, and clarification, and when running the define command (/define in Claude Code). Covers its phase sequence (prepare through document), the investigation gate, read-only agent dispatch, question prioritization, and requirement formatting.
 metadata:
   version: "4.2.0"
 ---
 
-The phase sequence /define executes, so the command file does not restate it, plus question design and
-requirement formatting.
+The phase sequence the define command (/define in Claude Code) executes, so the command file does not restate
+it, plus question design and requirement formatting.
 
-Read-only throughout: no file or memory is created or modified, and no code is written. Return the document
-in the response. Report any memory candidates for a later write-authorized phase.
+Read-only throughout, as the define command sets. Return the document in the response. Memory candidates:
+CLAUDE.md memory_policy.
 
 ## Phases
 
 **prepare**: Load serena-usage before any memory operation and any other companion this run needs:
 [fact-check](../fact-check/SKILL.md) when a claim needs an external source,
-[workflow-patterns](../workflow-patterns/SKILL.md) for the shared decision-criteria structure. Then activate the
-project when Serena is available, check the memory catalog once, and read only relevant entries. If the store
-is unavailable, continue from repository evidence and report the limitation.
+[workflow-patterns](../workflow-patterns/SKILL.md) for the shared decision-criteria structure. Then read only
+the memories relevant to this request, by the procedure in serena-usage. If the store is unavailable, continue
+from repository evidence and report the limitation.
 
 **analyze**: Extract the core requirements from the request, identify the technical constraints its context
 implies, name the design decisions that will need user input, and take a first read on feasibility.
@@ -25,20 +25,20 @@ implies, name the design decisions that will need user input, and take a first r
 **investigate**: Establish the relevant files, patterns, dependencies, and schema implications. Delegate
 bounded independent checks only when their value warrants coordination, using the available agent catalog.
 If a needed role is unavailable, perform its checks yourself and report the limitation; do not substitute a
-role whose runtime restrictions are unavailable. Verify external library claims with Context7 when available,
-otherwise with official documentation, rather than recall.
+role whose runtime restrictions are unavailable. Verify external library claims by the fact-check skill.
 
 **clarify**: Prioritize and classify the candidate questions as described under
-[Which questions to ask first](#which-questions-to-ask-first). Ask only when readings differ in a destructive
-or externally visible effect (CLAUDE.md `work_selection`); use the runtime's question tool with its supported
-options and one marked (Recommended), or a concise question in text. Every other open question becomes a
-recorded assumption in the document, tagged inferred or assumed, and work proceeds.
+[Which questions to ask first](#which-questions-to-ask-first). Which questions to ask: the define command when
+it is running, otherwise CLAUDE.md work_selection. Ask with the runtime's question tool when available
+(AskUserQuestion in Claude Code, request_user_input in Codex), within its supported option count and with the
+recommended option marked in the user's language; otherwise ask a concise question in text. Every open question
+not asked becomes a recorded assumption in the document, tagged inferred or assumed, and work proceeds.
 
 **verify**: Cross-check the user's answers against the investigation findings, and read the
 implementations the chosen approach depends on.
 
-**document**: Produce the requirements document and the phased task breakdown for /execute. This is the last
-phase: there is no approval prompt afterwards.
+**document**: Produce the requirements document and the phased task breakdown for the execute command
+(/execute in Claude Code).
 
 ## Gate after investigation
 
@@ -51,15 +51,15 @@ unexamined area.**
 
 ## Unresolved items
 
-Outstanding Issues lists each unresolved item with the assumption taken. Do not ask the user to resolve,
-defer, or stop. State whether the handoff is ready or partially blocked, naming the tasks that depend on an
+Outstanding Issues lists each unresolved item with the assumption taken. State whether the handoff is ready or partially blocked, naming the tasks that depend on an
 assumption that could not be checked. Recording an assumption does not verify it or clear a dependent task's
 gate.
 
 ## Agents
 
-All read-only. Every delegation carries the scope, the target paths, the explicit prohibition on editing, and
-the instruction to use the runtime's question tool when available, otherwise a concise question in text.
+All read-only. Brief contents: CLAUDE.md delegation. A delegated agent does not ask the user: it returns its
+questions to the parent, which ranks them with its own under
+[Which questions to ask first](#which-questions-to-ask-first).
 
 - **explore**: relevant files and existing patterns
 - **design**: architectural consistency, dependencies, API design
@@ -74,12 +74,7 @@ their combined findings follows only when completeness or dependency risk needs 
 
 Establish the current state first: directory structure, the symbol overview of the affected area, keyword and
 symbol search for the feature's existing neighbours, the reference graph around anything that will change, then
-the specific files. Verify external library behavior with Context7 when available, otherwise with official
-documentation, rather than recall.
-
-**A question that investigation could have answered spends the user's turn.** The point of investigating first
-is not thoroughness for its own sake: it is that the remaining questions are then exactly the ones only the
-user can settle.
+the specific files. External library behavior: the fact-check skill.
 
 ## Which questions to ask first
 
@@ -91,9 +86,8 @@ Rank a candidate question by four considerations, in this order:
    investigate rather than ask.
 4. **Effort impact**: how much the answer moves the size of the work.
 
-A question is **critical** when it branches the design *and* the wrong answer is expensive to undo. Record the
-assumption taken for a critical question prominently in Outstanding Issues; ask only under the destructive or
-externally visible rule in clarify.
+A question that branches the design *and* whose wrong answer is expensive to undo ranks first. When clarify
+leaves it unasked, list its assumption first in Outstanding Issues.
 
 ### Classify each question
 
@@ -102,9 +96,6 @@ externally visible rule in clarify.
 - **Constraint**: "must this support the legacy client?"
 - **Scope**: "are admin features in the first version?"
 - **Priority**: "which of these ships first?"
-
-When a question is asked, use the runtime's question tool, respecting its supported option count and marking a
-recommendation when supported. If no question tool is available, ask a concise question in the response.
 
 ## Writing the requirements
 
@@ -142,12 +133,8 @@ State which capability was located at which file:line, and which was not found a
 > primitive exists in the codebase (searched `src/lib`, `src/middleware`), so that remains an open constraint
 > recorded in Outstanding Issues.
 
-A feasibility number produced in the same pass that wrote the requirement never contradicts that requirement,
-so nothing downstream ever reads a low score and investigates further.
-
 Record explicit user requests as desired behavior, not as unverified claims about the existing system.
-Tag factual premises **verified** (grounded in direct investigation), **inferred** (derived from something
-verified but not directly observed), or **assumed** (unchecked). **A factual premise still assumed at handoff
+Tag factual premises per CLAUDE.md evidence. **A factual premise still assumed at handoff
 time is not ready to support dependent implementation.** A partial handoff must name those blocked
 tasks separately from independent, ready tasks; recording the assumption does not approve it.
 
@@ -164,11 +151,11 @@ FR-001 form marked mandatory or optional; non-functional requirements when appli
 with each decision's rationale; test requirements as observable behavior; and Outstanding Issues when any
 remain.
 
-Feasibility is stated as the observable condition supporting it, per the section above, never as a score.
+State feasibility as in [Feasibility is a condition, not a score](#feasibility-is-a-condition-not-a-score).
 Where a requirement rests on an assumption rather than on investigation, say so at that requirement.
 
 Then the task breakdown: the dependency graph, phased tasks with files and dependencies, and the handoff
-carrying the decisions made, the references, and the constraints, including what /execute must not assume.
+carrying the decisions made, the references, and the constraints, including what the execute command must not assume.
 
 ## Related
 
