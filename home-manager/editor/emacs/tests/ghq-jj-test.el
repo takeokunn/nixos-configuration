@@ -30,7 +30,7 @@
     "my/ghq-repo-worktrees"
     "my/ghq--jj-init-bare" "my/ghq--jj-run" "my/ghq--jj-fetch"
     "my/ghq--jj-resolves-p" "my/ghq--resolve-base-ref" "my/ghq--link-state"
-    "my/ghq-create-worktree" "my/ghq--current-repo-path"
+    "my/ghq--copy-local-mcp-servers" "my/ghq-create-worktree" "my/ghq--current-repo-path"
     "my/remote-url-to-https" "my/jj-origin-url" "my/copy-projectile-github-url"
     "my/jj-checkout-pr")
   "Defuns evaluated from init.org.")

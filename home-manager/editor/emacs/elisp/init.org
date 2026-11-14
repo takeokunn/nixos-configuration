@@ -2395,7 +2395,6 @@ adding a remote."
               (format "(%s).darwinConfigurations.M4-Max.options" flake-path))
       (setopt lsp-nix-nixd-home-manager-options-expr
               (format "(%s).darwinConfigurations.M4-Max.options.home-manager.users.type.getSubOptions []" flake-path))))
-
 #+END_SRC
 *** kakehashi
 :PROPERTIES:
@@ -3657,83 +3656,17 @@ stderr warning on the same failure."
                  (message "my/ghq--link-state: direnv allow failed for %s (%s)" target-path (error-message-string err)))))))))))
 
   (defun my/ghq--copy-local-mcp-servers (repo-path target-path)
-    "Copy REPO-PATH's local Claude MCP servers into TARGET-PATH."
-    (let ((settings-file (expand-file-name "~/.claude.json")))
-      (when (file-exists-p settings-file)
-        (let* ((source-key
-                (condition-case nil
-                    (file-truename repo-path)
-                  (error
-                   (error "my/ghq-create-worktree: worktree created at %s, but the source path could not be resolved for local MCP copy"
-                          target-path))))
-               (target-key
-                (condition-case nil
-                    (file-truename target-path)
-                  (error
-                   (error "my/ghq-create-worktree: worktree created at %s, but the destination path could not be resolved for local MCP copy"
-                          target-path))))
-               (settings
-                (condition-case nil
-                    (with-temp-buffer
-                      (insert-file-contents settings-file)
-                      (json-parse-buffer :object-type 'hash-table
-                                         :null-object nil
-                                         :false-object :json-false))
-                  (error
-                   (error "my/ghq-create-worktree: worktree created at %s, but ~/.claude.json could not be read for local MCP settings"
-                          target-path))))
-               (missing (make-symbol "missing")))
-          (unless (hash-table-p settings)
-            (error "my/ghq-create-worktree: worktree created at %s, but ~/.claude.json is not an object; local MCP copy incomplete"
-                   target-path))
-          (let ((projects (gethash "projects" settings missing)))
-            (unless (or (eq projects missing) (hash-table-p projects))
-              (error "my/ghq-create-worktree: worktree created at %s, but ~/.claude.json has an invalid projects object; local MCP copy incomplete"
-                     target-path))
-            (when (hash-table-p projects)
-              (let ((source-project (gethash source-key projects missing)))
-                (unless (or (eq source-project missing) (hash-table-p source-project))
-                  (error "my/ghq-create-worktree: worktree created at %s, but the source project entry is invalid; local MCP copy incomplete"
-                         target-path))
-                (unless (eq source-project missing)
-                  (let ((servers (gethash "mcpServers" source-project missing)))
-                    (unless (or (eq servers missing) (hash-table-p servers))
-                      (error "my/ghq-create-worktree: worktree created at %s, but the source mcpServers value is invalid; local MCP copy incomplete"
-                             target-path))
-                    (when (and (hash-table-p servers)
-                               (> (hash-table-count servers) 0))
-                      (maphash
-                       (lambda (name server)
-                         (unless (and (stringp name)
-                                      (> (length name) 0)
-                                      (not (string-match-p "\\`-" name))
-                                      (not (string-match-p "[[:cntrl:]]" name)))
-                           (error "my/ghq-create-worktree: worktree created at %s, but a local MCP server name is not safe for CLI registration"
-                                  target-path))
-                         (unless (hash-table-p server)
-                           (error "my/ghq-create-worktree: worktree created at %s, but a local MCP server configuration is not an object"
-                                  target-path)))
-                       servers)
-                      (let ((claude (executable-find "claude")))
-                        (unless claude
-                          (error "my/ghq-create-worktree: worktree created at %s, but claude is not in PATH; local MCP copy incomplete"
-                                 target-path))
-                        (maphash
-                         (lambda (name server)
-                           (let ((status
-                                  (condition-case nil
-                                      (let ((default-directory (file-name-as-directory target-key)))
-                                        (call-process claude nil nil nil
-                                                      "mcp" "add-json" "--scope" "local"
-                                                      name
-                                                      (json-serialize server
-                                                                      :null-object nil
-                                                                      :false-object :json-false)))
-                                    (error nil))))
-                             (unless (and (integerp status) (zerop status))
-                               (error "my/ghq-create-worktree: local MCP registration failed in the created worktree (status %s); earlier registrations may remain"
-                                      status))))
-                         servers))))))))))))
+    "Run `copy-local-mcp-servers' on REPO-PATH and TARGET-PATH.
+Failures are reported via `message' and never signal, because the
+workspace already exists by then."
+    (let ((program (executable-find "copy-local-mcp-servers")))
+      (if (not program)
+          (message "my/ghq--copy-local-mcp-servers: copy-local-mcp-servers not found; local MCP servers were not copied to %s" target-path)
+        (with-temp-buffer
+          (let ((exit (call-process program nil t nil repo-path target-path)))
+            (unless (eq exit 0)
+              (message "my/ghq--copy-local-mcp-servers: local MCP servers were not fully copied to %s (exit %s): %s"
+                       target-path exit (string-trim (buffer-string)))))))))
 
   (defun my/ghq-create-worktree (repo-path &optional base-ref naming-mode)
     "Create a new jj workspace under the .worktrees/ of REPO-PATH.
