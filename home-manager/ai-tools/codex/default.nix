@@ -30,6 +30,7 @@ let
     | run_in_background | Use exec_command sessions for long-running processes and poll them before finishing. |
     | Bash / Read / Edit / Write | Use exec_command for shell commands; file operations follow environment_facts. |
     | WebSearch / WebFetch | Use web.run when current external information is required. |
+    | Playwright MCP | Use Playwright MCP for browser verification, screenshots, console logs, and interaction checks. |
   '';
 
   # Claude Code loads the output style separately; Codex gets its body appended so replies follow the same rules.
