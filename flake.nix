@@ -511,7 +511,6 @@
                 nativeBuildInputs = [ pkgs.jq ];
                 permissionsJson = builtins.toJSON claudeCodePermissions;
                 projectMcpEnabledJson = builtins.toJSON claudeCodeManagedSettings.enableAllProjectMcpServers;
-                autoModeJson = builtins.toJSON claudeCodeManagedSettings.autoMode;
                 claudeHooksJson = builtins.unsafeDiscardStringContext (
                   builtins.toJSON claudeCodeManagedSettings.hooks
                 );
@@ -596,26 +595,6 @@
                 fi
                 if ! jq -e '[.PreToolUse[].hooks[] | select(.command | test("/block-destructive-git( |$)|/nix/store/[^/]+-guard-and-guide$"))] | length == 2 and all(.type == "command" and .onFailure == "block")' <<< "$claudeHooksJson" >/dev/null; then
                   echo "managed-settings must register both safety hooks with onFailure=block" >&2
-                  exit 1
-                fi
-                if ! jq -e '.environment | index("$defaults")' <<< "$autoModeJson" >/dev/null; then
-                  echo "managed-settings autoMode.environment lost \"\$defaults\", which drops the built-in trust slots" >&2
-                  exit 1
-                fi
-                # "$defaults" plus the seven custom entries (source control, worktrees, scratch, contest servers,
-                # routine worktree cleanup, own background processes, the Mediator MCP server).
-                if [ "$(jq '.environment | length' <<< "$autoModeJson")" -ne 8 ]; then
-                  echo "managed-settings autoMode.environment no longer has \"\$defaults\" plus 7 custom entries" >&2
-                  exit 1
-                fi
-                for needle in 'that this session created' 'the agent itself started in this session' 'unless the message directs a push, merge, publication, or deletion'; do
-                  if ! jq -e --arg n "$needle" '[.environment[] | select(contains($n))] | length == 1' <<< "$autoModeJson" >/dev/null; then
-                    echo "managed-settings autoMode.environment lost the entry containing \"$needle\"" >&2
-                    exit 1
-                  fi
-                done
-                if jq -e '.environment[] | select(contains("/Users/") or contains("/home/"))' <<< "$autoModeJson" >/dev/null; then
-                  echo "managed-settings autoMode.environment names an absolute home path" >&2
                   exit 1
                 fi
                 if [ "$configDir" != "$expectedConfigDir" ]; then

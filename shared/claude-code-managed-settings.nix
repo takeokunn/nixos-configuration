@@ -76,18 +76,6 @@ in
   # managed settings.
   skipDangerousModePermissionPrompt = true;
 
-  # "$defaults" keeps the built-in environment; the entries after it name where this user's work lives.
-  autoMode.environment = [
-    "$defaults"
-    "Source control: repositories under the user's own owner directories in the ghq root (the user's account and the organizations the user belongs to) and those repositories' configured remotes. Third-party clones under the ghq root are reference copies, not trusted destinations."
-    "jj workspaces and .worktrees directories of those repositories are part of the same trusted repository."
-    "Scratch: /tmp, /private/tmp, and the system temp directory are ephemeral agent scratch space."
-    "Contest servers: only SSH host aliases whose names start with \"isu\" in the user's ssh config, used for ISUCON practice and contests; benchmarking, editing configs, restarting services, and reading logs there is routine."
-    "Deleting, moving, and rebasing files and jj changes inside .worktrees checkouts and jj workspaces that this session created is routine; other sessions' checkouts and workspaces are not."
-    "Stopping background processes the agent itself started in this session, by PID, is routine."
-    "The Mediator MCP server is the user's own agent orchestrator; sending messages, plans, and turns through it is routine delegation unless the message directs a push, merge, publication, or deletion."
-  ];
-
   env = {
     BASH_DEFAULT_TIMEOUT_MS = "300000";
     BASH_MAX_TIMEOUT_MS = "1200000";
