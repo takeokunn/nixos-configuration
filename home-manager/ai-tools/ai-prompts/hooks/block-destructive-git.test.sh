@@ -379,6 +379,15 @@ expect_block 'aitools run --cwd home-manager/vcs/gh -- git reset --hard'
 expect_block 'aitools run --cwd ../gh -- jj git push --bookmark x'
 expect_block 'aitools run --grep gh -- git push --force origin main'
 expect_block 'aitools run --stdout-to /tmp/gh -- sh -c "git reset --hard"'
+# Nor is an option value named jj or a shell.
+expect_block 'aitools run --grep bash -- git clean -fdx'
+expect_block 'aitools run --grep jj -- git reset --hard'
+expect_block 'aitools run --cwd jj -- git reset --hard'
+expect_block 'aitools run --cwd sh -- git reset --hard'
+expect_block 'aitools run --cwd /x/jj -- git branch -D main'
+expect_block 'aitools run --stdout-to out/sh -- jj git push --bookmark x'
+# An unknown option leaves the program position undetermined; every candidate is still classified.
+expect_block 'aitools run --bogus jj -- git reset --hard'
 # Reserved words and wrapper options that precede the command.
 expect_block '! git push'
 expect_block 'if true; then git push; fi'

@@ -422,22 +422,25 @@ sub verdict_for_segment {
 # or through a shell; use the same classifier after finding that command.
 sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
-    my ($launcher, $prog) = (0, undef);
+    my $launcher = 0;
     for my $i (0 .. $#a) {
-        if (!$launcher and ($a[$i] eq 'run' or $a[$i] eq 'bg')) {
-            my $s = $i + 1;
-            $s++ if $a[$i] eq 'bg' and ($a[$s] // q{}) eq 'start';
+        if (!$launcher and ($a[$i] eq 'run' or ($a[$i] eq 'bg' and ($a[$i + 1] // q{}) eq 'start'))) {
+            my $s = $a[$i] eq 'bg' ? $i + 2 : $i + 1;
             my $k = aitools_program_index(@a[$s .. $#a]);
-            $prog = $s + $k if defined $k;
+            # Option values such as `--cwd vcs/gh` or `--grep jj` are not the launched program, so
+            # only the program's own words are classified. A launched gh's arguments then belong to
+            # the gh wrapper, which classify leaves alone.
+            return classify(join(q{ }, map { shell_quote($_) } @a[$s + $k .. $#a]), $depth + 1, $allow)
+                if defined $k;
         }
         $launcher = 1 if $a[$i] eq 'run' or $a[$i] eq 'bg';
         (my $b = $a[$i]) =~ s{^.*/}{};
-        # A launched gh's arguments belong to the gh wrapper, not this classifier. Option values
-        # such as `--cwd vcs/gh` are not the launched program.
-        return q{} if defined $prog and $i == $prog and $b eq 'gh';
         next unless $b eq 'git' or $b eq 'jj' or $SHELL{$b};
         return q{} unless $launcher;
-        return classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);
+        # The program position is unknown here, so a candidate may be an option value; keep looking
+        # past one that classifies as allowed.
+        my $v = classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);
+        return $v if length $v;
     }
     return q{};
 }
