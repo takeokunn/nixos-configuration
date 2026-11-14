@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Sends file-tool and Bash events through guard-and-guide with rules.toml and checks which ones it denies,
 # for the `guard-and-guide-rules` flake check. Usage: rules.test.sh <guard-and-guide binary> <rules.toml>
 
@@ -8,6 +8,7 @@ gg="$1"
 rules="$2"
 failures=0
 checked=0
+agent_args=()
 
 event() {
   jq -nc --arg t "$1" --argjson i "$2" '{hook_event_name: "PreToolUse", tool_name: $t, tool_input: $i, session_id: "s", transcript_path: "/x", cwd: "/x"}'
@@ -16,7 +17,7 @@ event() {
 # guard-and-guide prints nothing when no rule matches.
 decision() {
   local out
-  out=$(event "$1" "$2" | "$gg" --config "$rules")
+  out=$(event "$1" "$2" | "$gg" "${agent_args[@]}" --config "$rules")
   if [[ -z $out ]]; then echo allow; else jq -r '.hookSpecificOutput.permissionDecision' <<<"$out"; fi
 }
 
@@ -43,13 +44,13 @@ expect_cmd() {
 # Read, Write, and Edit all reach the `File` rules. MultiEdit and NotebookEdit are not covered by any
 # matcher in rules.toml, so they have no cases here.
 for tool in Read Write Edit; do
-  # .env: `\.env$` matches a file named *.env only; .env.local and similar are not matched.
+  # FR-002 protects .env.* as well, including templates until an exception is specified.
   expect deny "$tool" '/work/app/.env'
   expect deny "$tool" '.env'
   expect deny "$tool" '/work/app/.ENV'
   expect deny "$tool" '/work/app/prod.Env'
-  expect allow "$tool" '/work/app/.env.local'
-  expect allow "$tool" '/work/app/.env.example'
+  expect deny "$tool" '/work/app/.env.local'
+  expect deny "$tool" '/work/app/.env.example'
   expect allow "$tool" '/work/app/environment.md'
 
   # Key names are anchored to the file name; any id_<word> is a key, an extension makes it something else.
@@ -76,7 +77,7 @@ for tool in Read Write Edit; do
   expect allow "$tool" '/work/app/README.md'
 done
 
-# .ssh/ read: config, known_hosts, known_hosts.old and *.pub directly in the directory are readable.
+# FR-002 protects the whole .ssh directory, including config and public files.
 for ssh in .ssh .SSH .Ssh; do
   expect deny Read "/home/u/$ssh/id_ed25519"
   expect deny Read "/home/u/$ssh/id_rsa"
@@ -95,17 +96,17 @@ for ssh in .ssh .SSH .Ssh; do
   expect deny Read "/home/u/$ssh/config/../id_rsa"
   expect deny Read "/home/u/$ssh/"
   expect deny Read "/home/u/$ssh/config/.ssh/id_rsa"
-  expect allow Read "/home/u/$ssh/config"
-  expect allow Read "/home/u/$ssh/known_hosts"
-  expect allow Read "/home/u/$ssh/known_hosts.old"
-  expect allow Read "/home/u/$ssh/id_ed25519.pub"
-  expect allow Read "/home/u/$ssh/id_rsa.pub"
-  expect allow Read "/home/u/$ssh/custom_key.pub"
-  expect allow Read "/home/u/$ssh/.pub"
+  expect deny Read "/home/u/$ssh/config"
+  expect deny Read "/home/u/$ssh/known_hosts"
+  expect deny Read "/home/u/$ssh/known_hosts.old"
+  expect deny Read "/home/u/$ssh/id_ed25519.pub"
+  expect deny Read "/home/u/$ssh/id_rsa.pub"
+  expect deny Read "/home/u/$ssh/custom_key.pub"
+  expect deny Read "/home/u/$ssh/.pub"
 done
 expect allow Read '/home/u/.sshx'
 
-# .ssh/ write: Write and Edit block every path there, the readable ones included.
+# .ssh/ write: Write and Edit block every path there.
 for tool in Write Edit; do
   for ssh in .ssh .SSH; do
     expect deny "$tool" "/home/u/$ssh/config"
@@ -159,13 +160,50 @@ for cmd in 'rm -rf /tmp/x' 'rm -rf /tmp' 'rm -rf /tmp/' 'rm -rf /private/tmp/x' 
   expect_cmd allow "$cmd"
 done
 
-# A Bash event is not a file-tool event: the File rules leave shell commands to the other hooks.
-checked=$((checked + 1))
-out=$(event Bash '{"command": "cat /home/u/.ssh/id_rsa"}' | "$gg" --config "$rules")
-[[ -z $out ]] || {
-  echo "FAIL: a Bash command was decided by a File rule: $out" >&2
-  failures=$((failures + 1))
-}
+# Both runtimes supply Claude Code Bash events. Codex explicitly selects the adapter.
+for runtime in claude codex; do
+  agent_args=()
+  if [[ $runtime == codex ]]; then agent_args=(--agent claude-code); fi
+  for path in '.env' '.env.local' '.env.example' '.envrc' \
+    '~/.config/gh/hosts.yml' '$HOME/.config/gh/hosts.yml' '${HOME}/.config/gh/hosts.yml' \
+    '/home/u/.config/gh/hosts.yml' '/home/u/.gnupg/private-keys-v1.d/key' \
+    '/home/u/.gnupg' '/home/u/.docker/config.json' '/home/u/.kube/config' \
+    '/home/u/.ssh/id_rsa' '/home/u/.ssh/config' '/home/u/.ssh/id_ed25519.pub' \
+    '/home/u/.SSH/known_hosts' '/work/project with spaces/.env.local'; do
+    expect_cmd deny "cat $path"
+    expect_cmd deny "cat \"$path\""
+    expect_cmd deny "head -n 1 '$path'"
+    expect_cmd deny "bash -c 'cat \"$path\"'"
+    expect_cmd deny "aitools read '$path'"
+    expect_cmd deny "aitools read --range 1:2 '$path'"
+    expect_cmd deny "aitools --root /home/u read '$path'"
+    expect_cmd deny "aitools run -- cat '$path'"
+    expect_cmd deny "aitools run -- sh -c 'cat \"$path\"'"
+    expect_cmd deny "cat<'$path'"
+    expect_cmd deny "p='$path'; cat \"\$p\""
+    for tool in Read Write Edit; do
+      expect deny "$tool" "$path"
+    done
+  done
+  for path in '/work/environment.md' '/work/.envrc.example' '/work/prod.env.example' \
+    '/home/u/.sshx/key' '/home/u/.gnupgx/key' '/home/u/.config/gh/hosts.yml.example' \
+    '/home/u/.docker/config.json.example' '/home/u/.kube/config.example' \
+    '/work/docs/ssh.md' '/work/ssh/config' '/work/gnupg/key' \
+    '/work/my.ssh/config' '/work/my.gnupg/key' '/work/my.envrc' \
+    '/work/my.config/gh/hosts.yml'; do
+    expect_cmd allow "cat '$path'"
+    expect_cmd allow "aitools read '$path'"
+    for tool in Read Write Edit; do
+      expect allow "$tool" "$path"
+    done
+  done
+  # Existing credential protections also apply to shell tools.
+  for path in '/home/u/.aws/credentials' '/home/u/.git-credentials' '/home/u/.netrc' \
+    '/home/u/.npmrc' '/work/keys/id_ed25519'; do
+    expect_cmd deny "cat '$path'"
+    expect_cmd deny "aitools read '$path'"
+  done
+done
 
 if ((failures > 0)); then
   echo "$failures of $checked cases failed" >&2

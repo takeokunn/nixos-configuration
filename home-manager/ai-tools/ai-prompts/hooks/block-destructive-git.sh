@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # PreToolUse:Bash hook for agents that share a checkout with other sessions. Policy:
 # - `git` blocks (verdict `git`) unless its subcommand is on a read-only allowlist: status, log, diff,
 #   show, blame, rev-parse, ls-files, ls-tree, ls-remote, merge-base, rev-list, cat-file, grep,
@@ -17,6 +17,7 @@
 #   A global option value computed at run time blocks, except the value of -C and --work-tree when it
 #   is double-quoted and only a plain variable expansion (`git -C "$repo" log`).
 # - `aitools git ...` only reads, so it passes; `aitools run|bg ... git <args>` is judged like `git <args>`.
+# - `gh pr merge` and `gh repo delete` block in both modes, without an override.
 # - Destructive jj commands block: edit, next, prev, bisect, sparse set/reset/edit, abandon, undo, redo,
 #   op restore/revert, restore without paths, and new onto another revision; plus jj git push,
 #   which skips Git hooks.
@@ -29,7 +30,7 @@
 # `$(echo git) commit`, `$'git' commit`), a command fed to a shell on stdin (`bash <<< ...`,
 # `echo ... | bash`), `coproc git`, wrappers it does not peel (find -exec, watch, ssh, nix
 # run/shell), or a wrapper option whose value is a separate word that the hook does not know takes
-# one (`xargs -I {} git`, `sudo -T 5 git`, `time -f %e git`). A command substitution inside double
+# one (`sudo -T 5 git`, `time -f %e git`). A command substitution inside double
 # quotes ("$(git commit)", "`git commit`") is not classified either, for jj as well as git.
 # Everything else fails open on what the hook cannot classify, except where the unclassifiable part
 # could itself be destructive, which blocks: nesting deeper than the recursion limit, a jj
@@ -40,8 +41,8 @@
 # Override for the jj verdicts: ALLOW_DESTRUCTIVE_GIT=1 <command>. It covers jj git push only in the
 # default (Codex) mode.
 # Argument 1 selects how a jj git push verdict is reported. Without it the hook exits 2 with a banner
-# (Codex, where the override prefix lifts the push block). With `claude` the push is allowed silently:
-# Claude Code runs in bypassPermissions, so the user approved pushes without a prompt. A push never
+# (Codex, where the override prefix lifts the push block). With `claude` a direct push is allowed silently;
+# wrapped pushes block and must be rerun directly. Authorization is governed by the shared prompt. A push never
 # hides another verdict in the same command line: `jj git push -b x; jj undo` exits 2.
 # Every other verdict exits 2 in both modes.
 
@@ -89,6 +90,10 @@ my %RESERVED = map { $_ => 1 } qw(! if then elif else do while until);
 my %SUDO_VALUE_OPT = map { $_ => 1 } qw(-u -g -C -D -U -h -p -r -t
     --user --group --close-from --chdir --other-user --host --prompt --role --type --command-timeout --chroot);
 my %ENV_VALUE_OPT = map { $_ => 1 } qw(-u --unset -C --chdir);
+my %XARGS_VALUE_OPT = map { $_ => 1 } qw(
+    -I -J -L -n -P -s -E -R -S -a -d
+    --arg-file --delimiter --max-args --max-procs --max-chars --process-slot-var
+);
 
 # Wrappers whose command arrives as a string operand and has to be re-parsed.
 my %SHELL = map { $_ => 1 } qw(bash sh zsh fish dash ksh mksh ash);
@@ -271,6 +276,7 @@ sub lex_segments {
 sub verdict_for_segment {
     my ($tokens, $depth, $allow) = @_;
     my @t = @{$tokens};
+    my $wrapped = $depth > 0;
 
     # Environment that swaps the config jj reads, which can change the identity the push check relies on.
     my $jj_env = 0;
@@ -285,7 +291,8 @@ sub verdict_for_segment {
     # In claude mode a jj push keeps its verdict, which the push branch below allows.
     my $lift = sub {
         my ($v) = @_;
-        return q{} if $allow and $v ne 'git' and $v ne 'depth' and !($CLAUDE_MODE and $v eq 'jj-push');
+        return q{} if $allow and $v =~ /^jj-/ and $v ne 'jj-push-wrapper'
+            and !($CLAUDE_MODE and $v eq 'jj-push');
         return $v;
     };
 
@@ -304,7 +311,7 @@ sub verdict_for_segment {
             next;
         }
 
-        if (!$t[0]{quoted} and $RESERVED{$raw}) { shift @t; next; }
+        if (!$t[0]{quoted} and $RESERVED{$raw}) { $wrapped = 1; shift @t; next; }
 
         # eval takes its command as the concatenation of the remaining words.
         if ($w eq 'eval') {
@@ -316,8 +323,8 @@ sub verdict_for_segment {
             shift @t;
             while (@t) {
                 my $a = $t[0]{text};
-                # -c, and combined short forms such as -lc, take the command string next.
-                if ($a =~ /^-[A-Za-z]*c$/) {
+                # -c may appear anywhere in a short-option bundle (-lc, -cl, -ec).
+                if ($a =~ /^-[A-Za-z]*c[A-Za-z]*$/) {
                     shift @t;
                     return @t ? classify($t[0]{text}, $depth + 1, $allow) : q{};
                 }
@@ -330,6 +337,7 @@ sub verdict_for_segment {
         }
 
         if ($WRAPPER{$w}) {
+            $wrapped = 1;
             shift @t;
             while (@t) {
                 my $a = $t[0]{text};
@@ -344,7 +352,8 @@ sub verdict_for_segment {
                 }
                 # `command -v git` only prints a path.
                 return q{} if $w eq 'command' and $a =~ /^-[A-Za-z]*[vV][A-Za-z]*$/;
-                if (($w eq 'sudo' and $SUDO_VALUE_OPT{$a}) or ($w eq 'env' and $ENV_VALUE_OPT{$a})) {
+                if (($w eq 'sudo' and $SUDO_VALUE_OPT{$a}) or ($w eq 'env' and $ENV_VALUE_OPT{$a})
+                    or ($w eq 'xargs' and $XARGS_VALUE_OPT{$a})) {
                     shift @t; shift @t if @t; next;
                 }
                 if ($a =~ /^-/) { shift @t; next; }
@@ -369,7 +378,12 @@ sub verdict_for_segment {
     shift @t;
     my @a = map { $_->{text} } @t;
 
-    return $lift->(jj_verdict($depth, $allow, $jj_env, @a)) if $prog eq 'jj';
+    if ($prog eq 'jj') {
+        my $v = jj_verdict($depth, $allow, $jj_env, @a);
+        return 'jj-push-wrapper' if $CLAUDE_MODE and $wrapped and $v eq 'jj-push';
+        return $v if $v eq 'jj-push-wrapper';
+        return $lift->($v);
+    }
     # A dynamic value counts as quoted only when every part of its word is quoted.
     my @aq = map { ($_->{quoted} && !$_->{udyn}) ? 1 : 0 } @t;
     if ($prog eq 'git') {
@@ -377,23 +391,45 @@ sub verdict_for_segment {
         return q{} unless $git_verdict;
         return git_dynamic_path_help($git_env, \@aq, @a) ? 'git-dynamic-path' : 'git';
     }
+    return gh_verdict(@a) if $prog eq 'gh';
     return aitools_verdict($depth, $allow, @a) if $prog eq 'aitools';
     return q{};
 }
 
-# `aitools git ...` only reads (status, log, diff, blame, show). `aitools run|bg` can launch any program,
-# so from the first git word after a launcher word the rest is judged as a git command line. Scanning
-# stops at the first git word, so `aitools git log --grep run` never reads as a launch.
+# `aitools git ...` only reads. Its process launchers can invoke protected commands directly
+# or through a shell; use the same classifier after finding that command.
 sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
     my $launcher = 0;
     for my $i (0 .. $#a) {
         $launcher = 1 if $a[$i] eq 'run' or $a[$i] eq 'bg';
         (my $b = $a[$i]) =~ s{^.*/}{};
-        next unless $b eq 'git';
+        next unless $b eq 'git' or $b eq 'gh' or $b eq 'jj' or $SHELL{$b};
         return q{} unless $launcher;
         return classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);
     }
+    return q{};
+}
+
+# gh permits persistent options before or between subcommands.
+sub gh_verdict {
+    my @a = @_;
+    my @pos;
+    while (@a and @pos < 2) {
+        my $x = shift @a;
+        return q{} if $x eq '--help' or $x eq '-h' or $x eq '--version';
+        if ($x eq '-R' or $x eq '--repo' or $x eq '--hostname') {
+            shift @a if @a;
+            next;
+        }
+        next if $x =~ /^(?:--(?:repo|hostname)=|-R.)/;
+        next if $x =~ /^-/;
+        push @pos, $x;
+    }
+    return 'gh-destructive' if @pos and is_dynamic($pos[0]);
+    return q{} unless @pos == 2;
+    return 'gh-destructive' if ($pos[0] eq 'pr' and ($pos[1] eq 'merge' or is_dynamic($pos[1])))
+        or ($pos[0] eq 'repo' and ($pos[1] eq 'delete' or is_dynamic($pos[1])));
     return q{};
 }
 
@@ -732,6 +768,27 @@ EOF
   exit 2
 fi
 
+if [[ $verdict == gh-destructive ]]; then
+  cat >&2 <<'EOF'
+GitHub destructive operation blocked (ORCH-P005)
+
+gh pr merge and gh repo delete are not available to agents. Ask the user to perform the operation.
+ALLOW_DESTRUCTIVE_GIT=1 does not lift this block.
+EOF
+  exit 2
+fi
+
+if [[ $verdict == jj-push-wrapper ]]; then
+  cat >&2 <<'EOF'
+Wrapped jj git push blocked (ORCH-P005)
+
+Run jj git push directly so its revisions can be checked before pushing.
+Remove shell and process wrappers such as bash -c, env, or aitools run.
+ALLOW_DESTRUCTIVE_GIT=1 does not lift this block.
+EOF
+  exit 2
+fi
+
 if [[ $verdict == jj-push ]]; then
   if [[ $mode == claude ]]; then
     exit 0
@@ -783,8 +840,7 @@ Use instead:
   Undo a revision      jj revert -r <rev> --onto @
   Discard one file     jj restore <path> (allowed)
 
-If this is the only way to do the task, the override prefix lifts this block (Claude Code asks the
-user to confirm each use; Codex has no prompt, so the prefix is the only gate there):
+If the user has authorized this operation, the override prefix lifts this block without a prompt:
   ALLOW_DESTRUCTIVE_GIT=1 <your command>
 EOF
   exit 2
@@ -805,7 +861,7 @@ cat >&2 <<'EOF'
 
 Only read-only git subcommands are allowed (status, log, diff, show, blame, rev-parse, ls-files, ...),
 and ALLOW_DESTRUCTIVE_GIT=1 does not lift this block. Writes go through jj:
-  commit              jj commit -m "<message>"
+  commit              jj commit <paths> -m "<message>"
   branch, checkout -b jj bookmark create <b> -r @
   fetch               git fetch <remote> [<ref>...] is allowed (named remote, no local-branch refspec,
                       no --prune or --upload-pack); jj git fetch --remote <r> --branch <b> also works

@@ -489,10 +489,11 @@ expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
 expect_claude_allow 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
 expect_claude_allow 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
-expect_claude_allow 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
-expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
-expect_claude_allow 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
-expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
+# FR-002 requires wrapped pushes to be rerun directly, including overrides.
+expect_claude_block 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
+expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
+expect_claude_block 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
 # Other jj verdicts are still lifted by the override, so the push is allowed.
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
@@ -574,6 +575,74 @@ expect_block 'jj util exec -- bash -c "jj abandon"'
 expect_allow 'echo "jj abandon"'
 expect_allow "rg -n 'jj undo' docs"
 expect_allow $'cat <<EOF\njj abandon\nEOF'
+
+# FR-002: irreversible GitHub commands block in both runtimes, regardless of wrappers or override.
+for runtime in claude codex; do
+  for operation in 'pr merge 12 --merge' 'repo delete example/project --yes'; do
+    for invocation in \
+      "gh $operation" \
+      "/opt/bin/gh $operation" \
+      "gh -R example/project $operation" \
+      "gh --repo=example/project $operation" \
+      "gh -Rexample/project $operation" \
+      "env gh $operation" \
+      "bash -lc 'gh $operation'" \
+      "bash -cl 'gh $operation'" \
+      "bash -ec 'gh $operation'" \
+      "xargs -I {} gh $operation" \
+      "xargs -I{} gh $operation" \
+      "xargs -n 1 -P 2 gh $operation" \
+      "ALLOW_DESTRUCTIVE_GIT=1 gh $operation" \
+      "CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 gh $operation" \
+      "ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- gh $operation" \
+      "aitools run -- gh $operation" \
+      "aitools bg start -- gh $operation" \
+      "aitools run -- sh -c 'gh $operation'"; do
+      expect_block_message "$invocation" 'GitHub destructive operation blocked' "$runtime"
+    done
+  done
+  expect_block_message 'gh pr --repo example/project merge 12' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'gh repo --hostname github.com delete example/project' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'jj git push -b x; gh pr merge 12' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'git commit src/app.sh -m update' 'jj commit <paths> -m' "$runtime"
+  expect_block_message 'gh "$group" merge 1' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'gh $(printf pr) merge 1' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'gh $operation' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'gh pr "$action" 1' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'gh repo "$action" example/project' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'ALLOW_DESTRUCTIVE_GIT=1 gh "$group" merge 1' 'GitHub destructive operation blocked' "$runtime"
+  expect_block_message 'xargs -I {} gh pr merge {}' 'GitHub destructive operation blocked' "$runtime"
+done
+expect_allow 'gh pr view 12'
+expect_allow 'gh repo view example/project'
+expect_allow 'gh pr list --search merge'
+expect_allow 'gh repo list --json name'
+expect_allow 'echo "gh pr merge 12"'
+expect_allow 'aitools read gh'
+expect_allow 'gh --help'
+expect_allow 'gh pr --help'
+expect_allow 'xargs -I {} gh pr view {}'
+expect_allow 'xargs -n 1 gh repo view'
+expect_allow 'bash -cl "gh pr view 1"'
+expect_block 'bash -cl "jj git push"'
+
+# Every refusal assertion checks a nonempty stderr banner as well as exit 2.
+for invocation in \
+  'bash -c "jj git push"' \
+  'bash -cl "jj git push"' \
+  'xargs -I {} jj git push -b {}' \
+  'zsh -lc "jj git push -b feature"' \
+  'env jj git push' \
+  'env -S "jj git push"' \
+  'command jj git push' \
+  'sudo jj git push' \
+  'eval jj git push' \
+  'jj util exec -- jj git push' \
+  'aitools run -- jj git push' \
+  'aitools run -- bash -c "jj git push"' \
+  'ALLOW_DESTRUCTIVE_GIT=1 aitools run -- jj git push'; do
+  expect_block_message "$invocation" 'Run jj git push directly' claude
+done
 
 # Nothing to classify: malformed input and an empty command stand aside.
 checked=$((checked + 1))
