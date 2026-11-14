@@ -646,99 +646,117 @@
                 touch $out
               '';
 
-          checks.codex-hooks =
-            let
-              darwinConfig = self.darwinConfigurations.M4-Max.config;
-              codex = darwinConfig.home-manager.users.take.programs.codex;
-              linuxPolicy = self.nixosConfigurations.X13Gen2.config.environment.etc."codex/requirements.toml";
-              plain = builtins.unsafeDiscardStringContext;
-            in
-            pkgs.runCommand "codex-hooks-test"
-              {
-                nativeBuildInputs = [
-                  pkgs.jq
-                  pkgs.python3
-                ];
-                requirementsFile = linuxPolicy.source;
-                userHooksJson = plain (builtins.toJSON codex.hooks);
-                userRulesJson = plain (builtins.toJSON codex.rules);
-                settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
-                darwinActivation = darwinConfig.system.activationScripts.extraActivation.text;
-                linuxPolicyJson = plain (
-                  builtins.toJSON {
-                    inherit (linuxPolicy) mode;
-                    source = toString linuxPolicy.source;
-                  }
-                );
-                settingsJson = builtins.toJSON {
-                  inherit (codex.settings) model model_reasoning_effort;
-                  hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;
-                  hasApprovalPolicy = codex.settings ? approval_policy;
-                  hasSandboxMode = codex.settings ? sandbox_mode;
-                };
-              }
-              ''
-                python3 - <<'PY'
-                import json
-                import os
-                from pathlib import Path
-                import shlex
-                import tomllib
+          imports = [
+            {
+              checks =
+                pkgs.lib.optionalAttrs
+                  (builtins.elem pkgs.stdenv.hostPlatform.system [
+                    "aarch64-darwin"
+                    "x86_64-linux"
+                  ])
+                  {
+                    codex-hooks =
+                      let
+                        isDarwin = pkgs.stdenv.isDarwin;
+                        hostConfig =
+                          if isDarwin then
+                            self.darwinConfigurations.M4-Max.config
+                          else
+                            self.nixosConfigurations.X13Gen2.config;
+                        codex = hostConfig.home-manager.users.take.programs.codex;
+                        linuxPolicy = hostConfig.environment.etc."codex/requirements.toml";
+                        plain = builtins.unsafeDiscardStringContext;
+                      in
+                      pkgs.runCommand "codex-hooks-test"
+                        (
+                          {
+                            nativeBuildInputs = [
+                              pkgs.jq
+                              pkgs.python3
+                            ];
+                            userHooksJson = plain (builtins.toJSON codex.hooks);
+                            userRulesJson = plain (builtins.toJSON codex.rules);
+                            settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
+                            settingsJson = builtins.toJSON {
+                              inherit (codex.settings) model model_reasoning_effort;
+                              hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;
+                              hasApprovalPolicy = codex.settings ? approval_policy;
+                              hasSandboxMode = codex.settings ? sandbox_mode;
+                            };
+                          }
+                          // pkgs.lib.optionalAttrs isDarwin {
+                            darwinActivation = hostConfig.system.activationScripts.extraActivation.text;
+                          }
+                          // pkgs.lib.optionalAttrs (!isDarwin) {
+                            requirementsFile = linuxPolicy.source;
+                            requirementsMode = linuxPolicy.mode;
+                          }
+                        )
+                        ''
+                          python3 - <<'PY'
+                          import json
+                          import os
+                          from pathlib import Path
+                          import shlex
+                          import tomllib
 
-                def check_policy(source):
-                    policy = tomllib.loads(Path(source).read_text())
-                    assert policy["features"]["hooks"] is True
-                    hooks = policy["hooks"]
-                    root = Path(hooks["managed_dir"])
-                    assert root.is_absolute() and root.is_dir()
-                    entries = hooks["PreToolUse"]
-                    assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
-                    commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
-                    expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
-                    assert sorted(commands) == sorted(str(root / name) for name in expected)
-                    for command in commands:
-                        path = Path(command)
-                        assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
-                    assert "--agent claude-code" in (root / "guard-and-guide").read_text()
-                    assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
-                    rules = policy["rules"]["prefix_rules"]
-                    assert rules and all(rule["decision"] == "forbidden" for rule in rules)
-                    patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
-                    for command in [["git", "commit"], ["gh", "pr", "merge"], ["gh", "repo", "delete"]]:
-                        assert command in patterns
-                    assert ["git", "stash"] not in patterns
-                    print(f"codex managed policy: {len(commands)} hooks, {len(rules)} forbidden prefixes")
+                          def check_policy(source):
+                              policy = tomllib.loads(Path(source).read_text())
+                              assert policy["features"]["hooks"] is True
+                              hooks = policy["hooks"]
+                              root = Path(hooks["managed_dir"])
+                              assert root.is_absolute() and root.is_dir()
+                              entries = hooks["PreToolUse"]
+                              assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
+                              commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
+                              expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
+                              assert sorted(commands) == sorted(str(root / name) for name in expected)
+                              for command in commands:
+                                  path = Path(command)
+                                  assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
+                              assert "--agent claude-code" in (root / "guard-and-guide").read_text()
+                              assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
+                              rules = policy["rules"]["prefix_rules"]
+                              assert rules and all(rule["decision"] == "forbidden" for rule in rules)
+                              patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
+                              for command in [["git", "commit"], ["gh", "pr", "merge"], ["gh", "repo", "delete"]]:
+                                  assert command in patterns
+                              assert ["git", "stash"] not in patterns
+                              print(f"codex managed policy: {len(commands)} hooks, {len(rules)} forbidden prefixes")
 
-                # Home Manager must not register these again or recreate a rules symlink.
-                assert json.loads(os.environ["userHooksJson"]) == {}
-                assert json.loads(os.environ["settingsHooksJson"]) is None
-                assert json.loads(os.environ["userRulesJson"]) == {}
-                linux = json.loads(os.environ["linuxPolicyJson"])
-                assert linux["mode"] == "0644"
-                assert linux["source"] == os.environ["requirementsFile"]
-                check_policy(linux["source"])
-                installs = []
-                for line in os.environ["darwinActivation"].splitlines():
-                    if not line.lstrip().startswith("install "):
-                        continue
-                    argv = shlex.split(line, comments=True)
-                    if argv[-1] == "/etc/codex/requirements.toml":
-                        assert len(argv) == 5 and argv[:3] == ["install", "-m", "0644"]
-                        installs.append(argv[3])
-                assert len(installs) == 1
-                check_policy(installs[0])
-                PY
-                if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
-                  echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
-                  exit 1
-                fi
-                # approval_policy and sandbox_mode are wrapper -c flags so they outrank the mutable config.toml.
-                if ! jq -e '.hasAutoCompactLimit == false and .hasApprovalPolicy == false and .hasSandboxMode == false' <<< "$settingsJson" >/dev/null; then
-                  echo "programs.codex.settings carries model_auto_compact_token_limit, approval_policy, or sandbox_mode" >&2
-                  exit 1
-                fi
-                touch $out
-              '';
+                          # Home Manager must not register these again or recreate a rules symlink.
+                          assert json.loads(os.environ["userHooksJson"]) == {}
+                          assert json.loads(os.environ["settingsHooksJson"]) is None
+                          assert json.loads(os.environ["userRulesJson"]) == {}
+                          if "darwinActivation" in os.environ:
+                              installs = []
+                              for line in os.environ["darwinActivation"].splitlines():
+                                  if not line.lstrip().startswith("install "):
+                                      continue
+                                  argv = shlex.split(line, comments=True)
+                                  if argv[-1] == "/etc/codex/requirements.toml":
+                                      assert len(argv) == 5 and argv[:3] == ["install", "-m", "0644"]
+                                      installs.append(argv[3])
+                              assert len(installs) == 1
+                              check_policy(installs[0])
+                          else:
+                              assert os.environ["requirementsMode"] == "0644"
+                              check_policy(os.environ["requirementsFile"])
+                          PY
+                          if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
+                            echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
+                            exit 1
+                          fi
+                          # approval_policy and sandbox_mode are wrapper -c flags so they outrank the mutable config.toml.
+                          if ! jq -e '.hasAutoCompactLimit == false and .hasApprovalPolicy == false and .hasSandboxMode == false' <<< "$settingsJson" >/dev/null; then
+                            echo "programs.codex.settings carries model_auto_compact_token_limit, approval_policy, or sandbox_mode" >&2
+                            exit 1
+                          fi
+                          touch $out
+                        '';
+                  };
+            }
+          ];
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [ nixd ];
