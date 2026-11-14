@@ -230,7 +230,7 @@
             self.nixosConfigurations.X13Gen2.config.home-manager.users.take.programs.claude-code.configDir;
 
           claudeCodeManagedSettings = import ./shared/claude-code-managed-settings.nix {
-            inherit (pkgs) lib;
+            inherit (pkgs) lib python3;
             guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
             homeDirectory = claudeCodeHomeDirectory;
           };
@@ -393,14 +393,20 @@
           checks.guard-and-guide-rules =
             pkgs.runCommand "guard-and-guide-rules-test"
               {
-                nativeBuildInputs = [ pkgs.jq ];
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.python3
+                ];
               }
               ''
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/rules.test.sh} \
                   ${
                     inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default
                   }/bin/guard-and-guide \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml}
+                  ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.py}
+                python3 ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.test.py} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.py}
                 touch $out
               '';
 

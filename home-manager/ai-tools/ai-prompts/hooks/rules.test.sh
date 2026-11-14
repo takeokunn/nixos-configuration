@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Sends file-tool and Bash events through guard-and-guide with rules.toml and checks which ones it denies,
-# for the `guard-and-guide-rules` flake check. Usage: rules.test.sh <guard-and-guide binary> <rules.toml>
+# for the flake check. Usage: rules.test.sh <guard-and-guide binary> <rules.toml> [search adapter]
 
 set -euo pipefail
 
 gg="$1"
 rules="$2"
+adapter="${3:-$(dirname "$0")/guard-search-arguments.py}"
 failures=0
 checked=0
 agent_args=()
@@ -17,7 +18,7 @@ event() {
 # guard-and-guide prints nothing when no rule matches.
 decision() {
   local out
-  out=$(event "$1" "$2" | "$gg" "${agent_args[@]}" --config "$rules")
+  out=$(event "$1" "$2" | python3 "$adapter" "$gg" "${agent_args[@]}" --config "$rules")
   if [[ -z $out ]]; then echo allow; else jq -r '.hookSpecificOutput.permissionDecision' <<<"$out"; fi
 }
 
@@ -248,6 +249,25 @@ for runtime in claude codex; do
       '~/.ssh/id_rsa'; do
       expect_cmd deny "${reader/X/$path}"
     done
+    for path in 'prod.env' 'config.env' '/work/app.env' './prod.env' '/work/project with spaces/prod.env'; do
+      expect_cmd deny "${reader/X/\"$path\"}"
+    done
+  done
+  for cmd in 'source config.env' 'aitools read prod.env' 'cat prod.env>out' \
+    'rg process.env prod.env' 'rg prod.env ./prod.env' 'rg "process.env" "prod.env"' \
+    'rg -e process.env -e app.env prod.env' 'grep --regexp=process.env prod.env' \
+    'rg -f prod.env process.env' 'grep --file=prod.env process.env' \
+    'rg --glob prod.env process.env' 'rg --unknown process.env' \
+    'rg process.env>prod.env' 'grep process.env<prod.env' 'rg $(cat prod.env)' \
+    'rg "process.env|.env" docs' 'rg .env docs' 'rg .env.local docs'; do
+    expect_cmd deny "$cmd"
+  done
+  for cmd in 'rg prod.env docs' 'grep -rn app.env src' 'rg -- process.env docs' \
+    'rg -e process.env -e app.env docs' 'grep -ineprocess.env docs' \
+    'rg --regexp=process.env docs' 'grep --regexp process.env docs' \
+    'rg -g src -e process.env docs' 'rg docs -e process.env' \
+    'rg -f patterns -e process.env docs' 'rg process.env>>out'; do
+    expect_cmd allow "$cmd"
   done
   # D1 accepts blocking non-read uses to avoid reopening credential reads.
   for cmd in 'python -m venv .env' 'cp .env.example .env' \
@@ -256,6 +276,28 @@ for runtime in claude codex; do
     expect_cmd deny "$cmd"
   done
   for cmd in 'rg "process.env"' 'jq .id_token f.json' 'git diff -- .env.example'; do
+    expect_cmd allow "$cmd"
+  done
+
+  # Redirection and backticks terminate credential words without intervening whitespace.
+  for path in '.env' '.env.local' '.envrc' 'id_rsa' '/keys/id_custom' \
+    '/home/u/.ssh/key' '/home/u/.gnupg/key' '/home/u/.aws/credentials' \
+    '/home/u/.config/gh/hosts.yml' '/home/u/.docker/config.json' \
+    '/home/u/.kube/config' '/home/u/.netrc'; do
+    expect_cmd deny "cat $path>out"
+    expect_cmd deny "cat $path<in"
+    expect_cmd deny "echo \`cat $path\`"
+  done
+  for cmd in 'grep K .env>/tmp/x' 'cat .env`' 'cat id_rsa>x'; do
+    expect_cmd deny "$cmd"
+  done
+  for template in example sample template; do
+    expect_cmd allow "cat .env.$template>out"
+    expect_cmd allow "cat .env.$template<in"
+    expect_cmd allow "echo \`cat .env.$template\`"
+  done
+  for cmd in 'rg "process.env">out' "grep -rn 'import.meta.env' .>out" \
+    'cat id_rsa.pub>out' 'cat /work/.envrc.example>out'; do
     expect_cmd allow "$cmd"
   done
 
