@@ -57,8 +57,8 @@ review or verification agents only on user request, for security or data changes
 changes without tests for the changed behavior; do not have agents recheck what a check established.
 
 Ask the user only about actions needing approval, design branches that would be hard to reverse, and facts
-only the user holds. Take the recommended option of a reversible branch and report it; /define instead asks
-every design branch. Otherwise state the assumption and proceed.
+only the user holds. Take the recommended option of a reversible branch and report it; /define is the exception
+(see the define command). Otherwise state the assumption and proceed.
 
 Do all in-scope work, including same-kind defects in code you touched and review findings on your change.
 Stop when the requested result is verified; report other improvements without implementing them. An
