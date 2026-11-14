@@ -5,11 +5,13 @@
 # (every gh account's token and environment variables named like a secret), which catches values
 # whose format gitleaks does not know.
 #
-# auth and secret pass through: they carry credentials to GitHub by design, and git's credential
-# helper runs `gh auth git-credential` on every fetch and push. Fails closed, with no override.
+# Agent processes (CLAUDECODE or CODEX_THREAD_ID) also refuse merges, repository deletion, token
+# output, and alias/extension execution. REST writes use an endpoint allowlist; GraphQL documents
+# are checked after JSON decoding. auth and secret otherwise carry credentials by design, and
+# git's credential helper must remain usable. Fails closed, with no override.
 #
-# Not covered: a secret split across words, gh extensions, and commits that gh pushes, which are
-# git's to check.
+# Not covered: secrets split across words, interactive editor input, and commits gh pushes. Agent
+# policy does not cover deliberately cleared markers, direct upstream binaries, or other API clients.
 
 set -uo pipefail
 
@@ -29,6 +31,39 @@ stop and ask the user.
 EOF
   exit 1
 }
+
+agent=0
+[[ -n ${CLAUDECODE:-} || -n ${CODEX_THREAD_ID:-} ]] && agent=1
+if ((agent)); then
+  case "${1-}" in
+  "" | --version | -h | --help) ;;
+  agent-task | alias | api | attestation | auth | browse | cache | codespace | cs | completion | config | discussion | extension | ext | gist | gpg-key | help | issue | label | licenses | org | pr | preview | project | release | repo | ruleset | run | search | secret | skill | ssh-key | status | variable | version | workflow) ;;
+  *) block "the command is not a recognised gh built-in; aliases and extensions are not allowed" ;;
+  esac
+  sub=""
+  sub_args=("${@:2}")
+  i=0
+  while ((i < ${#sub_args[@]})); do
+    case ${sub_args[i]} in
+    -R | --repo | --hostname) ((i += 2)); continue ;;
+    -*) ;;
+    *) sub=${sub_args[i]}; break ;;
+    esac
+    ((i += 1))
+  done
+  case "${1-} $sub" in
+  "pr merge" | "repo delete") block "merge and repository deletion require the user to run gh" ;;
+  "alias set" | "alias import") block "gh aliases are not allowed; run the full command" ;;
+  "extension install" | "extension exec" | "extension upgrade" | "ext install" | "ext exec" | "ext upgrade") block "extension installation and execution are not allowed from agents" ;;
+  "auth token") block "token output is not allowed from agents" ;;
+  "auth status")
+    for arg in "${sub_args[@]}"; do
+      [[ $arg == --show-token || $arg == --show-token=* || $arg =~ ^-[^-]*t ]] &&
+        block "token output is not allowed from agents"
+    done
+    ;;
+  esac
+fi
 
 case "${1-}" in
 "" | auth | secret | help | completion | version | --version | -h | --help)
@@ -72,6 +107,86 @@ if ((reads_stdin)) && [[ ! -t 0 ]]; then
   append "$stdin_copy"
 fi
 ((${#files[@]} == 0)) || append -- "${files[@]}"
+
+if ((agent)) && [[ ${1-} == api ]]; then
+  method="" endpoint="" input="" has_body=0
+  api_args=("${@:2}")
+  i=0
+  while ((i < ${#api_args[@]})); do
+    arg=${api_args[i]}
+    option=${arg%%=*}
+    value=""
+    case $arg in
+    -X?* | -f?* | -F?* | -H?* | -q?* | -t?* | -p?*) option=${arg:0:2}; value=${arg:2}; value=${value#=} ;;
+    --*=*) value=${arg#*=} ;;
+    esac
+    case $option in
+    -X | --method | -f | -F | --raw-field | --field | --input | -H | --header | -q | --jq | -t | --template | -p | --preview | --hostname | --cache)
+      if [[ $arg == "$option" ]]; then
+        ((i += 1))
+        ((i < ${#api_args[@]})) || block "gh api is missing an option value"
+        value=${api_args[i]}
+      fi
+      case $option in
+      -X | --method)
+        method=$(printf '%s' "$value" | tr '[:lower:]' '[:upper:]') || block "gh api method could not be parsed"
+        [[ -n $method ]] || block "gh api method could not be parsed"
+        ;;
+      --input) has_body=1; input=$value; [[ -n $input ]] || block "gh api has an empty input path" ;;
+      -f | -F | --raw-field | --field)
+        has_body=1
+        [[ $value == *=* ]] || block "gh api field could not be parsed"
+        if [[ $option == -F || $option == --field ]] && [[ ${value#*=} == @* ]]; then
+          source_path=${value#*=@}
+          [[ $source_path == - || $source_path == /dev/stdin ]] && source_path=$stdin_copy
+          [[ -n $source_path && -f $source_path && -r $source_path ]] || block "gh api field file could not be read"
+        fi
+        ;;
+      esac
+      ;;
+    -i | --include | --paginate | --slurp | --silent | --verbose | --allow-escape-sequences) [[ $arg == "$option" ]] || block "gh api flag could not be parsed" ;;
+    --help | -h) ;;
+    -*) block "gh api option is not recognised by the guard" ;;
+    *) [[ -z $endpoint ]] || block "gh api has multiple endpoints"; endpoint=$arg ;;
+    esac
+    ((i += 1))
+  done
+  [[ -n $endpoint ]] || block "gh api endpoint could not be parsed"
+  if [[ -z $method ]]; then
+    if ((has_body)); then method=POST; else method=GET; fi
+  fi
+  case $method in GET | HEAD | POST | PATCH | PUT | DELETE | OPTIONS) ;; *) block "gh api method could not be parsed" ;; esac
+  path=${endpoint#http*://*/}
+  path=${path#/}
+  path=${path%%\?*}
+  path=${path#api/v3/}
+  if [[ $path == graphql || $path == api/graphql ]]; then
+    [[ $endpoint != *\?* ]] || block "GraphQL query strings cannot be verified; use a query field or JSON input"
+    doc="$work/graphql"
+    cp "$content" "$doc" || block "could not record the GraphQL document"
+    if [[ -n $input ]]; then
+      source_path=$input
+      [[ $source_path == - || $source_path == /dev/stdin ]] && source_path=$stdin_copy
+      [[ -n $source_path && -f $source_path && -r $source_path ]] || block "the GraphQL input could not be read"
+      "$jq" -er 'if type == "object" and (.query | type) == "string" then .. | strings else error("invalid body") end' \
+        <"$source_path" >>"$doc" 2>/dev/null || block "the GraphQL input is not a readable JSON query"
+    fi
+    grep -qE '(^|[^A-Za-z0-9_])(mergePullRequest|enablePullRequestAutoMerge|enqueuePullRequest|mergeBranch|deleteRepository)([^A-Za-z0-9_]|$)' "$doc"
+    case $? in
+    0) block "GraphQL merge, auto-merge, merge queue, and repository deletion are not allowed" ;;
+    1) ;;
+    *) block "the GraphQL check did not complete" ;;
+    esac
+  elif [[ $method != GET && $method != HEAD ]]; then
+    seg='[A-Za-z0-9_{}-][A-Za-z0-9_.{}-]*'
+    n='[0-9]+'
+    allowed="^repos/$seg/$seg/(pulls|issues)(/$n(/(comments|reviews|requested_reviewers|labels|assignees))?)?$"
+    allowed+="|^repos/$seg/$seg/pulls/$n/(comments/$n/replies|reviews/$n(/events)?)$"
+    allowed+="|^repos/$seg/$seg/(pulls|issues)/comments/$n$"
+    allowed+="|^repos/$seg/$seg/git/(refs|tags)$"
+    [[ $path =~ $allowed ]] || block "the REST write endpoint is not on the agent allowlist; ask the user"
+  fi
+fi
 
 # Text gh can build from git: commit messages (pr create --fill and its spellings) and tag messages
 # (release --notes-from-tag). Read whenever the subcommand could use them, since matching the flags

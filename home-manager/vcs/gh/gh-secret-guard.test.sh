@@ -8,6 +8,9 @@
 
 set -uo pipefail
 
+# The original egress checks apply to people too; agent-only policy is exercised separately below.
+unset CLAUDECODE CODEX_THREAD_ID
+
 guard="$1"
 broken_guard="$2"
 failures=0
@@ -192,6 +195,99 @@ checked=$((checked + 1))
 status=0
 STUB_EXIT=4 "$guard" pr view 1 </dev/null >/dev/null 2>&1 || status=$?
 [[ $status -eq 4 ]] || fail "expected gh's exit status 4 to pass through, got $status"
+
+# D1: post-expansion argv policy, with both runtime markers and a human control.
+expect_allow /dev/null pr merge 1
+printf 'aliases:\n  m: pr merge\n' >"$GH_CONFIG_DIR/config.yml"
+printf '{"query":"query{viewer{login}}"}\n' >query.json
+# Generate JSON with escaped mutation spelling without relying on shell escape interpretation.
+printf '%s\n' '{"query":"mutation{merge\u0050ullRequest{clientMutationId}}"}' >escaped.json
+printf '%s\n' 'mutation{mergePullRequest{clientMutationId}}' >merge.graphql
+for marker in CLAUDECODE CODEX_THREAD_ID; do
+  export "$marker=fixture"
+  while IFS=$'\t' read -r expected line; do
+    read -r -a argv <<<"$line"
+    if [[ $expected == stdin ]]; then
+      expect_block escaped.json "${argv[@]}"
+    elif [[ $expected == allow ]]; then
+      expect_allow /dev/null "${argv[@]}"
+    else
+      expect_block /dev/null "${argv[@]}"
+    fi
+  done <<'CASES'
+allow	pr create --title t --body b
+allow	pr create --title merge-fix --body b
+allow	pr comment 1 --body hi
+allow	pr view 1
+allow	pr list --search merge
+allow	repo view o/r
+allow	issue create --title t --body b
+allow	api repos/o/r/pulls
+allow	api repos/o/r/pulls/1/comments -f body=x
+allow	api -X POST repos/o/r/pulls/1/reviews -f event=COMMENT
+allow	api repos/o/r/pulls/1/comments/2/replies -f body=x
+allow	api repos/{owner}/{repo}/pulls/1/comments -f body=x
+allow	api -X PATCH repos/o/r/issues/comments/5 -f body=x
+allow	api graphql -f query=query{viewer{login}}
+block	api graphql?query=mutation%7B%6dergePullRequest%7BclientMutationId%7D%7D
+allow	api graphql -f query=mutation{resolveReviewThread(input:{threadId:"x"}){clientMutationId}}
+allow	api graphql --input query.json
+block	m 1
+block	probe pr merge 1
+allow	ext list
+block	copilot
+block	extension exec probe
+block	--repo o/r pr merge 1
+block	pr merge 1
+block	pr merge --auto --squash 1
+block	pr -R o/r merge 1
+block	pr --repo o/r merge 1
+block	repo delete o/r --yes
+block	api -X PUT repos/o/r/pulls/1/merge
+block	api --method=put repos/o/r/pulls/1/merge
+block	api -XPUT repos//o/r/pulls/1/merge
+block	api -X PUT repos/o/r/./pulls/1/merge
+block	api -X PUT repos/o/x/../r/pulls/1/merge
+block	api -X PUT repositories/123/pulls/1/merge
+block	api -X PUT repos/o/r/pulls/1/%6derge
+block	api https://api.github.com/repos/o/r/pulls/1/merge -X PUT
+block	api -X DELETE repos/o/r
+block	api -X DELETE //repos/o/r
+block	api -X POST repos/o/r/merges -f base=main -f head=x
+block	api graphql -f query=mutation{mergePullRequest(input:{pullRequestId:"x"}){clientMutationId}}
+block	api graphql -f query=mutation{enablePullRequestAutoMerge(input:{pullRequestId:"x"}){clientMutationId}}
+block	api graphql -f query=mutation{enqueuePullRequest(input:{pullRequestId:"x"}){clientMutationId}}
+block	api graphql -f query=mutation{deleteRepository(input:{repositoryId:"x"}){clientMutationId}}
+block	api graphql -F query=@merge.graphql
+block	api graphql --input escaped.json
+stdin	api graphql --input -
+block	ext exec probe
+block	ext install probe
+block	extension upgrade
+block	alias set m pr
+block	alias import missing.yml
+allow	alias list
+allow	extension list
+allow	cs list
+block	auth token
+block	auth status -t
+block	auth status --show-token
+allow	auth status
+allow	auth git-credential
+block	api graphql --input missing.json
+block	api graphql --input clean.md
+block	api graphql -F query=@missing.graphql
+block	api --method
+block	api --unrecognised=value repos/o/r
+block	api -X=PUT repos/o/r/pulls/1/merge
+allow	api -XPOST repos/o/r/git/tags -f tag=v1
+allow	api -XHEAD repos/o/r
+CASES
+  expect_allow query.json api graphql --input -
+  cmp -s query.json "$STUB_LOG/stdin" || fail "GraphQL stdin changed before reaching gh"
+  expect_block /dev/null pr comment 1 --body "$token"
+  unset "$marker"
+done
 
 if [[ $failures -gt 0 ]]; then
   echo "$failures failures across $checked cases" >&2
