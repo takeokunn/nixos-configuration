@@ -269,7 +269,11 @@ for runtime in claude codex; do
     "rg -- '>' x prod.env" "grep -v '>>' README.md prod.env" \
     'grep -v \>\> README.md prod.env' "grep -v '<' README.md prod.env" \
     "grep -v x'>' README.md prod.env" 'grep -Z --context AWS prod.env' \
-    'grep --context AWS prod.env'; do
+    'grep --context AWS prod.env' 'grep -v -A 1{,} prod.env' 'rg -v -g x{,} prod.env' \
+    'grep -vA 1{,} prod.env' 'rg -v -m 9{,} prod.env' \
+    'grep -v --label=x --max-count 9{,} prod.env' 'grep -v -A {1,1} prod.env' \
+    'rg -v -g * prod.env' 'rg -v -g ? prod.env' 'rg -v -g [ab] prod.env' \
+    'grep -v --label ~ prod.env' 'rg -v -g x} prod.env'; do
     expect_cmd deny "$cmd"
   done
   for cmd in 'rg prod.env docs' 'grep -rn app.env src' 'rg -- process.env docs' \

@@ -40,6 +40,7 @@ for command, expected in [
     ('grep process.env <prod.env', ['grep', 'GUARD_SEARCH_PATTERN', '<', 'prod.env']),
     ('rg process.env >>prod.env', ['rg', 'GUARD_SEARCH_PATTERN', '>>', 'prod.env']),
     ('rg "process.env">out', ['rg', 'GUARD_SEARCH_PATTERN', '>', 'out']),
+    ("rg -g '*.ts' process.env src\\{a,b\\}", ['rg', '-g', '*.ts', 'GUARD_SEARCH_PATTERN', 'src{a,b}']),
     ('grep --context=2 process.env prod.env', ['grep', '--context=2', 'GUARD_SEARCH_PATTERN', 'prod.env']),
 ]:
     check(shlex.split(module.search_command(command)) == expected, command)
@@ -61,6 +62,11 @@ for command in [
     "rg -- '>' x prod.env", "grep -v '>>' README.md prod.env",
     r'grep -v \>\> README.md prod.env', "grep -v '<' README.md prod.env",
     "grep -v x'>' README.md prod.env", "rg -v '>' README.md 'prod.env'",
+    # Unquoted brace, glob and tilde expansion change the argument list the shell builds.
+    'grep -v -A 1{,} prod.env', 'rg -v -g x{,} prod.env', 'grep -vA 1{,} prod.env',
+    'rg -v -m 9{,} prod.env', 'grep -v --label=x --max-count 9{,} prod.env',
+    'grep -v -A {1,1} prod.env', 'rg -v -g * prod.env', 'rg -v -g ? prod.env',
+    'rg -v -g [ab] prod.env', 'grep -v --label ~ prod.env', 'rg -v -g x} prod.env',
     # BSD grep takes an optional --context value, so the next word may be the pattern.
     'grep -Z --context AWS prod.env', 'grep --context AWS prod.env',
 ]:

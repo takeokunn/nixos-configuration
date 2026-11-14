@@ -87,6 +87,10 @@ def shell_words(command):
                     raise ValueError("trailing backslash")
                 word.append(command[index + 1])
                 index += 2
+            elif char in "{}*?[~":
+                # Brace, glob and tilde expansion can split or rename a word, so the
+                # positions computed here would no longer match the shell's arguments.
+                raise ValueError("unquoted expansion")
             else:
                 word.append(char)
                 index += 1
