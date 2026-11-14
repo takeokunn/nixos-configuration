@@ -633,6 +633,11 @@ expect_allow $'cat <<EOF\njj abandon\nEOF'
 for runtime in claude codex; do
   expect_runtime_allow 'gh pr merge 12' "$runtime"
   expect_runtime_allow 'aitools run -- gh api -X DELETE repos/example/project' "$runtime"
+  expect_runtime_allow 'aitools read gh' "$runtime"
+  expect_runtime_allow 'echo "gh pr merge 12"' "$runtime"
+  expect_runtime_allow 'aitools run -- gh issue create --title jj --body x' "$runtime"
+  expect_runtime_allow 'aitools run -- gh search issues git push' "$runtime"
+  expect_runtime_allow 'aitools bg start -- /usr/bin/gh search issues git push' "$runtime"
   expect_block_message 'git commit src/app.sh -m update' 'jj commit <paths> -m' "$runtime"
   expect_block_message 'jj git push -b x; gh pr merge 12' 'ORCH-P005' "$runtime"
 done

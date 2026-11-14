@@ -65,6 +65,22 @@ if ((agent)); then
   "alias set" | "alias import") block "gh aliases are not allowed; run the full command" ;;
   "extension install" | "extension exec" | "extension upgrade" | "ext install" | "ext exec" | "ext upgrade") block "extension installation and execution are not allowed from agents" ;;
   "auth token") block "token output is not allowed from agents" ;;
+  "config get")
+    ((i += 1))
+    while ((i < ${#sub_args[@]})); do
+      case ${sub_args[i]} in
+      -h | --host)
+        ((i + 1 < ${#sub_args[@]})) || block "config get is missing its host value"
+        ((i += 2)); continue
+        ;;
+      -h?* | --host=* | --help) ;;
+      --) ;;
+      -*) block "config get option is not recognised by the guard" ;;
+      oauth_token) block "token output is not allowed from agents" ;;
+      esac
+      ((i += 1))
+    done
+    ;;
   "auth status")
     for arg in "${sub_args[@]}"; do
       [[ $arg == --show-token || $arg == --show-token=* || $arg =~ ^-[^-]*t ]] &&
@@ -118,7 +134,7 @@ fi
 ((${#files[@]} == 0)) || append -- "${files[@]}"
 
 if ((agent)) && [[ ${1-} == api ]]; then
-  method="" endpoint="" input="" has_body=0
+  method="" endpoint="" input="" has_body=0 typed_placeholder=0
   api_args=("${@:2}")
   i=0
   while ((i < ${#api_args[@]})); do
@@ -145,6 +161,11 @@ if ((agent)) && [[ ${1-} == api ]]; then
       -f | -F | --raw-field | --field)
         has_body=1
         [[ $value == *=* ]] || block "gh api field could not be parsed"
+        if [[ $option == -F || $option == --field ]]; then
+          case ${value#*=} in
+          *'{owner}'* | *'{repo}'* | *'{branch}'*) typed_placeholder=1 ;;
+          esac
+        fi
         if [[ $option == -F || $option == --field ]] && [[ ${value#*=} == @* ]]; then
           source_path=${value#*=@}
           [[ $source_path == - || $source_path == /dev/stdin ]] && source_path=$stdin_copy
@@ -170,6 +191,7 @@ if ((agent)) && [[ ${1-} == api ]]; then
   path=${path%%\?*}
   path=${path#api/v3/}
   if [[ $path == graphql || $path == api/graphql ]]; then
+    ((typed_placeholder == 0)) || block "GraphQL typed-field placeholders cannot be verified; use a literal raw field"
     [[ $endpoint != *\?* ]] || block "GraphQL query strings cannot be verified; use a query field or JSON input"
     doc="$work/graphql"
     cp "$content" "$doc" || block "could not record the GraphQL document"

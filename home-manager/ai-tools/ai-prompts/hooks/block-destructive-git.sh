@@ -426,6 +426,7 @@ sub aitools_verdict {
     for my $i (0 .. $#a) {
         $launcher = 1 if $a[$i] eq 'run' or $a[$i] eq 'bg';
         (my $b = $a[$i]) =~ s{^.*/}{};
+        return q{} if $b eq 'gh'; # Its arguments belong to the gh wrapper, not this classifier.
         next unless $b eq 'git' or $b eq 'jj' or $SHELL{$b};
         return q{} unless $launcher;
         return classify(join(q{ }, map { shell_quote($_) } @a[$i .. $#a]), $depth + 1, $allow);

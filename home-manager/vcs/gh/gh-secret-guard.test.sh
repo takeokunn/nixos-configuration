@@ -201,6 +201,7 @@ STUB_EXIT=4 "$guard" pr view 1 </dev/null >/dev/null 2>&1 || status=$?
 
 # D1: post-expansion argv policy, with both runtime markers and a human control.
 expect_allow /dev/null pr merge 1
+expect_allow /dev/null config get oauth_token -h github.com
 printf 'aliases:\n  m: pr merge\n' >"$GH_CONFIG_DIR/config.yml"
 printf '{"query":"query{viewer{login}}"}\n' >query.json
 # Generate JSON with escaped mutation spelling without relying on shell escape interpretation.
@@ -310,6 +311,25 @@ block	api --unrecognised=value repos/o/r
 block	api -X=PUT repos/o/r/pulls/1/merge
 allow	api -XPOST repos/o/r/git/tags -f tag=v1
 allow	api -XHEAD repos/o/r
+block	api graphql -F query=mutation{merge{repo}{clientMutationId}}
+block	api graphql -Fquery=mutation{delete{repo}{clientMutationId}}
+block	api graphql -F=query=mutation{merge{owner}{clientMutationId}}
+block	api graphql --field query=mutation{enable{repo}AutoMerge{clientMutationId}}
+block	api graphql --field=query=mutation{merge{branch}{clientMutationId}}
+block	api -F query=mutation{merge{repo}{clientMutationId}} graphql
+allow	api graphql -f query=mutation{merge{repo}{clientMutationId}}
+allow	api graphql -fquery=mutation{merge{owner}{clientMutationId}}
+allow	api graphql --raw-field=query=mutation{merge{branch}{clientMutationId}}
+allow	api repos/o/r/issues -F title={repo}
+block	config get oauth_token
+block	config get oauth_token -h github.com
+block	config get -h github.com oauth_token
+block	config get --host=github.com oauth_token
+block	config get -hgithub.com oauth_token
+block	config get -- oauth_token
+block	config --host github.com get oauth_token
+allow	config get git_protocol -h github.com
+allow	config get --host github.com git_protocol
 CASES
   expect_allow query.json api graphql --input -
   cmp -s query.json "$STUB_LOG/stdin" || fail "GraphQL stdin changed before reaching gh"

@@ -17,8 +17,12 @@ event() {
 
 # guard-and-guide prints nothing when no rule matches.
 decision() {
-  local out
-  out=$(event "$1" "$2" | python3 "$adapter" "$gg" "${agent_args[@]}" --config "$rules")
+  local out rc=0
+  out=$(event "$1" "$2" | python3 "$adapter" "$gg" "${agent_args[@]}" --config "$rules") || rc=$?
+  if (( rc != 0 )); then
+    printf 'error(exit=%s)\n' "$rc"
+    return
+  fi
   if [[ -z $out ]]; then echo allow; else jq -r '.hookSpecificOutput.permissionDecision' <<<"$out"; fi
 }
 
