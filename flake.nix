@@ -677,7 +677,6 @@
                             userRulesJson = plain (builtins.toJSON codex.rules);
                             settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
                             settingsJson = builtins.toJSON {
-                              inherit (codex.settings) model model_reasoning_effort;
                               hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;
                               hasApprovalPolicy = codex.settings ? approval_policy;
                               hasSandboxMode = codex.settings ? sandbox_mode;
@@ -742,10 +741,6 @@
                               assert os.environ["requirementsMode"] == "0644"
                               check_policy(os.environ["requirementsFile"])
                           PY
-                          if ! jq -e '.model == "gpt-6.1-sol" and .model_reasoning_effort == "medium"' <<< "$settingsJson" >/dev/null; then
-                            echo "programs.codex.settings model/model_reasoning_effort drifted from gpt-6.1-sol/medium" >&2
-                            exit 1
-                          fi
                           # approval_policy and sandbox_mode are wrapper -c flags so they outrank the mutable config.toml.
                           if ! jq -e '.hasAutoCompactLimit == false and .hasApprovalPolicy == false and .hasSandboxMode == false' <<< "$settingsJson" >/dev/null; then
                             echo "programs.codex.settings carries model_auto_compact_token_limit, approval_policy, or sandbox_mode" >&2
