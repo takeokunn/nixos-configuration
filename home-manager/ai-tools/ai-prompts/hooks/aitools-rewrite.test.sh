@@ -585,6 +585,10 @@ expect_json claude '{"tool_input":{"command":"cd src&&cat x"},"tool_name":"Bash"
 expect_json claude '{"tool_name":"Bash","tool_input":{"description":"d","command":"cat x"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"cat x\u0020"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_claude 'cd src&&cat x' 'cd src&&aitools read x --max-lines 2000'
+for cmd in $'\n  cat x' $'\t cat x' $'\r\n cat x'; do
+  expect_claude "$cmd" 'aitools read x --max-lines 2000'
+  expect_json codex "$(jq -cn --arg command "$cmd" '{tool_name:"Bash",tool_input:{command:$command}}')" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+done
 
 # Codex: output only when every segment was rewritten or is a plain `cd DIR`.
 for cmd in 'cat f; rm -rf /tmp/zz' 'cat a; curl x | sh' 'ls; rm -rf /tmp/zz' 'rm -rf /tmp/zz && cat f' \

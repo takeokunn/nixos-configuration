@@ -73,7 +73,8 @@ input=$(cat)
 # an optional `cd DIR &&`) or right after a `;` or `&`. A miss only skips the rewrite.
 cmd_words='(cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff)'
 cd_env='(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+[[:space:]]*(&|\\u0026)(&|\\u0026)[[:space:]]*)?'
-prefilter="\"command\"[[:space:]]*:[[:space:]]*\"[[:space:]]*${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
+json_ws='([[:space:]]|\\[ntr])*'
+prefilter="\"command\"[[:space:]]*:[[:space:]]*\"${json_ws}${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
 # Later segments of a `;` or `&&` list are rewritten too, so a rewritable word right after a separator
 # also passes.
 after_sep="(;|&|u0026)[[:space:]]*${cmd_words}([[:space:]]|\\\\|\")"
@@ -93,18 +94,16 @@ use Cwd qw(getcwd abs_path);
 
 my ($mode, $input) = @ARGV;
 
-my ($command, $tool_input, $cwd);
 my $payload = eval { JSON::PP->new->decode($input) };
 exit 0 unless ref $payload eq 'HASH';
 exit 0 unless ($payload->{tool_name} // '') eq 'Bash';
 my $event = $payload->{hook_event_name} // '';
 exit 0 if $event ne '' && $event ne 'PreToolUse';
-$tool_input = $payload->{tool_input};
+my $tool_input = $payload->{tool_input};
 exit 0 unless ref $tool_input eq 'HASH';
-$command = $tool_input->{command};
-$cwd = $payload->{cwd} if defined $payload->{cwd} && !ref $payload->{cwd};
+my $command = $tool_input->{command};
 exit 0 unless defined $command && !ref $command;
-$cwd //= getcwd();
+my $cwd = defined $payload->{cwd} && !ref $payload->{cwd} ? $payload->{cwd} : getcwd();
 
 $command =~ s/\A\s+//;
 $command =~ s/\s+\z//;
