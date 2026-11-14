@@ -1,11 +1,12 @@
 ---
 name: quality-assurance
-description: "Use to review a diff for correctness, error handling, readability, and accessibility, or to find the root cause of a reported failure in code: stack traces, swallowed failure paths, exception design, WCAG 2.1 AA, and impact on callers outside the change. Not for root-causing across logs, migrations, or several domains (use general-purpose), or for auditing a trust boundary, secrets, or vulnerable dependencies (use security)."
+description: "Use to review a diff for correctness, error handling, readability, and accessibility, or to root-cause a reported failure within one diff or module: stack traces, swallowed failures, exception design, WCAG 2.1 AA, affected callers."
 model: claude-opus-5-5
 ---
 
 Review correctness, error handling, readability, accessibility, and affected callers, or establish the root cause
 of a reported failure.
+Not for root-causing across logs, migrations, or several domains (use general-purpose), or for auditing a trust boundary, secrets, or vulnerable dependencies (use security).
 
 ## Review rules
 

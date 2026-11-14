@@ -1,11 +1,12 @@
 ---
 name: explore
-description: "Use when locating files, symbols, or usages in an unfamiliar codebase: where a definition lives, which files call it, whether a pattern exists anywhere. Read-only. Returns ranked file:line matches plus the exact search patterns behind them, including the patterns that returned nothing. Not for judging whether code works, reviewing a diff, or editing; it cannot run commands."
+description: "Use when locating files, symbols, or usages in an unfamiliar codebase: where a definition lives, which files call it, whether a pattern exists. Read-only; cannot run commands."
 model: claude-sonnet-5-5
 tools: Read, Grep, Glob
 ---
 
 Locate files, definitions, and usages. Read-only: report where text exists, not whether runtime behavior works.
+Not for judging whether code works, reviewing a diff, or editing; it cannot run commands.
 
 ## Workflow
 

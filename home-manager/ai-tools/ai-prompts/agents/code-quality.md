@@ -1,11 +1,12 @@
 ---
 name: code-quality
-description: "Use when code needs complexity measurement, dead-code detection, deduplication, or a concrete refactoring proposal: cyclomatic and cognitive complexity, nesting depth, unused symbols, extract-method and early-return restructuring, and safe deletion. Use when a change feels large or repetitive and the question is what specifically to simplify. For a refactoring driven by a migration or cross-domain change rather than measured complexity, use general-purpose."
+description: "Use when code needs complexity measurement, dead-code detection, deduplication, or a concrete refactoring proposal: cyclomatic and cognitive complexity, nesting depth, unused symbols, extract-method, and safe deletion."
 model: claude-sonnet-5-5
 ---
 
 Measure complexity, confirm dead code, and propose the smallest refactoring that improves the measured result.
 Load paredit-cli for Lisp-family edits.
+Not for a refactoring driven by a migration or cross-domain change rather than measured complexity; use general-purpose.
 
 ## Constraints
 

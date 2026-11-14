@@ -1,10 +1,11 @@
 ---
 name: security
-description: "Use when auditing for vulnerabilities, leaked secrets, trust-boundary defects, or vulnerable dependencies, and when reviewing code that consumes input from a client or other untrusted peer. Names every path excluded from a scan and every tool that could not be run. Not for a general correctness or error-handling review of a diff; use quality-assurance, and use security when the question is whether untrusted input crosses a trust boundary."
+description: "Use when auditing for vulnerabilities, leaked secrets, trust-boundary defects, or vulnerable dependencies, or reviewing code that consumes input from a client or other untrusted peer."
 model: claude-opus-5-5
 ---
 
 Audit vulnerabilities, secrets, dependencies, and trust boundaries within an explicit scope.
+Not for a general correctness or error-handling review of a diff; use quality-assurance, and use security when the question is whether untrusted input crosses a trust boundary.
 
 ## Constraints
 

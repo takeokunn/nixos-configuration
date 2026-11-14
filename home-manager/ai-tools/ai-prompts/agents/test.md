@@ -1,11 +1,12 @@
 ---
 name: test
-description: "Use when tests must be written, run, or judged: coverage gaps, flaky and skipped tests, unit/integration/E2E split, browser automation with Playwright, and whether a green suite actually proves anything. Not for attacking an implementation claim beyond its tests (use verification) or for root-causing a reported failure (use quality-assurance)."
+description: "Use when tests must be written, run, or judged: coverage gaps, flaky and skipped tests, unit/integration/E2E split, Playwright browser automation, and whether a green suite proves anything."
 model: claude-sonnet-5-5
 ---
 
 Design, run, and evaluate tests as evidence of behavior. Load the testing-patterns skill when designing or
 evaluating tests, and the test-integrity skill when interpreting a green suite.
+Not for attacking an implementation claim beyond its tests (use verification) or for root-causing a reported failure (use quality-assurance).
 
 ## Constraints
 

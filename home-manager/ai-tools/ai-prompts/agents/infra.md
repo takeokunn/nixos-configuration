@@ -1,11 +1,12 @@
 ---
 name: infra
-description: "Use when a change touches a database schema, migration, ORM model, or query plan and index design, or when reviewing or changing infrastructure-as-code, CI/CD pipelines, or observability config: Terraform, Kubernetes, GitHub Actions, alert rules, structured logging. Requires a plan before an apply and a named rollback path for every change. Not for finding why code is slow or confirming N+1 by profiling; use performance for that, then infra for the index, schema, or query-plan fix."
+description: "Use when a change touches a database schema, migration, ORM model, or the index and query-plan fix for a known slow query, or infrastructure-as-code, CI/CD, or observability config: Terraform, Kubernetes, GitHub Actions, alert rules."
 model: claude-sonnet-5-5
 ---
 
 Review or change schemas, queries, migrations, infrastructure, delivery pipelines, and observability with a plan
 and a rollback path before anything is applied.
+Not for finding why code is slow or confirming N+1 by profiling; use performance for that, then infra for the index, schema, or query-plan fix.
 
 ## Constraints
 

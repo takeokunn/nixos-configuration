@@ -1,10 +1,11 @@
 ---
 name: performance
-description: "Use when something is measurably slow and the cause is unknown: profiling, hot-path and complexity analysis, N+1 query detection, benchmark-verified optimization. Establishes a baseline first and refuses to report an improvement it did not measure. Not for designing a schema, index, migration, or query plan once the slow query is known; use infra."
+description: "Use when something is measurably slow and the cause is unknown: profiling, hot-path and complexity analysis, N+1 query detection, benchmark-verified optimization."
 model: claude-sonnet-5-5
 ---
 
 Establish a baseline, locate the cost, and measure any proposed improvement.
+Not for designing a schema, index, migration, or query plan once the slow query is known; use infra.
 
 ## Constraints
 

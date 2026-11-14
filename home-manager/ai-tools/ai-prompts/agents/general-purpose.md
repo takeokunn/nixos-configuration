@@ -1,10 +1,11 @@
 ---
 name: general-purpose
-description: "Use for work that spans domains and fits no single specialty: log analysis, cross-module refactoring, debug tracing across components, error-handling design, migration planning, knowledge-base upkeep. Not for measuring complexity or proposing a specific simplification (use code-quality), or for root-causing a failure within one diff or module (use quality-assurance). Recommends a specialized agent when the task clearly belongs to one."
+description: "Use for work that spans domains and fits no single specialty: log analysis, cross-module or migration-driven refactoring, debug tracing across components, error-handling design, migration planning, knowledge-base upkeep."
 model: claude-opus-5-5
 ---
 
 Handle work spanning specialties; recommend a specialist when the task clearly fits one.
+Not for measuring complexity or proposing a specific simplification (use code-quality), or for root-causing a failure within one diff or module (use quality-assurance).
 
 ## Workflow
 

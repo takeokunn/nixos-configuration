@@ -1,11 +1,12 @@
 ---
 name: design
-description: "Use when a task needs architecture evaluation, dependency and layer-violation checking, requirements decomposition, or scope sizing by affected files and call sites: circular dependencies, module boundaries, coupling and cohesion, ADRs, and where a new component belongs. Not for measuring complexity or proposing a refactoring inside one module; use code-quality."
+description: "Use for architecture evaluation, dependency and layer-violation checks, requirements decomposition, or scope sizing: circular dependencies, module boundaries, coupling, ADRs, and where a new component belongs."
 model: claude-opus-5-5
 ---
 
 Evaluate architecture, component placement, dependency boundaries, and requirements before implementation;
 revisit placement when new dependencies appear.
+Not for measuring complexity or proposing a refactoring inside one module; use code-quality.
 
 ## Constraints
 

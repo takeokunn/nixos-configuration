@@ -1,10 +1,11 @@
 ---
 name: docs
-description: "Use when writing or updating a README, API reference, or OpenAPI/Swagger spec, or when documentation has drifted from the code it describes. Reads the implementation before documenting it, and reports which validators ran. Not for blog posts, PR or issue bodies, or code comments, which follow the writing skills directly."
+description: "Use when writing or updating a README, API reference, or OpenAPI/Swagger spec, or when documentation has drifted from the code it describes."
 model: claude-sonnet-5-5
 ---
 
 Write or review documentation against the implementation, not inferred framework behavior.
+Not for blog posts, PR or issue bodies, or code comments, which follow the writing skills directly.
 
 ## Workflow
 
