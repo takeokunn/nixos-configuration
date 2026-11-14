@@ -395,7 +395,6 @@
               {
                 nativeBuildInputs = [
                   pkgs.jq
-                  pkgs.python3
                 ];
               }
               ''
@@ -403,10 +402,7 @@
                   ${
                     inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default
                   }/bin/guard-and-guide \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.py}
-                python3 ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.test.py} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/guard-search-arguments.py}
+                  ${./home-manager/ai-tools/ai-prompts/hooks/rules.toml}
                 touch $out
               '';
 
