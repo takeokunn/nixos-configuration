@@ -31,35 +31,94 @@ LONG_VALUES = {
               "context max-count max-columns max-depth encoding color colors sort sortr "
               "replace path-separator field-match-separator field-context-separator "
               "ignore-file type-add type-clear engine".split()),
-    "grep": set("regexp file after-context before-context context max-count "
+    "grep": set("regexp file after-context before-context max-count "
                 "directories devices binary-files include exclude exclude-dir "
                 "exclude-from label".split()),
 }
+# BSD grep (macOS /usr/bin/grep) reads `--context AWS prod.env` as an optional-value
+# option followed by pattern and file, while GNU grep consumes AWS as the value.
+LONG_OPTIONAL_VALUES = {"rg": set(), "grep": {"context"}}
+OPERATOR_CHARS = "();<>|&"
+
+
+def shell_words(command):
+    # shlex returns words after quote removal, which makes a quoted '>' look like a
+    # redirect. Each word here carries whether it was an unquoted operator.
+    words = []
+    index = 0
+    length = len(command)
+    while index < length:
+        char = command[index]
+        if char in " \t":
+            index += 1
+            continue
+        if char in OPERATOR_CHARS:
+            end = index
+            while end < length and command[end] in OPERATOR_CHARS:
+                end += 1
+            words.append((command[index:end], True))
+            index = end
+            continue
+        word = []
+        while index < length and command[index] not in " \t" + OPERATOR_CHARS:
+            char = command[index]
+            if char == "'":
+                end = command.find("'", index + 1)
+                if end < 0:
+                    raise ValueError("unterminated single quote")
+                word.append(command[index + 1:end])
+                index = end + 1
+            elif char == '"':
+                index += 1
+                while True:
+                    if index == length:
+                        raise ValueError("unterminated double quote")
+                    char = command[index]
+                    if char == '"':
+                        index += 1
+                        break
+                    if char == "\\" and index + 1 < length and command[index + 1] in '"\\':
+                        index += 1
+                        char = command[index]
+                    word.append(char)
+                    index += 1
+            elif char == "\\":
+                if index + 1 == length:
+                    raise ValueError("trailing backslash")
+                word.append(command[index + 1])
+                index += 2
+            else:
+                word.append(char)
+                index += 1
+        words.append(("".join(word), False))
+    return words
 
 
 def search_command(command):
     # No shell execution, expansion, pipelines, compound commands, or heredocs are interpreted.
     if any(char in command for char in "$`\n\r"):
         return command
-    lexer = shlex.shlex(command, posix=True, punctuation_chars="();<>|&")
-    lexer.whitespace_split = True
-    lexer.commenters = ""
     try:
-        words = list(lexer)
+        tokens = shell_words(command)
     except ValueError:
         return command
-    if not words or words[0] not in SHORT_FLAGS:
+    words = [word for word, _ in tokens]
+    operators = [operator for _, operator in tokens]
+    if not words or operators[0] or words[0] not in SHORT_FLAGS:
         return command
     tool = words[0]
     indices = []
     index = 1
     while index < len(words):
         word = words[index]
-        if word in ("<", ">", ">>"):
-            index += 1
-            if index == len(words) or not words[index] or any(c in words[index] for c in "();<>|&"):
+        if operators[index]:
+            if word not in ("<", ">", ">>"):
                 return command
-        elif any(c in word for c in "();<>|&"):
+            index += 1
+            if (index == len(words) or operators[index] or not words[index]
+                    or any(c in words[index] for c in OPERATOR_CHARS)):
+                return command
+        elif any(c in word for c in OPERATOR_CHARS):
             return command
         else:
             indices.append(index)
@@ -82,6 +141,9 @@ def search_command(command):
             option, equal, value = word[2:].partition("=")
             if option in LONG_FLAGS[tool] and not equal:
                 pass
+            elif option in LONG_OPTIONAL_VALUES[tool]:
+                if not equal:
+                    return command
             elif option in LONG_VALUES[tool]:
                 consumes_value = not equal
                 if equal and option == "regexp":
@@ -157,7 +219,11 @@ def main():
     except OSError:
         print("Credential guard could not start.", file=sys.stderr)
         return 2
-    return result.returncode if result.returncode >= 0 else 2
+    if result.returncode != 0:
+        # Claude Code blocks a PreToolUse call only on exit 2; other failures would allow it.
+        print(f"Credential guard failed with exit {result.returncode}.", file=sys.stderr)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ event() {
 # guard-and-guide prints nothing when no rule matches.
 decision() {
   local out rc=0
-  out=$(event "$1" "$2" | python3 "$adapter" "$gg" "${agent_args[@]}" --config "$rules") || rc=$?
+  out=$(event "$1" "$2" | python3 -I "$adapter" "$gg" "${agent_args[@]}" --config "$rules") || rc=$?
   if (( rc != 0 )); then
     printf 'error(exit=%s)\n' "$rc"
     return
@@ -263,14 +263,21 @@ for runtime in claude codex; do
     'rg -f prod.env process.env' 'grep --file=prod.env process.env' \
     'rg --glob prod.env process.env' 'rg --unknown process.env' \
     'rg process.env>prod.env' 'grep process.env<prod.env' 'rg $(cat prod.env)' \
-    'rg "process.env|.env" docs' 'rg .env docs' 'rg .env.local docs'; do
+    'rg "process.env|.env" docs' 'rg .env docs' 'rg .env.local docs' \
+    "grep -v '>' README.md prod.env" "rg -v '>' README.md prod.env" \
+    'grep -v "<" README.md prod.env' 'grep -hv \> README.md prod.env' \
+    "rg -- '>' x prod.env" "grep -v '>>' README.md prod.env" \
+    'grep -v \>\> README.md prod.env' "grep -v '<' README.md prod.env" \
+    "grep -v x'>' README.md prod.env" 'grep -Z --context AWS prod.env' \
+    'grep --context AWS prod.env'; do
     expect_cmd deny "$cmd"
   done
   for cmd in 'rg prod.env docs' 'grep -rn app.env src' 'rg -- process.env docs' \
     'rg -e process.env -e app.env docs' 'grep -ineprocess.env docs' \
     'rg --regexp=process.env docs' 'grep --regexp process.env docs' \
     'rg -g src -e process.env docs' 'rg docs -e process.env' \
-    'rg -f patterns -e process.env docs' 'rg process.env>>out'; do
+    'rg -f patterns -e process.env docs' 'rg process.env>>out' \
+    'grep --context=2 process.env docs'; do
     expect_cmd allow "$cmd"
   done
   # D1 accepts blocking non-read uses to avoid reopening credential reads.

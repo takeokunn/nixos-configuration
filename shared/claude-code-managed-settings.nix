@@ -124,7 +124,7 @@ in
       hooks = [
         {
           type = "command";
-          command = "${python3}/bin/python3 ${aiPromptsPath}/hooks/guard-search-arguments.py ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml";
+          command = "${python3}/bin/python3 -I ${aiPromptsPath}/hooks/guard-search-arguments.py ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml";
         }
       ];
     }
