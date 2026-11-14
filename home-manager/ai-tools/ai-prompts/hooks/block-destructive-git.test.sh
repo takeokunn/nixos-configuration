@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-hook="$1"
+hook="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 failures=0
 checked=0
 
@@ -466,10 +466,49 @@ expect_block 'jj git push -b x; jj git push -b y'
 
 # `claude` mode allows the jj push verdict silently (exit 0); every other verdict still exits 2.
 # Without the argument the verdict is the exit-2 banner tested above.
+# The Claude push cases scan a real, isolated no-colocate repository.
+# Only the clean baseline is pushed, to a local bare receiver. Secret revisions never leave it.
+push_fixture=$(mktemp -d /tmp/block-destructive-git.XXXXXX)
+real_jj=$(command -v jj)
+real_gitleaks=$(command -v gitleaks)
+export GITLEAKS_BIN="$real_gitleaks"
+export JJ_CONFIG="$push_fixture/jj.toml"
+cat >"$JJ_CONFIG" <<'CONFIG'
+[user]
+name = "Hook Test"
+email = "hook-test@example.invalid"
+[git]
+push = "origin"
+[signing]
+behavior = "drop"
+CONFIG
+fixture_jj() {
+  (cd "$push_fixture/sender" && "$real_jj" "$@") >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+}
+"$real_jj" git init --no-colocate "$push_fixture/receiver" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+"$real_jj" git init --no-colocate "$push_fixture/sender" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+printf 'clean baseline\n' >"$push_fixture/sender/clean.txt"
+fixture_jj commit clean.txt -m 'Clean baseline'
+fixture_jj bookmark create main -r @-
+fixture_jj git remote add origin "$push_fixture/receiver/.jj/repo/store/git"
+fixture_jj git push --remote origin --bookmark main
+printf 'clean candidate\n' >>"$push_fixture/sender/clean.txt"
+fixture_jj commit clean.txt -m 'Clean candidate'
+fixture_jj bookmark set main -r @-
+fixture_jj bookmark create x -r @-
+push_cwd="$push_fixture/sender"
+invoke_claude_hook() {
+  (
+    cd "$push_cwd"
+    jq -n --arg c "$1" --arg cwd "$push_cwd" \
+      '{tool_name: "Bash", tool_input: {command: $c}, cwd: $cwd}' | bash "$hook" claude
+  )
+}
+
 expect_claude_block() {
   checked=$((checked + 1))
   local status=0 out
-  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
+  out=$(invoke_claude_hook "$1" 2>"$stderr_file") || status=$?
   [[ $status -eq 2 ]] || fail "claude mode: expected block (exit 2) for [$1], got exit $status"
   [[ -z $out ]] || fail "claude mode: block for [$1] printed to stdout: $out"
   grep -q 'ORCH-P005' "$stderr_file" || fail "claude mode: block for [$1] printed no ORCH-P005 banner"
@@ -477,25 +516,25 @@ expect_claude_block() {
 expect_claude_allow() {
   checked=$((checked + 1))
   local status=0 out
-  out=$(jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" claude 2>"$stderr_file") || status=$?
+  out=$(invoke_claude_hook "$1" 2>"$stderr_file") || status=$?
   [[ $status -eq 0 && -z $out && ! -s $stderr_file ]] || fail "claude mode: expected silent allow for [$1], got exit $status, stdout [$out]"
 }
 expect_claude_allow 'jj git push -b main'
 expect_claude_allow 'jj -R . git push --all'
-expect_claude_allow 'jj git push -b $(jj log -r @- -T bookmarks)'
+expect_claude_block 'jj git push -b $(jj log -r @- -T bookmarks)'
 expect_claude_allow 'jj git push --dry-run'
 # A push is allowed in claude mode whether or not the override appears.
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
 expect_claude_allow 'CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 jj git push -b main'
-expect_claude_allow 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
-expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
+expect_claude_block 'FOO=1 ALLOW_DESTRUCTIVE_GIT=1 jj git push'
+expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 FOO=1 jj git push'
 # FR-002 requires wrapped pushes to be rerun directly, including overrides.
 expect_claude_block 'bash -c "ALLOW_DESTRUCTIVE_GIT=1 jj git push"'
 expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 bash -c "jj git push"'
 expect_claude_block 'env ALLOW_DESTRUCTIVE_GIT=1 jj git push'
 expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 jj util exec -- jj git push'
-# Other jj verdicts are still lifted by the override, so the push is allowed.
-expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
+# A compound command can change the revisions after inspection, so rerun the push directly.
+expect_claude_block 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon; jj git push -b x'
 expect_claude_allow 'ALLOW_DESTRUCTIVE_GIT=1 jj abandon'
 # A push in the same command line does not hide another block, with or without the override.
 expect_claude_block 'jj git push -b x; jj undo'
@@ -657,5 +696,177 @@ status=0
 jq -n '{tool_name: "Read", tool_input: {command: "jj abandon"}}' | bash "$hook" >/dev/null 2>&1 || status=$?
 [[ $status -eq 0 ]] || fail "non-Bash tool: expected exit 0, got $status"
 
+# Exercise range selection against real jj history and real gitleaks.
+fixture_jj tag set clean -r x
+expect_claude_allow 'jj git push --tag clean'
+for invocation in \
+  'jj git push' \
+  'jj git push -b main' \
+  'jj git push --bookmark=main' \
+  'jj git push -b main -b x' \
+  'jj git push --remote origin -b main' \
+  'jj git push -b main --remote=origin' \
+  'jj git push -c @-' \
+  'jj git push -r main' \
+  'jj git push --all' \
+  'jj git push --tracked'; do
+  expect_claude_allow "$invocation"
+done
+
+# A fresh remote has no base: new bookmarks must scan their full reachable history.
+"$real_jj" git init --no-colocate "$push_fixture/empty-receiver" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+fixture_jj git remote add empty "$push_fixture/empty-receiver/.jj/repo/store/git"
+expect_claude_allow 'jj git push --remote empty -b main'
+expect_claude_allow 'jj git push --remote origin --remote empty -b main'
+
+# Different remote bases must select different outgoing histories.
+cat >"$push_fixture/record-gitleaks" <<'SCANNER'
+#!/usr/bin/env bash
+report=''
+while (($#)); do
+  case "$1" in
+    --report-path) report=$2; shift ;;
+    --report-path=*) report=${1#*=} ;;
+  esac
+  shift
+done
+cat >/dev/null
+printf 'scan\n' >>"$SCANNER_LOG"
+printf '[]\n' >"$report"
+SCANNER
+chmod +x "$push_fixture/record-gitleaks"
+check_scan_count() {
+  local want=$1 command=$2 got
+  : >"$push_fixture/scans"
+  GITLEAKS_BIN="$push_fixture/record-gitleaks" SCANNER_LOG="$push_fixture/scans" \
+    expect_claude_allow "$command"
+  got=$(wc -l <"$push_fixture/scans")
+  [[ $got -eq $want ]] || fail "outgoing history: expected $want scans, got $got"
+}
+check_scan_count 1 'jj git push --remote origin -b main'
+check_scan_count 2 'jj git push --remote empty -b main'
+check_scan_count 1 'jj git push --remote origin -b main -b x'
+fixture_jj config set --repo git.push empty
+check_scan_count 2 'jj git push -b main'
+check_scan_count 1 'jj git push --remote origin -b main'
+fixture_jj config set --repo git.push origin
+
+synthetic_pat=$(perl -e '@a=("a".."z","A".."Z",0..9); print "ghp_", map {$a[int rand @a]} 1..36')
+# A payload line starting with ++ must not be mistaken for a +++ diff filename.
+printf '++ S1A_PRIVATE_VALUE_SENTINEL\nfixture_value=%s\n' "$synthetic_pat" >"$push_fixture/sender/fixture.txt"
+fixture_jj commit fixture.txt -m 'Synthetic scanner positive control'
+fixture_jj bookmark create leak -r @-
+secret_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy -r leak --no-graph -T commit_id)
+fixture_jj tag set secret -r leak
+expect_secret_block() {
+  checked=$((checked + 1))
+  local status=0
+  invoke_claude_hook "$1" >"$push_fixture/hook.stdout" 2>"$stderr_file" || status=$?
+  [[ $status -eq 2 ]] || fail "secret history: expected exit 2, got $status"
+  [[ ! -s $push_fixture/hook.stdout ]] || fail 'secret history: stdout was not empty'
+  grep -q ORCH-P005 "$stderr_file" || fail 'secret history: missing refusal banner'
+  grep -q github-pat "$stderr_file" || fail 'secret history: missing rule name'
+  grep -q fixture.txt "$stderr_file" || fail 'secret history: missing file name'
+  grep -Eq '"line": *2([,}])' "$stderr_file" || fail 'secret history: missing source line'
+  grep -q "$secret_commit" "$stderr_file" || fail 'secret history: missing commit id'
+  if grep -Fq "$synthetic_pat" "$stderr_file" "$push_fixture/hook.stdout"; then
+    fail 'secret history: raw synthetic value leaked'
+  fi
+  if grep -q S1A_PRIVATE_VALUE_SENTINEL "$stderr_file" "$push_fixture/hook.stdout"; then
+    fail 'secret history: diff payload was leaked as a location'
+  fi
+}
+expect_secret_block 'jj git push -b leak'
+expect_secret_block 'jj git push --tag secret'
+expect_secret_block 'ALLOW_DESTRUCTIVE_GIT=1 jj git push -b leak'
+expect_secret_block 'jj git push --remote empty -b leak'
+expect_secret_block 'jj git push -b main -b leak'
+expect_secret_block 'jj git push --remote origin --remote empty -b leak'
+expect_secret_block 'jj git push -c x -c leak'
+expect_secret_block 'jj git push -r x -r leak'
+expect_secret_block 'jj git push --remote "*" -b leak'
+expect_secret_block 'jj git push -b "l*"'
+
+# The endpoint is clean, but the secret existed in an intermediate outgoing commit.
+printf 'removed synthetic value\n' >"$push_fixture/sender/fixture.txt"
+fixture_jj commit fixture.txt -m 'Remove synthetic value'
+fixture_jj bookmark set main -r @-
+for invocation in \
+  'jj git push' \
+  'jj git push -b main' \
+  'jj git push --bookmark=main' \
+  'jj git push -c @-' \
+  'jj git push -r main' \
+  'jj git push --all' \
+  'jj git push --tracked' \
+  'jj git push --remote empty -b main'; do
+  expect_secret_block "$invocation"
+done
+# Selecting an older clean bookmark must not scan unrelated descendants.
+expect_claude_allow 'jj git push -b x'
+
+# Scanner launch/exit/report failures must not become an empty successful scan.
+cat >"$push_fixture/fake-gitleaks" <<'SCANNER'
+#!/usr/bin/env bash
+report=''
+while (($#)); do
+  case "$1" in
+    --report-path) report=$2; shift ;;
+    --report-path=*) report=${1#*=} ;;
+  esac
+  shift
+done
+cat >/dev/null
+printf 'DO_NOT_ECHO_SCANNER_OUTPUT\n'
+printf 'DO_NOT_ECHO_SCANNER_OUTPUT\n' >&2
+case "$SCANNER_CASE" in
+  missing) exit 127 ;;
+  failure) exit 2 ;;
+  malformed) printf 'not-json\n' >"$report"; exit 0 ;;
+  no-report) exit 0 ;;
+  empty-finding) printf '[]\n' >"$report"; exit 1 ;;
+  non-object) printf '[1]\n' >"$report"; exit 1 ;;
+esac
+SCANNER
+chmod +x "$push_fixture/fake-gitleaks"
+for scanner_case in missing failure malformed no-report empty-finding non-object; do
+  GITLEAKS_BIN="$push_fixture/fake-gitleaks" SCANNER_CASE="$scanner_case" \
+    expect_claude_block 'jj git push -b x'
+  if grep -q DO_NOT_ECHO_SCANNER_OUTPUT "$stderr_file"; then
+    fail "scanner $scanner_case: raw scanner output leaked"
+  fi
+done
+GITLEAKS_BIN="$push_fixture/not-installed" expect_claude_block 'jj git push -b x'
+
+# Missing revisions, remotes, and unsupported arguments cannot silently select zero commits.
+for invocation in \
+  'jj git push -b does-not-exist' \
+  'jj git push --remote does-not-exist -b main' \
+  'jj git push -r does-not-exist' \
+  'jj git push --unknown-option' \
+  'jj -R does-not-exist git push -b main' \
+  'jj git push -b main --config git.push=empty' \
+  'jj git push -b main; true'; do
+  expect_claude_block "$invocation"
+done
+push_cwd="$push_fixture"
+expect_claude_block 'jj git push -b main'
+push_cwd="$push_fixture/sender"
+
+# A binary diff omits the bytes, so it cannot count as a successful secret scan.
+fixture_jj new x -m 'Binary fixture workspace'
+printf '\000binary fixture\n' >"$push_fixture/sender/binary.bin"
+fixture_jj commit binary.bin -m 'Binary scanner boundary'
+fixture_jj bookmark create binary -r @-
+expect_claude_block 'jj git push -b binary'
+
+# The local receiver still contains only the clean baseline; hook calls never push.
+checked=$((checked + 1))
+receiver_tip=$(git --git-dir="$push_fixture/receiver/.jj/repo/store/git" rev-parse refs/heads/main)
+remote_tip=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy -r main@origin --no-graph -T commit_id)
+[[ $receiver_tip == "$remote_tip" ]] || fail 'hook changed the local receiver'
+if git --git-dir="$push_fixture/receiver/.jj/repo/store/git" cat-file -e "$secret_commit" 2>/dev/null; then
+  fail 'synthetic secret commit reached the local receiver'
+fi
 echo "block-destructive-git: $checked cases, $failures failures"
 [[ $failures -eq 0 ]]

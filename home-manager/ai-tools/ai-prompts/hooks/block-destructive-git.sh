@@ -41,8 +41,8 @@
 # Override for the jj verdicts: ALLOW_DESTRUCTIVE_GIT=1 <command>. It covers jj git push only in the
 # default (Codex) mode.
 # Argument 1 selects how a jj git push verdict is reported. Without it the hook exits 2 with a banner
-# (Codex, where the override prefix lifts the push block). With `claude` a direct push is allowed silently;
-# wrapped pushes block and must be rerun directly. Authorization is governed by the shared prompt. A push never
+# (Codex, where the override prefix lifts the push block). With `claude` a direct push must pass
+# gitleaks first; wrapped pushes block and must be rerun directly. Authorization is governed by the shared prompt. A push never
 # hides another verdict in the same command line: `jj git push -b x; jj undo` exits 2.
 # Every other verdict exits 2 in both modes.
 
@@ -73,9 +73,11 @@ fi
 read -r -d '' perl_prog <<'PERL' || true
 use strict;
 use warnings;
+use JSON::PP qw(encode_json);
 
 my $cmd = defined $ENV{HOOK_CMD} ? $ENV{HOOK_CMD} : q{};
 my $CLAUDE_MODE = (defined $ENV{HOOK_MODE} and $ENV{HOOK_MODE} eq 'claude') ? 1 : 0;
+my @push_argv;
 
 # Wrappers whose operand is the real command, e.g. `xargs git log` classifies as `git log`.
 my %WRAPPER = map { $_ => 1 } qw(
@@ -122,11 +124,12 @@ sub lex_segments {
     };
     my $add = sub {
         my ($text, $q) = @_;
-        $tok = { text => q{}, quoted => 0, udyn => 0 } if !defined $tok;
+        $tok = { text => q{}, quoted => 0, udyn => 0, expansion => 0 } if !defined $tok;
         $tok->{text} .= $text;
         $tok->{quoted} = 1 if $q;
         # An unquoted `$` or backtick leaves part of the word to the shell's own splitting and globbing.
         $tok->{udyn} = 1 if !$q and $text =~ /[\$`]/;
+        $tok->{expansion} = 1 if !$q and $text =~ /[\[\]*?~{}]/;
         return;
     };
 
@@ -382,6 +385,12 @@ sub verdict_for_segment {
         my $v = jj_verdict($depth, $allow, $jj_env, @a);
         return 'jj-push-wrapper' if $CLAUDE_MODE and $wrapped and $v eq 'jj-push';
         return $v if $v eq 'jj-push-wrapper';
+        if ($CLAUDE_MODE and $v eq 'jj-push') {
+            return 'jj-push-input' if grep { is_dynamic($_->{text}) or $_->{expansion} } @t;
+            @push_argv = ($tokens->[0]{text}, @a);
+            # Assignments are checked against the original command by the scanner.
+            $push_argv[0] = 'jj' if $push_argv[0] =~ /=/;
+        }
         return $lift->($v);
     }
     # A dynamic value counts as quoted only when every part of its word is quoted.
@@ -746,10 +755,13 @@ sub classify {
 my $allow_all = $cmd =~ /^\s*(?:CLAUDE_)?ALLOW_DESTRUCTIVE_GIT=1\s/ ? 1 : 0;
 my $verdict = classify($cmd, 0, $allow_all);
 print "$verdict\n" if length $verdict;
+print encode_json(\@push_argv), "\n" if $CLAUDE_MODE and $verdict eq 'jj-push';
 exit 0;
 PERL
 
 verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"
+push_argv=${verdict#*$'\n'}
+verdict=${verdict%%$'\n'*}
 
 # An `[[ ... ]] && exit 0` here would leave the whole list returning 1 on the common path,
 # which `set -e` turns into a spurious non-zero exit from the hook itself.
@@ -789,8 +801,304 @@ EOF
   exit 2
 fi
 
+if [[ $verdict == jj-push-input ]]; then
+  echo 'Unverifiable jj git push arguments blocked (ORCH-P005). Use literal arguments in a direct command.' >&2
+  exit 2
+fi
+
 if [[ $verdict == jj-push ]]; then
   if [[ $mode == claude ]]; then
+    if ! command -v python3 >/dev/null 2>&1; then
+      echo 'jj git push blocked (ORCH-P005): Python is unavailable for the secret scan.' >&2
+      exit 2
+    fi
+    scan_status=0
+    HOOK_PUSH_ARGV="$push_argv" HOOK_PUSH_COMMAND="$command" HOOK_INPUT="$input" python3 - <<'PY' || scan_status=$?
+import fnmatch
+import json
+import os
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+
+
+def block(reason):
+    print("jj git push blocked (ORCH-P005): " + reason, file=sys.stderr)
+    raise SystemExit(2)
+
+
+def run(args, cwd, *, data=None, env=None):
+    return subprocess.run(args, cwd=cwd, input=data, stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE, timeout=60, env=env)
+
+
+def scan_push():
+    argv = json.loads(os.environ["HOOK_PUSH_ARGV"])
+    words = shlex.split(os.environ["HOOK_PUSH_COMMAND"])
+    while words and re.match(r"^[A-Za-z_]\w*=", words[0]):
+        key = words.pop(0).split("=", 1)[0]
+        if key not in ("ALLOW_DESTRUCTIVE_GIT", "CLAUDE_ALLOW_DESTRUCTIVE_GIT"):
+            block("environment assignments cannot be verified; run the push directly.")
+    if words != argv or not argv or os.path.basename(argv[0]) != "jj":
+        block("run one literal jj git push command without shell operators.")
+    cwd = json.loads(os.environ["HOOK_INPUT"]).get("cwd") or os.getcwd()
+    base = [argv[0]]
+    selected = {"bookmark": [], "tag": [], "change": [], "revision": [], "remote": []}
+    mode = None
+    snapshot = True
+    positional = []
+    value_options = {"-R": "repository", "--repository": "repository", "--remote": "remote",
+                     "-b": "bookmark", "--bookmark": "bookmark", "-t": "tag", "--tag": "tag",
+                     "-c": "change", "--change": "change", "-r": "revision",
+                     "--revision": "revision", "--revisions": "revision", "--color": "color"}
+    args = iter(argv[1:])
+    for arg in args:
+        key, equal, value = arg.partition("=")
+        if not equal and len(arg) > 2 and arg[:2] in ("-R", "-b", "-t", "-c", "-r"):
+            key, value, equal = arg[:2], arg[2:], "="
+        if key in value_options:
+            if not equal:
+                value = next(args, None)
+            if value is None or value == "":
+                block("a push option is missing its value.")
+            kind = value_options[key]
+            if kind == "repository":
+                base.extend(["--repository", value])
+            elif kind == "color":
+                if value not in ("always", "never", "debug", "auto"):
+                    block("the color option is invalid.")
+            else:
+                selected[kind].append(value)
+        elif arg in ("--all", "--tracked", "--deleted"):
+            if mode is not None and mode != arg:
+                block("conflicting push selectors.")
+            mode = arg
+        elif arg == "--ignore-working-copy":
+            snapshot = False
+        elif arg in ("--no-pager", "--quiet", "--allow-empty-description"):
+            pass
+        elif arg.startswith("-"):
+            block("unsupported push option; use explicit bookmark or revision selectors.")
+        else:
+            positional.append(arg)
+    if positional != ["git", "push"]:
+        block("the push command could not be parsed.")
+    explicit = any(selected[k] for k in ("bookmark", "tag", "change", "revision"))
+    if mode and explicit:
+        block("conflicting push selectors.")
+    leak_bin = shutil.which(os.environ.get("GITLEAKS_BIN", "gitleaks"))
+    if leak_bin is None:
+        block("gitleaks is unavailable.")
+
+    def jj(args, *, pinned=True):
+        result = run(base + (["--at-operation", operation] if pinned else [])
+                     + ["--ignore-working-copy", "--no-pager", "--color=never"] + args, cwd)
+        if result.returncode != 0:
+            block("jj could not derive or read the push revisions.")
+        return result.stdout.decode("utf-8")
+
+    # Match the snapshot that the real push will make, then read one consistent operation.
+    if snapshot:
+        result = run(base + ["--no-pager", "--color=never", "log", "-r", "@", "--no-graph",
+                             "-T", 'commit_id ++ "\\n"'], cwd)
+        if result.returncode != 0:
+            block("the working copy could not be snapshotted for the scan.")
+    operation = jj(["op", "log", "--limit", "1", "--no-graph", "-T", 'id ++ "\\n"'], pinned=False).strip()
+    if not re.fullmatch(r"[0-9a-f]{128}", operation):
+        block("the repository operation could not be identified.")
+
+    def config(name):
+        rows = [json.loads(line) for line in jj(["config", "list", "--include-defaults", name,
+                                                "-T", 'json(self) ++ "\\n"']).splitlines()]
+        rows = [row for row in rows if row["name"] == name and not row["is_overridden"]]
+        if len(rows) > 1:
+            block("ambiguous push configuration.")
+        return rows[0]["value"] if rows else None
+
+    remote_names = []
+    for line in jj(["git", "remote", "list"]).splitlines():
+        parts = line.split(None, 1)
+        if len(parts) != 2:
+            block("remote names could not be derived.")
+        remote_names.append(parts[0])
+    patterns = selected["remote"] or config("git.push")
+    if patterns is None:
+        patterns = remote_names if len(remote_names) == 1 else ["origin"]
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    if not isinstance(patterns, list) or not patterns or any(not isinstance(p, str) for p in patterns):
+        block("push remotes could not be derived.")
+    remotes = set()
+    for pattern in patterns:
+        kind, separator, value = pattern.partition(":")
+        if not separator:
+            kind, value = "glob", pattern
+        if kind not in ("exact", "glob") or any(c in value for c in "|&~()'\""):
+            block("unsupported remote pattern; select a literal remote.")
+        matches = {name for name in remote_names if (name == value if kind == "exact"
+                                                    else fnmatch.fnmatchcase(name, value))}
+        if not matches:
+            block("the selected remote does not exist.")
+        remotes.update(matches)
+
+    def refs(kind, patterns=()):
+        rows = [json.loads(line) for line in jj([kind, "list", "--all-remotes", "-T",
+                                                'json(self) ++ "\\n"', "--", *patterns]).splitlines()]
+        for row in rows:
+            if not isinstance(row, dict):
+                block("a reference could not be resolved.")
+            target = row.get("target")
+            if not isinstance(target, list) or len(target) > 1 or any(
+                    not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", sha)
+                    for sha in target):
+                block("a reference is conflicted or could not be resolved.")
+        return rows
+
+    all_refs = {kind: refs(kind) for kind in ("bookmark", "tag")}
+
+    def resolve(revset, *, required=False):
+        ids = set(jj(["log", "-r", revset, "--no-graph", "-T", 'commit_id ++ "\\n"']).splitlines())
+        if (required and not ids) or any(not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", sha) for sha in ids):
+            block("push revisions could not be resolved.")
+        return ids
+
+    direct = set()
+    for revset in selected["change"]:
+        direct.update(resolve(revset, required=True))
+    revision_ids = set()
+    for revset in selected["revision"]:
+        revision_ids.update(resolve(revset, required=True))
+    named = set()
+    for kind in ("bookmark", "tag"):
+        for pattern in selected[kind]:
+            rows = refs(kind, [pattern])
+            if not rows:
+                block("the selected reference does not exist.")
+            named.update(sha for row in rows if "remote" not in row for sha in row["target"])
+    commits = set()
+    for remote in remotes:
+        targets = direct | named
+        default_ids = None
+        if not explicit and mode is None:
+            expression = config("revsets.git-push")
+            if not isinstance(expression, str) or not expression:
+                block("the default push revset could not be resolved.")
+            # jj substitutes the remote symbol, but not quoted text or the remote= argument name.
+            expression = re.sub(r'"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27|\bremote\b(?!\s*=)',
+                                lambda m: json.dumps(remote) if m.group() == "remote" else m.group(), expression)
+            default_ids = resolve(expression)
+        known = set()
+        for rows in all_refs.values():
+            local = {row["name"]: row["target"] for row in rows if "remote" not in row}
+            tracked = {row["name"] for row in rows if row.get("remote") == remote and "tracking_target" in row}
+            known.update(sha for row in rows if row.get("remote") == remote for sha in row["target"])
+            for name, ids in local.items():
+                if mode == "--all" or (mode == "--tracked" and name in tracked):
+                    targets.update(ids)
+                elif explicit:
+                    targets.update(set(ids) & revision_ids)
+                elif mode is None and name in tracked:
+                    targets.update(set(ids) & default_ids)
+        if targets:
+            target_expr = "(" + "|".join(sorted(targets)) + ")"
+            resolve(target_expr, required=True)
+            known_expr = "(" + "|".join(sorted(known)) + ")" if known else "root()"
+            commits.update(resolve(known_expr + ".." + target_expr))
+
+    def locations(diff):
+        mapping = {}
+        old_file = new_file = None
+        old_line = new_line = None
+        for number, line in enumerate(diff.splitlines(), 1):
+            if line.startswith("diff --git "):
+                old_file = new_file = old_line = new_line = None
+            elif old_line is None and line.startswith(("--- ", "+++ ")):
+                path = line[4:]
+                if path.startswith('"'):
+                    path = json.loads(path)
+                path = None if path == "/dev/null" else path[2:] if path.startswith(("a/", "b/")) else path
+                if line.startswith("--- "):
+                    old_file = path
+                else:
+                    new_file = path
+            elif line.startswith("@@ "):
+                match = re.match(r"@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@", line)
+                if not match:
+                    block("diff line locations could not be derived.")
+                old_line, new_line = map(int, match.groups())
+            elif old_line is not None:
+                if line.startswith("+"):
+                    mapping[number] = (new_file, new_line)
+                    new_line += 1
+                elif line.startswith("-"):
+                    mapping[number] = (old_file, old_line)
+                    old_line += 1
+                elif line.startswith(" "):
+                    mapping[number] = (new_file, new_line)
+                    old_line += 1
+                    new_line += 1
+        return mapping
+
+    findings = []
+    with tempfile.TemporaryDirectory(prefix="jj-push-scan-") as scratch:
+        report = os.path.join(scratch, "report.json")
+        scan_env = {key: value for key, value in os.environ.items() if not key.startswith("GITLEAKS_")}
+        leak_args = [leak_bin, "stdin", "--redact", "--no-banner", "--no-color",
+                     "--ignore-gitleaks-allow", "--report-format", "json", "--report-path", report]
+        user_config = os.path.expanduser("~/.config/gitleaks/config.toml")
+        if os.path.isfile(user_config):
+            leak_args.extend(["--config", user_config])
+        for commit in sorted(commits):
+            diff = jj(["diff", "--git", "--context", "0", "-r", commit])
+            if any(line.startswith("Binary files ") for line in diff.splitlines()):
+                block("binary file contents are unavailable to the secret scan.")
+            mapping = locations(diff)
+            # Hunk headings can repeat file contents without a reliable source line. Scan the
+            # actual added/deleted lines, keeping blank metadata lines so report offsets stay valid.
+            content = "\n".join(line[1:] if number in mapping else ""
+                                for number, line in enumerate(diff.splitlines(), 1)) + "\n"
+            if os.path.exists(report):
+                os.unlink(report)
+            result = run(leak_args, scratch, data=content.encode("utf-8"), env=scan_env)
+            if result.returncode not in (0, 1):
+                block("gitleaks could not complete the scan.")
+            with open(report, encoding="utf-8") as source:
+                rows = json.load(source)
+            if not isinstance(rows, list) or bool(rows) != (result.returncode == 1):
+                block("gitleaks returned an inconsistent report.")
+            for row in rows:
+                if not isinstance(row, dict):
+                    block("gitleaks returned an invalid finding.")
+                line = row.get("StartLine")
+                rule = row.get("RuleID")
+                if not isinstance(line, int) or line not in mapping or not isinstance(rule, str) or not rule:
+                    block("gitleaks finding locations could not be verified.")
+                path, line = mapping[line]
+                if not path or line < 1:
+                    block("gitleaks finding locations could not be verified.")
+                findings.append({"commit": commit, "file": path, "line": line, "rule": rule})
+    if findings:
+        print("jj git push blocked (ORCH-P005): secrets detected.", file=sys.stderr)
+        for finding in findings:
+            print(json.dumps(finding, ensure_ascii=True), file=sys.stderr)
+        raise SystemExit(2)
+    current = jj(["op", "log", "--limit", "1", "--no-graph", "-T", 'id ++ "\\n"'], pinned=False).strip()
+    if current != operation:
+        block("the repository changed during the scan; retry the direct push.")
+
+
+try:
+    scan_push()
+except (OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
+    block("the secret scan could not be completed; no push was authorized.")
+PY
+    if [[ $scan_status -ne 0 ]]; then
+      echo 'jj git push blocked (ORCH-P005): secret verification failed.' >&2
+      exit 2
+    fi
     exit 0
   fi
   cat >&2 <<'EOF'
