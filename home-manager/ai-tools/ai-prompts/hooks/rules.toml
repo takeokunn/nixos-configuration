@@ -2,6 +2,8 @@ version = 1
 
 # Claude Code and Codex both use the claude-code event format for this hook.
 # File covers Read|Write|Edit; Bash covers shell commands, including aitools.
+# Grep, Glob, MultiEdit, and NotebookEdit are not canonical tools in this guard version.
+# Their path fields cannot be configured here; FR-017 must restrict those tools.
 # Runtime registration must treat hook errors as blocking failures.
 #
 # These regex rules inspect literal paths, not filesystem identities or shell expansion.
@@ -10,7 +12,9 @@ version = 1
 
 [[rules]]
 matcher = "File"
-regex = '(?i)\.env$|(?:^|/)\.env(?:\.[^/]*|rc)$'
+# Rust regex has no lookaround or allow rules. The suffix expression is the complement of
+# exactly example/sample/template: proper prefixes, first mismatches, or longer words.
+regex = '(?i)\.env$|(?:^|/)\.env(?:\.(?:|e|ex|exa|exam|examp|exampl|s|sa|sam|samp|sampl|t|te|tem|temp|templ|templa|templat|[^est/][^/]*|e[^x/][^/]*|ex[^a/][^/]*|exa[^m/][^/]*|exam[^p/][^/]*|examp[^l/][^/]*|exampl[^e/][^/]*|example[^/]+|s[^a/][^/]*|sa[^m/][^/]*|sam[^p/][^/]*|samp[^l/][^/]*|sampl[^e/][^/]*|sample[^/]+|t[^e/][^/]*|te[^m/][^/]*|tem[^p/][^/]*|temp[^l/][^/]*|templ[^a/][^/]*|templa[^t/][^/]*|templat[^e/][^/]*|template[^/]+)|rc)$'
 message = "Environment files are off-limits. Continue without them; use the variables named in the task or in checked-in documentation."
 
 [[rules]]
@@ -22,14 +26,14 @@ message = "Credential files and SSH/GnuPG directories are off-limits. Continue w
 [[rules]]
 matcher = "Bash"
 regex = '''(?ix)
-    \.env(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])\.env(?:\.[^\s/'";|&)]*|rc)(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])\.(?:ssh|gnupg|aws)(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])\.config/gh/hosts\.yml(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])\.docker/config\.json(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])\.kube/config(?:$|[\s/'";|&)])
+    (?:\b(?:cat|head|tail|less|more|source|read)\s+[^;|&\n]*|[=<>:]\s*)['"]?(?:[^\s/'";|&]*/)*\.env(?:$|[\s'";|&)])
+  | (?:^|[\s/'"=<>:])\.env(?:\.(?:|e|ex|exa|exam|examp|exampl|s|sa|sam|samp|sampl|t|te|tem|temp|templ|templa|templat|[^est\s/'";|&)][^\s/'";|&)]*|e[^x\s/'";|&)][^\s/'";|&)]*|ex[^a\s/'";|&)][^\s/'";|&)]*|exa[^m\s/'";|&)][^\s/'";|&)]*|exam[^p\s/'";|&)][^\s/'";|&)]*|examp[^l\s/'";|&)][^\s/'";|&)]*|exampl[^e\s/'";|&)][^\s/'";|&)]*|example[^\s/'";|&)]+|s[^a\s/'";|&)][^\s/'";|&)]*|sa[^m\s/'";|&)][^\s/'";|&)]*|sam[^p\s/'";|&)][^\s/'";|&)]*|samp[^l\s/'";|&)][^\s/'";|&)]*|sampl[^e\s/'";|&)][^\s/'";|&)]*|sample[^\s/'";|&)]+|t[^e\s/'";|&)][^\s/'";|&)]*|te[^m\s/'";|&)][^\s/'";|&)]*|tem[^p\s/'";|&)][^\s/'";|&)]*|temp[^l\s/'";|&)][^\s/'";|&)]*|templ[^a\s/'";|&)][^\s/'";|&)]*|templa[^t\s/'";|&)][^\s/'";|&)]*|templat[^e\s/'";|&)][^\s/'";|&)]*|template[^\s/'";|&)]+)|rc)(?:$|[\s'";|&)])
+  | (?:^|[\s/'"=<>:])\.(?:ssh|gnupg|aws)(?:$|[\s/'";|&)])
+  | (?:^|[\s/'"=<>:])\.config/gh/hosts\.yml(?:$|[\s/'";|&)])
+  | (?:^|[\s/'"=<>:])\.docker/config\.json(?:$|[\s/'";|&)])
+  | (?:^|[\s/'"=<>:])\.kube/config(?:$|[\s/'";|&)])
   | \.(?:git-credentials|netrc|npmrc)(?:$|[\s/'";|&)])
-  | (?:^|[\s/'"=<>])id_[a-z0-9_]+(?:$|[\s/'";|&)])
+  | /id_[a-z0-9_]+(?:$|[\s'";|&)])
 '''
 message = "This command names a protected credential path. Continue without reading or changing it; use documented variable names instead."
 [[rules]]

@@ -44,13 +44,13 @@ expect_cmd() {
 # Read, Write, and Edit all reach the `File` rules. MultiEdit and NotebookEdit are not covered by any
 # matcher in rules.toml, so they have no cases here.
 for tool in Read Write Edit; do
-  # FR-002 protects .env.* as well, including templates until an exception is specified.
+  # R7 permits the three explicit template names; .envrc remains protected.
   expect deny "$tool" '/work/app/.env'
   expect deny "$tool" '.env'
   expect deny "$tool" '/work/app/.ENV'
   expect deny "$tool" '/work/app/prod.Env'
   expect deny "$tool" '/work/app/.env.local'
-  expect deny "$tool" '/work/app/.env.example'
+  expect allow "$tool" '/work/app/.env.example'
   expect allow "$tool" '/work/app/environment.md'
 
   # Key names are anchored to the file name; any id_<word> is a key, an extension makes it something else.
@@ -170,19 +170,21 @@ for runtime in claude codex; do
     '/home/u/.gnupg' '/home/u/.docker/config.json' '/home/u/.kube/config' \
     '/home/u/.ssh/id_rsa' '/home/u/.ssh/config' '/home/u/.ssh/id_ed25519.pub' \
     '/home/u/.SSH/known_hosts' '/work/project with spaces/.env.local'; do
-    expect_cmd deny "cat $path"
-    expect_cmd deny "cat \"$path\""
-    expect_cmd deny "head -n 1 '$path'"
-    expect_cmd deny "bash -c 'cat \"$path\"'"
-    expect_cmd deny "aitools read '$path'"
-    expect_cmd deny "aitools read --range 1:2 '$path'"
-    expect_cmd deny "aitools --root /home/u read '$path'"
-    expect_cmd deny "aitools run -- cat '$path'"
-    expect_cmd deny "aitools run -- sh -c 'cat \"$path\"'"
-    expect_cmd deny "cat<'$path'"
-    expect_cmd deny "p='$path'; cat \"\$p\""
+    want=deny
+    if [[ $path == .env.example ]]; then want=allow; fi
+    expect_cmd "$want" "cat $path"
+    expect_cmd "$want" "cat \"$path\""
+    expect_cmd "$want" "head -n 1 '$path'"
+    expect_cmd "$want" "bash -c 'cat \"$path\"'"
+    expect_cmd "$want" "aitools read '$path'"
+    expect_cmd "$want" "aitools read --range 1:2 '$path'"
+    expect_cmd "$want" "aitools --root /home/u read '$path'"
+    expect_cmd "$want" "aitools run -- cat '$path'"
+    expect_cmd "$want" "aitools run -- sh -c 'cat \"$path\"'"
+    expect_cmd "$want" "cat<'$path'"
+    expect_cmd "$want" "p='$path'; cat \"\$p\""
     for tool in Read Write Edit; do
-      expect deny "$tool" "$path"
+      expect "$want" "$tool" "$path"
     done
   done
   for path in '/work/environment.md' '/work/.envrc.example' '/work/prod.env.example' \
@@ -202,6 +204,30 @@ for runtime in claude codex; do
     '/home/u/.npmrc' '/work/keys/id_ed25519'; do
     expect_cmd deny "cat '$path'"
     expect_cmd deny "aitools read '$path'"
+  done
+  # Search identifiers and a virtualenv directory are not credential-file reads.
+  for cmd in 'rg -n "process.env" src' "grep -rn 'import.meta.env' ." 'rg id_token' \
+    'psql -c "select id_user from t"' 'python -m venv .env' '.env/bin/python x.py'; do
+    expect_cmd allow "$cmd"
+  done
+  for template in example sample template; do
+    for path in ".env.$template" "/work/.env.$template"; do
+      for tool in Read Write Edit; do expect allow "$tool" "$path"; done
+      expect_cmd allow "cat '$path'"
+      expect_cmd allow "aitools read '$path'"
+      expect_cmd allow "echo 'see $path'"
+    done
+  done
+  # Exact template exceptions must not exempt shorter, longer, or mutated secret names.
+  for suffix in '' e ex exampl examples example.local sampl samplex templat template.bak local production; do
+    for tool in Read Write Edit; do expect deny "$tool" "/work/.env.$suffix"; done
+    expect_cmd deny "cat '/work/.env.$suffix'"
+    expect_cmd deny "git show HEAD:.env.$suffix"
+  done
+  for cmd in 'git show HEAD:.envrc' 'git show HEAD:.ssh/config' \
+    'git show HEAD:.config/gh/hosts.yml' 'git show HEAD:.docker/config.json' \
+    'git show HEAD:.kube/config' 'cat /work/keys/id_token' 'cat .env' 'cat<.env'; do
+    expect_cmd deny "$cmd"
   done
 done
 
