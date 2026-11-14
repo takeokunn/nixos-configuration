@@ -24,31 +24,15 @@ rec {
   # (shared/claude-code-managed-settings.nix at the repository root).
   claudeCodeCaBundle = "/etc/ssl/certs/ca-certificates.crt";
 
-  mcpServerToOpencode =
-    def:
-    if def ? url then
-      {
-        type = "remote";
-        url = def.url;
-      }
-    else
-      {
-        type = "local";
-        command = [ def.command ] ++ (def.args or [ ]);
-      };
-
-  # Plain `*` globs only: Claude Code reads `x:*` as `x*`, and opencode has no `:*` form, so one
-  # spelling serves both. An entry another one already covers is omitted (`rm -rf ~*` covers
-  # `rm -rf ~/.ssh*`).
+  # Plain `*` globs only because Claude Code reads `x:*` as `x*`. Skip a glob when another covers it
+  # already (`rm -rf ~*` covers `rm -rf ~/.ssh*`).
   #
-  # git writes are denied and read-only git is not: agents use jj for every VCS write. The write list
-  # below is the only git guard for opencode, which runs no hooks. Its prefixes miss `/usr/bin/git`,
-  # `env git`, and `bash -c 'git ...'`; block-destructive-git catches those for Claude Code and Codex
-  # by allowing only read-only subcommands, which a prefix list cannot express. Some writes are also
-  # not expressible as a prefix because the same words begin a read: `git tag v1`, `git config k v`,
+  # Git writes are denied and read-only git is not: agents use jj for every VCS write. Prefix lists miss
+  # commands run as `/usr/bin/git`, `env git`, or `bash -c 'git ...'`; block-destructive-git catches
+  # those for Claude Code and Codex by allowing only read-only subcommands. Some writes are also not
+  # expressible as a prefix because the same words begin a read: `git tag v1`, `git config k v`,
   # and `git branch x` share a prefix with `git tag -l`, `git config --get`, and `git branch --list`.
-  # block-destructive-git covers them for Claude Code and Codex, and opencode's `git *` ask default
-  # covers them there.
+  # block-destructive-git covers them for Claude Code and Codex.
   #
   # gh alias and gh extension run arbitrary programs under a gh command line, and gh auth token and
   # gh auth status -t print the token into the transcript.
@@ -117,11 +101,9 @@ rec {
     "archive"
   ];
 
-  # Subcommands that never write the working tree, the index, or a local branch. opencode allows them
-  # ahead of its `git *` ask default (except `fetch`, see below), and the Codex rule conversion uses
-  # them to drop a deny prefix that would also forbid a read. `fetch` only updates remote-tracking refs
-  # when block-destructive-git vets its URL, option, and refspec forms. Claude Code and Codex run that
-  # hook; opencode runs no hooks, so opencode-config.nix leaves `fetch` at its `git *` ask default.
+  # Subcommands that never write the working tree, the index, or a local branch. Codex uses them to
+  # drop a deny prefix that would also forbid a read. `fetch` only updates remote-tracking refs when
+  # block-destructive-git vets its URL, option, and refspec forms. Claude Code and Codex run that hook.
   gitReadSubcommands = [
     "fetch"
     "status"
@@ -160,7 +142,7 @@ rec {
 
   # A bare `git stash` pushes, and `git push` with no arguments pushes the current branch, so each
   # subcommand is denied with and without arguments. The `-C dir` and `-c k=v` forms are the global
-  # options agents add most; Claude Code and opencode match `*` at any position, Codex lists the
+  # options agents add most; Claude Code matches `*` at any position, Codex lists the
   # non-prefix forms as unenforced.
   gitWriteDenyPatterns = [
     "git stash"
@@ -218,12 +200,11 @@ rec {
     "yp"
   ];
 
-  # `rm -rf /*` cannot be listed: a Claude Code or opencode glob `*` also matches `/tmp/x`, which
+  # `rm -rf /*` cannot be listed: a Claude Code glob `*` also matches `/tmp/x`, which
   # agents delete routinely. Every top-level directory except /tmp, /private/tmp, and /var/folders is
   # listed instead, with `*` so paths below it are covered (`/Users*` includes a home directory's
   # contents; relative paths pass). The literal `/*`, `/`, `~`, and `$HOME/*` forms for Claude Code are
-  # caught by a regex rule in ai-prompts/hooks/rules.toml; opencode runs no hooks, so it adds `rm -rf /*`
-  # to its own deny set (opencode/opencode-config.nix).
+  # caught by a regex rule in ai-prompts/hooks/rules.toml.
   bashDenyPatterns = [
     "rm -rf /"
     "rm -rf //*"
@@ -314,16 +295,6 @@ rec {
         "Edit"
         "NotebookEdit"
       ];
-
-  agentOpencodePermissions =
-    frontmatterLines:
-    lib.optionalString (agentIsReadOnly frontmatterLines) ''
-      permission:
-        '*': deny
-        read: allow
-        glob: allow
-        grep: allow
-    '';
 
   parseFrontmatter =
     content:

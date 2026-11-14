@@ -58,7 +58,7 @@ in
     "yomiyasu"
   ];
 
-  # Claude Code and OpenCode serve ai-prompts/commands/ as slash commands, so the same prompts are
+  # Claude Code serves ai-prompts/commands/ as slash commands, so the same prompts are
   # skills only for Codex, which has no slash commands.
   programs.agent-skills.skills.explicit = lib.genAttrs commandNames (_: {
     from = "commands";
@@ -70,8 +70,6 @@ in
     enable = true;
     dest = codexSkillsDest;
   };
-  programs.agent-skills.targets.opencode.enable = true;
-
   # One-shot migration. The sync refuses a non-empty destination without its marker, and Codex's
   # skills directory used to be filled by home-manager links into the store. Adopt it only when every
   # file is such a link (or under Codex's own .system): anything else is hand-placed work that the

@@ -90,7 +90,7 @@ agent failed; and re-running on that assumption discards completed work and doub
 
 1. Check the runtime's agent status and queued messages first.
 2. If the runtime exposes session transcripts, locate the actual transcript path. Claude-style
-   `subagents/agent-*.jsonl` paths are not a portable assumption for Codex or OpenCode.
+   `subagents/agent-*.jsonl` paths are not a portable assumption for Codex.
 3. Read the terminal status and final report identified by that runtime's transcript format. Message length
    and file mtime do not establish completion: a long intermediate message is not a final report, and a quiet
    file may belong to an agent waiting on a tool.
@@ -132,8 +132,8 @@ Choose the store by scope and by what the runtime actually exposes, not by the c
   and costly debugging traps. Include source references or reproducible commands so a later agent can recheck
   the claim. Knowledge can span files; it need not be attached to one symbol or line number.
 - A runtime-provided personal or auto-memory store may hold cross-project preferences and session-independent
-  working conventions. Use only an exposed store with the appropriate scope; do not invent Claude, Codex, or
-  OpenCode paths or assume another client's memory is injected.
+  working conventions. Use only an exposed store with the appropriate scope; do not invent Claude or Codex
+  paths or assume another client's memory is injected.
 - Rules that must govern future work belong in the repository's authoritative instructions when that edit is
   requested. Do not keep a competing policy in memory or write facts already documented in the repository.
 

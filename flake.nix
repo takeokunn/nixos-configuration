@@ -285,60 +285,6 @@
                 true
               ];
             };
-            testAgentOpencodePermissions = {
-              expr = sharedAiTools.agentOpencodePermissions [ "tools: Read, Grep, Glob" ];
-              expected = ''
-                permission:
-                  '*': deny
-                  read: allow
-                  glob: allow
-                  grep: allow
-              '';
-            };
-            testWritableAgentPermissions = {
-              expr = sharedAiTools.agentOpencodePermissions [ "tools: Read, Write" ];
-              expected = "";
-            };
-            # opencode's schema names URL servers "remote"; "http" is Claude Code's spelling.
-            testMcpServerToOpencodeRemote = {
-              expr = sharedAiTools.mcpServerToOpencode {
-                type = "http";
-                url = "https://example.com/mcp";
-              };
-              expected = {
-                type = "remote";
-                url = "https://example.com/mcp";
-              };
-            };
-            testMcpServerToOpencodeLocalNoArgs = {
-              expr = sharedAiTools.mcpServerToOpencode { command = "/bin/foo"; };
-              expected = {
-                type = "local";
-                command = [ "/bin/foo" ];
-              };
-            };
-            testMcpServerToOpencodeLocalWithArgs = {
-              expr = sharedAiTools.mcpServerToOpencode {
-                command = "/bin/foo";
-                args = [
-                  "a"
-                  "b"
-                ];
-              };
-              expected = {
-                type = "local";
-                command = [
-                  "/bin/foo"
-                  "a"
-                  "b"
-                ];
-              };
-            };
-            # opencode has no `:*` form, so such an entry would reach it as a literal that never matches.
-            testBashDenyPatternsUsePlainGlobs = {
-              expr = builtins.filter (pkgs.lib.hasSuffix ":*") sharedAiTools.bashDenyPatterns;
-              expected = [ ];
-            };
           };
         in
         {
@@ -543,9 +489,6 @@
                 claudeHooksJson = builtins.unsafeDiscardStringContext (
                   builtins.toJSON claudeCodeManagedSettings.hooks
                 );
-                # The module option, not the built opencode.json: a Linux runner can evaluate the Mac
-                # host but cannot build the file, whose MCP server packages are Mac builds.
-                opencodeBashPermissionsJson = builtins.toJSON self.darwinConfigurations.M4-Max.config.home-manager.users.take.programs.opencode.settings.permission.bash;
                 configDir = claudeCodeConfigDir;
                 expectedConfigDir = "${claudeCodeHomeDirectory}/.claude";
                 settingsFileKeysJson = builtins.toJSON claudeCodeSettingsFileKeys;
@@ -572,35 +515,11 @@
                     echo "managed-settings permissions.deny lost \"Bash($rule)\"; agents must not run git writes" >&2
                     exit 1
                   fi
-                  # opencode runs none of the hooks, so its prefix deny is the only thing between it and a git write.
-                  if ! jq -e --arg r "$rule" '.[$r] == "deny"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
-                    echo "opencode permission.bash no longer denies \"$rule\"" >&2
-                    exit 1
-                  fi
                 done
-                # Read-only git must stay reachable: Claude Code judges it through block-destructive-git, and
-                # opencode asks on an unknown git command but allows the listed reads.
+                # Read-only git must stay reachable: Claude Code judges it through block-destructive-git.
                 for rule in git 'git *' 'git stash *' 'git fetch' 'git fetch *' 'aitools git' 'aitools git *'; do
                   if jq -e --arg r "Bash($rule)" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
                     echo "managed-settings permissions.deny blocks read-only git again via \"Bash($rule)\"" >&2
-                    exit 1
-                  fi
-                done
-                if ! jq -e '.["git *"] == "ask" and .["git"] == "ask"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
-                  echo "opencode permission.bash lost its \"git\"/\"git *\" ask default, which covers git writes no prefix can name" >&2
-                  exit 1
-                fi
-                for rule in 'git status *' 'git status' 'git stash list'; do
-                  if ! jq -e --arg r "$rule" '.[$r] == "allow"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
-                    echo "opencode permission.bash no longer allows \"$rule\"" >&2
-                    exit 1
-                  fi
-                done
-                # opencode runs no hooks, so nothing vets fetch's URL, option, and refspec forms there; it must
-                # fall to the "git *" ask default instead of being allowed.
-                for rule in 'git fetch' 'git fetch *'; do
-                  if jq -e --arg r "$rule" '.[$r] == "allow"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
-                    echo "opencode permission.bash allows \"$rule\" although opencode runs no block-destructive-git hook" >&2
                     exit 1
                   fi
                 done
@@ -609,12 +528,6 @@
                     echo "managed-settings permissions.deny lost \"Bash(git $sub *)\"" >&2
                     exit 1
                   fi
-                  for rule in "git $sub" "git $sub *"; do
-                    if ! jq -e --arg r "$rule" '.[$r] == "deny"' <<< "$opencodeBashPermissionsJson" >/dev/null; then
-                      echo "opencode permission.bash no longer denies \"$rule\"" >&2
-                      exit 1
-                    fi
-                  done
                 done
                 # An ask rule prompts even in bypassPermissions, so only the override prefixes may stay.
                 if ! jq -e '.ask == ["Bash(ALLOW_DESTRUCTIVE_GIT=1 *)", "Bash(CLAUDE_ALLOW_DESTRUCTIVE_GIT=1 *)"]' <<< "$permissionsJson" >/dev/null; then

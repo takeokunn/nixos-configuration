@@ -16,7 +16,7 @@ let
   codexRuntimeAdapter = ''
     ## codex_runtime_adapter
 
-    Apply the shared Claude/OpenCode orchestration prompt in Codex while preserving Codex tool semantics.
+    Apply the shared Claude orchestration prompt in Codex while preserving Codex tool semantics.
 
     - The SSoT for core behavior is ai-prompts/CLAUDE.md. The SSoT for slash-command skill bodies is ai-prompts/commands/*/SKILL.md. The SSoT for Codex custom agents is ai-prompts/agents/*.md.
     - When the shared prompt mentions Claude-only mechanisms, translate the intent to the Codex tools available in the current session instead of treating those names as literal requirements.

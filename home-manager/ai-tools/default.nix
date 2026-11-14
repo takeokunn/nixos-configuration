@@ -5,7 +5,6 @@
 {
   imports = [
     ./claude-code
-    ./opencode
     ./codex
     ./agent-skills
     ./serena

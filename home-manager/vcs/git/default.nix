@@ -29,7 +29,6 @@
     ".git-hooks-config.yaml"
     ".markdown-preview.html"
     ".serena/"
-    ".sisyphus/"
     ".cache/"
     ".claude"
     "coverage.out"
