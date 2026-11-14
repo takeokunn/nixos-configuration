@@ -14,7 +14,12 @@ fail() {
 }
 
 stderr_file=$(mktemp)
-trap 'rm -f "$stderr_file"' EXIT
+push_fixture=''
+cleanup() {
+  rm -f "$stderr_file"
+  if [[ -n $push_fixture ]]; then rm -rf "$push_fixture"; fi
+}
+trap cleanup EXIT
 
 run_hook() {
   jq -n --arg c "$1" '{tool_name: "Bash", tool_input: {command: $c}}' | bash "$hook" >/dev/null 2>"$stderr_file"
@@ -683,12 +688,31 @@ for invocation in \
   expect_block_message "$invocation" 'Run jj git push directly' claude
 done
 
-# Nothing to classify: malformed input and an empty command stand aside.
+# Invalid input must not become a silent success when the safety parser fails.
 checked=$((checked + 1))
 status=0
-printf 'not json' | bash "$hook" >/dev/null 2>&1 || status=$?
-[[ $status -eq 0 ]] || fail "malformed JSON: expected exit 0, got $status"
+printf 'not json' | bash "$hook" >/dev/null 2>"$stderr_file" || status=$?
+[[ $status -eq 2 && -s $stderr_file ]] || fail "malformed JSON: expected refusal, got $status"
 expect_allow ''
+for runtime in claude codex; do
+  for bad_input in 'not json' '[]' '{"tool_name":"Bash","tool_input":{"command":7}}' \
+    '{"tool_name":"Bash","tool_input":null}'; do
+    checked=$((checked + 1))
+    status=0
+    out=$(printf '%s' "$bad_input" | bash "$hook" "$runtime" 2>"$stderr_file") || status=$?
+    [[ $status -eq 2 && -z $out && -s $stderr_file ]] || fail "$runtime malformed event: expected refusal, got $status"
+  done
+done
+bash_bin=$(command -v bash)
+mkdir "$push_fixture/no-parsers"
+ln -s "$(command -v cat)" "$push_fixture/no-parsers/cat"
+for runtime in claude codex; do
+  checked=$((checked + 1))
+  status=0
+  out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"jj git push"}}' |
+    PATH="$push_fixture/no-parsers" "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+  [[ $status -eq 2 && -z $out && -s $stderr_file ]] || fail "$runtime missing parsers: expected refusal, got $status"
+done
 
 # Other tools stand aside.
 checked=$((checked + 1))
@@ -718,6 +742,40 @@ done
 fixture_jj git remote add empty "$push_fixture/empty-receiver/.jj/repo/store/git"
 expect_claude_allow 'jj git push --remote empty -b main'
 expect_claude_allow 'jj git push --remote origin --remote empty -b main'
+
+# A snapshotting push may not target the mutable working-copy commit.
+fixture_jj bookmark create working -r @
+expect_claude_block 'jj git push -c @'
+expect_claude_block 'jj git push -b working'
+expect_claude_block 'jj git push -r @'
+expect_claude_allow 'jj --ignore-working-copy git push -c @'
+expect_claude_allow 'jj git push --ignore-working-copy -b working'
+fixture_jj bookmark delete working
+
+# Deleted and absent tracked references are empty targets, not conflicts.
+fixture_jj bookmark create gone -r main@origin
+fixture_jj git push --remote origin --bookmark gone
+fixture_jj bookmark delete gone
+expect_claude_allow 'jj git push --deleted'
+expect_claude_allow 'jj git push -b main'
+fixture_jj bookmark track x --remote empty
+expect_claude_allow 'jj git push --remote empty -b x'
+expect_claude_allow 'jj git push --remote origin -b main'
+
+# Concurrent bookmark moves create a real conflict without changing file contents.
+fixture_jj new main@origin -m 'Unrelated branch workspace'
+printf 'other clean branch\n' >"$push_fixture/sender/other.txt"
+fixture_jj commit other.txt -m 'Unrelated clean branch'
+other_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy -r @- --no-graph -T commit_id)
+fixture_jj new x -m 'Return to clean branch'
+fixture_jj bookmark create conflicted -r main@origin
+conflict_base=$("$real_jj" --repository "$push_fixture/sender" op log --ignore-working-copy --limit 1 --no-graph -T id)
+fixture_jj --at-operation "$conflict_base" bookmark set conflicted -r x
+fixture_jj --at-operation "$conflict_base" bookmark set conflicted -r "$other_commit"
+fixture_jj bookmark list
+expect_claude_allow 'jj git push -b main'
+expect_claude_block 'jj git push -b conflicted'
+fixture_jj bookmark delete conflicted
 
 # Different remote bases must select different outgoing histories.
 cat >"$push_fixture/record-gitleaks" <<'SCANNER'
@@ -760,15 +818,15 @@ secret_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-work
 fixture_jj tag set secret -r leak
 expect_secret_block() {
   checked=$((checked + 1))
-  local status=0
+  local status=0 expected_commit=${2:-$secret_commit} expected_file=${3:-fixture.txt} expected_line=${4:-2}
   invoke_claude_hook "$1" >"$push_fixture/hook.stdout" 2>"$stderr_file" || status=$?
   [[ $status -eq 2 ]] || fail "secret history: expected exit 2, got $status"
   [[ ! -s $push_fixture/hook.stdout ]] || fail 'secret history: stdout was not empty'
   grep -q ORCH-P005 "$stderr_file" || fail 'secret history: missing refusal banner'
   grep -q github-pat "$stderr_file" || fail 'secret history: missing rule name'
-  grep -q fixture.txt "$stderr_file" || fail 'secret history: missing file name'
-  grep -Eq '"line": *2([,}])' "$stderr_file" || fail 'secret history: missing source line'
-  grep -q "$secret_commit" "$stderr_file" || fail 'secret history: missing commit id'
+  grep -Fq "$expected_file" "$stderr_file" || fail 'secret history: missing file name'
+  grep -Eq "\"line\": *$expected_line([,}])" "$stderr_file" || fail 'secret history: missing source line'
+  grep -q "$expected_commit" "$stderr_file" || fail 'secret history: missing commit id'
   if grep -Fq "$synthetic_pat" "$stderr_file" "$push_fixture/hook.stdout"; then
     fail 'secret history: raw synthetic value leaked'
   fi
@@ -853,12 +911,52 @@ push_cwd="$push_fixture"
 expect_claude_block 'jj git push -b main'
 push_cwd="$push_fixture/sender"
 
-# A binary diff omits the bytes, so it cannot count as a successful secret scan.
+# Match gitleaks/pre-commit: binary files are skipped rather than blocking the push.
 fixture_jj new x -m 'Binary fixture workspace'
 printf '\000binary fixture\n' >"$push_fixture/sender/binary.bin"
 fixture_jj commit binary.bin -m 'Binary scanner boundary'
 fixture_jj bookmark create binary -r @-
-expect_claude_block 'jj git push -b binary'
+expect_claude_allow 'jj git push -b binary'
+
+# Non-UTF-8 text still reaches the scanner, both without and with a secret.
+fixture_jj new x -m 'Non-UTF-8 fixture workspace'
+printf 'caf\351\n' >"$push_fixture/sender/latin.txt"
+fixture_jj commit latin.txt -m 'Latin-1 clean text'
+fixture_jj bookmark create latin -r @-
+expect_claude_allow 'jj git push -b latin'
+printf 'fixture_value=%s\n' "$synthetic_pat" >>"$push_fixture/sender/latin.txt"
+fixture_jj commit latin.txt -m 'Latin-1 synthetic positive'
+fixture_jj bookmark create latin-secret -r @-
+latin_commit=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working-copy -r latin-secret --no-graph -T commit_id)
+expect_secret_block 'jj git push -b latin-secret' "$latin_commit" latin.txt 2
+
+# Build an already-published synthetic baseline directly in an independent local receiver.
+# No secret is pushed: a local clone reads it, then only hook calls inspect removals.
+"$real_jj" git init --no-colocate "$push_fixture/published-receiver" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+printf 'keep this line\nfixture_value=%s\n' "$synthetic_pat" >"$push_fixture/published-receiver/published.txt"
+(
+  cd "$push_fixture/published-receiver"
+  "$real_jj" commit published.txt -m 'Synthetic published baseline'
+  "$real_jj" bookmark create main -r @-
+  "$real_jj" git export
+) >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+"$real_jj" git clone --no-colocate "$push_fixture/published-receiver/.jj/repo/store/git" \
+  "$push_fixture/published-sender" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+published_jj() {
+  (cd "$push_fixture/published-sender" && "$real_jj" "$@") >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+}
+published_jj new main@origin -m 'Remove published synthetic line'
+printf 'keep this line\n' >"$push_fixture/published-sender/published.txt"
+published_jj commit published.txt -m 'Remove published synthetic line'
+published_jj bookmark set main -r @-
+push_cwd="$push_fixture/published-sender"
+expect_claude_allow 'jj git push -b main'
+published_jj new main@origin -m 'Remove published synthetic file'
+rm "$push_fixture/published-sender/published.txt"
+published_jj commit published.txt -m 'Remove published synthetic file'
+published_jj bookmark create remove-file -r @-
+expect_claude_allow 'jj git push -b remove-file'
+push_cwd="$push_fixture/sender"
 
 # The local receiver still contains only the clean baseline; hook calls never push.
 checked=$((checked + 1))
@@ -868,5 +966,9 @@ remote_tip=$("$real_jj" --repository "$push_fixture/sender" log --ignore-working
 if git --git-dir="$push_fixture/receiver/.jj/repo/store/git" cat-file -e "$secret_commit" 2>/dev/null; then
   fail 'synthetic secret commit reached the local receiver'
 fi
+cleanup
+trap - EXIT
+checked=$((checked + 1))
+[[ ! -e $push_fixture && ! -e $stderr_file ]] || fail 'fixture cleanup left temporary files'
 echo "block-destructive-git: $checked cases, $failures failures"
 [[ $failures -eq 0 ]]

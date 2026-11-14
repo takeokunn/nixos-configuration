@@ -36,8 +36,8 @@
 # could itself be destructive, which blocks: nesting deeper than the recursion limit, a jj
 # subcommand computed at run time ($(...), backticks, $VAR), and a jj subcommand that is not a
 # built-in (a user alias can expand to anything).
-# Input boundary: malformed JSON, an empty command, a non-Bash tool, or no jq and no python3 to parse
-# the input all exit 0, since there is nothing to classify.
+# Input boundary: malformed JSON, invalid Bash input, and unavailable parsers block. A valid
+# non-Bash event or an empty Bash command has nothing to classify and exits 0.
 # Override for the jj verdicts: ALLOW_DESTRUCTIVE_GIT=1 <command>. It covers jj git push only in the
 # default (Codex) mode.
 # Argument 1 selects how a jj git push verdict is reported. Without it the hook exits 2 with a banner
@@ -52,19 +52,32 @@ set -euo pipefail
 
 input=$(cat)
 
-# Unparsed input yields an empty command, so stand aside rather than error.
+input_error() {
+  echo 'Hook input blocked (ORCH-P005): JSON or Bash command could not be parsed.' >&2
+  exit 2
+}
+
 if command -v jq &>/dev/null; then
-  tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
-  command=$(echo "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
+  tool_name=$(printf '%s' "$input" | jq -er 'if type == "object" and (.tool_name | type) == "string" and .tool_name != "" then .tool_name else error("invalid event") end' 2>/dev/null) || input_error
+  if [[ $tool_name != Bash ]]; then exit 0; fi
+  command=$(printf '%s' "$input" | jq -er 'if (.tool_input | type) == "object" and (.tool_input.command | type) == "string" then .tool_input.command else error("invalid Bash input") end' 2>/dev/null) || input_error
 elif command -v python3 &>/dev/null; then
-  tool_name=$(printf '%s' "$input" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_name",""))' 2>/dev/null || echo "")
-  command=$(printf '%s' "$input" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))' 2>/dev/null || echo "")
+  tool_name=$(printf '%s' "$input" | python3 -c 'import json,sys
+d=json.load(sys.stdin)
+if not isinstance(d,dict) or not isinstance(d.get("tool_name"),str) or not d["tool_name"]: sys.exit(1)
+print(d["tool_name"])' 2>/dev/null) || input_error
+  if [[ $tool_name != Bash ]]; then exit 0; fi
+  command=$(printf '%s' "$input" | python3 -c 'import json,sys
+d=json.load(sys.stdin)
+i=d.get("tool_input")
+if not isinstance(i,dict) or not isinstance(i.get("command"),str): sys.exit(1)
+print(i["command"])' 2>/dev/null) || input_error
 else
-  # No JSON parser: cannot classify the command, so do not pretend to have checked it.
-  exit 0
+  echo 'Hook input blocked (ORCH-P005): neither jq nor Python is available.' >&2
+  exit 2
 fi
 
-if [[ $tool_name != "Bash" ]] || [[ -z $command ]]; then
+if [[ -z $command ]]; then
   exit 0
 fi
 
@@ -898,7 +911,7 @@ def scan_push():
                      + ["--ignore-working-copy", "--no-pager", "--color=never"] + args, cwd)
         if result.returncode != 0:
             block("jj could not derive or read the push revisions.")
-        return result.stdout.decode("utf-8")
+        return result.stdout.decode("utf-8", errors="surrogateescape")
 
     # Match the snapshot that the real push will make, then read one consistent operation.
     if snapshot:
@@ -950,11 +963,15 @@ def scan_push():
         for row in rows:
             if not isinstance(row, dict):
                 block("a reference could not be resolved.")
-            target = row.get("target")
-            if not isinstance(target, list) or len(target) > 1 or any(
-                    not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", sha)
+            target = row.setdefault("target", [])
+            if not isinstance(target, list) or any(
+                    sha is not None and (not isinstance(sha, str)
+                                         or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", sha))
                     for sha in target):
-                block("a reference is conflicted or could not be resolved.")
+                block("a reference could not be resolved.")
+            # jj serializes an absent ref as [null]. Keep null terms in multi-term conflicts.
+            if target == [None]:
+                row["target"] = []
         return rows
 
     all_refs = {kind: refs(kind) for kind in ("bookmark", "tag")}
@@ -971,16 +988,17 @@ def scan_push():
     revision_ids = set()
     for revset in selected["revision"]:
         revision_ids.update(resolve(revset, required=True))
-    named = set()
+    named = {kind: set() for kind in ("bookmark", "tag")}
     for kind in ("bookmark", "tag"):
         for pattern in selected[kind]:
             rows = refs(kind, [pattern])
             if not rows:
                 block("the selected reference does not exist.")
-            named.update(sha for row in rows if "remote" not in row for sha in row["target"])
+            named[kind].update(row["name"] for row in rows)
+    working_copy = resolve("@", required=True) if snapshot else set()
     commits = set()
     for remote in remotes:
-        targets = direct | named
+        targets = set(direct)
         default_ids = None
         if not explicit and mode is None:
             expression = config("revsets.git-push")
@@ -991,17 +1009,32 @@ def scan_push():
                                 lambda m: json.dumps(remote) if m.group() == "remote" else m.group(), expression)
             default_ids = resolve(expression)
         known = set()
-        for rows in all_refs.values():
+        for kind, rows in all_refs.items():
             local = {row["name"]: row["target"] for row in rows if "remote" not in row}
+            remote_refs = {row["name"]: row["target"] for row in rows if row.get("remote") == remote}
             tracked = {row["name"] for row in rows if row.get("remote") == remote and "tracking_target" in row}
-            known.update(sha for row in rows if row.get("remote") == remote for sha in row["target"])
+            # A conflicted remote ref does not establish which ancestors the remote has.
+            known.update(sha for ids in remote_refs.values() if len(ids) <= 1 for sha in ids)
+            names = set(named[kind])
+            if mode == "--all":
+                names.update(local)
+                names.update(tracked)
+            elif mode == "--tracked":
+                names.update(tracked)
+            elif mode == "--deleted":
+                names.update(name for name in tracked if not local.get(name))
             for name, ids in local.items():
-                if mode == "--all" or (mode == "--tracked" and name in tracked):
-                    targets.update(ids)
-                elif explicit:
-                    targets.update(set(ids) & revision_ids)
-                elif mode is None and name in tracked:
-                    targets.update(set(ids) & default_ids)
+                if explicit and set(ids) & revision_ids:
+                    names.add(name)
+                elif not explicit and mode is None and name in tracked and set(ids) & default_ids:
+                    names.add(name)
+            for name in names:
+                ids = local.get(name, [])
+                if len(ids) > 1 or len(remote_refs.get(name, [])) > 1:
+                    block("a selected reference is conflicted.")
+                targets.update(ids)
+        if targets & working_copy:
+            block("the push would snapshot a working-copy target. Run jj commit <paths> -m <message>, then push @-.")
         if targets:
             target_expr = "(" + "|".join(sorted(targets)) + ")"
             resolve(target_expr, required=True)
@@ -1053,16 +1086,14 @@ def scan_push():
             leak_args.extend(["--config", user_config])
         for commit in sorted(commits):
             diff = jj(["diff", "--git", "--context", "0", "-r", commit])
-            if any(line.startswith("Binary files ") for line in diff.splitlines()):
-                block("binary file contents are unavailable to the secret scan.")
             mapping = locations(diff)
-            # Hunk headings can repeat file contents without a reliable source line. Scan the
-            # actual added/deleted lines, keeping blank metadata lines so report offsets stay valid.
-            content = "\n".join(line[1:] if number in mapping else ""
+            # Only additions introduce content. Keep blank metadata/deletion lines so report
+            # offsets stay valid; binary diffs contain no additions, as in gitleaks git mode.
+            content = "\n".join(line[1:] if number in mapping and line.startswith("+") else ""
                                 for number, line in enumerate(diff.splitlines(), 1)) + "\n"
             if os.path.exists(report):
                 os.unlink(report)
-            result = run(leak_args, scratch, data=content.encode("utf-8"), env=scan_env)
+            result = run(leak_args, scratch, data=content.encode("utf-8", errors="surrogateescape"), env=scan_env)
             if result.returncode not in (0, 1):
                 block("gitleaks could not complete the scan.")
             with open(report, encoding="utf-8") as source:
