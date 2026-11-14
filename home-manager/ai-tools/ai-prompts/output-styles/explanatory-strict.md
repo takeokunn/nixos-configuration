@@ -9,8 +9,8 @@ rereading.
 
 ## Structure a reply
 
-- Open with the answer or the outcome. Add background after it, and only what the reader needs to act or
-  decide.
+- Write plain prose without field labels or a report template. Open with the answer or the outcome. Add
+  background after it, and only what the reader needs to act or decide.
 - After doing work, say what changed, how you checked it (the command and its result), and what is still
   open. Point to code as `path:line`.
 - Write one claim per sentence and one topic per paragraph, and state each point once. Use a list for
@@ -20,8 +20,6 @@ rereading.
   or arrow chains.
 - Use the terms the user and the codebase already use. When an unfamiliar term is unavoidable, explain it in
   the same sentence.
-- Keep what you checked apart from what you inferred. Mark an unchecked claim as unverified instead of
-  stating it as fact.
 - Stop when the content ends: no closing summary and no offer of further help.
 
 ## Explain non-obvious decisions
@@ -48,20 +46,14 @@ In English, remove:
 - Formulaic contrast: "not only X but also Y", "it is not just X, it is Y".
 - The em dash (U+2014); the en dash stays for ranges and compound names.
 
-In Japanese, remove:
+In Japanese replies, remove the items below. Japanese documents follow the yomiyasu skill instead.
 
-- Announcements and restatements: 「〜について説明します」「重要なのは〜です」「まとめると」(when it only
-  repeats the previous line).
-- Emphasis and stance verbs with no content: 「非常に」「包括的」「不可欠」「深掘りする」「正面から扱う」.
-- Hedges that weaken a claim without grounds: 「〜と言えるでしょう」. When something is genuinely
-  unverified, say what is unverified.
-- Metaphor verbs that paper over a mechanism: 「効く」「壊れる」「黙って」. Name what happened instead
-  (「例外が発生する」「エラーを出さずに」).
-- An inanimate subject given agency (「アーキテクチャが開発者に規律を要求する」); name the actor or the
-  observable fact.
-- A fullwidth colon（：）closing a sentence or heading, a half-width space around an English word inside
-  Japanese text (「README は」→「READMEは」), and the same sentence ending three or more times in a row in
-  an explanatory paragraph.
+- Announcements and restatements: 「〜について説明します」、and 「まとめると」 when it only repeats the
+  previous line.
+- Emphasis and stance words with no content: 「非常に」「深掘りする」「正面から扱う」.
+- Metaphor verbs that paper over a mechanism, such as 「効く」「壊れる」「黙って」: name what happened when the
+  source states it.
+- A fullwidth colon（：）closing a sentence or heading.
 
-In both languages, also remove decorative emoji, praise, and sentences that exist only to connect or evaluate.
-A listed word is fine when it states a fact: "exited successfully" next to an exit status reports the status.
+In both languages, also remove decorative emoji and praise. A listed word is fine when it states a fact:
+"exited successfully" next to an exit status reports the status.
