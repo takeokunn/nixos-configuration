@@ -20,12 +20,25 @@ let
       map denyPatternToTokens shared.bashDenyPatterns
     )
     ++ [
-      [ "gh" "pr" "merge" ]
-      [ "gh" "repo" "delete" ]
+      [
+        "gh"
+        "pr"
+        "merge"
+      ]
+      [
+        "gh"
+        "repo"
+        "delete"
+      ]
     ]
   );
 
-  hookPath = lib.makeBinPath [ pkgs.coreutils pkgs.jq pkgs.perl pkgs.python3 ];
+  hookPath = lib.makeBinPath [
+    pkgs.coreutils
+    pkgs.jq
+    pkgs.perl
+    pkgs.python3
+  ];
   guard = pkgs.writeShellScript "guard-and-guide-codex" ''
     if ! ${guardAndGuide}/bin/guard-and-guide --agent claude-code --config ${aiPromptsPath}/hooks/rules.toml; then
       echo 'guard-and-guide failed; command blocked.' >&2
@@ -62,10 +75,17 @@ in
     PreToolUse = [
       {
         matcher = "^Bash$";
-        hooks = map (name: {
-          type = "command";
-          command = "${hooksDir}/${name}";
-        }) [ "guard-and-guide" "block-destructive-git" "aitools-rewrite-codex" ];
+        hooks =
+          map
+            (name: {
+              type = "command";
+              command = "${hooksDir}/${name}";
+            })
+            [
+              "guard-and-guide"
+              "block-destructive-git"
+              "aitools-rewrite-codex"
+            ];
       }
     ];
   };

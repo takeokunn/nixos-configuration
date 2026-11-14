@@ -660,16 +660,21 @@
             in
             pkgs.runCommand "codex-hooks-test"
               {
-                nativeBuildInputs = [ pkgs.jq pkgs.python3 ];
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.python3
+                ];
                 inherit requirementsFile;
                 userHooksJson = plain (builtins.toJSON codex.hooks);
                 userRulesJson = plain (builtins.toJSON codex.rules);
                 settingsHooksJson = plain (builtins.toJSON (codex.settings.hooks or null));
                 darwinActivation = plain darwinConfig.system.activationScripts.extraActivation.text;
-                linuxPolicyJson = plain (builtins.toJSON {
-                  inherit (linuxPolicy) mode;
-                  source = toString linuxPolicy.source;
-                });
+                linuxPolicyJson = plain (
+                  builtins.toJSON {
+                    inherit (linuxPolicy) mode;
+                    source = toString linuxPolicy.source;
+                  }
+                );
                 settingsJson = builtins.toJSON {
                   inherit (codex.settings) model model_reasoning_effort;
                   hasAutoCompactLimit = codex.settings ? model_auto_compact_token_limit;

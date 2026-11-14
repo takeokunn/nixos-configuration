@@ -35,7 +35,9 @@ let
 
   # Claude Code loads the output style separately; Codex gets its body appended so replies follow the same rules.
   outputStyleBody =
-    (shared.parseFrontmatter (builtins.readFile (aiPromptsPath + "/output-styles/explanatory-strict.md"))).body;
+    (shared.parseFrontmatter (
+      builtins.readFile (aiPromptsPath + "/output-styles/explanatory-strict.md")
+    )).body;
 
   codexAgents = ''
     ${codexRuntimeAdapter}
@@ -66,11 +68,15 @@ let
       descriptionLine = shared.findLineWithPrefix "description: " parsed.frontmatterLines;
       name = lib.removePrefix "name: " nameLine;
       description = shared.decodeFrontmatterScalar (lib.removePrefix "description: " descriptionLine);
-      claudeModel = lib.removePrefix "model: " (shared.findLineWithPrefix "model: " parsed.frontmatterLines);
-      reasoningEffort = {
-        claude-sonnet-5-5 = "medium";
-        claude-opus-5-5 = "high";
-      }.${claudeModel};
+      claudeModel = lib.removePrefix "model: " (
+        shared.findLineWithPrefix "model: " parsed.frontmatterLines
+      );
+      reasoningEffort =
+        {
+          claude-sonnet-5-5 = "medium";
+          claude-opus-5-5 = "high";
+        }
+        .${claudeModel};
     in
     pkgs.writeText "codex-agent-${agent}.toml" ''
       name = ${builtins.toJSON name}
