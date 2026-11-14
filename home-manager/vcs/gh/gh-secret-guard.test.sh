@@ -317,6 +317,7 @@ block	api graphql -F=query=mutation{merge{owner}{clientMutationId}}
 block	api graphql --field query=mutation{enable{repo}AutoMerge{clientMutationId}}
 block	api graphql --field=query=mutation{merge{branch}{clientMutationId}}
 block	api -F query=mutation{merge{repo}{clientMutationId}} graphql
+block	api graphql -F query=mutation{merge:repo(input:{}){clientMutationId}}
 allow	api graphql -f query=mutation{merge{repo}{clientMutationId}}
 allow	api graphql -fquery=mutation{merge{owner}{clientMutationId}}
 allow	api graphql --raw-field=query=mutation{merge{branch}{clientMutationId}}
@@ -334,6 +335,10 @@ CASES
   expect_allow query.json api graphql --input -
   cmp -s query.json "$STUB_LOG/stdin" || fail "GraphQL stdin changed before reaching gh"
   expect_block /dev/null pr comment 1 --body "$token"
+  expect_block /dev/null -R o/r pr view 1
+  grep -q 'options before the gh command' "$work/err" || fail "a pre-command option is blocked with the wrong reason"
+  # gh's own help example: placeholders in typed variables, the document in a raw field.
+  expect_allow /dev/null api graphql -F owner={owner} -F name={repo} -f query='query($name: String!, $owner: String!) { repository(owner: $owner, name: $name) { releases(last: 3) { nodes { tagName } } } }'
   unset "$marker"
 done
 

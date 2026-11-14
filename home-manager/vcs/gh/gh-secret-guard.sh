@@ -38,6 +38,7 @@ if ((agent)); then
   case "${1-}" in
   "" | --version | -h | --help) ;;
   agent-task | alias | api | attestation | auth | browse | cache | codespace | cs | completion | config | discussion | extension | ext | gist | gpg-key | help | issue | label | licenses | org | pr | preview | project | release | repo | ruleset | run | search | secret | skill | ssh-key | status | variable | version | workflow) ;;
+  -*) block "options before the gh command are ambiguous; put them after the subcommand" ;;
   *) block "the command is not a recognised gh built-in; aliases and extensions are not allowed" ;;
   esac
   sub=""
@@ -135,6 +136,8 @@ fi
 
 if ((agent)) && [[ ${1-} == api ]]; then
   method="" endpoint="" input="" has_body=0 typed_placeholder=0
+  # gh's own pattern for typed fields, (\:(owner|repo|branch)\b|\{[a-z]+\}), with \b spelled out.
+  placeholder='(:(owner|repo|branch)([^A-Za-z0-9_]|$)|[{][a-z]+[}])'
   api_args=("${@:2}")
   i=0
   while ((i < ${#api_args[@]})); do
@@ -161,10 +164,10 @@ if ((agent)) && [[ ${1-} == api ]]; then
       -f | -F | --raw-field | --field)
         has_body=1
         [[ $value == *=* ]] || block "gh api field could not be parsed"
-        if [[ $option == -F || $option == --field ]]; then
-          case ${value#*=} in
-          *'{owner}'* | *'{repo}'* | *'{branch}'*) typed_placeholder=1 ;;
-          esac
+        # Filled variables stay data; only the document fields can gain a mutation name.
+        if [[ $option == -F || $option == --field ]] && [[ ${value%%=*} == query || ${value%%=*} == operationName ]] &&
+          [[ ${value#*=} =~ $placeholder ]]; then
+          typed_placeholder=1
         fi
         if [[ $option == -F || $option == --field ]] && [[ ${value#*=} == @* ]]; then
           source_path=${value#*=@}
