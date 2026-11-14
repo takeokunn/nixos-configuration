@@ -72,12 +72,12 @@ input=$(cat)
 # only has to be a superset of what the rewriter accepts: a rewritable command word at the start (after
 # an optional `cd DIR &&`) or right after a `;` or `&`. A miss only skips the rewrite.
 cmd_words='(cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff)'
-cd_env='(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+[[:space:]]*(&|\\u0026)(&|\\u0026)[[:space:]]*)?'
-json_ws='([[:space:]]|\\[ntr])*'
+json_ws='([[:space:]]|\\[ntr]|\\f|\\u00(0[9a-dA-D]|20|85|[aA]0)|\\u1680|\\u200[0-9aA]|\\u202[89]|\\u202[fF]|\\u205[fF]|\\u3000)*'
+cd_env="(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+${json_ws}(&|\\\\u0026)(&|\\\\u0026)${json_ws})?"
 prefilter="\"command\"[[:space:]]*:[[:space:]]*\"${json_ws}${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
 # Later segments of a `;` or `&&` list are rewritten too, so a rewritable word right after a separator
 # also passes.
-after_sep="(;|&|u0026)[[:space:]]*${cmd_words}([[:space:]]|\\\\|\")"
+after_sep="(;|&|u0026)${json_ws}${cmd_words}([[:space:]]|\\\\|\")"
 [[ $input =~ $prefilter || $input =~ $after_sep ]] || exit 0
 
 if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null; then

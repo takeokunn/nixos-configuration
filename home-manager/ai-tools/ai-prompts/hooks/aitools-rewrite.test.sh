@@ -124,6 +124,8 @@ expect_claude 'cat 2000 | head -5' 'aitools read 2000 --range 1:5 --max-lines 5'
 
 # Envelopes: a leading cd, a trailing stderr redirect, a trailing head/tail.
 expect_claude 'cd src && cat a.txt' 'cd src && aitools read a.txt --max-lines 2000'
+expect_claude $'cd src &&\tcat x' $'cd src &&\taitools read x --max-lines 2000'
+expect_claude $'pwd;\tcat x' $'pwd;\taitools read x --max-lines 2000'
 expect_claude 'cd ~/repo&&git status' ''
 expect_claude 'cat x 2>&1' 'aitools read x --max-lines 2000 2>&1'
 expect_claude 'cat x 2>/dev/null' 'aitools read x --max-lines 2000 2>/dev/null'
@@ -588,6 +590,12 @@ expect_claude 'cd src&&cat x' 'cd src&&aitools read x --max-lines 2000'
 for cmd in $'\n  cat x' $'\t cat x' $'\r\n cat x'; do
   expect_claude "$cmd" 'aitools read x --max-lines 2000'
   expect_json codex "$(jq -cn --arg command "$cmd" '{tool_name:"Bash",tool_input:{command:$command}}')" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+done
+for escape in '\f' '\u0009' '\u000a' '\u000A' '\u000D' '\u0020' '\u0085' '\u00A0' \
+  '\u1680' '\u2000' '\u2028' '\u202F' '\u205F' '\u3000'; do
+  payload="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"${escape}cat x\"}}"
+  expect_json claude "$payload" '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
+  expect_json codex "$payload" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 done
 
 # Codex: output only when every segment was rewritten or is a plain `cd DIR`.
