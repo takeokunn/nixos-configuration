@@ -13,10 +13,6 @@ rec {
           "false"
         ];
       };
-      deepwiki = {
-        type = "http";
-        url = "https://mcp.deepwiki.com/mcp";
-      };
     };
 
   # Handed to Claude Code as NODE_EXTRA_CA_CERTS from two places: the claude wrapper

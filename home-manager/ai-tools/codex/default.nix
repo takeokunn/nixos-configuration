@@ -116,7 +116,7 @@ let
     context7 = pickMcpServer nixMcpServers.context7;
     playwright = pickMcpServer nixMcpServers.playwright;
   }
-  // removeAttrs (shared.mcpServers { inherit nurPkgs; }) [ "deepwiki" ];
+  // shared.mcpServers { inherit nurPkgs; };
 
   codexSettings = {
     model = "gpt-6.1-sol";
