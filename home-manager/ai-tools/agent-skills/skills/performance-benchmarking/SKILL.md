@@ -95,8 +95,8 @@ one.**
 
 **Bound the run with a kill grace.** A plain timeout is not sufficient: a runtime that installs a termination
 handler or blocks signals can remain alive after its first signal, so a nominal limit leaks past the budget it
-was supposed to enforce. Use `timeout -k 10s <limit>s` where coreutils is available, and the tool's own timeout
-plus an explicit kill of the process group where it is not. `--foreground` does not time out the command's
+was supposed to enforce. Use GNU `timeout -k 10s <limit>s`; when a harness's own timeout bounds the run
+instead, follow it with an explicit kill of the process group. `--foreground` does not time out the command's
 children, so it does not bound a noninteractive run.
 
 ## Ways a clean run measures the wrong thing
@@ -194,8 +194,7 @@ interval-based gate can classify a regression when the lower bound exceeds the a
 on the sampling model and a calibrated harness; an interval is not a guarantee against systematic bias.
 
 **Keep inconclusive distinct from pass.** If the interval crosses the threshold, report the estimate and
-interval as inconclusive. Define beforehand whether that status blocks or requests another measurement;
-do not change an existing gate's policy to make a result green.
+interval as inconclusive. Define beforehand whether that status blocks or requests another measurement.
 
 **Missing required uncertainty is an invalid measurement.** If a gate requires an interval, do not silently
 substitute a point estimate or pass when the interval is absent. Report the missing field and follow the
@@ -211,9 +210,8 @@ total is zero, *before* evaluating the aggregate. **Verify the set of things sum
 ## Advisory results and required gates
 
 For a new advisory benchmark, document its non-blocking status and investigate regressions rather than
-ignoring them. For a required performance gate, preserve its budget and failure policy. A correctness fix
-that exceeds that budget needs an explicit tradeoff decision from its owner, not an automatic override or
-a change to `continue-on-error`.
+ignoring them. A correctness fix that exceeds a required gate's budget needs an explicit tradeoff decision
+from the gate's owner, not an automatic override or a change to `continue-on-error`.
 
 ## Wording the claim
 
@@ -233,11 +231,12 @@ a general claim.
 
 ## Negative results
 
-An optimization that was tried and did not work is durable knowledge, **and it is the knowledge most reliably
-lost between sessions.** A reverted experiment leaves no trace in the source tree, so the same idea is near
-certain to be re-proposed; and a bare "we tried that" is not enough to stop it.
+A reverted experiment leaves no trace in the source tree, so the same idea is near certain to be re-proposed;
+and a bare "we tried that" is not enough to stop it. Where and whether to record it follows CLAUDE.md
+memory_policy.
 
-Record three things: what was changed, what was measured, and **the explicit precondition for retrying.**
+A record of a negative result names three things: what was changed, what was measured, and **the explicit
+precondition for retrying.**
 Worked forms: "do not retry these no-op checks on this path without call-site frequency evidence and a profiler
 result"; "do not retry loop-wide scratch binding without first explaining the compiler and allocation
 interaction and proving improvement in the same isolated benchmark"; and, for a change measured at 0.006%
