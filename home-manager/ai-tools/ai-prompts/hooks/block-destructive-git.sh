@@ -750,7 +750,7 @@ print encode_json(\@push_argv), "\n" if $CLAUDE_MODE and $verdict eq 'jj-push';
 exit 0;
 PERL
 
-if ! verdict="$( { HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog"; } 2>/dev/null)"; then
+if ! verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"; then
   printf '%s\n' 'Command classification failed (ORCH-P005).' >&2
   exit 2
 fi
@@ -1009,7 +1009,7 @@ def scan_push():
             resolve(target_expr, required=True)
             known_expr = "(" + "|".join(sorted(known)) + ")" if known else "root()"
             remote_commits = resolve(known_expr + ".." + target_expr)
-            if remote_commits & working_copy:
+            if working_copy and resolve("::" + target_expr) & working_copy:
                 block("the push would snapshot a working-copy target. Run jj commit <paths> -m <message>, then push @-.")
             commits.update(remote_commits)
 

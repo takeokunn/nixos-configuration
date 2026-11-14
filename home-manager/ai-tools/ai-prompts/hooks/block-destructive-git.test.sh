@@ -741,6 +741,34 @@ for runtime in claude codex; do
     fail "$runtime oversized classifier argv: missing classifier refusal reason"
 done
 
+# Perl diagnostics must survive both successful classification and startup failure.
+mkdir "$push_fixture/diagnostic-perl"
+real_perl=$(command -v perl)
+export real_perl
+cat >"$push_fixture/diagnostic-perl/perl" <<'PERL_STUB'
+#!/bin/bash
+printf 'R11 classifier diagnostic\n' >&2
+if [[ ${CLASSIFIER_PROBE_FAILURE:-0} == 1 ]]; then exit 17; fi
+exec "$real_perl" "$@"
+PERL_STUB
+chmod +x "$push_fixture/diagnostic-perl/perl"
+for runtime in claude codex; do
+  for probe_failure in 0 1; do
+    checked=$((checked + 1))
+    status=0
+    out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git status"}}' |
+      PATH="$push_fixture/diagnostic-perl:$PATH" CLASSIFIER_PROBE_FAILURE="$probe_failure" \
+      "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+    expected_status=$((probe_failure * 2))
+    [[ $status -eq $expected_status && -z $out ]] || fail "$runtime classifier diagnostic: unexpected status $status or stdout"
+    grep -Fq 'R11 classifier diagnostic' "$stderr_file" || fail "$runtime classifier diagnostic was lost"
+    if ((probe_failure)); then
+      grep -Fq 'Command classification failed (ORCH-P005).' "$stderr_file" ||
+        fail "$runtime classifier failure omitted refusal reason"
+    fi
+  done
+done
+
 # Other tools stand aside.
 checked=$((checked + 1))
 status=0
@@ -786,6 +814,27 @@ expect_claude_block 'jj git push -b working-child'
 grep -Fq 'jj commit <paths>' "$stderr_file" || fail 'working-copy child refusal omitted commit guidance'
 expect_claude_allow 'jj --ignore-working-copy git push -b working-child'
 fixture_jj bookmark delete working-child
+
+# Remote knowledge does not prevent a later snapshot from rewriting @ and its descendants.
+"$real_jj" git init --no-colocate "$push_fixture/known-sender" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+"$real_jj" git init --no-colocate "$push_fixture/known-receiver" >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+(
+  cd "$push_fixture/known-sender"
+  printf 'clean known working copy\n' >clean.txt
+  "$real_jj" describe -m 'Known working copy'
+  "$real_jj" bookmark create known -r @
+  "$real_jj" git remote add origin "$push_fixture/known-receiver/.jj/repo/store/git"
+  "$real_jj" git push --ignore-working-copy --remote origin -b known
+  known_parent=$("$real_jj" log --ignore-working-copy -r '@ & known@origin' --no-graph -T commit_id)
+  [[ -n $known_parent ]] || exit 1
+  "$real_jj" new --no-edit @ -m 'Known working-copy child'
+  "$real_jj" bookmark create known-child -r '@+'
+) >"$push_fixture/setup.stdout" 2>"$push_fixture/setup.stderr"
+push_cwd="$push_fixture/known-sender"
+expect_claude_block 'jj git push -b known-child'
+grep -Fq 'jj commit <paths>' "$stderr_file" || fail 'known working-copy ancestor refusal omitted commit guidance'
+expect_claude_allow 'jj --ignore-working-copy git push -b known-child'
+push_cwd="$push_fixture/sender"
 
 # Deleted and absent tracked references are empty targets, not conflicts.
 fixture_jj bookmark create gone -r main@origin
