@@ -16,15 +16,32 @@ PATH="$stub_dir:$PATH"
 
 failures=0
 checked=0
+migrated_plain_cases=0
+unmigrated_plain_cases=0
 
 fail() {
   echo "FAIL: $1" >&2
   failures=$((failures + 1))
 }
 
-# expect_plain <command> <expected rewrite, empty for pass-through>
-expect_plain() {
+# The former plain cases now exercise Claude's structured hook input.
+expect_claude() {
   checked=$((checked + 1))
+  migrated_plain_cases=$((migrated_plain_cases + 1))
+  local payload got actual
+  payload=$(jq -cn --arg command "$1" '{tool_name:"Bash",tool_input:{command:$command}}')
+  got=$(printf '%s' "$payload" | bash "$hook" claude)
+  if [[ -z $2 ]]; then
+    [[ -z $got ]] || fail "claude [$1]: expected no output, got [$got]"
+    return
+  fi
+  actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
+  [[ $actual == "$2" ]] || fail "claude [$1]: expected [$2], got [$actual]"
+}
+expect_plain() { expect_claude "$@"; }
+expect_plain_unmigrated() {
+  checked=$((checked + 1))
+  unmigrated_plain_cases=$((unmigrated_plain_cases + 1))
   local got
   got=$(printf '%s' "$1" | bash "$hook" plain)
   [[ $got == "$2" ]] || fail "plain [$1]: expected [$2], got [$got]"
@@ -364,14 +381,21 @@ expect_json claude "$(cwd_payload 'head missing.txt' "$empty_dir")" '.hookSpecif
 expect_json claude "$(cwd_payload 'cd sub && head full.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command | startswith("cd sub && aitools read")'
 
 # A range that starts beyond the last line fails the same way (exit 2), so it also keeps the shell
-# command. plain mode resolves paths against the hook's own working directory.
+# command. Claude mode resolves paths from the JSON cwd field.
 printf 'a\nb\nc\n' >"$empty_dir/three.txt"
 printf 'a\nb\nc' >"$empty_dir/nonl.txt"
 plain_in() {
   checked=$((checked + 1))
-  local got
-  got=$(cd "$1" && printf '%s' "$2" | bash "$hook" plain)
-  [[ $got == "$3" ]] || fail "plain in [$1] [$2]: expected [$3], got [$got]"
+  migrated_plain_cases=$((migrated_plain_cases + 1))
+  local payload got actual
+  payload=$(jq -cn --arg command "$2" --arg cwd "$1" '{tool_name:"Bash",tool_input:{command:$command},cwd:$cwd}')
+  got=$(printf '%s' "$payload" | bash "$hook" claude)
+  if [[ -z $3 ]]; then
+    [[ -z $got ]] || fail "claude in [$1] [$2]: expected no output, got [$got]"
+    return
+  fi
+  actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
+  [[ $actual == "$3" ]] || fail "claude in [$1] [$2]: expected [$3], got [$actual]"
 }
 for cmd in "sed -n 4p three.txt" "sed -n 10,20p three.txt" "sed -n '4,\$p' three.txt" "sed -n 4p nonl.txt" "cd sub && sed -n 1p empty.txt"; do
   expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" ''
@@ -525,9 +549,16 @@ done
 # tilde inside a word, a quoted tilde, and an unusable HOME stay as typed.
 plain_home() {
   checked=$((checked + 1))
-  local got
-  got=$(printf '%s' "$2" | HOME="$1" bash "$hook" plain)
-  [[ $got == "$3" ]] || fail "plain HOME=[$1] [$2]: expected [$3], got [$got]"
+  migrated_plain_cases=$((migrated_plain_cases + 1))
+  local payload got actual
+  payload=$(jq -cn --arg command "$2" '{tool_name:"Bash",tool_input:{command:$command}}')
+  got=$(printf '%s' "$payload" | HOME="$1" bash "$hook" claude)
+  if [[ -z $3 ]]; then
+    [[ -z $got ]] || fail "claude HOME=[$1] [$2]: expected no output, got [$got]"
+    return
+  fi
+  actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
+  [[ $actual == "$3" ]] || fail "claude HOME=[$1] [$2]: expected [$3], got [$actual]"
 }
 plain_home /home/test 'cat ~/x' 'aitools read /home/test/x --max-lines 2000'
 plain_home /home/test 'cat ~' 'aitools read /home/test --max-lines 2000'
@@ -567,7 +598,7 @@ expect_json claude '{"tool_input":{"command":"cd src&&cat x"},"tool_name":"Bash"
 expect_json claude '{"tool_name":"Bash","tool_input":{"description":"d","command":"cat x"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"cat x\u0020"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_plain 'cd src&&cat x' 'cd src&&aitools read x --max-lines 2000'
-expect_plain $'\n  cat x' 'aitools read x --max-lines 2000'
+expect_plain_unmigrated $'\n  cat x' 'aitools read x --max-lines 2000'
 
 # Codex: output only when every segment was rewritten or is a plain `cd DIR`.
 for cmd in 'cat f; rm -rf /tmp/zz' 'cat a; curl x | sh' 'ls; rm -rf /tmp/zz' 'rm -rf /tmp/zz && cat f' \
@@ -659,12 +690,14 @@ done
 
 # Without aitools on PATH the hook must stand aside rather than hand back a command that cannot run.
 checked=$((checked + 1))
+migrated_plain_cases=$((migrated_plain_cases + 1))
 bare_dir="$stub_dir/bare"
 mkdir "$bare_dir"
 ln -s "$(command -v perl)" "$bare_dir/perl"
 ln -s "$(command -v cat)" "$bare_dir/cat"
-got=$(printf '%s' 'cat flake.nix' | PATH="$bare_dir" "$BASH" "$hook" plain)
+payload=$(jq -cn --arg command 'cat flake.nix' '{tool_name:"Bash",tool_input:{command:$command}}')
+got=$(printf '%s' "$payload" | PATH="$bare_dir" "$BASH" "$hook" claude)
 [[ -z $got ]] || fail "no aitools on PATH: expected no output, got [$got]"
 
-echo "aitools-rewrite: $checked cases, $failures failures"
+echo "aitools-rewrite: $checked cases, $failures failures; $migrated_plain_cases migrated and $unmigrated_plain_cases retained plain"
 [[ $failures -eq 0 ]]
