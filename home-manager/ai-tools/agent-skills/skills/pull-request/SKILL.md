@@ -1,6 +1,6 @@
 ---
 name: pull-request
-description: Use when creating or editing a pull request: commit shaping, title, body, and screenshots.
+description: "Use when creating or editing a pull request: commit shaping, title, body, and screenshots."
 metadata:
   version: "1.2.0"
 ---

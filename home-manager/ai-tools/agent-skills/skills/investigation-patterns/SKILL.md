@@ -1,6 +1,6 @@
 ---
 name: investigation-patterns
-description: Use when tracing a symptom to its cause: debugging, bisecting, working out how an unfamiliar implementation behaves, deciding whether something is absent or unused, or checking a completion claim against the artifact.
+description: "Use when tracing a symptom to its cause: debugging, bisecting, working out how an unfamiliar implementation behaves, deciding whether something is absent or unused, or checking a completion claim against the artifact."
 metadata:
   version: "3.2.0"
 ---
