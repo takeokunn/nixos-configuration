@@ -230,7 +230,7 @@
             self.nixosConfigurations.X13Gen2.config.home-manager.users.take.programs.claude-code.configDir;
 
           claudeCodeManagedSettings = import ./shared/claude-code-managed-settings.nix {
-            inherit (pkgs) lib python3;
+            inherit (pkgs) lib;
             guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
             homeDirectory = claudeCodeHomeDirectory;
           };

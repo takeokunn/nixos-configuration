@@ -5,7 +5,7 @@
 }:
 let
   settings = import ../../shared/claude-code-managed-settings.nix {
-    inherit (pkgs) lib python3;
+    inherit (pkgs) lib;
     inherit guardAndGuide;
     homeDirectory = "/Users/${username}";
   };

@@ -13,7 +13,6 @@
 {
   lib,
   guardAndGuide,
-  python3,
   # Absolute home directory of the user these settings govern. The hook commands need it because
   # this file is evaluated as system-level policy, where home-manager's own `programs.claude-code.configDir`
   # is out of scope. flake.nix asserts the two agree.
