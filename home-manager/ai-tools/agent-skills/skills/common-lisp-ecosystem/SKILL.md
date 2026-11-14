@@ -7,8 +7,8 @@ metadata:
 
 Silent failure modes in Common Lisp, CLOS, ASDF, and package systems: cases where correct-looking
 code loads and runs without error but does the wrong thing. Ordinary CLOS, condition, and ASDF usage
-is assumed knowledge; this file exists for the traps that pass a naive review. The SBCL operations part
-near the end covers running, debugging, profiling, and shipping SBCL programs.
+is assumed knowledge; this file exists for the traps that pass a naive review. `references/sbcl-operations.md`
+covers running, debugging, profiling, and shipping SBCL programs.
 
 ## CLOS: the construction boundary is the class, not the constructor
 
@@ -122,7 +122,8 @@ and does not unwind. If a later path in the same image evaluates the canonical d
 which is innocent. Run stub-defining harnesses in their own process, never sharing an image with
 canonical loads. When a definition fails that has no business failing, establish first whether the
 image is fresh: a polluted image produces errors that indict entirely unrelated code. This is the
-concrete reason behind the fresh-process-per-unit rule in the SBCL headless verification harness below.
+concrete reason behind the fresh-process-per-unit rule in `references/sbcl-operations.md` (Headless
+verification harness).
 
 ## Definition reachability verification
 
@@ -155,6 +156,16 @@ tooling's green result is used as evidence for a property it never examined. Use
 single rung as sufficient: balance check → top-level form outline (does each expected definition
 appear at depth zero?) → `fboundp` on the expected exports → an actual system load. Structural repair
 tooling should be verified at the outline and `fboundp` rungs, not just the balance rung.
+
+**A stale fasl can hide a definition present in the source.** ASDF skips recompiling when the cached fasl's
+mtime is not older than the source's, at one-second granularity, so a fasl with the *same* mtime is accepted
+even when it was compiled from an earlier version of the file. The run then reports "function X is undefined"
+for a function visibly defined at top level. A run killed mid-compile (SIGKILL from a timeout) is the likely
+way the cache gets into this state. Confirm before acting: compare `stat` mtimes of the source and its fasl
+under the ASDF output cache, and count the name in the fasl with `strings <fasl> | grep -c NAME` (symbol
+names are stored uppercased; string literals keep their case). Equal mtimes and a zero count are the
+signature. `touch` the source and rerun; do not delete the shared cache directory, which other sessions'
+runs may be using.
 
 ## ASDF path resolution
 
@@ -213,7 +224,8 @@ root, since the worktree directory does not contain them.
 ```
 
 If a stall survives switching to `:directory`, the traversal source may be the implementation's own
-wrapping registry rather than your configuration; see ASDF plan-layer hang triage below.
+wrapping registry rather than your configuration; see `references/sbcl-operations.md` (ASDF plan-layer hang
+triage).
 
 **Load the workspace, not a published build.** A development environment can pre-register a store copy of the
 system under test, and a benchmark or test then compiles that copy while the edits sit unread. Register the
@@ -284,6 +296,14 @@ range useless. Verify the change in a fresh registry and a fresh image, not in t
 made it: a warm image already has the departing package loaded and will happily resolve symbols that
 no longer have a source.
 
+## Navigation without Serena
+
+Serena has no language server for Common Lisp (nor Emacs Lisp, Org, or SQL), so its symbol tools return
+nothing for these files. Use grep for definitions and callers, the paredit-cli skill for structural outlines
+and edits, or the aitools skill where that binary is installed. In a repo that mixes languages, list every
+language it uses under `languages` in the Serena `project.yml`: automatic detection registers only the most
+common detected language, and symbol search for the others then comes back empty.
+
 ## Detailed references
 
 - [ASDF and source reliability](references/asdf-and-source-reliability.md) covers system loading, source layout, dependencies, data integrity, output, tests, and macro hygiene.
@@ -292,7 +312,7 @@ no longer have a source.
 ## Related
 
 - [trust-boundaries](../trust-boundaries/SKILL.md): general input-validation rules (limits before
-  allocation, validate before normalize) that the FORMAT-injection and pathname-coercion traps above
+  allocation, validate before normalize) that the FORMAT-injection and pathname-coercion traps
   instantiate in Common Lisp.
 - [serena-usage](../serena-usage/SKILL.md): navigating CLOS hierarchies, generic functions, and symbol
   definitions.

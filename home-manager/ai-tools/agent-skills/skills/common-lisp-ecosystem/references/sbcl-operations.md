@@ -4,7 +4,7 @@
 
 - Run batch and CI work with `--non-interactive` (or `--script`, with explicit exit codes via `sb-ext:exit`) so
   a debugger prompt cannot hang the job. Do not pass `--disable-debugger` while investigating a single
-  failure; reserve it for the Headless verification harness below.
+  failure; reserve it for the Headless verification harness.
 - After `asdf:load-system` fails, read the *first* ASDF failure; the later ones are usually its consequences.
 - Wrap a failing operation in `restart-case` so the debugger can continue or retry from the failure with the
   condition intact; a bare `handler-case` discards the condition and the stack it was raised on:
@@ -78,17 +78,18 @@ Other version-scoped observed triggers (SBCL 2.6.0), to test as hypotheses rathe
 
 **In-image timeouts do not guard this.** `sb-ext:with-timeout` does not reliably interrupt the compiler, so an
 in-image timeout is not a valid guard against a compile or load stall: the timeout simply never fires and the
-session hangs exactly as it would have without it. This is why the subprocess harness below is mandatory, not
-merely convenient: a stall has to be bounded from outside the image by a process-level timeout with a kill
-grace, because the process being bounded may be in a state where nothing inside it can run.
+session hangs exactly as it would have without it. This is why the subprocess harness (Headless verification
+harness) is mandatory, not merely convenient: a stall has to be bounded from outside the image by a
+process-level timeout with a kill grace, because the process being bounded may be in a state where nothing
+inside it can run.
 
 ### ASDF plan-layer hang triage
 
 The sibling failure family: a stall inside `asdf:load-system` that never reaches your code at all. ASDF's
 operation/plan layer (system-definition discovery, source-registry flattening, plan computation) runs
 *before* the first form of the target system is compiled, and it can hang there. Rule the environment out
-before spending time bisecting project sources, since every technique above assumes the stall is in a compile
-unit you own.
+before spending time bisecting project sources, since every technique in Compile/load hang triage assumes the
+stall is in a compile unit you own.
 
 **Use `(asdf:load-system "asdf")` as a control.** ASDF registers itself as a system, so loading it exercises
 the same find-system/operate machinery with none of your project's code in it. If `(require :asdf)` succeeds
@@ -122,12 +123,13 @@ child; a process that survived TERM and needed KILL is itself evidence about whe
 
 ### Headless verification harness
 
-A sound, non-interactive harness is a prerequisite for diagnosing the stalls above: if the timeout mechanism
-is unsound, a stalled form and a stalled harness are indistinguishable, producing false positives.
+A sound, non-interactive harness is a prerequisite for diagnosing compile/load and plan-layer stalls: if the
+timeout mechanism is unsound, a stalled form and a stalled harness are indistinguishable, producing false
+positives.
 
 **Real subprocess timeout.** The timeout must run in a parent process that keeps the ability to kill the
-child. Use an established timeout utility with a kill grace, as below, rather than an unverified fork/alarm
-wrapper. Verify normal completion, signal termination, and timeout exit statuses against known controls.
+child. Use an established timeout utility with a kill grace (Bound timeout with a kill grace) rather than an
+unverified fork/alarm wrapper. Verify normal completion, signal termination, and timeout exit statuses against known controls.
 Before group signalling, establish that the group belongs to this run; never infer ownership from a PID alone.
 
 **Kill the process group, not just the wrapper's PID.** A child that has called `setpgid`/`setpgrp` is
@@ -135,9 +137,9 @@ orphaned (not reaped) if only the parent is killed, and keeps holding resources.
 group and send TERM/KILL to the group, or let the wrapper live to its deadline and reap the child.
 
 **Deterministic child flags.** Launch every verification child with a fixed, minimal, non-interactive flag set:
-- `--disable-debugger`: never enter the interactive debugger in automation. This does not contradict the
-  root-cause rule above: disable it in the batch harness, keep it enabled while investigating a single failure
-  interactively.
+- `--disable-debugger`: never enter the interactive debugger in automation. This does not contradict
+  Invocation and debugging defaults: disable it in the batch harness, keep it enabled while investigating a
+  single failure interactively.
 - `--no-sysinit --no-userinit`: ignore site/user init files so the child does not inherit local state.
 - Exit with a fully qualified `(sb-ext:exit ...)`/`(sb-ext:quit)`; an unqualified `(quit)` can become unsafe
   after package changes during ASDF loading.
@@ -153,19 +155,19 @@ Passing isolated units does not establish that the whole-suite execution contrac
 the failing combined case. Keep diagnostic isolation complete, including the bootstrap compilation step.
 
 **Isolate the FASL cache.** Give each run a private, initialized output-translations/cache root before
-`asdf:load-system`, for the race described in ASDF parallel execution above. Initialize output translations in
+`asdf:load-system`, for the race described in `references/asdf-and-source-reliability.md` (ASDF parallel
+execution). Initialize output translations in
 the launcher itself with a run-owned directory inside the authorized worktree; do not repurpose `HOME` or clear
 another run's cache.
 
-**Bound timeout with a kill grace.** Wherever coreutils `timeout(1)` is available (Nix builds and CI; it is not
-on this machine's interactive PATH, where the tool's own timeout bounds the call), pass a kill grace:
-`timeout -k 10s <limit>s <command>`. Do not use `--foreground` for noninteractive test jobs:
+**Bound timeout with a kill grace.** Pass GNU `timeout(1)` a kill grace: `timeout -k 10s <limit>s <command>`.
+Do not use `--foreground` for noninteractive test jobs:
 [GNU Coreutils](https://www.gnu.org/s/coreutils/manual/html_node/timeout-invocation.html) documents that its
 children are not timed out in that mode. Descendants that escape the managed process group still need
 separate, ownership-checked cleanup. Plain `timeout` sends only TERM, and SBCL can remain alive
 after its initial termination signal, so a nominally bounded run leaks past the job budget and the escaped
-child keeps holding the FASL cache and any ports it opened, same root cause as the interrupt-disabled-region
-issue above: the first signal is a request, not a guarantee. Set the grace long enough for an orderly exit
+child keeps holding the FASL cache and any ports it opened, same root cause as Interrupt-disabled regions need
+SIGKILL: the first signal is a request, not a guarantee. Set the grace long enough for an orderly exit
 (a few seconds is usually ample) but budget the outer CI step timeout against `limit + grace`, not `limit`.
 ```bash
 # bounded: TERM at the limit, KILL 10s later if the child is still alive
@@ -175,9 +177,21 @@ timeout -k 10s 300s \
 
 **Timeout threshold vs. contention.** Distinguish a genuine per-file stall from ambient machine contention.
 When many SBCL sessions run concurrently, baseline load latency can exceed a low per-file timeout and report
-every file as a timeout. Reproduce alone and measure an unchanged control before attributing blame to a
-single file. Do not raise an acceptance timeout merely to make the check pass; document a demonstrated
-harness defect before changing its limit.
+every file as a timeout; check `uptime` and the other SBCL processes before attributing blame to a single file.
+
+**Stuck or slow.** Take two `ps -o pid,etime,time,pcpu -p <pid>` snapshots about 15 seconds apart on the
+`sbcl` process itself, not its shell or `nix develop` wrapper. Cumulative CPU `TIME` that does not grow means
+blocked, however long it has run; growing `TIME` means busy or starved, and waiting is still an option.
+A blocked SBCL commonly ignores SIGINT and SIGTERM and needs SIGKILL. Before killing, confirm the process is
+one this run started (its parent chain), not another session's. Redirect probe output to a file and read the
+file: a pipe into `tail` buffers until exit, which a blocked process never reaches.
+
+**When SBCL blocks in the agent shell, run the suite through Nix.** On aarch64-darwin, SBCL launched from an
+agent's shell has frozen on allocation-heavy loads and inside `asdf:load-system` while the same workload
+completed under `nix build --no-link -L .#checks.<system>.<check>`, whose builder runs outside the agent's
+process tree. The shell freeze can also mask a real defect that the `nix build` run reports as an ordinary
+backtrace, so rerun there before concluding anything about the code. Small, filtered runs (one suite, a few
+dozen tests) tend to complete directly.
 
 ### Form bisect and package preflight
 
@@ -241,8 +255,7 @@ cleanup paths that fire after reaping are exactly where reuse bites, so gate the
 
 **Distinguish ESRCH from EPERM.** Cleanup code must distinguish the two failure modes of a group signal:
 ESRCH means no such group: the target is genuinely gone and cleanup succeeded; EPERM means the group exists
-but is not signalable by this process: the target is still running and cleanup failed. Collapsing both into
-"kill failed, ignore" silently converts a leaked process tree into a clean shutdown report. Return ESRCH as
+but is not signalable by this process: the target is still running and cleanup failed. Return ESRCH as
 success from a reaper, and escalate EPERM as a real error carrying the pgid. This is POSIX-general and applies
 equally to a shell wrapper checking `kill`'s exit status.
 
@@ -331,7 +344,7 @@ total, before it accepts the percentage at all. Derive the manifest from the ASD
 hand-maintained second list, so a newly added component is covered by the gate on the commit that adds it.
 Normalize both sides (truename, case, store-path prefixes) before comparing, or the check fails open on path
 formatting alone. This manifest rule is language-neutral and applies to any coverage or lint report consumed
-as a gate; the SB-COVER specifics above are what make it easy to lose rows here.
+as a gate; the SB-COVER specifics in this section are what make it easy to lose rows here.
 
 ### Performance profiling
 

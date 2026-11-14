@@ -61,7 +61,8 @@ here, and removes the ordering constraint entirely.
 
 ## Source file decomposition constraints
 
-The counterpart to the "shrink the compile unit" advice in Compile/load hang triage below. Splitting
+The counterpart to the "shrink the compile unit" advice in `references/sbcl-operations.md` (Compile/load hang
+triage). Splitting
 a large file is often right, but the split points are constrained by the grammar, not by taste, and a
 split that fights those constraints costs more than the file it replaced.
 
