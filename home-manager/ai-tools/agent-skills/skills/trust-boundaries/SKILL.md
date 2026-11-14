@@ -27,7 +27,8 @@ path.**
 
 **Revalidate per boundary.** Validation on one side of a language, process, or module boundary does not protect
 the other. Tests, stubs, alternative entry points, and future refactors all reach the inner code without
-passing the outer parser.
+passing the outer parser. These are the reasons a fail-closed check stays under the trust-boundary exception
+in CLAUDE.md output_discipline.
 
 **Refusal is a valid boundary.** Sometimes the correct validation is to not offer the capability. When no
 wrapper can prove the property you need, declining the whole feature is legitimate and often the only sound
@@ -117,8 +118,8 @@ each helper that parses it. When the authorization gate resolves it one way and 
 **the value that was authorized is not the value that is used.** That is the classic parameter-pollution bypass
 and it needs no exotic input. Name exactly one boundary that owns normalization and let it *reject* ambiguity
 rather than picking a winner; then independently make each downstream helper apply the same rejection rules.
-The helper's fail-closed behavior must not be justified by "the gate already checked": a later caller will
-reach the helper directly.
+The helper keeps its fail-closed check even though the gate already checked: a later caller will reach the
+helper directly.
 
 **Match the validator's domain to the producer's range.** Validators get written against the example in front
 of the author: an integer validator over a genuinely fractional quantity, a positive-only validator over a
