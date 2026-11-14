@@ -5,7 +5,7 @@ description: Turn a request into an implementation-ready specification. Use when
 
 Turn a request into an implementation-ready specification. Do not edit files, write memories, or implement.
 
-Use this command for ambiguous scope, meaningful alternatives, cross-file impact, or high-risk decisions. A factual question belongs in /ask, a diagnosis in /bug, understood implementation in /execute, and saving the resulting document in /markdown.
+Use this command for ambiguous scope, meaningful alternatives, cross-file impact, or high-risk decisions. A factual question or a diagnosis belongs in /ask, and understood implementation in /execute.
 
 ## Method
 
