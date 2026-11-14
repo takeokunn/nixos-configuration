@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   # ISUCON tooling. To remove: delete this directory and the `./isucon` import in
-  # ../basic.nix. General Go tooling (go, gopls, ...) lives in ../basic.nix and stays.
+  # ../basic.nix. General Go tools (go and gotools) live in ../basic.nix and stay.
   home.packages = with pkgs; [
     alp
     percona-toolkit

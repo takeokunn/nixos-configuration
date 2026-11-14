@@ -13,7 +13,7 @@ in
     ./language-servers.nix
   ];
 
-  # Duplicate-code detection.
+  # Code similarity, AST search, and GNU timeout utilities.
   home.packages = with pkgs; [
     similarity
     ast-grep
