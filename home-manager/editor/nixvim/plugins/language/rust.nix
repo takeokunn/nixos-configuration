@@ -17,7 +17,7 @@
         });
       }).overrideAttrs
         (_: {
-          # doCheck keeps require/command checks; dontBustedCheck skips the wrapper's duplicate Busted run.
+          # Keep require/command checks, but skip the outer Busted wrapper because it reruns the same failing integration test.
           doCheck = true;
           dontBustedCheck = true;
           checkInputs = [ pkgs.vimPlugins.neotest ];
