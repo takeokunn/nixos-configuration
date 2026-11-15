@@ -390,6 +390,19 @@
                 touch $out
               '';
 
+          checks.secret-scan =
+            let
+              scan = import ./home-manager/security/secret-scan/secret-scan.nix { inherit pkgs; };
+              brokenScan = import ./home-manager/security/secret-scan/secret-scan.nix {
+                inherit pkgs;
+                gitleaks = pkgs.writeShellScriptBin "gitleaks" "exit 1";
+              };
+            in
+            pkgs.runCommand "secret-scan-test" { } ''
+              bash ${./home-manager/security/secret-scan/secret-scan.test.sh} ${scan} ${brokenScan}
+              touch $out
+            '';
+
           checks.block-destructive-git-hook =
             pkgs.runCommand "block-destructive-git-hook-test"
               {

@@ -36,8 +36,10 @@ export SECRET_SCAN_STATE_DIR="$work/state"
 export SECRET_SCAN_OSASCRIPT="$work/osascript"
 notify_log="$work/notify.log"
 logs="$work/logs"
+# The scan replaces PATH with its own store paths, which hold no bash, so `#!/usr/bin/env bash`
+# would fail inside it.
 cat >"$SECRET_SCAN_OSASCRIPT" <<EOF
-#!/usr/bin/env bash
+#!$BASH
 printf '%s\n' "\${@: -1}" >>"$notify_log"
 EOF
 chmod +x "$SECRET_SCAN_OSASCRIPT"
