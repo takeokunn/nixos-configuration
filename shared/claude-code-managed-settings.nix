@@ -29,6 +29,16 @@ let
     exec ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml
   '';
 
+  # Claude Code prefixes every Bash command with the contents of CLAUDE_ENV_FILE, which it sets only
+  # for SessionStart hooks. The unsets repeat the claude wrapper's for launches that bypass it.
+  scrubEnvHook = pkgs.writeShellScript "scrub-agent-env" ''
+    if [ -n "''${CLAUDE_ENV_FILE:-}" ]; then
+      printf '%s\n' ${
+        lib.escapeShellArg "unset ${lib.concatStringsSep " " shared.agentScrubbedEnvNames}"
+      } >>"$CLAUDE_ENV_FILE"
+    fi
+  '';
+
   # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
   # cannot silently fail to fire here.
   claudeBashHookNames = shared.guardrailHookNames ++ [
@@ -146,6 +156,19 @@ in
             onFailure = "block";
           }
         ) claudeBashHookNames;
+    }
+  ];
+
+  # The empty matcher covers every session source (startup, resume, clear, compact, fork).
+  hooks.SessionStart = [
+    {
+      matcher = "";
+      hooks = [
+        {
+          type = "command";
+          command = "${scrubEnvHook}";
+        }
+      ];
     }
   ];
 

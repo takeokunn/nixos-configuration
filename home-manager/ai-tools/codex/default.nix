@@ -130,6 +130,13 @@ let
     feedback = {
       enabled = false;
     };
+    # A second layer behind the wrapper's unsets, for launches that bypass the wrapper. It covers
+    # only this CODEX_HOME's config.toml, which Codex can rewrite. Patterns are wildcards, not regexes.
+    shell_environment_policy.exclude = [
+      "NIX_CONFIG"
+      "GH_*"
+      "GITHUB_*"
+    ];
     mcp_servers = lib.mapAttrs (
       _: server: lib.filterAttrs (_: v: v != null && v != [ ] && v != { }) server
     ) codexMcpServers;
@@ -154,7 +161,9 @@ let
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       rm $out/bin/codex
-      makeWrapper ${codexGhqTrust} $out/bin/codex --add-flags ${lib.escapeShellArg "${llmAgentsPkgs.codex}/bin/codex ${lib.escapeShellArgs codexForcedFlags}"}
+      makeWrapper ${codexGhqTrust} $out/bin/codex --add-flags ${lib.escapeShellArg "${llmAgentsPkgs.codex}/bin/codex ${lib.escapeShellArgs codexForcedFlags}"} ${
+        lib.concatMapStringsSep " " (name: "--unset ${lib.escapeShellArg name}") shared.agentScrubbedEnvNames
+      }
     '';
   };
 in

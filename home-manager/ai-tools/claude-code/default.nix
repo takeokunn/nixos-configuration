@@ -15,21 +15,27 @@ let
   # the launching process sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST, Claude Code ignores the
   # managed-settings entry for it (shared/claude-code-managed-settings.nix explains why the bundle is
   # needed) and logs "skipping settings-sourced NODE_EXTRA_CA_CERTS under host-managed provider".
-  # --set-default lets a caller's own value win.
+  # --set-default lets a caller's own value win. The same splice also unsets
+  # shared.agentScrubbedEnvNames, so tokens in the launching shell never reach Claude Code's commands.
   #
-  # The flag goes into upstream's single wrapProgram call, right after its --argv0 flag, because
+  # The flags go into upstream's single wrapProgram call, right after its --argv0 flag, because
   # wrapping a second time renames the process. The assert fails evaluation when upstream rewrites
-  # that call, instead of silently dropping the bundle.
+  # that call, instead of silently dropping the bundle and the unsets.
   wrapperSplicePoint = "--argv0 claude";
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (old: {
     doInstallCheck = false;
     postFixup =
       assert pkgs.lib.assertMsg (pkgs.lib.hasInfix wrapperSplicePoint old.postFixup)
-        "llm-agents claude-code: postFixup no longer contains `${wrapperSplicePoint}`, where NODE_EXTRA_CA_CERTS is spliced in";
+        "llm-agents claude-code: postFixup no longer contains `${wrapperSplicePoint}`, where NODE_EXTRA_CA_CERTS and the env unsets are spliced in";
       builtins.replaceStrings
         [ wrapperSplicePoint ]
         [
-          "${wrapperSplicePoint} \\\n      --set-default NODE_EXTRA_CA_CERTS ${shared.claudeCodeCaBundle}"
+          (
+            "${wrapperSplicePoint} \\\n      --set-default NODE_EXTRA_CA_CERTS ${shared.claudeCodeCaBundle}"
+            + pkgs.lib.concatMapStrings (
+              name: " \\\n      --unset ${pkgs.lib.escapeShellArg name}"
+            ) shared.agentScrubbedEnvNames
+          )
         ]
         old.postFixup;
   });

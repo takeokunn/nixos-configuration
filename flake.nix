@@ -732,6 +732,95 @@
                         '';
                   };
             }
+            {
+              # Builds the claude and codex packages the host actually installs, so it runs only on
+              # the systems that have a host configuration.
+              checks =
+                pkgs.lib.optionalAttrs
+                  (builtins.elem pkgs.stdenv.hostPlatform.system [
+                    "aarch64-darwin"
+                    "x86_64-linux"
+                  ])
+                  {
+                    agent-env-scrub =
+                      let
+                        hostConfig =
+                          if pkgs.stdenv.hostPlatform.isDarwin then
+                            self.darwinConfigurations.M4-Max.config
+                          else
+                            self.nixosConfigurations.X13Gen2.config;
+                        hmUser = hostConfig.home-manager.users.take;
+                        sessionStart = claudeCodeManagedSettings.hooks.SessionStart;
+                      in
+                      assert builtins.length sessionStart == 1;
+                      pkgs.runCommand "agent-env-scrub-test"
+                        {
+                          claude = hmUser.programs.claude-code.package;
+                          codex = hmUser.programs.codex.package;
+                          scrubHook = (builtins.head (builtins.head sessionStart).hooks).command;
+                          sessionStartMatcher = (builtins.head sessionStart).matcher;
+                          codexExcludeJson = builtins.toJSON (
+                            hmUser.programs.codex.settings.shell_environment_policy.exclude or null
+                          );
+                          sharedNamesJson = builtins.toJSON sharedAiTools.agentScrubbedEnvNames;
+                          nativeBuildInputs = [ pkgs.jq ];
+                        }
+                        ''
+                          # Listed here rather than read from the shared list, so dropping a name there fails.
+                          names="NIX_CONFIG GH_TOKEN GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN"
+                          if ! jq -e --arg n "$names" '. == ($n | split(" "))' <<< "$sharedNamesJson" >/dev/null; then
+                            echo "shared agentScrubbedEnvNames is $sharedNamesJson, expected: $names" >&2
+                            exit 1
+                          fi
+                          for wrapper in "$claude/bin/claude" "$codex/bin/codex"; do
+                            for name in $names; do
+                              if ! grep -qxF "unset $name" "$wrapper"; then
+                                echo "$wrapper has no \"unset $name\" line" >&2
+                                exit 1
+                              fi
+                            done
+                          done
+                          if ! jq -e '. == ["NIX_CONFIG", "GH_*", "GITHUB_*"]' <<< "$codexExcludeJson" >/dev/null; then
+                            echo "codex shell_environment_policy.exclude is $codexExcludeJson" >&2
+                            exit 1
+                          fi
+                          if [ -n "$sessionStartMatcher" ]; then
+                            echo "SessionStart matcher \"$sessionStartMatcher\" skips some session sources" >&2
+                            exit 1
+                          fi
+
+                          envFile=$TMPDIR/claude-env
+                          printf 'export KEEP=1\n' >"$envFile"
+                          CLAUDE_ENV_FILE=$envFile "$scrubHook" </dev/null
+                          for name in $names; do
+                            if ! grep -qE "^unset( [A-Z_]+)* $name( |\$)" "$envFile"; then
+                              echo "scrub hook wrote no unset for $name:" >&2
+                              cat "$envFile" >&2
+                              exit 1
+                            fi
+                          done
+                          if ! grep -qxF 'export KEEP=1' "$envFile"; then
+                            echo "scrub hook overwrote CLAUDE_ENV_FILE instead of appending" >&2
+                            exit 1
+                          fi
+                          leaked=$(env NIX_CONFIG=FAKE GH_TOKEN=ghp_FAKE GITHUB_TOKEN=ghp_FAKE \
+                            GH_ENTERPRISE_TOKEN=ghp_FAKE GITHUB_ENTERPRISE_TOKEN=ghp_FAKE \
+                            bash -c '. "$1"; env' _ "$envFile" | grep -cE '^(NIX_CONFIG|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_ENTERPRISE_TOKEN)=' || true)
+                          if [ "$leaked" != 0 ]; then
+                            echo "sourcing the scrub hook's output left $leaked of the variables set" >&2
+                            exit 1
+                          fi
+
+                          mkdir "$TMPDIR/no-env-file"
+                          (cd "$TMPDIR/no-env-file" && env -u CLAUDE_ENV_FILE "$scrubHook" </dev/null)
+                          if [ -n "$(ls -A "$TMPDIR/no-env-file")" ]; then
+                            echo "scrub hook wrote a file without CLAUDE_ENV_FILE" >&2
+                            exit 1
+                          fi
+                          touch $out
+                        '';
+                  };
+            }
           ];
 
           devShells.default = pkgs.mkShell {

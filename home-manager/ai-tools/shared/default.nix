@@ -20,6 +20,18 @@ rec {
   # (shared/claude-code-managed-settings.nix at the repository root).
   claudeCodeCaBundle = "/etc/ssl/certs/ca-certificates.crt";
 
+  # Removed from the environment of Claude Code and Codex by their wrappers. Interactive fish puts a
+  # gh token into NIX_CONFIG (home-manager/vcs/gh/default.nix), and an agent launched from that shell
+  # would otherwise hand it and any GitHub token to every command it runs. CLAUDE_CODE_MESSAGING_TOKEN
+  # is left alone: the host app needs it.
+  agentScrubbedEnvNames = [
+    "NIX_CONFIG"
+    "GH_TOKEN"
+    "GITHUB_TOKEN"
+    "GH_ENTERPRISE_TOKEN"
+    "GITHUB_ENTERPRISE_TOKEN"
+  ];
+
   # Avoid :* forms because Codex's denyPatternToTokens cannot enforce them. Skip a glob when another
   # covers it already (`rm -rf ~*` covers `rm -rf ~/.ssh*`).
   #
