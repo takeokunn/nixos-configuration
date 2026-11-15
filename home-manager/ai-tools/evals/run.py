@@ -52,7 +52,6 @@ STATE_CHECK_TYPES = ("file_exists", "file_absent", "file_matches", "file_not_mat
 REVIEW_CHECK_TYPES = ("output_matches", "output_not_matches")
 MANAGED_SETTINGS = Path("/Library/Application Support/ClaudeCode/managed-settings.json")
 BUILTIN_EDIT_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
-AITOOLS_EDIT_RE = re.compile(r"(?:^|[\s;&|(`'\"])aitools\s+(?:edit|write|replace|apply)\b")
 # Heuristic for a shell command that writes a file: in-place editors, tee, patch tools, Python file
 # writes, and output redirection other than to /dev/null or another descriptor.
 SHELL_WRITE_RE = re.compile(
@@ -532,27 +531,157 @@ def parse_transcript(runtime, path):
     return parsed
 
 
+AITOOLS_GLOBAL_VALUE_OPTIONS = ("--root", "--lock-timeout")
+# aitools commands that change file contents (`aitools schema`); reads, moves and copies are not edits.
+AITOOLS_EDIT_COMMANDS = {
+    ("edit",), ("insert",), ("replace",), ("apply",), ("transform",), ("move-lines",), ("write",),
+    ("doc", "set"), ("doc", "delete"), ("doc", "merge"), ("doc", "patch"), ("md", "replace"),
+    ("table", "set"),
+}
+SHELLS = {"sh", "bash", "zsh", "dash"}
+COMMAND_PREFIXES = {"env", "command", "exec", "nohup", "time"}
+SHELL_PUNCTUATION = ";&|()<>\n"
+HEREDOC_RE = re.compile(r"(?<!<)<<-?(?!<)\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+ASSIGNMENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
+
+
+def split_heredocs(script):
+    """The script with heredoc bodies removed, and the bodies in the order of their operators.
+
+    Only `<<` outside quotes starts a heredoc, so a quoted inner script (`zsh -lc "...<<'PY'..."`)
+    stays one word and is split again when it is classified on its own.
+    """
+    lines, kept, bodies, quote, i = script.split("\n"), [], [], None, 0
+    while i < len(lines):
+        line = lines[i]
+        kept.append(line)
+        i += 1
+        delimiters, j = [], 0
+        while j < len(line):
+            ch = line[j]
+            if quote == "'":
+                quote = None if ch == "'" else quote
+            elif ch == "\\":
+                j += 1
+            elif quote == '"':
+                quote = None if ch == '"' else quote
+            elif ch in "'\"":
+                quote = ch
+            elif m := HEREDOC_RE.match(line, j):
+                delimiters.append(m.group(2))
+                j = m.end()
+                continue
+            j += 1
+        for delimiter in delimiters:
+            body = []
+            while i < len(lines) and lines[i].strip() != delimiter:
+                body.append(lines[i])
+                i += 1
+            i += 1
+            bodies.append("\n".join(body))
+    return "\n".join(kept), bodies
+
+
+def shell_segments(script):
+    """Simple commands of a shell script as (words, heredoc bodies); None when it does not tokenize."""
+    text, bodies = split_heredocs(script)
+    lexer = shlex.shlex(text, posix=True, punctuation_chars=SHELL_PUNCTUATION)
+    lexer.whitespace = " \t\r"
+    lexer.whitespace_split = True
+    try:
+        tokens = list(lexer)
+    except ValueError:
+        return None
+    body_iter = iter(bodies)
+    segments, words, attached = [], [], []
+    for token in tokens:
+        if set(token) <= set(";&|()\n"):
+            segments.append((words, attached))
+            words, attached = [], []
+            continue
+        if token.startswith("<<") and not token.startswith("<<<"):
+            attached.append(next(body_iter, ""))
+        words.append(token)
+    segments.append((words, attached))
+    return [s for s in segments if s[0]]
+
+
+def command_words(words):
+    i = 0
+    while i < len(words) and (ASSIGNMENT_RE.match(words[i]) or words[i] in COMMAND_PREFIXES):
+        i += 1
+    return words[i:]
+
+
+def is_aitools_edit(words):
+    if not words or os.path.basename(words[0]) != "aitools":
+        return False
+    rest, i = words[1:], 0
+    while i < len(rest) and rest[i].split("=", 1)[0] in AITOOLS_GLOBAL_VALUE_OPTIONS:
+        i += 1 if "=" in rest[i] else 2
+    command = tuple(rest[i:i + 2])
+    return command[:1] in AITOOLS_EDIT_COMMANDS or command in AITOOLS_EDIT_COMMANDS
+
+
+def segment_text(words, bodies):
+    # Rejoin so SHELL_WRITE_RE sees `2>file` and `> file` as written; quoting is dropped on purpose,
+    # the regex looks for operators and call shapes, not for exact arguments.
+    out = []
+    for word in words:
+        if out and word[:1] in "<>" and out[-1].isdigit():
+            out[-1] += word
+        else:
+            out.append(word)
+    return " ".join(out + bodies)
+
+
+def classify_shell(script):
+    """(aitools edit, other shell write, parsed) for one shell command string."""
+    segments = shell_segments(script)
+    if segments is None:
+        return False, False, False
+    aitools = shell = False
+    for words, bodies in segments:
+        words = command_words(words)
+        if len(words) >= 3 and os.path.basename(words[0]) in SHELLS \
+                and words[1].startswith("-") and "c" in words[1]:
+            inner = classify_shell(words[2])
+            if not inner[2]:
+                return inner
+            aitools, shell = aitools or inner[0], shell or inner[1]
+        elif is_aitools_edit(words):
+            aitools = True
+        elif SHELL_WRITE_RE.search(segment_text(words, bodies)):
+            shell = True
+    return aitools, shell, True
+
+
 def edit_means(parsed):
-    """Edit means used by successful tool calls: builtin, apply_patch, aitools, shell."""
-    by_kind = {}
+    """Edit means used by successful tool calls: builtin, apply_patch, aitools, shell.
+
+    One shell call can count as both aitools and shell when it holds both kinds of command. A
+    shell call that does not tokenize is counted in unparsed_calls instead of being guessed.
+    """
+    by_kind, unparsed = {}, 0
     for call in parsed["calls"]:
         if not call["ok"]:
             continue
         tool, inp = call["tool"], call["input"]
+        found = []
         if tool in BUILTIN_EDIT_TOOLS:
-            kind, targets = "builtin", [inp.get("file_path") or inp.get("notebook_path")]
+            found.append(("builtin", [inp.get("file_path") or inp.get("notebook_path")]))
         elif tool == "apply_patch":
-            kind, targets = "apply_patch", [c.get("path") for c in inp.get("changes", [])]
-        elif tool in ("Bash", "shell") and AITOOLS_EDIT_RE.search(call["text"]):
-            kind, targets = "aitools", [clip(call["text"], 160)]
-        elif tool in ("Bash", "shell") and SHELL_WRITE_RE.search(call["text"]):
-            kind, targets = "shell", [clip(call["text"], 160)]
-        else:
-            continue
-        entry = by_kind.setdefault(kind, {"calls": 0, "targets": []})
-        entry["calls"] += 1
-        entry["targets"] += [t for t in targets if t not in entry["targets"]][:20 - len(entry["targets"])]
-    return {"kinds": sorted(by_kind), "by_kind": by_kind}
+            found.append(("apply_patch", [c.get("path") for c in inp.get("changes", [])]))
+        elif tool in ("Bash", "shell"):
+            aitools, shell, parsed_ok = classify_shell(call["text"])
+            unparsed += not parsed_ok
+            found += [(kind, [clip(call["text"], 160)]) for kind, hit in
+                      (("aitools", aitools), ("shell", shell)) if hit]
+        for kind, targets in found:
+            entry = by_kind.setdefault(kind, {"calls": 0, "targets": []})
+            entry["calls"] += 1
+            entry["targets"] += [t for t in targets if t not in entry["targets"]][:20 - len(entry["targets"])]
+    return {"kinds": sorted(by_kind), "by_kind": by_kind, "unparsed_calls": unparsed}
 
 
 def edit_bucket(means):
