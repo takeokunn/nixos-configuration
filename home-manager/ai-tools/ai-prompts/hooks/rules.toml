@@ -22,6 +22,12 @@ matcher = "File"
 regex = '(?i)(?:^|/)\.(?:ssh|gnupg)(?:/|$)|(?:^|/)\.config/gh/hosts\.yml$|(?:^|/)\.docker/config\.json$|(?:^|/)\.kube/config$'
 message = "Credential files and SSH/GnuPG directories are off-limits. Continue without reading or changing them."
 
+# Keychains, Codex auth and shell snapshots (snapshots capture exported tokens), gcloud, and Terraform.
+[[rules]]
+matcher = "File"
+regex = '(?i)(?:^|/)Library/Keychains(?:/|$)|(?:^|/)\.config/codex/auth\.json$|(?:^|/)\.codex/auth\.json$|(?:^|/)\.config/codex/shell_snapshots(?:/|$)|(?:^|/)\.config/gcloud(?:/|$)|(?:^|/)\.terraform\.d/credentials\.tfrc\.json$'
+message = "Keychains and CLI credential stores are off-limits. Continue without reading or changing them."
+
 # Match paths anywhere in shell text to cover wrappers, redirections, and aitools options.
 [[rules]]
 matcher = "Bash"
@@ -32,6 +38,11 @@ regex = '''(?ix)
   | (?:^|[\s/'"=<>:])\.config/gh/hosts\.yml(?:$|[\s/'";|&)<>`])
   | (?:^|[\s/'"=<>:])\.docker/config\.json(?:$|[\s/'";|&)<>`])
   | (?:^|[\s/'"=<>:])\.kube/config(?:$|[\s/'";|&)<>`])
+  | (?:^|[\s/'"=<>:])Library/Keychains(?:$|[\s/'";|&)<>`])
+  | (?:^|[\s/'"=<>:])\.config/codex/(?:auth\.json|shell_snapshots)(?:$|[\s/'";|&)<>`])
+  | (?:^|[\s/'"=<>:])\.codex/auth\.json(?:$|[\s/'";|&)<>`])
+  | (?:^|[\s/'"=<>:])\.config/gcloud(?:$|[\s/'";|&)<>`])
+  | (?:^|[\s/'"=<>:])\.terraform\.d/credentials\.tfrc\.json(?:$|[\s/'";|&)<>`])
   | \.(?:git-credentials|netrc|npmrc)(?:$|[\s/'";|&)<>`])
   | /id_[a-z0-9_]+(?:$|[\s'";|&)<>`])
   | (?:^|[\s/'"=<>:])id_(?:rsa|dsa|ecdsa|ed25519|ecdsa_sk|ed25519_sk)(?:$|[\s'";|&)<>`])

@@ -173,7 +173,12 @@ for runtime in claude codex; do
     '/home/u/.config/gh/hosts.yml' '/home/u/.gnupg/private-keys-v1.d/key' \
     '/home/u/.gnupg' '/home/u/.docker/config.json' '/home/u/.kube/config' \
     '/home/u/.ssh/id_rsa' '/home/u/.ssh/config' '/home/u/.ssh/id_ed25519.pub' \
-    '/home/u/.SSH/known_hosts' '/work/project with spaces/.env.local'; do
+    '/home/u/.SSH/known_hosts' '/work/project with spaces/.env.local' \
+    '/home/u/Library/Keychains/login.keychain-db' '~/Library/Keychains/' '/home/u/Library/Keychains' \
+    '/home/u/.config/codex/auth.json' '$HOME/.codex/auth.json' '/home/u/.codex/auth.json' \
+    '/home/u/.config/codex/shell_snapshots/s.sh' '/home/u/.config/codex/shell_snapshots' \
+    '/home/u/.config/gcloud/application_default_credentials.json' '/home/u/.config/gcloud' \
+    '/home/u/.terraform.d/credentials.tfrc.json'; do
     want=deny
     if [[ $path == .env.example ]]; then want=allow; fi
     expect_cmd "$want" "cat $path"
@@ -196,7 +201,12 @@ for runtime in claude codex; do
     '/home/u/.docker/config.json.example' '/home/u/.kube/config.example' \
     '/work/docs/ssh.md' '/work/ssh/config' '/work/gnupg/key' \
     '/work/my.ssh/config' '/work/my.gnupg/key' '/work/my.envrc' \
-    '/work/my.config/gh/hosts.yml'; do
+    '/work/my.config/gh/hosts.yml' \
+    '/home/u/.config/codex/config.toml' '/home/u/.config/codex/sessions/x.jsonl' \
+    '/home/u/.codex/config.toml' '/work/Library/Keychains-notes.md' '/work/docs/Keychains/x' \
+    '/home/u/.terraform.d/plugins/x' '/home/u/.terraform.d/credentials.tfrc.json.example' \
+    '/home/u/.config/gcloud-notes.txt' '/work/my.codex/auth.json.example' \
+    '/home/u/.codex/auth.json.example'; do
     expect_cmd allow "cat '$path'"
     expect_cmd allow "aitools read '$path'"
     for tool in Read Write Edit; do
@@ -293,7 +303,8 @@ for runtime in claude codex; do
     'rg -n id_ed25519 docs' 'ssh-keygen -t ed25519 -f id_ed25519'; do
     expect_cmd deny "$cmd"
   done
-  for cmd in 'jq .id_token f.json' 'git diff -- .env.example'; do
+  for cmd in 'jq .id_token f.json' 'git diff -- .env.example' 'security list-keychains' \
+    'security list-keychains -d user'; do
     expect_cmd allow "$cmd"
   done
 
@@ -301,7 +312,8 @@ for runtime in claude codex; do
   for path in '.env' '.env.local' '.envrc' 'id_rsa' '/keys/id_custom' \
     '/home/u/.ssh/key' '/home/u/.gnupg/key' '/home/u/.aws/credentials' \
     '/home/u/.config/gh/hosts.yml' '/home/u/.docker/config.json' \
-    '/home/u/.kube/config' '/home/u/.netrc'; do
+    '/home/u/.kube/config' '/home/u/.netrc' '/home/u/Library/Keychains/login.keychain-db' \
+    '/home/u/.codex/auth.json' '/home/u/.config/gcloud/credentials.db'; do
     expect_cmd deny "cat $path>out"
     expect_cmd deny "cat $path<in"
     expect_cmd deny "echo \`cat $path\`"
@@ -334,7 +346,8 @@ for runtime in claude codex; do
   done
   for cmd in 'git show HEAD:.envrc' 'git show HEAD:.ssh/config' \
     'git show HEAD:.config/gh/hosts.yml' 'git show HEAD:.docker/config.json' \
-    'git show HEAD:.kube/config' 'cat /work/keys/id_token' 'cat .env' 'cat<.env'; do
+    'git show HEAD:.kube/config' 'git show HEAD:.config/codex/auth.json' \
+    'git show HEAD:.terraform.d/credentials.tfrc.json' 'cat /work/keys/id_token' 'cat .env' 'cat<.env'; do
     expect_cmd deny "$cmd"
   done
 done
