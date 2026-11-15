@@ -70,6 +70,9 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
         ("python3 -c 'open(\"f\", \"w\").write(\"x\")'", 'write'),
         ("python3 -c 'from pathlib import Path; Path(\"f\").write_text(\"x\")'", 'write'),
         ("python3 -c 'from pathlib import Path; p=Path(\"f\"); p.open(mode=\"a\")'", 'write'),
+        ("python3 -c 'from pathlib import Path; p=Path(\"f\"); p.replace(\"g\")'", 'write'),
+        ("python3 -c 'import os; os.replace(\"f\", \"g\")'", 'write'),
+        ("python3 -c 'from shutil import copy; copy(\"f\", \"g\")'", 'write'),
         ("python3 <<'EOF'\nopen('f', 'wb').write(b'x')\nEOF", 'write'),
         ("aitools run --stdin -- python3 <<'EOF'\nopen('f', 'w').write('x')\nEOF", 'write'),
         ("aitools run --stdin -- sh <<'EOF'\necho x > f\nEOF", 'write'),
@@ -100,6 +103,8 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
         "aitools edit f --stdin <<'JSON'\n{\"old\":\"rm x\",\"new\":\"cat y > z\"}\nJSON",
         "printf '%s' 'rm f' | aitools write f --stdin",
         "python3 -c 'print(open(\"f\").read())'",
+        "python3 -c 'print(open(\"f\").read().replace(\"a\", \"b\"))'",
+        "python3 -c 'data=[1,2]; print(data.copy()); data.remove(1)'",
         "python3 <<'EOF'\nprint(open('f').read())\nEOF",
         "python3 -c 'print(\"open(f, w)\")'",
     ]

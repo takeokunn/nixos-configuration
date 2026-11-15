@@ -1208,19 +1208,31 @@ def python_write(source):
         tree = ast.parse(source)
     except SyntaxError:
         return False
+    def path_constructor(node):
+        return isinstance(node, ast.Call) and (
+            isinstance(node.func, ast.Name) and node.func.id == 'Path'
+            or isinstance(node.func, ast.Attribute) and node.func.attr == 'Path'
+            and isinstance(node.func.value, ast.Name) and node.func.value.id == 'pathlib')
+    path_names = {target.id for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                  and path_constructor(node.value) for target in node.targets if isinstance(target, ast.Name)}
+    imported = {alias.asname or alias.name for node in ast.walk(tree)
+                if isinstance(node, ast.ImportFrom) and node.module in ('os', 'shutil')
+                for alias in node.names}
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
         name = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, 'attr', '')
-        if name in ('write_text', 'write_bytes', 'unlink', 'rmdir', 'mkdir', 'rename',
+        receiver = node.func.value if isinstance(node.func, ast.Attribute) else None
+        file_api = (path_constructor(receiver)
+                    or isinstance(receiver, ast.Name) and receiver.id in (path_names | {'os', 'shutil'})
+                    or isinstance(node.func, ast.Name) and name in imported)
+        if file_api and name in ('write_text', 'write_bytes', 'unlink', 'rmdir', 'mkdir', 'rename',
                     'replace', 'remove', 'chmod', 'symlink', 'link', 'copy', 'copy2',
                     'copyfile', 'copytree', 'move', 'rmtree', 'touch'):
             return True
         if name == 'open':
             # builtins/io.open(path, mode) and Path(...).open(mode), including mode=.
-            path_method = (isinstance(node.func, ast.Attribute)
-                           and not (isinstance(node.func.value, ast.Name)
-                                    and node.func.value.id in ('io', 'os', 'builtins')))
+            path_method = path_constructor(receiver) or isinstance(receiver, ast.Name) and receiver.id in path_names
             positional = 0 if path_method else 1
             modes = [kw.value for kw in node.keywords if kw.arg == 'mode']
             if len(node.args) > positional:
