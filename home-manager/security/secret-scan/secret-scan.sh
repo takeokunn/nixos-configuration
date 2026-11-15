@@ -88,11 +88,13 @@ if [ "${#files[@]}" -gt 0 ]; then
   echo "secret-scan: $(jq length "$work/report.json") findings, $high notifiable"
 fi
 
-mv -f "$work/stamp" "$stamp"
-
+# The stamp advances only after the notification, so a failed one is retried by rescanning the
+# same files; the rescan appends their TSV rows again.
 if [ "$high" -gt 0 ]; then
   notify "$high secret findings; see $state_dir" || {
-    echo "secret-scan: notification failed" >&2
+    echo "secret-scan: notification failed; stamp not updated" >&2
     exit 2
   }
 fi
+
+mv -f "$work/stamp" "$stamp"

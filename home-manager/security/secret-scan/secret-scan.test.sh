@@ -48,6 +48,8 @@ logs="$work/logs"
 cat >"$SECRET_SCAN_OSASCRIPT" <<EOF
 #!$BASH
 printf '%s\n' "\${@: -1}" >>"$notify_log"
+# Fails while the flag file exists, as osascript does without a GUI session.
+[ ! -e "$work/notify-fail" ]
 EOF
 chmod +x "$SECRET_SCAN_OSASCRIPT"
 
@@ -132,6 +134,23 @@ check "failure is notified" 'grep -q "secret-scan failed" "$notify_log"'
 run "$scan"
 check "recovery run rescans the file" '[ "$(rule_rows github-pat)" -eq 3 ]'
 
+# 6b. A failed notification keeps the stamp, so the next run scans and notifies again.
+sleep 1
+touch "$pat_file"
+cp -p "$SECRET_SCAN_STATE_DIR/last-run" "$work/stamp-before"
+touch "$work/notify-fail"
+run "$scan"
+check "failed notification exits 2 (got $status)" '[ "$status" -eq 2 ]'
+check "failed notification leaves the stamp untouched" '! [ "$SECRET_SCAN_STATE_DIR/last-run" -nt "$work/stamp-before" ] && ! [ "$work/stamp-before" -nt "$SECRET_SCAN_STATE_DIR/last-run" ]'
+check "failed notification still writes the row" '[ "$(rule_rows github-pat)" -eq 4 ]'
+rm "$work/notify-fail"
+run "$scan"
+check "retry run exits 0 (got $status)" '[ "$status" -eq 0 ]'
+check "retry run rescans the file" 'grep -qx "secret-scan: 1 changed files" <<<"$last_out"'
+check "retry run notifies the count" 'grep -qx "1 secret findings; see $SECRET_SCAN_STATE_DIR" "$notify_log"'
+check "retry run duplicates the row, as accepted" '[ "$(rule_rows github-pat)" -eq 5 ]'
+check "retry run advances the stamp" '[ "$SECRET_SCAN_STATE_DIR/last-run" -nt "$work/stamp-before" ]'
+
 # 7. Several changed files in one run, across targets, are all scanned and the stamp advances.
 # 201 exceeds the old 200-file batch; gitleaks given several paths scans its cwd instead.
 many_run() {
@@ -162,8 +181,8 @@ check "no temporary report is left" '[ -z "$(find "$SECRET_SCAN_STATE_DIR" -name
 calls=$(find "$GITLEAKS_RECORD_DIR" -name '*.argv' | wc -l | tr -d ' ')
 redacted_calls=$(grep -lx -e '--redact=100' "$GITLEAKS_RECORD_DIR"/*.argv 2>/dev/null | wc -l | tr -d ' ')
 reports=$(find "$GITLEAKS_RECORD_DIR" -name '*.report' | wc -l | tr -d ' ')
-# Runs 1, 3, 4, 6 scan one file each; the two many-file runs scan 2 and 201.
-check "gitleaks was called once per scanned file (got $calls)" '[ "$calls" -eq 207 ]'
+# Runs 1, 3, 4, 6 and the two 6b runs scan one file each; the many-file runs scan 2 and 201.
+check "gitleaks was called once per scanned file (got $calls)" '[ "$calls" -eq 209 ]'
 check "every gitleaks call passes --redact=100 (got $redacted_calls of $calls)" '[ "$redacted_calls" -eq "$calls" ]'
 check "every call left a report copy (got $reports)" '[ "$reports" -eq "$calls" ]'
 check "the report copies hold redacted findings" 'grep -qF REDACTED "$GITLEAKS_RECORD_DIR"/*.report'
