@@ -71,11 +71,16 @@ let
     export PATH=${hookPath}:$PATH
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/aitools-rewrite.sh codex
   '';
+  redact = pkgs.writeShellScript "redact-secrets-codex" ''
+    export PATH=${pkgs.jq}/bin:$PATH
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/redact-secrets.sh codex
+  '';
   hooksDir = pkgs.runCommand "codex-managed-hooks" { } ''
     mkdir -p "$out"
     cp ${guard} "$out/guard-and-guide"
     cp ${destructiveGit} "$out/block-destructive-git"
     cp ${rewrite} "$out/aitools-rewrite-codex"
+    cp ${redact} "$out/redact-secrets-codex"
   '';
 in
 {
@@ -100,6 +105,18 @@ in
               "block-destructive-git"
               "aitools-rewrite-codex"
             ];
+      }
+    ];
+    # Last layer, fail-open like every Codex hook: a failure leaves the output as it was.
+    PostToolUse = [
+      {
+        matcher = "^Bash$";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/redact-secrets-codex";
+          }
+        ];
       }
     ];
   };

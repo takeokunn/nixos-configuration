@@ -39,6 +39,11 @@ let
     fi
   '';
 
+  redactHook = pkgs.writeShellScript "redact-secrets" ''
+    export PATH=${pkgs.jq}/bin:$PATH
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/redact-secrets.sh claude
+  '';
+
   # Derived from the shared catalog rather than restated, so a guardrail added there for Codex
   # cannot silently fail to fire here.
   claudeBashHookNames = shared.guardrailHookNames ++ [
@@ -156,6 +161,21 @@ in
             onFailure = "block";
           }
         ) claudeBashHookNames;
+    }
+  ];
+
+  # The last layer against a token reaching the model: it rewrites only what a tool returns, and it
+  # is fail-open by design (a hook failure leaves the output as it was). A failed tool call does not
+  # run PostToolUse, so its error output is not covered.
+  hooks.PostToolUse = [
+    {
+      matcher = "";
+      hooks = [
+        {
+          type = "command";
+          command = "${redactHook}";
+        }
+      ];
     }
   ];
 

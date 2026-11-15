@@ -333,6 +333,17 @@
                 touch $out
               '';
 
+          checks.redact-secrets-hook =
+            pkgs.runCommand "redact-secrets-hook-test"
+              {
+                nativeBuildInputs = [ pkgs.jq ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/redact-secrets.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/redact-secrets.sh}
+                touch $out
+              '';
+
           checks.codex-ghq-trust =
             pkgs.runCommand "codex-ghq-trust-test"
               {
@@ -600,6 +611,10 @@
                   echo "managed-settings must register both safety hooks with onFailure=block" >&2
                   exit 1
                 fi
+                if ! jq -e '.PostToolUse | length == 1 and .[0].matcher == "" and (.[0].hooks | length == 1 and (.[0] | .type == "command" and (.command | test("^/nix/store/[^/]+-redact-secrets$")) and (has("onFailure") | not)))' <<< "$claudeHooksJson" >/dev/null; then
+                  echo "managed-settings must register redact-secrets as the only PostToolUse hook, for every tool" >&2
+                  exit 1
+                fi
                 if [ "$configDir" != "$expectedConfigDir" ]; then
                   echo "home-manager configDir \"$configDir\" no longer matches the path the managed hook commands hardcode (\"$expectedConfigDir\")" >&2
                   exit 1
@@ -696,6 +711,12 @@
                                   assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
                               assert "--agent claude-code" in (root / "guard-and-guide").read_text()
                               assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
+                              post = hooks["PostToolUse"]
+                              assert [entry["matcher"] for entry in post] == ["^Bash$"]
+                              assert [hook["command"] for hook in post[0]["hooks"]] == [str(root / "redact-secrets-codex")]
+                              redact = root / "redact-secrets-codex"
+                              assert redact.is_file() and not redact.is_symlink() and os.access(redact, os.X_OK)
+                              assert "redact-secrets.sh codex" in redact.read_text()
                               rules = policy["rules"]["prefix_rules"]
                               assert rules and all(rule["decision"] == "forbidden" for rule in rules)
                               patterns = [[part["token"] for part in rule["pattern"]] for rule in rules]
