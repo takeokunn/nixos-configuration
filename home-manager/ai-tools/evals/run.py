@@ -235,7 +235,8 @@ def build_command(scenario, runtime, variant, fixture, work, args):
     # key is the physical path because that is the key Codex wrote. An inline table is used because
     # Codex splits a dotted -c key on every '.'.
     trust = ["-c", f"projects={{ {json.dumps(str(fixture.resolve()))} = {{ trust_level = \"trusted\" }} }}"]
-    return (["codex", "exec", "--json", "--skip-git-repo-check", "-C", str(fixture), *trust,
+    # --ephemeral keeps the session files out of the user's CODEX_HOME.
+    return (["codex", "exec", "--json", "--ephemeral", "--skip-git-repo-check", "-C", str(fixture), *trust,
              *sandbox, prompt], {})
 
 
@@ -268,7 +269,7 @@ def run_cli(cmd, env, cwd, out_dir, timeout):
 
 def make_work_dir():
     # A hex suffix keeps the realpath free of characters other than '/' and '.' that Claude Code would
-    # rewrite in a project dir name, so claude_project_dirs can derive that name exactly.
+    # rewrite in a project dir name, so claude_project_dir can derive that name exactly.
     while True:
         path = Path("/tmp") / f"ai-evals.{secrets.token_hex(4)}"
         try:
@@ -316,22 +317,18 @@ def aitools_preflight(fixture, env):
     return None
 
 
-def claude_project_dirs(fixture, config_dir):
-    """Session dirs Claude Code keys by this fixture's cwd, in ~/.claude and the variant's config dir."""
-    name = str(fixture.resolve()).replace("/", "-").replace(".", "-")
-    bases = {Path.home() / ".claude"}
-    if config_dir:
-        bases.add(Path(config_dir))
-    return [base / "projects" / name for base in sorted(bases)]
+def claude_project_dir(fixture, config_dir):
+    """Session dir Claude Code keys by this fixture's cwd under the CLAUDE_CONFIG_DIR this run passed."""
+    return Path(config_dir) / "projects" / str(fixture.resolve()).replace("/", "-").replace(".", "-")
 
 
-def remove_claude_project_dirs(fixture, config_dir):
-    removed = []
-    for path in claude_project_dirs(fixture, config_dir):
-        if path.is_dir() and not path.is_symlink():
-            shutil.rmtree(path)
-            removed.append(str(path))
-    return removed
+def remove_claude_project_dir(fixture, config_dir):
+    # Only the run's own config dir is touched; the user's ~/.claude is never a cleanup target.
+    path = claude_project_dir(fixture, config_dir)
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+        return [str(path)]
+    return []
 
 
 def fixture_listing(fixture, limit=200):
@@ -801,7 +798,8 @@ def run_one(scenario, runtime, variant, fixtures, args, run_dir):
         write_json(out_dir / "result.json", result)
         keep = result["status"] != "pass"
         meta["fixture_kept"] = keep
-        meta["deleted_project_dirs"] = remove_claude_project_dirs(fixture, extra_env.get("CLAUDE_CONFIG_DIR"))
+        meta["deleted_project_dirs"] = (remove_claude_project_dir(fixture, extra_env["CLAUDE_CONFIG_DIR"])
+                                        if runtime == "claude" else [])
         if not keep:
             shutil.rmtree(work, ignore_errors=True)
         write_json(out_dir / "meta.json", meta)
