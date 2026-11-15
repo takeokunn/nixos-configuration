@@ -10,7 +10,9 @@ Usage (run with `python3 -I`):
 --runtime, --variant, --scenario and --theme may be repeated. --dry-run builds each fixture, prints
 the command it would run, removes the fixture, and calls no model. `check` re-judges the transcripts
 saved under RUN_DIR (~/.local/state/ai-evals/runs/<run-id>) without calling a model; file and cmd
-checks need the fixture, which is kept only for runs that did not pass.
+checks need the fixture, which is kept only for runs that did not pass. Without it, a saved verdict
+is reused only when the stored check hash equals the current check definition; otherwise the check
+and the scenario are "unjudged" (neither pass nor fail) until the scenario is rerun.
 
 The contract for scenarios, fixtures and checks is the T10 schema; scenarios live in scenarios/ and
 fixture builders in fixtures/ next to this file (override with --scenarios-dir or
@@ -18,6 +20,7 @@ AI_EVALS_SCENARIOS_DIR; fixtures are then read from its sibling fixtures/ direct
 """
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -557,6 +560,10 @@ def evaluate(check, parsed, meta, fixture, work):
     raise ScenarioError(f"unknown check type {ctype!r}")
 
 
+def check_hash(check):
+    return hashlib.sha256(json.dumps(check, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
 def judge(scenario, meta, out_dir, previous=None):
     runtime = meta["runtime"]
     parsed = parse_transcript(runtime, out_dir / "transcript.jsonl")
@@ -568,17 +575,20 @@ def judge(scenario, meta, out_dir, previous=None):
 
     results = []
     for i, check in enumerate(scenario["checks"]):
+        digest = check_hash(check)
         passed, observed = evaluate(check, parsed, meta, fixture, work)
-        entry = {"index": i, "type": check["type"], "label": check.get("label"), "pass": passed,
-                 "observed": observed}
+        entry = {"index": i, "type": check["type"], "label": check.get("label"), "check_hash": digest,
+                 "pass": passed, "observed": observed}
         if passed is None:
-            # The fixture was removed after a pass; reuse the verdict observed while it existed.
+            # The fixture was removed after a pass; reuse the verdict observed while it existed, but
+            # only for the identical check definition. Results saved without a hash never match.
             prev = prev_checks.get(i)
-            if prev and prev.get("type") == check["type"] and prev.get("pass") is not None:
+            if prev and prev.get("check_hash") == digest and prev.get("pass") is not None:
                 entry["pass"] = prev["pass"]
                 entry["observed"] = {**prev.get("observed", {}), "carried_over": True}
             else:
-                entry["pass"] = False
+                entry["observed"] = {**observed, "unjudged": "no saved verdict for this check "
+                                     "definition; rerun the scenario to judge it"}
         results.append(entry)
 
     auth = auth_failure(runtime, parsed, stderr_text)
@@ -590,7 +600,13 @@ def judge(scenario, meta, out_dir, previous=None):
             hint = f"codex has no usable login ({auth!r}); run `codex login`"
         status, error = "error", hint
     else:
-        status = "pass" if all(r["pass"] for r in results) else "fail"
+        # A check that failed decides the scenario even when another one is unjudged.
+        if any(r["pass"] is False for r in results):
+            status = "fail"
+        elif any(r["pass"] is None for r in results):
+            status = "unjudged"
+        else:
+            status = "pass"
         error = None
     return {
         "scenario": scenario["id"], "theme": scenario["theme"], "fr003": scenario.get("fr003"),
@@ -620,7 +636,7 @@ def summarize(run_dir):
 
     def tally(rows):
         out = {"total": len(rows)}
-        for status in ("pass", "fail", "error", "deferred"):
+        for status in ("pass", "fail", "unjudged", "error", "deferred"):
             out[status] = sum(1 for r in rows if r["status"] == status)
         return out
 
@@ -644,7 +660,7 @@ def summarize(run_dir):
             "forbidden_bypass_failures": sorted(
                 r["scenario"] for r in ab
                 if r.get("fr003") == "forbidden-bypass" and r["status"] == "fail"
-                and any(not c["pass"] and c["type"] in STATE_CHECK_TYPES
+                and any(c["pass"] is False and c["type"] in STATE_CHECK_TYPES
                         for c in r.get("checks", []))),
             "required_ops_pass": sum(1 for r in required if r["status"] == "pass"),
             "required_ops_total": len(required),
@@ -660,13 +676,16 @@ def summarize(run_dir):
                    for r in results if r["status"] == "error"],
         "deferred": sorted(f"{r['scenario']}/{r['variant']}" for r in results
                            if r["status"] == "deferred"),
+        "unjudged": sorted(f"{r['scenario']}/{r['variant']}" for r in results
+                           if r["status"] == "unjudged"),
     }
     write_json(run_dir / "summary.json", summary)
 
     lines = [f"# Eval summary: {run_dir.name}", "", "## By variant", "",
-             "| variant | pass | fail | error | deferred | total |", "|---|---|---|---|---|---|"]
+             "| variant | pass | fail | unjudged | error | deferred | total |", "|---|---|---|---|---|---|---|"]
     for key, t in summary["by_variant"].items():
-        lines.append(f"| {key} | {t['pass']} | {t['fail']} | {t['error']} | {t['deferred']} | {t['total']} |")
+        lines.append(f"| {key} | {t['pass']} | {t['fail']} | {t['unjudged']} | {t['error']} | {t['deferred']} "
+                     f"| {t['total']} |")
     lines += ["", "## By theme (pass/total)", ""]
     keys = list(summary["by_variant"])
     lines += ["| theme | " + " | ".join(keys) + " |", "|---" * (len(keys) + 1) + "|"]
@@ -688,6 +707,9 @@ def summarize(run_dir):
                          + ", ".join(fr003[variant]["forbidden_bypass_failures"]))
     if summary["failed"]:
         lines += ["", "## Failed", ""] + [f"- {f}" for f in summary["failed"]]
+    if summary["unjudged"]:
+        lines += ["", "## Unjudged: check changed since the saved result, rerun", ""] + [
+            f"- {u}" for u in summary["unjudged"]]
     if summary["errors"]:
         lines += ["", "## Errors", ""] + [f"- {e['run']}: {e['error']}" for e in summary["errors"]]
     if summary["deferred"]:
@@ -842,7 +864,8 @@ def cmd_run(argv):
     summary = summarize(run_dir)
     print(f"summary: {run_dir / 'summary.md'}")
     for key, t in summary["by_variant"].items():
-        print(f"  {key}: pass {t['pass']} fail {t['fail']} error {t['error']} deferred {t['deferred']}")
+        print(f"  {key}: pass {t['pass']} fail {t['fail']} unjudged {t['unjudged']} error {t['error']} "
+              f"deferred {t['deferred']}")
     return 1 if any(st in ("fail", "error") for st in statuses) else 0
 
 
@@ -876,13 +899,15 @@ def cmd_check(argv):
         result["scenario_source"] = str(source)
         write_json(prev_path, result)
         statuses.append(result["status"])
-        failed = [f"#{c['index']} {c['type']}" for c in result["checks"] if not c["pass"]]
+        failed = [f"#{c['index']} {c['type']}" for c in result["checks"] if c["pass"] is False]
+        unjudged = [f"#{c['index']} {c['type']}" for c in result["checks"] if c["pass"] is None]
         print(f"[{result['status']}] {meta['scenario']}/{meta['runtime']}/{meta['variant']}"
               + (f" failed: {', '.join(failed)}" if failed else "")
+              + (f" unjudged: {', '.join(unjudged)}" if unjudged else "")
               + (f": {result['error']}" if result.get("error") else ""))
     summarize(run_dir)
     print(f"summary: {run_dir / 'summary.md'}")
-    return 1 if any(st in ("fail", "error") for st in statuses) else 0
+    return 1 if any(st in ("fail", "unjudged", "error") for st in statuses) else 0
 
 
 def main(argv):
