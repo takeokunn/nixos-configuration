@@ -125,6 +125,30 @@ check "failure is notified" 'grep -q "secret-scan failed" "$notify_log"'
 run "$scan"
 check "recovery run rescans the file" '[ "$(rule_rows github-pat)" -eq 3 ]'
 
+# 7. Several changed files in one run, across targets, are all scanned and the stamp advances.
+# 201 exceeds the old 200-file batch; gitleaks given several paths scans its cwd instead.
+many_run() {
+  local count=$1 before_rows n
+  before_rows=$(rule_rows github-pat)
+  sleep 1
+  mkdir -p "$HOME/.config/codex/sessions/many" "$HOME/.claude/transcripts"
+  printf 'GITHUB_TOKEN=ghp_FAKE%s\n' "$(random 32)" >"$HOME/.claude/transcripts/t$count.jsonl"
+  for ((n = 1; n < count; n++)); do
+    printf 'GITHUB_TOKEN=ghp_FAKE%s\n' "$(random 32)" >"$HOME/.config/codex/sessions/many/s$count-$n.jsonl"
+  done
+  cp -p "$SECRET_SCAN_STATE_DIR/last-run" "$work/stamp-before"
+  sleep 1
+  run "$scan"
+  check "$count-file run exits 0 (got $status)" '[ "$status" -eq 0 ]'
+  check "$count-file run reports $count changed files" 'grep -qx "secret-scan: $count changed files" <<<"$last_out"'
+  check "$count-file run writes $count github-pat rows" '[ "$(rule_rows github-pat)" -eq $((before_rows + count)) ]'
+  check "$count-file run writes no other rule" '[ "$(rows)" -eq $((before_rows + count + 1)) ]'
+  check "$count-file run notifies the count" 'grep -qx "$count secret findings; see $SECRET_SCAN_STATE_DIR" "$notify_log"'
+  check "$count-file run advances the stamp" '[ "$SECRET_SCAN_STATE_DIR/last-run" -nt "$work/stamp-before" ]'
+}
+many_run 2
+many_run 201
+
 check "no temporary report is left" '[ -z "$(find "$SECRET_SCAN_STATE_DIR" -name "*.json")" ]'
 for value in "$pat" "$jwt" "$old_pat" "$link_pat" FAKE; do
   check "TSV and logs do not contain $(printf %.8s "$value")..." \

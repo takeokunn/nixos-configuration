@@ -18,7 +18,6 @@ state_dir="${SECRET_SCAN_STATE_DIR:-$HOME/.local/state/secret-scan}"
 stamp="$state_dir/last-run"
 # First run without a stamp: a full scan takes over 20 minutes, so only the last day is scanned.
 first_run_minutes=1440
-batch_size=200
 
 targets=(
   "$HOME/.claude/projects"
@@ -67,20 +66,22 @@ fail() {
 # Own config with built-in rules only: --config takes precedence over GITLEAKS_CONFIG and a
 # target's .gitleaks.toml, and the user's config may carry allowlists that would hide findings.
 unset GITLEAKS_CONFIG GITLEAKS_CONFIG_TOML
-batch=0
-for ((i = 0; i < ${#files[@]}; i += batch_size)); do
-  batch=$((batch + 1))
+: >"$work/reports"
+for file in "${files[@]}"; do
+  # One file per call: given several paths, gitleaks 8.30.1 `dir` ignores them and scans the
+  # working directory. A single path also keeps that path in the report's File field.
   # --exit-code 0 makes any non-zero status an error rather than "leaks found".
-  "$gitleaks" dir --no-banner --config "$gitleaks_config" --gitleaks-ignore-path "$work" \
-    --ignore-gitleaks-allow --redact=100 --report-format json \
-    --report-path "$work/report.$batch.json" --exit-code 0 \
-    "${files[@]:i:batch_size}" ||
-    fail "gitleaks exited $? on batch $batch; stamp not updated"
+  rm -f "$work/report.json"
+  "$gitleaks" dir --no-banner --log-level warn --config "$gitleaks_config" \
+    --gitleaks-ignore-path "$work" --ignore-gitleaks-allow --redact=100 --report-format json \
+    --report-path "$work/report.json" --exit-code 0 "$file" ||
+    fail "gitleaks exited $? on a changed file; stamp not updated"
+  cat "$work/report.json" >>"$work/reports" || fail "gitleaks wrote no report; stamp not updated"
 done
 
 high=0
-if [ "$batch" -gt 0 ]; then
-  jq -s 'add' "$work"/report.*.json >"$work/report.json" || fail "could not parse the gitleaks report"
+if [ "${#files[@]}" -gt 0 ]; then
+  jq -s 'add' "$work/reports" >"$work/report.json" || fail "could not parse the gitleaks report"
   jq -r '.[] | [.File, (.StartLine | tostring), .RuleID] | @tsv' "$work/report.json" \
     >>"$state_dir/$(date +%F).tsv"
   high=$(jq --argjson rules "$notify_rules" '[.[] | select(.RuleID as $r | $rules | index($r))] | length' "$work/report.json")
