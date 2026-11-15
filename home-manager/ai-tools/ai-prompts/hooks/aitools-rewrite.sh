@@ -3,6 +3,8 @@
 # ls, find, fd, tree, wc -c, wc -l, jq, diff) into the equivalent
 # `aitools` call, so the model gets aitools' JSON with line numbers, hashes, and next_commands
 # instead of raw text.
+# The rewrite-stage restrictions below preserve output semantics. Afterwards, enforcement denies
+# any raw file operation left over, including writes and reads inside compound shell commands.
 #
 # The first argument selects the output shape:
 #   claude (default)  hookSpecificOutput.updatedInput only. A permissionDecision would auto-approve
@@ -32,8 +34,8 @@
 # An empty file, or a line range that starts beyond the last line, is left to the shell command, since
 # `aitools read` fails on both (see is_empty_file and range_past_eof).
 # A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
-# differs from aitools' leaves the command untouched. Everything fails open. To keep a command as
-# typed, prefix it: `command cat f`.
+# differs from aitools' is not rewritten. The enforcement pass below denies remaining raw file
+# operations. ALLOW_RAW_FILE_OP=1 is the explicit override for an authorized operation.
 #
 # rg, fd, and tree skip hidden entries where aitools lists them, so their rewrites add globs that
 # exclude dot-files and dot-directories. Those globs match workspace-relative paths, so the command
@@ -68,19 +70,7 @@ set -euo pipefail
 mode="${1:-claude}"
 input=$(cat)
 
-# Cheap prefilter, so the common non-rewritable command (jj, nix, git, ...) never pays for perl. It
-# only has to be a superset of what the rewriter accepts: a rewritable command word at the start (after
-# an optional `cd DIR &&`) or right after a `;` or `&`. A miss only skips the rewrite.
-cmd_words='(cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff)'
-json_ws='([[:space:]]|\\[ntr]|\\f|\\u00(0[9a-dA-D]|20|85|[aA]0)|\\u1680|\\u200[0-9aA]|\\u202[89]|\\u202[fF]|\\u205[fF]|\\u3000)*'
-cd_env="(cd[[:space:]]+[A-Za-z0-9_/.,:@%+~-]+${json_ws}(&|\\\\u0026)(&|\\\\u0026)${json_ws})?"
-prefilter="\"command\"[[:space:]]*:[[:space:]]*\"${json_ws}${cd_env}${cmd_words}([[:space:]]|\\\\|\")"
-# Later segments of a `;` or `&&` list are rewritten too, so a rewritable word right after a separator
-# also passes.
-after_sep="(;|&|u0026)${json_ws}${cmd_words}([[:space:]]|\\\\|\")"
-[[ $input =~ $prefilter || $input =~ $after_sep ]] || exit 0
-
-if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null; then
+if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null || ! command -v python3 &>/dev/null; then
   exit 0
 fi
 
@@ -156,6 +146,15 @@ sub rewrite_segment {
   my ($text, $cwd, $cd_dir, $is_last) = @_;
   my ($body, $redirect, $filter) = split_envelope($text);
   my @words = split_words($body) or return undef;
+  my @prefix;
+  if ($words[0] eq 'env') {
+    push @prefix, shift @words;
+    push @prefix, shift @words while @words && $words[0] =~ /\A[A-Za-z_][A-Za-z0-9_]*=/;
+    return undef if !@words || $words[0] =~ /\A-/;
+  }
+  shift @words if @words && $words[0] eq 'command';
+  return undef unless @words;
+  $words[0] =~ s{.*/}{};
   my %ctx = (cd_dir => $cd_dir, cwd => $cwd, hidden_cwd => under_dot_directory($cwd));
   my @rewritten = rewrite(\%ctx, @words) or return undef;
   # Every `aitools read` selector fails with selection.no-match (exit 2) on a file without lines, where
@@ -169,7 +168,7 @@ sub rewrite_segment {
   if ($filter) {
     @rewritten = apply_filter($filter, @rewritten) or return undef;
   }
-  return join(' ', map { quote($_) } 'aitools', @rewritten) . $redirect;
+  return join(' ', map { quote($_) } @prefix, 'aitools', @rewritten) . $redirect;
 }
 
 # Splits the command at top-level `;` and `&&` into [text, separator] pairs, keeping the separator and
@@ -1003,4 +1002,315 @@ sub rw_diff {
 }
 PERL
 
-perl -e "$perl_prog" "$mode" "$input" 2>/dev/null || true
+rewritten=$(perl -e "$perl_prog" "$mode" "$input" 2>/dev/null) || rewritten=''
+
+python3 - "$mode" "$input" "$rewritten" <<'PY'
+import ast
+import json
+import os
+import re
+import sys
+
+mode, raw, rewritten = sys.argv[1:]
+try:
+    payload = json.loads(raw)
+except (ValueError, TypeError):
+    sys.exit(0)
+if not isinstance(payload, dict) or payload.get('tool_name') != 'Bash':
+    sys.exit(0)
+if payload.get('hook_event_name', 'PreToolUse') != 'PreToolUse':
+    sys.exit(0)
+inp = payload.get('tool_input')
+if not isinstance(inp, dict) or not isinstance(inp.get('command'), str):
+    sys.exit(0)
+command = inp['command'].strip()
+
+def decision(kind, reason):
+    if mode == 'codex' and kind == 'deny':
+        print(reason, file=sys.stderr)
+        sys.exit(2)
+    print(json.dumps({'hookSpecificOutput': {
+        'hookEventName': 'PreToolUse', 'permissionDecision': kind,
+        'permissionDecisionReason': reason}}))
+    sys.exit(0)
+
+if re.match(r'ALLOW_RAW_FILE_OP=1(?:\s|$)', command):
+    decision('allow', 'Explicit raw file operation override.')
+
+READS = dict.fromkeys(('cat', 'head', 'tail', 'nl', 'sed'), 'read')
+READS.update(dict.fromkeys(('grep', 'egrep', 'fgrep', 'rg'), 'search'))
+READS.update(dict.fromkeys(('ls', 'find', 'fd', 'tree'), 'find'))
+READS.update(wc='info', jq='doc get', diff='diff', awk='table read', cut='table read')
+WRITES = dict(rm='rm', rmdir='rm', mv='move', cp='copy', mkdir='mkdir',
+              touch='touch', chmod='chmod', ln='link', tee='write')
+ASSIGN = re.compile(r'[A-Za-z_][A-Za-z0-9_]*=')
+
+class Token:
+    def __init__(self, value, operator=False):
+        self.value, self.operator = value, operator
+
+def lex(source):
+    # Keep operators distinct from quoted data, and inspect substitutions even inside double
+    # quotes. Heredoc bodies are data unless the receiving command is a shell or Python.
+    tokens, nested, heredocs = [], [], []
+    word, active, quote = '', False, ''
+    pending = []
+    i = 0
+    def flush():
+        nonlocal word, active
+        if active:
+            tokens.append(Token(word))
+        word, active = '', False
+    while i < len(source):
+        c = source[i]
+        if quote == "'":
+            if c == "'":
+                quote = ''
+            else:
+                word += c
+            i += 1
+            continue
+        if c == '\\':
+            if i + 1 < len(source):
+                if source[i + 1] != '\n':
+                    word += source[i + 1]
+                    active = True
+                i += 2
+                continue
+        if c == '`' or source.startswith('$(', i):
+            start = i + (1 if c == '`' else 2)
+            j, depth, state = start, 1, ''
+            while j < len(source):
+                d = source[j]
+                if d == '\\':
+                    j += 2
+                    continue
+                if c == '`':
+                    if d == '`':
+                        break
+                elif state:
+                    if d == state:
+                        state = ''
+                elif d in "\"'":
+                    state = d
+                elif d == '(':
+                    depth += 1
+                elif d == ')':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            nested.append(source[start:j])
+            word += source[i:j + 1]
+            active = True
+            i = j + 1
+            continue
+        if quote:
+            if c == quote:
+                quote = ''
+            else:
+                word += c
+            i += 1
+            continue
+        if c in "\"'":
+            quote, active = c, True
+            i += 1
+            continue
+        if c == '#' and not active:
+            end = source.find('\n', i)
+            i = len(source) if end < 0 else end
+            continue
+        if c == '\n':
+            flush()
+            # Each delimiter belongs to the command tokens preceding it. Do not classify
+            # quoted patch/code payloads as executable shell text.
+            i += 1
+            for token_start, delimiter, tabs, expanding in pending:
+                body = []
+                while i < len(source):
+                    end = source.find('\n', i)
+                    end = len(source) if end < 0 else end
+                    line = source[i:end]
+                    i = min(end + 1, len(source))
+                    if (line.lstrip('\t') if tabs else line) == delimiter:
+                        break
+                    body.append(line)
+                body = '\n'.join(body)
+                heredocs.append((tokens[token_start:], body))
+                if expanding:
+                    nested.extend(lex(body)[1])
+            pending = []
+            tokens.append(Token(';', True))
+            continue
+        if c.isspace():
+            flush()
+            i += 1
+            continue
+        if c in ';|&()<>{}':
+            flush()
+            op = next((s for s in ('<<-', '<<<', '<<', '>>', '>&', '<&', '<>', '>|',
+                                   '&&', '||', '|&', '&>') if source.startswith(s, i)), c)
+            tokens.append(Token(op, True))
+            i += len(op)
+            if op in ('<<', '<<-'):
+                match = re.match(r"\s*('([^']*)'|\"([^\"]*)\"|([\w.-]+))", source[i:])
+                if match:
+                    delimiter = next(x for x in match.groups()[1:] if x is not None)
+                    tokens.append(Token(delimiter))
+                    start = max((j + 1 for j, t in enumerate(tokens[:-2])
+                                 if t.operator and t.value in (';', '&&', '||', '|')), default=0)
+                    quoted = match.group(1).startswith(("'", '"'))
+                    pending.append((start, delimiter, op == '<<-', not quoted))
+                    i += len(match.group())
+            continue
+        word += c
+        active = True
+        i += 1
+    flush()
+    return tokens, nested, heredocs
+
+def unwrap(words):
+    words = list(words)
+    while words:
+        name = os.path.basename(words[0])
+        if ASSIGN.match(words[0]) or name in ('command', 'builtin', 'exec', 'env', 'time'):
+            words.pop(0)
+            if name == 'env':
+                while words:
+                    if ASSIGN.match(words[0]) or words[0] in ('-i', '--ignore-environment', '--'):
+                        words.pop(0)
+                    elif words[0] in ('-u', '--unset') and len(words) > 1:
+                        del words[:2]
+                    else:
+                        break
+            elif name == 'command':
+                if words and words[0] in ('-v', '-V'):
+                    return []
+                while words and words[0] in ('-p', '--'):
+                    words.pop(0)
+            elif name == 'builtin' and words and words[0] == '--':
+                words.pop(0)
+            continue
+        if name == 'aitools':
+            args = words[1:]
+            while args and args[0].startswith('-'):
+                option = args.pop(0)
+                if option in ('--root', '--state-dir', '--lock-timeout') and args:
+                    args.pop(0)
+            if args and args[0] == 'run' and '--' in args:
+                words = args[args.index('--') + 1:]
+                continue
+        break
+    return words
+
+def python_write(source):
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return False
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, 'attr', '')
+        if name in ('write_text', 'write_bytes', 'unlink', 'rmdir', 'mkdir', 'rename',
+                    'replace', 'remove', 'chmod', 'symlink', 'link', 'copy', 'copy2',
+                    'copyfile', 'copytree', 'move', 'rmtree', 'touch'):
+            return True
+        if name == 'open':
+            # builtins/io.open(path, mode) and Path(...).open(mode), including mode=.
+            path_method = (isinstance(node.func, ast.Attribute)
+                           and not (isinstance(node.func.value, ast.Name)
+                                    and node.func.value.id in ('io', 'os', 'builtins')))
+            positional = 0 if path_method else 1
+            modes = [kw.value for kw in node.keywords if kw.arg == 'mode']
+            if len(node.args) > positional:
+                modes.append(node.args[positional])
+            if any(isinstance(m, ast.Constant) and isinstance(m.value, str)
+                   and any(c in m.value for c in 'wax+') for m in modes):
+                return True
+    return False
+
+def inspect_words(words, reads):
+    words = unwrap(words)
+    if not words:
+        return None
+    name, args = os.path.basename(words[0]), words[1:]
+    if name in ('sh', 'bash', 'zsh', 'dash'):
+        for i, arg in enumerate(args[:-1]):
+            if arg.startswith('-') and 'c' in arg[1:] and not arg.startswith('--'):
+                return inspect(args[i + 1], reads)
+    if name in ('python', 'python3') and '-c' in args:
+        i = args.index('-c')
+        if i + 1 < len(args) and python_write(args[i + 1]):
+            return 'write', 'Python file write'
+    if name in WRITES:
+        return WRITES[name], name
+    if name == 'sed' and any(a == '--in-place' or a.startswith('--in-place=')
+                            or (a.startswith('-') and not a.startswith('--') and 'i' in a[1:]) for a in args):
+        return 'edit / aitools replace', 'sed in-place write'
+    if name == 'perl' and any(a.startswith('-') and not a.startswith('--') and 'i' in a[1:] for a in args):
+        return 'edit / aitools replace', 'perl in-place write'
+    if reads and name in READS:
+        return READS[name], name
+    return None
+
+def inspect(source, reads):
+    tokens, nested, heredocs = lex(source)
+    for body in nested:
+        found = inspect(body, reads)
+        if found:
+            return found
+    for receiver, body in heredocs:
+        words = unwrap([t.value for t in receiver if not t.operator])
+        if words and os.path.basename(words[0]) in ('python', 'python3') and python_write(body):
+            return 'write', 'Python heredoc file write'
+        if words and os.path.basename(words[0]) in ('sh', 'bash', 'zsh', 'dash'):
+            found = inspect(body, reads)
+            if found:
+                return found
+    words = []
+    skip = False
+    for i, token in enumerate(tokens):
+        v = token.value
+        if skip:
+            skip = False
+            continue
+        if token.operator and v in ('>', '>>', '>|', '&>', '<>'):
+            target = tokens[i + 1].value if i + 1 < len(tokens) else ''
+            if target != '/dev/null':
+                return 'write', 'file redirection'
+            if words and words[-1].isdigit():
+                words.pop()
+            skip = True
+        elif token.operator and v in ('<', '>&', '<&', '<<', '<<-', '<<<'):
+            if words and words[-1].isdigit():
+                words.pop()
+            # >&FILE writes a file too, while descriptor duplication does not.
+            if v == '>&' and i + 1 < len(tokens) and not re.fullmatch(r'[0-9]+|-|/dev/null', tokens[i + 1].value):
+                return 'write', 'file redirection'
+            skip = True
+        elif token.operator:
+            found = inspect_words(words, reads)
+            if found:
+                return found
+            words = []
+        elif not words and v in ('if', 'then', 'elif', 'else', 'while', 'until', 'do', '!', 'done', 'fi'):
+            continue
+        else:
+            words.append(v)
+    return inspect_words(words, reads)
+
+found = inspect(command, False)
+if not found:
+    candidate = json.loads(rewritten)['hookSpecificOutput']['updatedInput']['command'] if rewritten else command
+    found = inspect(candidate, True)
+if found:
+    subcommand, operation = found
+    reason = (f'Raw file operation ({operation}) blocked. Use aitools {subcommand}. '
+              'For a target outside the working directory, use aitools --root <dir> '
+              f'{subcommand}; for temporary files use aitools mktemp. '
+              'ALLOW_RAW_FILE_OP=1 is reserved for operations already authorized by the user.')
+    decision('deny', reason)
+if rewritten:
+    print(rewritten)
+PY

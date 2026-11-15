@@ -16,6 +16,15 @@ PATH="$stub_dir:$PATH"
 
 failures=0
 checked=0
+rewrites=0
+blocks=0
+passes=0
+
+assert_denied() {
+  blocks=$((blocks + 1))
+  [[ $(jq -r '.hookSpecificOutput.permissionDecision // empty' <<<"$1") == deny ]] || fail "[$2] expected deny: [$1]"
+  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason // empty' <<<"$1") == *aitools* ]] || fail "[$2] deny omitted aitools guidance"
+}
 
 fail() {
   echo "FAIL: $1" >&2
@@ -28,10 +37,16 @@ expect_claude() {
   local payload got actual
   payload=$(jq -cn --arg command "$1" '{tool_name:"Bash",tool_input:{command:$command}}')
   got=$(printf '%s' "$payload" | bash "$hook" claude)
+  if [[ $2 == deny ]]; then
+    assert_denied "$got" "claude [$1]"
+    return
+  fi
   if [[ -z $2 ]]; then
+    passes=$((passes + 1))
     [[ -z $got ]] || fail "claude [$1]: expected no output, got [$got]"
     return
   fi
+  rewrites=$((rewrites + 1))
   actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
   [[ $actual == "$2" ]] || fail "claude [$1]: expected [$2], got [$actual]"
 }
@@ -141,7 +156,7 @@ expect_claude 'rg -v foo f | head -3' "aitools search foo f --invert --context 0
 expect_claude 'rg --files | head -20' "aitools find '*' --type file $hidden --limit 20"
 expect_claude 'fd Config | head -5' "aitools find Config $hidden --limit 5"
 expect_claude 'cd src && rg -l foo' "cd src && aitools search foo --output files --limit 200 $hidden"
-expect_claude 'cd .github && rg -l foo' ''
+expect_claude 'cd .github && rg -l foo' deny
 expect_claude 'cd .github && grep -rl foo .' 'cd .github && aitools search foo . --output files --limit 200 --no-ignore'
 expect_claude 'ls | head' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 10"
 expect_claude 'ls -A src' "aitools find '*' src --depth 1 --no-ignore --limit 200"
@@ -149,12 +164,12 @@ expect_claude 'ls .config' "aitools find '*' .config --depth 1 --no-ignore --glo
 expect_claude 'cd .github && ls' "cd .github && aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_claude 'ls -l' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_claude "find . -name '*.nix' | head -5" "aitools find '*.nix' . --no-ignore --limit 5"
-expect_claude 'git log --oneline | head -5' ''
-expect_claude 'git show HEAD:f | head -30' ''
+expect_claude 'git log --oneline | head -5' deny
+expect_claude 'git show HEAD:f | head -30' deny
 expect_claude 'grep -rn foo . 2>/dev/null | head -5' 'aitools search foo . --context 0 --limit 5 --no-ignore 2>/dev/null'
 expect_claude 'cd src && grep -rn foo . 2>&1 | head -5' 'cd src && aitools search foo . --context 0 --limit 5 --no-ignore 2>&1'
 
-# Pass-through: anything the rewrite could change the meaning of.
+# Unsupported reads and writes are denied; unrelated commands still pass.
 for cmd in \
   'cat a b' \
   'cat' \
@@ -271,7 +286,6 @@ for cmd in \
   'cat <(ls)' \
   'cat `ls`' \
   'FOO=1 cat x' \
-  'command cat x' \
   'cat "unterminated' \
   "cat it\\'s.txt" \
   'cat a # comment' \
@@ -308,19 +322,37 @@ for cmd in \
   'cd /tmp && git stash' \
   'bat x' \
   ''; do
-  expect_claude "$cmd" ''
+  case "$cmd" in
+  git\ *\|*) expect_claude "$cmd" deny ;;
+  git\ * | 'cd /tmp' | 'cd /tmp && git stash' | 'bat x' | '') expect_claude "$cmd" '' ;;
+  *) expect_claude "$cmd" deny ;;
+  esac
 done
-expect_claude $'cat a\ncat b' ''
+expect_claude $'cat a\ncat b' deny
+expect_claude 'command cat x' 'aitools read x --max-lines 2000'
 
 # expect_json <mode> <payload> <jq filter that must print true>
 expect_json() {
   checked=$((checked + 1))
-  local got
-  got=$(printf '%s' "$2" | bash "$hook" "$1")
+  local got status=0
+  got=$(printf '%s' "$2" | bash "$hook" "$1" 2>"$stub_dir/stderr") || status=$?
+  if [[ $3 == deny ]]; then
+    if [[ $1 == codex ]]; then
+      blocks=$((blocks + 1))
+      [[ $status == 2 && -s "$stub_dir/stderr" && -z $got ]] || fail "[$2] codex deny transport: status=$status stdout=[$got]"
+    else
+      [[ $status == 0 ]] || fail "claude deny status: $status"
+      assert_denied "$got" "$2"
+    fi
+    return
+  fi
+  [[ $status == 0 ]] || fail "unexpected status: $status"
   if [[ -z $3 ]]; then
+    passes=$((passes + 1))
     [[ -z $got ]] || fail "$1 [$2]: expected no output, got [$got]"
     return
   fi
+  rewrites=$((rewrites + 1))
   [[ $(jq -r "$3" <<<"$got" 2>/dev/null) == true ]] || fail "$1 [$2]: [$3] not true for [$got]"
 }
 
@@ -348,10 +380,10 @@ mkdir -p "$repo/.git" "$repo/.hidden/sub" "$repo/src"
 cwd_payload() { jq -cn --arg c "$1" --arg d "$2" '{tool_name: "Bash", tool_input: {command: $c}, cwd: $d}'; }
 expect_json claude "$(cwd_payload 'rg -l foo' "$repo")" ".hookSpecificOutput.updatedInput.command == \"aitools search foo --output files --limit 200 $hidden\""
 expect_json claude "$(cwd_payload 'rg -l foo' "$repo/src")" '.hookSpecificOutput.updatedInput.command | startswith("aitools search")'
-expect_json claude "$(cwd_payload 'rg -l foo' "$repo/.hidden")" ''
-expect_json claude "$(cwd_payload 'fd Foo' "$repo/.hidden/sub")" ''
-expect_json claude "$(cwd_payload 'tree' "$repo/.hidden")" ''
-expect_json codex "$(cwd_payload 'rg --files' "$repo/.hidden")" ''
+expect_json claude "$(cwd_payload 'rg -l foo' "$repo/.hidden")" deny
+expect_json claude "$(cwd_payload 'fd Foo' "$repo/.hidden/sub")" deny
+expect_json claude "$(cwd_payload 'tree' "$repo/.hidden")" deny
+expect_json codex "$(cwd_payload 'rg --files' "$repo/.hidden")" deny
 expect_json claude "$(cwd_payload 'cat x' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
 expect_json claude "$(cwd_payload 'fd -H Foo' "$repo/.hidden")" '.hookSpecificOutput.updatedInput.command == "aitools find Foo --limit 200"'
 
@@ -364,8 +396,8 @@ mkdir -p "$empty_dir/sub"
 printf 'x\n' >"$empty_dir/full.txt"
 for cmd in 'cat empty.txt' 'head empty.txt' 'head -n 5 empty.txt' 'tail -n 5 empty.txt' \
   'sed -n 1,5p empty.txt' 'cat empty.txt | head -5' 'cat empty.txt 2>&1' 'cd sub && head empty.txt'; do
-  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" ''
-  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" ''
+  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" deny
+  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" deny
 done
 expect_json claude "$(cwd_payload 'head full.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read full.txt --range 1:10 --max-lines 10"'
 expect_json claude "$(cwd_payload 'head missing.txt' "$empty_dir")" '.hookSpecificOutput.updatedInput.command == "aitools read missing.txt --range 1:10 --max-lines 10"'
@@ -380,20 +412,26 @@ expect_claude_in() {
   local payload got actual
   payload=$(jq -cn --arg command "$2" --arg cwd "$1" '{tool_name:"Bash",tool_input:{command:$command},cwd:$cwd}')
   got=$(printf '%s' "$payload" | bash "$hook" claude)
+  if [[ $3 == deny ]]; then
+    assert_denied "$got" "claude in [$1] [$2]"
+    return
+  fi
   if [[ -z $3 ]]; then
+    passes=$((passes + 1))
     [[ -z $got ]] || fail "claude in [$1] [$2]: expected no output, got [$got]"
     return
   fi
+  rewrites=$((rewrites + 1))
   actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
   [[ $actual == "$3" ]] || fail "claude in [$1] [$2]: expected [$3], got [$actual]"
 }
 for cmd in "sed -n 4p three.txt" "sed -n 10,20p three.txt" "sed -n '4,\$p' three.txt" "sed -n 4p nonl.txt" "cd sub && sed -n 1p empty.txt"; do
-  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" ''
-  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" ''
-  expect_claude_in "$empty_dir" "$cmd" ''
+  expect_json claude "$(cwd_payload "$cmd" "$empty_dir")" deny
+  expect_json codex "$(cwd_payload "$cmd" "$empty_dir")" deny
+  expect_claude_in "$empty_dir" "$cmd" deny
 done
-expect_claude_in "$empty_dir" 'cat empty.txt' ''
-expect_claude_in "$empty_dir" 'head empty.txt' ''
+expect_claude_in "$empty_dir" 'cat empty.txt' deny
+expect_claude_in "$empty_dir" 'head empty.txt' deny
 expect_claude_in "$empty_dir" 'sed -n 3p three.txt' 'aitools read three.txt --range 3:3 --max-lines 1'
 expect_claude_in "$empty_dir" 'sed -n 3p nonl.txt' 'aitools read nonl.txt --range 3:3 --max-lines 1'
 expect_claude_in "$empty_dir" 'sed -n 2,9p three.txt' 'aitools read three.txt --range 2:9 --max-lines 8'
@@ -449,7 +487,12 @@ for cmd in \
   'cd src && jj log' \
   'catalog x' \
   'lsof -i'; do
-  expect_claude_in "$repo/src" "$cmd" ''
+  case "$cmd" in
+  'jj status' | 'nix build .#foo' | 'cd src && jj log' | 'catalog x' | 'lsof -i')
+    expect_claude_in "$repo/src" "$cmd" ''
+    ;;
+  *) expect_claude_in "$repo/src" "$cmd" deny ;;
+  esac
 done
 
 # A list of simple commands joined by `;` or `&&` is rewritten segment by segment; a segment that is
@@ -460,17 +503,17 @@ expect_claude_in "$repo/src" 'cat a && cat b' 'aitools read a --max-lines 2000 &
 expect_claude_in "$repo/src" 'cat a; cat b' 'aitools read a --max-lines 2000; aitools read b --max-lines 2000'
 expect_claude_in "$repo/src" 'cat a;' 'aitools read a --max-lines 2000;'
 # After `cd DIR ;` the next segment runs even when the cd failed, so the directory is unknown.
-expect_claude 'cd src; cat x' ''
+expect_claude 'cd src; cat x' deny
 expect_claude_in "$repo/src" 'echo ---; cat x 2>&1; jj st' 'echo ---; aitools read x --max-lines 2000 2>&1; jj st'
 expect_claude_in "$repo/src" 'echo "a;b && c"; cat x' 'echo "a;b && c"; aitools read x --max-lines 2000'
 expect_claude_in "$repo/src" "echo 'a && b' && cat c" "echo 'a && b' && aitools read c --max-lines 2000"
-expect_claude_in "$repo/src" 'cat x | sort; cat y' 'cat x | sort; aitools read y --max-lines 2000'
+expect_claude_in "$repo/src" 'cat x | sort; cat y' deny
 expect_claude_in "$repo/src" 'ls | head -3; cat x | head -2' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 3; aitools read x --range 1:2 --max-lines 2"
 expect_claude_in "$repo/src" 'cd .. && cat x; cat y' 'cd .. && aitools read x --max-lines 2000; aitools read y --max-lines 2000'
-expect_claude_in "$repo/src" 'cd /tmp && grep -rn foo .; cat x' 'cd /tmp && grep -rn foo .; aitools read x --max-lines 2000'
-expect_claude_in "$repo/src" 'cd .. ; cd src && grep -rn foo . | head -3' ''
+expect_claude_in "$repo/src" 'cd /tmp && grep -rn foo .; cat x' deny
+expect_claude_in "$repo/src" 'cd .. ; cd src && grep -rn foo . | head -3' deny
 expect_claude_in "$repo/src" 'cd .. && cd src && grep -rn foo . | head -3' 'cd .. && cd src && aitools search foo . --context 0 --limit 3 --no-ignore'
-expect_claude_in "$repo/src" 'grep -n foo a.txt; echo hit' ''
+expect_claude_in "$repo/src" 'grep -n foo a.txt; echo hit' deny
 expect_claude_in "$repo/src" 'echo hit && grep -n foo a.txt' 'echo hit && aitools search foo a.txt --context 0 --limit 100 --no-ignore'
 expect_claude_in "$repo/src" 'grep -n foo a.txt | head -5 && echo hit' 'aitools search foo a.txt --context 0 --limit 5 --no-ignore && echo hit'
 for cmd in \
@@ -501,7 +544,7 @@ for cmd in \
   'cat a; echo \; cat b' \
   'cat a; find . -exec cat {} \; ' \
   'cat a; echo "unterminated'; do
-  expect_claude_in "$repo/src" "$cmd" ''
+  expect_claude_in "$repo/src" "$cmd" deny
 done
 
 # rg --no-config only drops the user's config file, which aitools never reads.
@@ -531,7 +574,7 @@ for cmd in \
   "grep -rn '\\(*a\\)' src" \
   "grep -rn '^*a' src" \
   "grep -rn 'a\\' src"; do
-  expect_claude "$cmd" ''
+  expect_claude "$cmd" deny
 done
 
 # An unquoted `~` or `~/...` is the home directory. It is outside the workspace root, so grep, rg, ls,
@@ -542,10 +585,16 @@ expect_claude_home() {
   local payload got actual
   payload=$(jq -cn --arg command "$2" '{tool_name:"Bash",tool_input:{command:$command}}')
   got=$(printf '%s' "$payload" | HOME="$1" bash "$hook" claude)
+  if [[ $3 == deny ]]; then
+    assert_denied "$got" "claude HOME=[$1] [$2]"
+    return
+  fi
   if [[ -z $3 ]]; then
+    passes=$((passes + 1))
     [[ -z $got ]] || fail "claude HOME=[$1] [$2]: expected no output, got [$got]"
     return
   fi
+  rewrites=$((rewrites + 1))
   actual=$(jq -r '.hookSpecificOutput.updatedInput.command // empty' <<<"$got" 2>/dev/null)
   [[ $actual == "$3" ]] || fail "claude HOME=[$1] [$2]: expected [$3], got [$actual]"
 }
@@ -554,12 +603,12 @@ expect_claude_home /home/test 'cat ~' 'aitools read /home/test --max-lines 2000'
 expect_claude_home /home/test 'head -n 3 ~/.x' 'aitools read /home/test/.x --range 1:3 --max-lines 3'
 expect_claude_home /home/test 'diff ~/a b' 'aitools diff /home/test/a b'
 expect_claude_home /home/test 'cd ~/repo && cat x' 'cd ~/repo && aitools read x --max-lines 2000'
-expect_claude_home /home/test 'cd ~/repo && grep -rn foo .' ''
+expect_claude_home /home/test 'cd ~/repo && grep -rn foo .' deny
 for cmd in 'grep foo ~/x' 'ls ~' 'ls ~/x' 'find ~ -name "*.x"' 'rg foo ~/x' 'tree ~' 'cat ~user/x' 'cat a~b' "cat '~/x'" 'cat "~/x"' 'cat ~/x ~/y'; do
-  expect_claude_home /home/test "$cmd" ''
+  expect_claude_home /home/test "$cmd" deny
 done
-expect_claude_home '' 'cat ~/x' ''
-expect_claude_home relative 'cat ~/x' ''
+expect_claude_home '' 'cat ~/x' deny
+expect_claude_home relative 'cat ~/x' deny
 
 # wc -l reads the info lines field, which counts an unterminated last line where wc does not, so the
 # file must exist and be empty or end in a newline.
@@ -568,20 +617,19 @@ printf 'a\nb' >"$repo/src/nonl.txt"
 : >"$repo/src/empty.txt"
 expect_claude_in "$repo/src" 'wc -l nl.txt' 'aitools info nl.txt'
 expect_claude_in "$repo/src" 'wc -l empty.txt' 'aitools info empty.txt'
-expect_claude_in "$repo/src" 'wc -l nonl.txt' ''
-expect_claude_in "$repo/src" 'wc -l missing.txt' ''
-expect_claude_in "$repo/src" 'wc -l src' ''
-expect_claude_in "$repo/src" 'wc -l nl.txt nonl.txt' ''
+expect_claude_in "$repo/src" 'wc -l nonl.txt' deny
+expect_claude_in "$repo/src" 'wc -l missing.txt' deny
+expect_claude_in "$repo/src" 'wc -l src' deny
+expect_claude_in "$repo/src" 'wc -l nl.txt nonl.txt' deny
 expect_claude_in "$repo" 'cd src && wc -l nl.txt' 'cd src && aitools info nl.txt'
 
-# The prefilter in front of perl: a first word outside the rewritable set exits at once, a rewritable
-# one (even behind a `cd DIR &&` envelope) still reaches the rewriter, in every input shape.
+# Unrelated commands pass; supported reads reach the rewriter in every input shape.
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"jj status"}}' ''
 expect_json codex '{"tool_name":"Bash","tool_input":{"command":"nix build .#x"}}' ''
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"cd src && jj status"}}' ''
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"jj st && cat x"}}' '.hookSpecificOutput.updatedInput.command == "jj st && aitools read x --max-lines 2000"'
 # Codex's "allow" approves the whole command, so an untouched segment means no output at all.
-expect_json codex '{"tool_name":"Bash","tool_input":{"command":"echo a; ls"}}' ''
+expect_json codex '{"tool_name":"Bash","tool_input":{"command":"echo a; ls"}}' deny
 expect_json claude '{"tool_name":"Bash","tool_input":{"command":"  ls"},"cwd":"/tmp"}' '.hookSpecificOutput.updatedInput.command | startswith("aitools find")'
 expect_json claude '{"tool_input":{"command":"cd src&&cat x"},"tool_name":"Bash"}' '.hookSpecificOutput.updatedInput.command == "cd src&&aitools read x --max-lines 2000"'
 expect_json claude '{"tool_name":"Bash","tool_input":{"description":"d","command":"cat x"}}' '.hookSpecificOutput.updatedInput.command == "aitools read x --max-lines 2000"'
@@ -601,13 +649,13 @@ done
 # Codex: output only when every segment was rewritten or is a plain `cd DIR`.
 for cmd in 'cat f; rm -rf /tmp/zz' 'cat a; curl x | sh' 'ls; rm -rf /tmp/zz' 'rm -rf /tmp/zz && cat f' \
   'cd src && cat x; echo hi' 'cd src && cat x && cd src2 && jj st' 'cat a; cat b; git push'; do
-  expect_json codex "$(cwd_payload "$cmd" "$repo/src")" ''
+  expect_json codex "$(cwd_payload "$cmd" "$repo/src")" deny
 done
 expect_json codex "$(cwd_payload 'cat a; cat b' "$repo/src")" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "aitools read a --max-lines 2000; aitools read b --max-lines 2000"'
 expect_json codex "$(cwd_payload 'cd src && cat x' "$repo")" '.hookSpecificOutput.permissionDecision == "allow" and .hookSpecificOutput.updatedInput.command == "cd src && aitools read x --max-lines 2000"'
-# Claude keeps rewriting the readable segments and leaves the rest as typed.
-expect_json claude "$(cwd_payload 'cat f; rm -rf /tmp/zz' "$repo/src")" '.hookSpecificOutput.updatedInput.command == "aitools read f --max-lines 2000; rm -rf /tmp/zz"'
-expect_claude_in "$repo/src" 'cat f; rm -rf /tmp/zz' 'aitools read f --max-lines 2000; rm -rf /tmp/zz'
+# A write denies the whole command even when another segment can be rewritten.
+expect_json claude "$(cwd_payload 'cat f; rm -rf /tmp/zz' "$repo/src")" deny
+expect_claude_in "$repo/src" 'cat f; rm -rf /tmp/zz' deny
 
 # A segment whose exit status can differ (grep, rg, diff exit 1 where aitools exits 0; jq prints null
 # and exits 0 where json get exits 1; a read piped to head/tail of a missing file reports head's 0) is
@@ -623,33 +671,33 @@ for cmd in \
   'cat missing | head -1 && echo x' \
   'cat missing | tail -1; echo $?' \
   'cd .. && grep -n foo f; echo $?'; do
-  expect_claude_in "$repo/src" "$cmd" ''
+  expect_claude_in "$repo/src" "$cmd" deny
 done
 expect_claude_in "$repo/src" 'echo x && jq .b j.json' 'echo x && aitools json get j.json /b'
 expect_claude_in "$repo/src" 'cat a; jq .b j.json' 'aitools read a --max-lines 2000; aitools json get j.json /b'
 expect_claude_in "$repo/src" 'cat missing | head -1' 'aitools read missing --range 1:1 --max-lines 1'
 expect_claude_in "$repo/src" 'cat nl.txt | head -1 && echo x' 'aitools read nl.txt --range 1:1 --max-lines 1 && echo x'
 expect_claude_in "$repo/src" 'grep -n foo f | head -2; echo $?' 'aitools search foo f --context 0 --limit 2 --no-ignore; echo $?'
-expect_claude_in "$repo/src" 'diff a b | head -2 && echo x' ''
+expect_claude_in "$repo/src" 'diff a b | head -2 && echo x' deny
 
 # cd tracking: the directory accumulates across `&&`-joined cds, an option or `~user` is not a
 # directory, and `;` after a cd leaves the directory unknown.
-expect_claude_in "$repo/src" 'cd .. && cd .. && grep -n foo f' ''
+expect_claude_in "$repo/src" 'cd .. && cd .. && grep -n foo f' deny
 expect_claude_in "$repo/src" 'cd .. && cd src && grep -n foo f' 'cd .. && cd src && aitools search foo f --context 0 --limit 100 --no-ignore'
 expect_claude_in "$repo" 'cd src && cd sub && grep -n foo f' 'cd src && cd sub && aitools search foo f --context 0 --limit 100 --no-ignore'
-expect_claude_in "$repo" 'cd /tmp && cd x && grep -rn foo .' ''
+expect_claude_in "$repo" 'cd /tmp && cd x && grep -rn foo .' deny
 expect_claude_in "$repo" "cd $repo/src && grep -n foo f" "cd $repo/src && aitools search foo f --context 0 --limit 100 --no-ignore"
-expect_claude_in "$repo" "cd /tmp; cd $repo/src; grep -n foo f" ''
-expect_claude_in "$repo" "cd $repo/src; grep -n foo f" ''
-expect_claude_in "$repo" 'cd -foo && grep -n foo f' ''
-expect_claude_in "$repo" 'cd -foo && cat f' ''
-expect_claude_home /home/test 'cd ~user && cat x' ''
+expect_claude_in "$repo" "cd /tmp; cd $repo/src; grep -n foo f" deny
+expect_claude_in "$repo" "cd $repo/src; grep -n foo f" deny
+expect_claude_in "$repo" 'cd -foo && grep -n foo f' deny
+expect_claude_in "$repo" 'cd -foo && cat f' deny
+expect_claude_home /home/test 'cd ~user && cat x' deny
 expect_claude_home /home/test 'cd ~ && cat x' 'cd ~ && aitools read x --max-lines 2000'
 # After HOME changes, `~` no longer means the HOME the hook sees.
-expect_claude_home /home/test 'HOME=/other; cat ~/x' ''
-expect_claude_home /home/test 'export HOME=/other && cat ~/x' ''
-expect_claude_home /home/test 'export HOME=/other && cd ~/r && cat x' ''
-expect_claude_home /home/test 'unset HOME; cat ~/x' ''
+expect_claude_home /home/test 'HOME=/other; cat ~/x' deny
+expect_claude_home /home/test 'export HOME=/other && cat ~/x' deny
+expect_claude_home /home/test 'export HOME=/other && cd ~/r && cat x' deny
+expect_claude_home /home/test 'unset HOME; cat ~/x' deny
 expect_claude_home /home/test 'echo a; cat ~/x' 'echo a; aitools read /home/test/x --max-lines 2000'
 expect_claude_home /home/test 'export HOME=/other && cat x' 'export HOME=/other && aitools read x --max-lines 2000'
 
@@ -683,7 +731,7 @@ for cmd in \
   "grep -rn '\\(\\|a\\)' src" \
   "grep -rn '\\?a' src" \
   "grep -rn '^\\{2\\}' src"; do
-  expect_claude "$cmd" ''
+  expect_claude "$cmd" deny
 done
 
 # Without aitools on PATH the hook must stand aside rather than hand back a command that cannot run.
@@ -696,5 +744,6 @@ payload=$(jq -cn --arg command 'cat flake.nix' '{tool_name:"Bash",tool_input:{co
 got=$(printf '%s' "$payload" | PATH="$bare_dir" "$BASH" "$hook" claude)
 [[ -z $got ]] || fail "no aitools on PATH: expected no output, got [$got]"
 
-echo "aitools-rewrite: $checked cases, $failures failures"
+passes=$((passes + 1))
+echo "aitools-rewrite: $checked cases (rewrite=$rewrites block=$blocks pass=$passes), $failures failures"
 [[ $failures -eq 0 ]]

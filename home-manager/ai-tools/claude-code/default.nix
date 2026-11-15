@@ -110,7 +110,25 @@ in
     export GITLEAKS_BIN=${pkgs.gitleaks}/bin/gitleaks
     exec ${pkgs.bash}/bin/bash ${ai-prompts-path}/hooks/block-destructive-git.sh "$@"
   '';
-  programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh";
+  programs.claude-code.hooks.aitools-rewrite = pkgs.writeShellScript "aitools-rewrite" ''
+    export PATH=${
+      pkgs.lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.perl
+        pkgs.python3
+      ]
+    }:"$PATH"
+    exec ${pkgs.bash}/bin/bash ${ai-prompts-path}/hooks/aitools-rewrite.sh claude
+  '';
+  programs.claude-code.hooks.aitools-builtins = pkgs.writeShellScript "aitools-builtins" ''
+    export PATH=${
+      pkgs.lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.python3
+      ]
+    }:"$PATH"
+    exec ${pkgs.bash}/bin/bash ${ai-prompts-path}/hooks/aitools-builtins.sh claude
+  '';
 
   programs.claude-code.mcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {

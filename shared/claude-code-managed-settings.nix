@@ -162,6 +162,15 @@ in
           }
         ) claudeBashHookNames;
     }
+    {
+      matcher = "Read|Grep|Glob|Edit|Write|MultiEdit";
+      hooks = [
+        {
+          type = "command";
+          command = "${hooksDir}/aitools-builtins";
+        }
+      ];
+    }
   ];
 
   # The last layer against a token reaching the model: it rewrites only what a tool returns, and it

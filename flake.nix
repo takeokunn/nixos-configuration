@@ -325,11 +325,28 @@
                 nativeBuildInputs = [
                   pkgs.jq
                   pkgs.perl
+                  pkgs.python3
                 ];
               }
               ''
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.test.sh} \
                   ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.sh}
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-enforce.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.sh}
+                touch $out
+              '';
+
+          checks.aitools-builtins-hook =
+            pkgs.runCommand "aitools-builtins-hook-test"
+              {
+                nativeBuildInputs = [
+                  pkgs.jq
+                  pkgs.python3
+                ];
+              }
+              ''
+                bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-builtins.test.sh} \
+                  ${./home-manager/ai-tools/ai-prompts/hooks/aitools-builtins.sh}
                 touch $out
               '';
 
@@ -644,6 +661,14 @@
                   echo "managed-settings must register both safety hooks with onFailure=block" >&2
                   exit 1
                 fi
+                if ! jq -e '[.PreToolUse[] | select(.matcher == "Read|Grep|Glob|Edit|Write|MultiEdit") | .hooks[]] | length == 1 and all(.type == "command" and (.command | endswith("/aitools-builtins")) and (has("onFailure") | not))' <<< "$claudeHooksJson" >/dev/null; then
+                  echo "managed-settings must register the fail-open aitools built-in enforcement hook" >&2
+                  exit 1
+                fi
+                if ! jq -e '[.PreToolUse[].hooks[] | select(.command | endswith("/aitools-rewrite"))] | length == 1 and all(has("onFailure") | not)' <<< "$claudeHooksJson" >/dev/null; then
+                  echo "aitools-rewrite must remain fail-open" >&2
+                  exit 1
+                fi
                 if ! jq -e '.PostToolUse | length == 1 and .[0].matcher == "" and (.[0].hooks | length == 1 and (.[0] | .type == "command" and (.command | test("^/nix/store/[^/]+-redact-secrets$")) and (has("onFailure") | not)))' <<< "$claudeHooksJson" >/dev/null; then
                   echo "managed-settings must register redact-secrets as the only PostToolUse hook, for every tool" >&2
                   exit 1
@@ -684,6 +709,25 @@
                     "x86_64-linux"
                   ])
                   {
+                    aitools-path =
+                      let
+                        hosts = {
+                          darwin = self.darwinConfigurations.M4-Max.config.home-manager.users.take.home.packages;
+                          linux = self.nixosConfigurations.X13Gen2.config.home-manager.users.take.home.packages;
+                        };
+                        installed = builtins.mapAttrs (
+                          _: packages: builtins.filter (p: pkgs.lib.getName p == "aitools") packages
+                        ) hosts;
+                        native = if pkgs.stdenv.hostPlatform.isDarwin then installed.darwin else installed.linux;
+                      in
+                      assert builtins.all (packages: builtins.length packages == 1) (builtins.attrValues installed);
+                      pkgs.runCommand "aitools-path-test" { nativeBuildInputs = native; } ''
+                        # Both hosts must include aitools in the home profile. Execute only the
+                        # native host's binary; the other platform runs this check on its builder.
+                        test "$(command -v aitools)" = "${pkgs.lib.getExe (builtins.head native)}"
+                        aitools --version
+                        touch $out
+                      '';
                     codex-hooks =
                       let
                         isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
@@ -735,15 +779,17 @@
                               root = Path(hooks["managed_dir"])
                               assert root.is_absolute() and root.is_dir()
                               entries = hooks["PreToolUse"]
-                              assert entries and all(entry["matcher"] == "^Bash$" for entry in entries)
+                              assert [entry["matcher"] for entry in entries] == ["^Bash$", "^(apply_patch|Edit|Write)$"]
                               commands = [hook["command"] for entry in entries for hook in entry["hooks"]]
-                              expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex"]
-                              assert sorted(commands) == sorted(str(root / name) for name in expected)
+                              expected = ["guard-and-guide", "block-destructive-git", "aitools-rewrite-codex", "aitools-builtins-codex"]
+                              assert commands == [str(root / name) for name in expected]
+                              assert all("onFailure" not in hook for entry in entries for hook in entry["hooks"])
                               for command in commands:
                                   path = Path(command)
                                   assert path.is_file() and not path.is_symlink() and os.access(path, os.X_OK)
                               assert "--agent claude-code" in (root / "guard-and-guide").read_text()
                               assert "aitools-rewrite.sh codex" in (root / "aitools-rewrite-codex").read_text()
+                              assert "aitools-builtins.sh codex" in (root / "aitools-builtins-codex").read_text()
                               post = hooks["PostToolUse"]
                               assert [entry["matcher"] for entry in post] == ["^Bash$"]
                               assert [hook["command"] for hook in post[0]["hooks"]] == [str(root / "redact-secrets-codex")]

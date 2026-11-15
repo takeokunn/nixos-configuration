@@ -71,6 +71,10 @@ let
     export PATH=${hookPath}:$PATH
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/aitools-rewrite.sh codex
   '';
+  builtinsHook = pkgs.writeShellScript "aitools-builtins-codex" ''
+    export PATH=${hookPath}:$PATH
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/aitools-builtins.sh codex
+  '';
   redact = pkgs.writeShellScript "redact-secrets-codex" ''
     export PATH=${pkgs.jq}/bin:$PATH
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/redact-secrets.sh codex
@@ -80,6 +84,7 @@ let
     cp ${guard} "$out/guard-and-guide"
     cp ${destructiveGit} "$out/block-destructive-git"
     cp ${rewrite} "$out/aitools-rewrite-codex"
+    cp ${builtinsHook} "$out/aitools-builtins-codex"
     cp ${redact} "$out/redact-secrets-codex"
   '';
 in
@@ -105,6 +110,15 @@ in
               "block-destructive-git"
               "aitools-rewrite-codex"
             ];
+      }
+      {
+        matcher = "^(apply_patch|Edit|Write)$";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/aitools-builtins-codex";
+          }
+        ];
       }
     ];
     # Last layer, fail-open like every Codex hook: a failure leaves the output as it was.
