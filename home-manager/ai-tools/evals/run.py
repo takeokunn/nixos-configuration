@@ -513,7 +513,7 @@ def evaluate(check, parsed, meta, fixture, work):
         return (m is not None) == (ctype == "file_matches"), observed
     if ctype == "cmd":
         expect = check.get("expect_exit", 0)
-        env = {**os.environ, "FIXTURE": str(fixture), "WORK": str(work)}
+        env = {**os.environ, "FIXTURE": str(fixture), "WORK": str(work), "EVALS_DIR": str(HERE)}
         try:
             proc = subprocess.run(["sh", "-c", check["run"]], cwd=fixture, env=env,
                                   stdin=subprocess.DEVNULL, capture_output=True, text=True,

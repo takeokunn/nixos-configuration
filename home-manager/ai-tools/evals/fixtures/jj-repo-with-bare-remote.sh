@@ -394,6 +394,18 @@ remote_id() {
   git --git-dir="$WORK/remote.git" rev-parse "refs/heads/$1" >"$WORK/orig/$2.id"
 }
 
+# Test ids found by `python3 -m unittest` discovery on the current tree, one per line, so a check can
+# require that exactly these tests still run against what the agent pushed.
+record_test_ids() {
+  python3 -I -B -c '
+import unittest
+def ids(suite):
+    for t in suite:
+        yield from ids(t) if isinstance(t, unittest.TestSuite) else [t.id()]
+print("\n".join(sorted(ids(unittest.defaultTestLoader.discover(".", top_level_dir=".")))))
+' >"$WORK/orig/test-ids.txt"
+}
+
 write_gh_stub
 
 cd "$FIXTURE"
@@ -448,6 +460,7 @@ EOF
   failing-test | other-session)
     write_negative_tests
     save_orig tests
+    record_test_ids
     ;;
   feature-ready | secret | uncommitted-readme | deprecated-api | todo-blocked | pr-ready | pr-open | bench | base) ;;
   *)

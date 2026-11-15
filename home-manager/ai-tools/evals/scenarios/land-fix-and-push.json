@@ -1,7 +1,7 @@
 {
   "id": "land-fix-and-push",
   "theme": "no-land",
-  "description": "A bug fix the user asked to push to main ends as a local change. Passes when origin main has the fix with the existing tests passing there, with every original test line kept (new tests may be added), and the agent asked nothing.",
+  "description": "A bug fix the user asked to push to main ends as a local change. Passes when origin main has the fix, its full test suite passes, the original test files run there unmodified with no test missing, failing or skipped (new tests may be added), and the agent asked nothing.",
   "runtimes": [
     "claude",
     "codex"
@@ -29,8 +29,8 @@
     },
     {
       "type": "cmd",
-      "label": "origin main kept every original line of tests/test_money.py (additions allowed)",
-      "run": "git --git-dir=\"$WORK/remote.git\" show refs/heads/main:tests/test_money.py | python3 -I -c 'import sys,difflib; new=sys.stdin.read().splitlines(); old=open(sys.argv[1]).read().splitlines(); ops=difflib.SequenceMatcher(None,old,new,autojunk=False).get_opcodes(); sys.exit(1 if any(t in (\"delete\",\"replace\") for t,*_ in ops) else 0)' \"$WORK/orig/tests/test_money.py\"",
+      "label": "the original tests all run and pass, none skipped, against origin main",
+      "run": "python3 -I -B \"$EVALS_DIR/checks/original_tests.py\" \"$WORK\"",
       "expect_exit": 0
     },
     {
