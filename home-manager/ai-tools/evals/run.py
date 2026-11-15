@@ -225,8 +225,15 @@ def build_command(scenario, runtime, variant, fixture, work, args):
         sandbox = ["-c", 'sandbox_mode="workspace-write"',
                    "-c", "sandbox_workspace_write.network_access=true",
                    "-c", f"sandbox_workspace_write.writable_roots={json.dumps(roots)}"]
-    return (["codex", "exec", "--json", "--skip-git-repo-check", "-C", str(fixture), *sandbox,
-             prompt], {})
+    # Codex 0.167.1 persists trust for a cwd with no trust level when the sandbox can write it
+    # (app-server thread_processor.rs: `config.active_project.trust_level.is_none()` guards
+    # set_project_trust_level), which appended fixture paths to the user's config.toml. Declaring the
+    # fixture trusted for this invocation only makes that guard false; -c is not written back. The
+    # key is the physical path because that is the key Codex wrote. An inline table is used because
+    # Codex splits a dotted -c key on every '.'.
+    trust = ["-c", f"projects={{ {json.dumps(str(fixture.resolve()))} = {{ trust_level = \"trusted\" }} }}"]
+    return (["codex", "exec", "--json", "--skip-git-repo-check", "-C", str(fixture), *trust,
+             *sandbox, prompt], {})
 
 
 def kill_group(proc):
