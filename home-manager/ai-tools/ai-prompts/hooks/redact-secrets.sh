@@ -13,15 +13,26 @@
 #
 # No match prints nothing. Any failure of the hook itself (unreadable JSON, jq missing) also prints
 # nothing and exits 0: stdout is recorded in the transcript and stderr may be shown, so neither may
-# carry the input, and an exit status other than 0 does not stop the output in either agent.
+# carry the input (jq's parse errors quote it), and an exit status other than 0 does not stop the
+# output in either agent.
+#
+# jq 1.8 rejects a lone high UTF-16 surrogate escape (`\ud83d` cut from its pair, as in truncated
+# output), which would let every token in the same response through. Only when the first parse fails,
+# the raw text is reparsed with each lone surrogate escape turned into `�`; pairs are kept. The
+# pattern only touches backslash runs before a surrogate-range `u`, so the retry costs no more than
+# the first pass on ordinary output; the run's length tells an escape from an escaped backslash.
 #
 # Rule notes:
 #   github-token and github-pat follow GitHub's documented prefixes and lengths.
-#   nix-access-tokens takes the rest of the line, since nix.conf's access-tokens is a space-separated
-#     list of host=token pairs and `\S+` would stop after the first.
+#   nix-access-tokens covers nix.conf's space-separated host=token list. A value starting with a quote,
+#     `$`, `(`, or a backtick is source code building the setting, not a token, and is left alone; a
+#     value stops at whitespace, a quote, or a backtick so surrounding quoting survives.
 #   credential-password matches only at a line start, the form `git credential fill` and credential
 #     helpers print (`password=<value>`), so prose such as "set password=..." mid-line is left alone.
-#   authorization-header needs a scheme and a value, so a bare `Authorization: Bearer` is left alone.
+#   authorization-header requires a value of at least 8 characters that does not start with `$ ( " ' `
+#     < {` (a variable, substitution, or placeholder) and that has a digit, an uppercase letter, or one
+#     of `_+/=~` after its first character. Prose such as "authorization: basic authentication." has
+#     none of those; tokens and base64 credentials practically always do. The value stops like above.
 
 set -uo pipefail
 
@@ -31,16 +42,27 @@ claude | codex) ;;
 *) exit 0 ;;
 esac
 
-out=$(jq -c --arg mode "$mode" '
-  def rules: [
-    {name: "github-pat", re: "github_pat_[A-Za-z0-9_]{60,}", flags: "g"},
-    {name: "github-token", re: "gh[pousr]_[A-Za-z0-9]{36,}", flags: "g"},
-    {name: "nix-access-tokens", re: "access-tokens *= *\\S[^\\r\\n]*", flags: "g"},
-    {name: "credential-password", re: "(?m)^password=[^\\r\\n]+", flags: "g"},
-    {name: "authorization-header", re: "Authorization: *(token|bearer|basic) +\\S+", flags: "gi"}
-  ];
-  def redact: reduce rules[] as $r (.; gsub($r.re; "[REDACTED:\($r.name)]"; $r.flags));
+read -r -d '' defs <<'JQ'
+def rules: [
+  {name: "github-pat", re: "github_pat_[A-Za-z0-9_]{60,}"},
+  {name: "github-token", re: "gh[pousr]_[A-Za-z0-9]{36,}"},
+  {name: "nix-access-tokens", re: "access-tokens *= *[A-Za-z0-9./:_-]+=[^\\s\"'`$(][^\\s\"'`]*(?: +[A-Za-z0-9./:_-]+=[^\\s\"'`$(][^\\s\"'`]*)*"},
+  {name: "credential-password", re: "(?m)^password=[^\\r\\n]+"},
+  {name: "authorization-header", re: "(?i:authorization: *(?:token|bearer|basic) +)(?![$(\"'`<{])(?=[^\\s\"'`]{8})(?=[^\\s\"'`][^\\s\"'`]*[0-9A-Z_+/=~])[^\\s\"'`]+"}
+];
+def redact: reduce rules[] as $r (.; gsub($r.re; "[REDACTED:\($r.name)]"; "g"));
 
+# b: the whole run of backslashes before `u` (odd length means the last one starts an escape);
+# h: the surrogate's hex digits; l: a directly following low-surrogate escape.
+def fix_surrogates:
+  gsub("(?<!\\\\)(?<b>\\\\+)u(?<h>[dD][89a-fA-F][0-9a-fA-F]{2})(?<l>\\\\u[dD][c-fC-F][0-9a-fA-F]{2})?";
+    (.b | length % 2 == 1) as $escape
+    | (.h | test("^[dD][89abAB]")) as $high
+    | .b + if $escape and $high and .l then "u" + .h + .l
+           elif $escape then "ufffd" + (if .l then "\\ufffd" else "" end)
+           else "u" + .h + (if .l then "\\ufffd" else "" end) end);
+
+def main:
   .tool_response as $orig
   | ($orig | (.. | strings) |= redact) as $red
   | if $red == $orig then empty
@@ -52,8 +74,14 @@ out=$(jq -c --arg mode "$mode" '
         + if ((.tool_name | strings) // "" | startswith("mcp__"))
           then {updatedMCPToolOutput: $red}
           else {updatedToolOutput: $red} end)}
-    end
-' 2>/dev/null) || exit 0
+    end;
+JQ
+
+# `read -d ''` stops at end of input (status 1) or at a NUL byte, which JSON text cannot contain.
+IFS= read -r -d '' input
+out=$(printf '%s' "$input" | jq -c --arg mode "$mode" "$defs main" 2>/dev/null) ||
+  out=$(printf '%s' "$input" | jq -c -R -s --arg mode "$mode" "$defs fix_surrogates | fromjson | main" 2>/dev/null) ||
+  exit 0
 
 [[ -n $out ]] && printf '%s\n' "$out"
 exit 0

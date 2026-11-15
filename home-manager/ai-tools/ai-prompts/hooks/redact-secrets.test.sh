@@ -24,7 +24,7 @@ fail() {
 gh_tok='ghp_FAKE0123456789abcdefghijABCDEFGHIJKL' # gitleaks:allow
 gho_tok='gho_FAKEzyxwvutsrqponmlkjihgfedcba987654' # gitleaks:allow
 pat_tok='github_pat_FAKE_11ABCDEFG0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN'
-fakes=("$gh_tok" "$gho_tok" "$pat_tok" 'FAKEPASSWORDVALUE' 'FAKEAUTHVALUE' 'FAKENIXVALUE')
+fakes=("$gh_tok" "$gho_tok" "$pat_tok" 'FAKEPASSWORDVALUE' 'FAKEAUTHVALUE' 'FAKENIXVALUE' 'FAKExyzNIX')
 
 # Runs the hook with $2 on stdin in mode $1; sets got, err, rc.
 run_hook() {
@@ -150,6 +150,43 @@ expect_untouched claude near-authorization-no-value "$(bash_resp $'Authorization
 expect_untouched codex near-codex "$(bash_resp 'nothing here')"
 expect_untouched claude no-strings '{"interrupted":false,"n":3,"list":[1,null,true]}'
 expect_untouched claude no-response 'null'
+
+# Source text that builds a credential setting or header from a variable or command is not a secret.
+expect_untouched claude near-nix-config-source "$(bash_resp '  set -x NIX_CONFIG "access-tokens = github.com="(gh auth token)')"
+expect_untouched claude near-nix-config-variable "$(bash_resp $'access-tokens = github.com=$GH_TOKEN\naccess-tokens = github.com=\'x\'')"
+expect_untouched claude near-authorization-variable "$(bash_resp $'curl -H "Authorization: Bearer $TOKEN" url\ncurl -H "Authorization: token ${GH_TOKEN}"\nAuthorization: Bearer $(gh auth token)\nAuthorization: Bearer <YOUR_TOKEN>')"
+expect_untouched claude near-authorization-prose "$(bash_resp $'HTTP authorization: basic auth is enough\nAuthorization: basic authentication.\nauthorization: token-based\nauthorization: token v2')"
+
+# expect_exact LABEL RAW_PAYLOAD EXPECTED: claude mode, updatedToolOutput.stdout must equal EXPECTED.
+expect_exact() {
+  checked=$((checked + 1))
+  run_hook claude "$2"
+  local actual
+  actual=$(jq -r '.hookSpecificOutput.updatedToolOutput.stdout' <<<"$got" 2>/dev/null) || actual="<not JSON: $got>"
+  [[ $rc -eq 0 && $actual == "$3" ]] || fail "$1: expected [$3], got [$actual]"
+  no_fakes "$1" "$got"
+}
+stdout_payload() {
+  jq -cn --arg s "$1" '{tool_name:"Bash",tool_response:{stdout:$s}}'
+}
+
+# The value stops before a closing quote, so the surrounding quoting survives.
+expect_exact authorization-quoted "$(stdout_payload "curl -H \"Authorization: token $gh_tok\" url")" \
+  'curl -H "[REDACTED:authorization-header]" url'
+expect_exact nix-access-tokens-pairs "$(stdout_payload "access-tokens = github.com=$gh_tok gitlab.com=FAKExyzNIX")" \
+  '[REDACTED:nix-access-tokens]'
+expect_exact nix-config-quoted "$(stdout_payload 'NIX_CONFIG="access-tokens = github.com=FAKENIXVALUE" nix build')" \
+  'NIX_CONFIG="[REDACTED:nix-access-tokens]" nix build'
+
+# jq rejects a lone high surrogate escape; the retry must still redact, keep a valid pair and an escaped
+# backslash before `u` as they are, and turn only the lone ones into U+FFFD.
+expect_exact lone-surrogate \
+  "{\"tool_name\":\"Bash\",\"tool_response\":{\"stdout\":\"token $gh_tok cut \\ud83d lit \\\\ud83d pair \\ud83d\\ude00 low \\ude00 end \\ud83d\"}}" \
+  "token [REDACTED:github-token] cut $(printf '\xef\xbf\xbd') lit \\ud83d pair $(printf '\xf0\x9f\x98\x80') low $(printf '\xef\xbf\xbd') end $(printf '\xef\xbf\xbd')"
+checked=$((checked + 1))
+run_hook codex "{\"tool_name\":\"Bash\",\"tool_response\":\"$gh_tok \\ud800\"}"
+[[ $(jq -r .reason <<<"$got" 2>/dev/null) == "[REDACTED:github-token] $(printf '\xef\xbf\xbd')" ]] ||
+  fail "codex lone surrogate: got [$got]"
 
 # A missing or non-string tool_name must not stop the redaction.
 for name in '' ',"tool_name":7'; do
