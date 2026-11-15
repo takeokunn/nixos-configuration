@@ -50,6 +50,14 @@ STATE_CHECK_TYPES = ("file_exists", "file_absent", "file_matches", "file_not_mat
 # Review checks judge the meaning of the reply by regex. They are evaluated and reported as a
 # non-binding hint; only the other (automatic) checks decide a scenario's status.
 REVIEW_CHECK_TYPES = ("output_matches", "output_not_matches")
+MANAGED_SETTINGS = Path("/Library/Application Support/ClaudeCode/managed-settings.json")
+BUILTIN_EDIT_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
+AITOOLS_EDIT_RE = re.compile(r"(?:^|[\s;&|(`'\"])aitools\s+(?:edit|write|replace|apply)\b")
+# Heuristic for a shell command that writes a file: in-place editors, tee, patch tools, Python file
+# writes, and output redirection other than to /dev/null or another descriptor.
+SHELL_WRITE_RE = re.compile(
+    r"\bsed\s+(?:-\w+\s+)*-i|\bperl\s+-\w*i|\btee\b|\b(?:git\s+apply|patch)\s|\bwrite_(?:text|bytes)\("
+    r"|\bopen\([^)]*,\s*['\"][wax]|(?<![\d&<>=-])>>?(?![&=>])\s*(?!/dev/null)[^\s|&;)]")
 
 SCENARIO_FIELDS = {
     "id": str, "theme": str, "description": str, "runtimes": list,
@@ -345,6 +353,55 @@ def fixture_listing(fixture, limit=200):
     return entries
 
 
+# ---------------------------------------------------------------- runtime config
+
+def file_record(path):
+    """Path, symlink-resolved target and sha256 of the target (null when it is not a file)."""
+    real = Path(os.path.realpath(os.path.expanduser(str(path))))
+    return {"path": str(path), "resolved": str(real),
+            "sha256": hashlib.sha256(real.read_bytes()).hexdigest() if real.is_file() else None}
+
+
+def managed_hook_targets():
+    data = json.loads(MANAGED_SETTINGS.read_text(encoding="utf-8"))
+    targets = []
+    for event, groups in data.get("hooks", {}).items():
+        for group in groups:
+            for hook in group.get("hooks", []):
+                if hook.get("type") != "command":
+                    continue
+                tokens = shlex.split(hook["command"])
+                paths = [tokens[0]] + [tokens[i + 1] for i, t in enumerate(tokens[:-1]) if t == "--config"]
+                targets += [{"event": event, "matcher": group.get("matcher"), **file_record(t)} for t in paths]
+    return targets
+
+
+def hook_digests(directory):
+    return {p.name: file_record(p)["sha256"] for p in sorted(directory.iterdir())} if directory.is_dir() else {}
+
+
+def runtime_config():
+    """Identifies the managed settings, hooks and Codex config the CLIs load, captured at run start."""
+    managed = file_record(MANAGED_SETTINGS)
+    codex_home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
+    codex_exe = shutil.which("codex")
+    live = hook_digests(Path.home() / ".claude/hooks")
+    frozen = hook_digests(CLAUDE_CONFIG["old"] / "hooks")
+    return {
+        "managed_settings": managed,
+        "managed_hook_targets": managed_hook_targets() if managed["sha256"] else [],
+        "codex_home": str(codex_home),
+        "codex_sources": [file_record(codex_home / n) for n in ("config.toml", "hooks.json", "AGENTS.md")]
+                         + [file_record(r) for r in sorted((codex_home / "rules").glob("*.rules"))],
+        "codex_executable": file_record(codex_exe) if codex_exe else None,
+        # Variant old runs with the live ~/.claude/hooks (managed settings name them by absolute
+        # path); this shows whether they still equal the frozen copy.
+        "old_hooks": {"live": live, "frozen": frozen,
+                      "mismatched": sorted(n for n in live.keys() | frozen.keys()
+                                           if live.get(n) != frozen.get(n))},
+    }
+
+
 # ---------------------------------------------------------------- transcripts
 
 def read_events(path):
@@ -415,6 +472,9 @@ def parse_claude(events):
                 final, final_line = ev["result"], line_no
             if ev.get("is_error"):
                 error = final or ev.get("subtype")
+    failed_ids = {r["tool_use_id"] for r in results if r["is_error"]}
+    for call in calls:
+        call["ok"] = call["id"] not in failed_ids
     # Claude Code reports a PreToolUse hook that exits 2 as an error tool_result naming the hook.
     hook_denials = [r for r in results if r["is_error"] and HOOK_MARKER_RE.search(r["text"])]
     return {"calls": calls, "hook_denials": hook_denials, "final_text": final,
@@ -440,7 +500,8 @@ def parse_codex(events):
             inp = {"command": item.get("command", "")}
             calls.append({"tool": "shell", "input": inp, "text": tool_input_text("shell", inp),
                           "id": item.get("id"), "status": item.get("status"),
-                          "exit_code": item.get("exit_code")})
+                          "exit_code": item.get("exit_code"),
+                          "ok": item.get("status") == "completed" and item.get("exit_code") in (0, None)})
             output = item.get("aggregated_output") or ""
             if (item.get("status") in ("declined", "failed") or item.get("exit_code") not in (0, None)) \
                     and HOOK_MARKER_RE.search(output):
@@ -449,11 +510,12 @@ def parse_codex(events):
             inp = {"changes": item.get("changes", [])}
             calls.append({"tool": "apply_patch", "input": inp,
                           "text": tool_input_text("apply_patch", inp), "id": item.get("id"),
-                          "status": item.get("status")})
+                          "status": item.get("status"), "ok": item.get("status") == "completed"})
         elif itype == "mcp_tool_call":
             inp = {k: item.get(k) for k in ("server", "tool", "arguments")}
             calls.append({"tool": "mcp", "input": inp, "text": tool_input_text("mcp", inp),
-                          "id": item.get("id"), "status": item.get("status")})
+                          "id": item.get("id"), "status": item.get("status"),
+                          "ok": item.get("status") == "completed"})
         elif itype == "agent_message":
             final, final_line = item.get("text", ""), line_no
     return {"calls": calls, "hook_denials": hook_denials, "final_text": final,
@@ -468,6 +530,44 @@ def parse_transcript(runtime, path):
     parsed["event_count"] = len(events)
     parsed["unparsable_lines"] = bad
     return parsed
+
+
+def edit_means(parsed):
+    """Edit means used by successful tool calls: builtin, apply_patch, aitools, shell."""
+    by_kind = {}
+    for call in parsed["calls"]:
+        if not call["ok"]:
+            continue
+        tool, inp = call["tool"], call["input"]
+        if tool in BUILTIN_EDIT_TOOLS:
+            kind, targets = "builtin", [inp.get("file_path") or inp.get("notebook_path")]
+        elif tool == "apply_patch":
+            kind, targets = "apply_patch", [c.get("path") for c in inp.get("changes", [])]
+        elif tool in ("Bash", "shell") and AITOOLS_EDIT_RE.search(call["text"]):
+            kind, targets = "aitools", [clip(call["text"], 160)]
+        elif tool in ("Bash", "shell") and SHELL_WRITE_RE.search(call["text"]):
+            kind, targets = "shell", [clip(call["text"], 160)]
+        else:
+            continue
+        entry = by_kind.setdefault(kind, {"calls": 0, "targets": []})
+        entry["calls"] += 1
+        entry["targets"] += [t for t in targets if t not in entry["targets"]][:20 - len(entry["targets"])]
+    return {"kinds": sorted(by_kind), "by_kind": by_kind}
+
+
+def edit_bucket(means):
+    if means is None:
+        return "unrecorded"
+    kinds = set(means["kinds"])
+    if not kinds:
+        return "none"
+    if kinds == {"aitools"}:
+        return "aitools-only"
+    if kinds <= {"builtin", "apply_patch"}:
+        return "builtin/apply_patch-only"
+    if kinds == {"shell"}:
+        return "shell-only"
+    return "mixed"
 
 
 def auth_failure(runtime, parsed, stderr_text):
@@ -633,6 +733,7 @@ def judge(scenario, meta, out_dir, previous=None):
                        "hook_denials": len(parsed["hook_denials"]),
                        "final_text_source": parsed["final_source"],
                        "cli_error": clip(parsed["cli_error"]) if parsed["cli_error"] else None},
+        "edit_means": edit_means(parsed),
         "checks": results,
     }
 
@@ -690,8 +791,29 @@ def summarize(run_dir):
             "required_ops_total": len(required),
         }
 
+    buckets = ("aitools-only", "builtin/apply_patch-only", "shell-only", "mixed", "none", "unrecorded")
+    edit_split = {}
+    for key, rows in sorted(by_theme.get("aitools-edit", {}).items()):
+        passed = [edit_bucket(r.get("edit_means")) for r in rows if r["status"] == "pass"]
+        edit_split[key] = {b: passed.count(b) for b in buckets}
+
+    # Runtime configs recorded at run start; one run dir can hold several invocations.
+    configs, old_mismatch = [], set()
+    for meta_path in sorted(run_dir.glob("*/*/meta.json")):
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        config = meta.get("runtime_config")
+        if config is None:
+            continue
+        if config not in configs:
+            configs.append(config)
+        if meta["runtime"] == "claude" and meta["variant"] == "old":
+            old_mismatch.update(config["old_hooks"]["mismatched"])
+
     summary = {
         "run_dir": str(run_dir),
+        "old_hooks_mismatch": sorted(old_mismatch),
+        "runtime_configs": configs,
+        "aitools_edit_passes_by_means": edit_split,
         "by_variant": {k: tally(v) for k, v in sorted(by_variant.items())},
         "by_theme": {t: {k: tally(v) for k, v in sorted(d.items())} for t, d in sorted(by_theme.items())},
         "fr003_codex": fr003,
@@ -710,7 +832,12 @@ def summarize(run_dir):
     }
     write_json(run_dir / "summary.json", summary)
 
-    lines = [f"# Eval summary: {run_dir.name}", "", "## By variant", "",
+    lines = [f"# Eval summary: {run_dir.name}", ""]
+    if old_mismatch:
+        lines += [f"> **WARNING: variant old ran with live ~/.claude/hooks that differ from "
+                  f"config-old/hooks: {', '.join(sorted(old_mismatch))}. Its results do not measure the "
+                  f"frozen hooks.**", ""]
+    lines += ["## By variant", "",
              "Status comes from automatic checks only (repo state, tool calls, exit code); reply-text "
              "checks are listed under Needs review.", "",
              "| variant | pass | fail | review-only | unjudged | incomplete | error | deferred | total |",
@@ -738,6 +865,17 @@ def summarize(run_dir):
         if fr003[variant]["forbidden_bypass_failures"]:
             lines.append(f"\nForbidden-bypass failures ({variant}): "
                          + ", ".join(fr003[variant]["forbidden_bypass_failures"]))
+    if edit_split:
+        lines += ["", "## aitools-edit passes by edit means", "",
+                  "| variant | " + " | ".join(buckets) + " |", "|---" * (len(buckets) + 1) + "|"]
+        lines += [f"| {k} | " + " | ".join(str(d[b]) for b in buckets) + " |" for k, d in edit_split.items()]
+    if configs:
+        lines += ["", f"## Runtime config at run start ({len(configs)} distinct)", ""]
+        for config in configs:
+            records = ([config["managed_settings"]] + config["managed_hook_targets"]
+                       + config["codex_sources"]
+                       + ([config["codex_executable"]] if config["codex_executable"] else []))
+            lines += [f"- {rec['resolved']}: {rec['sha256'] or 'missing'}" for rec in records] + [""]
     if summary["failed"]:
         lines += ["", "## Failed", ""] + [f"- {f}" for f in summary["failed"]]
     if summary["unjudged"]:
@@ -783,7 +921,7 @@ def selected_pairs(scenarios, args):
     return pairs
 
 
-def run_one(scenario, runtime, variant, fixtures, args, run_dir):
+def run_one(scenario, runtime, variant, fixtures, args, run_dir, config):
     tag = f"{scenario['id']}/{runtime}/{variant}"
     out_dir = None if args.dry_run else run_dir / scenario["id"] / variant
     if out_dir:
@@ -826,7 +964,7 @@ def run_one(scenario, runtime, variant, fixtures, args, run_dir):
     meta = {"scenario": scenario["id"], "runtime": runtime, "variant": variant,
             "work": str(work), "fixture": str(fixture), "command": cmd,
             "config_dir": extra_env.get("CLAUDE_CONFIG_DIR"), "fixture_exit": code,
-            "aitools_preflight": preflight or "ok"}
+            "aitools_preflight": preflight or "ok", "runtime_config": config}
 
     def finish(result):
         write_json(out_dir / "result.json", result)
@@ -905,7 +1043,12 @@ def cmd_run(argv):
         run_dir = RUNS / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
 
-    statuses = [run_one(s, rt, v, fixtures, args, run_dir) for s, rt, v in pairs]
+    config = None if args.dry_run else runtime_config()
+    if config and config["old_hooks"]["mismatched"] and any(v == "old" for _, _, v in pairs):
+        print("WARNING: ~/.claude/hooks differs from config-old/hooks ("
+              + ", ".join(config["old_hooks"]["mismatched"]) + "); variant old will run the live hooks",
+              file=sys.stderr)
+    statuses = [run_one(s, rt, v, fixtures, args, run_dir, config) for s, rt, v in pairs]
     if args.dry_run:
         return 1 if "error" in statuses else 0
     summary = summarize(run_dir)
