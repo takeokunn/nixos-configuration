@@ -1,32 +1,36 @@
-#+STARTUP: fold
+#+STARTUP: content
 * First Installation (X13Gen2)
 
-X13Gen2 boots through Secure Boot (lanzaboote), unlocks LUKS with the TPM plus a PIN, and recreates ~/~ and ~/home~ on every boot; only ~/persist~, ~/nix~ and ~/var/log~ survive. Secrets (the home Wi-Fi and the login password) come from sops, decrypted with the machine's SSH host key.
-
-The disk layout, the LUKS sector size and the btrfs checksum can only be chosen when the disk is formatted, so this guide reinstalls from scratch.
+X13Gen2 boots through Secure Boot (lanzaboote), unlocks LUKS with the TPM plus a PIN, and recreates ~/~ and ~/home~ on every boot; only ~/persist~, ~/nix~ and ~/var/log~ survive.
 
 ** Before You Start
 
-Do these on the old system, in this order:
+On the current system:
 
 1. Apply firmware and Secure Boot database (dbx) updates with ~fwupdmgr update~. The TPM unlock is bound to PCR 7, which these updates change, so they must happen before the TPM is enrolled.
 2. Copy everything you want to keep out of the machine. The install erases the disk.
+
+Boot the NixOS installer USB, open a shell with ~nix-shell -p nvme-cli~, and erase the drive:
+
 3. Check whether the NVMe drive offers a 4096-byte LBA format:
    #+begin_src shell
      sudo nvme id-ns -H /dev/nvme0n1 | grep "LBA Format"
    #+end_src
-   If a 4096-byte format is listed, switch to it with ~sudo nvme format /dev/nvme0n1 --lbaf=<index>~ (this erases the drive). Otherwise erase it with ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~ so no old data, including previously leaked secrets, survives.
-4. In the firmware setup, clear the TPM and put Secure Boot into Setup Mode.
+   If a 4096-byte format is listed, switch to it and erase the drive with ~sudo nvme format /dev/nvme0n1 --lbaf=<index> --ses=1~. Otherwise erase it with ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~.
 
-The repository must already contain ~secrets/x13gen2.yaml~ (see [[*Secrets][Secrets]]) and ~hosts/X13Gen2/u2f-keys~ (see [[*YubiKey][YubiKey]]).
+In the firmware setup:
+
+4. Clear the TPM so nothing from the old install stays enrolled, and put Secure Boot into Setup Mode.
+
+nixos-anywhere installs from GitHub, so the main branch must already contain ~secrets/x13gen2.yaml~ (see [[*Secrets][Secrets]]) and ~hosts/X13Gen2/u2f-keys~ (see [[*YubiKey][YubiKey]]). Push any change to them before installing.
 
 ** Install with nixos-anywhere
 
 Boot the NixOS installer USB on the target, connect to the network (~nmtui~), set a password for the ~nixos~ user with ~passwd~, and note the address from ~ip addr~.
 
-From another machine with Nix, restore the SSH host key from pass into a staging directory and install. The host key must be placed before the first boot because sops derives its decryption key from it.
+On the Mac, which holds the pass store, restore the SSH host key into a staging directory and install. Run this in bash, not fish. The host key must be placed before the first boot because sops derives its decryption key from it.
 
-#+begin_src shell
+#+begin_src bash
   stage=$(mktemp -d)
   install -d -m 755 "$stage/persist/etc/ssh"
   pass show x13gen2/ssh_host_ed25519_key > "$stage/persist/etc/ssh/ssh_host_ed25519_key"
@@ -48,8 +52,10 @@ From another machine with Nix, restore the SSH host key from pass into a staging
 
 ** First Boot
 
-1. On the first boot, lanzaboote generates Secure Boot keys in ~/var/lib/sbctl~, enrolls them (keeping Microsoft's keys) and reboots. Unlock with the temporary passphrase.
-2. In the firmware setup, confirm Secure Boot is enabled, then check from NixOS:
+Until step 3 is done, every boot asks for the temporary passphrase.
+
+1. On the first boot, lanzaboote generates Secure Boot keys in ~/var/lib/sbctl~, enrolls them and reboots.
+2. After that reboot, check that Secure Boot is on. If it reports disabled, enable Secure Boot in the firmware setup.
    #+begin_src shell
      bootctl status | grep "Secure Boot"
    #+end_src
@@ -59,8 +65,11 @@ From another machine with Nix, restore the SSH host key from pass into a staging
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --recovery-key
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=password
    #+end_src
-   Store the printed recovery key in pass. It is the only way in when a firmware update changes PCR 7.
-4. Join the tailnet: ~tailscale up~.
+   Store the printed recovery key in pass on the Mac. When a firmware update changes PCR 7, the TPM no longer unlocks the disk: unlock with the recovery key, then enroll the TPM again:
+   #+begin_src shell
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
+   #+end_src
+4. Join the tailnet: ~sudo tailscale up~.
 
 ** Secrets
 
@@ -71,27 +80,32 @@ From another machine with Nix, restore the SSH host key from pass into a staging
 
 Edit it on the Mac with ~sops secrets/x13gen2.yaml~.
 
+If the host key in pass is lost, generate a new one, replace the ~x13gen2~ recipient in ~.sops.yaml~ with the output of ~ssh-to-age < ssh_host_ed25519_key.pub~, run ~sops updatekeys secrets/x13gen2.yaml~, and store the new key in pass.
+
 ** YubiKey
 
-sudo, the greeter and the lock screen accept a YubiKey touch and fall back to the password. Register a key on any machine with the key plugged in:
+sudo, the greeter and the lock screen accept a YubiKey touch and fall back to the password. Register a key from the repository root on any machine with the key plugged in:
 
 #+begin_src shell
   nix shell nixpkgs#pam_u2f -c pamu2fcfg -u take -o pam://X13Gen2 -i pam://X13Gen2 > hosts/X13Gen2/u2f-keys
 #+end_src
 
-USBGuard blocks USB devices plugged in after boot unless [[file:../nixos/config/security.nix][nixos/config/security.nix]] allows them; Yubico devices, hubs and internal ports are allowed. Allow another device with ~sudo usbguard allow-device <id>~ (list blocked ones with ~sudo usbguard list-devices --blocked~).
+~>~ replaces the registered keys. To add a second key, run ~pamu2fcfg -n -o pam://X13Gen2 -i pam://X13Gen2 >> hosts/X13Gen2/u2f-keys~ instead.
+
+USBGuard blocks every USB device that no rule in [[file:../nixos/config/security.nix][nixos/config/security.nix]] allows; Yubico devices, hubs and internal ports are allowed. List blocked devices with ~sudo usbguard list-devices --blocked~ and allow one until it is unplugged with ~sudo usbguard allow-device <id>~. Add a rule to allow it permanently.
 
 ** Update Configuration
+
+From a clone of this repository:
 
 #+begin_src shell
   sudo nixos-rebuild switch --flake .#X13Gen2
 #+end_src
 
-The ~rescue~ boot entry starts the same system without the ~/etc~ overlay and USBGuard, for recovering from either.
+The ~rescue~ boot entry starts the same system without the ~/etc~ overlay and USBGuard, for recovering when either of them breaks boot or blocks a needed device.
 
 ** Notes
 
-- ~@root~ (which contains ~/home~) is moved aside and recreated on every boot, after any resume from hibernation; old roots are kept for 7 days ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]). Persisted paths are listed there and in [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]].
+- Old roots are kept for 7 days in ~/.btrfs/@old_roots~ ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]). Persisted paths are listed there and in [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]].
 - btrbk snapshots ~@persist~ hourly into ~@snapshots~ (~/.btrfs/@snapshots~); container images live in ~@containers~ and are not snapshotted.
-- Closing the lid suspends, then hibernates after two hours.
-- DNS goes to Quad9 over TLS. On a captive portal, run ~resolvectl dnsovertls <link> no~ until signed in.
+- DNS goes to Quad9 over TLS. On a captive portal, find the Wi-Fi link with ~resolvectl status~ and run ~resolvectl dnsovertls <link> no~ until signed in.

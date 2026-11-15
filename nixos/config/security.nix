@@ -27,6 +27,8 @@
       authfile = ../../hosts/X13Gen2/u2f-keys;
     };
   };
+  # hyprlock comes from home-manager, which cannot declare a PAM service; without one it cannot unlock.
+  security.pam.services.hyprlock = { };
 
   # Blocks USB devices plugged in later unless a rule allows them; internal ports stay usable.
   services.usbguard = {
