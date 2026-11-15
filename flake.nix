@@ -562,7 +562,7 @@
                   echo "managed-settings permissions.ask must be empty" >&2
                   exit 1
                 fi
-                for rule in mcp__plugin_hm_slite__archive-note mcp__plugin_hm_slite__remove-blocks mcp__plugin_hm_clickup__clickup_delete_task mcp__plugin_hm_clickup__clickup_delete_comment mcp__plugin_hm_clickup__clickup_delete_chat_message mcp__plugin_hm_clickup__clickup_merge_tasks; do
+                for rule in mcp__slite__archive-note mcp__slite__remove-blocks mcp__clickup__clickup_delete_task mcp__clickup__clickup_delete_comment mcp__clickup__clickup_delete_chat_message mcp__clickup__clickup_merge_tasks; do
                   if ! jq -e --arg r "$rule" '.deny | index($r)' <<< "$permissionsJson" >/dev/null; then
                     echo "managed-settings permissions.deny lost \"$rule\"" >&2
                     exit 1

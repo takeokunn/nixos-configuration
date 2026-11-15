@@ -59,12 +59,14 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns ++ [
-      "mcp__plugin_hm_slite__archive-note"
-      "mcp__plugin_hm_slite__remove-blocks"
-      "mcp__plugin_hm_clickup__clickup_delete_task"
-      "mcp__plugin_hm_clickup__clickup_delete_comment"
-      "mcp__plugin_hm_clickup__clickup_delete_chat_message"
-      "mcp__plugin_hm_clickup__clickup_merge_tasks"
+      # Slite and ClickUp are local-scope servers registered as "slite" and "clickup"; the names
+      # must match these rules (see copy-local-mcp-servers.sh).
+      "mcp__slite__archive-note"
+      "mcp__slite__remove-blocks"
+      "mcp__clickup__clickup_delete_task"
+      "mcp__clickup__clickup_delete_comment"
+      "mcp__clickup__clickup_delete_chat_message"
+      "mcp__clickup__clickup_merge_tasks"
     ];
     # bypassPermissions skips every prompt and the auto-mode classifier; deny rules and the PreToolUse
     # hooks still apply. Ask rules would prompt, including for an already authorized override.
