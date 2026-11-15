@@ -41,8 +41,8 @@
     },
     {
       "type": "output_matches",
-      "label": "plan names slugify",
-      "regex": "slugify"
+      "label": "plan names slugify or its file",
+      "regex": "slugify|\\bslug\\b|text\\.py"
     },
     {
       "type": "output_matches",

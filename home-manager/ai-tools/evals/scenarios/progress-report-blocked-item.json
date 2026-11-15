@@ -36,7 +36,7 @@
     {
       "type": "output_matches",
       "label": "reply names the fx item as not done",
-      "regex": "(?s)(latest_rate|fx\\.py|為替|項目\\s*3|3\\s*つ目|TODO\\s*3).{0,200}(未完了|未実装|未着手|できな|でき(ません|ず)|残|保留|見送|決ま(って|ら)|blocked|not (done|implemented)|unfinished|skipp)|(未完了|未実装|未着手|できな|残|保留|見送|blocked|unfinished).{0,200}(latest_rate|fx\\.py|為替|項目\\s*3)"
+      "regex": "(?s)(latest_rate|fx\\.py|為替|項目\\s*3|3\\s*つ目|3\\s*項目目|三つ目|TODO\\s*3).{0,200}(未完了|未実装|未着手|できな|でき(ません|ず)|残|保留|見送|決ま(って|ら)|blocked|not (done|implemented)|unfinished|skipp)|(未完了|未実装|未着手|できな|残|保留|見送|blocked|unfinished).{0,200}(latest_rate|fx\\.py|為替|項目\\s*3)"
     },
     {
       "type": "output_matches",

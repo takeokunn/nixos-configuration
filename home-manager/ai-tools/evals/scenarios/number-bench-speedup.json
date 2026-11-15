@@ -18,7 +18,7 @@
     {
       "type": "output_matches",
       "label": "flags the number or the result as wrong",
-      "regex": "(?i)誤り|正しくない|一致しない|不一致|結果が(違|異な)|バグ|不自然|ありえない|疑わしい|信用でき|wrong|incorrect|mismatch|\\bbug\\b|implausible|suspicious"
+      "regex": "(?i)誤り|誤っ|間違|正しくない|一致しない|不一致|結果が(違|異な)|バグ|不自然|ありえない|疑わしい|信用でき|wrong|incorrect|mismatch|\\bbug\\b|implausible|suspicious"
     }
   ]
 }
