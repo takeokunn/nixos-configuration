@@ -2,7 +2,7 @@
   nix.settings = {
     cores = 2;
     max-jobs = 6;
-    sandbox = false;
+    allowed-users = [ "@wheel" ];
     substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"

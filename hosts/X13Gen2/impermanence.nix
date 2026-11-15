@@ -1,13 +1,18 @@
-{ ... }:
+{ username, ... }:
 {
   fileSystems."/persist".neededForBoot = true;
+  fileSystems."/persist/home/${username}/.local/share/containers".neededForBoot = true;
   fileSystems."/var/log".neededForBoot = true;
-  fileSystems."/home".neededForBoot = true;
 
+  # Moves @root (which holds /home) aside and recreates it empty; roots older than 7 days are deleted.
   boot.initrd.systemd.services.rollback = {
-    description = "Rollback btrfs root subvolume to blank snapshot";
+    description = "Recreate the btrfs root subvolume";
     wantedBy = [ "initrd.target" ];
-    after = [ "cryptsetup.target" ];
+    # Resuming from hibernation must win: recreating the root under a hibernated kernel corrupts it.
+    after = [
+      "cryptsetup.target"
+      "systemd-hibernate-resume.service"
+    ];
     before = [ "sysroot.mount" ];
     unitConfig.DefaultDependencies = "no";
     serviceConfig.Type = "oneshot";
@@ -47,12 +52,16 @@
       "/etc/ssh"
       "/etc/NetworkManager/system-connections"
       "/var/lib/nixos"
-      "/var/lib/systemd/coredump"
       "/var/lib/bluetooth"
       "/var/lib/alsa"
-      "/var/lib/docker"
-      "/var/lib/libvirt"
+      "/var/lib/iwd"
       "/var/lib/tailscale"
+      "/var/lib/sbctl"
+      "/var/lib/fwupd"
+      "/var/lib/usbguard"
+      "/var/lib/btrbk"
+      "/var/lib/upower"
+      "/var/lib/systemd/timers"
     ];
     files = [
       "/etc/machine-id"
@@ -61,12 +70,6 @@
 
   systemd.tmpfiles.rules = [
     "d /persist/home 0755 root root -"
-    "d /persist/home/take 0700 take users -"
+    "d /persist/home/${username} 0700 ${username} users -"
   ];
-
-  programs.fuse.userAllowOther = true;
-
-  security.sudo.extraConfig = ''
-    Defaults lecture = never
-  '';
 }

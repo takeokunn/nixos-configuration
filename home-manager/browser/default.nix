@@ -1,6 +1,6 @@
 {
   imports = [
     ./firefox
-    ./chromium
+    ./google-chrome
   ];
 }

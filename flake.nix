@@ -11,8 +11,14 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    xremap.url = "github:xremap/nix-flake";
-    xremap.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote.url = "github:nix-community/lanzaboote/v1.2.0";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    stylix.url = "github:nix-community/stylix";
+    stylix.inputs.nixpkgs.follows = "nixpkgs";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     # Pinned to a specific nixpkgs commit: newer nixpkgs breaks pty permissions here.
@@ -297,6 +303,8 @@
         in
         {
           treefmt.projectRootFile = "flake.nix";
+          # sops writes these files in its own layout on every edit; yamlfmt would rewrite them back.
+          treefmt.settings.global.excludes = [ "secrets/*" ];
           treefmt.programs.actionlint.enable = true;
           treefmt.programs.nixfmt.enable = true;
           treefmt.programs.taplo.enable = true;

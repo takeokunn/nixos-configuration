@@ -1,13 +1,13 @@
 { pkgs, nurPkgs, ... }:
 {
-  home.packages = [ pkgs.swww ];
+  home.packages = [ pkgs.awww ];
 
-  xdg.configFile."swww/wallpaper.sh".executable = true;
-  xdg.configFile."swww/wallpaper.sh".text = ''
+  xdg.configFile."awww/wallpaper.sh".executable = true;
+  xdg.configFile."awww/wallpaper.sh".text = ''
     #!/usr/bin/env bash
 
     WALLPAPER_DIR="''${HOME}/Pictures/Wallpapers"
-    CURRENT_WALLPAPER="''${XDG_STATE_HOME:-$HOME/.local/state}/swww/current"
+    CURRENT_WALLPAPER="''${XDG_STATE_HOME:-$HOME/.local/state}/awww/current"
 
     TRANSITION_TYPE="wipe"
     TRANSITION_DURATION="1"
@@ -23,7 +23,7 @@
         exit 1
       fi
 
-      swww img "$wallpaper" \
+      awww img "$wallpaper" \
         --transition-type "$TRANSITION_TYPE" \
         --transition-duration "$TRANSITION_DURATION" \
         --transition-fps "$TRANSITION_FPS" \

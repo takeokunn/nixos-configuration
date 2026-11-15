@@ -1,14 +1,25 @@
-{ pkgs, username }:
 {
+  config,
+  pkgs,
+  username,
+  ...
+}:
+{
+  users.mutableUsers = false;
   users.users.${username} = {
     isNormalUser = true;
-    hashedPassword = "$6$Fn6U6kyBKsUqKWS8$.bPQBq.4euz19YHLoHQSCWqxGB2eFSAd6TnotC33hmBZTbMgzqmx/4waEsu8M3yv7ODxs9VG2zc88qhQNTSWd1";
+    # Fixed so files under /persist keep their owner across reinstalls.
+    uid = 1000;
+    hashedPasswordFile = config.sops.secrets.take-hashed-password.path;
     extraGroups = [
       "networkmanager"
       "wheel"
       "video"
       "audio"
-      "docker"
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEZOYVVWqSDNiLasJKggu87+qbirAagxzHZeNQbhG4xs"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKicPueFUb/l/6u0QeuMRtj1qnFY07HNAQb9gyO6cZQl"
     ];
     shell = pkgs.fish;
     packages = with pkgs; [

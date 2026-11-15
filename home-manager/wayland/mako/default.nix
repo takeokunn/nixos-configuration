@@ -1,3 +1,7 @@
+{ config, ... }:
+let
+  colors = config.lib.stylix.colors.withHashtag;
+in
 {
   services.mako.enable = true;
   services.mako.settings = {
@@ -9,11 +13,10 @@
     border-size = 2;
     border-radius = 8;
 
-    # Dracula colors with transparency
-    background-color = "#282a36ee";
-    text-color = "#f8f8f2";
-    border-color = "#bd93f9";
-    progress-color = "over #44475a";
+    background-color = "${colors.base00}ee";
+    text-color = "${colors.base05}";
+    border-color = "${colors.base0F}";
+    progress-color = "over ${colors.base02}";
 
     default-timeout = 5000;
     layer = "overlay";
@@ -28,22 +31,22 @@
 
   services.mako.extraConfig = ''
     [urgency=low]
-    border-color=#6272a4
+    border-color=${colors.base03}
     default-timeout=3000
 
     [urgency=normal]
-    border-color=#bd93f9
+    border-color=${colors.base0F}
     default-timeout=5000
 
     [urgency=critical]
-    border-color=#ff5555
+    border-color=${colors.base08}
     default-timeout=0
     ignore-timeout=1
 
     [app-name=spotify]
-    border-color=#50fa7b
+    border-color=${colors.base0B}
 
     [app-name=discord]
-    border-color=#8be9fd
+    border-color=${colors.base0C}
   '';
 }

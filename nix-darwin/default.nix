@@ -35,6 +35,7 @@ let
   security = import ./config/security.nix { inherit username; };
   services = import ./config/services { inherit emacsLib; };
   spotlight = import ./config/spotlight.nix;
+  stylix = import ./config/stylix.nix { inherit pkgs; };
   system = import ./config/system.nix { inherit username; };
   wallpaper = import ./config/wallpaper.nix { inherit nurPkgs username; };
 in
@@ -49,6 +50,7 @@ in
     security
     services
     spotlight
+    stylix
     system
     wallpaper
   ];

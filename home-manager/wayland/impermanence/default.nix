@@ -47,7 +47,6 @@
 
       # Browsers
       ".mozilla"
-      ".config/chromium"
       ".config/google-chrome"
 
       # Communication
@@ -62,11 +61,30 @@
       ".go"
       ".cache/go-build"
       ".config/gh"
-      ".docker"
+
+      # Secrets editing key (sops)
+      {
+        directory = ".config/sops/age";
+        mode = "0700";
+      }
+
+      # Launcher, audio state
+      ".local/share/vicinae"
+      ".local/state/wireplumber"
+
+      # AI tools
+      ".claude"
+      ".config/codex"
+      ".serena"
+      ".local/share/opencode"
+
+      # Cloud credentials and mail
+      ".aws"
+      ".kube"
+      "Maildir"
 
       # Containers & VMs
       ".local/share/containers"
-      ".local/share/libvirt"
 
       # Nix
       ".local/state/nix"
@@ -76,17 +94,13 @@
       ".local/share/mime"
       ".config/dconf"
 
-      # Audio
-      ".config/easyeffects"
+      # Audio: per-device preset rules saved from the EasyEffects window
+      ".local/share/easyeffects/autoload"
 
-      # Wayland/niri specific
-      # Note: .config/niri is managed by Home Manager, not persisted
-      # to prevent stale configs (e.g., duplicate waybar spawns)
-      ".config/mako"
     ];
     files = [
+      ".claude.json"
       ".bash_history"
-      ".zsh_history"
     ];
   };
 }

@@ -1,4 +1,4 @@
 {
   services.wl-clip-persist.enable = true;
-  services.wl-clip-persist.clipboardType = "both";
+  services.wl-clip-persist.clipboardType = "regular";
 }

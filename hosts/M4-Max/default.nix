@@ -58,6 +58,7 @@ nix-darwin.lib.darwinSystem {
     configuration
     ../../nix-darwin
     darwin-vz-nix.darwinModules.default
+    inputs.stylix.darwinModules.stylix
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
     {

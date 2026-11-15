@@ -1,7 +1,6 @@
 {
   pkgs,
   inputs,
-  xremap,
   username,
   ...
 }:
@@ -15,15 +14,14 @@ let
 
   audio = import ./config/services/audio.nix;
 
-  display = import ./config/services/display.nix { inherit username; };
+  display = import ./config/services/display.nix;
   compositor = import ./config/compositor.nix;
-
-  input = import ./config/services/input.nix { inherit username; };
 
   network = import ./config/network.nix;
   wifi = import ./config/wifi.nix;
 
-  security = import ./config/security.nix { inherit username; };
+  secrets = import ./config/secrets.nix;
+  security = import ./config/security.nix;
 
   zram = import ./config/zram.nix;
   sysctl = import ./config/sysctl.nix;
@@ -32,8 +30,10 @@ let
 
   shell = import ./config/shell.nix;
 
-  users = import ./config/users.nix { inherit pkgs username; };
+  users = import ./config/users.nix;
   fonts = import ./config/fonts.nix { inherit pkgs; };
+  stylix = import ./config/stylix.nix;
+  browser = import ./config/browser.nix;
   claudeCodeSettings = import ./config/claude-code-settings.nix {
     inherit pkgs username;
     guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -42,16 +42,15 @@ let
 
   power = import ./config/services/power.nix;
   misc = import ./config/services/misc.nix;
+  backup = import ./config/services/backup.nix;
   swayosd = import ./config/services/swayosd.nix { inherit pkgs; };
 
   virtualisation = import ./config/virtualisation.nix;
-  containers = import ./config/containers.nix;
 in
 {
-  system.stateVersion = "24.11";
+  system.stateVersion = "26.11";
 
   imports = [
-    xremap.nixosModules.default
     boot
     time
     i18n
@@ -60,9 +59,9 @@ in
     audio
     display
     compositor
-    input
     network
     wifi
+    secrets
     security
     zram
     sysctl
@@ -70,13 +69,15 @@ in
     shell
     users
     fonts
+    stylix
+    browser
     claudeCodeSettings
     codexSettings
     power
     misc
+    backup
     swayosd
 
     virtualisation
-    containers
   ];
 }

@@ -1,0 +1,11 @@
+keys:
+  # Editing key on the Mac (~/.config/sops/age/keys.txt).
+  - &admin age1nhxndmyn08j29rkyn9rwrdaxdlu3tda2ezr4enseywpvkf3523esg3quf9
+  # Derived from X13Gen2's /persist/etc/ssh/ssh_host_ed25519_key (stored in pass as x13gen2/ssh_host_ed25519_key).
+  - &x13gen2 age1z0pyxr0dr6tsq4vcfyp83md0m67dt9aq9psvre0jldmjtj33cv5qcetm5y
+creation_rules:
+  - path_regex: secrets/x13gen2\.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *x13gen2

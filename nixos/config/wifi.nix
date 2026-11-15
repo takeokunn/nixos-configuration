@@ -1,9 +1,16 @@
+{ config, ... }:
 {
-  networking.networkmanager.ensureProfiles.profiles.home-wifi.connection.id = "Buffalo-G-90E0";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi.connection.type = "wifi";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi.wifi.mode = "infrastructure";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi.wifi.ssid = "Buffalo-G-90E0";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi."wifi-security".auth-alg = "open";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi."wifi-security".key-mgmt = "wpa-psk";
-  networking.networkmanager.ensureProfiles.profiles.home-wifi."wifi-security".psk = "uengspy3bwdkb";
+  # SSID and PSK come from sops (secrets/x13gen2.yaml, key networkmanager-env).
+  networking.networkmanager.ensureProfiles = {
+    environmentFiles = [ config.sops.secrets.networkmanager-env.path ];
+    profiles.home-wifi = {
+      connection.id = "home-wifi";
+      connection.type = "wifi";
+      wifi.mode = "infrastructure";
+      wifi.ssid = "$HOME_WIFI_SSID";
+      wifi-security.auth-alg = "open";
+      wifi-security.key-mgmt = "wpa-psk";
+      wifi-security.psk = "$HOME_WIFI_PSK";
+    };
+  };
 }

@@ -1,116 +1,97 @@
 #+STARTUP: fold
 * First Installation (X13Gen2)
 
-X13Gen2 uses LUKS encryption with Btrfs and impermanence. Follow these steps for a fresh installation.
+X13Gen2 boots through Secure Boot (lanzaboote), unlocks LUKS with the TPM plus a PIN, and recreates ~/~ and ~/home~ on every boot; only ~/persist~, ~/nix~ and ~/var/log~ survive. Secrets (the home Wi-Fi and the login password) come from sops, decrypted with the machine's SSH host key.
 
-** Prerequisites
+The disk layout, the LUKS sector size and the btrfs checksum can only be chosen when the disk is formatted, so this guide reinstalls from scratch.
 
-- NixOS installation USB
-- Another machine with Nix installed (Mac, Linux, etc.)
-- LUKS passphrase (strong, memorable)
+** Before You Start
 
-** Step 1: Boot NixOS Installer USB
+Do these on the old system, in this order:
 
-#+begin_src shell
-  # Set up network
-  sudo systemctl start NetworkManager
-  nmtui  # Connect to WiFi if needed
-#+end_src
+1. Apply firmware and Secure Boot database (dbx) updates with ~fwupdmgr update~. The TPM unlock is bound to PCR 7, which these updates change, so they must happen before the TPM is enrolled.
+2. Copy everything you want to keep out of the machine. The install erases the disk.
+3. Check whether the NVMe drive offers a 4096-byte LBA format:
+   #+begin_src shell
+     sudo nvme id-ns -H /dev/nvme0n1 | grep "LBA Format"
+   #+end_src
+   If a 4096-byte format is listed, switch to it with ~sudo nvme format /dev/nvme0n1 --lbaf=<index>~ (this erases the drive). Otherwise erase it with ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~ so no old data, including previously leaked secrets, survives.
+4. In the firmware setup, clear the TPM and put Secure Boot into Setup Mode.
 
-** Step 2: Enable SSH Access (on target machine)
+The repository must already contain ~secrets/x13gen2.yaml~ (see [[*Secrets][Secrets]]) and ~hosts/X13Gen2/u2f-keys~ (see [[*YubiKey][YubiKey]]).
 
-#+begin_src shell
-  # Set password for nixos user (for SSH login)
-  passwd
+** Install with nixos-anywhere
 
-  # Check IP address
-  ip addr
-#+end_src
+Boot the NixOS installer USB on the target, connect to the network (~nmtui~), set a password for the ~nixos~ user with ~passwd~, and note the address from ~ip addr~.
 
-** Step 3: Run nixos-anywhere (Recommended)
-
-Run this from another machine (Mac, Linux, etc.).
-
-*WARNING*: This will erase all data on the target disk.
+From another machine with Nix, restore the SSH host key from pass into a staging directory and install. The host key must be placed before the first boot because sops derives its decryption key from it.
 
 #+begin_src shell
-  # First, verify SSH connectivity
-  ssh nixos@<TARGET_IP>  # e.g., nixos@192.168.1.100
+  stage=$(mktemp -d)
+  install -d -m 755 "$stage/persist/etc/ssh"
+  pass show x13gen2/ssh_host_ed25519_key > "$stage/persist/etc/ssh/ssh_host_ed25519_key"
+  pass show x13gen2/ssh_host_ed25519_key.pub > "$stage/persist/etc/ssh/ssh_host_ed25519_key.pub"
+  chmod 600 "$stage/persist/etc/ssh/ssh_host_ed25519_key"
 
-  # Create password file securely (avoids shell history exposure)
-  read -s -p "Enter LUKS passphrase: " LUKS_PASS
+  # A temporary passphrase; it is removed after the TPM and recovery key are enrolled.
+  read -s -p "Temporary LUKS passphrase: " LUKS_PASS
 
-  # Run nixos-anywhere
   nix run github:nix-community/nixos-anywhere -- \
     --flake github:takeokunn/nixos-configuration#X13Gen2 \
+    --extra-files "$stage" \
     --disk-encryption-keys /tmp/luks-password <(printf '%s' "$LUKS_PASS") \
     nixos@<TARGET_IP>
 
   unset LUKS_PASS
+  rm -rf "$stage"
 #+end_src
 
-** Step 4: Reboot
+** First Boot
+
+1. On the first boot, lanzaboote generates Secure Boot keys in ~/var/lib/sbctl~, enrolls them (keeping Microsoft's keys) and reboots. Unlock with the temporary passphrase.
+2. In the firmware setup, confirm Secure Boot is enabled, then check from NixOS:
+   #+begin_src shell
+     bootctl status | grep "Secure Boot"
+   #+end_src
+3. Enroll the TPM with a PIN and a recovery key, then remove the temporary passphrase:
+   #+begin_src shell
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --recovery-key
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=password
+   #+end_src
+   Store the printed recovery key in pass. It is the only way in when a firmware update changes PCR 7.
+4. Join the tailnet: ~tailscale up~.
+
+** Secrets
+
+~secrets/x13gen2.yaml~ is encrypted for two age recipients listed in [[file:../.sops.yaml][.sops.yaml]]: the editing key on the Mac (~~/.config/sops/age/keys.txt~) and the key derived from this machine's SSH host key. It holds:
+
+- ~networkmanager-env~: ~HOME_WIFI_SSID=...~ and ~HOME_WIFI_PSK=...~ lines, read by NetworkManager's ~ensureProfiles~.
+- ~take-hashed-password~: a yescrypt hash (~mkpasswd --method=yescrypt~) for the login, greeter and sudo password.
+
+Edit it on the Mac with ~sops secrets/x13gen2.yaml~.
+
+** YubiKey
+
+sudo, the greeter and the lock screen accept a YubiKey touch and fall back to the password. Register a key on any machine with the key plugged in:
 
 #+begin_src shell
-  sudo reboot
+  nix shell nixpkgs#pam_u2f -c pamu2fcfg -u take -o pam://X13Gen2 -i pam://X13Gen2 > hosts/X13Gen2/u2f-keys
 #+end_src
 
-** Manual Installation (Fallback)
-
-If you don't have another machine available, use this traditional method.
-
-*** Step 1: Clone Configuration
-
-#+begin_src shell
-  nix-shell -p git
-  git clone https://github.com/takeokunn/nixos-configuration
-  cd nixos-configuration
-#+end_src
-
-*** Step 2: Create LUKS Password File
-
-#+begin_src shell
-  # Create password file securely (avoids shell history exposure)
-  read -s -p "Enter LUKS passphrase: " LUKS_PASS
-  printf '%s' "$LUKS_PASS" > /tmp/luks-password
-  chmod 600 /tmp/luks-password
-  unset LUKS_PASS
-#+end_src
-
-*** Step 3: Run Disko (Partitioning & Formatting)
-
-*WARNING*: This will erase all data on the target disk.
-
-#+begin_src shell
-  sudo -H nix --experimental-features "nix-command flakes" run \
-    github:nix-community/disko/latest -- \
-    --mode destroy,format,mount \
-    ./hosts/X13Gen2/disko-config.nix
-#+end_src
-
-*** Step 4: Install NixOS
-
-#+begin_src shell
-  # Increase file descriptor limit for large builds
-  ulimit -n 65536
-  sudo -H nixos-install --flake .#X13Gen2 --no-root-passwd --cores 1 --max-jobs 1
-#+end_src
-
-*** Step 5: Reboot
-
-#+begin_src shell
-  sudo reboot
-#+end_src
+USBGuard blocks USB devices plugged in after boot unless [[file:../nixos/config/security.nix][nixos/config/security.nix]] allows them; Yubico devices, hubs and internal ports are allowed. Allow another device with ~sudo usbguard allow-device <id>~ (list blocked ones with ~sudo usbguard list-devices --blocked~).
 
 ** Update Configuration
 
-After installation, use this command to apply configuration changes:
-
 #+begin_src shell
-  sudo -H nixos-rebuild switch --flake .#X13Gen2 --show-trace
+  sudo nixos-rebuild switch --flake .#X13Gen2
 #+end_src
+
+The ~rescue~ boot entry starts the same system without the ~/etc~ overlay and USBGuard, for recovering from either.
 
 ** Notes
 
-- On each boot the ~@root~ subvolume is deleted and recreated blank ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]); ~@persist~, ~@home~, and ~@nix~ survive
-- home-manager is integrated with advanced profile
+- ~@root~ (which contains ~/home~) is moved aside and recreated on every boot, after any resume from hibernation; old roots are kept for 7 days ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]). Persisted paths are listed there and in [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]].
+- btrbk snapshots ~@persist~ hourly into ~@snapshots~ (~/.btrfs/@snapshots~); container images live in ~@containers~ and are not snapshotted.
+- Closing the lid suspends, then hibernates after two hours.
+- DNS goes to Quad9 over TLS. On a captive portal, run ~resolvectl dnsovertls <link> no~ until signed in.

@@ -1,3 +1,21 @@
+{ config, pkgs, ... }:
+let
+  colors = config.lib.stylix.colors.withHashtag;
+
+  tailscaleStatus = pkgs.writeShellScript "waybar-tailscale" ''
+    if ${pkgs.tailscale}/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -e '.BackendState == "Running"' >/dev/null; then
+      printf '{"text":"󰖂","class":"connected","tooltip":"Tailscale: connected"}\n'
+    else
+      printf '{"text":"󰖂","class":"disconnected","tooltip":"Tailscale: disconnected"}\n'
+    fi
+  '';
+  tailscaleToggle = pkgs.writeShellScript "waybar-tailscale-toggle" ''
+    if ${pkgs.tailscale}/bin/tailscale status >/dev/null 2>&1; then
+      exec ${pkgs.tailscale}/bin/tailscale down
+    fi
+    exec ${pkgs.tailscale}/bin/tailscale up
+  '';
+in
 {
   programs.waybar.enable = true;
   programs.waybar.systemd.enable = true;
@@ -17,13 +35,14 @@
       modules-right = [
         "cpu"
         "memory"
-        "disk"
-        "custom/weather"
-        "tray"
-        "backlight"
-        "wireplumber"
         "network"
+        "bluetooth"
+        "wireplumber"
         "battery"
+        "power-profiles-daemon"
+        "idle_inhibitor"
+        "custom/tailscale"
+        "tray"
       ];
 
       "niri/workspaces" = {
@@ -49,11 +68,11 @@
           mode-mon-col = 3;
           weeks-pos = "right";
           format = {
-            months = "<span color='#f8f8f2'><b>{}</b></span>";
-            days = "<span color='#f8f8f2'>{}</span>";
-            weeks = "<span color='#6272a4'>W{}</span>";
-            weekdays = "<span color='#bd93f9'>{}</span>";
-            today = "<span color='#ff79c6'><b><u>{}</u></b></span>";
+            months = "<span color='${colors.base05}'><b>{}</b></span>";
+            days = "<span color='${colors.base05}'>{}</span>";
+            weeks = "<span color='${colors.base03}'>W{}</span>";
+            weekdays = "<span color='${colors.base0F}'>{}</span>";
+            today = "<span color='${colors.base0E}'><b><u>{}</u></b></span>";
           };
         };
       };
@@ -90,21 +109,6 @@
         on-click = "networkmanager_dmenu";
       };
 
-      backlight = {
-        format = "{icon} {percent}%";
-        format-icons = [
-          "󰃞"
-          "󰃟"
-          "󰃠"
-        ];
-        tooltip-format = "Brightness: {percent}%\n\nScroll: Adjust brightness\nClick: Brightness 100%\nRight-click: Brightness 50%\nMiddle-click: Brightness 10%";
-        on-scroll-up = "swayosd-client --brightness raise";
-        on-scroll-down = "swayosd-client --brightness lower";
-        on-click = "swayosd-client --brightness +100";
-        on-click-right = "swayosd-client --brightness 50";
-        on-click-middle = "swayosd-client --brightness 10";
-      };
-
       wireplumber = {
         format = "{icon} {volume}%";
         format-muted = "󰝟";
@@ -114,6 +118,42 @@
           "󰕾"
         ];
         on-click = "pavucontrol";
+      };
+
+      bluetooth = {
+        format = "󰂯";
+        format-disabled = "󰂲";
+        format-connected = "󰂱 {num_connections}";
+        tooltip-format-connected = "{device_enumerate}";
+        tooltip-format-enumerate-connected = "{device_alias}";
+        on-click = "kitty --class bluetui -e bluetui";
+      };
+
+      power-profiles-daemon = {
+        format = "{icon}";
+        tooltip-format = "Power profile: {profile}";
+        format-icons = {
+          default = "󰗑";
+          performance = "󰓅";
+          balanced = "󰾅";
+          power-saver = "󰾆";
+        };
+      };
+
+      # Mac's sleep_prevent item: holds an idle/sleep inhibitor while active.
+      idle_inhibitor = {
+        format = "{icon}";
+        format-icons = {
+          activated = "󰅶";
+          deactivated = "󰾪";
+        };
+      };
+
+      "custom/tailscale" = {
+        exec = "${tailscaleStatus}";
+        return-type = "json";
+        interval = 10;
+        on-click = "${tailscaleToggle}";
       };
 
       tray = {
@@ -155,26 +195,6 @@
         tooltip-format = "RAM: {used:0.1f}G/{total:0.1f}G ({percentage}%)\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G ({swapPercentage}%)";
       };
 
-      disk = {
-        path = "/";
-        interval = 30;
-        format = " {percentage_used}%";
-        format-alt = " {free}";
-        format-warning = "⚠ {percentage_used}%";
-        format-critical = "🔥 {percentage_used}%";
-        states = {
-          warning = 75;
-          critical = 90;
-        };
-        tooltip-format = "Disk: {used} / {total} ({percentage_used}%)";
-      };
-
-      "custom/weather" = {
-        exec = "curl -s 'https://wttr.in/Tokyo?format=%c+%t' 2>/dev/null || echo '--'";
-        interval = 1800;
-        format = "{}";
-        tooltip = false;
-      };
     };
   };
 
@@ -188,7 +208,7 @@
 
     window#waybar {
       background-color: rgba(40, 42, 54, 0.75);
-      color: #f8f8f2;
+      color: ${colors.base05};
       border-radius: 16px;
       border: 1px solid rgba(248, 248, 242, 0.1);
       margin: 8px 12px 0 12px;
@@ -197,7 +217,7 @@
 
     #workspaces button {
       padding: 0 8px;
-      color: #6272a4;
+      color: ${colors.base03};
       background-color: transparent;
       border: none;
       border-radius: 8px;
@@ -206,124 +226,122 @@
 
     #workspaces button:hover {
       background-color: rgba(68, 71, 90, 0.9);
-      color: #f8f8f2;
+      color: ${colors.base05};
     }
 
     #workspaces button.active {
-      color: #bd93f9;
+      color: ${colors.base0F};
       background-color: rgba(189, 147, 249, 0.2);
     }
 
     #workspaces button.urgent {
-      color: #ff5555;
+      color: ${colors.base08};
       background-color: rgba(255, 85, 85, 0.2);
     }
 
     #window {
       padding: 0 12px;
-      color: #f8f8f2;
+      color: ${colors.base05};
     }
 
     #clock {
       padding: 0 12px;
-      color: #f8f8f2;
+      color: ${colors.base05};
       font-weight: bold;
     }
 
     #cpu {
       padding: 0 12px;
-      color: #8be9fd;
+      color: ${colors.base0C};
     }
 
     #cpu.warning {
-      color: #ffb86c;
+      color: ${colors.base09};
       text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
     }
 
     #cpu.critical {
-      color: #ff5555;
+      color: ${colors.base08};
       text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
       animation: pulse 1.5s ease-in-out infinite;
     }
 
     #memory {
       padding: 0 12px;
-      color: #bd93f9;
+      color: ${colors.base0F};
     }
 
     #memory.warning {
-      color: #ffb86c;
+      color: ${colors.base09};
       text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
     }
 
     #memory.critical {
-      color: #ff5555;
+      color: ${colors.base08};
       text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
       animation: pulse 1.5s ease-in-out infinite;
     }
 
-    #disk {
-      padding: 0 12px;
-      color: #50fa7b;
-    }
 
-    #disk.warning {
-      color: #ffb86c;
-      text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
-    }
 
-    #disk.critical {
-      color: #ff5555;
-      text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
 
-    #custom-weather {
-      padding: 0 12px;
-      color: #f1fa8c;
-    }
 
     #battery {
       padding: 0 12px;
-      color: #50fa7b;
+      color: ${colors.base0B};
     }
 
     #battery.warning {
-      color: #ffb86c;
+      color: ${colors.base09};
       text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
     }
 
     #battery.critical {
-      color: #ff5555;
+      color: ${colors.base08};
       text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
       animation: pulse 1.5s ease-in-out infinite;
     }
 
     #battery.charging {
-      color: #8be9fd;
+      color: ${colors.base0C};
     }
 
     #network {
       padding: 0 12px;
-      color: #8be9fd;
+      color: ${colors.base0C};
     }
 
     #network.disconnected {
-      color: #ff5555;
+      color: ${colors.base08};
     }
 
-    #backlight {
-      padding: 0 12px;
-      color: #f1fa8c;
-    }
 
     #wireplumber {
       padding: 0 12px;
-      color: #f1fa8c;
+      color: ${colors.base0A};
     }
 
     #wireplumber.muted {
-      color: #6272a4;
+      color: ${colors.base03};
+    }
+
+    #bluetooth,
+    #power-profiles-daemon,
+    #idle_inhibitor {
+      color: ${colors.base0C};
+    }
+
+    #idle_inhibitor.activated,
+    #power-profiles-daemon.performance {
+      color: ${colors.base09};
+    }
+
+    #custom-tailscale.connected {
+      color: ${colors.base0B};
+    }
+
+    #custom-tailscale.disconnected {
+      color: ${colors.base03};
     }
 
     #tray {
@@ -345,13 +363,13 @@
 
     tooltip {
       background-color: rgba(40, 42, 54, 0.95);
-      border: 1px solid #bd93f9;
+      border: 1px solid ${colors.base0F};
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
     tooltip label {
-      color: #f8f8f2;
+      color: ${colors.base05};
     }
   '';
 }

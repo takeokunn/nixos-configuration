@@ -1807,6 +1807,25 @@ override rather than assuming it still runs."
                             (error-message-string err))))))))
 
   (run-with-idle-timer 3 nil #'my/scratchpad-warm-up)
+
+  (defun my/scratchpad-commit ()
+    "Send *scratch* to the window focused before the scratchpad, then clear it.
+  Only works where `emacs-scratchpad-commit' is installed (the niri host)."
+    (interactive)
+    (let ((commit (executable-find "emacs-scratchpad-commit"))
+          (text (string-trim-right (buffer-substring-no-properties (point-min) (point-max)))))
+      (cond
+       ((not commit) (user-error "emacs-scratchpad-commit is not installed"))
+       ((string-empty-p text) (message "scratchpad is empty"))
+       (t
+        (with-temp-buffer
+          (insert text)
+          (unless (zerop (call-process-region (point-min) (point-max) commit))
+            (user-error "emacs-scratchpad-commit failed")))
+        (erase-buffer)))))
+
+  (with-eval-after-load 'elisp-mode
+    (define-key lisp-interaction-mode-map (kbd "C-c C-c") #'my/scratchpad-commit))
 #+end_src
 * Coding
 :PROPERTIES:

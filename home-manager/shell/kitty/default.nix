@@ -1,10 +1,16 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  lib,
+  options,
+  ...
+}:
 let
   emojiFont = if pkgs.stdenv.hostPlatform.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
 in
 {
   programs.kitty.enable = true;
-  programs.kitty.themeFile = "Dracula";
+  # Hosts with Stylix get the palette from it (stylix.targets.kitty).
+  programs.kitty.themeFile = lib.mkIf (!(options ? stylix)) "Dracula";
 
   programs.kitty.font.name = "HackGen Console NF";
   programs.kitty.font.size = 13;

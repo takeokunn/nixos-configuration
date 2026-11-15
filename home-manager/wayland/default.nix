@@ -4,9 +4,9 @@
     ./niri
     ./fuzzel
     ./networkmanager-dmenu
+    ./vicinae
     ./yazi
-    ./clipse
-    ./swww
+    ./awww
     ./waybar
     ./gtk
     ./qt
@@ -16,7 +16,6 @@
     ./wlsunset
     ./kanshi
     ./playerctld
-    ./cliphist
     ./wl-clip-persist
     ./easyeffects
     ./mako
@@ -26,5 +25,6 @@
   home.packages = with pkgs; [
     networkmanagerapplet
     networkmanager_dmenu
+    bluetui
   ];
 }
