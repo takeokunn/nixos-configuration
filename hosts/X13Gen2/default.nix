@@ -33,9 +33,6 @@ nixpkgs.lib.nixosSystem {
       boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-partlabel/cryptroot";
       boot.initrd.luks.devices."cryptroot".allowDiscards = true;
       boot.initrd.luks.devices."cryptroot".bypassWorkqueues = true;
-
-      # LUKS unlock and the impermanence rollback both run from initrd.
-      boot.initrd.systemd.enable = true;
     }
     {
       home-manager.useUserPackages = true;
