@@ -392,7 +392,27 @@
 
           checks.secret-scan =
             let
-              scan = import ./home-manager/security/secret-scan/secret-scan.nix { inherit pkgs; };
+              # Records each call's arguments and report, which the scan deletes itself, so the test
+              # can assert the redaction flag and inspect what gitleaks actually wrote.
+              recordingGitleaks = pkgs.writeShellScriptBin "gitleaks" ''
+                set -u
+                n=$(mktemp "$GITLEAKS_RECORD_DIR/call.XXXXXX")
+                printf '%s\n' "$@" >"$n.argv"
+                ${pkgs.gitleaks}/bin/gitleaks "$@"
+                rc=$?
+                report=""
+                prev=""
+                for a in "$@"; do
+                  [ "$prev" = --report-path ] && report=$a
+                  prev=$a
+                done
+                if [ -n "$report" ] && [ -f "$report" ]; then cp "$report" "$n.report"; fi
+                exit "$rc"
+              '';
+              scan = import ./home-manager/security/secret-scan/secret-scan.nix {
+                inherit pkgs;
+                gitleaks = recordingGitleaks;
+              };
               brokenScan = import ./home-manager/security/secret-scan/secret-scan.nix {
                 inherit pkgs;
                 gitleaks = pkgs.writeShellScriptBin "gitleaks" "exit 1";

@@ -2,6 +2,11 @@
 # Test for secret-scan.sh, run by the `secret-scan` flake check.
 # Usage: secret-scan.test.sh <scan> <the same scan built with a gitleaks that exits 1>
 #
+# <scan> must be built with a recording gitleaks: for each call it creates a file prefix with
+# mktemp under $GITLEAKS_RECORD_DIR, writes one argument per line to <prefix>.argv, runs the real
+# gitleaks, and copies the --report-path file to <prefix>.report. The scan deletes its reports,
+# so the copies are the only way to check what gitleaks wrote.
+#
 # Fake secrets are generated at run time: a literal one in this file would be rejected by the
 # repository's gitleaks pre-commit hook. Every fake value contains FAKE.
 # check bodies are single-quoted and evaluated by check(), so the variables they read
@@ -34,6 +39,8 @@ trap 'rm -rf "$work"' EXIT
 export HOME="$work/home"
 export SECRET_SCAN_STATE_DIR="$work/state"
 export SECRET_SCAN_OSASCRIPT="$work/osascript"
+export GITLEAKS_RECORD_DIR="$work/gitleaks-record"
+mkdir -p "$GITLEAKS_RECORD_DIR"
 notify_log="$work/notify.log"
 logs="$work/logs"
 # The scan replaces PATH with its own store paths, which hold no bash, so `#!/usr/bin/env bash`
@@ -150,9 +157,20 @@ many_run 2
 many_run 201
 
 check "no temporary report is left" '[ -z "$(find "$SECRET_SCAN_STATE_DIR" -name "*.json")" ]'
+
+# Every gitleaks call fully redacts, and the reports it wrote hold no secret.
+calls=$(find "$GITLEAKS_RECORD_DIR" -name '*.argv' | wc -l | tr -d ' ')
+redacted_calls=$(grep -lx -e '--redact=100' "$GITLEAKS_RECORD_DIR"/*.argv 2>/dev/null | wc -l | tr -d ' ')
+reports=$(find "$GITLEAKS_RECORD_DIR" -name '*.report' | wc -l | tr -d ' ')
+# Runs 1, 3, 4, 6 scan one file each; the two many-file runs scan 2 and 201.
+check "gitleaks was called once per scanned file (got $calls)" '[ "$calls" -eq 207 ]'
+check "every gitleaks call passes --redact=100 (got $redacted_calls of $calls)" '[ "$redacted_calls" -eq "$calls" ]'
+check "every call left a report copy (got $reports)" '[ "$reports" -eq "$calls" ]'
+check "the report copies hold redacted findings" 'grep -qF REDACTED "$GITLEAKS_RECORD_DIR"/*.report'
+
 for value in "$pat" "$jwt" "$old_pat" "$link_pat" FAKE; do
-  check "TSV and logs do not contain $(printf %.8s "$value")..." \
-    '! grep -rqF -- "$value" "$SECRET_SCAN_STATE_DIR" "$logs.out" "$logs.err" "$notify_log"'
+  check "TSV, logs and reports do not contain $(printf %.8s "$value")..." \
+    '! grep -rqF -- "$value" "$SECRET_SCAN_STATE_DIR" "$logs.out" "$logs.err" "$notify_log" "$GITLEAKS_RECORD_DIR"'
 done
 
 echo "secret-scan.test: $checked checks, $failures failures"
