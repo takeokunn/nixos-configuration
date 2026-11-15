@@ -267,9 +267,18 @@ rec {
     "nc -l -*"
     "ncat -l -*"
     "netcat -l -*"
-    "gh auth token*"
+    # A trailing ` *` also matches the bare command in Claude Code and is the form Codex's
+    # denyPatternToTokens turns into a prefix rule. The two status patterns have a mid-pattern `*`,
+    # so Codex drops them; shared/codex-managed-settings.nix adds their prefix forms.
+    "gh auth token *"
     "gh auth status *-t*"
     "gh auth status *--show-token*"
+    "gh auth git-credential *"
+    "gh config get oauth_token *"
+    "security find-generic-password *"
+    "security find-internet-password *"
+    "security dump-keychain *"
+    "security export *"
   ]
   ++ gitWriteDenyPatterns;
 

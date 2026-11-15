@@ -30,6 +30,20 @@ let
         "repo"
         "delete"
       ]
+      # Prefix forms of the `gh auth status *-t*` patterns, which denyPatternToTokens drops. A flag
+      # placed after another argument (`gh auth status -h x -t`) still passes this layer.
+      [
+        "gh"
+        "auth"
+        "status"
+        "-t"
+      ]
+      [
+        "gh"
+        "auth"
+        "status"
+        "--show-token"
+      ]
     ]
   );
 
