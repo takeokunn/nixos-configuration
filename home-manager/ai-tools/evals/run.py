@@ -47,6 +47,9 @@ VARIANTS = {"claude": ["old", "new"], "codex": ["dfa", "ww"]}
 CLAUDE_CONFIG = {"old": STATE / "config-old", "new": STATE / "config-new"}
 FR003_TAGS = {"forbidden-bypass", "required-op"}
 STATE_CHECK_TYPES = ("file_exists", "file_absent", "file_matches", "file_not_matches", "cmd")
+# Review checks judge the meaning of the reply by regex. They are evaluated and reported as a
+# non-binding hint; only the other (automatic) checks decide a scenario's status.
+REVIEW_CHECK_TYPES = ("output_matches", "output_not_matches")
 
 SCENARIO_FIELDS = {
     "id": str, "theme": str, "description": str, "runtimes": list,
@@ -348,7 +351,7 @@ def read_events(path):
     events, bad = [], 0
     if not path.exists():
         return events, bad
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+    for line_no, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
         line = line.strip()
         if not line:
             continue
@@ -358,7 +361,7 @@ def read_events(path):
             bad += 1
             continue
         if isinstance(obj, dict):
-            events.append(obj)
+            events.append((line_no, obj))
     return events, bad
 
 
@@ -380,7 +383,8 @@ def tool_input_text(name, inp):
 def parse_claude(events):
     calls, results, seen = [], [], set()
     final, last_text, error = None, None, None
-    for ev in events:
+    final_line = last_text_line = None
+    for line_no, ev in events:
         etype = ev.get("type")
         parent = ev.get("parent_tool_use_id")
         content = (ev.get("message") or {}).get("content")
@@ -398,7 +402,7 @@ def parse_claude(events):
                     calls.append({"tool": name, "input": inp, "text": tool_input_text(name, inp),
                                   "id": block.get("id"), "parent_tool_use_id": parent})
                 elif block.get("type") == "text" and parent is None:
-                    last_text = block.get("text", "")
+                    last_text, last_text_line = block.get("text", ""), line_no
         elif etype == "user" and isinstance(content, list):
             for block in content:
                 if isinstance(block, dict) and block.get("type") == "tool_result":
@@ -407,7 +411,8 @@ def parse_claude(events):
                                     "text": block_text(block.get("content")),
                                     "parent_tool_use_id": parent})
         elif etype == "result":
-            final = ev.get("result") if isinstance(ev.get("result"), str) else final
+            if isinstance(ev.get("result"), str):
+                final, final_line = ev["result"], line_no
             if ev.get("is_error"):
                 error = final or ev.get("subtype")
     # Claude Code reports a PreToolUse hook that exits 2 as an error tool_result naming the hook.
@@ -415,13 +420,14 @@ def parse_claude(events):
     return {"calls": calls, "hook_denials": hook_denials, "final_text": final,
             "final_source": "result event" if final is not None else
             ("last assistant text (no result event)" if last_text is not None else "none"),
-            "fallback_text": last_text, "cli_error": error}
+            "final_line": final_line, "fallback_text": last_text, "fallback_line": last_text_line,
+            "cli_error": error}
 
 
 def parse_codex(events):
     calls, hook_denials, errors = [], [], []
-    final = None
-    for ev in events:
+    final = final_line = None
+    for line_no, ev in events:
         etype = ev.get("type")
         if etype in ("error", "turn.failed"):
             errors.append(block_text(ev.get("message") or ev.get("error")))
@@ -449,10 +455,11 @@ def parse_codex(events):
             calls.append({"tool": "mcp", "input": inp, "text": tool_input_text("mcp", inp),
                           "id": item.get("id"), "status": item.get("status")})
         elif itype == "agent_message":
-            final = item.get("text", "")
+            final, final_line = item.get("text", ""), line_no
     return {"calls": calls, "hook_denials": hook_denials, "final_text": final,
             "final_source": "last agent_message" if final is not None else "none",
-            "fallback_text": None, "cli_error": "; ".join(e for e in errors if e) or None}
+            "final_line": final_line, "fallback_text": None, "fallback_line": None,
+            "cli_error": "; ".join(e for e in errors if e) or None}
 
 
 def parse_transcript(runtime, path):
@@ -523,10 +530,10 @@ def evaluate(check, parsed, meta, fixture, work):
         return proc.returncode == expect, {"exit": proc.returncode, "expect_exit": expect,
                                            "stdout": clip(proc.stdout), "stderr": clip(proc.stderr)}
     if ctype in ("output_matches", "output_not_matches"):
-        text = parsed["final_text"]
+        text, line = parsed["final_text"], parsed["final_line"]
         if text is None:
-            text = parsed["fallback_text"]
-        observed = {"source": parsed["final_source"], "text": clip(text)}
+            text, line = parsed["fallback_text"], parsed["fallback_line"]
+        observed = {"source": parsed["final_source"], "transcript_line": line, "text": clip(text)}
         if text is None:
             return False, observed
         m = re.search(check["regex"], text, re.M)
@@ -575,6 +582,7 @@ def judge(scenario, meta, out_dir, previous=None):
         digest = check_hash(check)
         passed, observed = evaluate(check, parsed, meta, fixture, work)
         entry = {"index": i, "type": check["type"], "label": check.get("label"), "check_hash": digest,
+                 "class": "review" if check["type"] in REVIEW_CHECK_TYPES else "automatic",
                  "pass": passed, "observed": observed}
         if passed is None:
             # The fixture was removed after a pass; reuse the verdict observed while it existed, but
@@ -603,10 +611,13 @@ def judge(scenario, meta, out_dir, previous=None):
         error = (f"CLI timed out after {scenario['timeout_sec']}s" if meta["timed_out"]
                  else f"CLI exited {meta['exit_code']}")
     else:
+        automatic = [r for r in results if r["class"] == "automatic"]
+        if not automatic:
+            status = "review-only"
         # A check that failed decides the scenario even when another one is unjudged.
-        if any(r["pass"] is False for r in results):
+        elif any(r["pass"] is False for r in automatic):
             status = "fail"
-        elif any(r["pass"] is None for r in results):
+        elif any(r["pass"] is None for r in automatic):
             status = "unjudged"
         else:
             status = "pass"
@@ -633,13 +644,21 @@ def write_json(path, data):
 
 
 def summarize(run_dir):
-    results = []
+    results, needs_review = [], []
     for path in sorted(run_dir.glob("*/*/result.json")):
-        results.append(json.loads(path.read_text(encoding="utf-8")))
+        r = json.loads(path.read_text(encoding="utf-8"))
+        results.append(r)
+        for c in r.get("checks", []):
+            if c["type"] in REVIEW_CHECK_TYPES:
+                needs_review.append({
+                    "run": f"{r['scenario']}/{r['runtime']}/{r['variant']}", "index": c["index"],
+                    "type": c["type"], "label": c.get("label"), "hint_pass": c["pass"],
+                    "transcript": str(path.parent / "transcript.jsonl"),
+                    "line": c.get("observed", {}).get("transcript_line")})
 
     def tally(rows):
         out = {"total": len(rows)}
-        for status in ("pass", "fail", "unjudged", "incomplete", "error", "deferred"):
+        for status in ("pass", "fail", "review-only", "unjudged", "incomplete", "error", "deferred"):
             out[status] = sum(1 for r in rows if r["status"] == status)
         return out
 
@@ -685,15 +704,20 @@ def summarize(run_dir):
                            if r["status"] == "deferred"),
         "unjudged": sorted(f"{r['scenario']}/{r['variant']}" for r in results
                            if r["status"] == "unjudged"),
+        "review_only": sorted(f"{r['scenario']}/{r['runtime']}/{r['variant']}" for r in results
+                              if r["status"] == "review-only"),
+        "needs_review": needs_review,
     }
     write_json(run_dir / "summary.json", summary)
 
     lines = [f"# Eval summary: {run_dir.name}", "", "## By variant", "",
-             "| variant | pass | fail | unjudged | incomplete | error | deferred | total |",
-             "|---|---|---|---|---|---|---|---|"]
+             "Status comes from automatic checks only (repo state, tool calls, exit code); reply-text "
+             "checks are listed under Needs review.", "",
+             "| variant | pass | fail | review-only | unjudged | incomplete | error | deferred | total |",
+             "|---|---|---|---|---|---|---|---|---|"]
     for key, t in summary["by_variant"].items():
-        lines.append(f"| {key} | {t['pass']} | {t['fail']} | {t['unjudged']} | {t['incomplete']} | {t['error']} "
-                     f"| {t['deferred']} | {t['total']} |")
+        lines.append(f"| {key} | {t['pass']} | {t['fail']} | {t['review-only']} | {t['unjudged']} "
+                     f"| {t['incomplete']} | {t['error']} | {t['deferred']} | {t['total']} |")
     lines += ["", "## By theme (pass/total)", ""]
     keys = list(summary["by_variant"])
     lines += ["| theme | " + " | ".join(keys) + " |", "|---" * (len(keys) + 1) + "|"]
@@ -722,6 +746,16 @@ def summarize(run_dir):
     if summary["incomplete"]:
         lines += ["", "## Incomplete: CLI exited non-zero or timed out, not counted as pass or fail", ""] + [
             f"- {e['run']}: {e['error']}" for e in summary["incomplete"]]
+    if summary["review_only"]:
+        lines += ["", "## Review-only: no automatic check, not counted as pass or fail", ""] + [
+            f"- {u}" for u in summary["review_only"]]
+    if needs_review:
+        lines += ["", "## Needs review: reply meaning, regex verdict is a non-binding hint", "",
+                  "| run | check | regex hint | transcript:line |", "|---|---|---|---|"]
+        for n in needs_review:
+            hint = "pass" if n["hint_pass"] else "fail"
+            label = f"#{n['index']} {n['type']}" + (f" ({n['label']})" if n["label"] else "")
+            lines.append(f"| {n['run']} | {label} | {hint} | {n['transcript']}:{n['line'] or '-'} |")
     if summary["errors"]:
         lines += ["", "## Errors", ""] + [f"- {e['run']}: {e['error']}" for e in summary["errors"]]
     if summary["deferred"]:
@@ -912,11 +946,15 @@ def cmd_check(argv):
         result["scenario_source"] = str(source)
         write_json(prev_path, result)
         statuses.append(result["status"])
-        failed = [f"#{c['index']} {c['type']}" for c in result["checks"] if c["pass"] is False]
-        unjudged = [f"#{c['index']} {c['type']}" for c in result["checks"] if c["pass"] is None]
+        automatic = [c for c in result["checks"] if c["class"] == "automatic"]
+        failed = [f"#{c['index']} {c['type']}" for c in automatic if c["pass"] is False]
+        unjudged = [f"#{c['index']} {c['type']}" for c in automatic if c["pass"] is None]
+        review = [f"#{c['index']} {'pass' if c['pass'] else 'fail'}" for c in result["checks"]
+                  if c["class"] == "review"]
         print(f"[{result['status']}] {meta['scenario']}/{meta['runtime']}/{meta['variant']}"
               + (f" failed: {', '.join(failed)}" if failed else "")
               + (f" unjudged: {', '.join(unjudged)}" if unjudged else "")
+              + (f" review hint: {', '.join(review)}" if review else "")
               + (f": {result['error']}" if result.get("error") else ""))
     summarize(run_dir)
     print(f"summary: {run_dir / 'summary.md'}")
