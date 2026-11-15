@@ -20,10 +20,30 @@ rewrites=0
 blocks=0
 passes=0
 
+# Expected command families for these legacy fixtures, independent of the hook's parser.
+# Write fixtures precede reads because a write must deny before any read rewrite.
+assert_guidance() {
+  local reason="$1" command="$2" expected
+  case "$command" in
+  *'rm -rf'* | *'-delete'*) expected='aitools rm' ;;
+  *'sed -i'*) expected='aitools edit' ;;
+  *' > '* | *' >> '* | *'>out'*) expected='aitools write' ;;
+  *'cat <(ls)'*) expected='aitools find' ;;
+  *grep* | *'rg '*) expected='aitools search' ;;
+  *'wc '*) expected='aitools info' ;;
+  *'jq '*) expected='aitools doc get' ;;
+  *'diff '*) expected='aitools diff' ;;
+  *'ls'* | *'find '* | *'fd '* | *'tree'*) expected='aitools find' ;;
+  *'cat'* | *'head '* | *'tail '* | *'sed '*) expected='aitools read' ;;
+  *) fail "fixture has no concrete guidance expectation: [$command]"; return ;;
+  esac
+  [[ $reason == *"$expected "* || $reason == *"$expected."* ]] || fail "[$command] expected $expected guidance: [$reason]"
+}
+
 assert_denied() {
   blocks=$((blocks + 1))
   [[ $(jq -r '.hookSpecificOutput.permissionDecision // empty' <<<"$1") == deny ]] || fail "[$2] expected deny: [$1]"
-  [[ $(jq -r '.hookSpecificOutput.permissionDecisionReason // empty' <<<"$1") == *aitools* ]] || fail "[$2] deny omitted aitools guidance"
+  assert_guidance "$(jq -r '.hookSpecificOutput.permissionDecisionReason // empty' <<<"$1")" "$3"
 }
 
 fail() {
@@ -38,7 +58,7 @@ expect_claude() {
   payload=$(jq -cn --arg command "$1" '{tool_name:"Bash",tool_input:{command:$command}}')
   got=$(printf '%s' "$payload" | bash "$hook" claude)
   if [[ $2 == deny ]]; then
-    assert_denied "$got" "claude [$1]"
+    assert_denied "$got" "claude [$1]" "$1"
     return
   fi
   if [[ -z $2 ]]; then
@@ -164,8 +184,8 @@ expect_claude 'ls .config' "aitools find '*' .config --depth 1 --no-ignore --glo
 expect_claude 'cd .github && ls' "cd .github && aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_claude 'ls -l' "aitools find '*' --depth 1 --no-ignore --glob '!.*' --limit 200"
 expect_claude "find . -name '*.nix' | head -5" "aitools find '*.nix' . --no-ignore --limit 5"
-expect_claude 'git log --oneline | head -5' deny
-expect_claude 'git show HEAD:f | head -30' deny
+expect_claude 'git log --oneline | head -5' ''
+expect_claude 'git show HEAD:f | head -30' ''
 expect_claude 'grep -rn foo . 2>/dev/null | head -5' 'aitools search foo . --context 0 --limit 5 --no-ignore 2>/dev/null'
 expect_claude 'cd src && grep -rn foo . 2>&1 | head -5' 'cd src && aitools search foo . --context 0 --limit 5 --no-ignore 2>&1'
 
@@ -323,7 +343,7 @@ for cmd in \
   'bat x' \
   ''; do
   case "$cmd" in
-  git\ *\|*) expect_claude "$cmd" deny ;;
+  git\ *\|* | cat | 'jq .' | 'grep foo') expect_claude "$cmd" '' ;;
   git\ * | 'cd /tmp' | 'cd /tmp && git stash' | 'bat x' | '') expect_claude "$cmd" '' ;;
   *) expect_claude "$cmd" deny ;;
   esac
@@ -340,9 +360,10 @@ expect_json() {
     if [[ $1 == codex ]]; then
       blocks=$((blocks + 1))
       [[ $status == 2 && -s "$stub_dir/stderr" && -z $got ]] || fail "[$2] codex deny transport: status=$status stdout=[$got]"
+      assert_guidance "$(<"$stub_dir/stderr")" "$(jq -r '.tool_input.command' <<<"$2")"
     else
       [[ $status == 0 ]] || fail "claude deny status: $status"
-      assert_denied "$got" "$2"
+      assert_denied "$got" "$2" "$(jq -r '.tool_input.command' <<<"$2")"
     fi
     return
   fi
@@ -413,7 +434,7 @@ expect_claude_in() {
   payload=$(jq -cn --arg command "$2" --arg cwd "$1" '{tool_name:"Bash",tool_input:{command:$command},cwd:$cwd}')
   got=$(printf '%s' "$payload" | bash "$hook" claude)
   if [[ $3 == deny ]]; then
-    assert_denied "$got" "claude in [$1] [$2]"
+    assert_denied "$got" "claude in [$1] [$2]" "$2"
     return
   fi
   if [[ -z $3 ]]; then
@@ -586,7 +607,7 @@ expect_claude_home() {
   payload=$(jq -cn --arg command "$2" '{tool_name:"Bash",tool_input:{command:$command}}')
   got=$(printf '%s' "$payload" | HOME="$1" bash "$hook" claude)
   if [[ $3 == deny ]]; then
-    assert_denied "$got" "claude HOME=[$1] [$2]"
+    assert_denied "$got" "claude HOME=[$1] [$2]" "$2"
     return
   fi
   if [[ -z $3 ]]; then

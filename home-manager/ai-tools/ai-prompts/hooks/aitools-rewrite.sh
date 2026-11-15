@@ -4,7 +4,7 @@
 # `aitools` call, so the model gets aitools' JSON with line numbers, hashes, and next_commands
 # instead of raw text.
 # The rewrite-stage restrictions below preserve output semantics. Afterwards, enforcement denies
-# any raw file operation left over, including writes and reads inside compound shell commands.
+# recognized file operands and writes in the shell forms classified below. This is not a shell interpreter.
 #
 # The first argument selects the output shape:
 #   claude (default)  hookSpecificOutput.updatedInput only. A permissionDecision would auto-approve
@@ -35,7 +35,7 @@
 # `aitools read` fails on both (see is_empty_file and range_past_eof).
 # A flag outside the per-command allowlist, an unquoted glob, a variable, or a regex whose dialect
 # differs from aitools' is not rewritten. The enforcement pass below denies remaining raw file
-# operations. ALLOW_RAW_FILE_OP=1 is the explicit override for an authorized operation.
+# operations. ALLOW_RAW_FILE_OP=1 allows only a single simple authorized command.
 #
 # rg, fd, and tree skip hidden entries where aitools lists them, so their rewrites add globs that
 # exclude dot-files and dot-directories. Those globs match workspace-relative paths, so the command
@@ -71,6 +71,12 @@ mode="${1:-claude}"
 input=$(cat)
 
 if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null || ! command -v python3 &>/dev/null; then
+  exit 0
+fi
+
+# Conservative payload prefilters avoid interpreters for unrelated VCS/build commands.
+# Quoted data may enter the slow path; only the lexer below makes policy decisions.
+if [[ ! $input =~ (cat|head|tail|nl|sed|grep|rg|ls|find|fd|tree|wc|jq|diff|awk|cut|sort|rm|rmdir|mv|cp|mkdir|touch|chmod|ln|tee|install|truncate|dd|unlink|rsync|perl|python|aitools|ALLOW_RAW_FILE_OP|[\<\>]) ]]; then
   exit 0
 fi
 
@@ -1002,16 +1008,21 @@ sub rw_diff {
 }
 PERL
 
-rewritten=$(perl -e "$perl_prog" "$mode" "$input" 2>/dev/null) || rewritten=''
+rewritten=''
+if [[ $input =~ (cat|head|tail|sed|grep|rg|ls|find|fd|tree|wc|jq|diff) ]]; then
+  rewritten=$(perl -e "$perl_prog" "$mode" "$input" 2>/dev/null) || rewritten=''
+fi
 
-python3 - "$mode" "$input" "$rewritten" <<'PY'
+python3 - "$mode" "$input" "$rewritten" "$(dirname "$0")/aitools-launcher.pl" <<'PY'
 import ast
 import json
 import os
 import re
 import sys
+import shlex
+import subprocess
 
-mode, raw, rewritten = sys.argv[1:]
+mode, raw, rewritten, launcher_path = sys.argv[1:]
 try:
     payload = json.loads(raw)
 except (ValueError, TypeError):
@@ -1034,15 +1045,13 @@ def decision(kind, reason):
         'permissionDecisionReason': reason}}))
     sys.exit(0)
 
-if re.match(r'ALLOW_RAW_FILE_OP=1(?:\s|$)', command):
-    decision('allow', 'Explicit raw file operation override.')
-
 READS = dict.fromkeys(('cat', 'head', 'tail', 'nl', 'sed'), 'read')
 READS.update(dict.fromkeys(('grep', 'egrep', 'fgrep', 'rg'), 'search'))
 READS.update(dict.fromkeys(('ls', 'find', 'fd', 'tree'), 'find'))
-READS.update(wc='info', jq='doc get', diff='diff', awk='table read', cut='table read')
+READS.update(wc='info', jq='doc get', diff='diff', awk='table read', cut='table read', sort='read')
 WRITES = dict(rm='rm', rmdir='rm', mv='move', cp='copy', mkdir='mkdir',
-              touch='touch', chmod='chmod', ln='link', tee='write')
+              touch='touch', chmod='chmod', ln='link', tee='write', install='copy',
+              truncate='write', unlink='rm', rsync='copy')
 ASSIGN = re.compile(r'[A-Za-z_][A-Za-z0-9_]*=')
 
 class Token:
@@ -1077,6 +1086,28 @@ def lex(source):
                     active = True
                 i += 2
                 continue
+        # Parameter/arithmetic expressions and [[ comparisons are not redirections.
+        if source.startswith('${', i) or source.startswith('$((', i) or (not quote and source.startswith('[[', i)):
+            opening, closing = ('${', '}') if source.startswith('${', i) else (
+                ('$((', '))') if source.startswith('$((', i) else ('[[', ']]'))
+            j, depth = i + len(opening), 1
+            while j < len(source):
+                if source.startswith(opening, j):
+                    depth += 1
+                    j += len(opening)
+                elif source.startswith(closing, j):
+                    depth -= 1
+                    if not depth:
+                        break
+                    j += len(closing)
+                else:
+                    j += 1
+            body = source[i + len(opening):j]
+            nested.extend(lex(body)[1])
+            word += source[i:j + len(closing)]
+            active = True
+            i = j + len(closing)
+            continue
         if c == '`' or source.startswith('$(', i):
             start = i + (1 if c == '`' else 2)
             j, depth, state = start, 1, ''
@@ -1191,14 +1222,26 @@ def unwrap(words):
             elif name == 'builtin' and words and words[0] == '--':
                 words.pop(0)
             continue
+        if name in ('xargs', 'nohup', 'timeout', 'nice', 'sudo'):
+            words.pop(0)
+            values = {'xargs': ('-I', '-J', '-L', '-n', '-P', '-s', '-E', '--replace', '--max-args', '--max-procs', '--delimiter', '-d'),
+                      'sudo': ('-u', '-g', '-h', '-p', '-C', '-T', '--user', '--group'),
+                      'nice': ('-n', '--adjustment'), 'timeout': ('-s', '-k', '--signal', '--kill-after')}
+            while words and words[0].startswith('-'):
+                option = words.pop(0)
+                if option == '--':
+                    break
+                if option in values.get(name, ()) and words:
+                    words.pop(0)
+            if name == 'timeout' and words:
+                words.pop(0)
+            if name == 'xargs':
+                words.append('<xargs operand>')
+            continue
         if name == 'aitools':
-            args = words[1:]
-            while args and args[0].startswith('-'):
-                option = args.pop(0)
-                if option in ('--root', '--state-dir', '--lock-timeout') and args:
-                    args.pop(0)
-            if args and args[0] == 'run' and '--' in args:
-                words = args[args.index('--') + 1:]
+            parsed = json.loads(subprocess.check_output(['perl', launcher_path, *words[1:]], text=True))
+            if parsed.get('kind') == 'run' and parsed.get('index') is not None:
+                words = words[parsed['index'] + 1:]
                 continue
         break
     return words
@@ -1242,11 +1285,70 @@ def python_write(source):
                 return True
     return False
 
+def operands(name, args):
+    # Only known option arguments are consumed. Unknown flags do not erase later file operands.
+    values = {
+        'head': ('-n', '-c', '--lines', '--bytes'), 'tail': ('-n', '-c', '--lines', '--bytes'),
+        'grep': ('-e', '-f', '-m', '-A', '-B', '-C', '--regexp', '--file', '--include', '--exclude'),
+        'rg': ('-e', '-f', '-g', '-t', '-T', '-m', '-A', '-B', '-C', '--regexp', '--file', '--glob', '--type'),
+        'sed': ('-e', '-f', '--expression', '--file'),
+        'awk': ('-F', '-v', '-f'), 'jq': ('--arg', '--argjson', '--slurpfile', '--rawfile', '-f'),
+        'cut': ('-b', '-c', '-f', '-d', '--bytes', '--characters', '--fields', '--delimiter'),
+        'sort': ('-k', '-t', '-S', '-T', '--key', '--field-separator', '--buffer-size'),
+        'install': ('-m', '-o', '-g'), 'truncate': ('-s', '-r', '--size', '--reference'),
+        'nl': ('-b', '-d', '-f', '-h', '-i', '-l', '-n', '-s', '-v', '-w'),
+    }
+    result, program, i = [], name not in ('grep', 'egrep', 'fgrep', 'rg', 'sed', 'awk', 'jq'), 0
+    base = 'grep' if name in ('egrep', 'fgrep') else name
+    while i < len(args):
+        arg = args[i]
+        if arg == '--':
+            result.extend(args[i + 1:] if program else args[i + 2:])
+            break
+        if arg.startswith('-') and arg != '-':
+            if arg in values.get(base, ()):
+                # A script/pattern supplied by option replaces the positional script.
+                if arg in ('-e', '-f', '--regexp', '--file', '--expression'):
+                    program = True
+                i += 2
+                if name == 'jq' and arg in ('--arg', '--argjson', '--slurpfile', '--rawfile'):
+                    i += 1
+                continue
+            if base in ('grep', 'rg', 'sed', 'awk') and re.match(r'^-[ef].+', arg):
+                program = True
+            i += 1
+            continue
+        if not program:
+            program = True
+        elif arg != '-':
+            result.append(arg)
+        i += 1
+    return result
+
+def batch_inspect(data, reads):
+    try:
+        rows = json.loads(data)
+    except (ValueError, TypeError):
+        return None
+    if isinstance(rows, list):
+        for row in rows:
+            if isinstance(row, list) and all(isinstance(v, str) for v in row):
+                found = inspect_words(['aitools', *row], reads)
+                if found:
+                    return found
+    return None
+
 def inspect_words(words, reads):
     words = unwrap(words)
     if not words:
         return None
     name, args = os.path.basename(words[0]), words[1:]
+    if name == 'aitools':
+        parsed = json.loads(subprocess.check_output(['perl', launcher_path, *args], text=True))
+        if parsed.get('kind') == 'batch' and '--stdin-data' in args:
+            i = args.index('--stdin-data')
+            if i + 1 < len(args):
+                return batch_inspect(args[i + 1], reads)
     if name in ('sh', 'bash', 'zsh', 'dash'):
         for i, arg in enumerate(args[:-1]):
             if arg.startswith('-') and 'c' in arg[1:] and not arg.startswith('--'):
@@ -1254,16 +1356,34 @@ def inspect_words(words, reads):
     if name in ('python', 'python3') and '-c' in args:
         i = args.index('-c')
         if i + 1 < len(args) and python_write(args[i + 1]):
-            return 'write', 'Python file write'
-    if name in WRITES:
-        return WRITES[name], name
-    if name == 'sed' and any(a == '--in-place' or a.startswith('--in-place=')
-                            or (a.startswith('-') and not a.startswith('--') and 'i' in a[1:]) for a in args):
-        return 'edit / aitools replace', 'sed in-place write'
-    if name == 'perl' and any(a.startswith('-') and not a.startswith('--') and 'i' in a[1:] for a in args):
-        return 'edit / aitools replace', 'perl in-place write'
-    if reads and name in READS:
-        return READS[name], name
+            return 'write', 'Python file write', None
+    files = operands(name, args)
+    if name in WRITES and files:
+        return WRITES[name], name, files[-1]
+    if name == 'dd':
+        output = next((a[3:] for a in args if a.startswith('of=')), None)
+        if output:
+            return 'write', 'dd output file', output
+        source = next((a[3:] for a in args if a.startswith('if=')), None)
+        if reads and source:
+            return 'read', 'dd input file', source
+    if name == 'find' and '-delete' in args:
+        return 'rm', 'find -delete', files[0] if files else '.'
+    if name == 'sed' and files and any(a == '--in-place' or a.startswith('--in-place=')
+                            or re.match(r'^-[nErzsu]*i', a) for a in args):
+        return 'edit', 'sed in-place write', files[-1]
+    # Perl module/script options consume their remainder; "i" there is not -i.
+    if name == 'perl':
+        for i, arg in enumerate(args):
+            if re.match(r'^-[0-9A-Za-z]*', arg):
+                switches = arg[1:]
+                for switch in switches:
+                    if switch in 'eEfFMmI':
+                        break
+                    if switch == 'i':
+                        return 'edit', 'perl in-place write', args[-1] if args else None
+    if reads and name in READS and (files or name in ('ls', 'find', 'fd', 'tree', 'rg')):
+        return READS[name], name, files[0] if files else '.'
     return None
 
 def inspect(source, reads):
@@ -1274,8 +1394,14 @@ def inspect(source, reads):
             return found
     for receiver, body in heredocs:
         words = unwrap([t.value for t in receiver if not t.operator])
+        if words and os.path.basename(words[0]) == 'aitools':
+            parsed = json.loads(subprocess.check_output(['perl', launcher_path, *words[1:]], text=True))
+            if parsed.get('kind') == 'batch':
+                found = batch_inspect(body, reads)
+                if found:
+                    return found
         if words and os.path.basename(words[0]) in ('python', 'python3') and python_write(body):
-            return 'write', 'Python heredoc file write'
+            return 'write', 'Python heredoc file write', None
         if words and os.path.basename(words[0]) in ('sh', 'bash', 'zsh', 'dash'):
             found = inspect(body, reads)
             if found:
@@ -1289,8 +1415,8 @@ def inspect(source, reads):
             continue
         if token.operator and v in ('>', '>>', '>|', '&>', '<>'):
             target = tokens[i + 1].value if i + 1 < len(tokens) else ''
-            if target != '/dev/null':
-                return 'write', 'file redirection'
+            if target not in ('/dev/null', '/dev/stderr', '/dev/stdout'):
+                return 'write', 'file redirection', target
             if words and words[-1].isdigit():
                 words.pop()
             skip = True
@@ -1298,8 +1424,14 @@ def inspect(source, reads):
             if words and words[-1].isdigit():
                 words.pop()
             # >&FILE writes a file too, while descriptor duplication does not.
-            if v == '>&' and i + 1 < len(tokens) and not re.fullmatch(r'[0-9]+|-|/dev/null', tokens[i + 1].value):
-                return 'write', 'file redirection'
+            if v == '>&' and i + 1 < len(tokens) and not re.fullmatch(r'[0-9]+|-|/dev/(?:null|stderr|stdout)', tokens[i + 1].value):
+                return 'write', 'file redirection', tokens[i + 1].value
+            if v == '<' and reads and i + 1 < len(tokens) and tokens[i + 1].value != '/dev/null':
+                return 'read', 'file input redirection', tokens[i + 1].value
+            if v == '<<<' and i + 1 < len(tokens):
+                found = batch_inspect(tokens[i + 1].value, reads) if words and 'batch' in words else None
+                if found:
+                    return found
             skip = True
         elif token.operator:
             found = inspect_words(words, reads)
@@ -1312,16 +1444,29 @@ def inspect(source, reads):
             words.append(v)
     return inspect_words(words, reads)
 
+if re.match(r'ALLOW_RAW_FILE_OP=1(?:\s|$)', command):
+    tokens, nested, heredocs = lex(command)
+    if nested or heredocs or any(t.operator and t.value in (';', '&&', '||', '|', '|&', '&', '(', ')', '{', '}') for t in tokens):
+        sys.exit(0)
+    decision('allow', 'Explicit raw file operation override for one simple command.')
+
 found = inspect(command, False)
 if not found:
     candidate = json.loads(rewritten)['hookSpecificOutput']['updatedInput']['command'] if rewritten else command
     found = inspect(candidate, True)
 if found:
-    subcommand, operation = found
-    reason = (f'Raw file operation ({operation}) blocked. Use aitools {subcommand}. '
-              'For a target outside the working directory, use aitools --root <dir> '
-              f'{subcommand}; for temporary files use aitools mktemp. '
-              'ALLOW_RAW_FILE_OP=1 is reserved for operations already authorized by the user.')
+    subcommand, operation, target = found
+    reason = f'Raw file operation ({operation}) blocked. Use aitools {subcommand}'
+    if target:
+        reason += ' ' + shlex.quote(target)
+    reason += '. '
+    cwd = os.path.abspath(payload.get('cwd') or os.getcwd())
+    if subcommand not in ('read', 'search', 'find', 'info', 'doc get', 'diff', 'table read') and target:
+        resolved = os.path.abspath(os.path.join(cwd, os.path.expanduser(target)))
+        if os.path.commonpath((cwd, resolved)) != cwd:
+            reason += ('For a target outside the workspace, use aitools --root <dir> write <dir>/x --stdin; '
+                       'for temporary files use aitools mktemp. ')
+    reason += 'ALLOW_RAW_FILE_OP=1 is reserved for operations already authorized by the user.'
     decision('deny', reason)
 if rewritten:
     print(rewritten)

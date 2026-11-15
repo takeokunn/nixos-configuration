@@ -421,8 +421,9 @@ sub verdict_for_segment {
 
 # The aitools process launchers can invoke protected commands directly
 # or through a shell; use the same classifier after finding that command.
-my %AITOOLS_GLOBAL_VALUE_OPT = map { $_ => 1 } qw(--root --lock-timeout);
-my %AITOOLS_GLOBAL_FLAG_OPT = map { $_ => 1 } qw(--trace);
+require $ENV{AITOOLS_LAUNCHER};
+my %AITOOLS_GLOBAL_VALUE_OPT = AitoolsLauncher::global_values();
+my %AITOOLS_GLOBAL_FLAG_OPT = AitoolsLauncher::global_flags();
 
 sub aitools_verdict {
     my ($depth, $allow, @a) = @_;
@@ -466,30 +467,8 @@ sub aitools_verdict {
     return q{};
 }
 
-# Options of `aitools run`, `aitools bg start`, and global options (aitools 0.3.0 schema).
-# Unknown options leave the program position undetermined and retain candidate scanning.
-my %AITOOLS_VALUE_OPT = map { $_ => 1 } qw(
-    --stdin-data --stdin-file --cwd --env --timeout --head --tail --grep --grep-limit --stdout-to
-    --name --root --lock-timeout
-);
-my %AITOOLS_FLAG_OPT = map { $_ => 1 } qw(--stdin --no-strip-ansi --trace);
-
-# Index of the launched program among the words after the launcher subcommand, or undef. A value
-# option consumes the next word even when it is `--`, as aitools does.
-sub aitools_program_index {
-    my @w = @_;
-    my $j = 0;
-    while ($j <= $#w) {
-        return $j + 1 if $w[$j] eq '--';
-        if ($AITOOLS_VALUE_OPT{$w[$j]}) { $j += 2; next; }
-        if ($AITOOLS_FLAG_OPT{$w[$j]} or ($w[$j] =~ /^(--[a-z-]+)=/ and $AITOOLS_VALUE_OPT{$1})) {
-            $j++;
-            next;
-        }
-        return $w[$j] =~ /^-/ ? undef : $j;
-    }
-    return undef;
-}
+# Shared option parsing; this hook retains its conservative candidate policy.
+sub aitools_program_index { return AitoolsLauncher::program_index(@_); }
 
 my %GIT_READONLY = map { $_ => 1 } qw(
     status log diff show blame rev-parse ls-files ls-tree ls-remote merge-base rev-list cat-file
@@ -808,7 +787,10 @@ print encode_json(\@push_argv), "\n" if $CLAUDE_MODE and $verdict eq 'jj-push';
 exit 0;
 PERL
 
-if ! verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"; then
+hook_dir=${BASH_SOURCE[0]%/*}
+[[ $hook_dir != "${BASH_SOURCE[0]}" ]] || hook_dir=.
+hook_dir=$(cd "$hook_dir" && pwd)
+if ! verdict="$(AITOOLS_LAUNCHER="$hook_dir/aitools-launcher.pl" HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"; then
   printf '%s\n' 'Command classification failed (ORCH-P005).' >&2
   exit 2
 fi

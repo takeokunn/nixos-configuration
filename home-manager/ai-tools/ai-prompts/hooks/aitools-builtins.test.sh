@@ -4,6 +4,7 @@ python3 - "$1" <<'PY'
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -20,13 +21,13 @@ with tempfile.TemporaryDirectory(prefix='aitools-builtins-') as directory:
     stub.chmod(0o755)
     env = dict(os.environ, HOME=str(root), CLAUDE_CONFIG_DIR=str(config),
                PATH=f'{root}:{os.environ["PATH"]}')
-    def check(tool, inp, expected, guidance='', mode='claude', **extra):
+    def check(tool, inp, expected, guidance='', mode='claude', outside=False, **extra):
         payload = dict(tool_name=tool, tool_input=inp, cwd=str(root), **extra)
         result = subprocess.run(['bash', hook, mode], input=json.dumps(payload), env=env,
                                 capture_output=True, text=True)
         if expected == 'block' and mode == 'codex':
             assert result.returncode == 2 and result.stderr.strip() and not result.stdout, (payload, result)
-            assert guidance in result.stderr, result.stderr
+            reason = result.stderr
         else:
             assert result.returncode == 0 and not result.stderr, (payload, result)
             if expected == 'pass_':
@@ -34,7 +35,16 @@ with tempfile.TemporaryDirectory(prefix='aitools-builtins-') as directory:
             else:
                 out = json.loads(result.stdout)['hookSpecificOutput']
                 assert out['permissionDecision'] == 'deny', (payload, out)
-                assert guidance in out['permissionDecisionReason'], (payload, out)
+                reason = out['permissionDecisionReason']
+        if expected == 'block':
+            assert guidance and guidance in reason, (payload, reason)
+            subcommand = ('apply' if mode == 'codex' else
+                          dict(Read='read', Grep='search', Glob='find', Write='write', Edit='edit', MultiEdit='edit')[tool])
+            assert re.search(r'aitools (?:--root (?:\S+|\x27[^\x27]*\x27) )?' + subcommand + r' ', reason), (payload, reason)
+            assert ('--root' in reason) == outside, (payload, reason)
+            assert ('aitools mktemp' in reason) == outside, (payload, reason)
+            if outside:
+                assert reason.index('--root') < reason.index('aitools mktemp'), reason
         counts[expected] += 1
 
     check('Read', dict(file_path='a b.txt', offset=4, limit=3), 'block', "aitools read 'a b.txt' --range 4:6")
@@ -46,7 +56,12 @@ with tempfile.TemporaryDirectory(prefix='aitools-builtins-') as directory:
     check('Edit', dict(file_path='x', old_string='before', new_string='after'), 'block',
           'JSON input: {"old": "before", "new": "after"}')
     check('MultiEdit', dict(file_path='x', edits=[]), 'block', 'aitools edit x --stdin')
-    check('Write', dict(file_path='/tmp/outside', content='x'), 'block', '--root')
+    check('Write', dict(file_path='/tmp/outside', content='x'), 'block',
+          'aitools --root /tmp write /tmp/outside --stdin', outside=True)
+    check('Write', dict(file_path='inside', content='x'), 'block', 'aitools write inside --stdin')
+    check('Read', dict(file_path='/tmp/outside'), 'block', 'aitools read /tmp/outside')
+    check('Edit', dict(file_path='/tmp/outside', old_string='a', new_string='b'), 'block',
+          'aitools --root /tmp write /tmp/outside --stdin', outside=True)
     for suffix in ('.png', '.JPG', '.jpeg', '.gif', '.webp', '.bmp', '.svg', '.avif', '.heic', '.pdf', '.ipynb'):
         check('Read', dict(file_path='asset' + suffix), 'pass_')
         check('Write', dict(file_path='asset' + suffix), 'block', 'aitools write')
@@ -57,10 +72,33 @@ with tempfile.TemporaryDirectory(prefix='aitools-builtins-') as directory:
         check(tool, dict(file_path=str(config / 'plans/p.md')), 'pass_')
     check('Write', dict(file_path=str(config / 'plans/../private.md')), 'block', 'aitools write')
     check('Write', dict(file_path='CLAUDE.md'), 'pass_')
-    check('Edit', dict(file_path='CLAUDE.md'), 'block', 'aitools edit')
+    (root / 'CLAUDE.md').write_text('existing project instructions')
+    check('Edit', dict(file_path='CLAUDE.md'), 'pass_')
+    check('Edit', dict(file_path='nested/CLAUDE.md'), 'block', 'aitools edit')
+    check('Read', dict(file_path='README.md'), 'block', 'aitools read README.md')
     check('Write', dict(file_path='nested/CLAUDE.md'), 'block', 'aitools write')
     check('Read', dict(file_path=str(config / 'skills/name/references/x.md')), 'pass_')
     check('Write', dict(file_path=str(config / 'skills/name/references/x.md')), 'block', 'aitools write')
+    for relative in ('projects/project/session/tool-results/result.txt',
+                     'plugins/cache/vendor/plugin/version/skills/name/SKILL.md',
+                     'plugins/cache/vendor/plugin/version/skills/name/references/example.md'):
+        check('Read', dict(file_path=str(config / relative)), 'pass_')
+        check('Write', dict(file_path=str(config / relative)), 'block', 'aitools write')
+    for relative in ('projects/project/tool-results/result.txt',
+                     'projects/project/session/other/result.txt',
+                     'projects/project/session/tool-results/../private.txt',
+                     'plugins/cache/vendor/plugin/version/private.txt',
+                     'plugins/cache/vendor/plugin/version/skills/../private.txt',
+                     'plugins/other/skills/name/SKILL.md'):
+        check('Read', dict(file_path=str(config / relative)), 'block', 'aitools read')
+    task = f'/private/tmp/claude-{os.getuid()}/project/session/tasks/task.output'
+    check('Read', dict(file_path=task), 'pass_')
+    check('Read', dict(file_path=task.replace('/private/tmp/', '/tmp/')), 'pass_')
+    check('Write', dict(file_path=task), 'block', f'aitools --root {Path(task).parent} write {task} --stdin', outside=True)
+    for path in (task.replace(f'claude-{os.getuid()}', f'claude-{os.getuid() + 1}'),
+                 task.replace('/tasks/', '/other/'), task + '.txt',
+                 task.replace('/tasks/task.output', '/tasks/../private.output')):
+        check('Read', dict(file_path=path), 'block', 'aitools read')
     for tool in ('Read', 'Edit', 'Write', 'MultiEdit'):
         check(tool, dict(file_path=str(config / 'projects/project/memory/topic.md')), 'pass_')
     check('Write', dict(file_path=str(config / 'projects/project/notes.md')), 'block', 'aitools write')
@@ -73,9 +111,20 @@ with tempfile.TemporaryDirectory(prefix='aitools-builtins-') as directory:
     check('Write', dict(file_path='plans/p.md'), 'block', 'aitools write')
     check('Write', dict(file_path='plans/../x.md'), 'block', 'aitools write', permission_mode='plan')
     (config / 'settings.json').write_text(json.dumps(dict(plansDirectory='../outside')))
-    check('Write', dict(file_path='../outside/p.md'), 'block', '--root', permission_mode='plan')
+    outside_plan = root.parent / 'outside/p.md'
+    check('Write', dict(file_path='../outside/p.md'), 'block',
+          f'aitools --root {outside_plan.parent} write {outside_plan} --stdin', outside=True, permission_mode='plan')
     for tool in ('apply_patch', 'Edit', 'Write'):
         check(tool, dict(patch='test'), 'block', 'aitools apply --stdin', mode='codex')
+    for tool in ('Edit', 'Write'):
+        check(tool, dict(file_path='inside'), 'block', 'aitools apply --stdin', mode='codex')
+        check(tool, dict(file_path='/tmp/outside'), 'block',
+              'aitools --root /tmp write /tmp/outside --stdin', mode='codex', outside=True)
+    for key in ('input', 'patch'):
+        check('apply_patch', {key: '*** Begin Patch\n*** Add File: inside\n+x\n*** End Patch'},
+              'block', 'aitools apply --stdin', mode='codex')
+        check('apply_patch', {key: '*** Begin Patch\n*** Add File: /tmp/outside\n+x\n*** End Patch'},
+              'block', 'aitools --root /tmp write /tmp/outside --stdin', mode='codex', outside=True)
     check('Read', dict(file_path='x'), 'pass_', mode='codex')
 
     bare = root / 'bare'

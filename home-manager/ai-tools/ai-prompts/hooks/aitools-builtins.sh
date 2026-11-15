@@ -8,6 +8,7 @@ python3 - "${1:-claude}" "$input" <<'PY'
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import sys
 
@@ -19,19 +20,7 @@ except ValueError:
 if not isinstance(payload, dict) or payload.get('hook_event_name', 'PreToolUse') != 'PreToolUse':
     sys.exit(0)
 tool = payload.get('tool_name')
-if mode == 'codex':
-    if tool in ('apply_patch', 'Edit', 'Write'):
-        print('Use aitools apply --stdin for a unified diff, or aitools edit PATH --stdin '
-              'with {"old":"existing text","new":"replacement text"}. '
-              'Outside the working directory use aitools --root <dir>; '
-              'for temporary files use aitools mktemp.', file=sys.stderr)
-        sys.exit(2)
-    sys.exit(0)
-if tool not in ('Read', 'Grep', 'Glob', 'Edit', 'Write', 'MultiEdit'):
-    sys.exit(0)
 inp = payload.get('tool_input')
-if not isinstance(inp, dict):
-    sys.exit(0)
 cwd = payload.get('cwd') or os.getcwd()
 if not isinstance(cwd, str):
     sys.exit(0)
@@ -41,6 +30,31 @@ def absolute(path, base=cwd):
     return os.path.abspath(os.path.join(base, os.path.expanduser(path)))
 def inside(path, directory):
     return os.path.commonpath((path, directory)) == directory
+def outside_guidance(paths):
+    for path in paths:
+        target = absolute(path)
+        if not inside(target, cwd):
+            example = shlex.join(['aitools', '--root', os.path.dirname(target),
+                                  'write', target, '--stdin'])
+            return f' For a write outside the working directory, use {example}; for temporary files use aitools mktemp.'
+    return ''
+if mode == 'codex':
+    if tool in ('apply_patch', 'Edit', 'Write'):
+        paths = []
+        if isinstance(inp, dict):
+            paths = [inp[key] for key in ('file_path', 'path') if isinstance(inp.get(key), str)]
+            patch = inp.get('input', inp.get('patch', ''))
+        else:
+            patch = inp
+        if tool == 'apply_patch' and isinstance(patch, str):
+            paths += re.findall(r'^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$', patch, re.M)
+        reason = ('Use aitools apply --stdin for a unified diff, or aitools edit PATH --stdin '
+                  'with {"old":"existing text","new":"replacement text"}.')
+        print(reason + outside_guidance(paths), file=sys.stderr)
+        sys.exit(2)
+    sys.exit(0)
+if tool not in ('Read', 'Grep', 'Glob', 'Edit', 'Write', 'MultiEdit') or not isinstance(inp, dict):
+    sys.exit(0)
 settings = {}
 for file in (Path(config) / 'settings.json', Path(cwd) / '.claude/settings.json',
              Path(cwd) / '.claude/settings.local.json'):
@@ -59,6 +73,21 @@ if tool == 'Read' and Path(target).suffix.lower() in (
     sys.exit(0)
 if tool == 'Read' and inside(target, absolute('skills', config)):
     sys.exit(0)
+if tool == 'Read':
+    projects = absolute('projects', config)
+    relative = os.path.relpath(target, projects).split(os.sep)
+    if inside(target, projects) and len(relative) >= 4 and relative[2] == 'tool-results':
+        sys.exit(0)
+    cache = absolute('plugins/cache', config)
+    relative = os.path.relpath(target, cache).split(os.sep)
+    if inside(target, cache) and 'skills' in relative[:-1]:
+        sys.exit(0)
+    # Claude stores task output by project and session beneath the current user's temp root.
+    for directory in (f'/private/tmp/claude-{os.getuid()}', f'/tmp/claude-{os.getuid()}'):
+        relative = os.path.relpath(target, directory).split(os.sep)
+        if (inside(target, directory) and len(relative) == 4 and relative[2] == 'tasks'
+                and relative[3].endswith('.output')):
+            sys.exit(0)
 if tool in ('Read', 'Write', 'Edit', 'MultiEdit'):
     # Default memory paths are project-specific. Do not exempt the entire projects directory.
     projects = absolute('projects', config)
@@ -76,10 +105,13 @@ if tool in ('Read', 'Write', 'Edit', 'MultiEdit'):
             and inside(absolute(plans), cwd) and inside(target, absolute(plans))
             and target.endswith('.md')):
         sys.exit(0)
-    if tool == 'Write' and target == os.path.join(cwd, 'CLAUDE.md'):
+    if tool in ('Write', 'Edit') and target == os.path.join(cwd, 'CLAUDE.md'):
         sys.exit(0)
 
 args = ['aitools']
+if tool in ('Write', 'Edit', 'MultiEdit') and not inside(target, cwd):
+    args += ['--root', os.path.dirname(target)]
+    path = target
 if tool == 'Read':
     args += ['read', path]
     start = inp.get('offset', 1)
@@ -106,7 +138,8 @@ if tool in ('Edit', 'MultiEdit'):
     example = {'old': inp.get('old_string', 'existing text'),
                'new': inp.get('new_string', 'replacement text')}
     reason += ' JSON input: ' + json.dumps(example, ensure_ascii=False) + '.'
-reason += ' Outside the working directory use aitools --root <dir>; for temporary files use aitools mktemp.'
+if tool in ('Write', 'Edit', 'MultiEdit'):
+    reason += outside_guidance([path])
 print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse',
     'permissionDecision': 'deny', 'permissionDecisionReason': reason}}))
 PY

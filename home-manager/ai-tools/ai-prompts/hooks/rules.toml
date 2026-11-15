@@ -71,6 +71,13 @@ matcher = "Write|Edit"
 regex = '\.git/(config|hooks/|modules/.+/(config|hooks/))'
 message = "Git config and hooks are off-limits to writes: a planted setting runs a program on the next git fetch. Continue without editing them; ask the user to make the change."
 
+# aitools moves writes into Bash. Match literal management paths, including --root before
+# the verb and apply/batch stdin text. As above, quoted mentions are conservatively protected.
+[[rules]]
+matcher = "Bash"
+regex = '''(?s)(?:^|[\s/'"])aitools(?:\s|$).*?(?:(?:write|edit|apply|replace|copy|move|link|rm|mkdir|touch|chmod|batch)\b.*?\.git/(?:config|hooks/|modules/.+/(?:config|hooks/))|\.git/(?:config|hooks/|modules/.+/(?:config|hooks/)).*?\b(?:write|edit|apply|replace|copy|move|link|rm|mkdir|touch|chmod|batch)\b)'''
+message = "Git config and hooks are off-limits to aitools writes. Continue without editing them; ask the user to make the change."
+
 # Claude Code cannot express `rm -rf /*` as a permission pattern without also matching `rm -rf /tmp/x`
 # (see bashDenyPatterns in home-manager/ai-tools/shared/default.nix), so the literal targets are matched
 # here. A target must be a whole word, so a deeper path (`/tmp/x`, `$HOME/work/x`) passes. The command

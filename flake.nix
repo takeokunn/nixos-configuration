@@ -330,9 +330,9 @@
               }
               ''
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.test.sh} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.sh}
+                  ${./home-manager/ai-tools/ai-prompts/hooks}/aitools-rewrite.sh
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/aitools-enforce.test.sh} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/aitools-rewrite.sh}
+                  ${./home-manager/ai-tools/ai-prompts/hooks}/aitools-rewrite.sh
                 touch $out
               '';
 
@@ -454,7 +454,7 @@
               }
               ''
                 bash ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.test.sh} \
-                  ${./home-manager/ai-tools/ai-prompts/hooks/block-destructive-git.sh}
+                  ${./home-manager/ai-tools/ai-prompts/hooks}/block-destructive-git.sh
                 touch $out
               '';
 
