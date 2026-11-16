@@ -50,14 +50,18 @@ if ((agent)); then
     -R | --repo | --hostname)
       ((i + 1 < ${#sub_args[@]})) && [[ -n ${sub_args[i + 1]} && ${sub_args[i + 1]} != -* ]] ||
         block "a pre-subcommand option is missing its value"
-      ((i += 2)); continue
+      ((i += 2))
+      continue
       ;;
     -R?* | --repo=?* | --hostname=?*) ;;
     -h | --help)
       ((i + 1 == ${#sub_args[@]})) || block "help before a subcommand is ambiguous; put help last"
       ;;
     -*) block "put command-specific options after the gh subcommand" ;;
-    *) sub=${sub_args[i]}; break ;;
+    *)
+      sub=${sub_args[i]}
+      break
+      ;;
     esac
     ((i += 1))
   done
@@ -72,7 +76,8 @@ if ((agent)); then
       case ${sub_args[i]} in
       -h | --host)
         ((i + 1 < ${#sub_args[@]})) || block "config get is missing its host value"
-        ((i += 2)); continue
+        ((i += 2))
+        continue
         ;;
       -h?* | --host=* | --help) ;;
       --) ;;
@@ -145,7 +150,11 @@ if ((agent)) && [[ ${1-} == api ]]; then
     option=${arg%%=*}
     value=""
     case $arg in
-    -X?* | -f?* | -F?* | -H?* | -q?* | -t?* | -p?*) option=${arg:0:2}; value=${arg:2}; value=${value#=} ;;
+    -X?* | -f?* | -F?* | -H?* | -q?* | -t?* | -p?*)
+      option=${arg:0:2}
+      value=${arg:2}
+      value=${value#=}
+      ;;
     --*=*) value=${arg#*=} ;;
     esac
     case $option in
@@ -160,7 +169,11 @@ if ((agent)) && [[ ${1-} == api ]]; then
         method=$(printf '%s' "$value" | tr '[:lower:]' '[:upper:]') || block "gh api method could not be parsed"
         [[ -n $method ]] || block "gh api method could not be parsed"
         ;;
-      --input) has_body=1; input=$value; [[ -n $input ]] || block "gh api has an empty input path" ;;
+      --input)
+        has_body=1
+        input=$value
+        [[ -n $input ]] || block "gh api has an empty input path"
+        ;;
       -f | -F | --raw-field | --field)
         has_body=1
         [[ $value == *=* ]] || block "gh api field could not be parsed"
@@ -180,7 +193,10 @@ if ((agent)) && [[ ${1-} == api ]]; then
     -i | --include | --paginate | --slurp | --silent | --verbose | --allow-escape-sequences) [[ $arg == "$option" ]] || block "gh api flag could not be parsed" ;;
     --help | -h) ;;
     -*) block "gh api option is not recognised by the guard" ;;
-    *) [[ -z $endpoint ]] || block "gh api has multiple endpoints"; endpoint=$arg ;;
+    *)
+      [[ -z $endpoint ]] || block "gh api has multiple endpoints"
+      endpoint=$arg
+      ;;
     esac
     ((i += 1))
   done

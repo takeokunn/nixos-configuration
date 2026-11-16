@@ -162,7 +162,9 @@ let
     postBuild = ''
       rm $out/bin/codex
       makeWrapper ${codexGhqTrust} $out/bin/codex --add-flags ${lib.escapeShellArg "${llmAgentsPkgs.codex}/bin/codex ${lib.escapeShellArgs codexForcedFlags}"} ${
-        lib.concatMapStringsSep " " (name: "--unset ${lib.escapeShellArg name}") shared.agentScrubbedEnvNames
+        lib.concatMapStringsSep " " (
+          name: "--unset ${lib.escapeShellArg name}"
+        ) shared.agentScrubbedEnvNames
       }
     '';
   };

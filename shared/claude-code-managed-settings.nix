@@ -33,9 +33,7 @@ let
   # for SessionStart hooks. The unsets repeat the claude wrapper's for launches that bypass it.
   scrubEnvHook = pkgs.writeShellScript "scrub-agent-env" ''
     if [ -n "''${CLAUDE_ENV_FILE:-}" ]; then
-      printf '%s\n' ${
-        lib.escapeShellArg "unset ${lib.concatStringsSep " " shared.agentScrubbedEnvNames}"
-      } >>"$CLAUDE_ENV_FILE"
+      printf '%s\n' ${lib.escapeShellArg "unset ${lib.concatStringsSep " " shared.agentScrubbedEnvNames}"} >>"$CLAUDE_ENV_FILE"
     fi
   '';
 

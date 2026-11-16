@@ -49,8 +49,8 @@ physical_dir "$HOME/ghq" ghq_root
 # A TOML basic string cannot hold a raw control character, so such a path keeps the prompt.
 if [[ -n $physical && -n $ghq_root && $physical != *[[:cntrl:]]* ]] &&
   [[ $physical == "$ghq_root/github.com/takeokunn/"* ||
-     $physical == "$ghq_root/github.com/nerima-lisp/"* ||
-     $physical == "$ghq_root/github.com/nerima-games/"* ]]; then
+    $physical == "$ghq_root/github.com/nerima-lisp/"* ||
+    $physical == "$ghq_root/github.com/nerima-games/"* ]]; then
   key=${physical//\\/\\\\}
   key=${key//\"/\\\"}
   trust=(-c "projects={ \"$key\" = { trust_level = \"trusted\" } }")

@@ -50,8 +50,8 @@ safe_rm() {
   parent="$(cd "$(dirname "$target")" && pwd -P)"
   resolved="$parent/$(basename "$target")"
   case "$resolved" in
-    "$state_real"/?*) rm -rf -- "$resolved" ;;
-    *) die "refusing to delete $resolved: outside $state_real" ;;
+  "$state_real"/?*) rm -rf -- "$resolved" ;;
+  *) die "refusing to delete $resolved: outside $state_real" ;;
   esac
 }
 

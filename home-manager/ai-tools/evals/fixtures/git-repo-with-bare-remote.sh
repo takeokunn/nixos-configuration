@@ -18,22 +18,22 @@ mkdir -p "$1"
 FIXTURE=$(cd "$1" && pwd -P)
 WORK=$(dirname "$FIXTURE")
 case $WORK in
-  /tmp/* | /private/tmp/*) ;;
-  *)
-    echo "refusing to build outside /tmp: $WORK" >&2
-    exit 64
-    ;;
+/tmp/* | /private/tmp/*) ;;
+*)
+  echo "refusing to build outside /tmp: $WORK" >&2
+  exit 64
+  ;;
 esac
 if [ -n "$(ls -A "$FIXTURE")" ]; then
   echo "fixture dir is not empty: $FIXTURE" >&2
   exit 64
 fi
 case $VARIANT in
-  ahead | diverged) ;;
-  *)
-    echo "unknown variant: $VARIANT" >&2
-    exit 64
-    ;;
+ahead | diverged) ;;
+*)
+  echo "unknown variant: $VARIANT" >&2
+  exit 64
+  ;;
 esac
 
 # Pinned so the user's global git config (signing, hooks, templates) cannot affect the build.

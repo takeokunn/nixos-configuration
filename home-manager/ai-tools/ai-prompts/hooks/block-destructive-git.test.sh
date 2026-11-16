@@ -804,7 +804,7 @@ for runtime in claude codex; do
     status=0
     out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git status"}}' |
       PATH="$push_fixture/diagnostic-perl:$PATH" CLASSIFIER_PROBE_FAILURE="$probe_failure" \
-      "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
+        "$bash_bin" "$hook" "$runtime" 2>"$stderr_file") || status=$?
     expected_status=$((probe_failure * 2))
     [[ $status -eq $expected_status && -z $out ]] || fail "$runtime classifier diagnostic: unexpected status $status or stdout"
     grep -Fq 'R11 classifier diagnostic' "$stderr_file" || fail "$runtime classifier diagnostic was lost"

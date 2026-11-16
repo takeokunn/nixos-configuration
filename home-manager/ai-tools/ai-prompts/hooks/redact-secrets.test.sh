@@ -21,7 +21,7 @@ fail() {
   failures=$((failures + 1))
 }
 
-gh_tok='ghp_FAKE0123456789abcdefghijABCDEFGHIJKL' # gitleaks:allow
+gh_tok='ghp_FAKE0123456789abcdefghijABCDEFGHIJKL'  # gitleaks:allow
 gho_tok='gho_FAKEzyxwvutsrqponmlkjihgfedcba987654' # gitleaks:allow
 pat_tok='github_pat_FAKE_11ABCDEFG0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN'
 fakes=("$gh_tok" "$gho_tok" "$pat_tok" 'FAKEPASSWORDVALUE' 'FAKEAUTHVALUE' 'FAKENIXVALUE' 'FAKExyzNIX')

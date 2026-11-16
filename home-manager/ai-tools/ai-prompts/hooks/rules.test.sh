@@ -18,7 +18,7 @@ event() {
 decision() {
   local out rc=0
   out=$(event "$1" "$2" | "$gg" "${agent_args[@]}" --config "$rules") || rc=$?
-  if (( rc != 0 )); then
+  if ((rc != 0)); then
     printf 'error(exit=%s)\n' "$rc"
     return
   fi

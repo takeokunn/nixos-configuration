@@ -21,11 +21,11 @@ mkdir -p "$1"
 FIXTURE=$(cd "$1" && pwd -P)
 WORK=$(dirname "$FIXTURE")
 case $WORK in
-  /tmp/* | /private/tmp/*) ;;
-  *)
-    echo "refusing to build outside /tmp: $WORK" >&2
-    exit 64
-    ;;
+/tmp/* | /private/tmp/*) ;;
+*)
+  echo "refusing to build outside /tmp: $WORK" >&2
+  exit 64
+  ;;
 esac
 if [ -n "$(ls -A "$FIXTURE")" ]; then
   echo "fixture dir is not empty: $FIXTURE" >&2
@@ -43,8 +43,8 @@ cat >README.md <<'EOF'
 EOF
 
 case $VARIANT in
-  rename)
-    cat >inventory/billing.py <<'EOF'
+rename)
+  cat >inventory/billing.py <<'EOF'
 """Billing. compute_total is the single source of order totals."""
 
 
@@ -60,7 +60,7 @@ def compute_total_with_shipping(lines, shipping):
 def is_free_shipping(lines):
     return compute_total(lines) >= 5000
 EOF
-    cat >inventory/report.py <<'EOF'
+  cat >inventory/report.py <<'EOF'
 from inventory.billing import compute_total
 
 
@@ -71,7 +71,7 @@ def line(order_id, lines):
 def grand_total(orders):
     return sum(compute_total(lines) for lines in orders.values())
 EOF
-    cat >inventory/cli.py <<'EOF'
+  cat >inventory/cli.py <<'EOF'
 import sys
 
 from inventory import billing
@@ -85,7 +85,7 @@ def main(argv):
 if __name__ == "__main__":
     main(sys.argv[1:])
 EOF
-    cat >tests/test_rename.py <<'EOF'
+  cat >tests/test_rename.py <<'EOF'
 import io
 import unittest
 from contextlib import redirect_stdout
@@ -114,9 +114,9 @@ class RenameTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 EOF
-    ;;
-  tax)
-    cat >inventory/pricing.py <<'EOF'
+  ;;
+tax)
+  cat >inventory/pricing.py <<'EOF'
 """Pricing. Amounts are integers in yen."""
 
 
@@ -137,7 +137,7 @@ def member_price(price):
 def describe():
     return "tax 8% / member discount 8%"
 EOF
-    cat >tests/test_tax.py <<'EOF'
+  cat >tests/test_tax.py <<'EOF'
 import unittest
 
 from inventory import pricing
@@ -161,9 +161,9 @@ class TaxTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 EOF
-    ;;
-  register)
-    cat >inventory/commands.py <<'EOF'
+  ;;
+register)
+  cat >inventory/commands.py <<'EOF'
 """Command registry for the inventory CLI."""
 
 __all__ = ["cmd_list", "cmd_count", "dispatch", "HELP"]
@@ -192,7 +192,7 @@ COMMANDS = {
 def dispatch(name, items):
     return COMMANDS[name](items)
 EOF
-    cat >tests/test_register.py <<'EOF'
+  cat >tests/test_register.py <<'EOF'
 import unittest
 
 from inventory import commands
@@ -217,21 +217,21 @@ class RegisterTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 EOF
-    ;;
-  crlf)
-    mkdir -p config
-    printf '%s\r\n' \
-      "; Uploader settings. This file must keep CRLF line endings." \
-      "[upload]" \
-      "endpoint = https://uploads.example.invalid/v1" \
-      "timeout = 30" \
-      "retries = 3" \
-      "" \
-      "[download]" \
-      "timeout = 30" \
-      "retries = 3" \
-      >config/settings.ini
-    cat >tests/test_crlf.py <<'EOF'
+  ;;
+crlf)
+  mkdir -p config
+  printf '%s\r\n' \
+    "; Uploader settings. This file must keep CRLF line endings." \
+    "[upload]" \
+    "endpoint = https://uploads.example.invalid/v1" \
+    "timeout = 30" \
+    "retries = 3" \
+    "" \
+    "[download]" \
+    "timeout = 30" \
+    "retries = 3" \
+    >config/settings.ini
+  cat >tests/test_crlf.py <<'EOF'
 import pathlib
 import unittest
 
@@ -258,9 +258,9 @@ class CrlfTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 EOF
-    ;;
-  twin)
-    cat >inventory/jobs.py <<'EOF'
+  ;;
+twin)
+  cat >inventory/jobs.py <<'EOF'
 """Batch jobs. Import and Export share their retry policy shape on purpose."""
 
 
@@ -281,7 +281,7 @@ class Export:
         backoff = 2
         return {"attempts": attempts, "backoff": backoff}
 EOF
-    cat >tests/test_twin.py <<'EOF'
+  cat >tests/test_twin.py <<'EOF'
 import unittest
 
 from inventory.jobs import Export, Import
@@ -298,11 +298,11 @@ class TwinTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 EOF
-    ;;
-  *)
-    echo "unknown variant: $VARIANT" >&2
-    exit 64
-    ;;
+  ;;
+*)
+  echo "unknown variant: $VARIANT" >&2
+  exit 64
+  ;;
 esac
 
 mkdir -p "$WORK/orig"

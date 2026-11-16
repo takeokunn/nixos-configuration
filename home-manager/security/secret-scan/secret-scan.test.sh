@@ -30,7 +30,7 @@ check() {
 
 random() {
   local chars=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 out=""
-  for ((n = 0; n < $1; n++)); do out+=${chars:RANDOM % 62:1}; done
+  for ((n = 0; n < $1; n++)); do out+=${chars:RANDOM%62:1}; done
   printf '%s' "$out"
 }
 
