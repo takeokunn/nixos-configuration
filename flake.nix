@@ -367,11 +367,20 @@
             let
               stubGh = pkgs.writeShellScript "stub-gh" ''
                 if [ "$1 $2" = "auth token" ]; then
-                  printf '%s\n' "$STUB_TOKEN"
+                  user=""
+                  while [ $# -gt 0 ]; do
+                    [ "$1" = -u ] && user=$2
+                    shift
+                  done
+                  case $user in
+                  "" | someone) printf '%s\n' "$STUB_TOKEN" ;;
+                  *) printf '%s-%s\n' "$STUB_TOKEN" "$user" ;;
+                  esac
                   exit 0
                 fi
                 mkdir -p "$STUB_LOG"
                 printf '%s\n' "$@" >"$STUB_LOG/argv"
+                printf '%s\n' "''${GH_TOKEN-}" >"$STUB_LOG/gh_token"
                 cat >"$STUB_LOG/stdin"
                 exit "''${STUB_EXIT:-0}"
               '';

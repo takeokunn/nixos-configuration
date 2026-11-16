@@ -670,6 +670,8 @@ done
 # GitHub policy belongs to the argv-level gh wrapper; git/jj remain this hook's responsibility.
 for runtime in claude codex; do
   expect_runtime_allow 'gh pr merge 12' "$runtime"
+  # The approval prefix the gh wrapper asks for must reach it.
+  expect_runtime_allow 'ALLOW_GH_MERGE=1 gh pr merge 12 --squash' "$runtime"
   expect_runtime_allow 'aitools run -- gh api -X DELETE repos/example/project' "$runtime"
   expect_runtime_allow 'aitools read gh' "$runtime"
   expect_runtime_allow 'echo "gh pr merge 12"' "$runtime"

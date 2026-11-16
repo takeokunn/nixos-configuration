@@ -2,8 +2,9 @@
 # Table-driven test for gh-secret-guard.sh, run by the `gh-secret-guard` flake check.
 # Usage: gh-secret-guard.test.sh <guard built against stub-gh> <the same guard with a missing gitleaks>
 #
-# The stub gh records its arguments and standard input under $STUB_LOG, prints $STUB_TOKEN for
-# `auth token`, and exits with $STUB_EXIT. Fake secrets are generated at run time: a literal one in
+# The stub gh records its arguments, standard input, and GH_TOKEN under $STUB_LOG, and exits with
+# $STUB_EXIT. For `auth token` it prints $STUB_TOKEN for the account `someone` (or no -u) and
+# $STUB_TOKEN-<account> for any other. Fake secrets are generated at run time: a literal one in
 # this file would be rejected by the repository's gitleaks pre-commit hook.
 
 set -uo pipefail
@@ -337,10 +338,112 @@ CASES
   expect_block /dev/null pr comment 1 --body "$token"
   expect_block /dev/null -R o/r pr view 1
   grep -q 'options before the gh command' "$work/err" || fail "a pre-command option is blocked with the wrong reason"
+  # A merge passes only with the approval prefix, and never with --admin or through gh api.
+  expect_block /dev/null pr merge 1
+  grep -q 'ALLOW_GH_MERGE=1' "$work/err" || fail "the merge block does not show the approval prefix"
+  ALLOW_GH_MERGE=1 expect_allow /dev/null pr merge 1
+  ALLOW_GH_MERGE=1 expect_allow /dev/null pr merge --squash --delete-branch 1
+  ALLOW_GH_MERGE=1 expect_allow /dev/null pr merge --auto --squash 1
+  ALLOW_GH_MERGE=1 expect_allow /dev/null pr -R o/r merge 1
+  ALLOW_GH_MERGE=0 expect_block /dev/null pr merge 1
+  ALLOW_GH_MERGE=yes expect_block /dev/null pr merge 1
+  ALLOW_GH_MERGE=1 expect_block /dev/null pr merge --admin 1
+  grep -q 'bypasses branch protection' "$work/err" || fail "the --admin block does not explain itself"
+  ALLOW_GH_MERGE=1 expect_block /dev/null pr merge 1 --admin=true
+  ALLOW_GH_MERGE=1 expect_block /dev/null pr merge 1 --body "$token"
+  ALLOW_GH_MERGE=1 expect_block /dev/null api -X PUT repos/o/r/pulls/1/merge
+  ALLOW_GH_MERGE=1 expect_block /dev/null api graphql -f 'query=mutation{mergePullRequest(input:{pullRequestId:"x"}){clientMutationId}}'
+  ALLOW_GH_MERGE=1 expect_block /dev/null repo delete o/r --yes
   # gh's own help example: placeholders in typed variables, the document in a raw field.
   expect_allow /dev/null api graphql -F owner={owner} -F name={repo} -f query='query($name: String!, $owner: String!) { repository(owner: $owner, name: $name) { releases(last: 3) { nodes { tagName } } } }'
   unset "$marker"
 done
+
+# --- The account follows the target repository's owner ---
+
+# An account named <another account>-<owner> serves that owner's repositories; the rest keep the
+# active one.
+mkdir -p accounts
+export GH_CONFIG_DIR="$work/accounts"
+printf 'github.com:\n    users:\n        someone:\n        someone-example-org:\n    user: someone\n' >accounts/hosts.yml
+unset GH_TOKEN GITHUB_TOKEN GH_REPO
+org_token="$STUB_TOKEN-someone-example-org"
+
+# Expects gh to run with GH_TOKEN set to $1 (empty: unset).
+expect_token() {
+  local want=$1
+  shift
+  expect_allow "$@"
+  [[ -e $STUB_LOG/gh_token && $(cat "$STUB_LOG/gh_token") == "$want" ]] ||
+    fail "expected GH_TOKEN [$want] for [${*:2}], got [$(cat "$STUB_LOG/gh_token" 2>/dev/null)]"
+}
+
+git init -q org-repo
+git -C org-repo remote add origin git@github.com:example-org/x.git
+git init -q upper-repo
+git -C upper-repo remote add origin ssh://git@github.com/Example-Org/x
+git init -q other-repo
+git -C other-repo remote add origin https://github.com/other/x
+
+expect_token "$org_token" /dev/null pr view 1 -R example-org/x
+expect_token "$org_token" /dev/null pr -R example-org/x view 1
+expect_token "$org_token" /dev/null pr view 1 -Rexample-org/x
+expect_token "$org_token" /dev/null pr view 1 --repo=https://github.com/example-org/x
+expect_token "$org_token" /dev/null pr view 1 --repo github.com/example-org/x
+expect_token "$org_token" /dev/null api repos/example-org/x/pulls
+expect_token "$org_token" /dev/null api /orgs/example-org/repos
+expect_token "$org_token" /dev/null api -X POST repos/example-org/x/issues -f title=t
+expect_token "$org_token" /dev/null api https://api.github.com/repos/example-org/x
+expect_token "$org_token" /dev/null pr view https://github.com/example-org/x/pull/1
+expect_token "$org_token" /dev/null repo view example-org/x --json nameWithOwner
+expect_token "$org_token" /dev/null repo clone example-org/x.git dir
+expect_token "" /dev/null repo view other/x
+expect_token "" /dev/null pr view 1 --jq example-org/x
+GH_REPO=example-org/x expect_token "$org_token" /dev/null pr view 1
+expect_token "" /dev/null pr view 1 -R other/x
+expect_token "" /dev/null pr view 1 -R ghe.example.com/example-org/x
+expect_token "" /dev/null api user
+expect_token "" /dev/null api repos/example-org-two/x
+# someone-example-org is someone-example plus -org, but no account someone-example is logged in.
+expect_token "" /dev/null api repos/org/x
+expect_token "" /dev/null auth status
+GH_TOKEN=caller-token expect_token caller-token /dev/null pr view 1 -R example-org/x
+GITHUB_TOKEN=caller-token expect_token "" /dev/null pr view 1 -R example-org/x
+CLAUDECODE=fixture expect_token "$org_token" /dev/null pr -R example-org/x view 1
+CLAUDECODE=fixture ALLOW_GH_MERGE=1 expect_token "$org_token" /dev/null pr -R example-org/x merge 1
+
+cd org-repo || exit 1
+expect_token "$org_token" /dev/null pr view 1
+expect_token "$org_token" /dev/null api 'repos/{owner}/{repo}/pulls'
+expect_token "" /dev/null pr view 1 -R other/x
+cd ../upper-repo || exit 1
+expect_token "$org_token" /dev/null pr view 1
+cd ../other-repo || exit 1
+expect_token "" /dev/null pr view 1
+expect_token "$org_token" /dev/null pr view 1 -R example-org/x
+cd "$work" || exit 1
+
+# git's credential request names the repository path when credential.useHttpPath is set.
+printf 'protocol=https\nhost=github.com\npath=example-org/x.git\n\n' >cred-org
+printf 'protocol=https\nhost=github.com\npath=other/x.git\n\n' >cred-other
+printf 'protocol=https\nhost=github.com\n\n' >cred-nopath
+printf 'protocol=https\nhost=gist.github.com\npath=example-org/x.git\n\n' >cred-gist
+expect_token "$org_token" cred-org auth git-credential get
+cmp -s cred-org "$STUB_LOG/stdin" || fail "the credential request did not reach gh intact"
+printf 'protocol=https\nhost=github.com\npath=example-org/x.git' >cred-unterminated
+expect_token "$org_token" cred-unterminated auth git-credential get
+expect_token "" cred-other auth git-credential get
+expect_token "" cred-nopath auth git-credential get
+expect_token "" cred-gist auth git-credential get
+expect_token "" cred-org auth git-credential store
+CLAUDECODE=fixture expect_token "$org_token" cred-org auth git-credential get
+
+# Two accounts for one owner is ambiguous, so nothing runs rather than a guess.
+printf '        other:\n        other-example-org:\n' >>accounts/hosts.yml
+expect_block /dev/null pr view 1 -R example-org/x
+grep -q 'ambiguous' "$work/err" || fail "the ambiguous-account block does not explain itself"
+expect_block cred-org auth git-credential get
+expect_token "" /dev/null pr view 1 -R other/x
 
 if [[ $failures -gt 0 ]]; then
   echo "$failures failures across $checked cases" >&2

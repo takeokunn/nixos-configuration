@@ -2,6 +2,9 @@
 {
   programs.gh.enable = true;
   programs.gh.gitCredentialHelper.enable = true;
+  # gh-secret-guard.sh picks the account from the repository owner, and git passes the repository
+  # path to a credential helper only with useHttpPath.
+  programs.git.settings.credential."https://github.com".useHttpPath = true;
 
   # Every gh on PATH runs through gh-secret-guard.sh, which refuses to send a secret. share/ keeps
   # the upstream completions and man pages; only bin/gh is replaced.

@@ -5,10 +5,14 @@
 # (every gh account's token and environment variables named like a secret), which catches values
 # whose format gitleaks does not know.
 #
-# Agent processes (CLAUDECODE or CODEX_THREAD_ID) also refuse merges, repository deletion, token
-# output, and alias/extension execution. REST writes use an endpoint allowlist; GraphQL documents
-# are checked after JSON decoding. auth and secret otherwise carry credentials by design, and
-# git's credential helper must remain usable. Fails closed, with no override.
+# Agent processes (CLAUDECODE or CODEX_THREAD_ID) also refuse repository deletion, token output,
+# alias/extension execution, and merges other than an approved `ALLOW_GH_MERGE=1 gh pr merge`.
+# REST writes use an endpoint allowlist; GraphQL documents are checked after JSON decoding. auth
+# and secret otherwise carry credentials by design, and git's credential helper must remain usable.
+# Fails closed; the merge prefix is the only override.
+#
+# Every run, people's included, also picks the account from the target repository's owner; see
+# use_account_for.
 #
 # Not covered: secrets split across words, interactive editor input, and commits gh pushes. Agent
 # policy does not cover deliberately cleared markers, direct upstream binaries, or other API clients.
@@ -66,7 +70,16 @@ if ((agent)); then
     ((i += 1))
   done
   case "${1-} $sub" in
-  "pr merge" | "repo delete") block "merge and repository deletion require the user to run gh" ;;
+  "pr merge")
+    # The variable records the user's approval. An agent can set it unasked, so it stops an
+    # accidental merge, not a deliberate one.
+    [[ ${ALLOW_GH_MERGE-} == 1 ]] ||
+      block "merging needs the user's approval. Ask the user; once they approve this merge, rerun the same command prefixed with ALLOW_GH_MERGE=1"
+    for arg in "${sub_args[@]}"; do
+      [[ $arg == --admin || $arg == --admin=* ]] && block "--admin bypasses branch protection and is not allowed from agents"
+    done
+    ;;
+  "repo delete") block "repository deletion requires the user to run gh" ;;
   "alias set" | "alias import") block "gh aliases are not allowed; run the full command" ;;
   "extension install" | "extension exec" | "extension upgrade" | "ext install" | "ext exec" | "ext upgrade") block "extension installation and execution are not allowed from agents" ;;
   "auth token") block "token output is not allowed from agents" ;;
@@ -95,6 +108,109 @@ if ((agent)); then
     ;;
   esac
 fi
+
+hosts_file="${GH_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/gh}/hosts.yml"
+# Prints "<host> <account>" for every account logged in to gh.
+hosts_accounts() {
+  [[ -r $hosts_file ]] || return 0
+  local line host=""
+  while IFS= read -r line; do
+    if [[ $line =~ ^([^[:space:]#][^:]*):[[:space:]]*$ ]]; then
+      host=${BASH_REMATCH[1]}
+    elif [[ -n $host && $line =~ ^\ {8}([^[:space:]:]+):[[:space:]]*$ ]]; then
+      printf '%s %s\n' "$host" "${BASH_REMATCH[1]}"
+    fi
+  done <"$hosts_file"
+}
+
+# The repositories of owner O are reached as the github.com account named A-O, where A is another
+# logged-in account, so a work account is chosen without its organisation being written down here.
+# Requiring A keeps the account someone-example-org from also matching an owner named org. Only
+# this process gets the token: the active account in hosts.yml stays as it is, because every other
+# shell and agent session reads it too. A token the caller exported wins.
+use_account_for() {
+  local owner=$1 host account base match="" count=0 accounts=()
+  [[ -z ${GH_TOKEN-}${GITHUB_TOKEN-} && $owner =~ ^[A-Za-z0-9][A-Za-z0-9-]*$ ]] || return 0
+  while read -r host account; do
+    [[ $host == github.com ]] && accounts+=("$account")
+  done < <(hosts_accounts)
+  shopt -s nocasematch
+  for account in "${accounts[@]+"${accounts[@]}"}"; do
+    for base in "${accounts[@]}"; do
+      if [[ $account == "$base-$owner" ]]; then
+        match=$account
+        ((count += 1))
+        break
+      fi
+    done
+  done
+  shopt -u nocasematch
+  ((count <= 1)) || block "more than one logged-in account is named *-$owner, so the account to use is ambiguous"
+  [[ -n $match ]] || return 0
+  GH_TOKEN=$("$real_gh" auth token -h github.com -u "$match" 2>/dev/null) && [[ -n $GH_TOKEN ]] ||
+    block "could not read the token of $match"
+  export GH_TOKEN
+}
+
+# The owner of the repository a gh run is about: --repo, then GH_REPO, then a gh api endpoint, an
+# OWNER/REPO argument of gh repo, or a github.com URL argument, then the origin remote of the
+# current directory. Prints nothing when an explicit repository is not on github.com.
+target_owner() {
+  local arg prev="" repo="" url
+  for arg in "$@"; do
+    case $prev in -R | --repo) repo=$arg ;; esac
+    case $arg in -R?*) repo=${arg#-R} ;; --repo=*) repo=${arg#--repo=} ;; esac
+    prev=$arg
+  done
+  repo=${repo:-${GH_REPO-}}
+  if [[ -n $repo ]]; then
+    repo=${repo#https://}
+    repo=${repo#github.com/}
+    [[ $repo =~ ^([^/]+)/[^/]+/?$ ]] && printf '%s' "${BASH_REMATCH[1]}"
+    return 0
+  fi
+  for arg in "${@:2}"; do
+    if [[ ${1-} == api && $arg =~ ^(https://api\.github\.com)?/*(repos|orgs)/+([^/?{}]+) ]]; then
+      printf '%s' "${BASH_REMATCH[3]}"
+      return 0
+    elif [[ ${1-} == repo && $arg =~ ^([A-Za-z0-9][A-Za-z0-9-]*)/[A-Za-z0-9._-]+$ ]]; then
+      printf '%s' "${BASH_REMATCH[1]}"
+      return 0
+    elif [[ $arg =~ ^https://github\.com/([^/?#]+)/ ]]; then
+      printf '%s' "${BASH_REMATCH[1]}"
+      return 0
+    fi
+  done
+  url=$("$git" remote get-url origin 2>/dev/null) || return 0
+  [[ $url =~ github\.com[:/]+([^/]+)/ ]] && printf '%s' "${BASH_REMATCH[1]}"
+  return 0
+}
+
+# git asks for a credential with key=value lines on standard input; with credential.useHttpPath
+# they carry the repository path, whose first segment is the owner.
+if [[ "${1-} ${2-}" == "auth git-credential" ]]; then
+  request=()
+  while IFS= read -r line || [[ -n $line ]]; do
+    [[ -n $line ]] || break
+    request+=("$line")
+  done
+  if [[ ${3-} == get ]]; then
+    protocol="" host="" path=""
+    for line in "${request[@]+"${request[@]}"}"; do
+      case $line in
+      protocol=*) protocol=${line#*=} ;;
+      host=*) host=${line#*=} ;;
+      path=*) path=${line#*=} ;;
+      esac
+    done
+    [[ $protocol == https && $host == github.com ]] && use_account_for "${path%%/*}"
+  fi
+  exec "$real_gh" "$@" < <(printf '%s\n' "${request[@]+"${request[@]}"}" "")
+fi
+case "${1-}" in
+"" | auth | help | completion | version | --version | -h | --help) ;;
+*) use_account_for "$(target_owner "$@")" ;;
+esac
 
 case "${1-}" in
 "" | auth | secret | help | completion | version | --version | -h | --help)
@@ -258,20 +374,11 @@ add_secret() {
     ((${#line} >= 16)) && secrets+=("$line")
   done <<<"$1"
 }
-hosts_file="${GH_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/gh}/hosts.yml"
-if [[ -r $hosts_file ]]; then
-  host=""
-  while IFS= read -r line; do
-    if [[ $line =~ ^([^[:space:]#][^:]*):[[:space:]]*$ ]]; then
-      host=${BASH_REMATCH[1]}
-    elif [[ -n $host && $line =~ ^\ {8}([^[:space:]:]+):[[:space:]]*$ ]]; then
-      account=${BASH_REMATCH[1]}
-      held=$("$real_gh" auth token -h "$host" -u "$account" 2>/dev/null) ||
-        block "could not read the token of $account on $host to check against it"
-      add_secret "$held"
-    fi
-  done <"$hosts_file"
-fi
+while read -r host account; do
+  held=$("$real_gh" auth token -h "$host" -u "$account" 2>/dev/null) ||
+    block "could not read the token of $account on $host to check against it"
+  add_secret "$held"
+done < <(hosts_accounts)
 # `export -p` rather than `compgen -e`: the non-interactive bash this runs under is built without
 # programmable completion, so compgen does not exist.
 shopt -s nocasematch
