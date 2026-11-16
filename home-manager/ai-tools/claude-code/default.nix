@@ -116,6 +116,7 @@ in
     (mcp-servers-nix.lib.evalModule pkgs {
       programs.context7.enable = true;
       programs.playwright.enable = true;
+      programs.slite.enable = true;
     }).config.settings.servers
     // shared.mcpServers { inherit nurPkgs; };
 }

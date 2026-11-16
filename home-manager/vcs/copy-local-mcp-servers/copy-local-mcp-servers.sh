@@ -8,7 +8,7 @@
 # from the bare root's key and, when the cwd is inside another workspace of the same repo, from that
 # workspace's key; on a name clash the bare root's entry wins. Every message goes to stderr: the
 # callers print the new path on stdout.
-# Register Slite and ClickUp as `slite` and `clickup`: the managed-settings deny rules match those names.
+# Register ClickUp as `clickup`: the managed-settings deny rules match that name.
 # Exit status: 0 when everything was copied or there was nothing to do, 1 on any failure, 2 on a
 # wrong argument count.
 

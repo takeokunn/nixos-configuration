@@ -74,10 +74,12 @@ in
 
   permissions = {
     deny = map (p: "Bash(${p})") shared.bashDenyPatterns ++ [
-      # Slite and ClickUp are local-scope servers registered as "slite" and "clickup"; the names
-      # must match these rules (see copy-local-mcp-servers.sh).
-      "mcp__slite__archive-note"
-      "mcp__slite__remove-blocks"
+      # Slite comes from programs.claude-code.mcpServers, which home-manager serves as the "hm" plugin,
+      # so its tools are named mcp__plugin_hm_slite__*.
+      "mcp__plugin_hm_slite__archive-note"
+      "mcp__plugin_hm_slite__remove-blocks"
+      # ClickUp is a local-scope server registered as "clickup"; the name must match these rules (see
+      # copy-local-mcp-servers.sh).
       "mcp__clickup__clickup_delete_task"
       "mcp__clickup__clickup_delete_comment"
       "mcp__clickup__clickup_delete_chat_message"
