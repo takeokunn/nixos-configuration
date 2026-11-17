@@ -19,6 +19,7 @@
     ./wl-clip-persist
     ./easyeffects
     ./mako
+    ./poweralertd
     ./zathura
     ./imv
     ./mpv

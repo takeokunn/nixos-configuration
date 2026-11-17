@@ -48,5 +48,8 @@ in
 
     [app-name=discord]
     border-color=${colors.base0C}
+
+    [mode=do-not-disturb]
+    invisible=1
   '';
 }

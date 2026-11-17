@@ -13,6 +13,17 @@ let
       printf '{"text":"󰖂","class":"disconnected","tooltip":"Tailscale: disconnected"}\n'
     fi
   '';
+  # Each prints nothing while inactive, which hides the module.
+  recordingStatus = pkgs.writeShellScript "waybar-recording" ''
+    if ${pkgs.procps}/bin/pgrep -f wl-screenrec >/dev/null; then
+      printf '{"text":"%s","class":"recording","tooltip":"Recording: Mod+Shift+R stops it"}\n' "󰑊"
+    fi
+  '';
+  doNotDisturbStatus = pkgs.writeShellScript "waybar-do-not-disturb" ''
+    if ${pkgs.mako}/bin/makoctl mode | ${pkgs.gnugrep}/bin/grep -qx do-not-disturb; then
+      printf '{"text":"%s","class":"on","tooltip":"Do not disturb: Mod+Alt+N turns it off"}\n' "󰂛"
+    fi
+  '';
   tailscaleToggle = pkgs.writeShellScript "waybar-tailscale-toggle" ''
     if ${pkgs.tailscale}/bin/tailscale status >/dev/null 2>&1; then
       exec ${pkgs.tailscale}/bin/tailscale down
@@ -37,6 +48,9 @@ in
       ];
       modules-center = [ "clock" ];
       modules-right = [
+        "custom/recording"
+        "privacy"
+        "custom/do-not-disturb"
         "cpu"
         "memory"
         "network"
@@ -151,6 +165,18 @@ in
           activated = "󰅶";
           deactivated = "󰾪";
         };
+      };
+
+      "custom/recording" = {
+        exec = "${recordingStatus}";
+        return-type = "json";
+        interval = 2;
+      };
+
+      "custom/do-not-disturb" = {
+        exec = "${doNotDisturbStatus}";
+        return-type = "json";
+        interval = 2;
       };
 
       "custom/tailscale" = {
@@ -318,6 +344,17 @@ in
 
     #idle_inhibitor.activated,
     #power-profiles-daemon.performance {
+      color: ${colors.base09};
+    }
+
+    #custom-recording,
+    #privacy {
+      padding: 0 12px;
+      color: ${colors.base08};
+    }
+
+    #custom-do-not-disturb {
+      padding: 0 12px;
       color: ${colors.base09};
     }
 

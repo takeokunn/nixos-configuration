@@ -68,9 +68,10 @@
         mode = "0700";
       }
 
-      # Launcher, audio state
+      # Launcher, audio state, current wallpaper
       ".local/share/vicinae"
       ".local/state/wireplumber"
+      ".local/state/awww"
 
       # AI tools
       ".claude"

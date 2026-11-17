@@ -1,6 +1,27 @@
 { pkgs, nurPkgs, ... }:
+let
+  # The home directory is recreated on every boot, so the daemon has no cached image to restore:
+  # set the wallpaper recorded by wallpaper.sh, or the bundled one on a fresh install.
+  wallpaperStart = pkgs.writeShellScriptBin "wallpaper-start" ''
+    ${pkgs.awww}/bin/awww-daemon &
+    for _ in $(seq 50); do
+      ${pkgs.awww}/bin/awww query >/dev/null 2>&1 && break
+      sleep 0.1
+    done
+    current="''${XDG_STATE_HOME:-$HOME/.local/state}/awww/current"
+    wallpaper="$HOME/Pictures/Wallpapers/dracula-nixos.png"
+    if [ -f "$current" ] && [ -f "$(cat "$current")" ]; then
+      wallpaper=$(cat "$current")
+    fi
+    ${pkgs.awww}/bin/awww img "$wallpaper" --transition-type none
+    wait
+  '';
+in
 {
-  home.packages = [ pkgs.awww ];
+  home.packages = [
+    pkgs.awww
+    wallpaperStart
+  ];
 
   xdg.configFile."awww/wallpaper.sh".executable = true;
   xdg.configFile."awww/wallpaper.sh".text = ''

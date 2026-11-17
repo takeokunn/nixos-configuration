@@ -27,6 +27,15 @@ let
     esac
   '';
 
+  # Mod+Shift+R starts a recording and the same key stops it; SIGINT lets wl-screenrec finish the file.
+  screenrecToggle = pkgs.writeShellScriptBin "screenrec-toggle" ''
+    if ${pkgs.procps}/bin/pkill -INT -f wl-screenrec; then
+      exit 0
+    fi
+    mkdir -p "$HOME/Videos/Recordings"
+    exec ${pkgs.wl-screenrec}/bin/wl-screenrec -f "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"
+  '';
+
   # Workspace numbers and app placement match the Mac's AeroSpace layout.
   workspaces = map toString (lib.range 1 10);
   workspaceKey = ws: if ws == "10" then "0" else ws;
@@ -235,8 +244,7 @@ in
 
         "Mod+Tab".toggle-overview = { };
 
-        "Mod+Shift+R".spawn-sh =
-          ''mkdir -p "$HOME/Videos/Recordings" && wl-screenrec -f "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"'';
+        "Mod+Shift+R".spawn = "screenrec-toggle";
 
         "Mod+N".spawn = [
           "makoctl"
@@ -250,6 +258,12 @@ in
         "Mod+Ctrl+N".spawn = [
           "makoctl"
           "restore"
+        ];
+        "Mod+Alt+N".spawn = [
+          "makoctl"
+          "mode"
+          "-t"
+          "do-not-disturb"
         ];
 
         # kanshi extends onto an external monitor by default; these switch by hand.
@@ -320,7 +334,7 @@ in
               scale = 1.0;
             };
           }
-          { spawn-at-startup = [ "awww-daemon" ]; }
+          { spawn-at-startup = [ "wallpaper-start" ]; }
           { spawn-at-startup = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
           {
             window-rule = {
@@ -359,6 +373,7 @@ in
 
   home.packages = with pkgs; [
     scratchpadCommit
+    screenrecToggle
     wl-clipboard
     grim
     slurp
