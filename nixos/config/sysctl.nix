@@ -1,6 +1,11 @@
 {
   boot.kernel.sysctl = {
-    "vm.swappiness" = 100;
+    # zram is faster than reading files back from disk, so swap early, one page at a time, and
+    # start reclaiming before memory runs short instead of in bursts.
+    "vm.swappiness" = 180;
+    "vm.page-cluster" = 0;
+    "vm.watermark_boost_factor" = 0;
+    "vm.watermark_scale_factor" = 125;
     "vm.vfs_cache_pressure" = 50;
     "vm.dirty_ratio" = 10;
     "vm.dirty_background_ratio" = 5;

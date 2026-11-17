@@ -7,6 +7,9 @@
   # A random MAC address per network that stays stable across reconnects (iwd handles Wi-Fi under NetworkManager).
   networking.wireless.iwd.settings.General.AddressRandomization = "network";
 
+  # Nothing at boot needs the network to be up, and waiting for Wi-Fi delays the greeter.
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   networking.nftables.enable = true;
   networking.firewall.enable = true;
 
