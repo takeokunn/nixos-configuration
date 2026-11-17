@@ -1,5 +1,9 @@
 { lib }:
 rec {
+  commandNames = builtins.attrNames (
+    lib.filterAttrs (_: type: type == "directory") (builtins.readDir ../ai-prompts/commands)
+  );
+
   mcpServers =
     { nurPkgs, context }:
     {
@@ -36,11 +40,10 @@ rec {
   # covers it already (`rm -rf ~*` covers `rm -rf ~/.ssh*`).
   #
   # Git writes are denied and read-only git is not: agents use jj for every VCS write. Prefix lists miss
-  # commands run as `/usr/bin/git`, `env git`, or `bash -c 'git ...'`; block-destructive-git catches
-  # those for Claude Code and Codex by allowing only read-only subcommands. Some writes are also not
-  # expressible as a prefix because the same words begin a read: `git tag v1`, `git config k v`,
-  # and `git branch x` share a prefix with `git tag -l`, `git config --get`, and `git branch --list`.
-  # block-destructive-git covers them for Claude Code and Codex.
+  # commands run as `/usr/bin/git`, `env git`, or `bash -c 'git ...'`, and writes whose words begin a
+  # read (`git tag v1`, `git config k v`, `git branch x` vs `git tag -l`, `git config --get`,
+  # `git branch --list`). block-destructive-git covers both for Claude Code and Codex by allowing only
+  # read-only subcommands.
   #
   # The gh wrapper guards GitHub operations and alias/extension execution. Keep token-output
   # prefix denials as an additional Claude Code boundary.

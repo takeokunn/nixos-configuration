@@ -1,15 +1,11 @@
 { inputs, pkgs, ... }:
-# Activation text below must go into one of `preActivation`, `extraActivation` or `postActivation`,
-# never an attribute named after the module. nix-darwin splices a fixed, enumerated list of slots
-# into the script it runs, so any other name defines an option that typechecks, evaluates, and is
-# never executed, with nothing reporting the omission.
+# Activation text in the imported modules must go into `preActivation`, `extraActivation` or
+# `postActivation`, never an attribute named after the module: nix-darwin runs only that fixed list
+# of slots, and any other name evaluates silently and never executes.
 #
-# `text` is `types.lines`, so several modules sharing a slot concatenate rather than collide, and
-# the whole script is one `set -e` sequence across every slot. Picking a later slot therefore adds
-# failures that can abort you, it does not decouple you from anything; `postActivation` already
-# carries mac-app-util and the entire home-manager activation. Prefer `extraActivation`, which runs
-# near the front. A failure anywhere fails the switch loudly, which is the opposite of the silent
-# no-op an unrecognised slot name produces.
+# `text` is `types.lines`, so modules sharing a slot concatenate, and all slots form one `set -e`
+# script. A later slot isolates nothing (`postActivation` already carries mac-app-util and the
+# home-manager activation), so prefer `extraActivation`, which runs near the front.
 {
   _module.args.guardAndGuide =
     inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;

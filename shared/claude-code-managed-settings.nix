@@ -13,9 +13,8 @@
   lib,
   pkgs,
   guardAndGuide,
-  # Absolute home directory of the user these settings govern. The hook commands need it because
-  # this file is evaluated as system-level policy, where home-manager's own `programs.claude-code.configDir`
-  # is out of scope. flake.nix asserts the two agree.
+  # Absolute home directory of the governed user. System-level policy cannot see home-manager's
+  # `programs.claude-code.configDir`, so the hook paths built from this must match it by hand.
   homeDirectory,
 }:
 let
@@ -105,30 +104,23 @@ in
     CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL = "1";
     CLAUDE_CODE_IDE_SKIP_VALID_CHECK = "1";
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-    # Adds the cacert bundle that nix-darwin places in /etc/ssl to the trusted roots, so they follow
-    # nixpkgs rather than the binary. The llm-agents claude wrapper used to set
-    # CLAUDE_CODE_CERT_STORE=system, which on macOS left only admin-trusted certificates and failed API
-    # calls with UNABLE_TO_GET_ISSUER_CERT_LOCALLY; it no longer does, and whether this entry is still
-    # needed is unmeasured. On NixOS it is expected to duplicate the system store.
-    #
-    # A launcher that sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST (the Mediator desktop app does)
-    # makes Claude Code ignore this entry, so the claude wrapper in
-    # home-manager/ai-tools/claude-code/default.nix also sets the bundle in the process environment.
-    # This entry stays for launches that bypass that wrapper.
+    # Trusts the nixpkgs cacert bundle in /etc/ssl. It guards against CLAUDE_CODE_CERT_STORE=system,
+    # which on macOS fails API calls with UNABLE_TO_GET_ISSUER_CERT_LOCALLY; whether it is still
+    # needed is unmeasured, and on NixOS it duplicates the system store.
+    # CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST (set by the Mediator desktop app) makes Claude Code ignore
+    # this entry, so home-manager/ai-tools/claude-code/default.nix also sets it in the wrapper; this
+    # entry covers launches that bypass that wrapper.
     NODE_EXTRA_CA_CERTS = shared.claudeCodeCaBundle;
   };
 
-  # Claude Code fans one event out to every matching hook in parallel and merges the results
-  # afterwards, so position in this list confers nothing: no hook runs before another and none
-  # sees another's updatedInput. Every hook here judges the command as issued. aitools-rewrite is
-  # currently the only one emitting updatedInput; adding a second would make precedence between
-  # them non-deterministic, and this list could not resolve it.
+  # Claude Code runs every matching hook in parallel and merges the results, so list order confers
+  # nothing and each hook judges the command as issued. aitools-rewrite is the only hook emitting
+  # updatedInput; a second one would make precedence non-deterministic.
   #
   # Hook lists merge across settings sources, so entries a tool installs into the user's own
   # settings.json still fire alongside these.
   hooks.PreToolUse = [
-    # The empty matcher is what reaches Read, Write, and Edit; the Bash entry below cannot see
-    # them, which is the gap guard-and-guide was added to close.
+    # Only the empty matcher reaches Read, Write, and Edit; the Bash entry below cannot see them.
     {
       matcher = "";
       hooks = [
@@ -141,9 +133,8 @@ in
     }
     {
       matcher = "Bash";
-      # The assert fails the build if the derived wiring stops matching what this file expects:
-      # a guardrail renamed or added in the shared catalog would otherwise be installed and never
-      # fire, which has gone unnoticed here once before.
+      # Without the assert, a guardrail renamed or added in the shared catalog would be installed
+      # and never fire.
       hooks =
         assert
           claudeBashHookNames == [

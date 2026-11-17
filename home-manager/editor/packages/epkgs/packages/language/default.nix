@@ -25,9 +25,7 @@ with epkgs;
   dart-mode
   dhall-mode
   direnv-mode
-  # docker-compose-mode: disabled, removed from MELPA and emacs-overlay
-  # (confirmed absent from https://melpa.org/archive.json and
-  # emacs-overlay@8cd7228 emacsPackages); re-enable if a recipe returns.
+  # docker-compose-mode: removed from MELPA and emacs-overlay; re-enable if a recipe returns.
   dockerfile-mode
   dotenv-mode
   elixir-mode

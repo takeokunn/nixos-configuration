@@ -32,5 +32,6 @@ jobs:
         with:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       # cachix-action pushes every path this builds, so the hosts download the closure instead of building it.
+      # --keep-going still builds and pushes the rest when one source download fails.
       - name: Build ${{ matrix.host }}
-        run: nix build --no-link --print-build-logs ".#${{ matrix.attr }}"
+        run: nix build --no-link --print-build-logs --keep-going ".#${{ matrix.attr }}"

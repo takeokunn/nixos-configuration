@@ -137,23 +137,17 @@ in
       KeepAlive = lib.mkForce true;
       ThrottleInterval = 10;
 
-      # launchd hands every agent a 256-file soft rlimit by default, which Emacs
-      # (native-comp .eln files alone keep ~500 FDs open at idle, plus LSP servers and many
-      # buffers/processes) exhausts -> "too many open files". Pin the agent itself so it does
-      # not depend on the global launchctl limit (a separate launchd domain). 65536 is ~130x
-      # measured idle usage, ample headroom without an enormous soft rlimit.
+      # launchd's default 256-file soft rlimit is too low: native-comp .eln files alone keep
+      # ~500 FDs open at idle, so Emacs hits "too many open files". Set it on the agent so it
+      # does not depend on the global launchctl limit (a separate launchd domain).
       SoftResourceLimits.NumberOfFiles = 65536;
       HardResourceLimits.NumberOfFiles = 65536;
     };
   };
 
-  # Install the Nix-built kuro native module into kuro-module.el's XDG default
-  # location (~/.local/share/kuro/). kuro-module.el validates the module file
-  # itself: it must be mode 0600, a single hard link, and not a symlink -- a
-  # raw /nix/store path fails all three (store files are read-only, often
-  # hardlink-deduplicated, and this activation would symlink rather than
-  # copy). A real copy with `install -m 600` is the only way to satisfy that
-  # check, which is also exactly the layout upstream's own installer produces.
+  # kuro-module.el loads its native module from ~/.local/share/kuro/ only when the file is
+  # mode 0600, has a single hard link, and is not a symlink. A store path fails all three,
+  # so copy it with `install -m 600`, the layout upstream's installer produces.
   home.activation.installKuroModule =
     let
       libName = if pkgs.stdenv.hostPlatform.isDarwin then "libkuro_core.dylib" else "libkuro_core.so";

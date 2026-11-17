@@ -77,12 +77,10 @@ let
     exec ${gitleaksCfg.package}/bin/gitleaks protect --staged --verbose --redact --config ${config.xdg.configHome}/gitleaks/config.toml
   '';
 
-  # Agents have committed as "take <...noreply...>" or with a misspelled email by
-  # passing `git -c user.*` or GIT_AUTHOR_*/GIT_COMMITTER_* overrides. The expected
-  # identity is what the config files resolve to (so includeIf work identities
-  # still apply), read with command-line config overrides stripped. Scoped to
-  # the ghq root so test fixtures committing as a fake identity in temp repos
-  # keep working.
+  # Catches identities injected via `git -c user.*` or GIT_AUTHOR_*/GIT_COMMITTER_*.
+  # The expected identity is what the config files resolve to (so includeIf work
+  # identities still apply). Scoped to the ghq root so test fixtures committing as
+  # a fake identity in temp repos keep working.
   identityPrelude = ''
     git_from_files() {
       env -u GIT_CONFIG_PARAMETERS -u GIT_CONFIG_COUNT ${pkgs.git}/bin/git "$@"

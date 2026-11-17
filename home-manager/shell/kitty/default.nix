@@ -7,16 +7,11 @@ in
   programs.kitty.enable = true;
   # Palette and font come from Stylix (stylix.targets.kitty in shared/stylix-home-targets.nix).
 
-  # HackGen Console NF has no emoji glyphs; route emoji ranges to the
-  # platform's color emoji font instead of a tofu glyph. Claude Code's own
-  # record-bullet (U+23FA) and other glyphs like U+2B50 star fell outside
-  # the original three ranges. The added codepoints list only the
-  # emoji-flagged characters in the Miscellaneous Technical (U+2300-U+23FF)
-  # and Miscellaneous Symbols and Arrows (U+2B00-U+2BFF) blocks, not the
-  # full blocks: routing the full blocks would also widen non-emoji glyphs
-  # they contain (e.g. U+2318 command key, U+23CE return) to the emoji
-  # font's wide aspect ratio, breaking column alignment wherever those
-  # appear.
+  # HackGen Console NF has no emoji glyphs, so emoji route to the platform's
+  # color emoji font. In U+2300-U+23FF and U+2B00-U+2BFF only the emoji-flagged
+  # codepoints are listed (e.g. U+23FA, Claude Code's record bullet): mapping the
+  # full blocks would widen non-emoji glyphs such as U+2318 and U+23CE and break
+  # column alignment.
   programs.kitty.settings.symbol_map = "U+1F300-U+1FAFF,U+2600-U+27BF,U+1F1E6-U+1F1FF,U+231A-U+231B,U+2328,U+23CF,U+23E9-U+23F3,U+23F8-U+23FA,U+2B05-U+2B07,U+2B1B-U+2B1C,U+2B50,U+2B55 ${emojiFont}";
 
   programs.kitty.settings = {

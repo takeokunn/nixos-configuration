@@ -142,9 +142,7 @@ let
     fi
   '';
 
-  # Sleep-prevention display plugin script: reflects system-wide disablesleep state.
-  # `pmset -g`'s "System-wide power settings:" block prints the setter keyword
-  # "disablesleep" as "SleepDisabled" -- the getter and setter names differ.
+  # `pmset -g` prints the setter keyword "disablesleep" as "SleepDisabled".
   sleepPreventPlugin = pkgs.writeShellScript "sleep_prevent.sh" ''
     STATE=$(pmset -g | awk '/SleepDisabled/ {print $2}')
 
@@ -155,8 +153,7 @@ let
     fi
   '';
 
-  # Tailscale-serve display plugin script: reflects whether Mediator
-  # (127.0.0.1:43100) is currently proxied onto the tailnet.
+  # 43100 is Mediator's local port (127.0.0.1:43100).
   tailscaleServePlugin = pkgs.writeShellScript "tailscale_serve.sh" ''
     TAILSCALE="/run/current-system/sw/bin/tailscale"
 
@@ -167,10 +164,8 @@ let
     fi
   '';
 
-  # Tailscale-serve toggle click script: flips `tailscale serve` for Mediator
-  # on/off. Requires the NOPASSWD sudoers grant in nix-darwin/config/security.nix
-  # (scoped to exactly these two invocations), since this click_script has no
-  # TTY to answer a password/Touch ID prompt.
+  # Needs the NOPASSWD sudoers grant for exactly these two invocations in
+  # nix-darwin/config/security.nix: a click_script has no TTY for a password prompt.
   tailscaleServeTogglePlugin = pkgs.writeShellScript "tailscale_serve_toggle.sh" ''
     TAILSCALE="/run/current-system/sw/bin/tailscale"
 

@@ -85,8 +85,6 @@
       # _module.args.nurPkgs themselves.
       flake.homeManagerModules =
         let
-          # Evaluates the nur-packages input against the consumer's pkgs and
-          # exposes it as `nurPkgs` to every module in the tree.
           nur =
             { pkgs, ... }:
             {

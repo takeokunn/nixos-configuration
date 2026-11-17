@@ -9,10 +9,8 @@
   ...
 }:
 let
+  shared = import ../shared { inherit lib; };
   commandPromptsPath = ../ai-prompts/commands;
-  commandNames = builtins.attrNames (
-    lib.filterAttrs (_: type: type == "directory") (builtins.readDir commandPromptsPath)
-  );
 
   # Mirrors the CODEX_HOME that programs.codex exports (home.preferXdgDirectories puts it at ~/.config/codex);
   # the activation environment may not export it.
@@ -60,7 +58,7 @@ in
 
   # Claude Code serves ai-prompts/commands/ as slash commands, so the same prompts are
   # skills only for Codex, which has no slash commands.
-  programs.agent-skills.skills.explicit = lib.genAttrs commandNames (_: {
+  programs.agent-skills.skills.explicit = lib.genAttrs shared.commandNames (_: {
     from = "commands";
     agents = [ "codex" ];
   });

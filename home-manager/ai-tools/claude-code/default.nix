@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   nurPkgs,
   mcp-servers-nix,
@@ -7,9 +8,9 @@
   ...
 }:
 let
-  ai-prompts-path = ../ai-prompts;
+  aiPromptsPath = ../ai-prompts;
 
-  shared = import ../shared { inherit (pkgs) lib; };
+  shared = import ../shared { inherit lib; };
 
   # The postFixup override below adds NODE_EXTRA_CA_CERTS to the claude wrapper's environment. When
   # the launching process sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST, Claude Code ignores the
@@ -25,31 +26,25 @@ let
   claude-code-fixed = llmAgentsPkgs.claude-code.overrideAttrs (old: {
     doInstallCheck = false;
     postFixup =
-      assert pkgs.lib.assertMsg (pkgs.lib.hasInfix wrapperSplicePoint old.postFixup)
+      assert lib.assertMsg (lib.hasInfix wrapperSplicePoint old.postFixup)
         "llm-agents claude-code: postFixup no longer contains `${wrapperSplicePoint}`, where NODE_EXTRA_CA_CERTS and the env unsets are spliced in";
       builtins.replaceStrings
         [ wrapperSplicePoint ]
         [
           (
             "${wrapperSplicePoint} \\\n      --set-default NODE_EXTRA_CA_CERTS ${shared.claudeCodeCaBundle}"
-            + pkgs.lib.concatMapStrings (
-              name: " \\\n      --unset ${pkgs.lib.escapeShellArg name}"
+            + lib.concatMapStrings (
+              name: " \\\n      --unset ${lib.escapeShellArg name}"
             ) shared.agentScrubbedEnvNames
           )
         ]
         old.postFixup;
   });
 
-  commandNames = builtins.attrNames (
-    pkgs.lib.filterAttrs (_: type: type == "directory") (
-      builtins.readDir (ai-prompts-path + "/commands")
-    )
-  );
-
-  agentNames = map (pkgs.lib.removeSuffix ".md") (
+  agentNames = map (lib.removeSuffix ".md") (
     builtins.attrNames (
-      pkgs.lib.filterAttrs (name: type: type == "regular" && pkgs.lib.hasSuffix ".md" name) (
-        builtins.readDir (ai-prompts-path + "/agents")
+      lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name) (
+        builtins.readDir (aiPromptsPath + "/agents")
       )
     )
   );
@@ -69,7 +64,7 @@ in
   # Pinned: the module's default moves to the XDG config directory once home.stateVersion reaches 26.11
   # or home.preferXdgDirectories is set, and the managed hook commands hardcode this path.
   programs.claude-code.configDir = "${config.home.homeDirectory}/.claude";
-  programs.claude-code.context = builtins.readFile "${ai-prompts-path}/CLAUDE.md";
+  programs.claude-code.context = builtins.readFile "${aiPromptsPath}/CLAUDE.md";
   # mutableSettings merges the declared keys into a writable `~/.claude/settings.json` on activation
   # instead of placing a read-only store symlink, so Claude Code can still persist a `/model` choice
   # and tools can still install hook entries there. Declared keys win on every activation.
@@ -83,20 +78,20 @@ in
     modelSettings.claude-opus-5-5.effortLevel = "high";
   };
 
-  programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" agentNames;
+  programs.claude-code.agents = readFiles "${aiPromptsPath}/agents" agentNames;
 
-  programs.claude-code.commands = pkgs.lib.genAttrs commandNames (
-    name: builtins.readFile "${ai-prompts-path}/commands/${name}/SKILL.md"
+  programs.claude-code.commands = lib.genAttrs shared.commandNames (
+    name: builtins.readFile "${aiPromptsPath}/commands/${name}/SKILL.md"
   );
 
-  programs.claude-code.outputStyles = readFiles "${ai-prompts-path}/output-styles" [
+  programs.claude-code.outputStyles = readFiles "${aiPromptsPath}/output-styles" [
     "explanatory-strict"
   ];
 
   programs.claude-code.hooks.block-destructive-git = pkgs.writeShellScript "block-destructive-git" ''
     # Keep jj on the caller's PATH so the scan uses the same binary as the push.
     export PATH=${
-      pkgs.lib.makeBinPath [
+      lib.makeBinPath [
         pkgs.coreutils
         pkgs.jq
         pkgs.perl
@@ -104,9 +99,9 @@ in
       ]
     }:"$PATH"
     export GITLEAKS_BIN=${pkgs.gitleaks}/bin/gitleaks
-    exec ${pkgs.bash}/bin/bash ${ai-prompts-path}/hooks/block-destructive-git.sh "$@"
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/block-destructive-git.sh "$@"
   '';
-  programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${ai-prompts-path}/hooks/aitools-rewrite.sh";
+  programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${aiPromptsPath}/hooks/aitools-rewrite.sh";
 
   programs.claude-code.mcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {
