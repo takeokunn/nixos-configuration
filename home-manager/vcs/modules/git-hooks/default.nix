@@ -199,7 +199,7 @@ let
   preCommitScript = pkgs.writeShellScript "pre-commit" ''
     RESULT=0
 
-    ${lib.optionalString cfg.enableIdentityCheck ''
+    ${lib.optionalString runIdentity ''
       ${checkCommitIdentity} || RESULT=1
     ''}
 
@@ -215,7 +215,7 @@ let
       ${checkCaseConflicts} || RESULT=1
     ''}
 
-    ${lib.optionalString (cfg.enableGitleaks && gitleaksCfg.enable) ''
+    ${lib.optionalString runGitleaks ''
       ${gitleaksCheck} || RESULT=1
     ''}
 
