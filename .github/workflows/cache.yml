@@ -1,0 +1,36 @@
+name: cache
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: cache-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build ${{ matrix.host }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: X13Gen2
+            runner: ubuntu-latest
+            attr: nixosConfigurations.X13Gen2.config.system.build.toplevel
+          - host: M4-Max
+            runner: macos-latest
+            attr: darwinConfigurations.M4-Max.system
+    steps:
+      - uses: actions/checkout@v7
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Setup nix
+        uses: ./.github/actions/setup-nix
+        with:
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      # cachix-action pushes every path this builds, so the hosts download the closure instead of building it.
+      - name: Build ${{ matrix.host }}
+        run: nix build --no-link --print-build-logs ".#${{ matrix.attr }}"

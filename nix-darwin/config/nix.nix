@@ -20,7 +20,7 @@ in
   ];
   nix.gc.options = "--delete-older-than 7d";
 
-  nix.settings = {
+  nix.settings = caches.settings // {
     trusted-users = [
       "root"
       username
@@ -31,9 +31,6 @@ in
     ];
     cores = 8;
     max-jobs = 4;
-    http-connections = 50;
-    download-buffer-size = 268435456;
-    always-allow-substitutes = true;
     warn-dirty = false;
     extra-substituters = caches.substituters;
     extra-trusted-public-keys = caches.trusted-public-keys;

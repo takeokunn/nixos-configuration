@@ -13,3 +13,5 @@ runs:
       with:
         name: takeokunn-nixos-configuration
         authToken: "${{ inputs.cachix-auth-token }}"
+        # Unfree packages must not be redistributed from the public cache. Add each new one here.
+        pushFilter: "(slack|discord|google-chrome)"

@@ -2,7 +2,7 @@ let
   caches = import ../../shared/nix-caches.nix;
 in
 {
-  nix.settings = {
+  nix.settings = caches.settings // {
     cores = 2;
     max-jobs = 6;
     allowed-users = [ "@wheel" ];
@@ -11,10 +11,6 @@ in
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
     ]
     ++ caches.trusted-public-keys;
-    keep-outputs = true;
-    keep-derivations = true;
-    connect-timeout = 5;
-    download-buffer-size = 268435456;
     warn-dirty = false;
     experimental-features = [
       "nix-command"
