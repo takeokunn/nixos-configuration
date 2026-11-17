@@ -5,7 +5,7 @@ in
 {
   services.mako.enable = true;
   services.mako.settings = {
-    font = "HackGen Console NF 14";
+    font = "${config.stylix.fonts.monospace.name} 14";
     width = 350;
     height = 150;
     margin = "10";

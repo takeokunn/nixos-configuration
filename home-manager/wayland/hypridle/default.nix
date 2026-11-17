@@ -1,10 +1,14 @@
+let
+  lock = "pidof hyprlock || hyprlock";
+  monitors = state: "command -v niri >/dev/null && niri msg action power-${state}-monitors || true";
+in
 {
   services.hypridle.enable = true;
   services.hypridle.settings = {
     general = {
-      lock_cmd = "pidof hyprlock || hyprlock";
+      lock_cmd = lock;
       before_sleep_cmd = "loginctl lock-session";
-      after_sleep_cmd = "command -v niri >/dev/null && niri msg action power-on-monitors || true";
+      after_sleep_cmd = monitors "on";
       ignore_dbus_inhibit = false;
       ignore_systemd_inhibit = false;
     };
@@ -17,12 +21,12 @@
       }
       {
         timeout = 600;
-        on-timeout = "pidof hyprlock || hyprlock";
+        on-timeout = lock;
       }
       {
         timeout = 900;
-        on-timeout = "command -v niri >/dev/null && niri msg action power-off-monitors || true";
-        on-resume = "command -v niri >/dev/null && niri msg action power-on-monitors || true";
+        on-timeout = monitors "off";
+        on-resume = monitors "on";
       }
       {
         timeout = 1800;

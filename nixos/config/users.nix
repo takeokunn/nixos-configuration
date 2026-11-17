@@ -26,8 +26,6 @@
       alsa-utils
       pavucontrol
       qpwgraph
-      wl-clipboard
-      grim
     ];
   };
 }

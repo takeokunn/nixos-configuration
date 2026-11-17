@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   username,
   ...
@@ -22,8 +23,8 @@
     control = "sufficient";
     settings = {
       cue = true;
-      origin = "pam://X13Gen2";
-      appid = "pam://X13Gen2";
+      origin = "pam://${config.networking.hostName}";
+      appid = "pam://${config.networking.hostName}";
       authfile = ../../hosts/X13Gen2/u2f-keys;
     };
   };

@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 let
-  colors = config.lib.stylix.colors.withHashtag;
+  palette = config.lib.stylix.colors;
+  colors = palette.withHashtag;
+  rgba =
+    base: alpha:
+    "rgba(${palette."${base}-rgb-r"}, ${palette."${base}-rgb-g"}, ${palette."${base}-rgb-b"}, ${alpha})";
 
   tailscaleStatus = pkgs.writeShellScript "waybar-tailscale" ''
     if ${pkgs.tailscale}/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -e '.BackendState == "Running"' >/dev/null; then
@@ -200,17 +204,17 @@ in
 
   programs.waybar.style = ''
     * {
-      font-family: "HackGen Console NF", "Font Awesome 7 Free";
+      font-family: "${config.stylix.fonts.monospace.name}", "Font Awesome 7 Free";
       font-size: 17px;
       min-height: 0;
       transition: all 0.2s ease;
     }
 
     window#waybar {
-      background-color: rgba(40, 42, 54, 0.75);
+      background-color: ${rgba "base00" "0.75"};
       color: ${colors.base05};
       border-radius: 16px;
-      border: 1px solid rgba(248, 248, 242, 0.1);
+      border: 1px solid ${rgba "base05" "0.1"};
       margin: 8px 12px 0 12px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
@@ -225,80 +229,64 @@ in
     }
 
     #workspaces button:hover {
-      background-color: rgba(68, 71, 90, 0.9);
+      background-color: ${rgba "base02" "0.9"};
       color: ${colors.base05};
     }
 
     #workspaces button.active {
       color: ${colors.base0F};
-      background-color: rgba(189, 147, 249, 0.2);
+      background-color: ${rgba "base0F" "0.2"};
     }
 
     #workspaces button.urgent {
       color: ${colors.base08};
-      background-color: rgba(255, 85, 85, 0.2);
+      background-color: ${rgba "base08" "0.2"};
+    }
+
+    #window,
+    #clock,
+    #cpu,
+    #memory,
+    #battery,
+    #network,
+    #wireplumber,
+    #tray {
+      padding: 0 12px;
     }
 
     #window {
-      padding: 0 12px;
       color: ${colors.base05};
     }
 
     #clock {
-      padding: 0 12px;
       color: ${colors.base05};
       font-weight: bold;
     }
 
     #cpu {
-      padding: 0 12px;
       color: ${colors.base0C};
     }
 
-    #cpu.warning {
-      color: ${colors.base09};
-      text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
-    }
-
-    #cpu.critical {
-      color: ${colors.base08};
-      text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
     #memory {
-      padding: 0 12px;
       color: ${colors.base0F};
     }
 
-    #memory.warning {
-      color: ${colors.base09};
-      text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
-    }
-
-    #memory.critical {
-      color: ${colors.base08};
-      text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-
-
-
-
     #battery {
-      padding: 0 12px;
       color: ${colors.base0B};
     }
 
+    #cpu.warning,
+    #memory.warning,
     #battery.warning {
       color: ${colors.base09};
-      text-shadow: 0 0 8px rgba(255, 184, 108, 0.8);
+      text-shadow: 0 0 8px ${rgba "base09" "0.8"};
     }
 
+    #cpu.critical,
+    #memory.critical,
     #battery.critical {
       color: ${colors.base08};
-      text-shadow: 0 0 10px rgba(255, 85, 85, 1.0);
+      text-shadow: 0 0 10px ${rgba "base08" "1.0"};
       animation: pulse 1.5s ease-in-out infinite;
     }
 
@@ -307,7 +295,6 @@ in
     }
 
     #network {
-      padding: 0 12px;
       color: ${colors.base0C};
     }
 
@@ -315,9 +302,7 @@ in
       color: ${colors.base08};
     }
 
-
     #wireplumber {
-      padding: 0 12px;
       color: ${colors.base0A};
     }
 
@@ -344,10 +329,6 @@ in
       color: ${colors.base03};
     }
 
-    #tray {
-      padding: 0 12px;
-    }
-
     #tray > .passive {
       -gtk-icon-effect: dim;
     }
@@ -362,7 +343,7 @@ in
     }
 
     tooltip {
-      background-color: rgba(40, 42, 54, 0.95);
+      background-color: ${rgba "base00" "0.95"};
       border: 1px solid ${colors.base0F};
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);

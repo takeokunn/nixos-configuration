@@ -6,7 +6,7 @@ in
   programs.fuzzel.enable = true;
   programs.fuzzel.settings = {
     main = {
-      font = "HackGen Console NF:size=12";
+      font = "${config.stylix.fonts.monospace.name}:size=12";
       terminal = "kitty";
       layer = "overlay";
       prompt = "❯ ";

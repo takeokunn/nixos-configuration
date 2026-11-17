@@ -241,49 +241,6 @@ in
 
         "Mod+Tab".toggle-overview = { };
 
-        "XF86AudioRaiseVolume".spawn = [
-          "swayosd-client"
-          "--output-volume"
-          "raise"
-        ];
-        "XF86AudioLowerVolume".spawn = [
-          "swayosd-client"
-          "--output-volume"
-          "lower"
-        ];
-        "XF86AudioMute".spawn = [
-          "swayosd-client"
-          "--output-volume"
-          "mute-toggle"
-        ];
-        "XF86MonBrightnessUp".spawn = [
-          "swayosd-client"
-          "--brightness"
-          "raise"
-        ];
-        "XF86MonBrightnessDown".spawn = [
-          "swayosd-client"
-          "--brightness"
-          "lower"
-        ];
-
-        "XF86AudioPlay".spawn = [
-          "playerctl"
-          "play-pause"
-        ];
-        "XF86AudioPause".spawn = [
-          "playerctl"
-          "play-pause"
-        ];
-        "XF86AudioNext".spawn = [
-          "playerctl"
-          "next"
-        ];
-        "XF86AudioPrev".spawn = [
-          "playerctl"
-          "previous"
-        ];
-
         "Mod+Shift+R".spawn-sh =
           ''mkdir -p "$HOME/Videos/Recordings" && wl-screenrec -f "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"'';
 
@@ -317,6 +274,42 @@ in
         "Mod+Shift+E".quit = { };
         "Mod+Shift+O".power-off-monitors = { };
       }
+      // lib.mapAttrs (_: args: { spawn = [ "swayosd-client" ] ++ args; }) {
+        XF86AudioRaiseVolume = [
+          "--output-volume"
+          "raise"
+        ];
+        XF86AudioLowerVolume = [
+          "--output-volume"
+          "lower"
+        ];
+        XF86AudioMute = [
+          "--output-volume"
+          "mute-toggle"
+        ];
+        XF86MonBrightnessUp = [
+          "--brightness"
+          "raise"
+        ];
+        XF86MonBrightnessDown = [
+          "--brightness"
+          "lower"
+        ];
+      }
+      //
+        lib.mapAttrs
+          (_: action: {
+            spawn = [
+              "playerctl"
+              action
+            ];
+          })
+          {
+            XF86AudioPlay = "play-pause";
+            XF86AudioPause = "play-pause";
+            XF86AudioNext = "next";
+            XF86AudioPrev = "previous";
+          }
       // lib.listToAttrs (
         lib.concatMap (ws: [
           (lib.nameValuePair "Mod+${workspaceKey ws}" { focus-workspace = ws; })

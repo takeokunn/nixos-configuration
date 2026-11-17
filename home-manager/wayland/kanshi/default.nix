@@ -1,3 +1,12 @@
+let
+  internal = {
+    criteria = "eDP-1";
+    status = "enable";
+    mode = "1920x1200@60Hz";
+    position = "0,0";
+    scale = 1.0;
+  };
+in
 {
   services.kanshi.enable = true;
   # Every profile with an external output matches the same set of outputs, and kanshi applies the
@@ -6,26 +15,14 @@
     {
       profile.name = "laptop";
       profile.outputs = [
-        {
-          criteria = "eDP-1";
-          status = "enable";
-          mode = "1920x1200@60Hz";
-          position = "0,0";
-          scale = 1.0;
-        }
+        internal
       ];
     }
 
     {
       profile.name = "dual";
       profile.outputs = [
-        {
-          criteria = "eDP-1";
-          status = "enable";
-          mode = "1920x1200@60Hz";
-          position = "0,0";
-          scale = 1.0;
-        }
+        internal
         {
           criteria = "*";
           status = "enable";
