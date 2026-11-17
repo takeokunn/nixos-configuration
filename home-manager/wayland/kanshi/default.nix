@@ -1,7 +1,8 @@
 {
   services.kanshi.enable = true;
+  # Every profile with an external output matches the same set of outputs, and kanshi applies the
+  # first match, so "dual" comes before "docked". Switch by hand with `kanshictl switch <name>`.
   services.kanshi.settings = [
-    # Laptop only (ThinkPad X13 Gen2)
     {
       profile.name = "laptop";
       profile.outputs = [
@@ -15,24 +16,6 @@
       ];
     }
 
-    # External monitor only (docked, lid closed)
-    {
-      profile.name = "docked";
-      profile.outputs = [
-        {
-          criteria = "eDP-1";
-          status = "disable";
-        }
-        {
-          criteria = "*";
-          status = "enable";
-          position = "0,0";
-          scale = 1.0;
-        }
-      ];
-    }
-
-    # Laptop + External monitor (extended)
     {
       profile.name = "dual";
       profile.outputs = [
@@ -52,21 +35,16 @@
       ];
     }
 
-    # Laptop + External monitor (mirror)
     {
-      profile.name = "mirror";
+      profile.name = "docked";
       profile.outputs = [
         {
           criteria = "eDP-1";
-          status = "enable";
-          mode = "1920x1080@60Hz";
-          position = "0,0";
-          scale = 1.0;
+          status = "disable";
         }
         {
           criteria = "*";
           status = "enable";
-          mode = "1920x1080@60Hz";
           position = "0,0";
           scale = 1.0;
         }

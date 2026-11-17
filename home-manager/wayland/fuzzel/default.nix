@@ -1,3 +1,7 @@
+{ config, ... }:
+let
+  colors = config.lib.stylix.colors;
+in
 {
   programs.fuzzel.enable = true;
   programs.fuzzel.settings = {
@@ -6,7 +10,7 @@
       terminal = "kitty";
       layer = "overlay";
       prompt = "❯ ";
-      icon-theme = "Papirus-Dark";
+      icon-theme = config.gtk.iconTheme.name;
       icons-enabled = true;
       fields = "name,generic,comment,categories,filename,keywords";
       show-actions = false;
@@ -40,16 +44,16 @@
     };
 
     colors = {
-      background = "282a36ee";
-      text = "f8f8f2ff";
-      prompt = "bd93f9ff";
-      placeholder = "6272a4ff";
-      input = "f8f8f2ff";
-      match = "ff79c6ff";
-      selection = "44475aff";
-      selection-text = "f8f8f2ff";
-      selection-match = "ff79c6ff";
-      border = "bd93f9ff";
+      background = "${colors.base00}ee";
+      text = "${colors.base05}ff";
+      prompt = "${colors.base0F}ff";
+      placeholder = "${colors.base03}ff";
+      input = "${colors.base05}ff";
+      match = "${colors.base0E}ff";
+      selection = "${colors.base02}ff";
+      selection-text = "${colors.base05}ff";
+      selection-match = "${colors.base0E}ff";
+      border = "${colors.base0F}ff";
     };
 
     border = {

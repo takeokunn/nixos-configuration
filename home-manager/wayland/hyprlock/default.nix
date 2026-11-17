@@ -1,3 +1,8 @@
+{ config, ... }:
+let
+  colors = config.lib.stylix.colors;
+  font = config.stylix.fonts.sansSerif.name;
+in
 {
   programs.hyprlock.enable = true;
   programs.hyprlock.settings = {
@@ -32,19 +37,19 @@
         dots_spacing = 0.15;
         dots_center = true;
         dots_rounding = -1;
-        outer_color = "rgb(BD93F9)";
-        inner_color = "rgb(282A36)";
-        font_color = "rgb(F8F8F2)";
+        outer_color = "rgb(${colors.base0F})";
+        inner_color = "rgb(${colors.base00})";
+        font_color = "rgb(${colors.base05})";
         fade_on_empty = true;
         fade_timeout = 1000;
         placeholder_text = "<i>Password...</i>";
         hide_input = false;
         rounding = 8;
-        check_color = "rgb(8BE9FD)";
-        fail_color = "rgb(FF5555)";
+        check_color = "rgb(${colors.base0C})";
+        fail_color = "rgb(${colors.base08})";
         fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
         fail_transition = 300;
-        capslock_color = "rgb(FFB86C)";
+        capslock_color = "rgb(${colors.base09})";
         numlock_color = -1;
         bothlock_color = -1;
         invert_numlock = false;
@@ -60,9 +65,9 @@
         monitor = "";
         text = "$TIME";
         text_align = "center";
-        color = "rgb(F8F8F2)";
+        color = "rgb(${colors.base05})";
         font_size = 90;
-        font_family = "Inter";
+        font_family = font;
         position = "0, 200";
         halign = "center";
         valign = "center";
@@ -71,9 +76,9 @@
         monitor = "";
         text = "cmd[update:60000] date '+%A, %B %d'";
         text_align = "center";
-        color = "rgb(BD93F9)";
+        color = "rgb(${colors.base0F})";
         font_size = 24;
-        font_family = "Inter";
+        font_family = font;
         position = "0, 110";
         halign = "center";
         valign = "center";

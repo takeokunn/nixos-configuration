@@ -143,8 +143,8 @@ in
       hotkey-overlay.skip-at-startup = { };
 
       cursor = {
-        xcursor-theme = "Adwaita";
-        xcursor-size = 24;
+        xcursor-theme = config.home.pointerCursor.name;
+        xcursor-size = config.home.pointerCursor.size;
       };
 
       environment = {
@@ -285,7 +285,7 @@ in
         ];
 
         "Mod+Shift+R".spawn-sh =
-          ''wl-screenrec -f "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"'';
+          ''mkdir -p "$HOME/Videos/Recordings" && wl-screenrec -f "$HOME/Videos/Recordings/recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"'';
 
         "Mod+N".spawn = [
           "makoctl"
@@ -299,6 +299,18 @@ in
         "Mod+Ctrl+N".spawn = [
           "makoctl"
           "restore"
+        ];
+
+        # kanshi extends onto an external monitor by default; these switch by hand.
+        "Mod+Ctrl+D".spawn = [
+          "kanshictl"
+          "switch"
+          "docked"
+        ];
+        "Mod+Ctrl+E".spawn = [
+          "kanshictl"
+          "switch"
+          "dual"
         ];
 
         "Mod+Escape".spawn = "hyprlock";

@@ -19,6 +19,9 @@
     ./wl-clip-persist
     ./easyeffects
     ./mako
+    ./zathura
+    ./imv
+    ./mpv
     ./impermanence
   ];
 
