@@ -1,8 +1,7 @@
-{ pkgs, inputs, ... }:
+{ pkgs, guardAndGuide, ... }:
 let
   requirements = import ../../shared/codex-managed-settings.nix {
-    inherit pkgs;
-    guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    inherit pkgs guardAndGuide;
   };
   requirementsFile = (pkgs.formats.toml { }).generate "codex-requirements.toml" requirements;
 in

@@ -21,7 +21,6 @@ with epkgs;
   neotree
   nyan-mode
   volatile-highlights
-  idle-highlight-mode
   font-lock-studio
   emojify
   modus-themes

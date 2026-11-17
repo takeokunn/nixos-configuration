@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 {
   # SwayOSD libinput backend - requires root for /dev/input access
   # Reference: https://wiki.nixos.org/wiki/Swayosd

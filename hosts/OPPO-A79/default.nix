@@ -12,11 +12,6 @@ nix-on-droid.lib.nixOnDroidConfiguration {
   modules = [ ../../nix-on-droid ];
   pkgs = import nixpkgs { inherit system; };
   extraSpecialArgs = {
-    inherit
-      nixpkgs
-      system
-      nixvim
-      nur-packages
-      ;
+    inherit nixvim nur-packages;
   };
 }

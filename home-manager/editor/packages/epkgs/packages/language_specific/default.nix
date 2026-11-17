@@ -5,7 +5,6 @@ let
   fish-repl = nurPkgs.emacs-fish-repl;
   dasel = nurPkgs.emacs-dasel;
   consult-dasel = nurPkgs.emacs-consult-dasel;
-  doclive = nurPkgs.emacs-doclive;
 in
 with epkgs;
 [
@@ -68,7 +67,6 @@ with epkgs;
 
   # Markdown
   poly-markdown
-  doclive
 
   # Fish
   fish-repl

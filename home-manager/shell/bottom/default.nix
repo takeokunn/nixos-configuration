@@ -34,18 +34,7 @@
         ];
       }
     ];
-    colors = {
-      avg_cpu_color = "Red";
-      border_color = "White";
-      graph_color = "Gray";
-      highlighted_border_color = "LightMagenta";
-      selected_bg_color = "Magenta";
-      selected_text_color = "Black";
-      table_header_color = "Blue";
-      text_color = "White";
-      widget_title_color = "Cyan";
-    };
-    disk_filter = {
+    disk.name_filter = {
       is_list_ignored = true;
       list = [ "/dev/loop\\d+" ];
       regex = true;
@@ -53,7 +42,7 @@
     flags = {
       basic = false;
       dot_marker = false;
-      hide_table_gap = true;
+      table_gap = "none";
       rate = 700;
     };
     processes = {

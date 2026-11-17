@@ -104,12 +104,6 @@ in
           color = "#00000064";
           inactive-color = "#00000040";
         };
-        struts = {
-          left = 0;
-          right = 0;
-          top = 0;
-          bottom = 0;
-        };
       };
 
       prefer-no-csd = { };

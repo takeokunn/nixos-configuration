@@ -1,19 +1,11 @@
-{
-  pkgs,
-  lib,
-  options,
-  ...
-}:
+{ config, pkgs, ... }:
 let
+  colors = config.lib.stylix.colors.withHashtag;
   emojiFont = if pkgs.stdenv.hostPlatform.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
 in
 {
   programs.kitty.enable = true;
-  # Hosts with Stylix get the palette from it (stylix.targets.kitty).
-  programs.kitty.themeFile = lib.mkIf (!(options ? stylix)) "Dracula";
-
-  programs.kitty.font.name = "HackGen Console NF";
-  programs.kitty.font.size = 13;
+  # Palette and font come from Stylix (stylix.targets.kitty in shared/stylix-home-targets.nix).
 
   # HackGen Console NF has no emoji glyphs; route emoji ranges to the
   # platform's color emoji font instead of a tofu glyph. Claude Code's own
@@ -56,9 +48,9 @@ in
     enable_audio_bell = false;
     visual_bell_duration = 0;
 
-    # Splits/Windows (not covered by Dracula theme)
-    active_border_color = "#f8f8f2";
-    inactive_border_color = "#6272a4";
+    # Stylix's kitty theme leaves the split borders unset.
+    active_border_color = colors.base05;
+    inactive_border_color = colors.base03;
   };
 
   programs.kitty.keybindings = {

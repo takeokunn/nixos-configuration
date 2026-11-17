@@ -16,7 +16,6 @@
           };
       in
       dropMailutils "emacs-unstable"
-      // dropMailutils "emacs-git"
       // {
         emacs = (prev.emacs.override { withMailutils = false; }).overrideAttrs (old: {
           buildInputs = (old.buildInputs or [ ]) ++ [ prev.apple-sdk ];

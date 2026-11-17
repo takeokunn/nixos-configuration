@@ -1,18 +1,19 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
+  palette = config.lib.stylix.colors;
   colors = {
-    background = "0xff282a36";
-    backgroundTransparent = "0xcc282a36";
-    currentLine = "0xff44475a";
-    foreground = "0xfff8f8f2";
-    comment = "0xff6272a4";
-    cyan = "0xff8be9fd";
-    green = "0xff50fa7b";
-    orange = "0xffffb86c";
-    pink = "0xffff79c6";
-    purple = "0xffbd93f9";
-    red = "0xffff5555";
-    yellow = "0xfff1fa8c";
+    background = "0xff${palette.base00}";
+    backgroundTransparent = "0xcc${palette.base00}";
+    currentLine = "0xff${palette.base02}";
+    foreground = "0xff${palette.base05}";
+    comment = "0xff${palette.base03}";
+    cyan = "0xff${palette.base0C}";
+    green = "0xff${palette.base0B}";
+    orange = "0xff${palette.base09}";
+    pink = "0xff${palette.base0E}";
+    purple = "0xff${palette.base0F}";
+    red = "0xff${palette.base08}";
+    yellow = "0xff${palette.base0A}";
     transparent = "0x00000000";
   };
 

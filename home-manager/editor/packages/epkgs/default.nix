@@ -9,10 +9,8 @@ let
   buffer = import ./packages/buffer { inherit epkgs; };
   client = if isDarwin then [ ] else import ./packages/client { inherit epkgs nurPkgs pkgs; };
   coding = import ./packages/coding { inherit epkgs; };
-  cursor = import ./packages/cursor { inherit epkgs; };
   dired = import ./packages/dired { inherit epkgs; };
   eshell = import ./packages/eshell { inherit epkgs; };
-  eww = import ./packages/eww { inherit epkgs; };
   file = import ./packages/file { inherit epkgs; };
   ime = import ./packages/ime { inherit epkgs nurPkgs; };
   language = import ./packages/language { inherit epkgs nurPkgs; };
@@ -31,10 +29,8 @@ awesome
 ++ buffer
 ++ client
 ++ coding
-++ cursor
 ++ dired
 ++ eshell
-++ eww
 ++ file
 ++ ime
 ++ language

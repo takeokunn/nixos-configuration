@@ -8,7 +8,7 @@ let
 
   languageLsp = import ./language/lsp.nix;
   languageTreesitter = import ./language/treesitter.nix { inherit pkgs; };
-  languageMarkdown = import ./language/markdown.nix { inherit pkgs customPackages; };
+  languageMarkdown = import ./language/markdown.nix { inherit pkgs; };
   languageRust = import ./language/rust.nix {
     inherit pkgs;
     lib = pkgs.lib;

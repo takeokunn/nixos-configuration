@@ -1,11 +1,4 @@
-{
-  inputs,
-  pkgs,
-  username,
-  emacsLib,
-  nurPkgs,
-  ...
-}:
+{ inputs, pkgs, ... }:
 # Activation text below must go into one of `preActivation`, `extraActivation` or `postActivation`,
 # never an attribute named after the module. nix-darwin splices a fixed, enumerated list of slots
 # into the script it runs, so any other name defines an option that typechecks, evaluates, and is
@@ -17,41 +10,21 @@
 # carries mac-app-util and the entire home-manager activation. Prefer `extraActivation`, which runs
 # near the front. A failure anywhere fails the switch loudly, which is the opposite of the silent
 # no-op an unrecognised slot name produces.
-#
-# `spotlight.nix` and `security.nix` still use module-named attributes and therefore have never
-# run: grep `mdutil` and `pmset` in /run/current-system/activate returns 0 while `osascript` from
-# `wallpaper.nix` returns 1. Repointing them is a behaviour change, not a cleanup — it would
-# newly disable and erase the Spotlight index on the next switch — so it wants its own decision.
-let
-  claudeCodeSettings = import ./config/claude-code-settings.nix {
-    inherit pkgs username;
-    guardAndGuide = inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  };
-  codexSettings = import ./config/codex-settings.nix { inherit pkgs inputs; };
-  fonts = import ./config/fonts.nix { inherit pkgs; };
-  homebrew = import ./config/homebrew.nix;
-  networking = import ./config/networking.nix;
-  nix = import ./config/nix.nix;
-  security = import ./config/security.nix { inherit username; };
-  services = import ./config/services { inherit emacsLib; };
-  spotlight = import ./config/spotlight.nix;
-  stylix = import ./config/stylix.nix { inherit pkgs; };
-  system = import ./config/system.nix { inherit username; };
-  wallpaper = import ./config/wallpaper.nix { inherit nurPkgs username; };
-in
 {
+  _module.args.guardAndGuide =
+    inputs.guard-and-guide.packages.${pkgs.stdenv.hostPlatform.system}.default;
+
   imports = [
-    claudeCodeSettings
-    codexSettings
-    fonts
-    homebrew
-    networking
-    nix
-    security
-    services
-    spotlight
-    stylix
-    system
-    wallpaper
+    ./config/claude-code-settings.nix
+    ./config/codex-settings.nix
+    ./config/fonts.nix
+    ./config/homebrew.nix
+    ./config/networking.nix
+    ./config/nix.nix
+    ./config/security.nix
+    ./config/services
+    ./config/stylix.nix
+    ./config/system.nix
+    ./config/wallpaper.nix
   ];
 }

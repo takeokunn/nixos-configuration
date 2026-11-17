@@ -1,5 +1,7 @@
-{ username }:
+{ username, ... }:
 {
+  users.users.${username}.home = "/Users/${username}";
+
   # kern.maxfiles/kern.maxfilesperproc are independent of launchd's own default
   # process rlimit (256 soft), so raising only the sysctl ceiling does nothing
   # for launchd-spawned processes; sysctl must run before launchctl limit,

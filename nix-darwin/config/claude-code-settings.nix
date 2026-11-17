@@ -2,6 +2,7 @@
   pkgs,
   username,
   guardAndGuide,
+  ...
 }:
 let
   settings = import ../../shared/claude-code-managed-settings.nix {

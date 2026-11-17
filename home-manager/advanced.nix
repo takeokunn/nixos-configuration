@@ -22,34 +22,18 @@ let
     overlays = editorOverlay ++ [ mcp-servers-nix.overlays.default ];
   };
 
-  nurPkgsEmacs = import "${nur-packages}" {
-    inherit pkgs;
-    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
-  };
   llmAgentsPkgs = llm-agents.packages.${system};
   cclensPkg = cclens.packages.${system}.default;
 
-  emacsPkgSet = import ./editor/packages {
-    inherit lib pkgs;
-    nurPkgs = nurPkgsEmacs;
-  };
-  emacsPkg = if isDarwin then emacsPkgSet.emacs-unstable else emacsPkgSet.emacs-unstable-pgtk;
-  emacsLib = import ./editor/lib/emacs.nix {
-    inherit pkgs emacsPkg;
-  };
+  inherit (import ./editor/emacs-package.nix { inherit pkgs nur-packages; }) emacsPkg emacsLib;
 in
 {
   imports = [
-    ./nur.nix
-    ./shell/basic.nix
+    ./basic.nix
     ./shell/advanced.nix
-    ./editor/basic.nix
     ./editor/advanced.nix
-    ./vcs/basic.nix
     ./vcs/advanced.nix
-    ./security/basic.nix
     ./security/advanced.nix
-    ./development/basic.nix
     ./development/advanced.nix
     ./browser
     ./email
@@ -83,10 +67,6 @@ in
     ++ [ mcp-servers-nix.overlays.default ];
 
   programs.nixvim.nixpkgs.source = nixpkgs;
-
-  home.stateVersion = "25.11";
-  home.preferXdgDirectories = true;
-  home.enableNixpkgsReleaseCheck = false;
 
   targets.darwin.linkApps.enable = isDarwin;
   targets.darwin.copyApps.enable = false;

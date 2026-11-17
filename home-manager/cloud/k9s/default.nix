@@ -1,21 +1,23 @@
+{ config, ... }:
 {
   programs.k9s.enable = true;
   programs.k9s.settings.k9s.noExitOnCtrlC = true;
   programs.k9s.settings.k9s.ui.skin = "dracula";
   programs.k9s.skins.dracula =
     let
-      foreground = "#f8f8f2";
-      background = "#282a36";
-      current_line = "#44475a";
-      selection = "#44475a";
-      comment = "#6272a4";
-      cyan = "#8be9fd";
-      green = "#50fa7b";
-      orange = "#ffb86c";
-      pink = "#ff79c6";
-      purple = "#bd93f9";
-      red = "#ff5555";
-      yellow = "#f1fa8c";
+      colors = config.lib.stylix.colors.withHashtag;
+      foreground = colors.base05;
+      background = colors.base00;
+      current_line = colors.base02;
+      selection = colors.base02;
+      comment = colors.base03;
+      cyan = colors.base0C;
+      green = colors.base0B;
+      orange = colors.base09;
+      pink = colors.base0E;
+      purple = colors.base0F;
+      red = colors.base08;
+      yellow = colors.base0A;
     in
     {
       k9s = {

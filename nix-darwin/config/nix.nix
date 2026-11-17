@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
+let
+  caches = import ../../shared/nix-caches.nix;
+in
 {
   # Pin the host nix-daemon to this flake's nixpkgs nix, matching the
   # darwin-vz-nix guest's Nix version for a consistent distributed-build protocol.
@@ -24,7 +27,7 @@
   nix.settings = {
     trusted-users = [
       "root"
-      "take"
+      username
     ];
     experimental-features = [
       "nix-command"
@@ -36,21 +39,9 @@
     download-buffer-size = 268435456;
     always-allow-substitutes = true;
     warn-dirty = false;
-    extra-substituters = [
-      "https://devenv.cachix.org"
-      "https://nix-community.cachix.org"
-      "https://takeokunn-darwin-vz-nix.cachix.org"
-      "https://takeokunn-nixos-configuration.cachix.org"
-      "https://cache.numtide.com"
-      "https://cclens.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    extra-substituters = caches.substituters ++ [ "https://takeokunn-darwin-vz-nix.cachix.org" ];
+    extra-trusted-public-keys = caches.trusted-public-keys ++ [
       "takeokunn-darwin-vz-nix.cachix.org-1:eqv/henpzh2D5PjoV9YNCGGQJ4jUHW4oeFoqcooQX3g="
-      "takeokunn-nixos-configuration.cachix.org-1:TzNrelquzPLqhPJnUFUp/RC/eHrtEegOjVvGEw+jsdc="
-      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-      "cclens.cachix.org-1:0QUNU6PuVyf+yXOvg3n1rd3FksBoB3s3/Jty50iKRNQ="
     ];
   };
 }

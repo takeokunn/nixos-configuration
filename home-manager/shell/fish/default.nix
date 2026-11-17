@@ -69,42 +69,21 @@
   programs.fish.shellAliases.make = "make -j8";
   programs.fish.shellAliases.magit = "emacsclient -nw --alternate-editor=\"\" -e \"(magit-status)\"";
 
-  programs.fish.plugins = [
-    {
-      name = pkgs.fishPlugins.fish-bd.pname;
-      src = pkgs.fishPlugins.fish-bd.src;
-    }
-    {
-      name = nurPkgs.fish-artisan-completion.pname;
-      src = nurPkgs.fish-artisan-completion.src;
-    }
-    {
-      name = nurPkgs.fish-ghq.pname;
-      src = nurPkgs.fish-ghq.src;
-    }
-    {
-      name = nurPkgs.dracula-fish.pname;
-      src = nurPkgs.dracula-fish.src;
-    }
-    {
-      name = pkgs.fishPlugins.autopair.pname;
-      src = pkgs.fishPlugins.autopair.src;
-    }
-    {
-      name = nurPkgs.fish-nix-completions.pname;
-      src = nurPkgs.fish-nix-completions.src;
-    }
-    {
-      name = nurPkgs.fish-nix-env.pname;
-      src = nurPkgs.fish-nix-env.src;
-    }
-    {
-      name = nurPkgs.fish-dart-completions.pname;
-      src = nurPkgs.fish-dart-completions.src;
-    }
-    {
-      name = nurPkgs.fish-by-binds-yourself.pname;
-      src = nurPkgs.fish-by-binds-yourself.src;
-    }
-  ];
+  programs.fish.plugins =
+    map
+      (plugin: {
+        name = plugin.pname;
+        inherit (plugin) src;
+      })
+      [
+        pkgs.fishPlugins.fish-bd
+        nurPkgs.fish-artisan-completion
+        nurPkgs.fish-ghq
+        nurPkgs.dracula-fish
+        pkgs.fishPlugins.autopair
+        nurPkgs.fish-nix-completions
+        nurPkgs.fish-nix-env
+        nurPkgs.fish-dart-completions
+        nurPkgs.fish-by-binds-yourself
+      ];
 }

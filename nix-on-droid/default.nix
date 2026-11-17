@@ -1,7 +1,5 @@
 {
-  nixpkgs,
   pkgs,
-  system,
   nur-packages,
   nixvim,
   ...
@@ -19,12 +17,7 @@
   home-manager.useGlobalPkgs = true;
   home-manager.sharedModules = [ nixvim.homeModules.nixvim ];
   home-manager.extraSpecialArgs = {
-    inherit
-      nixpkgs
-      system
-      nur-packages
-      nixvim
-      ;
+    inherit nur-packages nixvim;
   };
   home-manager.config = import ../home-manager/basic.nix;
 }

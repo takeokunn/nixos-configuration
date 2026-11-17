@@ -4,7 +4,6 @@ let
     nix-darwin
     home-manager
     nixpkgs
-    nixvim
     mac-app-util
     emacs-overlay
     nur-packages
@@ -13,7 +12,6 @@ let
 
   username = "take";
   system = "aarch64-darwin";
-  lib = nixpkgs.lib;
 
   editorOverlay = import ../../home-manager/editor/overlay.nix { inherit emacs-overlay; };
   shellOverlay = import ../../home-manager/shell/overlay.nix;
@@ -25,26 +23,14 @@ let
     overlays = editorOverlay ++ shellOverlay ++ sketchybarOverlay;
   };
 
-  nurPkgs = import "${nur-packages}" {
-    inherit pkgs;
-    emacsPackages = pkgs.emacsPackagesFor pkgs.emacs-unstable;
-  };
-
-  emacs = import ../../home-manager/editor/packages {
-    inherit lib pkgs nurPkgs;
-  };
-  emacsPkg = emacs.emacs-unstable;
-
-  emacsLib = import ../../home-manager/editor/lib/emacs.nix {
-    inherit pkgs emacsPkg;
-  };
-
-  configuration = _: {
-    users.users.${username}.home = "/Users/${username}";
-  };
+  inherit (import ../../home-manager/editor/emacs-package.nix { inherit pkgs nur-packages; })
+    nurPkgs
+    emacsLib
+    ;
 in
 nix-darwin.lib.darwinSystem {
-  inherit pkgs lib;
+  inherit pkgs;
+  inherit (nixpkgs) lib;
   specialArgs = {
     inherit
       inputs
@@ -55,38 +41,12 @@ nix-darwin.lib.darwinSystem {
       ;
   };
   modules = [
-    configuration
     ../../nix-darwin
     darwin-vz-nix.darwinModules.default
     inputs.stylix.darwinModules.stylix
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager
-    {
-      home-manager.useUserPackages = true;
-      home-manager.users."${username}" = import ../../home-manager/advanced.nix;
-      home-manager.sharedModules = [
-        nixvim.homeModules.nixvim
-        mac-app-util.homeManagerModules.default
-        inputs.agent-skills.homeManagerModules.default
-        inputs.git-bulk-clean.homeManagerModules.default
-      ];
-      home-manager.extraSpecialArgs = {
-        inherit inputs system username;
-        inherit (inputs)
-          nixpkgs
-          nixvim
-          mcp-servers-nix
-          llm-agents
-          cclens
-          nur-packages
-          anthropic-skills
-          paredit-cli-skills
-          aitools-skills
-          yomiyasu-skill
-          emacs-overlay
-          org-babel
-          ;
-      };
-    }
+    (import ../home-manager.nix { inherit inputs system username; })
+    { home-manager.sharedModules = [ mac-app-util.homeManagerModules.default ]; }
   ];
 }
