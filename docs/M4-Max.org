@@ -1,45 +1,45 @@
 #+STARTUP: fold
-* First Installation (M4-Max)
+* 初回インストール (M4-Max)
 
-M4-Max is a Mac M4 Max running nix-darwin with home-manager, brew-nix, and mac-app-util integration.
+M4-Max は nix-darwin で管理する Mac (M4 Max) です。home-manager、Homebrew、mac-app-util を組み合わせています。
 
-** Prerequisites
+** 前提
 
 - macOS (Apple Silicon)
+- macOS のユーザー名が ~take~ であること
+- Homebrew (https://brew.sh)。nix-darwin は Homebrew 本体をインストールしません。
 
-** Step 1: Install Xcode Command Line Tools
+** 手順 1: Xcode Command Line Tools を入れる
 
 #+begin_src shell
   xcode-select --install
 #+end_src
 
-** Step 2: Install Nix
+** 手順 2: Nix を入れる
 
-#+begin_src shell
-  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-#+end_src
-
-Or use the official installer:
+公式のインストーラーを使います。
 
 #+begin_src shell
   sh <(curl -L https://nixos.org/nix/install)
 #+end_src
 
-** Step 3: Clone Configuration
+install.determinate.systems のインストーラーは既定で Determinate Nix を入れます。この設定では nix-darwin が Nix を管理していて、Determinate Nix を検出すると適用を中止するため、使いません。
+
+** 手順 3: 設定を clone する
 
 #+begin_src shell
   git clone https://github.com/takeokunn/nixos-configuration
   cd nixos-configuration
 #+end_src
 
-** Step 4: First nix-darwin Installation
+** 手順 4: nix-darwin を初めて適用する
 
 #+begin_src shell
   sudo -H nix run nix-darwin --extra-experimental-features 'flakes nix-command' -- switch --flake .#M4-Max --show-trace
 #+end_src
 
-** Step 5: Restart Terminal
+** 手順 5: ターミナルを開き直す
 
-Close and reopen your terminal to ensure all environment variables are loaded.
+環境変数をすべて読み込むために、ターミナルを閉じて開き直します。
 
-Re-run the Step 4 command to apply later configuration changes.
+あとで設定を変えたときは、手順 4 のコマンドをもう一度実行します。

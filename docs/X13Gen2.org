@@ -1,34 +1,34 @@
 #+STARTUP: content
-* First Installation (X13Gen2)
+* 初回インストール (X13Gen2)
 
-X13Gen2 boots through Secure Boot (lanzaboote), unlocks LUKS with the TPM plus a PIN, and recreates ~/~ and ~/home~ on every boot; only ~/persist~, ~/nix~ and ~/var/log~ survive.
+X13Gen2 は Secure Boot (lanzaboote) で起動し、TPM と PIN で LUKS を解錠します。~/~ と ~/home~ は起動のたびに作り直され、残るのは ~/persist~、~/nix~、~/var/log~ だけです。
 
-** Before You Start
+** 始める前に
 
-On the current system:
+X13Gen2 に今入っているシステムで次の作業をします。
 
-1. Apply firmware and Secure Boot database (dbx) updates with ~fwupdmgr update~. The TPM unlock is bound to PCR 7, which these updates change, so they must happen before the TPM is enrolled.
-2. Copy everything you want to keep out of the machine. The install erases the disk.
+1. ~fwupdmgr update~ でファームウェアと Secure Boot データベース (dbx) を更新します。TPM による解錠は PCR 7 に結び付いていて、これらの更新は PCR 7 を変えるため、TPM を登録する前に済ませる必要があります。
+2. 残したいものをすべてマシンの外にコピーします。インストールはディスクを消去します。
 
-Boot the NixOS installer USB, open a shell with ~nix-shell -p nvme-cli~, and erase the drive:
+NixOS インストーラーの USB から起動し、~nix-shell -p nvme-cli~ でシェルを開いてドライブを消去します。
 
-3. Check whether the NVMe drive offers a 4096-byte LBA format:
+3. NVMe ドライブに 4096 バイトの LBA フォーマットがあるかを調べます。
    #+begin_src shell
      sudo nvme id-ns -H /dev/nvme0n1 | grep "LBA Format"
    #+end_src
-   If a 4096-byte format is listed, switch to it and erase the drive with ~sudo nvme format /dev/nvme0n1 --lbaf=<index> --ses=1~. Otherwise erase it with ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~.
+   4096 バイトのフォーマットが表示された場合は、~sudo nvme format /dev/nvme0n1 --lbaf=<index> --ses=1~ でそのフォーマットに切り替えてドライブを消去します。表示されない場合は ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~ で消去します。
 
-In the firmware setup:
+ファームウェアの設定画面で次の作業をします。
 
-4. Clear the TPM so nothing from the old install stays enrolled, and put Secure Boot into Setup Mode.
+4. 古いインストールの登録が残らないように TPM をクリアし、Secure Boot を Setup Mode にします。
 
-nixos-anywhere installs from GitHub, so the main branch must already contain ~secrets/x13gen2.yaml~ (see [[*Secrets][Secrets]]) and ~hosts/X13Gen2/u2f-keys~ (see [[*YubiKey][YubiKey]]). Push any change to them before installing.
+nixos-anywhere は GitHub 上の flake からインストールするため、main ブランチに ~secrets/x13gen2.yaml~ ([[*シークレット][シークレット]] を参照) と ~hosts/X13Gen2/u2f-keys~ ([[*YubiKey][YubiKey]] を参照) がすでに入っている必要があります。どちらかを変更した場合は、インストールの前に push します。
 
-** Install with nixos-anywhere
+** nixos-anywhere でインストールする
 
-Boot the NixOS installer USB on the target, connect to the network (~nmtui~), set a password for the ~nixos~ user with ~passwd~, and note the address from ~ip addr~.
+インストール先のマシンを NixOS インストーラーの USB から起動します。ネットワークに接続し (~nmtui~)、~passwd~ で ~nixos~ ユーザーのパスワードを設定し、~ip addr~ でアドレスを控えます。
 
-On the Mac, which holds the pass store, restore the SSH host key into a staging directory and install. Run this in bash, not fish. The host key must be placed before the first boot because sops derives its decryption key from it.
+pass のストアがある Mac で、SSH ホスト鍵を作業用のディレクトリに取り出してからインストールします。fish ではなく bash で実行します。sops はホスト鍵から復号鍵を導出するため、ホスト鍵は最初の起動より前に置いておく必要があります。
 
 #+begin_src bash
   stage=$(mktemp -d)
@@ -37,7 +37,7 @@ On the Mac, which holds the pass store, restore the SSH host key into a staging 
   pass show x13gen2/ssh_host_ed25519_key.pub > "$stage/persist/etc/ssh/ssh_host_ed25519_key.pub"
   chmod 600 "$stage/persist/etc/ssh/ssh_host_ed25519_key"
 
-  # A temporary passphrase; it is removed after the TPM and recovery key are enrolled.
+  # 一時的なパスフレーズ。TPM とリカバリーキーを登録したあとで削除する。
   read -s -p "Temporary LUKS passphrase: " LUKS_PASS
 
   nix run github:nix-community/nixos-anywhere -- \
@@ -50,62 +50,62 @@ On the Mac, which holds the pass store, restore the SSH host key into a staging 
   rm -rf "$stage"
 #+end_src
 
-** First Boot
+** 最初の起動
 
-Until step 3 is done, every boot asks for the temporary passphrase.
+この節の手順 3 を終えるまでは、起動のたびに一時的なパスフレーズを求められます。
 
-1. On the first boot, lanzaboote generates Secure Boot keys in ~/var/lib/sbctl~, enrolls them and reboots.
-2. After that reboot, check that Secure Boot is on. If it reports disabled, enable Secure Boot in the firmware setup.
+1. 最初の起動で、lanzaboote が Secure Boot の鍵を ~/var/lib/sbctl~ に生成して登録し、再起動します。
+2. 再起動したあと、Secure Boot が有効になっているかを確認します。無効と表示された場合は、ファームウェアの設定画面で Secure Boot を有効にします。
    #+begin_src shell
      bootctl status | grep "Secure Boot"
    #+end_src
-3. Enroll the TPM with a PIN and a recovery key, then remove the temporary passphrase:
+3. PIN 付きの TPM とリカバリーキーを登録し、一時的なパスフレーズを削除します。
    #+begin_src shell
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --recovery-key
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=password
    #+end_src
-   Store the printed recovery key in pass on the Mac. When a firmware update changes PCR 7, the TPM no longer unlocks the disk: unlock with the recovery key, then enroll the TPM again:
+   表示されたリカバリーキーは Mac の pass に保存します。ファームウェアの更新で PCR 7 が変わると、TPM ではディスクを解錠できなくなります。そのときはリカバリーキーで解錠し、TPM を登録し直します。
    #+begin_src shell
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
    #+end_src
-4. Join the tailnet: ~sudo tailscale up~.
+4. tailnet に参加します。コマンドは ~sudo tailscale up~ です。
 
-** Secrets
+** シークレット
 
-~secrets/x13gen2.yaml~ is encrypted for two age recipients listed in [[file:../.sops.yaml][.sops.yaml]]: the editing key on the Mac (~~/.config/sops/age/keys.txt~) and the key derived from this machine's SSH host key. It holds:
+~secrets/x13gen2.yaml~ は、[[file:../.sops.yaml][.sops.yaml]] に書かれた 2 つの age 受信者に向けて暗号化されています。1 つは Mac にある編集用の鍵 (~~/.config/sops/age/keys.txt~)、もう 1 つはこのマシンの SSH ホスト鍵から導出した鍵です。ファイルには次の 2 つが入っています。
 
-- ~networkmanager-env~: ~HOME_WIFI_SSID=...~ and ~HOME_WIFI_PSK=...~ lines, read by NetworkManager's ~ensureProfiles~.
-- ~take-hashed-password~: a yescrypt hash (~mkpasswd --method=yescrypt~) for the login, greeter and sudo password.
+- ~networkmanager-env~: ~HOME_WIFI_SSID=...~ と ~HOME_WIFI_PSK=...~ の行。NetworkManager の ~ensureProfiles~ が読みます。
+- ~take-hashed-password~: ログイン、greeter、sudo で使うパスワードの yescrypt ハッシュ (~mkpasswd --method=yescrypt~)。
 
-Edit it on the Mac with ~sops secrets/x13gen2.yaml~.
+編集は Mac で ~sops secrets/x13gen2.yaml~ を実行します。
 
-If the host key in pass is lost, generate a new one, replace the ~x13gen2~ recipient in ~.sops.yaml~ with the output of ~ssh-to-age < ssh_host_ed25519_key.pub~, run ~sops updatekeys secrets/x13gen2.yaml~, and store the new key in pass.
+pass にあるホスト鍵を失った場合は、新しいホスト鍵を生成します。次に、~.sops.yaml~ の ~x13gen2~ の受信者を ~ssh-to-age < ssh_host_ed25519_key.pub~ の出力に置き換え、~sops updatekeys secrets/x13gen2.yaml~ を実行します。最後に新しい鍵を pass に保存します。
 
 ** YubiKey
 
-sudo, the greeter and the lock screen accept a YubiKey touch and fall back to the password. Register a key from the repository root on any machine with the key plugged in:
+sudo、greeter、ロック画面は YubiKey へのタッチを受け付け、タッチがなければパスワードで認証します。鍵を登録するには、YubiKey を挿した任意のマシンで、リポジトリのルートから次のコマンドを実行します。
 
 #+begin_src shell
   nix shell nixpkgs#pam_u2f -c pamu2fcfg -u take -o pam://X13Gen2 -i pam://X13Gen2 > hosts/X13Gen2/u2f-keys
 #+end_src
 
-~>~ replaces the registered keys. To add a second key, run ~pamu2fcfg -n -o pam://X13Gen2 -i pam://X13Gen2 >> hosts/X13Gen2/u2f-keys~ instead.
+~>~ は登録済みの鍵を置き換えます。2 本目の鍵を追加する場合は、代わりに ~nix shell nixpkgs#pam_u2f -c pamu2fcfg -n -o pam://X13Gen2 -i pam://X13Gen2 >> hosts/X13Gen2/u2f-keys~ を実行します。
 
-USBGuard blocks every USB device that no rule in [[file:../nixos/config/security.nix][nixos/config/security.nix]] allows; Yubico devices, hubs and internal ports are allowed. List blocked devices with ~sudo usbguard list-devices --blocked~ and allow one until it is unplugged with ~sudo usbguard allow-device <id>~. Add a rule to allow it permanently.
+USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイスです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
 
-** Update Configuration
+** 設定を更新する
 
-From a clone of this repository:
+このリポジトリを clone したディレクトリで次のコマンドを実行します。~/home~ は起動のたびに作り直されるため、clone は ~~/ghq~ のように永続化される場所に置きます。
 
 #+begin_src shell
   sudo nixos-rebuild switch --flake .#X13Gen2
 #+end_src
 
-The ~rescue~ boot entry starts the same system without the ~/etc~ overlay and USBGuard, for recovering when either of them breaks boot or blocks a needed device.
+ブートメニューは起動時に 3 秒間表示されます。メニューの ~rescue~ エントリは、同じ世代のシステムを ~/etc~ overlay、USBGuard、Plymouth なしで起動します。overlay が原因で起動できないとき、USBGuard が必要なデバイスをブロックしたとき、Plymouth の画面に LUKS の PIN 入力が出ないときに使います。TPM と PIN による解錠は ~rescue~ でも必要です。
 
-** Notes
+** 補足
 
-- Old roots are kept for 7 days in ~/.btrfs/@old_roots~ ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]]). Persisted paths are listed there and in [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]].
-- btrbk snapshots ~@persist~ hourly into ~@snapshots~ (~/.btrfs/@snapshots~); container images live in ~@containers~ and are not snapshotted.
-- DNS goes to Quad9 over TLS. On a captive portal, find the Wi-Fi link with ~resolvectl status~ and run ~resolvectl dnsovertls <link> no~ until signed in.
+- 古いルートは ~/.btrfs/@old_roots~ に残り、7 日を過ぎたものが起動時に削除されます ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]])。永続化するパスはこのファイルと [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]] に書かれています。
+- btrbk は ~@persist~ のスナップショットを 1 時間ごとに ~@snapshots~ (~/.btrfs/@snapshots~) へ取り、24 時間分、7 日分、4 週分を保持します。コンテナイメージは ~@containers~ にあり、スナップショットの対象外です。
+- DNS は Quad9 に TLS で問い合わせます。キャプティブポータルでは、~resolvectl status~ で Wi-Fi のリンクを調べ、~resolvectl dnsovertls <link> no~ を実行してからサインインします。
