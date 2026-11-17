@@ -83,13 +83,6 @@ Compile both the same way.
 - For editing Lisp in a tangle or test file, see the paredit-cli skill. init.org itself is Org, so edit
   its blocks as text and check the tangle. Serena has no Emacs Lisp or Org support; use grep and paredit-cli.
 
-## Tests
-
-- `home-manager/editor/emacs/tests/*.el` read named defuns out of init.org and `eval` them, so they test
-  the current source without loading the whole config. Nothing runs them automatically; run them by hand
-  (README.org):
-  `emacs --batch -l home-manager/editor/emacs/tests/org-roam-db-autosync-missing-repo-guard-test.el -f ert-run-tests-batch-and-exit`.
-
 ## The user's running daemon
 
 - On macOS the daemon is the launchd agent `org.nix-community.home.emacs` (`--fg-daemon`, socket
