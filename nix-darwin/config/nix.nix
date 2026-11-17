@@ -1,12 +1,8 @@
-{ pkgs, username, ... }:
+{ username, ... }:
 let
   caches = import ../../shared/nix-caches.nix;
 in
 {
-  # Pin the host nix-daemon to this flake's nixpkgs nix, matching the
-  # darwin-vz-nix guest's Nix version for a consistent distributed-build protocol.
-  nix.package = pkgs.nix;
-
   nix.optimise.automatic = true;
   nix.optimise.interval = [
     {
@@ -39,9 +35,7 @@ in
     download-buffer-size = 268435456;
     always-allow-substitutes = true;
     warn-dirty = false;
-    extra-substituters = caches.substituters ++ [ "https://takeokunn-darwin-vz-nix.cachix.org" ];
-    extra-trusted-public-keys = caches.trusted-public-keys ++ [
-      "takeokunn-darwin-vz-nix.cachix.org-1:eqv/henpzh2D5PjoV9YNCGGQJ4jUHW4oeFoqcooQX3g="
-    ];
+    extra-substituters = caches.substituters;
+    extra-trusted-public-keys = caches.trusted-public-keys;
   };
 }

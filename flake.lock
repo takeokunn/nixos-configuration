@@ -691,21 +691,6 @@
     },
     "crane_2": {
       "locked": {
-        "lastModified": 1780532242,
-        "narHash": "sha256-D+BsdpxmtUwtqGoY0IXPhHgTlmqgcZKCEo1oMyn7ep0=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "59a82a1222dd3b2080b5cc52a1a2e8d5f1b77f37",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
-        "type": "github"
-      }
-    },
-    "crane_3": {
-      "locked": {
         "lastModified": 1789760033,
         "narHash": "sha256-jtT4yxZpR8seYnlCMMWSSPlFN92zO6ICuZ8pJrmi86k=",
         "owner": "ipetkov",
@@ -719,7 +704,7 @@
         "type": "github"
       }
     },
-    "crane_4": {
+    "crane_3": {
       "locked": {
         "lastModified": 1785631643,
         "narHash": "sha256-H++/2dMt+5+tErKU+t5z6c4Xedvj9w+UPQYrpygwIPw=",
@@ -734,7 +719,7 @@
         "type": "github"
       }
     },
-    "crane_5": {
+    "crane_4": {
       "locked": {
         "lastModified": 1794870543,
         "narHash": "sha256-RQc417nQURjHvaUkVFLyvaQ6Px18G7ZHjRF9bYUkScg=",
@@ -746,29 +731,6 @@
       "original": {
         "owner": "ipetkov",
         "repo": "crane",
-        "type": "github"
-      }
-    },
-    "darwin-vz-nix": {
-      "inputs": {
-        "nix-darwin": "nix-darwin",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "nixpkgs-linux": "nixpkgs-linux",
-        "nur-packages": "nur-packages"
-      },
-      "locked": {
-        "lastModified": 1785069278,
-        "narHash": "sha256-ugzf4xDvfE6XQA436CioqmLVfnOoRksB1JCaWhugnxw=",
-        "owner": "takeokunn",
-        "repo": "darwin-vz-nix",
-        "rev": "c25e773fd721edeb361a222d31e0723d39c515dc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "takeokunn",
-        "repo": "darwin-vz-nix",
         "type": "github"
       }
     },
@@ -1161,7 +1123,7 @@
     },
     "lanzaboote": {
       "inputs": {
-        "crane": "crane_3",
+        "crane": "crane_2",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -1251,27 +1213,6 @@
       }
     },
     "nix-darwin": {
-      "inputs": {
-        "nixpkgs": [
-          "darwin-vz-nix",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1781242433,
-        "narHash": "sha256-bchLZZ3sRn740zyvD2icZSnNoTaanN0nw7l6fjVXO+E=",
-        "owner": "nix-darwin",
-        "repo": "nix-darwin",
-        "rev": "aabb2037edfc0f210723b72cd5f528aab5dd3f0b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-darwin",
-        "repo": "nix-darwin",
-        "type": "github"
-      }
-    },
-    "nix-darwin_2": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
@@ -1477,22 +1418,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
-        "type": "github"
-      }
-    },
-    "nixpkgs-linux": {
-      "locked": {
-        "lastModified": 1781268102,
-        "narHash": "sha256-Zn5KTggEmUB3lXn/ccERNcBdddE6IaOFber9dWViWDg=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "49a4bd0573c376468dd7996ddb6f9fa31d8c4d97",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -1741,30 +1666,8 @@
     },
     "nur-packages": {
       "inputs": {
-        "crane": "crane_2",
-        "nixpkgs": [
-          "darwin-vz-nix",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1781368756,
-        "narHash": "sha256-txdlGOIX2vZ4JpJmfRs+JJAeAEIC5jlIRGjQ+fBTie8=",
-        "owner": "takeokunn",
-        "repo": "nur-packages",
-        "rev": "c7d153b1aafc08793f00fab23e5b861a3f95595d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "takeokunn",
-        "repo": "nur-packages",
-        "type": "github"
-      }
-    },
-    "nur-packages_2": {
-      "inputs": {
         "aitools": "aitools",
-        "crane": "crane_5",
+        "crane": "crane_4",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -1800,7 +1703,7 @@
     },
     "paredit-cli": {
       "inputs": {
-        "crane": "crane_4",
+        "crane": "crane_3",
         "nixpkgs": [
           "nur-packages",
           "aitools",
@@ -1868,7 +1771,6 @@
         "aitools-skills": "aitools-skills",
         "anthropic-skills": "anthropic-skills",
         "cclens": "cclens",
-        "darwin-vz-nix": "darwin-vz-nix",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts",
@@ -1880,14 +1782,14 @@
         "llm-agents": "llm-agents",
         "mac-app-util": "mac-app-util",
         "mcp-servers-nix": "mcp-servers-nix",
-        "nix-darwin": "nix-darwin_2",
+        "nix-darwin": "nix-darwin",
         "nix-index-database": "nix-index-database",
         "nix-on-droid": "nix-on-droid",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_9",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
-        "nur-packages": "nur-packages_2",
+        "nur-packages": "nur-packages",
         "org-babel": "org-babel",
         "paredit-cli-skills": "paredit-cli-skills",
         "sops-nix": "sops-nix",

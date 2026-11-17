@@ -9,7 +9,6 @@
   programs.tmux.prefix = "C-q";
   programs.tmux.secureSocket = true;
   programs.tmux.shell = "${pkgs.fish}/bin/fish";
-  programs.tmux.customPaneNavigationAndResize = true;
   programs.tmux.disableConfirmationPrompt = true;
 
   programs.tmux.plugins = with pkgs; [

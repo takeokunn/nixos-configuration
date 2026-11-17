@@ -1,14 +1,14 @@
 { lib }:
 rec {
   mcpServers =
-    { nurPkgs }:
+    { nurPkgs, context }:
     {
       serena = {
         command = "${nurPkgs.serena}/bin/serena";
         args = [
           "start-mcp-server"
           "--context"
-          "claude-code"
+          context
           "--enable-web-dashboard"
           "false"
         ];

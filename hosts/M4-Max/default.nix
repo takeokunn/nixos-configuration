@@ -7,7 +7,6 @@ let
     mac-app-util
     emacs-overlay
     nur-packages
-    darwin-vz-nix
     ;
 
   username = "take";
@@ -42,7 +41,6 @@ nix-darwin.lib.darwinSystem {
   };
   modules = [
     ../../nix-darwin
-    darwin-vz-nix.darwinModules.default
     inputs.stylix.darwinModules.stylix
     mac-app-util.darwinModules.default
     home-manager.darwinModules.home-manager

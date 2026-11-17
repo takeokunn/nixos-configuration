@@ -46,6 +46,14 @@ let
     )
   );
 
+  agentNames = map (pkgs.lib.removeSuffix ".md") (
+    builtins.attrNames (
+      pkgs.lib.filterAttrs (name: type: type == "regular" && pkgs.lib.hasSuffix ".md" name) (
+        builtins.readDir (ai-prompts-path + "/agents")
+      )
+    )
+  );
+
   readFiles =
     dir: names:
     builtins.listToAttrs (
@@ -75,19 +83,7 @@ in
     modelSettings.claude-opus-5-5.effortLevel = "high";
   };
 
-  programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" [
-    "code-quality"
-    "design"
-    "docs"
-    "explore"
-    "general-purpose"
-    "infra"
-    "performance"
-    "quality-assurance"
-    "security"
-    "test"
-    "verification"
-  ];
+  programs.claude-code.agents = readFiles "${ai-prompts-path}/agents" agentNames;
 
   programs.claude-code.commands = pkgs.lib.genAttrs commandNames (
     name: builtins.readFile "${ai-prompts-path}/commands/${name}/SKILL.md"
@@ -118,5 +114,8 @@ in
       programs.playwright.enable = true;
       programs.slite.enable = true;
     }).config.settings.servers
-    // shared.mcpServers { inherit nurPkgs; };
+    // shared.mcpServers {
+      inherit nurPkgs;
+      context = "claude-code";
+    };
 }

@@ -57,8 +57,6 @@
     yomiyasu-skill.flake = false;
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
-    darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
-    darwin-vz-nix.inputs.nixpkgs.follows = "nixpkgs";
     git-bulk-clean.url = "github:takeokunn/git-bulk-clean/v0.6.1";
     git-bulk-clean.inputs.nixpkgs.follows = "nixpkgs";
   };
