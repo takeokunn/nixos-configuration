@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let
   palette = config.lib.stylix.colors;
+  font = config.stylix.fonts.monospace.name;
   colors = {
     background = "0xff${palette.base00}";
     backgroundTransparent = "0xcc${palette.base00}";
@@ -214,11 +215,11 @@ let
     sketchybar --bar "''${bar[@]}"
 
     default=(
-      icon.font="Hack Nerd Font:Bold:14.0"
+      icon.font="${font}:Bold:14.0"
       icon.color="$FOREGROUND"
       icon.padding_left=6
       icon.padding_right=4
-      label.font="Hack Nerd Font:Bold:12.0"
+      label.font="${font}:Bold:12.0"
       label.color="$FOREGROUND"
       label.padding_left=4
       label.padding_right=6
@@ -256,7 +257,7 @@ let
       sketchybar --add item space.$sid left \
                   --set space.$sid \
                         icon="$display_icon" \
-                        icon.font="Hack Nerd Font:Bold:12.0" \
+                        icon.font="${font}:Bold:12.0" \
                         icon.color="$COMMENT" \
                         icon.padding_left=8 \
                         icon.padding_right=8 \
@@ -271,7 +272,7 @@ let
     sketchybar --add item front_app left \
                 --set front_app \
                       icon.drawing=off \
-                      label.font="Hack Nerd Font:Bold:12.0" \
+                      label.font="${font}:Bold:12.0" \
                       label.color="$FOREGROUND" \
                       label.padding_left=12 \
                       script="${frontAppPlugin}" \
@@ -280,7 +281,7 @@ let
     sketchybar --add item time right \
                 --set time \
                       icon="󰥔" \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$PURPLE" \
                       update_freq=15 \
                       script="${timePlugin}"
@@ -288,7 +289,7 @@ let
     sketchybar --add item date right \
                 --set date \
                       icon="󰃭" \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$PINK" \
                       update_freq=60 \
                       script="${datePlugin}"
@@ -309,14 +310,14 @@ let
     sketchybar --add item power_icon right \
                 --set power_icon \
                       icon=󰁹 \
-                      icon.font="Hack Nerd Font:Bold:16.0" \
+                      icon.font="${font}:Bold:16.0" \
                       icon.color="$GREEN" \
                       label.drawing=off
 
     sketchybar --add item sleep_prevent right \
                 --set sleep_prevent \
                       icon=󰅶 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$COMMENT" \
                       label.drawing=off \
                       update_freq=5 \
@@ -327,7 +328,7 @@ let
     sketchybar --add item tailscale_serve right \
                 --set tailscale_serve \
                       icon=󰛳 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$COMMENT" \
                       label.drawing=off \
                       update_freq=5 \
@@ -345,7 +346,7 @@ let
     sketchybar --add item volume right \
                 --set volume \
                       icon=󰕾 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$GREEN" \
                       update_freq=10 \
                       script="${volumePlugin}" \
@@ -354,7 +355,7 @@ let
     sketchybar --add item wifi right \
                 --set wifi \
                       icon=󰖩 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$CYAN" \
                       update_freq=15 \
                       script="${wifiPlugin}"
@@ -370,7 +371,7 @@ let
     sketchybar --add item memory right \
                 --set memory \
                       icon=󰍛 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$YELLOW" \
                       update_freq=15 \
                       script="${memoryPlugin}"
@@ -378,7 +379,7 @@ let
     sketchybar --add item cpu right \
                 --set cpu \
                       icon=󰻠 \
-                      icon.font="Hack Nerd Font:Bold:14.0" \
+                      icon.font="${font}:Bold:14.0" \
                       icon.color="$ORANGE" \
                       update_freq=3 \
                       script="${cpuPlugin}"

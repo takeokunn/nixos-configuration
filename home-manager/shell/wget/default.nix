@@ -2,7 +2,6 @@
 {
   home.packages = [ pkgs.wget ];
   xdg.configFile."wgetrc".text = ''
-    check_certificate = off
     timestamping = on
     no_parent = on
     timeout = 60

@@ -1,19 +1,8 @@
 { pkgs, ... }:
 {
-  fonts.packages = with pkgs; [
-    monaspace
-    noto-fonts
-    noto-fonts-lgc-plus
-    noto-fonts-cjk-sans
-    noto-fonts-cjk-serif
-    noto-fonts-color-emoji
-    noto-fonts-emoji-blob-bin
-    noto-fonts-monochrome-emoji
-    hackgen-font
-    hackgen-nf-font
-    nerd-fonts.fira-code
-    emacs-all-the-icons-fonts
-    font-awesome
-    font-awesome_5
+  fonts.packages = import ../../shared/fonts.nix pkgs ++ [
+    pkgs.monaspace
+    pkgs.noto-fonts-emoji-blob-bin
+    pkgs.noto-fonts-monochrome-emoji
   ];
 }

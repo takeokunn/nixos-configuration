@@ -58,7 +58,7 @@
       rs = "restore";
       sw = "switch";
       fix = "commit --amend --no-edit";
-      fixup = "!git log --oneline -n 20 | peco | awk '{print $1}' | xargs --no-run-if-empty -I COMMIT -o sh -c 'git commit --fixup COMMIT && git rebase -i --autosquash COMMIT~'";
+      fixup = "!git log --oneline -n 20 | fzf | awk '{print $1}' | xargs --no-run-if-empty -I COMMIT -o sh -c 'git commit --fixup COMMIT && git rebase -i --autosquash COMMIT~'";
     };
 
     user.name = "takeokunn";

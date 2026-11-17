@@ -2,7 +2,7 @@
   (_: prev: {
     # direnv test-zsh deadlocks on macOS due to /etc/zshenv inflating the env past the 64KB pipe buffer
     direnv = prev.direnv.overrideAttrs (_: {
-      doCheck = false;
+      doCheck = !prev.stdenv.hostPlatform.isDarwin;
     });
 
     # tmux 3.7c's configure now requires an explicit jemalloc choice on Darwin
