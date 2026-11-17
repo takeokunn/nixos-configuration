@@ -1,5 +1,4 @@
-# Builds gh-secret-guard.sh as a script standing in for `gh`. `gh` is a parameter so the flake check
-# can substitute a stub that records what it was called with.
+# Builds gh-secret-guard.sh as a script standing in for `gh`; `gh` is the real binary it forwards to.
 { pkgs, gh }:
 let
   # gitleaks' built-in rules only. The home-manager gitleaks config is not reused: it is

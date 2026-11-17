@@ -1,9 +1,6 @@
 # Builds secret-scan.sh with store paths for every dependency, since launchd starts it with a
-# minimal PATH. `gitleaks` is a parameter so the flake check can substitute a failing one.
-{
-  pkgs,
-  gitleaks ? pkgs.gitleaks,
-}:
+# minimal PATH.
+{ pkgs }:
 let
   # gitleaks built-in rules only. The home-manager gitleaks config is user-extensible, and an
   # allowlist added there for one repository would also hide findings in the logs.
@@ -21,7 +18,7 @@ pkgs.writeScript "secret-scan" (
         pkgs.findutils
         pkgs.jq
       ])
-      "${gitleaks}/bin/gitleaks"
+      "${pkgs.gitleaks}/bin/gitleaks"
       "${gitleaksConfig}"
     ]
     (builtins.readFile ./secret-scan.sh)

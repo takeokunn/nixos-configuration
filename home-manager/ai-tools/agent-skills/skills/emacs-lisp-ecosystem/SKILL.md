@@ -86,13 +86,9 @@ Compile both the same way.
 ## Tests
 
 - `home-manager/editor/emacs/tests/*.el` read named defuns out of init.org and `eval` them, so they test
-  the current source without loading the whole config. `checks.emacs-ghq-jj` in `flake.nix` runs
-  `ghq-jj-test.el`; `org-roam-db-autosync-missing-repo-guard-test.el` is run by hand (README.org).
-  Wire a new test into `flake.nix` `checks` the same way rather than leaving it unrun.
-- Run ERT from a working directory outside `$HOME`. `ghq-jj-test.el` rebinds `HOME`, and a
-  `default-directory` such as `~/ghq/...` then resolves into the sandbox and most of its tests fail with
-  `file-missing`. This passes:
-  `cd /tmp && emacs --batch -l <repo>/home-manager/editor/emacs/tests/ghq-jj-test.el -f ert-run-tests-batch-and-exit`.
+  the current source without loading the whole config. Nothing runs them automatically; run them by hand
+  (README.org):
+  `emacs --batch -l home-manager/editor/emacs/tests/org-roam-db-autosync-missing-repo-guard-test.el -f ert-run-tests-batch-and-exit`.
 
 ## The user's running daemon
 
