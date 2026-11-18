@@ -33,5 +33,13 @@ jobs:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       # cachix-action pushes every path this builds, so the hosts download the closure instead of building it.
       # --keep-going still builds and pushes the rest when one source download fails.
+      # A download that drops at its last byte is resumed past the end of the file, answered with 416, and
+      # disables that cache for the rest of the invocation. A new invocation has every cache again and
+      # only redoes what is still missing.
       - name: Build ${{ matrix.host }}
-        run: nix build --no-link --print-build-logs --keep-going ".#${{ matrix.attr }}"
+        run: |
+          for attempt in 1 2 3; do
+            nix build --no-link --print-build-logs --keep-going ".#${{ matrix.attr }}" && exit 0
+            echo "::warning::nix build attempt ${attempt} failed"
+          done
+          exit 1

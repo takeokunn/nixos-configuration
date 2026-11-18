@@ -17,8 +17,9 @@ runs:
         pushFilter: "(slack|discord|google-chrome)"
     # A runner knows only cache.nixos.org and the project cache. Without the hosts' other caches it
     # fetches the Emacs source from Savannah and compiles codex, both of which a host substitutes.
+    # The hosts' source fallback stays out: compiling codex after one failed download starves a hosted runner.
     - name: Use the hosts' binary caches
       shell: bash
       run: |
         mkdir -p ~/.config/nix
-        nix eval --raw --file shared/nix-caches.nix --apply 'c: "extra-substituters = ${toString c.substituters}\nextra-trusted-public-keys = ${toString c.trusted-public-keys}\nfallback = ${if c.settings.fallback then "true" else "false"}\n"' >> ~/.config/nix/nix.conf
+        nix eval --raw --file shared/nix-caches.nix --apply 'c: "extra-substituters = ${toString c.substituters}\nextra-trusted-public-keys = ${toString c.trusted-public-keys}\n"' >> ~/.config/nix/nix.conf
