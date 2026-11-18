@@ -81,7 +81,7 @@ after_sep="(;|&|u0026)${json_ws}${cmd_words}([[:space:]]|\\\\|\")"
 [[ $input =~ $prefilter || $input =~ $after_sep ]] || exit 0
 
 if ! command -v aitools &>/dev/null || ! command -v perl &>/dev/null; then
-  exit 0
+        exit 0
 fi
 
 # Bound to a variable, not heredoc-fed via $(...), since macOS's bash 3.2 mis-parses a heredoc

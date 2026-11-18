@@ -80,8 +80,8 @@ JQ
 # `read -d ''` stops at end of input (status 1) or at a NUL byte, which JSON text cannot contain.
 IFS= read -r -d '' input
 out=$(printf '%s' "$input" | jq -c --arg mode "$mode" "$defs main" 2>/dev/null) ||
-  out=$(printf '%s' "$input" | jq -c -R -s --arg mode "$mode" "$defs fix_surrogates | fromjson | main" 2>/dev/null) ||
-  exit 0
+        out=$(printf '%s' "$input" | jq -c -R -s --arg mode "$mode" "$defs fix_surrogates | fromjson | main" 2>/dev/null) ||
+        exit 0
 
 [[ -n $out ]] && printf '%s\n' "$out"
 exit 0

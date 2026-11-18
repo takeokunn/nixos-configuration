@@ -20,19 +20,19 @@ stamp="$state_dir/last-run"
 first_run_minutes=1440
 
 targets=(
-  "$HOME/.claude/projects"
-  "$HOME/.claude/transcripts"
-  "$HOME/.config/codex/sessions"
-  "$HOME/.config/codex/shell_snapshots"
-  "$HOME/Library/Application Support/Reinloom/orchestration"
-  "$HOME/.local/share/fish/fish_history"
+        "$HOME/.claude/projects"
+        "$HOME/.claude/transcripts"
+        "$HOME/.config/codex/sessions"
+        "$HOME/.config/codex/shell_snapshots"
+        "$HOME/Library/Application Support/Reinloom/orchestration"
+        "$HOME/.local/share/fish/fish_history"
 )
 
 notify_rules='["github-oauth","github-pat","github-app-token","github-fine-grained-pat","private-key","aws-access-token","hashicorp-tf-api-token","slack-webhook-url"]'
 
 notify() {
-  # The message is passed as an argument so its text is never parsed as AppleScript.
-  "$osascript" -e 'on run argv' -e 'display notification (item 1 of argv) with title "secret-scan"' -e 'end run' "$1"
+        # The message is passed as an argument so its text is never parsed as AppleScript.
+        "$osascript" -e 'on run argv' -e 'display notification (item 1 of argv) with title "secret-scan"' -e 'end run' "$1"
 }
 
 mkdir -p "$state_dir"
@@ -50,17 +50,17 @@ newer=(-mmin "-$first_run_minutes")
 
 : >"$work/files"
 for target in "${targets[@]}"; do
-  [ -e "$target" ] || continue
-  # -type f excludes symlinks, so nothing outside the targets is read.
-  find "$target" -type f "${newer[@]}" -print0 >>"$work/files"
+        [ -e "$target" ] || continue
+        # -type f excludes symlinks, so nothing outside the targets is read.
+        find "$target" -type f "${newer[@]}" -print0 >>"$work/files"
 done
 mapfile -d '' -t files <"$work/files"
 echo "secret-scan: ${#files[@]} changed files"
 
 fail() {
-  echo "secret-scan: $1" >&2
-  notify "secret-scan failed; see $state_dir/stderr.log" || true
-  exit 1
+        echo "secret-scan: $1" >&2
+        notify "secret-scan failed; see $state_dir/stderr.log" || true
+        exit 1
 }
 
 # Own config with built-in rules only: --config takes precedence over GITLEAKS_CONFIG and a
@@ -68,33 +68,33 @@ fail() {
 unset GITLEAKS_CONFIG GITLEAKS_CONFIG_TOML
 : >"$work/reports"
 for file in "${files[@]}"; do
-  # One file per call: given several paths, gitleaks 8.30.1 `dir` ignores them and scans the
-  # working directory. A single path also keeps that path in the report's File field.
-  # --exit-code 0 makes any non-zero status an error rather than "leaks found".
-  rm -f "$work/report.json"
-  "$gitleaks" dir --no-banner --log-level warn --config "$gitleaks_config" \
-    --gitleaks-ignore-path "$work" --ignore-gitleaks-allow --redact=100 --report-format json \
-    --report-path "$work/report.json" --exit-code 0 "$file" ||
-    fail "gitleaks exited $? on a changed file; stamp not updated"
-  cat "$work/report.json" >>"$work/reports" || fail "gitleaks wrote no report; stamp not updated"
+        # One file per call: given several paths, gitleaks 8.30.1 `dir` ignores them and scans the
+        # working directory. A single path also keeps that path in the report's File field.
+        # --exit-code 0 makes any non-zero status an error rather than "leaks found".
+        rm -f "$work/report.json"
+        "$gitleaks" dir --no-banner --log-level warn --config "$gitleaks_config" \
+                --gitleaks-ignore-path "$work" --ignore-gitleaks-allow --redact=100 --report-format json \
+                --report-path "$work/report.json" --exit-code 0 "$file" ||
+                fail "gitleaks exited $? on a changed file; stamp not updated"
+        cat "$work/report.json" >>"$work/reports" || fail "gitleaks wrote no report; stamp not updated"
 done
 
 high=0
 if [ "${#files[@]}" -gt 0 ]; then
-  jq -s 'add' "$work/reports" >"$work/report.json" || fail "could not parse the gitleaks report"
-  jq -r '.[] | [.File, (.StartLine | tostring), .RuleID] | @tsv' "$work/report.json" \
-    >>"$state_dir/$(date +%F).tsv"
-  high=$(jq --argjson rules "$notify_rules" '[.[] | select(.RuleID as $r | $rules | index($r))] | length' "$work/report.json")
-  echo "secret-scan: $(jq length "$work/report.json") findings, $high notifiable"
+        jq -s 'add' "$work/reports" >"$work/report.json" || fail "could not parse the gitleaks report"
+        jq -r '.[] | [.File, (.StartLine | tostring), .RuleID] | @tsv' "$work/report.json" \
+                >>"$state_dir/$(date +%F).tsv"
+        high=$(jq --argjson rules "$notify_rules" '[.[] | select(.RuleID as $r | $rules | index($r))] | length' "$work/report.json")
+        echo "secret-scan: $(jq length "$work/report.json") findings, $high notifiable"
 fi
 
 # The stamp advances only after the notification, so a failed one is retried by rescanning the
 # same files; the rescan appends their TSV rows again.
 if [ "$high" -gt 0 ]; then
-  notify "$high secret findings; see $state_dir" || {
-    echo "secret-scan: notification failed; stamp not updated" >&2
-    exit 2
-  }
+        notify "$high secret findings; see $state_dir" || {
+                echo "secret-scan: notification failed; stamp not updated" >&2
+                exit 2
+        }
 fi
 
 mv -f "$work/stamp" "$stamp"

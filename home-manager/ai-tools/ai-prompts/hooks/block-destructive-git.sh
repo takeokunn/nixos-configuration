@@ -54,33 +54,33 @@ set -euo pipefail
 input=$(cat)
 
 input_error() {
-  echo 'Hook input blocked (ORCH-P005): JSON or Bash command could not be parsed.' >&2
-  exit 2
+        echo 'Hook input blocked (ORCH-P005): JSON or Bash command could not be parsed.' >&2
+        exit 2
 }
 
 if command -v jq &>/dev/null; then
-  # jq accepts streams by default; one hook invocation must contain exactly one event.
-  tool_name=$(printf '%s' "$input" | jq -ers 'if length == 1 and (.[0] | type) == "object" then .[0] else error("expected one event") end | if (.tool_name | type) == "string" and .tool_name != "" then .tool_name else error("invalid event") end' 2>/dev/null) || input_error
-  if [[ $tool_name != Bash ]]; then exit 0; fi
-  command=$(printf '%s' "$input" | jq -er 'if (.tool_input | type) == "object" and (.tool_input.command | type) == "string" then .tool_input.command else error("invalid Bash input") end' 2>/dev/null) || input_error
+        # jq accepts streams by default; one hook invocation must contain exactly one event.
+        tool_name=$(printf '%s' "$input" | jq -ers 'if length == 1 and (.[0] | type) == "object" then .[0] else error("expected one event") end | if (.tool_name | type) == "string" and .tool_name != "" then .tool_name else error("invalid event") end' 2>/dev/null) || input_error
+        if [[ $tool_name != Bash ]]; then exit 0; fi
+        command=$(printf '%s' "$input" | jq -er 'if (.tool_input | type) == "object" and (.tool_input.command | type) == "string" then .tool_input.command else error("invalid Bash input") end' 2>/dev/null) || input_error
 elif command -v python3 &>/dev/null; then
-  tool_name=$(printf '%s' "$input" | python3 -c 'import json,sys
+        tool_name=$(printf '%s' "$input" | python3 -c 'import json,sys
 d=json.load(sys.stdin)
 if not isinstance(d,dict) or not isinstance(d.get("tool_name"),str) or not d["tool_name"]: sys.exit(1)
 print(d["tool_name"])' 2>/dev/null) || input_error
-  if [[ $tool_name != Bash ]]; then exit 0; fi
-  command=$(printf '%s' "$input" | python3 -c 'import json,sys
+        if [[ $tool_name != Bash ]]; then exit 0; fi
+        command=$(printf '%s' "$input" | python3 -c 'import json,sys
 d=json.load(sys.stdin)
 i=d.get("tool_input")
 if not isinstance(i,dict) or not isinstance(i.get("command"),str): sys.exit(1)
 print(i["command"])' 2>/dev/null) || input_error
 else
-  echo 'Hook input blocked (ORCH-P005): neither jq nor Python is available.' >&2
-  exit 2
+        echo 'Hook input blocked (ORCH-P005): neither jq nor Python is available.' >&2
+        exit 2
 fi
 
 if [[ -z $command ]]; then
-  exit 0
+        exit 0
 fi
 
 # Bound to a variable, not heredoc-fed via $(...), since macOS's bash 3.2 mis-parses a heredoc
@@ -809,8 +809,8 @@ exit 0;
 PERL
 
 if ! verdict="$(HOOK_CMD="$command" HOOK_MODE="$mode" perl -e "$perl_prog")"; then
-  printf '%s\n' 'Command classification failed (ORCH-P005).' >&2
-  exit 2
+        printf '%s\n' 'Command classification failed (ORCH-P005).' >&2
+        exit 2
 fi
 push_argv=${verdict#*$'\n'}
 verdict=${verdict%%$'\n'*}
@@ -818,44 +818,44 @@ verdict=${verdict%%$'\n'*}
 # An `[[ ... ]] && exit 0` here would leave the whole list returning 1 on the common path,
 # which `set -e` turns into a spurious non-zero exit from the hook itself.
 if [[ -z $verdict ]]; then
-  exit 0
+        exit 0
 fi
 
 if [[ $verdict == git-dynamic-path ]]; then
-  cat >&2 <<'EOF'
+        cat >&2 <<'EOF'
 ❌ Unquoted dynamic git path blocked (ORCH-P005)
 
 Quote the variable expansion so the shell passes the repository path as one argument:
   git -C "$dir" log
   git --work-tree="$dir" status
 EOF
-  exit 2
+        exit 2
 fi
 
 if [[ $verdict == jj-push-wrapper ]]; then
-  cat >&2 <<'EOF'
+        cat >&2 <<'EOF'
 Wrapped jj git push blocked (ORCH-P005)
 
 Run jj git push directly so its revisions can be checked before pushing.
 Remove shell and process wrappers such as bash -c, env, or aitools run.
 ALLOW_DESTRUCTIVE_GIT=1 does not lift this block.
 EOF
-  exit 2
+        exit 2
 fi
 
 if [[ $verdict == jj-push-input ]]; then
-  echo 'Unverifiable jj git push arguments blocked (ORCH-P005). Use literal arguments in a direct command.' >&2
-  exit 2
+        echo 'Unverifiable jj git push arguments blocked (ORCH-P005). Use literal arguments in a direct command.' >&2
+        exit 2
 fi
 
 if [[ $verdict == jj-push ]]; then
-  if [[ $mode == claude ]]; then
-    if ! command -v python3 >/dev/null 2>&1; then
-      echo 'jj git push blocked (ORCH-P005): Python is unavailable for the secret scan.' >&2
-      exit 2
-    fi
-    scan_status=0
-    HOOK_PUSH_ARGV="$push_argv" HOOK_PUSH_COMMAND="$command" HOOK_INPUT="$input" python3 - <<'PY' || scan_status=$?
+        if [[ $mode == claude ]]; then
+                if ! command -v python3 >/dev/null 2>&1; then
+                        echo 'jj git push blocked (ORCH-P005): Python is unavailable for the secret scan.' >&2
+                        exit 2
+                fi
+                scan_status=0
+                HOOK_PUSH_ARGV="$push_argv" HOOK_PUSH_COMMAND="$command" HOOK_INPUT="$input" python3 - <<'PY' || scan_status=$?
 import fnmatch
 import json
 import os
@@ -1156,13 +1156,13 @@ try:
 except (OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
     block("the secret scan could not be completed; no push was authorized.")
 PY
-    if [[ $scan_status -ne 0 ]]; then
-      echo 'jj git push blocked (ORCH-P005): secret verification failed.' >&2
-      exit 2
-    fi
-    exit 0
-  fi
-  cat >&2 <<'EOF'
+                if [[ $scan_status -ne 0 ]]; then
+                        echo 'jj git push blocked (ORCH-P005): secret verification failed.' >&2
+                        exit 2
+                fi
+                exit 0
+        fi
+        cat >&2 <<'EOF'
 ❌ jj git push blocked (ORCH-P005)
 
 jj runs no Git hooks, so the gitleaks pre-commit scan never saw these commits.
@@ -1174,30 +1174,30 @@ Scan exactly what would be pushed:
 This environment cannot ask the user to confirm a push. The override prefix lifts this block without
 a person confirming (ALLOW_DESTRUCTIVE_GIT=1 <command>); use it only for a push the user asked for.
 EOF
-  exit 2
+        exit 2
 fi
 
 if [[ $verdict == jj-* ]]; then
-  if [[ $verdict == jj-workspace-add ]]; then
-    cat >&2 <<'EOF'
+        if [[ $verdict == jj-workspace-add ]]; then
+                cat >&2 <<'EOF'
 ❌ jj workspace add blocked (ORCH-P005)
 
 A workspace made without sparse patterns inherits the empty sparse set from the bare repository and checks out no files.
 Use this complete form:
   jj -R <repo> workspace add --no-colocate --sparse-patterns full --name <dir> -r <rev> <repo>/.worktrees/<dir>
 EOF
-    exit 2
-  fi
-  case "$verdict" in
-  jj-edit | jj-next | jj-prev | jj-new | jj-bisect | jj-sparse) detail="This moves the working-copy revision, rewriting the files every session sharing this checkout is editing (jj bisect checks out each revision it tests; jj sparse changes which files exist on disk)." ;;
-  jj-abandon) detail="jj abandon drops a revision, including working-copy changes you did not make when it is @." ;;
-  jj-restore) detail="jj restore without paths overwrites the working copy (or the --into revision) wholesale, including changes you did not make." ;;
-  jj-undo | jj-redo | jj-op) detail="Rewinding the operation log also rewinds the files other sessions are editing." ;;
-  jj-dynamic) detail="The subcommand is computed when the shell runs it, so the hook cannot tell whether it is destructive; spell it literally." ;;
-  jj-alias) detail="This is not a jj built-in subcommand, so it may be an alias that expands to a destructive one; run the built-in it stands for (status, not st)." ;;
-  jj-identity) detail="This overrides the jj user, loads another config, or allows private commits, which disables the check that stops jj git push from sending commits you did not author." ;;
-  esac
-  cat >&2 <<EOF
+                exit 2
+        fi
+        case "$verdict" in
+        jj-edit | jj-next | jj-prev | jj-new | jj-bisect | jj-sparse) detail="This moves the working-copy revision, rewriting the files every session sharing this checkout is editing (jj bisect checks out each revision it tests; jj sparse changes which files exist on disk)." ;;
+        jj-abandon) detail="jj abandon drops a revision, including working-copy changes you did not make when it is @." ;;
+        jj-restore) detail="jj restore without paths overwrites the working copy (or the --into revision) wholesale, including changes you did not make." ;;
+        jj-undo | jj-redo | jj-op) detail="Rewinding the operation log also rewinds the files other sessions are editing." ;;
+        jj-dynamic) detail="The subcommand is computed when the shell runs it, so the hook cannot tell whether it is destructive; spell it literally." ;;
+        jj-alias) detail="This is not a jj built-in subcommand, so it may be an alias that expands to a destructive one; run the built-in it stands for (status, not st)." ;;
+        jj-identity) detail="This overrides the jj user, loads another config, or allows private commits, which disables the check that stops jj git push from sending commits you did not author." ;;
+        esac
+        cat >&2 <<EOF
 ❌ Destructive jj operation blocked (ORCH-P005)
 
 $detail
@@ -1212,17 +1212,17 @@ Use instead:
 If the user has authorized this operation, the override prefix lifts this block without a prompt:
   ALLOW_DESTRUCTIVE_GIT=1 <your command>
 EOF
-  exit 2
+        exit 2
 fi
 
 if [[ $verdict == depth ]]; then
-  cat >&2 <<'EOF'
+        cat >&2 <<'EOF'
 ❌ Command nesting too deep (ORCH-P005)
 
 The command nests eval, sh -c, or jj util exec deeper than the hook follows, so what finally runs is
 unchecked. Flatten it. ALLOW_DESTRUCTIVE_GIT=1 does not lift this block.
 EOF
-  exit 2
+        exit 2
 fi
 
 cat >&2 <<'EOF'
