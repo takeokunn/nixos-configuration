@@ -2,7 +2,8 @@ name: update
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 8 * * *
+    # 02:00 JST: the cache workflow that follows has finished by morning.
+    - cron: 0 17 * * *
 jobs:
   nix-update:
     name: Update lockfile
