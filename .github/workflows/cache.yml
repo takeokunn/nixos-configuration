@@ -1,8 +1,12 @@
 name: cache
 on:
-  push:
-    branches:
-      - main
+  # The daily lockfile update is what changes the closures. Its commit is pushed with GITHUB_TOKEN,
+  # which starts no push-triggered workflow, so this one follows the update workflow instead.
+  workflow_run:
+    workflows:
+      - update
+    types:
+      - completed
   workflow_dispatch:
 concurrency:
   group: cache-${{ github.ref }}
@@ -10,6 +14,7 @@ concurrency:
 jobs:
   build:
     name: Build ${{ matrix.host }}
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 300
     strategy:
