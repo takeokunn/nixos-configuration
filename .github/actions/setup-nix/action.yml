@@ -15,3 +15,10 @@ runs:
         authToken: "${{ inputs.cachix-auth-token }}"
         # Unfree packages must not be redistributed from the public cache. Add each new one here.
         pushFilter: "(slack|discord|google-chrome)"
+    # A runner knows only cache.nixos.org and the project cache. Without the hosts' other caches it
+    # fetches the Emacs source from Savannah and compiles codex, both of which a host substitutes.
+    - name: Use the hosts' binary caches
+      shell: bash
+      run: |
+        mkdir -p ~/.config/nix
+        nix eval --raw --file shared/nix-caches.nix --apply 'c: "extra-substituters = ${toString c.substituters}\nextra-trusted-public-keys = ${toString c.trusted-public-keys}\nfallback = ${if c.settings.fallback then "true" else "false"}\n"' >> ~/.config/nix/nix.conf
