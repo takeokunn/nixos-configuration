@@ -25,7 +25,9 @@
       cue = true;
       origin = "pam://${config.networking.hostName}";
       appid = "pam://${config.networking.hostName}";
-      authfile = ../../hosts/X13Gen2/u2f-keys;
+      # Interpolated so the file is copied to the store and kept in the system closure; a bare
+      # path renders as a location inside the flake source, which the target may not have.
+      authfile = "${../../hosts/X13Gen2/u2f-keys}";
     };
   };
   # hyprlock comes from home-manager, which cannot declare a PAM service; without one it cannot unlock.
