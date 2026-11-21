@@ -30,12 +30,15 @@
     # disable fzf Ctrl-R to use fish native history (avoids EINTR in tmux)
     set -gx FZF_CTRL_R_COMMAND ""
 
+    # --global --path edits $PATH only when the directory is missing from it. The default mode
+    # moves it to the front of the universal fish_user_paths even when present, which puts
+    # /run/current-system/sw/bin/sudo (not setuid) ahead of NixOS's /run/wrappers/bin/sudo.
     if test -d /etc/profiles/per-user/(whoami)/bin
-        fish_add_path /etc/profiles/per-user/(whoami)/bin
+        fish_add_path --global --path /etc/profiles/per-user/(whoami)/bin
     end
 
     if test -d /run/current-system/sw/bin
-        fish_add_path /run/current-system/sw/bin
+        fish_add_path --global --path /run/current-system/sw/bin
     end
 
     # KITTY_INSTALLATION_DIR is set once by kitty at process launch and then
