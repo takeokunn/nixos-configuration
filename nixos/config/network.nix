@@ -40,9 +40,11 @@
   services.openssh = {
     enable = true;
     openFirewall = false;
+    # Read from /persist directly: bind-mounting /persist/etc/ssh over /etc/ssh hides the
+    # generated sshd_config and authorized_keys.d, and sshd fails to start.
     hostKeys = [
       {
-        path = "/etc/ssh/ssh_host_ed25519_key";
+        path = "/persist/etc/ssh/ssh_host_ed25519_key";
         type = "ed25519";
       }
     ];
