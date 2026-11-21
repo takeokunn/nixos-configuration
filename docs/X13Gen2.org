@@ -210,7 +210,7 @@ sudo、greeter、ロック画面は YubiKey へのタッチを受け付け、タ
   and mv hosts/X13Gen2/u2f-keys.new hosts/X13Gen2/u2f-keys
 #+end_src
 
-USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイスです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
+USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイス、内蔵の Bluetooth とカメラです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
 
 ** 補足
 
