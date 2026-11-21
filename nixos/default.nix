@@ -14,6 +14,7 @@
     ./config/services/audio.nix
     ./config/services/display.nix
     ./config/compositor.nix
+    ./config/keyring.nix
     ./config/network.nix
     ./config/wifi.nix
     ./config/secrets.nix

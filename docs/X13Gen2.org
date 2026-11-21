@@ -212,6 +212,20 @@ sudo、greeter、ロック画面は YubiKey へのタッチを受け付け、タ
 
 USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイス、内蔵の Bluetooth とカメラです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
 
+** キーリング
+
+Secret Service は oo7 が提供します ([[file:../nixos/config/keyring.nix][nixos/config/keyring.nix]])。oo7 はログイン時のパスワードを使わず、TPM で暗号化した systemd の資格情報でキーリングを解錠します。そのため、YubiKey だけでログインしたときもキーリングが開きます。
+
+資格情報はインストールのあとに 1 回作ります。手順 5 で TPM をクリアするため、インストールし直したときは作り直します。X13Gen2 にログインした状態で次のコマンドを実行し、キーリングのパスワードを入力します。新しく作るキーリングならパスワードを決めて入力し、gnome-keyring で作ったキーリングを引き継ぐ場合はそのキーリングと同じパスワードを入力します。入力は確認されないので、引き継いだキーリングが開かないときはコマンドをやり直します。
+
+#+begin_src shell
+  mkdir -p ~/.config/credstore.encrypted
+  systemd-ask-password -n | systemd-creds encrypt --user --name=oo7.keyring-encryption-password - ~/.config/credstore.encrypted/oo7.keyring-encryption-password
+  systemctl --user restart oo7-daemon
+#+end_src
+
+~busctl --user status org.freedesktop.secrets~ の出力のプロセス名が ~oo7-daemon~ であれば、oo7 が Secret Service として動いています。~journalctl --user -b -u oo7-daemon~ に ~Unlocking session keyring with systemd credential~ が出ていれば、資格情報でキーリングを解錠できています。この資格情報は root と TPM を使える人なら復号できます。
+
 ** 補足
 
 - 古いルートは ~/.btrfs/@old_roots~ に残り、7 日を過ぎたものが起動時に削除されます ([[file:../hosts/X13Gen2/impermanence.nix][hosts/X13Gen2/impermanence.nix]])。永続化するパスはこのファイルと [[file:../home-manager/wayland/impermanence/default.nix][home-manager/wayland/impermanence/default.nix]] に書かれています。

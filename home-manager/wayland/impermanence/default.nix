@@ -36,6 +36,11 @@
         directory = ".local/share/keyrings";
         mode = "0700";
       }
+      # The TPM-sealed credential oo7 unlocks the keyring with.
+      {
+        directory = ".config/credstore.encrypted";
+        mode = "0700";
+      }
 
       # Editors
       ".config/emacs"

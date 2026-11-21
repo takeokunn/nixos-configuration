@@ -60,7 +60,10 @@
       "/var/lib/usbguard"
       "/var/lib/btrbk"
       "/var/lib/upower"
-      "/var/lib/systemd/timers"
+      # Whole directory, not only timers: systemd-creds binds credentials such as oo7's
+      # keyring password to the host key credential.secret here, and a fresh one each boot
+      # would make them undecryptable.
+      "/var/lib/systemd"
     ];
     files = [
       "/etc/machine-id"
