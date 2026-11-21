@@ -1,4 +1,4 @@
-{ username, ... }:
+{ config, username, ... }:
 {
   fileSystems."/persist".neededForBoot = true;
   fileSystems."/persist/home/${username}/.local/share/containers".neededForBoot = true;
@@ -64,6 +64,13 @@
       # keyring password to the host key credential.secret here, and a fresh one each boot
       # would make them undecryptable.
       "/var/lib/systemd"
+      # regreet remembers the last user and session here.
+      {
+        directory = "/var/lib/regreet";
+        user = config.services.greetd.settings.default_session.user;
+        group = config.services.greetd.settings.default_session.user;
+        mode = "0755";
+      }
     ];
     files = [
       "/etc/machine-id"

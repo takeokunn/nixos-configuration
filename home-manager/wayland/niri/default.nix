@@ -165,7 +165,6 @@ in
         TERM = "xterm-kitty";
         QT_QPA_PLATFORM = "wayland";
         QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-        GDK_BACKEND = "wayland";
         MOZ_ENABLE_WAYLAND = "1";
         XDG_CURRENT_DESKTOP = "niri";
         XDG_SESSION_TYPE = "wayland";

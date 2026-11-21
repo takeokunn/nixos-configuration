@@ -105,6 +105,9 @@
       # Nautilus scripts, starred files and script shortcuts; its view settings live in dconf.
       ".local/share/nautilus"
       ".config/nautilus"
+      # Nautilus sidebar bookmarks (gtk-3.0/bookmarks); GTK rewrites the file by rename, so the
+      # directory is persisted rather than the file.
+      ".config/gtk-3.0"
 
       # Audio: per-device preset rules saved from the EasyEffects window
       ".local/share/easyeffects/autoload"
