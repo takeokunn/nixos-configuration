@@ -1,4 +1,4 @@
-{ pkgs, nurPkgs, ... }:
+{ config, pkgs, ... }:
 let
   # The home directory is recreated on every boot, so the daemon has no cached image to restore:
   # set the wallpaper recorded by wallpaper.sh, or the bundled one on a fresh install.
@@ -103,6 +103,5 @@ in
     esac
   '';
 
-  home.file."Pictures/Wallpapers/dracula-nixos.png".source =
-    "${nurPkgs.dracula-wallpaper}/first-collection/nixos.png";
+  home.file."Pictures/Wallpapers/dracula-nixos.png".source = config.stylix.image;
 }

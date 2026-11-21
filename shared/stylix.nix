@@ -28,14 +28,19 @@
     base0F = "bd93f9";
   };
   fonts = {
-    sizes.terminal = 13;
+    sizes = {
+      applications = 11;
+      desktop = 11;
+      popups = 12;
+      terminal = 13;
+    };
     monospace = {
-      package = pkgs.hackgen-nf-font;
-      name = "HackGen Console NF";
+      package = pkgs.udev-gothic-nf;
+      name = "UDEV Gothic NF";
     };
     sansSerif = {
-      package = pkgs.noto-fonts-cjk-sans;
-      name = "Noto Sans CJK JP";
+      package = pkgs.geist-font;
+      name = "Geist";
     };
     serif = {
       package = pkgs.noto-fonts-cjk-serif;

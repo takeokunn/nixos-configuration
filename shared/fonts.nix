@@ -7,6 +7,8 @@ pkgs: with pkgs; [
   noto-fonts-color-emoji
   hackgen-font
   hackgen-nf-font
+  geist-font
+  udev-gothic-nf
   nerd-fonts.fira-code
   emacs-all-the-icons-fonts
   font-awesome

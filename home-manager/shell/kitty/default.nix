@@ -7,7 +7,7 @@ in
   programs.kitty.enable = true;
   # Palette and font come from Stylix (stylix.targets.kitty in shared/stylix-home-targets.nix).
 
-  # HackGen Console NF has no emoji glyphs, so emoji route to the platform's
+  # The Stylix monospace font has no emoji glyphs, so emoji route to the platform's
   # color emoji font. In U+2300-U+23FF and U+2B00-U+2BFF only the emoji-flagged
   # codepoints are listed (e.g. U+23FA, Claude Code's record bullet): mapping the
   # full blocks would widen non-emoji glyphs such as U+2318 and U+23CE and break

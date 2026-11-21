@@ -12,7 +12,7 @@
     # Japanese first, so shared Han characters never fall back to Chinese glyph shapes.
     defaultFonts = {
       sansSerif = [
-        "Noto Sans"
+        "Geist"
         "Noto Sans CJK JP"
       ];
       serif = [
@@ -20,7 +20,7 @@
         "Noto Serif CJK JP"
       ];
       monospace = [
-        "HackGen Console NF"
+        "UDEV Gothic NF"
         "Noto Sans Mono CJK JP"
       ];
       emoji = [ "Noto Color Emoji" ];
