@@ -1,19 +1,16 @@
 #+STARTUP: fold
 * 初回インストール (M4-Max)
 
-M4-Max は nix-darwin で管理する Mac (M4 Max) です。home-manager、Homebrew、mac-app-util を組み合わせています。
+M4-Max は nix-darwin で管理する Mac (M4 Max) です。
 
 ** 前提
 
-- macOS (Apple Silicon)
-- macOS のユーザー名が ~take~ であること
-- Homebrew (https://brew.sh)。nix-darwin は Homebrew 本体をインストールしません。
+- macOS (Apple Silicon)。macOS のユーザー名が ~take~ であること。
+- nix-darwin は適用のたびに Homebrew のパッケージを [[file:../nix-darwin/config/homebrew.nix][nix-darwin/config/homebrew.nix]] に合わせ、書かれていないものを削除します。すでに Homebrew で入れたものを残したい場合は、手順 4 の前にこのファイルに追加します。
 
-** 手順 1: Xcode Command Line Tools を入れる
+** 手順 1: Homebrew を入れる
 
-#+begin_src shell
-  xcode-select --install
-#+end_src
+https://brew.sh のインストーラーを実行します。nix-darwin は Homebrew 本体をインストールしません。Homebrew のインストーラーは、Xcode Command Line Tools がなければ一緒に入れます。
 
 ** 手順 2: Nix を入れる
 
@@ -23,7 +20,9 @@ M4-Max は nix-darwin で管理する Mac (M4 Max) です。home-manager、Homeb
   sh <(curl -L https://nixos.org/nix/install)
 #+end_src
 
-install.determinate.systems のインストーラーは既定で Determinate Nix を入れます。この設定では nix-darwin が Nix を管理していて、Determinate Nix を検出すると適用を中止するため、使いません。
+install.determinate.systems のインストーラーは使いません。このインストーラーは既定で Determinate Nix を入れますが、この設定では nix-darwin が Nix を管理していて、Determinate Nix を検出すると適用を中止します。
+
+インストールが終わったら、~nix~ を PATH に入れるために、ターミナルを閉じて開き直します。
 
 ** 手順 3: 設定を clone する
 
@@ -42,4 +41,6 @@ install.determinate.systems のインストーラーは既定で Determinate Nix
 
 環境変数をすべて読み込むために、ターミナルを閉じて開き直します。
 
-あとで設定を変えたときは、手順 4 のコマンドをもう一度実行します。
+** 設定を更新する
+
+設定を変えたときは、clone したディレクトリで手順 4 のコマンドをもう一度実行します。

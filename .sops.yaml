@@ -1,5 +1,6 @@
 keys:
-  # Editing key on the Mac (~/.config/sops/age/keys.txt).
+  # Editing key on the Mac (~/Library/Application Support/sops/age/keys.txt; sops on macOS
+  # reads $XDG_CONFIG_HOME/sops/age/keys.txt instead when XDG_CONFIG_HOME is set).
   - &admin age1nhxndmyn08j29rkyn9rwrdaxdlu3tda2ezr4enseywpvkf3523esg3quf9
   # Derived from X13Gen2's /persist/etc/ssh/ssh_host_ed25519_key (stored in pass as x13gen2/ssh_host_ed25519_key).
   - &x13gen2 age1z0pyxr0dr6tsq4vcfyp83md0m67dt9aq9psvre0jldmjtj33cv5qcetm5y

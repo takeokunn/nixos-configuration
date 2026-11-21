@@ -1,12 +1,12 @@
 #+STARTUP: fold
 * 初回インストール (OPPO-A79)
 
-OPPO-A79 は Android 端末です。nix-on-droid で Nix の環境を動かします。
+OPPO-A79 は Android 端末です。nix-on-droid で Nix の環境を動かし、home-manager の basic プロファイル ([[file:../home-manager/basic.nix][home-manager/basic.nix]]) を適用します。システムのアーキテクチャは aarch64-linux です。
 
 ** 前提
 
-- Android 端末 (OPPO-A79 または互換機)
-- F-Droid が使えるか、APK を直接インストールできること
+- Android 端末 (OPPO-A79 または互換機)。
+- F-Droid が使えるか、APK を直接インストールできること。
 
 ** 手順 1: nix-on-droid アプリを入れる
 
@@ -15,13 +15,11 @@ F-Droid か GitHub の releases から nix-on-droid をダウンロードして�
 - F-Droid: https://f-droid.org/packages/com.termux.nix/
 - GitHub: https://github.com/nix-community/nix-on-droid/releases
 
-** 手順 2: 初期セットアップ
+** 手順 2: 最初の Nix のインストールを待つ
 
 nix-on-droid アプリを開き、最初の Nix のインストールが終わるまで待ちます。
 
 ** 手順 3: flakes を有効にする
-
-Nix の設定ファイルに次の 1 行を書いて flakes を有効にします。
 
 #+begin_src shell
   mkdir -p ~/.config/nix
@@ -29,6 +27,8 @@ Nix の設定ファイルに次の 1 行を書いて flakes を有効にしま�
 #+end_src
 
 ** 手順 4: 設定を clone する
+
+git はまだ入っていないので、~nix-shell~ で一時的に使います。
 
 #+begin_src shell
   nix-shell -p git
@@ -38,14 +38,14 @@ Nix の設定ファイルに次の 1 行を書いて flakes を有効にしま�
 
 ** 手順 5: 設定を適用する
 
+手順 4 の ~nix-shell~ の中で、続けて実行します。
+
 #+begin_src shell
   nix-on-droid switch --flake .#OPPO-A79 --show-trace
 #+end_src
 
-あとで設定を変えたときは、このコマンドをもう一度実行します。
+適用後は git が入り、ログインシェルが fish になります。
 
-** 補足
+** 設定を更新する
 
-- この設定には home-manager の basic プロファイルが含まれます。
-- システムのアーキテクチャは aarch64-linux です。
-- 追加のパッケージとして nur-packages を使えます。
+設定を変えたときは、clone したディレクトリで手順 5 のコマンドをもう一度実行します。

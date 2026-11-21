@@ -1,108 +1,216 @@
 #+STARTUP: content
 * 初回インストール (X13Gen2)
 
-X13Gen2 は Secure Boot (lanzaboote) で起動し、TPM と PIN で LUKS を解錠します。~/~ と ~/home~ は起動のたびに作り直され、残るのは ~/persist~、~/nix~、~/var/log~ だけです。
+X13Gen2 は ThinkPad X13 Gen 2 で動く NixOS です。Secure Boot (lanzaboote) で起動し、TPM と PIN で LUKS を解錠します。~/~ と ~/home~ は起動のたびに作り直され、残るのは ~/persist~、~/nix~、~/var/log~ だけです。SSH は tailnet からの鍵認証だけを受け付けます。
 
-** 始める前に
+インストールはディスクを消去し、GitHub の main ブランチにある flake から X13Gen2 を作り直します。作業は X13Gen2 と Mac の 2 台で進め、Mac のコマンドは fish で実行します。
+
+** 前提
+
+- pass のストアがある Mac。ストアに ~x13gen2/ssh_host_ed25519_key~ と ~x13gen2/ssh_host_ed25519_key.pub~ があること。
+- main ブランチに ~secrets/x13gen2.yaml~ ([[*シークレット][シークレット]]) と ~hosts/X13Gen2/u2f-keys~ ([[*YubiKey と USBGuard][YubiKey と USBGuard]]) が入っていること。どちらかを変更した場合は、インストールの前に push します。
+- インストーラーを書き込む USB メモリ。中身は消えます。
+
+** 手順 1: データを退避し、ファームウェアを更新する
 
 X13Gen2 に今入っているシステムで次の作業をします。
 
-1. ~fwupdmgr update~ でファームウェアと Secure Boot データベース (dbx) を更新します。TPM による解錠は PCR 7 に結び付いていて、これらの更新は PCR 7 を変えるため、TPM を登録する前に済ませる必要があります。
-2. 残したいものをすべてマシンの外にコピーします。インストールはディスクを消去します。
+1. 残したいものをすべてマシンの外にコピーします。
+2. ~fwupdmgr update~ でファームウェアと Secure Boot データベース (dbx) を更新し、再起動を求められたら再起動します。これらの更新は、TPM による解錠が結び付く PCR 7 を変えます。そのため、手順 9 で TPM を登録する前に済ませます。
 
-NixOS インストーラーの USB から起動し、~nix-shell -p nvme-cli~ でシェルを開いてドライブを消去します。
+** 手順 2: ホスト鍵を確かめる
 
-3. NVMe ドライブに 4096 バイトの LBA フォーマットがあるかを調べます。
+インストールでは、pass に保存した SSH ホスト鍵を X13Gen2 に置きます。pass が復号に失敗しても、インストールは空のファイルを鍵として置いたまま進みます。また、ホスト鍵が ~.sops.yaml~ の受信者と合わないと、sops がパスワードのハッシュを復号できず、インストール後にログインできません。どちらも Mac で先に確かめます。
+
+1. 秘密鍵を復号できることを確かめます。エラーなく終われば問題ありません。
+   #+begin_src fish
+     pass show x13gen2/ssh_host_ed25519_key > /dev/null
+   #+end_src
+2. 公開鍵から導出した age の受信者が、[[file:../.sops.yaml][.sops.yaml]] の ~x13gen2~ と同じであることを確かめます。
+   #+begin_src fish
+     pass show x13gen2/ssh_host_ed25519_key.pub | nix run nixpkgs#ssh-to-age
+   #+end_src
+
+~gpg: decryption failed: Screen or window too small~ と出る場合は、gpg-agent が別の端末で起動したまま pinentry-curses を使っています。次のコマンドで agent を今の端末で起動し直してから、もう一度確かめます。
+
+#+begin_src fish
+  set -x GPG_TTY (tty)
+  gpgconf --kill gpg-agent
+  gpg-connect-agent updatestartuptty /bye
+#+end_src
+
+** 手順 3: インストーラーの USB を作る
+
+最新の NixOS ISO を使います。古い ISO の nix では nixos-anywhere が ~nix config show~ を実行できず、~Gathering machine facts~ で止まります。
+
+1. https://nixos.org/download/ から 64-bit Intel/AMD 向けの ISO をダウンロードします。
+2. Mac に USB メモリを挿し、~diskutil list external physical~ でデバイス番号を確かめます。番号を取り違えると別のディスクを上書きします。
+3. 次のコマンドの ~N~ を確かめた番号に置き換えて、ISO を書き込みます。
+   #+begin_src fish
+     diskutil unmountDisk /dev/diskN
+     sudo dd if=<ISO のパス> of=/dev/rdiskN bs=4m status=progress
+     diskutil eject /dev/diskN
+   #+end_src
+
+** 手順 4: ドライブを消去する
+
+X13Gen2 に USB メモリを挿し、起動時に F12 を押してブートメニューから USB を選びます。インストーラーが起動したら、~nmtui~ でネットワークに接続し、~nix-shell -p nvme-cli~ でシェルを開きます。~nix-shell~ は nvme-cli をダウンロードするため、ネットワークが必要です。
+
+1. NVMe ドライブに 4096 バイトの LBA フォーマットがあるかを調べます。
    #+begin_src shell
      sudo nvme id-ns -H /dev/nvme0n1 | grep "LBA Format"
    #+end_src
-   4096 バイトのフォーマットが表示された場合は、~sudo nvme format /dev/nvme0n1 --lbaf=<index> --ses=1~ でそのフォーマットに切り替えてドライブを消去します。表示されない場合は ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~ で消去します。
+2. ~Data Size: 4096 bytes~ の行がある場合は、その行の ~LBA Format~ の番号を ~<index>~ に入れて ~sudo nvme format /dev/nvme0n1 --lbaf=<index> --ses=1~ を実行します。フォーマットが切り替わり、ドライブが消去されます。その行がない場合は ~sudo nvme sanitize /dev/nvme0n1 --sanact=2~ で消去します。
 
-ファームウェアの設定画面で次の作業をします。
+** 手順 5: TPM をクリアし、Secure Boot を Setup Mode にする
 
-4. 古いインストールの登録が残らないように TPM をクリアし、Secure Boot を Setup Mode にします。
+1. X13Gen2 を再起動し、起動時に Enter を押してから F1 を押して、ファームウェアの設定画面に入ります。
+2. 古いインストールの登録が残らないように TPM をクリアし、Secure Boot を Setup Mode にします。
+3. 設定を保存して再起動し、F12 でもう一度インストーラーの USB から起動します。
 
-nixos-anywhere は GitHub 上の flake からインストールするため、main ブランチに ~secrets/x13gen2.yaml~ ([[*シークレット][シークレット]] を参照) と ~hosts/X13Gen2/u2f-keys~ ([[*YubiKey][YubiKey]] を参照) がすでに入っている必要があります。どちらかを変更した場合は、インストールの前に push します。
+** 手順 6: nixos-anywhere でインストールする
 
-** nixos-anywhere でインストールする
+1. インストーラーで ~nmtui~ を使ってネットワークに接続し、~passwd~ で ~nixos~ ユーザーのパスワードを設定します。
+2. ~ip addr~ で IP アドレスを控えます。控えるのは、接続しているインターフェース (Wi-Fi なら ~wlp~ や ~wlan0~ で始まる名前) の ~inet~ 行の、~/~ より前の部分です。~lo~ の ~127.0.0.1~ は使いません。Mac から ~ping -c1 <TARGET_IP>~ で応答があることを確かめます。
+3. Mac で次を実行します。~<TARGET_IP>~ は控えたアドレスに置き換えます。
+   #+begin_src fish
+     set stage (mktemp -d)
+     install -d -m 755 $stage/persist/etc/ssh
+     pass show x13gen2/ssh_host_ed25519_key > $stage/persist/etc/ssh/ssh_host_ed25519_key
+     pass show x13gen2/ssh_host_ed25519_key.pub > $stage/persist/etc/ssh/ssh_host_ed25519_key.pub
+     chmod 600 $stage/persist/etc/ssh/ssh_host_ed25519_key
 
-インストール先のマシンを NixOS インストーラーの USB から起動します。ネットワークに接続し (~nmtui~)、~passwd~ で ~nixos~ ユーザーのパスワードを設定し、~ip addr~ でアドレスを控えます。
+     # 一時的なパスフレーズ。手順 9 で TPM とリカバリーキーを登録したあとで削除する。
+     read -s -P "Temporary LUKS passphrase: " LUKS_PASS
 
-pass のストアがある Mac で、SSH ホスト鍵を作業用のディレクトリに取り出してからインストールします。fish ではなく bash で実行します。sops はホスト鍵から復号鍵を導出するため、ホスト鍵は最初の起動より前に置いておく必要があります。
+     nix run github:nix-community/nixos-anywhere -- \
+       --flake github:takeokunn/nixos-configuration#X13Gen2 \
+       --extra-files $stage \
+       --disk-encryption-keys /tmp/luks-password (printf '%s' $LUKS_PASS | psub) \
+       nixos@<TARGET_IP>
 
-#+begin_src bash
-  stage=$(mktemp -d)
-  install -d -m 755 "$stage/persist/etc/ssh"
-  pass show x13gen2/ssh_host_ed25519_key > "$stage/persist/etc/ssh/ssh_host_ed25519_key"
-  pass show x13gen2/ssh_host_ed25519_key.pub > "$stage/persist/etc/ssh/ssh_host_ed25519_key.pub"
-  chmod 600 "$stage/persist/etc/ssh/ssh_host_ed25519_key"
+     set -e LUKS_PASS
+     rm -rf $stage
+   #+end_src
+   Mac は x86_64-linux のシステムをビルドできないため、ビルドはインストーラーの上で行われます。一時的なパスフレーズは確認のための再入力がないので、打ち間違えないようにします。途中で ~nixos@<TARGET_IP>~ のパスワードを聞かれたら、手順 6 の 1 で設定したものを入力します。
+4. ビルドとインストールが終わると、X13Gen2 が自動で再起動します。再起動が始まったら USB メモリを抜きます。
 
-  # 一時的なパスフレーズ。TPM とリカバリーキーを登録したあとで削除する。
-  read -s -p "Temporary LUKS passphrase: " LUKS_PASS
+手順 9 を終えるまでは、起動のたびに一時的なパスフレーズを求められます。
 
-  nix run github:nix-community/nixos-anywhere -- \
-    --flake github:takeokunn/nixos-configuration#X13Gen2 \
-    --extra-files "$stage" \
-    --disk-encryption-keys /tmp/luks-password <(printf '%s' "$LUKS_PASS") \
-    nixos@<TARGET_IP>
+** 手順 7: ホームディレクトリの所有者を直す
 
-  unset LUKS_PASS
-  rm -rf "$stage"
+最初の起動では、lanzaboote が Secure Boot の鍵を ~/var/lib/sbctl~ に生成して登録し、もう一度再起動します。そのあと、Ctrl+Alt+F3 の TTY で ~take~ としてログインし、次を実行します。パスワードは、[[*シークレット][シークレット]] の ~take-hashed-password~ を作ったときのものです。
+
+#+begin_src shell
+  sudo find /persist/home/take -xdev -user root -exec chown -h take:users '{}' +
+  sudo find /home/take -xdev -user root -exec chown -h take:users '{}' +
+  sudo systemctl restart home-manager-take.service
+  systemctl is-active home-manager-take.service
 #+end_src
 
-** 最初の起動
+インストール中はまだ ~take~ ユーザーがいないため、impermanence が ~/persist/home/take~ の下に作るディレクトリは ~root~ の所有になります。直すまでは home-manager の適用が ~Could not find suitable profile directory~ で失敗し、niri も設定ファイルがないままエラーを出します。~-xdev~ は、rootless podman のサブボリューム ~@containers~ (~~/.local/share/containers~) の中の所有者を変えないために付けています。
 
-この節の手順 3 を終えるまでは、起動のたびに一時的なパスフレーズを求められます。
+最後のコマンドが ~active~ を返したら、Ctrl+Alt+F1 でログイン画面に戻り、ログインします。niri にログイン済みの場合は、Mod+Shift+E で niri を終了してからログインし直します。
 
-1. 最初の起動で、lanzaboote が Secure Boot の鍵を ~/var/lib/sbctl~ に生成して登録し、再起動します。
-2. 再起動したあと、Secure Boot が有効になっているかを確認します。無効と表示された場合は、ファームウェアの設定画面で Secure Boot を有効にします。
-   #+begin_src shell
-     bootctl status | grep "Secure Boot"
-   #+end_src
-3. PIN 付きの TPM とリカバリーキーを登録し、一時的なパスフレーズを削除します。
+** 手順 8: Secure Boot を確かめる
+
+#+begin_src shell
+  bootctl status | grep "Secure Boot"
+#+end_src
+
+~enabled~ と表示されない場合は、ファームウェアの設定画面で Secure Boot を有効にし、再起動してからもう一度確かめます。手順 9 の TPM は Secure Boot の状態に結び付くため、~enabled~ になる前に進みません。
+
+** 手順 9: TPM と PIN を登録する
+
+1. PIN 付きの TPM を登録します。今の一時的なパスフレーズと、新しく決める PIN を聞かれます。
    #+begin_src shell
      sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
-     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --recovery-key
-     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=password
    #+end_src
-   表示されたリカバリーキーは Mac の pass に保存します。ファームウェアの更新で PCR 7 が変わると、TPM ではディスクを解錠できなくなります。そのときはリカバリーキーで解錠し、TPM を登録し直します。
+2. リカバリーキーを登録します。表示されたリカバリーキーは、次に進む前に Mac の pass に保存します (~pass insert x13gen2/luks-recovery-key~ など)。
    #+begin_src shell
-     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --recovery-key
    #+end_src
-4. tailnet に参加します。コマンドは ~sudo tailscale up~ です。
+3. 一時的なパスフレーズを削除し、残ったスロットが ~tpm2~ と ~recovery~ の 2 つだけであることを確かめます。
+   #+begin_src shell
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=password
+     sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot
+   #+end_src
+4. 再起動し、PIN で解錠できることを確かめます。
+
+** 手順 10: tailnet に参加する
+
+~sudo tailscale up~ を実行し、表示された URL を Mac のブラウザで開いて承認します。Mac の ~tailscale status~ に ~x13gen2~ が表示されたら、~ssh take@<tailnet の IP>~ で接続できます。接続に使える鍵は [[file:../nixos/config/users.nix][nixos/config/users.nix]] の ~openssh.authorizedKeys.keys~ にあるものだけで、パスワードでは接続できません。~ssh take@<tailnet の IP> 'sudo …'~ のようにコマンドを渡して sudo を使うときは、パスワードを入力できるように ~ssh -t~ で接続します。
+
+** 設定を更新する
+
+このリポジトリの clone で ~nixos-rebuild~ を実行します。~/home~ は起動のたびに作り直されるため、clone は ~~/ghq~ のように永続化される場所に置きます。初めてのときは clone します。
+
+#+begin_src shell
+  git clone https://github.com/takeokunn/nixos-configuration ~/ghq/github.com/takeokunn/nixos-configuration
+#+end_src
+
+更新するときは、main の変更を取り込んでから適用します。
+
+#+begin_src shell
+  cd ~/ghq/github.com/takeokunn/nixos-configuration
+  git pull
+  sudo nixos-rebuild switch --flake .#X13Gen2
+#+end_src
+
+** 起動できないとき
+
+ブートメニューは起動時に 3 秒間表示されます。メニューの ~rescue~ エントリは、同じ世代のシステムを ~/etc~ overlay、USBGuard、Plymouth なしで起動します。overlay が原因で起動できないとき、USBGuard が必要なデバイスをブロックしたとき、Plymouth の画面に LUKS の PIN 入力が出ないときに使います。TPM と PIN による解錠は ~rescue~ でも必要です。
+
+ファームウェアの更新で PCR 7 が変わると、TPM ではディスクを解錠できなくなります。そのときはリカバリーキーで解錠し、TPM を登録し直します。
+
+#+begin_src shell
+  sudo systemd-cryptenroll /dev/disk/by-partlabel/cryptroot --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 --tpm2-with-pin=yes
+#+end_src
 
 ** シークレット
 
-~secrets/x13gen2.yaml~ は、[[file:../.sops.yaml][.sops.yaml]] に書かれた 2 つの age 受信者に向けて暗号化されています。1 つは Mac にある編集用の鍵 (~~/.config/sops/age/keys.txt~)、もう 1 つはこのマシンの SSH ホスト鍵から導出した鍵です。ファイルには次の 2 つが入っています。
+~secrets/x13gen2.yaml~ は、[[file:../.sops.yaml][.sops.yaml]] に書かれた 2 つの age 受信者に向けて暗号化されています。1 つは Mac にある編集用の鍵 (~~/Library/Application Support/sops/age/keys.txt~。macOS の sops は ~XDG_CONFIG_HOME~ が設定されていなければここを読みます)、もう 1 つはこのマシンの SSH ホスト鍵から導出した鍵です。ファイルには次の 2 つが入っています。
 
 - ~networkmanager-env~: ~HOME_WIFI_SSID=...~ と ~HOME_WIFI_PSK=...~ の行。NetworkManager の ~ensureProfiles~ が読みます。
-- ~take-hashed-password~: ログイン、greeter、sudo で使うパスワードの yescrypt ハッシュ (~mkpasswd --method=yescrypt~)。
+- ~take-hashed-password~: ログイン、greeter、sudo で使うパスワードの yescrypt ハッシュ。Mac では ~nix run nixpkgs#mkpasswd -- --method=yescrypt~ で作れます。
 
-編集は Mac で ~sops secrets/x13gen2.yaml~ を実行します。
+編集は Mac で ~sops secrets/x13gen2.yaml~ を実行します。パスワードを変えたときは、ハッシュを作り直して main に push し、X13Gen2 で設定を更新します。
 
-pass にあるホスト鍵を失った場合は、新しいホスト鍵を生成します。次に、~.sops.yaml~ の ~x13gen2~ の受信者を ~ssh-to-age < ssh_host_ed25519_key.pub~ の出力に置き換え、~sops updatekeys secrets/x13gen2.yaml~ を実行します。最後に新しい鍵を pass に保存します。
+pass にあるホスト鍵を失った場合は、Mac で新しいホスト鍵を作り直します。
 
-** YubiKey
+1. 作業用のディレクトリで新しいホスト鍵を生成します。
+   #+begin_src fish
+     set work (mktemp -d)
+     ssh-keygen -t ed25519 -N "" -C "" -f $work/ssh_host_ed25519_key
+   #+end_src
+2. ~.sops.yaml~ の ~x13gen2~ の受信者を ~nix run nixpkgs#ssh-to-age < $work/ssh_host_ed25519_key.pub~ の出力に置き換え、リポジトリのルートで ~sops updatekeys secrets/x13gen2.yaml~ を実行します。
+3. 新しい鍵を pass に保存し、作業用のディレクトリを消します。
+   #+begin_src fish
+     pass insert -m x13gen2/ssh_host_ed25519_key < $work/ssh_host_ed25519_key
+     pass insert -m x13gen2/ssh_host_ed25519_key.pub < $work/ssh_host_ed25519_key.pub
+     rm -rf $work
+   #+end_src
+4. ~.sops.yaml~ と ~secrets/x13gen2.yaml~ を main に push します。動いている X13Gen2 は古い鍵を使い続けるため、新しい鍵は次のインストールで置かれます。
 
-sudo、greeter、ロック画面は YubiKey へのタッチを受け付け、タッチがなければパスワードで認証します。鍵を登録するには、YubiKey を挿した任意のマシンで、リポジトリのルートから次のコマンドを実行します。
+** YubiKey と USBGuard
+
+sudo、greeter、ロック画面は YubiKey へのタッチを受け付け、タッチがなければパスワードで認証します。YubiKey は、認証を始める前に X13Gen2 に挿しておきます。挿していないと、タッチを求めずにパスワードを聞きます。
+
+鍵を登録するには、YubiKey を挿した任意のマシンで、リポジトリのルートから次のコマンドを実行します。
 
 #+begin_src shell
   nix shell nixpkgs#pam_u2f -c pamu2fcfg -u take -o pam://X13Gen2 -i pam://X13Gen2 > hosts/X13Gen2/u2f-keys
 #+end_src
 
-~>~ は登録済みの鍵を置き換えます。2 本目の鍵を追加する場合は、代わりに ~nix shell nixpkgs#pam_u2f -c pamu2fcfg -n -o pam://X13Gen2 -i pam://X13Gen2 >> hosts/X13Gen2/u2f-keys~ を実行します。
+~>~ は登録済みの鍵を置き換えます。2 本目の鍵を追加する場合は、代わりに fish で次を実行します。鍵はすべて ~take:~ で始まる 1 行に並べる必要があり、改行のあとに足した鍵は pam_u2f に無視されます。~.editorconfig~ に従うエディタで保存すると末尾に改行が付くため、~>>~ で足さずに、既存の行と連結して書き直します。
 
-USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイスです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
-
-** 設定を更新する
-
-このリポジトリを clone したディレクトリで次のコマンドを実行します。~/home~ は起動のたびに作り直されるため、clone は ~~/ghq~ のように永続化される場所に置きます。
-
-#+begin_src shell
-  sudo nixos-rebuild switch --flake .#X13Gen2
+#+begin_src fish
+  set new (nix shell nixpkgs#pam_u2f -c pamu2fcfg -n -o pam://X13Gen2 -i pam://X13Gen2)
+  printf '%s%s' (cat hosts/X13Gen2/u2f-keys) $new > hosts/X13Gen2/u2f-keys.new
+  and mv hosts/X13Gen2/u2f-keys.new hosts/X13Gen2/u2f-keys
 #+end_src
 
-ブートメニューは起動時に 3 秒間表示されます。メニューの ~rescue~ エントリは、同じ世代のシステムを ~/etc~ overlay、USBGuard、Plymouth なしで起動します。overlay が原因で起動できないとき、USBGuard が必要なデバイスをブロックしたとき、Plymouth の画面に LUKS の PIN 入力が出ないときに使います。TPM と PIN による解錠は ~rescue~ でも必要です。
+USBGuard は [[file:../nixos/config/security.nix][nixos/config/security.nix]] のルールが許可していない USB デバイスをすべてブロックします。許可されているのは Yubico のデバイス、ハブ、内部に配線されたデバイスです。ブロックされたデバイスは ~sudo usbguard list-devices --blocked~ で一覧でき、~sudo usbguard allow-device <id>~ で抜くまでの間だけ許可できます。恒久的に許可するにはルールを追加します。
 
 ** 補足
 
