@@ -23,6 +23,7 @@
     ./zathura
     ./imv
     ./mpv
+    ./nautilus
     ./impermanence
   ];
 

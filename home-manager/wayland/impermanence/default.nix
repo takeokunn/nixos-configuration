@@ -102,6 +102,9 @@
       ".local/share/applications"
       ".local/share/mime"
       ".config/dconf"
+      # Nautilus scripts, starred files and script shortcuts; its view settings live in dconf.
+      ".local/share/nautilus"
+      ".config/nautilus"
 
       # Audio: per-device preset rules saved from the EasyEffects window
       ".local/share/easyeffects/autoload"

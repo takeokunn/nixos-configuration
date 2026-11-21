@@ -290,7 +290,8 @@ in
         ];
 
         "Mod+Escape".spawn = "hyprlock";
-        "Mod+Shift+E".quit = { };
+        # Quitting niri is the menu's "Log out" row.
+        "Mod+Shift+E".spawn = "power-menu";
         "Mod+Shift+O".power-off-monitors = { };
       }
       // lib.mapAttrs (_: args: { spawn = [ "swayosd-client" ] ++ args; }) {
@@ -304,6 +305,10 @@ in
         ];
         XF86AudioMute = [
           "--output-volume"
+          "mute-toggle"
+        ];
+        XF86AudioMicMute = [
+          "--input-volume"
           "mute-toggle"
         ];
         XF86MonBrightnessUp = [
@@ -361,6 +366,21 @@ in
           {
             window-rule._children = [
               { match._props.app-id = "^pavucontrol$"; }
+              { open-floating = true; }
+            ];
+          }
+          {
+            # niri already floats windows that have a parent; the title match catches file
+            # choosers opened without one (no parent handle passed to the portal), from any app.
+            window-rule._children = [
+              # GTK 3 may report either its GApplication id or its program name.
+              { match._props.app-id = "^(nm-connection-editor|org[.]gnome[.]nm_connection_editor)$"; }
+              # Started as `kitty --class bluetui` from the rail's network chip.
+              { match._props.app-id = "^bluetui$"; }
+              { match._props.app-id = "^com[.]gabm[.]satty$"; }
+              { match._props.app-id = "^gay[.]vaskel[.]soteria$"; }
+              { match._props.app-id = "^xdg-desktop-portal-gtk$"; }
+              { match._props.title = "^((Open|Save|Select|Choose) (Files?|Folders?|As)|File Upload)"; }
               { open-floating = true; }
             ];
           }
