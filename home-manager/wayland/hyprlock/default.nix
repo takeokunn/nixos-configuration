@@ -10,8 +10,6 @@ in
       disable_loading_bar = false;
       grace = 2;
       hide_cursor = true;
-      no_fade_in = false;
-      no_fade_out = false;
     };
 
     background = [
@@ -48,7 +46,6 @@ in
         check_color = "rgb(${colors.base0C})";
         fail_color = "rgb(${colors.base08})";
         fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
-        fail_transition = 300;
         capslock_color = "rgb(${colors.base09})";
         numlock_color = -1;
         bothlock_color = -1;
