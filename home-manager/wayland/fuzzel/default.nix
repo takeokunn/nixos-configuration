@@ -1,16 +1,12 @@
-{ config, ... }:
-let
-  colors = config.lib.stylix.colors;
-in
 {
   programs.fuzzel.enable = true;
+  # Stylix sets the font, colors and icon theme.
+  stylix.targets.fuzzel.enable = true;
   programs.fuzzel.settings = {
     main = {
-      font = "${config.stylix.fonts.monospace.name}:size=12";
       terminal = "kitty";
       layer = "overlay";
       prompt = "❯ ";
-      icon-theme = config.gtk.iconTheme.name;
       icons-enabled = true;
       fields = "name,generic,comment,categories,filename,keywords";
       show-actions = false;
@@ -41,19 +37,6 @@ in
       execute = "Return KP_Enter";
       execute-or-next = "Tab";
       cancel = "Escape Control+c Control+bracketleft";
-    };
-
-    colors = {
-      background = "${colors.base00}ee";
-      text = "${colors.base05}ff";
-      prompt = "${colors.base0F}ff";
-      placeholder = "${colors.base03}ff";
-      input = "${colors.base05}ff";
-      match = "${colors.base0E}ff";
-      selection = "${colors.base02}ff";
-      selection-text = "${colors.base05}ff";
-      selection-match = "${colors.base0E}ff";
-      border = "${colors.base0F}ff";
     };
 
     border = {

@@ -25,6 +25,8 @@ in
     };
     targets.console.enable = true;
     targets.plymouth.enable = true;
+    # Colors the Chrome and Chromium frame through managed policy (replaces the Dracula theme extension).
+    targets.chromium.enable = true;
   };
   home-manager.sharedModules = [ (import ../../shared/stylix-home-targets.nix) ];
 }

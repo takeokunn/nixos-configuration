@@ -34,6 +34,12 @@ in
 {
   programs.waybar.enable = true;
   programs.waybar.systemd.enable = true;
+  # Stylix supplies the font and @define-color only; the style below keeps the layout.
+  stylix.targets.waybar = {
+    enable = true;
+    addCss = false;
+    font = "sansSerif";
+  };
 
   programs.waybar.settings = {
     mainBar = {
@@ -230,8 +236,6 @@ in
 
   programs.waybar.style = ''
     * {
-      font-family: "${config.stylix.fonts.monospace.name}", "Font Awesome 7 Free";
-      font-size: 17px;
       min-height: 0;
       transition: all 0.2s ease;
     }

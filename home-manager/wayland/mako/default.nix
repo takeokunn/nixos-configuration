@@ -4,19 +4,16 @@ let
 in
 {
   services.mako.enable = true;
+  # Stylix sets the font, the base colors and the [urgency=low|critical] sections; extraConfig is
+  # written after them, so its criteria below win.
+  stylix.targets.mako.enable = true;
   services.mako.settings = {
-    font = "${config.stylix.fonts.monospace.name} 14";
     width = 350;
     height = 150;
     margin = "10";
     padding = "12";
     border-size = 2;
     border-radius = 8;
-
-    background-color = "${colors.base00}ee";
-    text-color = "${colors.base05}";
-    border-color = "${colors.base0F}";
-    progress-color = "over ${colors.base02}";
 
     default-timeout = 5000;
     layer = "overlay";
