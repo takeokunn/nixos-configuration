@@ -14,4 +14,7 @@
   xdg.portal.config.common.default = [ "gtk" ];
 
   security.polkit.enable = true;
+  # GTK4 polkit agent, so Stylix's GTK theme applies to its dialogs. It starts with
+  # graphical-session.target, which niri-session brings up.
+  security.soteria.enable = true;
 }

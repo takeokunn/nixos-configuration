@@ -346,7 +346,6 @@ in
             };
           }
           { spawn-at-startup = [ "wallpaper-start" ]; }
-          { spawn-at-startup = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
           {
             window-rule = {
               geometry-corner-radius = 16;
