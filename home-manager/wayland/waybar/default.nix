@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, ... }:
 let
   palette = config.lib.stylix.colors;
   colors = palette.withHashtag;
@@ -6,29 +6,42 @@ let
     base: alpha:
     "rgba(${palette."${base}-rgb-r"}, ${palette."${base}-rgb-g"}, ${palette."${base}-rgb-b"}, ${alpha})";
 
-  tailscaleStatus = pkgs.writeShellScript "waybar-tailscale" ''
-    if ${pkgs.tailscale}/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -e '.BackendState == "Running"' >/dev/null; then
-      printf '{"text":"󰖂","class":"connected","tooltip":"Tailscale: connected"}\n'
-    else
-      printf '{"text":"󰖂","class":"disconnected","tooltip":"Tailscale: disconnected"}\n'
-    fi
-  '';
-  # Each prints nothing while inactive, which hides the module.
-  recordingStatus = pkgs.writeShellScript "waybar-recording" ''
-    if ${pkgs.procps}/bin/pgrep -f wl-screenrec >/dev/null; then
-      printf '{"text":"%s","class":"recording","tooltip":"Recording: Mod+Shift+R stops it"}\n' "󰑊"
-    fi
-  '';
-  doNotDisturbStatus = pkgs.writeShellScript "waybar-do-not-disturb" ''
-    if ${pkgs.mako}/bin/makoctl mode | ${pkgs.gnugrep}/bin/grep -qx do-not-disturb; then
-      printf '{"text":"%s","class":"on","tooltip":"Do not disturb: Mod+Alt+N turns it off"}\n' "󰂛"
-    fi
-  '';
-  tailscaleToggle = pkgs.writeShellScript "waybar-tailscale-toggle" ''
-    if ${pkgs.tailscale}/bin/tailscale status >/dev/null 2>&1; then
-      exec ${pkgs.tailscale}/bin/tailscale down
-    fi
-    exec ${pkgs.tailscale}/bin/tailscale up
+  glyph = size: icon: "<span font_family='Symbols Nerd Font' size='${size}'>${icon}</span>";
+  # A rail chip: the glyph on top, a short value under it.
+  chip = icon: value: "${glyph "16pt" icon}\n<span size='10pt'>${value}</span>";
+  clockLine =
+    color: size: weight: text:
+    "<span foreground='${colors.${color}}' size='${size}' weight='${weight}'>${text}</span>";
+
+  # Workspaces not listed here (4-8 and any unnamed one) use base04.
+  workspaceColors = {
+    "1" = "base0C";
+    "2" = "base0E";
+    "3" = "base0B";
+    "9" = "base0F";
+    "10" = "base09";
+  };
+  # waybar names each niri button niri-workspace-<name>, and niri/default.nix names them 1-10.
+  workspaceCss = selector: base: ''
+    ${selector} {
+      color: ${colors.${base}};
+      background-color: ${rgba base "0.08"};
+    }
+
+    ${selector}:hover {
+      background-color: ${rgba base "0.18"};
+    }
+
+    ${selector}.active {
+      color: ${colors.base00};
+      background-color: ${colors.${base}};
+      box-shadow: 0 0 18px ${rgba base "0.55"};
+    }
+
+    ${selector}.urgent {
+      color: ${colors.base08};
+      background-color: ${rgba "base08" "0.2"};
+    }
   '';
 in
 {
@@ -44,48 +57,40 @@ in
   programs.waybar.settings = {
     mainBar = {
       layer = "top";
-      position = "top";
-      height = 40;
-      spacing = 8;
+      position = "left";
+      width = 64;
+      margin-top = 10;
+      margin-bottom = 10;
+      margin-left = 10;
+      spacing = 6;
 
-      modules-left = [
-        "niri/workspaces"
-        "niri/window"
-      ];
+      modules-left = [ "niri/workspaces" ];
       modules-center = [ "clock" ];
       modules-right = [
-        "custom/recording"
-        "privacy"
-        "custom/do-not-disturb"
         "cpu"
         "memory"
         "network"
-        "bluetooth"
         "wireplumber"
         "battery"
-        "power-profiles-daemon"
-        "idle_inhibitor"
-        "custom/tailscale"
-        "tray"
+        "group/tray-drawer"
+        "custom/power"
       ];
 
       "niri/workspaces" = {
-        format = "{icon}";
-        format-icons = {
-          active = "";
-          default = "";
-        };
+        format = "{value}";
         on-click = "activate";
       };
 
-      "niri/window" = {
-        format = "󰖯 {}";
-        max-length = 50;
-      };
-
       clock = {
-        format = "{:%H:%M}";
-        format-alt = "{:%Y-%m-%d %H:%M}";
+        # One argument (the time) is formatted, so every placeholder names it by index.
+        format = lib.concatStringsSep "\n" [
+          (clockLine "base0E" "24pt" "bold" "{0:%H}")
+          (clockLine "base0C" "24pt" "bold" "{0:%M}")
+          (clockLine "base04" "10pt" "normal" "{0:%m.%d}")
+          (clockLine "base04" "10pt" "normal" "{0:L%a}")
+        ];
+        locale = "ja_JP.UTF-8";
+        justify = "center";
         tooltip-format = "<tt><small>{calendar}</small></tt>";
         calendar = {
           mode = "year";
@@ -101,16 +106,60 @@ in
         };
       };
 
+      cpu = {
+        interval = 5;
+        format = chip "󰍛" "{usage}%";
+        justify = "center";
+        states = {
+          warning = 70;
+          critical = 90;
+        };
+        tooltip-format = "CPU: {usage}%\nLoad: {load}";
+      };
+
+      memory = {
+        interval = 10;
+        format = chip "󰘚" "{used:0.1f}G";
+        format-alt = chip "󰘚" "{percentage}%";
+        justify = "center";
+        states = {
+          warning = 70;
+          critical = 90;
+        };
+        tooltip-format = "RAM: {used:0.1f}G/{total:0.1f}G ({percentage}%)\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G ({swapPercentage}%)";
+      };
+
+      network = {
+        format-wifi = glyph "16pt" "󰖩";
+        format-ethernet = glyph "16pt" "󰈀";
+        format-disconnected = glyph "16pt" "󰖪";
+        justify = "center";
+        tooltip-format = "{ifname}: {ipaddr}/{cidr}";
+        tooltip-format-wifi = "{essid} {signalStrength}%\n{ifname}: {ipaddr}/{cidr}";
+        on-click = "networkmanager_dmenu";
+        on-click-right = "kitty --class bluetui -e bluetui";
+      };
+
+      wireplumber = {
+        format = chip "{icon}" "{volume}";
+        format-muted = chip "󰝟" "{volume}";
+        format-icons = [
+          "󰕿"
+          "󰖀"
+          "󰕾"
+        ];
+        justify = "center";
+        on-click = "pavucontrol";
+      };
+
       battery = {
         states = {
           warning = 30;
           critical = 15;
         };
-        format = "{icon} {capacity}%";
-        format-charging = "󰂄 {capacity}%";
-        format-plugged = "󰚥 {capacity}%";
-        format-warning = "󰁺⚠ {capacity}%";
-        format-critical = "󰁺🔥 {capacity}%";
+        format = chip "{icon}" "{capacity}%";
+        format-charging = chip "󰂄" "{capacity}%";
+        format-plugged = chip "󰚥" "{capacity}%";
         format-icons = [
           "󰁺"
           "󰁻"
@@ -123,114 +172,36 @@ in
           "󰂂"
           "󰁹"
         ];
+        justify = "center";
       };
 
-      network = {
-        format-wifi = "󰖩 {signalStrength}%";
-        format-ethernet = "󰈀";
-        format-disconnected = "󰖪";
-        tooltip-format = "{ifname}: {ipaddr}/{cidr}";
-        on-click = "networkmanager_dmenu";
-      };
-
-      wireplumber = {
-        format = "{icon} {volume}%";
-        format-muted = "󰝟";
-        format-icons = [
-          "󰕿"
-          "󰖀"
-          "󰕾"
+      "group/tray-drawer" = {
+        orientation = "inherit";
+        drawer = {
+          transition-duration = 300;
+          transition-left-to-right = false;
+        };
+        modules = [
+          "custom/tray-handle"
+          "tray"
         ];
-        on-click = "pavucontrol";
       };
 
-      bluetooth = {
-        format = "󰂯";
-        format-disabled = "󰂲";
-        format-connected = "󰂱 {num_connections}";
-        tooltip-format-connected = "{device_enumerate}";
-        tooltip-format-enumerate-connected = "{device_alias}";
-        on-click = "kitty --class bluetui -e bluetui";
-      };
-
-      power-profiles-daemon = {
-        format = "{icon}";
-        tooltip-format = "Power profile: {profile}";
-        format-icons = {
-          default = "󰗑";
-          performance = "󰓅";
-          balanced = "󰾅";
-          power-saver = "󰾆";
-        };
-      };
-
-      # Mac's sleep_prevent item: holds an idle/sleep inhibitor while active.
-      idle_inhibitor = {
-        format = "{icon}";
-        format-icons = {
-          activated = "󰅶";
-          deactivated = "󰾪";
-        };
-      };
-
-      "custom/recording" = {
-        exec = "${recordingStatus}";
-        return-type = "json";
-        interval = 2;
-      };
-
-      "custom/do-not-disturb" = {
-        exec = "${doNotDisturbStatus}";
-        return-type = "json";
-        interval = 2;
-      };
-
-      "custom/tailscale" = {
-        exec = "${tailscaleStatus}";
-        return-type = "json";
-        interval = 10;
-        on-click = "${tailscaleToggle}";
+      "custom/tray-handle" = {
+        format = glyph "14pt" "󰅃";
+        tooltip = false;
       };
 
       tray = {
         spacing = 10;
       };
 
-      cpu = {
-        interval = 5;
-        format = "󰍛 {usage}%";
-        format-warning = "󰍛⚠ {usage}%";
-        format-critical = "󰍛🔥 {usage}%";
-        format-icons = [
-          "▁"
-          "▂"
-          "▃"
-          "▄"
-          "▅"
-          "▆"
-          "▇"
-          "█"
-        ];
-        states = {
-          warning = 70;
-          critical = 90;
-        };
-        tooltip-format = "CPU: {usage}%\nLoad: {load}";
+      "custom/power" = {
+        format = glyph "16pt" "󰐥";
+        tooltip = false;
+        # The menu itself comes with the power-menu script.
+        on-click = "power-menu";
       };
-
-      memory = {
-        interval = 10;
-        format = "󰘚 {used:0.1f}G/{total:0.1f}G";
-        format-alt = "󰘚 {percentage}%";
-        format-warning = "󰘚⚠ {used:0.1f}G/{total:0.1f}G";
-        format-critical = "󰘚🔥 {used:0.1f}G/{total:0.1f}G";
-        states = {
-          warning = 70;
-          critical = 90;
-        };
-        tooltip-format = "RAM: {used:0.1f}G/{total:0.1f}G ({percentage}%)\nSwap: {swapUsed:0.1f}G/{swapTotal:0.1f}G ({swapPercentage}%)";
-      };
-
     };
   };
 
@@ -241,133 +212,120 @@ in
     }
 
     window#waybar {
-      background-color: ${rgba "base00" "0.75"};
+      background-color: ${rgba "base00" "0.9"};
       color: ${colors.base05};
-      border-radius: 16px;
-      border: 1px solid ${rgba "base05" "0.1"};
-      margin: 8px 12px 0 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      border-radius: 18px;
+      border: 1px solid ${rgba "base05" "0.07"};
+    }
+
+    .modules-left {
+      padding-top: 10px;
+    }
+
+    .modules-right {
+      padding-bottom: 10px;
     }
 
     #workspaces button {
-      padding: 0 8px;
-      color: ${colors.base03};
-      background-color: transparent;
+      min-width: 42px;
+      min-height: 36px;
+      padding: 0;
+      margin: 3px 10px;
       border: none;
-      border-radius: 8px;
-      margin: 4px 2px;
+      border-radius: 11px;
+      background-image: none;
+      box-shadow: none;
+      font-family: "Geist Mono";
+      font-size: 13pt;
+      font-weight: bold;
     }
 
-    #workspaces button:hover {
-      background-color: ${rgba "base02" "0.9"};
-      color: ${colors.base05};
-    }
-
-    #workspaces button.active {
-      color: ${colors.base0F};
-      background-color: ${rgba "base0F" "0.2"};
-    }
-
-    #workspaces button.urgent {
-      color: ${colors.base08};
-      background-color: ${rgba "base08" "0.2"};
-    }
-
-    #window,
-    #clock,
-    #cpu,
-    #memory,
-    #battery,
-    #network,
-    #wireplumber,
-    #tray {
-      padding: 0 12px;
-    }
-
-    #window {
-      color: ${colors.base05};
-    }
+    ${workspaceCss "#workspaces button" "base04"}
+    ${lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (
+        name: base: workspaceCss "#workspaces button#niri-workspace-${name}" base
+      ) workspaceColors
+    )}
 
     #clock {
-      color: ${colors.base05};
-      font-weight: bold;
+      padding: 8px 0;
+    }
+
+    #cpu,
+    #memory,
+    #network,
+    #wireplumber,
+    #battery,
+    #custom-tray-handle {
+      min-width: 46px;
+      padding: 6px 0;
+      margin: 0 8px;
+      border-radius: 12px;
     }
 
     #cpu {
       color: ${colors.base0C};
+      background-color: ${rgba "base0C" "0.12"};
     }
 
     #memory {
       color: ${colors.base0F};
+      background-color: ${rgba "base0F" "0.12"};
+    }
+
+    #network {
+      color: ${colors.base0B};
+      background-color: ${rgba "base0B" "0.12"};
+    }
+
+    #network.disconnected {
+      color: ${colors.base08};
+      background-color: ${rgba "base08" "0.12"};
+    }
+
+    #wireplumber {
+      color: ${colors.base0A};
+      background-color: ${rgba "base0A" "0.12"};
+    }
+
+    #wireplumber.muted {
+      color: ${colors.base03};
+      background-color: ${rgba "base03" "0.12"};
     }
 
     #battery {
       color: ${colors.base0B};
+      background-color: ${rgba "base0B" "0.12"};
+    }
+
+    #battery.charging {
+      color: ${colors.base0C};
+      background-color: ${rgba "base0C" "0.12"};
     }
 
     #cpu.warning,
     #memory.warning,
     #battery.warning {
       color: ${colors.base09};
-      text-shadow: 0 0 8px ${rgba "base09" "0.8"};
+      background-color: ${rgba "base09" "0.12"};
     }
 
     #cpu.critical,
     #memory.critical,
     #battery.critical {
       color: ${colors.base08};
-      text-shadow: 0 0 10px ${rgba "base08" "1.0"};
+      background-color: ${rgba "base08" "0.13"};
       animation: pulse 1.5s ease-in-out infinite;
     }
 
-    #battery.charging {
-      color: ${colors.base0C};
+    #custom-tray-handle {
+      padding: 4px 0;
+      color: ${colors.base04};
+      background-color: ${rgba "base04" "0.08"};
     }
 
-    #network {
-      color: ${colors.base0C};
-    }
-
-    #network.disconnected {
-      color: ${colors.base08};
-    }
-
-    #wireplumber {
-      color: ${colors.base0A};
-    }
-
-    #wireplumber.muted {
-      color: ${colors.base03};
-    }
-
-    #bluetooth,
-    #power-profiles-daemon,
-    #idle_inhibitor {
-      color: ${colors.base0C};
-    }
-
-    #idle_inhibitor.activated,
-    #power-profiles-daemon.performance {
-      color: ${colors.base09};
-    }
-
-    #custom-recording,
-    #privacy {
-      padding: 0 12px;
-      color: ${colors.base08};
-    }
-
-    #custom-do-not-disturb {
-      padding: 0 12px;
-      color: ${colors.base09};
-    }
-
-    #custom-tailscale.connected {
-      color: ${colors.base0B};
-    }
-
-    #custom-tailscale.disconnected {
-      color: ${colors.base03};
+    #tray {
+      padding: 4px 0;
     }
 
     #tray > .passive {
@@ -376,6 +334,15 @@ in
 
     #tray > .needs-attention {
       -gtk-icon-effect: highlight;
+    }
+
+    #custom-power {
+      min-width: 38px;
+      min-height: 38px;
+      margin: 4px 12px 0 12px;
+      border-radius: 19px;
+      color: ${colors.base08};
+      background-color: ${rgba "base08" "0.14"};
     }
 
     @keyframes pulse {

@@ -1,6 +1,31 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
-  colors = config.lib.stylix.colors.withHashtag;
+  palette = config.lib.stylix.colors;
+  colors = palette.withHashtag;
+  # Same alpha Stylix gives the base background-color.
+  opacity = lib.toHexString (builtins.ceil (config.stylix.opacity.popups * 255));
+  # base00 with 12% of the app's color mixed in.
+  tinted =
+    base:
+    let
+      channel =
+        c:
+        lib.fixedWidthString 2 "0" (
+          lib.toHexString (
+            builtins.floor (
+              lib.toInt palette."base00-rgb-${c}" * 0.88 + lib.toInt palette."${base}-rgb-${c}" * 0.12 + 0.5
+            )
+          )
+        );
+    in
+    "#${channel "r"}${channel "g"}${channel "b"}${opacity}";
+  # mako fills the whole notification with the progress, so it stays translucent over the text.
+  appSection = app: base: ''
+    [app-name=${app}]
+    border-color=${colors.${base}}
+    background-color=${tinted base}
+    progress-color=over ${colors.${base}}40
+  '';
 in
 {
   services.mako.enable = true;
@@ -8,12 +33,15 @@ in
   # written after them, so its criteria below win.
   stylix.targets.mako.enable = true;
   services.mako.settings = {
-    width = 350;
+    width = 356;
     height = 150;
-    margin = "10";
-    padding = "12";
+    # niri's layer shadow covers the whole surface, so the gap to the screen edge is a
+    # layer-shell margin rather than transparent space inside the surface.
+    margin = "0";
+    outer-margin = "10";
+    padding = "14,16";
     border-size = 2;
-    border-radius = 8;
+    border-radius = 14;
 
     default-timeout = 5000;
     layer = "overlay";
@@ -21,7 +49,7 @@ in
     sort = "-time";
     max-visible = 5;
     icons = true;
-    max-icon-size = 48;
+    max-icon-size = 40;
     markup = true;
     actions = true;
   };
@@ -40,11 +68,13 @@ in
     default-timeout=0
     ignore-timeout=1
 
-    [app-name=spotify]
-    border-color=${colors.base0B}
-
-    [app-name=discord]
-    border-color=${colors.base0C}
+    ${appSection "discord" "base0C"}
+    ${appSection "google-chrome" "base0B"}
+    ${appSection "spotify" "base0B"}
+    ${appSection "slack" "base0E"}
+    # Repeated after the app sections so a critical notification keeps its red border.
+    [urgency=critical]
+    border-color=${colors.base08}
 
     [mode=do-not-disturb]
     invisible=1

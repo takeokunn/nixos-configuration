@@ -9,7 +9,11 @@ let
   emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
     windowManager = "niri";
   };
-  colors = config.lib.stylix.colors.withHashtag;
+  palette = config.lib.stylix.colors;
+  colors = palette.withHashtag;
+  rgba =
+    base: alpha:
+    "rgba(${palette."${base}-rgb-r"}, ${palette."${base}-rgb-g"}, ${palette."${base}-rgb-b"}, ${alpha})";
 
   # Called by Emacs (my/scratchpad-commit) with the text on stdin: copies it, hides the
   # scratchpad and pastes into the window that had focus before it.
@@ -87,7 +91,7 @@ in
       };
 
       layout = {
-        gaps = 8;
+        gaps = 10;
         center-focused-column = "never";
         preset-column-widths._children = [
           { proportion = 0.33333; }
@@ -97,21 +101,28 @@ in
         default-column-width.proportion = 0.5;
         focus-ring = {
           width = 2;
-          active-color = colors.base0F;
-          inactive-color = colors.base02;
+          # "longer hue" goes the long way round from cyan to pink, through purple.
+          active-gradient._props = {
+            from = colors.base0C;
+            to = colors.base0E;
+            angle = 135;
+            "in" = "oklch longer hue";
+          };
+          inactive-color = rgba "base05" "0.06";
         };
         border.off = { };
         shadow = {
           on = { };
-          softness = 30;
+          softness = 64;
           spread = 5;
           offset._props = {
             x = 0;
-            y = 5;
+            y = 24;
           };
           draw-behind-window = true;
-          color = "#00000064";
-          inactive-color = "#00000040";
+          # Plain black: the base16 palette has no black.
+          color = "rgba(0, 0, 0, 0.5)";
+          inactive-color = "rgba(0, 0, 0, 0.3)";
         };
       };
 
@@ -338,9 +349,15 @@ in
           { spawn-at-startup = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
           {
             window-rule = {
-              geometry-corner-radius = 8;
+              geometry-corner-radius = 16;
               clip-to-geometry = true;
             };
+          }
+          {
+            window-rule._children = [
+              { match._props.is-focused = false; }
+              { opacity = 0.9; }
+            ];
           }
           {
             window-rule._children = [
@@ -357,6 +374,23 @@ in
             ];
           }
         ]
+        # A layer shadow follows the whole surface, transparent margins included, so these
+        # namespaces draw their shape edge to edge.
+        ++
+          lib.mapAttrsToList
+            (namespace: radius: {
+              layer-rule._children = [
+                { match._props.namespace = "^${namespace}$"; }
+                { shadow.on = { }; }
+                { geometry-corner-radius = radius; }
+              ];
+            })
+            {
+              waybar = 18;
+              notifications = 14;
+              swayosd = 25;
+              launcher = 16;
+            }
         ++ lib.concatLists (
           lib.mapAttrsToList (
             ws: appIds:

@@ -41,7 +41,7 @@
 
     border = {
       width = 2;
-      radius = 8;
+      radius = 16;
     };
   };
 }

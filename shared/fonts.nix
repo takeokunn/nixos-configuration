@@ -11,6 +11,4 @@ pkgs: with pkgs; [
   udev-gothic-nf
   nerd-fonts.fira-code
   emacs-all-the-icons-fonts
-  font-awesome
-  font-awesome_5
 ]
