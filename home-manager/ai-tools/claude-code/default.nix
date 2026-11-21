@@ -109,8 +109,5 @@ in
       programs.playwright.enable = true;
       programs.slite.enable = true;
     }).config.settings.servers
-    // shared.mcpServers {
-      inherit nurPkgs;
-      context = "claude-code";
-    };
+    // shared.mcpServers { inherit nurPkgs; };
 }

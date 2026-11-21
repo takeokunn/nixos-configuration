@@ -23,7 +23,7 @@ from a plan, a prior review, or a hook's rubric often contains items already sat
 most common source of wasted parallel waves. Where the directive names a tool-defined property (dead code,
 duplication, cyclomatic complexity), run that tool's own detector rather than judging by reading.
 
-Memory lookup: the serena-usage skill.
+Memory lookup: CLAUDE.md `memory_policy`.
 Treat memories as historical evidence; verify claims that affect this task against the current tree.
 
 Identify which subtasks are independent. **Two subtasks writing to the same file are not independent however
@@ -160,7 +160,7 @@ Each pattern below has occurred despite a prompt that seemed to forbid it.
   report; one message asking for the answer to each question returns it with context, cheaper than a
   re-dispatch. (Claude Code only) Passing `name` to a non-fork agent makes it a mailbox teammate: no completion
   notification, replies minutes late, long ones truncated. Waiting on it is not a retry; do not re-dispatch the
-  same work in parallel. A lost completion notification: the serena-usage skill.
+  same work in parallel.
 
 ### A failed CI job
 
@@ -421,7 +421,6 @@ A clean tracked diff alone does not establish that removal is safe.
 
 ## Related
 
-- [serena-usage](../serena-usage/SKILL.md): before any memory check or symbol operation
 - [investigation-patterns](../investigation-patterns/SKILL.md): when review reveals behavior that is unclear
 - [testing-patterns](../testing-patterns/SKILL.md): when verifying coverage or designing a suite
 - [test-integrity](../test-integrity/SKILL.md): when a gate reports green

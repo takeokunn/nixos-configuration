@@ -15,7 +15,6 @@ let
   editorOverlay = import ./editor/overlay.nix { inherit emacs-overlay; };
   shellOverlay = import ./shell/overlay.nix;
   sketchybarOverlay = import ./mac/sketchybar/overlay.nix;
-  serenaOverlay = import ./ai-tools/serena/overlay.nix;
   pkgs = import nixpkgs {
     inherit system;
     config.allowUnfree = true;
@@ -60,11 +59,7 @@ in
   # host's pkgs and builds programs.sketchybar.package / programs.tmux.package
   # from this nixpkgs instance.
   nixpkgs.overlays =
-    editorOverlay
-    ++ shellOverlay
-    ++ sketchybarOverlay
-    ++ serenaOverlay
-    ++ [ mcp-servers-nix.overlays.default ];
+    editorOverlay ++ shellOverlay ++ sketchybarOverlay ++ [ mcp-servers-nix.overlays.default ];
 
   programs.nixvim.nixpkgs.source = nixpkgs;
 

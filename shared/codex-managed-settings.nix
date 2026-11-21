@@ -1,8 +1,15 @@
-{ pkgs, guardAndGuide }:
+{
+  pkgs,
+  guardAndGuide,
+  # Absolute home directory of the governed user, for the hook home-manager installs there.
+  homeDirectory,
+}:
 let
   inherit (pkgs) lib;
   shared = import ../home-manager/ai-tools/shared { inherit lib; };
   aiPromptsPath = ../home-manager/ai-tools/ai-prompts;
+  # Installed by home-manager/ai-tools/gbrain, which asserts this path.
+  gbrainHook = "${homeDirectory}/.local/share/gbrain/hook";
 
   # Prefix rules cannot express shell globs or distinguish `git stash` from `git stash list`.
   # Those cases remain guarded by the Bash hooks.
@@ -115,6 +122,28 @@ in
           {
             type = "command";
             command = "${hooksDir}/redact-secrets-codex";
+          }
+        ];
+      }
+    ];
+    SessionStart = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${gbrainHook} session-start --harness codex";
+            timeout = 15;
+          }
+        ];
+      }
+    ];
+    UserPromptSubmit = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${gbrainHook} user-prompt --harness codex";
+            timeout = 15;
           }
         ];
       }

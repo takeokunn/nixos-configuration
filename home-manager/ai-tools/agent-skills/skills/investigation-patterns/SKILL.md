@@ -16,11 +16,11 @@ the inferential step*, so the step can be disputed; an assumed finding states wh
 
 Coverage is an observable boundary, not a percentage: name the files and symbols actually read, what was *not*
 examined and why, and the query that established the boundary (the `aitools search` pattern, the
-`find_referencing_symbols` call, the directory walked) so a reader can re-run it and judge whether it was
+ast-grep rule, the directory walked) so a reader can re-run it and judge whether it was
 exhaustive.
 
-Prefer Serena's symbol tools (`find_symbol`, `get_symbols_overview`, `find_referencing_symbols`) to reading
-whole files, and follow an `aitools search` hit with symbol navigation rather than treating the hit as the answer.
+Prefer structural search through the ast-grep MCP server to reading whole files, and follow an
+`aitools search` hit with a structural query rather than treating the hit as the answer.
 
 ## Name the suspected layer before adding a signal
 
@@ -198,7 +198,6 @@ at the concrete module, then delete the barrel), and single-use private helpers 
 
 ## Related
 
-- [serena-usage](../serena-usage/SKILL.md): memory operations and symbol-level navigation
 - [execution-workflow](../execution-workflow/SKILL.md): implementing the fix once the cause is established
 - [fact-check](../fact-check/SKILL.md): verifying external documentation and library behavior
 - [testing-patterns](../testing-patterns/SKILL.md): adding the regression test afterwards

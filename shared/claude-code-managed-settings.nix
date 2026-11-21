@@ -24,6 +24,9 @@ let
 
   hooksDir = "${homeDirectory}/.claude/hooks";
 
+  # Installed by home-manager/ai-tools/gbrain, which asserts this path.
+  gbrainHook = "${homeDirectory}/.local/share/gbrain/hook";
+
   guardAndGuideHook = pkgs.writeShellScript "guard-and-guide" ''
     exec ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml
   '';
@@ -84,6 +87,11 @@ in
     ];
     # bypassPermissions skips every prompt and the auto-mode classifier; deny rules and the PreToolUse
     # hooks still apply. Ask rules would prompt, including for an already authorized override.
+    # Headless `claude -p` refuses MCP tools that no allow rule names.
+    allow = [
+      "mcp__plugin_hm_gbrain"
+      "mcp__plugin_hm_ast-grep"
+    ];
     ask = [ ];
     defaultMode = "bypassPermissions";
   };
@@ -111,6 +119,8 @@ in
     # this entry, so home-manager/ai-tools/claude-code/default.nix also sets it in the wrapper; this
     # entry covers launches that bypass that wrapper.
     NODE_EXTRA_CA_CERTS = shared.claudeCodeCaBundle;
+    # Memory lives in gbrain (home-manager/ai-tools/gbrain); auto memory would be a second store.
+    CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
   };
 
   # Claude Code runs every matching hook in parallel and merges the results, so list order confers
@@ -178,6 +188,25 @@ in
         {
           type = "command";
           command = "${scrubEnvHook}";
+        }
+        # gbrain waits up to 4 s for its server inside this budget.
+        {
+          type = "command";
+          command = "${gbrainHook} session-start --harness claude-code";
+          timeout = 5;
+        }
+      ];
+    }
+  ];
+
+  hooks.UserPromptSubmit = [
+    {
+      matcher = "";
+      hooks = [
+        {
+          type = "command";
+          command = "${gbrainHook} user-prompt --harness claude-code";
+          timeout = 3;
         }
       ];
     }

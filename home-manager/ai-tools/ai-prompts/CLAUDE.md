@@ -6,7 +6,7 @@ Environment variables can override CLI credentials: when an identity is wrong, i
 values.
 
 ghq clones are bare at `<repo>.git/`; edit in their `.worktrees/` directories, not the bare root. Other
-sessions share the working tree, HEAD, build artifacts, the nix store, and Serena's active project: preserve
+sessions share the working tree, HEAD, build artifacts, the nix store, and this host's gbrain memory: preserve
 their changes, stop only processes you started (a pattern kill hits other sessions), and leave the user's
 tmux session alone.
 
@@ -116,9 +116,15 @@ asking. Partitioning, retries, and reconciling conflicting reports: execution-wo
 
 ## memory_policy
 
-Memory lives in Serena (serena-usage skill); when Serena is unreachable, read the memory files directly.
-Record only durable, non-obvious learning (user conventions, decisions, costly traps), never secrets or
-session diffs, and update stale claims in place. Read-only work writes no memory and returns a candidate.
+Memory lives in gbrain, one brain per host behind the `gbrain` MCP server. Before answering, recall what the
+task touches. Without being asked, record durable, non-obvious learning (user conventions, decisions,
+costly traps), never secrets or session diffs: a one-sentence fact with `remember`, and a procedure or trap
+that needs its reasoning as a page with `put_page` (reached through `request_tools`). Set `entity` to the
+repository (`github.com/<owner>/<repo>`) for knowledge that holds only there, and to the topic otherwise.
+Correct or `forget` a stale claim rather than adding one that contradicts it. When gbrain is unreachable,
+say which lookup failed, continue, and return what you would have written as a candidate; an empty or
+failed recall is not evidence that nothing is stored. Read-only work writes no memory and returns a
+candidate.
 
 ## standard_practices
 
@@ -128,7 +134,7 @@ documentation in the existing documents' language, and English where neither exi
 and commit messages in English; a commit message follows the repo's existing format, such as
 `feat(ai-tools): ...`. Keep timestamps and drifting counts out of documentation.
 
-Use Serena for symbolic investigation when available. If a command is missing, try
+Use the ast-grep MCP server for structural code search when available. If a command is missing, try
 `nix run nixpkgs#<command>` once; do not assume tools outside the injected catalogs. Check that requested
 behavior does not already exist, follow local patterns, and report a task premise the current source
 contradicts. Run long builds and tests in the background or with a suitable timeout. Load each matching

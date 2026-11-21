@@ -1,7 +1,13 @@
-{ pkgs, guardAndGuide, ... }:
+{
+  pkgs,
+  username,
+  guardAndGuide,
+  ...
+}:
 let
   requirements = import ../../shared/codex-managed-settings.nix {
     inherit pkgs guardAndGuide;
+    homeDirectory = "/Users/${username}";
   };
   requirementsFile = (pkgs.formats.toml { }).generate "codex-requirements.toml" requirements;
 in

@@ -24,7 +24,7 @@ Reproduce a PR locally, run automated probes, prepare manual checks, and review 
 3. Load testing-patterns and test-integrity; add investigation-patterns when failure diagnosis needs it. Use the run and webapp-testing skills for their surfaces when available, otherwise repository definitions. Read matching QA memories and any prior report.
 4. Inspect `jj workspace list --ignore-working-copy --no-pager` for a prior `qa-pr-<number>-` workspace, then inspect its on-disk changes. Reuse it only if the checked-out content matches the PR head, no unrelated edits exist, and no other session owns it. An empty working-copy commit can have the PR head as its parent; its own commit ID need not match.
 5. Otherwise isolate in a new jj workspace (see the execution-workflow skill). Fetch the verified PR head branch with `jj git fetch --remote <source-remote> --branch <head-branch>` and compare its SHA with the recorded PR head before creating the workspace. If a fork needs new remote configuration, stop and report. Record commands and resolved paths.
-6. Make that QA worktree the active project root before writing artifacts. Do not change Serena's shared project pointer while delegated investigations run.
+6. Make that QA worktree the active project root before writing artifacts.
 
 Resolve all command placeholders before execution.
 

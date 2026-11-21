@@ -8,7 +8,7 @@
     ./claude-code
     ./codex
     ./agent-skills
-    ./serena
+    ./gbrain
   ];
 
   home.packages = [

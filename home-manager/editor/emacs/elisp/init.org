@@ -3630,10 +3630,9 @@ branch REPO-PATH/HEAD points at, and signal an error otherwise."
 
   (defun my/ghq--link-state (repo-path target-path)
     "Link or copy REPO-PATH's shared .state/ contents into TARGET-PATH,
-mirroring __fzf_ghq_new_worktree.fish. .state/.serena/memories and
-.state/.claude are symlinked, so a memory written in one worktree stays
-visible from every other worktree of the same repository. .state/.envrc and
-.state/.env are instead copied: unlike the symlinked pair, per-worktree
+mirroring __fzf_ghq_new_worktree.fish. .state/.claude is symlinked, so its
+settings stay shared by every worktree of the same repository. .state/.envrc and
+.state/.env are instead copied: unlike the symlinked directory, per-worktree
 environment settings are meant to diverge from that shared file
 independently once created, as a one-shot snapshot rather than something
 every worktree must keep seeing live. Every target the checkout already
@@ -3647,9 +3646,8 @@ available; a failed or unavailable direnv is non-fatal, and a failure (as
 opposed to unavailability) is reported via `message', mirroring fish's
 stderr warning on the same failure."
     (let ((state-dir (expand-file-name ".state" repo-path)))
-      (make-directory (expand-file-name ".serena/memories" state-dir) t)
       (make-directory (expand-file-name ".claude" state-dir) t)
-      (dolist (pair '(".serena/memories" ".claude"))
+      (dolist (pair '(".claude"))
         (let ((src (expand-file-name pair state-dir))
               (dst (expand-file-name pair target-path)))
           (if (or (file-exists-p dst) (file-symlink-p dst))
@@ -3689,10 +3687,7 @@ workspace already exists by then."
 
   (defun my/ghq-create-worktree (repo-path &optional base-ref naming-mode)
     "Create a new jj workspace under the .worktrees/ of REPO-PATH.
-Elisp-native equivalent of __fzf_ghq_new_worktree.fish (fish's Serena
-serena_config.yml projects: prune step is deliberately NOT reimplemented here
-because it needs YAML parsing this Emacs config has no library for; that
-cleanup remains fish's job for worktrees created there).  A bare REPO-PATH
+Elisp-native equivalent of __fzf_ghq_new_worktree.fish.  A bare REPO-PATH
 without jj's store is given one first; a non-bare one without it is an error.
 BASE-REF is a jj revset that must name exactly one commit; when omitted it is
 resolved via `my/ghq--resolve-base-ref'.  NAMING-MODE, when the symbol

@@ -140,10 +140,9 @@ yet. Then, when prior knowledge could change the work, read the memories the tas
 ### Prepare
 
 1. Load the skill this workflow depends on through the runtime's skill mechanism, or read its SKILL.md in full
-   when that mechanism is unavailable. Load serena-usage for memory or symbol operations. Return the skills
-   loaded, by name.
-2. When prior knowledge could change the work, read only the memories matching this task type, by the
-   procedure in serena-usage. Return the memories read, or an explicit "nothing matched".
+   when that mechanism is unavailable. Return the skills loaded, by name.
+2. When prior knowledge could change the work, recall only the gbrain memories matching this task type.
+   Return the memories read, or an explicit "nothing matched".
 ```
 
 **Name the loaded skills in the output.** "Loaded the governing skill" with no name is not checkable against
@@ -151,8 +150,8 @@ the transcript, which is the only thing distinguishing a real load from an inten
 in the step text rather than in a separate field, so a reader cannot see one without the other.
 
 Nothing resolves a reference automatically. Register a skill dependency as a row in the orchestrator's load
-table, naming **the condition that fires the load**: "Writing or evaluating tests", "Any Serena memory or
-symbol operation", not a taxonomy the skill belongs to. A category label cannot fire; a condition can.
+table, naming **the condition that fires the load**: "Writing or evaluating tests", "Any memory
+recall or write", not a taxonomy the skill belongs to. A category label cannot fire; a condition can.
 
 Do not compose a file from another's sections with reference markup (`refs`, `inherits="skill#anchor"`): the
 referenced body never enters the context, so the agent applies only what the referencing file restates. A
@@ -272,6 +271,5 @@ it.
 
 ## Related
 
-- [serena-usage](../serena-usage/SKILL.md): the memory and symbol operations the prepare phase performs
 - [test-integrity](../test-integrity/SKILL.md): the false-green failure a promoted tier produces
 - [execution-workflow](../execution-workflow/SKILL.md): where these gates run during a task
