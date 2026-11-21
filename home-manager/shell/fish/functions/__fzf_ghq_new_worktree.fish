@@ -30,40 +30,6 @@ function __fzf_ghq_new_worktree
         end
     end
 
-    # Serena never removes an activated project from serena_config.yml, so
-    # prune dead entries here before creating the worktree.
-    set -l serena_config "$HOME/.serena/serena_config.yml"
-    if test -f "$serena_config"
-        # Capture the read's own exit status before it can be overwritten --
-        # a failed read must not be mistaken for "zero projects" and wipe
-        # the list.
-        set -l yq_read_output (yq-go eval '.projects[]' "$serena_config" 2>/dev/null)
-        set -l yq_read_status $status
-
-        if test $yq_read_status -ne 0
-            echo "fzf_ghq: could not read '$serena_config' (yq-go exited $yq_read_status); skipping Serena project prune" >&2
-        else
-            set -l kept_projects
-            for project in $yq_read_output
-                test -d "$project"; and set -a kept_projects $project
-            end
-
-            # Escape backslashes before quotes so an escaped quote's own
-            # backslash isn't re-escaped.
-            if test (count $kept_projects) -eq 0
-                yq-go eval -i '.projects = []' "$serena_config"
-            else
-                set -l quoted_projects
-                for project in $kept_projects
-                    set -a quoted_projects (string replace -a '"' '\\"' -- (string replace -a '\\' '\\\\' -- $project))
-                end
-                set -l joined_projects (string join '", "' -- $quoted_projects)
-                set -l prune_expr ".projects = [\"$joined_projects\"]"
-                yq-go eval -i "$prune_expr" "$serena_config"
-            end
-        end
-    end
-
     # A bare clone's jj store sees refs that git fetched only after an import,
     # and a `ghq get --bare` clone has no remote bookmarks until fetched.
     if test -z "$base_ref"
@@ -120,17 +86,16 @@ function __fzf_ghq_new_worktree
         return 1
     end
 
-    # Symlinked (not copied) so all worktrees share Serena memories and
-    # .claude settings, except where the checkout already tracks the path --
-    # `ln -sfn` would otherwise link *inside* an existing directory instead
-    # of failing.
+    # Symlinked (not copied) so all worktrees share .claude settings, except
+    # where the checkout already tracks the path -- `ln -sfn` would otherwise
+    # link *inside* an existing directory instead of failing.
     set -l state_dir "$repo_path/.state"
 
     # mkdir -p first so the first worktree for a repo bootstraps $state_dir
     # instead of silently skipping the link below.
-    mkdir -p "$state_dir/.serena/memories" "$state_dir/.claude"
+    mkdir -p "$state_dir/.claude"
 
-    for pair in ".serena/memories" ".claude"
+    for pair in ".claude"
         set -l src "$state_dir/$pair"
         set -l dst "$target_path/$pair"
         test -d "$src"; or continue

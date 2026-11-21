@@ -81,7 +81,7 @@ Compile both the same way.
 - `check-parens` on the tangle needs `(emacs-lisp-mode)` first. In `fundamental-mode` it reports
   "Unmatched bracket or quote" on this file even when the file is balanced.
 - For editing Lisp in a tangle or test file, see the paredit-cli skill. init.org itself is Org, so edit
-  its blocks as text and check the tangle. Serena has no Emacs Lisp or Org support; use grep and paredit-cli.
+  its blocks as text and check the tangle. Use grep and paredit-cli to navigate.
 
 ## The user's running daemon
 

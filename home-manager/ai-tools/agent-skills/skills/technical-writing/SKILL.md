@@ -25,7 +25,6 @@ cold-read: see CLAUDE.md output_discipline.
 
 - [cold-read](../cold-read/SKILL.md): dispatch a context-free reviewer to test whether the written prose
   actually reads clearly to its audience
-- [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples from projects
 - [investigation-patterns](../investigation-patterns/SKILL.md): researching technical topics and verifying
   claims
 - [technical-documentation](../technical-documentation/SKILL.md): creating reference documentation from blog

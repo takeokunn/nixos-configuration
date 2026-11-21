@@ -13,11 +13,11 @@ CLAUDE.md memory_policy.
 
 ## Phases
 
-**prepare**: Load serena-usage before any memory operation and any other companion this run needs:
+**prepare**: Load any companion this run needs:
 [fact-check](../fact-check/SKILL.md) when a claim needs an external source,
 [workflow-patterns](../workflow-patterns/SKILL.md) for the shared decision-criteria structure. Then read only
-the memories relevant to this request, by the procedure in serena-usage. If the store is unavailable, continue
-from repository evidence and report the limitation.
+the memories relevant to this request, recalled from gbrain as CLAUDE.md `memory_policy` describes. If the
+store is unavailable, continue from repository evidence and report the limitation.
 
 **analyze**: Extract the core requirements from the request, identify the technical constraints its context
 implies, name the design decisions that will need user input, and take a first read on feasibility.
@@ -161,7 +161,6 @@ carrying the decisions made, the references, and the constraints, including what
 
 - [investigation-patterns](../investigation-patterns/SKILL.md): establishing current state and evidence for feasibility
 - [testing-patterns](../testing-patterns/SKILL.md): turning acceptance criteria into tests
-- [serena-usage](../serena-usage/SKILL.md): the memory operations in prepare
 - [fact-check](../fact-check/SKILL.md): verifying an external claim
 - [execution-workflow](../execution-workflow/SKILL.md): what happens to the handoff afterwards
 - [workflow-patterns](../workflow-patterns/SKILL.md): the decision-criteria template and the numeric-self-assessment prohibition

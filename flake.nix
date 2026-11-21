@@ -105,10 +105,7 @@
                 ./home-manager/ai-tools
               ];
               # per-user pkgs only; useGlobalPkgs consumers must add these overlays at the system level.
-              nixpkgs.overlays = [
-                inputs.mcp-servers-nix.overlays.default
-              ]
-              ++ import ./home-manager/ai-tools/serena/overlay.nix;
+              nixpkgs.overlays = [ inputs.mcp-servers-nix.overlays.default ];
               _module.args = {
                 llmAgentsPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
                 cclensPkg = inputs.cclens.packages.${pkgs.stdenv.hostPlatform.system}.default;

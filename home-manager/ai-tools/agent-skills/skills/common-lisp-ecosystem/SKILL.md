@@ -296,13 +296,10 @@ range useless. Verify the change in a fresh registry and a fresh image, not in t
 made it: a warm image already has the departing package loaded and will happily resolve symbols that
 no longer have a source.
 
-## Navigation without Serena
+## Navigation
 
-Serena has no language server for Common Lisp (nor Emacs Lisp, Org, or SQL), so its symbol tools return
-nothing for these files. Use grep for definitions and callers, the paredit-cli skill for structural outlines
-and edits, or the aitools skill where that binary is installed. In a repo that mixes languages, list every
-language it uses under `languages` in the Serena `project.yml`: automatic detection registers only the most
-common detected language, and symbol search for the others then comes back empty.
+Use grep for definitions and callers, the paredit-cli skill for structural outlines and edits, or the aitools
+skill where that binary is installed.
 
 ## Detailed references
 
@@ -314,8 +311,6 @@ common detected language, and symbol search for the others then comes back empty
 - [trust-boundaries](../trust-boundaries/SKILL.md): general input-validation rules (limits before
   allocation, validate before normalize) that the FORMAT-injection and pathname-coercion traps
   instantiate in Common Lisp.
-- [serena-usage](../serena-usage/SKILL.md): navigating CLOS hierarchies, generic functions, and symbol
-  definitions.
 - [investigation-patterns](../investigation-patterns/SKILL.md): debugging condition handling, macro
   expansion, and SBCL-specific issues.
 - [nix-ecosystem](../nix-ecosystem/SKILL.md): pinned SBCL runtime environments with nix shell/flake.

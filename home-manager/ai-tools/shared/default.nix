@@ -5,17 +5,10 @@ rec {
   );
 
   mcpServers =
-    { nurPkgs, context }:
+    { nurPkgs }:
     {
-      serena = {
-        command = "${nurPkgs.serena}/bin/serena";
-        args = [
-          "start-mcp-server"
-          "--context"
-          context
-          "--enable-web-dashboard"
-          "false"
-        ];
+      ast-grep = {
+        command = "${nurPkgs.ast-grep-mcp}/bin/ast-grep-server";
       };
     };
 

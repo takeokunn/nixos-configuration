@@ -28,7 +28,6 @@
     ".pre-commit-config.yaml"
     ".git-hooks-config.yaml"
     ".markdown-preview.html"
-    ".serena/"
     ".cache/"
     ".claude"
     "coverage.out"

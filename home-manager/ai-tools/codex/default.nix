@@ -116,10 +116,7 @@ let
     context7 = pickMcpServer nixMcpServers.context7;
     playwright = pickMcpServer nixMcpServers.playwright;
   }
-  // shared.mcpServers {
-    inherit nurPkgs;
-    context = "codex";
-  };
+  // shared.mcpServers { inherit nurPkgs; };
 
   codexSettings = {
     model = "gpt-6.1-sol";

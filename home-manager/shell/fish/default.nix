@@ -6,8 +6,6 @@
   xdg.configFile."fish/functions/".source = ./functions;
   xdg.configFile."fish/functions/".recursive = true;
 
-  home.packages = [ (pkgs.writeShellScriptBin "yq-go" ''exec ${pkgs.lib.getExe pkgs.yq-go} "$@"'') ];
-
   home.sessionVariables.COLORTERM = "truecolor";
   home.sessionVariables.LANG = "en_US.UTF-8";
   home.sessionVariables.LC_ALL = "en_US.UTF-8";

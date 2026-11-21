@@ -8,7 +8,7 @@ Answer a repository question or diagnose a failure from evidence. This command i
 ## Investigate
 
 1. Restate the question only if needed to fix its scope. Locate the code or configuration that can answer it.
-2. Read only domain-matching memories, checking their claims against the current ref. Load serena-usage for memory or symbol work, investigation-patterns for hypothesis testing and tracing, and fact-check for external contracts. A direct lookup needs none of them.
+2. Read only domain-matching memories, checking their claims against the current ref. Load investigation-patterns for hypothesis testing and tracing, and fact-check for external contracts. A direct lookup needs none of them.
 3. Handle bounded lookups directly. Delegate substantial independent questions read-only (see CLAUDE.md delegation): the runtime's exploration agent for execution paths, design for boundaries, performance for measured cost, quality-assurance for behavior, or code-quality for complexity.
 4. Cite the source governing the behavior. Before concluding absence or a production role, trace registration (see the investigation-patterns skill).
 5. Resolve contradictions by the evidence each claim examined, not by agreement. If evidence contradicts the user's premise, name both. Reconcile a consequential claim still disputed after rereading (see the execution-workflow skill).

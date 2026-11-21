@@ -100,7 +100,6 @@ prose, and use consistent terminology (build a glossary if terms recur).
 
 ## Related
 
-- [serena-usage](../serena-usage/SKILL.md): symbol operations for extracting code examples and API signatures
 - [investigation-patterns](../investigation-patterns/SKILL.md): analyzing codebases to understand features
   before documenting them
 - [technical-writing](../technical-writing/SKILL.md): writing blog posts and tutorials from documentation

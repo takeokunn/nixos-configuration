@@ -76,7 +76,10 @@
       # AI tools
       ".claude"
       ".config/codex"
-      ".serena"
+      {
+        directory = ".gbrain";
+        mode = "0700";
+      }
       ".local/share/opencode"
 
       # Cloud credentials and mail
