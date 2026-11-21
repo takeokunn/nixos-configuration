@@ -1,4 +1,10 @@
-{ pkgs, nurPkgs, ... }:
+{
+  lib,
+  options,
+  pkgs,
+  nurPkgs,
+  ...
+}:
 {
   xdg.configFile."fish/completions/".source = ./completions;
   xdg.configFile."fish/completions/".recursive = true;
@@ -76,15 +82,18 @@
         name = plugin.pname;
         inherit (plugin) src;
       })
-      [
-        pkgs.fishPlugins.fish-bd
-        nurPkgs.fish-artisan-completion
-        nurPkgs.fish-ghq
-        nurPkgs.dracula-fish
-        pkgs.fishPlugins.autopair
-        nurPkgs.fish-nix-completions
-        nurPkgs.fish-nix-env
-        nurPkgs.fish-dart-completions
-        nurPkgs.fish-by-binds-yourself
-      ];
+      (
+        [
+          pkgs.fishPlugins.fish-bd
+          nurPkgs.fish-artisan-completion
+          nurPkgs.fish-ghq
+          pkgs.fishPlugins.autopair
+          nurPkgs.fish-nix-completions
+          nurPkgs.fish-nix-env
+          nurPkgs.fish-dart-completions
+          nurPkgs.fish-by-binds-yourself
+        ]
+        # Hosts with Stylix get the palette from it (stylix.targets.fish).
+        ++ lib.optional (!(options ? stylix)) nurPkgs.dracula-fish
+      );
 }

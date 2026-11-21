@@ -1,4 +1,10 @@
-{ pkgs, nurPkgs, ... }:
+{
+  lib,
+  options,
+  pkgs,
+  nurPkgs,
+  ...
+}:
 {
   home.packages = [
     pkgs.tig
@@ -47,6 +53,9 @@
       '';
     in
     pkgs.runCommand "tig-config" { } ''
-      cat ${base} ${nurPkgs.dracula-tig}/share/tig/dracula.tigrc > $out
+      cat ${base} ${
+        # With Stylix, tig's default ANSI colors follow the Stylix terminal palette.
+        lib.optionalString (!(options ? stylix)) "${nurPkgs.dracula-tig}/share/tig/dracula.tigrc"
+      } > $out
     '';
 }

@@ -1,3 +1,4 @@
+{ lib, options, ... }:
 {
   programs.fzf.enable = true;
   programs.fzf.tmux.enableShellIntegration = true;
@@ -7,7 +8,8 @@
   programs.fzf.fileWidget.options = [ "--preview 'bat --color=always --style=plain {}'" ];
   programs.fzf.changeDirWidget.options = [ "--preview 'eza --tree --level=2 --color=always {}'" ];
   programs.fzf.defaultOptions = [ "--highlight-line" ];
-  programs.fzf.colors = {
+  # Hosts with Stylix get the palette from it (stylix.targets.fzf).
+  programs.fzf.colors = lib.mkIf (!(options ? stylix)) {
     fg = "#f8f8f2";
     "fg+" = "#f8f8f2";
     bg = "#282a36";

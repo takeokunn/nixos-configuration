@@ -1,4 +1,28 @@
-{ pkgs, nurPkgs, ... }:
+{
+  config,
+  lib,
+  options,
+  pkgs,
+  nurPkgs,
+  ...
+}:
+let
+  hasStylix = options ? stylix;
+  # Stylix's tmux target only sets colors, so the status line content is written here.
+  stylixStatusLine =
+    let
+      c = config.lib.stylix.colors.withHashtag;
+      gitBranch = pkgs.writeShellScript "tmux-git-branch" ''
+        ${pkgs.git}/bin/git -C "$1" rev-parse --abbrev-ref HEAD 2>/dev/null
+      '';
+    in
+    ''
+      set-option -g status-left-length 40
+      set-option -g status-right-length 80
+      set-option -g status-left "#[fg=${c.base00},bg=${c.base0E},bold] #S #[default] "
+      set-option -g status-right "#[fg=${c.base0C}]#(${gitBranch} '#{pane_current_path}')#[default]  #[fg=${c.base04}]%H:%M "
+    '';
+in
 {
   programs.tmux.enable = true;
   programs.tmux.terminal = "xterm-256color";
@@ -11,20 +35,24 @@
   programs.tmux.shell = "${pkgs.fish}/bin/fish";
   programs.tmux.disableConfirmationPrompt = true;
 
-  programs.tmux.plugins = with pkgs; [
-    tmuxPlugins.open
-    tmuxPlugins.sensible
-    tmuxPlugins.urlview
-    tmuxPlugins.pain-control
-    nurPkgs.tmux-dart
-    tmuxPlugins.resurrect
-    {
-      plugin = tmuxPlugins.continuum;
-      extraConfig = ''
-        set -g @continuum-restore 'on'
-      '';
-    }
-    {
+  programs.tmux.plugins =
+    with pkgs;
+    [
+      tmuxPlugins.open
+      tmuxPlugins.sensible
+      tmuxPlugins.urlview
+      tmuxPlugins.pain-control
+      nurPkgs.tmux-dart
+      tmuxPlugins.resurrect
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+        '';
+      }
+    ]
+    # Android has no Stylix and keeps the Dracula status line.
+    ++ lib.optional (!hasStylix) {
       plugin = tmuxPlugins.dracula;
       extraConfig = ''
         # Powerline with rounded separators (pill style)
@@ -54,8 +82,7 @@
 
         set -g @dracula-border-contrast true
       '';
-    }
-  ];
+    };
 
   programs.tmux.extraConfig = ''
     set-option -g default-command $SHELL
@@ -79,5 +106,6 @@
     bind-key -T copy-mode-vi v     send-keys -X begin-selection
     bind-key -T copy-mode-vi y     send-keys -X copy-selection-and-cancel
     bind-key -T copy-mode-vi Enter send-keys -X copy-selection-and-cancel
-  '';
+  ''
+  + lib.optionalString hasStylix stylixStatusLine;
 }

@@ -1,4 +1,10 @@
-{ pkgs, nurPkgs, ... }:
+{
+  lib,
+  options,
+  pkgs,
+  nurPkgs,
+  ...
+}:
 let
   customPackages = import ./packages { inherit nurPkgs; };
   plugins = import ./plugins { inherit pkgs customPackages; };
@@ -27,7 +33,8 @@ in
   programs.nixvim.enableMan = false;
 
   programs.nixvim.editorconfig.enable = true;
-  programs.nixvim.colorschemes.dracula.enable = true;
+  # Hosts with Stylix get the palette from it (stylix.targets.nixvim).
+  programs.nixvim.colorschemes.dracula.enable = !(options ? stylix);
 
   programs.nixvim.luaLoader.enable = true;
   programs.nixvim.performance.byteCompileLua.enable = true;
