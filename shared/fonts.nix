@@ -10,5 +10,4 @@ pkgs: with pkgs; [
   geist-font
   udev-gothic-nf
   nerd-fonts.fira-code
-  emacs-all-the-icons-fonts
 ]
