@@ -101,12 +101,13 @@ in
         default-column-width.proportion = 0.5;
         focus-ring = {
           width = 2;
-          # "longer hue" goes the long way round from cyan to pink, through purple.
+          # OKLCH hues: cyan 213, purple 302, pink 347. "shorter hue" passes purple; "longer hue"
+          # would pass green (148) and yellow (113) instead.
           active-gradient._props = {
             from = colors.base0C;
             to = colors.base0E;
             angle = 135;
-            "in" = "oklch longer hue";
+            "in" = "oklch shorter hue";
           };
           inactive-color = rgba "base05" "0.06";
         };
