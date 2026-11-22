@@ -16,4 +16,11 @@
   # oo7 asks org.gnome.keyring.SystemPrompter for passwords; of the gcr packages only gcr 3
   # still ships that prompter.
   services.dbus.packages = [ pkgs.gcr_3 ];
+
+  # oo7-daemon mlockall()s itself so secrets stay out of swap. Its upstream unit sets
+  # PrivateUsers=yes, so the wrapper's CAP_IPC_LOCK only holds inside that user namespace and
+  # RLIMIT_MEMLOCK (8M) applies; mlockall then fails. A user unit cannot exceed the user
+  # manager's hard limit, so user@ raises only the hard limit and oo7-daemon alone uses it.
+  systemd.services."user@".serviceConfig.LimitMEMLOCK = "8M:infinity";
+  systemd.user.services.oo7-daemon.serviceConfig.LimitMEMLOCK = "infinity";
 }
