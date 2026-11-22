@@ -8,6 +8,8 @@
 }:
 let
   colors = config.lib.stylix.colors;
+  inherit (import ../../../shared/design.nix config.stylix.fonts) font size radius;
+  pt = n: "${toString n}pt";
   xkb = config.services.xserver.xkb;
   span =
     attrs: text:
@@ -32,21 +34,23 @@ in
   # programs.niri installs niri.desktop (Exec=niri-session).
   services.displayManager.regreet = {
     enable = true;
+    # Stylix sets the family; the size is the same step as the lock screen's secondary lines.
+    font.size = size.title;
     # The clock label is Pango markup, so hours and minutes can take the lock screen's two colors.
     # regreet centers it at the top edge, so it is one line there instead of hyprlock's two.
     settings.widget.clock = {
       format = lib.concatStringsSep "\n" [
         (span {
-          font_family = "Geist Mono";
-          size = "120pt";
+          font_family = font.numeric;
+          size = pt size.loginClock;
           weight = "bold";
         } "${hour} ${minute}")
         (span {
-          size = "30pt";
+          size = pt size.heading;
           foreground = "#${colors.base05}";
         } "%-m月%-d日 %A")
         (span {
-          size = "16pt";
+          size = pt size.title;
           foreground = "#${colors.base04}";
         } "${config.networking.hostName} · ${username}")
       ];
@@ -64,7 +68,7 @@ in
       overlay > frame.background {
         background-color: alpha(#${colors.base00}, 0.6);
         border: none;
-        border-radius: 16px;
+        border-radius: ${toString radius.window}px;
       }
       overlay > frame.background entry {
         border-radius: 9999px;

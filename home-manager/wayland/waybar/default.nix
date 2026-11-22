@@ -1,17 +1,21 @@
 { config, lib, ... }:
 let
   palette = config.lib.stylix.colors;
+  design = import ../../../shared/design.nix config.stylix.fonts;
+  inherit (design) font size radius;
+  pt = n: "${toString n}pt";
+  px = n: "${toString n}px";
   colors = palette.withHashtag;
   rgba =
     base: alpha:
     "rgba(${palette."${base}-rgb-r"}, ${palette."${base}-rgb-g"}, ${palette."${base}-rgb-b"}, ${alpha})";
 
-  glyph = size: icon: "<span font_family='Symbols Nerd Font' size='${size}'>${icon}</span>";
+  glyph = points: icon: "<span font_family='${font.icons}' size='${pt points}'>${icon}</span>";
   # A rail chip: the glyph on top, a short value under it.
-  chip = icon: value: "${glyph "16pt" icon}\n<span size='10pt'>${value}</span>";
+  chip = icon: value: "${glyph size.title icon}\n<span size='${pt size.caption}'>${value}</span>";
   clockLine =
-    family: color: size: weight: text:
-    "<span font_family='${family}' foreground='${colors.${color}}' size='${size}' weight='${weight}'>${text}</span>";
+    family: color: points: weight: text:
+    "<span font_family='${family}' foreground='${colors.${color}}' size='${pt points}' weight='${weight}'>${text}</span>";
 
   # Workspaces not listed here (4-8 and any unnamed one) use base04.
   workspaceColors = {
@@ -84,10 +88,10 @@ in
       clock = {
         # One argument (the time) is formatted, so every placeholder names it by index.
         format = lib.concatStringsSep "\n" [
-          (clockLine "Geist Mono" "base0E" "24pt" "bold" "{0:%H}")
-          (clockLine "Geist Mono" "base0C" "24pt" "bold" "{0:%M}")
-          (clockLine "Geist" "base04" "10pt" "normal" "{0:%m.%d}")
-          (clockLine "Geist" "base04" "10pt" "normal" "{0:L%a}")
+          (clockLine font.numeric "base0E" size.clock "bold" "{0:%H}")
+          (clockLine font.numeric "base0C" size.clock "bold" "{0:%M}")
+          (clockLine font.sans "base04" size.caption "normal" "{0:%m.%d}")
+          (clockLine font.sans "base04" size.caption "normal" "{0:L%a}")
         ];
         locale = "ja_JP.UTF-8";
         justify = "center";
@@ -130,9 +134,9 @@ in
       };
 
       network = {
-        format-wifi = glyph "16pt" "󰖩";
-        format-ethernet = glyph "16pt" "󰈀";
-        format-disconnected = glyph "16pt" "󰖪";
+        format-wifi = glyph size.title "󰖩";
+        format-ethernet = glyph size.title "󰈀";
+        format-disconnected = glyph size.title "󰖪";
         justify = "center";
         tooltip-format = "{ifname}: {ipaddr}/{cidr}";
         tooltip-format-wifi = "{essid} {signalStrength}%\n{ifname}: {ipaddr}/{cidr}";
@@ -188,7 +192,7 @@ in
       };
 
       "custom/tray-handle" = {
-        format = glyph "14pt" "󰅃";
+        format = glyph size.subtitle "󰅃";
         tooltip = false;
       };
 
@@ -197,7 +201,7 @@ in
       };
 
       "custom/power" = {
-        format = glyph "16pt" "󰐥";
+        format = glyph size.title "󰐥";
         tooltip = false;
         # The menu itself comes with the power-menu script.
         on-click = "power-menu";
@@ -214,7 +218,7 @@ in
     window#waybar {
       background-color: ${rgba "base00" "0.9"};
       color: ${colors.base05};
-      border-radius: 18px;
+      border-radius: ${px radius.rail};
       border: 1px solid ${rgba "base05" "0.07"};
     }
 
@@ -232,11 +236,11 @@ in
       padding: 0;
       margin: 3px 10px;
       border: none;
-      border-radius: 11px;
+      border-radius: ${px radius.button};
       background-image: none;
       box-shadow: none;
-      font-family: "Geist Mono";
-      font-size: 13pt;
+      font-family: "${font.numeric}";
+      font-size: ${pt size.label};
       font-weight: bold;
     }
 
@@ -265,7 +269,7 @@ in
       min-width: 46px;
       padding: 6px 0;
       margin: 0 8px;
-      border-radius: 12px;
+      border-radius: ${px radius.chip};
     }
 
     #cpu {
@@ -359,7 +363,7 @@ in
     tooltip {
       background-color: ${rgba "base00" "0.95"};
       border: 1px solid ${colors.base0F};
-      border-radius: 12px;
+      border-radius: ${px radius.chip};
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 

@@ -7,8 +7,7 @@
 }:
 let
   colors = config.lib.stylix.colors;
-  font = config.stylix.fonts.sansSerif.name;
-  clockFont = "Geist Mono";
+  inherit (import ../../../shared/design.nix config.stylix.fonts) font size;
   date = "${pkgs.coreutils}/bin/date";
 
   batteryStatus = pkgs.writeShellScript "hyprlock-battery" ''
@@ -84,7 +83,7 @@ in
       bothlock_color = -1;
       invert_numlock = false;
       swap_font_color = false;
-      font_family = font;
+      font_family = font.sans;
       position = "140, -840";
     };
 
@@ -93,44 +92,44 @@ in
         {
           text = ''cmd[update:1000] echo "<b>$(${date} +%H)</b>"'';
           color = "rgb(${colors.base0E})";
-          font_size = 200;
-          font_family = clockFont;
+          font_size = size.lockClock;
+          font_family = font.numeric;
           position = "140, -180";
         }
         {
           text = ''cmd[update:1000] echo "<b>$(${date} +%M)</b>"'';
           color = "rgb(${colors.base0C})";
-          font_size = 200;
-          font_family = clockFont;
+          font_size = size.lockClock;
+          font_family = font.numeric;
           position = "140, -420";
         }
         {
           # LC_ALL, not LC_TIME: the session exports LC_ALL=en_US.UTF-8, which overrides LC_TIME.
           text = "cmd[update:60000] LC_ALL=ja_JP.UTF-8 ${date} '+%-m月%-d日 %A'";
           color = "rgb(${colors.base05})";
-          font_size = 30;
-          font_family = font;
+          font_size = size.heading;
+          font_family = font.sans;
           position = "140, -720";
         }
         {
           text = "${osConfig.networking.hostName} · ${config.home.username}";
           color = "rgb(${colors.base04})";
-          font_size = 16;
-          font_family = font;
+          font_size = size.title;
+          font_family = font.sans;
           position = "140, -780";
         }
         {
           text = "󰌆";
           color = "rgb(${colors.base0E})";
-          font_size = 16;
-          font_family = "Symbols Nerd Font";
+          font_size = size.title;
+          font_family = font.icons;
           position = "524, -856";
         }
         {
           text = "または YubiKey にタッチ";
           color = "rgb(${colors.base04})";
-          font_size = 14;
-          font_family = font;
+          font_size = size.subtitle;
+          font_family = font.sans;
           position = "556, -856";
         }
       ]
@@ -138,15 +137,15 @@ in
         {
           text = "cmd[update:60000] ${batteryStatus}";
           color = "rgb(${colors.base0B})";
-          font_size = 16;
-          font_family = font;
+          font_size = size.title;
+          font_family = font.sans;
           position = "-48, 48";
         }
         {
           text = "cmd[update:5000] ${nowPlaying}";
           color = "rgb(${colors.base04})";
-          font_size = 14;
-          font_family = font;
+          font_size = size.subtitle;
+          font_family = font.sans;
           position = "-48, 84";
         }
       ];

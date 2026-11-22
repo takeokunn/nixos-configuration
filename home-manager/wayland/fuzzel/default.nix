@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 let
+  inherit (import ../../../shared/design.nix config.stylix.fonts) radius;
   systemctl = "${pkgs.systemd}/bin/systemctl";
 
   # Opened by Mod+Shift+E and the rail's power button. Each row is "label\0icon\x1f<name>"
@@ -76,7 +77,7 @@ in
 
     border = {
       width = 2;
-      radius = 16;
+      radius = radius.window;
     };
   };
 }

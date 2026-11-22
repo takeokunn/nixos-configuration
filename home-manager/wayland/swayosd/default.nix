@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 let
+  inherit (import ../../../shared/design.nix config.stylix.fonts) radius;
   colors = config.lib.stylix.colors.withHashtag;
 in
 {
@@ -12,7 +13,7 @@ in
       min-width: 340px;
       min-height: 50px;
       background: alpha(${colors.base00}, 0.9);
-      border-radius: 25px;
+      border-radius: ${toString radius.osd}px;
       border: 2px solid ${colors.base0A};
     }
 
@@ -27,7 +28,7 @@ in
     progressbar,
     progressbar trough {
       min-height: 8px;
-      border-radius: 4px;
+      border-radius: ${toString radius.track}px;
       border: none;
     }
 
@@ -37,7 +38,7 @@ in
 
     progressbar progress {
       min-height: 8px;
-      border-radius: 4px;
+      border-radius: ${toString radius.track}px;
       border: none;
       background-image: linear-gradient(to right, ${colors.base0A}, ${colors.base09});
     }

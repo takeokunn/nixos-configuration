@@ -1,5 +1,6 @@
 { config, lib, ... }:
 let
+  inherit (import ../../../shared/design.nix config.stylix.fonts) radius;
   palette = config.lib.stylix.colors;
   colors = palette.withHashtag;
   # Same alpha Stylix gives the base background-color.
@@ -41,7 +42,7 @@ in
     outer-margin = "10";
     padding = "14,16";
     border-size = 2;
-    border-radius = 14;
+    border-radius = radius.notification;
 
     default-timeout = 5000;
     layer = "overlay";

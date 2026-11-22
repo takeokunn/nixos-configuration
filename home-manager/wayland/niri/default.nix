@@ -9,6 +9,7 @@ let
   emacsScratchpadToggle = emacsLib.mkScratchpadToggle {
     windowManager = "niri";
   };
+  inherit (import ../../../shared/design.nix config.stylix.fonts) radius;
   palette = config.lib.stylix.colors;
   colors = palette.withHashtag;
   rgba =
@@ -353,7 +354,7 @@ in
           { spawn-at-startup = [ "wallpaper-start" ]; }
           {
             window-rule = {
-              geometry-corner-radius = 16;
+              geometry-corner-radius = radius.window;
               clip-to-geometry = true;
             };
           }
@@ -397,18 +398,18 @@ in
         # namespaces draw their shape edge to edge.
         ++
           lib.mapAttrsToList
-            (namespace: radius: {
+            (namespace: cornerRadius: {
               layer-rule._children = [
                 { match._props.namespace = "^${namespace}$"; }
                 { shadow.on = { }; }
-                { geometry-corner-radius = radius; }
+                { geometry-corner-radius = cornerRadius; }
               ];
             })
             {
-              waybar = 18;
-              notifications = 14;
-              swayosd = 25;
-              launcher = 16;
+              waybar = radius.rail;
+              notifications = radius.notification;
+              swayosd = radius.osd;
+              launcher = radius.window;
             }
         ++ lib.concatLists (
           lib.mapAttrsToList (
