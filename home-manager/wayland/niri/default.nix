@@ -10,6 +10,17 @@ let
     windowManager = "niri";
   };
   inherit (import ../../../shared/design.nix config.stylix.fonts) radius;
+  # greetd's boot autologin leaves the marker (nixos/config/services/display.nix), so only that
+  # session locks at start; a session started from regreet is already authenticated. --grace 0
+  # overrides hyprlock's unlock-on-input grace. If hyprlock fails, the session ends rather than
+  # staying unlocked.
+  lockAtLogin = pkgs.writeShellScript "lock-at-login" ''
+    marker="$XDG_RUNTIME_DIR/lock-at-login"
+    [ -e "$marker" ] || exit 0
+    rm -f "$marker"
+    ${config.programs.hyprlock.package}/bin/hyprlock --grace 0 --immediate-render --no-fade-in ||
+      exec ${config.wayland.windowManager.niri.package}/bin/niri msg action quit --skip-confirmation
+  '';
   palette = config.lib.stylix.colors;
   colors = palette.withHashtag;
   rgba =
@@ -351,6 +362,7 @@ in
               scale = 1.0;
             };
           }
+          { spawn-at-startup = [ "${lockAtLogin}" ]; }
           { spawn-at-startup = [ "wallpaper-start" ]; }
           {
             window-rule = {
