@@ -18,15 +18,30 @@ let
     ''cmd[update:1000] echo "<span weight='800' font_features='${font.figures}'>$(${dateBin} +${format})</span>"'';
   dateBin = "${pkgs.coreutils}/bin/date";
 
+  # The rail's battery chip in Pango markup: the same level icons and the same colours (cyan while
+  # charging, orange at 30% and red at 15% on battery), the glyph from the icon font.
   batteryStatus = pkgs.writeShellScript "hyprlock-battery" ''
+    icons=(󰁺 󰁻 󰁼 󰁽 󰁾 󰁿 󰂀 󰂁 󰂂 󰁹)
     for battery in /sys/class/power_supply/BAT*; do
       [ -r "$battery/capacity" ] || continue
-      if [ "$(${pkgs.coreutils}/bin/cat "$battery/status")" = Charging ]; then
-        icon=󰂄
-      else
-        icon=󰁹
-      fi
-      printf '%s %s%%\n' "$icon" "$(${pkgs.coreutils}/bin/cat "$battery/capacity")"
+      capacity=$(${pkgs.coreutils}/bin/cat "$battery/capacity")
+      level=$((capacity / 10))
+      ((level > 9)) && level=9
+      icon=''${icons[level]}
+      color=${colors.base0B}
+      case "$(${pkgs.coreutils}/bin/cat "$battery/status")" in
+        Charging) icon=󰂄 color=${colors.base0C} ;;
+        Full | "Not charging") icon=󰚥 ;;
+        *)
+          if ((capacity <= 15)); then
+            color=${colors.base08}
+          elif ((capacity <= 30)); then
+            color=${colors.base09}
+          fi
+          ;;
+      esac
+      printf "<span font_family='%s' size='%s' foreground='#%s'>%s</span>  <span weight='600' foreground='#%s'>%s%%</span>\n" \
+        "${font.icons}" "${toString size.title}pt" "$color" "$icon" "$color" "$capacity"
       exit 0
     done
   '';
@@ -145,8 +160,8 @@ in
       ++ map (label: bottomRight // label) [
         {
           text = "cmd[update:60000] ${batteryStatus}";
-          color = "rgb(${colors.base0B})";
-          font_size = size.title;
+          color = "rgb(${colors.base05})";
+          font_size = size.subtitle;
           font_family = font.sans;
           position = "-48, 48";
         }
