@@ -10,8 +10,8 @@ let
   # A rail chip: the glyph on top, a short value under it.
   chip = icon: value: "${glyph "16pt" icon}\n<span size='10pt'>${value}</span>";
   clockLine =
-    color: size: weight: text:
-    "<span foreground='${colors.${color}}' size='${size}' weight='${weight}'>${text}</span>";
+    family: color: size: weight: text:
+    "<span font_family='${family}' foreground='${colors.${color}}' size='${size}' weight='${weight}'>${text}</span>";
 
   # Workspaces not listed here (4-8 and any unnamed one) use base04.
   workspaceColors = {
@@ -84,10 +84,10 @@ in
       clock = {
         # One argument (the time) is formatted, so every placeholder names it by index.
         format = lib.concatStringsSep "\n" [
-          (clockLine "base0E" "24pt" "bold" "{0:%H}")
-          (clockLine "base0C" "24pt" "bold" "{0:%M}")
-          (clockLine "base04" "10pt" "normal" "{0:%m.%d}")
-          (clockLine "base04" "10pt" "normal" "{0:L%a}")
+          (clockLine "Geist Mono" "base0E" "24pt" "bold" "{0:%H}")
+          (clockLine "Geist Mono" "base0C" "24pt" "bold" "{0:%M}")
+          (clockLine "Geist" "base04" "10pt" "normal" "{0:%m.%d}")
+          (clockLine "Geist" "base04" "10pt" "normal" "{0:L%a}")
         ];
         locale = "ja_JP.UTF-8";
         justify = "center";
@@ -238,6 +238,11 @@ in
       font-family: "Geist Mono";
       font-size: 13pt;
       font-weight: bold;
+    }
+
+    /* waybar packs the label at the start of the button, so it centers only at full width. */
+    #workspaces button label {
+      min-width: 42px;
     }
 
     ${workspaceCss "#workspaces button" "base04"}
