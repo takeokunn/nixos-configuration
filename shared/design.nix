@@ -5,8 +5,9 @@ stylixFonts: {
   font = {
     sans = stylixFonts.sansSerif.name;
     mono = stylixFonts.monospace.name;
-    # Geist's monospaced cut, shipped in geist-font: digits keep one width, so clocks do not shift.
-    numeric = "Geist Mono";
+    # Tabular figures for clocks and workspace numbers: the digits keep one width, so a clock does
+    # not shift as it ticks, and Geist keeps its plain zero (Geist Mono's is slashed).
+    figures = "tnum";
     icons = "Symbols Nerd Font";
   };
 

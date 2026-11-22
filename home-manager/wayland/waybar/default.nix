@@ -15,7 +15,7 @@ let
   chip = icon: value: "${glyph size.title icon}\n<span size='${pt size.caption}'>${value}</span>";
   clockLine =
     family: color: points: weight: text:
-    "<span font_family='${family}' foreground='${colors.${color}}' size='${pt points}' weight='${weight}'>${text}</span>";
+    "<span font_family='${family}' font_features='${font.figures}' foreground='${colors.${color}}' size='${pt points}' weight='${weight}'>${text}</span>";
 
   # Workspaces not listed here (4-8 and any unnamed one) use base04.
   workspaceColors = {
@@ -88,8 +88,8 @@ in
       clock = {
         # One argument (the time) is formatted, so every placeholder names it by index.
         format = lib.concatStringsSep "\n" [
-          (clockLine font.numeric "base0E" size.clock "bold" "{0:%H}")
-          (clockLine font.numeric "base0C" size.clock "bold" "{0:%M}")
+          (clockLine font.sans "base0E" size.clock "800" "{0:%H}")
+          (clockLine font.sans "base0C" size.clock "800" "{0:%M}")
           (clockLine font.sans "base04" size.caption "normal" "{0:%m.%d}")
           (clockLine font.sans "base04" size.caption "normal" "{0:L%a}")
         ];
@@ -239,7 +239,8 @@ in
       border-radius: ${px radius.button};
       background-image: none;
       box-shadow: none;
-      font-family: "${font.numeric}";
+      font-family: "${font.sans}";
+      font-feature-settings: "${font.figures}";
       font-size: ${pt size.label};
       font-weight: bold;
     }

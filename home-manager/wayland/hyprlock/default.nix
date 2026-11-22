@@ -12,7 +12,10 @@ let
     size
     date
     ;
-  clockDigits = format: ''cmd[update:1000] echo "<b>$(${dateBin} +${format})</b>"'';
+  # Geist ExtraBold with tabular figures: the mockup's heavy digits.
+  clockDigits =
+    format:
+    ''cmd[update:1000] echo "<span weight='800' font_features='${font.figures}'>$(${dateBin} +${format})</span>"'';
   dateBin = "${pkgs.coreutils}/bin/date";
 
   batteryStatus = pkgs.writeShellScript "hyprlock-battery" ''
@@ -60,7 +63,7 @@ in
     background = {
       monitor = "";
       blur_passes = 2;
-      blur_size = 8;
+      blur_size = 3;
       noise = 0.0117;
       contrast = 0.8916;
       brightness = 0.6;
@@ -77,7 +80,8 @@ in
       dots_spacing = 0.15;
       dots_center = true;
       dots_rounding = -1;
-      fade_on_empty = true;
+      # Always shown, as in the mockup; an empty, faded field hides where to type.
+      fade_on_empty = false;
       fade_timeout = 1000;
       placeholder_text = "<i>Password...</i>";
       hide_input = false;
@@ -98,14 +102,14 @@ in
           text = clockDigits "%H";
           color = "rgb(${colors.base0E})";
           font_size = size.lockClock;
-          font_family = font.numeric;
+          font_family = font.sans;
           position = "140, -180";
         }
         {
           text = clockDigits "%M";
           color = "rgb(${colors.base0C})";
           font_size = size.lockClock;
-          font_family = font.numeric;
+          font_family = font.sans;
           position = "140, -420";
         }
         {

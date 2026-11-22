@@ -65,9 +65,10 @@ in
       widget.clock = {
         format = lib.concatStringsSep "\n" [
           (span {
-            font_family = font.numeric;
+            font_family = font.sans;
+            font_features = font.figures;
             size = pt size.loginClock;
-            weight = "bold";
+            weight = "800";
           } "${hour}${colon}${minute}")
           (span {
             font_family = font.sans;
