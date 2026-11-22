@@ -93,7 +93,7 @@ in
           (clockLine font.sans "base04" size.caption "normal" "{0:%m.%d}")
           (clockLine font.sans "base04" size.caption "normal" "{0:L%a}")
         ];
-        locale = "ja_JP.UTF-8";
+        locale = "en_US.UTF-8";
         justify = "center";
         tooltip-format = "<tt><small>{calendar}</small></tt>";
         calendar = {

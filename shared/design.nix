@@ -19,9 +19,15 @@ stylixFonts: {
     subtitle = 14; # tray handle, lock screen hint and track
     title = 16; # rail icons, secondary lines on the lock and login screens
     clock = 24; # rail clock
-    heading = 30; # date on the lock and login screens
+    heading = 30; # date on the lock screen
     loginClock = 120;
     lockClock = 200;
+  };
+
+  # Dates on the lock and login screens.
+  date = {
+    format = "%A, %B %-d";
+    locale = "en_US";
   };
 
   # Corner radii in pixels.

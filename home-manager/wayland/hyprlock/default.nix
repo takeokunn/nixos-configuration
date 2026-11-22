@@ -7,8 +7,13 @@
 }:
 let
   colors = config.lib.stylix.colors;
-  inherit (import ../../../shared/design.nix config.stylix.fonts) font size;
-  date = "${pkgs.coreutils}/bin/date";
+  inherit (import ../../../shared/design.nix config.stylix.fonts)
+    font
+    size
+    date
+    ;
+  clockDigits = format: ''cmd[update:1000] echo "<b>$(${dateBin} +${format})</b>"'';
+  dateBin = "${pkgs.coreutils}/bin/date";
 
   batteryStatus = pkgs.writeShellScript "hyprlock-battery" ''
     for battery in /sys/class/power_supply/BAT*; do
@@ -90,22 +95,22 @@ in
     label =
       map (label: topLeft // label) [
         {
-          text = ''cmd[update:1000] echo "<b>$(${date} +%H)</b>"'';
+          text = clockDigits "%H";
           color = "rgb(${colors.base0E})";
           font_size = size.lockClock;
           font_family = font.numeric;
           position = "140, -180";
         }
         {
-          text = ''cmd[update:1000] echo "<b>$(${date} +%M)</b>"'';
+          text = clockDigits "%M";
           color = "rgb(${colors.base0C})";
           font_size = size.lockClock;
           font_family = font.numeric;
           position = "140, -420";
         }
         {
-          # LC_ALL, not LC_TIME: the session exports LC_ALL=en_US.UTF-8, which overrides LC_TIME.
-          text = "cmd[update:60000] LC_ALL=ja_JP.UTF-8 ${date} '+%-m月%-d日 %A'";
+          # LC_ALL, not LC_TIME: the session exports LC_ALL, which overrides LC_TIME.
+          text = ''cmd[update:60000] echo "<b>$(LC_ALL=${date.locale}.UTF-8 ${dateBin} '+${date.format}')</b>"'';
           color = "rgb(${colors.base05})";
           font_size = size.heading;
           font_family = font.sans;
@@ -126,7 +131,7 @@ in
           position = "524, -856";
         }
         {
-          text = "または YubiKey にタッチ";
+          text = "or touch your YubiKey";
           color = "rgb(${colors.base04})";
           font_size = size.subtitle;
           font_family = font.sans;
