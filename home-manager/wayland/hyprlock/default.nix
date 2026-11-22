@@ -105,7 +105,8 @@ in
           position = "140, -420";
         }
         {
-          text = "cmd[update:60000] LC_TIME=ja_JP.UTF-8 ${date} '+%-m月%-d日 %A'";
+          # LC_ALL, not LC_TIME: the session exports LC_ALL=en_US.UTF-8, which overrides LC_TIME.
+          text = "cmd[update:60000] LC_ALL=ja_JP.UTF-8 ${date} '+%-m月%-d日 %A'";
           color = "rgb(${colors.base05})";
           font_size = 30;
           font_family = font;
