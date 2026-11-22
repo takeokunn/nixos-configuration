@@ -6,4 +6,5 @@
   stylix.targets.fish.enable = true;
   stylix.targets.fzf.enable = true;
   stylix.targets.tmux.enable = true;
+  stylix.targets.k9s.enable = true;
 }
