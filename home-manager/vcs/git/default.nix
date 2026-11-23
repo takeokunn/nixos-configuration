@@ -137,8 +137,6 @@
       blame.markIgnoredLines = true;
     };
 
-    url."git@github.com:".pushInsteadOf = "https://github.com/";
-
     init.defaultBranch = "main";
 
     rerere.enabled = true;
