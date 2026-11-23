@@ -1,10 +1,4 @@
-{
-  lib,
-  options,
-  pkgs,
-  nurPkgs,
-  ...
-}:
+{ pkgs, nurPkgs, ... }:
 {
   home.packages = [
     pkgs.tig
@@ -52,10 +46,8 @@
         bind branch L !git pull origin %(branch)
       '';
     in
+    # dracula-tig uses ANSI color names only, so on Stylix hosts the colors follow the kitty palette.
     pkgs.runCommand "tig-config" { } ''
-      cat ${base} ${
-        # With Stylix, tig's default ANSI colors follow the Stylix terminal palette.
-        lib.optionalString (!(options ? stylix)) "${nurPkgs.dracula-tig}/share/tig/dracula.tigrc"
-      } > $out
+      cat ${base} ${nurPkgs.dracula-tig}/share/tig/dracula.tigrc > $out
     '';
 }

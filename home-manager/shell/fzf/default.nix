@@ -1,4 +1,12 @@
-{ lib, options, ... }:
+{
+  config,
+  options,
+  pkgs,
+  ...
+}:
+let
+  d = import ../../../shared/dracula-roles.nix { inherit config options pkgs; };
+in
 {
   programs.fzf.enable = true;
   programs.fzf.tmux.enableShellIntegration = true;
@@ -8,19 +16,19 @@
   programs.fzf.fileWidget.options = [ "--preview 'bat --color=always --style=plain {}'" ];
   programs.fzf.changeDirWidget.options = [ "--preview 'eza --tree --level=2 --color=always {}'" ];
   programs.fzf.defaultOptions = [ "--highlight-line" ];
-  # Hosts with Stylix get the palette from it (stylix.targets.fzf).
-  programs.fzf.colors = lib.mkIf (!(options ? stylix)) {
-    fg = "#f8f8f2";
-    "fg+" = "#f8f8f2";
-    bg = "#282a36";
-    "bg+" = "#44475a";
-    hl = "#bd93f9";
-    "hl+" = "#bd93f9";
-    info = "#ffb86c";
-    prompt = "#50fa7b";
-    pointer = "#ff79c6";
-    marker = "#ff79c6";
-    spinner = "#ffb86c";
-    header = "#6272a4";
+  # Dracula's fzf color assignments with the Stylix palette.
+  programs.fzf.colors = {
+    fg = "#${d.foreground}";
+    "fg+" = "#${d.foreground}";
+    bg = "#${d.background}";
+    "bg+" = "#${d.selection}";
+    hl = "#${d.purple}";
+    "hl+" = "#${d.purple}";
+    info = "#${d.orange}";
+    prompt = "#${d.green}";
+    pointer = "#${d.pink}";
+    marker = "#${d.pink}";
+    spinner = "#${d.orange}";
+    header = "#${d.comment}";
   };
 }

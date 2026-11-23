@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   colors = config.lib.stylix.colors.withHashtag;
   emojiFont = if pkgs.stdenv.hostPlatform.isDarwin then "Apple Color Emoji" else "Noto Color Emoji";
@@ -42,11 +47,16 @@ in
 
     enable_audio_bell = false;
     visual_bell_duration = 0;
-
-    # Stylix's kitty theme leaves the split borders unset.
-    active_border_color = colors.base05;
-    inactive_border_color = colors.base03;
   };
+
+  # Stylix includes its theme from extraConfig, after settings, so overrides of its colors must
+  # come later still. color8 (bright black) takes base03 instead of base02, which is too close to
+  # the background to read, as Dracula's own palette does.
+  programs.kitty.extraConfig = lib.mkAfter ''
+    active_border_color ${colors.base05}
+    inactive_border_color ${colors.base03}
+    color8 ${colors.base03}
+  '';
 
   programs.kitty.keybindings = {
     "ctrl+k" = "scroll_line_up";

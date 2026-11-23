@@ -1,10 +1,13 @@
 {
-  lib,
+  config,
   options,
   pkgs,
   nurPkgs,
   ...
 }:
+let
+  d = import ../../../shared/dracula-roles.nix { inherit config options pkgs; };
+in
 {
   xdg.configFile."fish/completions/".source = ./completions;
   xdg.configFile."fish/completions/".recursive = true;
@@ -66,6 +69,50 @@
     end
   '';
 
+  # dracula-fish's color assignments with the Stylix palette. Global scope so they shadow any
+  # universal fish_color_* left behind by an earlier theme.
+  programs.fish.interactiveShellInit = ''
+    set -g fish_color_normal ${d.foreground}
+    set -g fish_color_command ${d.cyan}
+    set -g fish_color_keyword ${d.pink}
+    set -g fish_color_quote ${d.yellow}
+    set -g fish_color_redirection ${d.foreground}
+    set -g fish_color_end ${d.orange}
+    set -g fish_color_error ${d.red}
+    set -g fish_color_param ${d.purple}
+    set -g fish_color_option ${d.orange}
+    set -g fish_color_comment ${d.comment}
+    set -g fish_color_selection --background=${d.selection}
+    set -g fish_color_search_match --background=${d.selection}
+    set -g fish_color_match --background=${d.selection}
+    set -g fish_color_operator ${d.green}
+    set -g fish_color_escape ${d.pink}
+    set -g fish_color_autosuggestion ${d.comment}
+    set -g fish_color_cancel ${d.red} --reverse
+    set -g fish_color_history_current --bold
+    set -g fish_color_valid_path --underline
+    set -g fish_color_status ${d.red}
+    set -g fish_color_cwd ${d.green}
+    set -g fish_color_cwd_root ${d.red}
+    set -g fish_color_user ${d.cyan}
+    set -g fish_color_host ${d.purple}
+    set -g fish_color_host_remote ${d.purple}
+
+    set -g fish_pager_color_progress ${d.comment}
+    set -g fish_pager_color_background
+    set -g fish_pager_color_prefix ${d.cyan}
+    set -g fish_pager_color_completion ${d.foreground}
+    set -g fish_pager_color_description ${d.comment}
+    set -g fish_pager_color_selected_background --background=${d.selection}
+    set -g fish_pager_color_selected_prefix ${d.cyan}
+    set -g fish_pager_color_selected_completion ${d.foreground}
+    set -g fish_pager_color_selected_description ${d.comment}
+    set -g fish_pager_color_secondary_background
+    set -g fish_pager_color_secondary_prefix ${d.cyan}
+    set -g fish_pager_color_secondary_completion ${d.foreground}
+    set -g fish_pager_color_secondary_description ${d.comment}
+  '';
+
   programs.fish.shellInitLast = ''
     if test -e ~/.config/fish/private.fish
         source ~/.config/fish/private.fish
@@ -82,18 +129,14 @@
         name = plugin.pname;
         inherit (plugin) src;
       })
-      (
-        [
-          pkgs.fishPlugins.fish-bd
-          nurPkgs.fish-artisan-completion
-          nurPkgs.fish-ghq
-          pkgs.fishPlugins.autopair
-          nurPkgs.fish-nix-completions
-          nurPkgs.fish-nix-env
-          nurPkgs.fish-dart-completions
-          nurPkgs.fish-by-binds-yourself
-        ]
-        # Hosts with Stylix get the palette from it (stylix.targets.fish).
-        ++ lib.optional (!(options ? stylix)) nurPkgs.dracula-fish
-      );
+      [
+        pkgs.fishPlugins.fish-bd
+        nurPkgs.fish-artisan-completion
+        nurPkgs.fish-ghq
+        pkgs.fishPlugins.autopair
+        nurPkgs.fish-nix-completions
+        nurPkgs.fish-nix-env
+        nurPkgs.fish-dart-completions
+        nurPkgs.fish-by-binds-yourself
+      ];
 }

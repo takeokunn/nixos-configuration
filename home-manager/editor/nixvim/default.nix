@@ -1,11 +1,13 @@
 {
-  lib,
+  config,
   options,
   pkgs,
   nurPkgs,
   ...
 }:
 let
+  d = import ../../../shared/dracula-roles.nix { inherit config options pkgs; };
+  hex = color: "#${color}";
   customPackages = import ./packages { inherit nurPkgs; };
   plugins = import ./plugins { inherit pkgs customPackages; };
   opts = import ./opts;
@@ -33,8 +35,36 @@ in
   programs.nixvim.enableMan = false;
 
   programs.nixvim.editorconfig.enable = true;
-  # Hosts with Stylix get the palette from it (stylix.targets.nixvim).
-  programs.nixvim.colorschemes.dracula.enable = !(options ? stylix);
+  # dracula.nvim rather than dracula/vim: only dracula.nvim accepts a palette from outside, and
+  # this one comes from Stylix. Stylix has nothing darker than its background, so menu and black
+  # (darker than bg in Dracula) use base01, and the bright colors repeat the kitty palette.
+  programs.nixvim.colorschemes.dracula-nvim.enable = true;
+  programs.nixvim.colorschemes.dracula-nvim.settings.colors = {
+    bg = hex d.background;
+    fg = hex d.foreground;
+    selection = hex d.selection;
+    comment = hex d.comment;
+    red = hex d.red;
+    orange = hex d.orange;
+    yellow = hex d.yellow;
+    green = hex d.green;
+    purple = hex d.purple;
+    cyan = hex d.cyan;
+    pink = hex d.pink;
+    bright_red = hex d.red;
+    bright_green = hex d.green;
+    bright_yellow = hex d.yellow;
+    bright_blue = hex d.blue;
+    bright_magenta = hex d.pink;
+    bright_cyan = hex d.cyan;
+    bright_white = hex d.brightWhite;
+    menu = hex d.surface;
+    visual = hex d.selection;
+    gutter_fg = hex d.comment;
+    nontext = hex d.selection;
+    white = hex d.muted;
+    black = hex d.surface;
+  };
 
   programs.nixvim.luaLoader.enable = true;
   programs.nixvim.performance.byteCompileLua.enable = true;
