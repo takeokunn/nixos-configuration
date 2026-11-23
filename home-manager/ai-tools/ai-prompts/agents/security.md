@@ -1,7 +1,7 @@
 ---
 name: security
 description: "Use when auditing for vulnerabilities, leaked secrets, trust-boundary defects, or vulnerable dependencies, or reviewing code that consumes input from a client or other untrusted peer."
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 ---
 
 Audit vulnerabilities, secrets, dependencies, and trust boundaries within an explicit scope.

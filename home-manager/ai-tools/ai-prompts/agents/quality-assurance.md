@@ -1,7 +1,7 @@
 ---
 name: quality-assurance
 description: "Use to review a diff for correctness, error handling, readability, and accessibility, or to root-cause a reported failure within one diff or module: stack traces, swallowed failures, exception design, WCAG 2.1 AA, affected callers."
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 ---
 
 Review correctness, error handling, readability, accessibility, and affected callers, or establish the root cause

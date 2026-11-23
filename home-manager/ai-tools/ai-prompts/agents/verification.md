@@ -1,7 +1,7 @@
 ---
 name: verification
 description: "Use when an implementation is claimed working and the claim must be attacked: probe concurrency, boundary values, idempotency, interruption, and error paths for the input that breaks it. Also use in read-only reconcile mode, to reconcile several agents' findings by cited evidence or to refute one claim before it is acted on."
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 ---
 
 Try to break the implementation with executed probes and captured output, or, in reconcile mode, reconcile

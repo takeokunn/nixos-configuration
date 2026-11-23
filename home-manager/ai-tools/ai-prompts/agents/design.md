@@ -1,7 +1,7 @@
 ---
 name: design
 description: "Use for architecture evaluation, dependency and layer-violation checks, requirements decomposition, or scope sizing: circular dependencies, module boundaries, coupling, ADRs, and where a new component belongs."
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 ---
 
 Evaluate architecture, component placement, dependency boundaries, and requirements before implementation;

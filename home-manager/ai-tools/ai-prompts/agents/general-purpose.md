@@ -1,7 +1,7 @@
 ---
 name: general-purpose
 description: "Use for work that spans domains and fits no single specialty: log analysis, cross-module or migration-driven refactoring, debug tracing across components, error-handling design, migration planning, knowledge-base upkeep."
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 ---
 
 Handle work spanning specialties; recommend a specialist when the task clearly fits one.
