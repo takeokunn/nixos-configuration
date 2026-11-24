@@ -11,8 +11,8 @@
 # and secret otherwise carry credentials by design, and git's credential helper must remain usable.
 # Fails closed; the merge prefix is the only override.
 #
-# Every run, people's included, also picks the account from the target repository's owner; see
-# use_account_for.
+# Every run, people's included, also picks the github.com account itself instead of leaving it to
+# the active account in hosts.yml, which any session can switch; see use_account_for.
 #
 # Not covered: secrets split across words, interactive editor input, and commits gh pushes. Agent
 # policy does not cover deliberately cleared markers, direct upstream binaries, or other API clients.
@@ -83,6 +83,7 @@ if ((agent)); then
         "alias set" | "alias import") block "gh aliases are not allowed; run the full command" ;;
         "extension install" | "extension exec" | "extension upgrade" | "ext install" | "ext exec" | "ext upgrade") block "extension installation and execution are not allowed from agents" ;;
         "auth token") block "token output is not allowed from agents" ;;
+        "auth switch" | "auth logout") block "the active account is shared by every session; choose the account for one command with GH_ACCOUNT=<login> instead" ;;
         "config get")
                 ((i += 1))
                 while ((i < ${#sub_args[@]})); do
@@ -123,32 +124,62 @@ hosts_accounts() {
         done <"$hosts_file"
 }
 
-# The repositories of owner O are reached as the github.com account named A-O, where A is another
-# logged-in account, so a work account is chosen without its organisation being written down here.
-# Requiring A keeps the account someone-example-org from also matching an owner named org. Only
-# this process gets the token: the active account in hosts.yml stays as it is, because every other
-# shell and agent session reads it too. A token the caller exported wins.
+# Exports GH_TOKEN for the github.com account this process uses, in this order: the account named
+# by GH_ACCOUNT; a token the caller exported; for owner O, the account named A-O where A is another
+# logged-in account; otherwise the account the other account names are built on. The A-O rule
+# chooses a work account without its organisation being written down here, and requiring A keeps
+# the account someone-example-org from also matching an owner named org. The active account in
+# hosts.yml is never consulted: every shell and agent session shares it, so a switch in one
+# session would otherwise change the account of all the others.
 use_account_for() {
-        local owner=$1 host account base match="" count=0 accounts=()
-        [[ -z ${GH_TOKEN-}${GITHUB_TOKEN-} && $owner =~ ^[A-Za-z0-9][A-Za-z0-9-]*$ ]] || return 0
+        local owner=$1 host account base match="" count=0 accounts=() bases=()
         while read -r host account; do
                 [[ $host == github.com ]] && accounts+=("$account")
         done < <(hosts_accounts)
         shopt -s nocasematch
-        for account in "${accounts[@]+"${accounts[@]}"}"; do
-                for base in "${accounts[@]}"; do
-                        if [[ $account == "$base-$owner" ]]; then
-                                match=$account
-                                ((count += 1))
-                                break
-                        fi
+        if [[ -n ${GH_ACCOUNT-} ]]; then
+                for account in "${accounts[@]+"${accounts[@]}"}"; do
+                        [[ $account == "$GH_ACCOUNT" ]] && match=$account
                 done
-        done
-        shopt -u nocasematch
-        ((count <= 1)) || block "more than one logged-in account is named *-$owner, so the account to use is ambiguous"
-        [[ -n $match ]] || return 0
-        GH_TOKEN=$("$real_gh" auth token -h github.com -u "$match" 2>/dev/null) && [[ -n $GH_TOKEN ]] ||
-                block "could not read the token of $match"
+                shopt -u nocasematch
+                [[ -n $match ]] || block "GH_ACCOUNT names $GH_ACCOUNT, which is not logged in to github.com"
+        else
+                if [[ -n ${GH_TOKEN-}${GITHUB_TOKEN-} ]] || ((${#accounts[@]} == 0)); then
+                        shopt -u nocasematch
+                        return 0
+                fi
+                if [[ $owner =~ ^[A-Za-z0-9][A-Za-z0-9-]*$ ]]; then
+                        for account in "${accounts[@]}"; do
+                                for base in "${accounts[@]}"; do
+                                        if [[ $account == "$base-$owner" ]]; then
+                                                match=$account
+                                                ((count += 1))
+                                                break
+                                        fi
+                                done
+                        done
+                fi
+                if ((count == 0)); then
+                        if ((${#accounts[@]} == 1)); then
+                                match=${accounts[0]}
+                        else
+                                for base in "${accounts[@]}"; do
+                                        for account in "${accounts[@]}"; do
+                                                if [[ $account == "$base"-?* ]]; then
+                                                        bases+=("$base")
+                                                        break
+                                                fi
+                                        done
+                                done
+                                ((${#bases[@]} == 1)) && match=${bases[0]}
+                        fi
+                fi
+                shopt -u nocasematch
+                ((count <= 1)) || block "more than one logged-in account is named *-$owner, so the account to use is ambiguous"
+                [[ -n $match ]] || block "no default github.com account: exactly one logged-in account must be the one the other account names are built on. Choose one with GH_ACCOUNT=<login>"
+        fi
+        GH_TOKEN=$(unset GH_TOKEN GITHUB_TOKEN && "$real_gh" auth token -h github.com -u "$match" 2>/dev/null) &&
+                [[ -n $GH_TOKEN ]] || block "could not read the token of $match"
         export GH_TOKEN
 }
 
@@ -206,6 +237,27 @@ if [[ "${1-} ${2-}" == "auth git-credential" ]]; then
                 [[ $protocol == https && $host == github.com ]] && use_account_for "${path%%/*}"
         fi
         exec "$real_gh" "$@" < <(printf '%s\n' "${request[@]+"${request[@]}"}" "")
+fi
+# `gh auth token` naming no account prints the token use_account_for picks for the current
+# directory; any other form goes to gh unchanged.
+if [[ "${1-} ${2-}" == "auth token" ]]; then
+        token_args=("${@:3}")
+        i=0
+        while ((i < ${#token_args[@]})); do
+                case ${token_args[i]} in
+                -h | --hostname) [[ ${token_args[i + 1]-} == github.com ]] && ((i += 1)) || break ;;
+                -hgithub.com | -h=github.com | --hostname=github.com) ;;
+                *) break ;;
+                esac
+                ((i += 1))
+        done
+        if ((i == ${#token_args[@]})); then
+                use_account_for "$(target_owner auth token)"
+                if [[ -n ${GH_TOKEN-}${GITHUB_TOKEN-} ]]; then
+                        printf '%s\n' "${GH_TOKEN:-$GITHUB_TOKEN}"
+                        exit 0
+                fi
+        fi
 fi
 case "${1-}" in
 "" | auth | help | completion | version | --version | -h | --help) ;;
