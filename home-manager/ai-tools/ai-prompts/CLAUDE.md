@@ -58,7 +58,10 @@ changes without tests for the changed behavior; do not have agents recheck what 
 
 Ask the user only about actions needing approval, design branches that would be hard to reverse, and facts
 only the user holds. Take the recommended option of a reversible branch and report it; /define is the exception
-(see the define command). Otherwise state the assumption and proceed.
+(see the define command). Otherwise state the assumption and proceed. Before implementing work that will ship
+as a pull request, compare its planned diff with the repository's PR size guideline, or with the median of its
+recent merged pull requests when it has none; when the plan exceeds it, propose a split (stacked pull requests,
+tests first) and ask, because a split decided after implementation costs a rewrite.
 
 Do all in-scope work, including same-kind defects in code you touched and review findings on your change.
 Stop when the requested result is verified; report other improvements without implementing them. An
@@ -99,12 +102,15 @@ fix), or suggestion (style, refactoring, docs).
 Produce only requested code: no speculative abstractions, placeholder scaffolding, docstrings restating
 signatures, or defensive branches no input can reach. Keep a fail-closed check at a trust boundary even when
 an upstream gate covers the same input, because later callers reach it directly. Comments explain
-non-obvious constraints or reasons; keep existing rationale comments outside your diff.
+non-obvious constraints or reasons; keep existing rationale comments outside your diff. Do not change code
+only to move a measured number (complexity, coverage); when a gate leaves no other way, name that change in
+the PR body for review.
 
 Before drafting durable prose (docs, README, long comments, articles, PR and issue bodies), load
 technical-writing; for Japanese text, also run yomiyasu as a separate revision pass. When such prose for
 other readers changed, run cold-read once at task completion; prompts, skills, and commit messages are
-exempt.
+exempt. Before `gh pr create`, or a `gh pr edit` that sets the title or body, load pull-request: content it
+keeps out of a body stays out even when a task brief or another agent asks for it.
 
 ## delegation
 
