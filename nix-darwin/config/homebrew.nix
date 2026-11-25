@@ -24,5 +24,6 @@
     "slack"
     "slite"
     "sublime-text"
+    "zoom"
   ];
 }
