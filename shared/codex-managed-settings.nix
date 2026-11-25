@@ -82,12 +82,23 @@ let
     export PATH=${pkgs.jq}/bin:$PATH
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/redact-secrets.sh codex
   '';
+  requirePrSkill = pkgs.writeShellScript "require-pr-skill" ''
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.gnugrep
+        pkgs.jq
+      ]
+    }:$PATH
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/require-pr-skill.sh
+  '';
   hooksDir = pkgs.runCommand "codex-managed-hooks" { } ''
     mkdir -p "$out"
     cp ${guard} "$out/guard-and-guide"
     cp ${destructiveGit} "$out/block-destructive-git"
     cp ${rewrite} "$out/aitools-rewrite-codex"
     cp ${redact} "$out/redact-secrets-codex"
+    cp ${requirePrSkill} "$out/require-pr-skill"
   '';
 in
 {
@@ -111,6 +122,7 @@ in
               "guard-and-guide"
               "block-destructive-git"
               "aitools-rewrite-codex"
+              "require-pr-skill"
             ];
       }
     ];

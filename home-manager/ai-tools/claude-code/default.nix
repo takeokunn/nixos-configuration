@@ -102,6 +102,16 @@ in
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/block-destructive-git.sh "$@"
   '';
   programs.claude-code.hooks.aitools-rewrite = builtins.readFile "${aiPromptsPath}/hooks/aitools-rewrite.sh";
+  programs.claude-code.hooks.require-pr-skill = pkgs.writeShellScript "require-pr-skill" ''
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.gnugrep
+        pkgs.jq
+      ]
+    }:"$PATH"
+    exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/require-pr-skill.sh
+  '';
 
   programs.claude-code.mcpServers =
     (mcp-servers-nix.lib.evalModule pkgs {

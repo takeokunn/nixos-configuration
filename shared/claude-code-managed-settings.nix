@@ -48,6 +48,7 @@ let
   # cannot silently fail to fire here.
   claudeBashHookNames = shared.guardrailHookNames ++ [
     "aitools-rewrite"
+    "require-pr-skill"
   ];
 in
 {
@@ -149,6 +150,7 @@ in
           claudeBashHookNames == [
             "block-destructive-git"
             "aitools-rewrite"
+            "require-pr-skill"
           ];
         map (
           name:
