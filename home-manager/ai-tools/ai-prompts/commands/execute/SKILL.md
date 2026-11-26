@@ -26,6 +26,11 @@ implementation. For planning depth and when to ask, see CLAUDE.md work_selection
 3. Add or update tests only when the task asks for tests or the repository has tests for that kind of change.
    A user instruction not to write tests takes precedence over any other guidance. Document changed public
    behavior. Do not create unrelated tests or docs to fill a role.
+4. When the task commits, put structural changes (refactor) and behavior changes in separate commits. Split the
+   diff by kind first, then check each structural commit: reverting it must leave behavior unchanged. If it does
+   not, the commit still holds a behavior change, so split that out again. Create and split these commits with jj,
+   following the jujutsu skill, and pass explicit paths (CLAUDE.md `hard_rules`). The Commits section of the
+   pull-request skill governs the split of a whole pull request; this step governs the commits within a task.
 
 ## Verify and review
 
