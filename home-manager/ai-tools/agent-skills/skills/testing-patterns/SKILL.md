@@ -70,6 +70,26 @@ property, or an ordering callers can observe. Slowness or static inspection is n
 check can be the cheapest guard on a user-facing key or path, if it survives renames of internal identifiers.
 A retained test that fails on the baseline is a possible product bug: reproduce it and fix the owning code.
 
+## Test-first work
+
+When the user asks for test-first or TDD, write the tests before the implementation, in this order:
+
+1. Write the completion criteria as tests: the normal path, the main error paths, boundary values, and invariants.
+   Answer the four questions in [Whether a test should exist](#whether-a-test-should-exist) for each test, and put a
+   family that differs only in input into a [case table](#drive-families-from-a-case-table).
+2. Build the suite and run it. Each test of a new behavior must fail on an assertion before the implementation
+   exists. A compile or link error is not a red result: add stubs that compile but cannot produce the expected
+   value, so the failure comes from the assertion that names the behavior. A test that protects behavior the code
+   already has, such as an invariant or a call shape existing callers use (see
+   [Backward compatibility](#backward-compatibility)), passes before the change. It must stay green after the
+   change, and it needs no stub.
+3. Write the smallest implementation that makes every test pass.
+4. Refactor with the whole suite green.
+
+A bug-fix regression test already has this red check: [Whether a test should exist](#whether-a-test-should-exist)
+requires it to fail on the pre-fix code. This section applies the same check to every new behavior. Without a
+request for test-first or TDD, the rules above decide when a test is written.
+
 ## Designing the cases
 
 ### Rotate adversarial perspectives
