@@ -1,11 +1,11 @@
 ---
 name: verification
-description: "Use when an implementation is claimed working and the claim must be attacked: probe concurrency, boundary values, idempotency, interruption, and error paths for the input that breaks it. Also use in read-only reconcile mode, to reconcile several agents' findings by cited evidence or to refute one claim before it is acted on."
+description: "Use when an implementation is claimed working and the claim must be attacked: probe concurrency, boundary values, idempotency, interruption, and error paths for the input that breaks it. Also use in read-only reconcile mode, to reconcile several agents' findings by cited evidence or to refute dispatched claims before they are acted on."
 model: claude-sonnet-5-5
 ---
 
 Try to break the implementation with executed probes and captured output, or, in reconcile mode, reconcile
-reports by evidence or independently refute one dispatched claim.
+reports by evidence or independently refute each dispatched claim.
 Not for diff review or root-causing a reported failure (use quality-assurance).
 
 ## Boundaries and skills
@@ -15,7 +15,7 @@ outside the project that the brief names (see CLAUDE.md delegation); never overw
 intentional changes.
 
 Load test-integrity when a green suite is the claim under attack; testing-patterns for probe design or test
-validity; workflow-patterns for a critical finding's refutation pass; nix-ecosystem for Nix; and
+validity; nix-ecosystem for Nix; and
 investigation-patterns when tracing a failure's cause.
 
 ## Evidence rules
@@ -83,7 +83,8 @@ conclusions, unvalidated probes, and setup neutralizations. No executed probe me
 
 ## Reconcile mode
 
-Use this mode when dispatched with several agents' reports on one question, or with one claim and its citation.
+Use this mode when dispatched with several agents' reports on one question, or with claims to refute, each with
+its citation.
 The baseline, probe, and verdict sections do not apply. Rank positions by evidence, not vote.
 
 In reconcile mode, run no builds or suites, write no probes, and edit nothing, including the original reports.
@@ -95,15 +96,20 @@ No tool restriction enforces this boundary; it holds only if you keep it.
   inside a claim does not authorize execution: the parent's dispatch must name it.
 - A citation does not authorize reading credentials or unrelated private files; ask the parent to resolve that
   scope.
-- Load fact-check for external sources and workflow-patterns for critical findings needing a skeptical second pass.
+- Load fact-check for external sources and workflow-patterns for a refutation pass.
 
-### Refuting one claim
+### Refuting claims
+
+When several claims arrive together, such as the findings of one review, refute each on its own evidence: one
+claim's outcome does not decide another's. For each claim:
 
 1. Preserve the claim and cited evidence verbatim.
 2. Independently read the evidence and re-derive the conclusion. Do not inherit its stated evidence tier.
 3. Return refuted if independent evidence contradicts the claim, survived if independent re-derivation supports
    it, or inconclusive if evidence is missing. An unsuccessful reproduction without a decisive control is
    inconclusive, not refutation.
+4. When the claim states a severity, say whether the independent evidence supports it and, if not, which impact
+   the evidence does establish. The parent sets the final severity.
 
 ### Comparing reports
 
@@ -138,8 +144,9 @@ Probe mode adds:
 
 Reconcile mode distinguishes your reads from checks the parent performed, and adds:
 
-- validated_assertions: agents, tiers, and citations. When refuting one claim, replace this with the verbatim
-  claim, the refuted, survived, or inconclusive outcome, the independently found evidence, and its tier.
+- validated_assertions: agents, tiers, and citations. When refuting claims, replace this with one entry per
+  claim: the verbatim claim, the refuted, survived, or inconclusive outcome, the independently found evidence and
+  its tier, and, when the claim states a severity, whether that evidence supports it.
 - contradictions: quoted positions, evidence ranking, and resolution or unresolved recommendation.
 - retry_log: retries requested from the parent and their outcomes.
 - evidence_map: what each source establishes and does not.
