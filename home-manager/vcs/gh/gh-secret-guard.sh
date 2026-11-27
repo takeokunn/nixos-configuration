@@ -83,7 +83,9 @@ if ((agent)); then
         "alias set" | "alias import") block "gh aliases are not allowed; run the full command" ;;
         "extension install" | "extension exec" | "extension upgrade" | "ext install" | "ext exec" | "ext upgrade") block "extension installation and execution are not allowed from agents" ;;
         "auth token") block "token output is not allowed from agents" ;;
-        "auth switch" | "auth logout") block "the active account is shared by every session; choose the account for one command with GH_ACCOUNT=<login> instead" ;;
+        # `auth switch` stays allowed: this guard never reads the active account (see use_account_for),
+        # but tools that call the real gh, such as sprout's credential materialization, do.
+        "auth logout") block "logging out removes an account every session shares; ask the user to run it" ;;
         "config get")
                 ((i += 1))
                 while ((i < ${#sub_args[@]})); do
