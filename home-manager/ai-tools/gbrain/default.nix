@@ -103,7 +103,10 @@ let
       gbrain config set dream.synthesize.session_corpus_dir ${lib.escapeShellArg sessionCorpusDir}
       gbrain config set facts.extraction_model ${chatModel}
       gbrain config set models.dream.triage ${chatModel}
-      gbrain config set models.tier.subagent claude-cli:sonnet
+      # Synthesis has its own model key, which outranks GBRAIN_CHAT_MODEL; models.tier.subagent
+      # does not. Its subagents run on claude-cli only through gbrain's gateway-native loop.
+      gbrain config set models.dream.synthesize claude-cli:sonnet
+      gbrain config set agent.use_gateway_loop true
 
       # Moving the brain onto the declared model needs the single-writer lock, so it runs here,
       # until the database records that model and no migration is left open. A failure exits
