@@ -24,6 +24,7 @@
       paredit-cli-skills
       aitools-skills
       yomiyasu-skill
+      ollama-bge-m3
       emacs-overlay
       org-babel
       ;

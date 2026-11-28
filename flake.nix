@@ -55,6 +55,10 @@
     aitools-skills.flake = false;
     yomiyasu-skill.url = "github:nanaism/yomiyasu";
     yomiyasu-skill.flake = false;
+    # bge-m3's registry manifest, which gbrain embeds with (home-manager/ai-tools/gbrain); the
+    # lockfile update moves it with the tag, and gbrain re-embeds the brain when it moves.
+    ollama-bge-m3.url = "file+https://registry.ollama.ai/v2/library/bge-m3/manifests/latest";
+    ollama-bge-m3.flake = false;
     nur-packages.url = "github:takeokunn/nur-packages";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     git-bulk-clean.url = "github:takeokunn/git-bulk-clean/v0.6.1";
@@ -115,6 +119,7 @@
                   paredit-cli-skills
                   aitools-skills
                   yomiyasu-skill
+                  ollama-bge-m3
                   ;
               };
             };

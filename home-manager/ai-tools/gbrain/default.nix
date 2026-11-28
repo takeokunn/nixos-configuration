@@ -3,6 +3,7 @@
   lib,
   pkgs,
   nurPkgs,
+  ollama-bge-m3,
   ...
 }:
 let
@@ -18,37 +19,15 @@ let
 
   # Embeddings come from the local Ollama below; gbrain's ollama recipe reads this base URL.
   ollamaUrl = "http://${config.services.ollama.host}:${toString config.services.ollama.port}";
-  embeddingModel = "ollama:bge-m3";
+  bgeM3 = import ./ollama-model.nix { inherit lib pkgs; } {
+    name = "bge-m3";
+    manifest = ollama-bge-m3;
+  };
+  # The name carries the manifest digest, so a lockfile update that moves the tag changes the model
+  # gbrain records, and the serve script re-embeds the brain instead of mixing two models' vectors.
+  embeddingModel = "ollama:${bgeM3.ollamaName}";
   # bge-m3 emits 1024-dimension vectors, the width a keyless gbrain brain is created with.
   embeddingDimensions = "1024";
-
-  # Pinned by registry digest so a switch never pulls at run time and a moved tag cannot change
-  # the vectors under the brain; updating the model means copying the new digests from
-  # https://registry.ollama.ai/v2/library/bge-m3/manifests/latest.
-  bgeM3 = {
-    name = "bge-m3";
-    tag = "latest";
-    manifestDigest = "sha256:7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab";
-    config = {
-      mediaType = "application/vnd.docker.container.image.v1+json";
-      digest = "sha256:0c4c9c2a325fb1cdafec606e6809cb745f1cb26a6d919994400d27372303e276";
-      size = 337;
-    };
-    layers = [
-      {
-        mediaType = "application/vnd.ollama.image.model";
-        digest = "sha256:daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c";
-        size = 1157671200;
-      }
-      {
-        mediaType = "application/vnd.ollama.image.license";
-        digest = "sha256:a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde";
-        size = 1068;
-      }
-    ];
-  };
-
-  ollamaModelFiles = import ./ollama-model.nix { inherit lib pkgs; };
 
   # Claude Code and Codex start a stdio MCP server per session, and a PGLite brain admits one owner:
   # every session after the first would get only gbrain_status. One resident HTTP server per host
@@ -87,16 +66,22 @@ let
       # The reranker gbrain's default search mode calls is Voyage's, which has no key here.
       gbrain config set search.reranker.enabled false
 
-      # Turning embeddings on needs the single-writer lock, so it runs here, until the database
-      # records the model. A failure exits before serve and launchd/systemd retry, instead of serving
-      # keyword-only; both commands resume an interrupted run. `enable` sets only the runtime config
-      # plane, and the migration records the model in the database and embeds the existing pages
-      # and facts; Ollama bills nothing, so a $0 cap admits all of it.
-      if [ "$(gbrain migrate embeddings --status --json | jq -r .db_plane.model)" != ${embeddingModel} ]; then
+      # Moving the brain onto the declared model needs the single-writer lock, so it runs here,
+      # until the database records that model. A failure exits before serve and launchd/systemd
+      # retry, instead of serving keyword-only or with vectors from two models; both commands resume
+      # an interrupted run. A keyless brain takes `enable` first, which sets only the runtime config
+      # plane. The migration records the model in the database and embeds every page and fact
+      # again; Ollama bills nothing, so a $0 cap admits all of it.
+      embedding_status=$(gbrain migrate embeddings --status --json)
+      if [ "$(jq -r .db_plane.model <<<"$embedding_status")" != ${embeddingModel} ]; then
         curl --fail --silent --show-error --output /dev/null \
           --retry 30 --retry-delay 2 --retry-connrefused \
-          --data ${lib.escapeShellArg (builtins.toJSON { model = bgeM3.name; })} ${ollamaUrl}/api/show
-        gbrain embeddings enable --embedding-model ${embeddingModel} --embedding-dimensions ${embeddingDimensions}
+          --data ${
+            lib.escapeShellArg (builtins.toJSON { model = bgeM3.ollamaName; })
+          } ${ollamaUrl}/api/show
+        if [ "$(jq -r .file_plane.model <<<"$embedding_status")" = null ]; then
+          gbrain embeddings enable --embedding-model ${embeddingModel} --embedding-dimensions ${embeddingDimensions}
+        fi
         gbrain migrate embeddings --to ${embeddingModel} --dim ${embeddingDimensions} --yes --max-cost-usd 0
       fi
 
@@ -181,9 +166,30 @@ in
   home.file = {
     ${hookRelPath}.source = hook;
   }
-  // ollamaModelFiles bgeM3;
+  // bgeM3.files;
 
   services.ollama.enable = true;
+
+  # Ollama holds only the models declared here. home-manager swaps its own links on each switch;
+  # this removes whatever else is under ~/.ollama/models (a hand pull, a partial download), so no
+  # model reaches Ollama outside Nix.
+  home.activation.ollamaModels =
+    let
+      models = "${config.home.homeDirectory}/.ollama/models";
+      declared = map (lib.removePrefix ".ollama/models/") (lib.attrNames bgeM3.files);
+    in
+    lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      for dir in manifests blobs; do
+        [ -d ${lib.escapeShellArg models}/"$dir" ] || continue
+        while IFS= read -r -d "" file; do
+          case "''${file#${lib.escapeShellArg models}/}" in
+            ${lib.concatMapStringsSep " | " lib.escapeShellArg declared}) ;;
+            *) run rm -f "$file" ;;
+          esac
+        done < <(${pkgs.findutils}/bin/find ${lib.escapeShellArg models}/"$dir" -mindepth 1 ! -type d -print0)
+        run ${pkgs.findutils}/bin/find ${lib.escapeShellArg models}/"$dir" -mindepth 1 -type d -empty -delete
+      done
+    '';
 
   launchd.agents.gbrain = lib.mkIf isDarwin {
     enable = true;

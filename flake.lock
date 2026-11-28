@@ -1686,6 +1686,18 @@
         "type": "github"
       }
     },
+    "ollama-bge-m3": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-SF55cb2P2kgEpEb0hNT+9fSw8MNWricUo8aFddZXENk=",
+        "type": "file",
+        "url": "https://registry.ollama.ai/v2/library/bge-m3/manifests/latest"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://registry.ollama.ai/v2/library/bge-m3/manifests/latest"
+      }
+    },
     "org-babel": {
       "locked": {
         "lastModified": 1781216126,
@@ -1790,6 +1802,7 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
         "nur-packages": "nur-packages",
+        "ollama-bge-m3": "ollama-bge-m3",
         "org-babel": "org-babel",
         "paredit-cli-skills": "paredit-cli-skills",
         "sops-nix": "sops-nix",
