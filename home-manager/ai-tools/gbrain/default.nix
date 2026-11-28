@@ -16,6 +16,79 @@ let
   port = 3131;
   url = "http://127.0.0.1:${toString port}/mcp";
 
+  # Embeddings come from the local Ollama below; gbrain's ollama recipe reads this base URL.
+  ollamaUrl = "http://${config.services.ollama.host}:${toString config.services.ollama.port}";
+  embeddingModel = "ollama:bge-m3";
+
+  # Pinned by registry digest so a switch never pulls at run time and a moved tag cannot change
+  # the vectors under the brain; updating the model means copying the new digests from
+  # https://registry.ollama.ai/v2/library/bge-m3/manifests/latest.
+  bgeM3 = {
+    name = "bge-m3";
+    tag = "latest";
+    manifestDigest = "sha256:7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab";
+    config = {
+      mediaType = "application/vnd.docker.container.image.v1+json";
+      digest = "sha256:0c4c9c2a325fb1cdafec606e6809cb745f1cb26a6d919994400d27372303e276";
+      size = 337;
+    };
+    layers = [
+      {
+        mediaType = "application/vnd.ollama.image.model";
+        digest = "sha256:daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c";
+        size = 1157671200;
+      }
+      {
+        mediaType = "application/vnd.ollama.image.license";
+        digest = "sha256:a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde";
+        size = 1068;
+      }
+    ];
+  };
+
+  # Ollama finds a model through <models>/manifests/registry.ollama.ai/library/<name>/<tag>, which
+  # names its blobs as <models>/blobs/sha256-<hex>. Linking each file rather than pointing
+  # OLLAMA_MODELS at the store keeps ~/.ollama/models writable for models pulled by hand.
+  ollamaModelFiles =
+    model:
+    let
+      blobName = digest: "sha256-${lib.removePrefix "sha256:" digest}";
+      blob =
+        { digest, ... }:
+        pkgs.fetchurl {
+          name = "ollama-${model.name}-${lib.substring 7 12 digest}";
+          url = "https://registry.ollama.ai/v2/library/${model.name}/blobs/${digest}";
+          hash = digest;
+        };
+      # The registry serves a manifest by tag only, so its bytes are rebuilt here in the registry's
+      # key order and checked against the registry's digest as a fixed output.
+      layerJson = b: ''{"mediaType":"${b.mediaType}","digest":"${b.digest}","size":${toString b.size}}'';
+      manifest = pkgs.runCommand "ollama-${model.name}-${model.tag}-manifest" {
+        json = ''{"schemaVersion":2,"mediaType":"application/vnd.docker.distribution.manifest.v2+json","config":${layerJson model.config},"layers":[${
+          lib.concatMapStringsSep "," layerJson model.layers
+        }]}'';
+        outputHashAlgo = "sha256";
+        outputHash = lib.removePrefix "sha256:" model.manifestDigest;
+      } ''printf '%s' "$json" >"$out"'';
+      # Ollama accepts a symlinked manifest only when the path it resolves to is named after the
+      # manifest's digest and is also that digest's blob.
+      manifestBlob = pkgs.runCommand "ollama-${model.name}-${model.tag}-manifest-blob" { } ''
+        mkdir "$out"
+        cp ${manifest} "$out/${blobName model.manifestDigest}"
+      '';
+      manifestPath = "${manifestBlob}/${blobName model.manifestDigest}";
+    in
+    {
+      ".ollama/models/manifests/registry.ollama.ai/library/${model.name}/${model.tag}".source =
+        manifestPath;
+      ".ollama/models/blobs/${blobName model.manifestDigest}".source = manifestPath;
+    }
+    // lib.listToAttrs (
+      map (b: lib.nameValuePair ".ollama/models/blobs/${blobName b.digest}" { source = blob b; }) (
+        [ model.config ] ++ model.layers
+      )
+    );
+
   # Claude Code and Codex start a stdio MCP server per session, and a PGLite brain admits one owner:
   # every session after the first would get only gbrain_status. One resident HTTP server per host
   # holds the brain instead. `auth create` and the setup commands open the datastore themselves, so
@@ -25,7 +98,9 @@ let
     runtimeInputs = [
       gbrain
       pkgs.coreutils
+      pkgs.curl
       pkgs.gnugrep
+      pkgs.jq
     ];
     text = ''
       umask 077
@@ -48,6 +123,21 @@ let
       # Extract durable claims (preferences, corrections, decisions) from the turns and transcripts
       # the agents' capture hooks bank (shared/*-managed-settings.nix).
       gbrain config set memory.auto_writeback salient
+      # The reranker gbrain's default search mode calls is Voyage's, which has no key here.
+      gbrain config set search.reranker.enabled false
+
+      # Turning embeddings on needs the single-writer lock, so it runs here, until the database
+      # records the model. A failure exits before serve and launchd/systemd retry, instead of serving
+      # keyword-only; both commands resume an interrupted run. `enable` sets only the runtime config
+      # plane, and the migration records the model in the database and embeds the existing pages
+      # and facts; Ollama bills nothing, so a $0 cap admits all of it.
+      if [ "$(gbrain migrate embeddings --status --json | jq -r .db_plane.model)" != ${embeddingModel} ]; then
+        curl --fail --silent --show-error --output /dev/null \
+          --retry 30 --retry-delay 2 --retry-connrefused \
+          --data ${lib.escapeShellArg (builtins.toJSON { model = bgeM3.name; })} ${ollamaUrl}/api/show
+        gbrain embeddings enable --embedding-model ${embeddingModel} --embedding-dimensions 1024
+        gbrain migrate embeddings --to ${embeddingModel} --dim 1024 --yes --max-cost-usd 0
+      fi
 
       if [ ! -s ${lib.escapeShellArg tokenFile} ]; then
         # The token prints once and lives only in the database, so a lost file leaves an orphan
@@ -127,7 +217,12 @@ in
   ];
 
   home.packages = [ gbrain ];
-  home.file.${hookRelPath}.source = hook;
+  home.file = {
+    ${hookRelPath}.source = hook;
+  }
+  // ollamaModelFiles bgeM3;
+
+  services.ollama.enable = true;
 
   launchd.agents.gbrain = lib.mkIf isDarwin {
     enable = true;
@@ -143,7 +238,12 @@ in
   };
 
   systemd.user.services.gbrain = lib.mkIf (!isDarwin) {
-    Unit.Description = "gbrain MCP server for coding agents";
+    Unit = {
+      Description = "gbrain MCP server for coding agents";
+      # launchd has no ordering, so gbrain-serve also waits for Ollama itself.
+      Wants = [ "ollama.service" ];
+      After = [ "ollama.service" ];
+    };
     Service = {
       ExecStart = "${serve}/bin/gbrain-serve";
       Restart = "on-failure";
