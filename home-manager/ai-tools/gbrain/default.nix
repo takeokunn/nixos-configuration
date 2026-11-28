@@ -45,6 +45,9 @@ let
       # Skills come from Nix; the brain's own skillpack would be offered to every connecting agent.
       gbrain config set mcp.publish_skills false
       gbrain sources shared-skills default off
+      # Extract durable claims (preferences, corrections, decisions) from the turns and transcripts
+      # the agents' capture hooks bank (shared/*-managed-settings.nix).
+      gbrain config set memory.auto_writeback salient
 
       if [ ! -s ${lib.escapeShellArg tokenFile} ]; then
         # The token prints once and lives only in the database, so a lost file leaves an orphan

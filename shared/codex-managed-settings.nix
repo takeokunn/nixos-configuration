@@ -92,6 +92,15 @@ let
     }:$PATH
     exec ${pkgs.bash}/bin/bash ${aiPromptsPath}/hooks/require-pr-skill.sh
   '';
+  # Parsing the transcript can outlast the 3 s budget `gbrain setup codex --capture` gives this hook,
+  # so, as that wiring does, the payload is saved and the ingest runs detached.
+  gbrainSessionEnd = pkgs.writeShellScript "gbrain-session-end-codex" ''
+    payload=$(${pkgs.coreutils}/bin/mktemp)
+    ${pkgs.coreutils}/bin/cat >"$payload"
+    ${pkgs.coreutils}/bin/nohup ${pkgs.bash}/bin/bash -c \
+      '"$0" session-end --harness codex <"$1"; ${pkgs.coreutils}/bin/rm -f "$1"' \
+      ${lib.escapeShellArg gbrainHook} "$payload" >/dev/null 2>&1 &
+  '';
   hooksDir = pkgs.runCommand "codex-managed-hooks" { } ''
     mkdir -p "$out"
     cp ${guard} "$out/guard-and-guide"
@@ -99,6 +108,7 @@ let
     cp ${rewrite} "$out/aitools-rewrite-codex"
     cp ${redact} "$out/redact-secrets-codex"
     cp ${requirePrSkill} "$out/require-pr-skill"
+    cp ${gbrainSessionEnd} "$out/gbrain-session-end-codex"
   '';
 in
 {
@@ -156,6 +166,18 @@ in
             type = "command";
             command = "${gbrainHook} user-prompt --harness codex";
             timeout = 15;
+          }
+        ];
+      }
+    ];
+    # gbrain's capture lane for Codex: the transcript goes to the serve for extraction.
+    SessionEnd = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/gbrain-session-end-codex";
+            timeout = 3;
           }
         ];
       }

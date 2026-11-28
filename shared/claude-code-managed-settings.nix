@@ -213,6 +213,46 @@ in
     }
   ];
 
+  # gbrain's capture lanes: Stop banks the turn, PreCompact banks the window's entities before
+  # compaction, SessionEnd hands the transcript to the serve for extraction. Commands and timeouts
+  # follow `gbrain setup claude-code --capture` and gbrain bootstrap's PreCompact entry. gbrain
+  # discards Stop-banked turns unless memory.auto_writeback is set (home-manager/ai-tools/gbrain).
+  hooks.Stop = [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${gbrainHook} stop";
+          timeout = 10;
+        }
+      ];
+    }
+  ];
+
+  hooks.PreCompact = [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${gbrainHook} compact";
+          timeout = 5;
+        }
+      ];
+    }
+  ];
+
+  hooks.SessionEnd = [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${gbrainHook} session-end";
+          timeout = 60;
+        }
+      ];
+    }
+  ];
+
   statusLine.type = "command";
   statusLine.command = "${aiPromptsPath}/scripts/statusline.sh";
   statusLine.padding = 0;
