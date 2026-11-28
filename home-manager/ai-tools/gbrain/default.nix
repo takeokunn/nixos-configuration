@@ -72,7 +72,10 @@ let
         mv "$tmp" ${lib.escapeShellArg tokenFile}
       fi
 
-      exec gbrain serve --http --bind 127.0.0.1 --port ${toString port} --surface starter --advertise verbs
+      # --surface caps what any token may call, and the token's read,write scope still refuses the
+      # admin-scope operations. --advertise keeps tools/list to the seven memory verbs; request_tools
+      # describes the rest.
+      exec gbrain serve --http --bind 127.0.0.1 --port ${toString port} --surface full --advertise verbs
     '';
   };
 
