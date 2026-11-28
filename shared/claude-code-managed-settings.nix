@@ -26,6 +26,17 @@ let
 
   # Installed by home-manager/ai-tools/gbrain, which asserts this path.
   gbrainHook = "${homeDirectory}/.local/share/gbrain/hook";
+  gbrainCaptureHook = subcommand: timeout: [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${gbrainHook} ${subcommand}";
+          inherit timeout;
+        }
+      ];
+    }
+  ];
 
   guardAndGuideHook = pkgs.writeShellScript "guard-and-guide" ''
     exec ${guardAndGuide}/bin/guard-and-guide --config ${aiPromptsPath}/hooks/rules.toml
@@ -217,41 +228,9 @@ in
   # compaction, SessionEnd hands the transcript to the serve for extraction. Commands and timeouts
   # follow `gbrain setup claude-code --capture` and gbrain bootstrap's PreCompact entry. gbrain
   # discards Stop-banked turns unless memory.auto_writeback is set (home-manager/ai-tools/gbrain).
-  hooks.Stop = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = "${gbrainHook} stop";
-          timeout = 10;
-        }
-      ];
-    }
-  ];
-
-  hooks.PreCompact = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = "${gbrainHook} compact";
-          timeout = 5;
-        }
-      ];
-    }
-  ];
-
-  hooks.SessionEnd = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = "${gbrainHook} session-end";
-          timeout = 60;
-        }
-      ];
-    }
-  ];
+  hooks.Stop = gbrainCaptureHook "stop" 10;
+  hooks.PreCompact = gbrainCaptureHook "compact" 5;
+  hooks.SessionEnd = gbrainCaptureHook "session-end" 60;
 
   statusLine.type = "command";
   statusLine.command = "${aiPromptsPath}/scripts/statusline.sh";
