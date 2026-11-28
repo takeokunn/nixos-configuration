@@ -154,8 +154,12 @@ let
       if [ -e ${lib.escapeShellArg dreamMarker} ]; then
         rm -f ${lib.escapeShellArg dreamMarker}
         # Dream is upkeep: a failed run (the subscription's usage limit, say) is logged and serving
-        # goes ahead, since the memory matters more than one night's synthesis.
-        if ! timeout 3600 gbrain dream --phase synthesize --phase patterns; then
+        # goes ahead, since the memory matters more than one night's synthesis. Synthesize and
+        # patterns skip, without failing, unless --dir names the default source's own checkout;
+        # another directory fails as source_changed.
+        if ! default_dir=$(gbrain sources list --json | jq -er '.sources[] | select(.id == "default") | .local_path'); then
+          echo "gbrain-serve: no local path for the default source; skipping the nightly dream run" >&2
+        elif ! timeout 3600 gbrain dream --dir "$default_dir" --phase synthesize --phase patterns; then
           echo "gbrain-serve: the nightly dream run failed; serving without it" >&2
         fi
       fi
@@ -198,9 +202,11 @@ let
       exit 1
     }
     # These select the brain or the hook's behaviour; a project shell that exports them would point
-    # the hook away from the resident server.
+    # the hook away from the resident server. The source is pinned instead of cleared: a session
+    # whose cwd lies in no source's path stays unresolved, and dream's synthesis holds its
+    # transcript, on a brain with more than one source (the conversation archive is a second).
     exec ${pkgs.coreutils}/bin/env -u DATABASE_URL -u GBRAIN_DATABASE_URL -u GBRAIN_HOME \
-      -u GBRAIN_SOURCE -u GBRAIN_HOOKS -u GBRAIN_HOOK_LANE ${gbrain}/bin/gbrain hook "$@"
+      -u GBRAIN_HOOKS -u GBRAIN_HOOK_LANE GBRAIN_SOURCE=default ${gbrain}/bin/gbrain hook "$@"
   '';
 in
 {
